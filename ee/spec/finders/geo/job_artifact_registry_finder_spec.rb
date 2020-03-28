@@ -107,13 +107,13 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
 
     describe '#count_failed' do
       before do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id, success: false)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_synced_project.id)
         create(:geo_job_artifact_registry, artifact_id: job_artifact_unsynced_project.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_broken_storage_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_expired_synced_project.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_expired_broken_storage.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_synced_project.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_broken_storage.id, success: false)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_broken_storage_1.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_expired_synced_project.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_expired_broken_storage.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_remote_synced_project.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_remote_broken_storage.id)
       end
 
       context 'without selective sync' do
@@ -229,6 +229,171 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
   end
 
   context 'finds all the things' do
+    describe '#find_registry_differences' do
+      context 'untracked IDs' do
+        before do
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id)
+          create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_broken_storage_1.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_unsynced_project.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_expired_broken_storage.id)
+        end
+
+        it 'includes Job Artifact IDs without an entry on the tracking database' do
+          untracked_ids, _ = subject.find_registry_differences(Ci::JobArtifact.first.id..Ci::JobArtifact.last.id)
+
+          expect(untracked_ids).to match_array(
+            [job_artifact_unsynced_project.id, job_artifact_remote_synced_project.id,
+             job_artifact_broken_storage_2.id, job_artifact_expired_synced_project.id,
+             job_artifact_remote_broken_storage.id])
+        end
+
+        it 'excludes Job Artifacts outside the ID range' do
+          untracked_ids, _ = subject.find_registry_differences(job_artifact_unsynced_project.id..job_artifact_broken_storage_2.id)
+
+          expect(untracked_ids).to match_array(
+            [job_artifact_unsynced_project.id, job_artifact_broken_storage_2.id])
+        end
+
+        context 'with selective sync by namespace' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+
+          it 'excludes Job Artifacts that are not in selectively synced projects' do
+            untracked_ids, _ = subject.find_registry_differences(Ci::JobArtifact.first.id..Ci::JobArtifact.last.id)
+
+            expect(untracked_ids).to match_array([job_artifact_expired_synced_project.id, job_artifact_remote_synced_project.id])
+          end
+        end
+
+        context 'with selective sync by shard' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
+
+          it 'excludes Job Artifacts that are not in selectively synced projects' do
+            untracked_ids, _ = subject.find_registry_differences(Ci::JobArtifact.first.id..Ci::JobArtifact.last.id)
+
+            expect(untracked_ids).to match_array([job_artifact_broken_storage_2.id, job_artifact_remote_broken_storage.id])
+          end
+        end
+
+        context 'with object storage sync disabled' do
+          let(:secondary) { create(:geo_node, :local_storage_only) }
+
+          it 'excludes Job Artifacts in object storage' do
+            untracked_ids, _ = subject.find_registry_differences(Ci::JobArtifact.first.id..Ci::JobArtifact.last.id)
+
+            expect(untracked_ids).to match_array(
+              [job_artifact_unsynced_project.id, job_artifact_broken_storage_2.id,
+               job_artifact_expired_synced_project.id])
+          end
+        end
+      end
+
+      context 'unused tracked IDs' do
+        context 'with an orphaned registry' do
+          let!(:orphaned) { create(:geo_job_artifact_registry, artifact_id: 1234567) }
+
+          it 'includes tracked IDs that do not exist in the model table' do
+            _, unused_tracked_ids = subject.find_registry_differences(1234567..1234567)
+
+            expect(unused_tracked_ids).to match_array([1234567])
+          end
+
+          it 'excludes IDs outside the ID range' do
+            _, unused_tracked_ids = subject.find_registry_differences(1..1000)
+
+            expect(unused_tracked_ids).to be_empty
+          end
+        end
+
+        context 'with selective sync by namespace' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+
+          context 'with a tracked Job Artifact' do
+            it 'includes tracked Job Artifact IDs that exist but are not in a selectively synced project' do
+              create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id)
+              create(:geo_job_artifact_registry, artifact_id: job_artifact_unsynced_project.id)
+
+              _, unused_tracked_ids = subject.find_registry_differences(job_artifact_synced_project.id..job_artifact_unsynced_project.id)
+
+              expect(unused_tracked_ids).to match_array([job_artifact_unsynced_project.id])
+            end
+          end
+
+          context 'without a tracked Job Artifact' do
+            it 'returns empty' do
+              _, unused_tracked_ids = subject.find_registry_differences(job_artifact_synced_project.id..job_artifact_unsynced_project.id)
+
+              expect(unused_tracked_ids).to be_empty
+            end
+          end
+        end
+
+        context 'with selective sync by shard' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
+
+          context 'with a tracked Job Artifact' do
+            it 'includes tracked Job Artifact IDs that exist but are not in a selectively synced project' do
+              create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id)
+              create(:geo_job_artifact_registry, artifact_id: job_artifact_broken_storage_1.id)
+
+              _, unused_tracked_ids = subject.find_registry_differences(job_artifact_synced_project.id..job_artifact_broken_storage_1.id)
+
+              expect(unused_tracked_ids).to match_array([job_artifact_synced_project.id])
+            end
+          end
+
+          context 'without a tracked Job Artifact' do
+            it 'returns empty' do
+              _, unused_tracked_ids = subject.find_registry_differences(job_artifact_synced_project.id..job_artifact_broken_storage_1.id)
+
+              expect(unused_tracked_ids).to be_empty
+            end
+          end
+        end
+
+        context 'with object storage sync disabled' do
+          let(:secondary) { create(:geo_node, :local_storage_only) }
+
+          context 'with a tracked Job Artifact' do
+            context 'in object storage' do
+              it 'includes tracked Job Artifact IDs that are in object storage' do
+                create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_synced_project.id)
+                range = job_artifact_remote_synced_project.id..job_artifact_remote_synced_project.id
+
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to match_array([job_artifact_remote_synced_project.id])
+              end
+            end
+
+            context 'not in object storage' do
+              it 'excludes tracked Job Artifact IDs that are not in object storage' do
+                create(:geo_lfs_object_registry, lfs_object_id: job_artifact_synced_project.id)
+                range = job_artifact_synced_project.id..job_artifact_synced_project.id
+
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to be_empty
+              end
+            end
+          end
+        end
+      end
+    end
+
+    describe '#find_never_synced_registries' do
+      let!(:registry_job_artifact_1) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_synced_project.id) }
+      let!(:registry_job_artifact_2) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_unsynced_project.id) }
+      let!(:registry_job_artifact_3) { create(:geo_job_artifact_registry, artifact_id: job_artifact_broken_storage_1.id) }
+      let!(:registry_job_artifact_4) { create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_broken_storage_2.id) }
+      let!(:registry_job_artifact_remote_1) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_remote_synced_project.id) }
+
+      it 'returns registries for Job Artifacts that have never been synced' do
+        registries = subject.find_never_synced_registries(batch_size: 10)
+
+        expect(registries).to match_ids(registry_job_artifact_1, registry_job_artifact_2, registry_job_artifact_remote_1)
+      end
+    end
+
     describe '#find_unsynced' do
       before do
         create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id, success: false)
@@ -238,7 +403,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
 
       context 'without selective sync' do
         it 'returns job artifacts without an entry on the tracking database, ignoring expired ones' do
-          job_artifacts = subject.find_unsynced(batch_size: 10, except_artifact_ids: [job_artifact_unsynced_project.id])
+          job_artifacts = subject.find_unsynced(batch_size: 10, except_ids: [job_artifact_unsynced_project.id])
 
           expect(job_artifacts).to match_ids(job_artifact_remote_synced_project, job_artifact_remote_unsynced_project,
                                              job_artifact_broken_storage_2)
@@ -285,7 +450,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
       end
 
       it 'returns job artifacts excluding ones from the exception list' do
-        job_artifacts = subject.find_migrated_local(batch_size: 10, except_artifact_ids: [job_artifact_remote_synced_project.id])
+        job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
 
         expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
       end
@@ -321,7 +486,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns job artifacts excluding ones from the exception list' do
-          job_artifacts = subject.find_migrated_local(batch_size: 10, except_artifact_ids: [job_artifact_remote_synced_project.id])
+          job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
 
           expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
         end

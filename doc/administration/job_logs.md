@@ -66,7 +66,7 @@ job output in the UI will be empty.
 
 ## New incremental logging architecture
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18169) in GitLab 10.4.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18169) in GitLab 10.4.
 > - [Announced as generally available](https://gitlab.com/gitlab-org/gitlab-foss/issues/46097) in GitLab 11.0.
 
 NOTE: **Note:**
@@ -81,7 +81,7 @@ with one change: _the stored path of the first two phases is different_. This in
 log architecture stores chunks of logs in Redis and a persistent store (object storage or database) instead of
 file storage. Redis is used as first-class storage, and it stores up-to 128KB
 of data. Once the full chunk is sent, it is flushed to a persistent store, either object storage (temporary directory) or database.
-After a while, the data in Redis and a persitent store will be archived to [object storage](#uploading-logs-to-object-storage).
+After a while, the data in Redis and a persistent store will be archived to [object storage](#uploading-logs-to-object-storage).
 
 The data are stored in the following Redis namespace: `Gitlab::Redis::SharedState`.
 
@@ -100,7 +100,7 @@ Here is the detailed data flow:
 
 The following commands are to be issued in a Rails console:
 
-```sh
+```shell
 # Omnibus GitLab
 gitlab-rails console
 

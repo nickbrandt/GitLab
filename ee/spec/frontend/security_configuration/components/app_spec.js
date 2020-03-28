@@ -1,22 +1,18 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import { GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
-
-const localVue = createLocalVue();
 
 describe('Security Configuration App', () => {
   let wrapper;
   const createComponent = (props = {}) => {
     wrapper = shallowMount(SecurityConfigurationApp, {
-      localVue,
       propsData: {
         features: [],
         autoDevopsEnabled: false,
         latestPipelinePath: 'http://latestPipelinePath',
         autoDevopsHelpPagePath: 'http://autoDevopsHelpPagePath',
         helpPagePath: 'http://helpPagePath',
-        pipelinesHelpPagePath: 'http://pipelineHelpPagePath',
         ...props,
       },
     });
@@ -49,14 +45,13 @@ describe('Security Configuration App', () => {
     });
 
     it.each`
-      autoDevopsEnabled | latestPipelinePath         | expectedUrl
-      ${true}           | ${'http://latestPipeline'} | ${'http://autoDevopsHelpPagePath'}
-      ${false}          | ${'http://latestPipeline'} | ${'http://latestPipeline'}
-      ${false}          | ${undefined}               | ${'http://pipelineHelpPagePath'}
+      autoDevopsEnabled | expectedUrl
+      ${true}           | ${'http://autoDevopsHelpPagePath'}
+      ${false}          | ${'http://latestPipelinePath'}
     `(
-      'displays a link to "$expectedUrl" when autoDevops is "$autoDevopsEnabled" and pipelinesPath is $latestPipelinePath',
-      ({ autoDevopsEnabled, latestPipelinePath, expectedUrl }) => {
-        createComponent({ autoDevopsEnabled, latestPipelinePath });
+      'displays a link to "$expectedUrl" when autoDevops is "$autoDevopsEnabled"',
+      ({ autoDevopsEnabled, expectedUrl }) => {
+        createComponent({ autoDevopsEnabled });
 
         expect(getPipelinesLink().attributes('href')).toBe(expectedUrl);
         expect(getPipelinesLink().attributes('rel')).toBe('noopener');

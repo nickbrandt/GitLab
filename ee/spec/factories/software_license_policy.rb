@@ -1,21 +1,17 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :software_license_policy, class: SoftwareLicensePolicy do
-    approval_status { 1 }
+  factory :software_license_policy, class: 'SoftwareLicensePolicy' do
+    classification { :allowed }
     project
     software_license
 
-    trait :blacklist do
-      approval_status { :blacklisted }
-    end
-
     trait :allowed do
-      approval_status { :approved }
+      classification { :allowed }
     end
 
     trait :denied do
-      approval_status { :blacklisted }
+      classification { :denied }
     end
   end
 end

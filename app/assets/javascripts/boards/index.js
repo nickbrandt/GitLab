@@ -1,33 +1,11 @@
 import $ from 'jquery';
 import Vue from 'vue';
 
-import Flash from '~/flash';
-import { __ } from '~/locale';
-import './models/label';
-import './models/assignee';
-
-import FilteredSearchBoards from '~/boards/filtered_search_boards';
-import eventHub from '~/boards/eventhub';
-import sidebarEventHub from '~/sidebar/event_hub';
 import 'ee_else_ce/boards/models/issue';
 import 'ee_else_ce/boards/models/list';
-import '~/boards/models/milestone';
-import '~/boards/models/project';
-import store from '~/boards/stores';
-import boardsStore from '~/boards/stores/boards_store';
-import ModalStore from '~/boards/stores/modal_store';
-import BoardService from 'ee_else_ce/boards/services/board_service';
-import modalMixin from '~/boards/mixins/modal_mixins';
-import '~/boards/filters/due_date_filters';
 import Board from 'ee_else_ce/boards/components/board';
 import BoardSidebar from 'ee_else_ce/boards/components/board_sidebar';
 import initNewListDropdown from 'ee_else_ce/boards/components/new_list_dropdown';
-import BoardAddIssuesModal from '~/boards/components/modal/index.vue';
-import {
-  NavigationType,
-  convertObjectPropsToCamelCase,
-  parseBoolean,
-} from '~/lib/utils/common_utils';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
 import toggleFocusMode from 'ee_else_ce/boards/toggle_focus';
 import toggleLabels from 'ee_else_ce/boards/toggle_labels';
@@ -38,6 +16,28 @@ import {
   getMilestoneTitle,
   getBoardsModalData,
 } from 'ee_else_ce/boards/ee_functions';
+
+import Flash from '~/flash';
+import { __ } from '~/locale';
+import './models/label';
+import './models/assignee';
+
+import FilteredSearchBoards from '~/boards/filtered_search_boards';
+import eventHub from '~/boards/eventhub';
+import sidebarEventHub from '~/sidebar/event_hub';
+import '~/boards/models/milestone';
+import '~/boards/models/project';
+import store from '~/boards/stores';
+import boardsStore from '~/boards/stores/boards_store';
+import ModalStore from '~/boards/stores/modal_store';
+import modalMixin from '~/boards/mixins/modal_mixins';
+import '~/boards/filters/due_date_filters';
+import BoardAddIssuesModal from '~/boards/components/modal/index.vue';
+import {
+  NavigationType,
+  convertObjectPropsToCamelCase,
+  parseBoolean,
+} from '~/lib/utils/common_utils';
 import mountMultipleBoardsSwitcher from './mount_multiple_boards_switcher';
 
 let issueBoardsApp;
@@ -68,6 +68,8 @@ export default () => {
       Board,
       BoardSidebar,
       BoardAddIssuesModal,
+      BoardSettingsSidebar: () =>
+        import('ee_component/boards/components/board_settings_sidebar.vue'),
     },
     store,
     data: {
@@ -82,7 +84,6 @@ export default () => {
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
       detailIssue: boardsStore.detail,
-      defaultAvatar: $boardApp.dataset.defaultAvatar,
     },
     computed: {
       detailIssueVisible() {
@@ -96,8 +97,8 @@ export default () => {
         listsEndpoint: this.listsEndpoint,
         bulkUpdatePath: this.bulkUpdatePath,
         boardId: this.boardId,
+        fullPath: $boardApp.dataset.fullPath,
       });
-      gl.boardService = new BoardService();
       boardsStore.rootPath = this.boardsEndpoint;
 
       eventHub.$on('updateTokens', this.updateTokens);
@@ -116,7 +117,7 @@ export default () => {
       this.filterManager.setup();
 
       boardsStore.disabled = this.disabled;
-      gl.boardService
+      boardsStore
         .all()
         .then(res => res.data)
         .then(lists => {
@@ -128,13 +129,10 @@ export default () => {
               position = -1;
             }
 
-            boardsStore.addList(
-              {
-                ...listObj,
-                position,
-              },
-              this.defaultAvatar,
-            );
+            boardsStore.addList({
+              ...listObj,
+              position,
+            });
           });
 
           boardsStore.addBlankState();
@@ -155,7 +153,8 @@ export default () => {
           newIssue.setFetchingState('subscriptions', true);
           setWeigthFetchingState(newIssue, true);
           setEpicFetchingState(newIssue, true);
-          BoardService.getIssueInfo(sidebarInfoEndpoint)
+          boardsStore
+            .getIssueInfo(sidebarInfoEndpoint)
             .then(res => res.data)
             .then(data => {
               const {
@@ -166,6 +165,7 @@ export default () => {
                 humanTotalTimeSpent,
                 weight,
                 epic,
+                assignees,
               } = convertObjectPropsToCamelCase(data);
 
               newIssue.setFetchingState('subscriptions', false);
@@ -179,6 +179,7 @@ export default () => {
                 subscribed,
                 weight,
                 epic,
+                assignees,
               });
             })
             .catch(() => {
@@ -211,7 +212,8 @@ export default () => {
         const { issue } = boardsStore.detail;
         if (issue.id === id && issue.toggleSubscriptionEndpoint) {
           issue.setFetchingState('subscriptions', true);
-          BoardService.toggleIssueSubscription(issue.toggleSubscriptionEndpoint)
+          boardsStore
+            .toggleIssueSubscription(issue.toggleSubscriptionEndpoint)
             .then(() => {
               issue.setFetchingState('subscriptions', false);
               issue.updateData({

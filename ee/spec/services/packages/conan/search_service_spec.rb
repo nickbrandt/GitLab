@@ -15,21 +15,6 @@ describe Packages::Conan::SearchService do
   end
 
   describe '#execute' do
-    context 'feature unavailable' do
-      let(:query) { '' }
-
-      before do
-        stub_feature_flags(conan_package_registry: false)
-      end
-
-      it 'responds with 404 not found' do
-        result = subject.execute
-
-        expect(result.http_status).to eq :not_found
-        expect(result.message).to eq('not found')
-      end
-    end
-
     context 'with wildcard' do
       let(:partial_name) { conan_package.name.first[0, 3] }
       let(:query) { "#{partial_name}*" }

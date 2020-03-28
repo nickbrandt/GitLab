@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::Replication::JobArtifactRetriever, :geo do
-  context '#execute' do
+  describe '#execute' do
     let(:retriever) { described_class.new(job_artifact.id, {}) }
+
     subject { retriever.execute }
 
     context 'when the job artifact exists' do

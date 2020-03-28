@@ -1,6 +1,6 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective, GlLink } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
@@ -148,7 +148,7 @@ export default {
       ];
     },
     hasNewPath() {
-      return !_.isEmpty(this.newFeatureFlagPath);
+      return !isEmpty(this.newFeatureFlagPath);
     },
     emptyStateTitle() {
       if (this.scope === this.$options.scopes.disabled) {
@@ -174,6 +174,7 @@ export default {
       'setInstanceIdEndpoint',
       'setInstanceId',
       'rotateInstanceId',
+      'toggleFeatureFlag',
     ]),
     onChangeTab(scope) {
       this.scope = scope;
@@ -247,7 +248,7 @@ export default {
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('FeatureFlags|Loading feature flags')"
-      :size="3"
+      size="md"
       class="js-loading-state prepend-top-20"
     />
 
@@ -280,6 +281,7 @@ export default {
       v-else-if="shouldRenderTable"
       :csrf-token="csrfToken"
       :feature-flags="featureFlags"
+      @toggle-flag="toggleFeatureFlag"
     />
 
     <table-pagination v-if="shouldRenderPagination" :change="onChangePage" :page-info="pageInfo" />

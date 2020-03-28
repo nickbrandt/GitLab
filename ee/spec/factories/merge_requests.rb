@@ -11,6 +11,7 @@ FactoryBot.modify do
     trait :on_train do
       transient do
         train_creator { author }
+        status { 'idle' }
       end
 
       auto_merge_enabled { true }
@@ -18,7 +19,8 @@ FactoryBot.modify do
       merge_user { train_creator }
 
       after :create do |merge_request, evaluator|
-        merge_request.create_merge_train(user: evaluator.train_creator,
+        merge_request.create_merge_train(status: evaluator.status,
+                                         user: evaluator.train_creator,
                                          target_project: merge_request.target_project,
                                          target_branch: merge_request.target_branch)
       end
@@ -77,6 +79,18 @@ FactoryBot.define do
           :ee_ci_pipeline,
           :success,
           :with_license_management_report,
+          project: merge_request.source_project,
+          ref: merge_request.source_branch,
+          sha: merge_request.diff_head_sha)
+      end
+    end
+
+    trait :with_license_scanning_reports do
+      after(:build) do |merge_request|
+        merge_request.head_pipeline = build(
+          :ee_ci_pipeline,
+          :success,
+          :with_license_scanning_report,
           project: merge_request.source_project,
           ref: merge_request.source_branch,
           sha: merge_request.diff_head_sha)

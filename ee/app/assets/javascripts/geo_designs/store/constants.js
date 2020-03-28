@@ -1,0 +1,31 @@
+export const FILTER_STATES = {
+  ALL: 'all',
+  SYNCED: 'synced',
+  PENDING: 'pending',
+  FAILED: 'failed',
+};
+
+export const DEFAULT_STATUS = 'never';
+
+export const STATUS_ICON_NAMES = {
+  [FILTER_STATES.SYNCED]: 'status_closed',
+  [FILTER_STATES.PENDING]: 'status_scheduled',
+  [FILTER_STATES.FAILED]: 'status_failed',
+  [DEFAULT_STATUS]: 'status_notfound',
+};
+
+export const STATUS_ICON_CLASS = {
+  [FILTER_STATES.SYNCED]: 'text-success',
+  [FILTER_STATES.PENDING]: 'text-warning',
+  [FILTER_STATES.FAILED]: 'text-danger',
+  [DEFAULT_STATUS]: 'text-muted',
+};
+
+export const DEFAULT_SEARCH_DELAY = 500;
+
+export const ACTION_TYPES = {
+  RESYNC: 'resync',
+  // Below not implemented yet
+  REVERIFY: 'reverify',
+  FORCE_REDOWNLOAD: 'force_redownload',
+};

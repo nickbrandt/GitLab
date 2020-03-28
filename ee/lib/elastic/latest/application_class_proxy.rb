@@ -4,6 +4,14 @@ module Elastic
   module Latest
     class ApplicationClassProxy < Elasticsearch::Model::Proxy::ClassMethodsProxy
       include ClassProxyUtil
+      include Elastic::Latest::Routing
+
+      def search(query, search_options = {})
+        es_options = routing_options(search_options)
+
+        # Calling elasticsearch-ruby method
+        super(query, es_options)
+      end
 
       def es_type
         target.name.underscore
@@ -181,7 +189,7 @@ module Elastic
       def pick_projects_by_visibility(visibility, user, features)
         condition = { term: { visibility_level: visibility } }
 
-        limit_by_feature(condition, features, include_members_only: user&.full_private_access?)
+        limit_by_feature(condition, features, include_members_only: user&.can_read_all_resources?)
       end
 
       # If a project feature(s) is specified, access is dependent on its visibility

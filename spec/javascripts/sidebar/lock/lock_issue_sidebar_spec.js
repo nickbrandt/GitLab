@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import lockIssueSidebar from '~/sidebar/components/lock/lock_issue_sidebar.vue';
 import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
+import lockIssueSidebar from '~/sidebar/components/lock/lock_issue_sidebar.vue';
 
 describe('LockIssueSidebar', () => {
   let vm1;
@@ -82,5 +82,18 @@ describe('LockIssueSidebar', () => {
 
       done();
     });
+  });
+
+  it('does not display the edit form when opened from collapsed state if not editable', done => {
+    expect(vm2.isLockDialogOpen).toBe(false);
+
+    vm2.$el.querySelector('.sidebar-collapsed-icon').click();
+
+    Vue.nextTick()
+      .then(() => {
+        expect(vm2.isLockDialogOpen).toBe(false);
+      })
+      .then(done)
+      .catch(done.fail);
   });
 });

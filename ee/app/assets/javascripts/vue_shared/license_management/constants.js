@@ -1,12 +1,18 @@
-/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+/* eslint-disable @gitlab/require-i18n-strings */
+
+/*
+ * Endpoint still returns 'approved' & 'blacklisted'
+ * even though we adopted 'allowed' & 'denied' in the UI
+ */
 export const LICENSE_APPROVAL_STATUS = {
-  APPROVED: 'approved',
-  BLACKLISTED: 'blacklisted',
+  ALLOWED: 'approved',
+  DENIED: 'blacklisted',
 };
 
-export const VERSION_1_0 = '1.0';
-export const VERSION_1_1 = '1.1';
-export const VERSION_2_0 = '2.0';
+export const LICENSE_APPROVAL_ACTION = {
+  ALLOW: 'allow',
+  DENY: 'deny',
+};
 
 export const KNOWN_LICENSES = [
   'AGPL-1.0',

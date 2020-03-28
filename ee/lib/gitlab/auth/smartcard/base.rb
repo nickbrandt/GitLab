@@ -67,6 +67,10 @@ module Gitlab
         def valid?
           self.class.store.verify(@certificate) if @certificate
         end
+
+        def password
+          @password ||= ::User.random_password
+        end
       end
     end
   end

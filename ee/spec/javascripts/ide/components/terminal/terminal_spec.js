@@ -33,7 +33,6 @@ describe('EE IDE Terminal', () => {
       },
       localVue,
       store,
-      sync: false,
     });
   };
 

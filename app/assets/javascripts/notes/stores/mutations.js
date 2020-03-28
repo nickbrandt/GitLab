@@ -169,7 +169,7 @@ export default {
     const { id, name, username } = state.userData;
 
     const hasEmojiAwardedByCurrentUser = note.award_emoji.filter(
-      emoji => emoji.name === data.awardName && emoji.user.id === id,
+      emoji => `${emoji.name}` === `${data.awardName}` && emoji.user.id === id,
     );
 
     if (hasEmojiAwardedByCurrentUser.length) {
@@ -188,6 +188,15 @@ export default {
     Object.assign(discussion, {
       expanded: forceExpanded === null ? !discussion.expanded : forceExpanded,
     });
+  },
+
+  [types.SET_EXPAND_DISCUSSIONS](state, { discussionIds, expanded }) {
+    if (discussionIds?.length) {
+      discussionIds.forEach(discussionId => {
+        const discussion = utils.findNoteObjectById(state.discussions, discussionId);
+        Object.assign(discussion, { expanded });
+      });
+    }
   },
 
   [types.UPDATE_NOTE](state, note) {
@@ -254,6 +263,10 @@ export default {
     discussion.truncated_diff_lines = utils.prepareDiffLines(diffLines);
   },
 
+  [types.SET_DISCUSSIONS_SORT](state, sort) {
+    state.discussionSortOrder = sort;
+  },
+
   [types.DISABLE_COMMENTS](state, value) {
     state.commentsDisabled = value;
   },
@@ -267,7 +280,6 @@ export default {
         discussion.resolvable &&
         discussion.notes.some(note => note.resolvable && !note.resolved),
     ).length;
-    state.hasUnresolvedDiscussions = state.unresolvedDiscussionsCount > 1;
   },
 
   [types.CONVERT_TO_DISCUSSION](state, discussionId) {
@@ -280,5 +292,30 @@ export default {
 
     convertedDisscussionIds.splice(convertedDisscussionIds.indexOf(discussionId), 1);
     Object.assign(state, { convertedDisscussionIds });
+  },
+
+  [types.SET_CURRENT_DISCUSSION_ID](state, discussionId) {
+    state.currentDiscussionId = discussionId;
+  },
+
+  [types.REQUEST_DESCRIPTION_VERSION](state) {
+    state.isLoadingDescriptionVersion = true;
+  },
+  [types.RECEIVE_DESCRIPTION_VERSION](state, { descriptionVersion, versionId }) {
+    const descriptionVersions = { ...state.descriptionVersions, [versionId]: descriptionVersion };
+    Object.assign(state, { descriptionVersions, isLoadingDescriptionVersion: false });
+  },
+  [types.RECEIVE_DESCRIPTION_VERSION_ERROR](state) {
+    state.isLoadingDescriptionVersion = false;
+  },
+  [types.REQUEST_DELETE_DESCRIPTION_VERSION](state) {
+    state.isLoadingDescriptionVersion = true;
+  },
+  [types.RECEIVE_DELETE_DESCRIPTION_VERSION](state, descriptionVersion) {
+    state.isLoadingDescriptionVersion = false;
+    Object.assign(state.descriptionVersions, descriptionVersion);
+  },
+  [types.RECEIVE_DELETE_DESCRIPTION_VERSION_ERROR](state) {
+    state.isLoadingDescriptionVersion = false;
   },
 };

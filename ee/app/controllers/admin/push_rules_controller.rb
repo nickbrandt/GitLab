@@ -3,6 +3,7 @@
 class Admin::PushRulesController < Admin::ApplicationController
   before_action :check_push_rules_available!
   before_action :push_rule
+  before_action :set_application_setting
 
   respond_to :html
 
@@ -46,4 +47,8 @@ class Admin::PushRulesController < Admin::ApplicationController
     @push_rule ||= PushRule.find_or_initialize_by(is_sample: true)
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def set_application_setting
+    @application_setting = ApplicationSetting.current_without_cache
+  end
 end

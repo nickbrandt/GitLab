@@ -32,11 +32,13 @@ class Feature
     end
 
     def persisted_names
+      return [] unless Gitlab::Database.exists?
+
       Gitlab::SafeRequestStore[:flipper_persisted_names] ||=
         begin
           # We saw on GitLab.com, this database request was called 2300
           # times/s. Let's cache it for a minute to avoid that load.
-          Gitlab::ThreadMemoryCache.cache_backend.fetch('flipper:persisted_names', expires_in: 1.minute) do
+          Gitlab::ProcessMemoryCache.cache_backend.fetch('flipper:persisted_names', expires_in: 1.minute) do
             FlipperFeature.feature_names
           end
         end
@@ -52,6 +54,10 @@ class Feature
     # use `default_enabled: true` to default the flag to being `enabled`
     # unless set explicitly.  The default is `disabled`
     def enabled?(key, thing = nil, default_enabled: false)
+      # During setup the database does not exist yet. So we haven't stored a value
+      # for the feature yet and return the default.
+      return default_enabled unless Gitlab::Database.exists?
+
       feature = Feature.get(key)
 
       # If we're not default enabling the flag or the feature has been set, always evaluate.
@@ -128,7 +134,11 @@ class Feature
     end
 
     def l1_cache_backend
-      Gitlab::ThreadMemoryCache.cache_backend
+      if Gitlab::Utils.to_boolean(ENV['USE_THREAD_MEMORY_CACHE'])
+        Gitlab::ThreadMemoryCache.cache_backend
+      else
+        Gitlab::ProcessMemoryCache.cache_backend
+      end
     end
 
     def l2_cache_backend

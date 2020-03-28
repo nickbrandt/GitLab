@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import store from '~/ide/stores';
-import CommitForm from '~/ide/components/commit_sidebar/form.vue';
-import { activityBarViews } from '~/ide/constants';
 import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import getSetTimeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 import { projectData } from 'spec/ide/mock_data';
+import store from '~/ide/stores';
+import CommitForm from '~/ide/components/commit_sidebar/form.vue';
+import { leftSidebarViews } from '~/ide/constants';
 import { resetStore } from '../../helpers';
 
 describe('IDE commit form', () => {
@@ -33,6 +33,12 @@ describe('IDE commit form', () => {
   });
 
   describe('compact', () => {
+    beforeEach(done => {
+      vm.isCompact = true;
+
+      vm.$nextTick(done);
+    });
+
     it('renders commit button in compact mode', () => {
       expect(vm.$el.querySelector('.btn-primary')).not.toBeNull();
       expect(vm.$el.querySelector('.btn-primary').textContent).toContain('Commit');
@@ -46,7 +52,7 @@ describe('IDE commit form', () => {
       vm.$store.state.stagedFiles.push('test');
 
       vm.$nextTick(() => {
-        expect(vm.$el.querySelector('p').textContent).toContain('1 unstaged and 1 staged changes');
+        expect(vm.$el.querySelector('p').textContent).toContain('1 changed file');
         done();
       });
     });
@@ -61,13 +67,32 @@ describe('IDE commit form', () => {
       });
     });
 
-    it('toggles activity bar vie when clicking commit button', done => {
+    it('toggles activity bar view when clicking commit button', done => {
       vm.$el.querySelector('.btn-primary').click();
 
       vm.$nextTick(() => {
-        expect(store.state.currentActivityView).toBe(activityBarViews.commit);
+        expect(store.state.currentActivityView).toBe(leftSidebarViews.commit.name);
 
         done();
+      });
+    });
+
+    it('collapses if lastCommitMsg is set to empty and current view is not commit view', done => {
+      store.state.lastCommitMsg = 'abc';
+      store.state.currentActivityView = leftSidebarViews.edit.name;
+
+      vm.$nextTick(() => {
+        // if commit message is set, form is uncollapsed
+        expect(vm.isCompact).toBe(false);
+
+        store.state.lastCommitMsg = '';
+
+        vm.$nextTick(() => {
+          // collapsed when set to empty
+          expect(vm.isCompact).toBe(true);
+
+          done();
+        });
       });
     });
   });
@@ -99,6 +124,17 @@ describe('IDE commit form', () => {
 
       vm.$nextTick(() => {
         expect(vm.isCompact).toBe(true);
+
+        done();
+      });
+    });
+
+    it('always opens itself in full view current activity view is not commit view when clicking commit button', done => {
+      vm.$el.querySelector('.btn-primary').click();
+
+      vm.$nextTick(() => {
+        expect(store.state.currentActivityView).toBe(leftSidebarViews.commit.name);
+        expect(vm.isCompact).toBe(false);
 
         done();
       });

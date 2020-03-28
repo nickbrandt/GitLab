@@ -1,6 +1,6 @@
-import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
 import CiTemplate from 'ee/pages/admin/application_settings/ci_cd/ci_template';
 import { setHTMLFixture } from 'helpers/fixtures';
+import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
 
 const DROPDOWN_DATA = {
   Instance: [{ name: 'test', id: 'test' }],

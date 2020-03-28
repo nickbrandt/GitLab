@@ -121,7 +121,7 @@ exports[`DependenciesTableRow component when a dependency with no vulnerabilitie
       <div
         class="table-mobile-content"
       >
-        <dependencylicenselinks-stub
+        <dependency-license-links-stub
           licenses=""
           title="left-pad"
         />
@@ -153,19 +153,20 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
       <div
         class="table-mobile-content"
       >
-        <glbutton-stub
+        <gl-button-stub
           class="bold text-warning-700 text-1 text-decoration-none js-vulnerabilities-toggle"
+          size="md"
           variant="link"
         >
           <icon-stub
             class="align-top text-secondary-700 d-none d-md-inline"
-            name="arrow-down"
+            name="chevron-down"
             size="16"
           />
           
-          7 vulnerabilities
+          8 vulnerabilities
         
-        </glbutton-stub>
+        </gl-button-stub>
       </div>
     </div>
      
@@ -256,7 +257,7 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
       <div
         class="table-mobile-content"
       >
-        <dependencylicenselinks-stub
+        <dependency-license-links-stub
           licenses=""
           title="left-pad"
         />
@@ -272,7 +273,7 @@ exports[`DependenciesTableRow component when loading matches the snapshot 1`] = 
 <div
   class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
-  <glskeletonloading-stub
+  <gl-skeleton-loading-stub
     class="d-flex flex-column justify-content-center h-auto"
     lines="1"
   />
@@ -285,7 +286,7 @@ exports[`DependenciesTableRow component when passed no props matches the snapsho
 <div
   class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
-  <glskeletonloading-stub
+  <gl-skeleton-loading-stub
     class="d-flex flex-column justify-content-center h-auto"
     lines="1"
   />

@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow */
 
+import ListIssue from 'ee_else_ce/boards/models/issue';
 import { __ } from '~/locale';
 import ListLabel from './label';
 import ListAssignee from './assignee';
-import ListIssue from 'ee_else_ce/boards/models/issue';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import flash from '~/flash';
 import boardsStore from '../stores/boards_store';
@@ -36,7 +36,7 @@ const TYPES = {
 };
 
 class List {
-  constructor(obj, defaultAvatar) {
+  constructor(obj) {
     this.id = obj.id;
     this._uid = this.guid();
     this.position = obj.position;
@@ -55,7 +55,6 @@ class List {
     this.maxIssueCount = Object.hasOwnProperty.call(obj, 'max_issue_count')
       ? obj.max_issue_count
       : 0;
-    this.defaultAvatar = defaultAvatar;
 
     if (obj.label) {
       this.label = new ListLabel(obj.label);
@@ -83,27 +82,7 @@ class List {
   }
 
   save() {
-    const entity = this.label || this.assignee || this.milestone;
-    let entityType = '';
-    if (this.label) {
-      entityType = 'label_id';
-    } else if (this.assignee) {
-      entityType = 'assignee_id';
-    } else if (IS_EE && this.milestone) {
-      entityType = 'milestone_id';
-    }
-
-    return boardsStore
-      .createList(entity.id, entityType)
-      .then(res => res.data)
-      .then(data => {
-        this.id = data.id;
-        this.type = data.list_type;
-        this.position = data.position;
-        this.label = data.label;
-
-        return this.getIssues();
-      });
+    return boardsStore.saveList(this);
   }
 
   destroy() {
@@ -176,55 +155,12 @@ class List {
 
   createIssues(data) {
     data.forEach(issueObj => {
-      this.addIssue(new ListIssue(issueObj, this.defaultAvatar));
+      this.addIssue(new ListIssue(issueObj));
     });
   }
 
   addMultipleIssues(issues, listFrom, newIndex) {
-    let moveBeforeId = null;
-    let moveAfterId = null;
-
-    const listHasIssues = issues.every(issue => this.findIssue(issue.id));
-
-    if (!listHasIssues) {
-      if (newIndex !== undefined) {
-        if (this.issues[newIndex - 1]) {
-          moveBeforeId = this.issues[newIndex - 1].id;
-        }
-
-        if (this.issues[newIndex]) {
-          moveAfterId = this.issues[newIndex].id;
-        }
-
-        this.issues.splice(newIndex, 0, ...issues);
-      } else {
-        this.issues.push(...issues);
-      }
-
-      if (this.label) {
-        issues.forEach(issue => issue.addLabel(this.label));
-      }
-
-      if (this.assignee) {
-        if (listFrom && listFrom.type === 'assignee') {
-          issues.forEach(issue => issue.removeAssignee(listFrom.assignee));
-        }
-        issues.forEach(issue => issue.addAssignee(this.assignee));
-      }
-
-      if (IS_EE && this.milestone) {
-        if (listFrom && listFrom.type === 'milestone') {
-          issues.forEach(issue => issue.removeMilestone(listFrom.milestone));
-        }
-        issues.forEach(issue => issue.addMilestone(this.milestone));
-      }
-
-      if (listFrom) {
-        this.issuesSize += issues.length;
-
-        this.updateMultipleIssues(issues, listFrom, moveBeforeId, moveAfterId);
-      }
-    }
+    boardsStore.addMultipleListIssues(this, issues, listFrom, newIndex);
   }
 
   addIssue(issue, listFrom, newIndex) {

@@ -4,11 +4,14 @@ import $ from 'jquery';
 import NewCommitForm from '../new_commit_form';
 import EditBlob from './edit_blob';
 import BlobFileDropzone from '../blob/blob_file_dropzone';
+import initPopover from '~/blob/suggest_gitlab_ci_yml';
+import { setCookie } from '~/lib/utils/common_utils';
 
 export default () => {
   const editBlobForm = $('.js-edit-blob-form');
   const uploadBlobForm = $('.js-upload-blob-form');
   const deleteBlobForm = $('.js-delete-blob-form');
+  const suggestEl = document.querySelector('.js-suggest-gitlab-ci-yml');
 
   if (editBlobForm.length) {
     const urlRoot = editBlobForm.data('relativeUrlRoot');
@@ -55,5 +58,19 @@ export default () => {
 
   if (deleteBlobForm.length) {
     new NewCommitForm(deleteBlobForm);
+  }
+
+  if (suggestEl) {
+    const commitButton = document.querySelector('#commit-changes');
+
+    initPopover(suggestEl);
+
+    if (commitButton) {
+      const commitCookieName = `suggest_gitlab_ci_yml_commit_${suggestEl.dataset.dismissKey}`;
+
+      commitButton.addEventListener('click', () => {
+        setCookie(commitCookieName, true);
+      });
+    }
   }
 };

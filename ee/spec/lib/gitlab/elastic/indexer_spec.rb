@@ -51,7 +51,7 @@ describe Gitlab::Elastic::Indexer do
         ],
         nil,
         hash_including(
-          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
           'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => nil
@@ -76,11 +76,11 @@ describe Gitlab::Elastic::Indexer do
         current_commit = project.wiki.repository.commit('master').sha
 
         described_class.new(project, wiki: true).run(current_commit)
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       def indexed_wiki_paths_for(term)
-        blobs = ProjectWiki.search(
+        blobs = ProjectWiki.elastic_search(
           term,
           type: :wiki_blob
         )[:wiki_blobs][:results].response
@@ -141,8 +141,9 @@ describe Gitlab::Elastic::Indexer do
         nil,
         hash_including(
           'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
-          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
+          'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
           'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => to_sha
         )
@@ -209,11 +210,11 @@ describe Gitlab::Elastic::Indexer do
       current_commit = project.repository.commit('master').sha
 
       described_class.new(project).run(current_commit)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     def indexed_file_paths_for(term)
-      blobs = Repository.search(
+      blobs = Repository.elastic_search(
         term,
         type: :blob
       )[:blobs][:results].response
@@ -269,6 +270,35 @@ describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'when SSL env vars are not set explicitly' do
+    let(:ruby_cert_file) { OpenSSL::X509::DEFAULT_CERT_FILE }
+    let(:ruby_cert_dir) { OpenSSL::X509::DEFAULT_CERT_DIR }
+
+    subject { envvars }
+
+    it 'they will be set to default values determined by Ruby' do
+      is_expected.to include('SSL_CERT_FILE' => ruby_cert_file, 'SSL_CERT_DIR' => ruby_cert_dir)
+    end
+  end
+
+  context 'when SSL env vars are set' do
+    let(:cert_file) { '/fake/cert.pem' }
+    let(:cert_dir) { '/fake/cert/dir' }
+
+    before do
+      stub_env('SSL_CERT_FILE', cert_file)
+      stub_env('SSL_CERT_DIR', cert_dir)
+    end
+
+    context 'when building env vars for child process' do
+      subject { envvars }
+
+      it 'SSL env vars will be included' do
+        is_expected.to include('SSL_CERT_FILE' => cert_file, 'SSL_CERT_DIR' => cert_dir)
+      end
+    end
+  end
+
   def expect_popen
     expect(Gitlab::Popen).to receive(:popen)
   end
@@ -279,5 +309,17 @@ describe Gitlab::Elastic::Indexer do
     expect(status).not_to be_nil
     expect(status.indexed_at).not_to be_nil
     expect(status.last_commit).to eq(sha)
+  end
+
+  def elasticsearch_config
+    Gitlab::CurrentSettings.elasticsearch_config.merge(
+      index_name: 'gitlab-test'
+    )
+  end
+
+  def envvars
+    indexer.send(:build_envvars,
+      Gitlab::Git::BLANK_SHA,
+      project.repository.__elasticsearch__.elastic_writing_targets.first)
   end
 end

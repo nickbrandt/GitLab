@@ -6,8 +6,7 @@ module QA
     # See https://gitlab.com/gitlab-org/gitlab/issues/13769
     describe 'Pull mirror a repository over HTTP', :requires_admin do
       it 'configures and syncs a (pull) mirrored repository with password auth' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+        Flow::Login.sign_in_as_admin
 
         source = Resource::Repository::ProjectPush.fabricate! do |project_push|
           project_push.project_name = 'pull-mirror-source-project'

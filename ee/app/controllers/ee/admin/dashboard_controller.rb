@@ -17,8 +17,8 @@ module EE
       end
 
       def stats
-        @admin_count = ::User.admins.count
         @roles_count = ::ProjectAuthorization.roles_stats
+        @bot_count = ::User.bots.count
       end
 
       # The license section may time out if the number of users is

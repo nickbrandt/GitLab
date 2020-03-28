@@ -46,7 +46,7 @@ describe 'GraphQL' do
       end
 
       it 'logs the exception in Sentry and continues with the request' do
-        expect(Gitlab::Sentry).to receive(:track_exception).at_least(1).times
+        expect(Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception).at_least(:once)
         expect(Gitlab::GraphqlLogger).to receive(:info)
 
         post_graphql(query, variables: {})
@@ -58,7 +58,7 @@ describe 'GraphQL' do
     it 'returns an error' do
       post_graphql(query, variables: "This is not JSON")
 
-      expect(response).to have_gitlab_http_status(422)
+      expect(response).to have_gitlab_http_status(:unprocessable_entity)
       expect(json_response['errors'].first['message']).not_to be_nil
     end
   end
@@ -114,7 +114,7 @@ describe 'GraphQL' do
 
           post_graphql(query, headers: { 'PRIVATE-TOKEN' => token.token })
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
 
           expect(graphql_data['echo']).to eq('nil says: Hello world')
         end
@@ -146,9 +146,44 @@ describe 'GraphQL' do
       end
 
       it "logs a warning that the 'calls_gitaly' field declaration is missing" do
-        expect(Gitlab::Sentry).to receive(:track_exception).once
+        expect(Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception).once
 
         post_graphql(query, current_user: user)
+      end
+    end
+  end
+
+  describe 'resolver complexity' do
+    let_it_be(:project) { create(:project, :public) }
+    let(:query) do
+      graphql_query_for(
+        'project',
+        { 'fullPath' => project.full_path },
+        query_graphql_field(resource, {}, 'edges { node { iid } }')
+      )
+    end
+
+    before do
+      stub_const('GitlabSchema::DEFAULT_MAX_COMPLEXITY', 6)
+    end
+
+    context 'when fetching single resource' do
+      let(:resource) { 'issues(first: 1)' }
+
+      it 'processes the query' do
+        post_graphql(query)
+
+        expect(graphql_errors).to be_nil
+      end
+    end
+
+    context 'when fetching too many resources' do
+      let(:resource) { 'issues(first: 100)' }
+
+      it 'returns an error' do
+        post_graphql(query)
+
+        expect_graphql_errors_to_include(/which exceeds max complexity/)
       end
     end
   end

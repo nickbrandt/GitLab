@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, plan: :bronze_plan) }
+  let_it_be(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -14,6 +14,29 @@ describe Ci::Build do
   end
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
+  let(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
+
+  describe '.license_scan' do
+    subject(:build) { described_class.license_scan.first }
+
+    let(:artifact) { build.job_artifacts.first }
+
+    context 'with old license_management artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_management' }
+    end
+
+    context 'with new license_scanning artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_scanning' }
+    end
+  end
+
+  describe 'associations' do
+    it { is_expected.to have_many(:security_scans) }
+  end
 
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
@@ -23,7 +46,7 @@ describe Ci::Build do
         job.runner = create(:ci_runner, :instance)
       end
 
-      it do
+      specify do
         expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
           .and_return(true)
 
@@ -112,58 +135,59 @@ describe Ci::Build do
 
     context 'when build has a security report' do
       context 'when there is a sast report' do
-        before do
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-        end
+        let!(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
 
         it 'parses blobs and add the results to the report' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
+          expect(security_reports.get_report('sast', artifact).occurrences.size).to eq(33)
+        end
+
+        it 'adds the created date to the report' do
+          subject
+
+          expect(security_reports.get_report('sast', artifact).created_at.to_s).to eq(artifact.created_at.to_s)
         end
       end
 
       context 'when there are multiple reports' do
-        before do
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dast, job: job, project: job.project)
-        end
+        let!(:sast_artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
+        let!(:ds_artifact) { create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project) }
+        let!(:cs_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project) }
+        let!(:dast_artifact) { create(:ee_ci_job_artifact, :dast, job: job, project: job.project) }
 
         it 'parses blobs and adds the results to the reports' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
-          expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
-          expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
-          expect(security_reports.get_report('dast').occurrences.size).to eq(20)
+          expect(security_reports.get_report('sast', sast_artifact).occurrences.size).to eq(33)
+          expect(security_reports.get_report('dependency_scanning', ds_artifact).occurrences.size).to eq(4)
+          expect(security_reports.get_report('container_scanning', cs_artifact).occurrences.size).to eq(8)
+          expect(security_reports.get_report('dast', dast_artifact).occurrences.size).to eq(20)
         end
       end
 
       context 'when there is a corrupted sast report' do
-        before do
-          create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
-        end
+        let!(:artifact) { create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project) }
 
         it 'stores an error' do
           subject
 
-          expect(security_reports.get_report('sast')).to be_errored
+          expect(security_reports.get_report('sast', artifact)).to be_errored
         end
       end
     end
 
     context 'when there is unsupported file type' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :codequality, job: job, project: job.project) }
+
       before do
         stub_const("Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES", %w[codequality])
-        create(:ee_ci_job_artifact, :codequality, job: job, project: job.project)
       end
 
       it 'stores an error' do
         subject
 
-        expect(security_reports.get_report('codequality')).to be_errored
+        expect(security_reports.get_report('codequality', artifact)).to be_errored
       end
     end
   end
@@ -174,7 +198,7 @@ describe Ci::Build do
     let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     it { expect(license_scanning_report.licenses.count).to eq(0) }
@@ -196,7 +220,7 @@ describe Ci::Build do
 
       context 'when there is a corrupted license management report' do
         before do
-          create(:ee_ci_job_artifact, :corrupted_license_management_report, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: job, project: job.project)
         end
 
         it 'raises an error' do
@@ -219,7 +243,7 @@ describe Ci::Build do
 
       context 'when the license management feature is disabled' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
@@ -240,12 +264,12 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add the results to the report' do
         subject
-        blob_path = "/#{project.full_path}/blob/#{job.sha}/yarn/yarn.lock"
+        blob_path = "/#{project.full_path}/-/blob/#{job.sha}/yarn/yarn.lock"
         mini_portile2 = dependency_list_report.dependencies[0]
         yarn = dependency_list_report.dependencies[20]
 
@@ -277,7 +301,7 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add found license' do
@@ -320,7 +344,7 @@ describe Ci::Build do
 
       context 'when license does not have metrics_reports' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
         end
 
         it 'does not parse metrics report' do

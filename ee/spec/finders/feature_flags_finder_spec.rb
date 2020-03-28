@@ -75,24 +75,21 @@ describe FeatureFlagsFinder do
       end
     end
 
-    context 'when it is presented for list' do
-      let!(:feature_flag_1) { create(:operations_feature_flag, project: project, active: false) }
-      let!(:feature_flag_2) { create(:operations_feature_flag, project: project, active: false) }
+    context 'when new version flags are enabled' do
+      let!(:feature_flag_3) { create(:operations_feature_flag, :new_version_flag, name: 'flag-c', project: project) }
 
-      context 'when there is an active scope' do
-        before do
-          create_scope(feature_flag_1, 'review/*', true)
-        end
-
-        it 'presents a virtual active value' do
-          expect(subject.map(&:active)).to eq([true, false])
-        end
+      it 'returns new and legacy flags' do
+        is_expected.to eq([feature_flag_1, feature_flag_2, feature_flag_3])
       end
+    end
 
-      context 'when there are no active scopes' do
-        it 'presents a virtual active value' do
-          expect(subject.map(&:active)).to eq([false, false])
-        end
+    context 'when new version flags are disabled' do
+      let!(:feature_flag_3) { create(:operations_feature_flag, :new_version_flag, name: 'flag-c', project: project) }
+
+      it 'returns only legacy flags' do
+        stub_feature_flags(feature_flags_new_version: false)
+
+        is_expected.to eq([feature_flag_1, feature_flag_2])
       end
     end
   end

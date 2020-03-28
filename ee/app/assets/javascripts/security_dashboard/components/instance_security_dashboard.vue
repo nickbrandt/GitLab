@@ -3,7 +3,7 @@ import { mapActions, mapState } from 'vuex';
 import { GlButton, GlEmptyState, GlLink, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectManager from './project_manager.vue';
-import SecurityDashboard from './app.vue';
+import SecurityDashboard from './security_dashboard_vuex.vue';
 
 export default {
   name: 'InstanceSecurityDashboard',
@@ -40,10 +40,6 @@ export default {
       type: String,
       required: true,
     },
-    vulnerabilitiesCountEndpoint: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesHistoryEndpoint: {
       type: String,
       required: true,
@@ -51,6 +47,11 @@ export default {
     vulnerabilityFeedbackHelpPath: {
       type: String,
       required: true,
+    },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {
@@ -139,12 +140,10 @@ export default {
 
         <security-dashboard
           v-else
-          :dashboard-documentation="dashboardDocumentation"
-          :empty-state-svg-path="emptyDashboardStateSvgPath"
           :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
-          :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
           :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
           :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+          :vulnerable-projects-endpoint="vulnerableProjectsEndpoint"
         />
       </template>
     </template>

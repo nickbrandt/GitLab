@@ -1,14 +1,14 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import _ from 'underscore';
+import { debounce } from 'lodash';
 
 import ListLabel from '../../models/label';
 
-import LabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
+import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 
 export default {
   components: {
-    LabelsSelect,
+    LabelsSelectVue,
   },
   props: {
     canUpdate: {
@@ -27,6 +27,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'epicId',
       'labels',
       'namespace',
       'updateEndpoint',
@@ -35,6 +36,7 @@ export default {
       'epicsWebUrl',
       'scopedLabels',
       'scopedLabelsDocumentationLink',
+      'epicLabelsSelectInProgress',
     ]),
     epicContext() {
       return {
@@ -55,7 +57,7 @@ export default {
     );
   },
   methods: {
-    ...mapActions(['toggleSidebar']),
+    ...mapActions(['toggleSidebar', 'updateEpicLabels']),
     toggleSidebarRevealLabelsDropdown() {
       const contentContainer = this.$el.closest('.page-with-contextual-sidebar');
       this.toggleSidebar({ sidebarCollapsed: this.sidebarCollapsed });
@@ -64,7 +66,7 @@ export default {
       // dropdown as otherwise it causes `calc()`
       // used in CSS to miscalculate collapsed
       // sidebar size.
-      _.debounce(() => {
+      debounce(() => {
         this.sidebarExpandedOnClick = true;
         if (contentContainer) {
           contentContainer
@@ -90,7 +92,7 @@ export default {
             new ListLabel({
               id: label.id,
               title: label.title,
-              color: label.color[0],
+              color: label.color,
               textColor: label.text_color,
             }),
           );
@@ -99,26 +101,28 @@ export default {
         }
       }
     },
+    handleUpdateSelectedLabels(labels) {
+      this.updateEpicLabels(labels);
+    },
   },
 };
 </script>
 
 <template>
-  <labels-select
-    :can-edit="canUpdate"
-    :context="epicContext"
-    :namespace="namespace"
-    :update-path="updateEndpoint"
-    :labels-path="labelsPath"
-    :labels-web-url="labelsWebUrl"
-    :label-filter-base-path="epicsWebUrl"
-    :show-create="true"
-    :enable-scoped-labels="scopedLabels"
-    :scoped-labels-documentation-link="scopedLabelsDocumentationLink"
-    ability-name="epic"
-    @onLabelClick="handleLabelClick"
+  <labels-select-vue
+    :allow-label-edit="canUpdate"
+    :allow-label-create="true"
+    :allow-scoped-labels="scopedLabels"
+    :selected-labels="labels"
+    :labels-select-in-progress="epicLabelsSelectInProgress"
+    :labels-fetch-path="labelsPath"
+    :labels-manage-path="labelsWebUrl"
+    :labels-filter-base-path="epicsWebUrl"
+    :scoped-labels-documentation-path="scopedLabelsDocumentationLink"
+    class="block labels js-labels-block"
+    @updateSelectedLabels="handleUpdateSelectedLabels"
     @onDropdownClose="handleDropdownClose"
     @toggleCollapse="toggleSidebarRevealLabelsDropdown"
-    >{{ __('None') }}</labels-select
+    >{{ __('None') }}</labels-select-vue
   >
 </template>

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
-import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 import $ from 'jquery';
+import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 
 jest.mock('~/lib/utils/common_utils', () => ({
   debounceByAnimationFrame(callback) {
@@ -14,7 +14,6 @@ describe('Resizable Chart Container', () => {
 
   beforeEach(() => {
     wrapper = mount(ResizableChartContainer, {
-      attachToDocument: true,
       scopedSlots: {
         default: `
         <div class="slot" slot-scope="{ width, height }">

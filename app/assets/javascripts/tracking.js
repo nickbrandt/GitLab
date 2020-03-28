@@ -54,7 +54,7 @@ export default class Tracking {
 
   static event(category = document.body.dataset.page, action = 'generic', data = {}) {
     if (!this.enabled()) return false;
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+    // eslint-disable-next-line @gitlab/require-i18n-strings
     if (!category) throw new Error('Tracking: no category provided for tracking.');
 
     const { label, property, value, context } = data;
@@ -73,20 +73,25 @@ export default class Tracking {
     return handlers;
   }
 
-  static mixin(opts) {
+  static mixin(opts = {}) {
     return {
-      data() {
-        return {
-          tracking: {
-            // eslint-disable-next-line no-underscore-dangle
-            category: this.$options.name || this.$options._componentTag,
-          },
-        };
+      computed: {
+        trackingCategory() {
+          const localCategory = this.tracking ? this.tracking.category : null;
+          return localCategory || opts.category;
+        },
+        trackingOptions() {
+          return { ...opts, ...this.tracking };
+        },
       },
       methods: {
-        track(action, data) {
-          const category = opts.category || data.category || this.tracking.category;
-          Tracking.event(category || 'unspecified', action, { ...opts, ...this.tracking, ...data });
+        track(action, data = {}) {
+          const category = data.category || this.trackingCategory;
+          const options = {
+            ...this.trackingOptions,
+            ...data,
+          };
+          Tracking.event(category, action, options);
         },
       },
     };
@@ -106,4 +111,6 @@ export function initUserTracking() {
   if (opts.linkClickTracking) window.snowplow('enableLinkClickTracking');
 
   Tracking.bindDocument();
+
+  document.dispatchEvent(new Event('SnowplowInitialized'));
 }

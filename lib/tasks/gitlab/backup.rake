@@ -3,23 +3,30 @@ require 'active_record/fixtures'
 namespace :gitlab do
   namespace :backup do
     # Create backup of GitLab system
-    desc "GitLab | Create a backup of the GitLab system"
+    desc 'GitLab | Backup | Create a backup of the GitLab system'
     task create: :gitlab_environment do
       warn_user_is_not_gitlab
 
-      Rake::Task["gitlab:backup:db:create"].invoke
-      Rake::Task["gitlab:backup:repo:create"].invoke
-      Rake::Task["gitlab:backup:uploads:create"].invoke
-      Rake::Task["gitlab:backup:builds:create"].invoke
-      Rake::Task["gitlab:backup:artifacts:create"].invoke
-      Rake::Task["gitlab:backup:pages:create"].invoke
-      Rake::Task["gitlab:backup:lfs:create"].invoke
-      Rake::Task["gitlab:backup:registry:create"].invoke
+      Rake::Task['gitlab:backup:db:create'].invoke
+      Rake::Task['gitlab:backup:repo:create'].invoke
+      Rake::Task['gitlab:backup:uploads:create'].invoke
+      Rake::Task['gitlab:backup:builds:create'].invoke
+      Rake::Task['gitlab:backup:artifacts:create'].invoke
+      Rake::Task['gitlab:backup:pages:create'].invoke
+      Rake::Task['gitlab:backup:lfs:create'].invoke
+      Rake::Task['gitlab:backup:registry:create'].invoke
 
       backup = Backup::Manager.new(progress)
-      backup.pack
-      backup.cleanup
-      backup.remove_old
+      backup.write_info
+
+      if ENV['SKIP'] && ENV['SKIP'].include?('tar')
+        backup.upload
+      else
+        backup.pack
+        backup.upload
+        backup.cleanup
+        backup.remove_old
+      end
 
       progress.puts "Warning: Your gitlab.rb and gitlab-secrets.json files contain sensitive data \n" \
            "and are not included in this backup. You will need these files to restore a backup.\n" \
@@ -28,12 +35,13 @@ namespace :gitlab do
     end
 
     # Restore backup of GitLab system
-    desc 'GitLab | Restore a previously created backup'
+    desc 'GitLab | Backup | Restore a previously created backup'
     task restore: :gitlab_environment do
       warn_user_is_not_gitlab
 
       backup = Backup::Manager.new(progress)
-      backup.unpack
+      cleanup_required = backup.unpack
+      backup.verify_backup_version
 
       unless backup.skipped?('db')
         begin
@@ -72,7 +80,10 @@ namespace :gitlab do
       Rake::Task['gitlab:shell:setup'].invoke
       Rake::Task['cache:clear'].invoke
 
-      backup.cleanup
+      if cleanup_required
+        backup.cleanup
+      end
+
       puts "Warning: Your gitlab.rb and gitlab-secrets.json files contain sensitive data \n" \
            "and are not included in this backup. You will need to restore these files manually.".color(:red)
       puts "Restore task is done."

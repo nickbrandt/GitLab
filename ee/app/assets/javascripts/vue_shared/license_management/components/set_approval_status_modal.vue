@@ -1,42 +1,40 @@
 <script>
-import { s__ } from '~/locale';
 import { mapActions, mapState } from 'vuex';
-import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
+import { s__ } from '~/locale';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import LicensePackages from './license_packages.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 export default {
   name: 'LicenseSetApprovalStatusModal',
   components: { SafeLink, LicensePackages, GlModal: DeprecatedModal2 },
   computed: {
-    ...mapState(['currentLicenseInModal', 'canManageLicenses']),
+    ...mapState(LICENSE_MANAGEMENT, ['currentLicenseInModal', 'canManageLicenses']),
     headerTitleText() {
       if (!this.canManageLicenses) {
         return s__('LicenseCompliance|License details');
       }
-      if (this.canApprove) {
-        return s__('LicenseCompliance|Approve license?');
-      }
-      return s__('LicenseCompliance|Blacklist license?');
+      return s__('LicenseCompliance|License review');
     },
     canApprove() {
       return (
         this.canManageLicenses &&
         this.currentLicenseInModal &&
-        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.APPROVED
+        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.ALLOWED
       );
     },
     canBlacklist() {
       return (
         this.canManageLicenses &&
         this.currentLicenseInModal &&
-        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.BLACKLISTED
+        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.DENIED
       );
     },
   },
   methods: {
-    ...mapActions(['resetLicenseInModal', 'approveLicense', 'blacklistLicense']),
+    ...mapActions(LICENSE_MANAGEMENT, ['resetLicenseInModal', 'allowLicense', 'denyLicense']),
   },
 };
 </script>
@@ -95,9 +93,9 @@ export default {
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
         data-qa-selector="blacklist_license_button"
-        @click="blacklistLicense(currentLicenseInModal)"
+        @click="denyLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseCompliance|Blacklist license') }}
+        {{ s__('LicenseCompliance|Deny') }}
       </button>
       <button
         v-if="canApprove"
@@ -105,9 +103,9 @@ export default {
         class="btn btn-success js-modal-primary-action"
         data-dismiss="modal"
         data-qa-selector="approve_license_button"
-        @click="approveLicense(currentLicenseInModal)"
+        @click="allowLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseCompliance|Approve license') }}
+        {{ s__('LicenseCompliance|Allow') }}
       </button>
     </template>
   </gl-modal>

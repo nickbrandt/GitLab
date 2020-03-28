@@ -9,7 +9,7 @@ describe Issue do
 
   context 'callbacks' do
     describe '.after_create' do
-      set(:project) { create(:project) }
+      let_it_be(:project) { create(:project) }
       let(:author) { User.alert_bot }
 
       context 'when issue title is "New: Incident"' do
@@ -67,19 +67,39 @@ describe Issue do
       end
     end
 
-    describe '.in_epics' do
+    describe '.counts_by_health_status' do
+      it 'returns counts grouped by health_status' do
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :at_risk)
+
+        expect(Issue.counts_by_health_status).to eq({ 'on_track' => 2, 'at_risk' => 1 } )
+      end
+    end
+
+    context 'epics' do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }
       let_it_be(:epic_issue1) { create(:epic_issue, epic: epic1) }
       let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2) }
+      let_it_be(:issue_no_epic) { create(:issue) }
 
       before do
         stub_licensed_features(epics: true)
       end
 
-      it 'returns only issues in selected epics' do
-        expect(described_class.count).to eq 2
-        expect(described_class.in_epics([epic1])).to eq [epic_issue1.issue]
+      describe '.no_epic' do
+        it 'returns only issues without an epic assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.no_epic).to eq [issue_no_epic]
+        end
+      end
+
+      describe '.in_epics' do
+        it 'returns only issues in selected epics' do
+          expect(described_class.count).to eq 3
+          expect(described_class.in_epics([epic1])).to eq [epic_issue1.issue]
+        end
       end
     end
   end
@@ -116,6 +136,7 @@ describe Issue do
     it { is_expected.to have_many(:vulnerability_links).class_name('Vulnerabilities::IssueLink').inverse_of(:issue) }
     it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
     it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
+    it { is_expected.to have_many(:resource_weight_events) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
@@ -161,6 +182,13 @@ describe Issue do
           .to contain_exactly(authorized_issue_b, authorized_issue_c)
     end
 
+    it 'returns issues with valid issue_link_type' do
+      link_types = authorized_issue_a.related_issues(user).map(&:issue_link_type)
+
+      expect(link_types).not_to be_empty
+      expect(link_types).not_to include(nil)
+    end
+
     describe 'when a user cannot read cross project' do
       it 'only returns issues within the same project' do
         expect(Ability).to receive(:allowed?).with(user, :read_all_resources, :global).and_call_original
@@ -187,6 +215,17 @@ describe Issue do
       issue = build(:issue)
 
       expect(issue.allows_multiple_assignees?).to be_truthy
+    end
+  end
+
+  describe '.simple_sorts' do
+    it 'includes weight with other base keys' do
+      expect(Issue.simple_sorts.keys).to match_array(
+        %w(created_asc created_at_asc created_date created_desc created_at_desc
+           closest_future_date closest_future_date_asc due_date due_date_asc due_date_desc
+           id_asc id_desc relative_position relative_position_asc
+           updated_desc updated_asc updated_at_asc updated_at_desc
+           weight weight_asc weight_desc))
     end
   end
 
@@ -259,6 +298,7 @@ describe Issue do
 
   describe '#promoted?' do
     let(:issue) { create(:issue) }
+
     subject { issue.promoted? }
 
     context 'issue not promoted' do
@@ -270,6 +310,49 @@ describe Issue do
       let(:issue) { create(:issue, promoted_to_epic: promoted_to_epic) }
 
       it { is_expected.to be_truthy }
+    end
+  end
+
+  context 'ES related specs', :elastic do
+    before do
+      stub_ee_application_setting(elasticsearch_indexing: true)
+    end
+
+    context 'when updating an Issue' do
+      let(:project) { create(:project, :public) }
+      let(:issue) { create(:issue, project: project, confidential: true) }
+
+      before do
+        Sidekiq::Testing.disable! do
+          create(:note, note: 'the_normal_note', noteable: issue, project: project)
+        end
+        Sidekiq::Testing.inline! do
+          project.maintain_elasticsearch_update
+
+          issue.update!(update_field => update_value)
+          ensure_elasticsearch_index!
+        end
+      end
+
+      context 'when changing the confidential value' do
+        let(:update_field) { :confidential }
+        let(:update_value) { false }
+
+        it 'updates issue notes excluding system notes' do
+          expect(issue.elasticsearch_issue_notes_need_updating?).to eq(true)
+          expect(Note.elastic_search('the_normal_note', options: { project_ids: [issue.project.id] }).present?).to eq(true)
+        end
+      end
+
+      context 'when changing the title' do
+        let(:update_field) { :title }
+        let(:update_value) { 'abc' }
+
+        it 'does not update issue notes' do
+          expect(issue.elasticsearch_issue_notes_need_updating?).to eq(false)
+          expect(Note.elastic_search('the_normal_note', options: { project_ids: [issue.project.id] }).present?).to eq(false)
+        end
+      end
     end
   end
 
@@ -480,6 +563,7 @@ describe Issue do
 
   describe 'current designs' do
     let(:issue) { create(:issue) }
+
     subject { issue.designs.current }
 
     context 'an issue has no designs' do
@@ -508,6 +592,98 @@ describe Issue do
       let!(:design_c) { create(:design, :with_file, issue: issue) }
 
       it { is_expected.to contain_exactly(design_a, design_c) }
+    end
+  end
+
+  describe "#issue_link_type" do
+    let(:issue) { build(:issue) }
+
+    it 'returns nil for a regular issue' do
+      expect(issue.issue_link_type).to be_nil
+    end
+
+    where(:id, :issue_link_source_id, :issue_link_type_value, :expected) do
+      1 | 1   | 0 | 'relates_to'
+      1 | 1   | 1 | 'blocks'
+      1 | 2   | 3 | 'relates_to'
+      1 | 2   | 1 | 'is_blocked_by'
+      1 | 2   | 2 | 'blocks'
+    end
+
+    with_them do
+      let(:issue) { build(:issue) }
+      subject { issue.issue_link_type }
+
+      before do
+        allow(issue).to receive(:id).and_return(id)
+        allow(issue).to receive(:issue_link_source_id).and_return(issue_link_source_id)
+        allow(issue).to receive(:issue_link_type_value).and_return(issue_link_type_value)
+      end
+
+      it { is_expected.to eq(expected) }
+    end
+  end
+
+  describe "#blocked_by_issues" do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:issue) { create(:issue, project: project) }
+    let_it_be(:blocking_issue) { create(:issue, project: project) }
+    let_it_be(:other_project_blocking_issue) { create(:issue) }
+    let_it_be(:blocked_by_issue) { create(:issue, project: project) }
+    let_it_be(:confidential_blocked_by_issue) { create(:issue, :confidential, project: project) }
+    let_it_be(:related_issue) { create(:issue, project: project) }
+    let_it_be(:closed_blocking_issue) { create(:issue, project: project, state: :closed) }
+
+    before_all do
+      create(:issue_link, source: blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: other_project_blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: issue, target: blocked_by_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: issue, target: confidential_blocked_by_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: issue, target: related_issue, link_type: IssueLink::TYPE_RELATES_TO)
+      create(:issue_link, source: closed_blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+    end
+
+    context 'when user can read issues' do
+      it 'returns blocked issues' do
+        project.add_developer(user)
+        other_project_blocking_issue.project.add_developer(user)
+
+        expect(issue.blocked_by_issues(user)).to match_array([blocking_issue, blocked_by_issue, other_project_blocking_issue, confidential_blocked_by_issue])
+      end
+    end
+
+    context 'when user cannot read issues' do
+      it 'returns empty array' do
+        expect(issue.blocked_by_issues(user)).to be_empty
+      end
+    end
+
+    context 'when user can read some issues' do
+      it 'returns issues that user can read' do
+        guest = create(:user)
+        project.add_guest(guest)
+
+        expect(issue.blocked_by_issues(guest)).to match_array([blocking_issue, blocked_by_issue])
+      end
+    end
+  end
+
+  it_behaves_like 'having health status'
+
+  describe '#service_desk?' do
+    subject { issue.from_service_desk? }
+
+    context 'when issue author is support bot' do
+      let(:issue) { create(:issue, author: ::User.support_bot) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when issue author is not support bot' do
+      let(:issue) { create(:issue) }
+
+      it { is_expected.to be_falsey }
     end
   end
 end

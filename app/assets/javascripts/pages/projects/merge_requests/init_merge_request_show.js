@@ -6,7 +6,7 @@ import howToMerge from '~/how_to_merge';
 import initPipelines from '~/commit/pipelines/pipelines_bundle';
 import initVueIssuableSidebarApp from '~/issuable_sidebar/sidebar_bundle';
 import initSourcegraph from '~/sourcegraph';
-import initWidget from '../../../vue_merge_request_widget';
+import initPopover from '~/mr_tabs_popover';
 
 export default function() {
   new ZenMode(); // eslint-disable-line no-new
@@ -19,6 +19,11 @@ export default function() {
   new ShortcutsIssuable(true); // eslint-disable-line no-new
   handleLocationHash();
   howToMerge();
-  initWidget();
   initSourcegraph();
+
+  const tabHighlightEl = document.querySelector('.js-tabs-feature-highlight');
+
+  if (tabHighlightEl) {
+    initPopover(tabHighlightEl);
+  }
 }

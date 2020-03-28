@@ -4,8 +4,8 @@ The internal API is used by different GitLab components, it can not be
 used by other consumers. This documentation is intended for people
 working on the GitLab codebase.
 
-This documentation does not yet include the internal api used by
-GitLab pages.
+This documentation does not yet include the internal API used by
+GitLab Pages.
 
 ## Authentication
 
@@ -15,11 +15,11 @@ default this is in the root of the rails app named
 `.gitlab_shell_secret`
 
 To authenticate using that token, clients read the contents of that
-file, and include the token Base64 encoded in a `secret_token` param
+file, and include the token Base64 encoded in a `secret_token` parameter
 or in the `Gitlab-Shared-Secret` header.
 
 NOTE: **Note:**
-The internal api used by GitLab pages uses a different kind of
+The internal API used by GitLab Pages uses a different kind of
 authentication.
 
 ## Git Authentication
@@ -34,7 +34,7 @@ Gitaly.
 When called from Gitaly in a `pre-receive` hook the changes are passed
 and those are validated to determine if the push is allowed.
 
-```
+```plaintext
 POST /internal/allowed
 ```
 
@@ -47,17 +47,17 @@ POST /internal/allowed
 | `protocol` | string | yes     | SSH when called from GitLab-shell, HTTP or SSH when called from Gitaly |
 | `action`   | string | yes     | Git command being run (`git-upload-pack`, `git-receive-pack`, `git-upload-archive`) |
 | `changes`  | string | yes     | `<oldrev> <newrev> <refname>` when called from Gitaly, The magic string `_any` when called from GitLab Shell |
-| `check_ip` | string | no     | Ip adress from which call to GitLab Shell was made |
+| `check_ip` | string | no     | Ip address from which call to GitLab Shell was made |
 
 Example request:
 
-```sh
+```shell
 curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --data "key_id=11&project=gnuwget/wget2&action=git-upload-pack&protocol=ssh" http://localhost:3001/api/v4/internal/allowed
 ```
 
 Example response:
 
-```
+```json
 {
   "status": true,
   "gl_repository": "project-3",
@@ -99,11 +99,11 @@ information for LFS clients when the repository is accessed over SSH.
 
 Example request:
 
-```sh
+```shell
 curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --data "key_id=11&project=gnuwget/wget2" http://localhost:3001/api/v4/internal/lfs_authenticate
 ```
 
-```
+```json
 {
   "username": "root",
   "lfs_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImFjdG9yIjoicm9vdCJ9LCJqdGkiOiIyYWJhZDcxZC0xNDFlLTQ2NGUtOTZlMi1mODllYWRiMGVmZTYiLCJpYXQiOjE1NzAxMTc2NzYsIm5iZiI6MTU3MDExNzY3MSwiZXhwIjoxNTcwMTE5NDc2fQ.g7atlBw1QMY7QEBVPE0LZ8ZlKtaRzaMRmNn41r2YITM",
@@ -119,26 +119,26 @@ curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --da
 ## Authorized Keys Check
 
 This endpoint is called by the GitLab-shell authorized keys
-check. Which is called by OpenSSH for [fast ssh key
+check. Which is called by OpenSSH for [fast SSH key
 lookup](../administration/operations/fast_ssh_key_lookup.md).
 
 | Attribute | Type   | Required | Description |
 |:----------|:-------|:---------|:------------|
 | `key`     | string | yes      | SSH key as passed by OpenSSH to GitLab-shell |
 
-```
+```plaintext
 GET /internal/authorized_keys
 ```
 
 Example request:
 
-```sh
+```shell
 curl --request GET --header "Gitlab-Shared-Secret: <Base64 encoded secret>""http://localhost:3001/api/v4/internal/authorized_keys?key=<key as passed by OpenSSH>"
 ```
 
 Example response:
 
-```
+```json
 {
   "id": 11,
   "title": "admin@example.com",
@@ -161,19 +161,19 @@ discovers the user associated with an SSH key.
 | `key_id` | integer | no | The id of the SSH key used as found in the authorized-keys file or through the `/authorized_keys` check |
 | `username` | string | no | Username of the user being looked up, used by GitLab-shell when authenticating using a certificate |
 
-```
+```plaintext
 GET /internal/discover
 ```
 
 Example request:
 
-```sh
+```shell
 curl --request GET --header "Gitlab-Shared-Secret: <Base64 encoded secret>" "http://localhost:3001/api/v4/internal/discover?key_id=7"
 ```
 
 Example response:
 
-```
+```json
 {
   "id": 7,
   "name": "Dede Eichmann",
@@ -187,22 +187,22 @@ Example response:
 
 ## Instance information
 
-This get's some generic information about the instance. This is used
-by Geo nodes to get information about eachother
+This gets some generic information about the instance. This is used
+by Geo nodes to get information about each other
 
-```
+```plaintext
 GET /internal/check
 ```
 
 Example request:
 
-```sh
+```shell
 curl --request GET --header "Gitlab-Shared-Secret: <Base64 encoded secret>" "http://localhost:3001/api/v4/internal/check"
 ```
 
 Example response:
 
-```
+```json
 {
   "api_version": "v4",
   "gitlab_version": "12.3.0-pre",
@@ -226,19 +226,19 @@ recovery codes based on their SSH key
 | `key_id`  | integer | no | The id of the SSH key used as found in the authorized-keys file or through the `/authorized_keys` check |
 | `user_id` | integer | no | **Deprecated** User_id for which to generate new recovery codes |
 
-```
+```plaintext
 GET /internal/two_factor_recovery_codes
 ```
 
 Example request:
 
-```sh
+```shell
 curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "key_id=7" http://localhost:3001/api/v4/internal/two_factor_recovery_codes
 ```
 
 Example response:
 
-```
+```json
 {
   "success": true,
   "recovery_codes": [
@@ -269,30 +269,28 @@ for a push that might be accepted.
 |:----------|:-------|:---------|:------------|
 | `gl_repository` | string | yes | repository identifier for the repository receiving the push |
 
-```
+```plaintext
 POST /internal/pre_receive
 ```
 
 Example request:
 
-```sh
+```shell
 curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "gl_repository=project-7" http://localhost:3001/api/v4/internal/pre_receive
 ```
 
 Example response:
 
-```
+```json
 {
   "reference_counter_increased": true
 }
 ```
 
-## Notify Post Receive [UNUSED] ?
-
 ## PostReceive
 
 Called from Gitaly after a receiving a push. This triggers the
-`PostReceive`-worker in sidekiq, processes the passed push options and
+`PostReceive`-worker in Sidekiq, processes the passed push options and
 builds the response including messages that need to be displayed to
 the user.
 
@@ -300,22 +298,22 @@ the user.
 |:----------|:-------|:---------|:------------|
 | `identifier` | string | yes | `user-[id]` or `key-[id]` Identifying the user performing the push |
 | `gl_repository` | string | yes | identifier of the repository being pushed to |
-| `push_options` | [string] | no | array of push options |
+| `push_options` | string array | no | array of push options |
 | `changes` | string | no | refs to be updated in the push in the format `oldrev newrev refname\n`. |
 
-```
+```plaintext
 POST /internal/post_receive
 ```
 
 Example Request:
 
-```sh
+```shell
 curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "gl_repository=project-7" --data "identifier=user-1" --data "changes=0000000000000000000000000000000000000000 fd9e76b9136bdd9fe217061b497745792fe5a5ee gh-pages\n"  http://localhost:3001/api/v4/internal/post_receive
 ```
 
 Example response:
 
-```
+```json
 {
   "messages": [
     {

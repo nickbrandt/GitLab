@@ -13,11 +13,11 @@ describe Notify do
 
   let(:current_user_sanitized) { 'www_example_com' }
 
-  set(:user) { create(:user) }
-  set(:current_user) { create(:user, email: "current@email.com", name: 'www.example.com') }
-  set(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
+  let_it_be(:user, reload: true) { create(:user) }
+  let_it_be(:current_user, reload: true) { create(:user, email: "current@email.com", name: 'www.example.com') }
+  let_it_be(:assignee, reload: true) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
 
-  set(:merge_request) do
+  let_it_be(:merge_request) do
     create(:merge_request, source_project: project,
                            target_project: project,
                            author: current_user,
@@ -25,7 +25,7 @@ describe Notify do
                            description: 'Awesome description')
   end
 
-  set(:issue) do
+  let_it_be(:issue, reload: true) do
     create(:issue, author: current_user,
                    assignees: [assignee],
                    project: project,
@@ -109,6 +109,7 @@ describe Notify do
 
       describe 'that are reassigned' do
         let(:previous_assignee) { create(:user, name: 'Previous Assignee') }
+
         subject { described_class.reassigned_issue_email(recipient.id, issue.id, [previous_assignee.id], current_user.id) }
 
         it_behaves_like 'a multiple recipients email'
@@ -207,6 +208,7 @@ describe Notify do
 
       describe 'status changed' do
         let(:status) { 'closed' }
+
         subject { described_class.issue_status_changed_email(recipient.id, issue.id, status, current_user.id) }
 
         it_behaves_like 'an answer to an existing thread with reply-by-email enabled' do
@@ -228,13 +230,14 @@ describe Notify do
             is_expected.to have_referable_subject(issue, reply: true)
             is_expected.to have_body_text(status)
             is_expected.to have_body_text(current_user_sanitized)
-            is_expected.to have_body_text(project_issue_path project, issue)
+            is_expected.to have_body_text(project_issue_path(project, issue))
           end
         end
       end
 
       describe 'moved to another project' do
         let(:new_issue) { create(:issue) }
+
         subject { described_class.issue_moved_email(recipient, issue, new_issue, current_user) }
 
         context 'when a user has permissions to access the new issue' do
@@ -334,6 +337,7 @@ describe Notify do
 
       describe 'that are reassigned' do
         let(:previous_assignee) { create(:user, name: 'Previous Assignee') }
+
         subject { described_class.reassigned_merge_request_email(recipient.id, merge_request.id, [previous_assignee.id], current_user.id) }
 
         it_behaves_like 'a multiple recipients email'
@@ -426,6 +430,7 @@ describe Notify do
 
       describe 'status changed' do
         let(:status) { 'reopened' }
+
         subject { described_class.merge_request_status_email(recipient.id, merge_request.id, status, current_user.id) }
 
         it_behaves_like 'an answer to an existing thread with reply-by-email enabled' do
@@ -454,6 +459,7 @@ describe Notify do
 
       describe 'that are merged' do
         let(:merge_author) { create(:user) }
+
         subject { described_class.merged_merge_request_email(recipient.id, merge_request.id, merge_author.id) }
 
         it_behaves_like 'a multiple recipients email'
@@ -481,7 +487,7 @@ describe Notify do
       end
 
       describe 'that are unmergeable' do
-        set(:merge_request) do
+        let_it_be(:merge_request) do
           create(:merge_request, :conflict,
                  source_project: project,
                  target_project: project,
@@ -562,7 +568,7 @@ describe Notify do
     end
 
     describe '#mail_thread' do
-      set(:mail_thread_note) { create(:note) }
+      let_it_be(:mail_thread_note) { create(:note) }
 
       let(:headers) do
         {
@@ -632,9 +638,9 @@ describe Notify do
       let(:host) { Gitlab.config.gitlab.host }
 
       context 'in discussion' do
-        set(:first_note) { create(:discussion_note_on_issue, project: project) }
-        set(:second_note) { create(:discussion_note_on_issue, in_reply_to: first_note, project: project) }
-        set(:third_note) { create(:discussion_note_on_issue, in_reply_to: second_note, project: project) }
+        let_it_be(:first_note) { create(:discussion_note_on_issue, project: project) }
+        let_it_be(:second_note) { create(:discussion_note_on_issue, in_reply_to: first_note, project: project) }
+        let_it_be(:third_note) { create(:discussion_note_on_issue, in_reply_to: second_note, project: project) }
 
         subject { described_class.note_issue_email(recipient.id, third_note.id) }
 
@@ -658,7 +664,7 @@ describe Notify do
       end
 
       context 'individual issue comments' do
-        set(:note) { create(:note_on_issue, project: project) }
+        let_it_be(:note) { create(:note_on_issue, project: project) }
 
         subject { described_class.note_issue_email(recipient.id, note.id) }
 
@@ -680,7 +686,7 @@ describe Notify do
       let(:project_snippet) { create(:project_snippet, project: project) }
       let(:project_snippet_note) { create(:note_on_project_snippet, project: project, noteable: project_snippet) }
 
-      subject { described_class.note_project_snippet_email(project_snippet_note.author_id, project_snippet_note.id) }
+      subject { described_class.note_snippet_email(project_snippet_note.author_id, project_snippet_note.id) }
 
       it_behaves_like 'appearance header and footer enabled'
       it_behaves_like 'appearance header and footer not enabled'
@@ -690,14 +696,25 @@ describe Notify do
       end
       it_behaves_like 'a user cannot unsubscribe through footer link'
 
-      it 'has the correct subject and body' do
+      it 'has the correct subject' do
         is_expected.to have_referable_subject(project_snippet, reply: true)
+      end
+
+      it 'has the correct body' do
         is_expected.to have_body_text project_snippet_note.note
+      end
+
+      it 'links to the project snippet' do
+        target_url = project_snippet_url(project,
+                                         project_snippet_note.noteable,
+                                         { anchor: "note_#{project_snippet_note.id}" })
+        is_expected.to have_body_text target_url
       end
     end
 
     describe 'project was moved' do
       let(:recipient) { user }
+
       subject { described_class.project_was_moved_email(project.id, user.id, "gitlab/gitlab") }
 
       it_behaves_like 'an email sent to a user'
@@ -725,6 +742,7 @@ describe Notify do
         project.request_access(user)
         project.requesters.find_by(user_id: user.id)
       end
+
       subject { described_class.member_access_requested_email('project', project_member.id, recipient.id) }
 
       it_behaves_like 'an email sent from GitLab'
@@ -750,6 +768,7 @@ describe Notify do
         project.request_access(user)
         project.requesters.find_by(user_id: user.id)
       end
+
       subject { described_class.member_access_denied_email('project', project.id, user.id) }
 
       it_behaves_like 'an email sent from GitLab'
@@ -769,6 +788,7 @@ describe Notify do
       let(:owner) { create(:user, name: "Chang O'Keefe") }
       let(:project) { create(:project, :public, namespace: owner.namespace) }
       let(:project_member) { create(:project_member, project: project, user: user) }
+
       subject { described_class.member_access_granted_email('project', project_member.id) }
 
       it_behaves_like 'an email sent from GitLab'
@@ -1190,6 +1210,7 @@ describe Notify do
         group.request_access(user)
         group.requesters.find_by(user_id: user.id)
       end
+
       subject { described_class.member_access_requested_email('group', group_member.id, recipient.id) }
 
       it_behaves_like 'an email sent from GitLab'
@@ -1216,6 +1237,7 @@ describe Notify do
         group.requesters.find_by(user_id: user.id)
       end
       let(:recipient) { user }
+
       subject { described_class.member_access_denied_email('group', group.id, user.id) }
 
       it_behaves_like 'an email sent from GitLab'
@@ -1638,15 +1660,23 @@ describe Notify do
     let(:personal_snippet) { create(:personal_snippet) }
     let(:personal_snippet_note) { create(:note_on_personal_snippet, noteable: personal_snippet) }
 
-    subject { described_class.note_personal_snippet_email(personal_snippet_note.author_id, personal_snippet_note.id) }
+    subject { described_class.note_snippet_email(personal_snippet_note.author_id, personal_snippet_note.id) }
 
     it_behaves_like 'a user cannot unsubscribe through footer link'
     it_behaves_like 'appearance header and footer enabled'
     it_behaves_like 'appearance header and footer not enabled'
 
-    it 'has the correct subject and body' do
+    it 'has the correct subject' do
       is_expected.to have_referable_subject(personal_snippet, reply: true)
+    end
+
+    it 'has the correct body' do
       is_expected.to have_body_text personal_snippet_note.note
+    end
+
+    it 'links to the personal snippet' do
+      target_url = gitlab_snippet_url(personal_snippet_note.noteable)
+      is_expected.to have_body_text target_url
     end
   end
 end

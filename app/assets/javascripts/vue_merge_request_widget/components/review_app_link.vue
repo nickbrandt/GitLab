@@ -1,16 +1,24 @@
 <script>
+import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     Icon,
   },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
   props: {
-    link: {
+    cssClass: {
       type: String,
       required: true,
     },
-    cssClass: {
+    display: {
+      type: Object,
+      required: true,
+    },
+    link: {
       type: String,
       required: true,
     },
@@ -19,6 +27,8 @@ export default {
 </script>
 <template>
   <a
+    v-gl-tooltip
+    :title="display.tooltip"
     :href="link"
     target="_blank"
     rel="noopener noreferrer nofollow"
@@ -26,6 +36,6 @@ export default {
     data-track-event="open_review_app"
     data-track-label="review_app"
   >
-    {{ __('View app') }} <icon class="fgray" name="external-link" />
+    {{ display.text }} <icon class="fgray" name="external-link" />
   </a>
 </template>

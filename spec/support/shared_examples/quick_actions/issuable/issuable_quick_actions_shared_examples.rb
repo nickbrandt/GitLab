@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'issuable quick actions' do
+RSpec.shared_examples 'issuable quick actions' do
   QuickAction = Struct.new(:action_text, :expectation, :before_action, keyword_init: true) do
     # Pass a block as :before_action if
     # issuable state needs to be changed before
@@ -224,7 +224,7 @@ shared_examples 'issuable quick actions' do
   end
 
   context 'when user can update issuable' do
-    set(:developer) { create(:user) }
+    let_it_be(:developer) { create(:user) }
     let(:note_author) { developer }
 
     before do
@@ -251,7 +251,7 @@ shared_examples 'issuable quick actions' do
   end
 
   context 'when user cannot update issuable' do
-    set(:non_member) { create(:user) }
+    let_it_be(:non_member) { create(:user) }
     let(:note_author) { non_member }
 
     it 'applies commands that user can execute' do

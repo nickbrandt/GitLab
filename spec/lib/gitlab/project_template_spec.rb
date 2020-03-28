@@ -13,6 +13,7 @@ describe Gitlab::ProjectTemplate do
         described_class.new('dotnetcore', '.NET Core', 'A .NET Core console application template, customizable for any .NET Core project', 'https://gitlab.com/gitlab-org/project-templates/dotnetcore'),
         described_class.new('android', 'Android', 'A ready-to-go template for use with Android apps.', 'https://gitlab.com/gitlab-org/project-templates/android'),
         described_class.new('gomicro', 'Go Micro', 'Go Micro is a framework for micro service development.', 'https://gitlab.com/gitlab-org/project-templates/go-micro'),
+        described_class.new('gatsby', 'Pages/Gatsby', 'Everything you need to get started using a Gatsby site.', 'https://gitlab.com/pages/gatsby'),
         described_class.new('hugo', 'Pages/Hugo', 'Everything you need to get started using a Hugo Pages site.', 'https://gitlab.com/pages/hugo'),
         described_class.new('jekyll', 'Pages/Jekyll', 'Everything you need to get started using a Jekyll Pages site.', 'https://gitlab.com/pages/jekyll'),
         described_class.new('plainhtml', 'Pages/Plain HTML', 'Everything you need to get started using a plain HTML Pages site.', 'https://gitlab.com/pages/plain-html'),
@@ -23,6 +24,7 @@ describe Gitlab::ProjectTemplate do
         described_class.new('nfplainhtml', 'Netlify/Plain HTML', _('A plain HTML site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features.'), 'https://gitlab.com/pages/nfplain-html'),
         described_class.new('nfgitbook', 'Netlify/GitBook', _('A GitBook site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features.'), 'https://gitlab.com/pages/nfgitbook'),
         described_class.new('nfhexo', 'Netlify/Hexo', _('A Hexo site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features.'), 'https://gitlab.com/pages/nfhexo'),
+        described_class.new('salesforcedx', 'SalesforceDX', _('A project boilerplate for Salesforce App development with Salesforce Developer tools.'), 'https://gitlab.com/gitlab-org/project-templates/salesforcedx'),
         described_class.new('serverless_framework', 'Serverless Framework/JS', _('A basic page and serverless function that uses AWS Lambda, AWS API Gateway, and GitLab Pages'), 'https://gitlab.com/gitlab-org/project-templates/serverless-framework', 'illustrations/logos/serverless_framework.svg')
       ]
 
@@ -72,7 +74,7 @@ describe Gitlab::ProjectTemplate do
   end
 
   describe 'validate all templates' do
-    set(:admin) { create(:admin) }
+    let_it_be(:admin) { create(:admin) }
 
     described_class.all.each do |template|
       it "#{template.name} has a valid archive" do

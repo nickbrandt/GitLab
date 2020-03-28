@@ -1,9 +1,9 @@
 <script>
-import { __ } from '~/locale';
 import $ from 'jquery';
-import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
+import { escape } from 'lodash';
 import { GlLoadingIcon } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { __ } from '~/locale';
 import eventHub from '../eventhub';
 import Api from '../../api';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
@@ -64,6 +64,7 @@ export default {
           this.groupId,
           term,
           {
+            search_namespaces: true,
             with_issues_enabled: true,
             with_shared: false,
             include_subgroups: true,
@@ -83,7 +84,7 @@ export default {
               }" data-project-name="${project.name}" data-project-name-with-namespace="${
           project.name_with_namespace
         }">
-                ${_.escape(project.name_with_namespace)}
+                ${escape(project.name_with_namespace)}
               </a>
             </li>
           `;

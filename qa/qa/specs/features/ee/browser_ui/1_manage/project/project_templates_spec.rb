@@ -6,14 +6,14 @@ module QA
     describe 'Project templates' do
       before(:all) do
         @files = [
-            {
-                name: 'file.txt',
-                content: 'foo'
-            },
-            {
-                name: 'README.md',
-                content: 'bar'
-            }
+          {
+            name: 'file.txt',
+            content: 'foo'
+          },
+          {
+            name: 'README.md',
+            content: 'bar'
+          }
         ]
 
         @template_container_group_name = "instance-template-container-group-#{SecureRandom.hex(8)}"
@@ -37,8 +37,7 @@ module QA
 
       context 'built-in', :requires_admin do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          Flow::Login.sign_in_as_admin
 
           @group = Resource::Group.fabricate_via_api!
         end
@@ -55,8 +54,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using built-in project template',
-                                        namespace: Runtime::Namespace.name,
-                                        template_name: built_in)
+            namespace: Runtime::Namespace.name,
+            template_name: built_in)
 
           Page::Project::Show.perform(&:wait_for_import_success)
 
@@ -65,11 +64,9 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
-      context 'instance level', :quarantine, :requires_admin do
+      context 'instance level', :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/13418', type: :bug } do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          Flow::Login.sign_in_as_admin
 
           Page::Main::Menu.perform(&:go_to_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
@@ -84,8 +81,7 @@ module QA
             expect(templates.current_custom_project_template).to include @template_container_group_name
           end
 
-          group = Resource::Group.fabricate_via_api!
-          group.visit!
+          Resource::Group.fabricate_via_api!.visit!
 
           Page::Group::Show.perform(&:go_to_new_project)
 
@@ -99,8 +95,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using instance level project template',
-                                        namespace: Runtime::Namespace.path,
-                                        template_name: @template_project.name)
+            namespace: Runtime::Namespace.path,
+            template_name: @template_project.name)
 
           Page::Project::Show.perform(&:wait_for_import_success)
           @files.each do |file|
@@ -109,20 +105,20 @@ module QA
         end
       end
 
-      context 'group level' do
+      context 'group level', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/211528', type: :bug } do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Flow::Login.sign_in
 
           Page::Main::Menu.perform(&:go_to_groups)
           Page::Dashboard::Groups.perform { |groups| groups.click_group(Runtime::Namespace.sandbox_name) }
-          Page::Project::Menu.perform(&:click_settings)
+
+          Page::Group::Menu.perform(&:click_settings)
 
           Page::Group::Settings::General.perform do |settings|
             settings.choose_custom_project_template("#{@template_container_group_name}")
           end
 
-          Page::Project::Menu.perform(&:click_settings)
+          Page::Group::Menu.perform(&:click_settings)
 
           Page::Group::Settings::General.perform do |settings|
             expect(settings.current_custom_project_template).to include @template_container_group_name
@@ -144,8 +140,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using group level project template',
-                                        namespace: Runtime::Namespace.sandbox_name,
-                                        template_name: @template_project.name)
+            namespace: Runtime::Namespace.sandbox_name,
+            template_name: @template_project.name)
 
           Page::Project::Show.perform(&:wait_for_import_success)
           @files.each do |file|

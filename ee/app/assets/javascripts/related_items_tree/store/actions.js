@@ -1,16 +1,15 @@
-import flash from '~/flash';
-import { s__ } from '~/locale';
 import Api from 'ee/api';
-import axios from '~/lib/utils/axios_utils';
-import httpStatusCodes from '~/lib/utils/http_status';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import {
-  addRelatedIssueErrorMap,
   issuableTypesMap,
+  itemAddFailureTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
+import flash from '~/flash';
+import { s__, __ } from '~/locale';
+import axios from '~/lib/utils/axios_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
 import { ChildType, ChildState } from '../constants';
@@ -253,6 +252,8 @@ export const removeItem = ({ dispatch }, { parentItem, item }) => {
 export const toggleAddItemForm = ({ commit }, data) => commit(types.TOGGLE_ADD_ITEM_FORM, data);
 export const toggleCreateEpicForm = ({ commit }, data) =>
   commit(types.TOGGLE_CREATE_EPIC_FORM, data);
+export const toggleCreateIssueForm = ({ commit }, data) =>
+  commit(types.TOGGLE_CREATE_ISSUE_FORM, data);
 
 export const setPendingReferences = ({ commit }, data) =>
   commit(types.SET_PENDING_REFERENCES, data);
@@ -308,14 +309,11 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', { toggleState: false });
 };
-export const receiveAddItemFailure = ({ commit, state }, data = {}) => {
-  commit(types.RECEIVE_ADD_ITEM_FAILURE);
-
-  let errorMessage = addRelatedIssueErrorMap[state.issuableType];
-  if (data.message) {
-    errorMessage = data.message;
-  }
-  flash(errorMessage);
+export const receiveAddItemFailure = (
+  { commit },
+  { itemAddFailureType, itemAddFailureMessage = '' } = {},
+) => {
+  commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType, itemAddFailureMessage });
 };
 export const addItem = ({ state, dispatch, getters }) => {
   dispatch('requestAddItem');
@@ -330,8 +328,25 @@ export const addItem = ({ state, dispatch, getters }) => {
         rawItems: data.issuables.slice(0, state.pendingReferences.length),
       });
     })
-    .catch(({ data }) => {
-      dispatch('receiveAddItemFailure', data);
+    .catch(data => {
+      const { response } = data;
+      if (response.status === httpStatusCodes.NOT_FOUND) {
+        dispatch('receiveAddItemFailure', { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND });
+      }
+      // Ignore 409 conflict when the issue or epic is already attached to epic
+      /* eslint-disable @gitlab/require-i18n-strings */
+      else if (
+        response.status === httpStatusCodes.CONFLICT &&
+        response.data.message === 'Epic hierarchy level too deep'
+      ) {
+        dispatch('receiveAddItemFailure', {
+          itemAddFailureType: itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS,
+        });
+      } else {
+        dispatch('receiveAddItemFailure', {
+          itemAddFailureMessage: response.data.message,
+        });
+      }
     });
 };
 
@@ -433,6 +448,63 @@ export const reorderItem = (
         newIndex: oldIndex,
       });
     });
+};
+
+export const receiveCreateIssueSuccess = ({ commit }) =>
+  commit(types.RECEIVE_CREATE_ITEM_SUCCESS, { insertAt: 0, items: [] });
+export const receiveCreateIssueFailure = ({ commit }) => {
+  commit(types.RECEIVE_CREATE_ITEM_FAILURE);
+  flash(s__('Epics|Something went wrong while creating issue.'));
+};
+export const createNewIssue = ({ state, dispatch }, { issuesEndpoint, title }) => {
+  const { parentItem } = state;
+
+  // necessary because parentItem comes from GraphQL and we are using REST API here
+  const epicId = parseInt(parentItem.id.replace(/^gid:\/\/gitlab\/Epic\//, ''), 10);
+
+  dispatch('requestCreateItem');
+  return axios
+    .post(issuesEndpoint, { epic_id: epicId, title })
+    .then(({ data }) => {
+      dispatch('receiveCreateIssueSuccess', data);
+      dispatch('fetchItems', {
+        parentItem,
+      });
+    })
+    .catch(e => {
+      dispatch('receiveCreateIssueFailure');
+      throw e;
+    });
+};
+
+export const requestProjects = ({ commit }) => commit(types.REQUEST_PROJECTS);
+export const receiveProjectsSuccess = ({ commit }, data) =>
+  commit(types.RECIEVE_PROJECTS_SUCCESS, data);
+export const receiveProjectsFailure = ({ commit }) => {
+  commit(types.RECIEVE_PROJECTS_FAILURE);
+  flash(__('Something went wrong while fetching projects.'));
+};
+export const fetchProjects = ({ state, dispatch }, searchKey = '') => {
+  const params = {
+    include_subgroups: true,
+    order_by: 'last_activity_at',
+    with_issues_enabled: true,
+    with_shared: false,
+  };
+
+  if (searchKey) {
+    params.search = searchKey;
+  }
+
+  dispatch('requestProjects');
+  axios
+    .get(state.projectsEndpoint, {
+      params,
+    })
+    .then(({ data }) => {
+      dispatch('receiveProjectsSuccess', data);
+    })
+    .catch(() => dispatch('receiveProjectsFailure'));
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

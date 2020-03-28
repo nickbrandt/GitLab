@@ -32,7 +32,7 @@ module Gitlab
 
           while current
 
-            if (plan_id = current.plan_id)
+            if (plan_id = current.hosted_plan_id)
               hash[group.id] << plan_id
               all_plan_ids << plan_id
             end
@@ -61,7 +61,8 @@ module Gitlab
       Gitlab::ObjectHierarchy
         .new(groups)
         .base_and_ancestors
-        .select(:id, :parent_id, :plan_id)
+        .join_gitlab_subscription
+        .select('namespaces.id', 'namespaces.parent_id', 'gitlab_subscriptions.hosted_plan_id')
     end
   end
 end

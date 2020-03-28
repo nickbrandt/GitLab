@@ -1,0 +1,14 @@
+fragment SnippetBase on Snippet {
+  id
+  title
+  description
+  descriptionHtml
+  createdAt
+  updatedAt
+  visibilityLevel
+  webUrl
+  userPermissions {
+    adminSnippet
+    updateSnippet
+  }
+}

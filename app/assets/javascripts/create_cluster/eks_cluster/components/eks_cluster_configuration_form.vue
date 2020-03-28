@@ -1,9 +1,9 @@
 <script>
-import { createNamespacedHelpers, mapState, mapActions } from 'vuex';
-import { sprintf, s__ } from '~/locale';
-import _ from 'underscore';
+import { createNamespacedHelpers, mapState, mapActions, mapGetters } from 'vuex';
+import { escape as esc } from 'lodash';
 import { GlFormInput, GlFormCheckbox } from '@gitlab/ui';
-import ClusterFormDropdown from './cluster_form_dropdown.vue';
+import { sprintf, s__ } from '~/locale';
+import ClusterFormDropdown from '~/create_cluster/components/cluster_form_dropdown.vue';
 import { KUBERNETES_VERSIONS } from '../constants';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
@@ -22,10 +22,7 @@ const {
   mapState: mapSecurityGroupsState,
   mapActions: mapSecurityGroupsActions,
 } = createNamespacedHelpers('securityGroups');
-const {
-  mapState: mapInstanceTypesState,
-  mapActions: mapInstanceTypesActions,
-} = createNamespacedHelpers('instanceTypes');
+const { mapState: mapInstanceTypesState } = createNamespacedHelpers('instanceTypes');
 
 export default {
   components: {
@@ -64,6 +61,7 @@ export default {
       'gitlabManagedCluster',
       'isCreatingCluster',
     ]),
+    ...mapGetters(['subnetValid']),
     ...mapRolesState({
       roles: 'items',
       isLoadingRoles: 'isLoadingItems',
@@ -122,7 +120,7 @@ export default {
         !this.selectedRegion ||
         !this.selectedKeyPair ||
         !this.selectedVpc ||
-        !this.selectedSubnet ||
+        !this.subnetValid ||
         !this.selectedRole ||
         !this.selectedSecurityGroup ||
         !this.selectedInstanceType ||
@@ -130,13 +128,16 @@ export default {
         this.isCreatingCluster
       );
     },
+    displaySubnetError() {
+      return Boolean(this.loadingSubnetsError) || this.selectedSubnet?.length === 1;
+    },
     createClusterButtonLabel() {
       return this.isCreatingCluster
         ? s__('ClusterIntegration|Creating Kubernetes cluster')
         : s__('ClusterIntegration|Create Kubernetes cluster');
     },
     kubernetesIntegrationHelpText() {
-      const escapedUrl = _.escape(this.kubernetesIntegrationHelpPath);
+      const escapedUrl = esc(this.kubernetesIntegrationHelpPath);
 
       return sprintf(
         s__(
@@ -152,11 +153,11 @@ export default {
     roleDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Select the IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role name, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}.',
+          'ClusterIntegration|Your service role is distinct from the provision role used when authenticating. It will allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}.',
         ),
         {
           startLink:
-            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html#role-create" target="_blank" rel="noopener noreferrer">',
+            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role" target="_blank" rel="noopener noreferrer">',
           externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
@@ -219,6 +220,13 @@ export default {
         false,
       );
     },
+    subnetValidationErrorText() {
+      if (this.loadingSubnetsError) {
+        return s__('ClusterIntegration|Could not load subnets for the selected VPC');
+      }
+
+      return s__('ClusterIntegration|You should select at least two subnets');
+    },
     securityGroupDropdownHelpText() {
       return sprintf(
         s__(
@@ -248,7 +256,7 @@ export default {
       );
     },
     gitlabManagedHelpText() {
-      const escapedUrl = _.escape(this.gitlabManagedClusterHelpPath);
+      const escapedUrl = esc(this.gitlabManagedClusterHelpPath);
 
       return sprintf(
         s__(
@@ -265,12 +273,10 @@ export default {
   mounted() {
     this.fetchRegions();
     this.fetchRoles();
-    this.fetchInstanceTypes();
   },
   methods: {
     ...mapActions([
       'createCluster',
-      'signOut',
       'setClusterName',
       'setEnvironmentScope',
       'setKubernetesVersion',
@@ -290,19 +296,18 @@ export default {
     ...mapRolesActions({ fetchRoles: 'fetchItems' }),
     ...mapKeyPairsActions({ fetchKeyPairs: 'fetchItems' }),
     ...mapSecurityGroupsActions({ fetchSecurityGroups: 'fetchItems' }),
-    ...mapInstanceTypesActions({ fetchInstanceTypes: 'fetchItems' }),
     setRegionAndFetchVpcsAndKeyPairs(region) {
       this.setRegion({ region });
       this.setVpc({ vpc: null });
       this.setKeyPair({ keyPair: null });
-      this.setSubnet({ subnet: null });
+      this.setSubnet({ subnet: [] });
       this.setSecurityGroup({ securityGroup: null });
       this.fetchVpcs({ region });
       this.fetchKeyPairs({ region });
     },
     setVpcAndFetchSubnets(vpc) {
       this.setVpc({ vpc });
-      this.setSubnet({ subnet: null });
+      this.setSubnet({ subnet: [] });
       this.setSecurityGroup({ securityGroup: null });
       this.fetchSubnets({ vpc, region: this.selectedRegion });
       this.fetchSecurityGroups({ vpc, region: this.selectedRegion });
@@ -312,15 +317,10 @@ export default {
 </script>
 <template>
   <form name="eks-cluster-configuration-form">
-    <h2>
+    <h4>
       {{ s__('ClusterIntegration|Enter the details for your Amazon EKS Kubernetes cluster') }}
-    </h2>
+    </h4>
     <div class="mb-3" v-html="kubernetesIntegrationHelpText"></div>
-    <div class="mb-3">
-      <button class="btn btn-link js-sign-out" @click.prevent="signOut()">
-        {{ s__('ClusterIntegration|Select a different AWS role') }}
-      </button>
-    </div>
     <div class="form-group">
       <label class="label-bold" for="eks-cluster-name">{{
         s__('ClusterIntegration|Kubernetes cluster name')
@@ -353,10 +353,9 @@ export default {
         :empty-text="s__('ClusterIntegration|Kubernetes version not found')"
         @input="setKubernetesVersion({ kubernetesVersion: $event })"
       />
-      <p class="form-text text-muted" v-html="roleDropdownHelpText"></p>
     </div>
     <div class="form-group">
-      <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Role name') }}</label>
+      <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Service role') }}</label>
       <cluster-form-dropdown
         field-id="eks-role"
         field-name="eks-role"
@@ -364,7 +363,7 @@ export default {
         :items="roles"
         :loading="isLoadingRoles"
         :loading-text="s__('ClusterIntegration|Loading IAM Roles')"
-        :placeholder="s__('ClusterIntergation|Select role name')"
+        :placeholder="s__('ClusterIntergation|Select service role')"
         :search-field-placeholder="s__('ClusterIntegration|Search IAM Roles')"
         :empty-text="s__('ClusterIntegration|No IAM Roles found')"
         :has-errors="Boolean(loadingRolesError)"
@@ -448,8 +447,8 @@ export default {
         :placeholder="s__('ClusterIntergation|Select a subnet')"
         :search-field-placeholder="s__('ClusterIntegration|Search subnets')"
         :empty-text="s__('ClusterIntegration|No subnet found')"
-        :has-errors="Boolean(loadingSubnetsError)"
-        :error-message="s__('ClusterIntegration|Could not load subnets for the selected VPC')"
+        :has-errors="displaySubnetError"
+        :error-message="subnetValidationErrorText"
         @input="setSubnet({ subnet: $event })"
       />
       <p class="form-text text-muted" v-html="subnetDropdownHelpText"></p>

@@ -3,7 +3,7 @@
 module Clusters
   module Applications
     class ElasticStack < ApplicationRecord
-      VERSION = '1.8.0'
+      VERSION = '1.9.0'
 
       ELASTICSEARCH_PORT = 9200
 
@@ -17,20 +17,8 @@ module Clusters
 
       default_value_for :version, VERSION
 
-      def set_initial_status
-        return unless not_installable?
-        return unless cluster&.application_ingress_available?
-
-        ingress = cluster.application_ingress
-        self.status = status_states[:installable] if ingress.external_ip_or_hostname?
-      end
-
       def chart
         'stable/elastic-stack'
-      end
-
-      def values
-        content_values.to_yaml
       end
 
       def install_command
@@ -39,7 +27,8 @@ module Clusters
           version: VERSION,
           rbac: cluster.platform_kubernetes_rbac?,
           chart: chart,
-          files: files
+          files: files,
+          postinstall: post_install_script
         )
       end
 
@@ -50,6 +39,10 @@ module Clusters
           files: files,
           postdelete: post_delete_script
         )
+      end
+
+      def files
+        super.merge('wait-for-elasticsearch.sh': File.read("#{Rails.root}/vendor/elastic_stack/wait-for-elasticsearch.sh"))
       end
 
       def elasticsearch_client
@@ -71,33 +64,23 @@ module Clusters
           # `proxy_url` could raise an exception because gitlab can not communicate with the cluster.
           # We check for a nil client in downstream use and behaviour is equivalent to an empty state
           log_exception(error, :failed_to_create_elasticsearch_client)
+
+          nil
         end
       end
 
       private
 
-      def specification
-        {
-          "kibana" => {
-            "ingress" => {
-              "hosts" => [kibana_hostname],
-              "tls" => [{
-                "hosts" => [kibana_hostname],
-                "secretName" => "kibana-cert"
-              }]
-            }
-          }
-        }
-      end
-
-      def content_values
-        YAML.load_file(chart_values_file).deep_merge!(specification)
+      def post_install_script
+        [
+          "timeout -t60 sh /data/helm/elastic-stack/config/wait-for-elasticsearch.sh http://elastic-stack-elasticsearch-client:9200"
+        ]
       end
 
       def post_delete_script
         [
           Gitlab::Kubernetes::KubectlCmd.delete("pvc", "--selector", "release=elastic-stack")
-        ].compact
+        ]
       end
 
       def kube_client

@@ -65,6 +65,10 @@ module NavHelper
     %w(groups#issues labels#index milestones#index boards#index boards#show)
   end
 
+  def show_user_notification_dot?
+    experiment_enabled?(:ci_notification_dot)
+  end
+
   private
 
   def get_header_links
@@ -87,7 +91,7 @@ module NavHelper
     end
 
     if Feature.enabled?(:user_mode_in_session)
-      if current_user&.admin? && current_user_mode&.admin_mode?
+      if current_user_mode.admin_mode?
         links << :admin_mode
       end
     end

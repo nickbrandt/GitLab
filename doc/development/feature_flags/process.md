@@ -15,7 +15,9 @@ should be leveraged:
 - Feature flags should remain in the codebase for as short period as possible
   to reduce the need for feature flag accounting.
 - The person operating with feature flags is responsible for clearly communicating
-  the status of a feature behind the feature flag with responsible stakeholders.
+  the status of a feature behind the feature flag with responsible stakeholders. The
+  issue description should be updated with the feature flag name and whether it is
+  defaulted on or off as soon it is evident that a feature flag is needed.
 - Merge requests that make changes hidden behind a feature flag, or remove an
   existing feature flag because a feature is deemed stable must have the
   ~"feature flag" label assigned.
@@ -51,7 +53,7 @@ absolutely no way to use the feature until it is enabled.
 
 ### Including a feature behind feature flag in the final release
 
-In order to build a final release and present the feature for self-hosted
+In order to build a final release and present the feature for self-managed
 users, the feature flag should be at least defaulted to **on**. If the feature
 is deemed stable and there is confidence that removing the feature flag is safe,
 consider removing the feature flag altogether.
@@ -124,8 +126,11 @@ need to revert a release, and because feature flags are disabled by default we
 don't need to revert and pick any Git commits. In fact, all we have to do is
 disable the feature, and in the worst case, perform cleanup. Let's say that
 the cost of this is 2. In this case, our best case cost is 11: 10 to build the
-feature, and 1 to add the feature flag. The worst case cost is now 13: 10 to
-build the feature, 1 to add the feature flag, and 2 to disable and clean up.
+feature, and 1 to add the feature flag. The worst case cost is now 13:
+
+- 10 to build the feature.
+- 1 to add the feature flag.
+- 2 to disable and clean up.
 
 Here we can see that in the best case scenario the work necessary is only a tiny
 bit more compared to not using a feature flag. Meanwhile, the process of

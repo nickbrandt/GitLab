@@ -6,7 +6,7 @@ describe Gitlab::Geo::HealthCheck, :geo do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   describe '#perform_checks' do
     before do

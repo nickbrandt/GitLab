@@ -29,7 +29,7 @@ module Analytics
           description: -> { _('From merge request merge until deploy to production') }
         }.freeze,
         production: {
-          title: -> { s_('CycleAnalyticsStage|Production') },
+          title: -> { s_('CycleAnalyticsStage|Total') },
           description: -> { _('From issue creation until deploy to production') }
         }.freeze
       }.freeze

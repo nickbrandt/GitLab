@@ -7,10 +7,10 @@ describe EE::EmailsHelper do
     using RSpec::Parameterized::TableSyntax
 
     where(:path, :result) do
-      'somedomain.com/groups/agroup/-/epics/231'   | 'View Epic'
-      'somedomain.com/aproject/issues/231'         | 'View Issue'
-      'somedomain.com/aproject/merge_requests/231' | 'View Merge request'
-      'somedomain.com/aproject/commit/al3f231'     | 'View Commit'
+      'somedomain.com/groups/agroup/-/epics/231'     | 'View Epic'
+      'somedomain.com/aproject/issues/231'           | 'View Issue'
+      'somedomain.com/aproject/-/merge_requests/231' | 'View Merge request'
+      'somedomain.com/aproject/-/commit/al3f231'     | 'View Commit'
     end
 
     with_them do

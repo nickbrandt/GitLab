@@ -1,5 +1,20 @@
 import * as urlUtils from '~/lib/utils/url_utility';
 
+const shas = {
+  valid: [
+    'ad9be38573f9ee4c4daec22673478c2dd1d81cd8',
+    '76e07a692f65a2f4fd72f107a3e83908bea9b7eb',
+    '9dd8f215b1e8605b1d59eaf9df1178081cda0aaf',
+    'f2e0be58c4091b033203bae1cc0302febd54117d',
+  ],
+  invalid: [
+    'zd9be38573f9ee4c4daec22673478c2dd1d81cd8',
+    ':6e07a692f65a2f4fd72f107a3e83908bea9b7eb',
+    '-dd8f215b1e8605b1d59eaf9df1178081cda0aaf',
+    ' 2e0be58c4091b033203bae1cc0302febd54117d',
+  ],
+};
+
 const setWindowLocation = value => {
   Object.defineProperty(window, 'location', {
     writable: true,
@@ -11,6 +26,12 @@ describe('URL utility', () => {
   describe('webIDEUrl', () => {
     afterEach(() => {
       gon.relative_url_root = '';
+    });
+
+    it('escapes special characters', () => {
+      expect(urlUtils.webIDEUrl('/gitlab-org/gitlab-#-foss/merge_requests/1')).toBe(
+        '/-/ide/project/gitlab-org/gitlab-%23-foss/merge_requests/1',
+      );
     });
 
     describe('without relative_url_root', () => {
@@ -154,6 +175,44 @@ describe('URL utility', () => {
     });
   });
 
+  describe('urlContainsSha', () => {
+    it('returns true when there is a valid 40-character SHA1 hash in the URL', () => {
+      shas.valid.forEach(sha => {
+        expect(
+          urlUtils.urlContainsSha({ url: `http://urlstuff/${sha}/moreurlstuff` }),
+        ).toBeTruthy();
+      });
+    });
+
+    it('returns false when there is not a valid 40-character SHA1 hash in the URL', () => {
+      shas.invalid.forEach(str => {
+        expect(urlUtils.urlContainsSha({ url: `http://urlstuff/${str}/moreurlstuff` })).toBeFalsy();
+      });
+    });
+  });
+
+  describe('getShaFromUrl', () => {
+    let validUrls = [];
+    let invalidUrls = [];
+
+    beforeAll(() => {
+      validUrls = shas.valid.map(sha => `http://urlstuff/${sha}/moreurlstuff`);
+      invalidUrls = shas.invalid.map(str => `http://urlstuff/${str}/moreurlstuff`);
+    });
+
+    it('returns the valid 40-character SHA1 hash from the URL', () => {
+      validUrls.forEach((url, idx) => {
+        expect(urlUtils.getShaFromUrl({ url })).toBe(shas.valid[idx]);
+      });
+    });
+
+    it('returns null from a URL with no valid 40-character SHA1 hash', () => {
+      invalidUrls.forEach(url => {
+        expect(urlUtils.getShaFromUrl({ url })).toBeNull();
+      });
+    });
+  });
+
   describe('setUrlFragment', () => {
     it('should set fragment when url has no fragment', () => {
       const url = urlUtils.setUrlFragment('/home/feature', 'usage');
@@ -171,6 +230,44 @@ describe('URL utility', () => {
       const url = urlUtils.setUrlFragment('/home/feature#overview', '#install');
 
       expect(url).toBe('/home/feature#install');
+    });
+  });
+
+  describe('updateHistory', () => {
+    const state = { key: 'prop' };
+    const title = 'TITLE';
+    const url = 'URL';
+    const win = {
+      history: {
+        pushState: jest.fn(),
+        replaceState: jest.fn(),
+      },
+    };
+
+    beforeEach(() => {
+      win.history.pushState.mockReset();
+      win.history.replaceState.mockReset();
+    });
+
+    it('should call replaceState if the replace option is true', () => {
+      urlUtils.updateHistory({ state, title, url, replace: true, win });
+
+      expect(win.history.replaceState).toHaveBeenCalledWith(state, title, url);
+      expect(win.history.pushState).not.toHaveBeenCalled();
+    });
+
+    it('should call pushState if the replace option is missing', () => {
+      urlUtils.updateHistory({ state, title, url, win });
+
+      expect(win.history.replaceState).not.toHaveBeenCalled();
+      expect(win.history.pushState).toHaveBeenCalledWith(state, title, url);
+    });
+
+    it('should call pushState if the replace option is false', () => {
+      urlUtils.updateHistory({ state, title, url, replace: false, win });
+
+      expect(win.history.replaceState).not.toHaveBeenCalled();
+      expect(win.history.pushState).toHaveBeenCalledWith(state, title, url);
     });
   });
 
@@ -296,6 +393,96 @@ describe('URL utility', () => {
       const searchQueryObject = { one: '1', two: '2' };
 
       expect(urlUtils.objectToQuery(searchQueryObject)).toEqual('one=1&two=2');
+    });
+  });
+
+  describe('joinPaths', () => {
+    it.each`
+      paths                                       | expected
+      ${['foo', 'bar']}                           | ${'foo/bar'}
+      ${['foo/', 'bar']}                          | ${'foo/bar'}
+      ${['foo//', 'bar']}                         | ${'foo/bar'}
+      ${['abc/', '/def']}                         | ${'abc/def'}
+      ${['foo', '/bar']}                          | ${'foo/bar'}
+      ${['foo', '/bar/']}                         | ${'foo/bar/'}
+      ${['foo', '//bar/']}                        | ${'foo/bar/'}
+      ${['foo', '', '/bar']}                      | ${'foo/bar'}
+      ${['foo', '/bar', '']}                      | ${'foo/bar'}
+      ${['/', '', 'foo/bar/  ', '', '/ninja']}    | ${'/foo/bar/  /ninja'}
+      ${['', '/ninja', '/', ' ', '', 'bar', ' ']} | ${'/ninja/ /bar/ '}
+      ${['http://something/bar/', 'foo']}         | ${'http://something/bar/foo'}
+      ${['foo/bar', null, 'ninja', null]}         | ${'foo/bar/ninja'}
+      ${[null, 'abc/def', 'zoo']}                 | ${'abc/def/zoo'}
+      ${['', '', '']}                             | ${''}
+      ${['///', '/', '//']}                       | ${'/'}
+    `('joins paths $paths => $expected', ({ paths, expected }) => {
+      expect(urlUtils.joinPaths(...paths)).toBe(expected);
+    });
+  });
+
+  describe('escapeFileUrl', () => {
+    it('encodes URL excluding the slashes', () => {
+      expect(urlUtils.escapeFileUrl('/foo-bar/file.md')).toBe('/foo-bar/file.md');
+      expect(urlUtils.escapeFileUrl('foo bar/file.md')).toBe('foo%20bar/file.md');
+      expect(urlUtils.escapeFileUrl('foo/bar/file.md')).toBe('foo/bar/file.md');
+    });
+  });
+
+  describe('urlIsDifferent', () => {
+    beforeEach(() => {
+      setWindowLocation('current');
+    });
+
+    it('should compare against the window location if no compare value is provided', () => {
+      expect(urlUtils.urlIsDifferent('different')).toBeTruthy();
+      expect(urlUtils.urlIsDifferent('current')).toBeFalsy();
+    });
+
+    it('should use the provided compare value', () => {
+      expect(urlUtils.urlIsDifferent('different', 'current')).toBeTruthy();
+      expect(urlUtils.urlIsDifferent('current', 'current')).toBeFalsy();
+    });
+  });
+
+  describe('setUrlParams', () => {
+    it('adds new params as query string', () => {
+      const url = 'https://gitlab.com/test';
+
+      expect(
+        urlUtils.setUrlParams({ group_id: 'gitlab-org', project_id: 'my-project' }, url),
+      ).toEqual('https://gitlab.com/test?group_id=gitlab-org&project_id=my-project');
+    });
+
+    it('updates an existing parameter', () => {
+      const url = 'https://gitlab.com/test?group_id=gitlab-org&project_id=my-project';
+
+      expect(urlUtils.setUrlParams({ project_id: 'gitlab-test' }, url)).toEqual(
+        'https://gitlab.com/test?group_id=gitlab-org&project_id=gitlab-test',
+      );
+    });
+
+    it("removes the project_id param when it's value is null", () => {
+      const url = 'https://gitlab.com/test?group_id=gitlab-org&project_id=my-project';
+
+      expect(urlUtils.setUrlParams({ project_id: null }, url)).toEqual(
+        'https://gitlab.com/test?group_id=gitlab-org',
+      );
+    });
+
+    it('handles arrays properly', () => {
+      const url = 'https://gitlab.com/test';
+
+      expect(urlUtils.setUrlParams({ label_name: ['foo', 'bar'] }, url)).toEqual(
+        'https://gitlab.com/test?label_name=foo&label_name=bar',
+      );
+    });
+
+    it('removes all existing URL params and sets a new param when cleanParams=true', () => {
+      const url = 'https://gitlab.com/test?group_id=gitlab-org&project_id=my-project';
+
+      expect(urlUtils.setUrlParams({ foo: 'bar' }, url, true)).toEqual(
+        'https://gitlab.com/test?foo=bar',
+      );
     });
   });
 });

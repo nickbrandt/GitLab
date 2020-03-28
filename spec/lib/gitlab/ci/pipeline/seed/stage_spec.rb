@@ -10,9 +10,9 @@ describe Gitlab::Ci::Pipeline::Seed::Stage do
   let(:attributes) do
     { name: 'test',
       index: 0,
-      builds: [{ name: 'rspec' },
-               { name: 'spinach' },
-               { name: 'deploy', only: { refs: ['feature'] } }] }
+      builds: [{ name: 'rspec', scheduling_type: :stage },
+               { name: 'spinach', scheduling_type: :stage },
+               { name: 'deploy', only: { refs: ['feature'] } }], scheduling_type: :stage }
   end
 
   subject do
@@ -81,7 +81,9 @@ describe Gitlab::Ci::Pipeline::Seed::Stage do
 
     context 'when a ref is protected' do
       before do
-        allow_any_instance_of(Project).to receive(:protected_for?).and_return(true)
+        allow_next_instance_of(Project) do |instance|
+          allow(instance).to receive(:protected_for?).and_return(true)
+        end
       end
 
       it 'returns protected builds' do
@@ -91,7 +93,9 @@ describe Gitlab::Ci::Pipeline::Seed::Stage do
 
     context 'when a ref is not protected' do
       before do
-        allow_any_instance_of(Project).to receive(:protected_for?).and_return(false)
+        allow_next_instance_of(Project) do |instance|
+          allow(instance).to receive(:protected_for?).and_return(false)
+        end
       end
 
       it 'returns unprotected builds' do

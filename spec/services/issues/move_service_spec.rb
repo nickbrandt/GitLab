@@ -6,7 +6,7 @@ describe Issues::MoveService do
   let(:user) { create(:user) }
   let(:author) { create(:user) }
   let(:title) { 'Some issue' }
-  let(:description) { 'Some issue description' }
+  let(:description) { "Some issue description with mention to #{user.to_reference}" }
   let(:group) { create(:group, :private) }
   let(:sub_group_1) { create(:group, :private, parent: group) }
   let(:sub_group_2) { create(:group, :private, parent: group) }
@@ -36,6 +36,9 @@ describe Issues::MoveService do
     end
 
     context 'issue movable' do
+      let!(:note_with_mention) { create(:note, noteable: old_issue, author: author, project: old_project, note: "note with mention #{user.to_reference}") }
+      let!(:note_with_no_mention) { create(:note, noteable: old_issue, author: author, project: old_project, note: "note without mention") }
+
       include_context 'user can move issue'
 
       context 'generic issue' do
@@ -94,6 +97,15 @@ describe Issues::MoveService do
         it 'moves the award emoji' do
           expect(old_issue.award_emoji.first.name).to eq new_issue.reload.award_emoji.first.name
         end
+
+        context 'when issue has notes with mentions' do
+          it 'saves user mentions with actual mentions for new issue' do
+            expect(new_issue.user_mentions.find_by(note_id: nil).mentioned_users_ids).to match_array([user.id])
+            expect(new_issue.user_mentions.where.not(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
+            expect(new_issue.user_mentions.where.not(note_id: nil).count).to eq 1
+            expect(new_issue.user_mentions.count).to eq 2
+          end
+        end
       end
 
       context 'issue with assignee' do
@@ -131,7 +143,9 @@ describe Issues::MoveService do
         let!(:hook) { create(:project_hook, project: old_project, issues_events: true) }
 
         it 'executes project issue hooks' do
-          allow_any_instance_of(WebHookService).to receive(:execute)
+          allow_next_instance_of(WebHookService) do |instance|
+            allow(instance).to receive(:execute)
+          end
 
           # Ideally, we'd test that `WebHookWorker.jobs.size` increased by 1,
           # but since the entire spec run takes place in a transaction, we never
@@ -191,6 +205,7 @@ describe Issues::MoveService do
       context 'issue is not persisted' do
         include_context 'user can move issue'
         let(:old_issue) { build(:issue, project: old_project, author: author) }
+
         it { expect { move }.to raise_error(StandardError, /permissions/) }
       end
     end

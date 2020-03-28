@@ -10,8 +10,60 @@ describe Service do
     it { is_expected.to have_one :issue_tracker_data }
   end
 
-  describe 'Validations' do
+  describe 'validations' do
     it { is_expected.to validate_presence_of(:type) }
+
+    it 'validates presence of project_id if not template', :aggregate_failures do
+      expect(build(:service, project_id: nil, template: true)).to be_valid
+      expect(build(:service, project_id: nil, template: false)).to be_invalid
+    end
+
+    it 'validates presence of project_id if not instance', :aggregate_failures do
+      expect(build(:service, project_id: nil, instance: true)).to be_valid
+      expect(build(:service, project_id: nil, instance: false)).to be_invalid
+    end
+
+    it 'validates absence of project_id if instance', :aggregate_failures do
+      expect(build(:service, project_id: nil, instance: true)).to be_valid
+      expect(build(:service, instance: true)).to be_invalid
+    end
+
+    it 'validates absence of project_id if template', :aggregate_failures do
+      expect(build(:service, template: true)).to validate_absence_of(:project_id)
+      expect(build(:service, template: false)).not_to validate_absence_of(:project_id)
+    end
+
+    it 'validates service is template or instance' do
+      expect(build(:service, project_id: nil, template: true, instance: true)).to be_invalid
+    end
+
+    context 'with an existing service template' do
+      before do
+        create(:service, :template)
+      end
+
+      it 'validates only one service template per type' do
+        expect(build(:service, :template)).to be_invalid
+      end
+    end
+
+    context 'with an existing instance service' do
+      before do
+        create(:service, :instance)
+      end
+
+      it 'validates only one service instance per type' do
+        expect(build(:service, :instance)).to be_invalid
+      end
+    end
+
+    it 'validates uniqueness of type and project_id on create' do
+      project = create(:project)
+
+      expect(create(:service, project: project, type: 'Service')).to be_valid
+      expect(build(:service, project: project, type: 'Service').valid?(:create)).to eq(false)
+      expect(build(:service, project: project, type: 'Service').valid?(:update)).to eq(true)
+    end
   end
 
   describe 'Scopes' do
@@ -97,8 +149,98 @@ describe Service do
     end
   end
 
-  describe "Template" do
+  describe '.find_or_initialize_instances' do
+    shared_examples 'service instances' do
+      it 'returns the available service instances' do
+        expect(Service.find_or_initialize_instances.pluck(:type)).to match_array(Service.available_services_types)
+      end
+
+      it 'does not create service instances' do
+        expect { Service.find_or_initialize_instances }.not_to change { Service.count }
+      end
+    end
+
+    it_behaves_like 'service instances'
+
+    context 'with all existing instances' do
+      before do
+        Service.insert_all(
+          Service.available_services_types.map { |type| { instance: true, type: type } }
+        )
+      end
+
+      it_behaves_like 'service instances'
+
+      context 'with a previous existing service (Previous) and a new service (Asana)' do
+        before do
+          Service.insert(type: 'PreviousService', instance: true)
+          Service.delete_by(type: 'AsanaService', instance: true)
+        end
+
+        it_behaves_like 'service instances'
+      end
+    end
+
+    context 'with a few existing instances' do
+      before do
+        create(:jira_service, :instance)
+      end
+
+      it_behaves_like 'service instances'
+    end
+  end
+
+  describe 'template' do
     let(:project) { create(:project) }
+
+    shared_examples 'retrieves service templates' do
+      it 'returns the available service templates' do
+        expect(Service.find_or_create_templates.pluck(:type)).to match_array(Service.available_services_types)
+      end
+    end
+
+    describe '.find_or_create_templates' do
+      it 'creates service templates' do
+        expect { Service.find_or_create_templates }.to change { Service.count }.from(0).to(Service.available_services_names.size)
+      end
+
+      it_behaves_like 'retrieves service templates'
+
+      context 'with all existing templates' do
+        before do
+          Service.insert_all(
+            Service.available_services_types.map { |type| { template: true, type: type } }
+          )
+        end
+
+        it 'does not create service templates' do
+          expect { Service.find_or_create_templates }.not_to change { Service.count }
+        end
+
+        it_behaves_like 'retrieves service templates'
+
+        context 'with a previous existing service (Previous) and a new service (Asana)' do
+          before do
+            Service.insert(type: 'PreviousService', template: true)
+            Service.delete_by(type: 'AsanaService', template: true)
+          end
+
+          it_behaves_like 'retrieves service templates'
+        end
+      end
+
+      context 'with a few existing templates' do
+        before do
+          create(:jira_service, :template)
+        end
+
+        it 'creates the rest of the service templates' do
+          expect { Service.find_or_create_templates }.to change { Service.count }.from(1).to(Service.available_services_names.size)
+        end
+
+        it_behaves_like 'retrieves service templates'
+      end
+    end
 
     describe '.build_from_template' do
       context 'when template is invalid' do
@@ -153,7 +295,7 @@ describe Service do
 
         context 'when data are stored in separated fields' do
           let(:template) do
-            create(:jira_service, data_params.merge(properties: {}, title: title, description: description, template: true))
+            create(:jira_service, :template, data_params.merge(properties: {}, title: title, description: description))
           end
 
           it_behaves_like 'service creation from a template'
@@ -388,14 +530,6 @@ describe Service do
     it 'is empty by default' do
       service = create(:service, project: project)
       expect(service.deprecation_message).to be_nil
-    end
-  end
-
-  describe '.find_by_template' do
-    let!(:service) { create(:service, template: true) }
-
-    it 'returns service template' do
-      expect(described_class.find_by_template).to eq(service)
     end
   end
 

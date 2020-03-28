@@ -19,10 +19,6 @@ module Clusters
             application.hostname = params[:hostname]
           end
 
-          if application.has_attribute?(:kibana_hostname)
-            application.kibana_hostname = params[:kibana_hostname]
-          end
-
           if application.has_attribute?(:email)
             application.email = params[:email]
           end
@@ -31,8 +27,22 @@ module Clusters
             application.stack = params[:stack]
           end
 
+          if application.has_attribute?(:modsecurity_enabled)
+            application.modsecurity_enabled = params[:modsecurity_enabled] || false
+          end
+
+          if application.has_attribute?(:modsecurity_mode)
+            application.modsecurity_mode = params[:modsecurity_mode] || 0
+          end
+
           if application.respond_to?(:oauth_application)
             application.oauth_application = create_oauth_application(application, request)
+          end
+
+          if application.instance_of?(Knative)
+            Serverless::AssociateDomainService
+              .new(application, pages_domain_id: params[:pages_domain_id], creator: current_user)
+              .execute
           end
 
           worker = worker_class(application)
@@ -58,17 +68,13 @@ module Clusters
       end
 
       def instantiate_application
-        raise_invalid_application_error if invalid_application?
+        raise_invalid_application_error if unknown_application?
 
         builder || raise(InvalidApplicationError, "invalid application: #{application_name}")
       end
 
       def raise_invalid_application_error
         raise(InvalidApplicationError, "invalid application: #{application_name}")
-      end
-
-      def invalid_application?
-        unknown_application? || (application_name == Applications::ElasticStack.application_name && !Feature.enabled?(:enable_cluster_application_elastic_stack)) || (application_name == Applications::Crossplane.application_name && !Feature.enabled?(:enable_cluster_application_crossplane))
       end
 
       def unknown_application?

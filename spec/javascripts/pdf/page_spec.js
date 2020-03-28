@@ -1,10 +1,9 @@
 import Vue from 'vue';
-import pdfjsLib from 'pdfjs-dist/build/pdf';
-import workerSrc from 'pdfjs-dist/build/pdf.worker.min';
+import pdfjsLib from 'pdfjs-dist/webpack';
 
-import PageComponent from '~/pdf/page/index.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { FIXTURES_PATH } from 'spec/test_constants';
+import PageComponent from '~/pdf/page/index.vue';
 
 const testPDF = `${FIXTURES_PATH}/blob/pdf/test.pdf`;
 
@@ -14,7 +13,6 @@ describe('Page component', () => {
   let testPage;
 
   beforeEach(done => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
     pdfjsLib
       .getDocument(testPDF)
       .promise.then(pdf => pdf.getPage(1))

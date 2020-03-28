@@ -17,7 +17,7 @@ module Gitlab
           rescue JSON::ParserError
             raise SecurityReportParserError, 'JSON parsing failed'
           rescue => e
-            Gitlab::Sentry.track_exception(e)
+            Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
             raise SecurityReportParserError, "#{report.type} security report parsing failed"
           end
 
@@ -31,13 +31,20 @@ module Gitlab
           def collate_remediations(report_data)
             return report_data["vulnerabilities"] || [] unless report_data["remediations"]
 
+            fixes = fixes_from(report_data)
             report_data["vulnerabilities"].map do |vulnerability|
-              # Grab the first available remediation.
-              remediation = report_data["remediations"].find do |remediation|
-                remediation["fixes"].any? { |fix| fix["cve"] == vulnerability["cve"] }
-              end
-
+              remediation = fixes[vulnerability['id']] || fixes[vulnerability['cve']]
               vulnerability.merge("remediations" => [remediation])
+            end
+          end
+
+          def fixes_from(report_data)
+            report_data['remediations'].each_with_object({}) do |item, memo|
+              item['fixes'].each do |fix|
+                id = fix['id'] || fix['cve']
+                memo[id] = item if id
+              end
+              memo
             end
           end
 
@@ -93,7 +100,8 @@ module Gitlab
           end
 
           def parse_level(input)
-            input.blank? ? 'undefined' : input.downcase
+            input = input&.downcase
+            input.blank? || input == 'undefined' ? 'unknown' : input
           end
 
           def create_location(location_data)

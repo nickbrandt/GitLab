@@ -5,7 +5,7 @@
 The Dependency list allows you to see your project's dependencies, and key
 details about them, including their known vulnerabilities. To see it,
 navigate to **Security & Compliance > Dependency List** in your project's
-sidebar.
+sidebar. This information is sometimes referred to as a Software Bill of Materials or SBoM / BOM.
 
 ## Requirements
 
@@ -48,8 +48,8 @@ vulnerability will then be displayed below it.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/10536) in GitLab Ultimate 12.3.
 
-If the [License Compliance](../license_compliance/index.md) CI job is configured,
-the [discovered licenses](../license_compliance/index.md#supported-languages-and-package-managers) will be displayed on this page.
+If the [License Compliance](../../compliance/license_compliance/index.md) CI job is configured,
+the [discovered licenses](../../compliance/license_compliance/index.md#supported-languages-and-package-managers) will be displayed on this page.
 
 ## Downloading the Dependency List
 

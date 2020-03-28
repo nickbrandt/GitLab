@@ -7,18 +7,23 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   before_action :authorize_read_environment!
   before_action :authorize_create_environment!, only: [:new, :create]
   before_action :authorize_stop_environment!, only: [:stop]
-  before_action :authorize_update_environment!, only: [:edit, :update]
+  before_action :authorize_update_environment!, only: [:edit, :update, :cancel_auto_stop]
   before_action :authorize_admin_environment!, only: [:terminal, :terminal_websocket_authorize]
-  before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics]
+  before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics, :cancel_auto_stop]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
-  before_action :expire_etag_cache, only: [:index]
+  before_action :expire_etag_cache, only: [:index], unless: -> { request.format.json? }
   before_action only: [:metrics, :additional_metrics, :metrics_dashboard] do
     push_frontend_feature_flag(:prometheus_computed_alerts)
   end
+  before_action do
+    push_frontend_feature_flag(:auto_stop_environments, default_enabled: true)
+  end
+  after_action :expire_etag_cache, only: [:cancel_auto_stop]
 
   def index
     @environments = project.environments
       .with_state(params[:scope] || :available)
+    @project = ProjectPresenter.new(project, current_user: current_user)
 
     respond_to do |format|
       format.html
@@ -27,6 +32,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
         render json: {
           environments: serialize_environments(request, response, params[:nested]),
+          review_app: serialize_review_app,
           available_count: project.environments.available.count,
           stopped_count: project.environments.stopped.count
         }
@@ -104,6 +110,27 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     end
   end
 
+  def cancel_auto_stop
+    result = Environments::ResetAutoStopService.new(project, current_user)
+      .execute(environment)
+
+    if result[:status] == :success
+      respond_to do |format|
+        message = _('Auto stop successfully canceled.')
+
+        format.html { redirect_back_or_default(default: { action: 'show' }, options: { notice: message }) }
+        format.json { render json: { message: message }, status: :ok }
+      end
+    else
+      respond_to do |format|
+        message = result[:message]
+
+        format.html { redirect_back_or_default(default: { action: 'show' }, options: { alert: message }) }
+        format.json { render json: { message: message }, status: :unprocessable_entity }
+      end
+    end
+  end
+
   def terminal
     # Currently, this acts as a hint to load the terminal details into the cache
     # if they aren't there already. In the future, users will need these details
@@ -175,8 +202,6 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def expire_etag_cache
-    return if request.format.json?
-
     # this forces to reload json content
     Gitlab::EtagCaching::Store.new.tap do |store|
       store.touch(project_environments_path(project, format: :json))
@@ -197,7 +222,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
   def metrics_dashboard_params
     params
-      .permit(:embedded, :group, :title, :y_label, :dashboard_path, :environment)
+      .permit(:embedded, :group, :title, :y_label, :dashboard_path, :environment, :sample_metrics)
       .merge(dashboard_path: params[:dashboard], environment: environment)
   end
 
@@ -219,8 +244,16 @@ class Projects::EnvironmentsController < Projects::ApplicationController
       .represent(@environments)
   end
 
+  def serialize_review_app
+    ReviewAppSetupSerializer.new(current_user: @current_user).represent(@project)
+  end
+
   def authorize_stop_environment!
     access_denied! unless can?(current_user, :stop_environment, environment)
+  end
+
+  def authorize_update_environment!
+    access_denied! unless can?(current_user, :update_environment, environment)
   end
 end
 

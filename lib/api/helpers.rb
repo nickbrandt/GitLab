@@ -4,6 +4,7 @@ module API
   module Helpers
     include Gitlab::Utils
     include Helpers::Pagination
+    include Helpers::PaginationStrategies
 
     SUDO_HEADER = "HTTP_SUDO"
     GITLAB_SHARED_SECRET_HEADER = "Gitlab-Shared-Secret"
@@ -30,6 +31,7 @@ module API
       check_unmodified_since!(last_updated)
 
       status 204
+      body false
 
       if block_given?
         yield resource
@@ -140,6 +142,12 @@ module API
       end
     end
 
+    def check_namespace_access(namespace)
+      return namespace if can?(current_user, :read_namespace, namespace)
+
+      not_found!('Namespace')
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
     def find_namespace(id)
       if id.to_s =~ /^\d+$/
@@ -151,13 +159,15 @@ module API
     # rubocop: enable CodeReuse/ActiveRecord
 
     def find_namespace!(id)
-      namespace = find_namespace(id)
+      check_namespace_access(find_namespace(id))
+    end
 
-      if can?(current_user, :read_namespace, namespace)
-        namespace
-      else
-        not_found!('Namespace')
-      end
+    def find_namespace_by_path(path)
+      Namespace.find_by_full_path(path)
+    end
+
+    def find_namespace_by_path!(path)
+      check_namespace_access(find_namespace_by_path(path))
     end
 
     def find_branch!(branch_name)
@@ -213,9 +223,9 @@ module API
       unauthorized! unless Devise.secure_compare(secret_token, input)
     end
 
-    def authenticated_with_full_private_access!
+    def authenticated_with_can_read_all_resources!
       authenticate!
-      forbidden! unless current_user.full_private_access?
+      forbidden! unless current_user.can_read_all_resources?
     end
 
     def authenticated_as_admin!
@@ -256,9 +266,19 @@ module API
     end
 
     def require_gitlab_workhorse!
+      verify_workhorse_api!
+
       unless env['HTTP_GITLAB_WORKHORSE'].present?
         forbidden!('Request should be executed via GitLab Workhorse')
       end
+    end
+
+    def verify_workhorse_api!
+      Gitlab::Workhorse.verify_api_request!(request.headers)
+    rescue => e
+      Gitlab::ErrorTracking.track_exception(e)
+
+      forbidden!
     end
 
     def require_pages_enabled!
@@ -314,7 +334,7 @@ module API
 
     def order_options_with_tie_breaker
       order_options = { params[:order_by] => params[:sort] }
-      order_options['id'] ||= 'desc'
+      order_options['id'] ||= params[:sort] || 'asc'
       order_options
     end
 
@@ -347,6 +367,14 @@ module API
       render_api_error!('405 Method Not Allowed', 405)
     end
 
+    def not_acceptable!
+      render_api_error!('406 Not Acceptable', 406)
+    end
+
+    def service_unavailable!
+      render_api_error!('503 Service Unavailable', 503)
+    end
+
     def conflict!(message = nil)
       render_api_error!(message || '409 Conflict', 409)
     end
@@ -361,6 +389,10 @@ module API
 
     def no_content!
       render_api_error!('204 No Content', 204)
+    end
+
+    def created!
+      render_api_error!('201 Created', 201)
     end
 
     def accepted!
@@ -384,8 +416,9 @@ module API
     def handle_api_exception(exception)
       if report_exception?(exception)
         define_params_for_grape_middleware
-        Gitlab::Sentry.context(current_user)
-        Gitlab::Sentry.track_acceptable_exception(exception, extra: params)
+        Gitlab::ErrorTracking.with_context(current_user) do
+          Gitlab::ErrorTracking.track_exception(exception, params)
+        end
       end
 
       # This is used with GrapeLogging::Loggers::ExceptionLogger
@@ -427,7 +460,7 @@ module API
 
     def present_disk_file!(path, filename, content_type = 'application/octet-stream')
       filename ||= File.basename(path)
-      header['Content-Disposition'] = ::Gitlab::ContentDisposition.format(disposition: 'attachment', filename: filename)
+      header['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: 'attachment', filename: filename)
       header['Content-Transfer-Encoding'] = 'binary'
       content_type content_type
 
@@ -476,6 +509,7 @@ module API
       finder_params[:visibility_level] = Gitlab::VisibilityLevel.level_value(params[:visibility]) if params[:visibility]
       finder_params[:archived] = archived_param unless params[:archived].nil?
       finder_params[:search] = params[:search] if params[:search]
+      finder_params[:search_namespaces] = true if params[:search_namespaces].present?
       finder_params[:user] = params.delete(:user) if params[:user]
       finder_params[:custom_attributes] = params[:custom_attributes] if params[:custom_attributes]
       finder_params[:min_access_level] = params[:min_access_level] if params[:min_access_level]
@@ -535,7 +569,7 @@ module API
     def send_git_blob(repository, blob)
       env['api.format'] = :txt
       content_type 'text/plain'
-      header['Content-Disposition'] = ::Gitlab::ContentDisposition.format(disposition: 'inline', filename: blob.name)
+      header['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: 'inline', filename: blob.name)
 
       # Let Workhorse examine the content and determine the better content disposition
       header[Gitlab::Workhorse::DETECT_HEADER] = "true"

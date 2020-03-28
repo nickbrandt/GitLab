@@ -1,5 +1,6 @@
 <script>
 import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import { VALID_DESIGN_FILE_MIMETYPE } from '../../constants';
 
 export default {
   components: {
@@ -19,10 +20,11 @@ export default {
     openFileUpload() {
       this.$refs.fileUpload.click();
     },
-    onFileUploadChange() {
-      this.$emit('upload', this.$refs.fileUpload.files);
+    onFileUploadChange(e) {
+      this.$emit('upload', e.target.files);
     },
   },
+  VALID_DESIGN_FILE_MIMETYPE,
 };
 </script>
 
@@ -42,11 +44,12 @@ export default {
       {{ s__('DesignManagement|Add designs') }}
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
     </gl-button>
+
     <input
       ref="fileUpload"
       type="file"
       name="design_file"
-      accept="image/*"
+      :accept="$options.VALID_DESIGN_FILE_MIMETYPE.mimetype"
       class="hide"
       multiple
       @change="onFileUploadChange"

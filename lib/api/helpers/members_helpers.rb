@@ -5,6 +5,11 @@
 module API
   module Helpers
     module MembersHelpers
+      extend Grape::API::Helpers
+
+      params :optional_filter_params_ee do
+      end
+
       def find_source(source_type, id)
         public_send("find_#{source_type}!", id) # rubocop:disable GitlabSecurity/PublicSend
       end
@@ -29,16 +34,22 @@ module API
       end
 
       def find_all_members_for_project(project)
-        MembersFinder.new(project, current_user).execute(include_invited_groups_members: true)
+        MembersFinder.new(project, current_user).execute(include_relations: [:inherited, :direct, :invited_groups_members])
       end
 
       def find_all_members_for_group(group)
         GroupMembersFinder.new(group).execute
       end
 
+      def create_member(current_user, user, source, params)
+        source.add_user(user, params[:access_level], current_user: current_user, expires_at: params[:expires_at])
+      end
+
       def present_members(members)
-        present members, with: Entities::Member, current_user: current_user
+        present members, with: Entities::Member, current_user: current_user, show_seat_info: params[:show_seat_info]
       end
     end
   end
 end
+
+API::Helpers::MembersHelpers.prepend_if_ee('EE::API::Helpers::MembersHelpers')

@@ -46,6 +46,10 @@ describe EpicLinks::DestroyService do
     end
 
     context 'when epics feature is disabled' do
+      before do
+        stub_licensed_features(epics: false)
+      end
+
       subject { remove_epic_relation(child_epic) }
 
       include_examples 'returns not found error'

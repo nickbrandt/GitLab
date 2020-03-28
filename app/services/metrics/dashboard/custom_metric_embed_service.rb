@@ -18,7 +18,7 @@ module Metrics
         # custom metrics from the DB.
         def valid_params?(params)
           [
-            params[:embedded],
+            embedded?(params[:embedded]),
             valid_dashboard?(params[:dashboard_path]),
             valid_group_title?(params[:group]),
             params[:title].present?,
@@ -40,7 +40,7 @@ module Metrics
         # All custom metrics are displayed on the system dashboard.
         # Nil is acceptable as we'll default to the system dashboard.
         def valid_dashboard?(dashboard)
-          dashboard.nil? || ::Metrics::Dashboard::SystemDashboardService.system_dashboard?(dashboard)
+          dashboard.nil? || ::Metrics::Dashboard::SystemDashboardService.matching_dashboard?(dashboard)
         end
       end
 

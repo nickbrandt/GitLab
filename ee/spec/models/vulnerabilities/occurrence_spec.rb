@@ -281,17 +281,31 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '.undismissed' do
-    set(:project) { create(:project) }
-    set(:project2) { create(:project) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:project2) { create(:project) }
     let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
-    let!(:finding2) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding2) { create(:vulnerabilities_occurrence, project: project, report_type: :dast) }
     let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
 
     before do
       create(
         :vulnerability_feedback,
         :dismissal,
+        project: finding1.project,
         project_fingerprint: finding1.project_fingerprint
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        project_fingerprint: finding2.project_fingerprint,
+        project: project2
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        category: :sast,
+        project_fingerprint: finding2.project_fingerprint,
+        project: finding2.project
       )
     end
 
@@ -305,14 +319,38 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '.batch_count_by_project_and_severity' do
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
     let(:project) { create(:project) }
 
     it 'fetches a vulnerability count for the given project and severity' do
-      create(:vulnerabilities_occurrence, project: project, severity: :high)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
 
       count = described_class.batch_count_by_project_and_severity(project.id, 'high')
 
       expect(count).to be(1)
+    end
+
+    it 'only returns vulnerabilities from the latest successful pipeline' do
+      old_pipeline = create(:ci_pipeline, :success, project: project)
+      latest_pipeline = create(:ci_pipeline, :success, project: project)
+      latest_failed_pipeline = create(:ci_pipeline, :failed, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [old_pipeline], project: project, severity: :critical)
+      create(
+        :vulnerabilities_occurrence,
+        pipelines: [latest_failed_pipeline],
+        project: project,
+        severity: :critical
+      )
+      create_list(
+        :vulnerabilities_occurrence, 2,
+        pipelines: [latest_pipeline],
+        project: project,
+        severity: :critical
+      )
+
+      count = described_class.batch_count_by_project_and_severity(project.id, 'critical')
+
+      expect(count).to be(2)
     end
 
     it 'returns 0 when there are no vulnerabilities for that severity level' do
@@ -325,8 +363,10 @@ describe Vulnerabilities::Occurrence do
       projects = create_list(:project, 2)
 
       projects.each do |project|
-        create(:vulnerabilities_occurrence, project: project, severity: :high)
-        create(:vulnerabilities_occurrence, project: project, severity: :low)
+        pipeline = create(:ci_pipeline, :success, project: project)
+
+        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :low)
       end
 
       projects_and_severities = [
@@ -344,8 +384,8 @@ describe Vulnerabilities::Occurrence do
     end
 
     it 'does not include dismissed vulnerabilities in the counts' do
-      create(:vulnerabilities_occurrence, project: project, severity: :high)
-      dismissed_vulnerability = create(:vulnerabilities_occurrence, project: project, severity: :high)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+      dismissed_vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
       create(
         :vulnerability_feedback,
         project: project,
@@ -357,10 +397,29 @@ describe Vulnerabilities::Occurrence do
 
       expect(count).to be(1)
     end
+
+    it "does not overwrite one project's counts with another's" do
+      project1 = create(:project)
+      project2 = create(:project)
+      pipeline1 = create(:ci_pipeline, :success, project: project1)
+      pipeline2 = create(:ci_pipeline, :success, project: project2)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline1], project: project1, severity: :critical)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline2], project: project2, severity: :high)
+
+      project1_critical_count = described_class.batch_count_by_project_and_severity(project1.id, 'critical')
+      project1_high_count = described_class.batch_count_by_project_and_severity(project1.id, 'high')
+      project2_critical_count = described_class.batch_count_by_project_and_severity(project2.id, 'critical')
+      project2_high_count = described_class.batch_count_by_project_and_severity(project2.id, 'high')
+
+      expect(project1_critical_count).to be(1)
+      expect(project1_high_count).to be(0)
+      expect(project2_critical_count).to be(0)
+      expect(project2_high_count).to be(1)
+    end
   end
 
   describe 'feedback' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
     let(:occurrence) do
       create(
         :vulnerabilities_occurrence,
@@ -438,7 +497,7 @@ describe Vulnerabilities::Occurrence do
 
   describe '#state' do
     before do
-      create(:vulnerability, :closed, project: finding_with_issue.project, findings: [finding_with_issue])
+      create(:vulnerability, :dismissed, project: finding_with_issue.project, findings: [finding_with_issue])
     end
 
     let(:unresolved_finding) { create(:vulnerabilities_finding) }
@@ -448,7 +507,7 @@ describe Vulnerabilities::Occurrence do
     let(:finding_with_issue) { create(:vulnerabilities_finding, :with_issue_feedback) }
 
     it 'returns the expected state for a unresolved finding' do
-      expect(unresolved_finding.state).to eq 'opened'
+      expect(unresolved_finding.state).to eq 'detected'
     end
 
     it 'returns the expected state for a confirmed finding' do
@@ -482,5 +541,13 @@ describe Vulnerabilities::Occurrence do
         expect(resolved_finding.state).to eq 'resolved'
       end
     end
+  end
+
+  describe '#scanner_name' do
+    let(:vulnerabilities_occurrence) { create(:vulnerabilities_occurrence) }
+
+    subject(:scanner_name) { vulnerabilities_occurrence.scanner_name }
+
+    it { is_expected.to eq(vulnerabilities_occurrence.scanner.name) }
   end
 end

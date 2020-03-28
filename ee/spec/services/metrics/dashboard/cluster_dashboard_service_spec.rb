@@ -5,27 +5,41 @@ require 'spec_helper'
 describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_store_caching do
   include MetricsDashboardHelpers
 
-  set(:user) { create(:user) }
-  set(:cluster_project) { create(:cluster_project) }
-  set(:cluster) { cluster_project.cluster }
-  set(:project) { cluster_project.project }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:cluster_project) { create(:cluster_project) }
+  let_it_be(:cluster) { cluster_project.cluster }
+  let_it_be(:project) { cluster_project.project }
 
   before do
     project.add_maintainer(user)
   end
 
-  describe 'get_dashboard' do
+  describe '.valid_params?' do
+    let(:params) { { cluster: cluster, embedded: 'false' } }
+
+    subject { described_class.valid_params?(params) }
+
+    it { is_expected.to be_truthy }
+
+    context 'with matching dashboard_path' do
+      let(:params) { { dashboard_path: ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH } }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'missing cluster without dashboard_path' do
+      let(:params) { {} }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#get_dashboard' do
     let(:service_params) { [project, user, { cluster: cluster, cluster_type: :project }] }
     let(:service_call) { described_class.new(*service_params).get_dashboard }
 
     it_behaves_like 'valid dashboard service response'
-
-    it 'caches the unprocessed dashboard for subsequent calls' do
-      expect(YAML).to receive(:safe_load).once.and_call_original
-
-      described_class.new(*service_params).get_dashboard
-      described_class.new(*service_params).get_dashboard
-    end
+    it_behaves_like 'caches the unprocessed dashboard for subsequent calls'
 
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }

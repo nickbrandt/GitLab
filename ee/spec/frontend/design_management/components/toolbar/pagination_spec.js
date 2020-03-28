@@ -1,5 +1,18 @@
+/* global Mousetrap */
+import 'mousetrap';
 import { shallowMount } from '@vue/test-utils';
 import Pagination from 'ee/design_management/components/toolbar/pagination.vue';
+import { DESIGN_ROUTE_NAME } from 'ee/design_management/router/constants';
+
+const push = jest.fn();
+const $router = {
+  push,
+};
+
+const $route = {
+  path: '/designs/design-2',
+  query: {},
+};
 
 describe('Design management pagination component', () => {
   let wrapper;
@@ -8,6 +21,10 @@ describe('Design management pagination component', () => {
     wrapper = shallowMount(Pagination, {
       propsData: {
         id: '2',
+      },
+      mocks: {
+        $router,
+        $route,
       },
     });
   }
@@ -29,6 +46,34 @@ describe('Design management pagination component', () => {
       designs: [{ id: '1' }, { id: '2' }],
     });
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
+
+  describe('keyboard buttons navigation', () => {
+    beforeEach(() => {
+      wrapper.setData({
+        designs: [{ filename: '1' }, { filename: '2' }, { filename: '3' }],
+      });
+    });
+
+    it('routes to previous design on Left button', () => {
+      Mousetrap.trigger('left');
+      expect(push).toHaveBeenCalledWith({
+        name: DESIGN_ROUTE_NAME,
+        params: { id: '1' },
+        query: {},
+      });
+    });
+
+    it('routes to next design on Right button', () => {
+      Mousetrap.trigger('right');
+      expect(push).toHaveBeenCalledWith({
+        name: DESIGN_ROUTE_NAME,
+        params: { id: '3' },
+        query: {},
+      });
+    });
   });
 });

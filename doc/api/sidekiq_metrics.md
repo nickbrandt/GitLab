@@ -10,11 +10,11 @@ of Sidekiq, its jobs, queues, and processes.
 List information about all the registered queues, their backlog and their
 latency.
 
-```
+```plaintext
 GET /sidekiq/queue_metrics
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/sidekiq/queue_metrics
 ```
 
@@ -35,11 +35,11 @@ Example response:
 
 List information about all the Sidekiq workers registered to process your queues.
 
-```
+```plaintext
 GET /sidekiq/process_metrics
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/sidekiq/process_metrics
 ```
 
@@ -77,11 +77,11 @@ Example response:
 
 List information about the jobs that Sidekiq has performed.
 
-```
+```plaintext
 GET /sidekiq/job_stats
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/sidekiq/job_stats
 ```
 
@@ -102,11 +102,11 @@ Example response:
 
 List all the currently available information about Sidekiq.
 
-```
+```plaintext
 GET /sidekiq/compound_metrics
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/sidekiq/compound_metrics
 ```
 

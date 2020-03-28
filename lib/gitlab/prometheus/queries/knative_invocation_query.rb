@@ -20,7 +20,7 @@ module Gitlab
         protected
 
         def context(function_id)
-          function = Serverless::Function.find_by_id(function_id)
+          function = ::Serverless::Function.find_by_id(function_id)
           {
             function_name: function.name,
             kube_namespace: function.namespace
@@ -29,7 +29,7 @@ module Gitlab
 
         def run_query(query, context)
           query %= context
-          client_query_range(query, start: 8.hours.ago.to_f, stop: Time.now.to_f)
+          client_query_range(query, start_time: 8.hours.ago.to_f, end_time: Time.now.to_f)
         end
 
         def self.transform_reactive_result(result)

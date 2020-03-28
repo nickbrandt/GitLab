@@ -1,11 +1,11 @@
-import createStore from '~/notes/stores';
-import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { discussionMock } from '../../notes/mock_data';
 import DiscussionActions from '~/notes/components/discussion_actions.vue';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import ResolveDiscussionButton from '~/notes/components/discussion_resolve_button.vue';
 import ResolveWithIssueButton from '~/notes/components/discussion_resolve_with_issue_button.vue';
 import JumpToNextDiscussionButton from '~/notes/components/discussion_jump_to_next_button.vue';
+import createStore from '~/notes/stores';
 
 // NOTE: clone mock_data so that it is not accidentally mutated
 const createDiscussionMock = (props = {}) =>
@@ -22,12 +22,10 @@ const createUnallowedNote = () =>
 describe('DiscussionActions', () => {
   let wrapper;
   const createComponentFactory = (shallow = true) => props => {
-    const localVue = createLocalVue();
     const store = createStore();
     const mountFn = shallow ? shallowMount : mount;
 
     wrapper = mountFn(DiscussionActions, {
-      localVue,
       store,
       propsData: {
         discussion: discussionMock,
@@ -121,15 +119,6 @@ describe('DiscussionActions', () => {
         .find('button')
         .trigger('click');
       expect(wrapper.vm.$emit).toHaveBeenCalledWith('resolve');
-    });
-
-    it('emits jumpToNextDiscussion event when clicking on jump to next discussion button', () => {
-      jest.spyOn(wrapper.vm, '$emit');
-      wrapper
-        .find(JumpToNextDiscussionButton)
-        .find('button')
-        .trigger('click');
-      expect(wrapper.vm.$emit).toHaveBeenCalledWith('jumpToNextDiscussion');
     });
   });
 });

@@ -69,7 +69,7 @@ If you have problems with Git, the following may help:
 
 The following are advanced topics for those who want to get the most out of Git:
 
-- [Custom Git Hooks](../../administration/custom_hooks.md)
+- [Server Hooks](../../administration/server_hooks.md)
 - [Git Attributes](../../user/project/git_attributes.md)
 - Git Submodules: [Using Git submodules with GitLab CI](../../ci/git_submodules.md#using-git-submodules-with-gitlab-ci)
 - [Partial Clone](partial_clone.md)
@@ -85,6 +85,7 @@ The following relate to Git Large File Storage:
 
 - [Getting Started with Git LFS](https://about.gitlab.com/blog/2017/01/30/getting-started-with-git-lfs-tutorial/)
 - [Migrate an existing Git repo with Git LFS](migrate_to_git_lfs/index.md)
+- [Removing objects from LFS](../../administration/lfs/manage_large_binaries_with_git_lfs.md#removing-objects-from-lfs)
 - [GitLab Git LFS user documentation](../../administration/lfs/manage_large_binaries_with_git_lfs.md)
 - [GitLab Git LFS admin documentation](../../administration/lfs/lfs_administration.md)
 - [git-annex to Git-LFS migration guide](../../administration/lfs/migrate_from_git_annex_to_git_lfs.md)

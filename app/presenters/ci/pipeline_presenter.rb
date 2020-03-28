@@ -8,7 +8,9 @@ module Ci
     # We use a class method here instead of a constant, allowing EE to redefine
     # the returned `Hash` more easily.
     def self.failure_reasons
-      { config_error: 'CI/CD YAML configuration error!' }
+      { unknown_failure: 'Unknown pipeline failure!',
+        config_error: 'CI/CD YAML configuration error!',
+        external_validation_failure: 'External pipeline validation failed!' }
     end
 
     presents :pipeline
@@ -68,16 +70,20 @@ module Ci
       end
     end
 
-    def all_related_merge_request_text
+    def all_related_merge_request_text(limit: nil)
       if all_related_merge_requests.none?
-        'No related merge requests found.'
+        _("No related merge requests found.")
       else
         _("%{count} related %{pluralized_subject}: %{links}" % {
           count: all_related_merge_requests.count,
-          pluralized_subject: 'merge request'.pluralize(all_related_merge_requests.count),
-          links: all_related_merge_request_links.join(', ')
+          pluralized_subject: n_('merge request', 'merge requests', all_related_merge_requests.count),
+          links: all_related_merge_request_links(limit: limit).join(', ')
         }).html_safe
       end
+    end
+
+    def has_many_merge_requests?
+      all_related_merge_requests.count > 1
     end
 
     def link_to_pipeline_ref
@@ -110,14 +116,16 @@ module Ci
 
     def merge_request_presenter
       strong_memoize(:merge_request_presenter) do
-        if pipeline.triggered_by_merge_request?
+        if pipeline.merge_request?
           pipeline.merge_request.present(current_user: current_user)
         end
       end
     end
 
-    def all_related_merge_request_links
-      all_related_merge_requests.map do |merge_request|
+    def all_related_merge_request_links(limit: nil)
+      limit ||= all_related_merge_requests.count
+
+      all_related_merge_requests.first(limit).map do |merge_request|
         mr_path = project_merge_request_path(merge_request.project, merge_request)
 
         link_to "#{merge_request.to_reference} #{merge_request.title}", mr_path, class: 'mr-iid'
@@ -126,7 +134,11 @@ module Ci
 
     def all_related_merge_requests
       strong_memoize(:all_related_merge_requests) do
-        pipeline.ref ? pipeline.all_merge_requests_by_recency.to_a : []
+        if pipeline.ref && can?(current_user, :read_merge_request, pipeline.project)
+          pipeline.all_merge_requests_by_recency.to_a
+        else
+          []
+        end
       end
     end
   end

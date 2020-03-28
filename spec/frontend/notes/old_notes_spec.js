@@ -1,14 +1,13 @@
 /* eslint-disable import/no-commonjs, no-new */
 
 import $ from 'jquery';
-import _ from 'underscore';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import * as urlUtility from '~/lib/utils/url_utility';
 import '~/behaviors/markdown/render_gfm';
 import { createSpyObj } from 'helpers/jest_helpers';
 import { setTestTimeoutOnce } from 'helpers/timeout';
 import { TEST_HOST } from 'helpers/test_constants';
+import * as urlUtility from '~/lib/utils/url_utility';
+import axios from '~/lib/utils/axios_utils';
 
 // These must be imported synchronously because they pull dependencies
 // from the DOM.
@@ -29,7 +28,10 @@ window.gl = window.gl || {};
 gl.utils = gl.utils || {};
 gl.utils.disableButtonIfEmptyField = () => {};
 
-describe('Old Notes (~/notes.js)', () => {
+// the following test is unreliable and failing in master 2-3 times a day
+// see https://gitlab.com/gitlab-org/gitlab/issues/206906#note_290602581
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip('Old Notes (~/notes.js)', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     loadFixtures(fixture);
@@ -792,14 +794,11 @@ describe('Old Notes (~/notes.js)', () => {
     });
 
     it('should return form metadata with sanitized formContent from form reference', () => {
-      jest.spyOn(_, 'escape');
-
       sampleComment = '<script>alert("Boom!");</script>';
       $form.find('textarea.js-note-text').val(sampleComment);
 
       const { formContent } = notes.getFormData($form);
 
-      expect(_.escape).toHaveBeenCalledWith(sampleComment);
       expect(formContent).toEqual('&lt;script&gt;alert(&quot;Boom!&quot;);&lt;/script&gt;');
     });
   });
@@ -990,7 +989,6 @@ describe('Old Notes (~/notes.js)', () => {
 
     beforeEach(() => {
       notes = new Notes('', []);
-      jest.spyOn(_, 'escape');
     });
 
     it('should return constructed placeholder element for system note based on form contents', () => {

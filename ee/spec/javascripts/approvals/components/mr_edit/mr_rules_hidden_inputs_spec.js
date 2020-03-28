@@ -31,7 +31,6 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
     wrapper = shallowMount(localVue.extend(MRRulesHiddenInputs), {
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
 
@@ -63,7 +62,7 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
     it('is empty', () => {
       factory();
 
-      expect(wrapper.html()).toBeUndefined();
+      expect(wrapper.isEmpty()).toBe(true);
     });
   });
 
@@ -163,10 +162,10 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
           rule.isNew = true;
         });
 
-        it('does not render id input', () => {
+        it('does render id input', () => {
           factory();
 
-          expect(findHiddenInputs().map(x => x.name)).not.toContain(INPUT_ID);
+          expect(findHiddenInputs().map(x => x.name)).toContain(INPUT_ID);
         });
 
         describe('with source', () => {

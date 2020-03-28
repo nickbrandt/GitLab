@@ -15,8 +15,8 @@ describe ContainerRegistry::EventHandler do
     { 'tag' => 'latest', 'repository' => container_repository.path }
   end
 
-  set(:primary_node)   { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node)   { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   before do
     stub_current_geo_node(primary_node)

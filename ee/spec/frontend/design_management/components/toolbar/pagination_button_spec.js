@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import PaginationButton from 'ee/design_management/components/toolbar/pagination_button.vue';
+import { DESIGN_ROUTE_NAME } from 'ee/design_management/router/constants';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -11,7 +12,6 @@ describe('Design management pagination button component', () => {
 
   function createComponent(design = null) {
     wrapper = shallowMount(PaginationButton, {
-      sync: false,
       localVue,
       router,
       propsData: {
@@ -52,7 +52,7 @@ describe('Design management pagination button component', () => {
       wrapper.vm.$router.replace('/root/test-project/issues/1/designs/test?version=1');
 
       expect(wrapper.vm.designLink).toEqual({
-        name: 'design',
+        name: DESIGN_ROUTE_NAME,
         params: { id: 'test' },
         query: { version: '1' },
       });

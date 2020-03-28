@@ -14,8 +14,10 @@ To access the visibility and access control options:
 
 ## Default branch protection
 
-Branch protection specifies which roles can push to branches and which roles can delete
-branches.
+This global option defines the branch protection that applies to every repository's default branch. [Branch protection](../../project/protected_branches.md) specifies which roles can push to branches and which roles can delete
+branches. In this case _Default_ refers to a repository's default branch, which in most cases is _master_.
+
+This setting applies only to each repositories' default branch. To protect other branches, you must configure branch protection in repository. For details, see [Protected Branches](../../project/protected_branches.md).
 
 To change the default branch protection:
 
@@ -23,6 +25,8 @@ To change the default branch protection:
 1. Click **Save changes**.
 
 For more details, see [Protected branches](../../project/protected_branches.md).
+
+To change this setting for a specific group, see [Default branch protection for groups](../../group/index.md#changing-the-default-branch-protection-of-a-group)
 
 ## Default project creation protection
 
@@ -35,7 +39,7 @@ To change the default project creation protection:
 
 For more details, see [Default project-creation level](../../group/index.md#default-project-creation-level).
 
-## Default project deletion protection
+## Default project deletion protection **(PREMIUM ONLY)**
 
 By default, a project can be deleted by anyone with the **Owner** role, either at the project or
 group level.
@@ -43,6 +47,19 @@ group level.
 To ensure only admin users can delete projects:
 
 1. Check the **Default project deletion protection** checkbox.
+1. Click **Save changes**.
+
+## Default deletion adjourned period **(PREMIUM ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/32935) in GitLab 12.6.
+
+By default, a project or group marked for removal will be permanently removed after 7 days.
+This period may be changed, and setting this period to 0 will enable immediate removal
+of projects or groups.
+
+To change this period:
+
+1. Select the desired option.
 1. Click **Save changes**.
 
 ## Default project visibility
@@ -99,7 +116,7 @@ For more details, see [Exporting a project and its data](../../../user/project/s
 
 ## Enabled Git access protocols
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/4696) in GitLab 8.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/4696) in GitLab 8.10.
 
 With GitLab's access restrictions, you can select with which protocols users can communicate with
 GitLab.
@@ -131,13 +148,13 @@ On top of these UI restrictions, GitLab will deny all Git actions on the protoco
 not selected.
 
 CAUTION: **Important:**
-Starting with [GitLab 10.7](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18021),
+Starting with [GitLab 10.7](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18021),
 HTTP(S) protocol will be allowed for Git clone or fetch requests done by GitLab Runner
 from CI/CD jobs, even if _Only SSH_ was selected.
 
 ## Custom Git clone URL for HTTP(S)
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18422) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18422) in GitLab 12.4.
 
 You can customize project Git clone URLs for HTTP(S). This will affect the clone
 panel:
@@ -175,7 +192,7 @@ For more details, see [SSH key restrictions](../../../security/ssh_keys_restrict
 
 ## Allow mirrors to be set up for projects
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3586) in GitLab 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3586) in GitLab 10.3.
 
 This option is enabled by default. By disabling it, both [pull and push mirroring](../../project/repository/repository_mirroring.md) will no longer
 work in every repository and can only be re-enabled by an admin on a per-project basis.

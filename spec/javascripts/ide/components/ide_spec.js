@@ -1,7 +1,7 @@
 import Vue from 'vue';
+import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import store from '~/ide/stores';
 import ide from '~/ide/components/ide.vue';
-import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { file, resetStore } from '../helpers';
 import { projectData } from '../mock_data';
 
@@ -61,14 +61,14 @@ describe('ide component, non-empty repo', () => {
   });
 
   it('shows error message when set', done => {
-    expect(vm.$el.querySelector('.flash-container')).toBe(null);
+    expect(vm.$el.querySelector('.gl-alert')).toBe(null);
 
     vm.$store.state.errorMessage = {
       text: 'error',
     };
 
     vm.$nextTick(() => {
-      expect(vm.$el.querySelector('.flash-container')).not.toBe(null);
+      expect(vm.$el.querySelector('.gl-alert')).not.toBe(null);
 
       done();
     });

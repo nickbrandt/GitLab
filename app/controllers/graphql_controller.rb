@@ -3,6 +3,7 @@
 class GraphqlController < ApplicationController
   # Unauthenticated users have access to the API for public data
   skip_before_action :authenticate_user!
+  skip_around_action :set_session_storage
 
   # Allow missing CSRF tokens, this would mean that if a CSRF is invalid or missing,
   # the user won't be authenticated but can proceed as an anonymous user.
@@ -13,6 +14,11 @@ class GraphqlController < ApplicationController
 
   before_action :authorize_access_api!
   before_action(only: [:execute]) { authenticate_sessionless_user!(:api) }
+
+  # Since we deactivate authentication from the main ApplicationController and
+  # defer it to :authorize_access_api!, we need to override the bypass session
+  # callback execution order here
+  around_action :sessionless_bypass_admin_mode!, if: :sessionless_user?
 
   def execute
     result = multiplex? ? execute_multiplex : execute_query

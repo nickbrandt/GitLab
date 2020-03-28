@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Updating an Epic' do
+describe Mutations::Epics::Update do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
@@ -105,6 +105,7 @@ describe 'Updating an Epic' do
 
       context 'when changing labels of the epic' do
         let(:attributes) { { add_label_ids: [label_1.id, label_3.id], remove_label_ids: label_2.id } }
+
         it 'adds and removes labels correctly' do
           post_graphql_mutation(mutation, current_user: current_user)
 

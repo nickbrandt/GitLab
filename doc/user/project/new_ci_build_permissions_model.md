@@ -48,7 +48,7 @@ It is important to note that we have a few types of users:
   via another project's job.
 
 - **External users**: CI jobs created by [external users](../permissions.md#external-users-core-only) will have
-  access only to projects to which user has at least reporter access. This
+  access only to projects to which the user has at least Reporter access. This
   rules out accessing all internal projects by default.
 
 This allows us to make the CI and permission system more trustworthy.
@@ -68,7 +68,7 @@ Let's consider the following scenario:
 A unique job token is generated for each job and provides the user read
 access all projects that would be normally accessible to the user creating that
 job. The unique job token does not have any write permissions, but there
-is a [proposal to add support](https://gitlab.com/gitlab-org/gitlab-foss/issues/18106).
+is a [proposal to add support](https://gitlab.com/gitlab-org/gitlab/issues/35067).
 
 We try to make sure that this token doesn't leak by:
 
@@ -101,20 +101,20 @@ allowing pulling and pushing Docker images from within the CI job.
 
 GitLab would create a special checkout URL like:
 
-```
+```plaintext
 https://gitlab-ci-token:<project-runners-token>/gitlab.com/gitlab-org/gitlab-foss.git
 ```
 
 And then the users could also use it in their CI jobs all Docker related
 commands to interact with GitLab Container Registry. For example:
 
-```
+```shell
 docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
 ```
 
 Using single token had multiple security implications:
 
-- The token would be readable to anyone who had developer access to a project
+- The token would be readable to anyone who had Developer access to a project
   that could run CI jobs, allowing the developer to register any specific
   Runner for that project.
 - The token would allow to access only the project's sources, forbidding from
@@ -173,20 +173,20 @@ As a user:
 The [Job environment variable][jobenv] `CI_JOB_TOKEN` can be used to
 authenticate any clones of dependent repositories. For example:
 
-```
+```shell
 git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/<user>/<mydependentrepo>.git
 ```
 
 It can also be used for system-wide authentication
 (only do this in a docker container, it will overwrite ~/.netrc):
 
-```
+```shell
 echo -e "machine gitlab.com\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
 ```
 
 ### Git submodules
 
-To properly configure submodules with GitLab CI, read the
+To properly configure submodules with GitLab CI/CD, read the
 [Git submodules documentation][gitsub].
 
 ### Container Registry
@@ -213,7 +213,7 @@ project for which the job is triggered.
 
 This is how an example usage can look like:
 
-```
+```yaml
 test:
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY

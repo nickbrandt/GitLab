@@ -29,19 +29,19 @@ describe 'Group routing', "routing" do
     it 'lists vulnerabilities' do
       allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
 
-      expect(get('/groups/gitlabhq/-/security/vulnerabilities')).to route_to('groups/security/vulnerabilities#index', group_id: 'gitlabhq')
+      expect(get('/groups/gitlabhq/-/security/vulnerability_findings')).to route_to('groups/security/vulnerability_findings#index', group_id: 'gitlabhq')
     end
 
     it 'shows vulnerability summary' do
       allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
 
-      expect(get('/groups/gitlabhq/-/security/vulnerabilities/summary')).to route_to('groups/security/vulnerabilities#summary', group_id: 'gitlabhq')
+      expect(get('/groups/gitlabhq/-/security/vulnerability_findings/summary')).to route_to('groups/security/vulnerability_findings#summary', group_id: 'gitlabhq')
     end
 
     it 'shows vulnerability history' do
       allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
 
-      expect(get('/groups/gitlabhq/-/security/vulnerabilities/history')).to route_to('groups/security/vulnerabilities#history', group_id: 'gitlabhq')
+      expect(get('/groups/gitlabhq/-/security/vulnerability_findings/history')).to route_to('groups/security/vulnerability_findings#history', group_id: 'gitlabhq')
     end
   end
 
@@ -60,6 +60,16 @@ describe 'Group routing', "routing" do
         expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/blobs/abc12345'))
           .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'ruby', sha: 'abc12345')
       end
+
+      it "does not route to #blob with an invalid sha" do
+        expect(get("/v2/gitlabhq/dependency_proxy/containers/ruby/blobs/sha256:asdf1234%2f%2e%2e"))
+          .not_to route_to(group_id: 'gitlabhq', image: 'ruby', sha: 'sha256:asdf1234%2f%2e%2e')
+      end
+
+      it "does not route to #blob with an invalid image" do
+        expect(get("/v2/gitlabhq/dependency_proxy/containers/ru*by/blobs/abc12345"))
+          .not_to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'ru*by', sha: 'abc12345')
+      end
     end
 
     context 'image name with namespace' do
@@ -72,6 +82,14 @@ describe 'Group routing', "routing" do
         expect(get('/v2/gitlabhq/dependency_proxy/containers/foo/bar/blobs/abc12345'))
           .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'foo/bar', sha: 'abc12345')
       end
+    end
+  end
+
+  describe 'hooks' do
+    it 'routes to hooks edit page' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/hooks/2/edit')).to route_to('groups/hooks#edit', group_id: 'gitlabhq', id: '2')
     end
   end
 

@@ -1,7 +1,8 @@
 # Integrate your GitLab server with Bitbucket Cloud
 
 NOTE: **Note:**
-You need to [enable OmniAuth](omniauth.md) in order to use this.
+Starting from GitLab 11.4, OmniAuth is enabled by default. If you're using an
+earlier version, you'll need to explicitly enable it.
 
 Import projects from Bitbucket.org and login to your GitLab instance with your
 Bitbucket.org account.
@@ -56,7 +57,7 @@ you to use.
 
    And grant at least the following permissions:
 
-   ```
+   ```plaintext
    Account: Email, Read
    Projects: Read
    Repositories: Read
@@ -76,7 +77,7 @@ you to use.
 
 1. On your GitLab server, open the configuration file:
 
-   ```
+   ```shell
    # For Omnibus packages
    sudo editor /etc/gitlab/gitlab.rb
 
@@ -89,8 +90,6 @@ you to use.
    For Omnibus packages:
 
    ```ruby
-   gitlab_rails['omniauth_enabled'] = true
-
    gitlab_rails['omniauth_providers'] = [
      {
        "name" => "bitbucket",

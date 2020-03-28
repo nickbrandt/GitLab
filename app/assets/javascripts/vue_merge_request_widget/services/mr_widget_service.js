@@ -54,11 +54,18 @@ export default class MRWidgetService {
     return axios.post(this.endpoints.rebasePath);
   }
 
-  static stopEnvironment(url) {
+  static executeInlineAction(url) {
     return axios.post(url);
   }
 
   static fetchMetrics(metricsUrl) {
     return axios.get(`${metricsUrl}.json`);
+  }
+
+  static fetchInitialData() {
+    return Promise.all([
+      axios.get(window.gl.mrWidgetData.merge_request_cached_widget_path),
+      axios.get(window.gl.mrWidgetData.merge_request_widget_path),
+    ]).then(axios.spread((res, cachedRes) => ({ data: Object.assign(res.data, cachedRes.data) })));
   }
 }

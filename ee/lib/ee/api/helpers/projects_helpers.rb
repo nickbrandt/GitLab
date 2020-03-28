@@ -16,11 +16,11 @@ module EE
           end
 
           params :optional_project_params_ee do
-            optional :repository_storage, type: String, desc: 'Which storage shard the repository is on. Available only to admins'
             optional :approvals_before_merge, type: Integer, desc: 'How many approvers should approve merge request by default'
             optional :mirror, type: Grape::API::Boolean, desc: 'Enables pull mirroring in a project'
             optional :mirror_trigger_builds, type: Grape::API::Boolean, desc: 'Pull mirroring triggers builds'
             optional :external_authorization_classification_label, type: String, desc: 'The classification label for the project'
+            optional :service_desk_enabled, type: Grape::API::Boolean, desc: 'Disable or enable the service desk'
           end
 
           params :optional_filter_params_ee do
@@ -49,11 +49,11 @@ module EE
           def update_params_at_least_one_of
             super.concat [
               :approvals_before_merge,
-              :repository_storage,
               :external_authorization_classification_label,
               :import_url,
               :packages_enabled,
-              :fallback_approvals_required
+              :fallback_approvals_required,
+              :service_desk_enabled
             ]
           end
         end

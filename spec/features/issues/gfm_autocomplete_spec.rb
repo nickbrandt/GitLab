@@ -282,6 +282,46 @@ describe 'GFM autocomplete', :js do
     end
   end
 
+  context 'assignees' do
+    let(:issue_assignee) { create(:issue, project: project) }
+    let(:unassigned_user) { create(:user) }
+
+    before do
+      issue_assignee.update(assignees: [user])
+
+      project.add_maintainer(unassigned_user)
+    end
+
+    it 'lists users who are currently not assigned to the issue when using /assign' do
+      visit project_issue_path(project, issue_assignee)
+
+      note = find('#note-body')
+      page.within '.timeline-content-form' do
+        note.native.send_keys('/as')
+      end
+
+      find('.atwho-view li', text: '/assign')
+      note.native.send_keys(:tab)
+
+      wait_for_requests
+
+      expect(find('#at-view-users .atwho-view-ul')).not_to have_content(user.username)
+      expect(find('#at-view-users .atwho-view-ul')).to have_content(unassigned_user.username)
+    end
+
+    it 'shows dropdown on new issue form' do
+      visit new_project_issue_path(project)
+
+      textarea = find('#issue_description')
+      textarea.native.send_keys('/ass')
+      find('.atwho-view li', text: '/assign')
+      textarea.native.send_keys(:tab)
+
+      expect(find('#at-view-users .atwho-view-ul')).to have_content(unassigned_user.username)
+      expect(find('#at-view-users .atwho-view-ul')).to have_content(user.username)
+    end
+  end
+
   context 'labels' do
     it 'opens autocomplete menu for Labels when field starts with text with item escaping HTML characters' do
       create(:label, project: project, title: label_xss_title)

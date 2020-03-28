@@ -155,34 +155,41 @@ module Gitlab
       # column - The name of the column to create the foreign key on.
       # on_delete - The action to perform when associated data is removed,
       #             defaults to "CASCADE".
+      # name - The name of the foreign key.
       #
       # rubocop:disable Gitlab/RailsLogger
-      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade, name: nil)
+      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade, name: nil, validate: true)
         # Transactions would result in ALTER TABLE locks being held for the
         # duration of the transaction, defeating the purpose of this method.
         if transaction_open?
           raise 'add_concurrent_foreign_key can not be run inside a transaction'
         end
 
-        on_delete = 'SET NULL' if on_delete == :nullify
+        options = {
+          column: column,
+          on_delete: on_delete,
+          name: name.presence || concurrent_foreign_key_name(source, column)
+        }
 
-        key_name = name || concurrent_foreign_key_name(source, column)
-
-        unless foreign_key_exists?(source, target, column: column)
-          Rails.logger.warn "Foreign key not created because it exists already " \
+        if foreign_key_exists?(source, target, options)
+          warning_message = "Foreign key not created because it exists already " \
             "(this may be due to an aborted migration or similar): " \
-            "source: #{source}, target: #{target}, column: #{column}"
+            "source: #{source}, target: #{target}, column: #{options[:column]}, "\
+            "name: #{options[:name]}, on_delete: #{options[:on_delete]}"
 
+          Rails.logger.warn warning_message
+        else
           # Using NOT VALID allows us to create a key without immediately
           # validating it. This means we keep the ALTER TABLE lock only for a
           # short period of time. The key _is_ enforced for any newly created
           # data.
+
           execute <<-EOF.strip_heredoc
           ALTER TABLE #{source}
-          ADD CONSTRAINT #{key_name}
-          FOREIGN KEY (#{column})
+          ADD CONSTRAINT #{options[:name]}
+          FOREIGN KEY (#{options[:column]})
           REFERENCES #{target} (id)
-          #{on_delete ? "ON DELETE #{on_delete.upcase}" : ''}
+          #{on_delete_statement(options[:on_delete])}
           NOT VALID;
           EOF
         end
@@ -190,21 +197,36 @@ module Gitlab
         # Validate the existing constraint. This can potentially take a very
         # long time to complete, but fortunately does not lock the source table
         # while running.
+        # Disable this check by passing `validate: false` to the method call
+        # The check will be enforced for new data (inserts) coming in,
+        # but validating existing data is delayed.
         #
         # Note this is a no-op in case the constraint is VALID already
-        disable_statement_timeout do
-          execute("ALTER TABLE #{source} VALIDATE CONSTRAINT #{key_name};")
+
+        if validate
+          disable_statement_timeout do
+            execute("ALTER TABLE #{source} VALIDATE CONSTRAINT #{options[:name]};")
+          end
         end
       end
       # rubocop:enable Gitlab/RailsLogger
 
-      def foreign_key_exists?(source, target = nil, column: nil)
-        foreign_keys(source).any? do |key|
-          if column
-            key.options[:column].to_s == column.to_s
-          else
-            key.to_table.to_s == target.to_s
-          end
+      def validate_foreign_key(source, column, name: nil)
+        fk_name = name || concurrent_foreign_key_name(source, column)
+
+        unless foreign_key_exists?(source, name: fk_name)
+          raise missing_schema_object_message(source, "foreign key", fk_name)
+        end
+
+        disable_statement_timeout do
+          execute("ALTER TABLE #{source} VALIDATE CONSTRAINT #{fk_name};")
+        end
+      end
+
+      def foreign_key_exists?(source, target = nil, **options)
+        foreign_keys(source).any? do |foreign_key|
+          tables_match?(target.to_s, foreign_key.to_table.to_s) &&
+            options_match?(foreign_key.options, options)
         end
       end
 
@@ -213,11 +235,17 @@ module Gitlab
       # PostgreSQL constraint names have a limit of 63 bytes. The logic used
       # here is based on Rails' foreign_key_name() method, which unfortunately
       # is private so we can't rely on it directly.
-      def concurrent_foreign_key_name(table, column)
+      #
+      # prefix:
+      # - The default prefix is `fk_` for backward compatibility with the existing
+      # concurrent foreign key helpers.
+      # - For standard rails foreign keys the prefix is `fk_rails_`
+      #
+      def concurrent_foreign_key_name(table, column, prefix: 'fk_')
         identifier = "#{table}_#{column}_fk"
         hashed_identifier = Digest::SHA256.hexdigest(identifier).first(10)
 
-        "fk_#{hashed_identifier}"
+        "#{prefix}#{hashed_identifier}"
       end
 
       # Long-running migrations may take more than the timeout allowed by
@@ -256,6 +284,46 @@ module Gitlab
 
           execute('SET LOCAL statement_timeout TO 0')
         end
+      end
+
+      # Executes the block with a retry mechanism that alters the +lock_timeout+ and +sleep_time+ between attempts.
+      # The timings can be controlled via the +timing_configuration+ parameter.
+      # If the lock was not acquired within the retry period, a last attempt is made without using +lock_timeout+.
+      #
+      # ==== Examples
+      #   # Invoking without parameters
+      #   with_lock_retries do
+      #     drop_table :my_table
+      #   end
+      #
+      #   # Invoking with custom +timing_configuration+
+      #   t = [
+      #     [1.second, 1.second],
+      #     [2.seconds, 2.seconds]
+      #   ]
+      #
+      #   with_lock_retries(timing_configuration: t) do
+      #     drop_table :my_table # this will be retried twice
+      #   end
+      #
+      #   # Disabling the retries using an environment variable
+      #   > export DISABLE_LOCK_RETRIES=true
+      #
+      #   with_lock_retries do
+      #     drop_table :my_table # one invocation, it will not retry at all
+      #   end
+      #
+      # ==== Parameters
+      # * +timing_configuration+ - [[ActiveSupport::Duration, ActiveSupport::Duration], ...] lock timeout for the block, sleep time before the next iteration, defaults to `Gitlab::Database::WithLockRetries::DEFAULT_TIMING_CONFIGURATION`
+      # * +logger+ - [Gitlab::JsonLogger]
+      # * +env+ - [Hash] custom environment hash, see the example with `DISABLE_LOCK_RETRIES`
+      def with_lock_retries(**args, &block)
+        merged_args = {
+          klass: self.class,
+          logger: Gitlab::BackgroundMigration::Logger
+        }.merge(args)
+
+        Gitlab::Database::WithLockRetries.new(merged_args).run(&block)
       end
 
       def true_value
@@ -307,8 +375,11 @@ module Gitlab
       # less "complex" without introducing extra methods (which actually will
       # make things _more_ complex).
       #
+      # `batch_column_name` option is for tables without primary key, in this
+      # case an other unique integer column can be used. Example: :user_id
+      #
       # rubocop: disable Metrics/AbcSize
-      def update_column_in_batches(table, column, value, batch_size: nil)
+      def update_column_in_batches(table, column, value, batch_size: nil, batch_column_name: :id)
         if transaction_open?
           raise 'update_column_in_batches can not be run inside a transaction, ' \
             'you can disable transactions by calling disable_ddl_transaction! ' \
@@ -320,7 +391,7 @@ module Gitlab
         count_arel = table.project(Arel.star.count.as('count'))
         count_arel = yield table, count_arel if block_given?
 
-        total = exec_query(count_arel.to_sql).to_hash.first['count'].to_i
+        total = exec_query(count_arel.to_sql).to_a.first['count'].to_i
 
         return if total == 0
 
@@ -335,29 +406,29 @@ module Gitlab
           batch_size = max_size if batch_size > max_size
         end
 
-        start_arel = table.project(table[:id]).order(table[:id].asc).take(1)
+        start_arel = table.project(table[batch_column_name]).order(table[batch_column_name].asc).take(1)
         start_arel = yield table, start_arel if block_given?
-        start_id = exec_query(start_arel.to_sql).to_hash.first['id'].to_i
+        start_id = exec_query(start_arel.to_sql).to_a.first[batch_column_name.to_s].to_i
 
         loop do
-          stop_arel = table.project(table[:id])
-            .where(table[:id].gteq(start_id))
-            .order(table[:id].asc)
+          stop_arel = table.project(table[batch_column_name])
+            .where(table[batch_column_name].gteq(start_id))
+            .order(table[batch_column_name].asc)
             .take(1)
             .skip(batch_size)
 
           stop_arel = yield table, stop_arel if block_given?
-          stop_row = exec_query(stop_arel.to_sql).to_hash.first
+          stop_row = exec_query(stop_arel.to_sql).to_a.first
 
           update_arel = Arel::UpdateManager.new
             .table(table)
             .set([[table[column], value]])
-            .where(table[:id].gteq(start_id))
+            .where(table[batch_column_name].gteq(start_id))
 
           if stop_row
-            stop_id = stop_row['id'].to_i
+            stop_id = stop_row[batch_column_name.to_s].to_i
             start_id = stop_id
-            update_arel = update_arel.where(table[:id].lt(stop_id))
+            update_arel = update_arel.where(table[batch_column_name].lt(stop_id))
           end
 
           update_arel = yield table, update_arel if block_given?
@@ -393,7 +464,7 @@ module Gitlab
       #
       # This method can also take a block which is passed directly to the
       # `update_column_in_batches` method.
-      def add_column_with_default(table, column, type, default:, limit: nil, allow_null: false, &block)
+      def add_column_with_default(table, column, type, default:, limit: nil, allow_null: false, update_column_in_batches_args: {}, &block)
         if transaction_open?
           raise 'add_column_with_default can not be run inside a transaction, ' \
             'you can disable transactions by calling disable_ddl_transaction! ' \
@@ -415,7 +486,12 @@ module Gitlab
 
           begin
             default_after_type_cast = connection.type_cast(default, column_for(table, column))
-            update_column_in_batches(table, column, default_after_type_cast, &block)
+
+            if update_column_in_batches_args.any?
+              update_column_in_batches(table, column, default_after_type_cast, **update_column_in_batches_args, &block)
+            else
+              update_column_in_batches(table, column, default_after_type_cast, &block)
+            end
 
             change_column_null(table, column, false) unless allow_null
           # We want to rescue _all_ exceptions here, even those that don't inherit
@@ -626,7 +702,7 @@ module Gitlab
           start_id, end_id = batch.pluck('MIN(id), MAX(id)').first
           max_index = index
 
-          BackgroundMigrationWorker.perform_in(
+          migrate_in(
             index * interval,
             'CopyColumn',
             [table, column, temp_column, start_id, end_id]
@@ -635,7 +711,7 @@ module Gitlab
 
         # Schedule the renaming of the column to happen (initially) 1 hour after
         # the last batch finished.
-        BackgroundMigrationWorker.perform_in(
+        migrate_in(
           (max_index * interval) + 1.hour,
           'CleanupConcurrentTypeChange',
           [table, column, temp_column]
@@ -717,7 +793,7 @@ module Gitlab
           start_id, end_id = batch.pluck('MIN(id), MAX(id)').first
           max_index = index
 
-          BackgroundMigrationWorker.perform_in(
+          migrate_in(
             index * interval,
             'CopyColumn',
             [table, old_column, new_column, start_id, end_id]
@@ -726,7 +802,7 @@ module Gitlab
 
         # Schedule the renaming of the column to happen (initially) 1 hour after
         # the last batch finished.
-        BackgroundMigrationWorker.perform_in(
+        migrate_in(
           (max_index * interval) + 1.hour,
           'CleanupConcurrentRename',
           [table, old_column, new_column]
@@ -863,7 +939,10 @@ module Gitlab
       def column_for(table, name)
         name = name.to_s
 
-        columns(table).find { |column| column.name == name }
+        column = columns(table).find { |column| column.name == name }
+        raise(missing_schema_object_message(table, "column", name)) if column.nil?
+
+        column
       end
 
       # This will replace the first occurrence of a string in a column with
@@ -962,14 +1041,14 @@ into similar problems in the future (e.g. when new tables are created).
             # We push multiple jobs at a time to reduce the time spent in
             # Sidekiq/Redis operations. We're using this buffer based approach so we
             # don't need to run additional queries for every range.
-            BackgroundMigrationWorker.bulk_perform_async(jobs)
+            bulk_migrate_async(jobs)
             jobs.clear
           end
 
           jobs << [job_class_name, [start_id, end_id]]
         end
 
-        BackgroundMigrationWorker.bulk_perform_async(jobs) unless jobs.empty?
+        bulk_migrate_async(jobs) unless jobs.empty?
       end
 
       # Queues background migration jobs for an entire table, batched by ID range.
@@ -980,6 +1059,7 @@ into similar problems in the future (e.g. when new tables are created).
       # job_class_name - The background migration job class as a string
       # delay_interval - The duration between each job's scheduled time (must respond to `to_f`)
       # batch_size - The maximum number of rows per job
+      # other_arguments - Other arguments to send to the job
       #
       # Example:
       #
@@ -997,7 +1077,7 @@ into similar problems in the future (e.g. when new tables are created).
       #         # do something
       #       end
       #     end
-      def queue_background_migration_jobs_by_range_at_intervals(model_class, job_class_name, delay_interval, batch_size: BACKGROUND_MIGRATION_BATCH_SIZE)
+      def queue_background_migration_jobs_by_range_at_intervals(model_class, job_class_name, delay_interval, batch_size: BACKGROUND_MIGRATION_BATCH_SIZE, other_arguments: [])
         raise "#{model_class} does not have an ID to use for batch ranges" unless model_class.column_names.include?('id')
 
         # To not overload the worker too much we enforce a minimum interval both
@@ -1012,7 +1092,7 @@ into similar problems in the future (e.g. when new tables are created).
           # `BackgroundMigrationWorker.bulk_perform_in` schedules all jobs for
           # the same time, which is not helpful in most cases where we wish to
           # spread the work over time.
-          BackgroundMigrationWorker.perform_in(delay_interval * index, job_class_name, [start_id, end_id])
+          migrate_in(delay_interval * index, job_class_name, [start_id, end_id] + other_arguments)
         end
       end
 
@@ -1048,7 +1128,84 @@ into similar problems in the future (e.g. when new tables are created).
         connection.select_value(index_sql).to_i > 0
       end
 
+      def create_or_update_plan_limit(limit_name, plan_name, limit_value)
+        limit_name_quoted = quote_column_name(limit_name)
+        plan_name_quoted = quote(plan_name)
+        limit_value_quoted = quote(limit_value)
+
+        execute <<~SQL
+          INSERT INTO plan_limits (plan_id, #{limit_name_quoted})
+          SELECT id, #{limit_value_quoted} FROM plans WHERE name = #{plan_name_quoted} LIMIT 1
+          ON CONFLICT (plan_id) DO UPDATE SET #{limit_name_quoted} = EXCLUDED.#{limit_name_quoted};
+        SQL
+      end
+
+      # Note this should only be used with very small tables
+      def backfill_iids(table)
+        sql = <<-END
+          UPDATE #{table}
+          SET iid = #{table}_with_calculated_iid.iid_num
+          FROM (
+            SELECT id, ROW_NUMBER() OVER (PARTITION BY project_id ORDER BY id ASC) AS iid_num FROM #{table}
+          ) AS #{table}_with_calculated_iid
+          WHERE #{table}.id = #{table}_with_calculated_iid.id
+        END
+
+        execute(sql)
+      end
+
+      def migrate_async(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.perform_async(*args)
+        end
+      end
+
+      def migrate_in(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.perform_in(*args)
+        end
+      end
+
+      def bulk_migrate_in(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.bulk_perform_in(*args)
+        end
+      end
+
+      def bulk_migrate_async(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.bulk_perform_async(*args)
+        end
+      end
+
       private
+
+      def missing_schema_object_message(table, type, name)
+        <<~MESSAGE
+          Could not find #{type} "#{name}" on table "#{table}" which was referenced during the migration.
+          This issue could be caused by the database schema straying from the expected state.
+
+          To resolve this issue, please verify:
+            1. all previous migrations have completed
+            2. the database objects used in this migration match the Rails definition in schema.rb or structure.sql
+
+        MESSAGE
+      end
+
+      def tables_match?(target_table, foreign_key_table)
+        target_table.blank? || foreign_key_table == target_table
+      end
+
+      def options_match?(foreign_key_options, options)
+        options.all? { |k, v| foreign_key_options[k].to_s == v.to_s }
+      end
+
+      def on_delete_statement(on_delete)
+        return '' if on_delete.blank?
+        return 'ON DELETE SET NULL' if on_delete == :nullify
+
+        "ON DELETE #{on_delete.upcase}"
+      end
 
       def create_column_from(table, old, new, type: nil)
         old_col = column_for(table, old)
@@ -1090,6 +1247,10 @@ into similar problems in the future (e.g. when new tables are created).
           You can disable transactions by calling `disable_ddl_transaction!` in the body of
           your migration class
         ERROR
+      end
+
+      def with_migration_context(&block)
+        Gitlab::ApplicationContext.with_context(caller_id: self.class.to_s, &block)
       end
     end
   end

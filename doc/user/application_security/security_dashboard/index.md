@@ -26,7 +26,7 @@ The Security Dashboard supports the following reports:
 
 ## Requirements
 
-To use the group, project or pipeline security dashboard:
+To use the instance, group, project, or pipeline security dashboard:
 
 1. At least one project inside a group must be configured with at least one of
    the [supported reports](#supported-reports).
@@ -42,7 +42,7 @@ At the pipeline level, the Security Dashboard displays the vulnerabilities prese
 
 Visit the page for any pipeline which has run any of the [supported reports](#supported-reports). Click the **Security** tab to view the Security Dashboard.
 
-![Pipeline Security Dashboard](img/pipeline_security_dashboard_v12_3.png)
+![Pipeline Security Dashboard](img/pipeline_security_dashboard_v12_6.png)
 
 ## Project Security Dashboard
 
@@ -71,12 +71,12 @@ Once you're on the dashboard, at the top you should see a series of filters for:
 - Report type
 - Project
 
-To the right of the filters, you should see a **Hide dismissed** toggle button ([available for GitLab.com Gold, planned for GitLab Ultimate 12.6](https://gitlab.com/gitlab-org/gitlab/issues/9102)).
+To the right of the filters, you should see a **Hide dismissed** toggle button.
 
 NOTE: **Note:**
 The dashboard only shows projects with [security reports](#supported-reports) enabled in a group.
 
-![dashboard with action buttons and metrics](img/group_security_dashboard_v12_4.png)
+![dashboard with action buttons and metrics](img/group_security_dashboard_v12_6.png)
 
 Selecting one or more filters will filter the results in this page. Disabling the **Hide dismissed**
 toggle button will let you also see vulnerabilities that have been dismissed.
@@ -97,7 +97,44 @@ vulnerabilities your projects had at various points in time. You can filter amon
 90 days, with the default being 90. Hover over the chart to get more details about
 the open vulnerabilities at a specific time.
 
+Below the timeline chart is a list of projects, grouped and sorted by the severity of the vulnerability found:
+
+- F: 1 or more "critical"
+- D: 1 or more "high" or "unknown"
+- C: 1 or more "medium"
+- B: 1 or more "low"
+- A: 0 vulnerabilities
+
+Projects with no vulnerability tests configured will not appear in the list. Additionally, dismissed
+vulnerabilities are not included either.
+
 Read more on how to [interact with the vulnerabilities](../index.md#interacting-with-the-vulnerabilities).
+
+## Instance Security Dashboard
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/6953) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.8.
+
+At the instance level, the Security Dashboard displays the vulnerabilities
+present in all of the projects that you have added to it. It includes all
+of the features of the [group security dashboard](#group-security-dashboard).
+
+You can access the Instance Security Dashboard from the menu
+bar at the top of the page. Under **More**, select **Security**.
+
+![Instance Security Dashboard navigation link](img/instance_security_dashboard_link_v12_4.png)
+
+### Adding projects to the dashboard
+
+To add projects to the dashboard:
+
+1. Click the **Edit dashboard** button on the Instance Security Dashboard page.
+1. Search for and add one or more projects using the **Search your projects** field.
+1. Click the **Add projects** button.
+
+Once added, the dashboard will display the vulnerabilities found in your chosen
+projects.
+
+![Instance Security Dashboard with projects](img/instance_security_dashboard_with_projects_v12_8.png)
 
 ## Keeping the dashboards up to date
 
@@ -110,7 +147,7 @@ information on the Security Dashboard can become outdated as new vulnerabilities
 are discovered.
 
 To ensure the information on the Security Dashboard is regularly updated,
-[configure a scheduled pipeline](../../project/pipelines/schedules.md) to run a
+[configure a scheduled pipeline](../../../ci/pipelines/schedules.md) to run a
 daily security scan. This will update the information displayed on the Security
 Dashboard regardless of how often the default branch is updated.
 

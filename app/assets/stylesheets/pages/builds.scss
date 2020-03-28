@@ -32,16 +32,12 @@
     opacity: 0.2;
   }
 
-  25% {
-    opacity: 0.5;
-  }
-
   50% {
-    opacity: 0.7;
+    opacity: 1;
   }
 
   100% {
-    opacity: 1;
+    opacity: 0.2;
   }
 }
 
@@ -180,7 +176,6 @@
   }
 
   .sidebar-container {
-    width: calc(100% + 100px);
     padding-right: 100px;
     height: 100%;
     overflow-y: scroll;
@@ -359,5 +354,56 @@
       max-width: 220px;
       text-overflow: ellipsis;
     }
+  }
+}
+
+.environment-logs-viewer {
+  .build-trace-container {
+    position: relative;
+  }
+
+  .log-lines,
+  .gl-infinite-scroll-container {
+    // makes scrollbar visible by creating contrast
+    background: $black;
+  }
+
+  .gl-infinite-scroll-legend {
+    margin: 0;
+  }
+
+  .build-trace {
+    @include build-trace();
+    margin: 0;
+  }
+
+  .top-bar {
+    .date-time-picker-wrapper,
+    .dropdown-toggle {
+      @include media-breakpoint-up(md) {
+        width: 140px;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 160px;
+      }
+    }
+
+    .controllers {
+      @include build-controllers(16px, flex-end, false, 2);
+    }
+  }
+
+  .btn-refresh svg {
+    top: 0;
+  }
+
+  .build-loader-animation {
+    @include build-loader-animation;
+  }
+
+  .log-footer {
+    color: $white-normal;
+    background-color: $gray-900;
   }
 }

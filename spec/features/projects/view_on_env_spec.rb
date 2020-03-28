@@ -9,12 +9,10 @@ describe 'View on environment', :js do
   let(:user) { project.creator }
 
   before do
-    stub_feature_flags(single_mr_diff_view: false)
+    stub_feature_flags(diffs_batch_load: false)
 
     project.add_maintainer(user)
   end
-
-  it_behaves_like 'rendering a single diff version'
 
   context 'when the branch has a route map' do
     let(:route_map) do
@@ -67,7 +65,7 @@ describe 'View on environment', :js do
           within '.diffs' do
             text = 'View on feature.review.example.com'
             url = 'http://feature.review.example.com/ruby/feature'
-            expect(page).to have_selector("a[data-original-title='#{text}'][href='#{url}']")
+            expect(page).to have_selector("a[title='#{text}'][href='#{url}']")
           end
         end
       end

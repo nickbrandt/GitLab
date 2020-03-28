@@ -27,6 +27,9 @@ describe('text_utility', () => {
     it('should remove underscores and uppercase the first letter', () => {
       expect(textUtils.humanize('foo_bar')).toEqual('Foo bar');
     });
+    it('should remove underscores and dashes and uppercase the first letter', () => {
+      expect(textUtils.humanize('foo_bar-foo', '[_-]')).toEqual('Foo bar foo');
+    });
   });
 
   describe('dasherize', () => {
@@ -52,13 +55,19 @@ describe('text_utility', () => {
       expect(textUtils.slugify(' a new project ')).toEqual('a-new-project');
     });
     it('should only remove non-allowed special characters', () => {
-      expect(textUtils.slugify('test!_pro-ject~')).toEqual('test-_pro-ject-');
+      expect(textUtils.slugify('test!_pro-ject~')).toEqual('test-_pro-ject');
     });
     it('should squash multiple hypens', () => {
-      expect(textUtils.slugify('test!!!!_pro-ject~')).toEqual('test-_pro-ject-');
+      expect(textUtils.slugify('test!!!!_pro-ject~')).toEqual('test-_pro-ject');
     });
     it('should return empty string if only non-allowed characters', () => {
       expect(textUtils.slugify('здрасти')).toEqual('');
+    });
+    it('should squash multiple separators', () => {
+      expect(textUtils.slugify('Test:-)')).toEqual('test');
+    });
+    it('should trim any separators from the beginning and end of the slug', () => {
+      expect(textUtils.slugify('-Test:-)-')).toEqual('test');
     });
   });
 
@@ -85,8 +94,27 @@ describe('text_utility', () => {
   });
 
   describe('convertToCamelCase', () => {
-    it('converts snake_case string to camelCase string', () => {
-      expect(textUtils.convertToCamelCase('snake_case')).toBe('snakeCase');
+    it.each`
+      txt                         | result
+      ${'a_snake_cased_string'}   | ${'aSnakeCasedString'}
+      ${'_leading_underscore'}    | ${'_leadingUnderscore'}
+      ${'__leading_underscores'}  | ${'__leadingUnderscores'}
+      ${'trailing_underscore_'}   | ${'trailingUnderscore_'}
+      ${'trailing_underscores__'} | ${'trailingUnderscores__'}
+    `('converts string "$txt" to "$result"', ({ txt, result }) => {
+      expect(textUtils.convertToCamelCase(txt)).toBe(result);
+    });
+
+    it.each`
+      txt
+      ${'__withoutMiddleUnderscores__'}
+      ${''}
+      ${'with spaces'}
+      ${'with\nnew\r\nlines'}
+      ${'_'}
+      ${'___'}
+    `('does not modify string "$txt"', ({ txt }) => {
+      expect(textUtils.convertToCamelCase(txt)).toBe(txt);
     });
   });
 
@@ -106,6 +134,12 @@ describe('text_utility', () => {
   describe('convertToSentenceCase', () => {
     it('converts Sentence Case to Sentence case', () => {
       expect(textUtils.convertToSentenceCase('Hello World')).toBe('Hello world');
+    });
+  });
+
+  describe('convertToTitleCase', () => {
+    it('converts sentence case to Sentence Case', () => {
+      expect(textUtils.convertToTitleCase('hello world')).toBe('Hello World');
     });
   });
 

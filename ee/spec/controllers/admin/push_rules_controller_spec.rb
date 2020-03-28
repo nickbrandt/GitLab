@@ -19,7 +19,9 @@ describe Admin::PushRulesController do
     end
 
     it 'updates sample push rule' do
-      expect_any_instance_of(PushRule).to receive(:update).with(ActionController::Parameters.new(params).permit!)
+      expect_next_instance_of(PushRule) do |instance|
+        expect(instance).to receive(:update).with(ActionController::Parameters.new(params).permit!)
+      end
 
       patch :update, params: { push_rule: params }
 
@@ -34,7 +36,7 @@ describe Admin::PushRulesController do
       it 'returns 404' do
         patch :update, params: { push_rule: params }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -43,7 +45,7 @@ describe Admin::PushRulesController do
     it 'returns 200' do
       get :show
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     context 'push rules unlicensed' do
@@ -54,7 +56,7 @@ describe Admin::PushRulesController do
       it 'returns 404' do
         get :show
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

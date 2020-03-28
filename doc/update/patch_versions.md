@@ -12,17 +12,11 @@ You can select the tag in the version dropdown in the top left corner of GitLab 
 
 ### 0. Backup
 
-It's useful to make a backup just in case things go south:
-
-```bash
-cd /home/git/gitlab
-
-sudo -u git -H bundle exec rake gitlab:backup:create RAILS_ENV=production
-```
+It's useful to make a backup just in case things go south. Depending on the installation method, backup commands vary, see the [backing up and restoring GitLab](../raketasks/backup_restore.md#creating-a-backup-of-the-gitlab-system) documentation.
 
 ### 1. Stop server
 
-```bash
+```shell
 sudo service gitlab stop
 ```
 
@@ -33,17 +27,17 @@ to update to, for example `v8.0.3`. Use `git tag -l 'v*.[0-9]' --sort='v:refname
 to see a list of all tags. Make sure to update patch versions only (check your
 current version with `cat VERSION`).
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H git fetch --all
-sudo -u git -H git checkout -- Gemfile.lock db/schema.rb locale
+sudo -u git -H git checkout -- Gemfile.lock db/structure.sql locale
 sudo -u git -H git checkout LATEST_TAG -b LATEST_TAG
 ```
 
 ### 3. Install libs, migrations, etc
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle install --without development test mysql --deployment
@@ -66,7 +60,7 @@ sudo -u git -H bundle exec rake yarn:install gitlab:assets:clean gitlab:assets:c
 
 ### 4. Update GitLab Workhorse to the corresponding version
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake "gitlab:workhorse:install[/home/git/gitlab-workhorse]" RAILS_ENV=production
@@ -74,7 +68,7 @@ sudo -u git -H bundle exec rake "gitlab:workhorse:install[/home/git/gitlab-workh
 
 ### 5. Update Gitaly to the corresponding version
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake "gitlab:gitaly:install[/home/git/gitaly,/home/git/repositories]" RAILS_ENV=production
@@ -82,7 +76,7 @@ sudo -u git -H bundle exec rake "gitlab:gitaly:install[/home/git/gitaly,/home/gi
 
 ### 6. Update GitLab Shell to the corresponding version
 
-```bash
+```shell
 cd /home/git/gitlab-shell
 
 sudo -u git -H git fetch --all --tags
@@ -92,7 +86,7 @@ sudo -u git -H make build
 
 ### 7. Update GitLab Pages to the corresponding version (skip if not using pages)
 
-```bash
+```shell
 cd /home/git/gitlab-pages
 
 sudo -u git -H git fetch --all --tags
@@ -100,15 +94,13 @@ sudo -u git -H git checkout v$(</home/git/gitlab/GITLAB_PAGES_VERSION)
 sudo -u git -H make
 ```
 
-### 8. Install/Update `gitlab-elasticsearch-indexer` (optional) **(STARTER ONLY)**
+### 8. Install/Update `gitlab-elasticsearch-indexer` **(STARTER ONLY)**
 
-If you're interested in using GitLab's new [Elasticsearch repository indexer](../integration/elasticsearch.md#elasticsearch-repository-indexer-beta) (currently in beta)
-please follow the instructions on the document linked above and enable the
-indexer usage in the GitLab admin settings.
+Please follow the [install instruction](../integration/elasticsearch.md#installing-elasticsearch).
 
 ### 9. Start application
 
-```bash
+```shell
 sudo service gitlab start
 sudo service nginx restart
 ```
@@ -117,7 +109,7 @@ sudo service nginx restart
 
 Check if GitLab and its environment are configured correctly:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
@@ -125,7 +117,7 @@ sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
 
 To make sure you didn't miss anything run a more thorough check with:
 
-```bash
+```shell
 sudo -u git -H bundle exec rake gitlab:check RAILS_ENV=production
 ```
 

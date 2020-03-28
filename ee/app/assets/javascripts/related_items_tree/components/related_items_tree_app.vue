@@ -5,8 +5,8 @@ import { GlLoadingIcon } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
-import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
+import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import CreateEpicForm from './create_epic_form.vue';
 import CreateIssueForm from './create_issue_form.vue';
 import IssueActionsSplitButton from './issue_actions_split_button.vue';
@@ -37,20 +37,19 @@ export default {
     IssueActionsSplitButton,
     SlotSwitch,
   },
-  data() {
-    return {
-      isCreateIssueFormVisible: false,
-    };
-  },
   computed: {
     ...mapState([
       'parentItem',
       'itemsFetchInProgress',
       'itemsFetchResultEmpty',
       'itemAddInProgress',
+      'itemAddFailure',
+      'itemAddFailureType',
+      'itemAddFailureMessage',
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
+      'showCreateIssueForm',
       'autoCompleteEpics',
       'autoCompleteIssues',
       'pendingReferences',
@@ -63,9 +62,6 @@ export default {
     disableContents() {
       return this.itemAddInProgress || this.itemCreateInProgress;
     },
-    createIssueEnabled() {
-      return gon.features && gon.features.epicNewIssue;
-    },
     visibleForm() {
       if (this.showAddItemForm) {
         return FORM_SLOTS.addItem;
@@ -75,7 +71,7 @@ export default {
         return FORM_SLOTS.createEpic;
       }
 
-      if (this.isCreateIssueFormVisible) {
+      if (this.showCreateIssueForm) {
         return FORM_SLOTS.createIssue;
       }
 
@@ -92,12 +88,15 @@ export default {
       'fetchItems',
       'toggleAddItemForm',
       'toggleCreateEpicForm',
+      'toggleCreateIssueForm',
       'setPendingReferences',
       'addPendingReferences',
       'removePendingReference',
       'setItemInputValue',
       'addItem',
       'createItem',
+      'createNewIssue',
+      'fetchProjects',
     ]),
     getRawRefs(value) {
       return value.split(/\s+/).filter(ref => ref.trim().length > 0);
@@ -113,8 +112,8 @@ export default {
       this.addPendingReferences(this.getRawRefs(newValue));
       this.setItemInputValue('');
     },
-    handleAddItemFormSubmit(newValue) {
-      this.handleAddItemFormBlur(newValue);
+    handleAddItemFormSubmit(event) {
+      this.handleAddItemFormBlur(event.pendingReferences);
 
       if (this.pendingReferences.length > 0) {
         this.addItem();
@@ -134,13 +133,11 @@ export default {
       this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
-    showAddIssueForm() {
+    handleShowAddIssueForm() {
       this.toggleAddItemForm({ toggleState: true, issuableType: issuableTypesMap.ISSUE });
     },
-    showCreateIssueForm() {
-      this.toggleAddItemForm({ toggleState: false });
-      this.toggleCreateEpicForm({ toggleState: false });
-      this.isCreateIssueFormVisible = true;
+    handleShowCreateIssueForm() {
+      this.toggleCreateIssueForm({ toggleState: true });
     },
   },
 };
@@ -161,18 +158,20 @@ export default {
     >
       <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
         <issue-actions-split-button
-          v-if="createIssueEnabled"
           slot="issueActions"
           class="ml-1"
-          @showAddIssueForm="showAddIssueForm"
-          @showCreateIssueForm="showCreateIssueForm"
+          @showAddIssueForm="handleShowAddIssueForm"
+          @showCreateIssueForm="handleShowCreateIssueForm"
         />
       </related-items-tree-header>
       <slot-switch
         v-if="visibleForm"
         :active-slot-names="[visibleForm]"
         class="card-body add-item-form-container"
-        :class="{ 'border-bottom-0': itemsFetchResultEmpty }"
+        :class="{
+          'border-bottom-0': itemsFetchResultEmpty,
+          'gl-show-field-errors': itemAddFailure,
+        }"
       >
         <add-item-form
           :slot="$options.FORM_SLOTS.addItem"
@@ -182,6 +181,9 @@ export default {
           :pending-references="pendingReferences"
           :auto-complete-sources="itemAutoCompleteSources"
           :path-id-separator="itemPathIdSeparator"
+          :has-error="itemAddFailure"
+          :item-add-failure-type="itemAddFailureType"
+          :item-add-failure-message="itemAddFailureMessage"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"
@@ -196,7 +198,8 @@ export default {
         />
         <create-issue-form
           :slot="$options.FORM_SLOTS.createIssue"
-          @cancel="isCreateIssueFormVisible = false"
+          @cancel="toggleCreateIssueForm({ toggleState: false })"
+          @submit="createNewIssue"
         />
       </slot-switch>
       <related-items-tree-body

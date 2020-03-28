@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'getting project information' do
   include GraphqlHelpers
 
-  set(:current_user) { create(:user) }
-  set(:design_todo) { create(:todo, user: current_user, target: create(:design)) }
-  set(:epic_todo) { create(:todo, user: current_user, target: create(:epic)) }
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:design_todo) { create(:todo, user: current_user, target: create(:design)) }
+  let_it_be(:epic_todo) { create(:todo, user: current_user, target: create(:epic)) }
   let(:fields) do
     <<~QUERY
     nodes {

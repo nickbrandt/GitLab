@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 module Geo
-  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker
+  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
     include ::CronjobQueue
 
     MAX_CAPACITY = 1000
 
     def perform
+      # No need to run when objects stored in Object Storage should be synced too
+      return if sync_object_storage_enabled?
       # No need to run when nothing is configured to be in Object Storage
-      return unless attachments_object_store_enabled? ||
-          lfs_objects_object_store_enabled? ||
-          job_artifacts_object_store_enabled?
+      return unless object_store_enabled?
 
       super
     end
@@ -49,7 +49,7 @@ module Geo
       return [] unless lfs_objects_object_store_enabled?
 
       lfs_objects_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:lfs))
-                        .pluck(:id)
+                        .pluck(Geo::Fdw::LfsObject.arel_table[:id])
                         .map { |id| ['lfs', id] }
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -58,8 +58,8 @@ module Geo
     def find_migrated_local_attachments_ids(batch_size:)
       return [] unless attachments_object_store_enabled?
 
-      attachments_finder.find_migrated_local(batch_size: batch_size, except_file_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
-                        .pluck(:uploader, :id)
+      attachments_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
+                        .pluck(Geo::Fdw::Upload.arel_table[:uploader], Geo::Fdw::Upload.arel_table[:id])
                         .map { |uploader, id| [uploader.sub(/Uploader\z/, '').underscore, id] }
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -68,7 +68,7 @@ module Geo
     def find_migrated_local_job_artifacts_ids(batch_size:)
       return [] unless job_artifacts_object_store_enabled?
 
-      job_artifacts_finder.find_migrated_local(batch_size: batch_size, except_artifact_ids: scheduled_file_ids(:job_artifact))
+      job_artifacts_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:job_artifact))
                           .pluck(Geo::Fdw::Ci::JobArtifact.arel_table[:id])
                           .map { |id| ['job_artifact', id] }
     end
@@ -91,6 +91,16 @@ module Geo
 
     def job_artifacts_object_store_enabled?
       JobArtifactUploader.object_store_enabled?
+    end
+
+    def object_store_enabled?
+      attachments_object_store_enabled? ||
+        lfs_objects_object_store_enabled? ||
+        job_artifacts_object_store_enabled?
+    end
+
+    def sync_object_storage_enabled?
+      current_node.sync_object_storage
     end
 
     def attachments_finder

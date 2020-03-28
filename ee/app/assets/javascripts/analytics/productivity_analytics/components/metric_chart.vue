@@ -1,7 +1,7 @@
 <script>
-import _ from 'underscore';
-import { s__ } from '~/locale';
+import { isEmpty } from 'lodash';
 import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -53,7 +53,7 @@ export default {
       return foundMetric ? foundMetric.label : s__('MetricChart|Please select a metric');
     },
     hasChartData() {
-      return !_.isEmpty(this.chartData);
+      return !isEmpty(this.chartData);
     },
   },
   methods: {

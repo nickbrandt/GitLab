@@ -48,6 +48,10 @@ module QA
             element :start_new_mr_checkbox
           end
 
+          view 'app/assets/javascripts/ide/components/repo_editor.vue' do
+            element :editor_container
+          end
+
           def has_file?(file_name)
             within_element(:file_list) do
               page.has_content? file_name
@@ -69,7 +73,7 @@ module QA
             # Wait for the modal to fade out too
             has_no_element?(:new_file_modal)
 
-            wait(reload: false) do
+            wait_until(reload: false) do
               within_element(:file_templates_bar) do
                 click_element :file_template_dropdown
                 fill_element :dropdown_filter_input, template
@@ -84,40 +88,45 @@ module QA
           end
 
           def commit_changes
-            # Clicking :begin_commit_button the first time switches from the
+            # Clicking :begin_commit_button switches from the
             # edit to the commit view
             click_element :begin_commit_button
             active_element? :commit_mode_tab
 
-            # We need to click :begin_commit_button again
-            click_element :begin_commit_button
-
-            # After clicking :begin_commit_button the 2nd time there is an
-            # animation that hides :begin_commit_button and shows :commit_button
+            # After clicking :begin_commit_button, there is an animation
+            # that hides :begin_commit_button and shows :commit_button
             #
             # Wait for the animation to complete before clicking :commit_button
             # otherwise the click will quietly do nothing.
-            wait(reload: false) do
+            wait_until(reload: false) do
               has_no_element?(:begin_commit_button) &&
                 has_element?(:commit_button)
             end
 
-            # At this point we're ready to commit and the button should be
-            # labelled "Stage & Commit"
-            #
             # Click :commit_button and keep retrying just in case part of the
             # animation is still in process even when the buttons have the
             # expected visibility.
-            commit_success_msg_shown = retry_until do
-              click_element :commit_to_current_branch_radio
-              click_element :commit_button
+            commit_success_msg_shown = retry_until(sleep_interval: 5) do
+              click_element(:commit_to_current_branch_radio) if has_element?(:commit_to_current_branch_radio)
+              click_element(:commit_button) if has_element?(:commit_button)
 
-              wait(reload: false) do
+              wait_until(reload: false) do
                 has_text?('Your changes have been committed')
               end
             end
 
             raise "The changes do not appear to have been committed successfully." unless commit_success_msg_shown
+          end
+
+          def add_to_modified_content(content)
+            finished_loading?
+            modified_text_area.set content
+          end
+
+          def modified_text_area
+            within_element(:editor_container) do
+              find('.modified textarea.inputarea')
+            end
           end
         end
       end

@@ -11,12 +11,14 @@ module EE
 
     override :filter_params
     def filter_params(issuable)
-      # This security check is repeated here to avoid multiple backports,
-      # this should be refactored to be reused from the base class.
-      ability_name = :"admin_#{issuable.to_ability_name}"
+      can_admin_issuable = can_admin_issuable?(issuable)
 
-      unless issuable.supports_weight? && can?(current_user, ability_name, issuable)
+      unless can_admin_issuable && issuable.supports_weight?
         params.delete(:weight)
+      end
+
+      unless can_admin_issuable && issuable.supports_health_status?
+        params.delete(:health_status)
       end
 
       super

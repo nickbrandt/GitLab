@@ -5,6 +5,12 @@ require 'spec_helper'
 describe UserPreference do
   let(:user_preference) { create(:user_preference) }
 
+  describe 'notes filters global keys' do
+    it 'contains expected values' do
+      expect(UserPreference::NOTES_FILTERS.keys).to match_array([:all_notes, :only_comments, :only_activity])
+    end
+  end
+
   describe '#set_notes_filter' do
     let(:issuable) { build_stubbed(:issue) }
 
@@ -77,6 +83,21 @@ describe UserPreference do
   describe '#timezone' do
     it 'returns server time as default' do
       expect(user_preference.timezone).to eq(Time.zone.tzinfo.name)
+    end
+  end
+
+  describe '#tab_width' do
+    it 'is set to 8 by default' do
+      # Intentionally not using factory here to test the constructor.
+      pref = UserPreference.new
+      expect(pref.tab_width).to eq(8)
+    end
+
+    it do
+      is_expected.to validate_numericality_of(:tab_width)
+        .only_integer
+        .is_greater_than_or_equal_to(1)
+        .is_less_than_or_equal_to(12)
     end
   end
 end

@@ -11,7 +11,6 @@ class Projects::PipelinesController < Projects::ApplicationController
   before_action :authorize_create_pipeline!, only: [:new, :create]
   before_action :authorize_update_pipeline!, only: [:retry, :cancel]
   before_action do
-    push_frontend_feature_flag(:hide_dismissed_vulnerabilities)
     push_frontend_feature_flag(:junit_pipeline_view)
   end
 
@@ -23,7 +22,7 @@ class Projects::PipelinesController < Projects::ApplicationController
 
   def index
     @scope = params[:scope]
-    @pipelines = PipelinesFinder
+    @pipelines = Ci::PipelinesFinder
       .new(project, current_user, scope: @scope)
       .execute
       .page(params[:page])
@@ -61,10 +60,10 @@ class Projects::PipelinesController < Projects::ApplicationController
       .new(project, current_user, create_params)
       .execute(:web, ignore_skip_ci: true, save_on_errors: false)
 
-    if @pipeline.persisted?
+    if @pipeline.created_successfully?
       redirect_to project_pipeline_path(project, @pipeline)
     else
-      render 'new'
+      render 'new', status: :bad_request
     end
   end
 
@@ -79,6 +78,12 @@ class Projects::PipelinesController < Projects::ApplicationController
           .represent(@pipeline, show_represent_params)
       end
     end
+  end
+
+  def destroy
+    ::Ci::DestroyPipelineService.new(project, current_user).execute(pipeline)
+
+    redirect_to project_pipelines_path(project), status: :see_other
   end
 
   def builds
@@ -174,6 +179,16 @@ class Projects::PipelinesController < Projects::ApplicationController
     end
   end
 
+  def test_reports_count
+    return unless Feature.enabled?(:junit_pipeline_view, project)
+
+    begin
+      render json: { total_count: pipeline.test_reports_count }.to_json
+    rescue Gitlab::Ci::Parsers::ParserError
+      render json: { total_count: 0 }.to_json
+    end
+  end
+
   private
 
   def serialize_pipelines
@@ -236,7 +251,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def limited_pipelines_count(project, scope = nil)
-    finder = PipelinesFinder.new(project, current_user, scope: scope)
+    finder = Ci::PipelinesFinder.new(project, current_user, scope: scope)
 
     view_context.limited_counter_with_delimiter(finder.execute)
   end

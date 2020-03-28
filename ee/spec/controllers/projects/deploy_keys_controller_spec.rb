@@ -30,7 +30,7 @@ describe Projects::DeployKeysController do
     it 'records an audit event' do
       expect { post :create, params: params }.to change { AuditEvent.count }.by(1)
 
-      expect(response).to redirect_to(project_settings_repository_path(project, anchor: 'js-deploy-keys-settings'))
+      expect(response).to redirect_to(project_settings_ci_cd_path(project, anchor: 'js-deploy-keys-settings'))
     end
   end
 
@@ -55,7 +55,7 @@ describe Projects::DeployKeysController do
       it 'returns 404' do
         put :enable, params: { id: 0, namespace_id: project.namespace, project_id: project }
 
-        expect(response).to have_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

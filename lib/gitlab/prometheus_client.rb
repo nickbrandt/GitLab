@@ -6,6 +6,7 @@ module Gitlab
     include Gitlab::Utils::StrongMemoize
     Error = Class.new(StandardError)
     QueryError = Class.new(Gitlab::PrometheusClient::Error)
+    HEALTHY_RESPONSE = "Prometheus is Healthy.\n"
 
     # Target number of data points for `query_range`.
     # Please don't exceed the limit of 11000 data points
@@ -32,13 +33,20 @@ module Gitlab
       json_api_get('query', query: '1')
     end
 
+    def healthy?
+      response_body = handle_management_api_response(get(health_url, {}))
+
+      # From Prometheus docs: This endpoint always returns 200 and should be used to check Prometheus health.
+      response_body == HEALTHY_RESPONSE
+    end
+
     def proxy(type, args)
       path = api_path(type)
       get(path, args)
     rescue Gitlab::HTTP::ResponseError => ex
       raise PrometheusClient::Error, "Network connection error" unless ex.response && ex.response.try(:code)
 
-      handle_response(ex.response)
+      handle_querying_api_response(ex.response)
     end
 
     def query(query, time: Time.now)
@@ -47,17 +55,17 @@ module Gitlab
       end
     end
 
-    def query_range(query, start: 8.hours.ago, stop: Time.now)
-      start = start.to_f
-      stop = stop.to_f
-      step = self.class.compute_step(start, stop)
+    def query_range(query, start_time: 8.hours.ago, end_time: Time.now)
+      start_time = start_time.to_f
+      end_time = end_time.to_f
+      step = self.class.compute_step(start_time, end_time)
 
       get_result('matrix') do
         json_api_get(
           'query_range',
           query: query,
-          start: start,
-          end: stop,
+          start: start_time,
+          end: end_time,
           step: step
         )
       end
@@ -67,16 +75,20 @@ module Gitlab
       json_api_get("label/#{name}/values")
     end
 
-    def series(*matches, start: 8.hours.ago, stop: Time.now)
-      json_api_get('series', 'match': matches, start: start.to_f, end: stop.to_f)
+    def series(*matches, start_time: 8.hours.ago, end_time: Time.now)
+      json_api_get('series', 'match': matches, start: start_time.to_f, end: end_time.to_f)
     end
 
-    def self.compute_step(start, stop)
-      diff = stop - start
+    def self.compute_step(start_time, end_time)
+      diff = end_time - start_time
 
       step = (diff / QUERY_RANGE_DATA_POINTS).ceil
 
       [QUERY_RANGE_MIN_STEP, step].max
+    end
+
+    def health_url
+      [api_url, '-/healthy'].join('/')
     end
 
     private
@@ -88,11 +100,11 @@ module Gitlab
     def json_api_get(type, args = {})
       path = api_path(type)
       response = get(path, args)
-      handle_response(response)
+      handle_querying_api_response(response)
     rescue Gitlab::HTTP::ResponseError => ex
       raise PrometheusClient::Error, "Network connection error" unless ex.response && ex.response.try(:code)
 
-      handle_response(ex.response)
+      handle_querying_api_response(ex.response)
     end
 
     def gitlab_http_key(key)
@@ -119,7 +131,15 @@ module Gitlab
       raise PrometheusClient::Error, 'Connection refused'
     end
 
-    def handle_response(response)
+    def handle_management_api_response(response)
+      if response.code == 200
+        response.body
+      else
+        raise PrometheusClient::Error, "#{response.code} - #{response.body}"
+      end
+    end
+
+    def handle_querying_api_response(response)
       response_code = response.try(:code)
       response_body = response.try(:body)
 

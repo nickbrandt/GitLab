@@ -2,8 +2,8 @@ import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
 import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
+  UPDATE_IMAGE_DIFF_NOTE_ERROR,
   ADD_DISCUSSION_COMMENT_ERROR,
-  UPLOAD_DESIGN_ERROR,
   designDeletionError,
 } from './error_messages';
 
@@ -45,14 +45,14 @@ const addNewVersionToStore = (store, query, version) => {
   });
 };
 
-const addDiscussionCommentToStore = (store, createNote, query, queryVariables) => {
+const addDiscussionCommentToStore = (store, createNote, query, queryVariables, discussionId) => {
   const data = store.readQuery({
     query,
     variables: queryVariables,
   });
 
   const design = extractDesign(data);
-  const currentDiscussion = extractCurrentDiscussion(design.discussions, this.discussion.id);
+  const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
   currentDiscussion.node.notes.edges = [
     ...currentDiscussion.node.notes.edges,
     {
@@ -62,6 +62,23 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables) =
   ];
 
   design.notesCount += 1;
+  if (
+    !design.issue.participants.edges.some(
+      participant => participant.node.username === createNote.note.author.username,
+    )
+  ) {
+    design.issue.participants.edges = [
+      ...design.issue.participants.edges,
+      {
+        __typename: 'UserEdge',
+        node: {
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          __typename: 'User',
+          ...createNote.note.author,
+        },
+      },
+    ];
+  }
   store.writeQuery({
     query,
     variables: queryVariables,
@@ -74,19 +91,16 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables) =
   });
 };
 
-const addImageDiffNoteToStore = (store, createImageDiffNote, query) => {
+const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) => {
   const data = store.readQuery({
     query,
-    variables: {
-      id: this.id,
-      version: this.designsVersion,
-    },
+    variables,
   });
   const newDiscussion = {
     __typename: 'DiscussionEdge',
     node: {
       // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       __typename: 'Discussion',
       id: createImageDiffNote.note.discussion.id,
       replyId: createImageDiffNote.note.discussion.replyId,
@@ -101,9 +115,74 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query) => {
       },
     },
   };
-  data.design.discussions.edges.push(newDiscussion);
-  data.design.notesCount += 1;
-  store.writeQuery({ query, data });
+  const design = extractDesign(data);
+  const notesCount = design.notesCount + 1;
+  design.discussions.edges = [...design.discussions.edges, newDiscussion];
+  if (
+    !design.issue.participants.edges.some(
+      participant => participant.node.username === createImageDiffNote.note.author.username,
+    )
+  ) {
+    design.issue.participants.edges = [
+      ...design.issue.participants.edges,
+      {
+        __typename: 'UserEdge',
+        node: {
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          __typename: 'User',
+          ...createImageDiffNote.note.author,
+        },
+      },
+    ];
+  }
+  store.writeQuery({
+    query,
+    variables,
+    data: {
+      ...data,
+      design: {
+        ...design,
+        notesCount,
+      },
+    },
+  });
+};
+
+const updateImageDiffNoteInStore = (store, updateImageDiffNote, query, variables) => {
+  const data = store.readQuery({
+    query,
+    variables,
+  });
+
+  const design = extractDesign(data);
+  const discussion = extractCurrentDiscussion(
+    design.discussions,
+    updateImageDiffNote.note.discussion.id,
+  );
+
+  discussion.node = {
+    ...discussion.node,
+    notes: {
+      ...discussion.node.notes,
+      edges: [
+        // the first note is original discussion, and includes the pin `position`
+        {
+          __typename: 'NoteEdge',
+          node: updateImageDiffNote.note,
+        },
+        ...discussion.node.notes.edges.slice(1),
+      ],
+    },
+  };
+
+  store.writeQuery({
+    query,
+    variables,
+    data: {
+      ...data,
+      design,
+    },
+  });
 };
 
 const addNewDesignToStore = (store, designManagementUpload, query) => {
@@ -161,6 +240,8 @@ const onError = (data, message) => {
   throw new Error(data.errors);
 };
 
+const hasErrors = ({ errors = [] }) => errors?.length;
+
 /**
  * Updates a store after design deletion
  *
@@ -170,33 +251,47 @@ const onError = (data, message) => {
  * @param {Array} designs
  */
 export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
-  if (data.errors) {
-    onError(data, designDeletionError(designs.length === 1));
+  if (hasErrors(data)) {
+    onError(data, designDeletionError({ singular: designs.length === 1 }));
   } else {
     deleteDesignsFromStore(store, query, designs);
     addNewVersionToStore(store, query, data.version);
   }
 };
 
-export const updateStoreAfterAddDiscussionComment = (store, data, query, queryVariables) => {
-  if (data.errors) {
+export const updateStoreAfterAddDiscussionComment = (
+  store,
+  data,
+  query,
+  queryVariables,
+  discussionId,
+) => {
+  if (hasErrors(data)) {
     onError(data, ADD_DISCUSSION_COMMENT_ERROR);
   } else {
-    addDiscussionCommentToStore(store, data, query, queryVariables);
+    addDiscussionCommentToStore(store, data, query, queryVariables, discussionId);
   }
 };
 
-export const updateStoreAfterAddImageDiffNote = (store, data, query) => {
-  if (data.errors) {
+export const updateStoreAfterAddImageDiffNote = (store, data, query, queryVariables) => {
+  if (hasErrors(data)) {
     onError(data, ADD_IMAGE_DIFF_NOTE_ERROR);
   } else {
-    addImageDiffNoteToStore(store, data, query);
+    addImageDiffNoteToStore(store, data, query, queryVariables);
+  }
+};
+
+export const updateStoreAfterUpdateImageDiffNote = (store, data, query, queryVariables) => {
+  if (hasErrors(data)) {
+    onError(data, UPDATE_IMAGE_DIFF_NOTE_ERROR);
+  } else {
+    updateImageDiffNoteInStore(store, data, query, queryVariables);
   }
 };
 
 export const updateStoreAfterUploadDesign = (store, data, query) => {
-  if (data.errors) {
-    onError(data, UPLOAD_DESIGN_ERROR);
+  if (hasErrors(data)) {
+    onError(data, data.errors[0]);
   } else {
     addNewDesignToStore(store, data, query);
   }

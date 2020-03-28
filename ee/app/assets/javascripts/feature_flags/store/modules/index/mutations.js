@@ -1,6 +1,21 @@
+import Vue from 'vue';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { mapToScopesViewModel } from '../helpers';
+
+const mapFlag = flag => ({ ...flag, scopes: mapToScopesViewModel(flag.scopes || []) });
+
+const updateFlag = (state, flag) => {
+  const i = state.featureFlags.findIndex(({ id }) => id === flag.id);
+  const staleFlag = state.featureFlags.find(({ id }) => id === flag.id);
+  Vue.set(state.featureFlags, i, flag);
+
+  if (staleFlag.active !== flag.active) {
+    const change = flag.active ? 1 : -1;
+    Vue.set(state.count, 'enabled', state.count.enabled + change);
+    Vue.set(state.count, 'disabled', state.count.disabled - change);
+  }
+};
 
 export default {
   [types.SET_FEATURE_FLAGS_ENDPOINT](state, endpoint) {
@@ -22,10 +37,7 @@ export default {
     state.isLoading = false;
     state.hasError = false;
     state.count = response.data.count;
-    state.featureFlags = (response.data.feature_flags || []).map(f => ({
-      ...f,
-      scopes: mapToScopesViewModel(f.scopes || []),
-    }));
+    state.featureFlags = (response.data.feature_flags || []).map(mapFlag);
 
     let paginationInfo;
     if (Object.keys(response.headers).length) {
@@ -57,5 +69,15 @@ export default {
   [types.RECEIVE_ROTATE_INSTANCE_ID_ERROR](state) {
     state.isRotating = false;
     state.hasRotateError = true;
+  },
+  [types.UPDATE_FEATURE_FLAG](state, flag) {
+    updateFlag(state, flag);
+  },
+  [types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS](state, data) {
+    updateFlag(state, mapFlag(data));
+  },
+  [types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR](state, i) {
+    const flag = state.featureFlags.find(({ id }) => i === id);
+    updateFlag(state, { ...flag, active: !flag.active });
   },
 };

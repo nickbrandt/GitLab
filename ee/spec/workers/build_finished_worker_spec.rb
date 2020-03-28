@@ -42,5 +42,11 @@ describe BuildFinishedWorker do
 
       subject
     end
+
+    it 'stores security scans' do
+      expect(StoreSecurityScansWorker).to receive(:perform_async)
+
+      subject
+    end
   end
 end

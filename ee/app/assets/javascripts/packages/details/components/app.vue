@@ -1,6 +1,7 @@
 <script>
 import {
   GlButton,
+  GlIcon,
   GlModal,
   GlModalDirective,
   GlTooltipDirective,
@@ -9,14 +10,21 @@ import {
   GlTable,
 } from '@gitlab/ui';
 import _ from 'underscore';
+import Tracking from '~/tracking';
+import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
-import PackageInstallation from './installation.vue';
-import Icon from '~/vue_shared/components/icon.vue';
+import PackageTitle from './package_title.vue';
+import ConanInstallation from './conan_installation.vue';
+import MavenInstallation from './maven_installation.vue';
+import NpmInstallation from './npm_installation.vue';
+import NugetInstallation from './nuget_installation.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { formatDate } from '~/lib/utils/datetime_utility';
+import { generatePackageInfo } from '../utils';
 import { __, s__, sprintf } from '~/locale';
-import PackageType from '../constants';
+import { PackageType, TrackingActions } from '../../shared/constants';
+import { packageTypeToTrackCategory } from '../../shared/utils';
+import { mapState } from 'vuex';
 
 export default {
   name: 'PackagesApp',
@@ -26,55 +34,45 @@ export default {
     GlLink,
     GlModal,
     GlTable,
-    Icon,
+    GlIcon,
+    PackageActivity,
     PackageInformation,
-    PackageInstallation,
+    PackageTitle,
+    ConanInstallation,
+    MavenInstallation,
+    NpmInstallation,
+    NugetInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
     GlModal: GlModalDirective,
   },
-  mixins: [timeagoMixin],
-  props: {
-    packageEntity: {
-      type: Object,
-      required: true,
-    },
-    files: {
-      type: Array,
-      default: () => [],
-      required: true,
-    },
-    canDelete: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
-    destroyPath: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    emptySvgPath: {
-      type: String,
-      required: true,
-    },
-    npmPath: {
-      type: String,
-      required: true,
-    },
-    npmHelpPath: {
-      type: String,
-      required: true,
-    },
-  },
+  mixins: [timeagoMixin, Tracking.mixin()],
+  trackingActions: { ...TrackingActions },
   computed: {
+    ...mapState([
+      'packageEntity',
+      'packageFiles',
+      'canDelete',
+      'destroyPath',
+      'svgPath',
+      'npmPath',
+      'npmHelpPath',
+    ]),
+    isNpmPackage() {
+      return this.packageEntity.package_type === PackageType.NPM;
+    },
+    isMavenPackage() {
+      return this.packageEntity.package_type === PackageType.MAVEN;
+    },
+    isConanPackage() {
+      return this.packageEntity.package_type === PackageType.CONAN;
+    },
+    isNugetPackage() {
+      return this.packageEntity.package_type === PackageType.NUGET;
+    },
     isValidPackage() {
-      if (this.packageEntity.name) {
-        return true;
-      }
-
-      return false;
+      return Boolean(this.packageEntity.name);
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
@@ -94,24 +92,7 @@ export default {
       );
     },
     packageInformation() {
-      return [
-        {
-          label: s__('Name'),
-          value: this.packageEntity.name,
-        },
-        {
-          label: s__('Version'),
-          value: this.packageEntity.version,
-        },
-        {
-          label: s__('Created on'),
-          value: formatDate(this.packageEntity.created_at),
-        },
-        {
-          label: s__('Updated at'),
-          value: formatDate(this.packageEntity.updated_at),
-        },
-      ];
+      return generatePackageInfo(this.packageEntity);
     },
     packageMetadataTitle() {
       switch (this.packageEntity.package_type) {
@@ -143,12 +124,17 @@ export default {
       }
     },
     filesTableRows() {
-      return this.files.map(x => ({
+      return this.packageFiles.map(x => ({
         name: x.file_name,
         downloadPath: x.download_path,
         size: this.formatSize(x.size),
         created: x.created_at,
       }));
+    },
+    tracking() {
+      return {
+        category: packageTypeToTrackCategory(this.packageEntity.package_type),
+      };
     },
   },
   methods: {
@@ -186,55 +172,71 @@ export default {
     v-if="!isValidPackage"
     :title="s__('PackageRegistry|Unable to load package')"
     :description="s__('PackageRegistry|There was a problem fetching the details for this package.')"
-    :svg-path="emptySvgPath"
-    class="js-package-empty-state"
+    :svg-path="svgPath"
   />
 
   <div v-else class="packages-app">
-    <div class="detail-page-header d-flex justify-content-between">
-      <strong class="js-version-title">{{ packageEntity.version }}</strong>
-      <gl-button
-        v-if="canDeletePackage"
-        v-gl-modal="'delete-modal'"
-        class="js-delete-button"
-        variant="danger"
-        data-qa-selector="delete_button"
-        >{{ __('Delete') }}</gl-button
-      >
+    <div class="detail-page-header d-flex justify-content-between flex-column flex-sm-row">
+      <package-title />
+
+      <div class="mt-sm-2">
+        <gl-button
+          v-if="canDeletePackage"
+          v-gl-modal="'delete-modal'"
+          class="js-delete-button"
+          variant="danger"
+          data-qa-selector="delete_button"
+          >{{ __('Delete') }}</gl-button
+        >
+      </div>
     </div>
 
     <div class="row prepend-top-default" data-qa-selector="package_information_content">
-      <package-information :type="packageEntity.package_type" :information="packageInformation" />
-      <package-information
-        v-if="packageMetadata"
-        :heading="packageMetadataTitle"
-        :information="packageMetadata"
-        :show-copy="true"
-      />
-      <package-installation
-        v-else
-        :type="packageEntity.package_type"
-        :name="packageEntity.name"
-        :registry-url="npmPath"
-        :help-url="npmHelpPath"
-      />
+      <div class="col-sm-6">
+        <package-information :information="packageInformation" />
+        <package-information
+          v-if="packageMetadata"
+          :heading="packageMetadataTitle"
+          :information="packageMetadata"
+          :show-copy="true"
+        />
+      </div>
+
+      <div class="col-sm-6">
+        <npm-installation
+          v-if="isNpmPackage"
+          :name="packageEntity.name"
+          :registry-url="npmPath"
+          :help-url="npmHelpPath"
+        />
+
+        <maven-installation v-else-if="isMavenPackage" />
+        <conan-installation v-else-if="isConanPackage" />
+        <nuget-installation v-else-if="isNugetPackage" />
+      </div>
     </div>
+
+    <package-activity />
 
     <gl-table
       :fields="$options.filesTableHeaderFields"
       :items="filesTableRows"
       tbody-tr-class="js-file-row"
     >
-      <template #name="items">
-        <icon name="doc-code" class="space-right" />
-        <gl-link :href="items.item.downloadPath" class="js-file-download">{{
-          items.item.name
-        }}</gl-link>
+      <template #cell(name)="items">
+        <gl-icon name="doc-code" class="space-right" />
+        <gl-link
+          :href="items.item.downloadPath"
+          class="js-file-download"
+          @click="track($options.trackingActions.PULL_PACKAGE)"
+        >
+          {{ items.item.name }}
+        </gl-link>
       </template>
 
-      <template #created="items">
+      <template #cell(created)="items">
         <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
-          timeFormated(items.item.created)
+          timeFormatted(items.item.created)
         }}</span>
       </template>
     </gl-table>
@@ -247,10 +249,12 @@ export default {
         <div class="float-right">
           <gl-button @click="cancelDelete()">{{ __('Cancel') }}</gl-button>
           <gl-button
+            ref="modal-delete-button"
             data-method="delete"
             :to="destroyPath"
             variant="danger"
             data-qa-selector="delete_modal_button"
+            @click="track($options.trackingActions.DELETE_PACKAGE)"
             >{{ __('Delete') }}</gl-button
           >
         </div>

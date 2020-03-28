@@ -35,6 +35,8 @@ module API
       get ':id/dependencies' do
         authorize! :read_dependencies, user_project
 
+        track_event('view_dependencies')
+
         dependencies = dependencies_by(declared_params.merge(project: user_project))
 
         present dependencies, with: ::EE::API::Entities::Dependency, user: current_user, project: user_project

@@ -75,7 +75,7 @@ ready.
 To keep files in the repository organized it is often helpful to create a new
 directory.
 
-From a project's files page, click the '+' button to the right of the branch selector.
+From a project's files page, click the plus button (`+`) to the right of the branch selector.
 Choose **New directory** from the dropdown.
 
 ![New directory dropdown](img/web_editor_new_directory_dropdown.png)
@@ -91,33 +91,49 @@ There are multiple ways to create a branch from GitLab's web interface.
 
 ### Create a new branch from an issue
 
-> [Introduced][ce-2808] in GitLab 8.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2808) in GitLab 8.6.
 
-In case your development workflow dictates to have an issue for every merge
-request, you can quickly create a branch right on the issue page which will be
-tied with the issue itself. You can see a **New branch** button after the issue
-description, unless there is already a branch with the same name or a referenced
-merge request.
+If your development workflow dictates to have an issue for every merge
+request, you can quickly create a branch directly from the issue to speed the process up.
+The new branch, and later its merge request, will be marked as related to this issue.
+Once merged, the MR will automatically close the issue.
+You can see a **Create merge request** dropdown below the issue description.
 
-![New Branch Button](img/web_editor_new_branch_from_issue.png)
+NOTE: **Note:**
+You won't see the **Create merge request** button if there is already a branch with the same
+name or a referenced merge request or your project has an active
+fork relationship.
+If you would like to make this button appear, a possible workaround is to [remove your project's
+fork relationship](../settings/index.md#removing-a-fork-relationship). Once removed, the fork
+relationship cannot be restored and you will no longer be able to send merge requests to the source.
 
-Once you click it, a new branch will be created that diverges from the default
+![Create Button](img/web_editor_new_branch_from_issue_create_button_v12_6.png)
+
+This dropdown contains the options **Create merge request and branch** and **Create branch**.
+
+![New Branch Button](img/web_editor_new_branch_from_issue_v_12_6.png)
+
+Once you choose one of these options, a new branch or branch and merge request
+will be created, based on the default
 branch of your project, by default `master`. The branch name will be based on
 the title of the issue and as a prefix, it will have its internal ID. Thus, the example
-screenshot above will yield a branch named
-`23177-add-support-for-rich-references-to-referables`.
+screenshot above will create a branch named
+`2-make-static-site-auto-deploy-and-serve`.
 
-Since GitLab 9.0, when you click the `New branch` in an empty repository project, GitLab automatically creates the master branch, commits a blank `README.md` file to it and creates and redirects you to a new branch based on the issue title.
-If your [project is already configured with a deployment service][project-services-doc] (e.g. Kubernetes), GitLab takes one step further and prompts you to set up [auto deploy][auto-deploy-doc] by helping you create a `.gitlab-ci.yml` file.
+When you click the **Create branch** button in an empty
+repository project, GitLab automatically creates a `master` branch, commits
+a blank `README.md` file to it, and creates and redirects you to a new branch
+based on the issue title.
+If your [project is already configured with a deployment service](../integrations/project_services.md),
+such as Kubernetes, GitLab takes one step further and prompts you to set up
+[auto deploy](../../../topics/autodevops/index.md#auto-deploy)
+by helping you create a `.gitlab-ci.yml` file.
 
 After the branch is created, you can edit files in the repository to fix
 the issue. When a merge request is created based on the newly created branch,
 the description field will automatically display the [issue closing pattern](../issues/managing_issues.md#closing-issues-automatically)
 `Closes #ID`, where `ID` the ID of the issue. This will close the issue once the
 merge request is merged.
-
-[project-services-doc]: ../integrations/project_services.md
-[auto-deploy-doc]: ../../../topics/autodevops/index.md#auto-deploy
 
 ### Create a new branch from a project's dashboard
 
@@ -152,7 +168,7 @@ SHA. From a project's files page, choose **New tag** from the dropdown.
 
 Give the tag a name such as `v1.0.0`. Choose the branch or SHA from which you
 would like to create this new tag. You can optionally add a message and
-release notes. The release notes section supports markdown format and you can
+release notes. The release notes section supports Markdown format and you can
 also upload an attachment. Click **Create tag** and you will be taken to the tag
 list page.
 
@@ -171,8 +187,6 @@ you commit the changes you will be taken to a new merge request form.
 If you'd prefer _not_ to use your primary email address for commits created
 through the web editor, you can choose to use another of your linked email
 addresses from the **User Settings > Edit Profile** page.
-
-[ce-2808]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2808
 
 <!-- ## Troubleshooting
 

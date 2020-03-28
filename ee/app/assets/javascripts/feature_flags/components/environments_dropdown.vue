@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
@@ -56,6 +56,7 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+      required: false,
     },
   },
   data() {
@@ -80,7 +81,7 @@ export default {
      * @returns Boolean
      */
     shouldRenderCreateButton() {
-      return !_.isEmpty(this.filter) && !this.isLoading && !this.results.length;
+      return !isEmpty(this.filter) && !this.isLoading && !this.results.length;
     },
   },
   watch: {
@@ -175,7 +176,7 @@ export default {
 
       <input
         type="text"
-        class="js-env-input form-control pl-4"
+        class="form-control pl-4 js-env-input"
         :aria-label="placeholder"
         :value="filter"
         :placeholder="placeholder"

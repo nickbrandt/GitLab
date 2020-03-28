@@ -1,5 +1,16 @@
-.design-image {
-  object-fit: contain;
+.design-presentation-wrapper {
+  top: 0;
+  left: 0;
+}
+
+.design-scaler {
+  z-index: 1;
+}
+
+.design-scaler-wrapper {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .design-list-item .design-event {
@@ -22,10 +33,6 @@
   min-width: 400px;
   flex-basis: 28%;
 
-  li {
-    list-style: none;
-  }
-
   .badge.badge-pill {
     margin-left: $gl-padding;
     background-color: $blue-400;
@@ -37,7 +44,6 @@
   }
 
   .design-discussion {
-    padding: $gl-padding 0;
     margin: $gl-padding 0;
 
     &::before {
@@ -51,6 +57,7 @@
 
     .design-note {
       padding: $gl-padding;
+      list-style: none;
 
       a {
         color: inherit;
@@ -63,7 +70,6 @@
 
     .reply-wrapper {
       padding: $gl-padding;
-      padding-bottom: 0;
     }
   }
 
@@ -87,4 +93,41 @@
     flex-grow: 1;
     flex-basis: auto;
   }
+}
+
+.design-dropzone-border {
+  border: 2px dashed $gray-200;
+}
+
+.design-dropzone-card {
+  transition: border $general-hover-transition-duration $general-hover-transition-curve;
+
+  &:focus,
+  &:active {
+    outline: none;
+    border: 2px dashed $purple;
+    color: $gl-text-color;
+  }
+
+  &:hover {
+    border-color: $gray-500;
+  }
+}
+
+.design-dropzone-overlay {
+  border: 2px dashed $purple;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.design-dropzone-fade-enter-active,
+.design-dropzone-fade-leave-active {
+  transition: opacity $general-hover-transition-duration $general-hover-transition-curve;
+}
+
+.design-dropzone-fade-enter,
+.design-dropzone-fade-leave-to {
+  opacity: 0;
 }

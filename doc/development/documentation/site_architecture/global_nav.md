@@ -4,9 +4,9 @@ description: "Learn how GitLab docs' global navigation works and how to add new 
 
 # Global navigation
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/362) in GitLab 11.6.
-> - [Updated](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/482) in GitLab 12.1.
-> - [Per-project](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/498) navigation added in GitLab 12.2.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/362) in GitLab 11.6.
+> - [Updated](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/482) in GitLab 12.1.
+> - [Per-project](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/498) navigation added in GitLab 12.2.
 
 Global navigation (the left-most pane in our three pane documentation) provides:
 
@@ -86,7 +86,7 @@ The available sections are described on the table below:
 | Section       | Description                                |
 | ------------- | ------------------------------------------ |
 | User          | Documentation for the GitLab's user UI.    |
-| Administrator | Documentation for the GitLab's admin area. |
+| Administrator | Documentation for the GitLab's Admin Area. |
 | Contributor   | Documentation for developing GitLab.       |
 
 The majority of the links available on the nav were added according to the UI.

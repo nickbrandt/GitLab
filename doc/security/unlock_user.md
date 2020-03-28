@@ -4,16 +4,16 @@ type: howto
 
 # How to unlock a locked user from the command line
 
-After six failed login attempts a user gets in a locked state.
+After ten failed login attempts a user gets in a locked state.
 
 To unlock a locked user:
 
 1. SSH into your GitLab server.
 1. Start a Ruby on Rails console:
 
-   ```sh
+   ```shell
    ## For Omnibus GitLab
-   sudo gitlab-rails console production
+   sudo gitlab-rails console -e production
 
    ## For installations from source
    sudo -u git -H bundle exec rails console RAILS_ENV=production

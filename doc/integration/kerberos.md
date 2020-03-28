@@ -33,7 +33,7 @@ system's Kerberos settings.
 The keytab is a sensitive file and must be readable by the GitLab user. Set
 ownership and protect the file appropriately:
 
-```
+```shell
 sudo chown git /etc/http.keytab
 sudo chmod 0600 /etc/http.keytab
 ```
@@ -72,7 +72,6 @@ For source installations, make sure the `kerberos` gem group
 1. Edit `/etc/gitlab/gitlab.rb`:
 
    ```ruby
-   gitlab_rails['omniauth_enabled'] = true
    gitlab_rails['omniauth_allow_single_sign_on'] = ['kerberos']
 
    gitlab_rails['kerberos_enabled'] = true
@@ -244,12 +243,12 @@ With Kerberos SPNEGO authentication, the browser is expected to send a list of
 mechanisms it supports to GitLab. If it doesn't support any of the mechanisms
 GitLab supports, authentication will fail with a message like this in the log:
 
-```
+```plaintext
 OmniauthKerberosSpnegoController: failed to process Negotiate/Kerberos authentication: gss_accept_sec_context did not return GSS_S_COMPLETE: An unsupported mechanism was requested Unknown error
 ```
 
 This is usually seen when the browser is unable to contact the Kerberos server
-directly. It will fall back to an  unsupported mechanism known as
+directly. It will fall back to an unsupported mechanism known as
 [`IAKERB`](https://k5wiki.kerberos.org/wiki/Projects/IAKERB), which tries to use
 the GitLab server as an intermediary to the Kerberos server.
 
@@ -265,7 +264,7 @@ so the client will fall back to attempting to negotiate `IAKERB`, leading to the
 above error message.
 
 To fix this, ensure that the forward and reverse DNS for your GitLab server
-match. So for instance, if you acces GitLab as `gitlab.example.com`, resolving
+match. So for instance, if you access GitLab as `gitlab.example.com`, resolving
 to IP address `1.2.3.4`, then `4.3.2.1.in-addr.arpa` must be a PTR record for
 `gitlab.example.com`.
 
@@ -275,7 +274,7 @@ authenticate to other Kerberos services.
 
 ### HTTP Basic: Access denied when cloning
 
-```sh
+```shell
 remote: HTTP Basic: Access denied
 fatal: Authentication failed for '<KRB5 path>'
 ```
@@ -283,7 +282,7 @@ fatal: Authentication failed for '<KRB5 path>'
 If you are using Git v2.11 or newer and see the above error when cloning, you can
 set the `http.emptyAuth` Git option to `true` to fix this:
 
-```
+```shell
 git config --global http.emptyAuth true
 ```
 

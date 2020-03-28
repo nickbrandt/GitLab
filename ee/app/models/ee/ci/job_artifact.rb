@@ -12,7 +12,7 @@ module EE
       after_destroy :log_geo_deleted_event
 
       SECURITY_REPORT_FILE_TYPES = %w[sast dependency_scanning container_scanning dast].freeze
-      LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
+      LICENSE_SCANNING_REPORT_FILE_TYPES = %w[license_management license_scanning].freeze
       DEPENDENCY_LIST_REPORT_FILE_TYPES = %w[dependency_scanning].freeze
       METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
       CONTAINER_SCANNING_REPORT_TYPES = %w[container_scanning].freeze
@@ -20,15 +20,15 @@ module EE
       DAST_REPORT_TYPES = %w[dast].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-      scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
+      scope :project_id_in, ->(ids) { where(project_id: ids) }
       scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
 
       scope :security_reports, -> do
         with_file_types(SECURITY_REPORT_FILE_TYPES)
       end
 
-      scope :license_management_reports, -> do
-        with_file_types(LICENSE_MANAGEMENT_REPORT_FILE_TYPES)
+      scope :license_scanning_reports, -> do
+        with_file_types(LICENSE_SCANNING_REPORT_FILE_TYPES)
       end
 
       scope :dependency_list_reports, -> do
@@ -49,6 +49,13 @@ module EE
 
       scope :metrics_reports, -> do
         with_file_types(METRICS_REPORT_FILE_TYPES)
+      end
+
+      def self.associated_file_types_for(file_type)
+        return unless file_types.include?(file_type)
+        return LICENSE_SCANNING_REPORT_FILE_TYPES if LICENSE_SCANNING_REPORT_FILE_TYPES.include?(file_type)
+
+        [file_type]
       end
     end
 

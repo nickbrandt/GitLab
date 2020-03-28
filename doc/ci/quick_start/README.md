@@ -5,7 +5,7 @@ type: reference
 # Getting started with GitLab CI/CD
 
 NOTE: **Note:**
-Starting from version 8.0, GitLab [Continuous Integration][ci] (CI)
+Starting from version 8.0, GitLab [Continuous Integration](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/) (CI)
 is fully integrated into GitLab itself and is [enabled] by default on all
 projects.
 
@@ -17,34 +17,34 @@ NOTE: **Note:**
 Coming over to GitLab from Jenkins? Check out our [reference](../jenkins/index.md)
 for converting your pre-existing pipelines over to our format.
 
-GitLab offers a [continuous integration][ci] service. If you
-[add a `.gitlab-ci.yml` file][yaml] to the root directory of your repository,
-and configure your GitLab project to use a [Runner], then each commit or
-push triggers your CI [pipeline].
+NOTE: **Note:**
+There are a few different [basic pipeline architectures](../pipelines/pipeline_architectures.md)
+that you can consider for use in your project. You may want to familiarize
+yourself with these prior to getting started.
 
-The `.gitlab-ci.yml` file tells the GitLab Runner what to do. By default it runs
-a pipeline with three [stages]: `build`, `test`, and `deploy`. You don't need to
-use all three stages; stages with no jobs are simply ignored.
+GitLab offers a [continuous integration](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/) service. For each commit or push to trigger your CI
+[pipeline](../pipelines/index.md), you must:
 
-If everything runs OK (no non-zero return values), you'll get a nice green
-checkmark associated with the commit. This makes it
-easy to see whether a commit caused any of the tests to fail before
-you even look at the code.
+- Add a [`.gitlab-ci.yml` file](#creating-a-gitlab-ciyml-file) to your repository's root directory.
+- Ensure your project is configured to use a [Runner](#configuring-a-runner).
 
-Most projects use GitLab's CI service to run the test suite so that
-developers get immediate feedback if they broke something.
+The `.gitlab-ci.yml` file tells the GitLab Runner what to do. A simple pipeline commonly has
+three [stages](../yaml/README.md#stages):
 
-There's a growing trend to use continuous delivery and continuous deployment to
-automatically deploy tested code to staging and production environments.
+- `build`
+- `test`
+- `deploy`
 
-So in brief, the steps needed to have a working CI can be summed up to:
+You do not need to use all three stages; stages with no jobs are ignored.
 
-1. Add `.gitlab-ci.yml` to the root directory of your repository
-1. Configure a Runner
+The pipeline appears under the project's **CI/CD > Pipelines** page. If everything runs OK (no non-zero
+return values), you get a green check mark associated with the commit. This makes it easy to see
+whether a commit caused any of the tests to fail before you even look at the job (test) log. Many projects use
+GitLab's CI service to run the test suite, so developers get immediate feedback if they broke
+something.
 
-From there on, on every push to your Git repository, the Runner will
-automatically start the pipeline and the pipeline will appear under the
-project's **Pipelines** page.
+It's also common to use pipelines to automatically deploy
+tested code to staging and production environments.
 
 ---
 
@@ -55,7 +55,7 @@ This guide assumes that you have:
 - A project in GitLab that you would like to use CI for.
 - Maintainer or owner access to the project
 
-Let's break it down to pieces and work on solving the GitLab CI puzzle.
+Let's break it down to pieces and work on solving the GitLab CI/CD puzzle.
 
 ## Creating a `.gitlab-ci.yml` file
 
@@ -133,7 +133,7 @@ For more information and a complete `.gitlab-ci.yml` syntax, please read
 Once you've created `.gitlab-ci.yml`, you should add it to your Git repository
 and push it to GitLab.
 
-```bash
+```shell
 git add .gitlab-ci.yml
 git commit -m "Add .gitlab-ci.yml"
 git push origin master
@@ -237,9 +237,4 @@ CI with various languages.
 [runner-install]: https://docs.gitlab.com/runner/install/
 [blog-ci]: https://about.gitlab.com/blog/2015/05/06/why-were-replacing-gitlab-ci-jobs-with-gitlab-ci-dot-yml/
 [examples]: ../examples/README.md
-[ci]: https://about.gitlab.com/product/continuous-integration/
-[yaml]: ../yaml/README.md
-[runner]: ../runners/README.md
 [enabled]: ../enable_or_disable_ci.md
-[stages]: ../yaml/README.md#stages
-[pipeline]: ../pipelines.md

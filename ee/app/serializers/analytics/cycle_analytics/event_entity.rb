@@ -12,7 +12,7 @@ module Analytics
       private
 
       def type
-        'simple'
+        object.label_based? ? 'label' : 'simple'
       end
 
       def can_be_start_event?

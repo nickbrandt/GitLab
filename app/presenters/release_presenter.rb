@@ -19,6 +19,12 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
     project_tag_path(project, release.tag)
   end
 
+  def self_url
+    return unless ::Feature.enabled?(:release_show_page, project, default_enabled: true)
+
+    project_release_url(project, release)
+  end
+
   def merge_requests_url
     return unless release_mr_issue_urls_available?
 
@@ -38,9 +44,10 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
   end
 
   def evidence_file_path
-    return unless release.evidence.present?
+    evidence = release.evidences.first
+    return unless evidence
 
-    evidence_project_release_url(project, tag, format: :json)
+    project_evidence_url(project, release, evidence, format: :json)
   end
 
   private
@@ -58,7 +65,6 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
   end
 
   def release_edit_page_available?
-    ::Feature.enabled?(:release_edit_page, project, default_enabled: true) &&
-      can?(current_user, :update_release, release)
+    can?(current_user, :update_release, release)
   end
 end

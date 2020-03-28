@@ -13,6 +13,15 @@ describe LfsObject do
         expect(described_class.not_linked_to_project(project)).to contain_exactly(other_lfs_object)
       end
     end
+
+    describe '.for_oids' do
+      it 'returns the correct LfsObjects' do
+        lfs_object_1, lfs_object_2 = create_list(:lfs_object, 2)
+
+        expect(described_class.for_oids(lfs_object_1.oid)).to contain_exactly(lfs_object_1)
+        expect(described_class.for_oids([lfs_object_1.oid, lfs_object_2.oid])).to contain_exactly(lfs_object_1, lfs_object_2)
+      end
+    end
   end
 
   it 'has a distinct has_many :projects relation through lfs_objects_projects' do
@@ -44,8 +53,8 @@ describe LfsObject do
   end
 
   describe '#project_allowed_access?' do
-    set(:lfs_object) { create(:lfs_objects_project).lfs_object }
-    set(:project) { create(:project) }
+    let_it_be(:lfs_object) { create(:lfs_objects_project).lfs_object }
+    let_it_be(:project, reload: true) { create(:project) }
 
     it 'returns true when project is linked' do
       create(:lfs_objects_project, lfs_object: lfs_object, project: project)
@@ -58,9 +67,9 @@ describe LfsObject do
     end
 
     context 'when project is a member of a fork network' do
-      set(:fork_network) { create(:fork_network) }
-      set(:fork_network_root_project) { fork_network.root_project }
-      set(:fork_network_membership) { create(:fork_network_member, project: project, fork_network: fork_network) }
+      let_it_be(:fork_network) { create(:fork_network) }
+      let_it_be(:fork_network_root_project, reload: true) { fork_network.root_project }
+      let_it_be(:fork_network_membership) { create(:fork_network_member, project: project, fork_network: fork_network) }
 
       it 'returns true for all members when forked project is linked' do
         create(:lfs_objects_project, lfs_object: lfs_object, project: project)

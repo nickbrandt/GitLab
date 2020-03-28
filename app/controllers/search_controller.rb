@@ -5,6 +5,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include RendersCommits
 
+  before_action :override_snippet_scope, only: :show
   around_action :allow_gitaly_ref_name_caching
 
   skip_before_action :authenticate_user!
@@ -20,6 +21,8 @@ class SearchController < ApplicationController
     @group = search_service.group
 
     return if params[:search].blank?
+
+    return unless search_term_valid?
 
     @search_term = params[:search]
 
@@ -62,6 +65,20 @@ class SearchController < ApplicationController
 
   private
 
+  def search_term_valid?
+    unless search_service.valid_query_length?
+      flash[:alert] = t('errors.messages.search_chars_too_long', count: SearchService::SEARCH_CHAR_LIMIT)
+      return false
+    end
+
+    unless search_service.valid_terms_count?
+      flash[:alert] = t('errors.messages.search_terms_too_long', count: SearchService::SEARCH_TERM_LIMIT)
+      return false
+    end
+
+    true
+  end
+
   def render_commits
     @search_objects = prepare_commits_for_rendering(@search_objects)
   end
@@ -86,5 +103,15 @@ class SearchController < ApplicationController
     return if params[:nav_source] != 'navbar'
 
     Gitlab::UsageDataCounters::SearchCounter.increment_navbar_searches_count
+  end
+
+  # Disallow web snippet_blobs search as we migrate snippet
+  # from database-backed storage to git repository-based,
+  # and searching across multiple git repositories is not feasible.
+  #
+  # TODO: after 13.0 refactor this into Search::SnippetService
+  # See https://gitlab.com/gitlab-org/gitlab/issues/208882
+  def override_snippet_scope
+    params[:scope] = 'snippet_titles' if params[:snippets] == 'true'
   end
 end

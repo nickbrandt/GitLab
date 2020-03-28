@@ -1,7 +1,7 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
-import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import containerMixin from 'ee_else_ce/environments/mixins/container_mixin';
+import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import EnvironmentTable from '../components/environments_table.vue';
 
 export default {
@@ -41,7 +41,7 @@ export default {
   <div class="environments-container">
     <gl-loading-icon
       v-if="isLoading"
-      :size="3"
+      size="md"
       class="prepend-top-default"
       label="Loading environments"
     />

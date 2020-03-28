@@ -8,21 +8,27 @@ module Gitlab
           class Content < Chain::Base
             include Chain::Helpers
 
+            SOURCES = [
+              Gitlab::Ci::Pipeline::Chain::Config::Content::Bridge,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::Repository,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::ExternalProject,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::Remote,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::AutoDevops
+            ].freeze
+
+            LEGACY_SOURCES = [
+              Gitlab::Ci::Pipeline::Chain::Config::Content::Bridge,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::LegacyRepository,
+              Gitlab::Ci::Pipeline::Chain::Config::Content::LegacyAutoDevops
+            ].freeze
+
             def perform!
-              return if @command.config_content
-
-              if content = content_from_repo
-                @command.config_content = content
-                @pipeline.config_source = :repository_source
-                # TODO: we should persist ci_config_path
-                # @pipeline.config_path = ci_config_path
-              elsif content = content_from_auto_devops
-                @command.config_content = content
-                @pipeline.config_source = :auto_devops_source
-              end
-
-              unless @command.config_content
-                return error("Missing #{ci_config_path} file")
+              if config = find_config
+                @pipeline.build_pipeline_config(content: config.content) if ci_root_config_content_enabled?
+                @command.config_content = config.content
+                @pipeline.config_source = config.source
+              else
+                error('Missing CI config file')
               end
             end
 
@@ -32,24 +38,21 @@ module Gitlab
 
             private
 
-            def content_from_repo
-              return unless project
-              return unless @pipeline.sha
-              return unless ci_config_path
+            def find_config
+              sources.each do |source|
+                config = source.new(@pipeline, @command)
+                return config if config.exists?
+              end
 
-              project.repository.gitlab_ci_yml_for(@pipeline.sha, ci_config_path)
-            rescue GRPC::NotFound, GRPC::Internal
               nil
             end
 
-            def content_from_auto_devops
-              return unless project&.auto_devops_enabled?
-
-              Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content
+            def sources
+              ci_root_config_content_enabled? ? SOURCES : LEGACY_SOURCES
             end
 
-            def ci_config_path
-              project.ci_config_path.presence || '.gitlab-ci.yml'
+            def ci_root_config_content_enabled?
+              Feature.enabled?(:ci_root_config_content, @command.project, default_enabled: true)
             end
           end
         end

@@ -27,7 +27,7 @@ describe ElasticNamespaceIndexerWorker, :elastic do
   end
 
   describe 'indexing and deleting' do
-    set(:namespace) { create :namespace }
+    let_it_be(:namespace) { create :namespace }
     let(:projects) { create_list :project, 3, namespace: namespace }
 
     it 'indexes all projects belonging to the namespace' do

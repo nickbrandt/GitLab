@@ -5,14 +5,23 @@ class ApprovalWrappedRule
   extend Forwardable
   include Gitlab::Utils::StrongMemoize
 
-  REQUIRED_APPROVALS_PER_CODE_OWNER_RULE = 1
-
   attr_reader :merge_request
   attr_reader :approval_rule
 
   def_delegators(:@approval_rule,
-                 :id, :name, :users, :groups, :code_owner, :code_owner?, :source_rule,
-                 :rule_type)
+                 :regular?, :any_approver?, :code_owner?, :report_approver?,
+                 :id, :name, :users, :groups, :code_owner, :source_rule,
+                 :rule_type, :approvals_required)
+
+  def self.wrap(merge_request, rule)
+    if rule.any_approver?
+      ApprovalWrappedAnyApproverRule.new(merge_request, rule)
+    elsif rule.code_owner?
+      ApprovalWrappedCodeOwnerRule.new(merge_request, rule)
+    else
+      ApprovalWrappedRule.new(merge_request, rule)
+    end
+  end
 
   def initialize(merge_request, approval_rule)
     @merge_request = merge_request
@@ -24,10 +33,7 @@ class ApprovalWrappedRule
   end
 
   def approvers
-    filtered_approvers =
-      ApprovalState.filter_author(@approval_rule.approvers, merge_request)
-
-    ApprovalState.filter_committers(filtered_approvers, merge_request)
+    filter_approvers(@approval_rule.approvers)
   end
 
   # @return [Array<User>] all approvers related to this rule
@@ -47,7 +53,7 @@ class ApprovalWrappedRule
     end
 
     strong_memoize(:approved_approvers) do
-      overall_approver_ids = merge_request.approvals.map(&:user_id)
+      overall_approver_ids = merge_request.approvals.map(&:user_id).to_set
 
       approvers.select do |approver|
         overall_approver_ids.include?(approver.id)
@@ -80,27 +86,12 @@ class ApprovalWrappedRule
     approvers - approved_approvers
   end
 
-  def approvals_required
-    if code_owner?
-      code_owner_approvals_required
-    else
-      approval_rule.approvals_required
-    end
-  end
-
   private
 
-  def code_owner_approvals_required
-    strong_memoize(:code_owner_approvals_required) do
-      next 0 unless branch_requires_code_owner_approval?
+  def filter_approvers(approvers)
+    filtered_approvers =
+      ApprovalState.filter_author(approvers, merge_request)
 
-      approvers.any? ? REQUIRED_APPROVALS_PER_CODE_OWNER_RULE : 0
-    end
-  end
-
-  def branch_requires_code_owner_approval?
-    return false unless project.code_owner_approval_required_available?
-
-    ProtectedBranch.branch_requires_code_owner_approval?(project, merge_request.target_branch)
+    ApprovalState.filter_committers(filtered_approvers, merge_request)
   end
 end

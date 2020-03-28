@@ -22,11 +22,11 @@ module EE
       end
     end
 
-    def process_wiki_changes(post_received)
+    def process_wiki_changes(post_received, project)
       super
 
       if ::Gitlab::Geo.primary?
-        ::Geo::RepositoryUpdatedService.new(post_received.project.wiki.repository).execute
+        ::Geo::RepositoryUpdatedService.new(project.wiki.repository).execute
       end
     end
 

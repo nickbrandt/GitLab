@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GeoNode, :geo, type: :model do
+describe GeoNode, :request_store, :geo, type: :model do
   using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 
@@ -186,12 +186,12 @@ describe GeoNode, :geo, type: :model do
         end
 
         context 'when it has an oauth_application' do
-          # TODO Should it instead be destroyed?
-          # https://gitlab.com/gitlab-org/gitlab/issues/10225
-          it 'disassociates the oauth_application' do
+          it 'destroys the oauth_application' do
             primary_node.oauth_application = create(:oauth_application)
 
-            expect(primary_node).to be_valid
+            expect do
+              expect(primary_node).to be_valid
+            end.to change(Doorkeeper::Application, :count).by(-1)
 
             expect(primary_node.oauth_application).to be_nil
           end
@@ -741,6 +741,24 @@ describe GeoNode, :geo, type: :model do
         node.valid?
 
         expect(node.name).to eq('foo')
+      end
+    end
+  end
+
+  describe '#job_artifacts' do
+    context 'when selective sync is enabled' do
+      it 'applies a CTE statement' do
+        node.update!(selective_sync_type: 'namespaces')
+
+        expect(node.job_artifacts.to_sql).to match(/WITH .+restricted_job_artifacts/)
+      end
+    end
+
+    context 'when selective sync is disabled' do
+      it 'doest not apply a CTE statement' do
+        node.update!(selective_sync_type: nil)
+
+        expect(node.job_artifacts.to_sql).not_to match(/WITH .+restricted_job_artifacts/)
       end
     end
   end

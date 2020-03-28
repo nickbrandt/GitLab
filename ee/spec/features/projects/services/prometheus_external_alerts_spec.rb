@@ -20,15 +20,11 @@ describe 'Prometheus external alerts', :js do
 
   context 'with manual configuration' do
     before do
-      check('Active')
-      fill_in('API URL', with: 'http://prometheus.example.com')
-      click_button('Save changes')
-
-      visit_edit_service
+      create(:prometheus_service, project: project, api_url: 'http://prometheus.example.com', manual_configuration: '1', active: true)
     end
 
     it 'shows the Alerts section' do
-      wait_for_requests
+      visit_edit_service
 
       expect(alerts_section).to have_content('Alerts')
       expect(alerts_section).to have_content('Receive alerts from manually configured Prometheus servers.')

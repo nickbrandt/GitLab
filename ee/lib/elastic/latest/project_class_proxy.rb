@@ -8,7 +8,7 @@ module Elastic
 
         query_hash = basic_query_hash(options[:in], query)
 
-        filters = []
+        filters = [{ terms: { type: [es_type] } }]
 
         if options[:namespace_id]
           filters << {
@@ -44,7 +44,7 @@ module Elastic
 
         query_hash[:sort] = [:_score]
 
-        search(query_hash)
+        search(query_hash, options)
       end
     end
   end

@@ -8,13 +8,14 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate, mockGroupId } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate, mockGroupId, mockMilestone } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = (
   {
     epics = [mockEpic],
+    milestones = [mockMilestone],
     timeframe = mockTimeframeMonths,
     currentGroupId = mockGroupId,
     defaultInnerHeight = 0,
@@ -34,6 +35,7 @@ const createComponent = (
     props: {
       presetType: PRESET_TYPES.MONTHS,
       epics,
+      milestones,
       timeframe,
       currentGroupId,
     },
@@ -43,8 +45,9 @@ const createComponent = (
 describe('RoadmapShellComponent', () => {
   let vm;
 
-  beforeEach(() => {
+  beforeEach(done => {
     vm = createComponent({});
+    vm.$nextTick(done);
   });
 
   afterEach(() => {
@@ -53,36 +56,7 @@ describe('RoadmapShellComponent', () => {
 
   describe('data', () => {
     it('returns default data props', () => {
-      expect(vm.shellWidth).toBe(0);
-      expect(vm.shellHeight).toBe(0);
-      expect(vm.noScroll).toBe(false);
       expect(vm.timeframeStartOffset).toBe(0);
-    });
-  });
-
-  describe('computed', () => {
-    describe('containerStyles', () => {
-      beforeEach(() => {
-        document.body.innerHTML +=
-          '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
-      });
-
-      afterEach(() => {
-        document.querySelector('.roadmap-container').remove();
-      });
-
-      it('returns style object based on shellWidth and shellHeight', done => {
-        const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
-        Vue.nextTick(() => {
-          const stylesObj = vmWithParentEl.containerStyles;
-          // Ensure that value for `width` & `height`
-          // is a non-zero number.
-          expect(parseInt(stylesObj.width, 10)).not.toBe(0);
-          expect(parseInt(stylesObj.height, 10)).not.toBe(0);
-          vmWithParentEl.$destroy();
-          done();
-        });
-      });
     });
   });
 
@@ -103,7 +77,6 @@ describe('RoadmapShellComponent', () => {
 
         Vue.nextTick()
           .then(() => {
-            vmWithParentEl.noScroll = false;
             vmWithParentEl.handleScroll();
 
             expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Object));
@@ -130,14 +103,6 @@ describe('RoadmapShellComponent', () => {
         })
         .then(done)
         .catch(done.fail);
-    });
-
-    it('adds `prevent-vertical-scroll` class on component container element', done => {
-      vm.noScroll = true;
-      Vue.nextTick(() => {
-        expect(vm.$el.classList.contains('prevent-vertical-scroll')).toBe(true);
-        done();
-      });
     });
   });
 });

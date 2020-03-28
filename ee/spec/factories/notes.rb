@@ -8,7 +8,17 @@ FactoryBot.modify do
     end
 
     trait :on_design do
-      noteable { create(:design, :with_file, project: project) }
+      transient do
+        issue { create(:issue, project: project) }
+      end
+      noteable { create(:design, :with_file, issue: issue) }
+
+      after(:build) do |note|
+        next if note.project == note.noteable.project
+
+        # note validations require consistency between these two objects
+        note.project = note.noteable.project
+      end
     end
 
     trait :with_review do
@@ -20,18 +30,7 @@ end
 FactoryBot.define do
   factory :note_on_epic, parent: :note, traits: [:on_epic]
 
-  factory :diff_note_on_design, parent: :note, traits: [:on_design], class: DiffNote do
-    position do
-      Gitlab::Diff::Position.new(
-        old_path: noteable.full_path,
-        new_path: noteable.full_path,
-        width: 10,
-        height: 10,
-        x: 1,
-        y: 1,
-        position_type: "image",
-        diff_refs: noteable.diff_refs
-      )
-    end
+  factory :diff_note_on_design, parent: :note, traits: [:on_design], class: 'DiffNote' do
+    position { build(:image_diff_position, file: noteable.full_path, diff_refs: noteable.diff_refs) }
   end
 end

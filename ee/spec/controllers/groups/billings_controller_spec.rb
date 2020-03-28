@@ -9,7 +9,7 @@ describe Groups::BillingsController do
   describe 'GET index' do
     before do
       stub_application_setting(check_namespace_plan: true)
-      allow(Gitlab).to receive(:dev_env_org_or_com?) { true }
+      allow(Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?) { true }
     end
 
     context 'authorized' do
@@ -23,7 +23,7 @@ describe Groups::BillingsController do
 
         get :index, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
       end
 
@@ -44,17 +44,17 @@ describe Groups::BillingsController do
 
         get :index, params: { group_id: group.id }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'renders 404 when it is not gitlab.com' do
-        allow(Gitlab).to receive(:dev_env_org_or_com?) { false }
+        expect(Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?).at_least(:once) { false }
         group.add_owner(user)
         sign_in(user)
 
         get :index, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

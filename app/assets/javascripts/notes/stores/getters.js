@@ -1,8 +1,16 @@
-import _ from 'underscore';
+import { flattenDeep, clone } from 'lodash';
 import * as constants from '../constants';
 import { collapseSystemNotes } from './collapse_utils';
 
-export const discussions = state => collapseSystemNotes(state.discussions);
+export const discussions = state => {
+  let discussionsInState = clone(state.discussions);
+  // NOTE: not testing bc will be removed when backend is finished.
+  if (state.discussionSortOrder === constants.DESC) {
+    discussionsInState = discussionsInState.reverse();
+  }
+
+  return collapseSystemNotes(discussionsInState);
+};
 
 export const convertedDisscussionIds = state => state.convertedDisscussionIds;
 
@@ -11,6 +19,13 @@ export const targetNoteHash = state => state.targetNoteHash;
 export const getNotesData = state => state.notesData;
 
 export const isNotesFetched = state => state.isNotesFetched;
+
+/*
+ * WARNING: This is an example of an "unnecessary" getter
+ * more info found here: https://gitlab.com/groups/gitlab-org/-/epics/2913.
+ */
+
+export const sortDirection = state => state.discussionSortOrder;
 
 export const isLoading = state => state.isLoading;
 
@@ -27,6 +42,8 @@ export const openState = state => state.noteableData.state;
 export const getUserData = state => state.userData || {};
 
 export const getUserDataByProp = state => prop => state.userData && state.userData[prop];
+
+export const descriptionVersions = state => state.descriptionVersions;
 
 export const notesById = state =>
   state.discussions.reduce((acc, note) => {
@@ -50,7 +67,7 @@ const isLastNote = (note, state) =>
   !note.system && state.userData && note.author && note.author.id === state.userData.id;
 
 export const getCurrentUserLastNote = state =>
-  _.flatten(reverseNotes(state.discussions).map(note => reverseNotes(note.notes))).find(el =>
+  flattenDeep(reverseNotes(state.discussions).map(note => reverseNotes(note.notes))).find(el =>
     isLastNote(el, state),
   );
 
@@ -59,7 +76,6 @@ export const getDiscussionLastNote = state => discussion =>
 
 export const unresolvedDiscussionsCount = state => state.unresolvedDiscussionsCount;
 export const resolvableDiscussionsCount = state => state.resolvableDiscussionsCount;
-export const hasUnresolvedDiscussions = state => state.hasUnresolvedDiscussions;
 
 export const showJumpToNextDiscussion = (state, getters) => (mode = 'discussion') => {
   const orderedDiffs =

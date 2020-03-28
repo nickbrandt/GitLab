@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe Gitlab::PhabricatorImport::Cache::Map, :clean_gitlab_redis_cache do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:redis) { Gitlab::Redis::Cache }
+
   subject(:map) { described_class.new(project) }
 
   describe '#get_gitlab_model' do

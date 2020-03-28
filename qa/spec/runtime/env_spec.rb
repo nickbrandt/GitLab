@@ -230,6 +230,20 @@ describe QA::Runtime::Env do
     end
   end
 
+  describe '.require_admin_access_token!' do
+    it 'raises ArgumentError if GITLAB_QA_ADMIN_ACCESS_TOKEN is not specified' do
+      stub_env('GITLAB_QA_ADMIN_ACCESS_TOKEN', nil)
+
+      expect { described_class.require_admin_access_token! }.to raise_error(ArgumentError)
+    end
+
+    it 'does not raise exception if GITLAB_QA_ADMIN_ACCESS_TOKEN is specified' do
+      stub_env('GITLAB_QA_ADMIN_ACCESS_TOKEN', 'foobar123')
+
+      expect { described_class.require_admin_access_token! }.not_to raise_error
+    end
+  end
+
   describe '.log_destination' do
     it 'returns $stdout if QA_LOG_PATH is not defined' do
       stub_env('QA_LOG_PATH', nil)
@@ -255,6 +269,12 @@ describe QA::Runtime::Env do
       method: :can_test?,
       param: :admin,
       env_key: 'QA_CAN_TEST_ADMIN_FEATURES',
+      default: true
+
+    it_behaves_like 'boolean method with parameter',
+      method: :can_test?,
+      param: :praefect,
+      env_key: 'QA_CAN_TEST_PRAEFECT',
       default: true
 
     it 'raises ArgumentError if feature is unknown' do

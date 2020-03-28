@@ -27,6 +27,10 @@ module EE
           @package_name_regex ||= %r{\A\@?(([\w\-\.\+]*)\/)*([\w\-\.]+)@?(([\w\-\.\+]*)\/)*([\w\-\.]*)\z}.freeze
         end
 
+        def maven_file_name_regex
+          @maven_file_name_regex ||= %r{\A[A-Za-z0-9\.\_\-\+]+\z}.freeze
+        end
+
         def maven_path_regex
           @maven_path_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.\+]*)\z}.freeze
         end
@@ -37,6 +41,11 @@ module EE
 
         def maven_app_group_regex
           maven_app_name_regex
+        end
+
+        def semver_regex
+          # see the official regex: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+          @semver_regex ||= %r{\A(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?\z}.freeze
         end
 
         def feature_flag_regex

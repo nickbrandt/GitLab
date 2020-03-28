@@ -2,7 +2,7 @@
 
 **CRUD for repository files**
 
-**Create, read, update and delete repository files using this API**
+**Create, read, update, and delete repository files using this API**
 
 The different scopes available using [personal access tokens](../user/profile/personal_access_tokens.md) are depicted
 in the following table.
@@ -12,7 +12,7 @@ in the following table.
 | `read_repository` | Allows read-access to the repository files. |
 | `api` | Allows read-write access to the repository files. |
 
-> `read_repository` scope was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/23534) in GitLab 11.6.
+> `read_repository` scope was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/23534) in GitLab 11.6.
 
 ## Get file from repository
 
@@ -20,12 +20,12 @@ Allows you to receive information about file in repository like name, size,
 content. Note that file content is Base64 encoded. This endpoint can be accessed
 without authentication if the repository is publicly accessible.
 
-```
+```plaintext
 GET /projects/:id/repository/files/:file_path
 ```
 
-```bash
-curl --request GET --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb?ref=master'
+```shell
+curl --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb?ref=master'
 ```
 
 Example response:
@@ -55,11 +55,11 @@ NOTE: **Note:**
 
 In addition to the `GET` method, you can also use `HEAD` to get just file metadata.
 
-```
+```plaintext
 HEAD /projects/:id/repository/files/:file_path
 ```
 
-```bash
+```shell
 curl --head --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb?ref=master'
 ```
 
@@ -84,12 +84,12 @@ X-Gitlab-Size: 1476
 
 Allows you to receive blame information. Each blame range contains lines and corresponding commit info.
 
-```
+```plaintext
 GET /projects/:id/repository/files/:file_path/blame
 ```
 
-```bash
-curl --request GET --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/path%2Fto%2Ffile.rb/blame?ref=master'
+```shell
+curl --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/path%2Fto%2Ffile.rb/blame?ref=master'
 ```
 
 Example response:
@@ -128,7 +128,7 @@ Parameters:
 NOTE: **Note:**
 `HEAD` method return just file metadata as in [Get file from repository](repository_files.md#get-file-from-repository).
 
-```bash
+```shell
 curl --head --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/path%2Fto%2Ffile.rb/blame?ref=master'
 ```
 
@@ -151,12 +151,12 @@ X-Gitlab-Size: 1476
 
 ## Get raw file from repository
 
-```
+```plaintext
 GET /projects/:id/repository/files/:file_path/raw
 ```
 
-```bash
-curl --request GET --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb/raw?ref=master'
+```shell
+curl --header 'PRIVATE-TOKEN: <your_access_token>' 'https://gitlab.example.com/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb/raw?ref=master'
 ```
 
 Parameters:
@@ -169,13 +169,13 @@ Like [Get file from repository](repository_files.md#get-file-from-repository) yo
 
 ## Create new file in repository
 
-This allows you to create a single file. For creating multiple files with a single request see the [commits API](commits.html#create-a-commit-with-multiple-files-and-actions).
+This allows you to create a single file. For creating multiple files with a single request see the [commits API](commits.md#create-a-commit-with-multiple-files-and-actions).
 
-```
+```plaintext
 POST /projects/:id/repository/files/:file_path
 ```
 
-```bash
+```shell
 curl --request POST --header 'PRIVATE-TOKEN: <your_access_token>' --header "Content-Type: application/json" \
   --data '{"branch": "master", "author_email": "author@example.com", "author_name": "Firstname Lastname", \
     "content": "some content", "commit_message": "create a new file"}' \
@@ -204,13 +204,13 @@ Parameters:
 
 ## Update existing file in repository
 
-This allows you to update a single file. For updating multiple files with a single request see the [commits API](commits.html#create-a-commit-with-multiple-files-and-actions).
+This allows you to update a single file. For updating multiple files with a single request see the [commits API](commits.md#create-a-commit-with-multiple-files-and-actions).
 
-```
+```plaintext
 PUT /projects/:id/repository/files/:file_path
 ```
 
-```bash
+```shell
 curl --request PUT --header 'PRIVATE-TOKEN: <your_access_token>' --header "Content-Type: application/json" \
   --data '{"branch": "master", "author_email": "author@example.com", "author_name": "Firstname Lastname", \
     "content": "some content", "commit_message": "update file"}' \
@@ -242,7 +242,7 @@ If the commit fails for any reason we return a 400 error with a non-specific
 error message. Possible causes for a failed commit include:
 
 - the `file_path` contained `/../` (attempted directory traversal);
-- the new file contents were identical to the current file contents, i.e. the
+- the new file contents were identical to the current file contents. That is, the
   user tried to make an empty commit;
 - the branch was updated by a Git push while the file edit was in progress.
 
@@ -250,13 +250,13 @@ Currently GitLab Shell has a boolean return code, preventing GitLab from specify
 
 ## Delete existing file in repository
 
-This allows you to delete a single file. For deleting multiple files with a single request, see the [commits API](commits.html#create-a-commit-with-multiple-files-and-actions).
+This allows you to delete a single file. For deleting multiple files with a single request, see the [commits API](commits.md#create-a-commit-with-multiple-files-and-actions).
 
-```
+```plaintext
 DELETE /projects/:id/repository/files/:file_path
 ```
 
-```bash
+```shell
 curl --request DELETE --header 'PRIVATE-TOKEN: <your_access_token>' --header "Content-Type: application/json" \
   --data '{"branch": "master", "author_email": "author@example.com", "author_name": "Firstname Lastname", \
     "commit_message": "delete file"}' \

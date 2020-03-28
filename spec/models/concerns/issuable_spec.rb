@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Issuable do
+  include ProjectForksHelper
+
   let(:issuable_class) { Issue }
   let(:issue) { create(:issue, title: 'An issue', description: 'A description') }
   let(:user) { create(:user) }
@@ -51,48 +53,9 @@ describe Issuable do
       it_behaves_like 'validates description length with custom validation'
       it_behaves_like 'truncates the description to its allowed maximum length on import'
     end
-
-    describe 'milestone' do
-      let(:project) { create(:project) }
-      let(:milestone_id) { create(:milestone, project: project).id }
-      let(:params) do
-        {
-          title: 'something',
-          project: project,
-          author: build(:user),
-          milestone_id: milestone_id
-        }
-      end
-
-      subject { issuable_class.new(params) }
-
-      context 'with correct params' do
-        it { is_expected.to be_valid }
-      end
-
-      context 'with empty string milestone' do
-        let(:milestone_id) { '' }
-
-        it { is_expected.to be_valid }
-      end
-
-      context 'with nil milestone id' do
-        let(:milestone_id) { nil }
-
-        it { is_expected.to be_valid }
-      end
-
-      context 'with a milestone id from another project' do
-        let(:milestone_id) { create(:milestone).id }
-
-        it { is_expected.to be_invalid }
-      end
-    end
   end
 
   describe "Scope" do
-    subject { build(:issue) }
-
     it { expect(issuable_class).to respond_to(:opened) }
     it { expect(issuable_class).to respond_to(:closed) }
     it { expect(issuable_class).to respond_to(:assigned) }
@@ -136,48 +99,6 @@ describe Issuable do
 
       expect(issuable.state).to eq('merged')
       expect(issuable.state_id).to eq(described_class::STATE_ID_MAP['merged'])
-    end
-  end
-
-  describe '#milestone_available?' do
-    let(:group) { create(:group) }
-    let(:project) { create(:project, group: group) }
-    let(:issue) { create(:issue, project: project) }
-
-    def build_issuable(milestone_id)
-      issuable_class.new(project: project, milestone_id: milestone_id)
-    end
-
-    it 'returns true with a milestone from the issue project' do
-      milestone = create(:milestone, project: project)
-
-      expect(build_issuable(milestone.id).milestone_available?).to be_truthy
-    end
-
-    it 'returns true with a milestone from the issue project group' do
-      milestone = create(:milestone, group: group)
-
-      expect(build_issuable(milestone.id).milestone_available?).to be_truthy
-    end
-
-    it 'returns true with a milestone from the the parent of the issue project group' do
-      parent = create(:group)
-      group.update(parent: parent)
-      milestone = create(:milestone, group: parent)
-
-      expect(build_issuable(milestone.id).milestone_available?).to be_truthy
-    end
-
-    it 'returns false with a milestone from another project' do
-      milestone = create(:milestone)
-
-      expect(build_issuable(milestone.id).milestone_available?).to be_falsey
-    end
-
-    it 'returns false with a milestone from another group' do
-      milestone = create(:milestone, group: create(:group))
-
-      expect(build_issuable(milestone.id).milestone_available?).to be_falsey
     end
   end
 
@@ -403,7 +324,7 @@ describe Issuable do
 
     context 'when all of the results are level on the sort key' do
       let!(:issues) do
-        10.times { create(:issue, project: project) }
+        create_list(:issue, 10, project: project)
       end
 
       it 'has no duplicates across pages' do
@@ -803,27 +724,6 @@ describe Issuable do
         expect(merged_mr).to be
         expect(first_time_contributor_issue).not_to be_first_contribution
         expect(contributor_issue).not_to be_first_contribution
-      end
-    end
-  end
-
-  describe '#supports_milestone?' do
-    let(:group)   { create(:group) }
-    let(:project) { create(:project, group: group) }
-
-    context "for issues" do
-      let(:issue) { build(:issue, project: project) }
-
-      it 'returns true' do
-        expect(issue.supports_milestone?).to be_truthy
-      end
-    end
-
-    context "for merge requests" do
-      let(:merge_request) { build(:merge_request, target_project: project, source_project: project) }
-
-      it 'returns true' do
-        expect(merge_request.supports_milestone?).to be_truthy
       end
     end
   end

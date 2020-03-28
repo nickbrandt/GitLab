@@ -43,17 +43,33 @@ describe ProtectedEnvironments::UpdateService, '#execute' do
         subject
       end.not_to change { ProtectedEnvironment::DeployAccessLevel.count }
     end
+
+    context 'multiple deploy access levels' do
+      let(:params) do
+        attributes_for(:protected_environment,
+                       deploy_access_levels_attributes: [{ group_id: group.id, user_id: user_to_add.id }])
+      end
+
+      it_behaves_like 'invalid multiple deployment access levels'
+    end
   end
 
   context 'deploy access level by group' do
     let(:params) { { deploy_access_levels_attributes: [{ group_id: group.id }] } }
 
-    context 'invalid group' do
-      it_behaves_like 'invalid protected environment group'
+    it_behaves_like 'invalid protected environment group'
+
+    it_behaves_like 'valid protected environment group'
+  end
+
+  context 'deploy access level by user' do
+    let(:params) do
+      attributes_for(:protected_environment,
+                     deploy_access_levels_attributes: [{ user_id: user_to_add.id }])
     end
 
-    context 'valid group' do
-      it_behaves_like 'valid protected environment group'
-    end
+    it_behaves_like 'invalid protected environment user'
+
+    it_behaves_like 'valid protected environment user'
   end
 end

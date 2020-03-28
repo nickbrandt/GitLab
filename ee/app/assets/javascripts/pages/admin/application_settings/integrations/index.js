@@ -2,6 +2,7 @@ import 'select2/select2';
 import $ from 'jquery';
 import { s__ } from '~/locale';
 import Api from '~/api';
+import PersistentUserCallout from '~/persistent_user_callout';
 
 const onLimitCheckboxChange = (checked, $limitByNamespaces, $limitByProjects) => {
   $limitByNamespaces.find('.select2').select2('data', null);
@@ -37,6 +38,10 @@ const getDropdownConfig = (placeholder, apiPath, textProp) => ({
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  const callout = document.querySelector('.js-admin-integrations-moved');
+  PersistentUserCallout.factory(callout);
+
+  // ElasticSearch
   const $container = $('#js-elasticsearch-settings');
 
   $container

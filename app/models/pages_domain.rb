@@ -6,12 +6,16 @@ class PagesDomain < ApplicationRecord
   SSL_RENEWAL_THRESHOLD = 30.days.freeze
 
   enum certificate_source: { user_provided: 0, gitlab_provided: 1 }, _prefix: :certificate
+  enum scope: { instance: 0, group: 1, project: 2 }, _prefix: :scope
+  enum usage: { pages: 0, serverless: 1 }, _prefix: :usage
 
   belongs_to :project
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"
+  has_many :serverless_domain_clusters, class_name: 'Serverless::DomainCluster', inverse_of: :pages_domain
 
   validates :domain, hostname: { allow_numeric_hostname: true }
   validates :domain, uniqueness: { case_sensitive: false }
+  validates :certificate, :key, presence: true, if: :usage_serverless?
   validates :certificate, presence: { message: 'must be present if HTTPS-only is enabled' },
             if: :certificate_should_be_present?
   validates :certificate, certificate: true, if: ->(domain) { domain.certificate.present? }
@@ -25,6 +29,9 @@ class PagesDomain < ApplicationRecord
   validate :validate_intermediates, if: ->(domain) { domain.certificate.present? && domain.certificate_changed? }
 
   default_value_for(:auto_ssl_enabled, allow_nil: false) { ::Gitlab::LetsEncrypt.enabled? }
+  default_value_for :scope, allow_nil: false, value: :project
+  default_value_for :wildcard, allow_nil: false, value: false
+  default_value_for :usage, allow_nil: false, value: :pages
 
   attr_encrypted :key,
     mode: :per_attribute_iv_and_salt,
@@ -56,6 +63,14 @@ class PagesDomain < ApplicationRecord
   end
 
   scope :for_removal, -> { where("remove_at < ?", Time.now) }
+
+  scope :with_logging_info, -> { includes(project: [:namespace, :route]) }
+
+  scope :instance_serverless, -> { where(wildcard: true, scope: :instance, usage: :serverless) }
+
+  def self.find_by_domain_case_insensitive(domain)
+    find_by("LOWER(domain) = LOWER(?)", domain)
+  end
 
   def verified?
     !!verified_at
@@ -217,6 +232,8 @@ class PagesDomain < ApplicationRecord
 
   # rubocop: disable CodeReuse/ServiceClass
   def update_daemon
+    return if usage_serverless?
+
     ::Projects::UpdatePagesConfigurationService.new(project).execute
   end
   # rubocop: enable CodeReuse/ServiceClass
@@ -278,3 +295,5 @@ class PagesDomain < ApplicationRecord
     !auto_ssl_enabled? && project&.pages_https_only?
   end
 end
+
+PagesDomain.prepend_if_ee('::EE::PagesDomain')

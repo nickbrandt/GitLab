@@ -38,13 +38,7 @@ module EE
     def mirror_was_hard_failed(project)
       return if project.emails_disabled?
 
-      recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
-
-      if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_maintainers
-      end
-
-      recipients.each do |recipient|
+      owners_and_maintainers_without_invites(project).each do |recipient|
         mailer.mirror_was_hard_failed_email(project.id, recipient.user.id).deliver_later
       end
     end
@@ -67,24 +61,10 @@ module EE
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
     end
 
-    def prometheus_alerts_fired(project, alerts)
-      return if project.emails_disabled?
-
-      recipients = project.members.active_without_invites_and_requests.owners_and_masters
-
-      if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
-      end
-
-      recipients.to_a.product(alerts).each do |recipient, alert|
-        mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
-      end
-    end
-
     private
 
     def send_new_review_notification(review)
-      recipients = ::NotificationRecipientService.build_new_review_recipients(review)
+      recipients = ::NotificationRecipients::BuildService.build_new_review_recipients(review)
 
       recipients.each do |recipient|
         mailer.new_review_email(recipient.user.id, review.id).deliver_later
@@ -98,7 +78,7 @@ module EE
     end
 
     def approve_mr_email(merge_request, project, current_user)
-      recipients = ::NotificationRecipientService.build_recipients(merge_request, current_user, action: 'approve')
+      recipients = ::NotificationRecipients::BuildService.build_recipients(merge_request, current_user, action: 'approve')
 
       recipients.each do |recipient|
         mailer.approved_merge_request_email(recipient.user.id, merge_request.id, current_user.id).deliver_later
@@ -106,7 +86,7 @@ module EE
     end
 
     def unapprove_mr_email(merge_request, project, current_user)
-      recipients = ::NotificationRecipientService.build_recipients(merge_request, current_user, action: 'unapprove')
+      recipients = ::NotificationRecipients::BuildService.build_recipients(merge_request, current_user, action: 'unapprove')
 
       recipients.each do |recipient|
         mailer.unapproved_merge_request_email(recipient.user.id, merge_request.id, current_user.id).deliver_later
@@ -131,7 +111,7 @@ module EE
     def epic_status_change_email(target, current_user, status)
       action = status == 'reopened' ? 'reopen' : 'close'
 
-      recipients = ::NotificationRecipientService.build_recipients(
+      recipients = ::NotificationRecipients::BuildService.build_recipients(
         target,
         current_user,
         action: action

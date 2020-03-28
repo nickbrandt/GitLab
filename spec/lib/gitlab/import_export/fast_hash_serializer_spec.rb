@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::ImportExport::FastHashSerializer do
@@ -213,9 +215,15 @@ describe Gitlab::ImportExport::FastHashSerializer do
     expect(subject['boards'].first['lists']).not_to be_empty
   end
 
+  context 'relation ordering' do
+    it 'orders exported pipelines by primary key' do
+      expected_order = project.ci_pipelines.reorder(:id).ids
+
+      expect(subject['ci_pipelines'].pluck('id')).to eq(expected_order)
+    end
+  end
+
   def setup_project
-    issue = create(:issue, assignees: [user])
-    snippet = create(:project_snippet)
     release = create(:release)
     group = create(:group)
 
@@ -226,12 +234,14 @@ describe Gitlab::ImportExport::FastHashSerializer do
                      :wiki_enabled,
                      :builds_private,
                      description: 'description',
-                     issues: [issue],
-                     snippets: [snippet],
                      releases: [release],
                      group: group,
                      approvals_before_merge: 1
                     )
+    allow(project).to receive(:commit).and_return(Commit.new(RepoHelpers.sample_commit, project))
+
+    issue = create(:issue, assignees: [user], project: project)
+    snippet = create(:project_snippet, project: project)
     project_label = create(:label, project: project)
     group_label = create(:group_label, group: group)
     create(:label_link, label: project_label, target: issue)
@@ -243,6 +253,8 @@ describe Gitlab::ImportExport::FastHashSerializer do
     ci_build = create(:ci_build, project: project, when: nil)
     ci_build.pipeline.update(project: project)
     create(:commit_status, project: project, pipeline: ci_build.pipeline)
+
+    create_list(:ci_pipeline, 5, :success, project: project)
 
     create(:milestone, project: project)
     create(:discussion_note, noteable: issue, project: project)

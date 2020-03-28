@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Admin::UsersController do
   let(:user) { create(:user) }
+
   let_it_be(:admin) { create(:admin) }
 
   before do
@@ -46,7 +47,7 @@ describe Admin::UsersController do
     it 'deletes user and ghosts their contributions' do
       delete :destroy, params: { id: user.username }, format: :json
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(User.exists?(user.id)).to be_falsy
       expect(issue.reload.author).to be_ghost
     end
@@ -54,7 +55,7 @@ describe Admin::UsersController do
     it 'deletes the user and their contributions when hard delete is specified' do
       delete :destroy, params: { id: user.username, hard_delete: true }, format: :json
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(User.exists?(user.id)).to be_falsy
       expect(Issue.exists?(issue.id)).to be_falsy
     end
@@ -155,7 +156,7 @@ describe Admin::UsersController do
       put :block, params: { id: user.username }
       user.reload
       expect(user.blocked?).to be_truthy
-      expect(flash[:notice]).to eq 'Successfully blocked'
+      expect(flash[:notice]).to eq _('Successfully blocked')
     end
   end
 
@@ -171,7 +172,7 @@ describe Admin::UsersController do
         put :unblock, params: { id: user.username }
         user.reload
         expect(user.blocked?).to be_truthy
-        expect(flash[:alert]).to eq 'This user cannot be unlocked manually from GitLab'
+        expect(flash[:alert]).to eq _('This user cannot be unlocked manually from GitLab')
       end
     end
 
@@ -184,7 +185,7 @@ describe Admin::UsersController do
         put :unblock, params: { id: user.username }
         user.reload
         expect(user.blocked?).to be_falsey
-        expect(flash[:notice]).to eq 'Successfully unblocked'
+        expect(flash[:notice]).to eq _('Successfully unblocked')
       end
     end
   end
@@ -234,7 +235,7 @@ describe Admin::UsersController do
       go
 
       expect(flash[:notice])
-        .to eq 'Two-factor Authentication has been disabled for this user'
+        .to eq _('Two-factor Authentication has been disabled for this user')
     end
 
     def go
@@ -249,7 +250,9 @@ describe Admin::UsersController do
 
     it 'shows only one error message for an invalid email' do
       post :create, params: { user: attributes_for(:user, email: 'bogus') }
-      expect(assigns[:user].errors).to contain_exactly("Email is invalid")
+
+      errors = assigns[:user].errors
+      expect(errors).to contain_exactly(errors.full_message(:email, I18n.t('errors.messages.invalid')))
     end
   end
 
@@ -267,7 +270,7 @@ describe Admin::UsersController do
         post :update, params: params
       end
 
-      context 'when the admin changes his own password' do
+      context 'when the admin changes their own password' do
         it 'updates the password' do
           expect { update_password(admin, 'AValidPassword1') }
             .to change { admin.reload.encrypted_password }
@@ -346,7 +349,7 @@ describe Admin::UsersController do
       it "shows a notice" do
         post :impersonate, params: { id: user.username }
 
-        expect(flash[:alert]).to eq("You cannot impersonate a blocked user")
+        expect(flash[:alert]).to eq(_('You cannot impersonate a blocked user'))
       end
 
       it "doesn't sign us in as the user" do
@@ -396,7 +399,7 @@ describe Admin::UsersController do
       it "shows error page" do
         post :impersonate, params: { id: user.username }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

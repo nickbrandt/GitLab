@@ -4,9 +4,21 @@ require 'spec_helper'
 
 describe EE::Audit::ProjectChangesAuditor do
   describe '.audit_changes' do
-    let!(:user) { create(:user) }
-    let!(:project) { create(:project, visibility_level: 0) }
-    let(:foo_instance) { described_class.new(user, project) }
+    let(:user) { create(:user) }
+    let(:project) do
+      create(
+        :project,
+        visibility_level: 0,
+        name: 'interesting name',
+        path: 'interesting-path',
+        repository_size_limit: 10,
+        packages_enabled: true,
+        merge_requests_author_approval: false,
+        merge_requests_disable_committers_approval: true
+      )
+    end
+
+    subject(:foo_instance) { described_class.new(user, project) }
 
     before do
       project.reload
@@ -64,6 +76,32 @@ describe EE::Audit::ProjectChangesAuditor do
 
         expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
         expect(SecurityEvent.last.details[:change]).to eq 'packages_enabled'
+      end
+
+      it 'creates an event when the merge requests author approval changes' do
+        project.update!(merge_requests_author_approval: true)
+
+        aggregate_failures do
+          expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
+          expect(SecurityEvent.last.details).to include(
+            change: 'prevent merge request approval from authors',
+            from: true,
+            to: false
+          )
+        end
+      end
+
+      it 'creates an event when the merge requests committers approval changes' do
+        project.update!(merge_requests_disable_committers_approval: false)
+
+        aggregate_failures do
+          expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
+          expect(SecurityEvent.last.details).to include(
+            change: 'prevent merge request approval from reviewers',
+            from: true,
+            to: false
+          )
+        end
       end
     end
   end

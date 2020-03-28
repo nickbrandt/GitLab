@@ -5,7 +5,7 @@ import flash from '~/flash';
 import ContentViewer from '~/vue_shared/components/content_viewer/content_viewer.vue';
 import DiffViewer from '~/vue_shared/components/diff_viewer/diff_viewer.vue';
 import {
-  activityBarViews,
+  leftSidebarViews,
   viewerTypes,
   FILE_VIEW_MODE_EDITOR,
   FILE_VIEW_MODE_PREVIEW,
@@ -32,7 +32,14 @@ export default {
     ...mapState('rightPane', {
       rightPaneIsOpen: 'isOpen',
     }),
-    ...mapState(['rightPanelCollapsed', 'viewer', 'panelResizing', 'currentActivityView']),
+    ...mapState([
+      'rightPanelCollapsed',
+      'viewer',
+      'panelResizing',
+      'currentActivityView',
+      'renderWhitespaceInCode',
+      'editorTheme',
+    ]),
     ...mapGetters([
       'currentMergeRequest',
       'getStagedFile',
@@ -76,6 +83,12 @@ export default {
     showEditor() {
       return !this.shouldHideEditor && this.isEditorViewMode;
     },
+    editorOptions() {
+      return {
+        renderWhitespace: this.renderWhitespaceInCode ? 'all' : 'none',
+        theme: this.editorTheme,
+      };
+    },
   },
   watch: {
     file(newVal, oldVal) {
@@ -87,7 +100,7 @@ export default {
       if (oldVal.key !== this.file.key) {
         this.initEditor();
 
-        if (this.currentActivityView !== activityBarViews.edit) {
+        if (this.currentActivityView !== leftSidebarViews.edit.name) {
           this.setFileViewMode({
             file: this.file,
             viewMode: FILE_VIEW_MODE_EDITOR,
@@ -96,7 +109,7 @@ export default {
       }
     },
     currentActivityView() {
-      if (this.currentActivityView !== activityBarViews.edit) {
+      if (this.currentActivityView !== leftSidebarViews.edit.name) {
         this.setFileViewMode({
           file: this.file,
           viewMode: FILE_VIEW_MODE_EDITOR,
@@ -131,7 +144,7 @@ export default {
   },
   mounted() {
     if (!this.editor) {
-      this.editor = Editor.create();
+      this.editor = Editor.create(this.editorOptions);
     }
     this.initEditor();
   },
@@ -263,7 +276,7 @@ export default {
 <template>
   <div id="ide" class="blob-viewer-container blob-editor-container">
     <div class="ide-mode-tabs clearfix">
-      <ul v-if="!shouldHideEditor && isEditModeActive" class="nav-links float-left">
+      <ul v-if="!shouldHideEditor && isEditModeActive" class="nav-links float-left border-bottom-0">
         <li :class="editTabCSS">
           <a
             href="javascript:void(0);"
@@ -295,6 +308,7 @@ export default {
         'is-added': file.tempFile,
       }"
       class="multi-file-editor-holder"
+      data-qa-selector="editor_container"
       @focusout="triggerFilesChange"
     ></div>
     <content-viewer

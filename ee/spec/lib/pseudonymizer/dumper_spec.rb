@@ -10,6 +10,7 @@ describe Pseudonymizer::Dumper do
       config: YAML.load_file(Gitlab.config.pseudonymizer.manifest)
     )
   end
+
   subject(:pseudo) { described_class.new(options) }
 
   before do

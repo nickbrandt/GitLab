@@ -53,8 +53,8 @@ differentiate the new cluster from the rest.
 
 ## GitLab-managed clusters
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22011) in GitLab 11.5.
-> Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/26565) in GitLab 11.11.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22011) in GitLab 11.5.
+> - Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/26565) in GitLab 11.11.
 
 You can choose to allow GitLab to manage your cluster for you. If your cluster is
 managed by GitLab, resources for your projects will be automatically created. See the
@@ -75,9 +75,24 @@ NOTE: **Note:**
 If you [install applications](#installing-applications) on your cluster, GitLab will create
 the resources required to run these even if you have chosen to manage your own cluster.
 
+### Clearing the cluster cache
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31759) in GitLab 12.6.
+
+If you choose to allow GitLab to manage your cluster for you, GitLab stores a cached
+version of the namespaces and service accounts it creates for your projects. If you
+modify these resources in your cluster manually, this cache can fall out of sync with
+your cluster, which can cause deployment jobs to fail.
+
+To clear the cache:
+
+1. Navigate to your group’s **Kubernetes** page, and select your cluster.
+1. Expand the **Advanced settings** section.
+1. Click **Clear cluster cache**.
+
 ## Base domain
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/24580) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/24580) in GitLab 11.8.
 
 Domains at the cluster level permit support for multiple domains
 per [multiple Kubernetes clusters](#multiple-kubernetes-clusters-premium). When specifying a domain,
@@ -154,6 +169,11 @@ For important information about securely configuring GitLab Runners, see
 [Security of
 Runners](../../project/clusters/add_remove_clusters.md#security-of-gitlab-runners)
 documentation for project-level clusters.
+
+## More information
+
+For information on integrating GitLab and Kubernetes, see
+[Kubernetes clusters](../../project/clusters/index.md).
 
 <!-- ## Troubleshooting
 

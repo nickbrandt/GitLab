@@ -18,16 +18,6 @@ module EE
           def authorize_can_read!
             authorize!(:read_epic, epic)
           end
-
-          override :find_todos
-          def find_todos
-            todos = super
-
-            return todos if ::Feature.enabled?(:design_management_todos_api, default_enabled: true)
-
-            # Exclude Design Todos if the feature is disabled
-            todos.where.not(target_type: ::DesignManagement::Design.name) # rubocop: disable CodeReuse/ActiveRecord
-          end
         end
 
         resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do

@@ -4,7 +4,7 @@ require 'spec_helper'
 describe DesignManagement::DesignCollection do
   include DesignManagementTestHelpers
 
-  set(:issue) { create(:issue) }
+  let_it_be(:issue, reload: true) { create(:issue) }
 
   subject(:collection) { described_class.new(issue) }
 

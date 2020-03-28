@@ -15,7 +15,7 @@ module Clusters
         def set_initial_status
           return unless not_installable?
 
-          self.status = status_states[:installable] if cluster&.application_helm_available?
+          self.status = status_states[:installable] if cluster&.application_helm_available? || ::Gitlab::Kubernetes::Helm.local_tiller_enabled?
         end
 
         def can_uninstall?
@@ -76,7 +76,7 @@ module Clusters
             message: error.message
           })
 
-          Gitlab::Sentry.track_acceptable_exception(error, extra: { cluster_id: cluster&.id, application_id: id })
+          Gitlab::ErrorTracking.track_exception(error, cluster_id: cluster&.id, application_id: id)
         end
       end
     end

@@ -8,32 +8,35 @@ describe Groups::EpicLinksController do
   let(:epic1) { create(:epic, group: group) }
   let(:epic2) { create(:epic, group: group) }
   let(:user)  { create(:user) }
+  let(:features_when_forbidden) { { epics: true, subepics: false } }
 
   before do
     sign_in(user)
   end
 
-  shared_examples 'unlicensed epics action' do
+  shared_examples 'unlicensed subepics action' do
     before do
-      stub_licensed_features(epics: false)
+      stub_licensed_features(features_when_forbidden)
       group.add_developer(user)
 
       subject
     end
 
-    it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(404)
+    it 'returns 403 status' do
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
   describe 'GET #index' do
+    let(:features_when_forbidden) { { epics: false } }
+
     before do
       epic1.update(parent: parent_epic)
     end
 
     subject { get :index, params: { group_id: group, epic_id: parent_epic.to_param } }
 
-    it_behaves_like 'unlicensed epics action'
+    it_behaves_like 'unlicensed subepics action'
 
     context 'when epics are enabled' do
       before do
@@ -50,7 +53,7 @@ describe Groups::EpicLinksController do
         it 'returns the correct JSON response' do
           list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq(list_service_response.as_json)
         end
       end
@@ -61,7 +64,7 @@ describe Groups::EpicLinksController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -74,11 +77,11 @@ describe Groups::EpicLinksController do
       post :create, params: { group_id: group, epic_id: parent_epic.to_param, issuable_references: reference }
     end
 
-    it_behaves_like 'unlicensed epics action'
+    it_behaves_like 'unlicensed subepics action'
 
-    context 'when epics are enabled' do
+    context 'when subepics are enabled' do
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
       end
 
       context 'when user has permissions to create requested association' do
@@ -90,7 +93,7 @@ describe Groups::EpicLinksController do
           subject
           list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq('message' => nil, 'issuables' => list_service_response.as_json)
         end
 
@@ -103,7 +106,7 @@ describe Groups::EpicLinksController do
         it 'returns 403 status' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not update parent attribute' do
@@ -125,11 +128,11 @@ describe Groups::EpicLinksController do
       put :update, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id, epic: { move_before_id: move_before_epic.id } }
     end
 
-    it_behaves_like 'unlicensed epics action'
+    it_behaves_like 'unlicensed subepics action'
 
-    context 'when epics are enabled' do
+    context 'when subepics are enabled' do
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
       end
 
       context 'when user has permissions to reorder epics' do
@@ -140,7 +143,7 @@ describe Groups::EpicLinksController do
         it 'returns status 200' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'updates the epic position' do
@@ -153,7 +156,7 @@ describe Groups::EpicLinksController do
           it 'returns status 404' do
             subject
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -162,7 +165,7 @@ describe Groups::EpicLinksController do
         it 'returns status 403' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -173,13 +176,15 @@ describe Groups::EpicLinksController do
       epic1.update(parent: parent_epic)
     end
 
+    let(:features_when_forbidden) { { epics: false } }
+
     subject { delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id } }
 
-    it_behaves_like 'unlicensed epics action'
+    it_behaves_like 'unlicensed subepics action'
 
-    context 'when epics are enabled' do
+    context 'when subepics are enabled' do
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
       end
 
       context 'when user has permissions to update the parent epic' do

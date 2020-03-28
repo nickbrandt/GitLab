@@ -3,6 +3,11 @@
 module ProjectsHelper
   prepend_if_ee('::EE::ProjectsHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
+  def project_incident_management_setting
+    @project_incident_management_setting ||= @project.incident_management_setting ||
+      @project.build_incident_management_setting
+  end
+
   def link_to_project(project)
     link_to namespace_project_path(namespace_id: project.namespace, id: project), title: h(project.name) do
       title = content_tag(:span, project.name, class: 'project-name')
@@ -110,17 +115,26 @@ module ProjectsHelper
       { project_full_name: project.full_name }
   end
 
-  def remove_fork_project_message(project)
-    _("You are going to remove the fork relationship to source project %{forked_from_project}. Are you ABSOLUTELY sure?") %
-      { forked_from_project: fork_source_name(project) }
+  def remove_fork_project_description_message(project)
+    source = visible_fork_source(project)
+
+    if source
+      msg = _('This will remove the fork relationship between this project and %{fork_source}.') %
+        { fork_source: link_to(source.full_name, project_path(source)) }
+
+      msg.html_safe
+    else
+      _('This will remove the fork relationship between this project and other projects in the fork network.')
+    end
   end
 
-  def fork_source_name(project)
-    if @project.fork_source
-      @project.fork_source.full_name
-    else
-      @project.fork_network&.deleted_root_project_name
-    end
+  def remove_fork_project_warning_message(project)
+    _("You are going to remove the fork relationship from %{project_full_name}. Are you ABSOLUTELY sure?") %
+      { project_full_name: project.full_name }
+  end
+
+  def visible_fork_source(project)
+    project.fork_source if project.fork_source && can?(current_user, :read_project, project.fork_source)
   end
 
   def project_nav_tabs
@@ -359,12 +373,20 @@ module ProjectsHelper
     @project.grafana_integration&.grafana_url
   end
 
-  def grafana_integration_token
-    @project.grafana_integration&.token
+  def grafana_integration_masked_token
+    @project.grafana_integration&.masked_token
   end
 
   def grafana_integration_enabled?
     @project.grafana_integration&.enabled?
+  end
+
+  def project_license_name(project)
+    project.repository.license&.name
+  rescue GRPC::Unavailable, GRPC::DeadlineExceeded, Gitlab::Git::CommandError => e
+    Gitlab::ErrorTracking.track_exception(e)
+
+    nil
   end
 
   private
@@ -394,6 +416,10 @@ module ProjectsHelper
       nav_tabs << :operations
     end
 
+    if can?(current_user, :read_cycle_analytics, project)
+      nav_tabs << :cycle_analytics
+    end
+
     tab_ability_map.each do |tab, ability|
       if can?(current_user, ability, project)
         nav_tabs << tab
@@ -416,7 +442,7 @@ module ProjectsHelper
     {
       environments:     :read_environment,
       milestones:       :read_milestone,
-      snippets:         :read_project_snippet,
+      snippets:         :read_snippet,
       settings:         :admin_project,
       builds:           :read_build,
       clusters:         :read_cluster,
@@ -434,7 +460,7 @@ module ProjectsHelper
       blobs:          :download_code,
       commits:        :download_code,
       merge_requests: :read_merge_request,
-      notes:          [:read_merge_request, :download_code, :read_issue, :read_project_snippet],
+      notes:          [:read_merge_request, :download_code, :read_issue, :read_snippet],
       members:        :read_project_member
     )
   end
@@ -554,6 +580,7 @@ module ProjectsHelper
       requestAccessEnabled: !!project.request_access_enabled,
       issuesAccessLevel: feature.issues_access_level,
       repositoryAccessLevel: feature.repository_access_level,
+      forkingAccessLevel: feature.forking_access_level,
       mergeRequestsAccessLevel: feature.merge_requests_access_level,
       buildsAccessLevel: feature.builds_access_level,
       wikiAccessLevel: feature.wiki_access_level,
@@ -576,8 +603,11 @@ module ProjectsHelper
       registryHelpPath: help_page_path('user/packages/container_registry/index'),
       lfsAvailable: Gitlab.config.lfs.enabled,
       lfsHelpPath: help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs'),
+      lfsObjectsExist: project.lfs_objects.exists?,
+      lfsObjectsRemovalHelpPath: help_page_path('administration/lfs/manage_large_binaries_with_git_lfs', anchor: 'removing-objects-from-lfs'),
       pagesAvailable: Gitlab.config.pages.enabled,
       pagesAccessControlEnabled: Gitlab.config.pages.access_control,
+      pagesAccessControlForced: ::Gitlab::Pages.access_control_is_forced?,
       pagesHelpPath: help_page_path('user/project/pages/introduction', anchor: 'gitlab-pages-access-control-core')
     }
   end
@@ -632,7 +662,6 @@ module ProjectsHelper
       projects#show
       projects#activity
       releases#index
-      cycle_analytics#show
     ]
   end
 
@@ -642,6 +671,9 @@ module ProjectsHelper
       project_members#index
       integrations#show
       services#edit
+      hooks#index
+      hooks#edit
+      hook_logs#show
       repository#show
       ci_cd#show
       operations#show
@@ -677,6 +709,7 @@ module ProjectsHelper
       error_tracking
       user
       gcp
+      logs
     ]
   end
 
@@ -688,6 +721,19 @@ module ProjectsHelper
   end
 
   def vue_file_list_enabled?
-    Feature.enabled?(:vue_file_list, @project)
+    Feature.enabled?(:vue_file_list, @project, default_enabled: true)
+  end
+
+  def native_code_navigation_enabled?(project)
+    Feature.enabled?(:code_navigation, project)
+  end
+
+  def show_visibility_confirm_modal?(project)
+    project.unlink_forks_upon_visibility_decrease_enabled? && project.visibility_level > Gitlab::VisibilityLevel::PRIVATE && project.forks_count > 0
+  end
+
+  def settings_container_registry_expiration_policy_available?(project)
+    Gitlab.config.registry.enabled &&
+      can?(current_user, :destroy_container_image, project)
   end
 end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::LDAP::User do
+describe Gitlab::Auth::Ldap::User do
   include LdapHelpers
 
   let(:ldap_user) { described_class.new(auth_hash) }
@@ -137,6 +137,18 @@ describe Gitlab::Auth::LDAP::User do
 
         expect(gl_user).to be_persisted
         expect(gl_user).to be_confirmed
+      end
+    end
+
+    context 'when the current minimum password length is different from the default minimum password length' do
+      before do
+        stub_application_setting minimum_password_length: 21
+      end
+
+      it 'creates the user' do
+        ldap_user.save
+
+        expect(gl_user).to be_persisted
       end
     end
   end

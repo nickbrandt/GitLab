@@ -6,7 +6,7 @@ import { addListType } from './store/utils';
 
 export default () => {
   const el = document.querySelector('#js-dependencies-app');
-  const { endpoint, emptyStateSvgPath, documentationPath } = el.dataset;
+  const { endpoint, emptyStateSvgPath, documentationPath, supportDocumentationPath } = el.dataset;
 
   const store = createStore();
   addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
@@ -23,6 +23,7 @@ export default () => {
           endpoint,
           emptyStateSvgPath,
           documentationPath,
+          supportDocumentationPath,
         },
       });
     },

@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
-class GroupHook < ProjectHook
+class GroupHook < WebHook
   include CustomModelNaming
   include TriggerableHooks
+  include Limitable
 
+  self.limit_name = 'group_hooks'
+  self.limit_scope = :group
   self.singular_route_key = :hook
 
   triggerable_hooks [
@@ -20,6 +23,9 @@ class GroupHook < ProjectHook
 
   belongs_to :group
 
-  clear_validators!
   validates :url, presence: true, addressable_url: true
+
+  def pluralized_name
+    _('Group Hooks')
+  end
 end

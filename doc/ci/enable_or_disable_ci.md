@@ -34,17 +34,19 @@ pipelines that are run from an [external integration](../user/project/integratio
 
 ## Per-project user setting
 
-The setting to enable or disable GitLab CI/CD Pipelines can be found in your project in
-**Settings > General > Visibility, project features, permissions**. If the project
-visibility is set to:
+To enable or disable GitLab CI/CD Pipelines in your project:
 
-- **Private**, only project members can access pipelines.
-- **Internal** or **Public**, pipelines can be made accessible to either
-  project members only or everyone with access.
+1. Navigate to **Settings > General > Visibility, project features, permissions**.
+1. Expand the **Repository** section
+1. Enable or disable the **Pipelines** toggle as required.
+
+**Project visibility** will also affect pipeline visibility. If set to:
+
+- **Private**: Only project members can access pipelines.
+- **Internal** or **Public**: Pipelines can be set to either **Only Project Members**
+  or **Everyone With Access** via the dropdown box.
 
 Press **Save changes** for the settings to take effect.
-
-![Sharing & Permissions settings](../user/project/settings/img/sharing_and_permissions_settings_v12_3.png)
 
 ## Site-wide admin setting
 
@@ -73,7 +75,7 @@ default_projects_features:
 
 Save the file and restart GitLab:
 
-```sh
+```shell
 sudo service gitlab restart
 ```
 
@@ -85,7 +87,7 @@ gitlab_rails['gitlab_default_projects_features_builds'] = false
 
 Save the file and reconfigure GitLab:
 
-```sh
+```shell
 sudo gitlab-ctl reconfigure
 ```
 

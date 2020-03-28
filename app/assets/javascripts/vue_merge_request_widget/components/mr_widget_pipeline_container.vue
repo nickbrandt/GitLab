@@ -1,7 +1,7 @@
 <script>
-import _ from 'underscore';
+import { isNumber } from 'lodash';
 import ArtifactsApp from './artifacts_list_app.vue';
-import Deployment from './deployment.vue';
+import Deployment from './deployment/deployment.vue';
 import MrWidgetContainer from './mr_widget_container.vue';
 import MrWidgetPipeline from './mr_widget_pipeline.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -67,7 +67,7 @@ export default {
       return this.mr.visualReviewAppAvailable && this.glFeatures.anonymousVisualReviewFeedback;
     },
     showMergeTrainPositionIndicator() {
-      return _.isNumber(this.mr.mergeTrainIndex);
+      return isNumber(this.mr.mergeTrainIndex);
     },
   },
 };
@@ -76,6 +76,7 @@ export default {
   <mr-widget-container>
     <mr-widget-pipeline
       :pipeline="pipeline"
+      :pipeline-coverage-delta="mr.pipelineCoverageDelta"
       :ci-status="mr.ciStatus"
       :has-ci="mr.hasCI"
       :source-branch="branch"

@@ -45,6 +45,8 @@ describe('Feature flags Edit Module Mutations', () => {
       description: 'All environments',
       scopes: [{ id: 1 }],
       iid: 5,
+      version: 2,
+      strategies: [{ scopes: [], type: 'default', paramters: {} }],
     };
 
     beforeEach(() => {
@@ -73,6 +75,14 @@ describe('Feature flags Edit Module Mutations', () => {
 
     it('should set the iid to the provided one', () => {
       expect(stateCopy.iid).toEqual(data.iid);
+    });
+
+    it('should set the version to the provided one', () => {
+      expect(stateCopy.version).toBe(2);
+    });
+
+    it('should set the strategies to the provided one', () => {
+      expect(stateCopy.strategies).toEqual([{ scopes: [], type: 'default', paramters: {} }]);
     });
   });
 

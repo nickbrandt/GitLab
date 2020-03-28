@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import MockAdapater from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import MilestoneSelect from 'ee/boards/components/milestone_select.vue';
-import IssuableContext from '~/issuable_context';
 import { boardObj } from 'spec/boards/mock_data';
+import axios from '~/lib/utils/axios_utils';
+import IssuableContext from '~/issuable_context';
 
 let vm;
 

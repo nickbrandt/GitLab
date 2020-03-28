@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Prometheus::Queries::ClusterQuery do
   let(:client) { double('prometheus_client', query_range: nil) }
+
   subject { described_class.new(client) }
 
   around do |example|
@@ -19,6 +20,6 @@ describe Gitlab::Prometheus::Queries::ClusterQuery do
   it 'sends queries to prometheus' do
     subject.query
 
-    expect(client).to have_received(:query_range).with(anything, start: 8.hours.ago, stop: Time.now).at_least(1)
+    expect(client).to have_received(:query_range).with(anything, start_time: 8.hours.ago, end_time: Time.now).at_least(1)
   end
 end

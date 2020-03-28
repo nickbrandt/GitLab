@@ -60,6 +60,10 @@ module BillingPlansHelper
     end
   end
 
+  def show_plans?(namespace)
+    namespace.trial_active? || !namespace.gold_plan?
+  end
+
   def show_trial_banner?(namespace)
     return false unless params[:trial]
 

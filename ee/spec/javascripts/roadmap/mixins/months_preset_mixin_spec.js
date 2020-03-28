@@ -6,7 +6,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -15,8 +15,6 @@ const createComponent = ({
   timeframe = mockTimeframeMonths,
   timeframeItem = mockTimeframeMonths[0],
   epic = mockEpic,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(EpicItemTimelineComponent);
 
@@ -25,8 +23,6 @@ const createComponent = ({
     timeframe,
     timeframeItem,
     epic,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -59,22 +55,34 @@ describe('MonthsPresetMixin', () => {
     });
 
     describe('isTimeframeUnderEndDateForMonth', () => {
+      const timeframeItem = new Date(2018, 0, 10); // Jan 10, 2018
+
       beforeEach(() => {
         vm = createComponent({});
       });
 
       it('returns true if provided timeframeItem is under epicEndDate', () => {
-        const timeframeItem = new Date(2018, 0, 10); // Jan 10, 2018
         const epicEndDate = new Date(2018, 0, 26); // Jan 26, 2018
 
-        expect(vm.isTimeframeUnderEndDateForMonth(timeframeItem, epicEndDate)).toBe(true);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForMonth(timeframeItem)).toBe(true);
       });
 
       it('returns false if provided timeframeItem is NOT under epicEndDate', () => {
-        const timeframeItem = new Date(2018, 0, 10); // Jan 10, 2018
         const epicEndDate = new Date(2018, 1, 26); // Feb 26, 2018
 
-        expect(vm.isTimeframeUnderEndDateForMonth(timeframeItem, epicEndDate)).toBe(false);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForMonth(timeframeItem)).toBe(false);
       });
     });
 
@@ -94,7 +102,7 @@ describe('MonthsPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForMonths()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForMonths(vm.epic)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -105,7 +113,7 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForMonths()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForMonths(vm.epic)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the month', () => {
@@ -115,7 +123,7 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForMonths()).toBe('left: 0;');
+        expect(vm.getTimelineBarStartOffsetForMonths(vm.epic)).toBe('left: 0;');
       });
 
       it('returns proportional `left` value based on Epic startDate and days in the month', () => {
@@ -125,14 +133,13 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForMonths()).toContain('left: 50%');
+        expect(vm.getTimelineBarStartOffsetForMonths(vm.epic)).toContain('left: 50%');
       });
     });
 
     describe('getTimelineBarWidthForMonths', () => {
       it('returns calculated width value based on Epic.startDate and Epic.endDate', () => {
         vm = createComponent({
-          shellWidth: 2000,
           timeframeItem: mockTimeframeMonths[0],
           epic: Object.assign({}, mockEpic, {
             startDate: new Date(2017, 11, 15), // Dec 15, 2017
@@ -140,7 +147,7 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForMonths())).toBe(637);
+        expect(Math.floor(vm.getTimelineBarWidthForMonths())).toBe(546);
       });
     });
   });

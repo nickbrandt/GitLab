@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { sprintf, __ } from '~/locale';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -130,7 +130,7 @@ const mixins = {
       return this.assignees.length > 0;
     },
     hasMilestone() {
-      return !_.isEmpty(this.milestone);
+      return !isEmpty(this.milestone);
     },
     iconName() {
       if (this.isMergeRequest && this.isMerged) {
@@ -159,7 +159,7 @@ const mixins = {
       return this.displayReference.split(this.pathIdSeparator).pop();
     },
     createdAtInWords() {
-      return this.createdAt ? this.timeFormated(this.createdAt) : '';
+      return this.createdAt ? this.timeFormatted(this.createdAt) : '';
     },
     createdAtTimestamp() {
       return this.createdAt ? formatDate(new Date(this.createdAt)) : '';
@@ -168,10 +168,10 @@ const mixins = {
       return this.mergedAt ? formatDate(new Date(this.mergedAt)) : '';
     },
     mergedAtInWords() {
-      return this.mergedAt ? this.timeFormated(this.mergedAt) : '';
+      return this.mergedAt ? this.timeFormatted(this.mergedAt) : '';
     },
     closedAtInWords() {
-      return this.closedAt ? this.timeFormated(this.closedAt) : '';
+      return this.closedAt ? this.timeFormatted(this.closedAt) : '';
     },
     closedAtTimestamp() {
       return this.closedAt ? formatDate(new Date(this.closedAt)) : '';

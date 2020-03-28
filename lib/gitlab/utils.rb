@@ -5,10 +5,20 @@ module Gitlab
     extend self
 
     # Ensure that the relative path will not traverse outside the base directory
-    def check_path_traversal!(path)
-      raise StandardError.new("Invalid path") if path.start_with?("..#{File::SEPARATOR}") ||
+    # We url decode the path to avoid passing invalid paths forward in url encoded format.
+    # We are ok to pass some double encoded paths to File.open since they won't resolve.
+    # Also see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24223#note_284122580
+    # It also checks for ALT_SEPARATOR aka '\' (forward slash)
+    def check_path_traversal!(path, allowed_absolute: false)
+      path = CGI.unescape(path)
+
+      if path.start_with?("..#{File::SEPARATOR}", "..#{File::ALT_SEPARATOR}") ||
           path.include?("#{File::SEPARATOR}..#{File::SEPARATOR}") ||
-          path.end_with?("#{File::SEPARATOR}..")
+          path.end_with?("#{File::SEPARATOR}..") ||
+          (!allowed_absolute && Pathname.new(path).absolute?)
+
+        raise StandardError.new("Invalid path")
+      end
 
       path
     end
@@ -48,6 +58,12 @@ module Gitlab
       return str.downcase
         .gsub(/[^a-z0-9]/, '-')[0..62]
         .gsub(/(\A-+|-+\z)/, '')
+    end
+
+    # Wraps ActiveSupport's Array#to_sentence to convert the given array to a
+    # comma-separated sentence joined with localized 'or' Strings instead of 'and'.
+    def to_exclusive_sentence(array)
+      array.to_sentence(two_words_connector: _(' or '), last_word_connector: _(', or '))
     end
 
     # Converts newlines into HTML line break elements
@@ -129,6 +145,15 @@ module Gitlab
 
       IPAddr.new(str)
     rescue IPAddr::InvalidAddressError
+    end
+
+    # Converts a string to an Addressable::URI object.
+    # If the string is not a valid URI, it returns nil.
+    # Param uri_string should be a String object.
+    # This method returns an Addressable::URI object or nil.
+    def parse_url(uri_string)
+      Addressable::URI.parse(uri_string)
+    rescue Addressable::URI::InvalidURIError, TypeError
     end
   end
 end

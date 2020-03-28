@@ -1,23 +1,14 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Issues weight visualization' do
       before do
         Flow::Login.sign_in
       end
 
-      let(:project) do
-        QA::Resource::Project.fabricate_via_api! do |project|
-          project.name = 'the-lord-of-the-rings'
-        end
-      end
-
       let(:milestone) do
-        QA::EE::Resource::ProjectMilestone.fabricate_via_api! do |m|
-          m.project = project
-          m.title = 'the-fellowship-of-the-ring'
-        end
+        QA::EE::Resource::ProjectMilestone.fabricate_via_api!
       end
 
       let(:weight) { 1000 }
@@ -25,7 +16,7 @@ module QA
       let(:issue) do
         Resource::Issue.fabricate_via_api! do |issue|
           issue.milestone = milestone
-          issue.project = project
+          issue.project = milestone.project
           issue.title = 'keep-the-ring-safe'
           issue.weight = weight
         end

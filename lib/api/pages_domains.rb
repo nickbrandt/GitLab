@@ -37,7 +37,7 @@ module API
     resource :pages do
       before do
         require_pages_config_enabled!
-        authenticated_with_full_private_access!
+        authenticated_with_can_read_all_resources!
       end
 
       desc "Get all pages domains" do
@@ -148,8 +148,9 @@ module API
       delete ":id/pages/domains/:domain", requirements: PAGES_DOMAINS_ENDPOINT_REQUIREMENTS do
         authorize! :update_pages, user_project
 
-        status 204
         pages_domain.destroy
+
+        no_content!
       end
     end
   end

@@ -23,13 +23,13 @@ describe API::PackageFiles do
         it 'returns 200' do
           get api(url)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'returns 404 if package does not exist' do
           get api("/projects/#{project.id}/packages/0/package_files")
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -39,7 +39,7 @@ describe API::PackageFiles do
         it 'returns 404 for non authenticated user' do
           get api(url)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 for a user without access to the project' do
@@ -47,13 +47,13 @@ describe API::PackageFiles do
 
           get api(url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 200 and valid response schema' do
           get api(url, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/packages/package_files', dir: 'ee')
         end
       end
@@ -94,7 +94,7 @@ describe API::PackageFiles do
       it 'returns 403' do
         get api(url, user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

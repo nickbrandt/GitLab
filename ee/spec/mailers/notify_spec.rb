@@ -11,12 +11,45 @@ describe Notify do
 
   include_context 'gitlab email notification'
 
-  set(:user) { create(:user) }
-  set(:current_user) { create(:user, email: "current@email.com") }
-  set(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
-  set(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
+  RSpec.shared_examples 'epic notifications with reply' do
+    it_behaves_like 'having group identification headers'
 
-  set(:merge_request) do
+    it_behaves_like 'it should show Gmail Actions View Epic link'
+
+    it_behaves_like 'an unsubscribeable thread'
+
+    it 'has the characteristics of a threaded reply' do
+      host = Gitlab.config.gitlab.host
+      route_key = "#{epic.class.model_name.singular_route_key}_#{epic.id}"
+
+      aggregate_failures do
+        is_expected.to have_header('Message-ID', /\A<.*@#{host}>\Z/)
+        is_expected.to have_header('In-Reply-To', "<#{route_key}@#{host}>")
+        is_expected.to have_header('References',  /\A<reply\-.*@#{host}> <#{route_key}@#{host}>\Z/ )
+        is_expected.to have_subject(/^Re: /)
+      end
+    end
+
+    it 'has a Reply-To header' do
+      is_expected.to have_header 'Reply-To', /<reply+(.*)@#{Gitlab.config.gitlab.host}>\Z/
+    end
+
+    it 'has the correct subject and body' do
+      email_subject = "Re: #{epic.group.name} | #{epic.title} (#{epic.to_reference})"
+
+      aggregate_failures do
+        is_expected.to have_subject(email_subject)
+        is_expected.to have_body_text(email_body)
+      end
+    end
+  end
+
+  let_it_be(:user) { create(:user) }
+  let_it_be(:current_user) { create(:user, email: "current@email.com") }
+  let_it_be(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
+  let_it_be(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
+
+  let_it_be(:merge_request, reload: true) do
     create(:merge_request, source_project: project,
                            target_project: project,
                            author: current_user,
@@ -24,27 +57,26 @@ describe Notify do
                            description: 'Awesome description')
   end
 
-  set(:issue) do
+  let_it_be(:issue, reload: true) do
     create(:issue, author: current_user,
                    assignees: [assignee],
                    project: project,
                    description: 'My awesome description!')
   end
 
-  set(:project2) { create(:project, :repository) }
-  set(:merge_request_without_assignee) do
+  let_it_be(:project2, reload: true) { create(:project, :repository) }
+  let_it_be(:merge_request_without_assignee, reload: true) do
     create(:merge_request, source_project: project2,
                            author: current_user,
                            description: 'Awesome description')
   end
 
   describe '.note_design_email' do
-    set(:design) { create(:design, :with_file) }
-    set(:recipient) { create(:user) }
-    set(:note) do
+    let_it_be(:design) { create(:design, :with_file) }
+    let_it_be(:recipient) { create(:user) }
+    let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
-         project: design.project,
          note: "Hello #{recipient.to_reference}")
     end
 
@@ -68,6 +100,12 @@ describe Notify do
         issue.update!(service_desk_reply_to: 'service.desk@example.com')
       end
 
+      def expect_sender(username)
+        sender = subject.header[:from].addrs[0]
+        expect(sender.display_name).to eq(username)
+        expect(sender.address).to eq(gitlab_sender)
+      end
+
       describe 'thank you email' do
         subject { described_class.service_desk_thank_you_email(issue.id) }
 
@@ -83,10 +121,30 @@ describe Notify do
             is_expected.to have_body_text("Thank you for your support request! We are tracking your request as ticket #{issue.to_reference}, and will respond as soon as we can.")
           end
         end
+
+        it 'uses service bot name by default' do
+          expect_sender(User.support_bot.name)
+        end
+
+        context 'when custom outgoing name is set' do
+          let_it_be(:settings) { create(:service_desk_setting, project: project, outgoing_name: 'some custom name') }
+
+          it 'uses custom name in "from" header' do
+            expect_sender('some custom name')
+          end
+        end
+
+        context 'when custom outgoing name is empty' do
+          let_it_be(:settings) { create(:service_desk_setting, project: project, outgoing_name: '') }
+
+          it 'uses service bot name' do
+            expect_sender(User.support_bot.name)
+          end
+        end
       end
 
       describe 'new note email' do
-        set(:first_note) { create(:discussion_note_on_issue, note: 'Hello world') }
+        let_it_be(:first_note) { create(:discussion_note_on_issue, note: 'Hello world') }
 
         subject { described_class.service_desk_new_note_email(issue.id, first_note.id) }
 
@@ -94,6 +152,10 @@ describe Notify do
 
         it 'has the correct recipient' do
           is_expected.to deliver_to('service.desk@example.com')
+        end
+
+        it 'uses author\'s name in "from" header' do
+          expect_sender(first_note.author.name)
         end
 
         it 'has the correct subject and body' do
@@ -122,6 +184,7 @@ describe Notify do
 
       describe 'that are approved' do
         let(:last_approver) { create(:user) }
+
         subject { described_class.approved_merge_request_email(recipient.id, merge_request.id, last_approver.id) }
 
         before do
@@ -185,6 +248,7 @@ describe Notify do
 
       describe 'that are unapproved' do
         let(:last_unapprover) { create(:user) }
+
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request.id, last_unapprover.id) }
 
         before do
@@ -239,6 +303,7 @@ describe Notify do
     context 'for merge requests without assignee' do
       describe 'that are unapproved' do
         let(:last_unapprover) { create(:user) }
+
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request_without_assignee.id, last_unapprover.id) }
 
         before do
@@ -254,8 +319,8 @@ describe Notify do
 
   context 'for a group' do
     describe 'for epics' do
-      set(:group) { create(:group) }
-      set(:epic) { create(:epic, group: group) }
+      let_it_be(:group) { create(:group) }
+      let_it_be(:epic) { create(:epic, group: group) }
 
       context 'that are new' do
         subject { described_class.new_epic_email(recipient.id, epic.id) }
@@ -265,6 +330,7 @@ describe Notify do
         end
         it_behaves_like 'it should show Gmail Actions View Epic link'
         it_behaves_like 'an unsubscribeable thread'
+        it_behaves_like 'having group identification headers'
 
         it 'has the correct subject and body' do
           prefix = "#{epic.group.name} | "
@@ -285,46 +351,27 @@ describe Notify do
         end
       end
 
+      context 'that changed status' do
+        let(:status) { 'reopened' }
+
+        subject { described_class.epic_status_changed_email(recipient.id, epic.id, status, current_user.id) }
+
+        it_behaves_like 'epic notifications with reply' do
+          let(:email_body) { "Epic was #{status} by #{current_user.name}" }
+        end
+      end
+
       context 'for epic notes' do
-        set(:note) { create(:note, project: nil, noteable: epic) }
+        let_it_be(:note) { create(:note, project: nil, noteable: epic) }
         let(:note_author) { note.author }
-        let(:epic_note_path) { group_epic_path(group, epic, anchor: "note_#{note.id}") }
 
         subject { described_class.note_epic_email(recipient.id, note.id) }
 
+        it_behaves_like 'epic notifications with reply' do
+          let(:email_body) { group_epic_path(group, epic, anchor: "note_#{note.id}") }
+        end
+
         it_behaves_like 'a note email'
-
-        it_behaves_like 'an unsubscribeable thread'
-
-        it 'has the characteristics of a threaded reply' do
-          host = Gitlab.config.gitlab.host
-          route_key = "#{epic.class.model_name.singular_route_key}_#{epic.id}"
-
-          aggregate_failures do
-            is_expected.to have_header('Message-ID', /\A<.*@#{host}>\Z/)
-            is_expected.to have_header('In-Reply-To', "<#{route_key}@#{host}>")
-            is_expected.to have_header('References',  /\A<reply\-.*@#{host}> <#{route_key}@#{host}>\Z/ )
-            is_expected.to have_subject(/^Re: /)
-          end
-        end
-
-        context 'when reply-by-email is enabled with incoming address with %{key}' do
-          it 'has a Reply-To header' do
-            is_expected.to have_header 'Reply-To', /<reply+(.*)@#{Gitlab.config.gitlab.host}>\Z/
-          end
-        end
-
-        it_behaves_like 'it should show Gmail Actions View Epic link'
-
-        it 'has the correct subject and body' do
-          prefix = "Re: #{epic.group.name} | "
-          suffix = "#{epic.title} (#{epic.to_reference})"
-
-          aggregate_failures do
-            is_expected.to have_subject [prefix, suffix].compact.join
-            is_expected.to have_body_text(epic_note_path)
-          end
-        end
       end
     end
   end

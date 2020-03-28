@@ -151,6 +151,7 @@ describe Issues::UpdateService, :mailer do
 
       context 'when current user cannot admin issues in the project' do
         let(:guest) { create(:user) }
+
         before do
           project.add_guest(guest)
         end
@@ -208,6 +209,49 @@ describe Issues::UpdateService, :mailer do
           note = find_note('locked this issue')
 
           expect(note.note).to eq 'locked this issue'
+        end
+      end
+
+      context 'after_save callback to store_mentions' do
+        let(:issue) { create(:issue, title: 'Old title', description: "simple description", project: project, author: create(:user)) }
+        let(:labels) { create_pair(:label, project: project) }
+        let(:milestone) { create(:milestone, project: project) }
+
+        context 'when mentionable attributes change' do
+          let(:opts) { { description: "Description with #{user.to_reference}" } }
+
+          it 'saves mentions' do
+            expect(issue).to receive(:store_mentions!).and_call_original
+
+            expect { update_issue(opts) }.to change { IssueUserMention.count }.by(1)
+
+            expect(issue.referenced_users).to match_array([user])
+          end
+        end
+
+        context 'when mentionable attributes do not change' do
+          let(:opts) { { label_ids: labels.map(&:id), milestone_id: milestone.id } }
+
+          it 'does not call store_mentions' do
+            expect(issue).not_to receive(:store_mentions!).and_call_original
+
+            expect { update_issue(opts) }.not_to change { IssueUserMention.count }
+
+            expect(issue.referenced_users).to be_empty
+          end
+        end
+
+        context 'when save fails' do
+          let(:opts) { { title: '', label_ids: labels.map(&:id), milestone_id: milestone.id } }
+
+          it 'does not call store_mentions' do
+            expect(issue).not_to receive(:store_mentions!).and_call_original
+
+            expect { update_issue(opts) }.not_to change { IssueUserMention.count }
+
+            expect(issue.referenced_users).to be_empty
+            expect(issue.valid?).to be false
+          end
         end
       end
     end
@@ -341,6 +385,10 @@ describe Issues::UpdateService, :mailer do
       end
 
       context 'when the milestone is removed' do
+        before do
+          stub_feature_flags(track_resource_milestone_change_events: false)
+        end
+
         let!(:non_subscriber) { create(:user) }
 
         let!(:subscriber) do
@@ -364,9 +412,28 @@ describe Issues::UpdateService, :mailer do
           should_email(subscriber)
           should_not_email(non_subscriber)
         end
+
+        it 'clears milestone issue counters cache' do
+          issue.milestone = create(:milestone, project: project)
+
+          issue.save
+
+          expect_next_instance_of(Milestones::IssuesCountService, issue.milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+          expect_next_instance_of(Milestones::ClosedIssuesCountService, issue.milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+
+          update_issue(milestone_id: "")
+        end
       end
 
-      context 'when the milestone is changed' do
+      context 'when the milestone is assigned' do
+        before do
+          stub_feature_flags(track_resource_milestone_change_events: false)
+        end
+
         let!(:non_subscriber) { create(:user) }
 
         let!(:subscriber) do
@@ -391,6 +458,43 @@ describe Issues::UpdateService, :mailer do
 
           should_email(subscriber)
           should_not_email(non_subscriber)
+        end
+
+        it 'deletes issue counters cache for the milestone' do
+          milestone = create(:milestone, project: project)
+
+          expect_next_instance_of(Milestones::IssuesCountService, milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+          expect_next_instance_of(Milestones::ClosedIssuesCountService, milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+
+          update_issue(milestone: milestone)
+        end
+      end
+
+      context 'when the milestone is changed' do
+        it 'deletes issue counters cache for both milestones' do
+          old_milestone = create(:milestone, project: project)
+          new_milestone = create(:milestone, project: project)
+
+          issue.update!(milestone: old_milestone)
+
+          expect_next_instance_of(Milestones::IssuesCountService, old_milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+          expect_next_instance_of(Milestones::ClosedIssuesCountService, old_milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+          expect_next_instance_of(Milestones::IssuesCountService, new_milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+          expect_next_instance_of(Milestones::ClosedIssuesCountService, new_milestone) do |service|
+            expect(service).to receive(:delete_cache).and_call_original
+          end
+
+          update_issue(milestone: new_milestone)
         end
       end
 
@@ -689,8 +793,9 @@ describe Issues::UpdateService, :mailer do
 
       context 'valid canonical_issue_id' do
         it 'calls the duplicate service with both issues' do
-          expect_any_instance_of(Issues::DuplicateService)
-            .to receive(:execute).with(issue, canonical_issue)
+          expect_next_instance_of(Issues::DuplicateService) do |service|
+            expect(service).to receive(:execute).with(issue, canonical_issue)
+          end
 
           update_issue(canonical_issue_id: canonical_issue.id)
         end

@@ -40,28 +40,38 @@ class CommitStatus < ApplicationRecord
   scope :latest, -> { where(retried: [false, nil]) }
   scope :retried, -> { where(retried: true) }
   scope :ordered, -> { order(:name) }
+  scope :ordered_by_stage, -> { order(stage_idx: :asc) }
   scope :latest_ordered, -> { latest.ordered.includes(project: :namespace) }
   scope :retried_ordered, -> { retried.ordered.includes(project: :namespace) }
   scope :before_stage, -> (index) { where('stage_idx < ?', index) }
   scope :for_stage, -> (index) { where(stage_idx: index) }
   scope :after_stage, -> (index) { where('stage_idx > ?', index) }
-  scope :processables, -> { where(type: %w[Ci::Build Ci::Bridge]) }
   scope :for_ids, -> (ids) { where(id: ids) }
+  scope :for_ref, -> (ref) { where(ref: ref) }
+  scope :by_name, -> (name) { where(name: name) }
+
+  scope :for_project_paths, -> (paths) do
+    where(project: Project.where_full_path_in(Array(paths)))
+  end
 
   scope :with_preloads, -> do
     preload(:project, :user)
   end
 
-  scope :with_needs, -> (names = nil) do
-    needs = Ci::BuildNeed.scoped_build.select(1)
-    needs = needs.where(name: names) if names
-    where('EXISTS (?)', needs).preload(:needs)
+  scope :with_project_preload, -> do
+    preload(project: :namespace)
   end
 
-  scope :without_needs, -> (names = nil) do
-    needs = Ci::BuildNeed.scoped_build.select(1)
-    needs = needs.where(name: names) if names
-    where('NOT EXISTS (?)', needs)
+  scope :match_id_and_lock_version, -> (items) do
+    # it expects that items are an array of attributes to match
+    # each hash needs to have `id` and `lock_version`
+    or_conditions = items.inject(none) do |relation, item|
+      match = CommitStatus.default_scoped.where(item.slice(:id, :lock_version))
+
+      relation.or(match)
+    end
+
+    merge(or_conditions)
   end
 
   # We use `CommitStatusEnums.failure_reasons` here so that EE can more easily
@@ -81,6 +91,16 @@ class CommitStatus < ApplicationRecord
     # rubocop: enable CodeReuse/ServiceClass
   end
 
+  before_save if: :status_changed?, unless: :importing? do
+    if Feature.disabled?(:ci_atomic_processing, project)
+      self.processed = nil
+    elsif latest?
+      self.processed = false # force refresh of all dependent ones
+    elsif retried?
+      self.processed = true # retried are considered to be already processed
+    end
+  end
+
   state_machine :status do
     event :process do
       transition [:skipped, :manual] => :created
@@ -90,7 +110,7 @@ class CommitStatus < ApplicationRecord
       # A CommitStatus will never have prerequisites, but this event
       # is shared by Ci::Build, which cannot progress unless prerequisites
       # are satisfied.
-      transition [:created, :preparing, :skipped, :manual, :scheduled] => :pending, unless: :any_unmet_prerequisites?
+      transition [:created, :skipped, :manual, :scheduled] => :pending, if: :all_met_to_become_pending?
     end
 
     event :run do
@@ -98,22 +118,22 @@ class CommitStatus < ApplicationRecord
     end
 
     event :skip do
-      transition [:created, :preparing, :pending] => :skipped
+      transition [:created, :waiting_for_resource, :preparing, :pending] => :skipped
     end
 
     event :drop do
-      transition [:created, :preparing, :pending, :running, :scheduled] => :failed
+      transition [:created, :waiting_for_resource, :preparing, :pending, :running, :scheduled] => :failed
     end
 
     event :success do
-      transition [:created, :preparing, :pending, :running] => :success
+      transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success
     end
 
     event :cancel do
-      transition [:created, :preparing, :pending, :running, :manual, :scheduled] => :canceled
+      transition [:created, :waiting_for_resource, :preparing, :pending, :running, :manual, :scheduled] => :canceled
     end
 
-    before_transition [:created, :preparing, :skipped, :manual, :scheduled] => :pending do |commit_status|
+    before_transition [:created, :waiting_for_resource, :preparing, :skipped, :manual, :scheduled] => :pending do |commit_status|
       commit_status.queued_at = Time.now
     end
 
@@ -131,19 +151,13 @@ class CommitStatus < ApplicationRecord
     end
 
     after_transition do |commit_status, transition|
-      next unless commit_status.project
       next if transition.loopback?
+      next if commit_status.processed?
+      next unless commit_status.project
 
       commit_status.run_after_commit do
-        if pipeline_id
-          if complete? || manual?
-            PipelineProcessWorker.perform_async(pipeline_id, [id])
-          else
-            PipelineUpdateWorker.perform_async(pipeline_id)
-          end
-        end
+        schedule_stage_and_pipeline_update
 
-        StageUpdateWorker.perform_async(stage_id)
         ExpireJobCacheWorker.perform_async(id)
       end
     end
@@ -172,6 +186,15 @@ class CommitStatus < ApplicationRecord
     where(name: names).latest.slow_composite_status || 'success'
   end
 
+  def self.update_as_processed!
+    # Marks items as processed, and increases `lock_version` (Optimisitc Locking)
+    update_all('processed=TRUE, lock_version=COALESCE(lock_version,0)+1')
+  end
+
+  def self.locking_enabled?
+    false
+  end
+
   def locking_enabled?
     will_save_change_to_status?
   end
@@ -186,6 +209,10 @@ class CommitStatus < ApplicationRecord
 
   def duration
     calculate_duration
+  end
+
+  def latest?
+    !retried?
   end
 
   def playable?
@@ -212,7 +239,15 @@ class CommitStatus < ApplicationRecord
     false
   end
 
+  def all_met_to_become_pending?
+    !any_unmet_prerequisites? && !requires_resource?
+  end
+
   def any_unmet_prerequisites?
+    false
+  end
+
+  def requires_resource?
     false
   end
 
@@ -229,6 +264,23 @@ class CommitStatus < ApplicationRecord
   def sortable_name
     name.to_s.split(/(\d+)/).map do |v|
       v =~ /\d+/ ? v.to_i : v
+    end
+  end
+
+  private
+
+  def schedule_stage_and_pipeline_update
+    if Feature.enabled?(:ci_atomic_processing, project)
+      # Atomic Processing requires only single Worker
+      PipelineProcessWorker.perform_async(pipeline_id, [id])
+    else
+      if complete? || manual?
+        PipelineProcessWorker.perform_async(pipeline_id, [id])
+      else
+        PipelineUpdateWorker.perform_async(pipeline_id)
+      end
+
+      StageUpdateWorker.perform_async(stage_id)
     end
   end
 end

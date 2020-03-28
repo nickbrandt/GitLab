@@ -2,6 +2,7 @@
 
 module SystemNoteHelper
   ICON_NAMES_BY_ACTION = {
+    'cherry_pick' => 'cherry-pick-commit',
     'commit' => 'commit',
     'description' => 'pencil-square',
     'merge' => 'git-merge',
@@ -22,7 +23,7 @@ module SystemNoteHelper
     'moved' => 'arrow-right',
     'outdated' => 'pencil-square',
     'pinned_embed' => 'thumbtack',
-    'duplicate' => 'issue-duplicate',
+    'duplicate' => 'duplicate',
     'locked' => 'lock',
     'unlocked' => 'lock-open',
     'due_date' => 'calendar'

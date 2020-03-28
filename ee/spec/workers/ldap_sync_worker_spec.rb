@@ -7,7 +7,7 @@ describe LdapSyncWorker do
 
   before do
     allow(Sidekiq.logger).to receive(:info)
-    allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
+    allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
 
     create(:omniauth_user, provider: 'ldapmain')
   end
@@ -15,7 +15,7 @@ describe LdapSyncWorker do
   describe '#perform' do
     context 'with the default license key' do
       it 'syncs all LDAP users' do
-        expect(Gitlab::Auth::LDAP::Access).to receive(:allowed?)
+        expect(Gitlab::Auth::Ldap::Access).to receive(:allowed?)
 
         subject.perform
       end
@@ -27,7 +27,7 @@ describe LdapSyncWorker do
       end
 
       it 'does not sync LDAP users' do
-        expect(Gitlab::Auth::LDAP::Access).not_to receive(:allowed?)
+        expect(Gitlab::Auth::Ldap::Access).not_to receive(:allowed?)
 
         subject.perform
       end

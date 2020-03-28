@@ -18,7 +18,7 @@ module Gitlab
         :committed_date, :committer_name, :committer_email
       ].freeze
 
-      attr_accessor *SERIALIZE_KEYS # rubocop:disable Lint/AmbiguousOperator
+      attr_accessor(*SERIALIZE_KEYS)
 
       def ==(other)
         return false unless other.is_a?(Gitlab::Git::Commit)
@@ -130,8 +130,7 @@ module Gitlab
         #     :skip is the number of commits to skip
         #     :order is the commits order and allowed value is :none (default), :date,
         #        :topo, or any combination of them (in an array). Commit ordering types
-        #        are documented here:
-        #        http://www.rubydoc.info/github/libgit2/rugged/Rugged#SORT_NONE-constant)
+        #        are documented here: https://git-scm.com/docs/git-log#_commit_ordering
         def find_all(repo, options = {})
           wrapped_gitaly_errors do
             Gitlab::GitalyClient::CommitService.new(repo).find_all_commits(options)
@@ -254,7 +253,7 @@ module Gitlab
       end
 
       def no_commit_message
-        "--no commit message"
+        "No commit message"
       end
 
       def to_hash
@@ -370,13 +369,24 @@ module Gitlab
         # subject from the message to make it clearer when there's one
         # available but not the other.
         @message = message_from_gitaly_body
-        @authored_date = Time.at(commit.author.date.seconds).utc
+        @authored_date = init_date_from_gitaly(commit.author)
         @author_name = commit.author.name.dup
         @author_email = commit.author.email.dup
-        @committed_date = Time.at(commit.committer.date.seconds).utc
+
+        @committed_date = init_date_from_gitaly(commit.committer)
         @committer_name = commit.committer.name.dup
         @committer_email = commit.committer.email.dup
         @parent_ids = Array(commit.parent_ids)
+      end
+
+      # Gitaly provides a UNIX timestamp in author.date.seconds, and a timezone
+      # offset in author.timezone. If the latter isn't present, assume UTC.
+      def init_date_from_gitaly(author)
+        if author.timezone.present?
+          Time.strptime("#{author.date.seconds} #{author.timezone}", '%s %z')
+        else
+          Time.at(author.date.seconds).utc
+        end
       end
 
       def serialize_keys

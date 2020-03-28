@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Gitlab::Graphql::Connections::Keyset::Connection do
   let(:nodes) { Project.all.order(id: :asc) }
   let(:arguments) { {} }
+
   subject(:connection) do
     described_class.new(nodes, arguments, max_page_size: 3)
   end
@@ -102,7 +103,75 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
       end
     end
 
-    context 'when multiple orders are defined' do
+    shared_examples 'nodes are in ascending order' do
+      context 'when no cursor is passed' do
+        let(:arguments) { {} }
+
+        it 'returns projects in ascending order' do
+          expect(subject.sliced_nodes).to eq(ascending_nodes)
+        end
+      end
+
+      context 'when before cursor value is not NULL' do
+        let(:arguments) { { before: encoded_cursor(ascending_nodes[2]) } }
+
+        it 'returns all projects before the cursor' do
+          expect(subject.sliced_nodes).to eq(ascending_nodes.first(2))
+        end
+      end
+
+      context 'when after cursor value is not NULL' do
+        let(:arguments) { { after: encoded_cursor(ascending_nodes[1]) } }
+
+        it 'returns all projects after the cursor' do
+          expect(subject.sliced_nodes).to eq(ascending_nodes.last(3))
+        end
+      end
+
+      context 'when before and after cursor' do
+        let(:arguments) { { before: encoded_cursor(ascending_nodes.last), after: encoded_cursor(ascending_nodes.first) } }
+
+        it 'returns all projects after the cursor' do
+          expect(subject.sliced_nodes).to eq(ascending_nodes[1..3])
+        end
+      end
+    end
+
+    shared_examples 'nodes are in descending order' do
+      context 'when no cursor is passed' do
+        let(:arguments) { {} }
+
+        it 'only returns projects in descending order' do
+          expect(subject.sliced_nodes).to eq(descending_nodes)
+        end
+      end
+
+      context 'when before cursor value is not NULL' do
+        let(:arguments) { { before: encoded_cursor(descending_nodes[2]) } }
+
+        it 'returns all projects before the cursor' do
+          expect(subject.sliced_nodes).to eq(descending_nodes.first(2))
+        end
+      end
+
+      context 'when after cursor value is not NULL' do
+        let(:arguments) { { after: encoded_cursor(descending_nodes[1]) } }
+
+        it 'returns all projects after the cursor' do
+          expect(subject.sliced_nodes).to eq(descending_nodes.last(3))
+        end
+      end
+
+      context 'when before and after cursor' do
+        let(:arguments) { { before: encoded_cursor(descending_nodes.last), after: encoded_cursor(descending_nodes.first) } }
+
+        it 'returns all projects after the cursor' do
+          expect(subject.sliced_nodes).to eq(descending_nodes[1..3])
+        end
+      end
+    end
+
+    context 'when multiple orders with nil values are defined' do
       let!(:project1) { create(:project, last_repository_check_at: 10.days.ago) }    # Asc: project5  Desc: project3
       let!(:project2) { create(:project, last_repository_check_at: nil) }            # Asc: project1  Desc: project1
       let!(:project3) { create(:project, last_repository_check_at: 5.days.ago) }     # Asc: project3  Desc: project5
@@ -113,14 +182,9 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
         let(:nodes) do
           Project.order(Arel.sql('projects.last_repository_check_at IS NULL')).order(last_repository_check_at: :asc).order(id: :asc)
         end
+        let(:ascending_nodes) { [project5, project1, project3, project2, project4] }
 
-        context 'when no cursor is passed' do
-          let(:arguments) { {} }
-
-          it 'returns projects in ascending order' do
-            expect(subject.sliced_nodes).to eq([project5, project1, project3, project2, project4])
-          end
-        end
+        it_behaves_like 'nodes are in ascending order'
 
         context 'when before cursor value is NULL' do
           let(:arguments) { { before: encoded_cursor(project4) } }
@@ -130,35 +194,11 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
           end
         end
 
-        context 'when before cursor value is not NULL' do
-          let(:arguments) { { before: encoded_cursor(project3) } }
-
-          it 'returns all projects before the cursor' do
-            expect(subject.sliced_nodes).to eq([project5, project1])
-          end
-        end
-
         context 'when after cursor value is NULL' do
           let(:arguments) { { after: encoded_cursor(project2) } }
 
           it 'returns all projects after the cursor' do
             expect(subject.sliced_nodes).to eq([project4])
-          end
-        end
-
-        context 'when after cursor value is not NULL' do
-          let(:arguments) { { after: encoded_cursor(project1) } }
-
-          it 'returns all projects after the cursor' do
-            expect(subject.sliced_nodes).to eq([project3, project2, project4])
-          end
-        end
-
-        context 'when before and after cursor' do
-          let(:arguments) { { before: encoded_cursor(project4), after: encoded_cursor(project5) } }
-
-          it 'returns all projects after the cursor' do
-            expect(subject.sliced_nodes).to eq([project1, project3, project2])
           end
         end
       end
@@ -167,14 +207,9 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
         let(:nodes) do
           Project.order(Arel.sql('projects.last_repository_check_at IS NULL')).order(last_repository_check_at: :desc).order(id: :asc)
         end
+        let(:descending_nodes) { [project3, project1, project5, project2, project4] }
 
-        context 'when no cursor is passed' do
-          let(:arguments) { {} }
-
-          it 'only returns projects in descending order' do
-            expect(subject.sliced_nodes).to eq([project3, project1, project5, project2, project4])
-          end
-        end
+        it_behaves_like 'nodes are in descending order'
 
         context 'when before cursor value is NULL' do
           let(:arguments) { { before: encoded_cursor(project4) } }
@@ -184,14 +219,6 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
           end
         end
 
-        context 'when before cursor value is not NULL' do
-          let(:arguments) { { before: encoded_cursor(project5) } }
-
-          it 'returns all projects before the cursor' do
-            expect(subject.sliced_nodes).to eq([project3, project1])
-          end
-        end
-
         context 'when after cursor value is NULL' do
           let(:arguments) { { after: encoded_cursor(project2) } }
 
@@ -199,42 +226,40 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
             expect(subject.sliced_nodes).to eq([project4])
           end
         end
-
-        context 'when after cursor value is not NULL' do
-          let(:arguments) { { after: encoded_cursor(project1) } }
-
-          it 'returns all projects after the cursor' do
-            expect(subject.sliced_nodes).to eq([project5, project2, project4])
-          end
-        end
-
-        context 'when before and after cursor' do
-          let(:arguments) { { before: encoded_cursor(project4), after: encoded_cursor(project3) } }
-
-          it 'returns all projects after the cursor' do
-            expect(subject.sliced_nodes).to eq([project1, project5, project2])
-          end
-        end
       end
     end
 
-    # TODO Enable this as part of below issue
-    # https://gitlab.com/gitlab-org/gitlab/issues/32933
-    # context 'when an invalid cursor is provided' do
-    #   let(:arguments) { { before: 'invalidcursor' } }
-    #
-    #   it 'raises an error' do
-    #     expect { expect(subject.sliced_nodes) }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
-    #   end
-    # end
+    context 'when ordering uses LOWER' do
+      let!(:project1) { create(:project, name: 'A') } # Asc: project1  Desc: project4
+      let!(:project2) { create(:project, name: 'c') } # Asc: project5  Desc: project2
+      let!(:project3) { create(:project, name: 'b') } # Asc: project3  Desc: project3
+      let!(:project4) { create(:project, name: 'd') } # Asc: project2  Desc: project5
+      let!(:project5) { create(:project, name: 'a') } # Asc: project4  Desc: project1
 
-    # TODO Remove this as part of below issue
-    # https://gitlab.com/gitlab-org/gitlab/issues/32933
-    context 'when an old style cursor is provided' do
-      let(:arguments) { { before: Base64Bp.urlsafe_encode64(projects[1].id.to_s, padding: false) } }
+      context 'when ascending' do
+        let(:nodes) do
+          Project.order(Arel::Table.new(:projects)['name'].lower.asc).order(id: :asc)
+        end
+        let(:ascending_nodes) { [project1, project5, project3, project2, project4] }
 
-      it 'only returns the project before the selected one' do
-        expect(subject.sliced_nodes).to contain_exactly(projects.first)
+        it_behaves_like 'nodes are in ascending order'
+      end
+
+      context 'when descending' do
+        let(:nodes) do
+          Project.order(Arel::Table.new(:projects)['name'].lower.desc).order(id: :desc)
+        end
+        let(:descending_nodes) { [project4, project2, project3, project5, project1] }
+
+        it_behaves_like 'nodes are in descending order'
+      end
+    end
+
+    context 'when an invalid cursor is provided' do
+      let(:arguments) { { before: Base64Bp.urlsafe_encode64('invalidcursor', padding: false) } }
+
+      it 'raises an error' do
+        expect { subject.sliced_nodes }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
       end
     end
   end
@@ -243,7 +268,9 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
     let_it_be(:all_nodes) { create_list(:project, 5) }
     let(:paged_nodes) { subject.paged_nodes }
 
-    it_behaves_like "connection with paged nodes"
+    it_behaves_like "connection with paged nodes" do
+      let(:paged_nodes_size) { 3 }
+    end
 
     context 'when both are passed' do
       let(:arguments) { { first: 2, last: 2 } }

@@ -11,7 +11,7 @@ describe Notes::PostProcessService do
       subject { described_class.new(note).execute }
 
       def create_note(in_reply_to: nil)
-        create(:diff_note_on_design, noteable: noteable, project: noteable.project, in_reply_to: in_reply_to)
+        create(:diff_note_on_design, noteable: noteable, in_reply_to: in_reply_to)
       end
 
       context 'when the note is the start of a new discussion' do
@@ -28,6 +28,21 @@ describe Notes::PostProcessService do
         it 'does not create a new system note' do
           expect { subject }.not_to change { Note.system.count }
         end
+      end
+    end
+
+    context 'analytics' do
+      subject { described_class.new(note) }
+
+      let(:note) { create(:note) }
+      let(:analytics_mock) { instance_double('Analytics::RefreshCommentsData') }
+
+      it 'invokes Analytics::RefreshCommentsData' do
+        allow(Analytics::RefreshCommentsData).to receive(:for_note).with(note).and_return(analytics_mock)
+
+        expect(analytics_mock).to receive(:execute)
+
+        subject.execute
       end
     end
   end

@@ -1,11 +1,11 @@
 <script>
 import $ from 'jquery';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
@@ -56,6 +56,12 @@ export default {
     };
   },
   computed: {
+    tracking() {
+      return {
+        // eslint-disable-next-line no-underscore-dangle
+        category: this.$options._componentTag,
+      };
+    },
     isNoValue() {
       return this.checkIfNoValue(this.weight);
     },
@@ -170,7 +176,7 @@ export default {
         class="float-right js-weight-edit-link"
         data-qa-selector="edit_weight_link"
         href="#"
-        @click="onEditClick(!shouldShowEditField)"
+        @click.prevent="onEditClick(!shouldShowEditField)"
         >{{ __('Edit') }}</a
       >
     </div>

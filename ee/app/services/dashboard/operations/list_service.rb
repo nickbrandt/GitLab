@@ -25,8 +25,8 @@ module Dashboard
       def load_projects(user)
         projects = user.ops_dashboard_projects
 
-        ProjectsService
-          .new(user)
+        Dashboard::Projects::ListService
+          .new(user, feature: :operations_dashboard)
           .execute(projects, include_unavailable: true)
           .to_a # 1 query
       end

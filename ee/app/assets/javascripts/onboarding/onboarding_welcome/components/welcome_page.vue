@@ -1,6 +1,6 @@
 <script>
-import { __ } from '~/locale';
 import { GlLink } from '@gitlab/ui';
+import { __ } from '~/locale';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import HelpContentPopover from './../../onboarding_helper/components/help_content_popover.vue';
 import ActionPopover from './../../onboarding_helper/components/action_popover.vue';

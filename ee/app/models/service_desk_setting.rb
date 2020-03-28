@@ -6,15 +6,8 @@ class ServiceDeskSetting < ApplicationRecord
   belongs_to :project
   validates :project_id, presence: true
   validate :valid_issue_template
-
-  def self.update_template_key_for(project:, issue_template_key:)
-    return unless issue_template_key
-
-    settings = safe_find_or_create_by!(project_id: project.id)
-    settings.update!(issue_template_key: issue_template_key)
-
-    settings
-  end
+  validates :outgoing_name, length: { maximum: 255 }, allow_blank: true
+  validates :project_key, length: { maximum: 255 }, allow_blank: true, format: { with: /\A[a-z0-9_]+\z/ }
 
   def issue_template_content
     strong_memoize(:issue_template_content) do
@@ -31,7 +24,7 @@ class ServiceDeskSetting < ApplicationRecord
 
   def valid_issue_template
     if issue_template_missing?
-      errors.add(:issue_template_key, "Issue template empty or not found")
+      errors.add(:issue_template_key, 'is empty or does not exist')
     end
   end
 end

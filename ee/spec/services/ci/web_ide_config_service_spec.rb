@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Ci::WebIdeConfigService do
-  set(:project) { create(:project, :repository) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
   let(:sha) { 'sha' }
 
   describe '#execute' do

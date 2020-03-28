@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { property, isEqual } from 'lodash';
 import { truncatePathMiddleToLength } from '~/lib/utils/text_utility';
 import { diffModes, diffViewerModes } from '~/ide/constants';
 import {
@@ -13,6 +13,8 @@ import {
   LINES_TO_BE_RENDERED_DIRECTLY,
   MAX_LINES_TO_BE_RENDERED,
   TREE_TYPE,
+  INLINE_DIFF_VIEW_TYPE,
+  PARALLEL_DIFF_VIEW_TYPE,
 } from '../constants';
 
 export function findDiffFile(files, match, matchKey = 'file_hash') {
@@ -93,8 +95,7 @@ export function getNoteFormData(params) {
 export const findIndexInInlineLines = (lines, lineNumbers) => {
   const { oldLineNumber, newLineNumber } = lineNumbers;
 
-  return _.findIndex(
-    lines,
+  return lines.findIndex(
     line => line.old_line === oldLineNumber && line.new_line === newLineNumber,
   );
 };
@@ -102,8 +103,7 @@ export const findIndexInInlineLines = (lines, lineNumbers) => {
 export const findIndexInParallelLines = (lines, lineNumbers) => {
   const { oldLineNumber, newLineNumber } = lineNumbers;
 
-  return _.findIndex(
-    lines,
+  return lines.findIndex(
     line =>
       line.left &&
       line.right &&
@@ -112,13 +112,32 @@ export const findIndexInParallelLines = (lines, lineNumbers) => {
   );
 };
 
+const indexGettersByViewType = {
+  [INLINE_DIFF_VIEW_TYPE]: findIndexInInlineLines,
+  [PARALLEL_DIFF_VIEW_TYPE]: findIndexInParallelLines,
+};
+
+export const getPreviousLineIndex = (diffViewType, file, lineNumbers) => {
+  const findIndex = indexGettersByViewType[diffViewType];
+  const lines = {
+    [INLINE_DIFF_VIEW_TYPE]: file.highlighted_diff_lines,
+    [PARALLEL_DIFF_VIEW_TYPE]: file.parallel_diff_lines,
+  };
+
+  return findIndex && findIndex(lines[diffViewType], lineNumbers);
+};
+
 export function removeMatchLine(diffFile, lineNumbers, bottom) {
   const indexForInline = findIndexInInlineLines(diffFile.highlighted_diff_lines, lineNumbers);
   const indexForParallel = findIndexInParallelLines(diffFile.parallel_diff_lines, lineNumbers);
   const factor = bottom ? 1 : -1;
 
-  diffFile.highlighted_diff_lines.splice(indexForInline + factor, 1);
-  diffFile.parallel_diff_lines.splice(indexForParallel + factor, 1);
+  if (indexForInline > -1) {
+    diffFile.highlighted_diff_lines.splice(indexForInline + factor, 1);
+  }
+  if (indexForParallel > -1) {
+    diffFile.parallel_diff_lines.splice(indexForParallel + factor, 1);
+  }
 }
 
 export function addLineReferences(lines, lineNumbers, bottom, isExpandDown, nextLineNumbers) {
@@ -160,8 +179,8 @@ export function addLineReferences(lines, lineNumbers, bottom, isExpandDown, next
   return linesWithNumbers;
 }
 
-export function addContextLines(options) {
-  const { inlineLines, parallelLines, contextLines, lineNumbers, isExpandDown } = options;
+function addParallelContextLines(options) {
+  const { parallelLines, contextLines, lineNumbers, isExpandDown } = options;
   const normalizedParallelLines = contextLines.map(line => ({
     left: line,
     right: line,
@@ -170,14 +189,37 @@ export function addContextLines(options) {
   const factor = isExpandDown ? 1 : 0;
 
   if (!isExpandDown && options.bottom) {
-    inlineLines.push(...contextLines);
     parallelLines.push(...normalizedParallelLines);
   } else {
-    const inlineIndex = findIndexInInlineLines(inlineLines, lineNumbers);
     const parallelIndex = findIndexInParallelLines(parallelLines, lineNumbers);
 
-    inlineLines.splice(inlineIndex + factor, 0, ...contextLines);
     parallelLines.splice(parallelIndex + factor, 0, ...normalizedParallelLines);
+  }
+}
+
+function addInlineContextLines(options) {
+  const { inlineLines, contextLines, lineNumbers, isExpandDown } = options;
+  const factor = isExpandDown ? 1 : 0;
+
+  if (!isExpandDown && options.bottom) {
+    inlineLines.push(...contextLines);
+  } else {
+    const inlineIndex = findIndexInInlineLines(inlineLines, lineNumbers);
+
+    inlineLines.splice(inlineIndex + factor, 0, ...contextLines);
+  }
+}
+
+export function addContextLines(options) {
+  const { diffViewType } = options;
+  const contextLineHandlers = {
+    [INLINE_DIFF_VIEW_TYPE]: addInlineContextLines,
+    [PARALLEL_DIFF_VIEW_TYPE]: addParallelContextLines,
+  };
+  const contextLineHandler = contextLineHandlers[diffViewType];
+
+  if (contextLineHandler) {
+    contextLineHandler(options);
   }
 }
 
@@ -185,6 +227,7 @@ export function addContextLines(options) {
  * Trims the first char of the `richText` property when it's either a space or a diff symbol.
  * @param {Object} line
  * @returns {Object}
+ * @deprecated
  */
 export function trimFirstCharOfLineContent(line = {}) {
   // eslint-disable-next-line no-param-reassign
@@ -212,78 +255,178 @@ function getLineCode({ left, right }, index) {
   return index;
 }
 
-// This prepares and optimizes the incoming diff data from the server
-// by setting up incremental rendering and removing unneeded data
-export function prepareDiffData(diffData) {
-  const filesLength = diffData.diff_files.length;
-  let showingLines = 0;
-  for (let i = 0; i < filesLength; i += 1) {
-    const file = diffData.diff_files[i];
+function diffFileUniqueId(file) {
+  return `${file.content_sha}-${file.file_hash}`;
+}
 
-    if (file.parallel_diff_lines) {
-      const linesLength = file.parallel_diff_lines.length;
-      for (let u = 0; u < linesLength; u += 1) {
-        const line = file.parallel_diff_lines[u];
+function mergeTwoFiles(target, source) {
+  const originalInline = target.highlighted_diff_lines;
+  const originalParallel = target.parallel_diff_lines;
+  const missingInline = !originalInline.length;
+  const missingParallel = !originalParallel.length;
 
-        line.line_code = getLineCode(line, u);
-        if (line.left) {
-          line.left = trimFirstCharOfLineContent(line.left);
-          line.left.discussions = [];
-          line.left.hasForm = false;
-        }
-        if (line.right) {
-          line.right = trimFirstCharOfLineContent(line.right);
-          line.right.discussions = [];
-          line.right.hasForm = false;
-        }
-      }
-    }
+  return {
+    ...target,
+    highlighted_diff_lines: missingInline ? source.highlighted_diff_lines : originalInline,
+    parallel_diff_lines: missingParallel ? source.parallel_diff_lines : originalParallel,
+    renderIt: source.renderIt,
+    collapsed: source.collapsed,
+  };
+}
 
-    if (file.highlighted_diff_lines) {
-      const linesLength = file.highlighted_diff_lines.length;
-      for (let u = 0; u < linesLength; u += 1) {
-        const line = file.highlighted_diff_lines[u];
-        Object.assign(line, {
-          ...trimFirstCharOfLineContent(line),
-          discussions: [],
-          hasForm: false,
-        });
-      }
-      showingLines += file.parallel_diff_lines.length;
-    }
+function ensureBasicDiffFileLines(file) {
+  const missingInline = !file.highlighted_diff_lines;
+  const missingParallel = !file.parallel_diff_lines;
 
-    Object.assign(file, {
-      renderIt: showingLines < LINES_TO_BE_RENDERED_DIRECTLY,
-      collapsed:
-        file.viewer.name === diffViewerModes.text && showingLines > MAX_LINES_TO_BE_RENDERED,
-      isShowingFullFile: false,
-      isLoadingFullFile: false,
+  Object.assign(file, {
+    highlighted_diff_lines: missingInline ? [] : file.highlighted_diff_lines,
+    parallel_diff_lines: missingParallel ? [] : file.parallel_diff_lines,
+  });
+
+  return file;
+}
+
+function cleanRichText(text) {
+  return text ? text.replace(/^[+ -]/, '') : undefined;
+}
+
+function prepareLine(line) {
+  if (!line.alreadyPrepared) {
+    Object.assign(line, {
+      rich_text: cleanRichText(line.rich_text),
+      discussionsExpanded: true,
       discussions: [],
-      renderingLines: false,
+      hasForm: false,
+      text: undefined,
+      alreadyPrepared: true,
     });
   }
 }
 
-export function getDiffPositionByLineCode(diffFiles) {
-  return diffFiles.reduce((acc, diffFile) => {
-    // We can only use highlightedDiffLines to create the map of diff lines because
-    // highlightedDiffLines will also include every parallel diff line in it.
-    if (diffFile.highlighted_diff_lines) {
+function prepareDiffFileLines(file) {
+  const inlineLines = file.highlighted_diff_lines;
+  const parallelLines = file.parallel_diff_lines;
+  let parallelLinesCount = 0;
+
+  inlineLines.forEach(prepareLine);
+
+  parallelLines.forEach((line, index) => {
+    Object.assign(line, { line_code: getLineCode(line, index) });
+
+    if (line.left) {
+      parallelLinesCount += 1;
+      prepareLine(line.left);
+    }
+
+    if (line.right) {
+      parallelLinesCount += 1;
+      prepareLine(line.right);
+    }
+  });
+
+  Object.assign(file, {
+    inlineLinesCount: inlineLines.length,
+    parallelLinesCount,
+  });
+
+  return file;
+}
+
+function getVisibleDiffLines(file) {
+  return Math.max(file.inlineLinesCount, file.parallelLinesCount);
+}
+
+function finalizeDiffFile(file) {
+  const name = (file.viewer && file.viewer.name) || diffViewerModes.text;
+  const lines = getVisibleDiffLines(file);
+
+  Object.assign(file, {
+    renderIt: lines < LINES_TO_BE_RENDERED_DIRECTLY,
+    collapsed: name === diffViewerModes.text && lines > MAX_LINES_TO_BE_RENDERED,
+    isShowingFullFile: false,
+    isLoadingFullFile: false,
+    discussions: [],
+    renderingLines: false,
+  });
+
+  return file;
+}
+
+function deduplicateFilesList(files) {
+  const dedupedFiles = files.reduce((newList, file) => {
+    const id = diffFileUniqueId(file);
+
+    return {
+      ...newList,
+      [id]: newList[id] ? mergeTwoFiles(newList[id], file) : file,
+    };
+  }, {});
+
+  return Object.values(dedupedFiles);
+}
+
+export function prepareDiffData(diff, priorFiles = []) {
+  const cleanedFiles = (diff.diff_files || [])
+    .map(ensureBasicDiffFileLines)
+    .map(prepareDiffFileLines)
+    .map(finalizeDiffFile);
+
+  return deduplicateFilesList([...priorFiles, ...cleanedFiles]);
+}
+
+export function getDiffPositionByLineCode(diffFiles, useSingleDiffStyle) {
+  let lines = [];
+  const hasInlineDiffs = diffFiles.some(file => file.highlighted_diff_lines.length > 0);
+
+  if (!useSingleDiffStyle || hasInlineDiffs) {
+    // In either of these cases, we can use `highlighted_diff_lines` because
+    // that will include all of the parallel diff lines, too
+
+    lines = diffFiles.reduce((acc, diffFile) => {
       diffFile.highlighted_diff_lines.forEach(line => {
-        if (line.line_code) {
-          acc[line.line_code] = {
-            base_sha: diffFile.diff_refs.base_sha,
-            head_sha: diffFile.diff_refs.head_sha,
-            start_sha: diffFile.diff_refs.start_sha,
-            new_path: diffFile.new_path,
-            old_path: diffFile.old_path,
-            old_line: line.old_line,
-            new_line: line.new_line,
-            line_code: line.line_code,
-            position_type: 'text',
-          };
+        acc.push({ file: diffFile, line });
+      });
+
+      return acc;
+    }, []);
+  } else {
+    // If we're in single diff view mode and the inline lines haven't been
+    // loaded yet, we need to parse the parallel lines
+
+    lines = diffFiles.reduce((acc, diffFile) => {
+      diffFile.parallel_diff_lines.forEach(pair => {
+        // It's possible for a parallel line to have an opposite line that doesn't exist
+        // For example: *deleted* lines will have `null` right lines, while
+        // *added* lines will have `null` left lines.
+        // So we have to check each line before we push it onto the array so we're not
+        // pushing null line diffs
+
+        if (pair.left) {
+          acc.push({ file: diffFile, line: pair.left });
+        }
+
+        if (pair.right) {
+          acc.push({ file: diffFile, line: pair.right });
         }
       });
+
+      return acc;
+    }, []);
+  }
+
+  return lines.reduce((acc, { file, line }) => {
+    if (line.line_code) {
+      acc[line.line_code] = {
+        base_sha: file.diff_refs.base_sha,
+        head_sha: file.diff_refs.head_sha,
+        start_sha: file.diff_refs.start_sha,
+        new_path: file.new_path,
+        old_path: file.old_path,
+        old_line: line.old_line,
+        new_line: line.new_line,
+        line_code: line.line_code,
+        position_type: 'text',
+      };
     }
 
     return acc;
@@ -299,7 +442,7 @@ export function isDiscussionApplicableToLine({ discussion, diffPosition, latestD
     const originalRefs = discussion.original_position;
     const refs = discussion.position;
 
-    return _.isEqual(refs, diffPositionCopy) || _.isEqual(originalRefs, diffPositionCopy);
+    return isEqual(refs, diffPositionCopy) || isEqual(originalRefs, diffPositionCopy);
   }
 
   // eslint-disable-next-line
@@ -435,10 +578,10 @@ export const convertExpandLines = ({
   for (let i = 0, diffLinesLength = diffLines.length; i < diffLinesLength; i += 1) {
     const line = diffLines[i];
 
-    if (_.property(typeKey)(line) === 'match') {
+    if (property(typeKey)(line) === 'match') {
       const beforeLine = diffLines[i - 1];
       const afterLine = diffLines[i + 1];
-      const newLineProperty = _.property(newLineKey);
+      const newLineProperty = property(newLineKey);
       const beforeLineIndex = newLineProperty(beforeLine) || 0;
       const afterLineIndex = newLineProperty(afterLine) - 1 || dataLength;
 
@@ -446,7 +589,7 @@ export const convertExpandLines = ({
         ...data.slice(beforeLineIndex, afterLineIndex).map((l, index) =>
           mapLine({
             line: Object.assign(l, { hasForm: false, discussions: [] }),
-            oldLine: (_.property(oldLineKey)(beforeLine) || 0) + index + 1,
+            oldLine: (property(oldLineKey)(beforeLine) || 0) + index + 1,
             newLine: (newLineProperty(beforeLine) || 0) + index + 1,
           }),
         ),
@@ -461,47 +604,47 @@ export const convertExpandLines = ({
 
 export const idleCallback = cb => requestIdleCallback(cb);
 
+function getLinesFromFileByLineCode(file, lineCode) {
+  const parallelLines = file.parallel_diff_lines;
+  const inlineLines = file.highlighted_diff_lines;
+  const matchesCode = line => line.line_code === lineCode;
+
+  return [
+    ...parallelLines.reduce((acc, line) => {
+      if (line.left) {
+        acc.push(line.left);
+      }
+
+      if (line.right) {
+        acc.push(line.right);
+      }
+
+      return acc;
+    }, []),
+    ...inlineLines,
+  ].filter(matchesCode);
+}
+
 export const updateLineInFile = (selectedFile, lineCode, updateFn) => {
-  if (selectedFile.parallel_diff_lines) {
-    const targetLine = selectedFile.parallel_diff_lines.find(
-      line =>
-        (line.left && line.left.line_code === lineCode) ||
-        (line.right && line.right.line_code === lineCode),
-    );
-    if (targetLine) {
-      const side = targetLine.left && targetLine.left.line_code === lineCode ? 'left' : 'right';
-
-      updateFn(targetLine[side]);
-    }
-  }
-  if (selectedFile.highlighted_diff_lines) {
-    const targetInlineLine = selectedFile.highlighted_diff_lines.find(
-      line => line.line_code === lineCode,
-    );
-
-    if (targetInlineLine) {
-      updateFn(targetInlineLine);
-    }
-  }
+  getLinesFromFileByLineCode(selectedFile, lineCode).forEach(updateFn);
 };
 
 export const allDiscussionWrappersExpanded = diff => {
-  const discussionsExpandedArray = [];
-  if (diff.parallel_diff_lines) {
-    diff.parallel_diff_lines.forEach(line => {
-      if (line.left && line.left.discussions.length) {
-        discussionsExpandedArray.push(line.left.discussionsExpanded);
-      }
-      if (line.right && line.right.discussions.length) {
-        discussionsExpandedArray.push(line.right.discussionsExpanded);
-      }
-    });
-  } else if (diff.highlighted_diff_lines) {
-    diff.parallel_diff_lines.forEach(line => {
-      if (line.discussions.length) {
-        discussionsExpandedArray.push(line.discussionsExpanded);
-      }
-    });
-  }
-  return discussionsExpandedArray.every(el => el);
+  let discussionsExpanded = true;
+  const changeExpandedResult = line => {
+    if (line && line.discussions.length) {
+      discussionsExpanded = discussionsExpanded && line.discussionsExpanded;
+    }
+  };
+
+  diff.parallel_diff_lines.forEach(line => {
+    changeExpandedResult(line.left);
+    changeExpandedResult(line.right);
+  });
+
+  diff.highlighted_diff_lines.forEach(line => {
+    changeExpandedResult(line);
+  });
+
+  return discussionsExpanded;
 };

@@ -16,6 +16,7 @@ module EE
 
     def stub_primary_node
       allow(::Gitlab::Geo).to receive(:primary?).and_return(true)
+      allow(::Gitlab::Geo).to receive(:secondary?).and_return(false)
     end
 
     def stub_secondary_node

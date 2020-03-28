@@ -21,7 +21,10 @@ describe Geo::DesignRegistryFinder, :geo, :geo_fdw do
 
   context 'count all the things' do
     describe '#count_syncable' do
-      it 'returns number of container repositories' do
+      it 'returns number of design repositories' do
+        # One more design for the same project to assert absence of duplicates
+        create(:design, project: synced_registry.project)
+
         result = subject.count_syncable
 
         expect(result).to eq(2)
@@ -67,7 +70,7 @@ describe Geo::DesignRegistryFinder, :geo, :geo_fdw do
 
       context 'count all the things' do
         describe '#count_syncable' do
-          it 'returns number of container repositories' do
+          it 'returns number of design repositories' do
             result = subject.count_syncable
 
             expect(result).to eq(2)

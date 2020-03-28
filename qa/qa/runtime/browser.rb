@@ -44,10 +44,20 @@ module QA
         new.visit(address, page_class, &block)
       end
 
+      # rubocop: disable Metrics/AbcSize
       def self.configure!
         RSpec.configure do |config|
           config.define_derived_metadata(file_path: %r{/qa/specs/features/}) do |metadata|
             metadata[:type] = :feature
+          end
+
+          config.around(:each) do |example|
+            example.run
+
+            if example.metadata[:screenshot]
+              screenshot = example.metadata[:screenshot][:image] || example.metadata[:screenshot][:html]
+              example.metadata[:stdout] = %{[[ATTACHMENT|#{screenshot}]]}
+            end
           end
         end
 
@@ -122,8 +132,10 @@ module QA
           driver.browser.save_screenshot(path)
         end
 
+        Capybara::Screenshot.append_timestamp = false
+
         Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
-          ::File.join(QA::Runtime::Namespace.name, example.file_path.sub('./qa/specs/features/', ''))
+          ::File.join(QA::Runtime::Namespace.name, example.full_description.downcase.parameterize(separator: "_")[0..99])
         end
 
         Capybara.configure do |config|
@@ -132,8 +144,13 @@ module QA
           config.default_max_wait_time = CAPYBARA_MAX_WAIT_TIME
           # https://github.com/mattheworiordan/capybara-screenshot/issues/164
           config.save_path = ::File.expand_path('../../tmp', __dir__)
+
+          # Cabybara 3 does not normalize text by default, so older tests
+          # fail because of unexpected line breaks and other white space
+          config.default_normalize_ws = true
         end
       end
+      # rubocop: enable Metrics/AbcSize
 
       class Session
         include Capybara::DSL
@@ -151,6 +168,8 @@ module QA
 
         def perform(&block)
           visit(url)
+
+          simulate_slow_connection if Runtime::Env.simulate_slow_connection?
 
           page_class.validate_elements_present!
 
@@ -174,6 +193,28 @@ module QA
         def clear!
           visit(url)
           reset_session!
+          @network_conditions_configured = false
+        end
+
+        private
+
+        def simulate_slow_connection
+          return if @network_conditions_configured
+
+          QA::Runtime::Logger.info(
+            <<~MSG.tr("\n", " ")
+              Simulating a slow connection with additional latency
+              of #{Runtime::Env.slow_connection_latency} ms and a maximum
+              throughput of #{Runtime::Env.slow_connection_throughput} kbps
+            MSG
+          )
+
+          Capybara.current_session.driver.browser.network_conditions = {
+            latency: Runtime::Env.slow_connection_latency,
+            throughput: Runtime::Env.slow_connection_throughput * 1000
+          }
+
+          @network_conditions_configured = true
         end
       end
     end

@@ -86,4 +86,29 @@ describe Analytics::CycleAnalytics::Stages::CreateService do
       end
     end
   end
+
+  describe 'label based stages' do
+    let(:label) { create(:group_label, group: group) }
+
+    let(:params) do
+      {
+        name: 'my stage',
+        start_event_identifier: :issue_label_added,
+        end_event_identifier: :issue_label_removed,
+        start_event_label_id: label.id,
+        end_event_label_id: label.id
+      }
+    end
+
+    it { expect(subject).to be_success }
+
+    it 'persists the `start_event_label_id` and `end_event_label_id` attributes' do
+      subject
+
+      stage = subject.payload[:stage]
+
+      expect(stage.start_event_label).to eq(label)
+      expect(stage.end_event_label).to eq(label)
+    end
+  end
 end

@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as types from 'ee/approvals/stores/modules/base/mutation_types';
 import actionsModule, * as actions from 'ee/approvals/stores/modules/project_settings/actions';
 import { mapApprovalRuleRequest, mapApprovalSettingsResponse } from 'ee/approvals/mappers';
+import axios from '~/lib/utils/axios_utils';
 
 const TEST_PROJECT_ID = 9;
 const TEST_RULE_ID = 7;

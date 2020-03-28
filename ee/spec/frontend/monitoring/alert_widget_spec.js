@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
-import createFlash from '~/flash';
+import { GlLoadingIcon, GlTooltip, GlSprintf, GlBadge } from '@gitlab/ui';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import waitForPromises from 'helpers/wait_for_promises';
+import createFlash from '~/flash';
 
 const mockReadAlert = jest.fn();
 const mockCreateAlert = jest.fn();
@@ -26,9 +26,36 @@ jest.mock(
 describe('AlertWidget', () => {
   let wrapper;
 
+  const nonFiringAlertResult = [
+    {
+      values: [[0, 1], [1, 42], [2, 41]],
+    },
+  ];
+  const firingAlertResult = [
+    {
+      values: [[0, 42], [1, 43], [2, 44]],
+    },
+  ];
   const metricId = '5';
   const alertPath = 'my/alert.json';
-  const relevantQueries = [{ metricId, label: 'alert-label', alert_path: alertPath }];
+
+  const relevantQueries = [
+    {
+      metricId,
+      label: 'alert-label',
+      alert_path: alertPath,
+      result: nonFiringAlertResult,
+    },
+  ];
+
+  const firingRelevantQueries = [
+    {
+      metricId,
+      label: 'alert-label',
+      alert_path: alertPath,
+      result: firingAlertResult,
+    },
+  ];
 
   const defaultProps = {
     alertsEndpoint: '',
@@ -50,19 +77,25 @@ describe('AlertWidget', () => {
 
   const createComponent = propsData => {
     wrapper = shallowMount(AlertWidget, {
+      stubs: { GlTooltip, GlSprintf },
       propsData: {
         ...defaultProps,
         ...propsData,
       },
-      sync: false,
     });
   };
+  const hasLoadingIcon = () => wrapper.contains(GlLoadingIcon);
   const findWidgetForm = () => wrapper.find({ ref: 'widgetForm' });
-  const findAlertErrorMessage = () => wrapper.find('.alert-error-message');
-  const findCurrentSettings = () => wrapper.find('.alert-current-setting');
+  const findAlertErrorMessage = () => wrapper.find({ ref: 'alertErrorMessage' });
+  const findCurrentSettingsText = () =>
+    wrapper
+      .find({ ref: 'alertCurrentSetting' })
+      .text()
+      .replace(/\s\s+/g, ' ');
+  const findBadge = () => wrapper.find(GlBadge);
+  const findTooltip = () => wrapper.find(GlTooltip);
 
   afterEach(() => {
-    jest.clearAllMocks();
     wrapper.destroy();
     wrapper = null;
   });
@@ -78,14 +111,14 @@ describe('AlertWidget', () => {
     return wrapper.vm
       .$nextTick()
       .then(() => {
-        expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(true);
+        expect(hasLoadingIcon()).toBe(true);
         expect(findWidgetForm().props('disabled')).toBe(true);
 
         resolveReadAlert({ operator: '==', threshold: 42 });
       })
       .then(() => waitForPromises())
       .then(() => {
-        expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(false);
+        expect(hasLoadingIcon()).toBe(false);
         expect(findWidgetForm().props('disabled')).toBe(false);
       });
   });
@@ -93,46 +126,163 @@ describe('AlertWidget', () => {
   it('displays an error message when fetch fails', () => {
     mockReadAlert.mockRejectedValue();
     createComponent(propsWithAlert);
-
-    expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(true);
+    expect(hasLoadingIcon()).toBe(true);
 
     return waitForPromises().then(() => {
       expect(createFlash).toHaveBeenCalled();
-      expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(false);
+      expect(hasLoadingIcon()).toBe(false);
     });
   });
 
-  it('displays an alert summary when there is a single alert', () => {
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
-    createComponent(propsWithAlertData);
+  describe('Alert not firing', () => {
+    it('displays a warning icon and matches snapshot', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      createComponent(propsWithAlertData);
 
-    expect(wrapper.text()).toContain('alert-label > 42');
+      return waitForPromises().then(() => {
+        expect(findBadge().element).toMatchSnapshot();
+      });
+    });
+
+    it('displays an alert summary when there is a single alert', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      createComponent(propsWithAlertData);
+      return waitForPromises().then(() => {
+        expect(findCurrentSettingsText()).toEqual('alert-label > 42');
+      });
+    });
+
+    it('displays a combined alert summary when there are multiple alerts', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      const propsWithManyAlerts = {
+        relevantQueries: [
+          ...relevantQueries,
+          ...[
+            {
+              metricId: '6',
+              alert_path: 'my/alert2.json',
+              label: 'alert-label2',
+              result: [{ values: [] }],
+            },
+          ],
+        ],
+        alertsToManage: {
+          'my/alert.json': {
+            operator: '>',
+            threshold: 42,
+            alert_path: alertPath,
+            metricId,
+          },
+          'my/alert2.json': {
+            operator: '==',
+            threshold: 900,
+            alert_path: 'my/alert2.json',
+            metricId: '6',
+          },
+        },
+      };
+      createComponent(propsWithManyAlerts);
+      return waitForPromises().then(() => {
+        expect(findCurrentSettingsText()).toContain('2 alerts applied');
+      });
+    });
   });
 
-  it('displays a combined alert summary when there are multiple alerts', () => {
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
-    const propsWithManyAlerts = {
-      relevantQueries: relevantQueries.concat([
-        { metricId: '6', alert_path: 'my/alert2.json', label: 'alert-label2' },
-      ]),
-      alertsToManage: {
-        'my/alert.json': {
-          operator: '>',
-          threshold: 42,
-          alert_path: alertPath,
-          metricId,
-        },
-        'my/alert2.json': {
-          operator: '==',
-          threshold: 900,
-          alert_path: 'my/alert2.json',
-          metricId: '6',
-        },
-      },
-    };
-    createComponent(propsWithManyAlerts);
+  describe('Alert firing', () => {
+    it('displays a warning icon and matches snapshot', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      propsWithAlertData.relevantQueries = firingRelevantQueries;
+      createComponent(propsWithAlertData);
 
-    expect(findCurrentSettings().text()).toEqual('2 alerts applied');
+      return waitForPromises().then(() => {
+        expect(findBadge().element).toMatchSnapshot();
+      });
+    });
+
+    it('displays an alert summary when there is a single alert', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      propsWithAlertData.relevantQueries = firingRelevantQueries;
+      createComponent(propsWithAlertData);
+      return waitForPromises().then(() => {
+        expect(findCurrentSettingsText()).toEqual('Firing: alert-label > 42');
+      });
+    });
+
+    it('displays a combined alert summary when there are multiple alerts', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      const propsWithManyAlerts = {
+        relevantQueries: [
+          ...firingRelevantQueries,
+          ...[
+            {
+              metricId: '6',
+              alert_path: 'my/alert2.json',
+              label: 'alert-label2',
+              result: [{ values: [] }],
+            },
+          ],
+        ],
+        alertsToManage: {
+          'my/alert.json': {
+            operator: '>',
+            threshold: 42,
+            alert_path: alertPath,
+            metricId,
+          },
+          'my/alert2.json': {
+            operator: '==',
+            threshold: 900,
+            alert_path: 'my/alert2.json',
+            metricId: '6',
+          },
+        },
+      };
+      createComponent(propsWithManyAlerts);
+
+      return waitForPromises().then(() => {
+        expect(findCurrentSettingsText()).toContain('2 alerts applied, 1 firing');
+      });
+    });
+
+    it('should display tooltip with thresholds summary', () => {
+      mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+      const propsWithManyAlerts = {
+        relevantQueries: [
+          ...firingRelevantQueries,
+          ...[
+            {
+              metricId: '6',
+              alert_path: 'my/alert2.json',
+              label: 'alert-label2',
+              result: [{ values: [] }],
+            },
+          ],
+        ],
+        alertsToManage: {
+          'my/alert.json': {
+            operator: '>',
+            threshold: 42,
+            alert_path: alertPath,
+            metricId,
+          },
+          'my/alert2.json': {
+            operator: '==',
+            threshold: 900,
+            alert_path: 'my/alert2.json',
+            metricId: '6',
+          },
+        },
+      };
+      createComponent(propsWithManyAlerts);
+
+      return waitForPromises().then(() => {
+        expect(
+          findTooltip()
+            .text()
+            .replace(/\s\s+/g, ' '),
+        ).toEqual('Firing: alert-label > 42');
+      });
+    });
   });
 
   it('creates an alert with an appropriate handler', () => {
@@ -205,8 +355,10 @@ describe('AlertWidget', () => {
 
     findWidgetForm().vm.$emit('delete', { alert: alertPath });
 
-    expect(mockDeleteAlert).toHaveBeenCalledWith(alertPath);
-    expect(findAlertErrorMessage().exists()).toBe(false);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(mockDeleteAlert).toHaveBeenCalledWith(alertPath);
+      expect(findAlertErrorMessage().exists()).toBe(false);
+    });
   });
 
   describe('when delete fails', () => {
@@ -228,6 +380,7 @@ describe('AlertWidget', () => {
       });
 
       findWidgetForm().vm.$emit('delete', { alert: alertPath });
+      return wrapper.vm.$nextTick();
     });
 
     it('shows error message', () => {

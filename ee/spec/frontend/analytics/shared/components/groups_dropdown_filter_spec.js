@@ -3,8 +3,8 @@ import $ from 'jquery';
 import 'bootstrap';
 import '~/gl_dropdown';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
-import Api from '~/api';
 import { TEST_HOST } from 'helpers/test_constants';
+import Api from '~/api';
 
 jest.mock('~/api', () => ({
   groups: jest.fn(),
@@ -28,6 +28,14 @@ const groups = [
 describe('GroupsDropdownFilter component', () => {
   let wrapper;
 
+  const createComponent = (props = {}) => {
+    wrapper = mount(GroupsDropdownFilter, {
+      propsData: {
+        ...props,
+      },
+    });
+  };
+
   afterEach(() => {
     wrapper.destroy();
   });
@@ -37,10 +45,9 @@ describe('GroupsDropdownFilter component', () => {
     Api.groups.mockImplementation((term, options, callback) => {
       callback(groups);
     });
-    wrapper = mount(GroupsDropdownFilter);
   });
 
-  const findDropdown = () => wrapper.find('.dropdown');
+  const findDropdown = () => wrapper.find({ ref: 'groupsDropdown' });
   const openDropdown = () => {
     $(findDropdown().element)
       .parent()
@@ -48,13 +55,33 @@ describe('GroupsDropdownFilter component', () => {
   };
   const findDropdownItems = () => findDropdown().findAll('a');
   const findDropdownButton = () => findDropdown().find('button');
+  const findDropdownButtonAvatar = () => findDropdown().find('.gl-avatar');
 
   it('should call glDropdown', () => {
+    createComponent();
     expect($.fn.glDropdown).toHaveBeenCalled();
+  });
+
+  describe('when passed a defaultGroup as prop', () => {
+    beforeEach(() => {
+      createComponent({
+        defaultGroup: groups[0],
+      });
+    });
+
+    it("displays the defaultGroup's name", () => {
+      expect(findDropdownButton().text()).toContain(groups[0].name);
+    });
+
+    it("renders the defaultGroup's avatar", () => {
+      expect(findDropdownButtonAvatar().exists()).toBe(true);
+    });
   });
 
   describe('it renders the items correctly', () => {
     beforeEach(() => {
+      createComponent();
+
       openDropdown();
 
       return wrapper.vm.$nextTick();
@@ -102,6 +129,8 @@ describe('GroupsDropdownFilter component', () => {
 
   describe('on group click', () => {
     beforeEach(() => {
+      createComponent();
+
       openDropdown();
 
       return wrapper.vm.$nextTick();
@@ -112,12 +141,14 @@ describe('GroupsDropdownFilter component', () => {
         .at(0)
         .trigger('click');
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [groups[0]],
-        },
-      ]);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [groups[0]],
+          },
+        ]);
+      });
     });
 
     it('should change selection when new group is clicked', () => {
@@ -125,12 +156,14 @@ describe('GroupsDropdownFilter component', () => {
         .at(1)
         .trigger('click');
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [groups[1]],
-        },
-      ]);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [groups[1]],
+          },
+        ]);
+      });
     });
 
     it('renders an avatar in the dropdown button when the group has an avatar_url', done => {

@@ -15,7 +15,8 @@ module EE
     override :new_issuable
     def new_issuable(issuable, author)
       if issuable.is_a?(MergeRequest)
-        create_approval_required_todos(issuable, issuable.overall_approvers(exclude_code_owners: true), author)
+        approvers = issuable.overall_approvers(exclude_code_owners: true)
+        create_approval_required_todos(issuable, approvers, author)
       end
 
       super
@@ -44,6 +45,14 @@ module EE
 
     def create_approval_required_todos(merge_request, approvers, author)
       attributes = attributes_for_todo(merge_request.project, merge_request, author, ::Todo::APPROVAL_REQUIRED)
+
+      # Preload project_authorizations to prevent n+1 queries
+      merge_request.project.team.max_member_access_for_user_ids(approvers.map(&:id))
+
+      approvers = approvers.select do |approver|
+        approver.can?(:approve_merge_request, merge_request)
+      end
+
       create_todos(approvers, attributes)
     end
   end

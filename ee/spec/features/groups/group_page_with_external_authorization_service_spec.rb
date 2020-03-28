@@ -18,7 +18,7 @@ describe 'The group page' do
       visit group_path(group)
 
       within('.nav-sidebar') do
-        expect(page).to have_link('Contribution Analytics')
+        expect(page).to have_link('Contribution')
       end
     end
 

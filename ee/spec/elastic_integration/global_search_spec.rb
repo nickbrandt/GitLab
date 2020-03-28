@@ -14,6 +14,7 @@ describe 'GlobalSearch', :elastic do
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    stub_const('POSSIBLE_FEATURES', %i(issues merge_requests wiki_blobs blobs commits).freeze)
 
     project.add_developer(member)
     project.add_developer(external_member)
@@ -45,7 +46,7 @@ describe 'GlobalSearch', :elastic do
         expect_items_to_be_found(auditor)
         expect_items_to_be_found(member)
         expect_items_to_be_found(external_member)
-        expect_non_code_items_to_be_found(guest)
+        expect_items_to_be_found(guest, except: [:merge_requests, :blobs, :commits])
         expect_no_items_to_be_found(non_member)
         expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
@@ -89,7 +90,7 @@ describe 'GlobalSearch', :elastic do
         expect_items_to_be_found(auditor)
         expect_items_to_be_found(member)
         expect_items_to_be_found(external_member)
-        expect_non_code_items_to_be_found(guest)
+        expect_items_to_be_found(guest, except: :merge_requests)
         expect_no_items_to_be_found(non_member)
         expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
@@ -133,7 +134,7 @@ describe 'GlobalSearch', :elastic do
         expect_items_to_be_found(auditor)
         expect_items_to_be_found(member)
         expect_items_to_be_found(external_member)
-        expect_non_code_items_to_be_found(guest)
+        expect_items_to_be_found(guest, except: :merge_requests)
         expect_no_items_to_be_found(non_member)
         expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
@@ -153,7 +154,7 @@ describe 'GlobalSearch', :elastic do
       project.repository.index_commits_and_blobs
       project.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
   end
 
@@ -163,30 +164,33 @@ describe 'GlobalSearch', :elastic do
   end
 
   def expect_no_items_to_be_found(user)
-    results = search(user, 'term')
-    expect(results.issues_count).to eq(0)
-    expect(results.merge_requests_count).to eq(0)
-    expect(results.wiki_blobs_count).to eq(0)
-    expect(search(user, 'def').blobs_count).to eq(0)
-    expect(search(user, 'add').commits_count).to eq(0)
+    expect_items_to_be_found(user, except: :all)
   end
 
-  def expect_items_to_be_found(user)
-    results = search(user, 'term')
-    expect(results.issues_count).not_to eq(0)
-    expect(results.merge_requests_count).not_to eq(0)
-    expect(results.wiki_blobs_count).not_to eq(0)
-    expect(search(user, 'def').blobs_count).not_to eq(0)
-    expect(search(user, 'add').commits_count).not_to eq(0)
-  end
+  def expect_items_to_be_found(user, only: nil, except: nil)
+    arr = if only
+            [only].flatten.compact
+          elsif except == :all
+            []
+          else
+            POSSIBLE_FEATURES - [except].flatten.compact
+          end
 
-  def expect_non_code_items_to_be_found(user)
+    check_count = lambda do |feature, c|
+      if arr.include?(feature)
+        expect(c).to be > 0
+      else
+        expect(c).to eq(0)
+      end
+    end
+
     results = search(user, 'term')
-    expect(results.issues_count).not_to eq(0)
-    expect(results.wiki_blobs_count).not_to eq(0)
-    expect(results.merge_requests_count).to eq(0)
-    expect(search(user, 'def').blobs_count).to eq(0)
-    expect(search(user, 'add').commits_count).to eq(0)
+
+    check_count[:issues, results.issues_count]
+    check_count[:merge_requests, results.merge_requests_count]
+    check_count[:wiki_blobs, results.wiki_blobs_count]
+    check_count[:blobs, search(user, 'def').blobs_count]
+    check_count[:commits, search(user, 'add').commits_count]
   end
 
   def search(user, search, snippets: false)

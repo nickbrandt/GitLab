@@ -1,19 +1,27 @@
 import Visibility from 'visibilityjs';
 import Vue from 'vue';
-import AccessorUtilities from '~/lib/utils/accessor';
 import { GlToast } from '@gitlab/ui';
+import AccessorUtilities from '~/lib/utils/accessor';
 import PersistentUserCallout from '../persistent_user_callout';
 import { s__, sprintf } from '../locale';
 import Flash from '../flash';
 import Poll from '../lib/utils/poll';
 import initSettingsPanels from '../settings_panels';
 import eventHub from './event_hub';
-import { APPLICATION_STATUS, INGRESS, INGRESS_DOMAIN_SUFFIX, CROSSPLANE } from './constants';
+import {
+  APPLICATION_STATUS,
+  INGRESS,
+  INGRESS_DOMAIN_SUFFIX,
+  CROSSPLANE,
+  KNATIVE,
+} from './constants';
 import ClustersService from './services/clusters_service';
 import ClustersStore from './stores/clusters_store';
 import Applications from './components/applications.vue';
+import RemoveClusterConfirmation from './components/remove_cluster_confirmation.vue';
 import setupToggleButtons from '../toggle_buttons';
 import initProjectSelectDropdown from '~/project_select';
+import initServerlessSurveyBanner from '~/serverless/survey_banner';
 
 const Environments = () => import('ee_component/clusters/components/environments.vue');
 
@@ -52,6 +60,7 @@ export default class Clusters {
       helpPath,
       ingressHelpPath,
       ingressDnsHelpPath,
+      ingressModSecurityHelpPath,
       environmentsHelpPath,
       clustersHelpPath,
       deployBoardsHelpPath,
@@ -68,6 +77,7 @@ export default class Clusters {
       helpPath,
       ingressHelpPath,
       ingressDnsHelpPath,
+      ingressModSecurityHelpPath,
       environmentsHelpPath,
       clustersHelpPath,
       deployBoardsHelpPath,
@@ -144,6 +154,8 @@ export default class Clusters {
         () => this.handlePollError(),
       );
     }
+
+    this.initRemoveClusterActions();
   }
 
   initApplications(type) {
@@ -166,6 +178,7 @@ export default class Clusters {
             ingressHelpPath: this.state.ingressHelpPath,
             managePrometheusPath: this.state.managePrometheusPath,
             ingressDnsHelpPath: this.state.ingressDnsHelpPath,
+            ingressModSecurityHelpPath: this.state.ingressModSecurityHelpPath,
             cloudRunHelpPath: this.state.cloudRunHelpPath,
             providerType: this.state.providerType,
             preInstalledKnative: this.state.preInstalledKnative,
@@ -205,6 +218,25 @@ export default class Clusters {
     });
   }
 
+  initRemoveClusterActions() {
+    const el = document.querySelector('#js-cluster-remove-actions');
+    if (el && el.dataset) {
+      const { clusterName, clusterPath } = el.dataset;
+
+      this.removeClusterAction = new Vue({
+        el,
+        render(createElement) {
+          return createElement(RemoveClusterConfirmation, {
+            props: {
+              clusterName,
+              clusterPath,
+            },
+          });
+        },
+      });
+    }
+  }
+
   handleClusterEnvironmentsSuccess(data) {
     this.store.toggleFetchEnvironments(false);
     this.store.updateEnvironments(data.data);
@@ -230,6 +262,9 @@ export default class Clusters {
     eventHub.$on('setKnativeHostname', data => this.setKnativeHostname(data));
     eventHub.$on('uninstallApplication', data => this.uninstallApplication(data));
     eventHub.$on('setCrossplaneProviderStack', data => this.setCrossplaneProviderStack(data));
+    eventHub.$on('setIngressModSecurityEnabled', data => this.setIngressModSecurityEnabled(data));
+    eventHub.$on('setIngressModSecurityMode', data => this.setIngressModSecurityMode(data));
+    eventHub.$on('resetIngressModSecurityChanges', id => this.resetIngressModSecurityChanges(id));
     // Add event listener to all the banner close buttons
     this.addBannerCloseHandler(this.unreachableContainer, 'unreachable');
     this.addBannerCloseHandler(this.authenticationFailureContainer, 'authentication_failure');
@@ -243,6 +278,9 @@ export default class Clusters {
     eventHub.$off('setKnativeHostname');
     eventHub.$off('setCrossplaneProviderStack');
     eventHub.$off('uninstallApplication');
+    eventHub.$off('setIngressModSecurityEnabled');
+    eventHub.$off('setIngressModSecurityMode');
+    eventHub.$off('resetIngressModSecurityChanges');
   }
 
   initPolling(method, successCallback, errorCallback) {
@@ -288,10 +326,17 @@ export default class Clusters {
 
     this.checkForNewInstalls(prevApplicationMap, this.store.state.applications);
     this.updateContainer(prevStatus, this.store.state.status, this.store.state.statusReason);
-    this.toggleIngressDomainHelpText(
-      prevApplicationMap[INGRESS],
-      this.store.state.applications[INGRESS],
-    );
+
+    if (this.ingressDomainHelpText) {
+      this.toggleIngressDomainHelpText(
+        prevApplicationMap[INGRESS],
+        this.store.state.applications[INGRESS],
+      );
+    }
+
+    if (this.store.state.applications[KNATIVE]?.status === APPLICATION_STATUS.INSTALLED) {
+      initServerlessSurveyBanner();
+    }
   }
 
   showToken() {
@@ -486,6 +531,21 @@ export default class Clusters {
     const appId = data.id;
     this.store.updateAppProperty(appId, 'stack', data.stack.code);
     this.store.updateAppProperty(appId, 'validationError', null);
+  }
+
+  setIngressModSecurityEnabled({ id, modSecurityEnabled }) {
+    this.store.updateAppProperty(id, 'isEditingModSecurityEnabled', true);
+    this.store.updateAppProperty(id, 'modsecurity_enabled', modSecurityEnabled);
+  }
+
+  setIngressModSecurityMode({ id, modSecurityMode }) {
+    this.store.updateAppProperty(id, 'isEditingModSecurityMode', true);
+    this.store.updateAppProperty(id, 'modsecurity_mode', modSecurityMode);
+  }
+
+  resetIngressModSecurityChanges(id) {
+    this.store.updateAppProperty(id, 'isEditingModSecurityEnabled', false);
+    this.store.updateAppProperty(id, 'isEditingModSecurityMode', false);
   }
 
   destroy() {

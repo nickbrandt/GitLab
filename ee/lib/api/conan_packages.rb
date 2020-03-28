@@ -10,7 +10,7 @@
 # Technical debt: https://gitlab.com/gitlab-org/gitlab/issues/35798
 module API
   class ConanPackages < Grape::API
-    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::PackagesManagerClientsHelpers
 
     PACKAGE_REQUIREMENTS = {
       package_name: API::NO_SLASH_URL_PART_REGEX,
@@ -24,13 +24,13 @@ module API
     }.freeze
 
     PACKAGE_COMPONENT_REGEX = Gitlab::Regex.conan_recipe_component_regex
+    CONAN_REVISION_REGEX = Gitlab::Regex.conan_revision_regex
 
     before do
-      not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
       # Personal access token will be extracted from Bearer or Basic authorization
-      # in the overridden find_personal_access_token helper
+      # in the overridden find_personal_access_token or find_user_from_job_token helpers
       authenticate!
     end
 
@@ -38,6 +38,7 @@ module API
       desc 'Ping the Conan API' do
         detail 'This feature was introduced in GitLab 12.2'
       end
+      route_setting :authentication, job_token_allowed: true
       get 'ping' do
         header 'X-Conan-Server-Capabilities', [].join(',')
       end
@@ -48,6 +49,7 @@ module API
       params do
         requires :q, type: String, desc: 'Search query'
       end
+      route_setting :authentication, job_token_allowed: true
       get 'conans/search' do
         service = ::Packages::Conan::SearchService.new(current_user, query: params[:q]).execute
         service.payload
@@ -59,14 +61,21 @@ module API
         desc 'Authenticate user against conan CLI' do
           detail 'This feature was introduced in GitLab 12.2'
         end
+        route_setting :authentication, job_token_allowed: true
         get 'authenticate' do
-          token = ::Gitlab::ConanToken.from_personal_access_token(access_token)
+          token = if access_token
+                    ::Gitlab::ConanToken.from_personal_access_token(access_token)
+                  else
+                    ::Gitlab::ConanToken.from_job(find_job_from_token)
+                  end
+
           token.to_jwt
         end
 
         desc 'Check for valid user credentials per conan CLI' do
           detail 'This feature was introduced in GitLab 12.4'
         end
+        route_setting :authentication, job_token_allowed: true
         get 'check_credentials' do
           authenticate!
           :ok
@@ -88,10 +97,19 @@ module API
         desc 'Package Snapshot' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
+        end
+        route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference' do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(
+            recipe,
+            current_user,
+            project,
+            conan_package_reference: params[:conan_package_reference]
+          )
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanPackageSnapshot
         end
@@ -99,10 +117,11 @@ module API
         desc 'Recipe Snapshot' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        route_setting :authentication, job_token_allowed: true
         get do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeSnapshot
         end
@@ -115,6 +134,10 @@ module API
         desc 'Package Digest' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
+        end
+        route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference/digest' do
           present_package_download_urls
         end
@@ -122,6 +145,7 @@ module API
         desc 'Recipe Digest' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        route_setting :authentication, job_token_allowed: true
         get 'digest' do
           present_recipe_download_urls
         end
@@ -135,6 +159,10 @@ module API
         desc 'Package Download Urls' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
+        end
+        route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference/download_urls' do
           present_package_download_urls
         end
@@ -142,6 +170,7 @@ module API
         desc 'Recipe Download Urls' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        route_setting :authentication, job_token_allowed: true
         get 'download_urls' do
           present_recipe_download_urls
         end
@@ -159,6 +188,7 @@ module API
         params do
           requires :conan_package_reference, type: String, desc: 'Conan package ID'
         end
+        route_setting :authentication, job_token_allowed: true
         post 'packages/:conan_package_reference/upload_urls' do
           authorize!(:read_package, project)
 
@@ -171,6 +201,7 @@ module API
         desc 'Recipe Upload Urls' do
           detail 'This feature was introduced in GitLab 12.4'
         end
+        route_setting :authentication, job_token_allowed: true
         post 'upload_urls' do
           authorize!(:read_package, project)
 
@@ -183,8 +214,11 @@ module API
         desc 'Delete Package' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        route_setting :authentication, job_token_allowed: true
         delete do
           authorize!(:destroy_package, project)
+
+          track_event('delete_package')
 
           package.destroy
         end
@@ -195,7 +229,7 @@ module API
         requires :package_version, type: String, regexp: PACKAGE_COMPONENT_REGEX, desc: 'Package version'
         requires :package_username, type: String, regexp: PACKAGE_COMPONENT_REGEX, desc: 'Package username'
         requires :package_channel, type: String, regexp: PACKAGE_COMPONENT_REGEX, desc: 'Package channel'
-        requires :recipe_revision, type: String, desc: 'Conan Recipe Revision'
+        requires :recipe_revision, type: String, regexp: CONAN_REVISION_REGEX, desc: 'Conan Recipe Revision'
       end
       namespace 'files/:package_name/:package_version/:package_username/:package_channel/:recipe_revision', requirements: PACKAGE_REQUIREMENTS do
         before do
@@ -203,28 +237,68 @@ module API
         end
 
         params do
-          requires :file_name, type: String, desc: 'Package file name'
+          requires :file_name, type: String, desc: 'Package file name', regexp: Gitlab::Regex.conan_file_name_regex
         end
         namespace 'export/:file_name', requirements: FILE_NAME_REQUIREMENTS do
           desc 'Download recipe files' do
-            detail 'This feature was introduced in GitLab 12.5'
+            detail 'This feature was introduced in GitLab 12.6'
           end
+          route_setting :authentication, job_token_allowed: true
           get do
             download_package_file(:recipe_file)
+          end
+
+          desc 'Upload recipe package files' do
+            detail 'This feature was introduced in GitLab 12.6'
+          end
+          params do
+            use :workhorse_upload_params
+          end
+          route_setting :authentication, job_token_allowed: true
+          put do
+            upload_package_file(:recipe_file)
+          end
+
+          desc 'Workhorse authorize the conan recipe file' do
+            detail 'This feature was introduced in GitLab 12.6'
+          end
+          route_setting :authentication, job_token_allowed: true
+          put 'authorize' do
+            authorize_workhorse!(subject: project)
           end
         end
 
         params do
           requires :conan_package_reference, type: String, desc: 'Conan Package ID'
           requires :package_revision, type: String, desc: 'Conan Package Revision'
-          requires :file_name, type: String, desc: 'Package file name'
+          requires :file_name, type: String, desc: 'Package file name', regexp: Gitlab::Regex.conan_file_name_regex
         end
         namespace 'package/:conan_package_reference/:package_revision/:file_name', requirements: FILE_NAME_REQUIREMENTS do
           desc 'Download package files' do
             detail 'This feature was introduced in GitLab 12.5'
           end
+          route_setting :authentication, job_token_allowed: true
           get do
             download_package_file(:package_file)
+          end
+
+          desc 'Workhorse authorize the conan package file' do
+            detail 'This feature was introduced in GitLab 12.6'
+          end
+          route_setting :authentication, job_token_allowed: true
+          put 'authorize' do
+            authorize_workhorse!(subject: project)
+          end
+
+          desc 'Upload package files' do
+            detail 'This feature was introduced in GitLab 12.6'
+          end
+          params do
+            use :workhorse_upload_params
+          end
+          route_setting :authentication, job_token_allowed: true
+          put do
+            upload_package_file(:package_file)
           end
         end
       end
@@ -233,131 +307,7 @@ module API
     helpers do
       include Gitlab::Utils::StrongMemoize
       include ::API::Helpers::RelatedResourcesHelpers
-
-      def present_package_download_urls
-        authorize!(:read_package, project)
-
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
-
-        render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
-
-        present presenter, with: EE::API::Entities::ConanPackage::ConanPackageManifest
-      end
-
-      def present_recipe_download_urls
-        authorize!(:read_package, project)
-
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
-
-        render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
-
-        present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeManifest
-      end
-
-      def recipe_upload_urls(file_names)
-        { upload_urls: Hash[
-          file_names.collect do |file_name|
-            [file_name, recipe_file_upload_url(file_name)]
-          end
-        ] }
-      end
-
-      def package_upload_urls(file_names)
-        { upload_urls: Hash[
-          file_names.collect do |file_name|
-            [file_name, package_file_upload_url(file_name)]
-          end
-        ] }
-      end
-
-      def package_file_upload_url(file_name)
-        expose_url(
-          api_v4_packages_conan_v1_files_package_path(
-            package_name: params[:package_name],
-            package_version: params[:package_version],
-            package_username: params[:package_username],
-            package_channel: params[:package_channel],
-            recipe_revision: '0',
-            conan_package_reference: params[:conan_package_reference],
-            package_revision: '0',
-            file_name: file_name
-          )
-        )
-      end
-
-      def recipe_file_upload_url(file_name)
-        expose_url(
-          api_v4_packages_conan_v1_files_export_path(
-            package_name: params[:package_name],
-            package_version: params[:package_version],
-            package_username: params[:package_username],
-            package_channel: params[:package_channel],
-            recipe_revision: '0',
-            file_name: file_name
-          )
-        )
-      end
-
-      def recipe
-        "%{package_name}/%{package_version}@%{package_username}/%{package_channel}" % params.symbolize_keys
-      end
-
-      def project
-        strong_memoize(:project) do
-          full_path = ::Packages::ConanMetadatum.full_path_from(package_username: params[:package_username])
-          Project.find_by_full_path(full_path)
-        end
-      end
-
-      def package
-        strong_memoize(:package) do
-          project.packages
-            .with_name(params[:package_name])
-            .with_version(params[:package_version])
-            .with_conan_channel(params[:package_channel])
-            .order_created
-            .last
-        end
-      end
-
-      def download_package_file(file_type)
-        authorize!(:read_package, project)
-
-        package_file = ::Packages::PackageFileFinder
-          .new(package, "#{params[:file_name]}", conan_file_type: file_type).execute!
-
-        present_carrierwave_file!(package_file.file)
-      end
-
-      def find_personal_access_token
-        personal_access_token = find_personal_access_token_from_conan_jwt ||
-          find_personal_access_token_from_conan_http_basic_auth
-
-        personal_access_token || unauthorized!
-      end
-
-      # We need to override this one because it
-      # looks into Bearer authorization header
-      def find_oauth_access_token
-      end
-
-      def find_personal_access_token_from_conan_jwt
-        jwt = Doorkeeper::OAuth::Token.from_bearer_authorization(current_request)
-        return unless jwt
-
-        token = ::Gitlab::ConanToken.decode(jwt)
-        return unless token&.personal_access_token_id && token&.user_id
-
-        PersonalAccessToken.find_by_id_and_user_id(token.personal_access_token_id, token.user_id)
-      end
-
-      def find_personal_access_token_from_conan_http_basic_auth
-        encoded_credentials = headers['Authorization'].to_s.split('Basic ', 2).second
-        token = Base64.decode64(encoded_credentials || '').split(':', 2).second
-        return unless token
-
-        PersonalAccessToken.find_by_token(token)
-      end
+      include ::API::Helpers::Packages::Conan::ApiHelpers
     end
   end
 end

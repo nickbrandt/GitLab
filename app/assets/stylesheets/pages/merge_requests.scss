@@ -3,6 +3,8 @@
  *
  */
 
+$mr-widget-min-height: 69px;
+
 .space-children {
   @include clearfix;
 
@@ -51,6 +53,10 @@
   position: relative;
   border: 1px solid $border-color;
   border-radius: $border-radius-default;
+
+  .gl-skeleton-loader {
+    display: block;
+  }
 }
 
 .mr-widget-extension {
@@ -551,12 +557,11 @@
 }
 
 .mr-source-target {
-  display: flex;
   flex-wrap: wrap;
   border-radius: $border-radius-default;
   padding: $gl-padding;
   border: 1px solid $border-color;
-  min-height: 69px;
+  min-height: $mr-widget-min-height;
 
   @include media-breakpoint-up(md) {
     align-items: center;
@@ -592,6 +597,26 @@
 
   .diverged-commits-count {
     color: $gl-text-color-secondary;
+  }
+}
+
+.mr-pipeline-suggest {
+  flex-wrap: wrap;
+  border-radius: $border-radius-default;
+  padding: $gl-padding;
+  border: 1px solid $border-color;
+  min-height: $mr-widget-min-height;
+
+  @include media-breakpoint-up(md) {
+    align-items: center;
+  }
+
+  .circle-icon-container {
+    color: $gl-text-color-quaternary;
+  }
+
+  .popover {
+    z-index: 240;
   }
 }
 
@@ -704,7 +729,7 @@
 .mr-version-controls {
   position: relative;
   z-index: 203;
-  background: $gray-light;
+  background: $white-light;
   color: $gl-text-color;
   margin-top: -1px;
 
@@ -728,7 +753,7 @@
   }
 
   .content-block {
-    padding: $gl-padding-top $gl-padding;
+    padding: $gl-padding;
     border-bottom: 0;
   }
 

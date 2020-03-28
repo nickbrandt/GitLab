@@ -14,7 +14,7 @@ describe 'OAuth tokens' do
 
         request_oauth_token(user)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
         expect(json_response['error']).to eq('invalid_grant')
       end
     end
@@ -25,31 +25,45 @@ describe 'OAuth tokens' do
 
         request_oauth_token(user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['access_token']).not_to be_nil
       end
     end
 
-    context "when user is blocked" do
-      it "does not create an access token" do
-        user = create(:user)
+    shared_examples 'does not create an access token' do
+      let(:user) { create(:user) }
+
+      it { expect(response).to have_gitlab_http_status(:unauthorized) }
+    end
+
+    context 'when user is blocked' do
+      before do
         user.block
 
         request_oauth_token(user)
-
-        expect(response).to have_gitlab_http_status(401)
       end
+
+      include_examples 'does not create an access token'
     end
 
-    context "when user is ldap_blocked" do
-      it "does not create an access token" do
-        user = create(:user)
+    context 'when user is ldap_blocked' do
+      before do
         user.ldap_block
 
         request_oauth_token(user)
-
-        expect(response).to have_gitlab_http_status(401)
       end
+
+      include_examples 'does not create an access token'
+    end
+
+    context 'when user account is not confirmed' do
+      before do
+        user.update!(confirmed_at: nil)
+
+        request_oauth_token(user)
+      end
+
+      include_examples 'does not create an access token'
     end
   end
 end

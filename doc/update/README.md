@@ -50,6 +50,7 @@ However, for this to work there are the following requirements:
    migrations](../development/post_deployment_migrations.md) (included in
    zero downtime update steps below).
 - You are using PostgreSQL. Starting from GitLab 12.1, MySQL is not supported.
+- Multi-node GitLab instance. Single-node instances may experience brief interruptions as services restart.
 
 Most of the time you can safely upgrade from a patch release to the next minor
 release if the patch release is not the latest. For example, upgrading from
@@ -69,13 +70,8 @@ before continuing the upgrading procedure. While this won't require downtime
 between upgrading major/minor releases, allowing the background migrations to
 finish. The time necessary to complete these migrations can be reduced by
 increasing the number of Sidekiq workers that can process jobs in the
-`background_migration` queue. To check the size of this queue,
-[start a Rails console session](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session)
-and run the command below:
-
-```ruby
-Sidekiq::Queue.new('background_migration').size
-```
+`background_migration` queue. To see the size of this queue,
+[Check for background migrations before upgrading](#checking-for-background-migrations-before-upgrading).
 
 As a rule of thumb, any database smaller than 10 GB won't take too much time to
 upgrade; perhaps an hour at most per minor release. Larger databases however may
@@ -111,6 +107,59 @@ meet the other online upgrade requirements mentioned above.
 ### Steps
 
 Steps to [upgrade without downtime][omni-zero-downtime].
+
+## Checking for background migrations before upgrading
+
+Certain major/minor releases may require a set of background migrations to be
+finished. The number of remaining migrations jobs can be found by running the
+following command:
+
+**For Omnibus installations**
+
+If using GitLab 12.9 and newer, run:
+
+```shell
+sudo gitlab-rails runner -e production 'puts Gitlab::BackgroundMigration.remaining'
+```
+
+If using GitLab 12.8 and older, run the following using a [Rails console](../administration/troubleshooting/debug.md#starting-a-rails-console):
+
+```ruby
+puts Sidekiq::Queue.new("background_migration").size
+Sidekiq::ScheduledSet.new.select { |r| r.klass == 'BackgroundMigrationWorker' }.size
+```
+
+---
+
+**For installations from source**
+
+If using GitLab 12.9 and newer, run:
+
+```shell
+cd /home/git/gitlab
+sudo -u git -H bundle exec rails runner -e production 'puts Gitlab::BackgroundMigration.remaining'
+```
+
+If using GitLab 12.8 and older, run the following using a [Rails console](../administration/troubleshooting/debug.md#starting-a-rails-console):
+
+```ruby
+puts Sidekiq::Queue.new("background_migration").size
+Sidekiq::ScheduledSet.new.select { |r| r.klass == 'BackgroundMigrationWorker' }.size
+```
+
+There is also a [rake task](../administration/raketasks/maintenance.md#display-status-of-database-migrations)
+for displaying the status of each database migration.
+
+## Upgrading to a new major version
+
+Major versions are reserved for backwards incompatible changes. We recommend that
+you first upgrade to the latest available minor version within your major version.
+Please follow the [Upgrade Recommendations](../policy/maintenance.md#upgrade-recommendations)
+to identify a supported upgrade path.
+
+Before upgrading to a new major version, you should ensure that any background
+migration jobs from previous releases have been completed. To see the current size
+of the `background_migration` queue, [check for background migrations before upgrading](#checking-for-background-migrations-before-upgrading).
 
 ## Upgrading between editions
 
@@ -155,15 +204,21 @@ any downgrades would result to all sessions being invalidated and users are logg
 
 In 12.0.0 we made various database related changes. These changes require that
 users first upgrade to the latest 11.11 patch release. Once upgraded to 11.11.x,
-users can upgrade to 12.x. Failure to do so may result in database migrations
+users can upgrade to 12.0.x. Failure to do so may result in database migrations
 not being applied, which could lead to application errors.
 
-Example 1: you are currently using GitLab 11.11.3, which is the latest patch
-release for 11.11.x. You can upgrade as usual to 12.0.0, 12.1.0, etc.
+It is also required that you upgrade to 12.0.x before moving to a later version
+of 12.x.
+
+Example 1: you are currently using GitLab 11.11.8, which is the latest patch
+release for 11.11.x. You can upgrade as usual to 12.0.x.
 
 Example 2: you are currently using a version of GitLab 10.x. To upgrade, first
-upgrade to 11.11.3. Once upgraded to 11.11.3 you can safely upgrade to 12.0.0
-or future versions.
+upgrade to the last 10.x release (10.8.7) then the last 11.x release (11.11.8).
+Once upgraded to 11.11.8 you can safely upgrade to 12.0.x.
+
+See our [documentation on upgrade paths](../policy/maintenance.md#upgrade-recommendations)
+for more information.
 
 ## Miscellaneous
 

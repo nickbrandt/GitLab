@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'restricts access to protected environments' do |developer_access_when_protected, developer_access_when_unprotected|
   context 'when build is related to a protected environment' do
     let(:user) { create(:user) }

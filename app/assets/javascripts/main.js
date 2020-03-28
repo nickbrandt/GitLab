@@ -19,7 +19,7 @@ import { getLocationHash, visitUrl } from './lib/utils/url_utility';
 
 // everything else
 import loadAwardsHandler from './awards_handler';
-import bp from './breakpoints';
+import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import Flash, { removeFlashClickListener } from './flash';
 import './gl_dropdown';
 import initTodoToggle from './header';
@@ -35,6 +35,8 @@ import initPerformanceBar from './performance_bar';
 import initSearchAutocomplete from './search_autocomplete';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
+import initBroadcastNotifications from './broadcast_notification';
+import PersistentUserCallout from './persistent_user_callout';
 import { initUserTracking } from './tracking';
 import { __ } from './locale';
 
@@ -47,7 +49,7 @@ window.$ = jQuery;
 // Add nonce to jQuery script handler
 jQuery.ajaxSetup({
   converters: {
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings, func-names
+    // eslint-disable-next-line @gitlab/require-i18n-strings, func-names
     'text script': function(text) {
       jQuery.globalEval(text, { nonce: getCspNonceValue() });
       return text;
@@ -55,10 +57,19 @@ jQuery.ajaxSetup({
   },
 });
 
+function disableJQueryAnimations() {
+  $.fx.off = true;
+}
+
+// Disable jQuery animations
+if (gon && gon.disable_animations) {
+  disableJQueryAnimations();
+}
+
 // inject test utilities if necessary
 if (process.env.NODE_ENV !== 'production' && gon && gon.test_env) {
-  $.fx.off = true;
-  import(/* webpackMode: "eager" */ './test_utils/');
+  disableJQueryAnimations();
+  import(/* webpackMode: "eager" */ './test_utils/'); // eslint-disable-line no-unused-expressions
 }
 
 document.addEventListener('beforeunload', () => {
@@ -96,6 +107,10 @@ function deferredInitialisation() {
   initUsagePingConsent();
   initUserPopovers();
   initUserTracking();
+  initBroadcastNotifications();
+
+  const recoverySettingsCallout = document.querySelector('.js-recovery-settings-callout');
+  PersistentUserCallout.factory(recoverySettingsCallout);
 
   if (document.querySelector('.search')) initSearchAutocomplete();
 
@@ -113,6 +128,7 @@ function deferredInitialisation() {
   });
 
   $('.js-remove-tr').on('ajax:success', function removeTRAjaxSuccessCallback() {
+    // eslint-disable-next-line no-jquery/no-fade
     $(this)
       .closest('tr')
       .fadeOut();
@@ -184,10 +200,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  if (bootstrapBreakpoint === 'xs') {
-    const $rightSidebar = $('aside.right-sidebar, .layout-page');
+  const isBoardsPage = /(projects|groups):boards:show/.test(document.body.dataset.page);
+  if (!isBoardsPage && (bootstrapBreakpoint === 'sm' || bootstrapBreakpoint === 'xs')) {
+    const $rightSidebar = $('aside.right-sidebar');
+    const $layoutPage = $('.layout-page');
 
-    $rightSidebar.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+    if ($rightSidebar.length > 0) {
+      $rightSidebar.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+      $layoutPage.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+    } else {
+      $layoutPage.removeClass('right-sidebar-expanded right-sidebar-collapsed');
+    }
   }
 
   // prevent default action for disabled buttons
@@ -212,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Disable form buttons while a form is submitting
   $body.on('ajax:complete, ajax:beforeSend, submit', 'form', function ajaxCompleteCallback(e) {
-    const $buttons = $('[type="submit"], .js-disable-on-submit', this);
+    const $buttons = $('[type="submit"], .js-disable-on-submit', this).not('.js-no-auto-disable');
     switch (e.type) {
       case 'ajax:beforeSend':
       case 'submit':
@@ -222,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // eslint-disable-next-line no-jquery/no-ajax-events
   $(document).ajaxError((e, xhrObj) => {
     const ref = xhrObj.status;
 
@@ -268,7 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   $document.on('breakpoint:change', (e, breakpoint) => {
-    if (breakpoint === 'sm' || breakpoint === 'xs') {
+    const breakpointSizes = ['md', 'sm', 'xs'];
+    if (breakpointSizes.includes(breakpoint)) {
       const $gutterIcon = $sidebarGutterToggle.find('i');
       if ($gutterIcon.hasClass('fa-angle-double-right')) {
         $sidebarGutterToggle.trigger('click');

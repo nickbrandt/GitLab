@@ -1,81 +1,22 @@
-import dateformat from 'dateformat';
-import { secondsIn, dateTimePickerRegex, dateFormats } from './constants';
-import { secondsToMilliseconds } from '~/lib/utils/datetime_utility';
-
-export const getTimeDiff = timeWindow => {
-  const end = Math.floor(Date.now() / 1000); // convert milliseconds to seconds
-  const difference = secondsIn[timeWindow] || secondsIn.eightHours;
-  const start = end - difference;
-
-  return {
-    start: new Date(secondsToMilliseconds(start)).toISOString(),
-    end: new Date(secondsToMilliseconds(end)).toISOString(),
-  };
-};
-
-export const getTimeWindow = ({ start, end }) =>
-  Object.entries(secondsIn).reduce((acc, [timeRange, value]) => {
-    if (new Date(end) - new Date(start) === secondsToMilliseconds(value)) {
-      return timeRange;
-    }
-    return acc;
-  }, null);
-
-export const isDateTimePickerInputValid = val => dateTimePickerRegex.test(val);
-
-export const truncateZerosInDateTime = datetime => datetime.replace(' 00:00:00', '');
-
-/**
- * The URL params start and end need to be validated
- * before passing them down to other components.
- *
- * @param {string} dateString
- */
-export const isValidDate = dateString => {
-  try {
-    // dateformat throws error that can be caught.
-    // This is better than using `new Date()`
-    if (dateString && dateString.trim()) {
-      dateformat(dateString, 'isoDateTime');
-      return true;
-    }
-    return false;
-  } catch (e) {
-    return false;
-  }
-};
-
-/**
- * Convert the input in Time picker component to ISO date.
- *
- * @param {string} val
- * @returns {string}
- */
-export const stringToISODate = val =>
-  dateformat(new Date(val.replace(/-/g, '/')), dateFormats.dateTimePicker.ISODate, true);
-
-/**
- * Convert the ISO date received from the URL to string
- * for the Time picker component.
- *
- * @param {Date} date
- * @returns {string}
- */
-export const ISODateToString = date => dateformat(date, dateFormats.dateTimePicker.stringDate);
+import { queryToObject, mergeUrlParams, removeParams } from '~/lib/utils/url_utility';
+import {
+  timeRangeParamNames,
+  timeRangeFromParams,
+  timeRangeToParams,
+} from '~/lib/utils/datetime_range';
 
 /**
  * This method is used to validate if the graph data format for a chart component
- * that needs a time series as a response from a prometheus query (query_range) is
+ * that needs a time series as a response from a prometheus query (queryRange) is
  * of a valid format or not.
  * @param {Object} graphData  the graph data response from a prometheus request
  * @returns {boolean} whether the graphData format is correct
  */
 export const graphDataValidatorForValues = (isValues, graphData) => {
   const responseValueKeyName = isValues ? 'value' : 'values';
-
   return (
-    Array.isArray(graphData.queries) &&
-    graphData.queries.filter(query => {
+    Array.isArray(graphData.metrics) &&
+    graphData.metrics.filter(query => {
       if (Array.isArray(query.result)) {
         return (
           query.result.filter(res => Array.isArray(res[responseValueKeyName])).length ===
@@ -83,11 +24,11 @@ export const graphDataValidatorForValues = (isValues, graphData) => {
         );
       }
       return false;
-    }).length === graphData.queries.length
+    }).length === graphData.metrics.filter(query => query.result).length
   );
 };
 
-/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+/* eslint-disable @gitlab/require-i18n-strings */
 /**
  * Checks that element that triggered event is located on cluster health check dashboard
  * @param {HTMLElement}  element to check against
@@ -116,6 +57,7 @@ export const generateLinkToChartOptions = chartLink => {
 /**
  * Tracks snowplow event when user downloads CSV of cluster metric
  * @param {String}  chart title that will be sent as a property for the event
+ * @return {Object} config object for event tracking
  */
 export const downloadCSVOptions = title => {
   const isCLusterHealthBoard = isClusterHealthBoard();
@@ -131,7 +73,19 @@ export const downloadCSVOptions = title => {
 };
 
 /**
- * This function validates the graph data contains exactly 3 queries plus
+ * Generate options for snowplow to track adding a new metric via the dashboard
+ * custom metric modal
+ * @return {Object} config object for event tracking
+ */
+export const getAddMetricTrackingOptions = () => ({
+  category: document.body.dataset.page,
+  action: 'click_button',
+  label: 'add_new_metric',
+  property: 'modal',
+});
+
+/**
+ * This function validates the graph data contains exactly 3 metrics plus
  * value validations from graphDataValidatorForValues.
  * @param {Object} isValues
  * @param {Object} graphData  the graph data response from a prometheus request
@@ -140,10 +94,101 @@ export const downloadCSVOptions = title => {
 export const graphDataValidatorForAnomalyValues = graphData => {
   const anomalySeriesCount = 3; // metric, upper, lower
   return (
-    graphData.queries &&
-    graphData.queries.length === anomalySeriesCount &&
+    graphData.metrics &&
+    graphData.metrics.length === anomalySeriesCount &&
     graphDataValidatorForValues(false, graphData)
   );
 };
+
+/**
+ * Returns a time range from the current URL params
+ *
+ * @returns {Object|null} The time range defined by the
+ * current URL, reading from search query or `window.location.search`.
+ * Returns `null` if no parameters form a time range.
+ */
+export const timeRangeFromUrl = (search = window.location.search) => {
+  const params = queryToObject(search);
+  return timeRangeFromParams(params);
+};
+
+/**
+ * Returns a URL with no time range based on the current URL.
+ *
+ * @param {String} New URL
+ */
+export const removeTimeRangeParams = (url = window.location.href) =>
+  removeParams(timeRangeParamNames, url);
+
+/**
+ * Returns a URL for the a different time range based on the
+ * current URL and a time range.
+ *
+ * @param {String} New URL
+ */
+export const timeRangeToUrl = (timeRange, url = window.location.href) => {
+  const toUrl = removeTimeRangeParams(url);
+  const params = timeRangeToParams(timeRange);
+  return mergeUrlParams(params, toUrl);
+};
+
+/**
+ * Get the metric value from first data point.
+ * Currently only used for bar charts
+ *
+ * @param {Array} values data points
+ * @returns {Number}
+ */
+const metricValueMapper = values => values[0]?.[1];
+
+/**
+ * Get the metric name from metric object
+ * Currently only used for bar charts
+ * e.g. { handler: '/query' }
+ * { method: 'get' }
+ *
+ * @param {Object} metric metric object
+ * @returns {String}
+ */
+const metricNameMapper = metric => Object.values(metric)?.[0];
+
+/**
+ * Parse metric object to extract metric value and name in
+ * [<metric-value>, <metric-name>] format.
+ * Currently only used for bar charts
+ *
+ * @param {Object} param0 metric object
+ * @returns {Array}
+ */
+const resultMapper = ({ metric, values = [] }) => [
+  metricValueMapper(values),
+  metricNameMapper(metric),
+];
+
+/**
+ * Bar charts graph data parser to massage data from
+ * backend to a format acceptable by bar charts component
+ * in GitLab UI
+ *
+ * e.g.
+ * {
+ *   SLO: [
+ *      [98, 'api'],
+ *      [99, 'web'],
+ *      [99, 'database']
+ *   ]
+ * }
+ *
+ * @param {Array} data series information
+ * @returns {Object}
+ */
+export const barChartsDataParser = (data = []) =>
+  data?.reduce(
+    (acc, { result = [], label }) => ({
+      ...acc,
+      [label]: result.map(resultMapper),
+    }),
+    {},
+  );
 
 export default {};

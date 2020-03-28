@@ -42,6 +42,7 @@ describe NavHelper, :do_not_mock_admin_mode do
 
           context 'with admin mode enabled' do
             before do
+              current_user_mode.request_admin_mode!
               current_user_mode.enable_admin_mode!(password: user.password)
             end
 
@@ -62,6 +63,7 @@ describe NavHelper, :do_not_mock_admin_mode do
 
           context 'with admin mode enabled' do
             before do
+              current_user_mode.request_admin_mode!
               current_user_mode.enable_admin_mode!(password: user.password)
             end
 
@@ -81,7 +83,7 @@ describe NavHelper, :do_not_mock_admin_mode do
           expect(helper.header_links).not_to include(:issues, :merge_requests, :todos, :search)
         end
 
-        it 'shows the search box when the user cannot read cross project and he is visiting a project' do
+        it 'shows the search box when the user cannot read cross project and they are visiting a project' do
           helper.instance_variable_set(:@project, create(:project))
 
           expect(helper.header_links).to include(:search)
@@ -89,23 +91,50 @@ describe NavHelper, :do_not_mock_admin_mode do
       end
     end
 
-    it 'returns only the sign in and search when the user is not logged in' do
-      allow(helper).to receive(:current_user).and_return(nil)
-      allow(helper).to receive(:can?).with(nil, :read_cross_project) { true }
+    context 'when the user is not logged in' do
+      let(:current_user_mode) { Gitlab::Auth::CurrentUserMode.new(nil) }
 
-      expect(helper.header_links).to contain_exactly(:sign_in, :search)
+      before do
+        allow(helper).to receive(:current_user).and_return(nil)
+        allow(helper).to receive(:current_user_mode).and_return(current_user_mode)
+        allow(helper).to receive(:can?).with(nil, :read_cross_project) { true }
+      end
+
+      it 'returns only the sign in and search when the user is not logged in' do
+        expect(helper.header_links).to contain_exactly(:sign_in, :search)
+      end
     end
   end
 
-  context '.admin_monitoring_nav_links' do
+  describe '.admin_monitoring_nav_links' do
     subject { helper.admin_monitoring_nav_links }
 
     it { is_expected.to all(be_a(String)) }
   end
 
-  context '.group_issues_sub_menu_items' do
+  describe '.group_issues_sub_menu_items' do
     subject { helper.group_issues_sub_menu_items }
 
     it { is_expected.to all(be_a(String)) }
+  end
+
+  describe '.show_user_notification_dot?' do
+    subject { helper.show_user_notification_dot? }
+
+    context 'when experiment is disabled' do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(false)
+      end
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when experiment is enabled' do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(true)
+      end
+
+      it { is_expected.to be_truthy }
+    end
   end
 end

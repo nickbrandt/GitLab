@@ -1,8 +1,8 @@
-/* eslint-disable no-shadow */
+/* eslint-disable no-shadow, no-param-reassign */
 /* global List */
 
 import $ from 'jquery';
-import _ from 'underscore';
+import { sortBy } from 'lodash';
 import Vue from 'vue';
 import Cookies from 'js-cookie';
 import BoardsStoreEE from 'ee_else_ce/boards/stores/boards_store_ee';
@@ -12,6 +12,10 @@ import axios from '~/lib/utils/axios_utils';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
 import eventHub from '../eventhub';
 import { ListType } from '../constants';
+import IssueProject from '../models/project';
+import ListLabel from '../models/label';
+import ListAssignee from '../models/assignee';
+import ListMilestone from '../models/milestone';
 
 const boardsStore = {
   disabled: false,
@@ -30,7 +34,6 @@ const boardsStore = {
       labels: [],
     },
     currentPage: '',
-    reload: false,
     endpoints: {},
   },
   detail: {
@@ -42,7 +45,14 @@ const boardsStore = {
   },
   multiSelect: { list: [] },
 
-  setEndpoints({ boardsEndpoint, listsEndpoint, bulkUpdatePath, boardId, recentBoardsEndpoint }) {
+  setEndpoints({
+    boardsEndpoint,
+    listsEndpoint,
+    bulkUpdatePath,
+    boardId,
+    recentBoardsEndpoint,
+    fullPath,
+  }) {
     const listsEndpointGenerate = `${listsEndpoint}/generate.json`;
     this.state.endpoints = {
       boardsEndpoint,
@@ -50,6 +60,7 @@ const boardsStore = {
       listsEndpoint,
       listsEndpointGenerate,
       bulkUpdatePath,
+      fullPath,
       recentBoardsEndpoint: `${recentBoardsEndpoint}.json`,
     };
   },
@@ -61,13 +72,11 @@ const boardsStore = {
     };
   },
   showPage(page) {
-    this.state.reload = false;
     this.state.currentPage = page;
   },
-  addList(listObj, defaultAvatar) {
-    const list = new List(listObj, defaultAvatar);
-    this.state.lists = _.sortBy([...this.state.lists, list], 'position');
-
+  addList(listObj) {
+    const list = new List(listObj);
+    this.state.lists = sortBy([...this.state.lists, list], 'position');
     return list;
   },
   new(listObj) {
@@ -80,7 +89,7 @@ const boardsStore = {
         // Remove any new issues from the backlog
         // as they will be visible in the new list
         list.issues.forEach(backlogList.removeIssue.bind(backlogList));
-        this.state.lists = _.sortBy(this.state.lists, 'position');
+        this.state.lists = sortBy(this.state.lists, 'position');
       })
       .catch(() => {
         // https://gitlab.com/gitlab-org/gitlab-foss/issues/30821
@@ -131,16 +140,62 @@ const boardsStore = {
     listFrom.update();
   },
 
+  addMultipleListIssues(list, issues, listFrom, newIndex) {
+    let moveBeforeId = null;
+    let moveAfterId = null;
+
+    const listHasIssues = issues.every(issue => list.findIssue(issue.id));
+
+    if (!listHasIssues) {
+      if (newIndex !== undefined) {
+        if (list.issues[newIndex - 1]) {
+          moveBeforeId = list.issues[newIndex - 1].id;
+        }
+
+        if (list.issues[newIndex]) {
+          moveAfterId = list.issues[newIndex].id;
+        }
+
+        list.issues.splice(newIndex, 0, ...issues);
+      } else {
+        list.issues.push(...issues);
+      }
+
+      if (list.label) {
+        issues.forEach(issue => issue.addLabel(list.label));
+      }
+
+      if (list.assignee) {
+        if (listFrom && listFrom.type === 'assignee') {
+          issues.forEach(issue => issue.removeAssignee(listFrom.assignee));
+        }
+        issues.forEach(issue => issue.addAssignee(list.assignee));
+      }
+
+      if (IS_EE && list.milestone) {
+        if (listFrom && listFrom.type === 'milestone') {
+          issues.forEach(issue => issue.removeMilestone(listFrom.milestone));
+        }
+        issues.forEach(issue => issue.addMilestone(list.milestone));
+      }
+
+      if (listFrom) {
+        list.issuesSize += issues.length;
+
+        list.updateMultipleIssues(issues, listFrom, moveBeforeId, moveAfterId);
+      }
+    }
+  },
+
   startMoving(list, issue) {
     Object.assign(this.moving, { list, issue });
   },
 
   moveMultipleIssuesToList({ listFrom, listTo, issues, newIndex }) {
     const issueTo = issues.map(issue => listTo.findIssue(issue.id));
-    const issueLists = _.flatten(issues.map(issue => issue.getLists()));
+    const issueLists = issues.map(issue => issue.getLists()).flat();
     const listLabels = issueLists.map(list => list.label);
-
-    const hasMoveableIssues = _.compact(issueTo).length > 0;
+    const hasMoveableIssues = issueTo.filter(Boolean).length > 0;
 
     if (!hasMoveableIssues) {
       // Check if target list assignee is already present in this issue
@@ -288,7 +343,8 @@ const boardsStore = {
     return (
       (listTo.type !== 'label' && listFrom.type === 'assignee') ||
       (listTo.type !== 'assignee' && listFrom.type === 'label') ||
-      listFrom.type === 'backlog'
+      listFrom.type === 'backlog' ||
+      listFrom.type === 'closed'
     );
   },
   moveIssueInList(list, issue, oldIndex, newIndex, idArray) {
@@ -408,6 +464,29 @@ const boardsStore = {
     return axios.delete(`${this.state.endpoints.listsEndpoint}/${id}`);
   },
 
+  saveList(list) {
+    const entity = list.label || list.assignee || list.milestone;
+    let entityType = '';
+    if (list.label) {
+      entityType = 'label_id';
+    } else if (list.assignee) {
+      entityType = 'assignee_id';
+    } else if (IS_EE && list.milestone) {
+      entityType = 'milestone_id';
+    }
+
+    return this.createList(entity.id, entityType)
+      .then(res => res.data)
+      .then(data => {
+        list.id = data.id;
+        list.type = data.list_type;
+        list.position = data.position;
+        list.label = data.label;
+
+        return list.getIssues();
+      });
+  },
+
   getIssuesForList(id, filter = {}) {
     const data = { id };
     Object.keys(filter).forEach(key => {
@@ -469,10 +548,6 @@ const boardsStore = {
     return axios.post(endpoint);
   },
 
-  allBoards() {
-    return axios.get(this.generateBoardsPath());
-  },
-
   recentBoards() {
     return axios.get(this.state.endpoints.recentBoardsEndpoint);
   },
@@ -524,6 +599,38 @@ const boardsStore = {
 
   clearMultiSelect() {
     this.multiSelect.list = [];
+  },
+  refreshIssueData(issue, obj) {
+    issue.id = obj.id;
+    issue.iid = obj.iid;
+    issue.title = obj.title;
+    issue.confidential = obj.confidential;
+    issue.dueDate = obj.due_date;
+    issue.sidebarInfoEndpoint = obj.issue_sidebar_endpoint;
+    issue.referencePath = obj.reference_path;
+    issue.path = obj.real_path;
+    issue.toggleSubscriptionEndpoint = obj.toggle_subscription_endpoint;
+    issue.project_id = obj.project_id;
+    issue.timeEstimate = obj.time_estimate;
+    issue.assignableLabelsEndpoint = obj.assignable_labels_endpoint;
+    issue.blocked = obj.blocked;
+
+    if (obj.project) {
+      issue.project = new IssueProject(obj.project);
+    }
+
+    if (obj.milestone) {
+      issue.milestone = new ListMilestone(obj.milestone);
+      issue.milestone_id = obj.milestone.id;
+    }
+
+    if (obj.labels) {
+      issue.labels = obj.labels.map(label => new ListLabel(label));
+    }
+
+    if (obj.assignees) {
+      issue.assignees = obj.assignees.map(a => new ListAssignee(a));
+    }
   },
 };
 

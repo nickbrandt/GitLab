@@ -9,6 +9,12 @@ module Gitlab
 
       attr_reader :stages, :jobs
 
+      ResultWithErrors = Struct.new(:content, :errors) do
+        def valid?
+          errors.empty?
+        end
+      end
+
       def initialize(config, opts = {})
         @ci_config = Gitlab::Ci::Config.new(config, **opts)
         @config = @ci_config.to_hash
@@ -20,6 +26,18 @@ module Gitlab
         initial_parsing
       rescue Gitlab::Ci::Config::ConfigError => e
         raise ValidationError, e.message
+      end
+
+      def self.new_with_validation_errors(content, opts = {})
+        return ResultWithErrors.new('', ['Please provide content of .gitlab-ci.yml']) if content.blank?
+
+        config = Gitlab::Ci::Config.new(content, **opts)
+        return ResultWithErrors.new("", config.errors) unless config.valid?
+
+        config = Gitlab::Ci::YamlProcessor.new(content, opts)
+        ResultWithErrors.new(config, [])
+      rescue ValidationError, Gitlab::Ci::Config::ConfigError => e
+        ResultWithErrors.new('', [e.message])
       end
 
       def builds
@@ -39,16 +57,21 @@ module Gitlab
           when: job[:when] || 'on_success',
           environment: job[:environment_name],
           coverage_regex: job[:coverage],
-          yaml_variables: transform_to_yaml_variables(job_variables(name)),
+          yaml_variables: transform_to_yaml_variables(job[:variables]),
           needs_attributes: job.dig(:needs, :job),
           interruptible: job[:interruptible],
+          only: job[:only],
+          except: job[:except],
           rules: job[:rules],
           cache: job[:cache],
+          resource_group_key: job[:resource_group],
+          scheduling_type: job[:scheduling_type],
           options: {
             image: job[:image],
             services: job[:services],
             artifacts: job[:artifacts],
             dependencies: job[:dependencies],
+            cross_dependencies: job.dig(:needs, :cross_dependency),
             job_timeout: job[:timeout],
             before_script: job[:before_script],
             script: job[:script],
@@ -59,8 +82,13 @@ module Gitlab
             instance: job[:instance],
             start_in: job[:start_in],
             trigger: job[:trigger],
-            bridge_needs: job.dig(:needs, :bridge)&.first
+            bridge_needs: job.dig(:needs, :bridge)&.first,
+            release: release(job)
           }.compact }.compact
+      end
+
+      def release(job)
+        job[:release] if Feature.enabled?(:ci_release_generation, default_enabled: false)
       end
 
       def stage_builds_attributes(stage)
@@ -71,13 +99,7 @@ module Gitlab
 
       def stages_attributes
         @stages.uniq.map do |stage|
-          seeds = stage_builds_attributes(stage).map do |attributes|
-            job = @jobs.fetch(attributes[:name].to_sym)
-
-            attributes
-              .merge(only: job.fetch(:only, {}))
-              .merge(except: job.fetch(:except, {}))
-          end
+          seeds = stage_builds_attributes(stage)
 
           { name: stage, index: @stages.index(stage), builds: seeds }
         end
@@ -117,19 +139,11 @@ module Gitlab
 
         @jobs.each do |name, job|
           # logical validation for job
-
           validate_job_stage!(name, job)
           validate_job_dependencies!(name, job)
           validate_job_needs!(name, job)
           validate_job_environment!(name, job)
         end
-      end
-
-      def job_variables(name)
-        job_variables = @jobs.dig(name.to_sym, :variables)
-
-        @variables.to_h
-          .merge(job_variables.to_h)
       end
 
       def transform_to_yaml_variables(variables)

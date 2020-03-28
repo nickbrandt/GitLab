@@ -1,6 +1,6 @@
 import { GlButton } from '@gitlab/ui';
-import missingPrometheusComponent from '~/serverless/components/missing_prometheus.vue';
 import { shallowMount } from '@vue/test-utils';
+import missingPrometheusComponent from '~/serverless/components/missing_prometheus.vue';
 
 const createComponent = missingData =>
   shallowMount(missingPrometheusComponent, {
@@ -9,7 +9,6 @@ const createComponent = missingData =>
       helpPath: '/help',
       missingData,
     },
-    sync: false,
   });
 
 describe('missingPrometheusComponent', () => {

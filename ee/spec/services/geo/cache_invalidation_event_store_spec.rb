@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::CacheInvalidationEventStore do
   include EE::GeoHelpers
 
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:cache_key) { 'cache-key' }
 
@@ -30,6 +30,7 @@ describe Geo::CacheInvalidationEventStore do
 
         expected_message = {
           class: described_class.name,
+          host: "localhost",
           cache_key: '',
           message: 'Cache invalidation event could not be created',
           error: "Validation failed: Key can't be blank"

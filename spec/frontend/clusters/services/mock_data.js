@@ -20,6 +20,7 @@ const CLUSTERS_MOCK_DATA = {
             external_ip: null,
             external_hostname: null,
             can_uninstall: false,
+            modsecurity_enabled: false,
           },
           {
             name: 'runner',
@@ -150,14 +151,14 @@ const DEFAULT_APPLICATION_STATE = {
 
 const APPLICATIONS_MOCK_STATE = {
   helm: { title: 'Helm Tiller', status: 'installable' },
-  ingress: { title: 'Ingress', status: 'installable' },
+  ingress: { title: 'Ingress', status: 'installable', modsecurity_enabled: false },
   crossplane: { title: 'Crossplane', status: 'installable', stack: '' },
   cert_manager: { title: 'Cert-Manager', status: 'installable' },
   runner: { title: 'GitLab Runner' },
   prometheus: { title: 'Prometheus' },
   jupyter: { title: 'JupyterHub', status: 'installable', hostname: '' },
   knative: { title: 'Knative ', status: 'installable', hostname: '' },
-  elastic_stack: { title: 'Elastic Stack', status: 'installable', kibana_hostname: '' },
+  elastic_stack: { title: 'Elastic Stack', status: 'installable' },
 };
 
 export { CLUSTERS_MOCK_DATA, DEFAULT_APPLICATION_STATE, APPLICATIONS_MOCK_STATE };

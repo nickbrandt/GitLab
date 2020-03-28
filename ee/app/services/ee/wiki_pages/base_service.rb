@@ -11,7 +11,7 @@ module EE
 
       private
 
-      def execute_hooks(page, action = 'create')
+      def execute_hooks(page)
         super
         process_wiki_repository_update
       end

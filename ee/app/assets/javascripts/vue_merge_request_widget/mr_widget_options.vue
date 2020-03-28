@@ -1,11 +1,11 @@
 <script>
-import _ from 'underscore';
-import ReportSection from '~/reports/components/report_section.vue';
+import { isNumber, isString } from 'lodash';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
 import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
+import ReportSection from '~/reports/components/report_section.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 
 import { n__, s__, __, sprintf } from '~/locale';
@@ -43,12 +43,11 @@ export default {
       return this.mr.hasApprovalsAvailable && this.mr.state !== 'nothingToMerge';
     },
     shouldRenderCodeQuality() {
-      const { codeclimate } = this.mr;
-      return codeclimate && codeclimate.head_path && codeclimate.base_path;
+      const { codeclimate } = this.mr || {};
+      return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
-      const { licenseManagement } = this.mr;
-      return licenseManagement && licenseManagement.head_path;
+      return this.mr.enabledReports?.licenseManagement;
     },
     hasCodequalityIssues() {
       return (
@@ -67,15 +66,14 @@ export default {
       );
     },
     shouldRenderPerformance() {
-      const { performance } = this.mr;
+      const { performance } = this.mr || {};
       return performance && performance.head_path && performance.base_path;
     },
     shouldRenderSecurityReport() {
+      const { enabledReports } = this.mr;
       return (
-        (this.mr.sast && this.mr.sast.head_path) ||
-        (this.mr.sastContainer && this.mr.sastContainer.head_path) ||
-        (this.mr.dast && this.mr.dast.head_path) ||
-        (this.mr.dependencyScanning && this.mr.dependencyScanning.head_path)
+        enabledReports &&
+        this.$options.securityReportTypes.some(reportType => enabledReports[reportType])
       );
     },
     codequalityText() {
@@ -101,6 +99,23 @@ export default {
       }
 
       return text.join('');
+    },
+    codequalityPopover() {
+      const { codeclimate } = this.mr || {};
+      if (codeclimate && !codeclimate.base_path) {
+        return {
+          title: s__('ciReport|Base pipeline codequality artifact not found'),
+          content: sprintf(
+            s__('ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}'),
+            {
+              linkStartTag: `<a href="${this.mr.codequalityHelpPath}" target="_blank" rel="noopener noreferrer">`,
+              linkEndTag: '<i class="fa fa-external-link" aria-hidden="true"></i></a>',
+            },
+            false,
+          ),
+        };
+      }
+      return {};
     },
 
     performanceText() {
@@ -139,8 +154,8 @@ export default {
     shouldRenderMergeTrainHelperText() {
       return (
         this.mr.pipeline &&
-        _.isNumber(this.mr.pipeline.id) &&
-        _.isString(this.mr.pipeline.path) &&
+        isNumber(this.mr.pipeline.id) &&
+        isString(this.mr.pipeline.path) &&
         this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY &&
         !this.mr.autoMergeEnabled
       );
@@ -149,14 +164,17 @@ export default {
       return (gl && gl.mrWidgetData && gl.mrWidgetData.license_management_comparison_path) || null;
     },
   },
-  created() {
-    if (this.shouldRenderCodeQuality) {
-      this.fetchCodeQuality();
-    }
-
-    if (this.shouldRenderPerformance) {
-      this.fetchPerformance();
-    }
+  watch: {
+    shouldRenderCodeQuality(newVal) {
+      if (newVal) {
+        this.fetchCodeQuality();
+      }
+    },
+    shouldRenderPerformance(newVal) {
+      if (newVal) {
+        this.fetchPerformance();
+      }
+    },
   },
   methods: {
     getServiceEndpoints(store) {
@@ -171,11 +189,20 @@ export default {
       };
     },
     fetchCodeQuality() {
-      const { head_path, base_path } = this.mr.codeclimate;
+      const { codeclimate } = this.mr || {};
+
+      if (!codeclimate.base_path) {
+        this.isLoadingCodequality = false;
+        this.loadingCodequalityFailed = true;
+        return;
+      }
 
       this.isLoadingCodequality = true;
 
-      Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
+      Promise.all([
+        this.service.fetchReport(codeclimate.head_path),
+        this.service.fetchReport(codeclimate.base_path),
+      ])
         .then(values =>
           this.mr.compareCodeclimateMetrics(
             values[0],
@@ -220,11 +247,19 @@ export default {
       };
     },
   },
+  securityReportTypes: ['dast', 'sast', 'dependencyScanning', 'containerScanning'],
 };
 </script>
 <template>
-  <div class="mr-state-widget prepend-top-default">
+  <div v-if="mr" class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
+    <mr-widget-suggest-pipeline
+      v-if="shouldSuggestPipelines"
+      class="mr-widget-workflow"
+      :pipeline-path="mr.mergeRequestAddCiConfigPath"
+      :pipeline-svg-path="mr.pipelinesEmptySvgPath"
+      :human-access="mr.humanAccess.toLowerCase()"
+    />
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
       class="mr-widget-workflow"
@@ -248,6 +283,7 @@ export default {
         :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
         :has-issues="hasCodequalityIssues"
         :component="$options.componentNames.CodequalityIssueBody"
+        :popover-options="codequalityPopover"
         class="js-codequality-widget mr-widget-border-top mr-report"
       />
       <report-section
@@ -271,18 +307,12 @@ export default {
         v-if="shouldRenderSecurityReport"
         :head-blob-path="mr.headBlobPath"
         :source-branch="mr.sourceBranch"
+        :target-branch="mr.targetBranch"
         :base-blob-path="mr.baseBlobPath"
-        :sast-head-path="mr.sast.head_path"
-        :sast-base-path="mr.sast.base_path"
+        :enabled-reports="mr.enabledReports"
         :sast-help-path="mr.sastHelp"
-        :dast-head-path="mr.dast.head_path"
-        :dast-base-path="mr.dast.base_path"
         :dast-help-path="mr.dastHelp"
-        :sast-container-head-path="mr.sastContainer.head_path"
-        :sast-container-base-path="mr.sastContainer.base_path"
-        :sast-container-help-path="mr.sastContainerHelp"
-        :dependency-scanning-head-path="mr.dependencyScanning.head_path"
-        :dependency-scanning-base-path="mr.dependencyScanning.base_path"
+        :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
@@ -293,9 +323,11 @@ export default {
         :create-vulnerability-feedback-dismissal-path="mr.createVulnerabilityFeedbackDismissalPath"
         :pipeline-path="mr.pipeline.path"
         :pipeline-id="mr.securityReportsPipelineId"
-        :can-create-issue="mr.canCreateIssue"
-        :can-create-merge-request="mr.canCreateMergeRequest"
-        :can-dismiss-vulnerability="mr.canDismissVulnerability"
+        :diverged-commits-count="mr.divergedCommitsCount"
+        :mr-state="mr.state"
+        :target-branch-tree-path="mr.targetBranchTreePath"
+        :new-pipeline-path="mr.newPipelinePath"
+        class="js-security-widget"
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
@@ -305,8 +337,6 @@ export default {
         :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
         :full-report-path="mr.licenseManagement.license_management_full_report_path"
         :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
-        :base-path="mr.licenseManagement.base_path"
-        :head-path="mr.licenseManagement.head_path"
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />
@@ -366,4 +396,5 @@ export default {
       :is-post-merge="true"
     />
   </div>
+  <loading v-else />
 </template>

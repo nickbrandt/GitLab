@@ -47,7 +47,7 @@ describe Projects::UpdateService, '#execute' do
       }
     end
 
-    context '#name' do
+    describe '#name' do
       include_examples 'audit event logging' do
         let!(:old_name) { project.full_name }
         let(:operation) { update_project(project, user, name: 'foobar') }
@@ -67,7 +67,7 @@ describe Projects::UpdateService, '#execute' do
       end
     end
 
-    context '#path' do
+    describe '#path' do
       include_examples 'audit event logging' do
         let(:operation) { update_project(project, user, path: 'foobar1') }
         let(:fail_condition!) do
@@ -86,7 +86,7 @@ describe Projects::UpdateService, '#execute' do
       end
     end
 
-    context '#visibility' do
+    describe '#visibility' do
       include_examples 'audit event logging' do
         let(:operation) do
           update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)
@@ -110,8 +110,8 @@ describe Projects::UpdateService, '#execute' do
 
   context 'triggering wiki Geo syncs', :geo do
     context 'on a Geo primary' do
-      set(:primary)   { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
+      let_it_be(:primary)   { create(:geo_node, :primary) }
+      let_it_be(:secondary) { create(:geo_node) }
 
       before do
         stub_current_geo_node(primary)
@@ -176,39 +176,6 @@ describe Projects::UpdateService, '#execute' do
 
         expect(project.wiki_enabled?).to be true
       end
-    end
-  end
-
-  describe 'repository_storage' do
-    let(:admin_user) { create(:user, admin: true) }
-    let(:user) { create(:user) }
-    let(:project) { create(:project, :repository) }
-    let(:opts) { { repository_storage: 'b' } }
-
-    before do
-      FileUtils.mkdir('tmp/tests/storage_b')
-
-      storages = {
-          'default' => Gitlab.config.repositories.storages.default,
-          'b' => { 'path' => 'tmp/tests/storage_b' }
-      }
-      stub_storage_settings(storages)
-    end
-
-    after do
-      FileUtils.rm_rf('tmp/tests/storage_b')
-    end
-
-    it 'calls the change repository storage method if the storage changed' do
-      expect(project).to receive(:change_repository_storage).with('b')
-
-      update_project(project, admin_user, opts).inspect
-    end
-
-    it "doesn't call the change repository storage for non-admin users" do
-      expect(project).not_to receive(:change_repository_storage)
-
-      update_project(project, user, opts).inspect
     end
   end
 

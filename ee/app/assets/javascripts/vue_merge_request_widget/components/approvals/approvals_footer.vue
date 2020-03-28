@@ -37,6 +37,11 @@ export default {
       required: false,
       default: '',
     },
+    eligibleApproversDocsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     isCollapsed() {
@@ -84,6 +89,7 @@ export default {
       <approvals-list
         :approval-rules="approvalRules"
         :security-approvals-help-page-path="securityApprovalsHelpPagePath"
+        :eligible-approvers-docs-path="eligibleApproversDocsPath"
       />
     </div>
   </div>

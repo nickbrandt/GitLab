@@ -2,8 +2,7 @@
 
 module QA
   context 'Monitor' do
-    # https://gitlab.com/gitlab-org/gitlab/issues/35429
-    describe 'Cluster health graphs', :orchestrated, :kubernetes, :quarantine do
+    describe 'Cluster health graphs', :orchestrated, :kubernetes do
       before do
         @cluster = Service::KubernetesCluster.new.create!
       end
@@ -43,7 +42,7 @@ module QA
       def verify_cluster_health_graphs
         Page::Project::Operations::Kubernetes::Show.perform do |cluster|
           cluster.refresh
-          expect(cluster).to have_cluster_health_title
+          cluster.open_health
 
           cluster.wait_for_cluster_health
         end

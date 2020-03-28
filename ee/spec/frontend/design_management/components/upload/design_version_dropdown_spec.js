@@ -1,29 +1,40 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import { shallowMount } from '@vue/test-utils';
 import DesignVersionDropdown from 'ee/design_management/components/upload/design_version_dropdown.vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import mockAllVersions from './mock_data/all_versions';
 
-const VERSION_ID = 3;
-const localVue = createLocalVue();
-localVue.use(VueRouter);
-const router = new VueRouter();
+const LATEST_VERSION_ID = 3;
+const PREVIOUS_VERSION_ID = 2;
+
+const designRouteFactory = versionId => ({
+  path: `/designs?version=${versionId}`,
+  query: {
+    version: `${versionId}`,
+  },
+});
+
+const MOCK_ROUTE = {
+  path: '/designs',
+  query: {},
+};
 
 describe('Design management design version dropdown component', () => {
   let wrapper;
 
-  function createComponent() {
+  function createComponent({ maxVersions = -1, $route = MOCK_ROUTE } = {}) {
     wrapper = shallowMount(DesignVersionDropdown, {
       propsData: {
         projectPath: '',
         issueIid: '',
       },
-      localVue,
-      router,
+      mocks: {
+        $route,
+      },
+      stubs: ['router-link'],
     });
 
     wrapper.setData({
-      allVersions: mockAllVersions,
+      allVersions: maxVersions > -1 ? mockAllVersions.slice(0, maxVersions) : mockAllVersions,
     });
   }
 
@@ -36,38 +47,68 @@ describe('Design management design version dropdown component', () => {
   it('renders design version dropdown button', () => {
     createComponent();
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   it('renders design version list', () => {
     createComponent();
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   describe('selected version name', () => {
     it('has "latest" on most recent version item', () => {
       createComponent();
 
-      expect(findVersionLink(0).text()).toContain('latest');
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findVersionLink(0).text()).toContain('latest');
+      });
     });
   });
 
   describe('versions list', () => {
-    it('pushes version id when a version is clicked', () => {
+    it('displays latest version text by default', () => {
       createComponent();
-      wrapper.vm.$router.push(`/designs?version=${VERSION_ID}`);
-      const CurrentVersionNumber = wrapper.vm.getCurrentVersionNumber();
 
-      expect(wrapper.find(GlDropdown).attributes('text')).toBe(
-        `Showing Version #${CurrentVersionNumber}`,
-      );
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlDropdown).attributes('text')).toBe('Showing Latest Version');
+      });
+    });
+
+    it('displays latest version text when only 1 version is present', () => {
+      createComponent({ maxVersions: 1 });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlDropdown).attributes('text')).toBe('Showing Latest Version');
+      });
+    });
+
+    it('displays version text when the current version is not the latest', () => {
+      createComponent({ $route: designRouteFactory(PREVIOUS_VERSION_ID) });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlDropdown).attributes('text')).toBe(`Showing Version #1`);
+      });
+    });
+
+    it('displays latest version text when the current version is the latest', () => {
+      createComponent({ $route: designRouteFactory(LATEST_VERSION_ID) });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlDropdown).attributes('text')).toBe('Showing Latest Version');
+      });
     });
 
     it('should have the same length as apollo query', () => {
       createComponent();
 
-      expect(wrapper.findAll(GlDropdownItem).length).toEqual(wrapper.vm.allVersions.length);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.findAll(GlDropdownItem).length).toEqual(wrapper.vm.allVersions.length);
+      });
     });
   });
 });

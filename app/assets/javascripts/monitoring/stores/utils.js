@@ -1,86 +1,162 @@
-import _ from 'underscore';
+import { slugify } from '~/lib/utils/text_utility';
+import createGqClient, { fetchPolicies } from '~/lib/graphql';
+import { SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 
-function checkQueryEmptyData(query) {
-  return {
-    ...query,
-    result: query.result.filter(timeSeries => {
-      const newTimeSeries = timeSeries;
-      const hasValue = series =>
-        !Number.isNaN(series[1]) && (series[1] !== null || series[1] !== undefined);
-      const hasNonNullValue = timeSeries.values.find(hasValue);
-
-      newTimeSeries.values = hasNonNullValue ? newTimeSeries.values : [];
-
-      return newTimeSeries.values.length > 0;
-    }),
-  };
-}
-
-function removeTimeSeriesNoData(queries) {
-  return queries.reduce((series, query) => series.concat(checkQueryEmptyData(query)), []);
-}
-
-// Metrics and queries are currently stored 1:1, so `queries` is an array of length one.
-// We want to group queries onto a single chart by title & y-axis label.
-// This function will no longer be required when metrics:queries are 1:many,
-// though there is no consequence if the function stays in use.
-// @param metrics [Array<Object>]
-//      Ex) [
-//            { id: 1, title: 'title', y_label: 'MB', queries: [{ ...query1Attrs }] },
-//            { id: 2, title: 'title', y_label: 'MB', queries: [{ ...query2Attrs }] },
-//            { id: 3, title: 'new title', y_label: 'MB', queries: [{ ...query3Attrs }] }
-//          ]
-// @return [Array<Object>]
-//      Ex) [
-//            { title: 'title', y_label: 'MB', queries: [{ metricId: 1, ...query1Attrs },
-//                                                       { metricId: 2, ...query2Attrs }] },
-//            { title: 'new title', y_label: 'MB', queries: [{ metricId: 3, ...query3Attrs }]}
-//          ]
-export function groupQueriesByChartInfo(metrics) {
-  const metricsByChart = metrics.reduce((accumulator, metric) => {
-    const { queries, ...chart } = metric;
-
-    const chartKey = `${chart.title}|${chart.y_label}`;
-    accumulator[chartKey] = accumulator[chartKey] || { ...chart, queries: [] };
-
-    queries.forEach(queryAttrs => {
-      let metricId;
-
-      if (chart.id) {
-        metricId = chart.id.toString();
-      } else if (queryAttrs.metric_id) {
-        metricId = queryAttrs.metric_id.toString();
-      } else {
-        metricId = null;
-      }
-
-      accumulator[chartKey].queries.push({ metricId, ...queryAttrs });
-    });
-
-    return accumulator;
-  }, {});
-
-  return Object.values(metricsByChart);
-}
-
-export const uniqMetricsId = metric => `${metric.metric_id}_${metric.id}`;
+export const gqClient = createGqClient(
+  {},
+  {
+    fetchPolicy: fetchPolicies.NO_CACHE,
+  },
+);
 
 /**
- * Not to confuse with normalizeMetrics (plural)
  * Metrics loaded from project-defined dashboards do not have a metric_id.
  * This method creates a unique ID combining metric_id and id, if either is present.
- * This is hopefully a temporary solution until BE processes metrics before passing to fE
+ * This is hopefully a temporary solution until BE processes metrics before passing to FE
  * @param {Object} metric - metric
  * @returns {Object} - normalized metric with a uniqueID
  */
-export const normalizeMetric = (metric = {}) =>
-  _.omit(
-    {
-      ...metric,
-      metric_id: uniqMetricsId(metric),
-    },
-    'id',
-  );
+// eslint-disable-next-line babel/camelcase
+export const uniqMetricsId = ({ metric_id, id }) => `${metric_id}_${id}`;
+
+/**
+ * Project path has a leading slash that doesn't work well
+ * with project full path resolver here
+ * https://gitlab.com/gitlab-org/gitlab/blob/5cad4bd721ab91305af4505b2abc92b36a56ad6b/app/graphql/resolvers/full_path_resolver.rb#L10
+ *
+ * @param {String} str String with leading slash
+ * @returns {String}
+ */
+export const removeLeadingSlash = str => (str || '').replace(/^\/+/, '');
+
+/**
+ * GraphQL environments API returns only id and name.
+ * For the environments dropdown we need metrics_path.
+ * This method parses the results and add neccessart attrs
+ *
+ * @param {Array} response Environments API result
+ * @param {String} projectPath Current project path
+ * @returns {Array}
+ */
+export const parseEnvironmentsResponse = (response = [], projectPath) =>
+  (response || []).map(env => {
+    const id = getIdFromGraphQLId(env.id);
+    return {
+      ...env,
+      id,
+      metrics_path: `${projectPath}/environments/${id}/metrics`,
+    };
+  });
+
+/**
+ * Maps metrics to its view model
+ *
+ * This function difers from other in that is maps all
+ * non-define properties as-is to the object. This is not
+ * advisable as it could lead to unexpected side-effects.
+ *
+ * Related issue:
+ * https://gitlab.com/gitlab-org/gitlab/issues/207198
+ *
+ * @param {Array} metrics - Array of prometheus metrics
+ * @param {String} defaultLabel - Default label for metrics
+ * @returns {Object}
+ */
+const mapToMetricsViewModel = (metrics, defaultLabel) =>
+  metrics.map(({ label, id, metric_id, query_range, prometheus_endpoint_path, ...metric }) => ({
+    label: label || defaultLabel,
+    queryRange: query_range,
+    prometheusEndpointPath: prometheus_endpoint_path,
+    metricId: uniqMetricsId({ metric_id, id }),
+    ...metric,
+  }));
+
+/**
+ * Maps X-axis view model
+ *
+ * @param {Object} axis
+ */
+const mapXAxisToViewModel = ({ name = '' }) => ({ name });
+
+/**
+ * Maps Y-axis view model
+ *
+ * Defaults to a 2 digit precision and `number` format. It only allows
+ * formats in the SUPPORTED_FORMATS array.
+ *
+ * @param {Object} axis
+ */
+const mapYAxisToViewModel = ({ name = '', format = SUPPORTED_FORMATS.number, precision = 2 }) => {
+  return {
+    name,
+    format: SUPPORTED_FORMATS[format] || SUPPORTED_FORMATS.number,
+    precision,
+  };
+};
+
+/**
+ * Maps a metrics panel to its view model
+ *
+ * @param {Object} panel - Metrics panel
+ * @returns {Object}
+ */
+const mapPanelToViewModel = ({
+  title = '',
+  type,
+  x_axis = {},
+  x_label,
+  y_label,
+  y_axis = {},
+  metrics = [],
+}) => {
+  // Both `x_axis.name` and `x_label` are supported for now
+  // https://gitlab.com/gitlab-org/gitlab/issues/210521
+  const xAxis = mapXAxisToViewModel({ name: x_label, ...x_axis }); // eslint-disable-line babel/camelcase
+
+  // Both `y_axis.name` and `y_label` are supported for now
+  // https://gitlab.com/gitlab-org/gitlab/issues/208385
+  const yAxis = mapYAxisToViewModel({ name: y_label, ...y_axis }); // eslint-disable-line babel/camelcase
+
+  return {
+    title,
+    type,
+    xLabel: xAxis.name,
+    y_label: yAxis.name, // Changing y_label to yLabel is pending https://gitlab.com/gitlab-org/gitlab/issues/207198
+    yAxis,
+    xAxis,
+    metrics: mapToMetricsViewModel(metrics, yAxis.name),
+  };
+};
+
+/**
+ * Maps a metrics panel group to its view model
+ *
+ * @param {Object} panelGroup - Panel Group
+ * @returns {Object}
+ */
+const mapToPanelGroupViewModel = ({ group = '', panels = [] }, i) => {
+  return {
+    key: `${slugify(group || 'default')}-${i}`,
+    group,
+    panels: panels.map(mapPanelToViewModel),
+  };
+};
+
+/**
+ * Maps a dashboard json object to its view model
+ *
+ * @param {Object} dashboard - Dashboard object
+ * @param {String} dashboard.dashboard - Dashboard name object
+ * @param {Array} dashboard.panel_groups - Panel groups array
+ * @returns {Object}
+ */
+export const mapToDashboardViewModel = ({ dashboard = '', panel_groups = [] }) => {
+  return {
+    dashboard,
+    panelGroups: panel_groups.map(mapToPanelGroupViewModel),
+  };
+};
 
 export const normalizeQueryResult = timeSeries => {
   let normalizedResult = {};
@@ -93,6 +169,11 @@ export const normalizeQueryResult = timeSeries => {
         Number(value),
       ]),
     };
+    // Check result for empty data
+    normalizedResult.values = normalizedResult.values.filter(series => {
+      const hasValue = d => !Number.isNaN(d[1]) && (d[1] !== null || d[1] !== undefined);
+      return series.find(hasValue);
+    });
   } else if (timeSeries.value) {
     normalizedResult = {
       ...timeSeries,
@@ -101,22 +182,4 @@ export const normalizeQueryResult = timeSeries => {
   }
 
   return normalizedResult;
-};
-
-export const normalizeMetrics = metrics => {
-  const groupedMetrics = groupQueriesByChartInfo(metrics);
-
-  return groupedMetrics.map(metric => {
-    const queries = metric.queries.map(query => ({
-      ...query,
-      // custom metrics do not require a label, so we should ensure this attribute is defined
-      label: query.label || metric.y_label,
-      result: (query.result || []).map(normalizeQueryResult),
-    }));
-
-    return {
-      ...metric,
-      queries: removeTimeSeriesNoData(queries),
-    };
-  });
 };

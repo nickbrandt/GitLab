@@ -12,8 +12,12 @@ describe Gitlab::ImportExport::Importer do
     subject(:importer) { described_class.new(project) }
 
     before do
-      allow_any_instance_of(Gitlab::ImportExport).to receive(:storage_path).and_return(test_path)
-      allow_any_instance_of(Gitlab::ImportExport::FileImporter).to receive(:remove_import_file)
+      allow_next_instance_of(Gitlab::ImportExport) do |instance|
+        allow(instance).to receive(:storage_path).and_return(test_path)
+      end
+      allow_next_instance_of(Gitlab::ImportExport::FileImporter) do |instance|
+        allow(instance).to receive(:remove_import_file)
+      end
       stub_uploads_object_storage(FileUploader)
 
       FileUtils.mkdir_p(shared.export_path)

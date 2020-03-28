@@ -1,15 +1,5 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import diffsModule from '~/diffs/store/modules';
-import notesModule from '~/notes/stores/modules';
+// No new code should be added to this file. Instead, modify the
+// file this one re-exports from. For more detail about why, see:
+// https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/31349
 
-Vue.use(Vuex);
-
-export default function createDiffsStore() {
-  return new Vuex.Store({
-    modules: {
-      diffs: diffsModule(),
-      notes: notesModule(),
-    },
-  });
-}
+export { default } from '../../frontend/diffs/create_diffs_store';

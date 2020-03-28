@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import component from '~/jobs/components/stages_dropdown.vue';
 import { trimText } from 'spec/helpers/text_helper';
+import component from '~/jobs/components/stages_dropdown.vue';
 import mountComponent from '../../helpers/vue_mount_component_helper';
 
 describe('Stages Dropdown', () => {
@@ -27,7 +27,7 @@ describe('Stages Dropdown', () => {
     },
     merge_request: {
       iid: 1234,
-      path: '/root/detached-merge-request-pipelines/merge_requests/1',
+      path: '/root/detached-merge-request-pipelines/-/merge_requests/1',
       title: 'Update README.md',
       source_branch: 'feature-1234',
       source_branch_path: '/root/detached-merge-request-pipelines/branches/feature-1234',

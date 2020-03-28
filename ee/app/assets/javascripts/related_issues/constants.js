@@ -6,10 +6,22 @@ export const issuableTypesMap = {
   MERGE_REQUEST: 'merge_request',
 };
 
+export const linkedIssueTypesMap = {
+  BLOCKS: 'blocks',
+  IS_BLOCKED_BY: 'is_blocked_by',
+  RELATES_TO: 'relates_to',
+};
+
+export const linkedIssueTypesTextMap = {
+  [linkedIssueTypesMap.RELATES_TO]: __('Relates to'),
+  [linkedIssueTypesMap.BLOCKS]: __('Blocks'),
+  [linkedIssueTypesMap.IS_BLOCKED_BY]: __('Is blocked by'),
+};
+
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
-    [issuableTypesMap.EPIC]: __(' or <#epic id>'),
+    [issuableTypesMap.EPIC]: __(' or <&epic id>'),
     [issuableTypesMap.MERGE_REQUEST]: __(' or <!merge request id>'),
   },
   false: {
@@ -35,9 +47,20 @@ export const pathIndeterminateErrorMap = {
   [issuableTypesMap.EPIC]: __('We could not determine the path to remove the epic'),
 };
 
+export const itemAddFailureTypesMap = {
+  NOT_FOUND: 'not_found',
+  MAX_NUMBER_OF_CHILD_EPICS: 'conflict',
+};
+
 export const addRelatedIssueErrorMap = {
-  [issuableTypesMap.ISSUE]: __("We can't find an issue that matches what you are looking for."),
-  [issuableTypesMap.EPIC]: __("We can't find an epic that matches what you are looking for."),
+  [issuableTypesMap.ISSUE]: __('Issue cannot be found.'),
+  [issuableTypesMap.EPIC]: __('Epic cannot be found.'),
+};
+
+export const addRelatedItemErrorMap = {
+  [itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS]: __(
+    'This epic already has the maximum number of child epics.',
+  ),
 };
 
 /**
@@ -56,7 +79,6 @@ export const issuableIconMap = {
  * them inside i18n functions.
  */
 export const issuableQaClassMap = {
-  [issuableTypesMap.ISSUE]: 'qa-add-issues-button',
   [issuableTypesMap.EPIC]: 'qa-add-epics-button',
 };
 

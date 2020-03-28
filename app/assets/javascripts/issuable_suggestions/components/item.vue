@@ -1,6 +1,6 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
-import _ from 'underscore';
+/* eslint-disable @gitlab/vue-require-i18n-strings */
+import { uniqueId } from 'lodash';
 import { GlLink, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -36,13 +36,13 @@ export default {
     counts() {
       return [
         {
-          id: _.uniqueId(),
+          id: uniqueId(),
           icon: 'thumb-up',
           tooltipTitle: __('Upvotes'),
           count: this.suggestion.upvotes,
         },
         {
-          id: _.uniqueId(),
+          id: uniqueId(),
           icon: 'comment',
           tooltipTitle: __('Comments'),
           count: this.suggestion.userNotesCount,
@@ -91,7 +91,7 @@ export default {
       />
       <gl-tooltip :target="() => $refs.state" placement="bottom">
         <span class="d-block">
-          <span class="bold"> {{ stateTitle }} </span> {{ timeFormated(closedOrCreatedDate) }}
+          <span class="bold"> {{ stateTitle }} </span> {{ timeFormatted(closedOrCreatedDate) }}
         </span>
         <span class="text-tertiary">{{ tooltipTitle(closedOrCreatedDate) }}</span>
       </gl-tooltip>

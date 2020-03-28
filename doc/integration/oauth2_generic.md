@@ -26,7 +26,7 @@ This strategy is designed to allow configuration of the simple OmniAuth SSO proc
 
    The redirect URI you provide when registering the application should be:
 
-   ```
+   ```plaintext
    http://your-gitlab.host.com/users/auth/oauth2_generic/callback
    ```
 
@@ -38,13 +38,13 @@ This strategy is designed to allow configuration of the simple OmniAuth SSO proc
 
    For Omnibus package:
 
-   ```sh
+   ```shell
    sudo editor /etc/gitlab/gitlab.rb
    ```
 
    For installations from source:
 
-   ```sh
+   ```shell
    cd /home/git/gitlab
    sudo -u git -H editor config/gitlab.yml
    ```

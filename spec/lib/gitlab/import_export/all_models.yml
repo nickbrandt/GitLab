@@ -8,6 +8,10 @@ issues:
 - milestone
 - notes
 - resource_label_events
+- resource_weight_events
+- resource_milestone_events
+- sent_notifications
+- sentry_issue
 - label_links
 - labels
 - last_edited_by
@@ -33,6 +37,7 @@ issues:
 - zoom_meetings
 - vulnerability_links
 - related_vulnerabilities
+- user_mentions
 events:
 - author
 - project
@@ -81,13 +86,15 @@ snippets:
 - notes
 - award_emoji
 - user_agent_detail
+- user_mentions
+- snippet_repository
 releases:
 - author
 - project
 - links
 - milestone_releases
 - milestones
-- evidence
+- evidences
 links:
 - release
 project_members:
@@ -104,6 +111,7 @@ merge_requests:
 - milestone
 - notes
 - resource_label_events
+- resource_milestone_events
 - label_links
 - labels
 - last_edited_by
@@ -113,6 +121,8 @@ merge_requests:
 - merge_user
 - merge_request_diffs
 - merge_request_diff
+- merge_request_context_commits
+- merge_request_context_commit_diff_files
 - events
 - merge_requests_closing_issues
 - cached_closes_issues
@@ -139,6 +149,9 @@ merge_requests:
 - blocking_merge_requests
 - blocked_merge_requests
 - description_versions
+- deployment_merge_requests
+- deployments
+- user_mentions
 external_pull_requests:
 - project
 merge_request_diff:
@@ -149,11 +162,15 @@ merge_request_diff_commits:
 - merge_request_diff
 merge_request_diff_files:
 - merge_request_diff
+merge_request_context_commits:
+- merge_request
+- diff_files
 ci_pipelines:
 - project
 - user
 - stages
 - statuses
+- latest_statuses_ordered_by_stage
 - builds
 - processables
 - trigger_requests
@@ -162,6 +179,7 @@ ci_pipelines:
 - auto_canceled_pipelines
 - auto_canceled_jobs
 - pending_builds
+- failed_builds
 - retryable_builds
 - cancelable_statuses
 - manual_actions
@@ -175,21 +193,29 @@ ci_pipelines:
 - environments
 - chat_data
 - source_pipeline
+- ref_status
 - source_bridge
 - source_job
 - sourced_pipelines
+- source_project
 - triggered_by_pipeline
 - triggered_pipelines
+- child_pipelines
+- parent_pipeline
 - downstream_bridges
 - job_artifacts
 - vulnerabilities_occurrence_pipelines
 - vulnerability_findings
+- pipeline_config
+- security_scans
+- daily_report_results
 pipeline_variables:
 - pipeline
 stages:
 - project
 - pipeline
 - statuses
+- processables
 - builds
 - bridges
 statuses:
@@ -226,6 +252,7 @@ services:
 - service_hook
 - jira_tracker_data
 - issue_tracker_data
+- open_project_tracker_data
 hooks:
 - project
 - web_hook_logs
@@ -288,6 +315,7 @@ project:
 - microsoft_teams_service
 - mattermost_service
 - hangouts_chat_service
+- unify_circuit_service
 - buildkite_service
 - bamboo_service
 - teamcity_service
@@ -336,6 +364,7 @@ project:
 - ci_pipelines
 - all_pipelines
 - stages
+- ci_refs
 - builds
 - runner_projects
 - runners
@@ -365,6 +394,7 @@ project:
 - root_of_fork_network
 - fork_network_member
 - fork_network
+- fork_network_projects
 - custom_attributes
 - lfs_file_locks
 - project_badges
@@ -402,6 +432,7 @@ project:
 - sourced_pipelines
 - prometheus_metrics
 - vulnerabilities
+- vulnerability_exports
 - vulnerability_findings
 - vulnerability_feedback
 - vulnerability_identifiers
@@ -417,6 +448,7 @@ project:
 - package_files
 - tracing_setting
 - alerting_setting
+- project_setting
 - webide_pipelines
 - reviews
 - incident_management_setting
@@ -434,6 +466,14 @@ project:
 - upstream_project_subscriptions
 - downstream_project_subscriptions
 - service_desk_setting
+- import_failures
+- container_expiration_policy
+- resource_groups
+- autoclose_referenced_issues
+- status_page_setting
+- requirements
+- export_jobs
+- daily_report_results
 award_emoji:
 - awardable
 - user
@@ -533,14 +573,50 @@ design: &design
 - actions
 - versions
 - notes
+- user_mentions
 designs: *design
 actions:
 - design
 - version
+- uploads
+- file_uploads
 versions: &version
+- author
 - issue
 - designs
 - actions
 zoom_meetings:
 - issue
+sentry_issue:
+- issue
 design_versions: *version
+epic:
+- subscriptions
+- award_emoji
+- description_versions
+- author
+- assignee
+- issues
+- epic_issues
+- milestone
+- notes
+- label_links
+- labels
+- todos
+- metrics
+- group
+- parent
+- children
+- updated_by
+- last_edited_by
+- closed_by
+- start_date_sourcing_milestone
+- due_date_sourcing_milestone
+- start_date_sourcing_epic
+- due_date_sourcing_epic
+- events
+- resource_label_events
+- user_mentions
+epic_issue:
+- epic
+- issue

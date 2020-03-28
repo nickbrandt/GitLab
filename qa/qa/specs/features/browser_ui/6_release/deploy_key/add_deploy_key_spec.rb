@@ -4,8 +4,7 @@ module QA
   context 'Release' do
     describe 'Deploy key creation' do
       it 'user adds a deploy key' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         key = Runtime::Key::RSA.new
         deploy_key_title = 'deploy key title'
@@ -16,11 +15,11 @@ module QA
           resource.key = deploy_key_value
         end
 
-        expect(deploy_key.fingerprint).to eq key.fingerprint
+        expect(deploy_key.md5_fingerprint).to eq key.md5_fingerprint
 
-        Page::Project::Settings::Repository.perform do |setting|
+        Page::Project::Settings::CICD.perform do |setting|
           setting.expand_deploy_keys do |keys|
-            expect(keys).to have_key(deploy_key_title, key.fingerprint)
+            expect(keys).to have_key(deploy_key_title, key.md5_fingerprint)
           end
         end
       end

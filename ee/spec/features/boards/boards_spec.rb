@@ -136,11 +136,12 @@ describe 'issue boards', :js do
       end
 
       it 'hides weight' do
+        expect(page).not_to have_text('2 issues')
+
         backlog = board.lists.first
         badge(backlog).hover
 
-        tooltip = find("##{badge(backlog)['aria-describedby']}")
-        expect(tooltip.text).to eq('2 issues')
+        expect(page).to have_text('2 issues')
       end
     end
   end
@@ -174,10 +175,6 @@ describe 'issue boards', :js do
     end
 
     context 'When FF is turned on' do
-      before do
-        stub_licensed_features(wip_limits: true)
-      end
-
       context 'when max issue count is set' do
         let(:total_development_issues) { "1" }
 
@@ -192,30 +189,151 @@ describe 'issue boards', :js do
   end
 
   context 'list settings' do
-    let!(:label) { create(:label, project: project, name: 'Label') }
-    let!(:list) { create(:list, board: board, label: label, position: 1) }
-
     before do
-      stub_licensed_features(wip_limits: wip_limits)
-
       project.add_developer(user)
       login_as(user)
-      visit project_boards_path(project)
     end
 
-    context 'When FF is turned on' do
-      let(:wip_limits) { true }
+    context 'When license is available' do
+      let!(:label) { create(:label, project: project, name: 'Brount') }
+      let!(:list) { create(:list, board: board, label: label, position: 1) }
+
+      before do
+        stub_licensed_features(wip_limits: true)
+        visit_board_page
+      end
 
       it 'shows the list settings button' do
-        expect(page).to have_selector(:button, "List Settings")
+        expect(page).to have_selector(:button, "List settings")
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
+      end
+
+      context 'when settings button is clicked' do
+        it 'shows the board list settings sidebar' do
+          page.within(find(".board:nth-child(2)")) do
+            click_button('List settings')
+          end
+
+          expect(page.find('.js-board-settings-sidebar').find('.gl-label-text')).to have_text("Brount")
+        end
+      end
+
+      context 'when boards setting sidebar is open' do
+        before do
+          page.within(find(".board:nth-child(2)")) do
+            click_button('List settings')
+          end
+        end
+
+        context "when user clicks Remove Limit" do
+          before do
+            max_issue_count = 2
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            find('body').click
+
+            wait_for_requests
+          end
+
+          it "sets max issue count to zero" do
+            page.find('.js-remove-limit').click
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text("None")
+          end
+        end
+
+        context 'when the user is editing a wip limit and clicks close' do
+          it 'updates the max issue count wip limit' do
+            max_issue_count = 3
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            # Danger: coupling to gitlab-ui class name for close.
+            # Change when https://gitlab.com/gitlab-org/gitlab-ui/issues/578 is resolved
+            find('.gl-drawer-close-button').click
+
+            wait_for_requests
+
+            page.within(find(".board:nth-child(2)")) do
+              click_button('List settings')
+            end
+
+            expect(page.find('.js-wip-limit')).to have_text(max_issue_count)
+          end
+        end
+
+        context "when user off clicks" do
+          it 'updates the max issue count wip limit' do
+            max_issue_count = 2
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            find('body').click
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text(max_issue_count)
+          end
+
+          context "When user sets max issue count to 0" do
+            it 'updates the max issue count wip limit to None' do
+              max_issue_count = 0
+              page.within(find('.js-board-settings-sidebar')) do
+                click_button("Edit")
+
+                find('input').set(max_issue_count)
+              end
+
+              # Off click
+              find('body').click
+
+              wait_for_requests
+
+              expect(page.find('.js-wip-limit')).to have_text("None")
+            end
+          end
+        end
+
+        context "when user hits enter" do
+          it 'updates the max issue count wip limit' do
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(1).native.send_keys(:return)
+            end
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text(1)
+          end
+        end
       end
     end
 
-    context 'When FF is turned off' do
-      let(:wip_limits) { false }
+    context 'When license is not available' do
+      before do
+        stub_licensed_features(wip_limits: false)
+        visit project_boards_path(project)
+      end
 
-      it 'shows the list settings button' do
-        expect(page).to have_no_selector(:button, "List Settings")
+      it 'does not show the list settings button' do
+        expect(page).to have_no_selector(:button, "List settings")
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
     end
   end

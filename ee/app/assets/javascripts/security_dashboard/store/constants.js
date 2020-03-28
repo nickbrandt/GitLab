@@ -8,17 +8,7 @@ export const SEVERITY_LEVELS = {
   unknown: s__('severity|Unknown'),
   info: s__('severity|Info'),
   undefined: s__('severity|Undefined'),
-};
-
-export const CONFIDENCE_LEVELS = {
-  confirmed: s__('confidence|Confirmed'),
-  high: s__('confidence|High'),
-  medium: s__('confidence|Medium'),
-  low: s__('confidence|Low'),
-  unknown: s__('confidence|Unknown'),
-  ignore: s__('confidence|Ignore'),
-  experimental: s__('confidence|Experimental'),
-  undefined: s__('confidence|Undefined'),
+  none: s__('severity|None'),
 };
 
 export const REPORT_TYPES = {
@@ -27,3 +17,17 @@ export const REPORT_TYPES = {
   dependency_scanning: s__('ciReport|Dependency Scanning'),
   sast: s__('ciReport|SAST'),
 };
+
+export const DASHBOARD_TYPES = {
+  PROJECT: 'project',
+  PIPELINE: 'pipeline',
+  GROUP: 'group',
+  INSTANCE: 'instance',
+};
+
+export const UNSCANNED_PROJECTS_DATE_RANGES = [
+  { description: s__('UnscannedProjects|5 or more days'), fromDay: 5, toDay: 15 },
+  { description: s__('UnscannedProjects|15 or more days'), fromDay: 15, toDay: 30 },
+  { description: s__('UnscannedProjects|30 or more days'), fromDay: 30, toDay: 60 },
+  { description: s__('UnscannedProjects|60 or more days'), fromDay: 60, toDay: Infinity },
+];

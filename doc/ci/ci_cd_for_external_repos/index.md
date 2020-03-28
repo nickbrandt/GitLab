@@ -6,10 +6,6 @@ type: index, howto
 
 >[Introduced][ee-4642] in [GitLab Premium][eep] 10.6.
 
-NOTE: **Note:**
-This feature [is available for free](https://about.gitlab.com/blog/2019/09/09/ci-cd-github-extended-again/) to
-GitLab.com users until March 22nd, 2020.
-
 GitLab CI/CD can be used with:
 
 - [GitHub](github_integration.md).
@@ -99,7 +95,7 @@ via GitHub integration. If you want to exclusively run pipelines on external pul
 requests and not on branches you can add `except: [branches]` to the job specs.
 [Read more](https://gitlab.com/gitlab-org/gitlab/issues/24089#workaround).
 
-[ee-4642]: https://gitlab.com/gitlab-org/gitlab/merge_requests/4642
+[ee-4642]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/4642
 [eep]: https://about.gitlab.com/pricing/
 [mirroring]: ../../user/project/repository/repository_mirroring.md
 [settings]: ../../user/project/settings/index.md#sharing-and-permissions

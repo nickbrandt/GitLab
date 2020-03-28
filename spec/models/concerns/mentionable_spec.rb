@@ -26,6 +26,42 @@ describe Mentionable do
       expect(mentionable.referenced_mentionables).to be_empty
     end
   end
+
+  describe '#any_mentionable_attributes_changed?' do
+    Message = Struct.new(:text)
+
+    let(:mentionable) { Example.new }
+    let(:changes) do
+      msg = Message.new('test')
+
+      changes = {}
+      changes[msg] = ['', 'some message']
+      changes[:random_sym_key] = ['', 'some message']
+      changes["random_string_key"] = ['', 'some message']
+      changes
+    end
+
+    it 'returns true with key string' do
+      changes["message"] = ['', 'some message']
+
+      allow(mentionable).to receive(:saved_changes).and_return(changes)
+
+      expect(mentionable.send(:any_mentionable_attributes_changed?)).to be true
+    end
+
+    it 'returns false with key symbol' do
+      changes[:message] = ['', 'some message']
+      allow(mentionable).to receive(:saved_changes).and_return(changes)
+
+      expect(mentionable.send(:any_mentionable_attributes_changed?)).to be false
+    end
+
+    it 'returns false when no attr_mentionable keys' do
+      allow(mentionable).to receive(:saved_changes).and_return(changes)
+
+      expect(mentionable.send(:any_mentionable_attributes_changed?)).to be false
+    end
+  end
 end
 
 describe Issue, "Mentionable" do
@@ -166,6 +202,21 @@ describe Issue, "Mentionable" do
       create(:issue, project: project, description: description, author: author)
     end
   end
+
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in description', :issue
+    it_behaves_like 'mentions in notes', :issue do
+      let(:note) { create(:note_on_issue) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+
+  describe 'load mentions' do
+    it_behaves_like 'load mentions from DB', :issue do
+      let(:note) { create(:note_on_issue) }
+      let(:mentionable) { note.noteable }
+    end
+  end
 end
 
 describe Commit, 'Mentionable' do
@@ -219,6 +270,58 @@ describe Commit, 'Mentionable' do
 
         expect(commit.matches_cross_reference_regex?).to be_truthy
       end
+    end
+  end
+
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in notes', :commit do
+      let(:note) { create(:note_on_commit) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+
+  describe 'load mentions' do
+    it_behaves_like 'load mentions from DB', :commit do
+      let(:note) { create(:note_on_commit) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+end
+
+describe MergeRequest, 'Mentionable' do
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in description', :merge_request
+    it_behaves_like 'mentions in notes', :merge_request do
+      let(:project) { create(:project) }
+      let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+      let(:note) { create(:note_on_merge_request, noteable: merge_request, project: merge_request.project) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+
+  describe 'load mentions' do
+    it_behaves_like 'load mentions from DB', :merge_request do
+      let(:project) { create(:project) }
+      let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+      let(:note) { create(:note_on_merge_request, noteable: merge_request, project: merge_request.project) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+end
+
+describe Snippet, 'Mentionable' do
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in description', :project_snippet
+    it_behaves_like 'mentions in notes', :project_snippet do
+      let(:note) { create(:note_on_project_snippet) }
+      let(:mentionable) { note.noteable }
+    end
+  end
+
+  describe 'load mentions' do
+    it_behaves_like 'load mentions from DB', :project_snippet do
+      let(:note) { create(:note_on_project_snippet) }
+      let(:mentionable) { note.noteable }
     end
   end
 end

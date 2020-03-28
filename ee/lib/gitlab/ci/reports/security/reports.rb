@@ -14,8 +14,8 @@ module Gitlab
             @commit_sha = commit_sha
           end
 
-          def get_report(report_type)
-            reports[report_type] ||= Report.new(report_type, commit_sha)
+          def get_report(report_type, report_artifact)
+            reports[report_type] ||= Report.new(report_type, commit_sha, report_artifact.created_at)
           end
 
           def violates_default_policy?

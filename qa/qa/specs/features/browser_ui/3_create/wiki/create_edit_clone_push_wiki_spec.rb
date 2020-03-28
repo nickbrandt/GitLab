@@ -4,10 +4,9 @@ module QA
   context 'Create' do
     describe 'Wiki management' do
       it 'user creates, edits, clones, and pushes to the wiki' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
-        wiki = Resource::Wiki.fabricate! do |resource|
+        wiki = Resource::Wiki.fabricate_via_browser_ui! do |resource|
           resource.title = 'Home'
           resource.content = '# My First Wiki Content'
           resource.message = 'Update home'

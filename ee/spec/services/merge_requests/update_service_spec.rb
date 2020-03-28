@@ -172,13 +172,29 @@ describe MergeRequests::UpdateService, :mailer do
     end
 
     context 'updating target_branch' do
-      it 'resets approvals when target_branch is changed' do
-        merge_request.target_project.update(reset_approvals_on_push: true)
-        merge_request.approvals.create(user_id: user2.id)
+      let(:existing_approver) { create(:user) }
+      let(:new_approver) { create(:user) }
 
+      before do
+        project.add_developer(existing_approver)
+        project.add_developer(new_approver)
+
+        perform_enqueued_jobs do
+          update_merge_request(approver_ids: "#{existing_approver.id},#{new_approver.id}")
+        end
+
+        merge_request.target_project.update(reset_approvals_on_push: true)
+        merge_request.approvals.create(user_id: existing_approver.id)
+      end
+
+      it 'resets approvals when target_branch is changed' do
         update_merge_request(target_branch: 'video')
 
         expect(merge_request.reload.approvals).to be_empty
+      end
+
+      it 'creates new todos for the approvers' do
+        expect(Todo.where(action: Todo::APPROVAL_REQUIRED).map(&:user)).to contain_exactly(new_approver, existing_approver)
       end
     end
 
@@ -197,6 +213,27 @@ describe MergeRequests::UpdateService, :mailer do
         end
 
         update_merge_request({})
+      end
+    end
+
+    context 'when reassigned' do
+      it 'schedules for analytics metric update' do
+        expect(Analytics::CodeReviewMetricsWorker)
+          .to receive(:perform_async).with('Analytics::RefreshReassignData', merge_request.id, {})
+
+        update_merge_request({ assignee_ids: [user2.id] })
+      end
+
+      context 'when code_review_analytics is not available' do
+        before do
+          stub_licensed_features(code_review_analytics: false)
+        end
+
+        it 'does not schedule for analytics metric update' do
+          expect(Analytics::CodeReviewMetricsWorker).not_to receive(:perform_async)
+
+          update_merge_request({ assignee_ids: [user2.id] })
+        end
       end
     end
   end

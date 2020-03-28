@@ -9,11 +9,11 @@ module API
         @github_webhook_signature ||= headers['X-Hub-Signature']
       end
 
-      def authenticate_from_github_webhook!
-        return unless github_webhook_signature
-
-        unless valid_github_signature?
-          Guest.can?(:read_project, project) ? unauthorized! : not_found!
+      def render_invalid_github_signature!
+        if Guest.can?(:read_project, project)
+          unauthorized!
+        else
+          not_found!
         end
       end
 
@@ -28,10 +28,16 @@ module API
       end
 
       def authenticate_with_webhook_token!
-        if github_webhook_signature
-          not_found! unless project
+        return not_found! unless project
 
-          authenticate_from_github_webhook!
+        unless valid_github_signature?
+          render_invalid_github_signature!
+        end
+      end
+
+      def try_authenticate_with_webhook_token!
+        if github_webhook_signature
+          authenticate_with_webhook_token!
         else
           authenticate!
           authorize_admin_project
@@ -79,7 +85,7 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Triggers a pull mirror operation'
       post ":id/mirror/pull" do
-        authenticate_with_webhook_token!
+        try_authenticate_with_webhook_token!
 
         break render_api_error!('The project is not mirrored', 400) unless project.mirror?
 

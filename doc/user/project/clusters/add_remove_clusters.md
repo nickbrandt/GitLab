@@ -1,14 +1,84 @@
 # Adding and removing Kubernetes clusters
 
-GitLab can integrate with the following Kubernetes providers:
+GitLab offers integrated cluster creation for the following Kubernetes providers:
 
 - Google Kubernetes Engine (GKE).
 - Amazon Elastic Kubernetes Service (EKS).
+
+GitLab can also integrate with any standard Kubernetes provider, either on-premise or hosted.
 
 TIP: **Tip:**
 Every new Google Cloud Platform (GCP) account receives [$300 in credit upon sign up](https://console.cloud.google.com/freetrial),
 and in partnership with Google, GitLab is able to offer an additional $200 for new GCP accounts to get started with GitLab's
 Google Kubernetes Engine Integration. All you have to do is [follow this link](https://cloud.google.com/partners/partnercredit/?pcn_code=0014M00001h35gDQAQ#contact-form) and apply for credit.
+
+## Before you begin
+
+Before [adding a Kubernetes cluster](#add-new-cluster) using GitLab, you need:
+
+- GitLab itself. Either:
+  - A GitLab.com [account](https://about.gitlab.com/pricing/#gitlab-com).
+  - A [self-managed installation](https://about.gitlab.com/pricing/#self-managed) with GitLab version
+    12.5 or later. This will ensure the GitLab UI can be used for cluster creation.
+- The following GitLab access:
+  - [Maintainer access to a project](../../permissions.md#project-members-permissions) for a
+    project-level cluster.
+  - [Maintainer access to a group](../../permissions.md#group-members-permissions) for a
+    group-level cluster.
+  - [Admin Area access](../../admin_area/index.md) for a self-managed instance-level
+    cluster. **(CORE ONLY)**
+
+### GKE requirements
+
+Before creating your first cluster on Google GKE with GitLab's integration, make sure the following
+requirements are met:
+
+- A [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
+  set up with access.
+- The Kubernetes Engine API and related service are enabled. It should work immediately but may
+  take up to 10 minutes after you create a project. For more information see the
+  ["Before you begin" section of the Kubernetes Engine docs](https://cloud.google.com/kubernetes-engine/docs/quickstart#before-you-begin).
+
+### EKS requirements
+
+Before creating your first cluster on Amazon EKS with GitLab's integration, make sure the following
+requirements are met:
+
+- An [Amazon Web Services](https://aws.amazon.com/) account is set up and you are able to log in.
+- You have permissions to manage IAM resources.
+- If you want to use an [existing EKS cluster](#existing-eks-cluster):
+  - An Amazon EKS cluster with worker nodes properly configured.
+  - `kubectl` [installed and configured](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html#get-started-kubectl)
+    for access to the EKS cluster.
+
+#### Additional requirements for self-managed instances **(CORE ONLY)**
+
+If you are using a self-managed GitLab instance, GitLab must first be configured with a set of
+Amazon credentials. These credentials will be used to assume an Amazon IAM role provided by the user
+creating the cluster. Create an IAM user and ensure it has permissions to assume the role(s) that
+your users will use to create EKS clusters.
+
+For example, the following policy document allows assuming a role whose name starts with
+`gitlab-eks-` in account `123456789012`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Action": "sts:AssumeRole",
+    "Resource": "arn:aws:iam::123456789012:role/gitlab-eks-*"
+  }
+}
+```
+
+Generate an access key for the IAM user, and configure GitLab with the credentials:
+
+1. Navigate to **Admin Area > Settings > Integrations** and expand the **Amazon EKS** section.
+1. Check **Enable Amazon EKS integration**.
+1. Enter the account ID and access key credentials into the respective
+   `Account ID`, `Access key ID` and `Secret access key` fields.
+1. Click **Save changes**.
 
 ## Access controls
 
@@ -34,7 +104,7 @@ namespace.
 
 This service account will be:
 
-- Added to the installed Helm Tiller
+- Added to the installed Helm Tiller.
 - Used by Helm to install and run [GitLab managed applications](index.md#installing-applications).
 
 Helm will also create additional service accounts and other resources for each
@@ -111,57 +181,44 @@ If you don't want to use GitLab Runner in privileged mode, either:
 
 ## Add new cluster
 
-### GKE cluster
+New clusters can be added using GitLab for:
 
-GitLab supports:
+- Google Kubernetes Engine.
+- Amazon Elastic Kubernetes Service.
 
-- Creating a new GKE cluster using the GitLab UI.
-- Providing credentials to add an [existing Kubernetes cluster](#add-existing-cluster).
+### New GKE cluster
 
-Starting from [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/25925), all the GKE clusters provisioned by GitLab are [VPC-native](https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips).
+Starting from [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/25925), all the GKE clusters
+provisioned by GitLab are [VPC-native](https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips).
 
-NOTE: **Note:**
-The [Google authentication integration](../../../integration/google.md) must
-be enabled in GitLab at the instance level. If that's not the case, ask your
-GitLab administrator to enable it. On GitLab.com, this is enabled.
+#### Important notes
 
-#### GKE Requirements
+Note the following:
 
-Before creating your first cluster on Google Kubernetes Engine with GitLab's
-integration, make sure the following requirements are met:
-
-- A [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
-  is set up and you have permissions to access it.
-- The Kubernetes Engine API and related service are enabled. It should work immediately but may take up to 10 minutes after you create a project. For more information see the
-  ["Before you begin" section of the Kubernetes Engine docs](https://cloud.google.com/kubernetes-engine/docs/quickstart#before-you-begin).
-
-Also note the following:
-
+- The [Google authentication integration](../../../integration/google.md) must be enabled in GitLab
+  at the instance level. If that's not the case, ask your GitLab administrator to enable it. On
+  GitLab.com, this is enabled.
 - Starting from [GitLab 12.1](https://gitlab.com/gitlab-org/gitlab-foss/issues/55902), all GKE clusters
   created by GitLab are RBAC-enabled. Take a look at the [RBAC section](#rbac-cluster-resources) for
   more information.
-- Starting from [GitLab 12.5](https://gitlab.com/gitlab-org/gitlab/merge_requests/18341), the
+- Starting from [GitLab 12.5](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18341), the
   cluster's pod address IP range will be set to /16 instead of the regular /14. /16 is a CIDR
   notation.
-
-NOTE: **Note:**
-GitLab requires basic authentication enabled and a client certificate issued for the cluster in
-order to setup an [initial service account](#access-controls). Starting from [GitLab
-11.10](https://gitlab.com/gitlab-org/gitlab-foss/issues/58208), the cluster creation process will
-explicitly request that basic authentication and client certificate is enabled.
+- GitLab requires basic authentication enabled and a client certificate issued for the cluster to
+  set up an [initial service account](#access-controls). Starting from [GitLab
+  11.10](https://gitlab.com/gitlab-org/gitlab-foss/issues/58208), the cluster creation process will
+  explicitly request that basic authentication and client certificate is enabled.
 
 #### Creating the cluster on GKE
 
-If all of the above requirements are met, you can proceed to create and add a
-new Kubernetes cluster to your project:
+To create and add a new Kubernetes cluster to your project, group, or instance:
 
-1. Navigate to your project's **Operations > Kubernetes** page.
-
-   NOTE: **Note:**
-   You need Maintainer [permissions](../../permissions.md) and above to access the Kubernetes page.
-
+1. Navigate to your:
+   - Project's **Operations > Kubernetes** page, for a project-level cluster.
+   - Group's **Kubernetes** page, for a group-level cluster.
+   - **Admin Area > Kubernetes** page, for an instance-level cluster.
 1. Click **Add Kubernetes cluster**.
-1. Click **Create with Google Kubernetes Engine**.
+1. Under the **Create new cluster** tab, click **Google GKE**.
 1. Connect your Google account if you haven't done already by clicking the
    **Sign in with Google** button.
 1. Choose your cluster's settings:
@@ -175,8 +232,8 @@ new Kubernetes cluster to your project:
    - **Number of nodes** - Enter the number of nodes you wish the cluster to have.
    - **Machine type** - The [machine type](https://cloud.google.com/compute/docs/machine-types)
      of the Virtual Machine instance that the cluster will be based on.
-   - **Enable Cloud Run on GKE (beta)** - Check this if you want to use Cloud Run on GKE for this cluster.
-     See the [Cloud Run on GKE section](#cloud-run-on-gke) for more information.
+   - **Enable Cloud Run for Anthos** - Check this if you want to use Cloud Run for Anthos for this cluster.
+     See the [Cloud Run for Anthos section](#cloud-run-for-anthos) for more information.
    - **GitLab-managed cluster** - Leave this checked if you want GitLab to manage namespaces and service accounts for this cluster.
      See the [Managed clusters section](index.md#gitlab-managed-clusters) for more information.
 1. Finally, click the **Create Kubernetes cluster** button.
@@ -184,73 +241,28 @@ new Kubernetes cluster to your project:
 After a couple of minutes, your cluster will be ready to go. You can now proceed
 to install some [pre-defined applications](index.md#installing-applications).
 
-#### Cloud Run on GKE
+#### Cloud Run for Anthos
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16566) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16566) in GitLab 12.4.
 
-You can choose to use Cloud Run on GKE in place of installing Knative and Istio
+You can choose to use Cloud Run for Anthos in place of installing Knative and Istio
 separately after the cluster has been created. This means that Cloud Run
 (Knative), Istio, and HTTP Load Balancing will be enabled on the cluster at
 create time and cannot be [installed or uninstalled](../../clusters/applications.md) separately.
 
-### EKS Cluster
+### New EKS cluster
 
-GitLab supports:
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/22392) in GitLab 12.5.
 
-- Creating a new EKS cluster using the GitLab UI
-  ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/22392) in GitLab 12.5).
-- Providing credentials to add an [existing Kubernetes cluster](#add-existing-cluster).
+To create and add a new Kubernetes cluster to your project, group, or instance:
 
-#### EKS Requirements
-
-Before creating your first cluster on Amazon EKS with GitLab's integration,
-make sure the following requirements are met:
-
-- An [Amazon Web Services](https://aws.amazon.com/) account is set up and you are able to log in.
-- You have permissions to manage IAM resources.
-
-##### Additional requirements for self-managed instances
-
-If you are using a self-managed GitLab instance, GitLab must first
-be configured with a set of Amazon credentials. These credentials
-will be used to assume an Amazon IAM role provided by the user
-creating the cluster. Create an IAM user and ensure it has permissions
-to assume the role(s) that your users will use to create EKS clusters.
-
-For example, the following policy document allows assuming a role whose name starts with
-`gitlab-eks-` in account `123456789012`:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": {
-    "Effect": "Allow",
-    "Action": "sts:AssumeRole",
-    "Resource": "arn:aws:iam::123456789012:role/gitlab-eks-*"
-  }
-}
-```
-
-Generate an access key for the IAM user, and configure GitLab with the credentials:
-
-1. Navigate to **Admin Area > Settings > Integrations** and expand the **Amazon EKS** section.
-1. Check **Enable Amazon EKS integration**.
-1. Enter the account ID and access key credentials into the respective
-   `Account ID`, `Access key ID` and `Secret access key` fields.
-1. Click **Save changes**.
-
-#### Creating the cluster on EKS
-
-If all of the above requirements are met, you can proceed to create and add a
-new Kubernetes cluster to your project:
-
-1. Navigate to your project's **Operations > Kubernetes** page.
-
-   NOTE: **Note:**
-   You need Maintainer [permissions](../../permissions.md) and above to access the Kubernetes page.
-
+1. Navigate to your:
+   - Project's **Operations > Kubernetes** page, for a project-level cluster.
+   - Group's **Kubernetes** page, for a group-level cluster.
+   - **Admin Area > Kubernetes** page, for an instance-level cluster.
 1. Click **Add Kubernetes cluster**.
-1. Click **Amazon EKS**. You will be provided with an `Account ID` and `External ID` to use in the next step.
+1. Under the **Create new cluster** tab, click **Amazon EKS**. You will be provided with an
+   `Account ID` and `External ID` to use in the next step.
 1. In the [IAM Management Console](https://console.aws.amazon.com/iam/home), create an IAM role:
    1. From the left panel, select **Roles**.
    1. Click **Create role**.
@@ -295,6 +307,7 @@ new Kubernetes cluster to your project:
                       "iam:AttachRolePolicy",
                       "iam:CreateRole",
                       "iam:CreateInstanceProfile",
+                      "iam:CreateServiceLinkedRole",
                       "iam:GetRole",
                       "iam:ListRoles",
                       "iam:PassRole",
@@ -325,8 +338,9 @@ new Kubernetes cluster to your project:
    - **Kubernetes cluster name** - The name you wish to give the cluster.
    - **Environment scope** - The [associated environment](index.md#setting-the-environment-scope-premium) to this cluster.
    - **Kubernetes version** - The Kubernetes version to use. Currently the only version supported is 1.14.
-   - **Role name** - Select the [IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)
-     to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf.
+   - **Role name** - Select the [IAM role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html)
+     to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. This IAM role is separate
+     to the IAM role created above, you will need to create it if it does not yet exist.
    - **Region** - The [region](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html)
      in which the cluster will be created.
    - **Key pair name** - Select the [key pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html)
@@ -346,28 +360,34 @@ new Kubernetes cluster to your project:
 After about 10 minutes, your cluster will be ready to go. You can now proceed
 to install some [pre-defined applications](index.md#installing-applications).
 
+NOTE: **Note:**
+You will need to add your AWS external ID to the
+[IAM Role in the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html#cli-configure-role-xaccount)
+to manage your cluster using `kubectl`.
+
 ## Add existing cluster
 
-If you have either of the following types of clusters already, you can add them to a project:
+If you have an existing Kubernetes cluster, you can add it to a project, group, or instance.
 
-- [Google Kubernetes Engine cluster](#add-existing-gke-cluster).
-- [Amazon Elastic Kubernetes Service](#add-existing-eks-cluster).
+For more information, see information for adding an:
+
+- [Existing Kubernetes cluster](#existing-kubernetes-cluster).
+- [Existing Elastic Kubernetes Service cluster](#existing-eks-cluster).
 
 NOTE: **Note:**
 Kubernetes integration is not supported for arm64 clusters. See the issue
 [Helm Tiller fails to install on arm64 cluster](https://gitlab.com/gitlab-org/gitlab-foss/issues/64044) for details.
 
-### Add existing GKE cluster
+### Existing Kubernetes cluster
 
-To add an existing Kubernetes cluster to your project:
+To add a Kubernetes cluster to your project, group, or instance:
 
-1. Navigate to your project's **Operations > Kubernetes** page.
-
-   NOTE: **Note:**
-   You need Maintainer [permissions](../../permissions.md) and above to access the Kubernetes page.
-
+1. Navigate to your:
+   - Project's **Operations > Kubernetes** page, for a project-level cluster.
+   - Group's **Kubernetes** page, for a group-level cluster.
+   - **Admin Area > Kubernetes** page, for an instance-level cluster.
 1. Click **Add Kubernetes cluster**.
-1. Click **Add an existing Kubernetes cluster** and fill in the details:
+1. Click the **Add existing cluster** tab and fill in the details:
    - **Kubernetes cluster name** (required) - The name you wish to give the cluster.
    - **Environment scope** (required) - The
      [associated environment](index.md#setting-the-environment-scope-premium) to this cluster.
@@ -378,16 +398,16 @@ To add an existing Kubernetes cluster to your project:
 
      Get the API URL by running this command:
 
-     ```sh
+     ```shell
      kubectl cluster-info | grep 'Kubernetes master' | awk '/http/ {print $NF}'
      ```
 
    - **CA certificate** (required) - A valid Kubernetes certificate is needed to authenticate to the cluster. We will use the certificate created by default.
-     - List the secrets with `kubectl get secrets`, and one should named similar to
+     - List the secrets with `kubectl get secrets`, and one should be named similar to
       `default-token-xxxxx`. Copy that token name for use below.
      - Get the certificate by running this command:
 
-       ```sh
+       ```shell
 
        kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
 
@@ -429,7 +449,7 @@ To add an existing Kubernetes cluster to your project:
 
      1. Apply the service account and cluster role binding to your cluster:
 
-        ```bash
+        ```shell
         kubectl apply -f gitlab-admin-service-account.yaml
         ```
 
@@ -438,7 +458,7 @@ To add an existing Kubernetes cluster to your project:
         you can alternatively enable Basic Authentication and then run the
         `kubectl apply` command as an admin:
 
-        ```bash
+        ```shell
         kubectl apply -f gitlab-admin-service-account.yaml --username=admin --password=<password>
         ```
 
@@ -448,14 +468,14 @@ To add an existing Kubernetes cluster to your project:
 
         Output:
 
-        ```bash
+        ```shell
         serviceaccount "gitlab-admin" created
         clusterrolebinding "gitlab-admin" created
         ```
 
      1. Retrieve the token for the `gitlab-admin` service account:
 
-        ```bash
+        ```shell
         kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep gitlab-admin | awk '{print $1}')
         ```
 
@@ -502,136 +522,110 @@ To add an existing Kubernetes cluster to your project:
 After a couple of minutes, your cluster will be ready to go. You can now proceed
 to install some [pre-defined applications](index.md#installing-applications).
 
-### Add existing EKS cluster
+### Existing EKS cluster
 
-In this section, we will show how to integrate an [Amazon EKS](https://aws.amazon.com/eks/) cluster with GitLab and begin
-deploying applications.
+To add an existing EKS cluster to your project, group, or instance:
 
-#### Requirements
+1. Perform the following steps on the EKS cluster:
+   1. Retrieve the certificate. A valid Kubernetes certificate is needed to authenticate to the
+      EKS cluster. We will use the certificate created by default.
+      Open a shell and use `kubectl` to retrieve it:
 
-To integrate with with EKS, you will need:
+      1. List the secrets with `kubectl get secrets`, and one should named similar to
+         `default-token-xxxxx`. Copy that token name for use below.
+      1. Get the certificate with:
 
-- An account on GitLab, like [GitLab.com](https://gitlab.com).
-- An Amazon EKS cluster (with worker nodes properly configured).
-- `kubectl` [installed and configured for access to the EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html#get-started-kubectl).
+         ```shell
+         kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
+         ```
 
-If you don't have an Amazon EKS cluster, one can be created by following the
-[EKS getting started guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html).
+   1. Create admin token. A `cluster-admin` token is required to install and manage Helm Tiller.
+      GitLab establishes mutual SSL authentication with Helm Tiller and creates limited service
+      accounts for each application. To create the token we will create an admin service account as
+      follows:
 
-#### Configuring and connecting the EKS cluster
+      1. Create a file called `eks-admin-service-account.yaml` with contents:
 
-From the left side bar, hover over **Operations > Kubernetes > Add Kubernetes cluster**,
-then click **Add an existing Kubernetes cluster**.
+         ```yaml
+         apiVersion: v1
+         kind: ServiceAccount
+         metadata:
+           name: eks-admin
+           namespace: kube-system
+         ```
 
-A few details from the EKS cluster will be required to connect it to GitLab:
+      1. Apply the service account to your cluster:
 
-1. **Retrieve the certificate**: A valid Kubernetes certificate is needed to
-   authenticate to the EKS cluster. We will use the certificate created by default.
-   Open a shell and use `kubectl` to retrieve it:
+         ```shell
+         $ kubectl apply -f eks-admin-service-account.yaml
+         serviceaccount "eks-admin" created
+         ```
 
-   - List the secrets with `kubectl get secrets`, and one should named similar to
-     `default-token-xxxxx`. Copy that token name for use below.
-   - Get the certificate with:
+      1. Create a file called `eks-admin-cluster-role-binding.yaml` with contents:
 
-     ```sh
-     kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
-     ```
+         ```yaml
+         apiVersion: rbac.authorization.k8s.io/v1beta1
+         kind: ClusterRoleBinding
+         metadata:
+           name: eks-admin
+         roleRef:
+           apiGroup: rbac.authorization.k8s.io
+           kind: ClusterRole
+           name: cluster-admin
+         subjects:
+         - kind: ServiceAccount
+           name: eks-admin
+           namespace: kube-system
+         ```
 
-1. **Create admin token**: A `cluster-admin` token is required to install and
-   manage Helm Tiller. GitLab establishes mutual SSL auth with Helm Tiller
-   and creates limited service accounts for each application. To create the
-   token we will create an admin service account as follows:
+      1. Apply the cluster role binding to your cluster:
 
-   1. Create a file called `eks-admin-service-account.yaml` with contents:
+         ```shell
+         $ kubectl apply -f eks-admin-cluster-role-binding.yaml
+         clusterrolebinding "eks-admin" created
+         ```
 
-      ```yaml
-      apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: eks-admin
-        namespace: kube-system
-      ```
+      1. Retrieve the token for the `eks-admin` service account:
 
-   1. Apply the service account to your cluster:
+         ```shell
+         kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
+         ```
 
-      ```bash
-      kubectl apply -f eks-admin-service-account.yaml
-      ```
+         Copy the `<authentication_token>` value from the output:
 
-      Output:
-
-      ```bash
-      serviceaccount "eks-admin" created
-      ```
-
-   1. Create a file called `eks-admin-cluster-role-binding.yaml` with contents:
-
-      ```yaml
-      apiVersion: rbac.authorization.k8s.io/v1beta1
-      kind: ClusterRoleBinding
-      metadata:
-        name: eks-admin
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: ClusterRole
-        name: cluster-admin
-      subjects:
-      - kind: ServiceAccount
-        name: eks-admin
-        namespace: kube-system
-      ```
-
-   1. Apply the cluster role binding to your cluster:
-
-      ```bash
-      kubectl apply -f eks-admin-cluster-role-binding.yaml
-      ```
-
-      Output:
-
-      ```bash
-      clusterrolebinding "eks-admin" created
-      ```
-
-   1. Retrieve the token for the `eks-admin` service account:
-
-      ```bash
-      kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
-      ```
-
-      Copy the `<authentication_token>` value from the output:
-
-      ```yaml
-      Name:         eks-admin-token-b5zv4
-      Namespace:    kube-system
-      Labels:       <none>
-      Annotations:  kubernetes.io/service-account.name=eks-admin
+         ```yaml
+         Name:         eks-admin-token-b5zv4
+         Namespace:    kube-system
+         Labels:       <none>
+         Annotations:  kubernetes.io/service-account.name=eks-admin
                     kubernetes.io/service-account.uid=bcfe66ac-39be-11e8-97e8-026dce96b6e8
 
-      Type:  kubernetes.io/service-account-token
+         Type:  kubernetes.io/service-account-token
 
-      Data
-      ====
-      ca.crt:     1025 bytes
-      namespace:  11 bytes
-      token:      <authentication_token>
-      ```
+         Data
+         ====
+         ca.crt:     1025 bytes
+         namespace:  11 bytes
+         token:      <authentication_token>
+         ```
 
-1. The API server endpoint is also required, so GitLab can connect to the cluster.
-   This is displayed on the AWS EKS console, when viewing the EKS cluster details.
+   1. Locate the the API server endpoint so GitLab can connect to the cluster. This is displayed on
+      the AWS EKS console, when viewing the EKS cluster details.
+1. Navigate to your:
+   - Project's **Operations > Kubernetes** page, for a project-level cluster.
+   - Group's **Kubernetes** page, for a group-level cluster.
+   - **Admin Area > Kubernetes** page, for an instance-level cluster.
+1. Click **Add Kubernetes cluster**.
+1. Click the **Add existing cluster** tab and fill in the details:
+   - **Kubernetes cluster name**: A name for the cluster to identify it within GitLab.
+   - **Environment scope**: Leave this as `*` for now, since we are only connecting a single cluster.
+   - **API URL**: The API server endpoint retrieved earlier.
+   - **CA Certificate**: The certificate data from the earlier step, as-is.
+   - **Service Token**: The admin token value.
+   - For project-level clusters, **Project namespace prefix**: This can be left blank to accept the
+     default namespace, based on the project name.
+1. Click on **Add Kubernetes cluster**. The cluster is now connected to GitLab.
 
-You now have all the information needed to connect the EKS cluster:
-
-- Kubernetes cluster name: Provide a name for the cluster to identify it within GitLab.
-- Environment scope: Leave this as `*` for now, since we are only connecting a single cluster.
-- API URL: Paste in the API server endpoint retrieved above.
-- CA Certificate: Paste the certificate data from the earlier step, as-is.
-- Paste the admin token value.
-- Project namespace: This can be left blank to accept the default namespace, based on the project name.
-
-![Add Cluster](img/add_cluster.png)
-
-Click on **Add Kubernetes cluster**, the cluster is now connected to GitLab.
 At this point, [Kubernetes deployment variables](index.md#deployment-variables) will
 automatically be available during CI/CD jobs, making it easy to interact with the cluster.
 
@@ -654,7 +648,7 @@ or user who can authenticate to the cluster, has full API access. This is a
 
 To effectively disable RBAC, global permissions can be applied granting full access:
 
-```bash
+```shell
 kubectl create clusterrolebinding permissive-binding \
   --clusterrole=cluster-admin \
   --user=admin \
@@ -666,14 +660,14 @@ kubectl create clusterrolebinding permissive-binding \
 
 Amazon EKS doesn't have a default Storage Class out of the box, which means
 requests for persistent volumes will not be automatically fulfilled. As part
-of Auto DevOps, the deployed Postgres instance requests persistent storage,
+of Auto DevOps, the deployed PostgreSQL instance requests persistent storage,
 and without a default storage class it will fail to start.
 
 If a default Storage Class doesn't already exist and is desired, follow Amazon's
 [guide on storage classes](https://docs.aws.amazon.com/eks/latest/userguide/storage-classes.html)
 to create one.
 
-Alternatively, disable Postgres by setting the project variable
+Alternatively, disable PostgreSQL by setting the project variable
 [`POSTGRES_ENABLED`](../../../topics/autodevops/#environment-variables) to `false`.
 
 #### Deploy the app to EKS
@@ -713,16 +707,19 @@ To disable the Kubernetes cluster integration, follow the same procedure.
 
 ## Removing integration
 
-To remove the Kubernetes cluster integration from your project, simply click the
-**Remove integration** button. You will then be able to follow the procedure
-and add a Kubernetes cluster again.
+To remove the Kubernetes cluster integration from your project, either:
+
+- Select **Remove integration**, to remove only the Kubernetes integration.
+- [From GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/26815), select
+  **Remove integration and resources**, to also remove all related GitLab cluster resources (for
+  example, namespaces, roles, and bindings) when removing the integration.
 
 When removing the cluster integration, note:
 
 - You need Maintainer [permissions](../../permissions.md) and above to remove a Kubernetes cluster
   integration.
 - When you remove a cluster, you only remove its relationship to GitLab, not the cluster itself. To
-  remove the cluster, you can do so by visiting the GKE dashboard or using `kubectl`.
+  remove the cluster, you can do so by visiting the GKE or EKS dashboard, or using `kubectl`.
 
 ## Learn more
 

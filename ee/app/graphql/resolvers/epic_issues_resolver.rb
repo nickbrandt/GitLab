@@ -8,7 +8,7 @@ module Resolvers
 
     # When using EpicIssuesResolver then epic's issues are authorized when
     # rendering lazy-loaded issues, we explicitly ignore any inherited
-    # type_authorizations to avoid excuting any authorization checks in earlier
+    # type_authorizations to avoid executing any authorization checks in earlier
     # phase
     def self.skip_authorizations?
       true

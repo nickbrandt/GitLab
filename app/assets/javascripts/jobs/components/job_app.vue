@@ -1,14 +1,13 @@
 <script>
-import _ from 'underscore';
+import { throttle, isEmpty } from 'lodash';
 import { mapGetters, mapState, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { isScrolledToBottom } from '~/lib/utils/scroll_utils';
 import { polyfillSticky } from '~/lib/utils/sticky';
-import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import createStore from '../store';
 import EmptyState from './empty_state.vue';
 import EnvironmentsBlock from './environments_block.vue';
 import ErasedBlock from './erased_block.vue';
@@ -22,7 +21,6 @@ import { isNewJobLogActive } from '../store/utils';
 
 export default {
   name: 'JobPageApp',
-  store: createStore(),
   components: {
     CiHeader,
     Callout,
@@ -60,24 +58,12 @@ export default {
       required: false,
       default: null,
     },
-    endpoint: {
-      type: String,
-      required: true,
-    },
     terminalPath: {
       type: String,
       required: false,
       default: null,
     },
-    pagePath: {
-      type: String,
-      required: true,
-    },
     projectPath: {
-      type: String,
-      required: true,
-    },
-    logState: {
       type: String,
       required: true,
     },
@@ -139,7 +125,7 @@ export default {
     // Once the job log is loaded,
     // fetch the stages for the dropdown on the sidebar
     job(newVal, oldVal) {
-      if (_.isEmpty(oldVal) && !_.isEmpty(newVal.pipeline)) {
+      if (isEmpty(oldVal) && !isEmpty(newVal.pipeline)) {
         const stages = this.job.pipeline.details.stages || [];
 
         const defaultStage = stages.find(stage => stage && stage.name === this.selectedStage);
@@ -159,16 +145,7 @@ export default {
     },
   },
   created() {
-    this.throttled = _.throttle(this.toggleScrollButtons, 100);
-
-    this.setJobEndpoint(this.endpoint);
-    this.setTraceOptions({
-      logState: this.logState,
-      pagePath: this.pagePath,
-    });
-
-    this.fetchJob();
-    this.fetchTrace();
+    this.throttled = throttle(this.toggleScrollButtons, 100);
 
     window.addEventListener('resize', this.onResize);
     window.addEventListener('scroll', this.updateScroll);
@@ -176,22 +153,22 @@ export default {
   mounted() {
     this.updateSidebar();
   },
-  destroyed() {
+  beforeDestroy() {
+    this.stopPollingTrace();
+    this.stopPolling();
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('scroll', this.updateScroll);
   },
   methods: {
     ...mapActions([
-      'setJobEndpoint',
-      'setTraceOptions',
-      'fetchJob',
       'fetchJobsForStage',
       'hideSidebar',
       'showSidebar',
       'toggleSidebar',
-      'fetchTrace',
       'scrollBottom',
       'scrollTop',
+      'stopPollingTrace',
+      'stopPolling',
       'toggleScrollButtons',
       'toggleScrollAnimation',
     ]),
@@ -200,7 +177,8 @@ export default {
       this.updateScroll();
     },
     updateSidebar() {
-      if (bp.getBreakpointSize() === 'xs') {
+      const breakpoint = bp.getBreakpointSize();
+      if (breakpoint === 'xs' || breakpoint === 'sm') {
         this.hideSidebar();
       } else if (!this.isSidebarOpen) {
         this.showSidebar();
@@ -222,7 +200,7 @@ export default {
   <div>
     <gl-loading-icon
       v-if="isLoading"
-      :size="2"
+      size="lg"
       class="js-job-loading qa-loading-animation prepend-top-20"
     />
 
@@ -278,6 +256,7 @@ export default {
           v-if="hasEnvironment"
           class="js-job-environment"
           :deployment-status="job.deployment_status"
+          :deployment-cluster="job.deployment_cluster"
           :icon-status="job.status"
         />
 

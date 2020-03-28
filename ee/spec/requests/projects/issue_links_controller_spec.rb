@@ -25,7 +25,7 @@ describe Projects::IssueLinksController do
 
       get namespace_project_issue_links_path(issue_links_params)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq(list_service_response.as_json)
     end
   end
@@ -47,7 +47,7 @@ describe Projects::IssueLinksController do
 
         list_service_response = IssueLinks::ListService.new(issue, user).execute
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq('message' => nil,
                                     'issuables' => list_service_response.as_json)
       end
@@ -61,7 +61,7 @@ describe Projects::IssueLinksController do
         it 'returns 403' do
           post namespace_project_issue_links_path(issue_links_params(issuable_references: issuable_references))
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -74,7 +74,7 @@ describe Projects::IssueLinksController do
 
           list_service_response = IssueLinks::ListService.new(issue, user).execute
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response).to eq('message' => 'No Issue found for given params', 'issuables' => list_service_response.as_json)
         end
       end
@@ -97,7 +97,7 @@ describe Projects::IssueLinksController do
         it 'returns 403' do
           delete namespace_project_issue_link_path(issue_links_params(id: issue_link.id))
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -109,7 +109,7 @@ describe Projects::IssueLinksController do
         it 'returns 404' do
           delete namespace_project_issue_link_path(issue_links_params(id: issue_link.id))
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -142,7 +142,7 @@ describe Projects::IssueLinksController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'does not delete the link' do

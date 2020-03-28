@@ -12,7 +12,7 @@ module EE
           override :find_groups
           # rubocop: disable CodeReuse/ActiveRecord
           def find_groups(params, parent_id = nil)
-            super.preload(:ldap_group_links)
+            super.preload(:ldap_group_links, :deletion_schedule)
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
@@ -54,12 +54,27 @@ module EE
             audit_log_finder_params = params.slice(:created_after, :created_before)
             audit_log_finder_params.merge(entity_type: group.class.name, entity_id: group.id)
           end
+
+          override :delete_group
+          def delete_group(group)
+            return super unless group.adjourned_deletion?
+
+            result = destroy_conditionally!(group) do |group|
+              ::Groups::MarkForDeletionService.new(group, current_user).execute
+            end
+
+            if result[:status] == :success
+              accepted!
+            else
+              render_api_error!(result[:message], 400)
+            end
+          end
         end
 
         resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           desc 'Sync a group with LDAP.'
           post ":id/ldap_sync" do
-            not_found! unless ::Gitlab::Auth::LDAP::Config.group_sync_enabled?
+            not_found! unless ::Gitlab::Auth::Ldap::Config.group_sync_enabled?
 
             group = find_group!(params[:id])
             authorize! :admin_group, group
@@ -95,13 +110,31 @@ module EE
             desc 'Get a specific audit event in this group.' do
               success EE::API::Entities::AuditEvent
             end
+            params do
+              requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
+            end
             get '/:audit_event_id' do
-              audit_log_finder_params = audit_log_finder_params(user_group)
-              audit_event = AuditLogFinder.new(audit_log_finder_params.merge(id: params[:audit_event_id])).execute
-
-              not_found!('Audit Event') unless audit_event
+              # rubocop: disable CodeReuse/ActiveRecord
+              # This is not `find_by!` from ActiveRecord
+              audit_event = AuditLogFinder.new(audit_log_finder_params(user_group))
+                .find_by!(id: params[:audit_event_id])
+              # rubocop: enable CodeReuse/ActiveRecord
 
               present audit_event, with: EE::API::Entities::AuditEvent
+            end
+          end
+
+          desc 'Restore a group.'
+          post ':id/restore' do
+            authorize! :admin_group, user_group
+            break not_found! unless user_group.feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+            result = ::Groups::RestoreService.new(user_group, current_user).execute
+
+            if result[:status] == :success
+              present user_group, with: ::API::Entities::GroupDetail, current_user: current_user
+            else
+              render_api_error!(result[:message], 400)
             end
           end
         end

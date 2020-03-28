@@ -4,11 +4,17 @@ type: reference
 
 # Smartcard authentication **(PREMIUM ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33669) in GitLab 12.6,
-if a user has a pre-existing username and password, they can still use that to log
-in by default. However, this can be disabled.
-
 GitLab supports authentication using smartcards.
+
+## Existing password authentication
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33669) in GitLab 12.6.
+
+By default, existing users can continue to log in with a username and password when smartcard
+authentication is enabled.
+
+To force existing users to use only smartcard authentication,
+[disable username and password authentication](../../user/admin_area/settings/sign_in_restrictions.md#password-authentication-enabled).
 
 ## Authentication methods
 
@@ -19,10 +25,11 @@ GitLab supports two authentication methods:
 
 ### Authentication against a local database with X.509 certificates
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/726) in
-[GitLab Premium](https://about.gitlab.com/pricing/) 11.6 as an experimental
-feature. Smartcard authentication against local databases may change or be
-removed completely in future releases.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/726) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.6 as an experimental feature.
+
+CAUTION: **Caution:**
+Smartcard authentication against local databases may change or be removed completely in future
+releases.
 
 Smartcards with X.509 certificates can be used to authenticate with GitLab.
 
@@ -43,7 +50,7 @@ Certificate:
         Subject: CN=Gitlab User, emailAddress=gitlab-user@example.com
 ```
 
-### Authentication against a local database with X.509 certificates and SAN extensions **(PREMIUM ONLY)**
+### Authentication against a local database with X.509 certificates and SAN extension
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8605) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.3.
 
@@ -88,10 +95,7 @@ Certificate:
 
 ### Authentication against an LDAP server
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7693) in
-[GitLab Premium](https://about.gitlab.com/pricing/) 11.8 as an experimental
-feature. Smartcard authentication against an LDAP server may change or be
-removed completely in future releases.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7693) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8 as an experimental feature. Smartcard authentication against an LDAP server may change or be removed completely in future releases.
 
 GitLab implements a standard way of certificate matching following
 [RFC4523](https://tools.ietf.org/html/rfc4523). It uses the
@@ -128,14 +132,20 @@ attribute. As a prerequisite, you must use an LDAP server that:
    - The additional NGINX server context must be configured to run on a different
      port:
 
-     ```
+     ```plaintext
      listen *:3444 ssl;
+     ```
+
+   - It can also be configured to run on a different hostname:
+
+     ```plaintext
+     listen smartcard.example.com:443 ssl;
      ```
 
    - The additional NGINX server context must be configured to require the client
      side certificate:
 
-     ```
+     ```plaintext
      ssl_verify_depth 2;
      ssl_client_certificate /etc/ssl/certs/CA.pem;
      ssl_verify_client on;
@@ -144,16 +154,16 @@ attribute. As a prerequisite, you must use an LDAP server that:
    - The additional NGINX server context must be configured to forward the client
      side certificate:
 
-     ```
+     ```plaintext
      proxy_set_header    X-SSL-Client-Certificate    $ssl_client_escaped_cert;
      ```
 
    For example, the following is an example server context in an NGINX
    configuration file (eg. in `/etc/nginx/sites-available/gitlab-ssl`):
 
-   ```
+   ```plaintext
    server {
-       listen *:3444 ssl;
+       listen smartcard.example.com:3443 ssl;
 
        # certificate for configuring SSL
        ssl_certificate /path/to/example.com.crt;
@@ -192,9 +202,15 @@ attribute. As a prerequisite, you must use an LDAP server that:
      # Path to a file containing a CA certificate
      ca_file: '/etc/ssl/certs/CA.pem'
 
-     # Port where the client side certificate is requested by NGINX
-     client_certificate_required_port: 3444
+     # Host and port where the client side certificate is requested by the
+     # webserver (NGINX/Apache)
+     client_certificate_required_host: smartcard.example.com
+     client_certificate_required_port: 3443
    ```
+
+   NOTE: **Note**
+   Assign a value to at least one of the following variables:
+   `client_certificate_required_host` or `client_certificate_required_port`.
 
 1. Save the file and [restart](../restart_gitlab.md#installations-from-source)
    GitLab for the changes to take effect.

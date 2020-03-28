@@ -31,7 +31,7 @@ describe Projects::Security::ConfigurationController do
     it "renders data on the project's security configuration" do
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to render_template(:show)
       expect(response.body).to have_css(
         'div#js-security-configuration'\
@@ -55,7 +55,7 @@ describe Projects::Security::ConfigurationController do
       it 'reports that Auto DevOps is enabled' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.body).to have_css(
           'div#js-security-configuration'\
             '[data-auto-devops-enabled]'\

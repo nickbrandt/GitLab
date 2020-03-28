@@ -129,7 +129,7 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
         end
       end
 
-      context 'when head pipelines already exist for merge request source branch' do
+      context 'when head pipelines already exist for merge request source branch', :sidekiq_inline do
         let(:shas) { project.repository.commits(opts[:source_branch], limit: 2).map(&:id) }
         let!(:pipeline_1) { create(:ci_pipeline, project: project, ref: opts[:source_branch], project_id: project.id, sha: shas[1]) }
         let!(:pipeline_2) { create(:ci_pipeline, project: project, ref: opts[:source_branch], project_id: project.id, sha: shas[0]) }
@@ -175,20 +175,20 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
         end
       end
 
-      describe 'Pipelines for merge requests' do
+      describe 'Pipelines for merge requests', :sidekiq_inline do
         before do
-          stub_ci_pipeline_yaml_file(YAML.dump(config))
+          stub_ci_pipeline_yaml_file(config)
         end
 
         context "when .gitlab-ci.yml has merge_requests keywords" do
           let(:config) do
-            {
+            YAML.dump({
               test: {
                 stage: 'test',
                 script: 'echo',
                 only: ['merge_requests']
               }
-            }
+            })
           end
 
           it 'creates a detached merge request pipeline and sets it as a head pipeline' do
@@ -216,7 +216,9 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
               target_project.add_maintainer(user)
             end
 
-            it 'create legacy detached merge request pipeline for fork merge request', :sidekiq_might_not_need_inline do
+            it 'create legacy detached merge request pipeline for fork merge request' do
+              merge_request.reload
+
               expect(merge_request.actual_head_pipeline)
                 .to be_legacy_detached_merge_request_pipeline
             end
@@ -228,6 +230,8 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
             end
 
             it 'create legacy detached merge request pipeline for non-fork merge request' do
+              merge_request.reload
+
               expect(merge_request.actual_head_pipeline)
                 .to be_legacy_detached_merge_request_pipeline
             end
@@ -262,6 +266,8 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
             end
 
             it 'sets the latest detached merge request pipeline as the head pipeline' do
+              merge_request.reload
+
               expect(merge_request.actual_head_pipeline).to be_merge_request_event
             end
           end
@@ -269,12 +275,12 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
 
         context "when .gitlab-ci.yml does not have merge_requests keywords" do
           let(:config) do
-            {
+            YAML.dump({
               test: {
                 stage: 'test',
                 script: 'echo'
               }
-            }
+            })
           end
 
           it 'does not create a detached merge request pipeline' do
@@ -284,12 +290,65 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
             expect(merge_request.pipelines_for_merge_request.count).to eq(0)
           end
         end
+
+        context 'when .gitlab-ci.yml is invalid' do
+          let(:config) { 'invalid yaml file' }
+
+          it 'persists a pipeline with config error' do
+            expect(merge_request).to be_persisted
+
+            merge_request.reload
+            expect(merge_request.pipelines_for_merge_request.count).to eq(1)
+            expect(merge_request.pipelines_for_merge_request.last).to be_failed
+            expect(merge_request.pipelines_for_merge_request.last).to be_config_error
+          end
+        end
       end
 
       it 'increments the usage data counter of create event' do
         counter = Gitlab::UsageDataCounters::MergeRequestCounter
 
         expect { service.execute }.to change { counter.read(:create) }.by(1)
+      end
+
+      context 'after_save callback to store_mentions' do
+        let(:labels) { create_pair(:label, project: project) }
+        let(:milestone) { create(:milestone, project: project) }
+        let(:req_opts) { { source_branch: 'feature', target_branch: 'master' } }
+
+        context 'when mentionable attributes change' do
+          let(:opts) { { title: 'Title', description: "Description with #{user.to_reference}" }.merge(req_opts) }
+
+          it 'saves mentions' do
+            expect_next_instance_of(MergeRequest) do |instance|
+              expect(instance).to receive(:store_mentions!).and_call_original
+            end
+            expect(merge_request.user_mentions.count).to eq 1
+          end
+        end
+
+        context 'when mentionable attributes do not change' do
+          let(:opts) { { label_ids: labels.map(&:id), milestone_id: milestone.id }.merge(req_opts) }
+
+          it 'does not call store_mentions' do
+            expect_next_instance_of(MergeRequest) do |instance|
+              expect(instance).not_to receive(:store_mentions!).and_call_original
+            end
+            expect(merge_request.valid?).to be false
+            expect(merge_request.user_mentions.count).to eq 0
+          end
+        end
+
+        context 'when save fails' do
+          let(:opts) { { label_ids: labels.map(&:id), milestone_id: milestone.id } }
+
+          it 'does not call store_mentions' do
+            expect_next_instance_of(MergeRequest) do |instance|
+              expect(instance).not_to receive(:store_mentions!).and_call_original
+            end
+            expect(merge_request.valid?).to be false
+          end
+        end
       end
     end
 
@@ -481,6 +540,14 @@ describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
           merge_request = described_class.new(project, user, opts).execute
 
           expect(merge_request).to be_persisted
+        end
+
+        it 'calls MergeRequests::LinkLfsObjectsService#execute', :sidekiq_might_not_need_inline do
+          expect_next_instance_of(MergeRequests::LinkLfsObjectsService) do |service|
+            expect(service).to receive(:execute).with(instance_of(MergeRequest))
+          end
+
+          described_class.new(project, user, opts).execute
         end
 
         it 'does not create the merge request when the target project is archived' do

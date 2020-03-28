@@ -16,10 +16,9 @@ module QA
       commit_message_of_third_branch = "Add #{file_third_branch}"
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
-        project = Resource::Project.fabricate! do |proj|
+        project = Resource::Project.fabricate_via_api! do |proj|
           proj.name = 'project-qa-test'
           proj.description = 'project for qa test'
         end

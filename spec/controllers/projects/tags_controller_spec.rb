@@ -13,7 +13,7 @@ describe Projects::TagsController do
     end
 
     it 'returns the tags for the page' do
-      expect(assigns(:tags).map(&:name)).to eq(['v1.1.0', 'v1.0.0'])
+      expect(assigns(:tags).map(&:name)).to include('v1.1.0', 'v1.0.0')
     end
 
     it 'returns releases matching those tags' do
@@ -29,11 +29,13 @@ describe Projects::TagsController do
 
     context "valid tag" do
       let(:id) { 'v1.0.0' }
+
       it { is_expected.to respond_with(:success) }
     end
 
     context "invalid tag" do
       let(:id) { 'latest' }
+
       it { is_expected.to respond_with(:not_found) }
     end
   end

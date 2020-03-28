@@ -1,7 +1,7 @@
 # Web IDE
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4539) in [GitLab Ultimate][ee] 10.4.
-> [Brought to GitLab Core](https://gitlab.com/gitlab-org/gitlab-foss/issues/44157) in 10.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4539) in [GitLab Ultimate][ee] 10.4.
+> - [Brought to GitLab Core](https://gitlab.com/gitlab-org/gitlab-foss/issues/44157) in 10.7.
 
 The Web IDE editor makes it faster and easier to contribute changes to your
 projects by providing an advanced editor with commit staging.
@@ -15,7 +15,7 @@ and from merge requests.
 
 ## File finder
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18323) in [GitLab Core][ce] 10.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18323) in [GitLab Core][ce] 10.8.
 
 The file finder allows you to quickly open files in the current branch by
 searching. The file finder is launched using the keyboard shortcut `Command-p`,
@@ -30,11 +30,11 @@ the Web IDE will make your direct editing even easier.
 The Web IDE currently provides:
 
 - Basic syntax colorization for a variety of programming, scripting and markup
-  languages such as XML, PHP, C#, C++, Markdown, Java, VB, Batch, Python, Ruby
+  languages such as XML, PHP, C#, C++, Markdown, Java, VB, Batch, Python, Ruby,
   and Objective-C.
 - IntelliSense and validation support (displaying errors and warnings, providing
   smart completions, formatting, and outlining) for some languages. For example:
-TypeScript, JavaScript, CSS, LESS, SCSS, JSON and HTML.
+  TypeScript, JavaScript, CSS, LESS, SCSS, JSON, and HTML.
 
 Because the Web IDE is based on the [Monaco Editor](https://microsoft.github.io/monaco-editor/),
 you can find a more complete list of supported languages in the
@@ -43,33 +43,37 @@ you can find a more complete list of supported languages in the
 NOTE: **Note:**
 Single file editing is based on the [Ace Editor](https://ace.c9.io).
 
-## Stage and commit changes
+## Commit changes
 
-After making your changes, click the **Commit** button in the bottom left to
-review the list of changed files. Click on each file to review the changes and
-click the tick icon to stage the file.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4539) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4 and [brought to GitLab Core](https://gitlab.com/gitlab-org/gitlab-foss/issues/44157) in 10.7.
+> - From [GitLab 12.7 onward](https://gitlab.com/gitlab-org/gitlab/issues/33441), files were automatically staged.
+> - From [GitLab 12.9 onward](https://gitlab.com/gitlab-org/gitlab/-/issues/196609), support for staging files was removed to prevent loss of unstaged data. All your current changes necessarily have to be committed or discarded.
 
-![Review changes](img/review_changes_v12_3.png)
+After making your changes, click the **Commit** button on the bottom-left to
+review the list of changed files.
 
-Once you have staged some changes, you can add a commit message, commit the
-staged changes and directly create a merge request. In case you don't have write
+Once you have finalized your changes, you can add a commit message, commit the
+changes and directly create a merge request. In case you don't have write
 access to the selected branch, you will see a warning, but still be able to create
 a new branch and start a merge request.
 
-![Commit changes](img/commit_changes_v12_3.png)
+To discard a change in a particular file, click the **Discard changes** button on that
+file in the changes tab. To discard all the changes, click the trash icon on the
+top-right corner of the changes sidebar.
+
+![Commit changes](img/commit_changes_v12_9.png)
 
 ## Reviewing changes
 
 Before you commit your changes, you can compare them with the previous commit
-by switching to the review mode or selecting the file from the staged files
-list.
+by switching to the review mode or selecting the file from the list of changes.
 
 An additional review mode is available when you open a merge request, which
 shows you a preview of the merge request diff if you commit your changes.
 
 ## View CI job logs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19279) in [GitLab Core][ce] 11.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19279) in [GitLab Core][ce] 11.0.
 
 You can use the Web IDE to quickly fix failing tests by opening
 the branch or merge request in the Web IDE and opening the logs of the failed
@@ -82,7 +86,7 @@ left.
 
 ## Switching merge requests
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19318) in [GitLab Core][ce] 11.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19318) in [GitLab Core][ce] 11.0.
 
 To switch between your authored and assigned merge requests, click the
 dropdown in the top of the sidebar to open a list of merge requests. You will
@@ -91,7 +95,7 @@ request.
 
 ## Switching branches
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/20850) in [GitLab Core][ce] 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20850) in [GitLab Core][ce] 11.2.
 
 To switch between branches of the current project repository, click the dropdown
 in the top of the sidebar to open a list of branches.
@@ -100,7 +104,7 @@ different branch.
 
 ## Client Side Evaluation
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19764) in [GitLab Core][ce] 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19764) in [GitLab Core][ce] 11.2.
 
 You can use the Web IDE to preview JavaScript projects right in the browser.
 This feature uses CodeSandbox to compile and bundle the JavaScript used to

@@ -17,13 +17,13 @@ describe 'Repository index', :elastic do
       project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
 
       Gitlab::Elastic::Indexer.new(project).run(sha1)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       expect(indexed_file_paths_for('12')).to include('12')
     end
 
     def indexed_file_paths_for(term)
-      blobs = Repository.search(term, type: :blob)[:blobs][:results].response
+      blobs = Repository.elastic_search(term, type: :blob)[:blobs][:results].response
       blobs.map do |blob|
         blob['_source']['blob']['path']
       end

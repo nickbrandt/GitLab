@@ -8,7 +8,7 @@ Available only in APIv4.
 
 Get all wiki pages for a given project.
 
-```
+```plaintext
 GET /projects/:id/wikis
 ```
 
@@ -17,7 +17,7 @@ GET /projects/:id/wikis
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `with_content`      | boolean    | no      | Include pages' content  |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/wikis?with_content=1
 ```
 
@@ -49,7 +49,7 @@ Example response:
 
 Get a wiki page for a given project.
 
-```
+```plaintext
 GET /projects/:id/wikis/:slug
 ```
 
@@ -58,7 +58,7 @@ GET /projects/:id/wikis/:slug
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `slug` | string  | yes       | The slug (a unique string) of the wiki page |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/wikis/home
 ```
 
@@ -77,7 +77,7 @@ Example response:
 
 Creates a new wiki page for the given repository with the given title, slug, and content.
 
-```
+```plaintext
 POST /projects/:id/wikis
 ```
 
@@ -86,9 +86,9 @@ POST /projects/:id/wikis
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `content`       | string  | yes      | The content of the wiki page |
 | `title`        | string  | yes      | The title of the wiki page        |
-| `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, and `asciidoc` |
+| `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, `asciidoc` and `org` |
 
-```bash
+```shell
 curl --data "format=rdoc&title=Hello&content=Hello world" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis"
 ```
 
@@ -107,7 +107,7 @@ Example response:
 
 Updates an existing wiki page. At least one parameter is required to update the wiki page.
 
-```
+```plaintext
 PUT /projects/:id/wikis/:slug
 ```
 
@@ -116,10 +116,10 @@ PUT /projects/:id/wikis/:slug
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `content`       | string  | yes if `title` is not provided     | The content of the wiki page |
 | `title`        | string  | yes if `content` is not provided      | The title of the wiki page        |
-| `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, and `asciidoc` |
+| `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, `asciidoc` and `org` |
 | `slug` | string  | yes       | The slug (a unique string) of the wiki page |
 
-```bash
+```shell
 curl --request PUT --data "format=rdoc&content=documentation&title=Docs" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/foo"
 ```
 
@@ -138,7 +138,7 @@ Example response:
 
 Deletes a wiki page with a given slug.
 
-```
+```plaintext
 DELETE /projects/:id/wikis/:slug
 ```
 
@@ -147,20 +147,20 @@ DELETE /projects/:id/wikis/:slug
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `slug` | string  | yes       | The slug (a unique string) of the wiki page |
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/foo"
 ```
 
 On success the HTTP status code is `204` and no JSON response is expected.
 
-[ce-13372]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/13372
+[ce-13372]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13372
 
 ## Upload an attachment to the wiki repository
 
 Uploads a file to the attachment folder inside the wiki's repository. The
  attachment folder is the `uploads` folder.
 
-```
+```plaintext
 POST /projects/:id/wikis/attachments
 ```
 
@@ -175,7 +175,7 @@ cURL to post data using the header `Content-Type: multipart/form-data`.
 The `file=` parameter must point to a file on your filesystem and be preceded
 by `@`. For example:
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" https://gitlab.example.com/api/v4/projects/1/wikis/attachments
 ```
 

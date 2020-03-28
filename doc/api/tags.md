@@ -6,7 +6,7 @@ Get a list of repository tags from a project, sorted by name in reverse
 alphabetical order. This endpoint can be accessed without authentication if the
 repository is publicly accessible.
 
-```
+```plaintext
 GET /projects/:id/repository/tags
 ```
 
@@ -57,7 +57,7 @@ Parameters:
 Get a specific repository tag determined by its name. This endpoint can be
 accessed without authentication if the repository is publicly accessible.
 
-```
+```plaintext
 GET /projects/:id/repository/tags/:tag_name
 ```
 
@@ -68,7 +68,7 @@ Parameters:
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `tag_name` | string | yes | The name of the tag |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/repository/tags/v1.0.0
 ```
 
@@ -104,7 +104,7 @@ Example Response:
 
 Creates a new tag in the repository that points to the supplied ref.
 
-```
+```plaintext
 POST /projects/:id/repository/tags
 ```
 
@@ -116,7 +116,7 @@ Parameters:
 - `message` (optional) - Creates annotated tag.
 - `release_description` (optional) - Add release notes to the Git tag and store it in the GitLab database.
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/tags?tag_name=test&ref=master"
 ```
 
@@ -164,7 +164,7 @@ status code `405` with an explaining error message is returned.
 
 Deletes a tag of a repository with given name.
 
-```
+```plaintext
 DELETE /projects/:id/repository/tags/:tag_name
 ```
 
@@ -178,7 +178,7 @@ Parameters:
 Add release notes to the existing Git tag. If there
 already exists a release for the given tag, status code `409` is returned.
 
-```
+```plaintext
 POST /projects/:id/repository/tags/:tag_name/release
 ```
 
@@ -189,7 +189,7 @@ Parameters:
 
 Request body:
 
-- `description` (required) - Release notes with markdown support
+- `description` (required) - Release notes with Markdown support
 
 ```json
 {
@@ -210,7 +210,7 @@ Response:
 
 Updates the release notes of a given release.
 
-```
+```plaintext
 PUT /projects/:id/repository/tags/:tag_name/release
 ```
 
@@ -221,7 +221,7 @@ Parameters:
 
 Request body:
 
-- `description` (required) - Release notes with markdown support
+- `description` (required) - Release notes with Markdown support
 
 ```json
 {

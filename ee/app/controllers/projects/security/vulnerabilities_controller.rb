@@ -1,27 +1,25 @@
 # frozen_string_literal: true
 
-class Projects::Security::VulnerabilitiesController < Projects::ApplicationController
-  include VulnerabilitiesApiFeatureGate # must come first
-  include SecurityDashboardsPermissions
-  include VulnerabilityFindingsActions
+module Projects
+  module Security
+    class VulnerabilitiesController < Projects::ApplicationController
+      include SecurityDashboardsPermissions
 
-  alias_method :vulnerable, :project
+      alias_method :vulnerable, :project
 
-  private
+      def index
+        return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
 
-  # See the table below to understand the relation between first_class_vulnerabilities feature state and
-  # Group Security Dashboard controller being used:
-  #
-  # | first_class_vulnerabilities | controller to use                        |
-  # |---------------------------- | ---------------------------------------- |
-  # | enabled                     | projects/security/vulnerability_findings |
-  # | disabled                    | projects/security/vulnerabilities        |
-  #
-  # The reason is that when first_class_vulnerabilities is enabled, Vulnerabilities name is reserved for
-  # Standalone Vulnerabilities https://gitlab.com/gitlab-org/gitlab/issues/13561, and the entity that
-  # was previously returned by Vulnerabilities-named endpoints get the name of Vulnerability Findings.
-  # See also: https://gitlab.com/gitlab-org/gitlab/merge_requests/19029
-  def vulnerabilities_action_enabled?
-    Feature.disabled?(:first_class_vulnerabilities)
+        @vulnerabilities = project.vulnerabilities.page(params[:page])
+      end
+
+      def show
+        return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
+
+        @vulnerability = project.vulnerabilities.find(params[:id])
+        pipeline = @vulnerability.finding.pipelines.first
+        @pipeline = pipeline if Ability.allowed?(current_user, :read_pipeline, pipeline)
+      end
+    end
   end
 end

@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::FileDownloader, :geo do
   include EE::GeoHelpers
 
-  set(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
 
   subject { downloader.execute }
 

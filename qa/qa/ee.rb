@@ -15,6 +15,7 @@ module QA
       module Component
         autoload :DesignManagement, 'qa/ee/page/component/design_management'
         autoload :LicenseManagement, 'qa/ee/page/component/license_management'
+        autoload :SecureReport, 'qa/ee/page/component/secure_report'
 
         module IssueBoard
           autoload :Show, 'qa/ee/page/component/issue_board/show'
@@ -34,6 +35,7 @@ module QA
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
         autoload :SamlSSOSignUp, 'qa/ee/page/group/saml_sso_sign_up'
         autoload :Members, 'qa/ee/page/group/members'
+        autoload :ContributionAnalytics, 'qa/ee/page/group/contribution_analytics'
 
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'
@@ -126,6 +128,10 @@ module QA
           module Kubernetes
             autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
           end
+
+          module Metrics
+            autoload :Show, 'qa/ee/page/project/operations/metrics/show'
+          end
         end
 
         module Packages
@@ -159,7 +165,6 @@ module QA
         module Epic
           autoload :Index, 'qa/ee/page/group/epic/index'
           autoload :Show, 'qa/ee/page/group/epic/show'
-          autoload :Edit, 'qa/ee/page/group/epic/edit'
         end
 
         module Secure
@@ -190,6 +195,7 @@ module QA
 
           module Project
             autoload :BaseBoardList, 'qa/ee/resource/board/board_list/project/base_board_list'
+            autoload :AssigneeBoardList, 'qa/ee/resource/board/board_list/project/assignee_board_list'
             autoload :LabelBoardList, 'qa/ee/resource/board/board_list/project/label_board_list'
             autoload :MilestoneBoardList, 'qa/ee/resource/board/board_list/project/milestone_board_list'
           end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class RenameRepositoryWorker
+  class RenameRepositoryWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include GeoQueue
 

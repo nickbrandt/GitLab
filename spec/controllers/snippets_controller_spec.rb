@@ -3,11 +3,9 @@
 require 'spec_helper'
 
 describe SnippetsController do
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   describe 'GET #index' do
-    let(:user) { create(:user) }
-
     context 'when username parameter is present' do
       it_behaves_like 'paginated collection' do
         let(:collection) { Snippet.all }
@@ -51,7 +49,17 @@ describe SnippetsController do
       it 'responds with status 200' do
         get :new
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      context 'when user is not allowed to create a personal snippet' do
+        let(:user) { create(:user, :external) }
+
+        it 'responds with status 404' do
+          get :new
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
       end
     end
 
@@ -65,8 +73,37 @@ describe SnippetsController do
   end
 
   describe 'GET #show' do
+    shared_examples 'successful response' do
+      it 'renders the snippet' do
+        subject
+
+        expect(assigns(:snippet)).to eq(personal_snippet)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'renders the blob from the repository' do
+        subject
+
+        expect(assigns(:blob)).to eq(personal_snippet.blobs.first)
+      end
+
+      context 'when feature flag version_snippets is disabled' do
+        before do
+          stub_feature_flags(version_snippets: false)
+        end
+
+        it 'returns the snippet database content' do
+          subject
+
+          blob = assigns(:blob)
+
+          expect(blob.data).to eq(personal_snippet.content)
+        end
+      end
+    end
+
     context 'when the personal snippet is private' do
-      let(:personal_snippet) { create(:personal_snippet, :private, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :private, :repository, author: user) }
 
       context 'when signed in' do
         before do
@@ -80,22 +117,19 @@ describe SnippetsController do
           it 'responds with status 404' do
             get :show, params: { id: other_personal_snippet.to_param }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
         context 'when signed in user is the author' do
-          it 'renders the snippet' do
-            get :show, params: { id: personal_snippet.to_param }
-
-            expect(assigns(:snippet)).to eq(personal_snippet)
-            expect(response).to have_gitlab_http_status(200)
+          it_behaves_like 'successful response' do
+            subject { get :show, params: { id: personal_snippet.to_param } }
           end
 
           it 'responds with status 404 when embeddable content is requested' do
             get :show, params: { id: personal_snippet.to_param }, format: :js
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -110,24 +144,21 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is internal' do
-      let(:personal_snippet) { create(:personal_snippet, :internal, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :internal, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it 'renders the snippet' do
-          get :show, params: { id: personal_snippet.to_param }
-
-          expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+        it_behaves_like 'successful response' do
+          subject { get :show, params: { id: personal_snippet.to_param } }
         end
 
         it 'responds with status 404 when embeddable content is requested' do
           get :show, params: { id: personal_snippet.to_param }, format: :js
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -141,25 +172,22 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is public' do
-      let(:personal_snippet) { create(:personal_snippet, :public, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :public, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it 'renders the snippet' do
-          get :show, params: { id: personal_snippet.to_param }
-
-          expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+        it_behaves_like 'successful response' do
+          subject { get :show, params: { id: personal_snippet.to_param } }
         end
 
         it 'responds with status 200 when embeddable content is requested' do
           get :show, params: { id: personal_snippet.to_param }, format: :js
 
           expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -168,7 +196,7 @@ describe SnippetsController do
           get :show, params: { id: personal_snippet.to_param }
 
           expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -182,7 +210,7 @@ describe SnippetsController do
         it 'responds with status 404' do
           get :show, params: { id: 'doesntexist' }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -215,11 +243,27 @@ describe SnippetsController do
       expect(snippet.description).to eq('Description')
     end
 
+    context 'when user is not allowed to create a personal snippet' do
+      let(:user) { create(:user, :external) }
+
+      it 'responds with status 404' do
+        aggregate_failures do
+          expect do
+            create_snippet(visibility_level: Snippet::PUBLIC)
+          end.not_to change { Snippet.count }
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+
     context 'when the snippet description contains a file' do
       include FileMoverHelpers
 
-      let(:picture_file) { "/-/system/user/#{user.id}/secret56/picture.jpg" }
-      let(:text_file) { "/-/system/user/#{user.id}/secret78/text.txt" }
+      let(:picture_secret) { SecureRandom.hex }
+      let(:text_secret) { SecureRandom.hex }
+      let(:picture_file) { "/-/system/user/#{user.id}/#{picture_secret}/picture.jpg" }
+      let(:text_file) { "/-/system/user/#{user.id}/#{text_secret}/text.txt" }
       let(:description) do
         "Description with picture: ![picture](/uploads#{picture_file}) and "\
         "text: [text.txt](/uploads#{text_file})"
@@ -242,8 +286,8 @@ describe SnippetsController do
         snippet = subject
 
         expected_description = "Description with picture: "\
-          "![picture](/uploads/-/system/personal_snippet/#{snippet.id}/secret56/picture.jpg) and "\
-          "text: [text.txt](/uploads/-/system/personal_snippet/#{snippet.id}/secret78/text.txt)"
+          "![picture](/uploads/-/system/personal_snippet/#{snippet.id}/#{picture_secret}/picture.jpg) and "\
+          "text: [text.txt](/uploads/-/system/personal_snippet/#{snippet.id}/#{text_secret}/text.txt)"
 
         expect(snippet.description).to eq(expected_description)
       end
@@ -251,7 +295,7 @@ describe SnippetsController do
 
     context 'when the snippet is spam' do
       before do
-        allow_next_instance_of(AkismetService) do |instance|
+        allow_next_instance_of(Spam::AkismetService) do |instance|
           allow(instance).to receive(:spam?).and_return(true)
         end
       end
@@ -325,7 +369,7 @@ describe SnippetsController do
 
     context 'when the snippet is spam' do
       before do
-        allow_next_instance_of(AkismetService) do |instance|
+        allow_next_instance_of(Spam::AkismetService) do |instance|
           allow(instance).to receive(:spam?).and_return(true)
         end
       end
@@ -435,7 +479,7 @@ describe SnippetsController do
     let(:snippet) { create(:personal_snippet, :public, author: user) }
 
     before do
-      allow_next_instance_of(AkismetService) do |instance|
+      allow_next_instance_of(Spam::AkismetService) do |instance|
         allow(instance).to receive_messages(submit_spam: true)
       end
       stub_application_setting(akismet_enabled: true)
@@ -457,8 +501,82 @@ describe SnippetsController do
   end
 
   describe "GET #raw" do
+    shared_examples '200 status' do
+      before do
+        subject
+      end
+
+      it 'responds with status 200' do
+        expect(assigns(:snippet)).to eq(snippet)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'has expected headers' do
+        expect(response.header['Content-Type']).to eq('text/plain; charset=utf-8')
+        expect(response.header['Content-Disposition']).to match(/inline/)
+      end
+
+      it "sets #{Gitlab::Workhorse::DETECT_HEADER} header" do
+        expect(response.header[Gitlab::Workhorse::DETECT_HEADER]).to eq 'true'
+      end
+    end
+
+    shared_examples 'CRLF line ending' do
+      let(:content) { "first line\r\nsecond line\r\nthird line" }
+      let(:formatted_content) { content.gsub(/\r\n/, "\n") }
+      let(:snippet) do
+        create(:personal_snippet, :public, :repository, author: user, content: content)
+      end
+
+      before do
+        allow_next_instance_of(Blob) do |instance|
+          allow(instance).to receive(:data).and_return(content)
+        end
+
+        subject
+      end
+
+      it 'returns LF line endings by default' do
+        expect(response.body).to eq(formatted_content)
+      end
+
+      context 'when parameter present' do
+        let(:params) { { id: snippet.to_param, line_ending: :raw } }
+
+        it 'does not convert line endings when parameter present' do
+          expect(response.body).to eq(content)
+        end
+      end
+    end
+
+    shared_examples 'successful response' do
+      it_behaves_like '200 status'
+      it_behaves_like 'CRLF line ending'
+
+      it 'returns snippet first blob data' do
+        subject
+
+        expect(response.body).to eq snippet.blobs.first.data
+      end
+
+      context 'when feature flag version_snippets is disabled' do
+        before do
+          stub_feature_flags(version_snippets: false)
+        end
+
+        it_behaves_like '200 status'
+        it_behaves_like 'CRLF line ending'
+
+        it 'returns snippet database content' do
+          subject
+
+          expect(response.body).to eq snippet.content
+        end
+      end
+    end
+
     context 'when the personal snippet is private' do
-      let(:personal_snippet) { create(:personal_snippet, :private, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :private, :repository, author: user) }
 
       context 'when signed in' do
         before do
@@ -472,29 +590,16 @@ describe SnippetsController do
           it 'responds with status 404' do
             get :raw, params: { id: other_personal_snippet.to_param }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
         context 'when signed in user is the author' do
-          before do
-            get :raw, params: { id: personal_snippet.to_param }
-          end
+          it_behaves_like 'successful response' do
+            let(:snippet) { personal_snippet }
+            let(:params) { { id: snippet.to_param } }
 
-          it 'responds with status 200' do
-            expect(assigns(:snippet)).to eq(personal_snippet)
-            expect(response).to have_gitlab_http_status(200)
-          end
-
-          it 'has expected headers' do
-            expect(response.header['Content-Type']).to eq('text/plain; charset=utf-8')
-
-            expect(response.header['Content-Disposition']).to match(/inline/)
-          end
-
-          it "sets #{Gitlab::Workhorse::DETECT_HEADER} header" do
-            expect(response).to have_gitlab_http_status(200)
-            expect(response.header[Gitlab::Workhorse::DETECT_HEADER]).to eq "true"
+            subject { get :raw, params: params }
           end
         end
       end
@@ -509,18 +614,18 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is internal' do
-      let(:personal_snippet) { create(:personal_snippet, :internal, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :internal, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it 'responds with status 200' do
-          get :raw, params: { id: personal_snippet.to_param }
+        it_behaves_like 'successful response' do
+          let(:snippet) { personal_snippet }
+          let(:params) { { id: snippet.to_param } }
 
-          expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+          subject { get :raw, params: params }
         end
       end
 
@@ -534,36 +639,18 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is public' do
-      let(:personal_snippet) { create(:personal_snippet, :public, author: user) }
+      let_it_be(:personal_snippet) { create(:personal_snippet, :public, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it 'responds with status 200' do
-          get :raw, params: { id: personal_snippet.to_param }
+        it_behaves_like 'successful response' do
+          let(:snippet) { personal_snippet }
+          let(:params) { { id: snippet.to_param } }
 
-          expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        context 'CRLF line ending' do
-          let(:personal_snippet) do
-            create(:personal_snippet, :public, author: user, content: "first line\r\nsecond line\r\nthird line")
-          end
-
-          it 'returns LF line endings by default' do
-            get :raw, params: { id: personal_snippet.to_param }
-
-            expect(response.body).to eq("first line\nsecond line\nthird line")
-          end
-
-          it 'does not convert line endings when parameter present' do
-            get :raw, params: { id: personal_snippet.to_param, line_ending: :raw }
-
-            expect(response.body).to eq("first line\r\nsecond line\r\nthird line")
-          end
+          subject { get :raw, params: params }
         end
       end
 
@@ -572,7 +659,7 @@ describe SnippetsController do
           get :raw, params: { id: personal_snippet.to_param }
 
           expect(assigns(:snippet)).to eq(personal_snippet)
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -586,7 +673,7 @@ describe SnippetsController do
         it 'responds with status 404' do
           get :raw, params: { id: 'doesntexist' }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -638,6 +725,58 @@ describe SnippetsController do
       post :preview_markdown, params: { id: snippet, text: '*Markdown* text' }
 
       expect(json_response.keys).to match_array(%w(body references))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let!(:snippet) { create :personal_snippet, author: user }
+
+    context 'when current user has ability to destroy the snippet' do
+      before do
+        sign_in(user)
+      end
+
+      it 'removes the snippet' do
+        delete :destroy, params: { id: snippet.to_param }
+
+        expect { snippet.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context 'when snippet is succesfuly destroyed' do
+        it 'redirects to the project snippets page' do
+          delete :destroy, params: { id: snippet.to_param }
+
+          expect(response).to redirect_to(dashboard_snippets_path)
+        end
+      end
+
+      context 'when snippet is not destroyed' do
+        before do
+          allow(snippet).to receive(:destroy).and_return(false)
+          controller.instance_variable_set(:@snippet, snippet)
+        end
+
+        it 'renders the snippet page with errors' do
+          delete :destroy, params: { id: snippet.to_param }
+
+          expect(flash[:alert]).to eq('Failed to remove snippet.')
+          expect(response).to redirect_to(snippet_path(snippet))
+        end
+      end
+    end
+
+    context 'when current_user does not have ability to destroy the snippet' do
+      let(:another_user) { create(:user) }
+
+      before do
+        sign_in(another_user)
+      end
+
+      it 'responds with status 404' do
+        delete :destroy, params: { id: snippet.to_param }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
   end
 end

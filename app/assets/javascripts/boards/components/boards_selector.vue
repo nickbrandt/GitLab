@@ -1,5 +1,5 @@
 <script>
-import { throttle } from 'underscore';
+import { throttle } from 'lodash';
 import {
   GlLoadingIcon,
   GlSearchBoxByType,
@@ -9,8 +9,12 @@ import {
   GlDropdownItem,
 } from '@gitlab/ui';
 
-import Icon from '~/vue_shared/components/icon.vue';
 import httpStatusCodes from '~/lib/utils/http_status';
+
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
+import projectQuery from '../queries/project_boards.query.graphql';
+import groupQuery from '../queries/group_boards.query.graphql';
+
 import boardsStore from '../stores/boards_store';
 import BoardForm from './board_form.vue';
 
@@ -19,7 +23,6 @@ const MIN_BOARDS_TO_VIEW_RECENT = 10;
 export default {
   name: 'BoardsSelector',
   components: {
-    Icon,
     BoardForm,
     GlLoadingIcon,
     GlSearchBoxByType,
@@ -40,6 +43,7 @@ export default {
     throttleDuration: {
       type: Number,
       default: 200,
+      required: false,
     },
     boardBaseUrl: {
       type: String,
@@ -90,8 +94,9 @@ export default {
   },
   data() {
     return {
-      loading: true,
       hasScrollFade: false,
+      loadingBoards: 0,
+      loadingRecentBoards: false,
       scrollFadeInitialized: false,
       boards: [],
       recentBoards: [],
@@ -104,6 +109,12 @@ export default {
     };
   },
   computed: {
+    parentType() {
+      return this.groupId ? 'group' : 'project';
+    },
+    loading() {
+      return this.loadingRecentBoards && this.loadingBoards;
+    },
     currentPage() {
       return this.state.currentPage;
     },
@@ -111,14 +122,6 @@ export default {
       return this.boards.filter(board =>
         board.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
       );
-    },
-    reload: {
-      get() {
-        return this.state.reload;
-      },
-      set(newValue) {
-        this.state.reload = newValue;
-      },
     },
     board() {
       return this.state.currentBoard;
@@ -144,16 +147,6 @@ export default {
       this.scrollFadeInitialized = false;
       this.$nextTick(this.setScrollFade);
     },
-    reload() {
-      if (this.reload) {
-        this.boards = [];
-        this.recentBoards = [];
-        this.loading = true;
-        this.reload = false;
-
-        this.loadBoards(false);
-      }
-    },
   },
   created() {
     boardsStore.setCurrentBoard(this.currentBoard);
@@ -167,48 +160,70 @@ export default {
         return;
       }
 
-      const recentBoardsPromise = new Promise((resolve, reject) =>
-        boardsStore
-          .recentBoards()
-          .then(resolve)
-          .catch(err => {
-            /**
-             *  If user is unauthorized we'd still want to resolve the
-             *  request to display all boards.
-             */
-            if (err.response.status === httpStatusCodes.UNAUTHORIZED) {
-              resolve({ data: [] }); // recent boards are empty
-              return;
-            }
-            reject(err);
-          }),
-      );
+      this.$apollo.addSmartQuery('boards', {
+        variables() {
+          return { fullPath: this.state.endpoints.fullPath };
+        },
+        query() {
+          return this.groupId ? groupQuery : projectQuery;
+        },
+        loadingKey: 'loadingBoards',
+        update(data) {
+          if (!data?.[this.parentType]) {
+            return [];
+          }
+          return data[this.parentType].boards.edges.map(({ node }) => ({
+            id: getIdFromGraphQLId(node.id),
+            name: node.name,
+          }));
+        },
+      });
 
-      Promise.all([boardsStore.allBoards(), recentBoardsPromise])
-        .then(([allBoards, recentBoards]) => [allBoards.data, recentBoards.data])
-        .then(([allBoardsJson, recentBoardsJson]) => {
-          this.loading = false;
-          this.boards = allBoardsJson;
-          this.recentBoards = recentBoardsJson;
+      this.loadingRecentBoards = true;
+      boardsStore
+        .recentBoards()
+        .then(res => {
+          this.recentBoards = res.data;
+        })
+        .catch(err => {
+          /**
+           *  If user is unauthorized we'd still want to resolve the
+           *  request to display all boards.
+           */
+          if (err?.response?.status === httpStatusCodes.UNAUTHORIZED) {
+            this.recentBoards = []; // recent boards are empty
+            return;
+          }
+          throw err;
         })
         .then(() => this.$nextTick()) // Wait for boards list in DOM
         .then(() => {
           this.setScrollFade();
         })
-        .catch(() => {
-          this.loading = false;
+        .catch(() => {})
+        .finally(() => {
+          this.loadingRecentBoards = false;
         });
     },
     isScrolledUp() {
       const { content } = this.$refs;
+
+      if (!content) {
+        return false;
+      }
+
       const currentPosition = this.contentClientHeight + content.scrollTop;
 
-      return content && currentPosition < this.maxPosition;
+      return currentPosition < this.maxPosition;
     },
     initScrollFade() {
-      this.scrollFadeInitialized = true;
-
       const { content } = this.$refs;
+
+      if (!content) {
+        return;
+      }
+
+      this.scrollFadeInitialized = true;
 
       this.contentClientHeight = content.clientHeight;
       this.maxPosition = content.scrollHeight;
@@ -315,8 +330,7 @@ export default {
 
           <gl-dropdown-item
             v-if="showDelete"
-            class="text-danger"
-            data-qa-selector="delete_board_button"
+            class="text-danger js-delete-board"
             @click.prevent="showPage('delete')"
           >
             {{ s__('IssueBoards|Delete board') }}

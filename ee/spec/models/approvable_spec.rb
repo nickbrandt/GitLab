@@ -11,6 +11,7 @@ describe Approvable do
   describe '#approval_feature_available?' do
     let(:project) { create(:project) }
     let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+
     subject { merge_request.approval_feature_available? }
 
     it 'is false when feature is disabled' do

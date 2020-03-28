@@ -5,13 +5,23 @@ import * as types from './mutation_types';
 export default {
   [types.SET_INITIAL_CONFIG](
     state,
-    { epicsEndpoint, issuesEndpoint, autoCompleteEpics, autoCompleteIssues, userSignedIn },
+    {
+      epicsEndpoint,
+      issuesEndpoint,
+      autoCompleteEpics,
+      autoCompleteIssues,
+      projectsEndpoint,
+      userSignedIn,
+      allowSubEpics,
+    },
   ) {
     state.epicsEndpoint = epicsEndpoint;
     state.issuesEndpoint = issuesEndpoint;
     state.autoCompleteEpics = autoCompleteEpics;
     state.autoCompleteIssues = autoCompleteIssues;
+    state.projectsEndpoint = projectsEndpoint;
     state.userSignedIn = userSignedIn;
+    state.allowSubEpics = allowSubEpics;
   },
 
   [types.SET_INITIAL_PARENT_ITEM](state, data) {
@@ -134,6 +144,11 @@ export default {
     state.showAddItemForm = false;
   },
 
+  [types.TOGGLE_CREATE_ISSUE_FORM](state, { toggleState }) {
+    state.showCreateIssueForm = toggleState;
+    state.showAddItemForm = false;
+  },
+
   [types.SET_PENDING_REFERENCES](state, references) {
     state.pendingReferences = references;
   },
@@ -147,6 +162,9 @@ export default {
     state.pendingReferences = state.pendingReferences.filter(
       (ref, index) => index !== indexToRemove,
     );
+    if (state.pendingReferences.length === 0) {
+      state.itemAddFailure = false;
+    }
   },
 
   [types.SET_ITEM_INPUT_VALUE](state, itemInputValue) {
@@ -161,8 +179,13 @@ export default {
     state.itemAddInProgress = false;
     state.itemsFetchResultEmpty = false;
   },
-  [types.RECEIVE_ADD_ITEM_FAILURE](state) {
+  [types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType, itemAddFailureMessage }) {
     state.itemAddInProgress = false;
+    state.itemAddFailure = true;
+    state.itemAddFailureMessage = itemAddFailureMessage;
+    if (itemAddFailureType) {
+      state.itemAddFailureType = itemAddFailureType;
+    }
   },
 
   [types.REQUEST_CREATE_ITEM](state) {
@@ -183,5 +206,16 @@ export default {
 
     // Insert at new position
     state.children[parentItem.reference].splice(newIndex, 0, targetItem);
+  },
+
+  [types.REQUEST_PROJECTS](state) {
+    state.projectsFetchInProgress = true;
+  },
+  [types.RECIEVE_PROJECTS_SUCCESS](state, projects) {
+    state.projects = projects;
+    state.projectsFetchInProgress = false;
+  },
+  [types.RECIEVE_PROJECTS_FAILURE](state) {
+    state.projectsFetchInProgress = false;
   },
 };

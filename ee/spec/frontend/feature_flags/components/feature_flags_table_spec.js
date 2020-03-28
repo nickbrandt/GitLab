@@ -1,5 +1,6 @@
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import { GlToggle } from '@gitlab/ui';
 import { trimText } from 'helpers/text_helper';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -7,12 +8,11 @@ import {
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 
-const localVue = createLocalVue();
-
 const getDefaultProps = () => ({
   featureFlags: [
     {
       id: 1,
+      iid: 1,
       active: true,
       name: 'flag name',
       description: 'flag description',
@@ -42,8 +42,6 @@ describe('Feature flag table', () => {
   const createWrapper = (propsData, opts = {}) => {
     wrapper = shallowMount(FeatureFlagsTable, {
       propsData,
-      sync: false,
-      localVue,
       ...opts,
     });
   };
@@ -59,10 +57,7 @@ describe('Feature flag table', () => {
 
   describe('with an active scope and a standard rollout strategy', () => {
     beforeEach(() => {
-      props.featureFlags[0].iid = 1;
-      createWrapper(props, {
-        provide: { glFeatures: { featureFlagIID: true } },
-      });
+      createWrapper(props);
     });
 
     it('Should render a table', () => {
@@ -113,6 +108,30 @@ describe('Feature flag table', () => {
     });
   });
 
+  describe('when active and with an update toggle', () => {
+    let toggle;
+
+    beforeEach(() => {
+      props.featureFlags[0].update_path = props.featureFlags[0].destroy_path;
+      createWrapper(props);
+      toggle = wrapper.find(GlToggle);
+    });
+
+    it('should have a toggle', () => {
+      expect(toggle.exists()).toBe(true);
+      expect(toggle.props('value')).toBe(true);
+    });
+
+    it('should trigger a toggle event', () => {
+      toggle.vm.$emit('change');
+      const flag = { ...props.featureFlags[0], active: !props.featureFlags[0].active };
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('toggle-flag')).toEqual([[flag]]);
+      });
+    });
+  });
+
   describe('with an active scope and a percentage rollout strategy', () => {
     beforeEach(() => {
       props.featureFlags[0].scopes[0].rolloutStrategy = ROLLOUT_STRATEGY_PERCENT_ROLLOUT;
@@ -138,5 +157,13 @@ describe('Feature flag table', () => {
 
       expect(trimText(envColumn.find('.badge-inactive').text())).toBe('scope');
     });
+  });
+
+  it('renders a feature flag without an iid', () => {
+    delete props.featureFlags[0].iid;
+    createWrapper(props);
+
+    expect(wrapper.find('.js-feature-flag-id').exists()).toBe(true);
+    expect(trimText(wrapper.find('.js-feature-flag-id').text())).toBe('');
   });
 });

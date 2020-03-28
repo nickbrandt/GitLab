@@ -1,4 +1,5 @@
-import { activityBarViews, viewerTypes } from '../constants';
+import { leftSidebarViews, viewerTypes } from '../constants';
+import { DEFAULT_THEME } from '../lib/themes';
 
 export default () => ({
   currentProjectId: '',
@@ -20,7 +21,7 @@ export default () => ({
   entries: {},
   viewer: viewerTypes.edit,
   delayViewerUpdated: false,
-  currentActivityView: activityBarViews.edit,
+  currentActivityView: leftSidebarViews.edit.name,
   unusedSeal: true,
   fileFindVisible: false,
   links: {},
@@ -31,4 +32,7 @@ export default () => ({
     entry: {},
   },
   clientsidePreviewEnabled: false,
+  renderWhitespaceInCode: false,
+  editorTheme: DEFAULT_THEME,
+  codesandboxBundlerUrl: null,
 });

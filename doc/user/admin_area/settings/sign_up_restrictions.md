@@ -4,20 +4,49 @@ type: reference
 
 # Sign-up restrictions **(CORE ONLY)**
 
-You can use sign-up restrictions to require user email confirmation, as well as
-to blacklist or whitelist email addresses belonging to specific domains.
+You can use sign-up restrictions to:
 
->**Note**: These restrictions are only applied during sign-up. An admin is
+- Disable new signups.
+- Require user email confirmation.
+- Blacklist or whitelist email addresses belonging to specific domains.
+
+NOTE: **Note:**
+These restrictions are only applied during sign-up from an external user. An admin is
 able to add a user through the admin panel with a disallowed domain. Also
 note that the users can change their email addresses after signup to
 disallowed domains.
+
+## Disable new signups
+
+When this setting is enabled, any user visiting your GitLab domain will be able to sign up for an account.
+
+![Disable signups](img/disable_signup_v12_7.png)
+
+You can restrict new users from signing up by themselves for an account in your instance by disabling this setting.
+
+### Recommendations
+
+For customers running public facing GitLab instances, we highly recommend that you
+consider disabling new signups if you do not expect public users to sign up for an
+account.
+
+Alternatively, you could also consider setting up a
+[whitelist](#whitelist-email-domains) or [blacklist](#blacklist-email-domains) on
+email domains to prevent malicious users from creating accounts.
 
 ## Require email confirmation
 
 You can send confirmation emails during sign-up and require that users confirm
 their email address before they are allowed to sign in.
 
-![Email confirmation](img/email_confirmation.png)
+![Email confirmation](img/email_confirmation_v12_7.png)
+
+## Minimum password length limit
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20661) in GitLab 12.6
+
+You can [change](../../../security/password_length_limits.md#modify-minimum-password-length-using-gitlab-ui)
+the minimum number of characters a user must have in their password using the GitLab UI.
 
 ## Whitelist email domains
 
@@ -39,7 +68,7 @@ addresses.
 
 To access this feature:
 
-1. Navigate to the **Settings > General** in the Admin area.
+1. Navigate to the **Admin Area > Settings > General**.
 1. Expand the **Sign-up restrictions** section.
 
 For the blacklist, you can enter the list manually or upload a `.txt` file that
@@ -66,5 +95,5 @@ Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
 
-[ce-5259]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5259
-[ce-598]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/598
+[ce-5259]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5259
+[ce-598]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/598

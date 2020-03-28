@@ -1,42 +1,32 @@
 import Vue from 'vue';
 import PackagesApp from './components/app.vue';
 import Translate from '~/vue_shared/translate';
+import createStore from './store';
 
 Vue.use(Translate);
 
-export default () =>
+export default () => {
+  const el = document.querySelector('#js-vue-packages-detail');
+  const { package: packageJson, canDelete: canDeleteStr, ...rest } = el.dataset;
+  const packageEntity = JSON.parse(packageJson);
+  const canDelete = canDeleteStr === 'true';
+
+  const store = createStore({
+    packageEntity,
+    packageFiles: packageEntity.package_files,
+    canDelete,
+    ...rest,
+  });
+
+  // eslint-disable-next-line no-new
   new Vue({
-    el: '#js-vue-packages-detail',
+    el,
     components: {
       PackagesApp,
     },
-    data() {
-      const { dataset } = document.querySelector(this.$options.el);
-      const packageData = JSON.parse(dataset.package);
-      const packageFiles = JSON.parse(dataset.packageFiles);
-      const canDelete = dataset.canDelete === 'true';
-
-      return {
-        packageData,
-        packageFiles,
-        canDelete,
-        destroyPath: dataset.destroyPath,
-        emptySvgPath: dataset.svgPath,
-        npmPath: dataset.npmPath,
-        npmHelpPath: dataset.npmHelpPath,
-      };
-    },
+    store,
     render(createElement) {
-      return createElement('packages-app', {
-        props: {
-          packageEntity: this.packageData,
-          files: this.packageFiles,
-          canDelete: this.canDelete,
-          destroyPath: this.destroyPath,
-          emptySvgPath: this.emptySvgPath,
-          npmPath: this.npmPath,
-          npmHelpPath: this.npmHelpPath,
-        },
-      });
+      return createElement('packages-app');
     },
   });
+};

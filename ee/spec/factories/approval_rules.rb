@@ -29,6 +29,11 @@ FactoryBot.define do
     end
   end
 
+  factory :any_approver_rule, parent: :approval_merge_request_rule do
+    rule_type { :any_approver }
+    name { "All Members" }
+  end
+
   factory :approval_project_rule do
     project
     sequence(:name) { |n| "#{ApprovalRuleLike::DEFAULT_NAME}-#{n}" }

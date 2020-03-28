@@ -24,6 +24,10 @@ class DiffsEntity < Grape::Entity
     )
   end
 
+  expose :context_commits, using: API::Entities::Commit, if: -> (diffs, options) { merge_request&.project&.context_commits_enabled? } do |diffs|
+    options[:context_commits]
+  end
+
   expose :merge_request_diff, using: MergeRequestDiffEntity do |diffs|
     options[:merge_request_diff]
   end
@@ -42,13 +46,13 @@ class DiffsEntity < Grape::Entity
 
   # rubocop: disable CodeReuse/ActiveRecord
   expose :added_lines do |diffs|
-    diffs.diff_files.sum(&:added_lines)
+    diffs.raw_diff_files.sum(&:added_lines)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
   # rubocop: disable CodeReuse/ActiveRecord
   expose :removed_lines do |diffs|
-    diffs.diff_files.sum(&:removed_lines)
+    diffs.raw_diff_files.sum(&:removed_lines)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

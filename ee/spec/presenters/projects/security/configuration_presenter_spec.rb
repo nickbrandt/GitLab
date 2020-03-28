@@ -41,7 +41,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:dast, configured: true),
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: true),
-          security_scan(:dependency_scanning, configured: true)
+          security_scan(:dependency_scanning, configured: true),
+          security_scan(:license_scanning, configured: true)
         )
       end
     end
@@ -60,7 +61,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:dast, configured: false),
           security_scan(:sast, configured: false),
           security_scan(:container_scanning, configured: false),
-          security_scan(:dependency_scanning, configured: false)
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false)
         )
       end
     end
@@ -85,7 +87,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:dast, configured: true),
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
-          security_scan(:dependency_scanning, configured: false)
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false)
         )
       end
 
@@ -98,7 +101,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:dast, configured: false),
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
-          security_scan(:dependency_scanning, configured: false)
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false)
         )
       end
 
@@ -107,7 +111,7 @@ describe Projects::Security::ConfigurationPresenter do
         complicated_metadata = double(:complicated_metadata, config_options: config)
         complicated_job = double(:complicated_job, metadata: complicated_metadata)
 
-        allow_next_instance_of(::Security::JobsFinder) do |finder|
+        allow_next_instance_of(::Security::SecurityJobsFinder) do |finder|
           allow(finder).to receive(:execute).and_return([complicated_job])
         end
 
@@ -117,7 +121,20 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:dast, configured: false),
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
-          security_scan(:dependency_scanning, configured: false)
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false)
+        )
+      end
+
+      it 'detect new license compliance job' do
+        create(:ci_build, :license_scanning, pipeline: pipeline)
+
+        expect(JSON.parse(subject[:features])).to contain_exactly(
+          security_scan(:dast, configured: true),
+          security_scan(:sast, configured: true),
+          security_scan(:container_scanning, configured: false),
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: true)
         )
       end
 

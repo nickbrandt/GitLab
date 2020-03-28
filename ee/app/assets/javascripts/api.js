@@ -4,24 +4,34 @@ import axios from '~/lib/utils/axios_utils';
 export default {
   ...Api,
   geoNodesPath: '/api/:version/geo_nodes',
+  geoReplicationPath: '/api/:version/geo_replication/:replicable',
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
-  groupEpicsPath:
-    '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
+  groupEpicsPath: '/api/:version/groups/:id/epics',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  podLogsPath: '/:project_full_path/environments/:environment_id/pods/containers/logs.json',
-  podLogsPathWithPod:
-    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
-  podLogsPathWithPodContainer:
-    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
-  cycleAnalyticsSummaryDataPath: '/groups/:group_id/-/cycle_analytics',
-  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
-  cycleAnalyticsStageEventsPath: '/groups/:group_id/-/cycle_analytics/events/:stage_id.json',
+  cycleAnalyticsTopLabelsPath: '/-/analytics/type_of_work/tasks_by_type/top_labels',
+  cycleAnalyticsSummaryDataPath: '/-/analytics/value_stream_analytics/summary',
+  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/value_stream_analytics/stages',
+  cycleAnalyticsStageEventsPath: '/-/analytics/value_stream_analytics/stages/:stage_id/records',
+  cycleAnalyticsStageMedianPath: '/-/analytics/value_stream_analytics/stages/:stage_id/median',
+  cycleAnalyticsStagePath: '/-/analytics/value_stream_analytics/stages/:stage_id',
+  cycleAnalyticsDurationChartPath:
+    '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
+  cycleAnalyticsGroupLabelsPath: '/api/:version/groups/:namespace_path/labels',
+  codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
+  groupActivityIssuesPath: '/api/:version/analytics/group_activity/issues_count',
+  groupActivityMergeRequestsPath: '/api/:version/analytics/group_activity/merge_requests_count',
+  countriesPath: '/-/countries',
+  countryStatesPath: '/-/country_states',
+  paymentFormPath: '/-/subscriptions/payment_form',
+  paymentMethodPath: '/-/subscriptions/payment_method',
+  confirmOrderPath: '/-/subscriptions',
+  vulnerabilitiesActionPath: '/api/:version/vulnerabilities/:id/:action',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -48,7 +58,7 @@ export default {
 
   createChildEpic({ groupId, parentEpicIid, title }) {
     const url = Api.buildUrl(this.childEpicPath)
-      .replace(':id', groupId)
+      .replace(':id', encodeURIComponent(groupId))
       .replace(':epic_iid', parentEpicIid);
 
     return axios.post(url, {
@@ -56,13 +66,25 @@ export default {
     });
   },
 
-  groupEpics({ groupId, includeAncestorGroups = false, includeDescendantGroups = true }) {
-    const url = Api.buildUrl(this.groupEpicsPath)
-      .replace(':id', groupId)
-      .replace(':includeAncestorGroups', includeAncestorGroups)
-      .replace(':includeDescendantGroups', includeDescendantGroups);
+  groupEpics({
+    groupId,
+    includeAncestorGroups = false,
+    includeDescendantGroups = true,
+    search = '',
+  }) {
+    const url = Api.buildUrl(this.groupEpicsPath).replace(':id', groupId);
+    const params = {
+      include_ancestor_groups: includeAncestorGroups,
+      include_descendant_groups: includeDescendantGroups,
+    };
 
-    return axios.get(url);
+    if (search) {
+      params.search = search;
+    }
+
+    return axios.get(url, {
+      params,
+    });
   },
 
   addEpicIssue({ groupId, epicIid, issueId }) {
@@ -81,37 +103,6 @@ export default {
       .replace(':issue_id', epicIssueId);
 
     return axios.delete(url);
-  },
-
-  /**
-   * Returns pods logs for an environment with an optional pod and container
-   *
-   * @param {Object} params
-   * @param {string} param.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
-   * @param {number} param.environmentId - Id of the environment
-   * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
-   * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
-   * @returns {Promise} Axios promise for the result of a GET request of logs
-   */
-  getPodLogs({ projectPath, environmentId, podName, containerName }) {
-    let logPath = this.podLogsPath;
-    if (podName && containerName) {
-      logPath = this.podLogsPathWithPodContainer;
-    } else if (podName) {
-      logPath = this.podLogsPathWithPod;
-    }
-
-    let url = this.buildUrl(logPath)
-      .replace(':project_full_path', projectPath)
-      .replace(':environment_id', environmentId);
-
-    if (podName) {
-      url = url.replace(':pod_name', podName);
-    }
-    if (containerName) {
-      url = url.replace(':container_name', containerName);
-    }
-    return axios.get(url);
   },
 
   groupPackages(id, options = {}) {
@@ -145,25 +136,32 @@ export default {
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsSummaryData(groupId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsSummaryDataPath).replace(':group_id', groupId);
+  cycleAnalyticsTopLabels(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsTopLabelsPath);
+    return axios.get(url, { params });
+  },
 
+  cycleAnalyticsSummaryData(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsSummaryDataPath);
     return axios.get(url, { params });
   },
 
   cycleAnalyticsGroupStagesAndEvents(groupId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath);
+
     return axios.get(url, {
       params: { group_id: groupId, ...params },
     });
   },
 
   cycleAnalyticsStageEvents(groupId, stageId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath)
-      .replace(':group_id', groupId)
-      .replace(':stage_id', stageId);
+    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
+  },
 
-    return axios.get(url, { params });
+  cycleAnalyticsStageMedian(groupId, stageId, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsStageMedianPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
   },
 
   cycleAnalyticsCreateStage(groupId, data) {
@@ -172,5 +170,119 @@ export default {
     return axios.post(url, data, {
       params: { group_id: groupId },
     });
+  },
+
+  cycleAnalyticsStageUrl(stageId) {
+    return Api.buildUrl(this.cycleAnalyticsStagePath).replace(':stage_id', stageId);
+  },
+
+  cycleAnalyticsUpdateStage(stageId, groupId, data) {
+    const url = this.cycleAnalyticsStageUrl(stageId);
+
+    return axios.put(url, data, {
+      params: { group_id: groupId },
+    });
+  },
+
+  cycleAnalyticsRemoveStage(stageId, groupId) {
+    const url = this.cycleAnalyticsStageUrl(stageId);
+
+    return axios.delete(url, {
+      params: { group_id: groupId },
+    });
+  },
+
+  cycleAnalyticsDurationChart(stageSlug, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsDurationChartPath).replace(':stage_id', stageSlug);
+
+    return axios.get(url, {
+      params,
+    });
+  },
+
+  cycleAnalyticsGroupLabels(groupId, params = {}) {
+    // TODO: This can be removed when we resolve the labels endpoint
+    // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25746
+    const url = Api.buildUrl(this.cycleAnalyticsGroupLabelsPath).replace(
+      ':namespace_path',
+      groupId,
+    );
+
+    return axios.get(url, {
+      params,
+    });
+  },
+
+  codeReviewAnalytics(params = {}) {
+    const url = Api.buildUrl(this.codeReviewAnalyticsPath);
+    return axios.get(url, { params });
+  },
+
+  groupActivityMergeRequestsCount(groupPath) {
+    const url = Api.buildUrl(this.groupActivityMergeRequestsPath);
+    return axios.get(url, { params: { group_path: groupPath } });
+  },
+
+  groupActivityIssuesCount(groupPath) {
+    const url = Api.buildUrl(this.groupActivityIssuesPath);
+    return axios.get(url, { params: { group_path: groupPath } });
+  },
+
+  getGeoReplicableItems(replicable, params = {}) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
+    return axios.get(url, { params });
+  },
+
+  initiateAllGeoReplicableSyncs(replicable, action) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
+    return axios.post(`${url}/${action}`, {});
+  },
+
+  initiateGeoReplicableSync(replicable, { projectId, action }) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
+    return axios.put(`${url}/${projectId}/${action}`, {});
+  },
+
+  fetchCountries() {
+    const url = Api.buildUrl(this.countriesPath);
+    return axios.get(url);
+  },
+
+  fetchStates(country) {
+    const url = Api.buildUrl(this.countryStatesPath);
+    return axios.get(url, { params: { country } });
+  },
+
+  fetchPaymentFormParams(id) {
+    const url = Api.buildUrl(this.paymentFormPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  fetchPaymentMethodDetails(id) {
+    const url = Api.buildUrl(this.paymentMethodPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  confirmOrder(params = {}) {
+    const url = Api.buildUrl(this.confirmOrderPath);
+    return axios.post(url, params);
+  },
+
+  changeVulnerabilityState(id, state) {
+    const url = Api.buildUrl(this.vulnerabilitiesActionPath)
+      .replace(':id', id)
+      .replace(':action', state);
+
+    return axios.post(url);
+  },
+
+  createGeoNode(node) {
+    const url = Api.buildUrl(this.geoNodesPath);
+    return axios.post(url, node);
+  },
+
+  updateGeoNode(node) {
+    const url = Api.buildUrl(this.geoNodesPath);
+    return axios.put(`${url}/${node.id}`, node);
   },
 };

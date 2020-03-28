@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe ProjectWiki, :elastic do
-  set(:project) { create(:project, :wiki_repo) }
+  let_it_be(:project) { create(:project, :wiki_repo) }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
@@ -13,13 +13,13 @@ describe ProjectWiki, :elastic do
       project.wiki.create_page("omega_page", "Bla bla term2")
       project.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
   end
 
   it "searches wiki page" do
-    expect(project.wiki.search('term1', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
-    expect(project.wiki.search('term1 | term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(2)
+    expect(project.wiki.elastic_search('term1', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
+    expect(project.wiki.elastic_search('term1 | term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(2)
   end
 
   it 'indexes' do
@@ -29,7 +29,7 @@ describe ProjectWiki, :elastic do
   end
 
   it 'can delete wiki pages' do
-    expect(project.wiki.search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
+    expect(project.wiki.elastic_search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
 
     Sidekiq::Testing.inline! do
       project.wiki.find_page('omega_page').delete
@@ -41,9 +41,9 @@ describe ProjectWiki, :elastic do
 
       project.wiki.index_wiki_blobs(last_commit)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
-    expect(project.wiki.search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(0)
+    expect(project.wiki.elastic_search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(0)
   end
 end

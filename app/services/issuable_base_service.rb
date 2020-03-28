@@ -11,10 +11,14 @@ class IssuableBaseService < BaseService
     @skip_milestone_email = @params.delete(:skip_milestone_email)
   end
 
-  def filter_params(issuable)
+  def can_admin_issuable?(issuable)
     ability_name = :"admin_#{issuable.to_ability_name}"
 
-    unless can?(current_user, ability_name, issuable)
+    can?(current_user, ability_name, issuable)
+  end
+
+  def filter_params(issuable)
+    unless can_admin_issuable?(issuable)
       params.delete(:milestone_id)
       params.delete(:labels)
       params.delete(:add_label_ids)
@@ -163,7 +167,11 @@ class IssuableBaseService < BaseService
 
     before_create(issuable)
 
-    if issuable.save
+    issuable_saved = issuable.with_transaction_returning_status do
+      issuable.save
+    end
+
+    if issuable_saved
       Issuable::CommonSystemNotesService.new(project, current_user).execute(issuable, is_update: false)
 
       after_create(issuable)
@@ -224,7 +232,11 @@ class IssuableBaseService < BaseService
       update_project_counters = issuable.project && update_project_counter_caches?(issuable)
       ensure_milestone_available(issuable)
 
-      if issuable.with_transaction_returning_status { issuable.save(touch: should_touch) }
+      issuable_saved = issuable.with_transaction_returning_status do
+        issuable.save(touch: should_touch)
+      end
+
+      if issuable_saved
         Issuable::CommonSystemNotesService.new(project, current_user).execute(issuable, old_labels: old_associations[:labels])
 
         handle_changes(issuable, old_associations: old_associations)

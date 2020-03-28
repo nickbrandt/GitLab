@@ -8,6 +8,8 @@ describe Gitlab::SidekiqMiddleware do
     include Sidekiq::Worker
 
     def perform(_arg)
+      Gitlab::SafeRequestStore['gitaly_call_actual'] = 1
+      Gitlab::GitalyClient.query_time = 5
     end
   end
 
@@ -25,18 +27,29 @@ describe Gitlab::SidekiqMiddleware do
   # 1) not failing
   # 2) yielding exactly once
   describe '.server_configurator' do
+    around do |example|
+      original = Sidekiq::Testing.server_middleware.dup
+
+      example.run
+
+      Sidekiq::Testing.instance_variable_set :@server_chain, original
+    end
+
     let(:middleware_expected_args) { [a_kind_of(worker_class), hash_including({ 'args' => job_args }), anything] }
     let(:all_sidekiq_middlewares) do
       [
        Gitlab::SidekiqMiddleware::Monitor,
        Gitlab::SidekiqMiddleware::BatchLoader,
-       Gitlab::SidekiqMiddleware::CorrelationLogger,
+       Labkit::Middleware::Sidekiq::Server,
        Gitlab::SidekiqMiddleware::InstrumentationLogger,
        Gitlab::SidekiqStatus::ServerMiddleware,
-       Gitlab::SidekiqMiddleware::Metrics,
+       Gitlab::SidekiqMiddleware::ServerMetrics,
        Gitlab::SidekiqMiddleware::ArgumentsLogger,
        Gitlab::SidekiqMiddleware::MemoryKiller,
-       Gitlab::SidekiqMiddleware::RequestStoreMiddleware
+       Gitlab::SidekiqMiddleware::RequestStoreMiddleware,
+       Gitlab::SidekiqMiddleware::WorkerContext::Server,
+       Gitlab::SidekiqMiddleware::AdminMode::Server,
+       Gitlab::SidekiqMiddleware::DuplicateJobs::Server
       ]
     end
     let(:enabled_sidekiq_middlewares) { all_sidekiq_middlewares - disabled_sidekiq_middlewares }
@@ -66,7 +79,7 @@ describe Gitlab::SidekiqMiddleware do
       let(:request_store) { false }
       let(:disabled_sidekiq_middlewares) do
         [
-          Gitlab::SidekiqMiddleware::Metrics,
+          Gitlab::SidekiqMiddleware::ServerMetrics,
           Gitlab::SidekiqMiddleware::ArgumentsLogger,
           Gitlab::SidekiqMiddleware::MemoryKiller,
           Gitlab::SidekiqMiddleware::RequestStoreMiddleware
@@ -88,6 +101,24 @@ describe Gitlab::SidekiqMiddleware do
       it "passes through server middlewares" do
         worker_class.perform_async(*job_args)
       end
+
+      context "server metrics" do
+        let(:gitaly_histogram) { double(:gitaly_histogram) }
+
+        before do
+          allow(Gitlab::Metrics).to receive(:histogram).and_call_original
+
+          allow(Gitlab::Metrics).to receive(:histogram)
+                                      .with(:sidekiq_jobs_gitaly_seconds, anything, anything, anything)
+                                      .and_return(gitaly_histogram)
+        end
+
+        it "records correct Gitaly duration" do
+          expect(gitaly_histogram).to receive(:observe).with(anything, 5.0)
+
+          worker_class.perform_async(*job_args)
+        end
+      end
     end
   end
 
@@ -101,6 +132,16 @@ describe Gitlab::SidekiqMiddleware do
     let(:queue) { 'default' }
     let(:redis_pool) { Sidekiq.redis_pool }
     let(:middleware_expected_args) { [worker_class_arg, job, queue, redis_pool] }
+    let(:expected_middlewares) do
+      [
+        Gitlab::SidekiqStatus::ClientMiddleware,
+        Gitlab::SidekiqMiddleware::ClientMetrics,
+        Gitlab::SidekiqMiddleware::WorkerContext::Client,
+        Labkit::Middleware::Sidekiq::Client,
+        Gitlab::SidekiqMiddleware::AdminMode::Client,
+        Gitlab::SidekiqMiddleware::DuplicateJobs::Client
+      ]
+    end
 
     before do
       described_class.client_configurator.call(chain)
@@ -111,8 +152,9 @@ describe Gitlab::SidekiqMiddleware do
       # this will prevent the full middleware chain from being executed.
       # This test ensures that this does not happen
       it "invokes the chain" do
-        expect_any_instance_of(Gitlab::SidekiqStatus::ClientMiddleware).to receive(:call).with(*middleware_expected_args).once.and_call_original
-        expect_any_instance_of(Gitlab::SidekiqMiddleware::CorrelationInjector).to receive(:call).with(*middleware_expected_args).once.and_call_original
+        expected_middlewares do |middleware|
+          expect_any_instance_of(middleware).to receive(:call).with(*middleware_expected_args).once.ordered.and_call_original
+        end
 
         expect { |b| chain.invoke(worker_class_arg, job, queue, redis_pool, &b) }.to yield_control.once
       end

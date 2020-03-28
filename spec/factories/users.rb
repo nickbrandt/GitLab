@@ -23,6 +23,10 @@ FactoryBot.define do
       after(:build) { |user, _| user.block! }
     end
 
+    trait :bot do
+      user_type { :alert_bot }
+    end
+
     trait :external do
       external { true }
     end

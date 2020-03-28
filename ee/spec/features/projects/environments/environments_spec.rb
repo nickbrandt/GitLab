@@ -52,7 +52,7 @@ describe 'Environments page', :js do
       end
 
       it 'shows a stop button' do
-        stop_button_selector = %q{button[data-original-title="Stop environment"]}
+        stop_button_selector = %q{button[title="Stop environment"]}
 
         expect(page).to have_selector(stop_button_selector)
       end
@@ -92,7 +92,7 @@ describe 'Environments page', :js do
       end
 
       it 'shows re deploy button' do
-        redeploy_button_selector = %q{button[data-original-title="Re-deploy to environment"]}
+        redeploy_button_selector = %q{button[title="Re-deploy to environment"]}
 
         expect(page).to have_selector(redeploy_button_selector)
       end
@@ -136,7 +136,7 @@ describe 'Environments page', :js do
       end
 
       it 'does not show a stop button' do
-        stop_button_selector = %q{button[data-original-title="Stop environment"]}
+        stop_button_selector = %q{button[title="Stop environment"]}
 
         expect(page).not_to have_selector(stop_button_selector)
       end
@@ -176,7 +176,7 @@ describe 'Environments page', :js do
       end
 
       it 'does not show a re deploy button' do
-        redeploy_button_selector = %q{button[data-original-title="Re-deploy to environment"]}
+        redeploy_button_selector = %q{button[title="Re-deploy to environment"]}
 
         expect(page).not_to have_selector(redeploy_button_selector)
       end

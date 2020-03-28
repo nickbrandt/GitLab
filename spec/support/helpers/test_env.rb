@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rspec/mocks'
-require 'toml-rb'
 
 module TestEnv
   extend ActiveSupport::Concern
@@ -61,6 +60,11 @@ module TestEnv
     'merge-commit-analyze-before'        => '1adbdef',
     'merge-commit-analyze-side-branch'   => '8a99451',
     'merge-commit-analyze-after'         => '646ece5',
+    'snippet/single-file'                => '43e4080',
+    'snippet/multiple-files'             => 'b80faa8',
+    'snippet/rename-and-edit-file'       => '220a1e4',
+    'snippet/edit-file'                  => 'c2f074f',
+    'snippet/no-files'                   => '671aaa8',
     '2-mb-file'                          => 'bf12d25',
     'before-create-delete-modify-move'   => '845009f',
     'between-create-delete-modify-move'  => '3f5f443',
@@ -82,8 +86,9 @@ module TestEnv
     'conflict-resolvable-fork'   => '404fa3f'
   }.freeze
 
-  TMP_TEST_PATH = Rails.root.join('tmp', 'tests', '**')
+  TMP_TEST_PATH = Rails.root.join('tmp', 'tests').freeze
   REPOS_STORAGE = 'default'.freeze
+  SECOND_STORAGE_PATH = Rails.root.join('tmp', 'tests', 'second_storage')
 
   # Test environment
   #
@@ -103,6 +108,9 @@ module TestEnv
     setup_gitlab_shell
 
     setup_gitaly
+
+    # Feature specs are run through Workhorse
+    setup_workhorse
 
     # Create repository for FactoryBot.create(:project)
     setup_factory_repo
@@ -131,13 +139,14 @@ module TestEnv
   #
   # Keeps gitlab-shell and gitlab-test
   def clean_test_path
-    Dir[TMP_TEST_PATH].each do |entry|
+    Dir[File.join(TMP_TEST_PATH, '**')].each do |entry|
       unless test_dirs.include?(File.basename(entry))
         FileUtils.rm_rf(entry)
       end
     end
 
     FileUtils.mkdir_p(repos_path)
+    FileUtils.mkdir_p(SECOND_STORAGE_PATH)
     FileUtils.mkdir_p(backup_path)
     FileUtils.mkdir_p(pages_path)
     FileUtils.mkdir_p(artifacts_path)
@@ -154,8 +163,8 @@ module TestEnv
       install_dir: gitaly_dir,
       version: Gitlab::GitalyClient.expected_server_version,
       task: "gitlab:gitaly:install[#{install_gitaly_args}]") do
-
-        Gitlab::SetupHelper.create_gitaly_configuration(gitaly_dir, { 'default' => repos_path }, force: true)
+        Gitlab::SetupHelper::Gitaly.create_configuration(gitaly_dir, { 'default' => repos_path }, force: true)
+        Gitlab::SetupHelper::Praefect.create_configuration(gitaly_dir, { 'praefect' => repos_path }, force: true)
         start_gitaly(gitaly_dir)
       end
   end
@@ -174,8 +183,6 @@ module TestEnv
       return
     end
 
-    FileUtils.mkdir_p("tmp/tests/second_storage") unless File.exist?("tmp/tests/second_storage")
-
     spawn_script = Rails.root.join('scripts/gitaly-test-spawn').to_s
     Bundler.with_original_env do
       unless system(spawn_script)
@@ -185,17 +192,38 @@ module TestEnv
       end
     end
 
-    @gitaly_pid = Integer(File.read('tmp/tests/gitaly.pid'))
+    gitaly_pid = Integer(File.read(TMP_TEST_PATH.join('gitaly.pid')))
+    praefect_pid = Integer(File.read(TMP_TEST_PATH.join('praefect.pid')))
 
-    Kernel.at_exit { stop_gitaly }
+    Kernel.at_exit { stop(gitaly_pid) }
+    Kernel.at_exit { stop(praefect_pid) }
 
-    wait_gitaly
+    wait('gitaly')
+    wait('praefect')
   end
 
-  def wait_gitaly
+  def stop(pid)
+    Process.kill('KILL', pid)
+  rescue Errno::ESRCH
+    # The process can already be gone if the test run was INTerrupted.
+  end
+
+  def gitaly_url
+    ENV.fetch('GITALY_REPO_URL', nil)
+  end
+
+  def socket_path(service)
+    TMP_TEST_PATH.join('gitaly', "#{service}.socket").to_s
+  end
+
+  def praefect_socket_path
+    "unix:" + socket_path(:praefect)
+  end
+
+  def wait(service)
     sleep_time = 10
     sleep_interval = 0.1
-    socket = Gitlab::GitalyClient.address('default').sub('unix:', '')
+    socket = socket_path(service)
 
     Integer(sleep_time / sleep_interval).times do
       Socket.unix(socket)
@@ -204,19 +232,53 @@ module TestEnv
       sleep sleep_interval
     end
 
-    raise "could not connect to gitaly at #{socket.inspect} after #{sleep_time} seconds"
+    raise "could not connect to #{service} at #{socket.inspect} after #{sleep_time} seconds"
   end
 
-  def stop_gitaly
-    return unless @gitaly_pid
+  def setup_workhorse
+    install_workhorse_args = [workhorse_dir, workhorse_url].compact.join(',')
 
-    Process.kill('KILL', @gitaly_pid)
-  rescue Errno::ESRCH
-    # The process can already be gone if the test run was INTerrupted.
+    component_timed_setup(
+      'GitLab Workhorse',
+      install_dir: workhorse_dir,
+      version: Gitlab::Workhorse.version,
+      task: "gitlab:workhorse:install[#{install_workhorse_args}]"
+    )
   end
 
-  def gitaly_url
-    ENV.fetch('GITALY_REPO_URL', nil)
+  def workhorse_dir
+    @workhorse_path ||= File.join('tmp', 'tests', 'gitlab-workhorse')
+  end
+
+  def with_workhorse(workhorse_dir, host, port, upstream, &blk)
+    host = "[#{host}]" if host.include?(':')
+    listen_addr = [host, port].join(':')
+
+    workhorse_pid = spawn(
+      File.join(workhorse_dir, 'gitlab-workhorse'),
+      '-authSocket', upstream,
+      '-documentRoot', Rails.root.join('public').to_s,
+      '-listenAddr', listen_addr,
+      '-secretPath', Gitlab::Workhorse.secret_path.to_s,
+      # TODO: Needed for workhorse + redis features.
+      # https://gitlab.com/gitlab-org/gitlab/-/issues/209245
+      #
+      # '-config', '',
+      '-logFile', 'log/workhorse-test.log',
+      '-logFormat', 'structured',
+      '-developmentMode' # to serve assets and rich error messages
+    )
+
+    begin
+      yield
+    ensure
+      Process.kill('TERM', workhorse_pid)
+      Process.wait(workhorse_pid)
+    end
+  end
+
+  def workhorse_url
+    ENV.fetch('GITLAB_WORKHORSE_URL', nil)
   end
 
   def setup_factory_repo
@@ -246,8 +308,8 @@ module TestEnv
     end
   end
 
-  def copy_repo(project, bare_repo:, refs:)
-    target_repo_path = File.expand_path(repos_path + "/#{project.disk_path}.git")
+  def copy_repo(subject, bare_repo:, refs:)
+    target_repo_path = File.expand_path(repos_path + "/#{subject.disk_path}.git")
 
     FileUtils.mkdir_p(target_repo_path)
     FileUtils.cp_r("#{File.expand_path(bare_repo)}/.", target_repo_path)
@@ -348,6 +410,8 @@ module TestEnv
       gitlab-test_bare
       gitlab-test-fork
       gitlab-test-fork_bare
+      gitlab-workhorse
+      gitlab_workhorse_secret
     ]
   end
 

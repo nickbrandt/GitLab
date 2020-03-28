@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import { ApolloMutation } from 'vue-apollo';
-import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignNote from 'ee/design_management/components/design_notes/design_note.vue';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
 import createNoteMutation from 'ee/design_management/graphql/mutations/createNote.mutation.graphql';
+import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 
 describe('Design discussions component', () => {
   let wrapper;
@@ -30,7 +30,6 @@ describe('Design discussions component', () => {
 
   function createComponent(props = {}) {
     wrapper = shallowMount(DesignDiscussion, {
-      sync: false,
       propsData: {
         discussion: {
           id: '0',
@@ -95,6 +94,25 @@ describe('Design discussions component', () => {
         expect(mutate).toHaveBeenCalledWith(mutationVariables);
 
         return mutate({ variables: mutationVariables });
+      })
+      .then(() => {
+        expect(findReplyForm().exists()).toBe(false);
+      });
+  });
+
+  it('clears the discussion comment on closing comment form', () => {
+    wrapper.setData({
+      discussionComment: 'test',
+      isFormRendered: true,
+    });
+
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findReplyForm().vm.$emit('cancelForm');
+
+        expect(wrapper.vm.discussionComment).toBe('');
+        return wrapper.vm.$nextTick();
       })
       .then(() => {
         expect(findReplyForm().exists()).toBe(false);

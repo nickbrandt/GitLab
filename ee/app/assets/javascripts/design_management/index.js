@@ -4,6 +4,7 @@ import createRouter from './router';
 import App from './components/app.vue';
 import apolloProvider from './graphql';
 import projectQuery from './graphql/queries/project.query.graphql';
+import { DESIGNS_ROUTE_NAME, ROOT_ROUTE_NAME } from './router/constants';
 
 export default () => {
   const el = document.getElementById('js-design-management');
@@ -12,10 +13,10 @@ export default () => {
   const router = createRouter(issuePath);
 
   $('.js-issue-tabs').on('shown.bs.tab', ({ target: { id } }) => {
-    if (id === 'designs' && router.currentRoute.name === 'root') {
-      router.push('/designs');
+    if (id === 'designs' && router.currentRoute.name === ROOT_ROUTE_NAME) {
+      router.push({ name: DESIGNS_ROUTE_NAME });
     } else if (id === 'discussion') {
-      router.push('/');
+      router.push({ name: ROOT_ROUTE_NAME });
     }
   });
 

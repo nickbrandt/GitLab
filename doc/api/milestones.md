@@ -4,7 +4,7 @@
 
 Returns a list of project milestones.
 
-```
+```plaintext
 GET /projects/:id/milestones
 GET /projects/:id/milestones?iids[]=42
 GET /projects/:id/milestones?iids[]=42&iids[]=43
@@ -24,7 +24,7 @@ Parameters:
 | `title`   | string | optional | Return only the milestones having the given `title` |
 | `search`  | string | optional | Return only milestones with a title or description matching the provided string |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/milestones
 ```
 
@@ -51,7 +51,7 @@ Example Response:
 
 Gets a single project milestone.
 
-```
+```plaintext
 GET /projects/:id/milestones/:milestone_id
 ```
 
@@ -64,7 +64,7 @@ Parameters:
 
 Creates a new project milestone.
 
-```
+```plaintext
 POST /projects/:id/milestones
 ```
 
@@ -80,7 +80,7 @@ Parameters:
 
 Updates an existing project milestone.
 
-```
+```plaintext
 PUT /projects/:id/milestones/:milestone_id
 ```
 
@@ -96,9 +96,9 @@ Parameters:
 
 ## Delete project milestone
 
-Only for user with developer access to the project.
+Only for users with Developer access to the project.
 
-```
+```plaintext
 DELETE /projects/:id/milestones/:milestone_id
 ```
 
@@ -111,7 +111,7 @@ Parameters:
 
 Gets all issues assigned to a single project milestone.
 
-```
+```plaintext
 GET /projects/:id/milestones/:milestone_id/issues
 ```
 
@@ -124,7 +124,7 @@ Parameters:
 
 Gets all merge requests assigned to a single project milestone.
 
-```
+```plaintext
 GET /projects/:id/milestones/:milestone_id/merge_requests
 ```
 
@@ -137,9 +137,9 @@ Parameters:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/53861) in GitLab 11.9
 
-Only for users with developer access to the group.
+Only for users with Developer access to the group.
 
-```
+```plaintext
 POST /projects/:id/milestones/:milestone_id/promote
 ```
 
@@ -154,7 +154,7 @@ Parameters:
 
 Gets all burndown chart events for a single milestone.
 
-```
+```plaintext
 GET /projects/:id/milestones/:milestone_id/burndown_events
 ```
 

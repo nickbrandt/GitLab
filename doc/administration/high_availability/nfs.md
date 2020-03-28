@@ -12,6 +12,9 @@ performance, especially for actions that read or write to Git repositories. See
 [Filesystem Performance Benchmarking](../operations/filesystem_benchmarking.md)
 for steps to test filesystem performance.
 
+NOTE: **Note:** [Cloud Object Storage service](object_storage.md) with [Gitaly](gitaly.md)
+is recommended over NFS wherever possible for improved performance.
+
 ## NFS Server features
 
 ### Required features
@@ -51,13 +54,25 @@ management between systems:
 
 ### Improving NFS performance with GitLab
 
+#### Improving NFS performance with Unicorn
+
 NOTE: **Note:** From GitLab 12.1, it will automatically be detected if Rugged can and should be used per storage.
 
 If you previously enabled Rugged using the feature flag, you will need to unset the feature flag by using:
 
-```sh
+```shell
 sudo gitlab-rake gitlab:features:unset_rugged
 ```
+
+If the Rugged feature flag is explicitly set to either true or false, GitLab will use the value explicitly set.
+
+#### Improving NFS performance with Puma
+
+NOTE: **Note:** From GitLab 12.7, Rugged auto-detection is disabled if Puma thread count is greater than 1.
+
+If you want to use Rugged with Puma, it is recommended to [set Puma thread count to 1](https://docs.gitlab.com/omnibus/settings/puma.html#puma-settings).
+
+If you want to use Rugged with Puma thread count more than 1, Rugged can be enabled using the [feature flag](../../development/gitaly.md#legacy-rugged-code)
 
 If the Rugged feature flag is explicitly set to either true or false, GitLab will use the value explicitly set.
 
@@ -82,7 +97,7 @@ on an Linux NFS server, do the following:
 
 1. On the NFS server, run:
 
-   ```sh
+   ```shell
    echo 0 > /proc/sys/fs/leases-enable
    sysctl -w fs.leases-enable=0
    ```
@@ -117,7 +132,7 @@ across NFS. The GitLab support team will not be able to assist on performance is
 this configuration.
 
 Additionally, this configuration is specifically warned against in the
-[Postgres Documentation](https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-NFS):
+[PostgreSQL Documentation](https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-NFS):
 
 >PostgreSQL does nothing special for NFS file systems, meaning it assumes NFS behaves exactly like
 >locally-connected drives. If the client or server NFS implementation does not provide standard file
@@ -132,7 +147,7 @@ For supported database architecture, please see our documentation on
 Below is an example of an NFS mount point defined in `/etc/fstab` we use on
 GitLab.com:
 
-```
+```plaintext
 10.1.1.1:/var/opt/gitlab/git-data /var/opt/gitlab/git-data nfs4 defaults,soft,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2
 ```
 
@@ -146,10 +161,10 @@ Note there are several options that you should consider using:
 
 ## A single NFS mount
 
-It's recommended to nest all GitLab data dirs within a mount, that allows automatic
+It's recommended to nest all GitLab data directories within a mount, that allows automatic
 restore of backups without manually moving existing data.
 
-```
+```plaintext
 mountpoint
 └── gitlab-data
     ├── builds
@@ -186,7 +201,7 @@ single NFS mount point as you normally would in `/etc/fstab`. Let's assume your
 NFS mount point is `/gitlab-nfs`. Then, add the following bind mounts in
 `/etc/fstab`:
 
-```bash
+```shell
 /gitlab-nfs/gitlab-data/git-data /var/opt/gitlab/git-data none bind 0 0
 /gitlab-nfs/gitlab-data/.ssh /var/opt/gitlab/.ssh none bind 0 0
 /gitlab-nfs/gitlab-data/uploads /var/opt/gitlab/gitlab-rails/uploads none bind 0 0
@@ -209,7 +224,7 @@ following are the 4 locations need to be shared:
 | `/var/opt/gitlab/git-data` | Git repository data. This will account for a large portion of your data | `git_data_dirs({"default" => { "path" => "/var/opt/gitlab/git-data"} })`
 | `/var/opt/gitlab/gitlab-rails/uploads` | User uploaded attachments | `gitlab_rails['uploads_directory'] = '/var/opt/gitlab/gitlab-rails/uploads'`
 | `/var/opt/gitlab/gitlab-rails/shared` | Build artifacts, GitLab Pages, LFS objects, temp files, etc. If you're using LFS this may also account for a large portion of your data | `gitlab_rails['shared_path'] = '/var/opt/gitlab/gitlab-rails/shared'`
-| `/var/opt/gitlab/gitlab-ci/builds` | GitLab CI build traces | `gitlab_ci['builds_directory'] = '/var/opt/gitlab/gitlab-ci/builds'`
+| `/var/opt/gitlab/gitlab-ci/builds` | GitLab CI/CD build traces | `gitlab_ci['builds_directory'] = '/var/opt/gitlab/gitlab-ci/builds'`
 
 Other GitLab directories should not be shared between nodes. They contain
 node-specific files and GitLab code that does not need to be shared. To ship

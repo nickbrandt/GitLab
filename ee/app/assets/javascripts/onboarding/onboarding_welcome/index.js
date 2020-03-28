@@ -1,9 +1,9 @@
 import Vue from 'vue';
+import { GlBreakpointInstance as breakpointInstance } from '@gitlab/ui/dist/utils';
 import WelcomePage from './components/welcome_page.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import onboardingUtils from './../utils';
-import breakpointInstance from '~/breakpoints';
 
 export default function() {
   const el = document.getElementById('js-onboarding-welcome');

@@ -55,6 +55,10 @@
   background-color: $gray-light;
 }
 
+.bg-white {
+  background-color: $white;
+}
+
 .bg-line-target-blue {
   background: $line-target-blue;
 }
@@ -409,6 +413,7 @@ img.emoji {
 .prepend-left-20 { margin-left: 20px; }
 .prepend-left-32 { margin-left: 32px; }
 .prepend-left-64 { margin-left: 64px; }
+.append-right-2 { margin-right: 2px; }
 .append-right-4 { margin-right: 4px; }
 .append-right-5 { margin-right: 5px; }
 .append-right-8 { margin-right: 8px; }
@@ -420,6 +425,7 @@ img.emoji {
 .append-right-48 { margin-right: 48px; }
 .prepend-right-32 { margin-right: 32px; }
 .append-bottom-0 { margin-bottom: 0; }
+.append-bottom-2 { margin-bottom: 2px; }
 .append-bottom-4 { margin-bottom: $gl-padding-4; }
 .append-bottom-5 { margin-bottom: 5px; }
 .append-bottom-8 { margin-bottom: $grid-size; }
@@ -433,6 +439,7 @@ img.emoji {
 .block { display: block; }
 .flex { display: flex; }
 .vertical-align-top { vertical-align: top; }
+.vertical-align-text-top { vertical-align: text-top; }
 .vertical-align-middle { vertical-align: middle; }
 .vertical-align-sub { vertical-align: sub; }
 .flex-align-self-center { align-self: center; }
@@ -442,6 +449,7 @@ img.emoji {
 .ws-normal { white-space: normal; }
 .ws-pre-wrap { white-space: pre-wrap; }
 .overflow-auto { overflow: auto; }
+.overflow-visible { overflow: visible; }
 
 .d-flex-center {
   display: flex;
@@ -454,6 +462,8 @@ img.emoji {
 .w-8em { width: 8em; }
 .w-3rem { width: 3rem; }
 .w-15p { width: 15%; }
+.w-30p { width: 30%; }
+.w-60p { width: 60%; }
 .w-70p { width: 70%; }
 
 .h-12em { height: 12em; }
@@ -514,6 +524,14 @@ img.emoji {
   cursor: pointer;
 }
 
+.cursor-not-allowed { cursor: not-allowed; }
+
+// this needs to use "!important" due to some very specific styles
+// around buttons
+.cursor-default {
+  cursor: default !important;
+}
+
 // Make buttons/dropdowns full-width on mobile
 .full-width-mobile {
   @include media-breakpoint-down(xs) {
@@ -565,7 +583,9 @@ img.emoji {
 .gl-font-size-large { font-size: $gl-font-size-large; }
 
 .gl-line-height-24 { line-height: $gl-line-height-24; }
+.gl-line-height-14 { line-height: $gl-line-height-14; }
 
+.gl-font-size-0 { font-size: 0; }
 .gl-font-size-12 { font-size: $gl-font-size-12; }
 .gl-font-size-14 { font-size: $gl-font-size-14; }
 .gl-font-size-16 { font-size: $gl-font-size-16; }

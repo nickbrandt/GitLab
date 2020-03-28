@@ -1,10 +1,9 @@
 <script>
-import { s__, __ } from '~/locale';
-import _ from 'underscore';
+import { omit, throttle } from 'lodash';
 import { GlLink, GlButton, GlTooltip, GlResizeObserverDirective } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
-import { roundOffFloat } from '~/lib/utils/common_utils';
+import { s__, __ } from '~/locale';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
 import {
@@ -14,9 +13,29 @@ import {
   lineWidths,
   symbolSizes,
   dateFormats,
+  chartColorValues,
 } from '../../constants';
+import { getYAxisOptions, getChartGrid, getTooltipFormatter } from './options';
 import { makeDataSeries } from '~/helpers/monitor_helper';
 import { graphDataValidatorForValues } from '../../utils';
+
+/**
+ * A "virtual" coordinates system for the deployment icons.
+ * Deployment icons are displayed along the [min, max]
+ * range at height `pos`.
+ */
+const deploymentYAxisCoords = {
+  min: 0,
+  pos: 3, // 3% height of chart's grid
+  max: 100,
+};
+
+const THROTTLED_DATAZOOM_WAIT = 1000; // milliseconds
+const timestampToISODate = timestamp => new Date(timestamp).toISOString();
+
+const events = {
+  datazoom: 'datazoom',
+};
 
 export default {
   components: {
@@ -93,11 +112,11 @@ export default {
         isDeployment: false,
         sha: '',
       },
-      showTitleTooltip: false,
       width: 0,
       height: chartHeight,
       svgs: {},
       primaryColor: null,
+      throttledDatazoom: null,
     };
   },
   computed: {
@@ -105,7 +124,7 @@ export default {
       // Transforms & supplements query data to render appropriate labels & styles
       // Input: [{ queryAttributes1 }, { queryAttributes2 }]
       // Output: [{ seriesAttributes1 }, { seriesAttributes2 }]
-      return this.graphData.queries.reduce((acc, query) => {
+      return this.graphData.metrics.reduce((acc, query, i) => {
         const { appearance } = query;
         const lineType =
           appearance && appearance.line && appearance.line.type
@@ -121,12 +140,12 @@ export default {
               ? appearance.area.opacity
               : undefined,
         };
-        const series = makeDataSeries(query.result, {
+        const series = makeDataSeries(query.result || [], {
           name: this.formatLegendLabel(query),
           lineStyle: {
             type: lineType,
             width: lineWidth,
-            color: this.primaryColor,
+            color: chartColorValues[i % chartColorValues.length],
           },
           showSymbol: false,
           areaStyle: this.graphData.type === 'area-chart' ? areaStyle : undefined,
@@ -137,28 +156,46 @@ export default {
       }, []);
     },
     chartOptionSeries() {
-      return (this.option.series || []).concat(this.scatterSeries ? [this.scatterSeries] : []);
+      return (this.option.series || []).concat(
+        this.deploymentSeries ? [this.deploymentSeries] : [],
+      );
     },
     chartOptions() {
-      const option = _.omit(this.option, 'series');
+      const { yAxis, xAxis } = this.option;
+      const option = omit(this.option, ['series', 'yAxis', 'xAxis']);
+
+      const dataYAxis = {
+        ...getYAxisOptions(this.graphData.yAxis),
+        ...yAxis,
+      };
+
+      const deploymentsYAxis = {
+        show: false,
+        min: deploymentYAxisCoords.min,
+        max: deploymentYAxisCoords.max,
+        axisLabel: {
+          // formatter fn required to trigger tooltip re-positioning
+          formatter: () => {},
+        },
+      };
+
+      const timeXAxis = {
+        name: __('Time'),
+        type: 'time',
+        axisLabel: {
+          formatter: date => dateFormat(date, dateFormats.timeOfDay),
+        },
+        axisPointer: {
+          snap: true,
+        },
+        ...xAxis,
+      };
+
       return {
         series: this.chartOptionSeries,
-        xAxis: {
-          name: __('Time'),
-          type: 'time',
-          axisLabel: {
-            formatter: date => dateFormat(date, dateFormats.timeOfDay),
-          },
-          axisPointer: {
-            snap: true,
-          },
-        },
-        yAxis: {
-          name: this.yAxisLabel,
-          axisLabel: {
-            formatter: num => roundOffFloat(num, 3).toString(),
-          },
-        },
+        xAxis: timeXAxis,
+        yAxis: [dataYAxis, deploymentsYAxis],
+        grid: getChartGrid(),
         dataZoom: [this.dataZoomConfig],
         ...option,
       };
@@ -209,7 +246,7 @@ export default {
             id,
             createdAt: created_at,
             sha,
-            commitUrl: `${this.projectPath}/commit/${sha}`,
+            commitUrl: `${this.projectPath}/-/commit/${sha}`,
             tag,
             tagUrl: tag ? `${this.tagsPath}/${ref.name}` : null,
             ref: ref.name,
@@ -220,10 +257,16 @@ export default {
         return acc;
       }, []);
     },
-    scatterSeries() {
+    deploymentSeries() {
       return {
         type: graphTypes.deploymentData,
-        data: this.recentDeployments.map(deployment => [deployment.createdAt, 0]),
+
+        yAxisIndex: 1, // deploymentsYAxis index
+        data: this.recentDeployments.map(deployment => [
+          deployment.createdAt,
+          deploymentYAxisCoords.pos,
+        ]),
+
         symbol: this.svgs.rocket,
         symbolSize: symbolSizes.default,
         itemStyle: {
@@ -231,19 +274,19 @@ export default {
         },
       };
     },
-    yAxisLabel() {
-      return `${this.graphData.y_label}`;
+    tooltipYFormatter() {
+      // Use same format as y-axis
+      return getTooltipFormatter({ format: this.graphData.yAxis?.format });
     },
-  },
-  mounted() {
-    const graphTitleEl = this.$refs.graphTitle;
-    if (graphTitleEl && graphTitleEl.scrollWidth > graphTitleEl.offsetWidth) {
-      this.showTitleTooltip = true;
-    }
   },
   created() {
     this.setSvg('rocket');
     this.setSvg('scroll-handle');
+  },
+  destroyed() {
+    if (this.throttledDatazoom) {
+      this.throttledDatazoom.cancel();
+    }
   },
   methods: {
     formatLegendLabel(query) {
@@ -252,6 +295,7 @@ export default {
     formatTooltipText(params) {
       this.tooltip.title = dateFormat(params.value, dateFormats.default);
       this.tooltip.content = [];
+
       params.seriesData.forEach(dataPoint => {
         if (dataPoint.value) {
           const [xVal, yVal] = dataPoint.value;
@@ -264,11 +308,11 @@ export default {
             this.tooltip.commitUrl = deploy.commitUrl;
           } else {
             const { seriesName, color, dataIndex } = dataPoint;
-            const value = yVal.toFixed(3);
+
             this.tooltip.content.push({
               name: seriesName,
               dataIndex,
-              value,
+              value: this.tooltipYFormatter(yVal),
               color,
             });
           }
@@ -283,12 +327,43 @@ export default {
           }
         })
         .catch(e => {
-          // eslint-disable-next-line no-console, @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line no-console, @gitlab/require-i18n-strings
           console.error('SVG could not be rendered correctly: ', e);
         });
     },
-    onChartUpdated(chart) {
-      [this.primaryColor] = chart.getOption().color;
+    onChartUpdated(eChart) {
+      [this.primaryColor] = eChart.getOption().color;
+    },
+
+    onChartCreated(eChart) {
+      // Emit a datazoom event that corresponds to the eChart
+      // `datazoom` event.
+
+      if (this.throttledDatazoom) {
+        // Chart can be created multiple times in this component's
+        // lifetime, remove previous handlers every time
+        // chart is created.
+        this.throttledDatazoom.cancel();
+      }
+
+      // Emitting is throttled to avoid flurries of calls when
+      // the user changes or scrolls the zoom bar.
+      this.throttledDatazoom = throttle(
+        () => {
+          const { startValue, endValue } = eChart.getOption().dataZoom[0];
+          this.$emit(events.datazoom, {
+            start: timestampToISODate(startValue),
+            end: timestampToISODate(endValue),
+          });
+        },
+        THROTTLED_DATAZOOM_WAIT,
+        {
+          leading: false,
+        },
+      );
+
+      eChart.off('datazoom');
+      eChart.on('datazoom', this.throttledDatazoom);
     },
     onResize() {
       if (!this.$refs.chart) return;
@@ -300,21 +375,7 @@ export default {
 </script>
 
 <template>
-  <div v-gl-resize-observer-directive="onResize" class="prometheus-graph">
-    <div class="prometheus-graph-header">
-      <h5
-        ref="graphTitle"
-        class="prometheus-graph-title js-graph-title text-truncate append-right-8"
-      >
-        {{ graphData.title }}
-      </h5>
-      <gl-tooltip :target="() => $refs.graphTitle" :disabled="!showTitleTooltip">
-        {{ graphData.title }}
-      </gl-tooltip>
-      <div class="prometheus-graph-widgets js-graph-widgets flex-fill">
-        <slot></slot>
-      </div>
-    </div>
+  <div v-gl-resize-observer-directive="onResize">
     <component
       :is="glChartComponent"
       ref="chart"
@@ -328,6 +389,7 @@ export default {
       :height="height"
       :average-text="legendAverageText"
       :max-text="legendMaxText"
+      @created="onChartCreated"
       @updated="onChartUpdated"
     >
       <template v-if="tooltip.isDeployment">

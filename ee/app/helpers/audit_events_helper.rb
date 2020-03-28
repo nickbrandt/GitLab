@@ -10,6 +10,10 @@ module AuditEventsHelper
   def select_keys(key, value)
     if key =~ /^(author|target)_.*/
       ""
+    elsif key.to_s == 'ip_address' && value.blank?
+      ""
+    elsif key =~ /^expiry_(from|to)$/ && value.blank?
+      "#{key} <strong>never expires</strong>"
     else
       "#{key} <strong>#{value}</strong>"
     end

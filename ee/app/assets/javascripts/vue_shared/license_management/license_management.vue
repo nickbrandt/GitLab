@@ -1,46 +1,58 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
+import AdminLicenseManagementRow from './components/admin_license_management_row.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
 import PaginatedList from '~/vue_shared/components/paginated_list.vue';
-import createStore from './store/index';
 
-const store = createStore();
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 export default {
   name: 'LicenseManagement',
   components: {
     AddLicenseForm,
     DeleteConfirmationModal,
+    AdminLicenseManagementRow,
     LicenseManagementRow,
     GlButton,
     GlLoadingIcon,
     PaginatedList,
   },
-  props: {
-    apiUrl: {
-      type: String,
-      required: true,
+  data() {
+    return {
+      formIsOpen: false,
+      tableHeaders: [
+        { className: 'section-70', label: s__('Licenses|Policy') },
+        { className: 'section-30', label: s__('Licenses|Name') },
+      ],
+    };
+  },
+  computed: {
+    ...mapState(LICENSE_MANAGEMENT, ['managedLicenses', 'isLoadingManagedLicenses', 'isAdmin']),
+    ...mapGetters(LICENSE_MANAGEMENT, [
+      'isLicenseBeingUpdated',
+      'hasPendingLicenses',
+      'isAddingNewLicense',
+    ]),
+    showLoadingSpinner() {
+      return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
   },
-  data() {
-    return { formIsOpen: false };
-  },
-  store,
-  computed: {
-    ...mapState(['managedLicenses', 'isLoadingManagedLicenses']),
+  watch: {
+    isAddingNewLicense(isAddingNewLicense) {
+      if (!isAddingNewLicense) {
+        this.closeAddLicenseForm();
+      }
+    },
   },
   mounted() {
-    this.setAPISettings({
-      apiUrlManageLicenses: this.apiUrl,
-    });
-    this.loadManagedLicenses();
+    this.fetchManagedLicenses();
   },
   methods: {
-    ...mapActions(['loadManagedLicenses', 'setAPISettings', 'setLicenseApproval']),
+    ...mapActions(LICENSE_MANAGEMENT, ['fetchManagedLicenses', 'setLicenseApproval']),
     openAddLicenseForm() {
       this.formIsOpen = true;
     },
@@ -57,19 +69,21 @@ export default {
 };
 </script>
 <template>
-  <gl-loading-icon v-if="isLoadingManagedLicenses" />
+  <gl-loading-icon v-if="showLoadingSpinner" />
   <div v-else class="license-management">
-    <delete-confirmation-modal />
+    <delete-confirmation-modal v-if="isAdmin" />
 
     <paginated-list
       :list="managedLicenses"
       :empty-search-message="$options.emptySearchMessage"
       :empty-message="$options.emptyMessage"
+      :filterable="isAdmin"
       filter="name"
       data-qa-selector="license_compliance_list"
     >
       <template #header>
         <gl-button
+          v-if="isAdmin"
           class="js-open-form order-1"
           :disabled="formIsOpen"
           variant="success"
@@ -78,12 +92,25 @@ export default {
         >
           {{ s__('LicenseCompliance|Add a license') }}
         </gl-button>
+
+        <template v-else>
+          <div
+            v-for="header in tableHeaders"
+            :key="header.label"
+            class="table-section"
+            :class="header.className"
+            role="rowheader"
+          >
+            {{ header.label }}
+          </div>
+        </template>
       </template>
 
-      <template #subheader>
+      <template v-if="isAdmin" #subheader>
         <div v-if="formIsOpen" class="prepend-top-default append-bottom-default">
           <add-license-form
             :managed-licenses="managedLicenses"
+            :loading="isAddingNewLicense"
             @addLicense="setLicenseApproval"
             @closeForm="closeAddLicenseForm"
           />
@@ -91,7 +118,12 @@ export default {
       </template>
 
       <template #default="{ listItem }">
-        <license-management-row :license="listItem" />
+        <admin-license-management-row
+          v-if="isAdmin"
+          :license="listItem"
+          :loading="isLicenseBeingUpdated(listItem.id)"
+        />
+        <license-management-row v-else :license="listItem" />
       </template>
     </paginated-list>
   </div>

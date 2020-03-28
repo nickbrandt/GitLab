@@ -20,7 +20,7 @@ describe Projects::PushRulesController do
     it 'updates the push rule' do
       do_update
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(project.reload_push_rule.prevent_secrets).to be_truthy
     end
 
@@ -32,7 +32,7 @@ describe Projects::PushRulesController do
       it 'returns 404' do
         do_update
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -73,6 +73,7 @@ describe Projects::PushRulesController do
       context "Updating #{rule_attr} rule" do
         context 'as an admin' do
           let(:user) { create(:admin) }
+
           it_behaves_like 'a setting with global default', rule_attr, updates: true
         end
 

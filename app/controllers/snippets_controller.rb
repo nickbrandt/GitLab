@@ -15,13 +15,9 @@ class SnippetsController < ApplicationController
 
   before_action :snippet, only: [:show, :edit, :destroy, :update, :raw]
 
-  # Allow read snippet
+  before_action :authorize_create_snippet!, only: [:new, :create]
   before_action :authorize_read_snippet!, only: [:show, :raw]
-
-  # Allow modify snippet
   before_action :authorize_update_snippet!, only: [:edit, :update]
-
-  # Allow destroy snippet
   before_action :authorize_admin_snippet!, only: [:destroy]
 
   skip_before_action :authenticate_user!, only: [:index, :show, :raw]
@@ -54,34 +50,40 @@ class SnippetsController < ApplicationController
 
   def create
     create_params = snippet_params.merge(spammable_params)
+    service_response = Snippets::CreateService.new(nil, current_user, create_params).execute
+    @snippet = service_response.payload[:snippet]
+    repository_operation_error = service_response.error? && !@snippet.persisted? && @snippet.valid?
 
-    @snippet = CreateSnippetService.new(nil, current_user, create_params).execute
+    if repository_operation_error
+      flash.now[:alert] = service_response.message
 
-    move_temporary_files if @snippet.valid? && params[:files]
+      render :new
+    else
+      move_temporary_files if @snippet.valid? && params[:files]
 
-    recaptcha_check_with_fallback { render :new }
+      recaptcha_check_with_fallback { render :new }
+    end
   end
 
   def update
     update_params = snippet_params.merge(spammable_params)
 
-    UpdateSnippetService.new(nil, current_user, @snippet, update_params).execute
+    service_response = Snippets::UpdateService.new(nil, current_user, update_params).execute(@snippet)
+    @snippet = service_response.payload[:snippet]
 
-    recaptcha_check_with_fallback { render :edit }
+    check_repository_error
   end
 
   def show
-    blob = @snippet.blob
     conditionally_expand_blob(blob)
-
-    @note = Note.new(noteable: @snippet)
-    @noteable = @snippet
-
-    @discussions = @snippet.discussions
-    @notes = prepare_notes_for_rendering(@discussions.flat_map(&:notes), @noteable)
 
     respond_to do |format|
       format.html do
+        @note = Note.new(noteable: @snippet)
+        @noteable = @snippet
+
+        @discussions = @snippet.discussions
+        @notes = prepare_notes_for_rendering(@discussions.flat_map(&:notes), @noteable)
         render 'show'
       end
 
@@ -100,11 +102,17 @@ class SnippetsController < ApplicationController
   end
 
   def destroy
-    return access_denied! unless can?(current_user, :admin_personal_snippet, @snippet)
+    service_response = Snippets::DestroyService.new(current_user, @snippet).execute
 
-    @snippet.destroy
-
-    redirect_to snippets_path, status: :found
+    if service_response.success?
+      redirect_to dashboard_snippets_path, status: :found
+    elsif service_response.http_status == 403
+      access_denied!
+    else
+      redirect_to snippet_path(@snippet),
+                  status: :found,
+                  alert: service_response.message
+    end
   end
 
   protected
@@ -123,7 +131,7 @@ class SnippetsController < ApplicationController
   end
 
   def authorize_read_snippet!
-    return if can?(current_user, :read_personal_snippet, @snippet)
+    return if can?(current_user, :read_snippet, @snippet)
 
     if current_user
       render_404
@@ -133,11 +141,15 @@ class SnippetsController < ApplicationController
   end
 
   def authorize_update_snippet!
-    return render_404 unless can?(current_user, :update_personal_snippet, @snippet)
+    return render_404 unless can?(current_user, :update_snippet, @snippet)
   end
 
   def authorize_admin_snippet!
-    return render_404 unless can?(current_user, :admin_personal_snippet, @snippet)
+    return render_404 unless can?(current_user, :admin_snippet, @snippet)
+  end
+
+  def authorize_create_snippet!
+    return render_404 unless can?(current_user, :create_snippet)
   end
 
   def snippet_params

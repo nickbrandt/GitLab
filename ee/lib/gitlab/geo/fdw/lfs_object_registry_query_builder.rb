@@ -17,7 +17,7 @@ module Gitlab
         def for_lfs_objects(ids)
           query
             .joins(fdw_inner_join_lfs_objects)
-            .lfs_object_id_in(ids)
+            .model_id_in(ids)
         end
         # rubocop:enable CodeReuse/ActiveRecord
 

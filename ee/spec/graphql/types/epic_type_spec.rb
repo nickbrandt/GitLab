@@ -11,7 +11,7 @@ describe GitlabSchema.types['Epic'] do
       closed_at created_at updated_at children has_children has_issues
       web_path web_url relation_path reference issues user_permissions
       notes discussions relative_position subscribed participants
-      descendant_counts
+      descendant_counts descendant_weight_sum upvotes downvotes health_status
     ]
   end
 
@@ -23,7 +23,7 @@ describe GitlabSchema.types['Epic'] do
 
   it { expect(described_class).to have_graphql_fields(fields) }
 
-  it { is_expected.to have_graphql_field(:subscribed, complexity: 5) }
+  it { expect(described_class).to have_graphql_field(:subscribed, complexity: 5) }
 
-  it { is_expected.to have_graphql_field(:participants, complexity: 5) }
+  it { expect(described_class).to have_graphql_field(:participants, complexity: 5) }
 end

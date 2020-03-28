@@ -3,25 +3,20 @@
 require 'digest/sha1'
 
 module QA
-  context 'Release', :docker do
+  context 'Release', :docker, :runner do
     describe 'Git clone using a deploy key' do
       before do
-        # Handle WIP Job Logs flag - https://gitlab.com/gitlab-org/gitlab/issues/31162
-        @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
-        Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
-
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @runner_name = "qa-runner-#{Time.now.to_i}"
 
-        @project = Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'deploy-key-clone-project'
+        @project = Resource::Project.fabricate_via_api! do |project|
+          project.name = 'deploy-key-clone-project'
         end
 
         @repository_location = @project.repository_ssh_location
 
-        Resource::Runner.fabricate_via_api! do |resource|
+        @runner = Resource::Runner.fabricate_via_api! do |resource|
           resource.project = @project
           resource.name = @runner_name
           resource.tags = %w[qa docker]
@@ -30,8 +25,7 @@ module QA
       end
 
       after do
-        Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
-        Service::DockerRun::GitlabRunner.new(@runner_name).remove!
+        @runner.remove_via_api!
       end
 
       keys = [
@@ -52,12 +46,7 @@ module QA
 
           deploy_key_name = "DEPLOY_KEY_#{key.name}_#{key.bits}"
 
-          Resource::CiVariable.fabricate_via_browser_ui! do |resource|
-            resource.project = @project
-            resource.key = deploy_key_name
-            resource.value = key.private_key
-            resource.masked = false
-          end
+          make_ci_variable(deploy_key_name, key)
 
           gitlab_ci = <<~YAML
           cat-config:
@@ -94,6 +83,17 @@ module QA
           Page::Project::Job::Show.perform do |job|
             expect(job).to be_successful
             expect(job.output).to include(sha1sum)
+          end
+        end
+
+        private
+
+        def make_ci_variable(key_name, key)
+          Resource::CiVariable.fabricate_via_api! do |resource|
+            resource.project = @project
+            resource.key = key_name
+            resource.value = key.private_key
+            resource.masked = false
           end
         end
       end

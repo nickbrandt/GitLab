@@ -24,8 +24,9 @@ end
 ```
 
 Features that are developed and are intended to be merged behind a feature flag
-should not include a changelog entry. The entry should be added in the merge
-request removing the feature flag. If the feature contains any DB migration it
+should not include a changelog entry. The entry should either be added in the merge
+request removing the feature flag or the merge request where the default value of
+the feature flag is set to true. If the feature contains any DB migration it
 should include a changelog entry for DB changes.
 
 In the rare case that you need the feature flag to be on automatically, use
@@ -38,7 +39,7 @@ Feature.enabled?(:feature_flag, project, default_enabled: true)
 The [`Project#feature_available?`][project-fa],
 [`Namespace#feature_available?`][namespace-fa] (EE), and
 [`License.feature_available?`][license-fa] (EE) methods all implicitly check for
-a feature flag by the same name as the provided argument.
+a by default enabled feature flag with the same name as the provided argument.
 
 For example if a feature is license-gated, there's no need to add an additional
 explicit feature flag check since the flag will be checked as part of the
@@ -56,12 +57,19 @@ isn't gated by a License or Plan.
 unless the feature is explicitly disabled or limited to a percentage of users,
 the feature flag check will default to `true`.**
 
-As an example, if you were to ship the backend half of a feature behind a flag,
-you'd want to explicitly disable that flag until the frontend half is also ready
-to be shipped. To make sure this feature is disabled for both GitLab.com and
-self-managed instances you'd need to explicitly call `Feature.enabled?` method
-before the `feature_available` method. This ensures the feature_flag is defaulting
-to `false`.
+This is relevant when developing the feature using
+[several smaller merge requests](https://about.gitlab.com/handbook/values/#make-small-merge-requests), or when the feature is considered to be an
+[alpha or beta](https://about.gitlab.com/handbook/product/#alpha-beta-ga), and
+should not be available by default.
+
+As an example, if you were to ship the frontend half of a feature without the
+backend, you'd want to disable the feature entirely until the backend half is
+also ready to be shipped. To make sure this feature is disabled for both
+GitLab.com and self-managed instances, you should use the
+[`Namespace#alpha_feature_available?`](https://gitlab.com/gitlab-org/gitlab/blob/458749872f4a8f27abe8add930dbb958044cb926/ee/app/models/ee/namespace.rb#L113) or
+[`Namespace#beta_feature_available?`](https://gitlab.com/gitlab-org/gitlab/blob/458749872f4a8f27abe8add930dbb958044cb926/ee/app/models/ee/namespace.rb#L100-112)
+method, according to our [definitions](https://about.gitlab.com/handbook/product/#alpha-beta-ga). This ensures the feature is disabled unless the feature flag is
+_explicitly_ enabled.
 
 ## Feature groups
 
@@ -73,7 +81,7 @@ Feature groups must be defined statically in `lib/feature.rb` (in the
 dynamic (querying the DB etc.).
 
 Once defined in `lib/feature.rb`, you will be able to activate a
-feature for a given feature group via the [`feature_group` param of the features API](../../api/features.md#set-or-create-a-feature)
+feature for a given feature group via the [`feature_group` parameter of the features API](../../api/features.md#set-or-create-a-feature)
 
 ### Frontend
 
@@ -128,4 +136,10 @@ In the rails console (`rails c`), enter the following command to enable your fea
 
 ```ruby
 Feature.enable(:feature_flag_name)
+```
+
+Similarly, the following command will disable a feature flag:
+
+```ruby
+Feature.disable(:feature_flag_name)
 ```

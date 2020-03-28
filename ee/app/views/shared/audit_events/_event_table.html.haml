@@ -9,7 +9,7 @@
         = s_('AuditEvents|Target')
       .table-section.section-20{ role: 'rowheader' }
         = s_('AuditEvents|At')
-    - events.each do |event|
+    - events.map(&:present).each do |event|
       .gl-responsive-table-row
         .table-section.section-15
           .table-mobile-header{ role: 'rowheader' }
@@ -19,11 +19,11 @@
               = event.author_name
             - else
               = s_('AuditEvents|(removed)')
-        .table-section.section-50.flex-truncate-parent.audit-action.js-audit-action
+        .table-section.section-50.section-wrap.audit-action.js-audit-action
           %span= sanitize(human_text(event.details), tags: %w(strong))
-        .table-section.section-15.flex-truncate-parent
-          = event.details[:target_details]
+        .table-section.section-15.section-wrap
+          = event.target
         .table-section.section-20
-          = event.created_at
+          = event.date
 
   = paginate events, theme: "gitlab"

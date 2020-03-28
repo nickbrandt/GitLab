@@ -1,5 +1,6 @@
 <script>
 import LinkedPipeline from './linked_pipeline.vue';
+import { __ } from '~/locale';
 
 export default {
   components: {
@@ -18,6 +19,10 @@ export default {
       type: String,
       required: true,
     },
+    projectId: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
     columnClass() {
@@ -27,6 +32,15 @@ export default {
       };
       return `graph-position-${this.graphPosition} ${positionValues[this.graphPosition]}`;
     },
+    // Refactor string match when BE returns Upstream/Downstream indicators
+    isUpstream() {
+      return this.columnTitle === __('Upstream');
+    },
+  },
+  methods: {
+    onPipelineClick(downstreamNode, pipeline, index) {
+      this.$emit('linkedPipelineClick', pipeline, index, downstreamNode);
+    },
   },
 };
 </script>
@@ -34,18 +48,19 @@ export default {
 <template>
   <div :class="columnClass" class="stage-column linked-pipelines-column">
     <div class="stage-name linked-pipelines-column-title">{{ columnTitle }}</div>
-    <div class="cross-project-triangle"></div>
+    <div v-if="isUpstream" class="cross-project-triangle"></div>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
         :key="pipeline.id"
         :class="{
-          'flat-connector-before': index === 0 && graphPosition === 'right',
           active: pipeline.isExpanded,
           'left-connector': pipeline.isExpanded && graphPosition === 'left',
         }"
         :pipeline="pipeline"
-        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index)"
+        :column-title="columnTitle"
+        :project-id="projectId"
+        @pipelineClicked="onPipelineClick($event, pipeline, index)"
       />
     </ul>
   </div>

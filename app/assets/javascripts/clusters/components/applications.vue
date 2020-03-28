@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import helmInstallIllustration from '@gitlab/svgs/dist/illustrations/kubernetes-installation.svg';
 import { GlLoadingIcon } from '@gitlab/ui';
 import elasticsearchLogo from 'images/cluster_app_logos/elasticsearch.png';
@@ -19,18 +19,18 @@ import applicationRow from './application_row.vue';
 import clipboardButton from '../../vue_shared/components/clipboard_button.vue';
 import KnativeDomainEditor from './knative_domain_editor.vue';
 import { CLUSTER_TYPE, PROVIDER_TYPE, APPLICATION_STATUS, INGRESS } from '../constants';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import eventHub from '~/clusters/event_hub';
 import CrossplaneProviderStack from './crossplane_provider_stack.vue';
+import IngressModsecuritySettings from './ingress_modsecurity_settings.vue';
 
 export default {
   components: {
     applicationRow,
     clipboardButton,
-    LoadingButton,
     GlLoadingIcon,
     KnativeDomainEditor,
     CrossplaneProviderStack,
+    IngressModsecuritySettings,
   },
   props: {
     type: {
@@ -54,6 +54,11 @@ export default {
       default: '',
     },
     ingressDnsHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    ingressModSecurityHelpPath: {
       type: String,
       required: false,
       default: '',
@@ -102,8 +107,12 @@ export default {
     isProjectCluster() {
       return this.type === CLUSTER_TYPE.PROJECT;
     },
+    managedAppsLocalTillerEnabled() {
+      return Boolean(gon.features?.managedAppsLocalTiller);
+    },
     helmInstalled() {
       return (
+        this.managedAppsLocalTillerEnabled ||
         this.applications.helm.status === APPLICATION_STATUS.INSTALLED ||
         this.applications.helm.status === APPLICATION_STATUS.UPDATED
       );
@@ -123,30 +132,24 @@ export default {
     crossplaneInstalled() {
       return this.applications.crossplane.status === APPLICATION_STATUS.INSTALLED;
     },
-    enableClusterApplicationCrossplane() {
-      return gon.features && gon.features.enableClusterApplicationCrossplane;
-    },
-    enableClusterApplicationElasticStack() {
-      return gon.features && gon.features.enableClusterApplicationElasticStack;
-    },
     ingressDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Installing Ingress may incur additional costs. Learn more about %{pricingLink}.`,
           ),
         ),
         {
-          pricingLink: `<strong><a href="https://cloud.google.com/compute/pricing#lb"
+          pricingLink: `<a href="https://cloud.google.com/compute/pricing#lb"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__('ClusterIntegration|pricing'))}</a></strong>`,
+              ${esc(s__('ClusterIntegration|pricing'))}</a>`,
         },
         false,
       );
     },
     certManagerDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Cert-Manager is a native Kubernetes certificate management controller that helps with issuing certificates.
             Installing Cert-Manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates
@@ -156,23 +159,23 @@ export default {
         {
           letsEncrypt: `<a href="https://letsencrypt.org/"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__("ClusterIntegration|Let's Encrypt"))}</a>`,
+              ${esc(s__("ClusterIntegration|Let's Encrypt"))}</a>`,
         },
         false,
       );
     },
     crossplaneDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Crossplane enables declarative provisioning of managed services from your cloud of choice using %{kubectl} or %{gitlabIntegrationLink}.
 Crossplane runs inside your Kubernetes cluster and supports secure connectivity and secrets management between app containers and the cloud services they depend on.`,
           ),
         ),
         {
-          gitlabIntegrationLink: `<a href="https://docs.gitlab.com/ce/user/project/integrations/crossplane.html"
+          gitlabIntegrationLink: `<a href="https://docs.gitlab.com/ee/user/clusters/applications.html#crossplane"
           target="_blank" rel="noopener noreferrer">
-          ${_.escape(s__('ClusterIntegration|Gitlab Integration'))}</a>`,
+          ${esc(s__('ClusterIntegration|Gitlab Integration'))}</a>`,
           kubectl: `<code>kubectl</code>`,
         },
         false,
@@ -181,7 +184,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
     prometheusDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Prometheus is an open-source monitoring system
             with %{gitlabIntegrationLink} to monitor deployed applications.`,
@@ -190,7 +193,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         {
           gitlabIntegrationLink: `<a href="https://docs.gitlab.com/ce/user/project/integrations/prometheus.html"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__('ClusterIntegration|GitLab Integration'))}</a>`,
+              ${esc(s__('ClusterIntegration|GitLab Integration'))}</a>`,
         },
         false,
       );
@@ -204,9 +207,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
     elasticStackInstalled() {
       return this.applications.elastic_stack.status === APPLICATION_STATUS.INSTALLED;
     },
-    elasticStackKibanaHostname() {
-      return this.applications.elastic_stack.kibana_hostname;
-    },
     knative() {
       return this.applications.knative;
     },
@@ -219,11 +219,11 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
     installedVia() {
       if (this.cloudRun) {
         return sprintf(
-          _.escape(s__(`ClusterIntegration|installed via %{installed_via}`)),
+          esc(s__(`ClusterIntegration|installed via %{installed_via}`)),
           {
             installed_via: `<a href="${
               this.cloudRunHelpPath
-            }" target="_blank" rel="noopener noreferrer">${_.escape(
+            }" target="_blank" rel="noopener noreferrer">${esc(
               s__('ClusterIntegration|Cloud Run'),
             )}</a>`,
           },
@@ -231,6 +231,9 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         );
       }
       return null;
+    },
+    ingress() {
+      return this.applications.ingress;
     },
   },
   created() {
@@ -261,7 +264,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
 <template>
   <section id="cluster-applications">
-    <h4>{{ s__('ClusterIntegration|Applications') }}</h4>
     <p class="append-bottom-0">
       {{
         s__(`ClusterIntegration|Choose which applications to install on your Kubernetes cluster.
@@ -272,6 +274,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
     <div class="cluster-application-list prepend-top-10">
       <application-row
+        v-if="!managedAppsLocalTillerEnabled"
         id="helm"
         :logo-url="helmLogo"
         :title="applications.helm.title"
@@ -313,10 +316,15 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :request-reason="applications.ingress.requestReason"
         :installed="applications.ingress.installed"
         :install-failed="applications.ingress.installFailed"
+        :install-application-request-params="{
+          modsecurity_enabled: applications.ingress.modsecurity_enabled,
+          modsecurity_mode: applications.ingress.modsecurity_mode,
+        }"
         :uninstallable="applications.ingress.uninstallable"
         :uninstall-successful="applications.ingress.uninstallSuccessful"
         :uninstall-failed="applications.ingress.uninstallFailed"
         :disabled="!helmInstalled"
+        :updateable="false"
         title-link="https://kubernetes.io/docs/concepts/services-networking/ingress/"
       >
         <div slot="description">
@@ -327,6 +335,11 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
                         centralizing a number of services into a single entrypoint.`)
             }}
           </p>
+
+          <ingress-modsecurity-settings
+            :ingress="ingress"
+            :ingress-mod-security-help-path="ingressModSecurityHelpPath"
+          />
 
           <template v-if="ingressInstalled">
             <div class="form-group">
@@ -377,7 +390,9 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
             </p>
           </template>
           <template v-if="!ingressInstalled">
-            <div class="bs-callout bs-callout-info" v-html="ingressDescription"></div>
+            <div class="bs-callout bs-callout-info">
+              <strong v-html="ingressDescription"></strong>
+            </div>
           </template>
         </div>
       </application-row>
@@ -479,7 +494,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         </div>
       </application-row>
       <application-row
-        v-if="enableClusterApplicationCrossplane"
         id="crossplane"
         :logo-url="crossplaneLogo"
         :title="applications.crossplane.title"
@@ -619,7 +633,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         </div>
       </application-row>
       <application-row
-        v-if="enableClusterApplicationElasticStack"
         id="elastic_stack"
         :logo-url="elasticStackLogo"
         :title="applications.elastic_stack.title"
@@ -638,9 +651,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :uninstall-successful="applications.elastic_stack.uninstallSuccessful"
         :uninstall-failed="applications.elastic_stack.uninstallFailed"
         :disabled="!helmInstalled"
-        :install-application-request-params="{
-          kibana_hostname: applications.elastic_stack.kibana_hostname,
-        }"
         title-link="https://github.com/helm/charts/tree/master/stable/elastic-stack"
       >
         <div slot="description">
@@ -651,40 +661,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
               )
             }}
           </p>
-
-          <template v-if="ingressExternalEndpoint">
-            <div class="form-group">
-              <label for="elastic-stack-kibana-hostname">{{
-                s__('ClusterIntegration|Kibana Hostname')
-              }}</label>
-
-              <div class="input-group">
-                <input
-                  v-model="applications.elastic_stack.kibana_hostname"
-                  :readonly="elasticStackInstalled"
-                  type="text"
-                  class="form-control js-hostname"
-                />
-                <span class="input-group-btn">
-                  <clipboard-button
-                    :text="elasticStackKibanaHostname"
-                    :title="s__('ClusterIntegration|Copy Kibana Hostname')"
-                    class="js-clipboard-btn"
-                  />
-                </span>
-              </div>
-
-              <p v-if="ingressInstalled" class="form-text text-muted">
-                {{
-                  s__(`ClusterIntegration|Replace this with your own hostname if you want.
-                                If you do so, point hostname to Ingress IP Address from above.`)
-                }}
-                <a :href="ingressDnsHelpPath" target="_blank" rel="noopener noreferrer">
-                  {{ __('More information') }}
-                </a>
-              </p>
-            </div>
-          </template>
         </div>
       </application-row>
     </div>

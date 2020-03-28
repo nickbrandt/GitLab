@@ -13,7 +13,7 @@ import '~/boards/models/list';
 import store from '~/boards/stores';
 import boardsStore from '~/boards/stores/boards_store';
 import boardCard from '~/boards/components/board_card.vue';
-import { listObj, boardsMockInterceptor, mockBoardService } from './mock_data';
+import { listObj, boardsMockInterceptor, setMockEndpoints } from './mock_data';
 
 describe('Board card', () => {
   let vm;
@@ -22,8 +22,8 @@ describe('Board card', () => {
   beforeEach(done => {
     mock = new MockAdapter(axios);
     mock.onAny().reply(boardsMockInterceptor);
+    setMockEndpoints();
 
-    gl.boardService = mockBoardService();
     boardsStore.create();
     boardsStore.detail.issue = {};
 
@@ -32,7 +32,7 @@ describe('Board card', () => {
     const label1 = new ListLabel({
       id: 3,
       title: 'testing 123',
-      color: 'blue',
+      color: '#000cff',
       text_color: 'white',
       description: 'test',
     });
@@ -151,12 +151,6 @@ describe('Board card', () => {
 
     it('does not set detail issue if link is clicked', () => {
       triggerEvent('mouseup', vm.$el.querySelector('a'));
-
-      expect(boardsStore.detail.issue).toEqual({});
-    });
-
-    it('does not set detail issue if button is clicked', () => {
-      triggerEvent('mouseup', vm.$el.querySelector('button'));
 
       expect(boardsStore.detail.issue).toEqual({});
     });

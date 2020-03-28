@@ -1,12 +1,13 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlModal } from '@gitlab/ui';
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
+import { GlButton, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import state from 'ee/vue_shared/dashboards/store/state';
 import component from 'ee/environments_dashboard/components/dashboard/dashboard.vue';
 import ProjectHeader from 'ee/environments_dashboard/components/dashboard/project_header.vue';
 import Environment from 'ee/environments_dashboard/components/dashboard/environment.vue';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
+import { trimText } from 'helpers/text_helper';
 
 import environment from './mock_environment.json';
 
@@ -14,7 +15,6 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('dashboard', () => {
-  const Component = localVue.extend(component);
   let actionSpies;
   const store = createStore();
   let wrapper;
@@ -29,22 +29,24 @@ describe('dashboard', () => {
       removeProject: jest.fn(),
       toggleSelectedProject: jest.fn(),
       fetchNextPage: jest.fn(),
+      fetchProjects: jest.fn(),
     };
     propsData = {
       addPath: 'mock-addPath',
       listPath: 'mock-listPath',
       emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
       emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
+      environmentsDashboardHelpPath: '/help/user/operations_dashboard/index.html',
     };
 
-    wrapper = shallowMount(Component, {
+    wrapper = shallowMount(component, {
       propsData,
       localVue,
       store,
       methods: {
-        fetchProjects: () => {},
         ...actionSpies,
       },
+      stubs: { GlSprintf },
     });
   });
 
@@ -59,6 +61,28 @@ describe('dashboard', () => {
 
   it('renders the dashboard title', () => {
     expect(wrapper.find('.js-dashboard-title').text()).toBe('Environments Dashboard');
+  });
+
+  describe('page limits information message', () => {
+    let message;
+
+    beforeEach(() => {
+      message = wrapper.find('.js-page-limits-message');
+    });
+
+    it('renders the message', () => {
+      expect(trimText(message.text())).toBe(
+        'This dashboard displays a maximum of 7 projects and 3 environments per project. Read more.',
+      );
+    });
+
+    it('includes the correct documentation link in the message', () => {
+      const helpLink = message.find(GlLink);
+
+      expect(helpLink.text()).toBe('Read more.');
+      expect(helpLink.attributes('href')).toBe(propsData.environmentsDashboardHelpPath);
+      expect(helpLink.attributes('rel')).toBe('noopener noreferrer');
+    });
   });
 
   describe('add projects button', () => {
@@ -109,6 +133,7 @@ describe('dashboard', () => {
     describe('project selector modal', () => {
       beforeEach(() => {
         wrapper.find(GlButton).trigger('click');
+        return wrapper.vm.$nextTick();
       });
 
       it('should fire the add projects action on ok', () => {
@@ -134,6 +159,19 @@ describe('dashboard', () => {
       it('should toggle a project when clicked', () => {
         wrapper.find(ProjectSelector).vm.$emit('projectClicked', { name: 'test', id: 1 });
         expect(actionSpies.toggleSelectedProject).toHaveBeenCalledWith({ name: 'test', id: 1 });
+      });
+
+      it('should fetch the next page when bottom is reached', () => {
+        wrapper.find(ProjectSelector).vm.$emit('bottomReached');
+        expect(actionSpies.fetchNextPage).toHaveBeenCalled();
+      });
+
+      it('should get the page info from the state', () => {
+        store.state.pageInfo = { totalResults: 100 };
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.find(ProjectSelector).props('totalResults')).toBe(100);
+        });
       });
     });
   });

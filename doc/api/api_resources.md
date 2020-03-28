@@ -29,6 +29,7 @@ The following API resources are available in the project context:
 | [Deployments](deployments.md)                                       | `/projects/:id/deployments`                                                                                                                                                                           |
 | [Discussions](discussions.md) (threaded comments)                   | `/projects/:id/issues/.../discussions`, `/projects/:id/snippets/.../discussions`, `/projects/:id/merge_requests/.../discussions`, `/projects/:id/commits/.../discussions` (also available for groups) |
 | [Environments](environments.md)                                     | `/projects/:id/environments`                                                                                                                                                                          |
+| [Error Tracking](error_tracking.md)                        | `/projects/:id/error_tracking/settings`                                                                                                                                                |
 | [Events](events.md)                                                 | `/projects/:id/events` (also available for users and standalone)                                                                                                                                      |
 | [Issues](issues.md)                                                 | `/projects/:id/issues` (also available for groups and standalone)                                                                                                                                     |
 | [Issues Statistics](issues_statistics.md)                           | `/projects/:id/issues_statistics` (also available for groups and standalone)                                                                                                                          |
@@ -55,10 +56,12 @@ The following API resources are available in the project context:
 | [Project milestones](milestones.md)                                 | `/projects/:id/milestones`                                                                                                                                                                            |
 | [Project snippets](project_snippets.md)                             | `/projects/:id/snippets`                                                                                                                                                                              |
 | [Project templates](project_templates.md)                           | `/projects/:id/templates`                                                                                                                                                                             |
+| [Protected_environments](protected_environments.md)                 | `/projects/:id/protected_environments`                                                                                                                                                                |
 | [Protected branches](protected_branches.md)                         | `/projects/:id/protected_branches`                                                                                                                                                                    |
 | [Protected tags](protected_tags.md)                                 | `/projects/:id/protected_tags`                                                                                                                                                                        |
 | [Releases](releases/index.md)                                       | `/projects/:id/releases`                                                                                                                                                                              |
 | [Release links](releases/links.md)                                  | `/projects/:id/releases/.../assets/links`                                                                                                                                                             |
+| [Remote mirrors](remote_mirrors.md)                                 | `/projects/:id/remote_mirrors`                                                                                                                                                                        |
 | [Repositories](repositories.md)                                     | `/projects/:id/repository`                                                                                                                                                                            |
 | [Repository files](repository_files.md)                             | `/projects/:id/repository/files`                                                                                                                                                                      |
 | [Repository submodules](repository_submodules.md)                   | `/projects/:id/repository/submodules`                                                                                                                                                                 |
@@ -103,42 +106,43 @@ The following API resources are available in the group context:
 
 The following API resources are available outside of project and group contexts (including `/users`):
 
-| Resource                                          | Available endpoints                                                     |
-|:--------------------------------------------------|:------------------------------------------------------------------------|
-| [Applications](applications.md)                   | `/applications`                                                         |
+| Resource                                           | Available endpoints                                                     |
+|:---------------------------------------------------|:------------------------------------------------------------------------|
+| [Admin Sidekiq queues](admin_sidekiq_queues.md)    | `/admin/sidekiq/queues/:queue_name`                                               |
+| [Appearance](appearance.md) **(CORE ONLY)**        | `/application/appearance`                                               |
+| [Applications](applications.md)                    | `/applications`                                                         |
 | [Audit Events](audit_events.md) **(PREMIUM ONLY)** | `/audit_events`                                                         |
-| [Avatar](avatar.md)                               | `/avatar`                                                               |
-| [Broadcast messages](broadcast_messages.md)       | `/broadcast_messages`                                                   |
-| [Code snippets](snippets.md)                      | `/snippets`                                                             |
-| [Custom attributes](custom_attributes.md)         | `/users/:id/custom_attributes` (also available for groups and projects) |
-| [Deploy keys](deploy_keys.md)                     | `/deploy_keys` (also available for projects)                            |
-| [Events](events.md)                               | `/events`, `/users/:id/events` (also available for projects)            |
-| [Feature flags](features.md)                      | `/features`                                                             |
-| [Geo Nodes](geo_nodes.md) **(PREMIUM ONLY)**      | `/geo_nodes`                                                            |
-| [Import repository from GitHub](import.md)        | `/import/github`                                                        |
-| [Issues](issues.md)                               | `/issues` (also available for groups and projects)                      |
-| [Issues Statistics](issues_statistics.md)         | `/issues_statistics` (also available for groups and projects)           |
-| [Keys](keys.md)                                   | `/keys`                                                                 |
-| [License](license.md) **(CORE ONLY)**             | `/license`                                                              |
-| [Markdown](markdown.md)                           | `/markdown`                                                             |
-| [Merge requests](merge_requests.md)               | `/merge_requests` (also available for groups and projects)              |
-| [Namespaces](namespaces.md)                       | `/namespaces`                                                           |
-| [Notification settings](notification_settings.md) | `/notification_settings` (also available for groups and projects)       |
-| [Pages domains](pages_domains.md)                 | `/pages/domains` (also available for projects)                          |
-| [Projects](projects.md)                           | `/users/:id/projects` (also available for projects)                     |
-| [Runners](runners.md)                             | `/runners` (also available for projects)                                |
-| [Search](search.md)                               | `/search` (also available for groups and projects)                      |
-| [Settings](settings.md)                           | `/application/settings`                                                 |
-| [Statistics](statistics.md)                       | `/application/statistics`                                               |
-| [Sidekiq metrics](sidekiq_metrics.md)             | `/sidekiq`                                                              |
-| [Suggestions](suggestions.md)                     | `/suggestions`                                                          |
-| [System hooks](system_hooks.md)                   | `/hooks`                                                                |
-| [Todos](todos.md)                                 | `/todos`                                                                |
-| [Users](users.md)                                 | `/users`                                                                |
-| [Validate `.gitlab-ci.yml` file](lint.md)         | `/lint`                                                                 |
-| [Version](version.md)                             | `/version`                                                              |
-| [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**  | `/vulnerabilities` (also available for projects)                    |
-| [Vulnerability Issue links](vulnerability_issue_links.md) **(ULTIMATE)** | `/vulnerabilities/:id/issue_links`               |
+| [Avatar](avatar.md)                                | `/avatar`                                                               |
+| [Broadcast messages](broadcast_messages.md)        | `/broadcast_messages`                                                   |
+| [Code snippets](snippets.md)                       | `/snippets`                                                             |
+| [Custom attributes](custom_attributes.md)          | `/users/:id/custom_attributes` (also available for groups and projects) |
+| [Deploy keys](deploy_keys.md)                      | `/deploy_keys` (also available for projects)                            |
+| [Events](events.md)                                | `/events`, `/users/:id/events` (also available for projects)            |
+| [Feature flags](features.md)                       | `/features`                                                             |
+| [Geo Nodes](geo_nodes.md) **(PREMIUM ONLY)**       | `/geo_nodes`                                                            |
+| [Group Activity Analytics](group_activity_analytics.md) **(STARTER)**  | `/analytics/group_activity/{issues_count | merge_requests_count}`  |
+| [Import repository from GitHub](import.md)         | `/import/github`                                                        |
+| [Issues](issues.md)                                | `/issues` (also available for groups and projects)                      |
+| [Issues Statistics](issues_statistics.md)          | `/issues_statistics` (also available for groups and projects)           |
+| [Keys](keys.md)                                    | `/keys`                                                                 |
+| [License](license.md) **(CORE ONLY)**              | `/license`                                                              |
+| [Markdown](markdown.md)                            | `/markdown`                                                             |
+| [Merge requests](merge_requests.md)                | `/merge_requests` (also available for groups and projects)              |
+| [Namespaces](namespaces.md)                        | `/namespaces`                                                           |
+| [Notification settings](notification_settings.md)  | `/notification_settings` (also available for groups and projects)       |
+| [Pages domains](pages_domains.md)                  | `/pages/domains` (also available for projects)                          |
+| [Projects](projects.md)                            | `/users/:id/projects` (also available for projects)                     |
+| [Runners](runners.md)                              | `/runners` (also available for projects)                                |
+| [Search](search.md)                                | `/search` (also available for groups and projects)                      |
+| [Settings](settings.md) **(CORE ONLY)**            | `/application/settings`                                                 |
+| [Statistics](statistics.md)                        | `/application/statistics`                                               |
+| [Sidekiq metrics](sidekiq_metrics.md)              | `/sidekiq`                                                              |
+| [Suggestions](suggestions.md)                      | `/suggestions`                                                          |
+| [System hooks](system_hooks.md)                    | `/hooks`                                                                |
+| [Todos](todos.md)                                  | `/todos`                                                                |
+| [Users](users.md)                                  | `/users`                                                                |
+| [Validate `.gitlab-ci.yml` file](lint.md)          | `/lint`                                                                 |
+| [Version](version.md)                              | `/version`                                                              |
 
 ## Templates API resources
 
@@ -146,5 +150,5 @@ Endpoints are available for:
 
 - [Dockerfile templates](templates/dockerfiles.md).
 - [`.gitignore` templates](templates/gitignores.md).
-- [GitLab CI YAML templates](templates/gitlab_ci_ymls.md).
+- [GitLab CI/CD YAML templates](templates/gitlab_ci_ymls.md).
 - [Open source license templates](templates/licenses.md).

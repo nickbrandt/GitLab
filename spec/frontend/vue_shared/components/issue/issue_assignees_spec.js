@@ -17,10 +17,8 @@ describe('IssueAssigneesComponent', () => {
         assignees: mockAssigneesList,
         ...props,
       },
-      sync: false,
-      attachToDocument: true,
     });
-    vm = wrapper.vm; // eslint-disable-line
+    vm = wrapper.vm;
   };
 
   const findTooltipText = () => wrapper.find('.js-assignee-tooltip').text();
@@ -66,7 +64,7 @@ describe('IssueAssigneesComponent', () => {
 
           expect(findOverflowCounter().exists()).toBe(true);
           expect(findOverflowCounter().text()).toEqual(expectedHidden.toString());
-          expect(findOverflowCounter().attributes('data-original-title')).toEqual(
+          expect(findOverflowCounter().attributes('title')).toEqual(
             `${hiddenCount} more assignees`,
           );
         });

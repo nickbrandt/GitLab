@@ -28,6 +28,19 @@ describe('TOGGLE_LABELS', () => {
   });
 });
 
+describe('SET_ACTIVE_LIST_ID', () => {
+  it('updates aciveListId to be the value that is passed', () => {
+    const expectedId = 1;
+    const state = {
+      activeListId: 0,
+    };
+
+    mutations.SET_ACTIVE_LIST_ID(state, expectedId);
+
+    expect(state.activeListId).toBe(expectedId);
+  });
+});
+
 describe('REQUEST_AVAILABLE_BOARDS', () => {
   expectNotImplemented(mutations.REQUEST_AVAILABLE_BOARDS);
 });

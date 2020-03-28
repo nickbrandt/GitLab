@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe GroupSaml::SamlProvider::CreateService do
-  subject(:service) { described_class.new(nil, group, params: params) }
+  let(:current_user) { build_stubbed(:user) }
+  subject(:service) { described_class.new(current_user, group, params: params) }
 
   let(:group) { create :group }
 

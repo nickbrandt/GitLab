@@ -22,7 +22,7 @@ and you know how to use GitLab.
 
 Laravel is a high quality web framework written in PHP.
 It has a great community with a [fantastic documentation](https://laravel.com/docs).
-Aside from the usual routing, controllers, requests, responses, views, and (blade) templates, out of the box Laravel provides plenty of additional services such as cache, events, localization, authentication and many others.
+Aside from the usual routing, controllers, requests, responses, views, and (blade) templates, out of the box Laravel provides plenty of additional services such as cache, events, localization, authentication, and many others.
 
 We will use [Envoy](https://laravel.com/docs/master/envoy) as an SSH task runner based on PHP.
 It uses a clean, minimal [Blade syntax](https://laravel.com/docs/master/blade) to set up tasks that can run on remote servers, such as, cloning your project from the repository, installing the Composer dependencies, and running [Artisan commands](https://laravel.com/docs/master/artisan).
@@ -57,7 +57,7 @@ This test is as simple as asserting that the given value is true.
 Laravel uses `PHPUnit` for tests by default.
 If we run `vendor/bin/phpunit` we should see the green output:
 
-```bash
+```shell
 vendor/bin/phpunit
 OK (1 test, 1 assertions)
 ```
@@ -70,7 +70,7 @@ Since we have our app up and running locally, it's time to push the codebase to 
 Let's create [a new project](../../../gitlab-basics/create-project.md) in GitLab named `laravel-sample`.
 After that, follow the command line instructions displayed on the project's homepage to initiate the repository on our machine and push the first commit.
 
-```bash
+```shell
 cd laravel-sample
 git init
 git remote add origin git@gitlab.example.com:<USERNAME>/laravel-sample.git
@@ -82,14 +82,14 @@ git push -u origin master
 ## Configure the production server
 
 Before we begin setting up Envoy and GitLab CI/CD, let's quickly make sure the production server is ready for deployment.
-We have installed LEMP stack which stands for Linux, NGINX, MySQL and PHP on our Ubuntu 16.04.
+We have installed LEMP stack which stands for Linux, NGINX, MySQL, and PHP on our Ubuntu 16.04.
 
 ### Create a new user
 
 Let's now create a new user that will be used to deploy our website and give it
 the needed permissions using [Linux ACL](https://serversforhackers.com/c/linux-acls):
 
-```bash
+```shell
 # Create user deployer
 sudo adduser deployer
 # Give the read-write-execute permissions to deployer user for directory /var/www
@@ -98,7 +98,7 @@ sudo setfacl -R -m u:deployer:rwx /var/www
 
 If you don't have ACL installed on your Ubuntu server, use this command to install it:
 
-```bash
+```shell
 sudo apt install acl
 ```
 
@@ -108,7 +108,7 @@ Let's suppose we want to deploy our app to the production server from a private 
 
 After that, we need to copy the private key, which will be used to connect to our server as the deployer user with SSH, to be able to automate our deployment process:
 
-```bash
+```shell
 # As the deployer user on server
 #
 # Copy the content of public key to authorized_keys
@@ -128,7 +128,7 @@ We'll use this variable in the `.gitlab-ci.yml` later, to easily connect to our 
 
 We also need to add the public key to **Project** > **Settings** > **Repository** as a [Deploy Key](../../../ssh/README.md#deploy-keys), which gives us the ability to access our repository from the server through [SSH protocol](../../../gitlab-basics/command-line-commands.md#start-working-on-your-project).
 
-```bash
+```shell
 # As the deployer user on the server
 #
 # Copy the public key
@@ -141,7 +141,7 @@ To the field **Title**, add any name you want, and paste the public key into the
 
 Now, let's clone our repository on the server just to make sure the `deployer` user has access to the repository.
 
-```bash
+```shell
 # As the deployer user on server
 #
 git clone git@gitlab.example.com:<USERNAME>/laravel-sample.git
@@ -157,13 +157,13 @@ Now, let's make sure our web server configuration points to the `current/public`
 
 Open the default NGINX server block configuration file by typing:
 
-```bash
+```shell
 sudo nano /etc/nginx/sites-available/default
 ```
 
 The configuration should be like this.
 
-```
+```nginx
 server {
     root /var/www/app/current/public;
     server_name example.com;
@@ -194,12 +194,12 @@ To start, we create an `Envoy.blade.php` in the root of our app with a simple ta
 @endtask
 ```
 
-As you may expect, we have an array within `@servers` directive at the top of the file, which contains a key named `web` with a value of the server's address (e.g. `deployer@192.168.1.1`).
+As you may expect, we have an array within `@servers` directive at the top of the file, which contains a key named `web` with a value of the server's address (for example, `deployer@192.168.1.1`).
 Then within our `@task` directive we define the bash commands that should be run on the server when the task is executed.
 
 On the local machine use the `run` command to run Envoy tasks.
 
-```bash
+```shell
 envoy run list
 ```
 
@@ -382,7 +382,7 @@ Now it's time to commit [Envoy.blade.php](https://gitlab.com/mehranrasulian/lara
 To keep things simple, we commit directly to `master`, without using [feature-branches](../../../topics/gitlab_flow.md#github-flow-as-a-simpler-alternative) since collaboration is beyond the scope of this tutorial.
 In a real world project, teams may use [Issue Tracker](../../../user/project/issues/index.md) and [Merge Requests](../../../user/project/merge_requests/index.md) to move their code across branches:
 
-```bash
+```shell
 git add Envoy.blade.php
 git commit -m 'Add Envoy'
 git push origin master
@@ -407,7 +407,7 @@ With Docker images our builds run incredibly faster!
 
 Let's create a [Dockerfile](https://gitlab.com/mehranrasulian/laravel-sample/blob/master/Dockerfile) in the root directory of our app with the following content:
 
-```bash
+```shell
 # Set the base image for subsequent instructions
 FROM php:7.1
 
@@ -449,13 +449,13 @@ You may need to [enable Container Registry](../../../user/packages/container_reg
 
 To start using Container Registry on our machine, we first need to login to the GitLab registry using our GitLab username and password:
 
-```bash
+```shell
 docker login registry.gitlab.com
 ```
 
 Then we can build and push our image to GitLab:
 
-```bash
+```shell
 docker build -t registry.gitlab.com/<USERNAME>/laravel-sample .
 
 docker push registry.gitlab.com/<USERNAME>/laravel-sample
@@ -475,7 +475,7 @@ We'll use this image further down in the `.gitlab-ci.yml` configuration file to 
 
 Let's commit the `Dockerfile` file.
 
-```bash
+```shell
 git add Dockerfile
 git commit -m 'Add Dockerfile'
 git push origin master
@@ -608,7 +608,7 @@ If the SSH keys have added successfully, we can run Envoy.
 As mentioned before, GitLab supports [Continuous Delivery](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/#continuous-delivery) methods as well.
 The [environment](../../yaml/README.md#environment) keyword tells GitLab that this job deploys to the `production` environment.
 The `url` keyword is used to generate a link to our application on the GitLab Environments page.
-The `only` keyword tells GitLab CI that the job should be executed only when the pipeline is building the `master` branch.
+The `only` keyword tells GitLab CI/CD that the job should be executed only when the pipeline is building the `master` branch.
 Lastly, `when: manual` is used to turn the job from running automatically to a manual action.
 
 ```yaml
@@ -679,6 +679,6 @@ As you see, the `.env` is pointing to the `/var/www/app/.env` file and also `sto
 
 ## Conclusion
 
-We configured GitLab CI to perform automated tests and used the method of [Continuous Delivery](https://continuousdelivery.com/) to deploy to production a Laravel application with Envoy, directly from the codebase.
+We configured GitLab CI/CD to perform automated tests and used the method of [Continuous Delivery](https://continuousdelivery.com/) to deploy to production a Laravel application with Envoy, directly from the codebase.
 
 Envoy also was a great match to help us deploy the application without writing our custom bash script and doing Linux magics.

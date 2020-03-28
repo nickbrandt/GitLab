@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 FactoryBot.define do
-  factory :ee_ci_build, class: Ci::Build, parent: :ci_build do
+  factory :ee_ci_build, class: 'Ci::Build', parent: :ci_build do
     trait :protected_environment_failure do
       failed
       failure_reason { Ci::Build.failure_reasons[:protected_environment_failure] }
     end
 
-    %i[sast codequality dependency_scanning container_scanning dast performance license_management].each do |report_type|
+    %i[codequality container_scanning dast dependency_scanning license_management license_scanning performance sast].each do |report_type|
       trait "legacy_#{report_type}".to_sym do
         success
         artifacts
@@ -104,13 +104,21 @@ FactoryBot.define do
 
     trait :corrupted_license_management_report do
       after(:build) do |build|
-        build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_license_management_report, job: build)
+        build.job_artifacts << create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: build)
       end
     end
 
     trait :low_severity_dast_report do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :low_severity_dast_report, job: build)
+      end
+    end
+
+    %w[1 1_1 2].each do |version|
+      trait :"license_scan_v#{version}" do
+        after :build do |build|
+          build.job_artifacts << build(:ee_ci_job_artifact, :license_scan, :"v#{version}", job: build)
+        end
       end
     end
   end

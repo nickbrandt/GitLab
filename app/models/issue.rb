@@ -14,6 +14,8 @@ class Issue < ApplicationRecord
   include TimeTrackable
   include ThrottledTouch
   include LabelEventable
+  include IgnorableColumns
+  include MilestoneEventable
 
   DueDateStruct                   = Struct.new(:title, :name).freeze
   NoDueDate                       = DueDateStruct.new('No Due Date', '0').freeze
@@ -30,7 +32,7 @@ class Issue < ApplicationRecord
   belongs_to :duplicated_to, class_name: 'Issue'
   belongs_to :closed_by, class_name: 'User'
 
-  has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.issues&.maximum(:iid) }
+  has_internal_id :iid, scope: :project, track_if: -> { !importing? }, init: ->(s) { s&.project&.issues&.maximum(:iid) }
 
   has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
@@ -41,6 +43,12 @@ class Issue < ApplicationRecord
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
   has_many :zoom_meetings
+  has_many :user_mentions, class_name: "IssueUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+  has_many :sent_notifications, as: :noteable
+
+  has_one :sentry_issue
+
+  accepts_nested_attributes_for :sentry_issue
 
   validates :project, presence: true
 
@@ -59,8 +67,10 @@ class Issue < ApplicationRecord
   scope :order_due_date_desc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'DESC')) }
   scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
+  scope :order_closed_date_desc, -> { reorder(closed_at: :desc) }
+  scope :order_created_at_desc, -> { reorder(created_at: :desc) }
 
-  scope :preload_associated_models, -> { preload(:labels, project: :namespace) }
+  scope :preload_associated_models, -> { preload(:assignees, :labels, project: :namespace) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
 
   scope :public_only, -> { where(confidential: false) }
@@ -68,16 +78,13 @@ class Issue < ApplicationRecord
 
   scope :counts_by_state, -> { reorder(nil).group(:state_id).count }
 
-  # Only remove after 2019-12-22 and with %12.7
-  self.ignored_columns += %i[state]
-
-  after_commit :expire_etag_cache
-  after_save :ensure_metrics, unless: :imported?
+  after_commit :expire_etag_cache, unless: :importing?
+  after_save :ensure_metrics, unless: :importing?
 
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
 
-  state_machine :state_id, initial: :opened do
+  state_machine :state_id, initial: :opened, initialize: false do
     event :close do
       transition [:opened] => :closed
     end
@@ -124,12 +131,12 @@ class Issue < ApplicationRecord
   def self.reference_pattern
     @reference_pattern ||= %r{
       (#{Project.reference_pattern})?
-      #{Regexp.escape(reference_prefix)}(?<issue>\d+)
+      #{Regexp.escape(reference_prefix)}#{Gitlab::Regex.issue}
     }x
   end
 
   def self.link_reference_pattern
-    @link_reference_pattern ||= super("issues", /(?<issue>\d+)/)
+    @link_reference_pattern ||= super("issues", Gitlab::Regex.issue)
   end
 
   def self.reference_valid?(reference)
@@ -138,6 +145,20 @@ class Issue < ApplicationRecord
 
   def self.project_foreign_key
     'project_id'
+  end
+
+  def self.simple_sorts
+    super.merge(
+      {
+        'closest_future_date' => -> { order_closest_future_date },
+        'closest_future_date_asc' => -> { order_closest_future_date },
+        'due_date' => -> { order_due_date_asc.with_order_id_desc },
+        'due_date_asc' => -> { order_due_date_asc.with_order_id_desc },
+        'due_date_desc' => -> { order_due_date_desc.with_order_id_desc },
+        'relative_position' => -> { order_relative_position_asc.with_order_id_desc },
+        'relative_position_asc' => -> { order_relative_position_asc.with_order_id_desc }
+      }
+    )
   end
 
   def self.sort_by_attribute(method, excluded_labels: [])
@@ -151,8 +172,10 @@ class Issue < ApplicationRecord
     end
   end
 
-  def self.order_by_position_and_priority
-    order_labels_priority
+  # `with_cte` argument allows sorting when using CTE queries and prevents
+  # errors in postgres when using CTE search optimisation
+  def self.order_by_position_and_priority(with_cte: false)
+    order_labels_priority(with_cte: with_cte)
       .reorder(Gitlab::Database.nulls_last_order('relative_position', 'ASC'),
               Gitlab::Database.nulls_last_order('highest_priority', 'ASC'),
               "id DESC")
@@ -166,7 +189,7 @@ class Issue < ApplicationRecord
   def to_reference(from = nil, full: false)
     reference = "#{self.class.reference_prefix}#{iid}"
 
-    "#{project.to_reference(from, full: full)}#{reference}"
+    "#{project.to_reference_base(from, full: full)}#{reference}"
   end
 
   def suggested_branch_name
@@ -238,7 +261,7 @@ class Issue < ApplicationRecord
 
     return false unless readable_by?(user)
 
-    user.full_private_access? ||
+    user.can_read_all_resources? ||
       ::Gitlab::ExternalAuthorization.access_allowed?(
         user, project.external_authorization_classification_label)
   end
@@ -282,6 +305,10 @@ class Issue < ApplicationRecord
     labels.map(&:hook_attrs)
   end
 
+  def previous_updated_at
+    previous_changes['updated_at']&.first || updated_at
+  end
+
   private
 
   def ensure_metrics
@@ -299,10 +326,8 @@ class Issue < ApplicationRecord
       true
     elsif project.owner == user
       true
-    elsif confidential?
-      author == user ||
-        assignees.include?(user) ||
-        project.team.member?(user, Gitlab::Access::REPORTER)
+    elsif confidential? && !assignee_or_author?(user)
+      project.team.member?(user, Gitlab::Access::REPORTER)
     else
       project.public? ||
         project.internal? && !user.external? ||

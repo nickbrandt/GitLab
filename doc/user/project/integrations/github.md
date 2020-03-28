@@ -14,7 +14,7 @@ and is automatically configured on [GitHub import](../../../integration/github.m
 
 ### Complete these steps on GitHub
 
-This integration requires a [GitHub API token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line)
+This integration requires a [GitHub API token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line)
 with `repo:status` access granted:
 
 1. Go to your "Personal access tokens" page at <https://github.com/settings/tokens>
@@ -32,6 +32,9 @@ with `repo:status` access granted:
 1. Enter the path to your project on GitHub, such as `https://github.com/username/repository`
 1. Optionally uncheck **Static status check names** checkbox to disable static status check names.
 1. Save or optionally click "Test Settings".
+
+Once the integration is configured, see [Pipelines for external pull requests](../../../ci/ci_cd_for_external_repos/#pipelines-for-external-pull-requests)
+to configure pipelines to run for open pull requests.
 
 #### Static / dynamic status check names
 

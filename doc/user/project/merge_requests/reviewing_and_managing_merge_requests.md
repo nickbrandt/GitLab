@@ -13,7 +13,7 @@ which is then reviewed, and accepted (or rejected).
 View all the merge requests within a project by navigating to **Project > Merge Requests**.
 
 When you access your project's merge requests, GitLab will present them in a list,
-and you can use the tabs available to quickly filter by open and closed. You can also [search and filter the results](../../search/index.md#issues-and-merge-requests-per-project).
+and you can use the tabs available to quickly filter by open and closed. You can also [search and filter the results](../../search/index.md#filtering-issue-and-merge-request-lists).
 
 ![Project merge requests list view](img/project_merge_requests_list_view.png)
 
@@ -21,7 +21,7 @@ and you can use the tabs available to quickly filter by open and closed. You can
 
 View merge requests in all projects in the group, including all projects of all descendant subgroups of the group. Navigate to **Group > Merge Requests** to view these merge requests. This view also has the open and closed merge requests tabs.
 
-You can [search and filter the results](../../search/index.md#issues-and-merge-requests-per-group) from here.
+You can [search and filter the results](../../search/index.md#filtering-issue-and-merge-request-lists) from here.
 
 ![Group Issues list view](img/group_merge_requests_list_view.png)
 
@@ -68,7 +68,7 @@ list.
 
 By default, the diff shows only the parts of a file which are changed.
 To view more unchanged lines above or below a change click on the
-**Expand up** or **Expand down** icons. You can also click on **Show all lines**
+**Expand up** or **Expand down** icons. You can also click on **Show unchanged lines**
 to expand the entire file.
 
 ![Incrementally expand merge request diffs](img/incrementally_expand_merge_request_diffs_v12_2.png)
@@ -85,7 +85,7 @@ specific commit page.
 You can append `?w=1` while on the diffs page of a merge request to ignore any
 whitespace changes.
 
-## Commenting on any file line in merge requests
+## Perform inline code reviews
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/13950) in GitLab 11.5.
 
@@ -94,20 +94,7 @@ in a Merge Request. To do so, click the **...** button in the gutter of the Merg
 
 ![Comment on any diff file line](img/comment-on-any-diff-line.png)
 
-## Live preview with Review Apps
-
-If you configured [Review Apps](https://about.gitlab.com/product/review-apps/) for your project,
-you can preview the changes submitted to a feature-branch through a merge request
-in a per-branch basis. No need to checkout the branch, install and preview locally;
-all your changes will be available to preview by anyone with the Review Apps link.
-
-With GitLab's [Route Maps](../../../ci/review_apps/index.md#route-maps) set, the
-merge request widget takes you directly to the pages changed, making it easier and
-faster to preview proposed modifications.
-
-[Read more about Review Apps](../../../ci/review_apps/index.md).
-
-## Pipeline status in merge requests
+## Pipeline status in merge requests widgets
 
 If you've set up [GitLab CI/CD](../../../ci/README.md) in your project,
 you will be able to see:
@@ -133,7 +120,38 @@ be disabled. If the pipeline fails to deploy, the deployment info will be hidden
 
 ![Merge request pipeline](img/merge_request_pipeline.png)
 
-For more information, [read about pipelines](../../../ci/pipelines.md).
+For more information, [read about pipelines](../../../ci/pipelines/index.md).
+
+### Merge when pipeline succeeds (MWPS)
+
+Set a merge request that looks ready to merge to [merge automatically when CI pipeline succeeds](merge_when_pipeline_succeeds.md).
+
+### Live preview with Review Apps
+
+If you configured [Review Apps](https://about.gitlab.com/stages-devops-lifecycle/review-apps/) for your project,
+you can preview the changes submitted to a feature-branch through a merge request
+in a per-branch basis. No need to checkout the branch, install and preview locally;
+all your changes will be available to preview by anyone with the Review Apps link.
+
+With GitLab's [Route Maps](../../../ci/review_apps/index.md#route-maps) set, the
+merge request widget takes you directly to the pages changed, making it easier and
+faster to preview proposed modifications.
+
+[Read more about Review Apps](../../../ci/review_apps/index.md).
+
+## Associated features
+
+There is also a large number of features to associated to merge requests:
+
+| Feature                                                                                                                                               | Description                                                                                                                                              |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Bulk editing merge requests](../../project/bulk_editing.md)                                                                                          | Update the attributes of multiple merge requests simultaneously.                                                                                         |
+| [Cherry-pick changes](cherry_pick_changes.md)                                                                                                         | Cherry-pick any commit in the UI by simply clicking the **Cherry-pick** button in a merged merge requests or a commit.                                   |
+| [Fast-forward merge requests](fast_forward_merge.md)                                                                                                  | For a linear Git history and a way to accept merge requests without creating merge commits                                                               |
+| [Find the merge request that introduced a change](versions.md)                                                                                        | When viewing the commit details page, GitLab will link to the merge request(s) containing that commit.                                                   |
+| [Merge requests versions](versions.md)                                                                                                                | Select and compare the different versions of merge request diffs                                                                                         |
+| [Resolve conflicts](resolve_conflicts.md)                                                                                                             | GitLab can provide the option to resolve certain merge request conflicts in the GitLab UI.                                                               |
+| [Revert changes](revert_changes.md)                                                                                                                   | Revert changes from any commit from within a merge request.                                                                                              |
 
 ## Troubleshooting
 
@@ -182,7 +200,7 @@ project is a fork (even a private fork) of the target project.
 
 Add the following alias to your `~/.gitconfig`:
 
-```
+```plaintext
 [alias]
     mr = !sh -c 'git fetch $1 merge-requests/$2/head:mr-$1-$2 && git checkout mr-$1-$2' -
 ```
@@ -191,7 +209,7 @@ Now you can check out a particular merge request from any repository and any
 remote. For example, to check out the merge request with ID 5 as shown in GitLab
 from the `origin` remote, do:
 
-```
+```shell
 git mr origin 5
 ```
 
@@ -203,7 +221,7 @@ it out.
 Locate the section for your GitLab remote in the `.git/config` file. It looks
 like this:
 
-```
+```plaintext
 [remote "origin"]
   url = https://gitlab.com/gitlab-org/gitlab-foss.git
   fetch = +refs/heads/*:refs/remotes/origin/*
@@ -211,19 +229,19 @@ like this:
 
 You can open the file with:
 
-```
+```shell
 git config -e
 ```
 
 Now add the following line to the above section:
 
-```
+```plaintext
 fetch = +refs/merge-requests/*/head:refs/remotes/origin/merge-requests/*
 ```
 
 In the end, it should look like this:
 
-```
+```plaintext
 [remote "origin"]
   url = https://gitlab.com/gitlab-org/gitlab-foss.git
   fetch = +refs/heads/*:refs/remotes/origin/*
@@ -232,7 +250,7 @@ In the end, it should look like this:
 
 Now you can fetch all the merge requests:
 
-```
+```shell
 git fetch origin
 
 ...
@@ -244,7 +262,7 @@ From https://gitlab.com/gitlab-org/gitlab-foss.git
 
 And to check out a particular merge request:
 
-```
+```shell
 git checkout origin/merge-requests/1
 ```
 

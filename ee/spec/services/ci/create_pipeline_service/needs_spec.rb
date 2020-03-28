@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Ci::CreatePipelineService do
   subject(:execute) { service.execute(:push) }
 
+  let_it_be(:downstream_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'some')) }
   let(:project) { create(:project, :repository) }
   let(:user) { create(:admin) }
   let(:service) { described_class.new(project, user, { ref: 'refs/heads/master' }) }
@@ -46,6 +47,37 @@ describe Ci::CreatePipelineService do
   it 'persists bridge target project' do
     bridge = execute.stages.last.bridges.first
 
-    expect(bridge.downstream_project).to eq('some/project')
+    expect(bridge.downstream_project).to eq downstream_project
+  end
+
+  it "sets scheduling_type of bridge_dag_job as 'dag'" do
+    bridge = execute.stages.last.bridges.first
+
+    expect(bridge.scheduling_type).to eq('dag')
+  end
+
+  context 'when needs is empty array' do
+    let(:config) do
+      <<~YAML
+        regular_job:
+          stage: build
+          script: echo 'hello'
+        bridge_dag_job:
+          stage: test
+          needs: []
+          trigger: 'some/project'
+      YAML
+    end
+
+    it 'creates a pipeline with regular_job and bridge_dag_job pending' do
+      processables = execute.processables
+
+      regular_job = processables.find { |processable| processable.name == 'regular_job' }
+      bridge_dag_job = processables.find { |processable| processable.name == 'bridge_dag_job' }
+
+      expect(execute).to be_persisted
+      expect(regular_job.status).to eq('pending')
+      expect(bridge_dag_job.status).to eq('pending')
+    end
   end
 end

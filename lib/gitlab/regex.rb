@@ -5,12 +5,23 @@ module Gitlab
     extend self
 
     def project_name_regex
-      @project_name_regex ||= /\A[\p{Alnum}\u{00A9}-\u{1f9c0}_][\p{Alnum}\p{Pd}\u{00A9}-\u{1f9c0}_\. ]*\z/.freeze
+      # The character range \p{Alnum} overlaps with \u{00A9}-\u{1f9ff}
+      # hence the Ruby warning.
+      # https://gitlab.com/gitlab-org/gitlab/merge_requests/23165#not-easy-fixable
+      @project_name_regex ||= /\A[\p{Alnum}\u{00A9}-\u{1f9ff}_][\p{Alnum}\p{Pd}\u{00A9}-\u{1f9ff}_\. ]*\z/.freeze
     end
 
     def project_name_regex_message
       "can contain only letters, digits, emojis, '_', '.', dash, space. " \
       "It must start with letter, digit, emoji or '_'."
+    end
+
+    def group_name_regex
+      project_name_regex
+    end
+
+    def group_name_regex_message
+      project_name_regex_message
     end
 
     ##
@@ -19,7 +30,7 @@ module Gitlab
     # See https://github.com/docker/distribution/blob/master/reference/regexp.go.
     #
     def container_repository_name_regex
-      @container_repository_regex ||= %r{\A[a-z0-9]+((?:[._/]|__|[-])[a-z0-9]+)*\Z}
+      @container_repository_regex ||= %r{\A[a-z0-9]+((?:[._/]|__|[-]{0,10})[a-z0-9]+)*\Z}
     end
 
     ##
@@ -109,7 +120,7 @@ module Gitlab
     # Based on Jira's project key format
     # https://confluence.atlassian.com/adminjiraserver073/changing-the-project-key-format-861253229.html
     def jira_issue_key_regex
-      @jira_issue_key_regex ||= /[A-Z][A-Z_0-9]+-\d+/
+      @jira_issue_key_regex ||= /[A-Z][A-Z_0-9]+-\d+\b/
     end
 
     def jira_transition_id_regex
@@ -140,6 +151,10 @@ module Gitlab
 
     def utc_date_regex
       @utc_date_regex ||= /\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/.freeze
+    end
+
+    def issue
+      @issue ||= /(?<issue>\d+\b)/
     end
   end
 end

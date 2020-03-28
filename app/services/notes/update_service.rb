@@ -3,11 +3,15 @@
 module Notes
   class UpdateService < BaseService
     def execute(note)
-      return note unless note.editable?
+      return note unless note.editable? && params.present?
 
       old_mentioned_users = note.mentioned_users(current_user).to_a
 
-      note.update(params.merge(updated_by: current_user))
+      note.assign_attributes(params.merge(updated_by: current_user))
+
+      note.with_transaction_returning_status do
+        note.save
+      end
 
       only_commands = false
 
@@ -51,6 +55,8 @@ module Notes
       # We must add the error after we call #save because errors are reset
       # when #save is called
       note.errors.add(:commands_only, message.presence || _('Commands did not apply'))
+      # Allow consumers to detect problems applying commands
+      note.errors.add(:commands, _('Commands did not apply')) unless message.present?
 
       Notes::DestroyService.new(project, current_user).execute(note)
     end

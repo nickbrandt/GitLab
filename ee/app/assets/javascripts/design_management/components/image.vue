@@ -1,11 +1,7 @@
 <script>
-import _ from 'underscore';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { throttle } from 'lodash';
 
 export default {
-  components: {
-    GlLoadingIcon,
-  },
   props: {
     image: {
       type: String,
@@ -17,51 +13,86 @@ export default {
       required: false,
       default: '',
     },
+    scale: {
+      type: Number,
+      required: false,
+      default: 1,
+    },
+  },
+  data() {
+    return {
+      baseImageSize: null,
+      imageStyle: null,
+    };
+  },
+  watch: {
+    scale(val) {
+      this.zoom(val);
+    },
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeThrottled, false);
   },
   mounted() {
     this.onImgLoad();
-    this.resizeThrottled = _.throttle(this.onImgLoad, 400);
+
+    this.resizeThrottled = throttle(() => {
+      // NOTE: if imageStyle is set, then baseImageSize
+      // won't change due to resize. We must still emit a
+      // `resize` event so that the parent can handle
+      // resizes appropriately (e.g. for design_overlay)
+      this.setBaseImageSize();
+    }, 400);
     window.addEventListener('resize', this.resizeThrottled, false);
   },
   methods: {
     onImgLoad() {
-      requestIdleCallback(this.calculateImgSize, { timeout: 1000 });
+      requestIdleCallback(this.setBaseImageSize, { timeout: 1000 });
     },
-    calculateImgSize() {
+    setBaseImageSize() {
       const { contentImg } = this.$refs;
+      if (!contentImg || contentImg.offsetHeight === 0 || contentImg.offsetWidth === 0) return;
 
-      if (!contentImg) return;
+      this.baseImageSize = {
+        height: contentImg.offsetHeight,
+        width: contentImg.offsetWidth,
+      };
+      this.onResize({ width: this.baseImageSize.width, height: this.baseImageSize.height });
+    },
+    onResize({ width, height }) {
+      this.$emit('resize', { width, height });
+    },
+    zoom(amount) {
+      if (amount === 1) {
+        this.imageStyle = null;
+        this.$nextTick(() => {
+          this.setBaseImageSize();
+        });
+        return;
+      }
+      const width = this.baseImageSize.width * amount;
+      const height = this.baseImageSize.height * amount;
 
-      this.$nextTick(() => {
-        const naturalRatio = contentImg.naturalWidth / contentImg.naturalHeight;
-        const visibleRatio = contentImg.width / contentImg.height;
+      this.imageStyle = {
+        width: `${width}px`,
+        height: `${height}px`,
+      };
 
-        const position = {
-          // Handling the case where img element takes more width than visible image thanks to object-fit: contain
-          width:
-            naturalRatio < visibleRatio
-              ? contentImg.clientHeight * naturalRatio
-              : contentImg.clientWidth,
-          height: contentImg.clientHeight,
-        };
-
-        this.$emit('setOverlayDimensions', position);
-      });
+      this.onResize({ width, height });
     },
   },
 };
 </script>
 
 <template>
-  <div class="d-flex align-items-center h-100 w-100 p-3 overflow-hidden js-design-image">
+  <div class="m-auto js-design-image">
     <img
       ref="contentImg"
+      class="mh-100"
       :src="image"
       :alt="name"
-      class="ml-auto mr-auto img-fluid mh-100 design-image"
+      :style="imageStyle"
+      :class="{ 'img-fluid': !imageStyle }"
       @load="onImgLoad"
     />
   </div>

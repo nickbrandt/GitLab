@@ -54,7 +54,7 @@ module API
           project = find_project!(
             ::Gitlab::Jira::Dvcs.restore_full_path(params.slice(:namespace, :project).symbolize_keys)
           )
-          not_found! unless licensed?(project)
+          not_found! unless licensed?(project) && can?(current_user, :download_code, project)
           project
         end
 
@@ -75,7 +75,11 @@ module API
         # rubocop: enable CodeReuse/ActiveRecord
 
         def authorized_merge_requests
-          MergeRequestsFinder.new(current_user, authorized_only: true).execute
+          MergeRequestsFinder.new(current_user, authorized_only: !current_user.admin?).execute
+        end
+
+        def authorized_merge_requests_for_project(project)
+          MergeRequestsFinder.new(current_user, authorized_only: !current_user.admin?, project_id: project.id).execute
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
@@ -83,7 +87,7 @@ module API
           # They're not presented on Jira Dev Panel ATM. A comments count with a
           # redirect link is presented.
           notes = paginate(noteable.notes.user.reorder(nil))
-          notes.select { |n| n.visible_for?(current_user) }
+          notes.select { |n| n.readable_by?(current_user) }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -113,12 +117,14 @@ module API
           namespace = Namespace.find_by_full_path(params[:namespace])
           not_found!('Namespace') unless namespace && licensed?(namespace)
 
-          projects = Project.public_or_visible_to_user(current_user)
-                            .in_namespace(namespace.self_and_descendants)
-                            .eager_load_namespace_and_owner
-                            .with_route
+          projects = current_user.can_read_all_resources? ? Project.all : current_user.authorized_projects
+          projects = projects.in_namespace(namespace.self_and_descendants)
 
-          present paginate(projects),
+          projects_cte = Project.wrap_with_cte(projects)
+                                .eager_load_namespace_and_owner
+                                .with_route
+
+          present paginate(projects_cte),
                   with: ::API::Github::Entities::Repository,
                   root_namespace: namespace.root_ancestor
         end
@@ -154,7 +160,7 @@ module API
         get ':namespace/:project/pulls' do
           user_project = find_project_with_access(params)
 
-          merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequest
         end
@@ -163,9 +169,9 @@ module API
           use :project_full_path
         end
         get ':namespace/:project/pulls/:id' do
-          mr = find_merge_request_with_access(params[:id])
+          merge_request = find_merge_request_with_access(params[:id])
 
-          present mr, with: ::API::Github::Entities::PullRequest
+          present merge_request, with: ::API::Github::Entities::PullRequest
         end
 
         # In Github, each Merge Request is automatically also an issue.
@@ -195,7 +201,7 @@ module API
         get ':namespace/:project/events' do
           user_project = find_project_with_access(params)
 
-          merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequestEvent
         end

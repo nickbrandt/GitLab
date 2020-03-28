@@ -26,11 +26,6 @@ module QA
             element :avatar_image
           end
 
-          view 'app/assets/javascripts/sidebar/components/assignees/assignee_title.vue' do
-            element :assignee_edit_link
-            element :assignee_title
-          end
-
           view 'app/assets/javascripts/sidebar/components/assignees/uncollapsed_assignee_list.vue' do
             element :more_assignees_link
           end
@@ -44,6 +39,7 @@ module QA
           end
 
           view 'app/views/shared/issuable/_close_reopen_button.html.haml' do
+            element :close_issue_button
             element :reopen_issue_button
           end
 
@@ -60,28 +56,16 @@ module QA
             element :new_note_form, 'attr: :note' # rubocop:disable QA/ElementWithPattern
           end
 
-          def assign(user)
-            click_element(:assignee_edit_link)
-            select_user(user.username)
-            click_body
-          end
-
-          def assignee_title
-            find_element(:assignee_title)
-          end
-
-          def avatar_image_count
-            wait_assignees_block_finish_loading do
-              all_elements(:avatar_image).count
-            end
-          end
-
           def click_milestone_link
             click_element(:milestone_link)
           end
 
           def click_remove_related_issue_button
             click_element(:remove_related_issue_button)
+          end
+
+          def click_close_issue_button
+            click_element :close_issue_button
           end
 
           # Adds a comment to an issue
@@ -98,10 +82,14 @@ module QA
             click_element :comment_button
           end
 
-          def has_comment?(comment_text)
-            wait(reload: false) do
-              has_element?(:noteable_note_item, text: comment_text)
+          def has_avatar_image_count?(count)
+            wait_assignees_block_finish_loading do
+              all_elements(:avatar_image, count: count)
             end
+          end
+
+          def has_comment?(comment_text)
+            has_element?(:noteable_note_item, text: comment_text, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
           end
 
           def more_assignees_link
@@ -136,10 +124,10 @@ module QA
               end
             end
 
-            click_body
+            click_element(:edit_link_labels)
 
             labels.each do |label|
-              has_element?(:labels_block, text: label)
+              has_element?(:labels_block, text: label, wait: 0)
             end
 
             refresh
@@ -157,28 +145,15 @@ module QA
 
           def select_filter_with_text(text)
             retry_on_exception do
-              click_body
+              click_element(:title)
               click_element :discussion_filter
               find_element(:filter_options, text: text).click
             end
           end
 
-          def select_user(username)
-            find("#{element_selector_css(:assignee_block)} input").set(username)
-
-            dropdown_menu_user_link_selector = '.dropdown-menu-user-link'
-            at_username = "@#{username}"
-            ten_seconds = 10
-
-            wait(reload: false, max: ten_seconds, interval: 1) do
-              has_css?(dropdown_menu_user_link_selector, wait: ten_seconds, text: at_username)
-            end
-            find(dropdown_menu_user_link_selector, text: at_username).click
-          end
-
           def wait_assignees_block_finish_loading
             within_element(:assignee_block) do
-              wait(reload: false, max: 10, interval: 1) do
+              wait_until(reload: false, max_duration: 10, sleep_interval: 1) do
                 finished_loading_block?
                 yield
               end

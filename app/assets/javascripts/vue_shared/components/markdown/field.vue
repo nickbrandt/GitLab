@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import '~/behaviors/markdown/render_gfm';
-import _ from 'underscore';
+import { unescape as unesc } from 'lodash';
 import { __, sprintf } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
@@ -20,6 +20,11 @@ export default {
     Suggestions,
   },
   props: {
+    isSubmitting: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     markdownPreviewPath: {
       type: String,
       required: false,
@@ -74,6 +79,12 @@ export default {
       required: false,
       default: false,
     },
+    // This prop is used as a fallback in case if textarea.elm is undefined
+    textareaValue: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -104,7 +115,7 @@ export default {
           return text;
         }
 
-        return _.unescape(stripHtml(richText).replace(/\n/g, ''));
+        return unesc(stripHtml(richText).replace(/\n/g, ''));
       }
 
       return '';
@@ -131,6 +142,20 @@ export default {
         },
         false,
       );
+    },
+  },
+  watch: {
+    isSubmitting(isSubmitting) {
+      if (!isSubmitting || !this.$refs['markdown-preview'].querySelectorAll) {
+        return;
+      }
+      const mediaInPreview = this.$refs['markdown-preview'].querySelectorAll('video, audio');
+
+      if (mediaInPreview) {
+        mediaInPreview.forEach(media => {
+          media.pause();
+        });
+      }
     },
   },
   mounted() {
@@ -164,7 +189,7 @@ export default {
           Can't use `$refs` as the component is technically in the parent component
           so we access the VNode & then get the element
         */
-      const text = this.$slots.textarea[0].elm.value;
+      const text = this.$slots.textarea[0]?.elm?.value || this.textareaValue;
 
       if (text) {
         this.markdownPreviewLoading = true;
@@ -177,7 +202,6 @@ export default {
         this.renderMarkdown();
       }
     },
-
     showWriteTab() {
       this.markdownPreview = '';
       this.previewMarkdown = false;

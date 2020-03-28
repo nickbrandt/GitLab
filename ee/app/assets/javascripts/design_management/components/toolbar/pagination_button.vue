@@ -1,5 +1,6 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
+import { DESIGN_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
@@ -25,7 +26,7 @@ export default {
       if (!this.design) return {};
 
       return {
-        name: 'design',
+        name: DESIGN_ROUTE_NAME,
         params: { id: this.design.filename },
         query: this.$route.query,
       };

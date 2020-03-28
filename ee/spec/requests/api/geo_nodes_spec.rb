@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::GeoNodes, :geo, :prometheus, api: true do
+describe API::GeoNodes, :request_store, :geo, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
@@ -13,22 +13,49 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
   set(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
 
   let(:unexisting_node_id) { GeoNode.maximum(:id).to_i.succ }
+  let(:group_to_sync) { create(:group) }
 
   set(:admin) { create(:admin) }
   set(:user) { create(:user) }
+
+  describe 'POST /geo_nodes' do
+    it 'denies access if not admin' do
+      post api('/geo_nodes', user), params: {}
+      expect(response).to have_gitlab_http_status(:forbidden)
+    end
+
+    it 'returns rendering error if params are missing' do
+      post api('/geo_nodes', admin), params: {}
+      expect(response).to have_gitlab_http_status(:bad_request)
+    end
+
+    it 'delegates the creation of the Geo node to Geo::NodeCreateService' do
+      geo_node_params = {
+        name: 'Test Node 1',
+        url: 'http://example.com',
+        selective_sync_type: "shards",
+        selective_sync_shards: %w[shard1 shard2],
+        selective_sync_namespace_ids: [group_to_sync.id],
+        minimum_reverification_interval: 10
+      }
+      expect_any_instance_of(Geo::NodeCreateService).to receive(:execute).once.and_call_original
+      post api('/geo_nodes', admin), params: geo_node_params
+      expect(response).to have_gitlab_http_status(:created)
+    end
+  end
 
   describe 'GET /geo_nodes' do
     it 'retrieves the Geo nodes if admin is logged in' do
       get api("/geo_nodes", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_nodes', dir: 'ee')
     end
 
     it 'denies access if not admin' do
       get api('/geo_nodes', user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -36,7 +63,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'retrieves the Geo nodes if admin is logged in' do
       get api("/geo_nodes/#{primary.id}", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response['web_edit_url']).to end_with("/admin/geo/nodes/#{primary.id}/edit")
 
@@ -53,7 +80,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       get api('/geo_nodes', user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -63,7 +90,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/status", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_statuses', dir: 'ee')
       expect(json_response.size).to eq(2)
     end
@@ -71,7 +98,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'returns only one record if only one record exists' do
       get api("/geo_nodes/status", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_statuses', dir: 'ee')
       expect(json_response.size).to eq(1)
     end
@@ -79,7 +106,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       get api('/geo_nodes', user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -92,7 +119,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/#{secondary.id}/status", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
 
       expect(json_response['version']).to eq('secondary-version')
@@ -112,7 +139,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/#{secondary.id}/status", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
@@ -124,7 +151,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/#{secondary.id}/status", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
@@ -137,7 +164,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/#{secondary.id}/status", admin)
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'the primary shows 404 response if secondary node status does not exist in database yet' do
@@ -148,7 +175,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       get api("/geo_nodes/#{secondary.id}/status", admin)
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it_behaves_like '404 response' do
@@ -158,7 +185,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       get api("/geo_nodes/#{secondary.id}/status", user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -170,7 +197,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       post api("/geo_nodes/#{secondary.id}/repair", user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'returns 200 for the primary node' do
@@ -179,7 +206,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       post api("/geo_nodes/#{primary.id}/repair", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
@@ -188,7 +215,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       post api("/geo_nodes/#{secondary.id}/repair", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
@@ -197,7 +224,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       post api("/geo_nodes/#{secondary.id}/repair", admin)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
   end
@@ -210,7 +237,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       put api("/geo_nodes/#{secondary.id}", user), params: {}
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'updates the parameters' do
@@ -220,12 +247,16 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
         internal_url: 'https://internal-com.com/',
         files_max_capacity: 33,
         repos_max_capacity: 44,
-        verification_max_capacity: 55
+        verification_max_capacity: 55,
+        selective_sync_type: "shards",
+        selective_sync_shards: %w[shard1 shard2],
+        selective_sync_namespace_ids: [group_to_sync.id],
+        minimum_reverification_interval: 10
       }.stringify_keys
 
       put api("/geo_nodes/#{secondary.id}", admin), params: params
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
     end
@@ -237,7 +268,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       put api("/geo_nodes/#{primary.id}", admin), params: params
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
     end
@@ -249,7 +280,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
       put api("/geo_nodes/#{primary.id}", admin), params: params
 
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
   end
 
@@ -261,21 +292,21 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'denies access if not admin' do
       delete api("/geo_nodes/#{secondary.id}", user)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'deletes the node' do
       delete api("/geo_nodes/#{secondary.id}", admin)
 
-      expect(response).to have_gitlab_http_status(204)
+      expect(response).to have_gitlab_http_status(:no_content)
     end
 
-    it 'returns 400 if Geo Node could not be deleted' do
+    it 'returns 500 if Geo Node could not be deleted' do
       allow_any_instance_of(GeoNode).to receive(:destroy!).and_raise(StandardError, 'Something wrong')
 
       delete api("/geo_nodes/#{secondary.id}", admin)
 
-      expect(response).to have_gitlab_http_status(500)
+      expect(response).to have_gitlab_http_status(:internal_server_error)
     end
   end
 
@@ -288,7 +319,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       it 'forbids requests' do
         get api("/geo_nodes/current/failures", admin)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -303,7 +334,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
         get api("/geo_nodes/current/failures", admin)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
       end
 
@@ -312,7 +343,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
         get api("/geo_nodes/current/failures", admin)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response.count).to be_zero
       end
 
@@ -323,7 +354,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { type: :wiki }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.count).to eq(1)
           expect(json_response.first['wiki_retry_count']).to be > 0
         end
@@ -336,7 +367,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { type: :repository }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.count).to eq(1)
           expect(json_response.first['repository_retry_count']).to be > 0
         end
@@ -348,14 +379,14 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { type: :nonexistent }
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
 
       it 'denies access if not admin' do
         get api("/geo_nodes/current/failures", user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       context 'verification failures' do
@@ -369,7 +400,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { failure_type: 'verification' }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
         end
 
@@ -378,7 +409,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { failure_type: 'verification' }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.count).to be_zero
         end
 
@@ -389,7 +420,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
             get api("/geo_nodes/current/failures", admin), params: { failure_type: 'verification', type: :wiki }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.count).to eq(1)
             expect(json_response.first['last_wiki_verification_failure']).to be_present
           end
@@ -402,7 +433,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
             get api("/geo_nodes/current/failures", admin), params: { failure_type: 'verification', type: :repository }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.count).to eq(1)
             expect(json_response.first['last_repository_verification_failure']).to be_present
           end
@@ -420,7 +451,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { failure_type: 'checksum_mismatch' }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
         end
 
@@ -429,7 +460,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
           get api("/geo_nodes/current/failures", admin), params: { failure_type: 'checksum_mismatch' }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.count).to be_zero
         end
 
@@ -440,7 +471,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
             get api("/geo_nodes/current/failures", admin), params: { failure_type: 'checksum_mismatch', type: :wiki }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.count).to eq(1)
             expect(json_response.first['wiki_checksum_mismatch']).to be_truthy
           end
@@ -453,7 +484,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
 
             get api("/geo_nodes/current/failures", admin), params: { failure_type: 'checksum_mismatch', type: :repository }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.count).to eq(1)
             expect(json_response.first['repository_checksum_mismatch']).to be_truthy
           end

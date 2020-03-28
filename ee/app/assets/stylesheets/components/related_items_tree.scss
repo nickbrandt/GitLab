@@ -4,6 +4,10 @@
 
   .add-item-form-container {
     border-bottom: 1px solid $border-color;
+
+    .projects-dropdown .dropdown-contents {
+      max-height: $dropdown-max-height - 50;
+    }
   }
 
   .sub-tree-root {

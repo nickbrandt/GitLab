@@ -1,11 +1,45 @@
 import $ from 'jquery';
-import 'at.js';
+import '@gitlab/at.js';
 import _ from 'underscore';
+import SidebarMediator from '~/sidebar/sidebar_mediator';
 import glRegexp from './lib/utils/regexp';
 import AjaxCache from './lib/utils/ajax_cache';
+import { spriteIcon } from './lib/utils/common_utils';
 
 function sanitize(str) {
   return str.replace(/<(?:.|\n)*?>/gm, '');
+}
+
+export function membersBeforeSave(members) {
+  return _.map(members, member => {
+    const GROUP_TYPE = 'Group';
+
+    let title = '';
+    if (member.username == null) {
+      return member;
+    }
+    title = member.name;
+    if (member.count && !member.mentionsDisabled) {
+      title += ` (${member.count})`;
+    }
+
+    const autoCompleteAvatar = member.avatar_url || member.username.charAt(0).toUpperCase();
+
+    const rectAvatarClass = member.type === GROUP_TYPE ? 'rect-avatar' : '';
+    const imgAvatar = `<img src="${member.avatar_url}" alt="${member.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
+    const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
+    const avatarIcon = member.mentionsDisabled
+      ? spriteIcon('notifications-off', 's16 vertical-align-middle prepend-left-5')
+      : '';
+
+    return {
+      username: member.username,
+      avatarTag: autoCompleteAvatar.length === 1 ? txtAvatar : imgAvatar,
+      title: sanitize(title),
+      search: sanitize(`${member.username} ${member.name}`),
+      icon: avatarIcon,
+    };
+  });
 }
 
 export const defaultAutocompleteConfig = {
@@ -20,8 +54,8 @@ export const defaultAutocompleteConfig = {
 };
 
 class GfmAutoComplete {
-  constructor(dataSources) {
-    this.dataSources = dataSources || {};
+  constructor(dataSources = {}) {
+    this.dataSources = dataSources;
     this.cachedData = {};
     this.isLoadingData = {};
   }
@@ -74,8 +108,13 @@ class GfmAutoComplete {
         if (value.params.length > 0) {
           tpl += ' <small class="params"><%- params.join(" ") %></small>';
         }
-        if (value.description !== '') {
-          tpl += '<small class="description"><i><%- description %> <%- warningText %></i></small>';
+        if (value.warning && value.icon && value.icon === 'confidential') {
+          tpl +=
+            '<small class="description"><em><i class="fa fa-eye-slash" aria-hidden="true"/><%- warning %></em></small>';
+        } else if (value.warning) {
+          tpl += '<small class="description"><em><%- warning %></em></small>';
+        } else if (value.description !== '') {
+          tpl += '<small class="description"><em><%- description %></em></small>';
         }
         tpl += '</li>';
 
@@ -86,7 +125,6 @@ class GfmAutoComplete {
         return _.template(tpl)({
           ...value,
           className: cssClasses.join(' '),
-          warningText: value.warning ? `(${value.warning})` : '',
         });
       },
       insertTpl(value) {
@@ -117,6 +155,7 @@ class GfmAutoComplete {
               params: c.params,
               description: c.description,
               warning: c.warning,
+              icon: c.icon,
               search,
             };
           });
@@ -161,18 +200,29 @@ class GfmAutoComplete {
   }
 
   setupMembers($input) {
+    const fetchData = this.fetchData.bind(this);
+    const MEMBER_COMMAND = {
+      ASSIGN: '/assign',
+      UNASSIGN: '/unassign',
+      REASSIGN: '/reassign',
+      CC: '/cc',
+    };
+    let assignees = [];
+    let command = '';
+
     // Team Members
     $input.atwho({
       at: '@',
       alias: 'users',
       displayTpl(value) {
         let tmpl = GfmAutoComplete.Loading.template;
-        const { avatarTag, username, title } = value;
+        const { avatarTag, username, title, icon } = value;
         if (username != null) {
           tmpl = GfmAutoComplete.Members.templateFunction({
             avatarTag,
             username,
             title,
+            icon,
           });
         }
         return tmpl;
@@ -185,32 +235,49 @@ class GfmAutoComplete {
       data: GfmAutoComplete.defaultLoadingData,
       callbacks: {
         ...this.getDefaultCallbacks(),
-        beforeSave(members) {
-          return $.map(members, m => {
-            let title = '';
-            if (m.username == null) {
-              return m;
+        beforeSave: membersBeforeSave,
+        matcher(flag, subtext) {
+          const subtextNodes = subtext
+            .split(/\n+/g)
+            .pop()
+            .split(GfmAutoComplete.regexSubtext);
+
+          // Check if @ is followed by '/assign', '/reassign', '/unassign' or '/cc' commands.
+          command = subtextNodes.find(node => {
+            if (Object.values(MEMBER_COMMAND).includes(node)) {
+              return node;
             }
-            title = m.name;
-            if (m.count) {
-              title += ` (${m.count})`;
-            }
-
-            const GROUP_TYPE = 'Group';
-
-            const autoCompleteAvatar = m.avatar_url || m.username.charAt(0).toUpperCase();
-
-            const rectAvatarClass = m.type === GROUP_TYPE ? 'rect-avatar' : '';
-            const imgAvatar = `<img src="${m.avatar_url}" alt="${m.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
-            const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
-
-            return {
-              username: m.username,
-              avatarTag: autoCompleteAvatar.length === 1 ? txtAvatar : imgAvatar,
-              title: sanitize(title),
-              search: sanitize(`${m.username} ${m.name}`),
-            };
+            return null;
           });
+
+          // Cache assignees list for easier filtering later
+          assignees =
+            SidebarMediator.singleton?.store?.assignees?.map(
+              assignee => `${assignee.username} ${assignee.name}`,
+            ) || [];
+
+          const match = GfmAutoComplete.defaultMatcher(flag, subtext, this.app.controllers);
+          return match && match.length ? match[1] : null;
+        },
+        filter(query, data, searchKey) {
+          if (GfmAutoComplete.isLoading(data)) {
+            fetchData(this.$inputor, this.at);
+            return data;
+          }
+
+          if (data === GfmAutoComplete.defaultLoadingData) {
+            return $.fn.atwho.default.callbacks.filter(query, data, searchKey);
+          }
+
+          if (command === MEMBER_COMMAND.ASSIGN) {
+            // Only include members which are not assigned to Issuable currently
+            return data.filter(member => !assignees.includes(member.search));
+          } else if (command === MEMBER_COMMAND.UNASSIGN) {
+            // Only include members which are assigned to Issuable currently
+            return data.filter(member => assignees.includes(member.search));
+          }
+
+          return data;
         },
       },
     });
@@ -624,8 +691,8 @@ GfmAutoComplete.Emoji = {
 };
 // Team Members
 GfmAutoComplete.Members = {
-  templateFunction({ avatarTag, username, title }) {
-    return `<li>${avatarTag} ${username} <small>${_.escape(title)}</small></li>`;
+  templateFunction({ avatarTag, username, title, icon }) {
+    return `<li>${avatarTag} ${username} <small>${_.escape(title)}</small> ${icon}</li>`;
   },
 };
 GfmAutoComplete.Labels = {
@@ -653,7 +720,7 @@ GfmAutoComplete.Milestones = {
 };
 GfmAutoComplete.Loading = {
   template:
-    '<li style="pointer-events: none;"><i class="fa fa-spinner fa-spin"></i> Loading...</li>',
+    '<li style="pointer-events: none;"><span class="spinner align-text-bottom mr-1"></span>Loading...</li>',
 };
 
 export default GfmAutoComplete;

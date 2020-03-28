@@ -7,16 +7,16 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
   <div
     class="btn-group flex-grow-1 mr-2"
   >
-    <gldropdown-stub
+    <gl-dropdown-stub
       class="flex-grow-1 text-center"
       right=""
       text="Component name"
     >
-      <gldropdownitem-stub>
+      <gl-dropdown-item-stub>
         <span
           class="d-flex"
         >
-          <icon-stub
+          <gl-icon-stub
             class="flex-shrink-0 append-right-4"
             name="mobile-issue-close"
             size="16"
@@ -25,12 +25,12 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Component name
         
         </span>
-      </gldropdownitem-stub>
-      <gldropdownitem-stub>
+      </gl-dropdown-item-stub>
+      <gl-dropdown-item-stub>
         <span
           class="d-flex"
         >
-          <icon-stub
+          <gl-icon-stub
             class="flex-shrink-0 append-right-4 invisible"
             name="mobile-issue-close"
             size="16"
@@ -39,12 +39,12 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Packager
         
         </span>
-      </gldropdownitem-stub>
-      <gldropdownitem-stub>
+      </gl-dropdown-item-stub>
+      <gl-dropdown-item-stub>
         <span
           class="d-flex"
         >
-          <icon-stub
+          <gl-icon-stub
             class="flex-shrink-0 append-right-4 invisible"
             name="mobile-issue-close"
             size="16"
@@ -53,32 +53,34 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Severity
         
         </span>
-      </gldropdownitem-stub>
-    </gldropdown-stub>
+      </gl-dropdown-item-stub>
+    </gl-dropdown-stub>
      
-    <glbutton-stub
+    <gl-button-stub
       class="flex-grow-0 js-sort-order"
-      data-original-title="Sort direction"
-      title=""
+      size="md"
+      title="Sort direction"
+      variant="secondary"
     >
-      <icon-stub
+      <gl-icon-stub
         name="sort-lowest"
         size="16"
       />
-    </glbutton-stub>
+    </gl-button-stub>
   </div>
    
-  <glbutton-stub
+  <gl-button-stub
     class="js-download"
-    data-original-title="Export as JSON"
     download="dependencies.json"
     href="http://test.host/dependencies.json"
-    title=""
+    size="md"
+    title="Export as JSON"
+    variant="secondary"
   >
-    <icon-stub
-      name="download"
+    <gl-icon-stub
+      name="export"
       size="16"
     />
-  </glbutton-stub>
+  </gl-button-stub>
 </div>
 `;

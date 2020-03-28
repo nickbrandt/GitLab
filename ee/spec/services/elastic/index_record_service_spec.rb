@@ -25,14 +25,14 @@ describe Elastic::IndexRecordService, :elastic do
 
     with_them do
       it 'indexes new records' do
-        object = nil
-        Sidekiq::Testing.disable! do
-          object = create(type)
-        end
+        object = create(type)
+
+        # Prevent records from being added via bulk indexing updates
+        ::Elastic::ProcessBookkeepingService.clear_tracking!
 
         expect do
           expect(subject.execute(object, true)).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end.to change { Elasticsearch::Model.search('*').records.size }.by(1)
       end
 
@@ -47,8 +47,16 @@ describe Elastic::IndexRecordService, :elastic do
 
         expect do
           expect(subject.execute(object, false)).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
+      end
+
+      it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound errors' do
+        object = create(type)
+
+        allow(object.__elasticsearch__).to receive(:index_document).and_raise(Elasticsearch::Transport::Transport::Errors::NotFound)
+
+        expect(subject.execute(object, true)).to eq(true)
       end
     end
   end
@@ -76,7 +84,7 @@ describe Elastic::IndexRecordService, :elastic do
       Sidekiq::Testing.inline! do
         expect(subject.execute(project, true)).to eq(true)
       end
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       # Fetch all child documents
       children = Elasticsearch::Model.search(
@@ -114,10 +122,14 @@ describe Elastic::IndexRecordService, :elastic do
       Sidekiq::Testing.inline! do
         expect(subject.execute(other_project, true)).to eq(true)
       end
-      Gitlab::Elastic::Helper.refresh_index
+
+      # Prevent records from being added via bulk indexing updates
+      ::Elastic::ProcessBookkeepingService.clear_tracking!
+
+      ensure_elasticsearch_index!
 
       # Only the project itself should be in the index
-      expect(Elasticsearch::Model.search('*').total_count).to be 1
+      expect(Elasticsearch::Model.search('*').total_count).to eq(1)
       expect(Project.elastic_search('*').records).to contain_exactly(other_project)
     end
 
@@ -277,9 +289,9 @@ describe Elastic::IndexRecordService, :elastic do
     note = nil
 
     Sidekiq::Testing.inline! do
-      project = create :project, :repository
+      project = create :project, :repository, :public
       note = create :note, project: project, note: 'note_1'
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }
@@ -295,7 +307,7 @@ describe Elastic::IndexRecordService, :elastic do
 
     Sidekiq::Testing.inline! do
       expect(subject.execute(project, true)).to eq(true)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(Note.elastic_search('note_1', options: options).present?).to eq(false)
@@ -304,65 +316,15 @@ describe Elastic::IndexRecordService, :elastic do
   end
 
   it 'skips records for which indexing is disabled' do
-    project = nil
+    stub_ee_application_setting(elasticsearch_limit_indexing: true)
 
-    Sidekiq::Testing.disable! do
-      project = create :project, name: 'project_1'
-    end
-
-    expect(project).to receive(:use_elasticsearch?).and_return(false)
+    project = create(:project, name: 'project_1')
 
     Sidekiq::Testing.inline! do
       expect(subject.execute(project, true)).to eq(true)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(Project.elastic_search('project_1').present?).to eq(false)
-  end
-
-  context 'when updating an Issue' do
-    context 'when changing the confidential value' do
-      it 'updates issue notes excluding system notes' do
-        issue = nil
-        Sidekiq::Testing.disable! do
-          issue = create(:issue, confidential: false)
-          subject.execute(issue.project, true)
-          subject.execute(issue, false)
-          create(:note, note: 'the_normal_note', noteable: issue, project: issue.project)
-          create(:note, note: 'the_system_note', system: true, noteable: issue, project: issue.project)
-        end
-
-        options = { project_ids: [issue.project.id] }
-
-        Sidekiq::Testing.inline! do
-          expect(subject.execute(issue, false, 'changed_fields' => ['confidential'])).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
-        end
-
-        expect(Note.elastic_search('the_normal_note', options: options).present?).to eq(true)
-        expect(Note.elastic_search('the_system_note', options: options).present?).to eq(false)
-      end
-    end
-
-    context 'when changing the title' do
-      it 'does not update issue notes' do
-        issue = nil
-        Sidekiq::Testing.disable! do
-          issue = create(:issue, confidential: false)
-          subject.execute(issue.project, true)
-          subject.execute(issue, false)
-          create(:note, note: 'the_normal_note', noteable: issue, project: issue.project)
-        end
-
-        options = { project_ids: [issue.project.id] }
-
-        Sidekiq::Testing.inline! do
-          expect(subject.execute(issue, false, 'changed_fields' => ['title'])).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
-        end
-
-        expect(Note.elastic_search('the_normal_note', options: options).present?).to eq(false)
-      end
-    end
   end
 end

@@ -53,7 +53,7 @@ module QA
 
             filename = ::File.basename(design_file_path)
 
-            found = wait(reload: false, interval: 1) do
+            found = wait_until(reload: false, sleep_interval: 1) do
               image = find_element(:design_image)
 
               has_element?(:design_file_name, text: filename) &&

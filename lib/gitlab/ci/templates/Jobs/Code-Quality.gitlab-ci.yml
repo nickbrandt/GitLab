@@ -1,12 +1,13 @@
 code_quality:
   stage: test
-  image: docker:stable
+  image: docker:19.03.5
   allow_failure: true
   services:
-    - docker:stable-dind
+    - docker:19.03.5-dind
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    CODE_QUALITY_IMAGE: "registry.gitlab.com/gitlab-org/ci-cd/codequality:0.85.9"
   script:
     - |
       if ! docker info &>/dev/null; then
@@ -14,11 +15,12 @@ code_quality:
           export DOCKER_HOST='tcp://localhost:2375'
         fi
       fi
+    - docker pull --quiet "$CODE_QUALITY_IMAGE"
     - docker run
         --env SOURCE_CODE="$PWD"
         --volume "$PWD":/code
         --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/codequality:12-5-stable" /code
+        "$CODE_QUALITY_IMAGE" /code
   artifacts:
     reports:
       codequality: gl-code-quality-report.json

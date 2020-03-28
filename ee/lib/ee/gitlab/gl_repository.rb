@@ -9,7 +9,8 @@ module EE
       DESIGN = ::Gitlab::GlRepository::RepoType.new(
         name: :design,
         access_checker_class: ::Gitlab::GitAccessDesign,
-        repository_accessor: -> (project) { ::DesignManagement::Repository.new(project) }
+        repository_resolver: -> (project) { ::DesignManagement::Repository.new(project) },
+        suffix: :design
       )
 
       EE_TYPES = {

@@ -5,13 +5,14 @@ require 'spec_helper'
 describe Git::BranchPushService, services: true do
   include RepoHelpers
 
-  set(:user)     { create(:user) }
-  set(:project)  { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project, reload: true) { create(:project, :repository) }
   let(:blankrev) { Gitlab::Git::BLANK_SHA }
   let(:oldrev)   { sample_commit.parent_id }
   let(:newrev)   { sample_commit.id }
   let(:branch)   { 'master' }
   let(:ref)      { "refs/heads/#{branch}" }
+  let(:push_options) { nil }
 
   before do
     project.add_maintainer(user)
@@ -19,7 +20,7 @@ describe Git::BranchPushService, services: true do
 
   describe 'Push branches' do
     subject do
-      execute_service(project, user, oldrev: oldrev, newrev: newrev, ref: ref)
+      execute_service(project, user, oldrev: oldrev, newrev: newrev, ref: ref, push_options: push_options)
     end
 
     context 'new branch' do
@@ -108,10 +109,39 @@ describe Git::BranchPushService, services: true do
       end
 
       it 'reports an error' do
-        allow(Sidekiq).to receive(:server?).and_return(true)
+        allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
         expect(Sidekiq.logger).to receive(:warn)
 
         expect { subject }.not_to change { Ci::Pipeline.count }
+      end
+
+      context 'with push options' do
+        let(:push_options) { ['mr.create'] }
+
+        it 'sanitizes push options' do
+          allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
+          expect(Sidekiq.logger).to receive(:warn) do |args|
+            pipeline_params = args[:pipeline_params]
+            expect(pipeline_params.keys).to match_array(%i(before after ref variables_attributes checkout_sha))
+          end
+
+          expect { subject }.not_to change { Ci::Pipeline.count }
+        end
+      end
+    end
+
+    context 'when .gitlab-ci.yml file is invalid' do
+      before do
+        stub_ci_pipeline_yaml_file('invalid yaml file')
+      end
+
+      it 'persists an error pipeline' do
+        expect { subject }.to change { Ci::Pipeline.count }
+
+        pipeline = Ci::Pipeline.last
+        expect(pipeline).to be_push
+        expect(pipeline).to be_failed
+        expect(pipeline).to be_config_error
       end
     end
   end
@@ -171,7 +201,7 @@ describe Git::BranchPushService, services: true do
       end
 
       it "when pushing a branch for the first time with default branch protection disabled" do
-        stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_NONE)
+        expect(project.namespace).to receive(:default_branch_protection).and_return(Gitlab::Access::PROTECTION_NONE)
 
         expect(project).to receive(:execute_hooks)
         expect(project.default_branch).to eq("master")
@@ -180,7 +210,7 @@ describe Git::BranchPushService, services: true do
       end
 
       it "when pushing a branch for the first time with default branch protection set to 'developers can push'" do
-        stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_DEV_CAN_PUSH)
+        expect(project.namespace).to receive(:default_branch_protection).and_return(Gitlab::Access::PROTECTION_DEV_CAN_PUSH)
 
         expect(project).to receive(:execute_hooks)
         expect(project.default_branch).to eq("master")
@@ -193,7 +223,7 @@ describe Git::BranchPushService, services: true do
       end
 
       it "when pushing a branch for the first time with an existing branch permission configured" do
-        stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_DEV_CAN_PUSH)
+        expect(project.namespace).to receive(:default_branch_protection).and_return(Gitlab::Access::PROTECTION_DEV_CAN_PUSH)
 
         create(:protected_branch, :no_one_can_push, :developers_can_merge, project: project, name: 'master')
         expect(project).to receive(:execute_hooks)
@@ -208,7 +238,7 @@ describe Git::BranchPushService, services: true do
       end
 
       it "when pushing a branch for the first time with default branch protection set to 'developers can merge'" do
-        stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_DEV_CAN_MERGE)
+        expect(project.namespace).to receive(:default_branch_protection).and_return(Gitlab::Access::PROTECTION_DEV_CAN_MERGE)
 
         expect(project).to receive(:execute_hooks)
         expect(project.default_branch).to eq("master")
@@ -421,7 +451,7 @@ describe Git::BranchPushService, services: true do
         let(:message) { "this is some work.\n\ncloses JIRA-1" }
         let(:comment_body) do
           {
-            body: "Issue solved with [#{closing_commit.id}|http://#{Gitlab.config.gitlab.host}/#{project.full_path}/commit/#{closing_commit.id}]."
+            body: "Issue solved with [#{closing_commit.id}|http://#{Gitlab.config.gitlab.host}/#{project.full_path}/-/commit/#{closing_commit.id}]."
           }.to_json
         end
 
@@ -637,8 +667,8 @@ describe Git::BranchPushService, services: true do
     end
   end
 
-  def execute_service(project, user, change)
-    service = described_class.new(project, user, change: change)
+  def execute_service(project, user, change, push_options = {})
+    service = described_class.new(project, user, change: change, push_options: push_options)
     service.execute
     service
   end

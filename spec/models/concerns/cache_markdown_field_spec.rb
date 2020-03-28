@@ -92,6 +92,7 @@ describe CacheMarkdownField, :clean_gitlab_redis_cache do
 
     describe '#latest_cached_markdown_version' do
       let(:thing) { klass.new }
+
       subject { thing.latest_cached_markdown_version }
 
       it 'returns default version' do
@@ -151,6 +152,7 @@ describe CacheMarkdownField, :clean_gitlab_redis_cache do
 
     describe '#banzai_render_context' do
       let(:thing) { klass.new(title: markdown, title_html: html, cached_markdown_version: cache_version) }
+
       subject(:context) { thing.banzai_render_context(:title) }
 
       it 'sets project to nil if the object lacks a project' do
@@ -225,6 +227,26 @@ describe CacheMarkdownField, :clean_gitlab_redis_cache do
           expect(thing).not_to receive(:refresh_markdown_cache)
 
           expect(thing.updated_cached_html_for(:description)).to eq(html)
+        end
+      end
+    end
+
+    describe '#rendered_field_content' do
+      let(:thing) { klass.new(description: markdown, description_html: nil, cached_markdown_version: cache_version) }
+
+      context 'when a field can be cached' do
+        it 'returns the html' do
+          thing.description = updated_markdown
+
+          expect(thing.rendered_field_content(:description)).to eq updated_html
+        end
+      end
+
+      context 'when a field cannot be cached' do
+        it 'returns nil' do
+          allow(thing).to receive(:can_cache_field?).with(:description).and_return false
+
+          expect(thing.rendered_field_content(:description)).to eq nil
         end
       end
     end

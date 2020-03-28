@@ -5,6 +5,7 @@ import state from '~/reports/store/state';
 import component from '~/reports/components/grouped_test_reports_app.vue';
 import mountComponent from '../../helpers/vue_mount_component_helper';
 import newFailedTestReports from '../mock_data/new_failures_report.json';
+import newErrorsTestReports from '../mock_data/new_errors_report.json';
 import successTestReports from '../mock_data/no_failures_report.json';
 import mixedResultsTestReports from '../mock_data/new_and_fixed_failures_report.json';
 import resolvedFailures from '../mock_data/resolved_failures.json';
@@ -83,16 +84,40 @@ describe('Grouped Test Reports App', () => {
       setTimeout(() => {
         expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Test summary contained 2 failed/error test results out of 11 total tests',
+          'Test summary contained 2 failed out of 11 total tests',
         );
 
-        expect(vm.$el.textContent).toContain(
-          'rspec:pg found 2 failed/error test results out of 8 total tests',
-        );
+        expect(vm.$el.textContent).toContain('rspec:pg found 2 failed out of 8 total tests');
 
         expect(vm.$el.textContent).toContain('New');
         expect(vm.$el.textContent).toContain(
           'java ant found no changed test results out of 3 total tests',
+        );
+        done();
+      }, 0);
+    });
+  });
+
+  describe('with new error result', () => {
+    beforeEach(() => {
+      mock.onGet('test_results.json').reply(200, newErrorsTestReports, {});
+      vm = mountComponent(Component, {
+        endpoint: 'test_results.json',
+      });
+    });
+
+    it('renders error summary text + new badge', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
+        expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+          'Test summary contained 2 errors out of 11 total tests',
+        );
+
+        expect(vm.$el.textContent).toContain('karma found 2 errors out of 3 total tests');
+
+        expect(vm.$el.textContent).toContain('New');
+        expect(vm.$el.textContent).toContain(
+          'rspec:pg found no changed test results out of 8 total tests',
         );
         done();
       }, 0);
@@ -111,23 +136,21 @@ describe('Grouped Test Reports App', () => {
       setTimeout(() => {
         expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Test summary contained 2 failed/error test results and 2 fixed test results out of 11 total tests',
+          'Test summary contained 2 failed and 2 fixed test results out of 11 total tests',
         );
 
         expect(vm.$el.textContent).toContain(
-          'rspec:pg found 1 failed/error test result and 2 fixed test results out of 8 total tests',
+          'rspec:pg found 1 failed and 2 fixed test results out of 8 total tests',
         );
 
         expect(vm.$el.textContent).toContain('New');
-        expect(vm.$el.textContent).toContain(
-          ' java ant found 1 failed/error test result out of 3 total tests',
-        );
+        expect(vm.$el.textContent).toContain(' java ant found 1 failed out of 3 total tests');
         done();
       }, 0);
     });
   });
 
-  describe('with resolved failures', () => {
+  describe('with resolved failures and resolved errors', () => {
     beforeEach(() => {
       mock.onGet('test_results.json').reply(200, resolvedFailures, {});
       vm = mountComponent(Component, {
@@ -139,11 +162,11 @@ describe('Grouped Test Reports App', () => {
       setTimeout(() => {
         expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Test summary contained 2 fixed test results out of 11 total tests',
+          'Test summary contained 4 fixed test results out of 11 total tests',
         );
 
         expect(vm.$el.textContent).toContain(
-          'rspec:pg found 2 fixed test results out of 8 total tests',
+          'rspec:pg found 4 fixed test results out of 8 total tests',
         );
         done();
       }, 0);
@@ -157,6 +180,19 @@ describe('Grouped Test Reports App', () => {
 
         expect(vm.$el.querySelector('.report-block-container').textContent).toContain(
           resolvedFailures.suites[0].resolved_failures[1].name,
+        );
+        done();
+      }, 0);
+    });
+
+    it('renders resolved errors', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector('.report-block-container').textContent).toContain(
+          resolvedFailures.suites[0].resolved_errors[0].name,
+        );
+
+        expect(vm.$el.querySelector('.report-block-container').textContent).toContain(
+          resolvedFailures.suites[0].resolved_errors[1].name,
         );
         done();
       }, 0);

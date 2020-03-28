@@ -1,5 +1,0 @@
----
-title: Map software license names from the v1 license scan report to an equivalent SPDX identifer
-merge_request: 20195
-author:
-type: fixed

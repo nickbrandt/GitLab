@@ -5,17 +5,43 @@ require 'spec_helper'
 describe 'User edits snippet', :js do
   include DropzoneHelper
 
-  let(:file_name) { 'test.rb' }
-  let(:content) { 'puts "test"' }
+  let_it_be(:file_name) { 'test.rb' }
+  let_it_be(:content) { 'puts "test"' }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:snippet, reload: true) { create(:personal_snippet, :repository, :public, file_name: file_name, content: content, author: user) }
 
-  let(:user) { create(:user) }
-  let(:snippet) { create(:personal_snippet, :public, file_name: file_name, content: content, author: user) }
+  let(:version_snippet_enabled) { true }
 
   before do
+    stub_feature_flags(snippets_vue: false)
+    stub_feature_flags(version_snippets: version_snippet_enabled)
+
     sign_in(user)
 
     visit edit_snippet_path(snippet)
-    wait_for_requests
+    wait_for_all_requests
+  end
+
+  it 'displays the snippet blob path and content' do
+    blob = snippet.blobs.first
+
+    aggregate_failures do
+      expect(page.find_field('personal_snippet_file_name').value).to eq blob.path
+      expect(page.find('.file-content')).to have_content(blob.data.strip)
+      expect(page.find('.snippet-file-content', visible: false).value).to eq blob.data
+    end
+  end
+
+  context 'when feature flag :version_snippets is disabled' do
+    let(:version_snippet_enabled) { false }
+
+    it 'displays the snippet file_name and content' do
+      aggregate_failures do
+        expect(page.find_field('personal_snippet_file_name').value).to eq file_name
+        expect(page.find('.file-content')).to have_content(content)
+        expect(page.find('.snippet-file-content', visible: false).value).to eq content
+      end
+    end
   end
 
   it 'updates the snippet' do
@@ -56,5 +82,22 @@ describe 'User edits snippet', :js do
 
     expect(page).to have_no_xpath("//i[@class='fa fa-lock']")
     expect(page).to have_xpath("//i[@class='fa fa-globe']")
+  end
+
+  context 'when the git operation fails' do
+    before do
+      allow_next_instance_of(Snippets::UpdateService) do |instance|
+        allow(instance).to receive(:create_commit).and_raise(StandardError)
+      end
+
+      fill_in 'personal_snippet_title', with: 'New Snippet Title'
+
+      click_button('Save changes')
+    end
+
+    it 'renders edit page and displays the error' do
+      expect(page.find('.flash-container span').text).to eq('Error updating the snippet')
+      expect(page).to have_content('Edit Snippet')
+    end
   end
 end

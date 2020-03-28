@@ -1,6 +1,6 @@
 import Vue from 'vue';
+import mountComponent, { mountComponentWithSlots } from 'spec/helpers/vue_mount_component_helper';
 import headerCi from '~/vue_shared/components/header_ci_component.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('Header CI Component', () => {
   let HeaderCi;
@@ -27,22 +27,6 @@ describe('Header CI Component', () => {
         email: 'foo@bar.com',
         avatar_url: 'link',
       },
-      actions: [
-        {
-          label: 'Retry',
-          path: 'path',
-          type: 'button',
-          cssClass: 'btn',
-          isLoading: false,
-        },
-        {
-          label: 'Go',
-          path: 'path',
-          type: 'link',
-          cssClass: 'link',
-          isLoading: false,
-        },
-      ],
       hasSidebarButton: true,
     };
   });
@@ -50,6 +34,8 @@ describe('Header CI Component', () => {
   afterEach(() => {
     vm.$destroy();
   });
+
+  const findActionButtons = () => vm.$el.querySelector('.header-action-buttons');
 
   describe('render', () => {
     beforeEach(() => {
@@ -76,25 +62,23 @@ describe('Header CI Component', () => {
       expect(vm.$el.querySelector('.js-user-link').innerText.trim()).toContain(props.user.name);
     });
 
-    it('should render provided actions', () => {
-      expect(vm.$el.querySelector('.btn').tagName).toEqual('BUTTON');
-      expect(vm.$el.querySelector('.btn').textContent.trim()).toEqual(props.actions[0].label);
-      expect(vm.$el.querySelector('.link').tagName).toEqual('A');
-      expect(vm.$el.querySelector('.link').textContent.trim()).toEqual(props.actions[1].label);
-      expect(vm.$el.querySelector('.link').getAttribute('href')).toEqual(props.actions[0].path);
-    });
-
-    it('should show loading icon', done => {
-      vm.actions[0].isLoading = true;
-
-      Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.btn .gl-spinner').getAttribute('style')).toBeFalsy();
-        done();
-      });
-    });
-
     it('should render sidebar toggle button', () => {
       expect(vm.$el.querySelector('.js-sidebar-build-toggle')).not.toBeNull();
+    });
+
+    it('should not render header action buttons when empty', () => {
+      expect(findActionButtons()).toBeNull();
+    });
+  });
+
+  describe('slot', () => {
+    it('should render header action buttons', () => {
+      vm = mountComponentWithSlots(HeaderCi, { props, slots: { default: 'Test Actions' } });
+
+      const buttons = findActionButtons();
+
+      expect(buttons).not.toBeNull();
+      expect(buttons.textContent).toEqual('Test Actions');
     });
   });
 

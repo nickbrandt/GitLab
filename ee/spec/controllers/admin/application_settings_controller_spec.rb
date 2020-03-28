@@ -20,7 +20,7 @@ describe Admin::ApplicationSettingsController do
       settings = {
           help_text: 'help_text',
           elasticsearch_url: 'http://my-elastic.search:9200',
-          elasticsearch_indexing: true,
+          elasticsearch_indexing: false,
           elasticsearch_aws: true,
           elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
           elasticsearch_aws_secret_access_key: 'elasticsearch_aws_secret_access_key',
@@ -42,12 +42,26 @@ describe Admin::ApplicationSettingsController do
 
       put :update, params: { application_setting: settings }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       settings.except(:elasticsearch_url, :repository_size_limit).each do |setting, value|
         expect(ApplicationSetting.current.public_send(setting)).to eq(value)
       end
       expect(ApplicationSetting.current.repository_size_limit).to eq(settings[:repository_size_limit].megabytes)
       expect(ApplicationSetting.current.elasticsearch_url).to contain_exactly(settings[:elasticsearch_url])
+    end
+
+    context 'elasticsearch_aws_secret_access_key setting is blank' do
+      let(:settings) do
+        {
+          elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
+          elasticsearch_aws_secret_access_key: ''
+        }
+      end
+
+      it 'does not update the elasticsearch_aws_secret_access_key setting' do
+        expect { put :update, params: { application_setting: settings } }
+          .not_to change { ApplicationSetting.current.reload.elasticsearch_aws_secret_access_key }
+      end
     end
 
     shared_examples 'settings for licensed features' do
@@ -90,6 +104,27 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating name disabled for users setting' do
+      let(:settings) { { updating_name_disabled_for_users: true } }
+      let(:feature) { :disable_name_update_for_users }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
+    context 'updating npm packages request forwarding setting' do
+      let(:settings) { { npm_package_requests_forwarding: true } }
+      let(:feature) { :packages }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
+    context 'project deletion adjourned period' do
+      let(:settings) { { deletion_adjourned_period: 6 } }
+      let(:feature) { :adjourned_deletion_for_projects_and_groups }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'additional email footer' do
       let(:settings) { { email_additional_text: 'scary legal footer' } }
       let(:feature) { :email_additional_text }
@@ -105,10 +140,23 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'merge request approvers rules' do
+      let(:settings) do
+        {
+          disable_overriding_approvers_per_merge_request: true,
+          prevent_merge_requests_author_approval: true,
+          prevent_merge_requests_committers_approval: true
+        }
+      end
+      let(:feature) { :admin_merge_request_approvers_rules }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     it 'updates repository_size_limit' do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       expect(response).to set_flash[:notice].to('Application settings saved successfully')
     end
 

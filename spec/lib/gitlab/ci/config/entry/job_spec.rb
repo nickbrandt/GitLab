@@ -6,6 +6,7 @@ describe Gitlab::Ci::Config::Entry::Job do
   let(:entry) { described_class.new(config, name: :rspec) }
 
   it_behaves_like 'with inheritable CI config' do
+    let(:config) { { script: 'echo' } }
     let(:inheritable_key) { 'default' }
     let(:inheritable_class) { Gitlab::Ci::Config::Entry::Default }
 
@@ -14,6 +15,10 @@ describe Gitlab::Ci::Config::Entry::Job do
     # as they do not have sense in context of Job
     let(:ignored_inheritable_columns) do
       %i[]
+    end
+
+    before do
+      allow(entry).to receive_message_chain(:inherit_entry, :default_entry, :inherit?).and_return(true)
     end
   end
 
@@ -24,7 +29,8 @@ describe Gitlab::Ci::Config::Entry::Job do
       let(:result) do
         %i[before_script script stage type after_script cache
            image services only except rules needs variables artifacts
-           environment coverage retry interruptible]
+           environment coverage retry interruptible timeout release tags
+           inherit]
       end
 
       it { is_expected.to match_array result }
@@ -93,7 +99,7 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when delayed job' do
         context 'when start_in is specified' do
-          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 day' } }
+          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 week' } }
 
           it { expect(entry).to be_valid }
         end
@@ -110,6 +116,10 @@ describe Gitlab::Ci::Config::Entry::Job do
 
         it { expect(entry).to be_valid }
 
+        it "returns scheduling_type as :dag" do
+          expect(entry.value[:scheduling_type]).to eq(:dag)
+        end
+
         context 'when has dependencies' do
           let(:config) do
             {
@@ -117,6 +127,21 @@ describe Gitlab::Ci::Config::Entry::Job do
               script: 'echo',
               dependencies: ['another-job'],
               needs: ['another-job']
+            }
+          end
+
+          it { expect(entry).to be_valid }
+        end
+
+        context 'when it is a release' do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              release: {
+                tag_name: "v0.06",
+                name: "Release $CI_TAG_NAME",
+                description: "./release_changelog.txt"
+              }
             }
           end
 
@@ -232,11 +257,9 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when delayed job' do
         context 'when start_in is specified' do
-          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 day' } }
+          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 week' } }
 
-          it 'returns error about invalid type' do
-            expect(entry).to be_valid
-          end
+          it { expect(entry).to be_valid }
         end
 
         context 'when start_in is empty' do
@@ -257,8 +280,8 @@ describe Gitlab::Ci::Config::Entry::Job do
           end
         end
 
-        context 'when start_in is longer than one day' do
-          let(:config) { { when: 'delayed', start_in: '2 days' } }
+        context 'when start_in is longer than one week' do
+          let(:config) { { when: 'delayed', start_in: '8 days' } }
 
           it 'returns error about exceeding the limit' do
             expect(entry).not_to be_valid
@@ -417,21 +440,21 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when timeout value is not correct' do
         context 'when it is higher than instance wide timeout' do
-          let(:config) { { timeout: '3 months' } }
+          let(:config) { { timeout: '3 months', script: 'test' } }
 
           it 'returns error about value too high' do
             expect(entry).not_to be_valid
             expect(entry.errors)
-              .to include "job timeout should not exceed the limit"
+              .to include "timeout config should not exceed the limit"
           end
         end
 
         context 'when it is not a duration' do
-          let(:config) { { timeout: 100 } }
+          let(:config) { { timeout: 100, script: 'test' } }
 
           it 'returns error about wrong value' do
             expect(entry).not_to be_valid
-            expect(entry.errors).to include 'job timeout should be a duration'
+            expect(entry.errors).to include 'timeout config should be a duration'
           end
         end
       end
@@ -443,6 +466,25 @@ describe Gitlab::Ci::Config::Entry::Job do
           expect(entry).to be_valid
           expect(entry.errors).to be_empty
           expect(entry.timeout).to eq('1m 1s')
+        end
+      end
+
+      context 'when it is a release' do
+        context 'when `release:description` is missing' do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              release: {
+                tag_name: "v0.06",
+                name: "Release $CI_TAG_NAME"
+              }
+            }
+          end
+
+          it "returns error" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include "release description can't be blank"
+          end
         end
       end
     end
@@ -463,7 +505,14 @@ describe Gitlab::Ci::Config::Entry::Job do
 
     let(:unspecified) { double('unspecified', 'specified?' => false) }
     let(:default) { double('default', '[]' => unspecified) }
-    let(:deps) { double('deps', 'default' => default, '[]' => unspecified) }
+    let(:workflow) { double('workflow', 'has_rules?' => false) }
+
+    let(:deps) do
+      double('deps',
+        'default_entry' => default,
+        'workflow_entry' => workflow,
+        'variables_value' => nil)
+    end
 
     context 'when job config overrides default config' do
       before do
@@ -494,6 +543,49 @@ describe Gitlab::Ci::Config::Entry::Job do
         expect(entry[:cache].value).to eq(key: 'test', policy: 'pull-push')
       end
     end
+
+    context 'with workflow rules' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:name, :has_workflow_rules?, :only, :rules, :result) do
+        "uses default only"    | false | nil          | nil    | { refs: %w[branches tags] }
+        "uses user only"       | false | %w[branches] | nil    | { refs: %w[branches] }
+        "does not define only" | false | nil          | []     | nil
+        "does not define only" | true  | nil          | nil    | nil
+        "uses user only"       | true  | %w[branches] | nil    | { refs: %w[branches] }
+        "does not define only" | true  | nil          | []     | nil
+      end
+
+      with_them do
+        let(:config) { { script: 'ls', rules: rules, only: only }.compact }
+
+        it "#{name}" do
+          expect(workflow).to receive(:has_rules?) { has_workflow_rules? }
+
+          entry.compose!(deps)
+
+          expect(entry.only_value).to eq(result)
+        end
+      end
+    end
+
+    context 'when workflow rules is used' do
+      context 'when rules are used' do
+        let(:config) { { script: 'ls', cache: { key: 'test' }, rules: [] } }
+
+        it 'does not define only' do
+          expect(entry).not_to be_only_defined
+        end
+      end
+
+      context 'when rules are not used' do
+        let(:config) { { script: 'ls', cache: { key: 'test' }, only: [] } }
+
+        it 'does not define only' do
+          expect(entry).not_to be_only_defined
+        end
+      end
+    end
   end
 
   context 'when composed' do
@@ -522,7 +614,8 @@ describe Gitlab::Ci::Config::Entry::Job do
                    ignore: false,
                    after_script: %w[cleanup],
                    only: { refs: %w[branches tags] },
-                   variables: {})
+                   variables: {},
+                   scheduling_type: :stage)
         end
       end
     end

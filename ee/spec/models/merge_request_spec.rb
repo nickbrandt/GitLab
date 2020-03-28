@@ -92,50 +92,52 @@ describe MergeRequest do
     end
   end
 
-  describe '#participant_approvers' do
-    let(:approvers) { create_list(:user, 2) }
-    let(:code_owners) { create_list(:user, 2) }
+  describe '#participants' do
+    context 'with approval rule' do
+      before do
+        approver = create(:approver, target: project)
+        second_approver = create(:approver, target: project)
 
-    let!(:regular_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: approvers) }
-    let!(:code_owner_rule) { create(:code_owner_rule, merge_request: merge_request, users: code_owners) }
+        create(:approval_merge_request_rule, merge_request: merge_request, users: [approver.user, second_approver.user])
+      end
 
-    let!(:approval) { create(:approval, merge_request: merge_request, user: approvers.last) }
-
-    before do
-      allow(subject).to receive(:code_owners).and_return(code_owners)
-    end
-
-    it 'returns empty array if approval not needed' do
-      allow(subject).to receive(:approval_needed?).and_return(false)
-
-      expect(subject.participant_approvers).to be_empty
-    end
-
-    it 'returns approvers if approval is needed, excluding code owners' do
-      allow(subject).to receive(:approval_needed?).and_return(true)
-
-      expect(subject.participant_approvers).to contain_exactly(approvers.first)
+      it 'returns only the author as a participant' do
+        expect(subject.participants).to contain_exactly(subject.author)
+      end
     end
   end
 
-  describe '#participant_approvers with approval_rules disabled' do
-    let!(:approver) { create(:approver, target: project) }
-    let(:code_owners) { [double(:code_owner)] }
+  describe '#enabled_reports' do
+    let(:project) { create(:project, :repository) }
 
-    before do
-      allow(subject).to receive(:code_owners).and_return(code_owners)
+    where(:report_type, :with_reports, :feature) do
+      :sast                | :with_sast_reports                | :sast
+      :container_scanning  | :with_container_scanning_reports  | :container_scanning
+      :dast                | :with_dast_reports                | :dast
+      :dependency_scanning | :with_dependency_scanning_reports | :dependency_scanning
+      :license_management  | :with_license_management_reports  | :license_management
+      :license_management  | :with_license_scanning_reports    | :license_management
+      :license_scanning    | :with_license_scanning_reports    | :license_management
     end
 
-    it 'returns empty array if approval not needed' do
-      allow(subject).to receive(:approval_needed?).and_return(false)
+    with_them do
+      subject { merge_request.enabled_reports[report_type] }
 
-      expect(subject.participant_approvers).to eq([])
-    end
+      before do
+        stub_licensed_features({ feature => true })
+      end
 
-    it 'returns approvers if approval is needed, excluding code owners' do
-      allow(subject).to receive(:approval_needed?).and_return(true)
+      context "when head pipeline has reports" do
+        let(:merge_request) { create(:ee_merge_request, with_reports, source_project: project) }
 
-      expect(subject.participant_approvers).to eq([approver.user])
+        it { is_expected.to be_truthy }
+      end
+
+      context "when head pipeline does not have reports" do
+        let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+        it { is_expected.to be_falsy }
+      end
     end
   end
 
@@ -303,6 +305,7 @@ describe MergeRequest do
     let(:project) { create(:project, :repository) }
     let(:current_user) { project.users.take }
     let(:merge_request) { create(:merge_request, source_project: project) }
+
     subject { merge_request.calculate_reactive_cache(service_class_name, current_user&.id) }
 
     context 'when given a known service class name' do
@@ -490,7 +493,7 @@ describe MergeRequest do
             expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
-            expect(subject[:key]).to include(*[license_1.id, license_1.approval_status, license_2.id, license_2.approval_status])
+            expect(subject[:key].last).to include("software_license_policies/query-")
           end
         end
 
@@ -650,30 +653,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#approvals_required' do
-    where(:license_value, :db_value, :project_db_value, :expected) do
-      true  | 5   | 6   | 6
-      true  | 6   | 5   | 6
-      true  | nil | 5   | 5
-      false | 5   | 6   | 0
-      false | nil | 5   | 0
-    end
-
-    with_them do
-      let(:merge_request) { build(:merge_request, approvals_before_merge: db_value) }
-
-      subject { merge_request.approvals_required }
-
-      before do
-        stub_licensed_features(merge_request_approvers: license_value)
-
-        merge_request.target_project.approvals_before_merge = project_db_value
-      end
-
-      it { is_expected.to eq(expected) }
-    end
-  end
-
   describe '#mergeable?' do
     let(:project) { create(:project) }
 
@@ -681,6 +660,7 @@ describe MergeRequest do
 
     context 'when using approvals' do
       let(:user) { create(:user) }
+
       before do
         allow(subject).to receive(:mergeable_state?).and_return(true)
 
@@ -711,12 +691,39 @@ describe MergeRequest do
       it { is_expected.to be_truthy }
     end
 
+    context 'when the merge request was on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, :on_train,
+          status: MergeTrain.state_machines[:status].states[:merged].value,
+          source_project: project, target_project: project)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
     context 'when the merge request is not on a merge train' do
       let(:merge_request) do
         create(:merge_request, source_project: project, target_project: project)
       end
 
       it { is_expected.to be_falsy }
+    end
+  end
+
+  describe 'review time sorting' do
+    def create_mr(metrics_data = {})
+      create(:merge_request, :with_productivity_metrics, metrics_data: metrics_data)
+    end
+
+    it 'orders by first_comment_at or first_approved_at whatever is earlier' do
+      mr1 = create_mr(first_comment_at: 1.day.ago)
+      mr2 = create_mr(first_comment_at: 3.days.ago)
+      mr3 = create_mr(first_approved_at: 5.days.ago)
+      mr4 = create_mr(first_comment_at: 1.day.ago, first_approved_at: 4.days.ago)
+      mr5 = create_mr(first_comment_at: nil, first_approved_at: nil)
+
+      expect(described_class.order_review_time_desc).to match([mr3, mr4, mr2, mr1, mr5])
+      expect(described_class.sort_by_attribute('review_time_desc')).to match([mr3, mr4, mr2, mr1, mr5])
     end
   end
 end

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Workhorse do
-  set(:project)    { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
 
   def decode_workhorse_header(array)
@@ -116,6 +116,7 @@ describe Gitlab::Workhorse do
 
   describe '.send_git_patch' do
     let(:diff_refs) { double(base_sha: "base", head_sha: "head") }
+
     subject { described_class.send_git_patch(repository, diff_refs) }
 
     it 'sets the header correctly' do
@@ -178,6 +179,7 @@ describe Gitlab::Workhorse do
 
   describe '.send_git_diff' do
     let(:diff_refs) { double(base_sha: "base", head_sha: "head") }
+
     subject { described_class.send_git_diff(repository, diff_refs) }
 
     it 'sets the header correctly' do

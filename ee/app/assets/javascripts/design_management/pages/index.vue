@@ -1,6 +1,5 @@
 <script>
-import { GlLoadingIcon, GlEmptyState, GlButton } from '@gitlab/ui';
-import _ from 'underscore';
+import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -8,25 +7,35 @@ import DeleteButton from '../components/delete_button.vue';
 import Design from '../components/list/item.vue';
 import DesignDestroyer from '../components/design_destroyer.vue';
 import DesignVersionDropdown from '../components/upload/design_version_dropdown.vue';
+import DesignDropzone from '../components/upload/design_dropzone.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import { UPLOAD_DESIGN_ERROR } from '../utils/error_messages';
+import {
+  UPLOAD_DESIGN_ERROR,
+  EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
+  EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
+  designUploadSkippedWarning,
+  designDeletionError,
+} from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
+import { designUploadOptimisticResponse } from '../utils/design_management_utils';
+import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
 export default {
   components: {
     GlLoadingIcon,
-    UploadButton,
-    GlEmptyState,
+    GlAlert,
     GlButton,
+    UploadButton,
     Design,
     DesignDestroyer,
     DesignVersionDropdown,
     DeleteButton,
+    DesignDropzone,
   },
   mixins: [allDesignsMixin],
   apollo: {
@@ -46,13 +55,16 @@ export default {
       permissions: {
         createDesign: false,
       },
-      isSaving: false,
+      filesToBeSaved: [],
       selectedDesigns: [],
     };
   },
   computed: {
     isLoading() {
       return this.$apollo.queries.designs.loading || this.$apollo.queries.permissions.loading;
+    },
+    isSaving() {
+      return this.filesToBeSaved.length > 0;
     },
     canCreateDesign() {
       return this.permissions.createDesign;
@@ -82,8 +94,15 @@ export default {
     },
   },
   methods: {
-    onUploadDesign(files) {
-      if (!this.canCreateDesign) return null;
+    resetFilesToBeSaved() {
+      this.filesToBeSaved = [];
+    },
+    /**
+     * Determine if a design upload is valid, given [files]
+     * @param {Array<File>} files
+     */
+    isValidDesignUpload(files) {
+      if (!this.canCreateDesign) return false;
 
       if (files.length > MAXIMUM_FILE_UPLOAD_LIMIT) {
         createFlash(
@@ -97,78 +116,58 @@ export default {
           ),
         );
 
-        return null;
+        return false;
       }
+      return true;
+    },
+    onUploadDesign(files) {
+      // convert to Array so that we have Array methods (.map, .some, etc.)
+      this.filesToBeSaved = Array.from(files);
+      if (!this.isValidDesignUpload(this.filesToBeSaved)) return null;
 
-      const optimisticResponse = Array.from(files).map(file => ({
-        // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-        __typename: 'Design',
-        id: -_.uniqueId(),
-        image: '',
-        filename: file.name,
-        fullPath: '',
-        notesCount: 0,
-        event: 'NONE',
-        diffRefs: {
-          __typename: 'DiffRefs',
-          baseSha: '',
-          startSha: '',
-          headSha: '',
+      const mutationPayload = {
+        optimisticResponse: designUploadOptimisticResponse(this.filesToBeSaved),
+        variables: {
+          files: this.filesToBeSaved,
+          projectPath: this.projectPath,
+          iid: this.issueIid,
         },
-        discussions: {
-          __typename: 'DesignDiscussion',
-          edges: [],
+        context: {
+          hasUpload: true,
         },
-        versions: {
-          __typename: 'DesignVersionConnection',
-          edges: {
-            __typename: 'DesignVersionEdge',
-            node: {
-              __typename: 'DesignVersion',
-              id: -_.uniqueId(),
-              sha: -_.uniqueId(),
-            },
-          },
-        },
-      }));
-
-      this.isSaving = true;
+        mutation: uploadDesignMutation,
+        update: this.afterUploadDesign,
+      };
 
       return this.$apollo
-        .mutate({
-          mutation: uploadDesignMutation,
-          variables: {
-            files,
-            projectPath: this.projectPath,
-            iid: this.issueIid,
-          },
-          context: {
-            hasUpload: true,
-          },
-          update: (store, { data: { designManagementUpload } }) => {
-            updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
-          },
-          optimisticResponse: {
-            // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-            // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-            __typename: 'Mutation',
-            designManagementUpload: {
-              __typename: 'DesignManagementUploadPayload',
-              designs: optimisticResponse,
-            },
-          },
-        })
-        .then(() => {
-          this.$router.push({ name: 'designs' });
-        })
-        .catch(e => {
-          createFlash(UPLOAD_DESIGN_ERROR);
-          throw e;
-        })
-        .finally(() => {
-          this.isSaving = false;
-        });
+        .mutate(mutationPayload)
+        .then(res => this.onUploadDesignDone(res))
+        .catch(() => this.onUploadDesignError());
+    },
+    afterUploadDesign(
+      store,
+      {
+        data: { designManagementUpload },
+      },
+    ) {
+      updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
+    },
+    onUploadDesignDone(res) {
+      const skippedFiles = res?.data?.designManagementUpload?.skippedDesigns || [];
+      const skippedWarningMessage = designUploadSkippedWarning(this.filesToBeSaved, skippedFiles);
+      if (skippedWarningMessage) {
+        createFlash(skippedWarningMessage, 'warning');
+      }
+
+      // if this upload resulted in a new version being created, redirect user to the latest version
+      if (!this.isLatestVersion) {
+        this.$router.push({ name: DESIGNS_ROUTE_NAME });
+      }
+      this.resetFilesToBeSaved();
+    },
+    onUploadDesignError() {
+      this.resetFilesToBeSaved();
+      createFlash(UPLOAD_DESIGN_ERROR);
     },
     changeSelectedDesigns(filename) {
       if (this.isDesignSelected(filename)) {
@@ -187,9 +186,34 @@ export default {
     isDesignSelected(filename) {
       return this.selectedDesigns.includes(filename);
     },
+    isDesignToBeSaved(filename) {
+      return this.filesToBeSaved.some(file => file.name === filename);
+    },
+    canSelectDesign(filename) {
+      return this.isLatestVersion && this.canCreateDesign && !this.isDesignToBeSaved(filename);
+    },
     onDesignDelete() {
       this.selectedDesigns = [];
-      if (this.$route.query.version) this.$router.push({ name: 'designs' });
+      if (this.$route.query.version) this.$router.push({ name: DESIGNS_ROUTE_NAME });
+    },
+    onDesignDeleteError() {
+      const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });
+      createFlash(errorMessage);
+    },
+    onExistingDesignDropzoneChange(files, existingDesignFilename) {
+      const filesArr = Array.from(files);
+
+      if (filesArr.length > 1) {
+        createFlash(EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE);
+        return;
+      }
+
+      if (!filesArr.some(({ name }) => existingDesignFilename === name)) {
+        createFlash(EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE);
+        return;
+      }
+
+      this.onUploadDesign(files);
     },
   },
   beforeRouteUpdate(to, from, next) {
@@ -204,7 +228,7 @@ export default {
     <header v-if="showToolbar" class="row-content-block border-top-0 p-2 d-flex">
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
-        <div class="d-flex">
+        <div :class="['qa-selector-toolbar', { 'd-flex': hasDesigns, 'd-none': !hasDesigns }]">
           <gl-button
             v-if="isLatestVersion"
             variant="link"
@@ -213,11 +237,12 @@ export default {
             >{{ selectAllButtonText }}</gl-button
           >
           <design-destroyer
-            v-slot="{ mutate, loading, error }"
+            v-slot="{ mutate, loading }"
             :filenames="selectedDesigns"
             :project-path="projectPath"
             :iid="issueIid"
             @done="onDesignDelete"
+            @error="onDesignDeleteError"
           >
             <delete-button
               v-if="isLatestVersion"
@@ -236,14 +261,20 @@ export default {
     </header>
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
-      <div v-else-if="error" class="alert alert-danger">
+      <gl-alert v-else-if="error" variant="danger" :dismissible="false">
         {{ __('An error occurred while loading designs. Please try again.') }}
-      </div>
-      <ol v-else-if="hasDesigns" class="list-unstyled row">
+      </gl-alert>
+      <ol v-else class="list-unstyled row">
+        <li class="col-md-6 col-lg-4 mb-3">
+          <design-dropzone class="design-list-item" @change="onUploadDesign" />
+        </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" />
+          <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
+            ><design v-bind="design" :is-uploading="isDesignToBeSaved(design.filename)"
+          /></design-dropzone>
+
           <input
-            v-if="isLatestVersion && canCreateDesign"
+            v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"
             type="checkbox"
             class="design-checkbox"
@@ -251,20 +282,6 @@ export default {
           />
         </li>
       </ol>
-      <gl-empty-state
-        v-else
-        :title="s__('DesignManagement|The one place for your designs')"
-        :description="
-          s__(`DesignManagement|Upload and view the latest designs for this issue.
-            Consistent and easy to find, so everyone is up to date.`)
-        "
-      >
-        <template #actions>
-          <div v-if="canCreateDesign" class="center">
-            <upload-button :is-saving="isSaving" @upload="onUploadDesign" />
-          </div>
-        </template>
-      </gl-empty-state>
     </div>
     <router-view />
   </div>

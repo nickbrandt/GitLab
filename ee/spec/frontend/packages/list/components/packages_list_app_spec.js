@@ -1,41 +1,52 @@
-import { shallowMount } from '@vue/test-utils';
-import { GlEmptyState } from '@gitlab/ui';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('packages_list_app', () => {
   let wrapper;
+  let store;
+
+  const PackageList = {
+    name: 'package-list',
+    template: '<div><slot name="empty-state"></slot></div>',
+  };
+  const GlLoadingIcon = { name: 'gl-loading-icon', template: '<div>loading</div>' };
 
   const emptyListHelpUrl = 'helpUrl';
-  const findGlEmptyState = () => wrapper.find({ name: 'gl-empty-state-stub' });
-  const findListComponent = () => wrapper.find({ name: 'package-list' });
-  const findLoadingComponent = () => wrapper.find({ name: 'gl-loading-icon' });
+  const findListComponent = () => wrapper.find(PackageList);
+  const findTabComponent = (index = 0) => wrapper.findAll(GlTab).at(index);
 
-  const componentConfig = {
-    stubs: {
-      'package-list': {
-        name: 'package-list',
-        template: '<div><slot name="empty-state"></slot></div>',
+  const mountComponent = () => {
+    wrapper = shallowMount(PackageListApp, {
+      localVue,
+      store,
+      stubs: {
+        GlEmptyState,
+        GlLoadingIcon,
+        PackageList,
+        GlTab,
+        GlTabs,
       },
-      GlEmptyState: { ...GlEmptyState, name: 'gl-empty-state-stub' },
-      'gl-loading-icon': { name: 'gl-loading-icon', template: '<div>loading</div>' },
-    },
-    computed: {
-      isLoading: () => false,
-      emptyListIllustration: () => 'helpSvg',
-      emptyListHelpUrl: () => emptyListHelpUrl,
-      resourceId: () => 'project_id',
-    },
-    methods: {
-      requestPackagesList: jest.fn(),
-      requestDeletePackage: jest.fn(),
-      setProjectId: jest.fn(),
-      setGroupId: jest.fn(),
-      setUserCanDelete: jest.fn(),
-    },
+    });
   };
 
   beforeEach(() => {
-    wrapper = shallowMount(PackageListApp, componentConfig);
+    store = new Vuex.Store({
+      state: {
+        isLoading: false,
+        config: {
+          resourceId: 'project_id',
+          emptyListIllustration: 'helpSvg',
+          emptyListHelpUrl,
+        },
+      },
+    });
+    store.dispatch = jest.fn();
+    mountComponent();
   });
 
   afterEach(() => {
@@ -43,45 +54,60 @@ describe('packages_list_app', () => {
   });
 
   it('renders', () => {
+    mountComponent();
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('when isLoading is true', () => {
-    beforeEach(() => {
-      wrapper = shallowMount(PackageListApp, {
-        ...componentConfig,
-        computed: {
-          isLoading: () => true,
-        },
-      });
-    });
-    it('shows the loading component', () => {
-      const loader = findLoadingComponent();
-      expect(loader.exists()).toBe(true);
-    });
-  });
+  describe('empty state', () => {
+    it('generate the correct empty list link', () => {
+      const link = findListComponent().find('a');
 
-  it('generate the correct empty list link', () => {
-    const emptyState = findGlEmptyState();
-    const link = emptyState.find('a');
+      expect(link.element).toMatchInlineSnapshot(`
+        <a
+          href="${emptyListHelpUrl}"
+          target="_blank"
+        >
+          publish and share your packages
+        </a>
+      `);
+    });
 
-    expect(link.html()).toMatchInlineSnapshot(
-      `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
-    );
+    it('includes the right content on the default tab', () => {
+      const heading = findListComponent().find('h4');
+
+      expect(heading.text()).toBe('There are no packages yet');
+    });
   });
 
   it('call requestPackagesList on page:changed', () => {
     const list = findListComponent();
     list.vm.$emit('page:changed', 1);
-    expect(componentConfig.methods.requestPackagesList).toHaveBeenCalledWith({ page: 1 });
+    expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList', { page: 1 });
   });
 
   it('call requestDeletePackage on package:delete', () => {
     const list = findListComponent();
-    list.vm.$emit('package:delete', 1);
-    expect(componentConfig.methods.requestDeletePackage).toHaveBeenCalledWith({
-      projectId: 'project_id',
-      packageId: 1,
+    list.vm.$emit('package:delete', 'foo');
+    expect(store.dispatch).toHaveBeenCalledWith('requestDeletePackage', 'foo');
+  });
+
+  it('calls requestPackagesList on sort:changed', () => {
+    const list = findListComponent();
+    list.vm.$emit('sort:changed');
+    expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+  });
+
+  describe('tab change', () => {
+    it('calls requestPackagesList when all tab is clicked', () => {
+      findTabComponent().trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
+
+    it('calls requestPackagesList when a package type tab is clicked', () => {
+      findTabComponent(1).trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
     });
   });
 });

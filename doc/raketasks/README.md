@@ -14,5 +14,6 @@ comments: false
 - [Webhooks](web_hooks.md)
 - [Import](import.md) of Git repositories in bulk
 - [Rebuild authorized_keys file](../administration/raketasks/maintenance.md#rebuild-authorized_keys-file) task for administrators
-- [Migrate Uploads](../administration/raketasks/uploads/migrate.md)
-- [Sanitize Uploads](../administration/raketasks/uploads/sanitize.md)
+- [Uploads Migrate](../administration/raketasks/uploads/migrate.md)
+- [Uploads Sanitize](../administration/raketasks/uploads/sanitize.md)
+- [Importing large GitLab project exports](../development/import_project.md#importing-via-a-rake-task)

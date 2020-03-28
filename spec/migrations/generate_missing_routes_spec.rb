@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'migrate', '20180702134423_generate_missing_routes.rb')
 
-describe GenerateMissingRoutes, :migration do
+describe GenerateMissingRoutes do
   describe '#up' do
     let(:namespaces) { table(:namespaces) }
     let(:projects) { table(:projects) }
@@ -26,7 +26,7 @@ describe GenerateMissingRoutes, :migration do
 
       described_class.new.up
 
-      route = routes.where(source_type: 'Project').take
+      route = routes.find_by(source_type: 'Project')
 
       expect(route.source_id).to eq(project.id)
       expect(route.path).to eq("gitlab/gitlab-ce-#{project.id}")
@@ -37,7 +37,7 @@ describe GenerateMissingRoutes, :migration do
 
       described_class.new.up
 
-      route = routes.where(source_type: 'Namespace').take
+      route = routes.find_by(source_type: 'Namespace')
 
       expect(route.source_id).to eq(namespace.id)
       expect(route.path).to eq("gitlab-#{namespace.id}")

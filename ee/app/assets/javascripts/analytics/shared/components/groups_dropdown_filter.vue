@@ -1,9 +1,9 @@
 <script>
-import { s__, __ } from '~/locale';
 import $ from 'jquery';
-import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
+import { escape as esc } from 'lodash';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { s__, __ } from '~/locale';
 import Api from '~/api';
 import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
@@ -26,11 +26,16 @@ export default {
       required: false,
       default: () => ({}),
     },
+    defaultGroup: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
       loading: true,
-      selectedGroup: {},
+      selectedGroup: this.defaultGroup || {},
     };
   },
   computed: {
@@ -94,7 +99,7 @@ export default {
       const lastPart = parts.length - 1;
       return parts
         .map((part, idx) =>
-          idx === lastPart ? `<strong>${_.escape(part.trim())}</strong>` : _.escape(part.trim()),
+          idx === lastPart ? `<strong>${esc(part.trim())}</strong>` : esc(part.trim()),
         )
         .join(' / ');
     },

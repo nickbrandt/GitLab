@@ -1,7 +1,9 @@
-import Board from '~/boards/components/board';
-import { __, n__, sprintf } from '~/locale';
-import boardsStore from '~/boards/stores/boards_store';
+import { mapActions } from 'vuex';
 import boardPromotionState from 'ee/boards/components/board_promotion_state';
+import { GlTooltip } from '@gitlab/ui';
+import Board from '~/boards/components/board';
+import { __, sprintf, s__ } from '~/locale';
+import boardsStore from '~/boards/stores/boards_store';
 
 export default Board.extend({
   data() {
@@ -10,22 +12,37 @@ export default Board.extend({
     };
   },
   components: {
+    GlTooltip,
     boardPromotionState,
   },
   computed: {
-    counterTooltip() {
-      if (!this.weightFeatureAvailable) {
-        // call computed property from base component (CE board.js)
-        return Board.options.computed.counterTooltip.call(this);
+    issuesTooltip() {
+      const { issuesSize, maxIssueCount } = this.list;
+
+      if (maxIssueCount > 0) {
+        return sprintf(__('%{issuesSize} issues with a limit of %{maxIssueCount}'), {
+          issuesSize,
+          maxIssueCount,
+        });
       }
 
-      const { issuesSize, totalWeight } = this.list;
-      return sprintf(
-        __(`${n__('%d issue', '%d issues', issuesSize)} with %{totalWeight} total weight`),
-        {
-          totalWeight,
-        },
-      );
+      // TODO: Remove this pattern.
+      return Board.options.computed.issuesTooltip.call(this);
+    },
+    weightCountToolTip() {
+      const { totalWeight } = this.list;
+
+      if (this.weightFeatureAvailable) {
+        return sprintf(s__('%{totalWeight} total weight'), { totalWeight });
+      }
+
+      return null;
+    },
+  },
+  methods: {
+    ...mapActions(['setActiveListId']),
+    openSidebarSettings() {
+      this.setActiveListId(this.list.id);
     },
   },
 });

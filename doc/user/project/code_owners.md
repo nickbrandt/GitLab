@@ -4,7 +4,7 @@ type: reference
 
 # Code Owners **(STARTER)**
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6916)
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6916)
 in [GitLab Starter](https://about.gitlab.com/pricing/) 11.3.
 > - [Support for group namespaces](https://gitlab.com/gitlab-org/gitlab-foss/issues/53182) added in GitLab Starter 12.1.
 > - Code Owners for Merge Request approvals was [introduced](https://gitlab.com/gitlab-org/gitlab/issues/4418) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.9.
@@ -25,15 +25,25 @@ specify themselves as a code owner, all before the new changes
 get merged to the default branch.
 
 When a file matches multiple entries in the `CODEOWNERS` file,
-the users from all entries are displayed on the blob page of
-the given file.
+the users from last pattern matching the file are displayed on the
+blob page of the given file. For example, you have the following
+`CODEOWNERS` file:
+
+```plaintext
+README.md @user1
+
+# This line would also match the file README.md
+*.md @user2
+```
+
+The user that would show for `README.md` would be `@user2`.
 
 ## Approvals by Code Owners
 
 Once you've set Code Owners to a project, you can configure it to
 receive approvals:
 
-- As [merge request eligible approvers](merge_requests/merge_request_approvals.md#code-owners-as-eligible-approvers-starter). **(STARTER)**
+- As [merge request eligible approvers](merge_requests/merge_request_approvals.md#code-owners-as-eligible-approvers).
 - As required approvers for [protected branches](protected_branches.md#protected-branches-approval-by-code-owners-premium). **(PREMIUM)**
 
 Once set, Code Owners are displayed in merge requests widgets:
@@ -45,7 +55,8 @@ Once set, Code Owners are displayed in merge requests widgets:
 Files can be specified using the same kind of patterns you would use
 in the `.gitignore` file followed by the `@username` or email of one
 or more users or by the `@name` of one or more groups that should
-be owners of the file.
+be owners of the file. Groups must be added as [members of the project](members/index.md),
+or they will be ignored.
 
 The order in which the paths are defined is significant: the last
 pattern that matches a given path will be used to find the code
@@ -57,7 +68,7 @@ escaped using `\#` to address files for which the name starts with a
 
 Example `CODEOWNERS` file:
 
-```
+```plaintext
 # This is an example code owners file, lines starting with a `#` will
 # be ignored.
 

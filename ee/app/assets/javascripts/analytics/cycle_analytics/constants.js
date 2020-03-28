@@ -30,5 +30,32 @@ export const EMPTY_STAGE_TEXT = {
   ),
 };
 
+export const DEFAULT_STAGE_NAMES = [...Object.keys(EMPTY_STAGE_TEXT), 'total'];
+
 export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
 export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
+export const TASKS_BY_TYPE_MAX_LABELS = 15;
+
+export const TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS = {
+  [TASKS_BY_TYPE_SUBJECT_ISSUE]: __('Issues'),
+  [TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST]: __('Merge Requests'),
+};
+
+export const TASKS_BY_TYPE_FILTERS = {
+  SUBJECT: 'SUBJECT',
+  LABEL: 'LABEL',
+};
+
+export const STAGE_ACTIONS = {
+  SELECT: 'selectStage',
+  EDIT: 'editStage',
+  REMOVE: 'removeStage',
+  HIDE: 'hideStage',
+  CREATE: 'createStage',
+  UPDATE: 'updateStage',
+};
+
+export const STAGE_NAME = {
+  TOTAL: 'total',
+  PRODUCTION: 'production',
+};

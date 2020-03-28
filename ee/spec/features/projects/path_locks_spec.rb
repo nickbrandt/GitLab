@@ -22,7 +22,8 @@ describe 'Path Locks', :js do
     within '.tree-content-holder' do
       click_link "encoding"
     end
-    click_link "Lock"
+
+    find('.js-path-lock').click
 
     expect(page).to have_link('Unlock')
   end

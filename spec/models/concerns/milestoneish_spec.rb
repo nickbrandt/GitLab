@@ -33,13 +33,30 @@ describe Milestone, 'Milestoneish' do
   end
 
   describe '#sorted_issues' do
-    it 'sorts issues by label priority' do
+    before do
       issue.labels << label_1
       security_issue_1.labels << label_2
       closed_issue_1.labels << label_3
+    end
 
+    it 'sorts issues by label priority' do
       issues = milestone.sorted_issues(member)
 
+      expect(issues.first).to eq(issue)
+      expect(issues.second).to eq(security_issue_1)
+      expect(issues.third).not_to eq(closed_issue_1)
+    end
+
+    it 'limits issue count and keeps the ordering' do
+      stub_const('Milestoneish::DISPLAY_ISSUES_LIMIT', 4)
+
+      issues = milestone.sorted_issues(member)
+      # Cannot use issues.count here because it is sorting
+      # by a virtual column 'highest_priority' and it will break
+      # the query.
+      total_issues_count = issues.opened.unassigned.length + issues.opened.assigned.length + issues.closed.length
+      expect(issues.length).to eq(4)
+      expect(total_issues_count).to eq(4)
       expect(issues.first).to eq(issue)
       expect(issues.second).to eq(security_issue_1)
       expect(issues.third).not_to eq(closed_issue_1)
@@ -192,58 +209,56 @@ describe Milestone, 'Milestoneish' do
         end
       end
     end
+
+    context 'when milestone is at parent level group' do
+      let(:parent_group) { create(:group) }
+      let(:group) { create(:group, parent: parent_group) }
+      let(:project) { create(:project, namespace: group) }
+      let(:milestone) { create(:milestone, group: parent_group) }
+
+      it 'does not return any merge request for a non member' do
+        merge_requests = milestone.merge_requests_visible_to_user(non_member)
+        expect(merge_requests).to be_empty
+      end
+
+      it 'returns milestone merge requests for a member' do
+        merge_requests = milestone.merge_requests_visible_to_user(member)
+        expect(merge_requests).to contain_exactly(merge_request)
+      end
+    end
   end
 
-  describe '#complete?' do
+  describe '#complete?', :use_clean_rails_memory_store_caching do
     it 'returns false when has items opened' do
-      expect(milestone.complete?(non_member)).to eq false
+      expect(milestone.complete?).to eq false
     end
 
     it 'returns true when all items are closed' do
       issue.close
-      merge_request.close
+      security_issue_1.close
+      security_issue_2.close
 
-      expect(milestone.complete?(non_member)).to eq true
+      expect(milestone.complete?).to eq true
     end
   end
 
-  describe '#percent_complete' do
+  describe '#percent_complete', :use_clean_rails_memory_store_caching do
     context 'division by zero' do
       let(:new_milestone) { build_stubbed(:milestone) }
 
-      it { expect(new_milestone.percent_complete(admin)).to eq(0) }
+      it { expect(new_milestone.percent_complete).to eq(0) }
     end
   end
 
-  describe '#count_issues_by_state' do
-    it 'does not count confidential issues for non project members' do
-      expect(milestone.closed_issues_count(non_member)).to eq 2
-      expect(milestone.total_issues_count(non_member)).to eq 3
+  describe '#closed_issues_count' do
+    it 'counts all closed issues including confidential' do
+      expect(milestone.closed_issues_count).to eq 6
     end
+  end
 
-    it 'does not count confidential issues for project members with guest role' do
-      expect(milestone.closed_issues_count(guest)).to eq 2
-      expect(milestone.total_issues_count(guest)).to eq 3
-    end
-
-    it 'counts confidential issues for author' do
-      expect(milestone.closed_issues_count(author)).to eq 4
-      expect(milestone.total_issues_count(author)).to eq 6
-    end
-
-    it 'counts confidential issues for assignee' do
-      expect(milestone.closed_issues_count(assignee)).to eq 4
-      expect(milestone.total_issues_count(assignee)).to eq 6
-    end
-
-    it 'counts confidential issues for project members' do
-      expect(milestone.closed_issues_count(member)).to eq 6
-      expect(milestone.total_issues_count(member)).to eq 9
-    end
-
-    it 'counts confidential issues for admin' do
-      expect(milestone.closed_issues_count(admin)).to eq 6
-      expect(milestone.total_issues_count(admin)).to eq 9
+  describe '#total_issues_count' do
+    it 'counts all issues including confidential' do
+      expect(milestone.total_issues_count).to eq 9
     end
   end
 

@@ -36,35 +36,12 @@ module EE
         end
       end
 
-      expose :sast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:sast) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:sast)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:sast)
-        end
+      expose :enabled_reports do |merge_request|
+        merge_request.enabled_reports
       end
 
-      expose :dependency_scanning, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dependency_scanning) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:dependency_scanning)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:dependency_scanning)
-        end
-      end
-
+      # TODO: remove after https://gitlab.com/gitlab-org/gitlab/issues/205304 is done
       expose :license_management, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:license_management) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:license_management)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:license_management)
-        end
-
         expose :managed_licenses_path do |merge_request|
           expose_path(api_v4_projects_managed_licenses_path(id: merge_request.target_project.id))
         end
@@ -82,28 +59,26 @@ module EE
         end
       end
 
+      expose :license_scanning, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:license_scanning) } do
+        expose :managed_licenses_path do |merge_request|
+          expose_path(api_v4_projects_managed_licenses_path(id: merge_request.target_project.id))
+        end
+
+        expose :can_manage_licenses do |merge_request|
+          can?(current_user, :admin_software_license_policy, merge_request)
+        end
+
+        expose :settings_path, if: -> (mr, _) { can?(current_user, :admin_software_license_policy, mr.target_project) } do |merge_request|
+          license_management_settings_path(merge_request.target_project)
+        end
+
+        expose :full_report_path, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
+          licenses_project_pipeline_path(merge_request.target_project, merge_request.head_pipeline)
+        end
+      end
+
       expose :metrics_reports_path, if: -> (mr, _) { mr.has_metrics_reports? } do |merge_request|
         metrics_reports_project_merge_request_path(merge_request.project, merge_request, format: :json)
-      end
-
-      expose :sast_container, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:container_scanning) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:container_scanning)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:container_scanning)
-        end
-      end
-
-      expose :dast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dast) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:dast)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:dast)
-        end
       end
 
       expose :pipeline_id, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
@@ -148,6 +123,10 @@ module EE
 
       expose :merge_train_when_pipeline_succeeds_docs_path do |merge_request|
         presenter(merge_request).merge_train_when_pipeline_succeeds_docs_path
+      end
+
+      expose :merge_immediately_docs_path do |merge_request|
+        presenter(merge_request).merge_immediately_docs_path
       end
 
       expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }

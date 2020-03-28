@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import _ from 'underscore';
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
-import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
+import { head } from 'lodash';
 
 import { GlSearchBoxByType, GlInfiniteScroll } from '@gitlab/ui';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { trimText } from 'spec/helpers/text_helper';
+import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 
 const localVue = createLocalVue();
 
@@ -22,6 +22,7 @@ describe('ProjectSelector component', () => {
 
   beforeEach(() => {
     jasmine.clock().install();
+    jasmine.clock().mockDate();
 
     wrapper = mount(Vue.extend(ProjectSelector), {
       localVue,
@@ -33,7 +34,6 @@ describe('ProjectSelector component', () => {
         showLoadingIndicator: false,
         showSearchErrorMessage: false,
       },
-      sync: false,
       attachToDocument: true,
     });
 
@@ -100,9 +100,9 @@ describe('ProjectSelector component', () => {
 
   it(`triggers a "projectClicked" event when a project is clicked`, () => {
     spyOn(vm, '$emit');
-    wrapper.find(ProjectListItem).vm.$emit('click', _.first(searchResults));
+    wrapper.find(ProjectListItem).vm.$emit('click', head(searchResults));
 
-    expect(vm.$emit).toHaveBeenCalledWith('projectClicked', _.first(searchResults));
+    expect(vm.$emit).toHaveBeenCalledWith('projectClicked', head(searchResults));
   });
 
   it(`shows a "no results" message if showNoResultsMessage === true`, () => {

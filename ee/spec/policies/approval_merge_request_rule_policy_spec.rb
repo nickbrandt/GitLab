@@ -15,7 +15,15 @@ describe ApprovalMergeRequestRulePolicy do
       expect(permissions(merge_request.author, approval_rule)).to be_allowed(:edit_approval_rule)
     end
 
-    context 'when rule is not regular type' do
+    context 'when rule is any-approval' do
+      let(:approval_rule) { build(:any_approver_rule, merge_request: merge_request) }
+
+      it 'allows updating approval rule' do
+        expect(permissions(merge_request.author, approval_rule)).to be_allowed(:edit_approval_rule)
+      end
+    end
+
+    context 'when rule is not user editable' do
       let(:approval_rule) { create(:code_owner_rule, merge_request: merge_request) }
 
       it 'disallows updating approval rule' do

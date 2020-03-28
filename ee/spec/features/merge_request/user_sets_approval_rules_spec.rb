@@ -63,7 +63,7 @@ describe 'Merge request > User sets approval rules', :js do
         td = tr.find(:css, '.js-approvers')
 
         # The approver granted by the private group is not visible
-        expect(td).to have_text('None')
+        expect(td).to have_text('')
       end
     end
   end

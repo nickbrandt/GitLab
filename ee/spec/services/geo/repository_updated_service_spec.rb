@@ -5,10 +5,10 @@ require 'spec_helper'
 describe Geo::RepositoryUpdatedService do
   include ::EE::GeoHelpers
 
-  set(:project) { create(:project) }
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:repository_state) { create(:repository_state, :repository_verified, :wiki_verified, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:repository_state) { create(:repository_state, :repository_verified, :wiki_verified, project: project) }
 
   before do
     stub_current_geo_node(primary)
@@ -93,12 +93,6 @@ describe Geo::RepositoryUpdatedService do
 
       it 'creates a design repository updated event' do
         expect { subject.execute }.to change(Geo::RepositoryUpdatedEvent, :count).by(1)
-      end
-
-      it 'does not create a design repository updated event when feature is disabled' do
-        stub_feature_flags(enable_geo_design_sync: false)
-
-        expect { subject.execute }.not_to change(Geo::RepositoryUpdatedEvent, :count)
       end
     end
   end

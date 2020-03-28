@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Security::ReportFetchService do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   let(:service) { described_class.new(project, artifact) }
   let(:artifact) { ::Ci::JobArtifact.dependency_list_reports }

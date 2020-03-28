@@ -14,7 +14,6 @@ describe('Grouped metrics reports app', () => {
 
   const mountComponent = () => {
     wrapper = mount(Component, {
-      sync: false,
       store: mockStore,
       localVue,
       propsData: {

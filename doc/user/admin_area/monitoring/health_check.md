@@ -51,7 +51,7 @@ GET /-/health
 
 Example request:
 
-```sh
+```shell
 curl 'https://gitlab.example.com/-/health'
 ```
 
@@ -78,7 +78,7 @@ GET /-/readiness?all=1
 
 Example request:
 
-```sh
+```shell
 curl 'https://gitlab.example.com/-/readiness'
 ```
 
@@ -103,7 +103,7 @@ This check is being exempt from Rack Attack.
 ## Liveness
 
 DANGER: **Warning:**
-In Gitlab [12.4](https://about.gitlab.com/upcoming-releases/)
+In GitLab [12.4](https://about.gitlab.com/upcoming-releases/)
 the response body of the Liveness check was changed
 to match the example below.
 
@@ -117,7 +117,7 @@ GET /-/liveness
 
 Example request:
 
-```sh
+```shell
 curl 'https://gitlab.example.com/-/liveness'
 ```
 
@@ -141,7 +141,7 @@ This check is being exempt from Rack Attack.
 > Access token has been deprecated in GitLab 9.4 in favor of [IP whitelist](#ip-whitelist).
 
 An access token needs to be provided while accessing the probe endpoints. The current
-accepted token can be found under the **Admin area ➔ Monitoring ➔ Health check**
+accepted token can be found under the **Admin Area > Monitoring > Health check**
 (`admin/health_check`) page of your GitLab instance.
 
 ![access token](img/health_check_token.png)
@@ -164,8 +164,8 @@ Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
 
-[ce-10416]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/10416
-[ce-3888]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/3888
+[ce-10416]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/10416
+[ce-3888]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/3888
 [pingdom]: https://www.pingdom.com
 [nagios-health]: https://nagios-plugins.org/doc/man/check_http.html
 [newrelic-health]: https://docs.newrelic.com/docs/alerts/alert-policies/downtime-alerts/availability-monitoring

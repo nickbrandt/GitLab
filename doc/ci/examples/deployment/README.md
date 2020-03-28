@@ -4,9 +4,9 @@ type: tutorial
 
 # Using Dpl as deployment tool
 
-[Dpl](https://github.com/travis-ci/dpl) (prouncounced like the letters D-P-L) is a deploy tool made for
+[Dpl](https://github.com/travis-ci/dpl) (pronounced like the letters D-P-L) is a deploy tool made for
 continuous deployment that's developed and used by Travis CI, but can also be
-used with GitLab CI.
+used with GitLab CI/CD.
 
 Dpl can be used to deploy to any of the [supported providers](https://github.com/travis-ci/dpl#supported-providers).
 
@@ -18,7 +18,7 @@ To use Dpl you need at least Ruby 1.9.3 with ability to install gems.
 
 Dpl can be installed on any machine with:
 
-```
+```shell
 gem install dpl
 ```
 
@@ -27,7 +27,7 @@ having to test it on a CI server.
 
 If you don't have Ruby installed you can do it on Debian-compatible Linux with:
 
-```
+```shell
 apt-get update
 apt-get install ruby-dev
 ```

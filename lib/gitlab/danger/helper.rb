@@ -34,6 +34,10 @@ module Gitlab
           .sort
       end
 
+      def all_ee_changes
+        all_changed_files.grep(%r{\Aee/})
+      end
+
       def ee?
         # Support former project name for `dev` and support local Danger run
         %w[gitlab gitlab-ee].include?(ENV['CI_PROJECT_NAME']) || Dir.exist?('../../ee')
@@ -118,19 +122,22 @@ module Gitlab
           \.haml-lint_todo.yml |
           babel\.config\.js |
           jest\.config\.js |
-          karma\.config\.js |
-          webpack\.config\.js |
           package\.json |
           yarn\.lock |
+          config/.+\.js |
           \.gitlab/ci/frontend\.gitlab-ci\.yml
         )\z}x => :frontend,
 
         %r{\A(ee/)?db/(?!fixtures)[^/]+} => :database,
         %r{\A(ee/)?lib/gitlab/(database|background_migration|sql|github_import)(/|\.rb)} => :database,
         %r{\A(app/models/project_authorization|app/services/users/refresh_authorized_projects_service)(/|\.rb)} => :database,
+        %r{\A(ee/)?app/finders/} => :database,
         %r{\Arubocop/cop/migration(/|\.rb)} => :database,
 
         %r{\A(\.gitlab-ci\.yml\z|\.gitlab\/ci)} => :engineering_productivity,
+        %r{\A\.overcommit\.yml\.example\z} => :engineering_productivity,
+        %r{\Atooling/overcommit/} => :engineering_productivity,
+        %r{\A.editorconfig\z} => :engineering_productivity,
         %r{Dangerfile\z} => :engineering_productivity,
         %r{\A(ee/)?(danger/|lib/gitlab/danger/)} => :engineering_productivity,
         %r{\A(ee/)?scripts/} => :engineering_productivity,
@@ -141,7 +148,7 @@ module Gitlab
         %r{\A(ee/)?spec/(?!javascripts|frontend)[^/]+} => :backend,
         %r{\A(ee/)?vendor/(?!assets)[^/]+} => :backend,
         %r{\A(ee/)?vendor/(languages\.yml|licenses\.csv)\z} => :backend,
-        %r{\A(Gemfile|Gemfile.lock|Procfile|Rakefile)\z} => :backend,
+        %r{\A(Gemfile|Gemfile.lock|Rakefile)\z} => :backend,
         %r{\A[A-Z_]+_VERSION\z} => :backend,
         %r{\A\.rubocop(_todo)?\.yml\z} => :backend,
 
@@ -153,7 +160,10 @@ module Gitlab
 
         # Fallbacks in case the above patterns miss anything
         %r{\.rb\z} => :backend,
-        %r{\.(md|txt)\z} => :none, # To reinstate roulette for documentation, set to `:docs`.
+        %r{(
+          \.(md|txt)\z |
+          \.markdownlint\.json
+        )}x => :none, # To reinstate roulette for documentation, set to `:docs`.
         %r{\.js\z} => :frontend
       }.freeze
 
@@ -169,6 +179,16 @@ module Gitlab
                  end
 
         labels - current_mr_labels
+      end
+
+      def sanitize_mr_title(title)
+        title.gsub(/^WIP: */, '').gsub(/`/, '\\\`')
+      end
+
+      def security_mr?
+        return false unless gitlab_helper
+
+        gitlab_helper.mr_json['web_url'].include?('/gitlab-org/security/')
       end
 
       private

@@ -11,7 +11,6 @@ export const SET_LINKS = 'SET_LINKS';
 // Project Mutation Types
 export const SET_PROJECT = 'SET_PROJECT';
 export const SET_CURRENT_PROJECT = 'SET_CURRENT_PROJECT';
-export const TOGGLE_PROJECT_OPEN = 'TOGGLE_PROJECT_OPEN';
 export const TOGGLE_EMPTY_STATE = 'TOGGLE_EMPTY_STATE';
 
 // Merge Request Mutation Types
@@ -68,7 +67,6 @@ export const REMOVE_PENDING_TAB = 'REMOVE_PENDING_TAB';
 export const UPDATE_ACTIVITY_BAR_VIEW = 'UPDATE_ACTIVITY_BAR_VIEW';
 export const UPDATE_TEMP_FLAG = 'UPDATE_TEMP_FLAG';
 export const TOGGLE_FILE_FINDER = 'TOGGLE_FILE_FINDER';
-export const BURST_UNUSED_SEAL = 'BURST_UNUSED_SEAL';
 
 export const CLEAR_PROJECTS = 'CLEAR_PROJECTS';
 export const RESET_OPEN_FILES = 'RESET_OPEN_FILES';

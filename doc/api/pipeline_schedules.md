@@ -1,12 +1,12 @@
 # Pipeline schedules API
 
-You can read more about [pipeline schedules](../user/project/pipelines/schedules.md).
+You can read more about [pipeline schedules](../ci/pipelines/schedules.md).
 
 ## Get all pipeline schedules
 
 Get a list of the pipeline schedules of a project.
 
-```
+```plaintext
 GET /projects/:id/pipeline_schedules
 ```
 
@@ -15,7 +15,7 @@ GET /projects/:id/pipeline_schedules
 | `id`      | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `scope`   | string  | no       | The scope of pipeline schedules, one of: `active`, `inactive` |
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules"
 ```
 
@@ -47,7 +47,7 @@ curl --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/
 
 Get the pipeline schedule of a project.
 
-```
+```plaintext
 GET /projects/:id/pipeline_schedules/:pipeline_schedule_id
 ```
 
@@ -56,7 +56,7 @@ GET /projects/:id/pipeline_schedules/:pipeline_schedule_id
 | `id`         | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user      |
 | `pipeline_schedule_id` | integer | yes      | The pipeline schedule id           |
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13"
 ```
 
@@ -99,7 +99,7 @@ curl --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/
 
 Create a new pipeline schedule of a project.
 
-```
+```plaintext
 POST /projects/:id/pipeline_schedules
 ```
 
@@ -112,7 +112,7 @@ POST /projects/:id/pipeline_schedules
 | `cron_timezone` | string  | no      | The timezone supported by `ActiveSupport::TimeZone` (e.g. `Pacific Time (US & Canada)`) (default: `'UTC'`)     |
 | `active` | boolean  | no      | The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially (default: `true`) |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form description="Build packages" --form ref="master" --form cron="0 1 * * 5" --form cron_timezone="UTC" --form active="true" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules"
 ```
 
@@ -141,9 +141,9 @@ curl --request POST --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form descri
 
 ## Edit a pipeline schedule
 
-Updates the pipeline schedule  of a project. Once the update is done, it will be rescheduled automatically.
+Updates the pipeline schedule of a project. Once the update is done, it will be rescheduled automatically.
 
-```
+```plaintext
 PUT /projects/:id/pipeline_schedules/:pipeline_schedule_id
 ```
 
@@ -157,7 +157,7 @@ PUT /projects/:id/pipeline_schedules/:pipeline_schedule_id
 | `cron_timezone` | string  | no      | The timezone supported by `ActiveSupport::TimeZone` (e.g. `Pacific Time (US & Canada)`) or `TZInfo::Timezone` (e.g. `America/Los_Angeles`)      |
 | `active` | boolean  | no      | The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially. |
 
-```sh
+```shell
 curl --request PUT --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form cron="0 2 * * *" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13"
 ```
 
@@ -193,7 +193,7 @@ curl --request PUT --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form cron="0
 
 Update the owner of the pipeline schedule of a project.
 
-```
+```plaintext
 POST /projects/:id/pipeline_schedules/:pipeline_schedule_id/take_ownership
 ```
 
@@ -202,7 +202,7 @@ POST /projects/:id/pipeline_schedules/:pipeline_schedule_id/take_ownership
 | `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user      |
 | `pipeline_schedule_id`  | integer | yes      | The pipeline schedule id           |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: hf2CvZXB9w8Uc5pZKpSB" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13/take_ownership"
 ```
 
@@ -238,7 +238,7 @@ curl --request POST --header "PRIVATE-TOKEN: hf2CvZXB9w8Uc5pZKpSB" "https://gitl
 
 Delete the pipeline schedule of a project.
 
-```
+```plaintext
 DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id
 ```
 
@@ -247,7 +247,7 @@ DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id
 | `id`           | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user      |
 | `pipeline_schedule_id`   | integer | yes      | The pipeline schedule id           |
 
-```sh
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13"
 ```
 
@@ -279,6 +279,36 @@ curl --request DELETE --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gi
 }
 ```
 
+## Run a scheduled pipeline immediately
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/201786) in GitLab 12.8.
+
+Trigger a new scheduled pipeline, which runs immediately. The next scheduled run
+of this pipeline is not affected.
+
+```text
+POST /projects/:id/pipeline_schedules/:pipeline_schedule_id/play
+```
+
+| Attribute              | Type           | required   | Description                                                                                                     |
+| ----------------       | ---------      | ---------- | --------------------------                                                                                      |
+| `id`                   | integer/string | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `pipeline_schedule_id` | integer        | yes        | The pipeline schedule id                                                                                        |
+
+Example request:
+
+```sh
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/projects/42/pipeline_schedules/1/play
+```
+
+Example response:
+
+```json
+{
+  "message": "201 Created"
+}
+```
+
 ## Pipeline schedule variables
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/34518) in GitLab 10.0.
@@ -287,7 +317,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gi
 
 Create a new variable of a pipeline schedule.
 
-```
+```plaintext
 POST /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables
 ```
 
@@ -299,7 +329,7 @@ POST /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables
 | `value`                | string         | yes      | The `value` of a variable |
 | `variable_type`        | string         | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form "key=NEW_VARIABLE" --form "value=new value" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13/variables"
 ```
 
@@ -315,7 +345,7 @@ curl --request POST --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form "key=N
 
 Updates the variable of a pipeline schedule.
 
-```
+```plaintext
 PUT /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key
 ```
 
@@ -327,7 +357,7 @@ PUT /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key
 | `value`                | string         | yes      | The `value` of a variable |
 | `variable_type`        | string         | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 
-```sh
+```shell
 curl --request PUT --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form "value=updated value" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13/variables/NEW_VARIABLE"
 ```
 
@@ -343,7 +373,7 @@ curl --request PUT --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form "value=
 
 Delete the variable of a pipeline schedule.
 
-```
+```plaintext
 DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key
 ```
 
@@ -353,7 +383,7 @@ DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key
 | `pipeline_schedule_id` | integer        | yes      | The pipeline schedule id |
 | `key`                  | string         | yes      | The `key` of a variable |
 
-```sh
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13/variables/NEW_VARIABLE"
 ```
 

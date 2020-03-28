@@ -18,7 +18,7 @@ exports[`Design management toolbar component renders design and updated data 1`]
     class="overflow-hidden d-flex align-items-center"
   >
     <h2
-      class="m-0 str-truncated-100"
+      class="m-0 str-truncated-100 gl-font-size-14"
     >
       test.jpg
     </h2>
@@ -35,7 +35,19 @@ exports[`Design management toolbar component renders design and updated data 1`]
     id="1"
   />
    
-  <deletebutton-stub
+  <gl-button-stub
+    class="mr-2"
+    href="/-/designs/306/7f747adcd4693afadbe968d7ba7d983349b9012d"
+    size="md"
+    variant="secondary"
+  >
+    <icon-stub
+      name="download"
+      size="18"
+    />
+  </gl-button-stub>
+   
+  <delete-button-stub
     buttonclass=""
     buttonvariant="danger"
     hasselecteddesigns="true"
@@ -44,6 +56,6 @@ exports[`Design management toolbar component renders design and updated data 1`]
       name="remove"
       size="18"
     />
-  </deletebutton-stub>
+  </delete-button-stub>
 </header>
 `;

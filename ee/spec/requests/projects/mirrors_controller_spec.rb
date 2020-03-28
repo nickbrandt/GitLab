@@ -28,7 +28,7 @@ describe Projects::MirrorsController do
         }
       }
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(response).to redirect_to(project_settings_repository_path(project, anchor: 'js-push-remote-settings'))
       expect(flash[:alert]).to include("Import url can't be blank")
     end

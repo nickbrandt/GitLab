@@ -11,8 +11,9 @@ describe Projects::SlackApplicationInstallService do
   end
 
   def stub_slack_response_with(response)
-    expect_any_instance_of(Projects::SlackApplicationInstallService)
-      .to receive(:exchange_slack_token).and_return(response.stringify_keys)
+    expect_next_instance_of(Projects::SlackApplicationInstallService) do |instance|
+      expect(instance).to receive(:exchange_slack_token).and_return(response.stringify_keys)
+    end
   end
 
   def expect_slack_integration_is_created(project)

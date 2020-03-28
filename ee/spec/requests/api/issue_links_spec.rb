@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe API::IssueLinks do
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
-  let(:issue) { create(:issue, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:issue) { create(:issue, project: project) }
 
   before do
     project.add_guest(user)
@@ -16,7 +16,7 @@ describe API::IssueLinks do
       it 'returns 401' do
         get api("/projects/#{project.id}/issues/#{issue.iid}/links")
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -27,10 +27,10 @@ describe API::IssueLinks do
 
         get api("/projects/#{project.id}/issues/#{issue.iid}/links", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an Array
         expect(json_response.length).to eq(1)
-        expect(json_response.first).to include('iid', 'title', 'issue_link_id')
+        expect(response).to match_response_schema('public_api/v4/issue_links')
       end
     end
   end
@@ -43,7 +43,7 @@ describe API::IssueLinks do
         post api("/projects/#{project.id}/issues/#{issue.iid}/links"),
              params: { target_project_id: target_issue.project.id, target_issue_iid: target_issue.iid }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -53,9 +53,9 @@ describe API::IssueLinks do
           target_issue = create(:issue)
 
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: 999, target_issue_iid: target_issue.iid }
+               params: { target_project_id: -1, target_issue_iid: target_issue.iid }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Project Not Found')
         end
       end
@@ -67,7 +67,7 @@ describe API::IssueLinks do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
                params: { target_project_id: target_project.id, target_issue_iid: 999 }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')
         end
       end
@@ -81,7 +81,7 @@ describe API::IssueLinks do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
                params: { target_project_id: unauthorized_project.id, target_issue_iid: target_issue.iid }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('No Issue found for given params')
         end
       end
@@ -94,7 +94,7 @@ describe API::IssueLinks do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
                params: { target_project_id: project.id, target_issue_iid: target_issue.iid }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')
         end
       end
@@ -107,32 +107,36 @@ describe API::IssueLinks do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
                params: { target_project_id: project.id, target_issue_iid: target_issue.iid }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Project Not Found')
         end
       end
 
       context 'when user has ability to create an issue link' do
-        it 'returns 201' do
-          target_issue = create(:issue, project: project)
+        let_it_be(:target_issue) { create(:issue, project: project) }
+
+        before do
           project.add_reporter(user)
+        end
 
+        it 'returns 201 status and contains the expected link response' do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: project.id, target_issue_iid: target_issue.iid }
+               params: { target_project_id: project.id, target_issue_iid: target_issue.iid, link_type: 'blocks' }
 
-          expect(response).to have_gitlab_http_status(201)
-          expect(json_response).to include('source_issue', 'target_issue')
+          expect_link_response(link_type: 'blocks')
         end
 
         it 'returns 201 when sending full path of target project' do
-          target_issue = create(:issue, project: project)
-          project.add_reporter(user)
-
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: project.to_reference(full: true), target_issue_iid: target_issue.iid }
+               params: { target_project_id: project.full_path, target_issue_iid: target_issue.iid }
 
-          expect(response).to have_gitlab_http_status(201)
-          expect(json_response).to include('source_issue', 'target_issue')
+          expect_link_response
+        end
+
+        def expect_link_response(link_type: 'relates_to')
+          expect(response).to have_gitlab_http_status(:created)
+          expect(response).to match_response_schema('public_api/v4/issue_link')
+          expect(json_response['link_type']).to eq(link_type)
         end
       end
     end
@@ -145,7 +149,7 @@ describe API::IssueLinks do
 
         delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{issue_link.id}")
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -159,7 +163,7 @@ describe API::IssueLinks do
 
           delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{issue_link.id}", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('No Issue Link found')
         end
       end
@@ -168,7 +172,7 @@ describe API::IssueLinks do
         it 'returns 404' do
           delete api("/projects/#{project.id}/issues/#{issue.iid}/links/999", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')
         end
       end
@@ -181,7 +185,7 @@ describe API::IssueLinks do
 
           delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{issue_link.id}", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Project Not Found')
         end
       end
@@ -194,8 +198,8 @@ describe API::IssueLinks do
 
           delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{issue_link.id}", user)
 
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response).to include('source_issue', 'target_issue')
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('public_api/v4/issue_link')
         end
       end
     end

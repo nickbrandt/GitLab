@@ -46,7 +46,7 @@ module Types
           description: 'Timestamp of the project last activity'
 
     field :archived, GraphQL::BOOLEAN_TYPE, null: true,
-          description: 'Archived status of the project'
+          description: 'Indicates the archived status of the project'
 
     field :visibility, GraphQL::STRING_TYPE, null: true,
           description: 'Visibility of the project'
@@ -90,8 +90,9 @@ module Types
           end
 
     field :import_status, GraphQL::STRING_TYPE, null: true,
-          description: 'Status of project import background job of the project'
-
+          description: 'Status of import background job of the project'
+    field :jira_import_status, GraphQL::STRING_TYPE, null: true,
+          description: 'Status of Jira import background job of the project'
     field :only_allow_merge_if_pipeline_succeeds, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if merge requests of the project can only be merged with successful jobs'
     field :request_access_enabled, GraphQL::BOOLEAN_TYPE, null: true,
@@ -102,6 +103,10 @@ module Types
           description: 'Indicates if a link to create or view a merge request should display after a push to Git repositories of the project from the command line'
     field :remove_source_branch_after_merge, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if `Delete source branch` option should be enabled by default for all new merge requests of the project'
+    field :autoclose_referenced_issues, GraphQL::BOOLEAN_TYPE, null: true,
+          description: 'Indicates if issues referenced by merge requests and commits within the default branch are closed automatically'
+    field :suggestion_commit_message, GraphQL::STRING_TYPE, null: true,
+          description: 'The commit message used to apply merge request suggestions'
 
     field :namespace, Types::NamespaceType, null: true,
           description: 'Namespace of the project'
@@ -134,6 +139,12 @@ module Types
           description: 'Issues of the project',
           resolver: Resolvers::IssuesResolver
 
+    field :environments,
+          Types::EnvironmentType.connection_type,
+          null: true,
+          description: 'Environments of the project',
+          resolver: Resolvers::EnvironmentsResolver
+
     field :issue,
           Types::IssueType,
           null: true,
@@ -145,5 +156,50 @@ module Types
           null: true,
           description: 'Build pipelines of the project',
           resolver: Resolvers::ProjectPipelinesResolver
+
+    field :sentry_detailed_error,
+          Types::ErrorTracking::SentryDetailedErrorType,
+          null: true,
+          description: 'Detailed version of a Sentry error on the project',
+          resolver: Resolvers::ErrorTracking::SentryDetailedErrorResolver
+
+    field :grafana_integration,
+          Types::GrafanaIntegrationType,
+          null: true,
+          description: 'Grafana integration details for the project',
+          resolver: Resolvers::Projects::GrafanaIntegrationResolver
+
+    field :snippets,
+          Types::SnippetType.connection_type,
+          null: true,
+          description: 'Snippets of the project',
+          resolver: Resolvers::Projects::SnippetsResolver
+
+    field :sentry_errors,
+          Types::ErrorTracking::SentryErrorCollectionType,
+          null: true,
+          description: 'Paginated collection of Sentry errors on the project',
+          resolver: Resolvers::ErrorTracking::SentryErrorCollectionResolver
+
+    field :boards,
+          Types::BoardType.connection_type,
+          null: true,
+          description: 'Boards of the project',
+          max_page_size: 2000,
+          resolver: Resolvers::BoardsResolver
+
+    field :board,
+          Types::BoardType,
+          null: true,
+          description: 'A single board of the project',
+          resolver: Resolvers::BoardsResolver.single
+
+    field :jira_imports,
+          Types::JiraImportType.connection_type,
+          null: true,
+          description: 'Jira imports into the project',
+          resolver: Resolvers::Projects::JiraImportsResolver
   end
 end
+
+Types::ProjectType.prepend_if_ee('::EE::Types::ProjectType')

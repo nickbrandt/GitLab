@@ -9,22 +9,17 @@ module MergeRequests
     end
 
     def create_detached_merge_request_pipeline(merge_request)
-      if can_use_merge_request_ref?(merge_request)
-        Ci::CreatePipelineService.new(merge_request.source_project, current_user,
-                                      ref: merge_request.ref_path)
-          .execute(:merge_request_event, merge_request: merge_request)
-      else
-        Ci::CreatePipelineService.new(merge_request.source_project, current_user,
-                                      ref: merge_request.source_branch)
-          .execute(:merge_request_event, merge_request: merge_request)
-      end
+      Ci::CreatePipelineService.new(merge_request.source_project,
+                                    current_user,
+                                    ref: pipeline_ref_for_detached_merge_request_pipeline(merge_request))
+        .execute(:merge_request_event, merge_request: merge_request)
     end
 
     def can_create_pipeline_for?(merge_request)
       ##
       # UpdateMergeRequestsWorker could be retried by an exception.
       # pipelines for merge request should not be recreated in such case.
-      return false if !allow_duplicate && merge_request.find_actual_head_pipeline&.triggered_by_merge_request?
+      return false if !allow_duplicate && merge_request.find_actual_head_pipeline&.merge_request?
       return false if merge_request.has_no_commits?
 
       true
@@ -32,6 +27,16 @@ module MergeRequests
 
     def allow_duplicate
       params[:allow_duplicate]
+    end
+
+    private
+
+    def pipeline_ref_for_detached_merge_request_pipeline(merge_request)
+      if can_use_merge_request_ref?(merge_request)
+        merge_request.ref_path
+      else
+        merge_request.source_branch
+      end
     end
   end
 end

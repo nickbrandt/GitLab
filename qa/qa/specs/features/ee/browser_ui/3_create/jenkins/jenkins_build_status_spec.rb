@@ -2,8 +2,7 @@
 require 'securerandom'
 
 module QA
-  # Issue: https://gitlab.com/gitlab-org/gitlab/issues/35370
-  context 'Create', :docker, :quarantine, :requires_admin do
+  context 'Create', :docker, :orchestrated, :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/195179', type: :flaky } do
     describe 'Jenkins integration' do
       let(:project_name) { "project_with_jenkins_#{SecureRandom.hex(4)}" }
 
@@ -42,9 +41,20 @@ module QA
             push.file_name = "file_#{SecureRandom.hex(4)}.txt"
           end
 
+          Vendor::Jenkins::Page::LastJobConsole.perform do |job_console|
+            job_console.job_name = project_name
+
+            job_console.visit!
+
+            Support::Waiter.wait_until(sleep_interval: 1, reload_page: page) do
+              job_console.has_successful_build? && job_console.no_failed_status_update?
+            end
+          end
+
           project.visit!
 
           Page::Project::Menu.perform(&:click_ci_cd_pipelines)
+
           Page::Project::Pipeline::Index.perform(&:click_on_latest_pipeline)
 
           Page::Project::Pipeline::Show.perform do |show|
@@ -105,8 +115,7 @@ module QA
       end
 
       def login_to_gitlab
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       def patch_host_name(host_name, container_name)
@@ -131,8 +140,7 @@ module QA
 
       def allow_requests_to_local_networks
         Page::Main::Menu.perform(&:sign_out_if_signed_in)
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+        Flow::Login.sign_in_as_admin
         Page::Main::Menu.perform(&:go_to_admin_area)
         Page::Admin::Menu.perform(&:go_to_network_settings)
 

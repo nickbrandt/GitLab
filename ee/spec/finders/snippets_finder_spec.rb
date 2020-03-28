@@ -152,5 +152,35 @@ describe SnippetsFinder do
         end
       end
     end
+
+    context 'when only_personal is passed' do
+      let(:finder_params) { { authorized_and_user_personal: true, only_personal: true } }
+
+      it 'returns only personal snippets' do
+        group.add_maintainer(user)
+
+        expect(subject)
+          .to contain_exactly(
+            public_personal_snippet,
+            internal_personal_snippet,
+            private_personal_snippet
+          )
+      end
+    end
+
+    context 'when only_project is passed' do
+      let(:finder_params) { { authorized_and_user_personal: true, only_project: true } }
+
+      it 'returns only project snippets' do
+        group.add_maintainer(user)
+
+        expect(subject)
+          .to contain_exactly(
+            public_project_snippet,
+            internal_project_snippet,
+            private_project_snippet
+          )
+      end
+    end
   end
 end

@@ -5,11 +5,7 @@ require 'spec_helper'
 describe "Public Project Access" do
   include AccessMatchers
 
-  set(:project) { create(:project, :public, :repository) }
-
-  before do
-    stub_feature_flags(job_log_json: false)
-  end
+  let_it_be(:project, reload: true) { create(:project, :public, :repository) }
 
   describe "Project should be public" do
     describe '#public?' do
@@ -33,7 +29,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/tree/master" do
+  describe "GET /:project_path/-/tree/master" do
     subject { project_tree_path(project, project.repository.root_ref) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -47,7 +43,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/commits/master" do
+  describe "GET /:project_path/-/commits/master" do
     subject { project_commits_path(project, project.repository.root_ref, limit: 1) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -61,7 +57,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/commit/:sha" do
+  describe "GET /:project_path/-/commit/:sha" do
     subject { project_commit_path(project, project.repository.commit) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -75,7 +71,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/compare" do
+  describe "GET /:project_path/-/compare" do
     subject { project_compare_index_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -89,7 +85,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/settings/members" do
+  describe "GET /:project_path/-/settings/members" do
     subject { project_settings_members_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -103,7 +99,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:external) }
   end
 
-  describe "GET /:project_path/settings/ci_cd" do
+  describe "GET /:project_path/-/settings/ci_cd" do
     subject { project_settings_ci_cd_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -117,7 +113,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:external) }
   end
 
-  describe "GET /:project_path/settings/repository" do
+  describe "GET /:project_path/-/settings/repository" do
     subject { project_settings_repository_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -147,6 +143,7 @@ describe "Public Project Access" do
 
   describe "GET /:project_path/pipelines/:id" do
     let(:pipeline) { create(:ci_pipeline, project: project) }
+
     subject { project_pipeline_path(project, pipeline) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -199,6 +196,7 @@ describe "Public Project Access" do
   describe "GET /:project_path/builds/:id" do
     let(:pipeline) { create(:ci_pipeline, project: project) }
     let(:build) { create(:ci_build, pipeline: pipeline) }
+
     subject { project_job_path(project, build.id) }
 
     context "when allowed for public" do
@@ -237,6 +235,7 @@ describe "Public Project Access" do
   describe 'GET /:project_path/builds/:id/trace' do
     let(:pipeline) { create(:ci_pipeline, project: project) }
     let(:build) { create(:ci_build, pipeline: pipeline) }
+
     subject { trace_project_job_path(project, build.id) }
 
     context 'when allowed for public' do
@@ -286,7 +285,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments" do
+  describe "GET /:project_path/-/environments" do
     subject { project_environments_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -300,8 +299,9 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/:id" do
+  describe "GET /:project_path/-/environments/:id" do
     let(:environment) { create(:environment, project: project) }
+
     subject { project_environment_path(project, environment) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -315,8 +315,9 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/:id/deployments" do
+  describe "GET /:project_path/-/environments/:id/deployments" do
     let(:environment) { create(:environment, project: project) }
+
     subject { project_environment_deployments_path(project, environment) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -330,7 +331,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/new" do
+  describe "GET /:project_path/-/environments/new" do
     subject { new_project_environment_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -344,7 +345,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/blob" do
+  describe "GET /:project_path/-/blob" do
     let(:commit) { project.repository.commit }
 
     subject { project_blob_path(project, File.join(commit.id, '.gitignore')) }
@@ -403,6 +404,7 @@ describe "Public Project Access" do
 
   describe "GET /:project_path/issues/:id/edit" do
     let(:issue) { create(:issue, project: project) }
+
     subject { edit_project_issue_path(project, issue) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -444,7 +446,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/merge_requests" do
+  describe "GET /:project_path/-/merge_requests" do
     subject { project_merge_requests_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -458,7 +460,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/merge_requests/new" do
+  describe "GET /:project_path/-/merge_requests/new" do
     subject { project_new_merge_request_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -472,7 +474,7 @@ describe "Public Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/branches" do
+  describe "GET /:project_path/-/branches" do
     subject { project_branches_path(project) }
 
     before do
@@ -493,7 +495,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/tags" do
+  describe "GET /:project_path/-/tags" do
     subject { project_tags_path(project) }
 
     before do
@@ -514,7 +516,7 @@ describe "Public Project Access" do
     it { is_expected.to be_allowed_for(:visitor) }
   end
 
-  describe "GET /:project_path/settings/integrations" do
+  describe "GET /:project_path/-/settings/integrations" do
     subject { project_settings_integrations_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }

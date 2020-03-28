@@ -1,5 +1,9 @@
 # InfluxDB Configuration
 
+CAUTION: **InfluxDB is deprecated in favor of Prometheus:**
+InfluxDB support is scheduled to be removed in GitLab 13.0.
+You are advised to use [Prometheus](../prometheus/index.md) instead.
+
 The default settings provided by [InfluxDB] are not sufficient for a high traffic
 GitLab environment. The settings discussed in this document are based on the
 settings GitLab uses for GitLab.com, depending on your own needs you may need to
@@ -44,7 +48,7 @@ upcoming InfluxDB releases.
 
 Make sure you have the following in your configuration file:
 
-```
+```toml
 [data]
   dir = "/var/lib/influxdb/data"
   engine = "tsm1"
@@ -56,7 +60,7 @@ Production environments should have the InfluxDB admin panel **disabled**. This
 feature can be disabled by adding the following to your InfluxDB configuration
 file:
 
-```
+```toml
 [admin]
   enabled = false
 ```
@@ -67,7 +71,7 @@ HTTP is required when using the [InfluxDB CLI] or other tools such as Grafana,
 thus it should be enabled. When enabling make sure to _also_ enable
 authentication:
 
-```
+```toml
 [http]
   enabled = true
   auth-enabled = true
@@ -81,7 +85,7 @@ admin user](#create-a-new-admin-user)._
 GitLab writes data to InfluxDB via UDP and thus this must be enabled. Enabling
 UDP can be done using the following settings:
 
-```
+```toml
 [[udp]]
   enabled = true
   bind-address = ":8089"
@@ -106,14 +110,14 @@ buffer size is set to the same value, the default value is almost never enough.
 
 To set the OS buffer size to 200 MB, on Linux you can run the following command:
 
-```bash
+```shell
 sysctl -w net.core.rmem_max=209715200
 ```
 
 To make this permanent, add the following to `/etc/sysctl.conf` and restart the
 server:
 
-```bash
+```shell
 net.core.rmem_max=209715200
 ```
 
@@ -134,7 +138,7 @@ allowing traffic from members of said VLAN.
 If you want to [enable authentication](#http), you might want to [create an
 admin user][influx-admin]:
 
-```
+```shell
 influx -execute "CREATE USER jeff WITH PASSWORD '1234' WITH ALL PRIVILEGES"
 ```
 
@@ -146,11 +150,11 @@ before creating a database.
 
 _**Note:** If you [created an admin user](#create-a-new-admin-user) and enabled
 [HTTP authentication](#http), remember to append the username (`-username <username>`)
-and password (`-password <password>`)  you set earlier to the commands below._
+and password (`-password <password>`) you set earlier to the commands below._
 
 Run the following command to create a database named `gitlab`:
 
-```bash
+```shell
 influx -execute 'CREATE DATABASE gitlab'
 ```
 
@@ -158,13 +162,13 @@ The name **must** be `gitlab`, do not use any other name.
 
 Next, make sure that the database was successfully created:
 
-```bash
+```shell
 influx -execute 'SHOW DATABASES'
 ```
 
 The output should be similar to:
 
-```
+```plaintext
 name: databases
 ---------------
 name
@@ -178,7 +182,7 @@ That's it! Now your GitLab instance should send data to InfluxDB.
 
 Read more on:
 
-- [Introduction to GitLab Performance Monitoring](introduction.md)
+- [Introduction to GitLab Performance Monitoring](index.md)
 - [GitLab Configuration](gitlab_configuration.md)
 - [InfluxDB Schema](influxdb_schema.md)
 - [Grafana Install/Configuration](grafana_configuration.md)

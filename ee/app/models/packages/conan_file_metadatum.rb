@@ -19,4 +19,5 @@ class Packages::ConanFileMetadatum < ApplicationRecord
 
   RECIPE_FILES = %w[conanfile.py conanmanifest.txt].freeze
   PACKAGE_FILES = %w[conaninfo.txt conanmanifest.txt conan_package.tgz].freeze
+  PACKAGE_BINARY = 'conan_package.tgz'
 end

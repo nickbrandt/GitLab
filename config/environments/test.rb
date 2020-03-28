@@ -1,7 +1,12 @@
+require 'gitlab/testing/request_blocker_middleware'
+require 'gitlab/testing/request_inspector_middleware'
+require 'gitlab/testing/clear_thread_memory_cache_middleware'
+
 Rails.application.configure do
   # Make sure the middleware is inserted first in middleware chain
   config.middleware.insert_before(ActionDispatch::Static, Gitlab::Testing::RequestBlockerMiddleware)
   config.middleware.insert_before(ActionDispatch::Static, Gitlab::Testing::RequestInspectorMiddleware)
+  config.middleware.insert_before(ActionDispatch::Static, Gitlab::Testing::ClearThreadMemoryCacheMiddleware)
 
   # Settings specified here will take precedence over those in config/application.rb
 
@@ -10,11 +15,8 @@ Rails.application.configure do
   # your test database is "scratch space" for the test suite and is wiped
   # and recreated between test runs. Don't rely on the data there!
 
-  # Enabling caching of classes slows start-up time because all controllers
-  # are loaded at initialization, but it reduces memory and load because files
-  # are not reloaded with every request. For example, caching is not necessary
-  # for loading database migrations but useful for handling Knapsack specs.
-  config.cache_classes = ENV['CACHE_CLASSES'] == 'true'
+  # Code doesn't change in CI so we don't need code-reloading
+  config.cache_classes = !!ENV['CI']
 
   # Configure static asset server for tests with Cache-Control for performance
   config.assets.compile = false if ENV['CI']

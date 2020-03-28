@@ -3,9 +3,9 @@ require 'spec_helper'
 
 describe DesignManagement::DeleteDesignsService do
   include DesignManagementTestHelpers
-  set(:project) { create(:project) }
-  set(:issue) { create(:issue, project: project) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:user) { create(:user) }
   let(:designs) { create_designs }
 
   subject(:service) { described_class.new(project, user, issue: issue, designs: designs) }
@@ -36,6 +36,12 @@ describe DesignManagement::DeleteDesignsService do
   shared_examples 'a success' do
     it 'returns successfully', :aggregate_failures do
       expect(response).to include(status: :success)
+    end
+
+    it 'saves the user as the author' do
+      version = response[:version]
+
+      expect(version.author).to eq(user)
     end
   end
 
@@ -90,8 +96,10 @@ describe DesignManagement::DeleteDesignsService do
         end
 
         it 'calls repository#log_geo_updated_event' do
-          design_repository = EE::Gitlab::GlRepository::DESIGN.repository_accessor.call(project)
-          allow_any_instance_of(described_class).to receive(:repository).and_return(design_repository)
+          design_repository = EE::Gitlab::GlRepository::DESIGN.repository_resolver.call(project)
+          allow_next_instance_of(described_class) do |instance|
+            allow(instance).to receive(:repository).and_return(design_repository)
+          end
 
           expect(design_repository).to receive(:log_geo_updated_event)
 

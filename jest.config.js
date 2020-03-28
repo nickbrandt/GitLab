@@ -35,10 +35,13 @@ const moduleNameMapper = {
   '^ee_else_ce(/.*)$': '<rootDir>/app/assets/javascripts$1',
   '^helpers(/.*)$': '<rootDir>/spec/frontend/helpers$1',
   '^vendor(/.*)$': '<rootDir>/vendor/assets/javascripts$1',
-  '\\.(jpg|jpeg|png|svg)$': '<rootDir>/spec/frontend/__mocks__/file_mock.js',
+  '\\.(jpg|jpeg|png|svg|css)$': '<rootDir>/spec/frontend/__mocks__/file_mock.js',
   'emojis(/.*).json': '<rootDir>/fixtures/emojis$1.json',
   '^spec/test_constants$': '<rootDir>/spec/frontend/helpers/test_constants',
+  '^jest/(.*)$': '<rootDir>/spec/frontend/$1',
 };
+
+const collectCoverageFrom = ['<rootDir>/app/assets/javascripts/**/*.{js,vue}'];
 
 if (IS_EE) {
   const rootDirEE = '<rootDir>/ee/app/assets/javascripts$1';
@@ -46,16 +49,28 @@ if (IS_EE) {
     '^ee(/.*)$': rootDirEE,
     '^ee_component(/.*)$': rootDirEE,
     '^ee_else_ce(/.*)$': rootDirEE,
+    '^ee_jest/(.*)$': '<rootDir>/ee/spec/frontend/$1',
   });
+
+  collectCoverageFrom.push(rootDirEE.replace('$1', '/**/*.{js,vue}'));
 }
+
+const coverageDirectory = () => {
+  if (process.env.CI_NODE_INDEX && process.env.CI_NODE_TOTAL) {
+    return `<rootDir>/coverage-frontend/jest-${process.env.CI_NODE_INDEX}-${process.env.CI_NODE_TOTAL}`;
+  }
+
+  return '<rootDir>/coverage-frontend/';
+};
 
 // eslint-disable-next-line import/no-commonjs
 module.exports = {
+  clearMocks: true,
   testMatch,
   moduleFileExtensions: ['js', 'json', 'vue'],
   moduleNameMapper,
-  collectCoverageFrom: ['<rootDir>/app/assets/javascripts/**/*.{js,vue}'],
-  coverageDirectory: '<rootDir>/coverage-frontend/',
+  collectCoverageFrom,
+  coverageDirectory: coverageDirectory(),
   coverageReporters: ['json', 'lcov', 'text-summary', 'clover'],
   cacheDirectory: '<rootDir>/tmp/cache/jest',
   modulePathIgnorePatterns: ['<rootDir>/.yarn-cache/'],
@@ -67,7 +82,7 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',
     '^.+\\.vue$': 'vue-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(@gitlab/ui)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@gitlab/ui|bootstrap-vue|three|monaco-editor)/)'],
   timers: 'fake',
   testEnvironment: '<rootDir>/spec/frontend/environment.js',
   testEnvironmentOptions: {

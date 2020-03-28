@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-class UpdateExternalPullRequestsWorker
+class UpdateExternalPullRequestsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category :source_code_management
+  weight 3
 
   def perform(project_id, user_id, ref)
     project = Project.find_by_id(project_id)

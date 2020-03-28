@@ -17,7 +17,7 @@ describe('MergeRequest', function() {
       mock = new MockAdapter(axios);
 
       mock
-        .onPatch(`${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/merge_requests/1.json`)
+        .onPatch(`${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/-/merge_requests/1.json`)
         .reply(200, {});
 
       this.merge = new MergeRequest();
@@ -75,7 +75,7 @@ describe('MergeRequest', function() {
 
         setTimeout(() => {
           expect(axios.patch).toHaveBeenCalledWith(
-            `${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/merge_requests/1.json`,
+            `${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/-/merge_requests/1.json`,
             {
               merge_request: {
                 description: '- [ ] Task List Item\n- [ ]   \n- [ ] Task List Item 2\n',
@@ -89,10 +89,13 @@ describe('MergeRequest', function() {
         });
       });
 
+      // https://gitlab.com/gitlab-org/gitlab/issues/34861
       // eslint-disable-next-line jasmine/no-disabled-tests
       xit('shows an error notification when tasklist update failed', done => {
         mock
-          .onPatch(`${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/merge_requests/1.json`)
+          .onPatch(
+            `${gl.TEST_HOST}/frontend-fixtures/merge-requests-project/-/merge_requests/1.json`,
+          )
           .reply(409, {});
 
         $('.js-task-list-field').trigger({

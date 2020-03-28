@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
-  let_it_be(:namespace, refind: true) { create(:namespace) }
-  let_it_be(:project, refind: true) { create(:project, namespace: namespace) }
-  set(:gold_plan) { create(:gold_plan) }
-  set(:plan_limits) { create(:plan_limits, plan: gold_plan) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:project, reload: true) { create(:project, namespace: namespace) }
+  let_it_be(:gold_plan, reload: true) { create(:gold_plan) }
+  let_it_be(:plan_limits, reload: true) { create(:plan_limits, plan: gold_plan) }
   let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
   subject { described_class.new(namespace, project) }

@@ -1,17 +1,13 @@
 # frozen_string_literal: true
 
-class StageUpdateWorker
+class StageUpdateWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include PipelineQueue
 
   queue_namespace :pipeline_processing
-  latency_sensitive_worker!
+  urgency :high
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def perform(stage_id)
-    Ci::Stage.find_by(id: stage_id).try do |stage|
-      stage.update_status
-    end
+    Ci::Stage.find_by_id(stage_id)&.update_legacy_status
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end

@@ -1,11 +1,11 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
-import { sprintf, __ } from '~/locale';
+import { n__, __ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import CommitMessageField from './message_field.vue';
 import Actions from './actions.vue';
 import SuccessMessage from './success_message.vue';
-import { activityBarViews, MAX_WINDOW_HEIGHT_COMPACT } from '../../constants';
+import { leftSidebarViews, MAX_WINDOW_HEIGHT_COMPACT } from '../../constants';
 
 export default {
   components: {
@@ -26,18 +26,14 @@ export default {
     ...mapGetters(['hasChanges']),
     ...mapGetters('commit', ['discardDraftButtonDisabled', 'preBuiltCommitMessage']),
     overviewText() {
-      return sprintf(
-        __(
-          '<strong>%{changedFilesLength} unstaged</strong> and <strong>%{stagedFilesLength} staged</strong> changes',
-        ),
-        {
-          stagedFilesLength: this.stagedFiles.length,
-          changedFilesLength: this.changedFiles.length,
-        },
-      );
+      return n__('%d changed file', '%d changed files', this.stagedFiles.length);
     },
     commitButtonText() {
       return this.stagedFiles.length ? __('Commit') : __('Stage & Commit');
+    },
+
+    currentViewIsCommitView() {
+      return this.currentActivityView === leftSidebarViews.commit.name;
     },
   },
   watch: {
@@ -46,27 +42,31 @@ export default {
         this.isCompact = false;
       } else {
         this.isCompact = !(
-          this.currentActivityView === activityBarViews.commit &&
-          window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
+          this.currentViewIsCommitView && window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
         );
       }
     },
+
     lastCommitMsg() {
       this.isCompact =
-        this.currentActivityView !== activityBarViews.commit && this.lastCommitMsg === '';
+        this.currentActivityView !== leftSidebarViews.commit.name && this.lastCommitMsg === '';
     },
   },
   methods: {
     ...mapActions(['updateActivityBarView']),
     ...mapActions('commit', ['updateCommitMessage', 'discardDraft', 'commitChanges']),
-    toggleIsSmall() {
-      this.updateActivityBarView(activityBarViews.commit)
-        .then(() => {
-          this.isCompact = !this.isCompact;
-        })
-        .catch(e => {
-          throw e;
-        });
+    toggleIsCompact() {
+      if (this.currentViewIsCommitView) {
+        this.isCompact = !this.isCompact;
+      } else {
+        this.updateActivityBarView(leftSidebarViews.commit.name)
+          .then(() => {
+            this.isCompact = false;
+          })
+          .catch(e => {
+            throw e;
+          });
+      }
     },
     beforeEnterTransition() {
       const elHeight = this.isCompact
@@ -88,7 +88,6 @@ export default {
       this.componentHeight = null;
     },
   },
-  activityBarViews,
 };
 </script>
 
@@ -114,11 +113,11 @@ export default {
           :disabled="!hasChanges"
           type="button"
           class="btn btn-primary btn-sm btn-block qa-begin-commit-button"
-          @click="toggleIsSmall"
+          @click="toggleIsCompact"
         >
           {{ __('Commit…') }}
         </button>
-        <p class="text-center" v-html="overviewText"></p>
+        <p class="text-center bold">{{ overviewText }}</p>
       </div>
       <form v-if="!isCompact" ref="formEl" @submit.prevent.stop="commitChanges">
         <transition name="fade"> <success-message v-show="lastCommitMsg" /> </transition>
@@ -148,7 +147,7 @@ export default {
             v-else
             type="button"
             class="btn btn-default btn-sm float-right"
-            @click="toggleIsSmall"
+            @click="toggleIsCompact"
           >
             {{ __('Collapse') }}
           </button>

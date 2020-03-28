@@ -63,13 +63,13 @@ GitLab provides two different options for the uploading mechanism: "Direct uploa
 
 **Option 1. Direct upload**
 
-1. User pushes an lfs file to the GitLab instance
+1. User pushes an `lfs` file to the GitLab instance
 1. GitLab-workhorse uploads the file directly to the external object storage
 1. GitLab-workhorse notifies GitLab-rails that the upload process is complete
 
 **Option 2. Background upload**
 
-1. User pushes an lfs file to the GitLab instance
+1. User pushes an `lfs` file to the GitLab instance
 1. GitLab-rails stores the file in the local file storage
 1. GitLab-rails then uploads the file to the external object storage asynchronously
 
@@ -127,7 +127,7 @@ Here is a configuration example with Rackspace Cloud Files.
 NOTE: **Note:**
 Regardless of whether the container has public access enabled or disabled, Fog will
 use the TempURL method to grant access to LFS objects. If you see errors in logs referencing
-instantiating storage with a temp-url-key, ensure that you have set they key properly
+instantiating storage with a temp-url-key, ensure that you have set the key properly
 on the Rackspace API and in `gitlab.rb`. You can verify the value of the key Rackspace
 has set by sending a GET request with token header to the service access endpoint URL
 and comparing the output of the returned headers.
@@ -138,13 +138,13 @@ There are two ways to manually do the same thing as automatic uploading (describ
 
 **Option 1: rake task**
 
-```sh
+```shell
 rake gitlab:lfs:migrate
 ```
 
 **Option 2: rails console**
 
-```sh
+```shell
 $ sudo gitlab-rails console            # Login to rails console
 
 > # Upload LFS files manually
@@ -178,7 +178,7 @@ On Omnibus installations, the settings are prefixed by `lfs_object_store_`:
 1. Save the file and [reconfigure GitLab]s for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:
 
-   ```bash
+   ```shell
    gitlab-rake gitlab:lfs:migrate
    ```
 
@@ -214,7 +214,7 @@ For source installations the settings are nested under `lfs:` and then
 1. Save the file and [restart GitLab][] for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:
 
-   ```bash
+   ```shell
    sudo -u git -H bundle exec rake gitlab:lfs:migrate RAILS_ENV=production
    ```
 
@@ -238,8 +238,8 @@ and [projects APIs](../../api/projects.md).
 
 ## Troubleshooting: `Google::Apis::TransmissionError: execution expired`
 
-If LFS integration is configred with Google Cloud Storage and background uploads (`background_upload: true` and `direct_upload: false`),
-Sidekiq workers may encouter this error. This is because the uploading timed out with very large files.
+If LFS integration is configured with Google Cloud Storage and background uploads (`background_upload: true` and `direct_upload: false`),
+Sidekiq workers may encounter this error. This is because the uploading timed out with very large files.
 LFS files up to 6Gb can be uploaded without any extra steps, otherwise you need to use the following workaround.
 
 ```shell
@@ -257,11 +257,11 @@ $ sudo gitlab-rails console            # Login to rails console
 > end
 ```
 
-See more information in [!19581](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19581)
+See more information in [!19581](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19581)
 
 ## Known limitations
 
-- Support for removing unreferenced LFS objects was added in 8.14 onwards.
+- Support for removing unreferenced LFS objects was added in 8.14 onward.
 - LFS authentications via SSH was added with GitLab 8.12.
 - Only compatible with the Git LFS client versions 1.1.0 and up, or 1.0.2.
 - The storage statistics currently count each LFS object multiple times for
@@ -270,4 +270,4 @@ See more information in [!19581](https://gitlab.com/gitlab-org/gitlab-foss/merge
 [reconfigure gitlab]: ../restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: ../restart_gitlab.md#installations-from-source "How to restart GitLab"
 [eep]: https://about.gitlab.com/pricing/ "GitLab Premium"
-[ee-2760]: https://gitlab.com/gitlab-org/gitlab/merge_requests/2760
+[ee-2760]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2760

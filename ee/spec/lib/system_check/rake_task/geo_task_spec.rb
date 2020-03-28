@@ -9,6 +9,7 @@ describe SystemCheck::RakeTask::GeoTask do
     [
       SystemCheck::Geo::LicenseCheck,
       SystemCheck::Geo::EnabledCheck,
+      SystemCheck::Geo::CurrentNodeCheck,
       SystemCheck::Geo::HTTPCloneEnabledCheck,
       SystemCheck::Geo::ClocksSynchronizationCheck,
       SystemCheck::App::GitUserDefaultSSHConfigCheck,

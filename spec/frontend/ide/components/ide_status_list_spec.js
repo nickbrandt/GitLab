@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import IdeStatusList from '~/ide/components/ide_status_list';
+import IdeStatusList from '~/ide/components/ide_status_list.vue';
 
 const TEST_FILE = {
   name: 'lorem.md',
@@ -25,9 +25,8 @@ describe('ide/components/ide_status_list', () => {
       },
     });
 
-    wrapper = shallowMount(localVue.extend(IdeStatusList), {
+    wrapper = shallowMount(IdeStatusList, {
       localVue,
-      sync: false,
       store,
       ...options,
     });

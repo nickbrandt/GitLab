@@ -60,14 +60,14 @@
   }
 }
 
-.board-type-assignee {
-  .board-title-text {
-    margin-right: $gl-padding-8;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+.board-title-text {
+  margin-right: $gl-padding-8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
+.board-type-assignee {
   .board-title-sub-text {
     color: $gl-text-color-secondary;
     font-weight: normal;

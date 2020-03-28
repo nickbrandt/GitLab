@@ -13,8 +13,8 @@ GitLab supports several ways deploy Serverless applications in both Kubernetes E
 
 Currently we support:
 
-- [Knative](#knative): Build Knative applications with Knative and gitlabktl on GKE.
-- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI.
+- [Knative](#knative): Build Knative applications with Knative and `gitlabktl` on GKE and EKS.
+- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI/CD.
 
 ## Knative
 
@@ -36,12 +36,14 @@ With GitLab Serverless, you can deploy both functions-as-a-service (FaaS) and se
 To run Knative on GitLab, you will need:
 
 1. **Existing GitLab project:** You will need a GitLab project to associate all resources. The simplest way to get started:
-
-   - If you are planning on deploying functions, clone the [functions example project](https://gitlab.com/knative-examples/functions) to get started.
-   - If you are planning on deploying a serverless application, clone the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get started.
-
+   - If you are planning on [deploying functions](#deploying-functions),
+     clone the [functions example project](https://gitlab.com/knative-examples/functions) to get
+     started.
+   - If you are planning on [deploying a serverless application](#deploying-serverless-applications),
+     clone the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get
+     started.
 1. **Kubernetes Cluster:** An RBAC-enabled Kubernetes cluster is required to deploy Knative.
-   The simplest way to get started is to add a cluster using [GitLab's GKE integration](../add_remove_clusters.md#gke-cluster).
+   The simplest way to get started is to add a cluster using GitLab's [GKE integration](../add_remove_clusters.md).
    The set of minimum recommended cluster specifications to run Knative is 3 nodes, 6 vCPUs, and 22.50 GB memory.
 1. **Helm Tiller:** Helm is a package manager for Kubernetes and is required to install
    Knative.
@@ -58,7 +60,7 @@ To run Knative on GitLab, you will need:
 1. **`serverless.yml`** (for [functions only](#deploying-functions)): When using serverless to deploy functions, the `serverless.yml` file
    will contain the information for all the functions being hosted in the repository as well as a reference to the
    runtime being used.
-1. **`Dockerfile`** (for [applications only](#deploying-serverless-applications): Knative requires a
+1. **`Dockerfile`** (for [applications only](#deploying-serverless-applications)): Knative requires a
    `Dockerfile` in order to build your applications. It should be included at the root of your
    project's repo and expose port `8080`. `Dockerfile` is not require if you plan to build serverless functions
    using our [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes).
@@ -87,7 +89,7 @@ The minimum recommended cluster size to run Knative is 3-nodes, 6 vCPUs, and 22.
    for other platforms [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
 1. The Ingress is now available at this address and will route incoming requests to the proper service based on the DNS
-   name in the request. To support this, a wildcard DNS A record should be created for the desired domain name. For example,
+   name in the request. To support this, a wildcard DNS record should be created for the desired domain name. For example,
    if your Knative base domain is `knative.info` then you need to create an A record or CNAME record with domain `*.knative.info`
    pointing the ip address or hostname of the Ingress.
 
@@ -117,7 +119,7 @@ You must do the following:
 1. Ensure GitLab can manage Knative:
    - For a non-GitLab managed cluster, ensure that the service account for the token
      provided can manage resources in the `serving.knative.dev` API group.
-   - For a GitLab managed cluster, if you added the cluster in [GitLab 12.1 or later](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30235),
+   - For a GitLab managed cluster, if you added the cluster in [GitLab 12.1 or later](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/30235),
      then GitLab will already have the required access and you can proceed to the next step.
 
      Otherwise, you need to manually grant GitLab's service account the ability to manage
@@ -157,7 +159,7 @@ You must do the following:
 
      Then run the following command:
 
-     ```bash
+     ```shell
      kubectl apply -f knative-serving-only-role.yaml
      ```
 
@@ -168,75 +170,42 @@ You must do the following:
    or [serverless applications](#deploying-serverless-applications) onto your
    cluster.
 
-## Configuring logging
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33330) in GitLab 12.5.
-
-### Prerequisites
-
-- A GitLab-managed cluster.
-- `kubectl` installed and working.
-
-Running `kubectl` commands on your cluster requires setting up access to the
-cluster first. For clusters created on:
-
-- GKE, see [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
-- Other platforms, see [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
-
-### Enable request log template
-
-Run the following command to enable request logs:
-
-```shell
-kubectl edit cm -n knative-serving config-observability
-```
-
-Copy the `logging.request-log-template` from the `data._example` field to the data field one level up in the hierarchy.
-
-### Enable request logs
-
-Run the following commands to install Elasticsearch, Kibana, and Filebeat into a `kube-logging` namespace and configure all nodes to forward logs using Filebeat:
-
-```shell
-kubectl apply -f https://gitlab.com/gitlab-org/serverless/configurations/knative/raw/v0.7.0/kube-logging-filebeat.yaml
-kubectl label nodes --all beta.kubernetes.io/filebeat-ready="true"
-```
-
-### Viewing request logs
-
-To view request logs:
-
-1. Run `kubectl proxy`.
-1. Navigate to Kibana UI.
-
-Or:
-
-1. Open the Kibana UI.
-1. Click on **Discover**, then select `filebeat-*` from the dropdown on the left.
-1. Enter `kubernetes.container.name:"queue-proxy" AND message:/httpRequest/` into the search box.
-
 ## Supported runtimes
 
-Serverless functions for GitLab can be written in 6 supported languages:
+Serverless functions for GitLab can be run using:
 
-- NodeJS and Ruby, with GitLab-managed and OpenFaas runtimes.
-- C#, Go, PHP, and Python with OpenFaaS runtimes only.
+- [GitLab-managed](#gitlab-managed-runtimes) runtimes.
+- [OpenFaaS](#openfaas-runtimes) runtimes.
 
-### GitLab managed runtimes
+If a runtime is not available for the required programming language, consider deploying a
+[serverless application](#deploying-serverless-applications).
 
-Currently the following [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes) are offered:
+### GitLab-managed runtimes
 
-- ruby
-- node.js
-- Dockerfile
+Currently the following GitLab-managed [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes)
+are available:
 
-`Dockerfile` presence is assumed when a runtime is not specified.
+- `go` (proof of concept)
+- `nodejs`
+- `ruby`
+
+You must provide a `Dockerfile` to run serverless functions if no runtime is specified.
 
 ### OpenFaaS runtimes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/29253) in GitLab 12.5.
 
 [OpenFaaS classic runtimes](https://github.com/openfaas/templates#templates-in-store) can be used with GitLab serverless.
+
+OpenFaas runtimes are available for the following languages:
+
+- C#
+- Go
+- NodeJS
+- PHP
+- Python
+- Ruby
+
 Runtimes are specified using the pattern: `openfaas/classic/<template_name>`. The following
 example shows how to define a function in `serverless.yml` using an OpenFaaS runtime:
 
@@ -276,7 +245,7 @@ project):
 
    ```yaml
    include:
-     template: Serverless.gitlab-ci.yml
+     - template: Serverless.gitlab-ci.yml
 
    functions:build:
      extends: .serverless:build:functions
@@ -311,17 +280,21 @@ project):
 
    provider:
      name: triggermesh
-     environment:
+     envs:
        FOO: value
+     secrets:
+       - my-secrets
 
    functions:
      echo-js:
        handler: echo-js
        source: ./echo-js
-       runtime: https://gitlab.com/gitlab-org/serverless/runtimes/nodejs
+       runtime: gitlab/runtimes/nodejs
        description: "node.js runtime function"
-       environment:
+       envs:
          MY_FUNCTION: echo-js
+       secrets:
+         - my-secrets
    ```
 
 Explanation of the fields used above:
@@ -338,7 +311,8 @@ Explanation of the fields used above:
 | Parameter | Description |
 |-----------|-------------|
 | `name` | Indicates which provider is used to execute the `serverless.yml` file. In this case, the TriggerMesh middleware. |
-| `environment` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are he variable contents. You may replace this with you own variables. |
+| `envs` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are the variable contents. You may replace this with your own variables. |
+| `secrets` | Includes the contents of the Kubernetes secret as environment variables accessible to be passed as part of function execution for **all** functions in the file. The secrets are expected in ini format. |
 
 ### `functions`
 
@@ -349,13 +323,33 @@ subsequent lines contain the function attributes.
 |-----------|-------------|
 | `handler` | The function's name. |
 | `source` | Directory with sources of a functions. |
-| `runtime` (optional)| The runtime to be used to execute the function. When the runtime is not specified, we assume that `Dockerfile` is present in the function directory specified by `source`. |
+| `runtime` (optional)| The runtime to be used to execute the function. This can be a runtime alias (see [Runtime aliases](#runtime-aliases)), or it can be a full URL to a custom runtime repository. When the runtime is not specified, we assume that `Dockerfile` is present in the function directory specified by `source`. |
 | `description` | A short description of the function. |
-| `environment` | Sets an environment variable for the specific function only. |
+| `envs` | Sets an environment variable for the specific function only. |
+| `secrets` | Includes the contents of the Kubernetes secret as environment variables accessible to be passed as part of function execution for the specific function only. The secrets are expected in ini format. |
+
+### Deployment
+
+#### Runtime aliases
+
+The optional `runtime` parameter can refer to one of the following runtime aliases (also see [Supported runtimes](#supported-runtimes)):
+
+| Runtime alias | Maintained by |
+|-------------|---------------|
+| `gitlab/runtimes/go` | GitLab |
+| `gitlab/runtimes/nodejs` | GitLab |
+| `gitlab/runtimes/ruby` | GitLab |
+| `openfaas/classic/csharp` | OpenFaaS |
+| `openfaas/classic/go` | OpenFaaS |
+| `openfaas/classic/node` | OpenFaaS |
+| `openfaas/classic/php7` | OpenFaaS |
+| `openfaas/classic/python` | OpenFaaS |
+| `openfaas/classic/python3` | OpenFaaS |
+| `openfaas/classic/ruby` | OpenFaaS |
 
 After the `gitlab-ci.yml` template has been added and the `serverless.yml` file
 has been created, pushing a commit to your project will result in a CI pipeline
-being executed which will deploy each function as a Knative service.  Once the
+being executed which will deploy each function as a Knative service. Once the
 deploy stage has finished, additional details for the function will appear
 under **Operations > Serverless**.
 
@@ -368,7 +362,7 @@ Kubernetes cluster. Click on each function to obtain detailed scale and invocati
 
 The function details can be retrieved directly from Knative on the cluster:
 
-```bash
+```shell
 kubectl -n "$KUBE_NAMESPACE" get services.serving.knative.dev
 ```
 
@@ -376,7 +370,7 @@ The sample function can now be triggered from any HTTP client using a simple `PO
 
   1. Using curl (replace the URL on the last line with the URL of your application):
 
-     ```bash
+     ```shell
      curl \
      --header "Content-Type: application/json" \
      --request POST \
@@ -387,6 +381,34 @@ The sample function can now be triggered from any HTTP client using a simple `PO
   1. Using a web-based tool (ie. postman, restlet, etc)
 
      ![function execution](img/function-execution.png)
+
+### Secrets
+
+To access your Kubernetes secrets from within your function, the secrets should be created under the namespace of your serverless deployment and specified in your `serverless.yml` file as above.
+You can create secrets in several ways. The following sections show some examples.
+
+#### CLI example
+
+```shell
+kubectl create secret generic my-secrets -n "$KUBE_NAMESPACE" --from-literal MY_SECRET=imverysecure
+```
+
+#### Part of deployment job
+
+You can extend your `.gitlab-ci.yml` to create the secrets during deployment using the [environment variables](../../../../ci/variables/README.md)
+stored securely under your GitLab project.
+
+```yaml
+deploy:function:
+  stage: deploy
+  environment: production
+  extends: .serverless:deploy:functions
+  before_script:
+    - kubectl create secret generic my-secret
+        --from-literal MY_SECRET="$GITLAB_SECRET_VARIABLE"
+        --namespace "$KUBE_NAMESPACE"
+        --dry-run -o yaml | kubectl apply -f -
+```
 
 ### Running functions locally
 
@@ -427,9 +449,10 @@ To run a function locally:
 
 > Introduced in GitLab 11.5.
 
-Serverless applications are the building block of serverless functions. They are useful in scenarios where an existing
-runtime does not meet the needs of an application, such as one written in a language that has no runtime available. Note
-though that serverless applications should be stateless!
+Serverless applications are an alternative to [serverless functions](#deploying-functions).
+They are useful in scenarios where an existing runtime does not meet the needs of an application,
+such as one written in a language that has no runtime available. Note though that serverless
+applications should be stateless!
 
 NOTE: **Note:**
 You can reference and import the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get started.
@@ -439,7 +462,7 @@ Add the following `.gitlab-ci.yml` to the root of your repository
 
 ```yaml
 include:
-  template: Serverless.gitlab-ci.yml
+  - template: Serverless.gitlab-ci.yml
 
 build:
   extends: .serverless:build:image
@@ -461,45 +484,20 @@ A `serverless.yml` file is not required when deploying serverless applications.
 With all the pieces in place, the next time a CI pipeline runs, the Knative application will be deployed. Navigate to
 **CI/CD > Pipelines** and click the most recent pipeline.
 
-### Obtain the URL for the Knative deployment
+### Function details
 
-Go to the **CI/CD > Pipelines** and click on the pipeline that deployed your app. Once all the stages of the pipeline finish, click the **deploy** stage.
+Go to the **Operations > Serverless** page to see the final URL of your functions.
 
-![deploy stage](img/deploy-stage.png)
+![function_details](img/function-list_v12_7.png)
 
-The output will look like this:
+### Invocation metrics
 
-```bash
-Running with gitlab-runner 12.1.0-rc1 (6da35412)
-  on prm-com-gitlab-org ae3bfce3
-Using Docker executor with image registry.gitlab.com/gitlab-org/gitlabktl:latest ...
-Running on runner-ae3bfc-concurrent-0 via runner-ae3bfc ...
-Fetching changes...
-Authenticating with credentials from job payload (GitLab Registry)
-$ /usr/bin/gitlabktl application deploy
-Welcome to gitlabktl tool
-time="2019-07-15T10:51:07Z" level=info msg="deploying registry credentials"
-Creating app-hello function
-Waiting for app-hello ready state
-Service app-hello URL: http://app-hello.serverless.example.com
-Job succeeded
-```
-
-The second to last line, labeled **Service domain** contains the URL for the
-deployment. Copy and paste the domain into your browser to see the app live.
-
-![knative app](img/knative-app.png)
-
-## Function details
-
-Go to the **Operations > Serverless** page and click on one of the function
+On the same page as above, click on one of the function
 rows to bring up the function details page.
 
 ![function_details](img/function-details-loaded.png)
 
 The pod count will give you the number of pods running the serverless function instances on a given cluster.
-
-### Prometheus support
 
 For the Knative function invocations to appear,
 [Prometheus must be installed](../index.md#installing-applications).
@@ -509,6 +507,53 @@ loading or is not available at this time._  It will appear upon the first access
 page, but should go away after a few seconds. If the message does not disappear, then it
 is possible that GitLab is unable to connect to the Prometheus instance running on the
 cluster.
+
+## Configuring logging
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33330) in GitLab 12.5.
+
+### Prerequisites
+
+- A GitLab-managed cluster.
+- `kubectl` installed and working.
+
+Running `kubectl` commands on your cluster requires setting up access to the
+cluster first. For clusters created on:
+
+- GKE, see [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
+- Other platforms, see [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+### Enable request log template
+
+Run the following command to enable request logs:
+
+```shell
+kubectl edit cm -n knative-serving config-observability
+```
+
+Copy the `logging.request-log-template` from the `data._example` field to the data field one level up in the hierarchy.
+
+### Enable request logs
+
+Run the following commands to install Elasticsearch, Kibana, and Filebeat into a `kube-logging` namespace and configure all nodes to forward logs using Filebeat:
+
+```shell
+kubectl apply -f https://gitlab.com/gitlab-org/serverless/configurations/knative/raw/v0.7.0/kube-logging-filebeat.yaml
+kubectl label nodes --all beta.kubernetes.io/filebeat-ready="true"
+```
+
+### Viewing request logs
+
+To view request logs:
+
+1. Run `kubectl proxy`.
+1. Navigate to [Kibana UI](http://localhost:8001/api/v1/namespaces/kube-logging/services/kibana/proxy/app/kibana).
+
+Or:
+
+1. Open the [Kibana UI](http://localhost:8001/api/v1/namespaces/kube-logging/services/kibana/proxy/app/kibana).
+1. Click on **Discover**, then select `filebeat-*` from the dropdown on the left.
+1. Enter `kubernetes.container.name:"queue-proxy" AND message:/httpRequest/` into the search box.
 
 ## Enabling TLS for Knative services
 
@@ -525,7 +570,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
    [`certbot-auto` wrapper script](https://certbot.eff.org/docs/install.html#certbot-auto).
    On the command line of your server, run the following commands:
 
-   ```sh
+   ```shell
    wget https://dl.eff.org/certbot-auto
    sudo mv certbot-auto /usr/local/bin/certbot-auto
    sudo chown root /usr/local/bin/certbot-auto
@@ -535,7 +580,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
 
    To check the integrity of the `certbot-auto` script, run:
 
-   ```sh
+   ```shell
    wget -N https://dl.eff.org/certbot-auto.asc
    gpg2 --keyserver ipv4.pool.sks-keyservers.net --recv-key A2CFB51FA275A7286234E7B24D17C995CD9775F2
    gpg2 --trusted-key 4D17C995CD9775F2 --verify certbot-auto.asc /usr/local/bin/certbot-auto
@@ -543,7 +588,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
 
    The output of the last command should look something like:
 
-   ```sh
+   ```shell
    gpg: Signature made Mon 10 Jun 2019 06:24:40 PM EDT
    gpg:                using RSA key A2CFB51FA275A7286234E7B24D17C995CD9775F2
    gpg: key 4D17C995CD9775F2 marked as ultimately trusted
@@ -557,7 +602,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
 1. Run the following command to use Certbot to request a certificate
    using DNS challenge during authorization:
 
-   ```sh
+   ```shell
    ./certbot-auto certonly --manual --preferred-challenges dns -d '*.<namespace>.example.com'
    ```
 
@@ -571,14 +616,14 @@ The instructions below relate to installing and running Certbot on a Linux serve
    In the above image, the namespace for the project is `node-function-11909507` and the domain is `knative.info`, thus
    certificate request line would look like this:
 
-   ```sh
+   ```shell
    ./certbot-auto certonly --manual --preferred-challenges dns -d '*.node-function-11909507.knative.info'
    ```
 
    The Certbot tool walks you through the steps of validating that you own each domain that you specify by creating TXT records in those domains.
    After this process is complete, the output should look something like this:
 
-   ```sh
+   ```shell
    IMPORTANT NOTES:
    - Congratulations! Your certificate and chain have been saved at:
      /etc/letsencrypt/live/namespace.example.com/fullchain.pem
@@ -602,13 +647,13 @@ The instructions below relate to installing and running Certbot on a Linux serve
 
    Run the following command to see the contents of `fullchain.pem`:
 
-   ```sh
+   ```shell
    sudo cat /etc/letsencrypt/live/node-function-11909507.knative.info/fullchain.pem
    ```
 
    Output should look like this:
 
-   ```sh
+   ```shell
    -----BEGIN CERTIFICATE-----
    2fcb195768c39e9a94cec2c2e32c59c0aad7a3365c10892e8116b5d83d4096b6
    04f294d1eaca42b8692017b426d53bbc8fe75f827734f0260710b83a556082df
@@ -674,13 +719,13 @@ The instructions below relate to installing and running Certbot on a Linux serve
 
    Once `cert.pem` is created, run the following command to see the contents of `privkey.pem`:
 
-   ```sh
+   ```shell
    sudo cat /etc/letsencrypt/live/namespace.example/privkey.pem
    ```
 
    Output should look like this:
 
-   ```sh
+   ```shell
    -----BEGIN PRIVATE KEY-----
    2fcb195768c39e9a94cec2c2e32c59c0aad7a3365c10892e8116b5d83d4096b6
    04f294d1eaca42b8692017b426d53bbc8fe75f827734f0260710b83a556082df
@@ -723,7 +768,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
    [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl).
    For other platforms, [install `kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
-   ```sh
+   ```shell
    kubectl create --namespace istio-system secret tls istio-ingressgateway-certs \
    --key cert.pk \
    --cert cert.pem
@@ -735,13 +780,13 @@ The instructions below relate to installing and running Certbot on a Linux serve
    connections. Run the
    following command to open the Knative shared `gateway` in edit mode:
 
-   ```sh
+   ```shell
    kubectl edit gateway knative-ingress-gateway --namespace knative-serving
    ```
 
    Update the gateway to include the following tls: section and configuration:
 
-   ```sh
+   ```shell
    tls:
      mode: SIMPLE
      privateKey: /etc/istio/ingressgateway-certs/tls.key
@@ -750,7 +795,7 @@ The instructions below relate to installing and running Certbot on a Linux serve
 
    Example:
 
-   ```sh
+   ```shell
    apiVersion: networking.istio.io/v1alpha3
    kind: Gateway
    metadata:
@@ -780,3 +825,23 @@ The instructions below relate to installing and running Certbot on a Linux serve
    After your changes are running on your Knative cluster, you can begin using the HTTPS protocol for secure access your deployed Knative services.
    In the event a mistake is made during this process and you need to update the cert, you will need to edit the gateway `knative-ingress-gateway`
    to switch back to `PASSTHROUGH` mode. Once corrections are made, edit the file again so the gateway will use the new certificates.
+
+## Using an older version of `gitlabktl`
+
+There may be situations where you want to run an older version of `gitlabktl`. This
+requires setting an older version of the `gitlabktl` image in the `.gitlab-ci.yml file.`
+
+To set an older version, add `image:` to the `functions:deploy` block. For example:
+
+```yaml
+functions:deploy:
+  extends: .serverless:deploy:functions
+  environment: production
+  image: registry.gitlab.com/gitlab-org/gitlabktl:0.5.0
+```
+
+Different versions are available by changing the version tag at the end of the registry URL in the
+format `registry.gitlab.com/gitlab-org/gitlabktl:<version>`.
+
+For a full inventory of available `gitlabktl` versions, see the `gitlabktl` project's
+[container registry](https://gitlab.com/gitlab-org/gitlabktl/container_registry).

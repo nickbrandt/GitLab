@@ -36,6 +36,7 @@ contains some settings that are common for all providers.
 - [OpenID Connect](../administration/auth/oidc.md)
 - [UltraAuth](ultra_auth.md)
 - [Salesforce](salesforce.md)
+- [AWS Cognito](../administration/auth/cognito.md)
 
 ## Initial OmniAuth Configuration
 
@@ -51,7 +52,7 @@ that are in common for all providers that we need to consider.
   be created manually or they will not be able to sign in via OmniAuth.
 - `auto_link_ldap_user` can be used if you have [LDAP / ActiveDirectory](ldap.md)
   integration enabled. It defaults to false. When enabled, users automatically
-  created through OmniAuth will be linked to their LDAP entry as well.
+  created through an OmniAuth provider will have their LDAP identity created in GitLab as well.
 - `block_auto_created_users` defaults to `true`. If `true` auto created users will
   be blocked by default and will have to be unblocked by an administrator before
   they are able to sign in.
@@ -73,16 +74,13 @@ To change these settings:
 
   Open the configuration file:
 
-  ```sh
+  ```shell
   sudo editor /etc/gitlab/gitlab.rb
   ```
 
   and change:
 
   ```ruby
-  # Versions prior to 11.4 require this to be set to true
-  # gitlab_rails['omniauth_enabled'] = nil
-
   # CAUTION!
   # This allows users to login without having a user account first. Define the allowed providers
   # using an array, e.g. ["saml", "twitter"], or as true/false to allow all providers or none.
@@ -96,7 +94,7 @@ To change these settings:
 
   Open the configuration file:
 
-  ```sh
+  ```shell
   cd /home/git/gitlab
 
   sudo -u git -H editor config/gitlab.yml
@@ -188,19 +186,19 @@ from the OmniAuth provider's documentation.
 
 - Stop GitLab:
 
-  ```sh
+  ```shell
   sudo service gitlab stop
   ```
 
 - Add the gem to your [Gemfile](https://gitlab.com/gitlab-org/gitlab/blob/master/Gemfile):
 
-  ```sh
+  ```shell
   gem "omniauth-your-auth-provider"
   ```
 
 - Install the new OmniAuth provider gem by running the following command:
 
-  ```sh
+  ```shell
   sudo -u git -H bundle install --without development test mysql --path vendor/bundle --no-deployment
   ```
 
@@ -208,7 +206,7 @@ from the OmniAuth provider's documentation.
 
 - Start GitLab:
 
-  ```sh
+  ```shell
   sudo service gitlab start
   ```
 
@@ -266,8 +264,8 @@ You can enable profile syncing from selected OmniAuth providers and for all or f
 When authenticating using LDAP, the user's name and email are always synced.
 
 ```ruby
-gitlab_rails['sync_profile_from_provider'] = ['twitter', 'google_oauth2']
-gitlab_rails['sync_profile_attributes'] = ['name', 'email', 'location']
+gitlab_rails['omniauth_sync_profile_from_provider'] = ['twitter', 'google_oauth2']
+gitlab_rails['omniauth_sync_profile_attributes'] = ['name', 'email', 'location']
 ```
 
 **For installations from source**

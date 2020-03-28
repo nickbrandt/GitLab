@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth do
+describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
+  let_it_be(:project) { create(:project) }
   let(:gl_auth) { described_class }
-  set(:project) { create(:project) }
 
   describe 'constants' do
     it 'API_SCOPES contains all scopes for API access' do
@@ -79,16 +79,81 @@ describe Gitlab::Auth do
   end
 
   describe 'find_for_git_client' do
+    describe 'rate limiting' do
+      before do
+        stub_rack_attack_setting(enabled: true, ip_whitelist: [])
+      end
+
+      context 'when IP is already banned' do
+        subject { gl_auth.find_for_git_client('username', 'password', project: nil, ip: 'ip') }
+
+        before do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).to receive(:banned?).and_return(true)
+          end
+        end
+
+        it 'raises an IpBlacklisted exception' do
+          expect { subject }.to raise_error(Gitlab::Auth::IpBlacklisted)
+        end
+      end
+
+      context 'for CI registry user' do
+        let_it_be(:build) { create(:ci_build, :running) }
+
+        it 'skips rate limiting for successful auth' do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).not_to receive(:reset!)
+          end
+
+          gl_auth.find_for_git_client('gitlab-ci-token', build.token, project: build.project, ip: 'ip')
+        end
+
+        it 'skips rate limiting for failed auth' do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).not_to receive(:register_fail!)
+          end
+
+          gl_auth.find_for_git_client('gitlab-ci-token', 'wrong_token', project: build.project, ip: 'ip')
+        end
+      end
+
+      context 'for other users' do
+        let_it_be(:user) { create(:user) }
+
+        it 'resets rate limit for successful auth' do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).to receive(:reset!)
+          end
+
+          gl_auth.find_for_git_client(user.username, user.password, project: nil, ip: 'ip')
+        end
+
+        it 'rate limits a user by unique IPs' do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).to receive(:reset!)
+          end
+          expect(Gitlab::Auth::UniqueIpsLimiter).to receive(:limit_user!).twice.and_call_original
+
+          gl_auth.find_for_git_client(user.username, user.password, project: nil, ip: 'ip')
+        end
+
+        it 'registers failure for failed auth' do
+          expect_next_instance_of(Gitlab::Auth::IpRateLimiter) do |rate_limiter|
+            expect(rate_limiter).to receive(:register_fail!)
+          end
+
+          gl_auth.find_for_git_client(user.username, 'wrong_password', project: nil, ip: 'ip')
+        end
+      end
+    end
+
     context 'build token' do
       subject { gl_auth.find_for_git_client('gitlab-ci-token', build.token, project: project, ip: 'ip') }
 
       context 'for running build' do
         let!(:build) { create(:ci_build, :running) }
         let(:project) { build.project }
-
-        before do
-          expect(gl_auth).not_to receive(:rate_limit!).with('ip', success: true, login: 'gitlab-ci-token')
-        end
 
         it 'recognises user-less build' do
           expect(subject).to eq(Gitlab::Auth::Result.new(nil, build.project, :ci, described_class.build_authentication_abilities))
@@ -99,16 +164,18 @@ describe Gitlab::Auth do
 
           expect(subject).to eq(Gitlab::Auth::Result.new(build.user, build.project, :build, described_class.build_authentication_abilities))
         end
+
+        it 'fails with blocked user token' do
+          build.update(user: create(:user, :blocked))
+
+          expect(subject).to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
       end
 
       (HasStatus::AVAILABLE_STATUSES - ['running']).each do |build_status|
         context "for #{build_status} build" do
           let!(:build) { create(:ci_build, status: build_status) }
           let(:project) { build.project }
-
-          before do
-            expect(gl_auth).not_to receive(:rate_limit!).with('ip', success: false, login: 'gitlab-ci-token')
-          end
 
           it 'denies authentication' do
             expect(subject).to eq(Gitlab::Auth::Result.new)
@@ -121,14 +188,12 @@ describe Gitlab::Auth do
       project.create_drone_ci_service(active: true)
       project.drone_ci_service.update(token: 'token')
 
-      expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: 'drone-ci-token')
       expect(gl_auth.find_for_git_client('drone-ci-token', 'token', project: project, ip: 'ip')).to eq(Gitlab::Auth::Result.new(nil, project, :ci, described_class.build_authentication_abilities))
     end
 
     it 'recognizes master passwords' do
       user = create(:user, password: 'password')
 
-      expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: user.username)
       expect(gl_auth.find_for_git_client(user.username, 'password', project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(user, nil, :gitlab_or_ldap, described_class.full_authentication_abilities))
     end
 
@@ -145,7 +210,6 @@ describe Gitlab::Auth do
         user = create(:user)
         token = Gitlab::LfsToken.new(user).token
 
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: user.username)
         expect(gl_auth.find_for_git_client(user.username, token, project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(user, nil, :lfs_token, described_class.read_write_project_authentication_abilities))
       end
 
@@ -153,7 +217,6 @@ describe Gitlab::Auth do
         key = create(:deploy_key)
         token = Gitlab::LfsToken.new(key).token
 
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: "lfs+deploy-key-#{key.id}")
         expect(gl_auth.find_for_git_client("lfs+deploy-key-#{key.id}", token, project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(key, nil, :lfs_deploy_token, described_class.read_only_authentication_abilities))
       end
 
@@ -171,7 +234,6 @@ describe Gitlab::Auth do
         create(:deploy_keys_project, :write_access, deploy_key: key, project: project)
         token = Gitlab::LfsToken.new(key).token
 
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: "lfs+deploy-key-#{key.id}")
         expect(gl_auth.find_for_git_client("lfs+deploy-key-#{key.id}", token, project: project, ip: 'ip')).to eq(Gitlab::Auth::Result.new(key, nil, :lfs_deploy_token, described_class.read_write_authentication_abilities))
       end
 
@@ -179,7 +241,6 @@ describe Gitlab::Auth do
         key = create(:deploy_key)
         token = Gitlab::LfsToken.new(key).token
 
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: "lfs+deploy-key-#{key.id}")
         expect(gl_auth.find_for_git_client("lfs+deploy-key-#{key.id}", token, project: project, ip: 'ip')).to eq(Gitlab::Auth::Result.new(key, nil, :lfs_deploy_token, described_class.read_only_authentication_abilities))
       end
     end
@@ -189,15 +250,20 @@ describe Gitlab::Auth do
       let(:token_w_api_scope) { Doorkeeper::AccessToken.create!(application_id: application.id, resource_owner_id: user.id, scopes: 'api') }
       let(:application) { Doorkeeper::Application.create!(name: 'MyApp', redirect_uri: 'https://app.com', owner: user) }
 
+      shared_examples 'an oauth failure' do
+        it 'fails' do
+          expect(gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip'))
+            .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
+      end
+
       it 'succeeds for OAuth tokens with the `api` scope' do
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: 'oauth2')
         expect(gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(user, nil, :oauth, described_class.full_authentication_abilities))
       end
 
       it 'fails for OAuth tokens with other scopes' do
         token = Doorkeeper::AccessToken.create!(application_id: application.id, resource_owner_id: user.id, scopes: 'read_user')
 
-        expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'oauth2')
         expect(gl_auth.find_for_git_client("oauth2", token.token, project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(nil, nil))
       end
 
@@ -205,6 +271,20 @@ describe Gitlab::Auth do
         expect(gl_auth).not_to receive(:find_with_user_password)
 
         gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip')
+      end
+
+      context 'blocked user' do
+        let(:user) { create(:user, :blocked) }
+
+        it_behaves_like 'an oauth failure'
+      end
+
+      context 'orphaned token' do
+        before do
+          user.destroy
+        end
+
+        it_behaves_like 'an oauth failure'
       end
     end
 
@@ -254,10 +334,36 @@ describe Gitlab::Auth do
       it 'fails if password is nil' do
         expect_results_with_abilities(nil, nil, false)
       end
+
+      context 'when user is blocked' do
+        let(:user) { create(:user, :blocked) }
+        let(:personal_access_token) { create(:personal_access_token, scopes: ['read_registry'], user: user) }
+
+        before do
+          stub_container_registry_config(enabled: true)
+        end
+
+        it 'fails if user is blocked' do
+          expect(gl_auth.find_for_git_client('', personal_access_token.token, project: nil, ip: 'ip'))
+          .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
+      end
     end
 
     context 'while using regular user and password' do
-      it 'falls through lfs authentication' do
+      it 'fails for a blocked user' do
+        user = create(
+          :user,
+          :blocked,
+          username: 'normal_user',
+          password: 'my-secret'
+        )
+
+        expect(gl_auth.find_for_git_client(user.username, user.password, project: nil, ip: 'ip'))
+          .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+      end
+
+      it 'goes through lfs authentication' do
         user = create(
           :user,
           username: 'normal_user',
@@ -268,7 +374,7 @@ describe Gitlab::Auth do
           .to eq(Gitlab::Auth::Result.new(user, nil, :gitlab_or_ldap, described_class.full_authentication_abilities))
       end
 
-      it 'fails through oauth authentication when the username is oauth2' do
+      it 'goes through oauth authentication when the username is oauth2' do
         user = create(
           :user,
           username: 'oauth2',
@@ -283,7 +389,6 @@ describe Gitlab::Auth do
     it 'returns double nil for invalid credentials' do
       login = 'foo'
 
-      expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
       expect(gl_auth.find_for_git_client(login, 'bar', project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new)
     end
 
@@ -300,10 +405,6 @@ describe Gitlab::Auth do
         let(:username) { 'normal_user' }
         let(:user) { create(:user, username: username, password: 'my-secret') }
         let(:deploy_token) { create(:deploy_token, username: username, read_registry: false, projects: [project]) }
-
-        before do
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: username)
-        end
 
         it 'succeeds for the token' do
           auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:download_code])
@@ -328,13 +429,11 @@ describe Gitlab::Auth do
           it 'succeeds for the right token' do
             auth_success = Gitlab::Auth::Result.new(read_repository, project, :deploy_token, [:download_code])
 
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: 'deployer')
             expect(gl_auth.find_for_git_client('deployer', read_repository.token, project: project, ip: 'ip'))
               .to eq(auth_success)
           end
 
           it 'fails for the wrong token' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'deployer')
             expect(gl_auth.find_for_git_client('deployer', read_registry.token, project: project, ip: 'ip'))
               .to eq(auth_failure)
           end
@@ -347,13 +446,11 @@ describe Gitlab::Auth do
           it 'succeeds for the right token' do
             auth_success = Gitlab::Auth::Result.new(read_repository, project, :deploy_token, [:download_code])
 
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: 'deployer')
             expect(gl_auth.find_for_git_client('deployer', read_repository.token, project: project, ip: 'ip'))
               .to eq(auth_success)
           end
 
           it 'fails for the wrong token' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'deployer')
             expect(gl_auth.find_for_git_client('deployer', read_registry.token, project: project, ip: 'ip'))
               .to eq(auth_failure)
           end
@@ -367,7 +464,6 @@ describe Gitlab::Auth do
         it 'succeeds when login and token are valid' do
           auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:download_code])
 
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: login)
           expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip'))
             .to eq(auth_success)
         end
@@ -376,32 +472,33 @@ describe Gitlab::Auth do
           deploy_token = create(:deploy_token, username: 'deployer', read_registry: false, projects: [project])
           auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:download_code])
 
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: 'deployer')
           expect(gl_auth.find_for_git_client('deployer', deploy_token.token, project: project, ip: 'ip'))
             .to eq(auth_success)
         end
 
+        it 'does not attempt to rate limit unique IPs for a deploy token' do
+          expect(Gitlab::Auth::UniqueIpsLimiter).not_to receive(:limit_user!)
+
+          gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip')
+        end
+
         it 'fails when login is not valid' do
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'random_login')
           expect(gl_auth.find_for_git_client('random_login', deploy_token.token, project: project, ip: 'ip'))
             .to eq(auth_failure)
         end
 
         it 'fails when token is not valid' do
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
           expect(gl_auth.find_for_git_client(login, '123123', project: project, ip: 'ip'))
             .to eq(auth_failure)
         end
 
         it 'fails if token is nil' do
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
           expect(gl_auth.find_for_git_client(login, nil, project: project, ip: 'ip'))
             .to eq(auth_failure)
         end
 
         it 'fails if token is not related to project' do
           another_deploy_token = create(:deploy_token)
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
           expect(gl_auth.find_for_git_client(login, another_deploy_token.token, project: project, ip: 'ip'))
             .to eq(auth_failure)
         end
@@ -410,9 +507,22 @@ describe Gitlab::Auth do
           deploy_token.revoke!
 
           expect(deploy_token.revoked?).to be_truthy
-          expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'deploy-token')
           expect(gl_auth.find_for_git_client('deploy-token', deploy_token.token, project: project, ip: 'ip'))
             .to eq(auth_failure)
+        end
+      end
+
+      context 'when the deploy token is of group type' do
+        let(:project_with_group) { create(:project, group: create(:group)) }
+        let(:deploy_token) { create(:deploy_token, :group, read_repository: true, groups: [project_with_group.group]) }
+        let(:login) { deploy_token.username }
+
+        subject { gl_auth.find_for_git_client(login, deploy_token.token, project: project_with_group, ip: 'ip') }
+
+        it 'succeeds when login and a group deploy token are valid' do
+          auth_success = Gitlab::Auth::Result.new(deploy_token, project_with_group, :deploy_token, [:download_code, :read_container_image])
+
+          expect(subject).to eq(auth_success)
         end
       end
 
@@ -425,34 +535,29 @@ describe Gitlab::Auth do
             stub_container_registry_config(enabled: true)
           end
 
-          it 'succeeds when login and token are valid' do
+          it 'succeeds when login and a project token are valid' do
             auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:read_container_image])
 
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: true, login: login)
-            expect(gl_auth.find_for_git_client(login, deploy_token.token, project: nil, ip: 'ip'))
+            expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip'))
               .to eq(auth_success)
           end
 
           it 'fails when login is not valid' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'random_login')
             expect(gl_auth.find_for_git_client('random_login', deploy_token.token, project: project, ip: 'ip'))
               .to eq(auth_failure)
           end
 
           it 'fails when token is not valid' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
             expect(gl_auth.find_for_git_client(login, '123123', project: project, ip: 'ip'))
               .to eq(auth_failure)
           end
 
           it 'fails if token is nil' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
             expect(gl_auth.find_for_git_client(login, nil, project: nil, ip: 'ip'))
               .to eq(auth_failure)
           end
 
           it 'fails if token is not related to project' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
             expect(gl_auth.find_for_git_client(login, 'abcdef', project: nil, ip: 'ip'))
               .to eq(auth_failure)
           end
@@ -461,7 +566,6 @@ describe Gitlab::Auth do
             deploy_token.revoke!
 
             expect(deploy_token.revoked?).to be_truthy
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: 'deploy-token')
             expect(gl_auth.find_for_git_client('deploy-token', deploy_token.token, project: nil, ip: 'ip'))
               .to eq(auth_failure)
           end
@@ -473,7 +577,6 @@ describe Gitlab::Auth do
           end
 
           it 'fails when login and token are valid' do
-            expect(gl_auth).to receive(:rate_limit!).with('ip', success: false, login: login)
             expect(gl_auth.find_for_git_client(login, deploy_token.token, project: nil, ip: 'ip'))
               .to eq(auth_failure)
           end
@@ -540,23 +643,23 @@ describe Gitlab::Auth do
 
     context "with ldap enabled" do
       before do
-        allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
+        allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
       end
 
       it "tries to autheticate with db before ldap" do
-        expect(Gitlab::Auth::LDAP::Authentication).not_to receive(:login)
+        expect(Gitlab::Auth::Ldap::Authentication).not_to receive(:login)
 
         expect(gl_auth.find_with_user_password(username, password)).to eq(user)
       end
 
       it "does not find user by using ldap as fallback to for authentication" do
-        expect(Gitlab::Auth::LDAP::Authentication).to receive(:login).and_return(nil)
+        expect(Gitlab::Auth::Ldap::Authentication).to receive(:login).and_return(nil)
 
         expect(gl_auth.find_with_user_password('ldap_user', 'password')).to be_nil
       end
 
       it "find new user by using ldap as fallback to for authentication" do
-        expect(Gitlab::Auth::LDAP::Authentication).to receive(:login).and_return(user)
+        expect(Gitlab::Auth::Ldap::Authentication).to receive(:login).and_return(user)
 
         expect(gl_auth.find_with_user_password('ldap_user', 'password')).to eq(user)
       end
@@ -573,7 +676,7 @@ describe Gitlab::Auth do
 
       context "with ldap enabled" do
         before do
-          allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
+          allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
         end
 
         it "does not find non-ldap user by valid login/password" do
@@ -586,7 +689,6 @@ describe Gitlab::Auth do
   private
 
   def expect_results_with_abilities(personal_access_token, abilities, success = true)
-    expect(gl_auth).to receive(:rate_limit!).with('ip', success: success, login: '')
     expect(gl_auth.find_for_git_client('', personal_access_token&.token, project: nil, ip: 'ip'))
       .to eq(Gitlab::Auth::Result.new(personal_access_token&.user, nil, personal_access_token.nil? ? nil : :personal_access_token, abilities))
   end

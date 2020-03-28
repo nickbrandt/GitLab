@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
-import Icon from '~/vue_shared/components/icon.vue';
-
 import DropdownValueCollapsed from 'ee/vue_shared/components/sidebar/epics_select/dropdown_value_collapsed.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 import { mockEpic1 } from '../mock_data';
 

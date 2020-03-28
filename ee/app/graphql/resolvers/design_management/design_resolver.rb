@@ -3,40 +3,54 @@
 module Resolvers
   module DesignManagement
     class DesignResolver < BaseResolver
-      argument :ids,
-               [GraphQL::ID_TYPE],
+      argument :id, GraphQL::ID_TYPE,
                required: false,
-               description: 'Filters designs by their ID'
-      argument :filenames,
-               [GraphQL::STRING_TYPE],
-               required: false,
-               description: 'Filters designs by their filename'
-      argument :at_version,
-               GraphQL::ID_TYPE,
-               required: false,
-               description: 'Filters designs to only those that existed at the version. ' \
-                            'If argument is omitted or nil then all designs will reflect the latest version'
+               description: 'Find a design by its ID'
 
-      def resolve(**args)
-        find_designs(args)
+      argument :filename, GraphQL::STRING_TYPE,
+               required: false,
+               description: 'Find a design by its filename'
+
+      def resolve(filename: nil, id: nil)
+        params = parse_args(filename, id)
+
+        build_finder(params).execute.first
       end
 
-      def version(args)
-        args[:at_version] ? GitlabSchema.object_from_id(args[:at_version])&.sync : nil
+      def self.single
+        self
       end
 
-      def design_ids(args)
-        args[:ids] ? args[:ids].map { |id| GlobalID.parse(id).model_id } : nil
+      private
+
+      def issue
+        object.issue
       end
 
-      def find_designs(args)
-        ::DesignManagement::DesignsFinder.new(
-          object.issue,
-          context[:current_user],
-          ids: design_ids(args),
-          filenames: args[:filenames],
-          visible_at_version: version(args)
-        ).execute
+      def build_finder(params)
+        ::DesignManagement::DesignsFinder.new(issue, current_user, params)
+      end
+
+      def error(msg)
+        raise ::Gitlab::Graphql::Errors::ArgumentError, msg
+      end
+
+      def parse_args(filename, id)
+        provided = [filename, id].map(&:present?)
+
+        if provided.none?
+          error('one of id or filename must be passed')
+        elsif provided.all?
+          error('only one of id or filename may be passed')
+        elsif filename.present?
+          { filenames: [filename] }
+        else
+          { ids: [parse_gid(id)] }
+        end
+      end
+
+      def parse_gid(gid)
+        GitlabSchema.parse_gid(gid, expected_type: ::DesignManagement::Design).model_id
       end
     end
   end

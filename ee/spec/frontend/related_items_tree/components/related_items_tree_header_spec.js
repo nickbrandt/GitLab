@@ -1,23 +1,24 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlButton } from '@gitlab/ui';
+import Vuex from 'vuex';
+import { GlButton, GlTooltip } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
-import {
-  mockParentItem,
-  mockQueryResponse,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockInitialConfig, mockParentItem, mockQueryResponse } from '../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = ({ slots } = {}) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
+  store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setInitialParentItem', mockParentItem);
   store.dispatch('setItemChildren', {
     parentItem: mockParentItem,
@@ -31,8 +32,6 @@ const createComponent = ({ slots } = {}) => {
   store.dispatch('setChildrenCount', mockParentItem.descendantCounts);
 
   return shallowMount(RelatedItemsTreeHeader, {
-    attachToDocument: true,
-    sync: false,
     localVue,
     store,
     slots,
@@ -50,15 +49,19 @@ describe('RelatedItemsTree', () => {
       wrapper.destroy();
     });
 
-    describe('computed', () => {
+    describe('badgeTooltip', () => {
       beforeEach(() => {
         wrapper = createComponent();
       });
 
-      describe('badgeTooltip', () => {
-        it('returns string containing epic count and issues count based on available direct children within state', () => {
-          expect(wrapper.vm.badgeTooltip).toBe('2 epics and 2 issues');
-        });
+      it('returns string containing epic count based on available direct children within state', () => {
+        expect(wrapper.find(GlTooltip).text()).toContain(`Epics •
+        1 open, 1 closed`);
+      });
+
+      it('returns string containing issue count based on available direct children within state', () => {
+        expect(wrapper.find(GlTooltip).text()).toContain(`Issues •
+        1 open, 1 closed`);
       });
     });
 
@@ -71,7 +74,7 @@ describe('RelatedItemsTree', () => {
         let toggleAddItemForm;
 
         beforeEach(() => {
-          toggleAddItemForm = jasmine.createSpy();
+          toggleAddItemForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               toggleAddItemForm,
@@ -84,7 +87,7 @@ describe('RelatedItemsTree', () => {
 
           expect(toggleAddItemForm).toHaveBeenCalled();
 
-          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+          const payload = toggleAddItemForm.mock.calls[0][1];
 
           expect(payload).toEqual({
             issuableType: issuableTypesMap.EPIC,
@@ -97,7 +100,7 @@ describe('RelatedItemsTree', () => {
         let toggleCreateEpicForm;
 
         beforeEach(() => {
-          toggleCreateEpicForm = jasmine.createSpy();
+          toggleCreateEpicForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               toggleCreateEpicForm,
@@ -110,7 +113,8 @@ describe('RelatedItemsTree', () => {
 
           expect(toggleCreateEpicForm).toHaveBeenCalled();
 
-          const payload = toggleCreateEpicForm.calls.mostRecent().args[1];
+          const payload =
+            toggleCreateEpicForm.mock.calls[toggleCreateEpicForm.mock.calls.length - 1][1];
 
           expect(payload).toEqual({ toggleState: true });
         });
@@ -127,8 +131,8 @@ describe('RelatedItemsTree', () => {
         let setItemInputValue;
 
         beforeEach(() => {
-          setItemInputValue = jasmine.createSpy();
-          toggleAddItemForm = jasmine.createSpy();
+          setItemInputValue = jest.fn();
+          toggleAddItemForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               setItemInputValue,
@@ -142,11 +146,11 @@ describe('RelatedItemsTree', () => {
 
           expect(setItemInputValue).toHaveBeenCalled();
 
-          expect(setItemInputValue.calls.mostRecent().args[1]).toEqual('');
+          expect(setItemInputValue.mock.calls[setItemInputValue.mock.calls.length - 1][1]).toBe('');
 
           expect(toggleAddItemForm).toHaveBeenCalled();
 
-          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+          const payload = toggleAddItemForm.mock.calls[setItemInputValue.mock.calls.length - 1][1];
 
           expect(payload).toEqual({
             issuableType: issuableTypesMap.ISSUE,
@@ -167,13 +171,42 @@ describe('RelatedItemsTree', () => {
         expect(badgesContainerEl.isVisible()).toBe(true);
       });
 
-      it('renders epics count and icon', () => {
-        const epicsEl = wrapper.findAll('.issue-count-badge > span').at(0);
-        const epicIcon = epicsEl.find(Icon);
+      describe('when sub-epics feature is available', () => {
+        it('renders epics count and icon', () => {
+          const epicsEl = wrapper.findAll('.issue-count-badge > span').at(0);
+          const epicIcon = epicsEl.find(Icon);
 
-        expect(epicsEl.text().trim()).toBe('2');
-        expect(epicIcon.isVisible()).toBe(true);
-        expect(epicIcon.props('name')).toBe('epic');
+          expect(epicsEl.text().trim()).toBe('2');
+          expect(epicIcon.isVisible()).toBe(true);
+          expect(epicIcon.props('name')).toBe('epic');
+        });
+
+        it('renders `Add an epic` dropdown button', () => {
+          expect(findEpicsSplitButton().isVisible()).toBe(true);
+        });
+      });
+
+      describe('when sub-epics feature is not available', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.commit('SET_INITIAL_CONFIG', {
+            ...mockInitialConfig,
+            allowSubEpics: false,
+          });
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('does not render epics count and icon', () => {
+          const countBadgesEl = wrapper.findAll('.issue-count-badge > span');
+          const badgeIcon = countBadgesEl.at(0).find(Icon);
+
+          expect(countBadgesEl.length).toBe(1);
+          expect(badgeIcon.props('name')).toBe('issues');
+        });
+
+        it('does not render `Add an epic` dropdown button', () => {
+          expect(findEpicsSplitButton().exists()).toBe(false);
+        });
       });
 
       it('renders issues count and icon', () => {
@@ -183,10 +216,6 @@ describe('RelatedItemsTree', () => {
         expect(issuesEl.text().trim()).toBe('2');
         expect(issueIcon.isVisible()).toBe(true);
         expect(issueIcon.props('name')).toBe('issues');
-      });
-
-      it('renders `Add an epic` dropdown button', () => {
-        expect(findEpicsSplitButton().isVisible()).toBe(true);
       });
 
       it('renders `Add an issue` dropdown button', () => {

@@ -6,8 +6,8 @@ describe MergeTrains::RefreshMergeRequestsService do
   include ExclusiveLeaseHelpers
 
   let(:project) { create(:project) }
-  set(:maintainer_1) { create(:user) }
-  set(:maintainer_2) { create(:user) }
+  let_it_be(:maintainer_1) { create(:user) }
+  let_it_be(:maintainer_2) { create(:user) }
   let(:service) { described_class.new(project, maintainer_1) }
 
   before do
@@ -112,6 +112,19 @@ describe MergeTrains::RefreshMergeRequestsService do
         end
       end
 
+      context 'when merge request 1 was on a merge train' do
+        before do
+          allow(merge_request_1.merge_train).to receive(:cleanup_ref)
+          merge_request_1.merge_train.update_column(:status, MergeTrain.state_machines[:status].states[:merged].value)
+        end
+
+        it 'does not refresh' do
+          expect(refresh_service_1).not_to receive(:execute).with(merge_request_1)
+
+          subject
+        end
+      end
+
       context 'when the other thread has already been processing the merge train' do
         let(:lock_key) { "batch_pop_queueing:lock:merge_trains:#{merge_request.target_project_id}:#{merge_request.target_branch}" }
 
@@ -131,26 +144,6 @@ describe MergeTrains::RefreshMergeRequestsService do
           end
 
           subject
-        end
-      end
-
-      context 'when merge_trains_efficient_refresh is disabled' do
-        before do
-          stub_feature_flags(merge_trains_efficient_refresh: false)
-        end
-
-        context 'when the exclusive lock has already been taken' do
-          let(:lease_key) do
-            "merge_train:#{merge_request_1.target_project_id}-#{merge_request_1.target_branch}"
-          end
-
-          before do
-            stub_exclusive_lease_taken(lease_key)
-          end
-
-          it 'raises FailedToObtainLockError' do
-            expect { subject }.to raise_error(Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError)
-          end
         end
       end
     end
@@ -176,6 +169,19 @@ describe MergeTrains::RefreshMergeRequestsService do
           expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_1.id).once
 
           subject
+        end
+
+        context 'when merge request 1 has already been merged' do
+          before do
+            allow(merge_request_1.merge_train).to receive(:cleanup_ref)
+            merge_request_1.merge_train.update_column(:status, MergeTrain.state_machines[:status].states[:merged].value)
+          end
+
+          it 'does not refresh the merge request 1' do
+            expect(AutoMergeProcessWorker).not_to receive(:perform_async).with(merge_request_1.id)
+
+            subject
+          end
         end
       end
     end

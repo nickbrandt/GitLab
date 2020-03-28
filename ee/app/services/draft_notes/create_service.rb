@@ -12,14 +12,14 @@ module DraftNotes
     def execute
       if in_reply_to_discussion_id.present?
         unless discussion
-          return base_error('Thread to reply to cannot be found')
+          return base_error(_('Thread to reply to cannot be found'))
         end
 
         params[:discussion_id] = discussion.reply_id
       end
 
       if params[:resolve_discussion] && !can_resolve_discussion?
-        return base_error('User is not allowed to resolve thread')
+        return base_error(_('User is not allowed to resolve thread'))
       end
 
       draft_note = DraftNote.new(params)

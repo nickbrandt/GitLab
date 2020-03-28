@@ -9,9 +9,21 @@ module ApplicationWorker
 
   include Sidekiq::Worker # rubocop:disable Cop/IncludeSidekiqWorker
   include WorkerAttributes
+  include WorkerContext
 
   included do
     set_queue
+
+    def structured_payload(payload = {})
+      context = Labkit::Context.current.to_h.merge(
+        'class' => self.class,
+        'job_status' => 'running',
+        'queue' => self.class.queue,
+        'jid' => jid
+      )
+
+      payload.stringify_keys.merge(context)
+    end
   end
 
   class_methods do

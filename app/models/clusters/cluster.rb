@@ -11,15 +11,15 @@ module Clusters
     self.table_name = 'clusters'
 
     APPLICATIONS = {
-      Applications::Helm.application_name => Applications::Helm,
-      Applications::Ingress.application_name => Applications::Ingress,
-      Applications::CertManager.application_name => Applications::CertManager,
-      Applications::Crossplane.application_name => Applications::Crossplane,
-      Applications::Prometheus.application_name => Applications::Prometheus,
-      Applications::Runner.application_name => Applications::Runner,
-      Applications::Jupyter.application_name => Applications::Jupyter,
-      Applications::Knative.application_name => Applications::Knative,
-      Applications::ElasticStack.application_name => Applications::ElasticStack
+      Clusters::Applications::Helm.application_name => Clusters::Applications::Helm,
+      Clusters::Applications::Ingress.application_name => Clusters::Applications::Ingress,
+      Clusters::Applications::CertManager.application_name => Clusters::Applications::CertManager,
+      Clusters::Applications::Crossplane.application_name => Clusters::Applications::Crossplane,
+      Clusters::Applications::Prometheus.application_name => Clusters::Applications::Prometheus,
+      Clusters::Applications::Runner.application_name => Clusters::Applications::Runner,
+      Clusters::Applications::Jupyter.application_name => Clusters::Applications::Jupyter,
+      Clusters::Applications::Knative.application_name => Clusters::Applications::Knative,
+      Clusters::Applications::ElasticStack.application_name => Clusters::Applications::ElasticStack
     }.freeze
     DEFAULT_ENVIRONMENT = '*'
     KUBE_INGRESS_BASE_DOMAIN = 'KUBE_INGRESS_BASE_DOMAIN'
@@ -31,9 +31,11 @@ module Clusters
     has_many :cluster_projects, class_name: 'Clusters::Project'
     has_many :projects, through: :cluster_projects, class_name: '::Project'
     has_one :cluster_project, -> { order(id: :desc) }, class_name: 'Clusters::Project'
+    has_many :deployment_clusters
 
     has_many :cluster_groups, class_name: 'Clusters::Group'
     has_many :groups, through: :cluster_groups, class_name: '::Group'
+    has_many :groups_projects, through: :groups, source: :projects, class_name: '::Project'
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
@@ -177,6 +179,13 @@ module Clusters
       end
     end
 
+    def all_projects
+      return projects if project_type?
+      return groups_projects if group_type?
+
+      ::Project.all
+    end
+
     def status_name
       return cleanup_status_name if cleanup_errored?
       return :cleanup_ongoing unless cleanup_not_started?
@@ -240,15 +249,14 @@ module Clusters
       platform_kubernetes.kubeclient if kubernetes?
     end
 
-    def kubernetes_namespace_for(environment)
-      project = environment.project
-      persisted_namespace = Clusters::KubernetesNamespaceFinder.new(
-        self,
-        project: project,
-        environment_name: environment.name
-      ).execute
+    def kubernetes_namespace_for(environment, deployable: environment.last_deployable)
+      if deployable && environment.project_id != deployable.project_id
+        raise ArgumentError, 'environment.project_id must match deployable.project_id'
+      end
 
-      persisted_namespace&.namespace || Gitlab::Kubernetes::DefaultNamespace.new(self, project: project).from_environment_slug(environment.slug)
+      managed_namespace(environment) ||
+        ci_configured_namespace(deployable) ||
+        default_namespace(environment)
     end
 
     def allow_user_defined_namespace?
@@ -267,6 +275,31 @@ module Clusters
       end
     end
 
+    def delete_cached_resources!
+      kubernetes_namespaces.delete_all(:delete_all)
+    end
+
+    def clusterable
+      return unless cluster_type
+
+      case cluster_type
+      when 'project_type'
+        project
+      when 'group_type'
+        group
+      when 'instance_type'
+        instance
+      else
+        raise NotImplementedError
+      end
+    end
+
+    def serverless_domain
+      strong_memoize(:serverless_domain) do
+        self.application_knative&.serverless_domain_cluster
+      end
+    end
+
     private
 
     def unique_management_project_environment_scope
@@ -277,8 +310,30 @@ module Clusters
         .where.not(id: id)
 
       if duplicate_management_clusters.any?
-        errors.add(:environment_scope, "cannot add duplicated environment scope")
+        errors.add(:environment_scope, 'cannot add duplicated environment scope')
       end
+    end
+
+    def managed_namespace(environment)
+      Clusters::KubernetesNamespaceFinder.new(
+        self,
+        project: environment.project,
+        environment_name: environment.name
+      ).execute&.namespace
+    end
+
+    def ci_configured_namespace(deployable)
+      # YAML configuration of namespaces not supported for managed clusters
+      return if managed?
+
+      deployable&.expanded_kubernetes_namespace
+    end
+
+    def default_namespace(environment)
+      Gitlab::Kubernetes::DefaultNamespace.new(
+        self,
+        project: environment.project
+      ).from_environment_slug(environment.slug)
     end
 
     def instance_domain
@@ -294,7 +349,7 @@ module Clusters
     rescue Kubeclient::HttpError => e
       kubeclient_error_status(e.message)
     rescue => e
-      Gitlab::Sentry.track_acceptable_exception(e, extra: { cluster_id: id })
+      Gitlab::ErrorTracking.track_exception(e, cluster_id: id)
 
       :unknown_failure
     else
@@ -332,7 +387,7 @@ module Clusters
 
     def restrict_modification
       if provider&.on_creation?
-        errors.add(:base, "cannot modify during creation")
+        errors.add(:base, _('Cannot modify provider during creation'))
         return false
       end
 

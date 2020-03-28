@@ -1,18 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Design management design version dropdown component renders design version dropdown button 1`] = `
-<gldropdown-stub
+<gl-dropdown-stub
   class="design-version-dropdown"
   issueiid=""
   projectpath=""
   text="Showing Latest Version"
   variant="link"
 >
-  <gldropdownitem-stub>
-    <routerlink-stub
+  <gl-dropdown-item-stub>
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -32,13 +30,11 @@ exports[`Design management design version dropdown component renders design vers
       <i
         class="fa fa-check pull-right"
       />
-    </routerlink-stub>
-  </gldropdownitem-stub>
-  <gldropdownitem-stub>
-    <routerlink-stub
+    </router-link-stub>
+  </gl-dropdown-item-stub>
+  <gl-dropdown-item-stub>
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -54,24 +50,22 @@ exports[`Design management design version dropdown component renders design vers
       </div>
        
       <!---->
-    </routerlink-stub>
-  </gldropdownitem-stub>
-</gldropdown-stub>
+    </router-link-stub>
+  </gl-dropdown-item-stub>
+</gl-dropdown-stub>
 `;
 
 exports[`Design management design version dropdown component renders design version list 1`] = `
-<gldropdown-stub
+<gl-dropdown-stub
   class="design-version-dropdown"
   issueiid=""
   projectpath=""
   text="Showing Latest Version"
   variant="link"
 >
-  <gldropdownitem-stub>
-    <routerlink-stub
+  <gl-dropdown-item-stub>
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -91,13 +85,11 @@ exports[`Design management design version dropdown component renders design vers
       <i
         class="fa fa-check pull-right"
       />
-    </routerlink-stub>
-  </gldropdownitem-stub>
-  <gldropdownitem-stub>
-    <routerlink-stub
+    </router-link-stub>
+  </gl-dropdown-item-stub>
+  <gl-dropdown-item-stub>
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -113,7 +105,7 @@ exports[`Design management design version dropdown component renders design vers
       </div>
        
       <!---->
-    </routerlink-stub>
-  </gldropdownitem-stub>
-</gldropdown-stub>
+    </router-link-stub>
+  </gl-dropdown-item-stub>
+</gl-dropdown-stub>
 `;

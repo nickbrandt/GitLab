@@ -1,6 +1,6 @@
+import { debounce } from 'lodash';
 import InputValidator from '~/validators/input_validator';
 
-import _ from 'underscore';
 import fetchGroupPathAvailability from './fetch_group_path_availability';
 import flash from '~/flash';
 import { __ } from '~/locale';
@@ -20,7 +20,7 @@ export default class GroupPathValidator extends InputValidator {
     const container = opts.container || '';
     const validateElements = document.querySelectorAll(`${container} .js-validate-group-path`);
 
-    this.debounceValidateInput = _.debounce(inputDomElement => {
+    this.debounceValidateInput = debounce(inputDomElement => {
       GroupPathValidator.validateGroupPathInput(inputDomElement);
     }, debounceTimeoutDuration);
 

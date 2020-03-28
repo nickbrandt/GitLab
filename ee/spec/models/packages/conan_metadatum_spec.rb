@@ -26,6 +26,16 @@ RSpec.describe Packages::ConanMetadatum, type: :model do
       it { is_expected.not_to allow_value("my(channel)").for(:package_channel) }
       it { is_expected.not_to allow_value("my@channel").for(:package_channel) }
     end
+
+    describe '#conan_package_type' do
+      it "will not allow a package with a different package_type" do
+        package = build('package')
+        conan_metadatum = build('conan_metadatum', package: package)
+
+        expect(conan_metadatum).not_to be_valid
+        expect(conan_metadatum.errors.to_a).to include("Package type must be Conan")
+      end
+    end
   end
 
   describe '#recipe' do

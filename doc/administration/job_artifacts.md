@@ -3,7 +3,7 @@
 > - Introduced in GitLab 8.2 and GitLab Runner 0.7.0.
 > - Starting with GitLab 8.4 and GitLab Runner 1.0, the artifacts archive format changed to `ZIP`.
 > - Starting with GitLab 8.17, builds are renamed to jobs.
-> - This is the administration documentation. For the user guide see [pipelines/job_artifacts](../user/project/pipelines/job_artifacts.md).
+> - This is the administration documentation. For the user guide see [pipelines/job_artifacts](../ci/pipelines/job_artifacts.md).
 
 Artifacts is a list of files and directories which are attached to a job after it
 finishes. This feature is enabled by default in all GitLab installations. Keep reading
@@ -77,9 +77,9 @@ _The artifacts are stored by default in
 
 ### Using object storage
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1762) in
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1762) in
 >   [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
-> - Since version 9.5, artifacts are [browsable](../user/project/pipelines/job_artifacts.md#browsing-artifacts),
+> - Since version 9.5, artifacts are [browsable](../ci/pipelines/job_artifacts.md#browsing-artifacts),
 >   when object storage is enabled. 9.4 lacks this feature.
 > - Since version 10.6, available in [GitLab Core](https://about.gitlab.com/pricing/)
 > - Since version 11.0, we support `direct_upload` to S3.
@@ -156,9 +156,14 @@ _The artifacts are stored by default in
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
-   ```bash
+   ```shell
    gitlab-rake gitlab:artifacts:migrate
    ```
+
+CAUTION: **CAUTION:**
+JUnit test report artifact (`junit.xml.gz`) migration
+[is not supported](https://gitlab.com/gitlab-org/gitlab/issues/27698)
+by the `gitlab:artifacts:migrate` script.
 
 **In installations from source:**
 
@@ -184,17 +189,29 @@ _The artifacts are stored by default in
 1. Save the file and [restart GitLab][] for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
-   ```bash
+   ```shell
    sudo -u git -H bundle exec rake gitlab:artifacts:migrate RAILS_ENV=production
    ```
 
+CAUTION: **CAUTION:**
+JUnit test report artifact (`junit.xml.gz`) migration
+[is not supported](https://gitlab.com/gitlab-org/gitlab/issues/27698)
+by the `gitlab:artifacts:migrate` script.
+
 ### Migrating from object storage to local storage
+
+**In Omnibus installations:**
 
 In order to migrate back to local storage:
 
-1. Set both `direct_upload` and `background_upload` to false under the artifacts object storage settings. Don't forget to restart GitLab.
-1. Run `rake gitlab:artifacts:migrate_to_local` on your console.
-1. Disable `object_storage` for artifacts in `gitlab.rb`. Remember to restart GitLab afterwards.
+1. Set both `direct_upload` and `background_upload` to false in `gitlab.rb`, under the artifacts object storage settings.
+1. [reconfigure GitLab][].
+1. Run `gitlab-rake gitlab:artifacts:migrate_to_local`.
+1. Disable object_storage for artifacts in `gitlab.rb`:
+   - Set `gitlab_rails['artifacts_object_store_enabled'] = false`.
+   - Comment out all other `artifacts_object_store` settings, including the entire
+     `artifacts_object_store_connection` section, including the closing `}`.
+1. [reconfigure GitLab][].
 
 ## Expiring artifacts
 
@@ -239,7 +256,7 @@ you can flip the feature flag from a Rails console.
 
 1. Enter the Rails console:
 
-   ```sh
+   ```shell
    sudo gitlab-rails console
    ```
 
@@ -253,7 +270,7 @@ you can flip the feature flag from a Rails console.
 
 1. Enter the Rails console:
 
-   ```sh
+   ```shell
    cd /home/git/gitlab
    RAILS_ENV=production sudo -u git -H bundle exec rails console
    ```
@@ -267,7 +284,7 @@ you can flip the feature flag from a Rails console.
 ## Set the maximum file size of the artifacts
 
 Provided the artifacts are enabled, you can change the maximum file size of the
-artifacts through the [Admin area settings](../user/admin_area/settings/continuous_integration.md#maximum-artifacts-size-core-only).
+artifacts through the [Admin Area settings](../user/admin_area/settings/continuous_integration.md#maximum-artifacts-size-core-only).
 
 ## Storage statistics
 
@@ -294,3 +311,149 @@ memory and disk I/O.
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
 [gitlab workhorse]: https://gitlab.com/gitlab-org/gitlab-workhorse "GitLab Workhorse repository"
+
+## Troubleshooting
+
+### Job artifacts using too much disk space
+
+Job artifacts can fill up your disk space quicker than expected. Some possible
+reasons are:
+
+- Users have configured job artifacts expiration to be longer than necessary.
+- The number of jobs run, and hence artifacts generated, is higher than expected.
+- Job logs are larger than expected, and have accumulated over time.
+
+In these and other cases, you'll need to identify the projects most responsible
+for disk space usage, figure out what types of artifacts are using the most
+space, and in some cases, manually delete job artifacts to reclaim disk space.
+
+#### List projects by total size of job artifacts stored
+
+List the top 20 projects, sorted by the total size of job artifacts stored, by
+running the following code in the Rails console (`sudo gitlab-rails console`):
+
+```ruby
+include ActionView::Helpers::NumberHelper
+ProjectStatistics.order(build_artifacts_size: :desc).limit(20).each do |s|
+  puts "#{number_to_human_size(s.build_artifacts_size)} \t #{s.project.full_path}"
+end
+```
+
+You can change the number of projects listed by modifying `.limit(20)` to the
+number you want.
+
+#### List largest artifacts in a single project
+
+List the 50 largest job artifacts in a single project by running the following
+code in the Rails console (`sudo gitlab-rails console`):
+
+```ruby
+include ActionView::Helpers::NumberHelper
+project = Project.find_by_full_path('path/to/project')
+Ci::JobArtifact.where(project: project).order(size: :desc).limit(50).map { |a| puts "ID: #{a.id} - #{a.file_type}: #{number_to_human_size(a.size)}" }
+```
+
+You can change the number of job artifacts listed by modifying `.limit(50)` to
+the number you want.
+
+#### Delete job artifacts from jobs completed before a specific date
+
+CAUTION: **CAUTION:**
+These commands remove data permanently from the database and from disk. We
+highly recommend running them only under the guidance of a Support Engineer, or
+running them in a test environment with a backup of the instance ready to be
+restored, just in case.
+
+If you need to manually remove job artifacts associated with multiple jobs while
+**retaining their job logs**, this can be done from the Rails console (`sudo gitlab-rails console`):
+
+1. Select jobs to be deleted:
+
+   To select all jobs with artifacts for a single project:
+
+   ```ruby
+   project = Project.find_by_full_path('path/to/project')
+   builds_with_artifacts =  project.builds.with_artifacts_archive
+   ```
+
+   To select all jobs with artifacts across the entire GitLab instance:
+
+   ```ruby
+   builds_with_artifacts = Ci::Build.with_artifacts_archive
+   ```
+
+1. Delete job artifacts older than a specific date:
+
+   NOTE: **NOTE:**
+   This step will also erase artifacts that users have chosen to
+   ["keep"](../ci/pipelines/job_artifacts.md#browsing-artifacts).
+
+   ```ruby
+   builds_to_clear = builds_with_artifacts.where("finished_at < ?", 1.week.ago)
+   builds_to_clear.find_each do |build|
+     build.artifacts_expire_at = Time.now
+     build.erase_erasable_artifacts!
+   end
+   ```
+
+   `1.week.ago` is a Rails `ActiveSupport::Duration` method which calculates a new
+   date or time in the past. Other valid examples are:
+
+   - `7.days.ago`
+   - `3.months.ago`
+   - `1.year.ago`
+
+#### Delete job artifacts and logs from jobs completed before a specific date
+
+CAUTION: **CAUTION:**
+These commands remove data permanently from the database and from disk. We
+highly recommend running them only under the guidance of a Support Engineer, or
+running them in a test environment with a backup of the instance ready to be
+restored, just in case.
+
+If you need to manually remove ALL job artifacts associated with multiple jobs,
+**including job logs**, this can be done from the Rails console (`sudo gitlab-rails console`):
+
+1. Select jobs to be deleted:
+
+   To select jobs with artifacts for a single project:
+
+   ```ruby
+   project = Project.find_by_full_path('path/to/project')
+   builds_with_artifacts =  project.builds.with_existing_job_artifacts(Ci::JobArtifact.trace)
+   ```
+
+   To select jobs with artifacts across the entire GitLab instance:
+
+   ```ruby
+   builds_with_artifacts = Ci::Build.with_existing_job_artifacts(Ci::JobArtifact.trace)
+   ```
+
+1. Select the user which will be mentioned in the web UI as erasing the job:
+
+   ```ruby
+   admin_user = User.find_by(username: 'username')
+   ```
+
+1. Erase job artifacts and logs older than a specific date:
+
+   ```ruby
+   builds_to_clear = builds_with_artifacts.where("finished_at < ?", 1.week.ago)
+   builds_to_clear.find_each do |build|
+     print "Ci::Build ID #{build.id}... "
+
+     if build.erasable?
+       build.erase(erased_by: admin_user)
+       puts "Erased"
+     else
+       puts "Skipped (Nothing to erase or not erasable)"
+     end
+   end
+   ```
+
+   `1.week.ago` is a Rails `ActiveSupport::Duration` method which calculates a new
+   date or time in the past. Other valid examples are:
+
+   - `7.days.ago`
+   - `3.months.ago`
+   - `1.year.ago`

@@ -11,9 +11,9 @@ module Approvable
     approval_needed?
     approved?
     approvals_left
+    approvals_required
     can_approve?
     has_approved?
-    any_approver_allowed?
     authors_can_approve?
     committers_can_approve?
     approvers_overwritten?
@@ -31,16 +31,15 @@ module Approvable
     end
   end
 
-  def approval_state
-    @approval_state ||= ApprovalState.new(self)
+  # rubocop:disable Gitlab/ModuleWithInstanceVariables
+  def approval_state(target_branch: nil)
+    @approval_state ||= {}
+    @approval_state[target_branch] ||= ApprovalState.new(self, target_branch: target_branch)
   end
+  # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
   def approvals_given
     approvals.size
-  end
-
-  def approvals_required
-    [approvals_before_merge.to_i, target_project.approvals_before_merge.to_i].max
   end
 
   def approvals_before_merge

@@ -11,7 +11,7 @@ class ProcessGithubPullRequestEventService < ::BaseService
   }.freeze
 
   def execute(webhook_params)
-    return unless project.mirror?
+    return unless project.github_external_pull_request_pipelines_available?
 
     params = params_from_webhook(webhook_params)
     return unless params[:status]

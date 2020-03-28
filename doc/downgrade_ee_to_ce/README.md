@@ -21,7 +21,7 @@ The `JenkinsService` and `GithubService` classes are only available in the Enter
 so if you downgrade to the Community Edition, you'll come across the following
 error:
 
-```
+```plaintext
 Completed 500 Internal Server Error in 497ms (ActiveRecord: 32.2ms)
 
 ActionView::Template::Error (The single-table inheritance mechanism failed to locate the subclass: 'JenkinsService'. This
@@ -32,7 +32,7 @@ use another column for that information.)
 
 or
 
-```
+```plaintext
 Completed 500 Internal Server Error in 497ms (ActiveRecord: 32.2ms)
 
 ActionView::Template::Error (The single-table inheritance mechanism failed to locate the subclass: 'GithubService'. This
@@ -47,13 +47,13 @@ to avoid getting this error, you need to remove all instances of the
 
 **Omnibus Installation**
 
-```sh
+```shell
 sudo gitlab-rails runner "Service.where(type: ['JenkinsService', 'JenkinsDeprecatedService', 'GithubService']).delete_all"
 ```
 
 **Source Installation**
 
-```sh
+```shell
 bundle exec rails runner "Service.where(type: ['JenkinsService', 'JenkinsDeprecatedService', 'GithubService']).delete_all" production
 ```
 
@@ -89,7 +89,7 @@ To downgrade a source installation, you need to replace the current remote of
 your GitLab installation with the Community Edition's remote, fetch the latest
 changes, and checkout the latest stable branch:
 
-```sh
+```shell
 git remote set-url origin git@gitlab.com:gitlab-org/gitlab-foss.git
 git fetch --all
 git checkout 8-x-stable

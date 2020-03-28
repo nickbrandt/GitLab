@@ -12,13 +12,13 @@ For users and groups supported API calls see the [users](users.md) and
 Get a list of the namespaces of the authenticated user. If the user is an
 administrator, a list of all namespaces in the GitLab instance is shown.
 
-```
+```plaintext
 GET /namespaces
 ```
 
 Example request:
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/namespaces
 ```
 
@@ -74,7 +74,7 @@ NOTE: **Note:** Only group maintainers/owners are presented with `members_count_
 
 Get all namespaces that match a string in their name or path.
 
-```
+```plaintext
 GET /namespaces?search=foobar
 ```
 
@@ -84,7 +84,7 @@ GET /namespaces?search=foobar
 
 Example request:
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/namespaces?search=twitter
 ```
 
@@ -108,7 +108,7 @@ Example response:
 
 Get a namespace by ID.
 
-```
+```plaintext
 GET /namespaces/:id
 ```
 
@@ -118,7 +118,7 @@ GET /namespaces/:id
 
 Example request:
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/namespaces/2
 ```
 
@@ -138,7 +138,7 @@ Example response:
 
 Example request:
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/namespaces/group1
 ```
 

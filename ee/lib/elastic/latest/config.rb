@@ -7,7 +7,7 @@ module Elastic
       extend Elasticsearch::Model::Indexing::ClassMethods
       extend Elasticsearch::Model::Naming::ClassMethods
 
-      self.index_name = [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+      self.index_name = [Rails.application.class.module_parent_name.downcase, Rails.env].join('-')
 
       # ES6 requires a single type per index
       self.document_type = 'doc'
@@ -21,17 +21,50 @@ module Elastic
             analyzer: {
               default: {
                 tokenizer: 'standard',
-                filter: %w(standard lowercase my_stemmer)
+                filter: %w(lowercase my_stemmer)
               },
               my_ngram_analyzer: {
                 tokenizer: 'my_ngram_tokenizer',
                 filter: ['lowercase']
+              },
+              path_analyzer: {
+                type: 'custom',
+                tokenizer: 'path_tokenizer',
+                filter: %w(lowercase asciifolding)
+              },
+              code_analyzer: {
+                type: 'custom',
+                tokenizer: 'whitespace',
+                filter: %w(code edgeNGram_filter lowercase asciifolding)
+              },
+              code_search_analyzer: {
+                type: 'custom',
+                tokenizer: 'whitespace',
+                filter: %w(lowercase asciifolding)
               }
             },
             filter: {
               my_stemmer: {
                 type: 'stemmer',
                 name: 'light_english'
+              },
+              code: {
+                type: "pattern_capture",
+                preserve_original: true,
+                patterns: [
+                  "(\\p{Ll}+|\\p{Lu}\\p{Ll}+|\\p{Lu}+)",
+                  "(\\d+)",
+                  "(?=([\\p{Lu}]+[\\p{L}]+))",
+                  '"((?:\\"|[^"]|\\")*)"', # capture terms inside quotes, removing the quotes
+                  "'((?:\\'|[^']|\\')*)'", # same as above, for single quotes
+                  '\.([^.]+)(?=\.|\s|\Z)', # separate terms on periods
+                  '\/?([^\/]+)(?=\/|\b)' # separate path terms (like/this/one)
+                ]
+              },
+              edgeNGram_filter: {
+                type: 'edgeNGram',
+                min_gram: 2,
+                max_gram: 40
               }
             },
             tokenizer: {
@@ -40,6 +73,16 @@ module Elastic
                 min_gram: 2,
                 max_gram: 3,
                 token_chars: %w(letter digit)
+              },
+              path_tokenizer: {
+                type: 'path_hierarchy',
+                reverse: true
+              }
+            },
+            normalizer: {
+              sha_normalizer: {
+                type: "custom",
+                filter: ["lowercase"]
               }
             }
           }
@@ -74,9 +117,9 @@ module Elastic
         indexes :iid, type: :integer
 
         indexes :title, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :description, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
         indexes :state, type: :text
         indexes :project_id, type: :integer
         indexes :author_id, type: :integer
@@ -96,16 +139,16 @@ module Elastic
 
         ### MERGE REQUESTS
         indexes :target_branch, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :source_branch, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :merge_status, type: :text
         indexes :source_project_id, type: :integer
         indexes :target_project_id, type: :integer
 
         ### NOTES
         indexes :note, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
 
         indexes :issue do
           indexes :assignee_id, type: :integer
@@ -120,14 +163,14 @@ module Elastic
 
         ### PROJECTS
         indexes :name, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :path, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :name_with_namespace, type: :text,
-          index_options: 'offsets',
+          index_options: 'docs',
           analyzer: :my_ngram_analyzer
         indexes :path_with_namespace, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
         indexes :namespace_id, type: :integer
         indexes :archived, type: :boolean
 
@@ -142,31 +185,31 @@ module Elastic
 
         ### SNIPPETS
         indexes :file_name, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :content, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
 
         ### REPOSITORIES
         indexes :blob do
           indexes :type, type: :keyword
 
-          indexes :id, type: :text,
-            index_options: 'offsets',
-            analyzer: :sha_analyzer
+          indexes :id, type: :keyword,
+            index_options: 'docs',
+            normalizer: :sha_normalizer
           indexes :rid, type: :keyword
-          indexes :oid, type: :text,
-            index_options: 'offsets',
-            analyzer: :sha_analyzer
-          indexes :commit_sha, type: :text,
-            index_options: 'offsets',
-            analyzer: :sha_analyzer
+          indexes :oid, type: :keyword,
+            index_options: 'docs',
+            normalizer: :sha_normalizer
+          indexes :commit_sha, type: :keyword,
+            index_options: 'docs',
+            normalizer: :sha_normalizer
           indexes :path, type: :text,
             analyzer: :path_analyzer
           indexes :file_name, type: :text,
             analyzer: :code_analyzer,
             search_analyzer: :code_search_analyzer
           indexes :content, type: :text,
-            index_options: 'offsets',
+            index_options: 'positions',
             analyzer: :code_analyzer,
             search_analyzer: :code_search_analyzer
           indexes :language, type: :keyword
@@ -175,27 +218,27 @@ module Elastic
         indexes :commit do
           indexes :type, type: :keyword
 
-          indexes :id, type: :text,
-            index_options: 'offsets',
-            analyzer: :sha_analyzer
+          indexes :id, type: :keyword,
+            index_options: 'docs',
+            normalizer: :sha_normalizer
           indexes :rid, type: :keyword
-          indexes :sha, type: :text,
-            index_options: 'offsets',
-            analyzer: :sha_analyzer
+          indexes :sha, type: :keyword,
+            index_options: 'docs',
+            normalizer: :sha_normalizer
 
           indexes :author do
-            indexes :name, type: :text, index_options: 'offsets'
-            indexes :email, type: :text, index_options: 'offsets'
+            indexes :name, type: :text, index_options: 'docs'
+            indexes :email, type: :text, index_options: 'docs'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
           indexes :committer do
-            indexes :name, type: :text, index_options: 'offsets'
-            indexes :email, type: :text, index_options: 'offsets'
+            indexes :name, type: :text, index_options: 'docs'
+            indexes :email, type: :text, index_options: 'docs'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
-          indexes :message, type: :text, index_options: 'offsets'
+          indexes :message, type: :text, index_options: 'positions'
         end
       end
     end

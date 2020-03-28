@@ -1,10 +1,10 @@
 <script>
-import _ from 'underscore';
+import { escape, debounce } from 'lodash';
 import { mapActions, mapState } from 'vuex';
+import { GlLoadingIcon, GlFormInput, GlFormGroup } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import { GlLoadingIcon, GlFormInput, GlFormGroup } from '@gitlab/ui';
 import createEmptyBadge from '../empty_badge';
 import Badge from './badge.vue';
 
@@ -54,7 +54,7 @@ export default {
         s__('Badges|The %{docsLinkStart}variables%{docsLinkEnd} GitLab supports: %{placeholders}'),
         {
           docsLinkEnd: '</a>',
-          docsLinkStart: `<a href="${_.escape(this.docsUrl)}">`,
+          docsLinkStart: `<a href="${escape(this.docsUrl)}">`,
           placeholders,
         },
         false,
@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     ...mapActions(['addBadge', 'renderBadge', 'saveBadge', 'stopEditing', 'updateBadgeInForm']),
-    debouncedPreview: _.debounce(function preview() {
+    debouncedPreview: debounce(function preview() {
       this.renderBadge();
     }, badgePreviewDelayInMilliseconds),
     onCancel() {

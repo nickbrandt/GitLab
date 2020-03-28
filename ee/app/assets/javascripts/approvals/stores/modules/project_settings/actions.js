@@ -103,4 +103,8 @@ export const requestDeleteRule = ({ dispatch }, rule) => {
   dispatch('deleteModal/open', rule);
 };
 
+export const addEmptyRule = ({ commit }) => {
+  commit(types.ADD_EMPTY_RULE);
+};
+
 export default () => {};

@@ -9,7 +9,7 @@ submodule's reference to keep up to date other projects that use it.
 This endpoint allows you to update a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) reference in a
 specific branch.
 
-```
+```plaintext
 PUT /projects/:id/repository/submodules/:submodule
 ```
 
@@ -21,7 +21,7 @@ PUT /projects/:id/repository/submodules/:submodule
 | `commit_sha` | string | yes | Full commit SHA to update the submodule to |
 | `commit_message` | string | no | Commit message. If no message is provided, a default one will be set |
 
-```sh
+```shell
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/submodules/lib%2Fmodules%2Fexample"
 --data "branch=master&commit_sha=3ddec28ea23acc5caa5d8331a6ecb2a65fc03e88&commit_message=Update submodule reference"
 ```

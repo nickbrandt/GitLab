@@ -37,35 +37,21 @@ describe EE::Issuable do
 
       expect(relation.labels_hash[issue_id]).to include('Feature', 'Second Label')
     end
-  end
 
-  describe '#milestone_available?' do
-    context 'with Epic' do
-      let(:epic) { create(:epic) }
+    # This tests the workaround for the lack of a NOT NULL constraint in
+    # label_links.label_id:
+    # https://gitlab.com/gitlab-org/gitlab/issues/197307
+    context 'with a NULL label ID in the link' do
+      let(:issue) { create(:labeled_issue, labels: [feature_label, second_label]) }
 
-      it 'returns true' do
-        expect(epic.milestone_available?).to be_truthy
+      before do
+        label_link = issue.label_links.find_by(label_id: second_label.id)
+        label_link.label_id = nil
+        label_link.save(validate: false)
       end
-    end
 
-    context 'no Epic' do
-      let(:issue) { create(:issue) }
-
-      it 'returns false' do
-        expect(issue.milestone_available?).to be_falsy
-      end
-    end
-  end
-
-  describe '#supports_milestone?' do
-    let(:group)   { create(:group) }
-    let(:project) { create(:project, group: group) }
-
-    context "for epics" do
-      let(:epic) { build(:epic) }
-
-      it 'returns false' do
-        expect(epic.supports_milestone?).to be_falsy
+      it 'filters out bad labels' do
+        expect(Issue.where(id: issue.id).labels_hash[issue.id]).to match_array(['Feature'])
       end
     end
   end

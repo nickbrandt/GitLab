@@ -12,14 +12,13 @@ describe EE::NotificationService, :mailer do
   let(:mailer) { double(deliver_later: true) }
 
   context 'when notified of a new design diff note' do
-    set(:design) { create(:design, :with_file) }
-    set(:project) { design.project }
-    set(:dev) { create(:user) }
-    set(:stranger) { create(:user) }
-    set(:note) do
+    let_it_be(:design) { create(:design, :with_file) }
+    let_it_be(:project) { design.project }
+    let_it_be(:dev) { create(:user) }
+    let_it_be(:stranger) { create(:user) }
+    let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
-         project: project,
          note: "Hello #{dev.to_reference}, G'day #{stranger.to_reference}")
     end
 
@@ -378,42 +377,9 @@ describe EE::NotificationService, :mailer do
     end
   end
 
-  describe '#prometheus_alerts_fired' do
-    let!(:project) { create(:project) }
-    let!(:prometheus_alert) { create(:prometheus_alert, project: project) }
-    let!(:master) { create(:user) }
-    let!(:developer) { create(:user) }
-
-    before do
-      project.add_master(master)
-    end
-
-    it 'sends the email to owners and masters' do
-      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, master.id, prometheus_alert).and_call_original
-      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, project.owner.id, prometheus_alert).and_call_original
-      expect(Notify).not_to receive(:prometheus_alert_fired_email).with(project.id, developer.id, prometheus_alert)
-
-      subject.prometheus_alerts_fired(prometheus_alert.project, [prometheus_alert])
-    end
-
-    it_behaves_like 'project emails are disabled' do
-      before do
-        allow_any_instance_of(::Gitlab::Alerting::Alert).to receive(:valid?).and_return(true)
-      end
-
-      let(:alert_params) { { 'labels' => { 'gitlab_alert_id' => 'unknown' } } }
-      let(:notification_target)  { prometheus_alert.project }
-      let(:notification_trigger) { subject.prometheus_alerts_fired(prometheus_alert.project, [alert_params]) }
-
-      around do |example|
-        perform_enqueued_jobs { example.run }
-      end
-    end
-  end
-
   describe 'epics' do
-    set(:group) { create(:group, :private) }
-    set(:epic) { create(:epic, group: group) }
+    let_it_be(:group) { create(:group, :private) }
+    let_it_be(:epic) { create(:epic, group: group) }
 
     around do |example|
       perform_enqueued_jobs do
@@ -558,7 +524,7 @@ describe EE::NotificationService, :mailer do
     # User to be participant by default
     # This user does not contain any record in notification settings table
     # It should be treated with a :participating notification_level
-    @u_lazy_participant      = create(:user, username: 'lazy-participant')
+    @u_lazy_participant = create(:user, username: 'lazy-participant')
 
     @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching', group)
     @u_guest_custom = create_user_with_notification(:custom, 'guest_custom', group)
@@ -637,18 +603,17 @@ describe EE::NotificationService, :mailer do
         let!(:rule) { create(:approval_project_rule, project: project, users: project_approvers, approvals_required: 1 )}
 
         before do
-          merge_request.target_project.update(approvals_before_merge: 1)
           reset_delivered_emails!
         end
 
-        it 'emails the approvers' do
+        it 'does not email the approvers' do
           notification.new_merge_request(merge_request, @u_disabled)
 
-          project_approvers.each { |approver| should_email(approver) }
+          project_approvers.each { |approver| should_not_email(approver) }
         end
 
         it 'does not email the approvers when approval is not necessary' do
-          rule.update(approvals_required: 0)
+          project.approval_rules.update_all(approvals_required: 0)
           notification.new_merge_request(merge_request, @u_disabled)
 
           project_approvers.each { |approver| should_not_email(approver) }
@@ -667,10 +632,10 @@ describe EE::NotificationService, :mailer do
             reset_delivered_emails!
           end
 
-          it 'emails the MR approvers' do
+          it 'does not email the MR approvers' do
             notification.new_merge_request(merge_request, @u_disabled)
 
-            mr_approvers.each { |approver| should_email(approver) }
+            mr_approvers.each { |approver| should_not_email(approver) }
           end
 
           it 'does not email approvers set on the project who are not approvers of this MR' do
@@ -701,7 +666,7 @@ describe EE::NotificationService, :mailer do
       # User to be participant by default
       # This user does not contain any record in notification settings table
       # It should be treated with a :participating notification_level
-      @u_lazy_participant      = create(:user, username: 'lazy-participant')
+      @u_lazy_participant = create(:user, username: 'lazy-participant')
 
       @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching')
       @u_guest_custom = create_user_with_notification(:custom, 'guest_custom')

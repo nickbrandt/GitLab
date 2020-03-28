@@ -16,6 +16,28 @@ module API
 
         present key, with: Entities::SSHKeyWithUser, current_user: current_user
       end
+
+      desc 'Get SSH Key information' do
+        success Entities::UserWithAdmin
+      end
+      params do
+        requires :fingerprint, type: String, desc: 'Search for a SSH fingerprint'
+      end
+      get do
+        authenticated_with_can_read_all_resources!
+
+        key = KeysFinder.new(params).execute
+
+        not_found!('Key') unless key
+
+        if key.type == "DeployKey"
+          present key, with: Entities::DeployKeyWithUser, current_user: current_user
+        else
+          present key, with: Entities::SSHKeyWithUser, current_user: current_user
+        end
+      rescue KeysFinder::InvalidFingerprint
+        render_api_error!('Failed to return the key', 400)
+      end
     end
   end
 end

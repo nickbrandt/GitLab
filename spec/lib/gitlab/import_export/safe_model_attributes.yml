@@ -30,16 +30,25 @@ Issue:
 - last_edited_at
 - last_edited_by_id
 - discussion_locked
+- health_status
+- external_key
 Event:
 - id
 - target_type
-- target_id
 - project_id
 - group_id
 - created_at
 - updated_at
 - action
 - author_id
+WikiPage::Meta:
+- id
+- title
+- project_id
+WikiPage::Slug:
+- id
+- wiki_page_meta_id
+- slug
 PushEventPayload:
 - commit_count
 - action
@@ -60,7 +69,6 @@ Note:
 - attachment
 - line_code
 - commit_id
-- noteable_id
 - system
 - st_diff
 - updated_by_id
@@ -73,11 +81,9 @@ Note:
 - resolved_by_push
 - discussion_id
 - original_discussion_id
-- review_id
+- confidential
 LabelLink:
 - id
-- label_id
-- target_id
 - target_type
 - created_at
 - updated_at
@@ -128,23 +134,21 @@ Release:
 - created_at
 - updated_at
 - released_at
-Evidence:
+Releases::Evidence:
 - id
-- release_id
 - summary
 - created_at
 - updated_at
 Releases::Link:
 - id
-- release_id
 - url
 - name
+- filepath
 - created_at
 - updated_at
 ProjectMember:
 - id
 - access_level
-- source_id
 - source_type
 - user_id
 - notification_level
@@ -233,6 +237,31 @@ MergeRequestDiffFile:
 - b_mode
 - too_large
 - binary
+MergeRequestContextCommit:
+- id
+- authored_date
+- committed_date
+- relative_order
+- sha
+- author_name
+- author_email
+- committer_name
+- committer_email
+- message
+- merge_request_id
+MergeRequestContextCommitDiffFile:
+- sha
+- relative_order
+- new_file
+- renamed_file
+- deleted_file
+- new_path
+- old_path
+- a_mode
+- b_mode
+- too_large
+- binary
+- text
 MergeRequest::Metrics:
 - id
 - created_at
@@ -252,6 +281,8 @@ MergeRequest::Metrics:
 - diff_size
 - modified_paths_size
 - commits_count
+- first_approved_at
+- first_reassigned_at
 Ci::Pipeline:
 - id
 - project_id
@@ -341,6 +372,8 @@ CommitStatus:
 - scheduled_at
 - upstream_pipeline_id
 - interruptible
+- processed
+- scheduling_type
 Ci::Variable:
 - id
 - project_id
@@ -435,6 +468,7 @@ Service:
 - active
 - properties
 - template
+- instance
 - push_events
 - issues_events
 - commit_events
@@ -443,6 +477,7 @@ Service:
 - note_events
 - pipeline_events
 - job_events
+- comment_on_event_enabled
 - category
 - default
 - wiki_page_events
@@ -541,6 +576,8 @@ Project:
 - pages_https_only
 - merge_requests_disable_committers_approval
 - require_password_to_approve
+- autoclose_referenced_issues
+- suggestion_commit_message
 ProjectTracingSetting:
 - external_url
 Author:
@@ -549,6 +586,7 @@ ProjectFeature:
 - id
 - project_id
 - merge_requests_access_level
+- forking_access_level
 - issues_access_level
 - wiki_access_level
 - snippets_access_level
@@ -599,7 +637,6 @@ AwardEmoji:
 LabelPriority:
 - id
 - project_id
-- label_id
 - priority
 - created_at
 - updated_at
@@ -607,7 +644,6 @@ Timelog:
 - id
 - time_spent
 - merge_request_id
-- issue_id
 - user_id
 - spent_at
 - created_at
@@ -622,7 +658,6 @@ ProjectAutoDevops:
 - updated_at
 IssueAssignee:
 - user_id
-- issue_id
 ProjectCustomAttribute:
 - id
 - created_at
@@ -678,7 +713,6 @@ ProtectedEnvironment::DeployAccessLevel:
 ResourceLabelEvent:
 - id
 - action
-- issue_id
 - merge_request_id
 - label_id
 - user_id
@@ -688,9 +722,11 @@ ErrorTracking::ProjectErrorTrackingSetting:
 - project_id
 - project_name
 - organization_name
+SentryIssue:
+- id
+- sentry_issue_identifier
 Suggestion:
 - id
-- note_id
 - relative_order
 - applied
 - commit_id
@@ -728,6 +764,8 @@ List:
 - milestone_id
 - user_id
 - max_issue_count
+- max_issue_weight
+- limit_metric
 ExternalPullRequest:
 - id
 - created_at
@@ -744,21 +782,18 @@ ExternalPullRequest:
 DesignManagement::Design:
 - id
 - project_id
-- issue_id
 - filename
 DesignManagement::Action:
-- design_id
+- id
 - event
-- version_id
+- image_v432x230
 DesignManagement::Version:
 - id
 - created_at
 - sha
-- issue_id
 - author_id
 ZoomMeeting:
 - id
-- issue_id
 - project_id
 - issue_status
 - url
@@ -767,3 +802,49 @@ ZoomMeeting:
 ServiceDeskSetting:
 - project_id
 - issue_template_key
+- project_key
+ContainerExpirationPolicy:
+- created_at
+- updated_at
+- next_run_at
+- project_id
+- name_regex
+- cadence
+- older_than
+- keep_n
+- enabled
+Epic:
+  - id
+  - milestone_id
+  - group_id
+  - author_id
+  - assignee_id
+  - iid
+  - updated_by_id
+  - last_edited_by_id
+  - lock_version
+  - start_date
+  - end_date
+  - last_edited_at
+  - created_at
+  - updated_at
+  - title
+  - description
+  - start_date_sourcing_milestone_id
+  - due_date_sourcing_milestone_id
+  - start_date_fixed
+  - due_date_fixed
+  - start_date_is_fixed
+  - due_date_is_fixed
+  - closed_by_id
+  - closed_at
+  - parent_id
+  - relative_position
+  - state_id
+  - start_date_sourcing_epic_id
+  - due_date_sourcing_epic_id
+  - health_status
+  - external_key
+EpicIssue:
+  - id
+  - relative_position

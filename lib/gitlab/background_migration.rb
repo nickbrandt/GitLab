@@ -58,6 +58,14 @@ module Gitlab
       migration_class_for(class_name).new.perform(*arguments)
     end
 
+    def self.remaining
+      scheduled = Sidekiq::ScheduledSet.new.count do |job|
+        job.queue == self.queue
+      end
+
+      scheduled + Sidekiq::Queue.new(self.queue).size
+    end
+
     def self.exists?(migration_class, additional_queues = [])
       enqueued = Sidekiq::Queue.new(self.queue)
       scheduled = Sidekiq::ScheduledSet.new
@@ -78,6 +86,20 @@ module Gitlab
     end
 
     def self.migration_class_for(class_name)
+      # We don't pass class name with Gitlab::BackgroundMigration:: prefix anymore
+      # but some jobs could be already spawned so we need to have some backward compatibility period.
+      # Can be removed since 13.x
+      full_class_name_prefix_regexp = /\A(::)?Gitlab::BackgroundMigration::/
+
+      if class_name.match(full_class_name_prefix_regexp)
+        Gitlab::ErrorTracking.track_and_raise_for_dev_exception(
+          StandardError.new("Full class name is used"),
+          class_name: class_name
+        )
+
+        class_name = class_name.sub(full_class_name_prefix_regexp, '')
+      end
+
       const_get(class_name, false)
     end
 

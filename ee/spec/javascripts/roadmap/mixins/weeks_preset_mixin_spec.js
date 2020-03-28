@@ -6,7 +6,7 @@ import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic } from '../mock_data';
 
 const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
@@ -15,8 +15,6 @@ const createComponent = ({
   timeframe = mockTimeframeWeeks,
   timeframeItem = mockTimeframeWeeks[0],
   epic = mockEpic,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(EpicItemTimelineComponent);
 
@@ -25,8 +23,6 @@ const createComponent = ({
     timeframe,
     timeframeItem,
     epic,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -70,22 +66,34 @@ describe('WeeksPresetMixin', () => {
     });
 
     describe('isTimeframeUnderEndDateForWeek', () => {
+      const timeframeItem = new Date(2018, 0, 7); // Jan 7, 2018
+
       beforeEach(() => {
         vm = createComponent({});
       });
 
       it('returns true if provided timeframeItem is under epicEndDate', () => {
-        const timeframeItem = new Date(2018, 0, 7); // Jan 7, 2018
         const epicEndDate = new Date(2018, 0, 3); // Jan 3, 2018
 
-        expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate)).toBe(true);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem)).toBe(true);
       });
 
       it('returns false if provided timeframeItem is NOT under epicEndDate', () => {
-        const timeframeItem = new Date(2018, 0, 7); // Jan 7, 2018
         const epicEndDate = new Date(2018, 0, 15); // Jan 15, 2018
 
-        expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate)).toBe(false);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem)).toBe(false);
       });
     });
 
@@ -105,7 +113,7 @@ describe('WeeksPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -116,7 +124,7 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the week', () => {
@@ -126,24 +134,23 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('left: 0;');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('left: 0;');
       });
 
-      it('returns proportional `left` value based on Epic startDate and days in the month', () => {
+      it('returns proportional `left` value based on Epic startDate and days in the week', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, {
             startDate: new Date(2018, 0, 15),
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toContain('left: 51');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toContain('left: 38');
       });
     });
 
     describe('getTimelineBarWidthForWeeks', () => {
       it('returns calculated width value based on Epic.startDate and Epic.endDate', () => {
         vm = createComponent({
-          shellWidth: 2000,
           timeframeItem: mockTimeframeWeeks[0],
           epic: Object.assign({}, mockEpic, {
             startDate: new Date(2018, 0, 1), // Jan 1, 2018
@@ -151,7 +158,7 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForWeeks())).toBe(1611);
+        expect(Math.floor(vm.getTimelineBarWidthForWeeks())).toBe(1208);
       });
     });
   });

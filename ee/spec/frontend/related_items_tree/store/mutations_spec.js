@@ -19,6 +19,7 @@ describe('RelatedItemsTree', () => {
             issuesEndpoint: '/bar',
             autoCompleteEpics: true,
             autoCompleteIssues: false,
+            allowSubEpics: true,
           };
 
           mutations[types.SET_INITIAL_CONFIG](state, data);
@@ -27,6 +28,7 @@ describe('RelatedItemsTree', () => {
           expect(state).toHaveProperty('issuesEndpoint', '/bar');
           expect(state).toHaveProperty('autoCompleteEpics', true);
           expect(state).toHaveProperty('autoCompleteIssues', false);
+          expect(state).toHaveProperty('allowSubEpics', true);
         });
       });
 
@@ -390,6 +392,17 @@ describe('RelatedItemsTree', () => {
         });
       });
 
+      describe(types.TOGGLE_CREATE_ISSUE_FORM, () => {
+        it('should set value of `showCreateIssueForm` as it is and `showAddItemForm` as false on state', () => {
+          const data = { toggleState: true };
+
+          mutations[types.TOGGLE_CREATE_ISSUE_FORM](state, data);
+
+          expect(state.showCreateIssueForm).toBe(data.toggleState);
+          expect(state.showAddItemForm).toBe(false);
+        });
+      });
+
       describe(types.SET_PENDING_REFERENCES, () => {
         it('should set `pendingReferences` to state based on provided `references` param', () => {
           const reference = ['foo'];
@@ -431,6 +444,16 @@ describe('RelatedItemsTree', () => {
 
           expect(state.pendingReferences).toEqual(expect.arrayContaining(['foo']));
         });
+
+        it('should update `itemAddFailure` to false if no `pendingReferences` are left', () => {
+          state.pendingReferences = ['foo'];
+          state.itemAddFailure = true;
+
+          mutations[types.REMOVE_PENDING_REFERENCE](state, 0);
+
+          expect(state.pendingReferences.length).toEqual(0);
+          expect(state.itemAddFailure).toBe(false);
+        });
       });
 
       describe(types.SET_ITEM_INPUT_VALUE, () => {
@@ -468,10 +491,16 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.RECEIVE_ADD_ITEM_FAILURE, () => {
-        it('should set `itemAddInProgress` to false within state', () => {
-          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state);
+        it('should set `itemAddInProgress` to false, `itemAddFailure` to true and `itemAddFailureType` value within state', () => {
+          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, {
+            itemAddFailureMessage: 'foo',
+            itemAddFailureType: 'bar',
+          });
 
           expect(state.itemAddInProgress).toBe(false);
+          expect(state.itemAddFailure).toBe(true);
+          expect(state.itemAddFailureMessage).toEqual('foo');
+          expect(state.itemAddFailureType).toEqual('bar');
         });
       });
 
@@ -526,6 +555,33 @@ describe('RelatedItemsTree', () => {
           expect(state.children[state.parentItem.reference]).toEqual(
             expect.arrayContaining(['bar', 'foo']),
           );
+        });
+      });
+
+      describe(types.REQUEST_PROJECTS, () => {
+        it('should set `projectsFetchInProgress` to true within state', () => {
+          mutations[types.REQUEST_PROJECTS](state);
+
+          expect(state.projectsFetchInProgress).toBe(true);
+        });
+      });
+
+      describe(types.RECIEVE_PROJECTS_SUCCESS, () => {
+        it('should set `projectsFetchInProgress` to false and provided `projects` param as it is within the state', () => {
+          const projects = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
+
+          mutations[types.RECIEVE_PROJECTS_SUCCESS](state, projects);
+
+          expect(state.projects).toBe(projects);
+          expect(state.projectsFetchInProgress).toBe(false);
+        });
+      });
+
+      describe(types.RECIEVE_PROJECTS_FAILURE, () => {
+        it('should set `projectsFetchInProgress` to false within state', () => {
+          mutations[types.RECIEVE_PROJECTS_FAILURE](state);
+
+          expect(state.projectsFetchInProgress).toBe(false);
         });
       });
     });

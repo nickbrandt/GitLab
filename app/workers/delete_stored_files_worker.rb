@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class DeleteStoredFilesWorker
+class DeleteStoredFilesWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category_not_owned!
@@ -15,7 +15,7 @@ class DeleteStoredFilesWorker
     unless klass
       message = "Unknown class '#{class_name}'"
       logger.error(message)
-      Gitlab::Sentry.track_exception(RuntimeError.new(message))
+      Gitlab::ErrorTracking.track_and_raise_for_dev_exception(RuntimeError.new(message))
       return
     end
 

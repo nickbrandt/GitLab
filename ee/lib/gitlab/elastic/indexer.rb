@@ -22,17 +22,6 @@ module Gitlab
         @project = project
         @wiki = wiki
 
-        # We accept any form of settings, including string and array
-        # This is why JSON is needed
-        @vars = {
-          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
-          'RAILS_ENV'               => Rails.env
-        }
-
-        @vars['GITALY_CONNECTION_INFO'] = {
-          storage: project.repository_storage
-        }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
-
         # Use the eager-loaded association if available.
         @index_status = project.index_status
       end
@@ -47,7 +36,9 @@ module Gitlab
           return
         end
 
-        run_indexer!(to_sha)
+        repository.__elasticsearch__.elastic_writing_targets.each do |target|
+          run_indexer!(to_sha, target)
+        end
         update_index_status(to_sha)
 
         true
@@ -63,9 +54,11 @@ module Gitlab
         wiki? ? project.wiki.repository : project.repository
       end
 
-      def run_indexer!(to_sha)
+      def run_indexer!(to_sha, target)
+        vars = build_envvars(to_sha, target)
+
         if index_status && !repository_contains_last_indexed_commit?
-          repository.delete_index_for_commits_and_blobs(wiki: wiki?)
+          target.delete_index_for_commits_and_blobs(wiki: wiki?)
         end
 
         path_to_indexer = Gitlab.config.elasticsearch.indexer_path
@@ -77,11 +70,29 @@ module Gitlab
             [path_to_indexer, project.id.to_s, repository_path]
           end
 
-        vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
-
         output, status = Gitlab::Popen.popen(command, nil, vars)
 
         raise Error, output unless status&.zero?
+      end
+
+      def build_envvars(to_sha, target)
+        # We accept any form of settings, including string and array
+        # This is why JSON is needed
+        vars = {
+          'RAILS_ENV'               => Rails.env,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config(target),
+          'GITALY_CONNECTION_INFO'  => gitaly_connection_info,
+          'FROM_SHA'                => from_sha,
+          'TO_SHA'                  => to_sha,
+          'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
+          'SSL_CERT_FILE'           => OpenSSL::X509::DEFAULT_CERT_FILE,
+          'SSL_CERT_DIR'            => OpenSSL::X509::DEFAULT_CERT_DIR
+        }
+
+        # Users can override default SSL certificate path via these envs
+        %w(SSL_CERT_FILE SSL_CERT_DIR).each_with_object(vars) do |key, hash|
+          hash[key] = ENV[key] if ENV.key?(key)
+        end
       end
 
       def last_commit
@@ -104,6 +115,18 @@ module Gitlab
 
       def repository_path
         "#{repository.disk_path}.git"
+      end
+
+      def elasticsearch_config(target)
+        Gitlab::CurrentSettings.elasticsearch_config.merge(
+          index_name: target.index_name
+        ).to_json
+      end
+
+      def gitaly_connection_info
+        {
+          storage: project.repository_storage
+        }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

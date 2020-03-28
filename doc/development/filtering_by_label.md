@@ -47,7 +47,7 @@ prone to errors (such as
 ### Attempt A1: use multiple subqueries with WHERE EXISTS
 
 In [issue #37137](https://gitlab.com/gitlab-org/gitlab-foss/issues/37137)
-and its associated [merge request](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/14022),
+and its associated [merge request](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/14022),
 we tried to replace the `GROUP BY` with multiple uses of `WHERE EXISTS`. For the
 example above, this would give:
 
@@ -80,7 +80,7 @@ it did not improve query performance.
 ## Attempt B: Denormalize using an array column
 
 Having [removed MySQL support in GitLab 12.1](https://about.gitlab.com/blog/2019/06/27/removing-mysql-support/),
-using [Postgres's arrays](https://www.postgresql.org/docs/9.6/arrays.html) became more
+using [PostgreSQL's arrays](https://www.postgresql.org/docs/9.6/arrays.html) became more
 tractable as we didn't have to support two databases. We discussed denormalizing
 the `label_links` table for querying in
 [issue #49651](https://gitlab.com/gitlab-org/gitlab-foss/issues/49651),

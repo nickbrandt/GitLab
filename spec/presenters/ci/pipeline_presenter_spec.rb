@@ -6,6 +6,7 @@ describe Ci::PipelinePresenter do
   include Gitlab::Routing
 
   let(:user) { create(:user) }
+  let(:current_user) { user }
   let(:project) { create(:project) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
 
@@ -15,7 +16,7 @@ describe Ci::PipelinePresenter do
 
   before do
     project.add_developer(user)
-    allow(presenter).to receive(:current_user) { user }
+    allow(presenter).to receive(:current_user) { current_user }
   end
 
   it 'inherits from Gitlab::View::Presenter::Delegated' do
@@ -62,13 +63,19 @@ describe Ci::PipelinePresenter do
     end
   end
 
-  context '#failure_reason' do
-    context 'when pipeline has failure reason' do
-      it 'represents a failure reason sentence' do
-        pipeline.failure_reason = :config_error
+  describe '#failure_reason' do
+    context 'when pipeline has a failure reason' do
+      ::Ci::PipelineEnums.failure_reasons.keys.each do |failure_reason|
+        context "when failure reason is #{failure_reason}" do
+          before do
+            pipeline.failure_reason = failure_reason
+          end
 
-        expect(presenter.failure_reason)
-          .to eq 'CI/CD YAML configuration error!'
+          it 'represents a failure reason sentence' do
+            expect(presenter.failure_reason).to be_an_instance_of(String)
+            expect(presenter.failure_reason).not_to eq(failure_reason.to_s)
+          end
+        end
       end
     end
 
@@ -203,16 +210,105 @@ describe Ci::PipelinePresenter do
           "<a class=\"mr-iid\" href=\"#{merge_request_path(mr_2)}\">#{mr_2.to_reference} #{mr_2.title}</a>, " \
           "<a class=\"mr-iid\" href=\"#{merge_request_path(mr_1)}\">#{mr_1.to_reference} #{mr_1.title}</a>")
       }
+
+      context 'with a limit passed' do
+        subject { presenter.all_related_merge_request_text(limit: 1) }
+
+        it {
+          is_expected.to eq("2 related merge requests: " \
+          "<a class=\"mr-iid\" href=\"#{merge_request_path(mr_2)}\">#{mr_2.to_reference} #{mr_2.title}</a>")
+        }
+      end
     end
   end
 
   describe '#all_related_merge_requests' do
     it 'memoizes the returned relation' do
       query_count = ActiveRecord::QueryRecorder.new do
-        2.times { presenter.send(:all_related_merge_requests).count }
+        3.times { presenter.send(:all_related_merge_requests).count }
       end.count
 
-      expect(query_count).to eq(1)
+      expect(query_count).to eq(2)
+    end
+
+    context 'permissions' do
+      let!(:merge_request) do
+        create(:merge_request, project: project, source_project: project)
+      end
+
+      subject(:all_related_merge_requests) do
+        presenter.send(:all_related_merge_requests)
+      end
+
+      shared_examples 'private merge requests' do
+        context 'when not logged in' do
+          let(:current_user) {}
+
+          it { is_expected.to be_empty }
+        end
+
+        context 'when logged in as a non_member' do
+          let(:current_user) { create(:user) }
+
+          it { is_expected.to be_empty }
+        end
+
+        context 'when logged in as a guest' do
+          let(:current_user) { create(:user) }
+
+          before do
+            project.add_guest(current_user)
+          end
+
+          it { is_expected.to be_empty }
+        end
+
+        context 'when logged in as a developer' do
+          it { is_expected.to contain_exactly(merge_request) }
+        end
+
+        context 'when logged in as a maintainer' do
+          let(:current_user) { create(:user) }
+
+          before do
+            project.add_maintainer(current_user)
+          end
+
+          it { is_expected.to contain_exactly(merge_request) }
+        end
+      end
+
+      context 'with a private project' do
+        it_behaves_like 'private merge requests'
+      end
+
+      context 'with a public project with private merge requests' do
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
+          project
+            .project_feature
+            .update!(merge_requests_access_level: ProjectFeature::PRIVATE)
+        end
+
+        it_behaves_like 'private merge requests'
+      end
+
+      context 'with a public project with public merge requests' do
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
+          project
+            .project_feature
+            .update!(merge_requests_access_level: ProjectFeature::ENABLED)
+        end
+
+        context 'when not logged in' do
+          let(:current_user) {}
+
+          it { is_expected.to contain_exactly(merge_request) }
+        end
+      end
     end
   end
 

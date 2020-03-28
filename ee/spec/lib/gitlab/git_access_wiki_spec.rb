@@ -43,7 +43,8 @@ describe Gitlab::GitAccessWiki do
     access.check('git-receive-pack', changes)
   end
 
-  def raise_unauthorized(message)
-    raise_error(Gitlab::GitAccess::UnauthorizedError, message)
+  # It is needed by the shared examples
+  def raise_forbidden(message)
+    raise_error(Gitlab::GitAccess::ForbiddenError, message)
   end
 end

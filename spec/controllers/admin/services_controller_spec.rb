@@ -10,29 +10,22 @@ describe Admin::ServicesController do
   end
 
   describe 'GET #edit' do
-    let!(:project) { create(:project) }
+    let!(:service) do
+      create(:jira_service, :template)
+    end
 
-    Service.available_services_names.each do |service_name|
-      context "#{service_name}" do
-        let!(:service) do
-          service_template = "#{service_name}_service".camelize.constantize
-          service_template.where(template: true).first_or_create
-        end
+    it 'successfully displays the template' do
+      get :edit, params: { id: service.id }
 
-        it 'successfully displays the template' do
-          get :edit, params: { id: service.id }
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-      end
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
   describe "#update" do
     let(:project) { create(:project) }
-    let!(:service) do
+    let!(:service_template) do
       RedmineService.create(
-        project: project,
+        project: nil,
         active: false,
         template: true,
         properties: {
@@ -44,19 +37,19 @@ describe Admin::ServicesController do
     end
 
     it 'calls the propagation worker when service is active' do
-      expect(PropagateServiceTemplateWorker).to receive(:perform_async).with(service.id)
+      expect(PropagateServiceTemplateWorker).to receive(:perform_async).with(service_template.id)
 
-      put :update, params: { id: service.id, service: { active: true } }
+      put :update, params: { id: service_template.id, service: { active: true } }
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
     end
 
     it 'does not call the propagation worker when service is not active' do
       expect(PropagateServiceTemplateWorker).not_to receive(:perform_async)
 
-      put :update, params: { id: service.id, service: { properties: {} } }
+      put :update, params: { id: service_template.id, service: { properties: {} } }
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
     end
   end
 end

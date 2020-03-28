@@ -1,19 +1,19 @@
 /* eslint-disable no-unused-vars */
-import GLDropdown from '~/gl_dropdown';
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
+import setTimeoutPromise from 'spec/helpers/set_timeout_promise_helper';
+import GLDropdown from '~/gl_dropdown';
 import axios from '~/lib/utils/axios_utils';
 import '~/behaviors/markdown/render_gfm';
 import issuableApp from '~/issue_show/components/app.vue';
 import eventHub from '~/issue_show/event_hub';
-import setTimeoutPromise from 'spec/helpers/set_timeout_promise_helper';
-import issueShowData from '../mock_data';
+import { initialRequest, secondRequest } from '../mock_data';
 
 function formatText(text) {
   return text.trim().replace(/\s\s+/g, ' ');
 }
 
-const REALTIME_REQUEST_STACK = [issueShowData.initialRequest, issueShowData.secondRequest];
+const REALTIME_REQUEST_STACK = [initialRequest, secondRequest];
 
 describe('Issuable output', () => {
   let mock;
@@ -40,17 +40,19 @@ describe('Issuable output', () => {
     const IssuableDescriptionComponent = Vue.extend(issuableApp);
 
     mock = new MockAdapter(axios);
-    mock.onGet('/gitlab-org/gitlab-shell/issues/9/realtime_changes/realtime_changes').reply(() => {
-      const res = Promise.resolve([200, REALTIME_REQUEST_STACK[realtimeRequestCount]]);
-      realtimeRequestCount += 1;
-      return res;
-    });
+    mock
+      .onGet('/gitlab-org/gitlab-shell/-/issues/9/realtime_changes/realtime_changes')
+      .reply(() => {
+        const res = Promise.resolve([200, REALTIME_REQUEST_STACK[realtimeRequestCount]]);
+        realtimeRequestCount += 1;
+        return res;
+      });
 
     vm = new IssuableDescriptionComponent({
       propsData: {
         canUpdate: true,
         canDestroy: true,
-        endpoint: '/gitlab-org/gitlab-shell/issues/9/realtime_changes',
+        endpoint: '/gitlab-org/gitlab-shell/-/issues/9/realtime_changes',
         updateEndpoint: gl.TEST_HOST,
         issuableRef: '#1',
         initialTitleHtml: '',

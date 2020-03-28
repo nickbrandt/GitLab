@@ -7,10 +7,12 @@ module Gitlab
         class Build < Seed::Base
           include Gitlab::Utils::StrongMemoize
 
+          EnvironmentCreationFailure = Class.new(StandardError)
+
           delegate :dig, to: :@seed_attributes
 
           # When the `ci_dag_limit_needs` is enabled it uses the lower limit
-          LOW_NEEDS_LIMIT = 5
+          LOW_NEEDS_LIMIT = 10
           HARD_NEEDS_LIMIT = 50
 
           def initialize(pipeline, attributes, previous_stages)
@@ -18,6 +20,7 @@ module Gitlab
             @seed_attributes = attributes
             @previous_stages = previous_stages
             @needs_attributes = dig(:needs_attributes)
+            @resource_group_key = attributes.delete(:resource_group_key)
 
             @using_rules  = attributes.key?(:rules)
             @using_only   = attributes.key?(:only)
@@ -76,11 +79,37 @@ module Gitlab
               if bridge?
                 ::Ci::Bridge.new(attributes)
               else
-                ::Ci::Build.new(attributes).tap do |job|
-                  job.deployment = Seed::Deployment.new(job).to_resource
+                ::Ci::Build.new(attributes).tap do |build|
+                  build.assign_attributes(self.class.environment_attributes_for(build))
+                  build.resource_group = Seed::Build::ResourceGroup.new(build, @resource_group_key).to_resource
                 end
               end
             end
+          end
+
+          def self.environment_attributes_for(build)
+            return {} unless build.has_environment?
+
+            environment = Seed::Environment.new(build).to_resource
+
+            # If there is a validation error on environment creation, such as
+            # the name contains invalid character, the build falls back to a
+            # non-environment job.
+            unless environment.persisted?
+              Gitlab::ErrorTracking.track_exception(
+                EnvironmentCreationFailure.new,
+                project_id: build.project_id,
+                reason: environment.errors.full_messages.to_sentence)
+
+              return { environment: nil }
+            end
+
+            {
+              deployment: Seed::Deployment.new(build, environment).to_resource,
+              metadata_attributes: {
+                expanded_environment_name: environment.name
+              }
+            }
           end
 
           private

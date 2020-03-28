@@ -4,8 +4,8 @@ module EE
   module NavHelper
     extend ::Gitlab::Utils::Override
 
-    override :show_separator?
-    def show_separator?
+    override :has_extra_nav_icons?
+    def has_extra_nav_icons?
       super || can?(current_user, :read_operations_dashboard)
     end
 

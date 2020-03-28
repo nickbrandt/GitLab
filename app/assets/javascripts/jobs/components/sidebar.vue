@@ -1,8 +1,8 @@
 <script>
-import { __, sprintf } from '~/locale';
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { mapActions, mapState } from 'vuex';
 import { GlLink, GlButton } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { timeIntervalInWords } from '~/lib/utils/datetime_utility';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -84,10 +84,10 @@ export default {
       );
     },
     hasArtifact() {
-      return !_.isEmpty(this.job.artifact);
+      return !isEmpty(this.job.artifact);
     },
     hasTriggers() {
-      return !_.isEmpty(this.job.trigger);
+      return !isEmpty(this.job.trigger);
     },
     hasStages() {
       return (
@@ -119,6 +119,7 @@ export default {
               :class="retryButtonClass"
               :href="job.retry_path"
               data-method="post"
+              data-qa-selector="retry_button"
               rel="nofollow"
               >{{ __('Retry') }}</gl-link
             >
@@ -168,13 +169,13 @@ export default {
           />
           <detail-row
             v-if="job.finished_at"
-            :value="timeFormated(job.finished_at)"
+            :value="timeFormatted(job.finished_at)"
             class="js-job-finished"
             title="Finished"
           />
           <detail-row
             v-if="job.erased_at"
-            :value="timeFormated(job.erased_at)"
+            :value="timeFormatted(job.erased_at)"
             class="js-job-erased"
             title="Erased"
           />

@@ -28,13 +28,13 @@ describe ProjectWiki do
 
   describe '#web_url' do
     it 'returns the full web URL to the wiki' do
-      expect(subject.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.full_path}/wikis/home")
+      expect(subject.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.full_path}/-/wikis/home")
     end
   end
 
   describe "#url_to_repo" do
     it "returns the correct ssh url to the repo" do
-      expect(subject.url_to_repo).to eq(gitlab_shell.url_to_repo(subject.full_path))
+      expect(subject.url_to_repo).to eq(Gitlab::Shell.url_to_repo(subject.full_path))
     end
   end
 
@@ -71,7 +71,7 @@ describe ProjectWiki do
 
   describe "#wiki_base_path" do
     it "returns the wiki base path" do
-      wiki_base_path = "#{Gitlab.config.gitlab.relative_url_root}/#{project.full_path}/wikis"
+      wiki_base_path = "#{Gitlab.config.gitlab.relative_url_root}/#{project.full_path}/-/wikis"
 
       expect(subject.wiki_base_path).to eq(wiki_base_path)
     end
@@ -97,9 +97,7 @@ describe ProjectWiki do
     it "raises CouldNotCreateWikiError if it can't create the wiki repository" do
       # Create a fresh project which will not have a wiki
       project_wiki = described_class.new(create(:project), user)
-      gitlab_shell = double(:gitlab_shell)
-      allow(gitlab_shell).to receive(:create_wiki_repository)
-      allow(project_wiki).to receive(:gitlab_shell).and_return(gitlab_shell)
+      expect(project_wiki.repository).to receive(:create_if_not_exists) { false }
 
       expect { project_wiki.send(:wiki) }.to raise_exception(ProjectWiki::CouldNotCreateWikiError)
     end
@@ -416,26 +414,12 @@ describe ProjectWiki do
     end
   end
 
-  describe '#create_repo!' do
-    let(:project) { create(:project) }
-
-    it 'creates a repository' do
-      expect(raw_repository.exists?).to eq(false)
-      expect(subject.repository).to receive(:after_create)
-
-      subject.send(:create_repo!, raw_repository)
-
-      expect(raw_repository.exists?).to eq(true)
-    end
-  end
-
   describe '#ensure_repository' do
     let(:project) { create(:project) }
 
     it 'creates the repository if it not exist' do
       expect(raw_repository.exists?).to eq(false)
 
-      expect(subject).to receive(:create_repo!).and_call_original
       subject.ensure_repository
 
       expect(raw_repository.exists?).to eq(true)

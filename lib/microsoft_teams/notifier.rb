@@ -14,7 +14,6 @@ module MicrosoftTeams
         response = Gitlab::HTTP.post(
           @webhook.to_str,
           headers: @header,
-          allow_local_requests: true,
           body: body(options)
         )
 
@@ -37,10 +36,7 @@ module MicrosoftTeams
 
       attachments = options[:attachments]
       unless attachments.blank?
-        result['sections'] << {
-          'title' => 'Details',
-          'facts' => [{ 'name' => 'Attachments', 'value' => attachments }]
-        }
+        result['sections'] << { text: attachments }
       end
 
       result.to_json

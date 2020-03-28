@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe StaticObjectExternalStorage do
   controller(Projects::ApplicationController) do
-    include StaticObjectExternalStorage # rubocop:disable RSpec/DescribedClass
+    include StaticObjectExternalStorage
 
     before_action :redirect_to_external_storage, if: :static_objects_external_storage_enabled?
 
@@ -27,7 +27,7 @@ describe StaticObjectExternalStorage do
 
       do_request
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -75,7 +75,7 @@ describe StaticObjectExternalStorage do
           request.headers['X-Gitlab-External-Storage-Token'] = 'letmein'
           do_request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -84,7 +84,7 @@ describe StaticObjectExternalStorage do
           request.headers['X-Gitlab-External-Storage-Token'] = 'donotletmein'
           do_request
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end

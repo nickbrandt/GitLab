@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { shallowMount, createLocalVue, createWrapper } from '@vue/test-utils';
+import { TEST_HOST } from 'spec/test_constants';
 import createStore from '~/notes/stores';
 import noteActions from '~/notes/components/note_actions.vue';
-import { TEST_HOST } from 'spec/test_constants';
 import { userDataMock } from '../mock_data';
 
 describe('noteActions', () => {
@@ -12,11 +12,10 @@ describe('noteActions', () => {
 
   const shallowMountNoteActions = propsData => {
     const localVue = createLocalVue();
-    return shallowMount(noteActions, {
+    return shallowMount(localVue.extend(noteActions), {
       store,
       propsData,
       localVue,
-      sync: false,
     });
   };
 
@@ -30,7 +29,7 @@ describe('noteActions', () => {
       canAwardEmoji: true,
       canReportAsAbuse: true,
       noteId: '539',
-      noteUrl: `${TEST_HOST}/group/project/merge_requests/1#note_1`,
+      noteUrl: `${TEST_HOST}/group/project/-/merge_requests/1#note_1`,
       reportAbusePath: `${TEST_HOST}/abuse_reports/new?ref_url=http%3A%2F%2Flocalhost%3A3000%2Fgitlab-org%2Fgitlab-ce%2Fissues%2F7%23note_539&user_id=26`,
       showReply: false,
     };

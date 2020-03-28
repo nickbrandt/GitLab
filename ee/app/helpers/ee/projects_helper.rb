@@ -4,13 +4,6 @@ module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
 
-    override :sidebar_projects_paths
-    def sidebar_projects_paths
-      super + %w[
-        projects/insights#show
-      ]
-    end
-
     override :sidebar_settings_paths
     def sidebar_settings_paths
       super + %w[
@@ -32,20 +25,26 @@ module EE
       ]
     end
 
+    # rubocop: disable Metrics/CyclomaticComplexity
     override :get_project_nav_tabs
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
 
       if can?(current_user, :read_project_security_dashboard, @project)
         nav_tabs << :security
+        nav_tabs << :security_configuration
       end
 
       if can?(current_user, :read_dependencies, @project)
         nav_tabs << :dependencies
       end
 
-      if ::Feature.enabled?(:licenses_list) && can?(current_user, :read_licenses_list, project)
+      if can?(current_user, :read_licenses, project)
         nav_tabs << :licenses
+      end
+
+      if can?(current_user, :read_threat_monitoring, project)
+        nav_tabs << :threat_monitoring
       end
 
       if ::Gitlab.config.packages.enabled &&
@@ -54,8 +53,16 @@ module EE
         nav_tabs << :packages
       end
 
+      if can?(current_user, :read_code_review_analytics, project)
+        nav_tabs << :code_review
+      end
+
       if can?(current_user, :read_feature_flag, project) && !nav_tabs.include?(:operations)
         nav_tabs << :operations
+      end
+
+      if project.feature_available?(:issues_analytics) && can?(current_user, :read_project, project)
+        nav_tabs << :issues_analytics
       end
 
       if project.insights_available?
@@ -64,6 +71,7 @@ module EE
 
       nav_tabs
     end
+    # rubocop: enable Metrics/CyclomaticComplexity
 
     override :tab_ability_map
     def tab_ability_map
@@ -111,6 +119,19 @@ module EE
       super || project_feature_flags_path(project)
     end
 
+    override :remove_project_message
+    def remove_project_message(project)
+      return super unless project.feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      date = permanent_deletion_date(Time.now.utc)
+      _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?") %
+        { date: date }
+    end
+
+    def permanent_deletion_date(date)
+      (date + ::Gitlab::CurrentSettings.deletion_adjourned_period.days).strftime('%F')
+    end
+
     # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
     def alternative_kerberos_url?
       ::Gitlab.config.alternative_gitlab_kerberos_url?
@@ -124,6 +145,10 @@ module EE
 
     def ci_cd_projects_available?
       ::License.feature_available?(:ci_cd_projects) && import_sources_enabled?
+    end
+
+    def first_class_vulnerabilities_available?(project)
+      ::Feature.enabled?(:first_class_vulnerabilities, project)
     end
 
     def merge_pipelines_available?
@@ -140,9 +165,12 @@ module EE
 
     def sidebar_security_paths
       %w[
-        projects/security/dashboard#show
-        projects/dependencies#show
-        projects/licenses#show
+        projects/security/configuration#show
+        projects/security/dashboard#index
+        projects/security/vulnerabilities#index
+        projects/dependencies#index
+        projects/licenses#index
+        projects/threat_monitoring#show
       ]
     end
 
@@ -181,8 +209,8 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
-          vulnerabilities_endpoint: project_vulnerabilities_endpoint_path(project),
-          vulnerabilities_summary_endpoint: project_vulnerabilities_summary_endpoint_path(project),
+          vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
+          vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
@@ -198,24 +226,14 @@ module EE
           pipeline_path: pipeline_url(pipeline),
           pipeline_created: pipeline.created_at.to_s(:iso8601),
           has_pipeline_data: "true"
-        }
+        }.merge(project_vulnerabilities_config(project))
       end
     end
 
-    def project_vulnerabilities_endpoint_path(project)
-      if ::Feature.enabled?(:first_class_vulnerabilities)
-        project_security_vulnerability_findings_path(project)
-      else
-        project_security_vulnerabilities_path(project)
-      end
-    end
+    def project_vulnerabilities_config(project)
+      return {} unless first_class_vulnerabilities_available?(project)
 
-    def project_vulnerabilities_summary_endpoint_path(project)
-      if ::Feature.enabled?(:first_class_vulnerabilities)
-        summary_project_security_vulnerability_findings_path(project)
-      else
-        summary_project_security_vulnerabilities_path(project)
-      end
+      { vulnerabilities_export_endpoint: api_v4_projects_vulnerability_exports_path(id: project.id) }
     end
 
     def can_create_feedback?(project, feedback_type)
@@ -245,15 +263,21 @@ module EE
       tabs.any? { |tab| project_nav_tab?(tab) }
     end
 
+    def show_discover_project_security?(project)
+      security_feature_available_at = DateTime.new(2019, 11, 1)
+
+      !!current_user &&
+        ::Gitlab.com? &&
+        current_user.created_at > security_feature_available_at &&
+        !project.feature_available?(:security_dashboard) &&
+        can?(current_user, :admin_namespace, project.root_ancestor) &&
+        current_user.ab_feature_enabled?(:discover_security)
+    end
+
     def settings_operations_available?
       return true if super
 
       @project.feature_available?(:tracing, current_user) && can?(current_user, :read_environment, @project)
-    end
-
-    def project_incident_management_setting
-      @project_incident_management_setting ||= @project.incident_management_setting ||
-        @project.build_incident_management_setting
     end
 
     override :can_import_members?

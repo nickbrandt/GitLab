@@ -1,6 +1,6 @@
 <script>
-import ReportSection from '~/reports/components/report_section.vue';
 import { componentNames } from 'ee/reports/components/issue_body';
+import ReportSection from '~/reports/components/report_section.vue';
 import { status as reportStatus } from '~/reports/constants';
 import { n__ } from '~/locale';
 

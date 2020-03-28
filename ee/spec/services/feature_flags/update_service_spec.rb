@@ -7,7 +7,7 @@ describe FeatureFlags::UpdateService do
   let(:developer) { create(:user) }
   let(:reporter) { create(:user) }
   let(:user) { developer }
-  let(:feature_flag) { create(:operations_feature_flag, project: project) }
+  let(:feature_flag) { create(:operations_feature_flag, project: project, active: true) }
 
   before do
     stub_licensed_features(feature_flags: true)
@@ -88,14 +88,29 @@ describe FeatureFlags::UpdateService do
       end
     end
 
-    context 'when active state is changed' do
+    context 'when flag active state is changed' do
+      let(:params) do
+        {
+          active: false
+        }
+      end
+
+      it 'creates audit event about changing active state' do
+        expect { subject }.to change { AuditEvent.count }.by(1)
+        expect(audit_event_message).to(
+          include('Updated active from <strong>"true"</strong> to <strong>"false"</strong>.')
+        )
+      end
+    end
+
+    context 'when scope active state is changed' do
       let(:params) do
         {
           scopes_attributes: [{ id: feature_flag.scopes.first.id, active: false }]
         }
       end
 
-      it 'creates audit event about changing active stae' do
+      it 'creates audit event about changing active state' do
         expect { subject }.to change { AuditEvent.count }.by(1)
         expect(audit_event_message).to(
           include("Updated rule <strong>*</strong> active state "\

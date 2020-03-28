@@ -2,13 +2,13 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::LDAP::Person do
+describe Gitlab::Auth::Ldap::Person do
   include LdapHelpers
 
   let(:entry) { ldap_user_entry('john.doe') }
 
   it 'includes the EE module' do
-    expect(described_class).to include(EE::Gitlab::Auth::LDAP::Person)
+    expect(described_class).to include(EE::Gitlab::Auth::Ldap::Person)
   end
 
   describe '.ldap_attributes' do
@@ -98,7 +98,7 @@ describe Gitlab::Auth::LDAP::Person do
       )
     end
 
-    let(:config) { Gitlab::Auth::LDAP::Config.new('ldapmain') }
+    let(:config) { Gitlab::Auth::Ldap::Config.new('ldapmain') }
     let(:ldap_attributes) { described_class.ldap_attributes(config) }
     let(:expected_attributes) { %w(dn cn uid mail memberof) }
 
@@ -154,7 +154,9 @@ describe Gitlab::Auth::LDAP::Person do
     subject { described_class.new(entry, 'ldapmain') }
 
     before do
-      allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(sync_ssh_keys: ssh_key_attribute_name)
+      allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+        allow(instance).to receive_messages(sync_ssh_keys: ssh_key_attribute_name)
+      end
     end
 
     context 'when the SSH key is literal' do
@@ -232,7 +234,7 @@ describe Gitlab::Auth::LDAP::Person do
     it 'gets the group cn from the memberof value' do
       person = described_class.new(entry, 'ldapmain')
 
-      expect(person.cn_from_memberof('cN=Group Policy Creator Owners,CN=Users,DC=Vosmaer,DC=com'))
+      expect(person.cn_from_memberof('CN=Group Policy Creator Owners,CN=Users,DC=Vosmaer,DC=com'))
         .to eq('Group Policy Creator Owners')
     end
 
@@ -241,6 +243,13 @@ describe Gitlab::Auth::LDAP::Person do
 
       expect(person.cn_from_memberof('DC=Vosmaer,DC=com'))
         .to be_nil
+    end
+
+    it "supports dashes in the group cn" do
+      person = described_class.new(entry, 'ldapmain')
+
+      expect(person.cn_from_memberof('CN=Group-Policy-Creator-Owners,CN=Users,DC=Vosmaer,DC=com'))
+        .to eq('Group-Policy-Creator-Owners')
     end
   end
 

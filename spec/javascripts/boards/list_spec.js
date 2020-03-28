@@ -5,12 +5,10 @@
 
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import _ from 'underscore';
 import '~/boards/models/label';
 import '~/boards/models/assignee';
 import '~/boards/models/issue';
 import '~/boards/models/list';
-import '~/boards/services/board_service';
 import boardsStore from '~/boards/stores/boards_store';
 import { listObj, listObjDuplicate, boardsMockInterceptor } from './mock_data';
 
@@ -41,7 +39,7 @@ describe('List model', () => {
     list = new List({
       title: 'test',
       label: {
-        id: _.random(10000),
+        id: 1,
         title: 'test',
         color: 'red',
         text_color: 'white',
@@ -97,8 +95,8 @@ describe('List model', () => {
     const listDup = new List(listObjDuplicate);
     const issue = new ListIssue({
       title: 'Testing',
-      id: _.random(10000),
-      iid: _.random(10000),
+      id: 1,
+      iid: 1,
       confidential: false,
       labels: [list.label, listDup.label],
       assignees: [],
@@ -130,8 +128,8 @@ describe('List model', () => {
         list.issues.push(
           new ListIssue({
             title: 'Testing',
-            id: _.random(10000) + i,
-            iid: _.random(10000) + i,
+            id: i,
+            iid: i,
             confidential: false,
             labels: [list.label],
             assignees: [],
@@ -152,7 +150,7 @@ describe('List model', () => {
       list.issues.push(
         new ListIssue({
           title: 'Testing',
-          id: _.random(10000),
+          id: 1,
           confidential: false,
           labels: [list.label],
           assignees: [],
@@ -193,7 +191,7 @@ describe('List model', () => {
       list.issues.push(
         new ListIssue({
           title: 'Testing',
-          id: _.random(10000),
+          id: 1,
           confidential: false,
           labels: [new ListLabel(list.label)],
           assignees: [],
@@ -201,7 +199,7 @@ describe('List model', () => {
       );
       const dummyIssue = new ListIssue({
         title: 'new issue',
-        id: _.random(10000),
+        id: 2,
         confidential: false,
         labels: [new ListLabel(list.label)],
         assignees: [user],

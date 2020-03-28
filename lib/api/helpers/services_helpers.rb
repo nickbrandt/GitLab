@@ -134,6 +134,12 @@ module API
           },
           {
             required: false,
+            name: :confidential_note_events,
+            type: Boolean,
+            desc: 'Enable notifications for confidential_note_events'
+          },
+          {
+            required: false,
             name: :tag_push_events,
             type: Boolean,
             desc: 'Enable notifications for tag_push_events'
@@ -155,6 +161,7 @@ module API
 
       def self.services
         {
+          'alerts' => [],
           'asana' => [
             {
               required: true,
@@ -359,6 +366,12 @@ module API
               name: :send_from_committer_email,
               type: Boolean,
               desc: 'Send from committer'
+            },
+            {
+              required: false,
+              name: :branches_to_be_notified,
+              type: String,
+              desc: 'Branches for which notifications are to be sent'
             }
           ],
           'external-wiki' => [
@@ -486,6 +499,12 @@ module API
               name: :jira_issue_transition_id,
               type: String,
               desc: 'The ID of a transition that moves issues to a closed state. You can find this number under the Jira workflow administration (**Administration > Issues > Workflows**) by selecting **View** under **Operations** of the desired workflow of your project. The ID of each state can be found inside the parenthesis of each transition name under the **Transitions (id)** column ([see screenshot][trans]). By default, this ID is set to `2`'
+            },
+            {
+              required: false,
+              name: :comment_on_event_enabled,
+              type: Boolean,
+              desc: 'Enable comments inside Jira issues on each GitLab event (commit / merge request)'
             }
           ],
           'mattermost-slash-commands' => [
@@ -657,6 +676,12 @@ module API
               type: String,
               desc: 'The Microsoft Teams webhook. e.g. https://outlook.office.com/webhook/…'
             },
+            {
+              required: false,
+              name: :branches_to_be_notified,
+              type: String,
+              desc: 'Branches for which notifications are to be sent'
+            },
             chat_notification_flags
           ].flatten,
           'mattermost' => [
@@ -690,12 +715,22 @@ module API
               type: String,
               desc: 'The password of the user'
             }
-          ]
+          ],
+          'unify-circuit' => [
+            {
+              required: true,
+              name: :webhook,
+              type: String,
+              desc: 'The Unify Circuit webhook. e.g. https://circuit.com/rest/v2/webhooks/incoming/…'
+            },
+            chat_notification_events
+          ].flatten
         }
       end
 
       def self.service_classes
         [
+          ::AlertsService,
           ::AsanaService,
           ::AssemblaService,
           ::BambooService,

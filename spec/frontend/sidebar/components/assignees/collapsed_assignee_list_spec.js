@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
+import UsersMockHelper from 'helpers/user_mock_data_helper';
 import CollapsedAssigneeList from '~/sidebar/components/assignees/collapsed_assignee_list.vue';
 import CollapsedAssignee from '~/sidebar/components/assignees/collapsed_assignee.vue';
-import UsersMockHelper from 'helpers/user_mock_data_helper';
 
 const DEFAULT_MAX_COUNTER = 99;
 
@@ -16,16 +16,14 @@ describe('CollapsedAssigneeList component', () => {
     };
 
     wrapper = shallowMount(CollapsedAssigneeList, {
-      attachToDocument: true,
       propsData,
-      sync: false,
     });
   }
 
   const findNoUsersIcon = () => wrapper.find('i[aria-label=None]');
   const findAvatarCounter = () => wrapper.find('.avatar-counter');
   const findAssignees = () => wrapper.findAll(CollapsedAssignee);
-  const getTooltipTitle = () => wrapper.attributes('data-original-title');
+  const getTooltipTitle = () => wrapper.attributes('title');
 
   afterEach(() => {
     wrapper.destroy();

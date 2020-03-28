@@ -27,7 +27,7 @@ describe Projects::PipelinesController do
         end
 
         it do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template :show
         end
       end
@@ -76,30 +76,30 @@ describe Projects::PipelinesController do
 
     let(:payload) { JSON.parse(licenses_with_json.body) }
 
-    context 'with a license management artifact' do
+    context 'with a license scanning artifact' do
       before do
         build = create(:ci_build, pipeline: pipeline)
-        create(:ee_ci_job_artifact, :license_management, job: build)
+        create(:ee_ci_job_artifact, :license_scanning, job: build)
       end
 
       context 'with feature enabled' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_html
         end
 
         it do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template :show
         end
       end
 
       context 'with feature enabled json' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
         end
 
-        it 'will return license management report in json format' do
+        it 'will return license scanning report in json format' do
           expect(payload.size).to eq(pipeline.license_scanning_report.licenses.size)
           expect(payload.first.keys).to eq(%w(name classification dependencies count url))
         end
@@ -133,15 +133,15 @@ describe Projects::PipelinesController do
         end
 
         it 'will not return report' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
 
-    context 'without license management artifact' do
+    context 'without license scanning artifact' do
       context 'with feature enabled' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_html
         end
 
@@ -152,12 +152,12 @@ describe Projects::PipelinesController do
 
       context 'with feature enabled json' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_json
         end
 
         it 'will return 404'  do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -177,7 +177,7 @@ describe Projects::PipelinesController do
         end
 
         it 'will return 404' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end

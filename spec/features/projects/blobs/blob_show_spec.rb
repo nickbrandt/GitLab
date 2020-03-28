@@ -13,6 +13,10 @@ describe 'File blob', :js do
     wait_for_requests
   end
 
+  before do
+    stub_feature_flags(code_navigation: false)
+  end
+
   context 'Ruby file' do
     before do
       visit_blob('files/ruby/popen.rb')
@@ -304,6 +308,48 @@ describe 'File blob', :js do
     end
   end
 
+  context 'Jupiter Notebook file' do
+    before do
+      project.add_maintainer(project.creator)
+
+      Files::CreateService.new(
+        project,
+        project.creator,
+        start_branch: 'master',
+        branch_name: 'master',
+        commit_message: "Add Jupiter Notebook",
+        file_path: 'files/basic.ipynb',
+        file_content: project.repository.blob_at('add-ipython-files', 'files/ipython/basic.ipynb').data
+      ).execute
+
+      visit_blob('files/basic.ipynb')
+
+      wait_for_requests
+    end
+
+    it 'displays the blob' do
+      aggregate_failures do
+        # shows rendered notebook
+        expect(page).to have_selector('.js-notebook-viewer-mounted')
+
+        # does show a viewer switcher
+        expect(page).to have_selector('.js-blob-viewer-switcher')
+
+        # show a disabled copy button
+        expect(page).to have_selector('.js-copy-blob-source-btn.disabled')
+
+        # shows a raw button
+        expect(page).to have_link('Open raw')
+
+        # shows a download button
+        expect(page).to have_link('Download')
+
+        # shows the rendered notebook
+        expect(page).to have_content('test')
+      end
+    end
+  end
+
   context 'ISO file (stored in LFS)' do
     context 'when LFS is enabled on the project' do
       before do
@@ -449,7 +495,7 @@ describe 'File blob', :js do
     end
   end
 
-  context '.gitlab-ci.yml' do
+  describe '.gitlab-ci.yml' do
     before do
       project.add_maintainer(project.creator)
 
@@ -477,7 +523,7 @@ describe 'File blob', :js do
     end
   end
 
-  context '.gitlab/route-map.yml' do
+  describe '.gitlab/route-map.yml' do
     before do
       project.add_maintainer(project.creator)
 
@@ -609,6 +655,52 @@ describe 'File blob', :js do
 
       expect(page).not_to have_selector '.gpg-status-box.js-loading-gpg-badge'
       expect(page).to have_selector '.gpg-status-box.invalid'
+    end
+  end
+
+  context 'when static objects external storage is enabled' do
+    before do
+      stub_application_setting(static_objects_external_storage_url: 'https://cdn.gitlab.com')
+    end
+
+    context 'private project' do
+      let_it_be(:project) { create(:project, :repository, :private) }
+      let_it_be(:user) { create(:user) }
+
+      before do
+        project.add_developer(user)
+
+        sign_in(user)
+        visit_blob('README.md')
+      end
+
+      it 'shows open raw and download buttons with external storage URL prepended and user token appended to their href' do
+        path = project_raw_path(project, 'master/README.md')
+        raw_uri = "https://cdn.gitlab.com#{path}?token=#{user.static_object_token}"
+        download_uri = "https://cdn.gitlab.com#{path}?inline=false&token=#{user.static_object_token}"
+
+        aggregate_failures do
+          expect(page).to have_link 'Open raw', href: raw_uri
+          expect(page).to have_link 'Download', href: download_uri
+        end
+      end
+    end
+
+    context 'public project' do
+      before do
+        visit_blob('README.md')
+      end
+
+      it 'shows open raw and download buttons with external storage URL prepended to their href' do
+        path = project_raw_path(project, 'master/README.md')
+        raw_uri = "https://cdn.gitlab.com#{path}"
+        download_uri = "https://cdn.gitlab.com#{path}?inline=false"
+
+        aggregate_failures do
+          expect(page).to have_link 'Open raw', href: raw_uri
+          expect(page).to have_link 'Download', href: download_uri
+        end
+      end
     end
   end
 end

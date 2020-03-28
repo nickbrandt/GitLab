@@ -29,8 +29,9 @@ describe 'User sees feature flag list', :js do
 
     it 'user sees the first flag' do
       within_feature_flag_row(1) do
+        expect(page.find('.js-feature-flag-id')).to have_content('^1')
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-        expect(page).to have_css('.js-feature-flag-status .badge-success')
+        expect(page).to have_css('.js-feature-flag-status button:not(.is-checked)')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -43,8 +44,9 @@ describe 'User sees feature flag list', :js do
 
     it 'user sees the second flag' do
       within_feature_flag_row(2) do
+        expect(page.find('.js-feature-flag-id')).to have_content('^2')
         expect(page.find('.feature-flag-name')).to have_content('drop_legacy_artifacts')
-        expect(page).to have_css('.js-feature-flag-status .badge-danger')
+        expect(page).to have_css('.js-feature-flag-status button:not(.is-checked)')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -55,8 +57,9 @@ describe 'User sees feature flag list', :js do
 
     it 'user sees the third flag' do
       within_feature_flag_row(3) do
+        expect(page.find('.js-feature-flag-id')).to have_content('^3')
         expect(page.find('.feature-flag-name')).to have_content('mr_train')
-        expect(page).to have_css('.js-feature-flag-status .badge-success')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -65,6 +68,20 @@ describe 'User sees feature flag list', :js do
           expect(page.find('.badge:nth-child(2)')['class']).to include('badge-inactive')
         end
       end
+    end
+
+    it 'user updates the status toggle' do
+      within_feature_flag_row(1) do
+        page.find('.js-feature-flag-status button').click
+
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
+      end
+
+      visit(project_audit_events_path(project))
+
+      expect(page).to(
+        have_text('Updated feature flag ci_live_trace. Updated active from "false" to "true".')
+      )
     end
   end
 

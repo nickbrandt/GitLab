@@ -8,21 +8,21 @@ type: reference
 
 The following are the requirements for providing your own Redis instance:
 
-- Redis version 2.8 or higher. Version 3.2 or higher is recommend as this is
-  what ships with the GitLab Omnibus package.
+- GitLab 12.0 and later requires Redis version 3.2 or higher. Version 3.2 or higher is recommend as this is
+  what ships with the GitLab Omnibus package. Older Redis versions do not
+  support an optional count argument to SPOP which is now required for
+  [Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
 - Standalone Redis or Redis high availability with Sentinel are supported. Redis
   Cluster is not supported.
-- Managed Redis from cloud providers such as AWS Elasticache will work. If these
+- Managed Redis from cloud providers such as AWS ElastiCache will work. If these
   services support high availability, be sure it is not the Redis Cluster type.
 
 Note the Redis node's IP address or hostname, port, and password (if required).
 These will be necessary when configuring the GitLab application servers later.
 
-## Redis in a Scaled Environment
+## Redis in a Scaled and Highly Available Environment
 
-This section is relevant for [Scaled Architecture](README.md#scalable-architecture-examples)
-environments including [Basic Scaling](README.md#basic-scaling) and
-[Full Scaling](README.md#full-scaling).
+This section is relevant for [Scalable and Highly Available Setups](README.md).
 
 ### Provide your own Redis instance **(CORE ONLY)**
 
@@ -71,7 +71,7 @@ Omnibus:
    redis['port'] = 6379
    redis['password'] = 'SECRET_PASSWORD_HERE'
 
-   gitlab_rails['auto_migrate'] = false
+   gitlab_rails['enable'] = false
    ```
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
@@ -83,22 +83,8 @@ Omnibus:
 Advanced configuration options are supported and can be added if
 needed.
 
-Continue configuration of other components by going
-[back to Scaled Architectures](README.md#scalable-architecture-examples)
-
-## Redis with High Availability
-
-This section is relevant for [High Availability Architecture](README.md#high-availability-architecture-examples)
-environments including [Horizontal](README.md#horizontal),
-[Hybrid](README.md#hybrid), and
-[Fully Distributed](README.md#fully-distributed).
-
-### Provide your own Redis instance **(CORE ONLY)**
-
-If you want to use your own deployed Redis instance(s),
-see [Provide your own Redis instance](#provide-your-own-redis-instance-core-only)
-for more details. However, you can use the GitLab Omnibus package to easily
-deploy the bundled Redis.
+Continue configuration of other components by going back to the
+[Scaling and High Availability](README.md#gitlab-components-and-configuration-instructions) page.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 
@@ -391,7 +377,7 @@ The prerequisites for a HA Redis setup are the following:
    prevent database migrations from running on upgrade, add the following
    configuration to your `/etc/gitlab/gitlab.rb` file:
 
-   ```
+   ```ruby
    gitlab_rails['auto_migrate'] = false
    ```
 
@@ -439,7 +425,7 @@ The prerequisites for a HA Redis setup are the following:
 
 1. To prevent reconfigure from running automatically on upgrade, run:
 
-   ```
+   ```shell
    sudo touch /etc/gitlab/skip-auto-reconfigure
    ```
 
@@ -569,7 +555,7 @@ multiple machines with the Sentinel daemon.
 
 1. To prevent database migrations from running on upgrade, run:
 
-   ```
+   ```shell
    sudo touch /etc/gitlab/skip-auto-reconfigure
    ```
 
@@ -876,7 +862,7 @@ mailroom['enable'] = false
 redis['master'] = false
 ```
 
-You can find the relevant attributes defined in [gitlab_rails.rb][omnifile].
+You can find the relevant attributes defined in [`gitlab_rails.rb`][omnifile].
 
 ## Troubleshooting
 
@@ -898,14 +884,14 @@ Before proceeding with the troubleshooting below, check your firewall rules:
 You can check if everything is correct by connecting to each server using
 `redis-cli` application, and sending the `info replication` command as below.
 
-```
+```shell
 /opt/gitlab/embedded/bin/redis-cli -h <redis-host-or-ip> -a '<redis-password>' info replication
 ```
 
 When connected to a `master` Redis, you will see the number of connected
 `slaves`, and a list of each with connection details:
 
-```
+```plaintext
 # Replication
 role:master
 connected_slaves:1
@@ -920,7 +906,7 @@ repl_backlog_histlen:1048576
 When it's a `slave`, you will see details of the master connection and if
 its `up` or `down`:
 
-```
+```plaintext
 # Replication
 role:slave
 master_host:10.133.1.58
@@ -950,7 +936,7 @@ and `redis['master_pasword']` as you defined for your sentinel node.
 
 The way the Redis connector `redis-rb` works with sentinel is a bit
 non-intuitive. We try to hide the complexity in omnibus, but it still requires
-a few extra configs.
+a few extra configurations.
 
 ---
 
@@ -959,12 +945,12 @@ To make sure your configuration is correct:
 1. SSH into your GitLab application server
 1. Enter the Rails console:
 
-   ```
+   ```shell
    # For Omnibus installations
    sudo gitlab-rails console
 
    # For source installations
-   sudo -u git rails console production
+   sudo -u git rails console -e production
    ```
 
 1. Run in the console:
@@ -978,14 +964,14 @@ To make sure your configuration is correct:
 
 1. To simulate a failover on master Redis, SSH into the Redis server and run:
 
-   ```bash
+   ```shell
    # port must match your master redis port, and the sleep time must be a few seconds bigger than defined one
     redis-cli -h localhost -p 6379 DEBUG sleep 20
    ```
 
 1. Then back in the Rails console from the first step, run:
 
-   ```
+   ```ruby
    redis.info
    ```
 
@@ -1016,7 +1002,7 @@ Read more on High Availability:
 1. [Configure the GitLab application servers](gitlab.md)
 1. [Configure the load balancers](load_balancer.md)
 
-[ce-1877]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/1877
+[ce-1877]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/1877
 [restart]: ../restart_gitlab.md#installations-from-source
 [reconfigure]: ../restart_gitlab.md#omnibus-gitlab-reconfigure
 [gh-531]: https://github.com/redis/redis-rb/issues/531

@@ -20,7 +20,7 @@ Milestones can be used as Agile sprints so that you can track all issues and mer
 
 ## Milestones as releases
 
-Similarily, milestones can be used as releases. To do so:
+Similarly, milestones can be used as releases. To do so:
 
 1. Set the milestone due date to represent the release date of your release and leave the milestone start date blank.
 1. Set the milestone title to the version of your release, such as `Version 9.4`.
@@ -64,7 +64,7 @@ You can delete a milestone by clicking the **Delete** button.
 
 ### Promoting project milestones to group milestones
 
-If you are expanding from a few projects to a larger number of projects within the same group, you may want to share the same milestone among multiple projects in the same group. If you previously created a project milestone and now want to make it available for other milestones, you can promote it to a group milestone.
+If you are expanding from a few projects to a larger number of projects within the same group, you may want to share the same milestone among multiple projects in the same group. If you previously created a project milestone and now want to make it available for other projects within the same group, you can promote it to a group milestone.
 
 From the project milestone list page, you can promote a project milestone to a group milestone. This will merge all project milestones across all projects in this group with the same name into a single group milestones. All issues and merge requests that previously were assigned one of these project milestones will now be assigned the new group milestones. This action cannot be reversed and the changes are permanent.
 
@@ -105,14 +105,17 @@ The milestone view shows the title and description.
 
 There are also tabs below these that show the following:
 
-- Issues
-  Shows all issues assigned to the milestone. These are displayed in three columns: Unstarted issues, ongoing issues, and completed issues.
-- Merge requests
-  Shows all merge requests assigned to the milestone. These are displayed in four columns: Work in progress merge requests, waiting for merge, rejected, and closed.
-- Participants
-  Shows all assignees of issues assigned to the milestone.
-- Labels
-  Shows all labels that are used in issues assigned to the milestone.
+- **Issues**: Shows all issues assigned to the milestone. These are displayed in three columns named:
+  - Unstarted Issues (open and unassigned)
+  - Ongoing Issues (open and assigned)
+  - Completed Issues (closed)
+- **Merge Requests**: Shows all merge requests assigned to the milestone. These are displayed in four columns named:
+  - Work in progress (open and unassigned)
+  - Waiting for merge (open and unassigned)
+  - Rejected (closed)
+  - Merged
+- **Participants**: Shows all assignees of issues assigned to the milestone.
+- **Labels**: Shows all labels that are used in issues assigned to the milestone.
 
 ### Project Burndown Charts **(STARTER)**
 

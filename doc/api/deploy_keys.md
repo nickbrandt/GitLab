@@ -4,11 +4,11 @@
 
 Get a list of all deploy keys across all projects of the GitLab instance. This endpoint requires admin access.
 
-```
+```plaintext
 GET /deploy_keys
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/deploy_keys"
 ```
 
@@ -35,7 +35,7 @@ Example response:
 
 Get a list of a project's deploy keys.
 
-```
+```plaintext
 GET /projects/:id/deploy_keys
 ```
 
@@ -43,7 +43,7 @@ GET /projects/:id/deploy_keys
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/deploy_keys"
 ```
 
@@ -72,7 +72,7 @@ Example response:
 
 Get a single key.
 
-```
+```plaintext
 GET /projects/:id/deploy_keys/:key_id
 ```
 
@@ -83,7 +83,7 @@ Parameters:
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `key_id`  | integer | yes | The ID of the deploy key |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/deploy_keys/11"
 ```
 
@@ -106,7 +106,7 @@ Creates a new deploy key for a project.
 If the deploy key already exists in another project, it will be joined to current
 project only if original one is accessible by the same user.
 
-```
+```plaintext
 POST /projects/:id/deploy_keys
 ```
 
@@ -117,7 +117,7 @@ POST /projects/:id/deploy_keys
 | `key`      | string  | yes | New deploy key |
 | `can_push` | boolean | no  | Can deploy key push to the project's repository |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" --data '{"title": "My deploy key", "key": "ssh-rsa AAAA...", "can_push": "true"}' "https://gitlab.example.com/api/v4/projects/5/deploy_keys/"
 ```
 
@@ -137,7 +137,7 @@ Example response:
 
 Updates a deploy key for a project.
 
-```
+```plaintext
 PUT /projects/:id/deploy_keys/:key_id
 ```
 
@@ -147,7 +147,7 @@ PUT /projects/:id/deploy_keys/:key_id
 | `title`    | string  | no | New deploy key's title |
 | `can_push` | boolean | no  | Can deploy key push to the project's repository |
 
-```bash
+```shell
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" --data '{"title": "New deploy key", "can_push": true}' "https://gitlab.example.com/api/v4/projects/5/deploy_keys/11"
 ```
 
@@ -167,7 +167,7 @@ Example response:
 
 Removes a deploy key from the project. If the deploy key is used only for this project, it will be deleted from the system.
 
-```
+```plaintext
 DELETE /projects/:id/deploy_keys/:key_id
 ```
 
@@ -176,7 +176,7 @@ DELETE /projects/:id/deploy_keys/:key_id
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `key_id`  | integer | yes | The ID of the deploy key |
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/deploy_keys/13"
 ```
 
@@ -184,7 +184,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://git
 
 Enables a deploy key for a project so this can be used. Returns the enabled key, with a status code 201 when successful.
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/deploy_keys/13/enable
 ```
 
@@ -212,25 +212,25 @@ group, this can be achieved quite easily with the API.
 First, find the ID of the projects you're interested in, by either listing all
 projects:
 
-```bash
+```shell
 curl --header 'PRIVATE-TOKEN: <your_access_token>' https://gitlab.example.com/api/v4/projects
 ```
 
 Or finding the ID of a group:
 
-```bash
+```shell
 curl --header 'PRIVATE-TOKEN: <your_access_token>' https://gitlab.example.com/api/v4/groups
 ```
 
 Then listing all projects in that group (for example, group 1234):
 
-```bash
+```shell
 curl --header 'PRIVATE-TOKEN: <your_access_token>' https://gitlab.example.com/api/v4/groups/1234
 ```
 
 With those IDs, add the same deploy key to all:
 
-```bash
+```shell
 for project_id in 321 456 987; do
     curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" \
     --data '{"title": "my key", "key": "ssh-rsa AAAA..."}' https://gitlab.example.com/api/v4/projects/${project_id}/deploy_keys

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ee_ci_pipeline, class: Ci::Pipeline, parent: :ci_pipeline do
+  factory :ee_ci_pipeline, class: 'Ci::Pipeline', parent: :ci_pipeline do
     trait :webide do
       source { :webide }
       config_source { :webide_source }
     end
 
-    %i[license_management dependency_list dependency_scanning sast dast container_scanning].each do |report_type|
+    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status { :success }
 

@@ -87,7 +87,17 @@ describe ProfilesController, :request_store do
       put :update, params: { user: { status: { message: 'Working hard!' } } }
 
       expect(user.reload.status.message).to eq('Working hard!')
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
+    end
+
+    it 'allows updating user specified job title' do
+      title = 'Marketing Executive'
+      sign_in(user)
+
+      put :update, params: { user: { job_title: title } }
+
+      expect(user.reload.job_title).to eq(title)
+      expect(response).to have_gitlab_http_status(:found)
     end
   end
 
@@ -118,7 +128,7 @@ describe ProfilesController, :request_store do
           format: :json
 
       expect(response.status).to eq(200)
-      expect(json_response['message']).to eq('Username successfully changed')
+      expect(json_response['message']).to eq(s_('Profiles|Username successfully changed'))
     end
 
     it 'renders an error message when the username was not updated' do

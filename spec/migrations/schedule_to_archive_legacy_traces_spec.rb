@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20180529152628_schedule_to_archive_legacy_traces')
 
-describe ScheduleToArchiveLegacyTraces, :migration do
+describe ScheduleToArchiveLegacyTraces do
   include TraceHelpers
 
   let(:namespaces) { table(:namespaces) }
@@ -39,9 +39,9 @@ describe ScheduleToArchiveLegacyTraces, :migration do
     expect(File.exist?(legacy_trace_path(@build_failed))).to be_falsy
     expect(File.exist?(legacy_trace_path(@builds_canceled))).to be_falsy
     expect(File.exist?(legacy_trace_path(@build_running))).to be_truthy
-    expect(File.exist?(archived_trace_path(job_artifacts.where(job_id: @build_success.id).first))).to be_truthy
-    expect(File.exist?(archived_trace_path(job_artifacts.where(job_id: @build_failed.id).first))).to be_truthy
-    expect(File.exist?(archived_trace_path(job_artifacts.where(job_id: @builds_canceled.id).first))).to be_truthy
+    expect(File.exist?(archived_trace_path(job_artifacts.find_by(job_id: @build_success.id)))).to be_truthy
+    expect(File.exist?(archived_trace_path(job_artifacts.find_by(job_id: @build_failed.id)))).to be_truthy
+    expect(File.exist?(archived_trace_path(job_artifacts.find_by(job_id: @builds_canceled.id)))).to be_truthy
     expect(job_artifacts.where(job_id: @build_running.id)).not_to be_exist
   end
 end

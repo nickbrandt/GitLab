@@ -8,7 +8,7 @@ module QA
           class Index < QA::Page::Base
             view 'ee/app/assets/javascripts/epic/components/epic_create.vue' do
               element :new_epic_button
-              element :epic_title
+              element :epic_title_field
               element :create_epic_button
             end
 
@@ -21,7 +21,7 @@ module QA
             end
 
             def set_title(title)
-              fill_element :epic_title, title
+              fill_element :epic_title_field, title
             end
 
             def create_new_epic
@@ -29,8 +29,14 @@ module QA
             end
 
             def click_first_epic(page = nil)
-              all_elements(:epic_title_text).first.click
+              all_elements(:epic_title_text, minimum: 1).first.click
               page.validate_elements_present! if page
+            end
+
+            def has_epic_title?(title)
+              wait_until do
+                has_element?(:epic_title_text, text: title)
+              end
             end
           end
         end

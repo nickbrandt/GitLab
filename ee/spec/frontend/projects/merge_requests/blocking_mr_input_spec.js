@@ -22,7 +22,6 @@ describe('BlockingMrInput', () => {
 
   afterEach(() => {
     document.querySelector('#test').remove();
-    jest.clearAllMocks();
   });
 
   it('adds hidden references block when hidden count is greater than 0', () => {

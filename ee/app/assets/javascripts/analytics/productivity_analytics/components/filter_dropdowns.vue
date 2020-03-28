@@ -10,15 +10,35 @@ export default {
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
   },
+  props: {
+    group: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    project: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    hideGroupDropDown: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+  },
   data() {
     return {
-      groupId: null,
+      groupId: this.group && this.group.id ? this.group.id : null,
     };
   },
   computed: {
     ...mapState('filters', ['groupNamespace']),
     showProjectsDropdownFilter() {
       return Boolean(this.groupId);
+    },
+    projects() {
+      return this.project && Object.keys(this.project).length ? [this.project] : null;
     },
   },
   methods: {
@@ -53,6 +73,7 @@ export default {
     per_page: projectsPerPage,
     with_shared: false, // exclude forks
     order_by: LAST_ACTIVITY_AT,
+    include_subgroups: true,
   },
 };
 </script>
@@ -60,14 +81,17 @@ export default {
 <template>
   <div class="dropdown-container d-flex flex-column flex-lg-row">
     <groups-dropdown-filter
+      v-if="!hideGroupDropDown"
       class="group-select"
       :query-params="$options.groupsQueryParams"
+      :default-group="group"
       @selected="onGroupSelected"
     />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"
       class="project-select"
+      :default-projects="projects"
       :query-params="$options.projectsQueryParams"
       :group-id="groupId"
       @selected="onProjectsSelected"

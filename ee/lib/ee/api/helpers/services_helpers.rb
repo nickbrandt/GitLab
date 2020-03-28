@@ -12,7 +12,6 @@ module EE
           override :services
           def services
             super.merge(
-              'alerts' => [],
               'github' => [
                 {
                   required: true,
@@ -88,7 +87,6 @@ module EE
               ::GithubService,
               ::JenkinsService,
               ::JenkinsDeprecatedService,
-              ::AlertsService,
               *super
             ]
           end

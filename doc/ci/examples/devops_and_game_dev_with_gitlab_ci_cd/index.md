@@ -26,7 +26,7 @@ Creating a strong CI/CD pipeline at the beginning of developing another game, [D
 was essential for the fast pace the team worked at. This tutorial will build upon my
 [previous introductory article](https://ryanhallcs.wordpress.com/2017/03/15/devops-and-game-dev/) and go through the following steps:
 
-1. Using code from the previous article to start with a barebones [Phaser](https://phaser.io) game built by a gulp file
+1. Using code from the previous article to start with a bare-bones [Phaser](https://phaser.io) game built by a gulp file
 1. Adding and running unit tests
 1. Creating a `Weapon` class that can be triggered to spawn a `Bullet` in a given direction
 1. Adding a `Player` class that uses this weapon and moves around the screen
@@ -54,7 +54,7 @@ CI/CD from every new push to master. The `master` branch for this game's [reposi
 contains a completed version with all configurations. If you would like to follow along
 with this article, you can clone and work from the `devops-article` branch:
 
-```sh
+```shell
 git clone git@gitlab.com:blitzgren/gitlab-game-demo.git
 git checkout devops-article
 ```
@@ -63,7 +63,7 @@ Next, we'll create a small subset of tests that exemplify most of the states I e
 this `Weapon` class to go through. To get started, create a folder called `lib/tests`
 and add the following code to a new file `weaponTests.ts`:
 
-```ts
+```typescript
 import { expect } from 'chai';
 import { Weapon, BulletFactory } from '../lib/weapon';
 
@@ -114,7 +114,7 @@ describe('Weapon', () => {
 To build and run these tests using gulp, let's also add the following gulp functions
 to the existing `gulpfile.js` file:
 
-```ts
+```typescript
 gulp.task('build-test', function () {
     return gulp.src('src/tests/**/*.ts', { read: false })
     .pipe(tap(function (file) {
@@ -140,7 +140,7 @@ to trigger the weapon. In the `src/lib` folder create a `weapon.ts` file. We'll 
 to it: `Weapon` and `BulletFactory` which will encapsulate Phaser's **sprite** and
 **group** objects, and the logic specific to our game.
 
-```ts
+```typescript
 export class Weapon {
     private isTriggered: boolean = false;
     private currentTimer: number = 0;
@@ -210,7 +210,7 @@ export class BulletFactory {
 Lastly, we'll redo our entry point, `game.ts`, to tie together both `Player` and `Weapon` objects
 as well as add them to the update loop. Here is what the updated `game.ts` file looks like:
 
-```ts
+```typescript
 import { Player } from "./player";
 import { Weapon, BulletFactory } from "./weapon";
 
@@ -363,7 +363,7 @@ our repository. If all goes well you'll end up with a green check mark on each j
 You can confirm that the tests passed by clicking on the `test` job to enter the full build logs.
 Scroll to the bottom and observe, in all its passing glory:
 
-```sh
+```shell
 $ gulp run-test
 [18:37:24] Using gulpfile /builds/blitzgren/gitlab-game-demo/gulpfile.js
 [18:37:24] Starting 'run-test'...
@@ -387,8 +387,8 @@ Uploading artifacts to coordinator... ok            id=17095874 responseStatus=2
 ## Continuous Deployment
 
 We have our codebase built and tested on every push. To complete the full pipeline with Continuous Deployment,
-let's set up [free web hosting with AWS S3](https://aws.amazon.com/s/dm/optimization/server-side-test/free-tier/free_np/) and a job through which our build artifacts get
-deployed. GitLab also has a free static site hosting service we could use, [GitLab Pages](https://about.gitlab.com/product/pages/),
+let's set up [free web hosting with AWS S3](https://aws.amazon.com/free/) and a job through which our build artifacts get
+deployed. GitLab also has a free static site hosting service we can use, [GitLab Pages](https://about.gitlab.com/stages-devops-lifecycle/pages/),
 however Dark Nova specifically uses other AWS tools that necessitates using `AWS S3`.
 Read through this article that describes [deploying to both S3 and GitLab Pages](https://about.gitlab.com/blog/2016/08/26/ci-deployment-and-environments/)
 and further delves into the principles of GitLab CI/CD than discussed in this article.

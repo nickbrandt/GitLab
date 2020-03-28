@@ -21,7 +21,7 @@ describe 'User activates GitHub Service' do
     it 'renders 404 when trying to access service settings directly' do
       visit edit_project_service_path(project, :github)
 
-      expect(page).to have_gitlab_http_status(404)
+      expect(page).to have_gitlab_http_status(:not_found)
     end
   end
 

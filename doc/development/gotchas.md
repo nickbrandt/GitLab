@@ -26,7 +26,7 @@ describe API::Labels do
 
     get api("/projects/#{project.id}/labels", user)
 
-    expect(response).to have_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(json_response.first['name']).to eq('label1')
   end
 
@@ -35,7 +35,7 @@ describe API::Labels do
 
     get api("/projects/#{project.id}/labels", user)
 
-    expect(response).to have_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(json_response.first['name']).to eq('label1')
   end
 end
@@ -43,7 +43,7 @@ end
 
 When run, this spec doesn't do what we might expect:
 
-```sh
+```shell
 1) API::API reproduce sequence issue creates a second label
    Failure/Error: expect(json_response.first['name']).to eq('label1')
 
@@ -77,7 +77,7 @@ describe API::Labels do
 
     get api("/projects/#{project.id}/labels", user)
 
-    expect(response).to have_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(json_response.first['name']).to eq('foo')
   end
 
@@ -86,7 +86,7 @@ describe API::Labels do
 
     get api("/projects/#{project.id}/labels", user)
 
-    expect(response).to have_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(json_response.first['name']).to eq('bar')
   end
 end
@@ -101,7 +101,7 @@ end
   in a prepended module, which is very likely the case in EE. We could see
   error like this:
 
-  ```
+  ```plaintext
   1.1) Failure/Error: expect_any_instance_of(ApplicationSetting).to receive_messages(messages)
        Using `any_instance` to stub a method (elasticsearch_indexing) that has been defined on a prepended module (EE::ApplicationSetting) is not supported.
   ```

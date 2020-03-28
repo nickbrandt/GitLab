@@ -1,9 +1,9 @@
-import $ from 'jquery';
-import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { joinPaths } from './lib/utils/url_utility';
 import flash from '~/flash';
 import { __ } from '~/locale';
+
+const DEFAULT_PER_PAGE = 20;
 
 const Api = {
   groupsPath: '/api/:version/groups.json',
@@ -22,6 +22,7 @@ const Api = {
   projectMergeRequestChangesPath: '/api/:version/projects/:id/merge_requests/:mrid/changes',
   projectMergeRequestVersionsPath: '/api/:version/projects/:id/merge_requests/:mrid/versions',
   projectRunnersPath: '/api/:version/projects/:id/runners',
+  projectProtectedBranchesPath: '/api/:version/projects/:id/protected_branches',
   mergeRequestsPath: '/api/:version/merge_requests',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
   issuableTemplatePath: '/:namespace_path/:project_path/templates/:type/:key',
@@ -41,7 +42,9 @@ const Api = {
   releasesPath: '/api/:version/projects/:id/releases',
   releasePath: '/api/:version/projects/:id/releases/:tag_name',
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
-  adminStatisticsPath: 'api/:version/application/statistics',
+  adminStatisticsPath: '/api/:version/application/statistics',
+  pipelineSinglePath: '/api/:version/projects/:id/pipelines/:pipeline_id',
+  environmentsPath: '/api/:version/projects/:id/environments',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -52,21 +55,26 @@ const Api = {
     });
   },
 
-  groupMembers(id) {
+  groupMembers(id, options) {
     const url = Api.buildUrl(this.groupMembersPath).replace(':id', encodeURIComponent(id));
 
-    return axios.get(url);
+    return axios.get(url, {
+      params: {
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
+    });
   },
 
   // Return groups list. Filtered by query
-  groups(query, options, callback = $.noop) {
+  groups(query, options, callback = () => {}) {
     const url = Api.buildUrl(Api.groupsPath);
     return axios
       .get(url, {
         params: Object.assign(
           {
             search: query,
-            per_page: 20,
+            per_page: DEFAULT_PER_PAGE,
           },
           options,
         ),
@@ -90,18 +98,18 @@ const Api = {
       .get(url, {
         params: {
           search: query,
-          per_page: 20,
+          per_page: DEFAULT_PER_PAGE,
         },
       })
       .then(({ data }) => callback(data));
   },
 
   // Return projects list. Filtered by query
-  projects(query, options, callback = _.noop) {
+  projects(query, options, callback = () => {}) {
     const url = Api.buildUrl(Api.projectsPath);
     const defaults = {
       search: query,
-      per_page: 20,
+      per_page: DEFAULT_PER_PAGE,
       simple: true,
     };
 
@@ -126,7 +134,7 @@ const Api = {
       .get(url, {
         params: {
           search: query,
-          per_page: 20,
+          per_page: DEFAULT_PER_PAGE,
           ...options,
         },
       })
@@ -138,6 +146,12 @@ const Api = {
     const url = Api.buildUrl(Api.projectPath).replace(':id', encodeURIComponent(projectPath));
 
     return axios.get(url);
+  },
+
+  // Update a single project
+  updateProject(projectPath, data) {
+    const url = Api.buildUrl(Api.projectPath).replace(':id', encodeURIComponent(projectPath));
+    return axios.put(url, data);
   },
 
   /**
@@ -205,6 +219,22 @@ const Api = {
     return axios.get(url, config);
   },
 
+  projectProtectedBranches(id, query = '') {
+    const url = Api.buildUrl(Api.projectProtectedBranchesPath).replace(
+      ':id',
+      encodeURIComponent(id),
+    );
+
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: DEFAULT_PER_PAGE,
+        },
+      })
+      .then(({ data }) => data);
+  },
+
   mergeRequests(params = {}) {
     const url = Api.buildUrl(Api.mergeRequestsPath);
 
@@ -235,7 +265,7 @@ const Api = {
     const url = Api.buildUrl(Api.groupProjectsPath).replace(':id', groupId);
     const defaults = {
       search: query,
-      per_page: 20,
+      per_page: DEFAULT_PER_PAGE,
     };
     return axios
       .get(url, {
@@ -325,7 +355,7 @@ const Api = {
       params: Object.assign(
         {
           search: query,
-          per_page: 20,
+          per_page: DEFAULT_PER_PAGE,
         },
         options,
       ),
@@ -355,7 +385,7 @@ const Api = {
     const url = Api.buildUrl(Api.userProjectsPath).replace(':id', userId);
     const defaults = {
       search: query,
-      per_page: 20,
+      per_page: DEFAULT_PER_PAGE,
     };
     return axios
       .get(url, {
@@ -371,7 +401,7 @@ const Api = {
     return axios.get(url, {
       params: {
         search: query,
-        per_page: 20,
+        per_page: DEFAULT_PER_PAGE,
         ...options,
       },
     });
@@ -403,10 +433,15 @@ const Api = {
     return axios.post(url);
   },
 
-  releases(id) {
+  releases(id, options = {}) {
     const url = Api.buildUrl(this.releasesPath).replace(':id', encodeURIComponent(id));
 
-    return axios.get(url);
+    return axios.get(url, {
+      params: {
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
+    });
   },
 
   release(projectPath, tagName) {
@@ -427,6 +462,19 @@ const Api = {
 
   adminStatistics() {
     const url = Api.buildUrl(this.adminStatisticsPath);
+    return axios.get(url);
+  },
+
+  pipelineSingle(id, pipelineId) {
+    const url = Api.buildUrl(this.pipelineSinglePath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':pipeline_id', encodeURIComponent(pipelineId));
+
+    return axios.get(url);
+  },
+
+  environments(id) {
+    const url = Api.buildUrl(this.environmentsPath).replace(':id', encodeURIComponent(id));
     return axios.get(url);
   },
 

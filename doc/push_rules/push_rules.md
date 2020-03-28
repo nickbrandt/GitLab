@@ -40,7 +40,7 @@ will be accepted.
 
 Let's assume there's a strict policy for branch names in your company, and
 you want the branches to start with a certain name because you have different
-GitLab CI jobs (`feature`, `hotfix`, `docker`, `android`, etc.) that rely on the
+GitLab CI/CD jobs (`feature`, `hotfix`, `docker`, `android`, etc.) that rely on the
 branch name.
 
 Your developers however, don't always remember that policy, so they push
@@ -49,11 +49,18 @@ branch names globally in Push Rules, you can now sleep without the anxiety
 of your developers' mistakes. Every branch that doesn't match your push rule
 will get rejected.
 
+### Custom Push Rules **(CORE ONLY)**
+
+It's possible to create custom push rules rather than the push rules available in
+**Admin Area > Push Rules** by using more advanced server hooks.
+
+See [server hooks](../administration/server_hooks.md) for more information.
+
 ## Enabling push rules
 
 NOTE: **Note:**
 GitLab administrators can set push rules globally under
-**Admin area > Push Rules** that all new projects will inherit. You can later
+**Admin Area > Push Rules** that all new projects will inherit. You can later
 override them in a project's settings.
 
 1. Navigate to your project's **Settings > Repository** and expand **Push Rules**

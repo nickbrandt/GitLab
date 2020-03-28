@@ -21,8 +21,7 @@ class ProjectsController < Projects::ApplicationController
   before_action :assign_ref_vars, if: -> { action_name == 'show' && repo_exists? }
   before_action :tree,
     if: -> { action_name == 'show' && repo_exists? && project_view_files? }
-  before_action :lfs_blob_ids,
-    if: -> { action_name == 'show' && repo_exists? && project_view_files? }
+  before_action :lfs_blob_ids, if: :show_blob_ids?, only: :show
   before_action :project_export_enabled, only: [:export, :download_export, :remove_export, :generate_new_export]
   before_action :present_project, only: [:edit]
   before_action :authorize_download_code!, only: [:refs]
@@ -31,6 +30,9 @@ class ProjectsController < Projects::ApplicationController
   before_action :authorize_admin_project!, only: [:edit, :update, :housekeeping, :download_export, :export, :remove_export, :generate_new_export]
   before_action :authorize_archive_project!, only: [:archive, :unarchive]
   before_action :event_filter, only: [:show, :activity]
+
+  # Project Export Rate Limit
+  before_action :export_rate_limit, only: [:export, :download_export, :generate_new_export]
 
   layout :determine_layout
 
@@ -48,8 +50,8 @@ class ProjectsController < Projects::ApplicationController
   # rubocop: enable CodeReuse/ActiveRecord
 
   def edit
-    @badge_api_endpoint = expose_url(api_v4_projects_badges_path(id: @project.id))
-    render 'edit'
+    @badge_api_endpoint = expose_path(api_v4_projects_badges_path(id: @project.id))
+    render_edit
   end
 
   def create
@@ -83,7 +85,7 @@ class ProjectsController < Projects::ApplicationController
       else
         flash.now[:alert] = result[:message]
 
-        format.html { render 'edit' }
+        format.html { render_edit }
       end
 
       format.js
@@ -116,7 +118,7 @@ class ProjectsController < Projects::ApplicationController
       format.html
       format.json do
         load_events
-        pager_json('events/_events', @events.count)
+        pager_json('events/_events', @events.count { |event| event.visible_to_user?(current_user) })
       end
     end
   end
@@ -293,6 +295,10 @@ class ProjectsController < Projects::ApplicationController
 
   private
 
+  def show_blob_ids?
+    repo_exists? && project_view_files? && Feature.disabled?(:vue_file_list, @project, default_enabled: true)
+  end
+
   # Render project landing depending of which features are available
   # So if page is not available in the list it renders the next page
   #
@@ -337,6 +343,7 @@ class ProjectsController < Projects::ApplicationController
     @events = EventCollection
       .new(projects, offset: params[:offset].to_i, filter: event_filter)
       .to_a
+      .map(&:present)
 
     Events::RenderService.new(current_user).execute(@events, atom_request: request.format.atom?)
   end
@@ -380,10 +387,13 @@ class ProjectsController < Projects::ApplicationController
       :template_project_id,
       :merge_method,
       :initialize_with_readme,
+      :autoclose_referenced_issues,
+      :suggestion_commit_message,
 
       project_feature_attributes: %i[
         builds_access_level
         issues_access_level
+        forking_access_level
         merge_requests_access_level
         repository_access_level
         snippets_access_level
@@ -464,6 +474,25 @@ class ProjectsController < Projects::ApplicationController
 
   def present_project
     @project = @project.present(current_user: current_user)
+  end
+
+  def export_rate_limit
+    prefixed_action = "project_#{params[:action]}".to_sym
+
+    if rate_limiter.throttled?(prefixed_action, scope: [current_user, prefixed_action, @project])
+      rate_limiter.log_request(request, "#{prefixed_action}_request_limit".to_sym, current_user)
+
+      flash[:alert] = _('This endpoint has been requested too many times. Try again later.')
+      redirect_to edit_project_path(@project)
+    end
+  end
+
+  def rate_limiter
+    ::Gitlab::ApplicationRateLimiter
+  end
+
+  def render_edit
+    render 'edit'
   end
 end
 

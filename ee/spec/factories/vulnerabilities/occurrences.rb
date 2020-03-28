@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   sequence :vulnerability_occurrence_uuid do |n|
-    Digest::SHA1.hexdigest("uuid-#{n}")[0..35]
+    SecureRandom.uuid
   end
 
-  factory :vulnerabilities_occurrence, class: Vulnerabilities::Occurrence, aliases: [:vulnerabilities_finding] do
+  factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
     name { 'Cipher with no integrity' }
     project
     sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
@@ -20,6 +20,8 @@ FactoryBot.define do
     raw_metadata do
       {
         description: "The cipher does not provide data integrity update 1",
+        message: "The cipher does not provide data integrity",
+        cve: "818bf5dacb291e15d9e6dc3c5ac32178:CIPHER",
         solution: "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
         location: {
           file: "maven/src/main/java/com/gitlab/security_products/tests/App.java",
@@ -39,7 +41,7 @@ FactoryBot.define do
 
     trait :confirmed do
       after(:create) do |finding|
-        create(:vulnerability, :opened, project: finding.project, findings: [finding])
+        create(:vulnerability, :detected, project: finding.project, findings: [finding])
       end
     end
 
@@ -64,6 +66,12 @@ FactoryBot.define do
                :issue,
                project: finding.project,
                project_fingerprint: finding.project_fingerprint)
+      end
+    end
+
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |security_report_type|
+      trait security_report_type do
+        report_type { security_report_type }
       end
     end
   end

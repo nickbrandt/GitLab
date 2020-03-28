@@ -1,13 +1,16 @@
 import * as mutationTypes from './mutation_types';
 
 const notImplemented = () => {
-  /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+  /* eslint-disable-next-line @gitlab/require-i18n-strings */
   throw new Error('Not implemented!');
 };
 
 export default {
   [mutationTypes.TOGGLE_LABELS]: state => {
     state.isShowingLabels = !state.isShowingLabels;
+  },
+  [mutationTypes.SET_ACTIVE_LIST_ID]: (state, id) => {
+    state.activeListId = id;
   },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {

@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils';
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
+import waitForPromises from 'helpers/wait_for_promises';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import axios from '~/lib/utils/axios_utils';
 
 const { CancelToken } = axios;
 
@@ -35,7 +36,6 @@ describe('custom metrics form fields component', () => {
         ...props,
       },
       csrfToken,
-      sync: false,
       methods,
     });
   };
@@ -180,11 +180,15 @@ describe('custom metrics form fields component', () => {
         component.vm.$nextTick(() => {
           expect(component.vm.queryValidateInFlight).toBe(true);
           jest.runOnlyPendingTimers();
-          component.vm.$nextTick(() => {
-            expect(component.vm.queryValidateInFlight).toBe(false);
-            expect(component.vm.queryIsValid).toBe(true);
-            done();
-          });
+          waitForPromises()
+            .then(() => {
+              component.vm.$nextTick(() => {
+                expect(component.vm.queryValidateInFlight).toBe(false);
+                expect(component.vm.queryIsValid).toBe(true);
+                done();
+              });
+            })
+            .catch(done.fail);
         });
       });
 
@@ -205,12 +209,16 @@ describe('custom metrics form fields component', () => {
         queryInput.trigger('input');
         component.vm.$nextTick(() => {
           jest.runOnlyPendingTimers();
-          component.vm.$nextTick(() => {
-            expect(component.vm.queryValidateInFlight).toBe(false);
-            expect(component.vm.queryIsValid).toBe(true);
-            expect(component.vm.errorMessage).toBe('');
-            done();
-          });
+          waitForPromises()
+            .then(() => {
+              component.vm.$nextTick(() => {
+                expect(component.vm.queryValidateInFlight).toBe(false);
+                expect(component.vm.queryIsValid).toBe(true);
+                expect(component.vm.errorMessage).toBe('');
+                done();
+              });
+            })
+            .catch(done.fail);
         });
       });
     });

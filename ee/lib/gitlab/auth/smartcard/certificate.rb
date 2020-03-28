@@ -75,10 +75,6 @@ module Gitlab
         def username
           ::Namespace.clean_path(common_name)
         end
-
-        def password
-          @password ||= Devise.friendly_token(8)
-        end
       end
     end
   end

@@ -13,8 +13,6 @@ module Packages
       end
 
       def execute
-        return ServiceResponse.error(message: 'not found', http_status: :not_found) unless feature_available?
-
         ServiceResponse.success(payload: { results: search_results })
       end
 
@@ -38,12 +36,8 @@ module Packages
         sanitized_query
       end
 
-      def feature_available?
-        Feature.enabled?(:conan_package_registry)
-      end
-
       def search_packages(query)
-        Packages::ConanPackageFinder.new(current_user, query: query).execute.map(&:conan_recipe)
+        ::Packages::Conan::PackageFinder.new(current_user, query: query).execute.map(&:conan_recipe)
       end
 
       def search_for_single_package(query)

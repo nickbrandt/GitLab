@@ -20,9 +20,8 @@ describe('RelatedMergeRequests', () => {
     mock = new MockAdapter(axios);
     mock.onGet(`${API_ENDPOINT}?per_page=100`).reply(200, mockData, { 'x-total': 2 });
 
-    wrapper = mount(RelatedMergeRequests, {
+    wrapper = mount(localVue.extend(RelatedMergeRequests), {
       localVue,
-      sync: false,
       store: createStore(),
       propsData: {
         endpoint: API_ENDPOINT,

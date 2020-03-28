@@ -1,6 +1,7 @@
 @import 'framework/variables';
 @import 'framework/mixins';
 @import './ide_mixins';
+@import './ide_monaco_overrides';
 
 $search-list-icon-width: 18px;
 $ide-activity-bar-width: 60px;
@@ -16,17 +17,8 @@ $ide-commit-header-height: 48px;
   display: inline-block;
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
 .commit-message {
   @include str-truncated(250px);
-}
-
-.editable-mode {
-  display: inline-block;
 }
 
 .ide-view {
@@ -53,10 +45,6 @@ $ide-commit-header-height: 48px;
   flex-direction: column;
   flex: 1;
   min-height: 0; // firefox fix
-
-  a {
-    color: $gl-text-color;
-  }
 }
 
 .multi-file-loading-container {
@@ -79,7 +67,7 @@ $ide-commit-header-height: 48px;
 
 .multi-file-tabs {
   display: flex;
-  background-color: $white-normal;
+  background-color: $gray-light;
   box-shadow: inset 0 -1px $white-dark;
 
   > ul {
@@ -164,147 +152,6 @@ $ide-commit-header-height: 48px;
   height: 0;
 }
 
-.blob-editor-container {
-  flex: 1;
-  height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  .vertical-center {
-    min-height: auto;
-  }
-
-  .monaco-editor .lines-content .cigr {
-    display: none;
-  }
-
-  .monaco-editor .selected-text {
-    z-index: 1;
-  }
-
-  .monaco-editor .view-lines {
-    z-index: 2;
-  }
-
-  .is-readonly,
-  .editor.original {
-    .view-lines {
-      cursor: default;
-    }
-
-    .cursors-layer {
-      display: none;
-    }
-  }
-
-  .is-deleted {
-    .editor.modified {
-      .margin-view-overlays,
-      .lines-content,
-      .decorationsOverviewRuler {
-        // !important to override monaco inline styles
-        display: none !important;
-      }
-    }
-
-    .diffOverviewRuler.modified {
-      // !important to override monaco inline styles
-      display: none !important;
-    }
-  }
-
-  .is-added {
-    .editor.original {
-      .margin-view-overlays,
-      .lines-content,
-      .decorationsOverviewRuler {
-        // !important to override monaco inline styles
-        display: none !important;
-      }
-    }
-
-    .diffOverviewRuler.original {
-      // !important to override monaco inline styles
-      display: none !important;
-    }
-  }
-
-  .monaco-diff-editor.vs {
-    .editor.modified {
-      box-shadow: none;
-    }
-
-    .diagonal-fill {
-      display: none !important;
-    }
-
-    .diffOverview {
-      background-color: $white-light;
-      border-left: 1px solid $white-dark;
-      cursor: ns-resize;
-    }
-
-    .diffViewport {
-      display: none;
-    }
-
-    .char-insert {
-      background-color: $line-added-dark;
-    }
-
-    .char-delete {
-      background-color: $line-removed-dark;
-    }
-
-    .line-numbers {
-      color: $black-transparent;
-    }
-
-    .view-overlays {
-      .line-insert {
-        background-color: $line-added;
-      }
-
-      .line-delete {
-        background-color: $line-removed;
-      }
-    }
-
-    .margin {
-      background-color: $white-light;
-      border-right: 1px solid $gray-100;
-
-      .line-insert {
-        border-right: 1px solid $line-added-dark;
-      }
-
-      .line-delete {
-        border-right: 1px solid $line-removed-dark;
-      }
-    }
-
-    .margin-view-overlays .insert-sign,
-    .margin-view-overlays .delete-sign {
-      opacity: 0.4;
-    }
-  }
-}
-
-.multi-file-editor-holder {
-  height: 100%;
-  min-height: 0; // firefox fix
-
-  &.is-readonly,
-  .editor.original {
-    .monaco-editor,
-    .monaco-editor-background,
-    .monaco-editor .inputarea.ime-input {
-      background-color: $gray-50;
-    }
-  }
-}
-
 .preview-container {
   flex-grow: 1;
   position: relative;
@@ -332,23 +179,6 @@ $ide-commit-header-height: 48px;
       padding: $gl-padding;
       max-width: 100%;
       max-height: 100%;
-
-      img {
-        max-width: 90%;
-      }
-
-      .isZoomable {
-        cursor: pointer;
-        cursor: zoom-in;
-
-        &.isZoomed {
-          cursor: pointer;
-          cursor: zoom-out;
-          max-width: none;
-          max-height: none;
-          margin-right: $gl-padding;
-        }
-      }
     }
 
     .file-info {
@@ -361,13 +191,9 @@ $ide-commit-header-height: 48px;
 .ide-mode-tabs {
   border-bottom: 1px solid $white-dark;
 
-  .nav-links {
-    border-bottom: 0;
-
-    li a {
-      padding: $gl-padding-8 $gl-padding;
-      line-height: $gl-btn-line-height;
-    }
+  li a {
+    padding: $gl-padding-8 $gl-padding;
+    line-height: $gl-btn-line-height;
   }
 }
 
@@ -564,12 +390,6 @@ $ide-commit-header-height: 48px;
     background: $gray-100;
 
     outline: 0;
-
-    .multi-file-discard-btn {
-      > .btn {
-        display: flex;
-      }
-    }
   }
 
   &:active {
@@ -593,18 +413,6 @@ $ide-commit-header-height: 48px;
 
   &:active {
     text-decoration: none;
-  }
-}
-
-.multi-file-discard-btn {
-  > .btn {
-    display: none;
-    width: $ide-commit-row-height;
-    height: $ide-commit-row-height;
-  }
-
-  svg {
-    top: 0;
   }
 }
 
@@ -704,10 +512,6 @@ $ide-commit-header-height: 48px;
   width: $ide-commit-row-height;
   height: $ide-commit-row-height;
   color: inherit;
-
-  > svg {
-    top: 0;
-  }
 }
 
 .ide-commit-file-count {
@@ -721,7 +525,7 @@ $ide-commit-header-height: 48px;
     font-weight: normal;
 
     &.is-disabled {
-      .ide-radio-label {
+      .ide-option-label {
         text-decoration: line-through;
       }
     }
@@ -740,6 +544,7 @@ $ide-commit-header-height: 48px;
 .ide-sidebar-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   position: relative;
   height: 60px;
   width: 100%;
@@ -883,38 +688,52 @@ $ide-commit-header-height: 48px;
   margin-right: $ide-tree-padding;
   border-bottom: 1px solid $white-dark;
 
+  svg {
+    color: $gray-700;
+
+    &:focus,
+    &:hover {
+      color: $blue-600;
+    }
+  }
+
   .ide-new-btn {
     margin-left: auto;
   }
 
-  .ide-nav-dropdown {
-    width: 100%;
-    margin-bottom: 12px;
+  button {
+    color: $gl-text-color;
+  }
+}
 
-    .dropdown-menu {
-      width: 385px;
-      max-height: initial;
-    }
+.ide-nav-dropdown {
+  width: 100%;
+  margin-bottom: 12px;
 
-    .dropdown-menu-toggle {
-      svg {
-        vertical-align: middle;
-      }
+  .dropdown-menu {
+    width: 385px;
+    max-height: initial;
+  }
+
+  .dropdown-menu-toggle {
+    svg {
+      vertical-align: middle;
+      color: $gray-700;
 
       &:hover {
-        background-color: $white-normal;
+        color: $gray-700;
       }
     }
 
-    &.show {
-      .dropdown-menu-toggle {
-        background-color: $white-dark;
-      }
+    &:hover {
+      background-color: $white-normal;
     }
   }
 
-  button {
-    color: $gl-text-color;
+  &.show {
+    .dropdown-menu-toggle {
+      background-color: $white-dark;
+    }
   }
 }
 
@@ -963,6 +782,8 @@ $ide-commit-header-height: 48px;
   transform: translateY(0);
 }
 
+.fade-enter,
+.fade-leave-to,
 .commit-form-slide-up-enter,
 .commit-form-slide-up-leave-to {
   opacity: 0;
@@ -1012,11 +833,6 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-context-header {
-  .ide-merge-requests-dropdown.dropdown-menu {
-    width: 385px;
-    max-height: initial;
-  }
-
   .avatar-container {
     flex: 0 0 auto;
     margin-right: 0;
@@ -1045,8 +861,6 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-external-link {
-  position: relative;
-
   svg {
     display: none;
     position: absolute;
@@ -1062,10 +876,12 @@ $ide-commit-header-height: 48px;
   }
 }
 
-.ide-right-sidebar {
+.ide-sidebar {
   width: auto;
   min-width: 60px;
+}
 
+.ide-right-sidebar {
   .ide-activity-bar {
     border-left: 1px solid $white-dark;
   }
@@ -1086,9 +902,6 @@ $ide-commit-header-height: 48px;
   @include ide-trace-view();
 
   .empty-state {
-    margin-top: auto;
-    margin-bottom: auto;
-
     p {
       margin: $grid-size 0;
       text-align: center;
@@ -1115,10 +928,6 @@ $ide-commit-header-height: 48px;
   min-height: 55px;
   padding-left: $gl-padding;
   padding-right: $gl-padding;
-
-  .ci-status-icon {
-    display: flex;
-  }
 }
 
 .ide-job-item {
@@ -1147,20 +956,10 @@ $ide-commit-header-height: 48px;
       align-items: center;
     }
   }
-
-  .card-body {
-    padding: 0;
-  }
 }
 
 .ide-stage-collapse-icon {
   margin: auto 0 auto auto;
-}
-
-.ide-stage-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .ide-job-header {
@@ -1168,7 +967,7 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-nav-form {
-  .nav-links li {
+  li {
     width: 50%;
     padding-left: 0;
     padding-right: 0;
@@ -1254,10 +1053,6 @@ $ide-commit-header-height: 48px;
     color: $white-normal;
     background-color: $blue-500;
     outline: 0;
-  }
-
-  svg {
-    fill: currentColor;
   }
 }
 

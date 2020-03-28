@@ -8,6 +8,7 @@ module QA
       prepend Support::Page::Logging if Runtime::Env.debug?
       include Capybara::DSL
       include Scenario::Actable
+      include Support::WaitForRequests
       extend Validatable
       extend SingleForwardable
 
@@ -21,27 +22,31 @@ module QA
 
       def refresh
         page.refresh
+
+        wait_for_requests
       end
 
-      def wait(max: 60, interval: 0.1, reload: true)
-        QA::Support::Waiter.wait(max: max, interval: interval) do
+      def wait_until(max_duration: 60, sleep_interval: 0.1, reload: true, raise_on_failure: true)
+        Support::Waiter.wait_until(max_duration: max_duration, sleep_interval: sleep_interval, raise_on_failure: raise_on_failure) do
           yield || (reload && refresh && false)
         end
       end
 
-      def retry_until(max_attempts: 3, reload: false, sleep_interval: 0)
-        QA::Support::Retrier.retry_until(max_attempts: max_attempts, reload_page: (reload && self), sleep_interval: sleep_interval) do
+      def retry_until(max_attempts: 3, reload: false, sleep_interval: 0, raise_on_failure: true)
+        Support::Retrier.retry_until(max_attempts: max_attempts, reload_page: (reload && self), sleep_interval: sleep_interval, raise_on_failure: raise_on_failure) do
           yield
         end
       end
 
       def retry_on_exception(max_attempts: 3, reload: false, sleep_interval: 0.5)
-        QA::Support::Retrier.retry_on_exception(max_attempts: max_attempts, reload_page: (reload && self), sleep_interval: sleep_interval) do
+        Support::Retrier.retry_on_exception(max_attempts: max_attempts, reload_page: (reload && self), sleep_interval: sleep_interval) do
           yield
         end
       end
 
       def scroll_to(selector, text: nil)
+        wait_for_requests
+
         page.execute_script <<~JS
           var elements = Array.from(document.querySelectorAll('#{selector}'));
           var text = '#{text}';
@@ -66,7 +71,7 @@ module QA
           xhr.send();
         JS
 
-        return false unless wait(interval: 0.5, max: 60, reload: false) do
+        return false unless wait_until(sleep_interval: 0.5, max_duration: 60, reload: false) do
           page.evaluate_script('xhr.readyState == XMLHttpRequest.DONE')
         end
 
@@ -74,6 +79,8 @@ module QA
       end
 
       def find_element(name, **kwargs)
+        wait_for_requests
+
         find(element_selector_css(name), kwargs)
       end
 
@@ -81,8 +88,14 @@ module QA
         find_element(name, class: 'active')
       end
 
-      def all_elements(name)
-        all(element_selector_css(name))
+      def all_elements(name, **kwargs)
+        if kwargs.keys.none? { |key| [:minimum, :maximum, :count, :between].include?(key) }
+          raise ArgumentError, "Please use :minimum, :maximum, :count, or :between so that all is more reliable"
+        end
+
+        wait_for_requests
+
+        all(element_selector_css(name), **kwargs)
       end
 
       def check_element(name)
@@ -102,8 +115,8 @@ module QA
       end
 
       # replace with (..., page = self.class)
-      def click_element(name, page = nil, text: nil)
-        find_element(name, text: text).click
+      def click_element(name, page = nil, text: nil, wait: Capybara.default_max_wait_time)
+        find_element(name, text: text, wait: wait).click
         page.validate_elements_present! if page
       end
 
@@ -119,33 +132,57 @@ module QA
         element.select value
       end
 
-      def has_element?(name, **kwargs)
-        wait = kwargs[:wait] ? kwargs[:wait] && kwargs.delete(:wait) : Capybara.default_max_wait_time
-        text = kwargs[:text] ? kwargs[:text] && kwargs.delete(:text) : nil
+      def has_active_element?(name, **kwargs)
+        has_element?(name, class: 'active', **kwargs)
+      end
 
-        has_css?(element_selector_css(name, kwargs), text: text, wait: wait)
+      def has_element?(name, **kwargs)
+        wait_for_requests
+
+        wait = kwargs.delete(:wait) || Capybara.default_max_wait_time
+        text = kwargs.delete(:text)
+        klass = kwargs.delete(:class)
+
+        has_css?(element_selector_css(name, kwargs), text: text, wait: wait, class: klass)
       end
 
       def has_no_element?(name, **kwargs)
-        wait = kwargs[:wait] ? kwargs[:wait] && kwargs.delete(:wait) : Capybara.default_max_wait_time
-        text = kwargs[:text] ? kwargs[:text] && kwargs.delete(:text) : nil
+        wait_for_requests
+
+        wait = kwargs.delete(:wait) || Capybara.default_max_wait_time
+        text = kwargs.delete(:text)
 
         has_no_css?(element_selector_css(name, kwargs), wait: wait, text: text)
       end
 
       def has_text?(text, wait: Capybara.default_max_wait_time)
+        wait_for_requests
+
         page.has_text?(text, wait: wait)
       end
 
-      def has_no_text?(text)
-        page.has_no_text? text
+      def has_no_text?(text, wait: Capybara.default_max_wait_time)
+        wait_for_requests
+
+        page.has_no_text?(text, wait: wait)
+      end
+
+      def has_normalized_ws_text?(text, wait: Capybara.default_max_wait_time)
+        has_text?(text.gsub(/\s+/, " "), wait: wait)
       end
 
       def finished_loading?
-        has_no_css?('.fa-spinner', wait: Capybara.default_max_wait_time)
+        wait_for_requests
+
+        # The number of selectors should be able to be reduced after
+        # migration to the new spinner is complete.
+        # https://gitlab.com/groups/gitlab-org/-/epics/956
+        has_no_css?('.gl-spinner, .fa-spinner, .spinner', wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
       end
 
       def finished_loading_block?
+        wait_for_requests
+
         has_no_css?('.fa-spinner.block-loading', wait: Capybara.default_max_wait_time)
       end
 
@@ -154,7 +191,7 @@ module QA
         # This loop gives time for the img tags to be rendered and for
         # images to start loading.
         previous_total_images = 0
-        wait(interval: 1) do
+        wait_until(sleep_interval: 1) do
           current_total_images = all("img").size
           result = previous_total_images == current_total_images
           previous_total_images = current_total_images
@@ -199,12 +236,7 @@ module QA
       end
 
       def within_element_by_index(name, index)
-        # Finding all elements can be flaky if the elements don't all load
-        # immediately. So we wait for any to appear before trying to find a
-        # specific one.
-        has_element?(name)
-
-        page.within all_elements(name)[index] do
+        page.within all_elements(name, minimum: index + 1)[index] do
           yield
         end
       end
@@ -218,11 +250,9 @@ module QA
       end
 
       def click_link_with_text(text)
-        click_link text
-      end
+        wait_for_requests
 
-      def click_body
-        find('body').click
+        click_link text
       end
 
       def visit_link_in_element(name)

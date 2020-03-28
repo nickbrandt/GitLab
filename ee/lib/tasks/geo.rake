@@ -10,53 +10,53 @@ namespace :geo do
   GEO_STATUS_COLUMN_WIDTH = 40
 
   namespace :db do |ns|
-    desc 'Drops the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
+    desc 'GitLab | Geo | DB | Drops the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
     task drop: [:environment] do
       Gitlab::Geo::DatabaseTasks.drop_current
     end
 
-    desc 'Creates the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
+    desc 'GitLab | Geo | DB | Creates the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
     task create: [:environment] do
       Gitlab::Geo::DatabaseTasks.create_current
     end
 
-    desc 'Create the Geo tracking database, load the schema, and initialize with the seed data.'
+    desc 'GitLab | Geo | DB | Create the Geo tracking database, load the schema, and initialize with the seed data.'
     task setup: ['geo:db:schema:load', 'geo:db:seed']
 
-    desc 'Migrate the Geo tracking database (options: VERSION=x, VERBOSE=false, SCOPE=blog).'
+    desc 'GitLab | Geo | DB | Migrate the Geo tracking database (options: VERSION=x, VERBOSE=false, SCOPE=blog).'
     task migrate: [:environment] do
       Gitlab::Geo::DatabaseTasks.migrate
 
       ns['_dump'].invoke
     end
 
-    desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n).'
+    desc 'GitLab | Geo | DB | Rolls the schema back to the previous version (specify steps w/ STEP=n).'
     task rollback: [:environment] do
       Gitlab::Geo::DatabaseTasks.rollback
 
       ns['_dump'].invoke
     end
 
-    desc 'Retrieves the current schema version number.'
+    desc 'GitLab | Geo | DB | Retrieves the current schema version number.'
     task version: [:environment] do
       puts "Current version: #{Gitlab::Geo::DatabaseTasks.version}"
     end
 
-    desc 'Drops and recreates the database from ee/db/geo/schema.rb for the current environment and loads the seeds.'
+    desc 'GitLab | Geo | DB | Drops and recreates the database from ee/db/geo/schema.rb for the current environment and loads the seeds.'
     task reset: [:environment] do
       ns['drop'].invoke
       ns['create'].invoke
       ns['setup'].invoke
     end
 
-    desc 'Load the seed data from ee/db/geo/seeds.rb'
+    desc 'GitLab | Geo | DB | Load the seed data from ee/db/geo/seeds.rb'
     task seed: [:environment] do
       ns['abort_if_pending_migrations'].invoke
 
       Gitlab::Geo::DatabaseTasks.load_seed
     end
 
-    desc 'Refresh Foreign Tables definition in Geo Secondary node'
+    desc 'GitLab | Geo | DB | Refresh Foreign Tables definition in Geo Secondary node'
     task refresh_foreign_tables: [:environment] do
       if Gitlab::Geo::GeoTasks.foreign_server_configured?
         print "\nRefreshing foreign tables for FDW: #{Gitlab::Geo::Fdw::FOREIGN_SCHEMA} ... "
@@ -93,12 +93,12 @@ namespace :geo do
     end
 
     namespace :schema do
-      desc 'Load a schema.rb file into the database'
+      desc 'GitLab | Geo | DB | Schema | Load a schema.rb file into the database'
       task load: [:environment] do
         Gitlab::Geo::DatabaseTasks.load_schema_current(:ruby, ENV['SCHEMA'])
       end
 
-      desc 'Create a ee/db/geo/schema.rb file that is portable against any DB supported by AR'
+      desc 'GitLab | Geo | DB | Schema | Create a ee/db/geo/schema.rb file that is portable against any DB supported by AR'
       task dump: [:environment] do
         Gitlab::Geo::DatabaseTasks::Schema.dump
 
@@ -107,21 +107,21 @@ namespace :geo do
     end
 
     namespace :migrate do
-      desc 'Runs the "up" for a given migration VERSION.'
+      desc 'GitLab | Geo | DB | Migrate | Runs the "up" for a given migration VERSION.'
       task up: [:environment] do
         Gitlab::Geo::DatabaseTasks::Migrate.up
 
         ns['_dump'].invoke
       end
 
-      desc 'Runs the "down" for a given migration VERSION.'
+      desc 'GitLab | Geo | DB | Migrate | Runs the "down" for a given migration VERSION.'
       task down: [:environment] do
         Gitlab::Geo::DatabaseTasks::Migrate.down
 
         ns['_dump'].invoke
       end
 
-      desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
+      desc 'GitLab | Geo | DB | Migrate | Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
       task redo: [:environment] do
         if ENV['VERSION']
           ns['migrate:down'].invoke
@@ -132,14 +132,14 @@ namespace :geo do
         end
       end
 
-      desc 'Display status of migrations'
+      desc 'GitLab | Geo | DB | Migrate | Display status of migrations'
       task status: [:environment] do
         Gitlab::Geo::DatabaseTasks::Migrate.status
       end
     end
 
     namespace :test do
-      desc 'Check for pending migrations and load the test schema'
+      desc 'GitLab | Geo | DB | Test | Check for pending migrations and load the test schema'
       task prepare: [:environment] do
         ns['test:load'].invoke
       end
@@ -154,7 +154,7 @@ namespace :geo do
         Gitlab::Geo::DatabaseTasks::Test.purge
       end
 
-      desc 'Refresh Foreign Tables definition for test environment'
+      desc 'GitLab | Geo | DB | Test | Refresh Foreign Tables definition for test environment'
       task refresh_foreign_tables: [:environment] do
         old_env = ActiveRecord::Tasks::DatabaseTasks.env
         ActiveRecord::Tasks::DatabaseTasks.env = 'test'
@@ -166,7 +166,7 @@ namespace :geo do
     end
   end
 
-  desc 'Run orphaned project registry cleaner'
+  desc 'GitLab | Geo | Run orphaned project registry cleaner'
   task run_orphaned_project_registry_cleaner: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
@@ -206,7 +206,7 @@ namespace :geo do
     puts "Orphaned registries removed(total): #{total_count}"
   end
 
-  desc 'Make this node the Geo primary'
+  desc 'GitLab | Geo | Make this node the Geo primary'
   task set_primary_node: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
     abort 'GitLab Geo primary node already present' if Gitlab::Geo.primary_node.present?
@@ -214,12 +214,12 @@ namespace :geo do
     Gitlab::Geo::GeoTasks.set_primary_geo_node
   end
 
-  desc 'Make this secondary node the primary'
+  desc 'GitLab | Geo | Make this secondary node the primary'
   task set_secondary_as_primary: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
     ActiveRecord::Base.transaction do
-      primary_node = Gitlab::Geo.primary_node
+      primary_node = GeoNode.primary_node
 
       unless primary_node
         abort 'The primary is not set'
@@ -227,7 +227,7 @@ namespace :geo do
 
       primary_node.destroy
 
-      current_node = Gitlab::Geo.current_node
+      current_node = GeoNode.current_node
 
       unless current_node.secondary?
         abort 'This is not a secondary node'
@@ -237,14 +237,14 @@ namespace :geo do
     end
   end
 
-  desc 'Update Geo primary node URL'
+  desc 'GitLab | Geo | Update Geo primary node URL'
   task update_primary_node_url: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
     Gitlab::Geo::GeoTasks.update_primary_geo_node_url
   end
 
-  desc 'Print Geo node status'
+  desc 'GitLab | Geo | Print Geo node status'
   task status: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
@@ -339,12 +339,10 @@ namespace :geo do
       puts using_percentage(current_node_status.container_repositories_synced_in_percentage)
     end
 
-    if Feature.enabled?(:enable_geo_design_sync)
-      print 'Design repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
-      show_failed_value(current_node_status.design_repositories_failed_count)
-      print "#{current_node_status.design_repositories_synced_count || 0}/#{current_node_status.design_repositories_count || 0} "
-      puts using_percentage(current_node_status.design_repositories_synced_in_percentage)
-    end
+    print 'Design repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
+    show_failed_value(current_node_status.design_repositories_failed_count)
+    print "#{current_node_status.design_repositories_synced_count || 0}/#{current_node_status.design_repositories_count || 0} "
+    puts using_percentage(current_node_status.design_repositories_synced_in_percentage)
 
     if Gitlab::CurrentSettings.repository_checks_enabled
       print 'Repositories Checked: '.rjust(GEO_STATUS_COLUMN_WIDTH)

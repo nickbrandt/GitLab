@@ -1,6 +1,5 @@
 import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlLink } from '@gitlab/ui';
-import { createLocalVue, mount } from '@vue/test-utils';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { mount } from '@vue/test-utils';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
 import { addListType } from 'ee/dependencies/store/utils';
@@ -11,6 +10,7 @@ import DependenciesActions from 'ee/dependencies/components/dependencies_actions
 import DependencyListIncompleteAlert from 'ee/dependencies/components/dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from 'ee/dependencies/components/dependency_list_job_failed_alert.vue';
 import PaginatedDependenciesTable from 'ee/dependencies/components/paginated_dependencies_table.vue';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 
 describe('DependenciesApp component', () => {
   let store;
@@ -22,11 +22,10 @@ describe('DependenciesApp component', () => {
     endpoint: '/foo',
     emptyStateSvgPath: '/bar.svg',
     documentationPath: TEST_HOST,
+    supportDocumentationPath: `${TEST_HOST}/dependency_scanning#supported-languages`,
   };
 
   const factory = (props = basicAppProps) => {
-    const localVue = createLocalVue();
-
     store = createStore();
     addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
     jest.spyOn(store, 'dispatch').mockImplementation();
@@ -35,10 +34,7 @@ describe('DependenciesApp component', () => {
     const stubs = Object.keys(DependenciesApp.components).filter(canBeStubbed);
 
     wrapper = mount(DependenciesApp, {
-      localVue,
       store,
-      sync: false,
-      attachToDocument: true,
       propsData: { ...props },
       stubs,
     });
@@ -92,6 +88,16 @@ describe('DependenciesApp component', () => {
     store.state[allNamespace].reportInfo.status = REPORT_STATUS.incomplete;
   };
 
+  const setStateNoDependencies = () => {
+    Object.assign(store.state[allNamespace], {
+      initialized: true,
+      isLoading: false,
+      dependencies: [],
+    });
+    store.state[allNamespace].pageInfo.total = 0;
+    store.state[allNamespace].reportInfo.status = REPORT_STATUS.noDependencies;
+  };
+
   const findJobFailedAlert = () => wrapper.find(DependencyListJobFailedAlert);
   const findIncompleteListAlert = () => wrapper.find(DependencyListIncompleteAlert);
   const findDependenciesTables = () => wrapper.findAll(PaginatedDependenciesTable);
@@ -109,14 +115,19 @@ describe('DependenciesApp component', () => {
     expect(componentWrapper.props()).toEqual(expect.objectContaining(props));
   };
 
+  const expectComponentPropsToMatchSnapshot = Component => {
+    const componentWrapper = wrapper.find(Component);
+    expect(componentWrapper.props()).toMatchSnapshot();
+  };
+
   const expectNoDependenciesTables = () => expect(findDependenciesTables()).toHaveLength(0);
   const expectNoHeader = () => expect(findHeader().exists()).toBe(false);
 
   const expectDependenciesTables = () => {
-    const { wrappers } = findDependenciesTables();
-    expect(wrappers).toHaveLength(2);
-    expect(wrappers[0].props()).toEqual({ namespace: allNamespace });
-    expect(wrappers[1].props()).toEqual({ namespace: vulnerableNamespace });
+    const tables = findDependenciesTables();
+    expect(tables).toHaveLength(2);
+    expect(tables.at(0).props()).toEqual({ namespace: allNamespace });
+    expect(tables.at(1).props()).toEqual({ namespace: vulnerableNamespace });
   };
 
   const expectHeader = () => {
@@ -154,6 +165,7 @@ describe('DependenciesApp component', () => {
 
       it('shows only the empty state', () => {
         expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+        expectComponentPropsToMatchSnapshot(GlEmptyState);
         expectNoHeader();
         expectNoDependenciesTables();
       });
@@ -291,10 +303,10 @@ describe('DependenciesApp component', () => {
 
       it('shows both dependencies tables with the correct props', expectDependenciesTables);
 
-      describe('when the job failure alert emits the close event', () => {
+      describe('when the job failure alert emits the dismiss event', () => {
         beforeEach(() => {
           const alertWrapper = findJobFailedAlert();
-          alertWrapper.vm.$emit('close');
+          alertWrapper.vm.$emit('dismiss');
           return wrapper.vm.$nextTick();
         });
 
@@ -317,16 +329,29 @@ describe('DependenciesApp component', () => {
 
       it('shows both dependencies tables with the correct props', expectDependenciesTables);
 
-      describe('when the incomplete-list alert emits the close event', () => {
+      describe('when the incomplete-list alert emits the dismiss event', () => {
         beforeEach(() => {
           const alertWrapper = findIncompleteListAlert();
-          alertWrapper.vm.$emit('close');
+          alertWrapper.vm.$emit('dismiss');
           return wrapper.vm.$nextTick();
         });
 
         it('does not render the incomplete-list alert', () => {
           expect(findIncompleteListAlert().exists()).toBe(false);
         });
+      });
+    });
+
+    describe('given there are no dependencies detected', () => {
+      beforeEach(() => {
+        setStateNoDependencies();
+      });
+
+      it('shows only the empty state', () => {
+        expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+        expectComponentPropsToMatchSnapshot(GlEmptyState);
+        expectNoHeader();
+        expectNoDependenciesTables();
       });
     });
   });

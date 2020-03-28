@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'forked project import' do
@@ -22,15 +24,17 @@ describe 'forked project import' do
   end
 
   let(:saver) do
-    Gitlab::ImportExport::ProjectTreeSaver.new(project: project_with_repo, current_user: user, shared: shared)
+    Gitlab::ImportExport::Project::TreeSaver.new(project: project_with_repo, current_user: user, shared: shared)
   end
 
   let(:restorer) do
-    Gitlab::ImportExport::ProjectTreeRestorer.new(user: user, shared: shared, project: project)
+    Gitlab::ImportExport::Project::TreeRestorer.new(user: user, shared: shared, project: project)
   end
 
   before do
-    allow_any_instance_of(Gitlab::ImportExport).to receive(:storage_path).and_return(export_path)
+    allow_next_instance_of(Gitlab::ImportExport) do |instance|
+      allow(instance).to receive(:storage_path).and_return(export_path)
+    end
 
     saver.save
     repo_saver.save

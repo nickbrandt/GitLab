@@ -3,16 +3,16 @@
 require 'spec_helper'
 
 describe ::TodosHelper do
-  set(:user) { create(:user) }
-  set(:author) { create(:user) }
-  set(:issue) { create(:issue) }
-  set(:design) { create(:design, issue: issue) }
-  set(:note) do
+  let_it_be(:user) { create(:user) }
+  let_it_be(:author) { create(:user) }
+  let_it_be(:issue) { create(:issue) }
+  let_it_be(:design) { create(:design, issue: issue) }
+  let_it_be(:note) do
     create(:note,
            project: issue.project,
            note: "I am note, hear me roar")
   end
-  set(:design_todo) do
+  let_it_be(:design_todo) do
     create(:todo, :mentioned,
            user: user,
            project: issue.project,

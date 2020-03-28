@@ -9,7 +9,7 @@ describe Gitlab::Ci::Parsers::Security::Dast do
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
     let(:artifact) { create(:ee_ci_job_artifact, :dast) }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha, 2.weeks.ago) }
     let(:parser) { described_class.new }
 
     where(:report_format,
@@ -21,9 +21,10 @@ describe Gitlab::Ci::Parsers::Security::Dast do
           :last_occurrence_path,
           :last_occurrence_severity,
           :last_occurrence_confidence) do
-      :dast                 | 24 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/start.mvc' | 'info' | 'low'
-      :dast_multiple_sites  | 25 | 15 | 1 | 'https://goat:8080' | 'GET' | '/WebGoat/registration' | 'high' | 'medium'
-      :dast_deprecated      | 2 | 3 | 1 | 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io' | 'GET' | '/' | 'low' | 'medium'
+      :dast                             | 24 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
+      :dast_multiple_sites              | 25 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
+      :dast_deprecated_no_spider        | 2  | 3  | 1 | 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io' | 'GET' | '/' | 'low' | 'medium'
+      :dast_deprecated_no_common_fields | 24 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
     end
 
     with_them do

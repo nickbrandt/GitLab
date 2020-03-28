@@ -9,12 +9,17 @@ module EE
       with_scope :subject
       condition(:ldap_synced) { @subject.ldap_synced? }
       condition(:epics_available) { @subject.feature_available?(:epics) }
+      condition(:subepics_available) { @subject.feature_available?(:subepics) }
       condition(:contribution_analytics_available) do
         @subject.feature_available?(:contribution_analytics)
       end
 
       condition(:cycle_analytics_available) do
         @subject.feature_available?(:cycle_analytics_for_groups)
+      end
+
+      condition(:group_activity_analytics_available) do
+        @subject.feature_available?(:group_activity_analytics)
       end
 
       condition(:can_owners_manage_ldap, scope: :global) do
@@ -25,8 +30,8 @@ module EE
         ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end
 
-      condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
+      condition(:security_dashboard_enabled) do
+        @subject.feature_available?(:security_dashboard)
       end
 
       condition(:needs_new_sso_session) do
@@ -49,13 +54,22 @@ module EE
         @subject.saml_provider&.enabled?
       end
 
+      condition(:group_timelogs_available) do
+        @subject.feature_available?(:group_timelogs)
+      end
+
+      with_scope :global
+      condition(:cluster_health_available) do
+        License.feature_available?(:cluster_health)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
         enable :read_prometheus
-        enable :view_code_analytics
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
+        enable :read_group_timelogs
       end
 
       rule { maintainer }.policy do
@@ -70,8 +84,11 @@ module EE
       rule { can?(:read_cluster) & cluster_deployments_available }
         .enable :read_cluster_environments
 
-      rule { can?(:read_group) & contribution_analytics_available }
+      rule { has_access & contribution_analytics_available }
         .enable :read_group_contribution_analytics
+
+      rule { can?(:read_group) & group_activity_analytics_available }
+        .enable :read_group_activity_analytics
 
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
@@ -89,6 +106,10 @@ module EE
         enable :create_epic
         enable :admin_epic
         enable :update_epic
+      end
+
+      rule { reporter & subepics_available }.policy do
+        enable :admin_epic_link
       end
 
       rule { owner & epics_available }.enable :destroy_epic
@@ -124,12 +145,14 @@ module EE
       end
 
       rule { developer }.policy do
-        enable :read_group_security_dashboard
         enable :admin_merge_request
       end
 
-      rule { security_dashboard_feature_disabled }.policy do
-        prevent :read_group_security_dashboard
+      rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard
+
+      rule { admin | owner }.policy do
+        enable :read_group_compliance_dashboard
+        enable :read_group_credentials_inventory
       end
 
       rule { needs_new_sso_session }.policy do
@@ -143,6 +166,10 @@ module EE
       rule { owner & group_saml_enabled }.policy do
         enable :read_group_saml_identity
       end
+
+      rule { ~group_timelogs_available }.prevent :read_group_timelogs
+
+      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
     end
 
     override :lookup_access_level!

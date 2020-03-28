@@ -18,6 +18,16 @@ describe EnvironmentPolicy do
     it_behaves_like 'protected environments access'
   end
 
+  describe '#destroy_environment' do
+    subject { user.can?(:destroy_environment, environment) }
+
+    before do
+      environment.stop!
+    end
+
+    it_behaves_like 'protected environments access'
+  end
+
   describe '#create_environment_terminal' do
     subject { user.can?(:create_environment_terminal, environment) }
 

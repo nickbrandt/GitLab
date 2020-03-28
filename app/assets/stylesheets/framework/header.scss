@@ -552,6 +552,12 @@
     svg {
       vertical-align: text-top;
     }
+
+    a.ci-minutes-emoji gl-emoji,
+    a.trial-link gl-emoji {
+      font-size: $gl-font-size;
+      vertical-align: baseline;
+    }
   }
 }
 
@@ -560,6 +566,14 @@
   margin-right: 5px;
   border-radius: 50%;
   border: 1px solid $gray-normal;
+}
+
+.header-user-notification-dot {
+  background-color: $orange-500;
+  height: 10px;
+  width: 10px;
+  right: 8px;
+  top: -8px;
 }
 
 .with-performance-bar .navbar-gitlab {

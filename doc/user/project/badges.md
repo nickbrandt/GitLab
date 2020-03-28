@@ -1,7 +1,6 @@
 # Badges
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/41174)
-in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/41174) in GitLab 10.7.
 
 Badges are a unified way to present condensed pieces of information about your
 projects. They consist of a small image and additionally a URL that the image
@@ -12,7 +11,7 @@ or ways to contact the project maintainers.
 
 ## Project badges
 
-Badges can be added to a project and will then be visible on the project's overview page.
+Badges can be added to a project by Maintainers or Owners, and will then be visible on the project's overview page.
 If you find that you have to add the same badges to several projects, you may want to add them at the [group level](#group-badges).
 
 To add a new badge to a project:
@@ -75,5 +74,5 @@ You can also configure badges via the GitLab API. As in the settings, there is
 a distinction between endpoints for badges on the
 [project level](../../api/project_badges.md) and [group level](../../api/group_badges.md).
 
-[pipeline status]: pipelines/settings.md#pipeline-status-badge
-[test coverage]: pipelines/settings.md#test-coverage-report-badge
+[pipeline status]: ../../ci/pipelines/settings.md#pipeline-status-badge
+[test coverage]: ../../ci/pipelines/settings.md#test-coverage-report-badge

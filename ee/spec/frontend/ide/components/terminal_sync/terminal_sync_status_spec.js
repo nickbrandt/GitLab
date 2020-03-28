@@ -1,13 +1,13 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
 import TerminalSyncStatus from 'ee/ide/components/terminal_sync/terminal_sync_status.vue';
 import {
   MSG_TERMINAL_SYNC_CONNECTING,
   MSG_TERMINAL_SYNC_UPLOADING,
   MSG_TERMINAL_SYNC_RUNNING,
 } from 'ee/ide/messages';
+import Icon from '~/vue_shared/components/icon.vue';
 
 const TEST_MESSAGE = 'lorem ipsum dolar sit';
 const START_LOADING = 'START_LOADING';
@@ -35,10 +35,8 @@ describe('ee/ide/components/terminal_sync/terminal_sync_status', () => {
       },
     });
 
-    wrapper = shallowMount(localVue.extend(TerminalSyncStatus), {
-      attachToDocument: true,
+    wrapper = shallowMount(TerminalSyncStatus, {
       localVue,
-      sync: false,
       store,
     });
   };
@@ -77,7 +75,7 @@ describe('ee/ide/components/terminal_sync/terminal_sync_status', () => {
     });
 
     it('shows message', () => {
-      expect(wrapper.attributes('data-original-title')).toContain(statusMessage);
+      expect(wrapper.attributes('title')).toContain(statusMessage);
     });
 
     if (!icon) {

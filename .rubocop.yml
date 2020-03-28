@@ -56,7 +56,6 @@ Style/FrozenStringLiteralComment:
     - 'qa/**/*'
     - 'rubocop/**/*'
     - 'scripts/**/*'
-    - 'spec/lib/gitlab/**/*'
 
 RSpec/FilePath:
   Exclude:
@@ -156,11 +155,10 @@ Rails/ApplicationRecord:
     # as they need to be as decoupled from application code as possible
     - db/**/*.rb
     - lib/gitlab/background_migration/**/*.rb
+    - ee/lib/ee/gitlab/background_migration/**/*.rb
     - lib/gitlab/database/**/*.rb
     - spec/**/*.rb
     - ee/db/**/*.rb
-    - ee/lib/gitlab/background_migration/**/*.rb
-    - ee/lib/ee/gitlab/background_migration/**/*.rb
     - ee/spec/**/*.rb
 
 # GitLab ###################################################################
@@ -202,6 +200,29 @@ GitlabSecurity/PublicSend:
     - 'ee/lib/**/*.rake'
     - 'ee/spec/**/*'
 
+Gitlab/DuplicateSpecLocation:
+  Exclude:
+    - ee/spec/helpers/auth_helper_spec.rb
+    - ee/spec/lib/gitlab/gl_repository_spec.rb
+    - ee/spec/models/namespace_spec.rb
+    - ee/spec/models/note_spec.rb
+    - ee/spec/serializers/environment_entity_spec.rb
+    - ee/spec/services/issues/create_service_spec.rb
+    - ee/spec/services/merge_requests/create_service_spec.rb
+    - ee/spec/services/merge_requests/refresh_service_spec.rb
+    - ee/spec/services/merge_requests/update_service_spec.rb
+    - ee/spec/services/system_hooks_service_spec.rb
+    - ee/spec/helpers/ee/auth_helper_spec.rb
+    - ee/spec/lib/ee/gitlab/gl_repository_spec.rb
+    - ee/spec/models/ee/namespace_spec.rb
+    - ee/spec/models/ee/note_spec.rb
+    - ee/spec/serializers/ee/environment_entity_spec.rb
+    - ee/spec/services/ee/issues/create_service_spec.rb
+    - ee/spec/services/ee/merge_requests/create_service_spec.rb
+    - ee/spec/services/ee/merge_requests/refresh_service_spec.rb
+    - ee/spec/services/ee/merge_requests/update_service_spec.rb
+    - ee/spec/services/ee/system_hooks_service_spec.rb
+
 Cop/InjectEnterpriseEditionModule:
   Enabled: true
   Exclude:
@@ -234,13 +255,8 @@ RSpec/FactoriesInMigrationSpecs:
     - 'spec/migrations/**/*.rb'
     - 'ee/spec/migrations/**/*.rb'
     - 'spec/lib/gitlab/background_migration/**/*.rb'
-    - 'ee/spec/lib/gitlab/background_migration/**/*.rb'
-
-Cop/IncludeActionViewContext:
-  Enabled: true
-  Exclude:
-    - 'spec/**/*'
-    - 'ee/spec/**/*'
+    - 'spec/lib/ee/gitlab/background_migration/**/*.rb'
+    - 'ee/spec/lib/ee/gitlab/background_migration/**/*.rb'
 
 Cop/IncludeSidekiqWorker:
   Enabled: true
@@ -300,3 +316,70 @@ Graphql/Descriptions:
 
 RSpec/AnyInstanceOf:
   Enabled: false
+
+# Cops for upgrade to gitlab-styles 3.1.0
+RSpec/ImplicitSubject:
+  Enabled: false
+
+RSpec/LeakyConstantDeclaration:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*.rb'
+    - 'qa/spec/**/*.rb'
+    - 'ee/spec/presenters/security/vulnerable_project_presenter_spec.rb'
+    - 'ee/spec/serializers/vulnerable_project_entity_spec.rb'
+    - 'ee/spec/services/clusters/applications/check_upgrade_progress_service_spec.rb'
+    - 'ee/spec/services/dashboard/projects/list_service_spec.rb'
+    - 'ee/spec/services/metrics/dashboard/clone_dashboard_service_spec.rb'
+    - 'ee/spec/support/shared_contexts/epic_aggregate_constants.rb'
+    - 'ee/spec/workers/elastic_namespace_rollout_worker_spec.rb'
+
+RSpec/EmptyLineAfterHook:
+  Enabled: false
+
+RSpec/HooksBeforeExamples:
+  Enabled: false
+
+RSpec/EmptyLineAfterExample:
+  Enabled: false
+
+RSpec/Be:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/SharedExamples:
+  Enabled: false
+
+RSpec/EmptyLineAfterExampleGroup:
+  Enabled: false
+
+RSpec/ReceiveNever:
+  Enabled: false
+
+RSpec/MissingExampleGroupArgument:
+  Enabled: false
+
+RSpec/UnspecifiedException:
+  Enabled: false
+
+RSpec/HaveGitlabHttpStatus:
+  Enabled: true
+  Exclude:
+    - 'spec/support/matchers/have_gitlab_http_status.rb'
+  Include:
+    - 'spec/**/*'
+    - 'ee/spec/**/*'
+
+Style/MultilineWhenThen:
+  Enabled: false
+
+Style/FloatDivision:
+  Enabled: false
+
+Cop/BanCatchThrow:
+  Enabled: true
+
+Performance/ReadlinesEach:
+  Enabled: true

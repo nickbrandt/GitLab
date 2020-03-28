@@ -23,7 +23,9 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
 
   context "when the note could not be saved" do
     before do
-      allow_any_instance_of(Note).to receive(:persisted?).and_return(false)
+      allow_next_instance_of(Note) do |instance|
+        allow(instance).to receive(:persisted?).and_return(false)
+      end
     end
 
     it "raises an InvalidNoteError" do
@@ -79,10 +81,21 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
     end
 
     it "adds all attachments" do
+      expect_next_instance_of(Gitlab::Email::AttachmentUploader) do |uploader|
+        expect(uploader).to receive(:execute).with(upload_parent: group, uploader_class: NamespaceFileUploader).and_return(
+          [
+            {
+              url: "uploads/image.png",
+              alt: "image",
+              markdown: markdown
+            }
+          ]
+        )
+      end
+
       receiver.execute
 
       note = noteable.notes.last
-
       expect(note.note).to include(markdown)
     end
 
@@ -119,8 +132,9 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
   context 'when the service desk' do
     let(:project) { create(:project, :public, service_desk_enabled: true) }
     let(:support_bot) { User.support_bot }
-    let(:noteable) { create(:issue, project: project, author: support_bot) }
+    let(:noteable) { create(:issue, project: project, author: support_bot, title: 'service desk issue') }
     let(:note) { create(:note, project: project, noteable: noteable) }
+    let(:email_raw) { fixture_file('emails/valid_reply_with_quick_actions.eml', dir: 'ee') }
 
     let!(:sent_notification) do
       SentNotification.record_note(note, support_bot.id, mail_key)
@@ -138,6 +152,18 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
 
         it 'creates a comment' do
           expect { receiver.execute }.to change { noteable.notes.count }.by(1)
+        end
+
+        context 'when quick actions are present' do
+          it 'encloses quick actions with code span markdown' do
+            receiver.execute
+            noteable.reload
+
+            note = Note.last
+            expect(note.note).to include("Jake out\n\n`/close`\n`/title test`")
+            expect(noteable.title).to eq('service desk issue')
+            expect(noteable).to be_opened
+          end
         end
       end
 

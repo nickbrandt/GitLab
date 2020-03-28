@@ -1,9 +1,9 @@
 <script>
+import { GlLink, GlTooltip } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import CiBadgeLink from '~/vue_shared/components/ci_badge_link.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlLink, GlTooltip } from '@gitlab/ui';
 import { STATUS_FAILED } from '../constants';
 
 export default {
@@ -117,7 +117,7 @@ export default {
 
     <ci-badge-link
       ref="status"
-      class="bg-white"
+      class="bg-white d-inline-block align-middle py-0"
       :status="lastPipeline.details.status"
       :show-text="true"
     />

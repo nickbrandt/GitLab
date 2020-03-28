@@ -1,7 +1,6 @@
 # Import Phabricator tasks into a GitLab project
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/60562) in
-GitLab 12.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/60562) in GitLab 12.0.
 
 GitLab allows you to import all tasks from a Phabricator instance into
 GitLab issues. The import creates a single project with the
@@ -32,4 +31,4 @@ we can gain early feedback before releasing it for everyone. To enable it:
    Feature.enable(:phabricator_import)
    ```
 
-1. Enable Phabricator as an [import source](../../admin_area/settings/visibility_and_access_controls.md#import-sources) in the Admin area.
+1. Enable Phabricator as an [import source](../../admin_area/settings/visibility_and_access_controls.md#import-sources) in the Admin Area.

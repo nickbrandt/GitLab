@@ -37,7 +37,7 @@ describe('Approvals ModalRuleRemove', () => {
       ...options.propsData,
     };
 
-    wrapper = shallowMount(localVue.extend(ModalRuleRemove), {
+    wrapper = shallowMount(ModalRuleRemove, {
       ...options,
       localVue,
       store,

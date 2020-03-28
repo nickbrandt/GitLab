@@ -31,13 +31,14 @@ module SearchHelper
     from = collection.offset_value + 1
     to = collection.offset_value + collection.to_a.size
     count = collection.total_count
+    term_element = "<span>&nbsp;<code>#{h(term)}</code>&nbsp;</span>".html_safe
 
     search_entries_info_template(collection) % {
       from: from,
       to: to,
       count: count,
       scope: search_entries_scope_label(scope, count),
-      term: term
+      term_element: term_element
     }
   end
 
@@ -72,9 +73,9 @@ module SearchHelper
 
   def search_entries_info_template(collection)
     if collection.total_pages > 1
-      s_("SearchResults|Showing %{from} - %{to} of %{count} %{scope} for \"%{term}\"")
+      s_("SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_element}").html_safe
     else
-      s_("SearchResults|Showing %{count} %{scope} for \"%{term}\"")
+      s_("SearchResults|Showing %{count} %{scope} for%{term_element}").html_safe
     end
   end
 
@@ -83,19 +84,6 @@ module SearchHelper
       scope: search_entries_scope_label(scope, 0),
       term: "<code>#{h(term)}</code>"
     }).html_safe
-  end
-
-  def find_project_for_result_blob(projects, result)
-    @project
-  end
-
-  # Used in EE
-  def blob_projects(results)
-    nil
-  end
-
-  def parse_search_result(result)
-    result
   end
 
   # Overriden in EE
@@ -142,7 +130,7 @@ module SearchHelper
 
   # Autocomplete results for the current project, if it's defined
   def project_autocomplete
-    if @project && @project.repository.exists? && @project.repository.root_ref
+    if @project && @project.repository.root_ref
       ref = @ref || @project.repository.root_ref
 
       [

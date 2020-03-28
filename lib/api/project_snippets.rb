@@ -5,12 +5,17 @@ module API
     include PaginationParams
 
     before { authenticate! }
+    before { check_snippets_enabled }
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       helpers do
+        def check_snippets_enabled
+          forbidden! unless user_project.feature_available?(:snippets, current_user)
+        end
+
         def handle_project_member_errors(errors)
           if errors[:project_access].any?
             error!(errors[:project_access], 422)
@@ -60,11 +65,12 @@ module API
         mutually_exclusive :code, :content
       end
       post ":id/snippets" do
-        authorize! :create_project_snippet, user_project
+        authorize! :create_snippet, user_project
         snippet_params = declared_params(include_missing: false).merge(request: request, api: true)
         snippet_params[:content] = snippet_params.delete(:code) if snippet_params[:code].present?
 
-        snippet = CreateSnippetService.new(user_project, current_user, snippet_params).execute
+        service_response = ::Snippets::CreateService.new(user_project, current_user, snippet_params).execute
+        snippet = service_response.payload[:snippet]
 
         render_spam_error! if snippet.spam?
 
@@ -96,15 +102,15 @@ module API
         snippet = snippets_for_current_user.find_by(id: params.delete(:snippet_id))
         not_found!('Snippet') unless snippet
 
-        authorize! :update_project_snippet, snippet
+        authorize! :update_snippet, snippet
 
         snippet_params = declared_params(include_missing: false)
           .merge(request: request, api: true)
 
         snippet_params[:content] = snippet_params.delete(:code) if snippet_params[:code].present?
 
-        UpdateSnippetService.new(user_project, current_user, snippet,
-                                 snippet_params).execute
+        service_response = ::Snippets::UpdateService.new(user_project, current_user, snippet_params).execute(snippet)
+        snippet = service_response.payload[:snippet]
 
         render_spam_error! if snippet.spam?
 
@@ -125,9 +131,16 @@ module API
         snippet = snippets_for_current_user.find_by(id: params[:snippet_id])
         not_found!('Snippet') unless snippet
 
-        authorize! :admin_project_snippet, snippet
+        authorize! :admin_snippet, snippet
 
-        destroy_conditionally!(snippet)
+        destroy_conditionally!(snippet) do |snippet|
+          service = ::Snippets::DestroyService.new(current_user, snippet)
+          response = service.execute
+
+          if response.error?
+            render_api_error!({ error: response.message }, response.http_status)
+          end
+        end
       end
       # rubocop: enable CodeReuse/ActiveRecord
 

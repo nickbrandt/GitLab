@@ -21,11 +21,18 @@ describe('resolveCommit', () => {
       entry: { name: 'index.js', type: 'blob' },
       resolve: jest.fn(),
     };
-    const commits = [{ fileName: 'index.js', type: 'blob' }];
+    const commits = [
+      { fileName: 'index.js', filePath: '/index.js', type: 'blob' },
+      { fileName: 'index.js', filePath: '/app/assets/index.js', type: 'blob' },
+    ];
 
-    resolveCommit(commits, resolver);
+    resolveCommit(commits, '', resolver);
 
-    expect(resolver.resolve).toHaveBeenCalledWith({ fileName: 'index.js', type: 'blob' });
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      fileName: 'index.js',
+      filePath: '/index.js',
+      type: 'blob',
+    });
   });
 });
 
@@ -64,7 +71,7 @@ describe('fetchLogsTree', () => {
 
   it('calls axios get', () =>
     fetchLogsTree(client, '', '0', resolver).then(() => {
-      expect(axios.get).toHaveBeenCalledWith('/gitlab-org/gitlab-foss/refs/master/logs_tree/', {
+      expect(axios.get).toHaveBeenCalledWith('/gitlab-org/gitlab-foss/-/refs/master/logs_tree/', {
         params: { format: 'json', offset: '0' },
       });
     }));
@@ -84,6 +91,7 @@ describe('fetchLogsTree', () => {
         commitPath: 'https://test.com',
         committedDate: '2019-01-01',
         fileName: 'index.js',
+        filePath: '/index.js',
         message: 'testing message',
         sha: '123',
         type: 'blob',
@@ -101,6 +109,7 @@ describe('fetchLogsTree', () => {
               commitPath: 'https://test.com',
               committedDate: '2019-01-01',
               fileName: 'index.js',
+              filePath: '/index.js',
               message: 'testing message',
               sha: '123',
               type: 'blob',

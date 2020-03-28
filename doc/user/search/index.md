@@ -17,8 +17,8 @@ When you click **Issues**, you'll see the opened issues assigned to you straight
 
 You can search through **Open**, **Closed**, or **All** issues.
 
-You can also filter the results using the search and filter field. This works in the same way as the ones found in the
-per project pages described below.
+You can also filter the results using the search and filter field, as described below in
+[Filtering issue and merge request lists](#filtering-issue-and-merge-request-lists).
 
 ### Issues and MRs assigned to you or created by you
 
@@ -27,19 +27,34 @@ on the search field on the top-right of your screen:
 
 ![shortcut to your issues and mrs](img/issues_mrs_shortcut.png)
 
-### Issues and merge requests per project
+### Filtering issue and merge request lists
 
-If you want to search for issues present in a specific project, navigate to
-a project's **Issues** tab, and click on the field **Search or filter results...**. It will
-display a dropdown menu, from which you can add filters per author, assignee, milestone,
-release, label, weight, confidentiality, and "my-reaction" (based on your emoji votes).
-When done, press **Enter** on your keyboard to filter the issues.
+Follow these steps to filter the **Issues** and **Merge Requests** list pages within projects and
+groups:
 
-![filter issues in a project](img/issue_search_filter_v12_5.png)
+1. Click in the field **Search or filter results...**.
+1. In the dropdown menu that appears, select the attribute you wish to filter by:
+   - Author
+   - Assignee
+   - [Milestone](../project/milestones/index.md)
+   - Release
+   - [Label](../project/labels.md)
+   - My-reaction
+   - Confidential
+   - Epic ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/195704) in GitLab 12.9)
+   - Search for this text
+1. Select or type the operator to use for filtering the attribute. The following operators are
+   available:
+   - `=`: Is
+   - `!=`: Is not ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/18059) in GitLab 12.7)
+1. Enter the text to filter the attribute by.
+1. Repeat this process to filter by multiple attributes. Multiple attributes are joined by a logical
+   `AND`.
 
-The same process is valid for merge requests. Navigate to your project's **Merge Requests** tab,
-and click **Search or filter results...**. Merge requests can be filtered by author, assignee,
-approver, milestone, release, label, "my-reaction", "work in progess" status, and target branch.
+For example, filtering by Author `=` Jane and Milestone `!=` 12.6 filters for the issues where Jane
+is the author and the milestone is not 12.6.
+
+![filter issues in a project](img/issue_search_filter_v12_7.png)
 
 ### Filtering by **None** / **Any**
 
@@ -62,18 +77,18 @@ You can filter issues and merge requests by specific terms included in titles or
 - Limitation
   - For performance reasons, terms shorter than 3 chars are ignored. E.g.: searching
     issues for `included in titles` is same as `included titles`
+  - Search is limited to 4096 characters and 64 terms per query.
 
 ![filter issues by specific terms](img/issue_search_by_term.png)
 
-### Issues and merge requests per group
+### Filtering merge requests by approvers **(STARTER)**
 
-Similar to **Issues and merge requests per project**, you can also search for issues
-within a group. Navigate to a group's **Issues** tab and query search results in
-the same way as you do for projects.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9468) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.9.
 
-![filter issues in a group](img/group_issues_filter.png)
+To filter merge requests by an individual approver, you can type (or select from
+the dropdown) `approver` and select the user.
 
-The same process is valid for merge requests. Navigate to your project's **Merge Requests** tab.
+![Filter MRs by an approver](img/filter_approver_merge_requests.png)
 
 ## Search history
 
@@ -91,7 +106,7 @@ Some filters can be added multiple times. These include but are not limited to a
 
 ![multiple assignees filtering](img/multiple_assignees.png)
 
-### Shortcut
+## Shortcut
 
 You'll also find a shortcut on the search field on the top-right of the project's dashboard to
 quickly access issues and merge requests created or assigned to you within that project:
@@ -104,7 +119,7 @@ Your [To-Do List](../todos.md#gitlab-to-do-list) can be searched by "to do" and 
 You can [filter](../todos.md#filtering-your-to-do-list) them per project,
 author, type, and action. Also, you can sort them by
 [**Label priority**](../../user/project/labels.md#label-priority),
-**Last created** and **Oldest created**.
+**Last created**, and **Oldest created**.
 
 ## Projects
 

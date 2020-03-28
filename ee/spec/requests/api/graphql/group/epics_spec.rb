@@ -24,6 +24,8 @@ describe 'Epics through GroupQuery' do
           id
           iid
           title
+          upvotes
+          downvotes
           userPermissions {
             adminEpic
           }
@@ -48,7 +50,7 @@ describe 'Epics through GroupQuery' do
       it_behaves_like 'a working graphql query'
 
       it 'returns epics successfully' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_errors).to be_nil
         expect(epic_node_array('id').first).to eq epic.to_global_id.to_s
         expect(graphql_data['group']['epicsEnabled']).to be_truthy
@@ -68,6 +70,18 @@ describe 'Epics through GroupQuery' do
         post_graphql(query, current_user: user)
 
         expect_array_response([epic2.to_global_id.to_s, epic.to_global_id.to_s])
+      end
+
+      it 'has upvote/downvote information' do
+        create(:award_emoji, name: 'thumbsup', awardable: epic, user: user )
+        create(:award_emoji, name: 'thumbsdown', awardable: epic2, user: user )
+
+        post_graphql(query, current_user: user)
+
+        expect(epic_node_array).to contain_exactly(
+          a_hash_including('upvotes' => 1, 'downvotes' => 0),
+          a_hash_including('upvotes' => 0, 'downvotes' => 1)
+        )
       end
 
       describe 'can admin epics' do

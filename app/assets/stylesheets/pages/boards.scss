@@ -133,6 +133,7 @@
     .issue-count-badge {
       border: 0;
       white-space: nowrap;
+      padding: 0;
     }
 
     .board-title-text > span,
@@ -265,25 +266,18 @@
     background-color: $blue-50;
   }
 
-  .badge {
-    border: 0;
-    outline: 0;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    @include media-breakpoint-down(lg) {
-      font-size: $gl-font-size-xs;
-      padding-left: $gl-padding-4;
-      padding-right: $gl-padding-4;
-      font-weight: $gl-font-weight-bold;
-    }
+  .gl-label {
+    margin-top: 4px;
+    margin-right: 4px;
   }
 
   .confidential-icon {
     color: $orange-600;
     cursor: help;
+  }
+
+  .issue-blocked-icon {
+    color: $red-500;
   }
 
   @include media-breakpoint-down(md) {
@@ -385,22 +379,19 @@
   margin: 5px;
 }
 
-.issue-boards-sidebar {
+.right-sidebar.issue-boards-sidebar {
   .gutter-toggle {
     bottom: 15px;
     width: 22px;
-    color: $gray-darkest;
+    padding-left: $gl-padding-32;
 
     svg {
       position: absolute;
       top: 50%;
+      right: 0;
       margin-top: (-11px / 2);
-    }
-
-    &:hover {
-      path {
-        fill: $gray-darkest;
-      }
+      height: $gl-font-size-12;
+      width: $gl-font-size-12;
     }
   }
 

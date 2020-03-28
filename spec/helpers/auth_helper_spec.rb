@@ -56,7 +56,7 @@ describe AuthHelper do
 
   describe 'any_form_based_providers_enabled?' do
     before do
-      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
+      allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
     end
 
     it 'detects form-based providers' do
@@ -73,12 +73,17 @@ describe AuthHelper do
 
   describe 'enabled_button_based_providers' do
     before do
-      allow(helper).to receive(:auth_providers) { [:twitter, :github] }
+      allow(helper).to receive(:auth_providers) { [:twitter, :github, :google_oauth2] }
     end
 
     context 'all providers are enabled to sign in' do
       it 'returns all the enabled providers from settings' do
-        expect(helper.enabled_button_based_providers).to include('twitter', 'github')
+        expect(helper.enabled_button_based_providers).to include('twitter', 'github', 'google_oauth2')
+      end
+
+      it 'puts google and github in the beginning' do
+        expect(helper.enabled_button_based_providers.first).to eq('google_oauth2')
+        expect(helper.enabled_button_based_providers.second).to eq('github')
       end
     end
 
@@ -147,6 +152,36 @@ describe AuthHelper do
       allow(policy).to receive(:can?).with(:unlink).and_return('policy_unlink_result')
 
       expect(helper.unlink_provider_allowed?(provider)).to eq 'policy_unlink_result'
+    end
+  end
+
+  describe '#provider_has_icon?' do
+    it 'returns true for defined providers' do
+      expect(helper.provider_has_icon?(described_class::PROVIDERS_WITH_ICONS.sample)).to eq true
+    end
+
+    it 'returns false for undefined providers' do
+      expect(helper.provider_has_icon?('test')).to be_falsey
+    end
+
+    context 'when provider is defined by config' do
+      before do
+        allow(Gitlab::Auth::OAuth::Provider).to receive(:icon_for).with('test').and_return('icon')
+      end
+
+      it 'returns true' do
+        expect(helper.provider_has_icon?('test')).to be_truthy
+      end
+    end
+
+    context 'when provider is not defined by config' do
+      before do
+        allow(Gitlab::Auth::OAuth::Provider).to receive(:icon_for).with('test').and_return(nil)
+      end
+
+      it 'returns true' do
+        expect(helper.provider_has_icon?('test')).to be_falsey
+      end
     end
   end
 end

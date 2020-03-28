@@ -9,9 +9,11 @@ module EE
 
       override :refresh_merge_requests!
       def refresh_merge_requests!
-        update_approvers do
-          super && reset_approvals_for_merge_requests(push.ref, push.newrev)
-        end
+        update_approvers
+        reset_approvals_for_merge_requests(push.ref, push.newrev)
+        check_merge_train_status
+
+        super
       end
 
       # Note: Closed merge requests also need approvals reset.
@@ -20,13 +22,7 @@ module EE
         merge_requests = merge_requests_for(branch_name, mr_states: [:opened, :closed])
 
         merge_requests.each do |merge_request|
-          target_project = merge_request.target_project
-
-          if target_project.reset_approvals_on_push &&
-              merge_request.rebase_commit_sha != newrev
-
-            merge_request.approvals.delete_all
-          end
+          reset_approvals(merge_request, newrev)
         end
       end
 
@@ -38,14 +34,23 @@ module EE
       end
 
       def update_approvers
-        results = yield
-
         merge_requests_for_source_branch.each do |merge_request|
           ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute if project.feature_available?(:code_owners)
           ::MergeRequests::SyncReportApproverApprovalRules.new(merge_request).execute if project.feature_available?(:report_approver_rules)
         end
+      end
 
-        results
+      # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      def check_merge_train_status
+        return unless @push.branch_updated?
+
+        MergeTrains::CheckStatusService.new(project, current_user)
+          .execute(project, @push.branch_name, @push.newrev)
+      end
+      # rubocop:enable Gitlab/ModuleWithInstanceVariables
+
+      def reset_approvals?(merge_request, newrev)
+        super && merge_request.rebase_commit_sha != newrev
       end
     end
   end

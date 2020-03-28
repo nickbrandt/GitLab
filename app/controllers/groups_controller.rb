@@ -91,13 +91,13 @@ class GroupsController < Groups::ApplicationController
 
       format.json do
         load_events
-        pager_json("events/_events", @events.count)
+        pager_json("events/_events", @events.count { |event| event.visible_to_user?(current_user) })
       end
     end
   end
 
   def edit
-    @badge_api_endpoint = expose_url(api_v4_groups_badges_path(id: @group.id))
+    @badge_api_endpoint = expose_path(api_v4_groups_badges_path(id: @group.id))
   end
 
   def projects
@@ -181,6 +181,7 @@ class GroupsController < Groups::ApplicationController
       :avatar,
       :description,
       :emails_disabled,
+      :mentions_disabled,
       :lfs_enabled,
       :name,
       :path,
@@ -194,7 +195,8 @@ class GroupsController < Groups::ApplicationController
       :require_two_factor_authentication,
       :two_factor_grace_period,
       :project_creation_level,
-      :subgroup_creation_level
+      :subgroup_creation_level,
+      :default_branch_protection
     ]
   end
 
@@ -208,8 +210,9 @@ class GroupsController < Groups::ApplicationController
                  .includes(:namespace)
 
     @events = EventCollection
-                .new(projects, offset: params[:offset].to_i, filter: event_filter, groups: groups)
-                .to_a
+      .new(projects, offset: params[:offset].to_i, filter: event_filter, groups: groups)
+      .to_a
+      .map(&:present)
 
     Events::RenderService
       .new(current_user)

@@ -23,9 +23,9 @@ describe Projects::ClustersController do
 
     describe 'functionality' do
       context 'when project has one or more clusters' do
-        let(:project) { create(:project) }
         let!(:enabled_cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
         let!(:disabled_cluster) { create(:cluster, :disabled, :provided_by_gcp, :production_environment, projects: [project]) }
+
         it 'lists available clusters' do
           go
 
@@ -52,8 +52,6 @@ describe Projects::ClustersController do
       end
 
       context 'when project does not have a cluster' do
-        let(:project) { create(:project) }
-
         it 'returns an empty state page' do
           go
 
@@ -95,29 +93,15 @@ describe Projects::ClustersController do
         end
 
         before do
-          stub_feature_flags(create_eks_clusters: false)
           allow(SecureRandom).to receive(:hex).and_return(key)
         end
 
-        it 'has authorize_url' do
+        it 'redirects to gcp authorize_url' do
           go
 
           expect(assigns(:authorize_url)).to include(key)
-          expect(session[session_key_for_redirect_uri]).to eq(new_project_cluster_path(project))
-        end
-
-        context 'when create_eks_clusters feature flag is enabled' do
-          before do
-            stub_feature_flags(create_eks_clusters: true)
-          end
-
-          context 'when selected provider is gke and no valid gcp token exists' do
-            it 'redirects to gcp authorize_url' do
-              go
-
-              expect(response).to redirect_to(assigns(:authorize_url))
-            end
-          end
+          expect(session[session_key_for_redirect_uri]).to eq(new_project_cluster_path(project, provider: :gcp))
+          expect(response).to redirect_to(assigns(:authorize_url))
         end
       end
 
@@ -458,10 +442,15 @@ describe Projects::ClustersController do
       post :authorize_aws_role, params: params.merge(namespace_id: project.namespace, project_id: project)
     end
 
+    before do
+      allow(Clusters::Aws::FetchCredentialsService).to receive(:new)
+        .and_return(double(execute: double))
+    end
+
     it 'creates an Aws::Role record' do
       expect { go }.to change { Aws::Role.count }
 
-      expect(response.status).to eq 201
+      expect(response.status).to eq 200
 
       role = Aws::Role.last
       expect(role.user).to eq user
@@ -491,18 +480,24 @@ describe Projects::ClustersController do
     end
   end
 
-  describe 'DELETE revoke AWS role for EKS cluster' do
-    let!(:role) { create(:aws_role, user: user) }
+  describe 'DELETE clear cluster cache' do
+    let(:cluster) { create(:cluster, :project, projects: [project]) }
+    let!(:kubernetes_namespace) { create(:cluster_kubernetes_namespace, cluster: cluster) }
 
     def go
-      delete :revoke_aws_role, params: { namespace_id: project.namespace, project_id: project }
+      delete :clear_cache,
+        params: {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: cluster
+        }
     end
 
-    it 'deletes the Aws::Role record' do
-      expect { go }.to change { Aws::Role.count }
+    it 'deletes the namespaces associated with the cluster' do
+      expect { go }.to change { Clusters::KubernetesNamespace.count }
 
-      expect(response.status).to eq 204
-      expect(user.reload_aws_role).to be_nil
+      expect(response).to redirect_to(project_cluster_path(project, cluster))
+      expect(cluster.kubernetes_namespaces).to be_empty
     end
 
     describe 'security' do
@@ -650,7 +645,7 @@ describe Projects::ClustersController do
             go(format: :json)
 
             cluster.reload
-            expect(response).to have_http_status(:no_content)
+            expect(response).to have_gitlab_http_status(:no_content)
             expect(cluster.enabled).to be_falsey
             expect(cluster.name).to eq('my-new-cluster-name')
             expect(cluster).not_to be_managed
@@ -673,7 +668,7 @@ describe Projects::ClustersController do
           it "rejects changes" do
             go(format: :json)
 
-            expect(response).to have_http_status(:bad_request)
+            expect(response).to have_gitlab_http_status(:bad_request)
           end
         end
       end

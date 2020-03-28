@@ -22,7 +22,7 @@ describe Groups::SamlProvidersController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -110,13 +110,13 @@ describe Groups::SamlProvidersController do
 
           subject
 
-          expect(response).to have_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
 
     describe 'PUT #update' do
-      subject { put :update, params: { group_id: group, saml_provider: { enforced_sso: 'true', enforced_group_managed_accounts: 'true' } } }
+      subject { put :update, params: { group_id: group, saml_provider: { enforced_sso: 'true' } } }
 
       before do
         group.add_owner(user)
@@ -148,29 +148,52 @@ describe Groups::SamlProvidersController do
         end
       end
 
-      context 'group_managed_accounts feature flag enabled' do
+      context 'enabling group managed when owner has linked identity' do
+        subject { put :update, params: { group_id: group, saml_provider: { enforced_sso: 'true', enforced_group_managed_accounts: 'true' } } }
+
+        before do
+          create(:group_saml_identity, saml_provider: saml_provider, user: user)
+        end
+
+        context 'group_managed_accounts feature flag enabled' do
+          before do
+            stub_feature_flags(group_managed_accounts: true)
+          end
+
+          it 'updates the flags' do
+            expect do
+              subject
+              saml_provider.reload
+            end.to change { saml_provider.enforced_group_managed_accounts? }.to(true)
+          end
+        end
+
+        context 'group_managed_accounts feature flag disabled' do
+          before do
+            stub_feature_flags(group_managed_accounts: false)
+          end
+
+          it 'does not update the setting' do
+            expect do
+              subject
+              saml_provider.reload
+            end.not_to change { saml_provider.enforced_group_managed_accounts? }.from(false)
+          end
+        end
+      end
+
+      context 'enabling group managed when owner has not linked identity' do
+        subject { put :update, params: { group_id: group, saml_provider: { enforced_sso: 'true', enforced_group_managed_accounts: 'true' } } }
+
         before do
           stub_feature_flags(group_managed_accounts: true)
         end
 
-        it 'updates the flags' do
+        it 'does not update update the flags' do
           expect do
             subject
             saml_provider.reload
-          end.to change { saml_provider.enforced_group_managed_accounts? }.to(true)
-        end
-      end
-
-      context 'group_managed_accounts feature flag disabled' do
-        before do
-          stub_feature_flags(group_managed_accounts: false)
-        end
-
-        it 'does not update the setting' do
-          expect do
-            subject
-            saml_provider.reload
-          end.not_to change { saml_provider.enforced_group_managed_accounts? }.from(false)
+          end.not_to change { saml_provider.enforced_group_managed_accounts? }
         end
       end
     end

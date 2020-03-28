@@ -241,9 +241,21 @@ describe DraftNotes::PublishService do
     end
 
     it 'sends notifications if all threads are resolved' do
-      expect_any_instance_of(MergeRequests::ResolvedDiscussionNotificationService).to receive(:execute).with(merge_request)
+      expect_next_instance_of(MergeRequests::ResolvedDiscussionNotificationService) do |instance|
+        expect(instance).to receive(:execute).with(merge_request)
+      end
 
       publish
+    end
+  end
+
+  context 'user cannot create notes' do
+    before do
+      allow(Ability).to receive(:allowed?).with(user, :create_note, merge_request).and_return(false)
+    end
+
+    it 'returns an error' do
+      expect(publish[:status]).to eq(:error)
     end
   end
 end

@@ -9,7 +9,7 @@ GitLab supports links links to `http`, `https`, and `ftp` assets.
 
 Get assets as links from a Release.
 
-```
+```plaintext
 GET /projects/:id/releases/:tag_name/assets/links
 ```
 
@@ -20,7 +20,7 @@ GET /projects/:id/releases/:tag_name/assets/links
 
 Example request:
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" "https://gitlab.example.com/api/v4/projects/24/releases/v0.1/assets/links"
 ```
 
@@ -47,7 +47,7 @@ Example response:
 
 Get an asset as a link from a Release.
 
-```
+```plaintext
 GET /projects/:id/releases/:tag_name/assets/links/:link_id
 ```
 
@@ -59,7 +59,7 @@ GET /projects/:id/releases/:tag_name/assets/links/:link_id
 
 Example request:
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" "https://gitlab.example.com/api/v4/projects/24/releases/v0.1/assets/links/1"
 ```
 
@@ -78,7 +78,7 @@ Example response:
 
 Create an asset as a link from a Release.
 
-```
+```plaintext
 POST /projects/:id/releases/:tag_name/assets/links
 ```
 
@@ -91,7 +91,7 @@ POST /projects/:id/releases/:tag_name/assets/links
 
 Example request:
 
-```sh
+```shell
 curl --request POST \
      --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" \
      --data name="awesome-v0.2.dmg" \
@@ -114,7 +114,7 @@ Example response:
 
 Update an asset as a link from a Release.
 
-```
+```plaintext
 PUT /projects/:id/releases/:tag_name/assets/links/:link_id
 ```
 
@@ -131,7 +131,7 @@ You have to specify at least one of `name` or `url`
 
 Example request:
 
-```sh
+```shell
 curl --request PUT --data name="new name" --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" "https://gitlab.example.com/api/v4/projects/24/releases/v0.1/assets/links/1"
 ```
 
@@ -150,7 +150,7 @@ Example response:
 
 Delete an asset as a link from a Release.
 
-```
+```plaintext
 DELETE /projects/:id/releases/:tag_name/assets/links/:link_id
 ```
 
@@ -162,7 +162,7 @@ DELETE /projects/:id/releases/:tag_name/assets/links/:link_id
 
 Example request:
 
-```sh
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" "https://gitlab.example.com/api/v4/projects/24/releases/v0.1/assets/links/1"
 ```
 

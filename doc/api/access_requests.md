@@ -2,11 +2,12 @@
 
  >**Note:** This feature was introduced in GitLab 8.11
 
- **Valid access levels**
+## Valid access levels
 
  The access levels are defined in the `Gitlab::Access` module. Currently, these levels are recognized:
 
 ```plaintext
+0 => No access
 10 => Guest access
 20 => Reporter access
 30 => Developer access
@@ -29,7 +30,7 @@ GET /projects/:id/access_requests
 
 Example request:
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/access_requests
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/access_requests
 ```
@@ -72,7 +73,7 @@ POST /projects/:id/access_requests
 
 Example request:
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/access_requests
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/access_requests
 ```
@@ -107,7 +108,7 @@ PUT /projects/:id/access_requests/:user_id/approve
 
 Example request:
 
-```bash
+```shell
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/access_requests/:user_id/approve?access_level=20
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/access_requests/:user_id/approve?access_level=20
 ```
@@ -141,7 +142,7 @@ DELETE /projects/:id/access_requests/:user_id
 
 Example request:
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/access_requests/:user_id
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/access_requests/:user_id
 ```

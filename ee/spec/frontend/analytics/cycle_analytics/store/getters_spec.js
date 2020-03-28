@@ -1,79 +1,18 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
-import { allowedStages as stages, startDate, endDate } from '../mock_data';
+import {
+  startDate,
+  endDate,
+  transformedDurationData,
+  transformedDurationMedianData,
+  durationChartPlottableData,
+  durationChartPlottableMedianData,
+  allowedStages,
+  selectedProjects,
+} from '../mock_data';
 
 let state = null;
-const selectedProjectIds = [5, 8, 11];
 
 describe('Cycle analytics getters', () => {
-  describe('with default state', () => {
-    beforeEach(() => {
-      state = {
-        stages: [],
-        selectedStageId: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
-    });
-
-    describe('defaultStage', () => {
-      it('will return null', () => {
-        expect(getters.defaultStage(state)).toEqual(null);
-      });
-    });
-  });
-
-  describe('with a set of stages', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStageId: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
-    });
-
-    describe('defaultStage', () => {
-      it('will return the first stage', () => {
-        expect(getters.defaultStage(state)).toEqual(stages[0]);
-      });
-    });
-  });
-
-  describe('with a set of stages and a stage selected', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStageId: stages[2].id,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(stages[2]);
-      });
-    });
-  });
-
   describe('hasNoAccessError', () => {
     beforeEach(() => {
       state = {
@@ -88,6 +27,25 @@ describe('Cycle analytics getters', () => {
 
     it('returns false if "hasError" is not set to 403', () => {
       expect(getters.hasNoAccessError(state)).toEqual(false);
+    });
+  });
+
+  describe('selectedProjectIds', () => {
+    describe('with selectedProjects set', () => {
+      it('returns the ids of each project', () => {
+        state = {
+          selectedProjects,
+        };
+
+        expect(getters.selectedProjectIds(state)).toEqual([1, 2]);
+      });
+    });
+
+    describe('without selectedProjects set', () => {
+      it('will return an empty array', () => {
+        state = { selectedProjects: [] };
+        expect(getters.selectedProjectIds(state)).toEqual([]);
+      });
     });
   });
 
@@ -122,7 +80,7 @@ describe('Cycle analytics getters', () => {
         },
         startDate,
         endDate,
-        selectedProjectIds,
+        selectedProjects,
       };
     });
 
@@ -130,9 +88,115 @@ describe('Cycle analytics getters', () => {
       param               | value
       ${'created_after'}  | ${'2018-12-15'}
       ${'created_before'} | ${'2019-01-14'}
-      ${'project_ids'}    | ${[5, 8, 11]}
+      ${'project_ids'}    | ${[1, 2]}
     `('should return the $param with value $value', ({ param, value }) => {
-      expect(getters.cycleAnalyticsRequestParams(state)).toMatchObject({ [param]: value });
+      expect(
+        getters.cycleAnalyticsRequestParams(state, { selectedProjectIds: [1, 2] }),
+      ).toMatchObject({
+        [param]: value,
+      });
+    });
+  });
+
+  describe('durationChartPlottableData', () => {
+    it('returns plottable data for selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: transformedDurationData,
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toEqual(
+        durationChartPlottableData,
+      );
+    });
+
+    it('returns null if there is no plottable data for the selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: [],
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toBeNull();
+    });
+  });
+
+  describe('durationChartPlottableMedianData', () => {
+    it('returns plottable median data for selected stages', () => {
+      const stateWithDurationMedianData = {
+        startDate,
+        endDate,
+        durationMedianData: transformedDurationMedianData,
+      };
+
+      expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual(
+        durationChartPlottableMedianData,
+      );
+    });
+
+    it('returns an empty array if there is no plottable median data for the selected stages', () => {
+      const stateWithDurationMedianData = {
+        startDate,
+        endDate,
+        durationMedianData: [],
+      };
+
+      expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual([]);
+    });
+  });
+
+  const hiddenStage = { ...allowedStages[2], hidden: true };
+  const givenStages = [allowedStages[0], allowedStages[1], hiddenStage];
+  describe.each`
+    func              | givenStages    | expectedStages
+    ${'hiddenStages'} | ${givenStages} | ${[hiddenStage]}
+    ${'activeStages'} | ${givenStages} | ${[allowedStages[0], allowedStages[1]]}
+  `('hiddenStages', ({ func, expectedStages, givenStages: stages }) => {
+    it(`'${func}' returns ${expectedStages.length} stages`, () => {
+      expect(getters[func]({ stages })).toEqual(expectedStages);
+    });
+
+    it(`'${func}' returns an empty array if there are no stages`, () => {
+      expect(getters[func]({ stages: [] })).toEqual([]);
+    });
+  });
+
+  describe('enableCustomOrdering', () => {
+    describe('with no errors saving the stage order', () => {
+      beforeEach(() => {
+        state = {
+          errorSavingStageOrder: false,
+        };
+      });
+
+      it('returns true when stages have numeric IDs', () => {
+        state.stages = [{ id: 1 }, { id: 2 }];
+        expect(getters.enableCustomOrdering(state)).toEqual(true);
+      });
+
+      it('returns false when stages have string based IDs', () => {
+        state.stages = [{ id: 'one' }, { id: 'two' }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
+    });
+
+    describe('with errors saving the stage order', () => {
+      beforeEach(() => {
+        state = {
+          errorSavingStageOrder: true,
+        };
+      });
+
+      it('returns false when stages have numeric IDs', () => {
+        state.stages = [{ id: 1 }, { id: 2 }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
+
+      it('returns false when stages have string based IDs', () => {
+        state.stages = [{ id: 'one' }, { id: 'two' }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
     });
   });
 });

@@ -66,17 +66,17 @@ First install [Docker Engine](https://docs.docker.com/installation/).
 To build this project you also need to have [GitLab Runner](https://docs.gitlab.com/runner/).
 You can use public runners available on `gitlab.com` or register your own:
 
-```sh
+```shell
 gitlab-runner register \
   --non-interactive \
   --url "https://gitlab.com/" \
   --registration-token "PROJECT_REGISTRATION_TOKEN" \
-  --description "ruby-2.2" \
+  --description "ruby:2.6" \
   --executor "docker" \
-  --docker-image ruby:2.2 \
-  --docker-postgres latest
+  --docker-image ruby:2.6 \
+  --docker-services latest
 ```
 
-With the command above, you create a Runner that uses the [ruby:2.2](https://hub.docker.com/_/ruby) image and uses a [postgres](https://hub.docker.com/_/postgres) database.
+With the command above, you create a Runner that uses the [ruby:2.6](https://hub.docker.com/_/ruby) image and uses a [PostgreSQL](https://hub.docker.com/_/postgres) database.
 
 To access the PostgreSQL database, connect to `host: postgres` as user `postgres` with no password.

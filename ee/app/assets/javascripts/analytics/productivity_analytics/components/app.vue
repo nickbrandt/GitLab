@@ -8,13 +8,17 @@ import {
   GlButton,
   GlTooltipDirective,
 } from '@gitlab/ui';
+import dateFormat from 'dateformat';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Icon from '~/vue_shared/components/icon.vue';
+import { beginOfDayTime, endOfDayTime } from '~/lib/utils/datetime_utility';
 import MetricChart from './metric_chart.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
 import MergeRequestTable from './mr_table.vue';
 import { chartKeys } from '../constants';
+import { dateFormats } from '../../shared/constants';
+import urlSyncMixin from '../../shared/mixins/url_sync_mixin';
 
 export default {
   components: {
@@ -32,12 +36,8 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [featureFlagsMixin()],
+  mixins: [featureFlagsMixin(), urlSyncMixin],
   props: {
-    endpoint: {
-      type: String,
-      required: true,
-    },
     emptyStateSvgPath: {
       type: String,
       required: true,
@@ -46,6 +46,11 @@ export default {
       type: String,
       required: true,
     },
+    hideGroupDropDown: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -53,7 +58,15 @@ export default {
     };
   },
   computed: {
-    ...mapState('filters', ['groupNamespace']),
+    ...mapState('filters', [
+      'groupNamespace',
+      'projectPath',
+      'authorUsername',
+      'labelName',
+      'milestoneTitle',
+      'startDate',
+      'endDate',
+    ]),
     ...mapState('table', ['isLoadingTable', 'mergeRequests', 'pageInfo', 'columnMetric']),
     ...mapGetters(['getMetricTypes']),
     ...mapGetters('charts', [
@@ -68,6 +81,7 @@ export default {
       'scatterplotYaxisLabel',
       'hasNoAccessError',
       'isChartEnabled',
+      'isFilteringByDaysToMerge',
     ]),
     ...mapGetters('table', [
       'sortFieldDropdownLabel',
@@ -89,20 +103,30 @@ export default {
     showSecondaryCharts() {
       return !this.chartLoading(chartKeys.main) && this.chartHasData(chartKeys.main);
     },
+    query() {
+      return {
+        group_id: !this.hideGroupDropDown ? this.groupNamespace : null,
+        project_id: this.projectPath,
+        author_username: this.authorUsername,
+        'label_name[]': this.labelName,
+        milestone_title: this.milestoneTitle,
+        merged_after: `${dateFormat(this.startDate, dateFormats.isoDate)}${beginOfDayTime}`,
+        merged_before: `${dateFormat(this.endDate, dateFormats.isoDate)}${endOfDayTime}`,
+      };
+    },
   },
   mounted() {
-    this.setEndpoint(this.endpoint);
     this.setChartEnabled({
       chartKey: chartKeys.scatterplot,
       isEnabled: this.isScatterplotFeatureEnabled(),
     });
   },
   methods: {
-    ...mapActions(['setEndpoint']),
     ...mapActions('charts', [
       'fetchChartData',
       'setMetricType',
       'updateSelectedItems',
+      'resetMainChartSelection',
       'setChartEnabled',
     ]),
     ...mapActions('table', ['setSortField', 'setPage', 'toggleSortOrder', 'setColumnMetric']),
@@ -116,6 +140,7 @@ export default {
           axisLabel: {
             formatter: value => value,
           },
+          minInterval: 1,
         },
         ...this.getColumnChartDatazoomOption(chartKey),
       };
@@ -154,7 +179,18 @@ export default {
       "
     />
     <template v-if="showAppContent">
-      <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
+      <div class="d-flex justify-content-between">
+        <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
+        <gl-button
+          v-if="isFilteringByDaysToMerge"
+          ref="clearChartFiltersBtn"
+          class="btn-link float-right"
+          type="button"
+          variant="default"
+          @click="resetMainChartSelection()"
+          >{{ __('Clear chart filters') }}</gl-button
+        >
+      </div>
       <metric-chart
         ref="mainChart"
         class="mb-4"

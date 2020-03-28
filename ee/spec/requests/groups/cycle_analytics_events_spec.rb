@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'cycle analytics events' do
+describe 'value stream analytics events' do
   let(:user) { create(:user) }
   let(:group) { create(:group)}
   let(:project) { create(:project, :repository, namespace: group, public_builds: false) }
   let(:issue) { create(:issue, project: project, created_at: 2.days.ago) }
 
-  describe 'GET /:namespace/-/cycle_analytics/events/:stage' do
+  describe 'GET /:namespace/-/value_stream_analytics/events/:stage' do
     before do
       stub_licensed_features(cycle_analytics_for_groups: true)
       group.add_developer(user)
@@ -26,7 +26,7 @@ describe 'cycle analytics events' do
 
     context 'when date range parameters are given' do
       it 'filter by `created_after`' do
-        params = { cycle_analytics: { created_after: issue.created_at - 5.days } }
+        params = { created_after: issue.created_at - 5.days }
 
         get group_cycle_analytics_issue_path(group, params: params, format: :json)
 
@@ -34,7 +34,7 @@ describe 'cycle analytics events' do
       end
 
       it 'filters by `created_after` where no events should be found' do
-        params = { cycle_analytics: { created_after: issue.created_at + 5.days } }
+        params = { created_after: issue.created_at + 5.days }
 
         get group_cycle_analytics_issue_path(group, params: params, format: :json)
 
@@ -42,7 +42,7 @@ describe 'cycle analytics events' do
       end
 
       it 'filter by `created_after` and `created_before`' do
-        params = { cycle_analytics: { created_after: issue.created_at - 5.days, created_before: issue.created_at + 5.days } }
+        params = { created_after: issue.created_at - 5.days, created_before: issue.created_at + 5.days }
 
         get group_cycle_analytics_issue_path(group, params: params, format: :json)
 
@@ -50,7 +50,7 @@ describe 'cycle analytics events' do
       end
 
       it 'raises error when date cannot be parsed' do
-        params = { cycle_analytics: { created_after: 'invalid' } }
+        params = { created_after: 'invalid' }
 
         expect do
           get group_cycle_analytics_issue_path(group, params: params, format: :json)

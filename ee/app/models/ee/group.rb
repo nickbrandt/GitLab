@@ -10,15 +10,16 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
+      include HasTimelogsReport
 
       add_authentication_token_field :saml_discovery_token, unique: false, token_generator: -> { Devise.friendly_token(8) }
 
       has_many :epics
 
       has_one :saml_provider
+      has_many :scim_identities
       has_many :ip_restrictions, autosave: true
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
@@ -42,6 +43,10 @@ module EE
       has_many :managed_users, class_name: 'User', foreign_key: 'managing_group_id', inverse_of: :managing_group
       has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::GroupStage'
 
+      has_one :deletion_schedule, class_name: 'GroupDeletionSchedule'
+      delegate :deleting_user, :marked_for_deletion_on, to: :deletion_schedule, allow_nil: true
+      delegate :enforced_group_managed_accounts?, :enforced_sso?, to: :saml_provider, allow_nil: true
+
       belongs_to :file_template_project, class_name: "Project"
 
       # Use +checked_file_template_project+ instead, which implements important
@@ -53,16 +58,14 @@ module EE
 
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
 
+      scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
+      scope :with_deletion_schedule, -> { preload(deletion_schedule: :deleting_user) }
+
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
       end
 
-      scope :with_project_templates, -> do
-        joins("INNER JOIN projects ON projects.namespace_id = namespaces.custom_project_templates_group_id")
-          .distinct
-      end
-
-      scope :with_project_templates_optimized, -> { where.not(custom_project_templates_group_id: nil) }
+      scope :with_project_templates, -> { where.not(custom_project_templates_group_id: nil) }
 
       scope :with_custom_file_templates, -> do
         preload(
@@ -70,6 +73,11 @@ module EE
           projects: :route,
           shared_projects: :route
         ).where.not(file_template_project_id: nil)
+      end
+
+      scope :for_epics, ->(epics) do
+        epics_query = epics.select(:group_id)
+        joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
       end
 
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do
@@ -114,14 +122,33 @@ module EE
       end
     end
 
+    class_methods do
+      def groups_user_can_read_epics(groups, user, same_root: false)
+        groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
+
+        # if we are sure that all groups have the same root group, we can
+        # preset root_ancestor for all of them to avoid an additional SQL query
+        # done for each group permission check:
+        # https://gitlab.com/gitlab-org/gitlab/issues/11539
+        preset_root_ancestor_for(groups) if same_root
+
+        DeclarativePolicy.user_scope do
+          groups.select { |group| Ability.allowed?(user, :read_epic, group) }
+        end
+      end
+
+      def preset_root_ancestor_for(groups)
+        return groups if groups.size < 2
+
+        root = groups.first.root_ancestor
+        groups.drop(1).each { |group| group.root_ancestor = root }
+      end
+    end
+
     def ip_restriction_ranges
       return unless ip_restrictions.present?
 
       ip_restrictions.map(&:range).join(",")
-    end
-
-    def vulnerable_projects
-      projects.where("EXISTS(?)", ::Vulnerabilities::Occurrence.select(1).undismissed.where('vulnerability_occurrences.project_id = projects.id'))
     end
 
     def human_ldap_access
@@ -218,15 +245,32 @@ module EE
       project
     end
 
+    override :billable_members_count
+    def billable_members_count(requested_hosted_plan = nil)
+      billed_user_ids(requested_hosted_plan).count
+    end
+
     # For now, we are not billing for members with a Guest role for subscriptions
     # with a Gold plan. The other plans will treat Guest members as a regular member
     # for billing purposes.
-    override :billable_members_count
-    def billable_members_count(requested_hosted_plan = nil)
+    #
+    # We are plucking the user_ids from the "Members" table in an array and
+    # converting the array of user_ids to a Set which will have unique user_ids.
+    def billed_user_ids(requested_hosted_plan = nil)
       if [actual_plan_name, requested_hosted_plan].include?(Plan::GOLD)
-        users_with_descendants.excluding_guests.count
+        strong_memoize(:gold_billed_user_ids) do
+          (billed_group_members.non_guests.distinct.pluck(:user_id) +
+          billed_project_members.non_guests.distinct.pluck(:user_id) +
+          billed_shared_group_members.non_guests.distinct.pluck(:user_id) +
+          billed_invited_group_members.non_guests.distinct.pluck(:user_id)).to_set
+        end
       else
-        users_with_descendants.count
+        strong_memoize(:non_gold_billed_user_ids) do
+          (billed_group_members.distinct.pluck(:user_id) +
+          billed_project_members.distinct.pluck(:user_id) +
+          billed_shared_group_members.distinct.pluck(:user_id) +
+          billed_invited_group_members.distinct.pluck(:user_id)).to_set
+        end
       end
     end
 
@@ -243,13 +287,66 @@ module EE
       feature_available?(:epics)
     end
 
+    def marked_for_deletion?
+      marked_for_deletion_on.present? &&
+        feature_available?(:adjourned_deletion_for_projects_and_groups)
+    end
+
+    def self_or_ancestor_marked_for_deletion
+      return unless feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      self_and_ancestors(hierarchy_order: :asc)
+        .joins(:deletion_schedule).first
+    end
+
+    override :adjourned_deletion?
+    def adjourned_deletion?
+      feature_available?(:adjourned_deletion_for_projects_and_groups) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def vulnerabilities
+      ::Vulnerability.where(project: ::Project.for_group_and_its_subgroups(self))
+    end
+
     private
 
     def custom_project_templates_group_allowed
       return if custom_project_templates_group_id.blank?
       return if children.exists?(id: custom_project_templates_group_id)
 
-      errors.add(:custom_project_templates_group_id, "has to be a subgroup of the group")
+      errors.add(:custom_project_templates_group_id, 'has to be a subgroup of the group')
+    end
+
+    def billed_group_members
+      ::GroupMember.active_without_invites_and_requests.where(
+        source_id: self_and_descendants
+      )
+    end
+
+    def billed_project_members
+      ::ProjectMember.active_without_invites_and_requests.where(
+        source_id: ::Project.joins(:group).where(namespace: self_and_descendants)
+      )
+    end
+
+    def billed_invited_group_members
+      invited_or_shared_group_members(invited_groups_in_projects)
+    end
+
+    def billed_shared_group_members
+      return ::GroupMember.none unless ::Feature.enabled?(:share_group_with_group)
+
+      invited_or_shared_group_members(shared_groups)
+    end
+
+    def invited_or_shared_group_members(groups)
+      ::GroupMember.active_without_invites_and_requests.where(source_id: ::Gitlab::ObjectHierarchy.new(groups).base_and_ancestors)
+    end
+
+    def invited_groups_in_projects
+      ::Group.joins(:project_group_links)
+        .where(project_group_links: { project_id: all_projects })
     end
   end
 end

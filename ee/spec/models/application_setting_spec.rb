@@ -36,15 +36,42 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_shards) }
 
     it { is_expected.to allow_value(10).for(:elasticsearch_replicas) }
+    it { is_expected.to allow_value(0).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(nil).for(:elasticsearch_replicas) }
-    it { is_expected.not_to allow_value(0).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
+
+    it { is_expected.to allow_value(10).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.to allow_value(0).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_indexed_field_length_limit) }
+
+    it { is_expected.to allow_value(25).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(0).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_max_bulk_size_mb) }
+
+    it { is_expected.to allow_value(2).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(0).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_max_bulk_concurrency) }
 
     it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("  ").for(:required_instance_ci_template) }
     it { is_expected.to allow_value("template_name").for(:required_instance_ci_template) }
+
+    it { is_expected.to allow_value(1).for(:max_personal_access_token_lifetime) }
+    it { is_expected.to allow_value(nil).for(:max_personal_access_token_lifetime) }
+    it { is_expected.to allow_value(10).for(:max_personal_access_token_lifetime) }
+    it { is_expected.to allow_value(365).for(:max_personal_access_token_lifetime) }
+    it { is_expected.not_to allow_value("value").for(:max_personal_access_token_lifetime) }
+    it { is_expected.not_to allow_value(2.5).for(:max_personal_access_token_lifetime) }
+    it { is_expected.not_to allow_value(-5).for(:max_personal_access_token_lifetime) }
+    it { is_expected.not_to allow_value(366).for(:max_personal_access_token_lifetime) }
 
     describe 'when additional email text is enabled' do
       before do
@@ -193,7 +220,9 @@ describe ApplicationSetting do
         elasticsearch_aws: false,
         elasticsearch_aws_region:     'test-region',
         elasticsearch_aws_access_key: 'test-access-key',
-        elasticsearch_aws_secret_access_key: 'test-secret-access-key'
+        elasticsearch_aws_secret_access_key: 'test-secret-access-key',
+        elasticsearch_max_bulk_size_mb: 67,
+        elasticsearch_max_bulk_concurrency: 8
       )
 
       expect(setting.elasticsearch_config).to eq(
@@ -201,7 +230,9 @@ describe ApplicationSetting do
         aws: false,
         aws_region:     'test-region',
         aws_access_key: 'test-access-key',
-        aws_secret_access_key: 'test-secret-access-key'
+        aws_secret_access_key: 'test-secret-access-key',
+        max_bulk_size_bytes: 67.megabytes,
+        max_bulk_concurrency: 8
       )
     end
 
@@ -228,7 +259,7 @@ describe ApplicationSetting do
 
           expect(setting.elasticsearch_limited_namespaces).to match_array(
             [namespaces.last, child_namespace, child_namespace_indexed_through_parent])
-          expect(setting.elasticsearch_limited_namespaces(true)).to match_array(
+          expect(setting.elasticsearch_limited_namespaces(ignore_descendants: true)).to match_array(
             [namespaces.last, child_namespace])
         end
       end
@@ -258,14 +289,14 @@ describe ApplicationSetting do
     where(indexing: [true, false], searching: [true, false], limiting: [true, false])
 
     with_them do
-      set(:included_project_container) { create(:elasticsearch_indexed_project) }
-      set(:included_namespace_container) { create(:elasticsearch_indexed_namespace) }
+      let_it_be(:included_project_container) { create(:elasticsearch_indexed_project) }
+      let_it_be(:included_namespace_container) { create(:elasticsearch_indexed_namespace) }
 
-      set(:included_project) { included_project_container.project }
-      set(:included_namespace) { included_namespace_container.namespace }
+      let_it_be(:included_project) { included_project_container.project }
+      let_it_be(:included_namespace) { included_namespace_container.namespace }
 
-      set(:excluded_project) { create(:project) }
-      set(:excluded_namespace) { create(:namespace) }
+      let_it_be(:excluded_project) { create(:project) }
+      let_it_be(:excluded_namespace) { create(:namespace) }
 
       let(:only_when_enabled_globally) { indexing && searching && !limiting }
 
@@ -413,6 +444,67 @@ describe ApplicationSetting do
         it 'is not permitted' do
           expect(subject).to be_falsey
         end
+      end
+    end
+  end
+
+  describe '#max_personal_access_token_lifetime_from_now' do
+    subject { setting.max_personal_access_token_lifetime_from_now }
+
+    let(:days_from_now) { nil }
+
+    before do
+      stub_application_setting(max_personal_access_token_lifetime: days_from_now)
+    end
+
+    context 'when max_personal_access_token_lifetime is defined' do
+      let(:days_from_now) { 30 }
+
+      it 'is a date time' do
+        expect(subject).to be_a Time
+      end
+
+      it 'is in the future' do
+        expect(subject).to be > Time.zone.now
+      end
+
+      it 'is in days_from_now' do
+        expect(subject.to_date - Date.today).to eq days_from_now
+      end
+    end
+
+    context 'when max_personal_access_token_lifetime is nil' do
+      it 'is nil' do
+        expect(subject).to be_nil
+      end
+    end
+  end
+
+  describe 'updates to max_personal_access_token_lifetime' do
+    context 'without personal_access_token_expiration_policy licensed' do
+      before do
+        stub_licensed_features(personal_access_token_expiration_policy: false)
+      end
+
+      it "doesn't call the update lifetime service" do
+        expect(::PersonalAccessTokens::UpdateLifetimeService).not_to receive(:new)
+
+        setting.save
+      end
+    end
+
+    context 'with personal_access_token_expiration_policy licensed' do
+      before do
+        setting.max_personal_access_token_lifetime = 30
+        stub_licensed_features(personal_access_token_expiration_policy: true)
+      end
+
+      it 'executes the update lifetime service' do
+        expect_next_instance_of(::PersonalAccessTokens::UpdateLifetimeService) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        setting.save
       end
     end
   end

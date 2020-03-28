@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
+class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :license_compliance
   worker_resource_boundary :cpu

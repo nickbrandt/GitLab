@@ -6,6 +6,8 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
+      include UsageStatistics
+
       scope :issues, -> { where(target_type: 'Issue') }
       scope :merge_requests, -> { where(target_type: 'MergeRequest') }
       scope :created, -> { where(action: ::Event::CREATED) }
@@ -16,15 +18,21 @@ module EE
       scope :epics, -> { where(target_type: 'Epic') }
     end
 
-    override :visible_to_user?
-    def visible_to_user?(user = nil)
-      if epic?
-        Ability.allowed?(user, :read_epic, target)
-      elsif epic_note?
-        Ability.allowed?(user, :read_epic, note_target)
-      else
-        super
-      end
+    override :capability
+    def capability
+      @capability ||= begin
+                        if epic? || epic_note?
+                          :read_epic
+                        elsif design_note?
+                          :read_design
+                        else
+                          super
+                        end
+                      end
+    end
+
+    def design_note?
+      note? && note.for_design?
     end
 
     def epic_note?

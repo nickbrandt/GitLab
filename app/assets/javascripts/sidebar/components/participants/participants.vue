@@ -1,8 +1,8 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __, n__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import userAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   directives: {
@@ -27,6 +27,11 @@ export default {
       type: Number,
       required: false,
       default: 7,
+    },
+    showParticipantLabel: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -80,6 +85,7 @@ export default {
 <template>
   <div>
     <div
+      v-if="showParticipantLabel"
       v-tooltip
       :title="participantLabel"
       class="sidebar-collapsed-icon"
@@ -92,7 +98,7 @@ export default {
       <gl-loading-icon v-if="loading" class="js-participants-collapsed-loading-icon" />
       <span v-else class="js-participants-collapsed-count"> {{ participantCount }} </span>
     </div>
-    <div class="title hide-collapsed">
+    <div v-if="showParticipantLabel" class="title hide-collapsed">
       <gl-loading-icon
         v-if="loading"
         :inline="true"

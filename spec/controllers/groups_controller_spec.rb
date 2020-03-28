@@ -47,7 +47,7 @@ describe GroupsController do
 
       it 'assigns events for all the projects in the group', :sidekiq_might_not_need_inline do
         subject
-        expect(assigns(:events)).to contain_exactly(event)
+        expect(assigns(:events).map(&:id)).to contain_exactly(event.id)
       end
     end
   end
@@ -96,7 +96,7 @@ describe GroupsController do
             User.where(id: [admin, owner, maintainer, developer, guest]).update_all(can_create_group: can_create_group_status)
           end
 
-          [:admin, :owner].each do |member_type|
+          [:admin, :owner, :maintainer].each do |member_type|
             context "and logged in as #{member_type.capitalize}" do
               it_behaves_like 'member with ability to create subgroups' do
                 let(:member) { send(member_type) }
@@ -104,7 +104,7 @@ describe GroupsController do
             end
           end
 
-          [:guest, :developer, :maintainer].each do |member_type|
+          [:guest, :developer].each do |member_type|
             context "and logged in as #{member_type.capitalize}" do
               it_behaves_like 'member without ability to create subgroups' do
                 let(:member) { send(member_type) }
@@ -119,12 +119,12 @@ describe GroupsController do
   describe 'GET #activity' do
     render_views
 
-    before do
-      sign_in(user)
-      project
-    end
-
     context 'as json' do
+      before do
+        sign_in(user)
+        project
+      end
+
       it 'includes events from all projects in group and subgroups', :sidekiq_might_not_need_inline do
         2.times do
           project = create(:project, group: group)
@@ -136,9 +136,34 @@ describe GroupsController do
 
         get :activity, params: { id: group.to_param }, format: :json
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['count']).to eq(3)
         expect(assigns(:projects).limit_value).to be_nil
+      end
+    end
+
+    context 'when user has no permission to see the event' do
+      let(:user) { create(:user) }
+      let(:group) { create(:group) }
+      let(:project) { create(:project, group: group) }
+
+      let(:project_with_restricted_access) do
+        create(:project, :public, issues_access_level: ProjectFeature::PRIVATE, group: group)
+      end
+
+      before do
+        create(:event, project: project)
+        create(:event, :created, project: project_with_restricted_access, target: create(:issue))
+
+        group.add_guest(user)
+
+        sign_in(user)
+      end
+
+      it 'filters out invisible event' do
+        get :activity, params: { id: group.to_param }, format: :json
+
+        expect(json_response['count']).to eq(1)
       end
     end
   end
@@ -151,7 +176,7 @@ describe GroupsController do
         post :create, params: { group: { name: 'new_group', path: "new_group" } }
       end.to change { Group.count }.by(1)
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
     end
 
     context 'authorization' do
@@ -162,7 +187,7 @@ describe GroupsController do
           post :create, params: { group: { name: 'new_group', path: "new_group" } }
         end.to change { Group.count }.by(1)
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -232,6 +257,18 @@ describe GroupsController do
           expect(response).to render_template(:new)
         end
       end
+    end
+
+    context "malicious group name" do
+      subject { post :create, params: { group: { name: "<script>alert('Mayday!');</script>", path: "invalid_group_url" } } }
+
+      before do
+        sign_in(user)
+      end
+
+      it { expect { subject }.not_to change { Group.count } }
+
+      it { expect(subject).to render_template(:new) }
     end
   end
 
@@ -367,7 +404,7 @@ describe GroupsController do
     it 'updates the path successfully' do
       post :update, params: { id: group.to_param, group: { path: 'new_path' } }
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(controller).to set_flash[:notice]
     end
 
@@ -382,8 +419,15 @@ describe GroupsController do
     it 'updates the project_creation_level successfully' do
       post :update, params: { id: group.to_param, group: { project_creation_level: ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS } }
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(group.reload.project_creation_level).to eq(::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
+    end
+
+    it 'updates the default_branch_protection successfully' do
+      post :update, params: { id: group.to_param, group: { default_branch_protection: ::Gitlab::Access::PROTECTION_DEV_CAN_MERGE } }
+
+      expect(response).to have_gitlab_http_status(:found)
+      expect(group.reload.default_branch_protection).to eq(::Gitlab::Access::PROTECTION_DEV_CAN_MERGE)
     end
 
     context 'when a project inside the group has container repositories' do
@@ -397,7 +441,7 @@ describe GroupsController do
         post :update, params: { id: group.to_param, group: { name: 'new_name' } }
 
         expect(controller).to set_flash[:notice]
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(group.reload.name).to eq('new_name')
       end
 
@@ -405,7 +449,7 @@ describe GroupsController do
         post :update, params: { id: group.to_param, group: { path: 'new_path' } }
 
         expect(assigns(:group).errors[:base].first).to match(/Docker images in their Container Registry/)
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end
@@ -468,7 +512,7 @@ describe GroupsController do
               it 'does not redirect' do
                 get :issues, params: { id: group.to_param }
 
-                expect(response).not_to have_gitlab_http_status(301)
+                expect(response).not_to have_gitlab_http_status(:moved_permanently)
               end
             end
 
@@ -487,7 +531,7 @@ describe GroupsController do
               it 'does not redirect' do
                 get :show, params: { id: group.to_param }
 
-                expect(response).not_to have_gitlab_http_status(301)
+                expect(response).not_to have_gitlab_http_status(:moved_permanently)
               end
             end
 
@@ -554,13 +598,13 @@ describe GroupsController do
           it 'does not 404' do
             post :update, params: { id: group.to_param.upcase, group: { path: 'new_path' } }
 
-            expect(response).not_to have_gitlab_http_status(404)
+            expect(response).not_to have_gitlab_http_status(:not_found)
           end
 
           it 'does not redirect to the correct casing' do
             post :update, params: { id: group.to_param.upcase, group: { path: 'new_path' } }
 
-            expect(response).not_to have_gitlab_http_status(301)
+            expect(response).not_to have_gitlab_http_status(:moved_permanently)
           end
         end
 
@@ -570,7 +614,7 @@ describe GroupsController do
           it 'returns not found' do
             post :update, params: { id: redirect_route.path, group: { path: 'new_path' } }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -580,13 +624,13 @@ describe GroupsController do
           it 'does not 404' do
             delete :destroy, params: { id: group.to_param.upcase }
 
-            expect(response).not_to have_gitlab_http_status(404)
+            expect(response).not_to have_gitlab_http_status(:not_found)
           end
 
           it 'does not redirect to the correct casing' do
             delete :destroy, params: { id: group.to_param.upcase }
 
-            expect(response).not_to have_gitlab_http_status(301)
+            expect(response).not_to have_gitlab_http_status(:moved_permanently)
           end
         end
 
@@ -596,7 +640,7 @@ describe GroupsController do
           it 'returns not found' do
             delete :destroy, params: { id: redirect_route.path }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -693,7 +737,7 @@ describe GroupsController do
       end
 
       it 'is denied' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -755,13 +799,13 @@ describe GroupsController do
         it 'is successful' do
           get :show, params: { id: group.to_param }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'does not allow other formats' do
           get :show, params: { id: group.to_param }, format: :atom
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -769,7 +813,7 @@ describe GroupsController do
         it 'is successful' do
           get :edit, params: { id: group.to_param }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -777,7 +821,7 @@ describe GroupsController do
         it 'is successful' do
           get :new
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -786,7 +830,7 @@ describe GroupsController do
           get :index
 
           # Redirects to the dashboard
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
 
@@ -804,13 +848,23 @@ describe GroupsController do
             put :update, params: { id: group.to_param, group: { name: 'world' } }
           end.to change { group.reload.name }
         end
+
+        context "malicious group name" do
+          subject { put :update, params: { id: group.to_param, group: { name: "<script>alert('Attack!');</script>" } } }
+
+          it { is_expected.to render_template(:edit) }
+
+          it 'does not update name' do
+            expect { subject }.not_to change { group.reload.name }
+          end
+        end
       end
 
       describe 'DELETE #destroy' do
         it 'deletes the group' do
           delete :destroy, params: { id: group.to_param }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
     end

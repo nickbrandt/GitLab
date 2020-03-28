@@ -23,4 +23,8 @@ class Review < ApplicationRecord
 
     ext
   end
+
+  def user_mentions
+    merge_request.user_mentions.where.not(note_id: nil)
+  end
 end

@@ -2,7 +2,6 @@
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
-import CIIcon from '~/vue_shared/components/ci_icon.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import CommitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
 import initUserPopovers from '../../user_popovers';
@@ -25,7 +24,6 @@ export default {
     UserAvatarLink,
     Icon,
     ClipboardButton,
-    CIIcon,
     TimeAgoTooltip,
     CommitPipelineStatus,
   },
@@ -50,7 +48,7 @@ export default {
     },
     authorUrl() {
       // name: 'mailto:' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       return this.author.web_url || `mailto:${this.commit.author_email}`;
     },
     authorAvatar() {

@@ -8,7 +8,7 @@ class Projects::BlobController < Projects::ApplicationController
   include NotesHelper
   include ActionView::Helpers::SanitizeHelper
   include RedirectsForMissingPathOnTree
-  include SourcegraphGon
+  include SourcegraphDecorator
 
   prepend_before_action :authenticate_user!, only: [:edit]
 
@@ -28,6 +28,11 @@ class Projects::BlobController < Projects::ApplicationController
   before_action :editor_variables, except: [:show, :preview, :diff]
   before_action :validate_diff_params, only: :diff
   before_action :set_last_commit_sha, only: [:edit, :update]
+
+  before_action only: :show do
+    push_frontend_feature_flag(:code_navigation, @project)
+    push_frontend_feature_flag(:suggest_pipeline) if experiment_enabled?(:suggest_pipeline)
+  end
 
   def new
     commit unless @repository.empty?
@@ -203,10 +208,24 @@ class Projects::BlobController < Projects::ApplicationController
       .last_for_path(@repository, @ref, @path).sha
   end
 
+  def set_code_navigation_build
+    return if Feature.disabled?(:code_navigation, @project)
+
+    artifact =
+      Ci::JobArtifact
+        .for_sha(@blob.commit_id, @project.id)
+        .for_job_name(Ci::Build::CODE_NAVIGATION_JOB_NAME)
+        .last
+
+    @code_navigation_build = artifact&.job
+  end
+
   def show_html
     environment_params = @repository.branch_exists?(@ref) ? { ref: @ref } : { commit: @commit }
+    environment_params[:find_latest] = true
     @environment = EnvironmentsFinder.new(@project, current_user, environment_params).execute.last
     @last_commit = @repository.last_commit_for_path(@commit.id, @blob.path)
+    set_code_navigation_build
 
     render 'show'
   end

@@ -90,18 +90,16 @@ describe ApplicationController do
       let(:format) { :html }
 
       it_behaves_like 'setting gon variables'
-
-      context 'for peek requests' do
-        before do
-          request.path = '/-/peek'
-        end
-
-        it_behaves_like 'not setting gon variables'
-      end
     end
 
     context 'with json format' do
       let(:format) { :json }
+
+      it_behaves_like 'not setting gon variables'
+    end
+
+    context 'with atom format' do
+      let(:format) { :atom }
 
       it_behaves_like 'not setting gon variables'
     end
@@ -158,7 +156,7 @@ describe ApplicationController do
       it 'returns 200 response' do
         get :index, format: requested_format
 
-        expect(response).to have_gitlab_http_status 200
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -166,7 +164,7 @@ describe ApplicationController do
       it 'returns 404 response' do
         get :index
 
-        expect(response).to have_gitlab_http_status 404
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -183,7 +181,7 @@ describe ApplicationController do
 
       get :index
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'redirects to login page if not authenticated' do
@@ -204,7 +202,7 @@ describe ApplicationController do
 
         get :index, format: 'unknown'
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end
@@ -491,7 +489,7 @@ describe ApplicationController do
       it 'redirects if the user did not accept the terms' do
         get :index
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
 
       it 'does not redirect when the user accepted terms' do
@@ -499,7 +497,7 @@ describe ApplicationController do
 
         get :index
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end
@@ -532,41 +530,6 @@ describe ApplicationController do
 
       expect(controller.last_payload).to include('correlation_id' => 'new-id')
     end
-
-    context '422 errors' do
-      it 'logs a response with a string' do
-        response = spy(ActionDispatch::Response, status: 422, body: 'Hello world', content_type: 'application/json', cookies: {})
-        allow(controller).to receive(:response).and_return(response)
-        get :index
-
-        expect(controller.last_payload[:response]).to eq('Hello world')
-      end
-
-      it 'logs a response with an array' do
-        body = ['I want', 'my hat back']
-        response = spy(ActionDispatch::Response, status: 422, body: body, content_type: 'application/json', cookies: {})
-        allow(controller).to receive(:response).and_return(response)
-        get :index
-
-        expect(controller.last_payload[:response]).to eq(body)
-      end
-
-      it 'does not log a string with an empty body' do
-        response = spy(ActionDispatch::Response, status: 422, body: nil, content_type: 'application/json', cookies: {})
-        allow(controller).to receive(:response).and_return(response)
-        get :index
-
-        expect(controller.last_payload.has_key?(:response)).to be_falsey
-      end
-
-      it 'does not log an HTML body' do
-        response = spy(ActionDispatch::Response, status: 422, body: 'This is a test', content_type: 'application/html', cookies: {})
-        allow(controller).to receive(:response).and_return(response)
-        get :index
-
-        expect(controller.last_payload.has_key?(:response)).to be_falsey
-      end
-    end
   end
 
   describe '#access_denied' do
@@ -583,21 +546,21 @@ describe ApplicationController do
     it 'renders a 404 without a message' do
       get :index
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
       expect(response).to render_template('errors/not_found')
     end
 
     it 'renders a 403 when a message is passed to access denied' do
       get :index, params: { message: 'None shall pass' }
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
       expect(response).to render_template('errors/access_denied')
     end
 
     it 'renders a status passed to access denied' do
       get :index, params: { status: 401 }
 
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
   end
 
@@ -727,6 +690,7 @@ describe ApplicationController do
         get :index
 
         expect(response.headers['Cache-Control']).to be_nil
+        expect(response.headers['Pragma']).to be_nil
       end
     end
 
@@ -737,6 +701,7 @@ describe ApplicationController do
         get :index
 
         expect(response.headers['Cache-Control']).to eq 'max-age=0, private, must-revalidate, no-store'
+        expect(response.headers['Pragma']).to eq 'no-cache'
       end
 
       it 'does not set the "no-store" header for XHR requests' do
@@ -816,6 +781,7 @@ describe ApplicationController do
 
       context 'that re-authenticated' do
         before do
+          Gitlab::Auth::CurrentUserMode.new(user).request_admin_mode!
           Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
         end
 
@@ -868,6 +834,84 @@ describe ApplicationController do
       end
 
       it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+    end
+
+    describe 'rescue_from Gitlab::Auth::IpBlacklisted' do
+      controller(described_class) do
+        skip_before_action :authenticate_user!
+
+        def index
+          raise Gitlab::Auth::IpBlacklisted
+        end
+      end
+
+      it 'returns a 403 and logs the request' do
+        expect(Gitlab::AuthLogger).to receive(:error).with({
+          message: 'Rack_Attack',
+          env: :blocklist,
+          remote_ip: '1.2.3.4',
+          request_method: 'GET',
+          path: '/anonymous'
+        })
+
+        request.remote_addr = '1.2.3.4'
+
+        get :index
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+  end
+
+  describe '#set_current_context' do
+    controller(described_class) do
+      def index
+        Labkit::Context.with_context do |context|
+          render json: context.to_h
+        end
+      end
+    end
+
+    let_it_be(:user) { create(:user) }
+
+    before do
+      sign_in(user)
+    end
+
+    it 'does not break anything when no group or project method is defined' do
+      get :index
+
+      expect(response).to have_gitlab_http_status(:success)
+    end
+
+    it 'sets the username in the context when signed in' do
+      get :index
+
+      expect(json_response['meta.user']).to eq(user.username)
+    end
+
+    it 'sets the group if it was available' do
+      group = build(:group)
+      controller.instance_variable_set(:@group, group)
+
+      get :index, format: :json
+
+      expect(json_response['meta.root_namespace']).to eq(group.path)
+    end
+
+    it 'sets the project if one was available' do
+      project = build(:project)
+      controller.instance_variable_set(:@project, project)
+
+      get :index, format: :json
+
+      expect(json_response['meta.project']).to eq(project.full_path)
+    end
+
+    it 'sets the caller_id as controller#action' do
+      get :index, format: :json
+
+      expect(json_response['meta.caller_id']).to eq('AnonymousController#index')
     end
   end
 end

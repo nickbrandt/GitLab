@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
-  set(:namespace) { create(:namespace) }
-  set(:project) { create(:project, :repository, namespace: namespace) }
-  set(:user) { create(:user) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:project, reload: true) { create(:project, :repository, namespace: namespace) }
+  let_it_be(:user) { create(:user) }
 
   let(:pipeline) { build(:ci_pipeline, project: project) }
 
@@ -72,9 +72,9 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
       end
 
       it 'logs the error' do
-        expect(Gitlab::Sentry).to receive(:track_acceptable_exception).with(
+        expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
           instance_of(EE::Gitlab::Ci::Limit::LimitExceededError),
-          extra: { project_id: project.id, plan: namespace.actual_plan_name }
+          project_id: project.id, plan: namespace.actual_plan_name
         )
 
         subject
@@ -124,7 +124,7 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
     end
 
     it 'does not log any error' do
-      expect(Gitlab::Sentry).not_to receive(:track_acceptable_exception)
+      expect(Gitlab::ErrorTracking).not_to receive(:track_exception)
 
       subject
     end

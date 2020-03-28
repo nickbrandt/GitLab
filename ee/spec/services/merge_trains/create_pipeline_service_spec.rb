@@ -3,12 +3,13 @@
 require 'spec_helper'
 
 describe MergeTrains::CreatePipelineService do
-  let(:project) { create(:project, :repository) }
-  set(:maintainer) { create(:user) }
+  let(:project) { create(:project, :repository, :auto_devops) }
+  let_it_be(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer) }
   let(:previous_ref) { 'refs/heads/master' }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_maintainer(maintainer)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.update!(merge_pipelines_enabled: true)
@@ -35,7 +36,7 @@ describe MergeTrains::CreatePipelineService do
 
     context 'when merge trains option is disabled' do
       before do
-        stub_feature_flags(merge_trains_enabled: false)
+        stub_feature_flags(disable_merge_trains: true)
       end
 
       it_behaves_like 'returns an error' do
@@ -115,6 +116,18 @@ describe MergeTrains::CreatePipelineService do
           context 'when previous_ref does not exist' do
             it_behaves_like 'returns an error' do
               let(:expected_reason) { '3:Invalid merge source' }
+            end
+          end
+
+          context 'when there is a conflict on merge ref creation' do
+            before do
+              allow(project.repository).to receive(:merge_to_ref) do
+                raise Gitlab::Git::CommandError.new('Failed to create merge commit')
+              end
+            end
+
+            it_behaves_like 'returns an error' do
+              let(:expected_reason) { 'Failed to create merge commit' }
             end
           end
         end

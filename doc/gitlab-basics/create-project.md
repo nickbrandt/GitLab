@@ -31,7 +31,14 @@ To create a new blank project on the **New project** page:
 1. On the **Blank project** tab, provide the following information:
    - The name of your project in the **Project name** field. You can't use
      special characters, but you can use spaces, hyphens, underscores or even
-     emoji.
+     emoji. When adding the name, the **Project slug** will auto populate.
+     The slug is what the GitLab instance will use as the URL path to the project.
+     If you want a different slug, input the project name first,
+     then change the slug after.
+   - The path to your project in the **Project slug** field. This is the URL
+     path for your project that the GitLab instance will use. If the
+     **Project name** is blank, it will auto populate when you fill in
+     the **Project slug**.
    - The **Project description (optional)** field enables you to enter a
      description for your project's dashboard, which will help others
      understand what your project is about. Though it's not required, it's a good
@@ -80,8 +87,7 @@ You can improve the existing built-in templates or contribute new ones in the
 
 #### Custom project templates **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/6860) in
-[GitLab Premium](https://about.gitlab.com/pricing/) 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/6860) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2.
 
 Creating new projects based on custom project templates is a convenient option for
 quickly starting projects.
@@ -112,7 +118,7 @@ set to Private by default (you can later change it in the [project's settings](.
 
 This can be done by using either SSH or HTTPS:
 
-```sh
+```shell
 ## Git push using SSH
 git push --set-upstream git@gitlab.example.com:namespace/nonexistent-project.git master
 

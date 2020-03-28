@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { GlToast } from '@gitlab/ui';
 
 import Translate from '~/vue_shared/translate';
 import { parseBoolean } from '~/lib/utils/common_utils';
@@ -9,6 +10,7 @@ import GeoNodesService from './service/geo_nodes_service';
 import geoNodesApp from './components/app.vue';
 
 Vue.use(Translate);
+Vue.use(GlToast);
 
 export default () => {
   const el = document.getElementById('js-geo-nodes');

@@ -15,10 +15,9 @@ module QA
               end
 
               def api_post_body
-                {
-                  board_id: board.id,
+                super.merge({
                   milestone_id: project_milestone.id
-                }
+                })
               end
             end
           end

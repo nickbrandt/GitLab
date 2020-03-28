@@ -6,8 +6,6 @@ describe('Design management upload button component', () => {
 
   function createComponent(isSaving = false, isInverted = false) {
     wrapper = shallowMount(UploadButton, {
-      attachToDocument: true,
-      sync: false,
       propsData: {
         isSaving,
         isInverted,
@@ -41,11 +39,7 @@ describe('Design management upload button component', () => {
     it('emits upload event', () => {
       createComponent();
 
-      jest
-        .spyOn(wrapper.find({ ref: 'fileUpload' }).element, 'files', 'get')
-        .mockReturnValue('test');
-
-      wrapper.vm.onFileUploadChange('test');
+      wrapper.vm.onFileUploadChange({ target: { files: 'test' } });
 
       expect(wrapper.emitted().upload[0]).toEqual(['test']);
     });
@@ -55,7 +49,7 @@ describe('Design management upload button component', () => {
     it('triggers click on input', () => {
       createComponent();
 
-      const clickSpy = jest.spyOn(wrapper.find({ ref: 'fileUpload' }).element, 'click');
+      const clickSpy = jest.spyOn(wrapper.find('input').element, 'click');
 
       wrapper.vm.openFileUpload();
 

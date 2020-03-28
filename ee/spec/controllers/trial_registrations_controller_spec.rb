@@ -10,18 +10,6 @@ describe TrialRegistrationsController do
       allow(Gitlab).to receive(:com?).and_return(true)
     end
 
-    context 'when feature is turned off' do
-      before do
-        stub_feature_flags(improved_trial_signup: false)
-      end
-
-      it 'redirects to subscription portal trial url' do
-        get :new
-
-        expect(response).to redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
-      end
-    end
-
     context 'when customer is authenticated' do
       before do
         sign_in(user)
@@ -31,6 +19,14 @@ describe TrialRegistrationsController do
         get :new
 
         expect(response).to redirect_to(new_trial_url)
+      end
+
+      it 'redirect keeps the query string parameters' do
+        get_params = { glm_source: 'some_source', glm_content: 'some_content' }
+
+        get :new, params: get_params
+
+        expect(response).to redirect_to(new_trial_url(get_params))
       end
     end
 
@@ -67,19 +63,6 @@ describe TrialRegistrationsController do
         post :create, params: { user: user_params }
 
         expect(response.status).to eq(404)
-      end
-    end
-
-    context 'when feature is turned off' do
-      before do
-        allow(Gitlab).to receive(:com?).and_return(true)
-        stub_feature_flags(improved_trial_signup: false)
-      end
-
-      it 'returns not found' do
-        post :create, params: { user: user_params }
-
-        expect(response).to redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
       end
     end
 

@@ -1,9 +1,7 @@
-import { createLocalVue, shallowMount, config } from '@vue/test-utils';
+import { shallowMount, config } from '@vue/test-utils';
 import BlockingMergeRequestsReport from 'ee/vue_merge_request_widget/components/blocking_merge_requests/blocking_merge_requests_report.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 import { status as reportStatus } from '~/reports/constants';
-
-const localVue = createLocalVue();
 
 describe('BlockingMergeRequestsReport', () => {
   let wrapper;
@@ -42,7 +40,6 @@ describe('BlockingMergeRequestsReport', () => {
   const createComponent = (propsData = props) => {
     wrapper = shallowMount(BlockingMergeRequestsReport, {
       propsData,
-      localVue,
     });
   };
 
@@ -51,7 +48,7 @@ describe('BlockingMergeRequestsReport', () => {
     props.mr.blockingMergeRequests.visible_merge_requests = {};
     createComponent(props);
 
-    expect(wrapper.html()).toBeUndefined();
+    expect(wrapper.isEmpty()).toBe(true);
   });
 
   it('passes merged MRs as resolved issues and anything else as unresolved ', () => {

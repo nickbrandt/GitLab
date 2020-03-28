@@ -26,9 +26,15 @@ describe Vulnerabilities::DismissService do
         dismiss_vulnerability
 
         expect(vulnerability.reload).to(
-          have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.current)))
+          have_attributes(state: 'dismissed', dismissed_by: user, dismissed_at: be_like_time(Time.current)))
         expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
       end
+    end
+
+    it 'creates note' do
+      expect(SystemNoteService).to receive(:change_vulnerability_state).with(vulnerability, user)
+
+      dismiss_vulnerability
     end
 
     context 'when there is a finding dismissal error' do

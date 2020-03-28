@@ -42,7 +42,7 @@ describe Namespaces::RootStatisticsWorker, '#perform' do
         allow_any_instance_of(Namespace::AggregationSchedule)
           .to receive(:schedule_root_storage_statistics).and_return(nil)
 
-        expect(Gitlab::SidekiqLogger).to receive(:error).once
+        expect(Gitlab::ErrorTracking).to receive(:track_exception).once
 
         worker.perform(group.id)
       end
@@ -72,6 +72,21 @@ describe Namespaces::RootStatisticsWorker, '#perform' do
         .not_to receive(:execute)
 
       worker.perform(group.id)
+    end
+  end
+
+  it_behaves_like 'an idempotent worker' do
+    let(:job_args) { [group.id] }
+
+    it 'deletes one aggregation schedule' do
+      # Make sure the group and it's aggregation schedule are created before
+      # counting
+      group
+
+      expect { worker.perform(*job_args) }
+        .to change { Namespace::AggregationSchedule.count }.by(-1)
+      expect { worker.perform(*job_args) }
+        .not_to change { Namespace::AggregationSchedule.count }
     end
   end
 end

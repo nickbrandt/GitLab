@@ -3,6 +3,7 @@
 module Emails
   module ServiceDesk
     extend ActiveSupport::Concern
+    include MarkupHelper
 
     included do
       layout 'service_desk', only: [:service_desk_thank_you_email, :service_desk_new_note_email]
@@ -11,13 +12,26 @@ module Emails
     def service_desk_thank_you_email(issue_id)
       setup_service_desk_mail(issue_id)
 
-      mail_new_thread(@issue, service_desk_options(@support_bot.id).merge(subject: "Re: #{@issue.title} (##{@issue.iid})"))
+      email_sender = sender(
+        @support_bot.id,
+        send_from_user_email: false,
+        sender_name: @project.service_desk_setting&.outgoing_name
+      )
+      options = service_desk_options(email_sender, 'thank_you')
+                  .merge(subject: "Re: #{subject_base}")
+
+      mail_new_thread(@issue, options)
     end
 
     def service_desk_new_note_email(issue_id, note_id)
       @note = Note.find(note_id)
       setup_service_desk_mail(issue_id)
-      mail_answer_thread(@issue, service_desk_options(@note.author_id).merge(subject: "#{@issue.title} (##{@issue.iid})"))
+
+      email_sender = sender(@note.author_id)
+      options = service_desk_options(email_sender, 'new_note')
+                  .merge(subject: subject_base)
+
+      mail_answer_thread(@issue, options)
     end
 
     private
@@ -30,11 +44,49 @@ module Emails
       @sent_notification = SentNotification.record(@issue, @support_bot.id, reply_key)
     end
 
-    def service_desk_options(author_id)
+    def service_desk_options(email_sender, email_type)
       {
-        from: sender(author_id),
+        from: email_sender,
         to: @issue.service_desk_reply_to
-      }
+      }.tap do |options|
+        next unless template_body = template_content(email_type)
+
+        options[:body] = template_body
+        options[:content_type] = 'text/html'
+      end
+    end
+
+    def template_content(email_type)
+      template = Gitlab::Template::ServiceDeskTemplate.find(email_type, @project)
+
+      text = substitute_template_replacements(template.content)
+
+      markdown(text, project: @project)
+    rescue Gitlab::Template::Finders::RepoTemplateFinder::FileNotFoundError
+      nil
+    end
+
+    def substitute_template_replacements(template_body)
+      template_body
+        .gsub(/%\{\s*ISSUE_ID\s*\}/, issue_id)
+        .gsub(/%\{\s*ISSUE_PATH\s*\}/, issue_path)
+        .gsub(/%\{\s*NOTE_TEXT\s*\}/, note_text)
+    end
+
+    def issue_id
+      "#{Issue.reference_prefix}#{@issue.iid}"
+    end
+
+    def issue_path
+      @issue.to_reference(full: true)
+    end
+
+    def note_text
+      @note&.note.to_s
+    end
+
+    def subject_base
+      "#{@issue.title} (##{@issue.iid})"
     end
   end
 end

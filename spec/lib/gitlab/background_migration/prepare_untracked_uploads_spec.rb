@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 # Rollback DB to 10.5 (later than this was originally written for) because it still needs to work.
-describe Gitlab::BackgroundMigration::PrepareUntrackedUploads, :sidekiq, :migration, schema: 20180208183958 do
+describe Gitlab::BackgroundMigration::PrepareUntrackedUploads, schema: 20180208183958 do
   include MigrationsHelpers::TrackUntrackedUploadsHelpers
 
   let!(:untracked_files_for_uploads) { table(:untracked_files_for_uploads) }
@@ -67,7 +67,7 @@ describe Gitlab::BackgroundMigration::PrepareUntrackedUploads, :sidekiq, :migrat
       it 'does not add hashed files to the untracked_files_for_uploads table' do
         described_class.new.perform
 
-        hashed_file_path = get_uploads(project2, 'Project').where(uploader: 'FileUploader').first.path
+        hashed_file_path = get_uploads(project2, 'Project').find_by(uploader: 'FileUploader').path
         expect(untracked_files_for_uploads.where("path like '%#{hashed_file_path}%'").exists?).to be_falsey
       end
 

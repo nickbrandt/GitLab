@@ -5,9 +5,9 @@ import createDefaultState from 'ee/security_dashboard/store/modules/project_sele
 
 import { GlButton } from '@gitlab/ui';
 
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -30,6 +30,7 @@ describe('Project Manager component', () => {
           actions: {
             setSearchQuery: jest.fn(),
             fetchSearchResults: jest.fn(),
+            fetchSearchResultsNextPage: jest.fn(),
             addProjects: jest.fn(),
             clearSearchResults: jest.fn(),
             toggleSelectedProject: jest.fn(),
@@ -53,7 +54,6 @@ describe('Project Manager component', () => {
     wrapper = shallowMount(ProjectManager, {
       localVue,
       store,
-      sync: false,
     });
   };
 
@@ -66,7 +66,6 @@ describe('Project Manager component', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    jest.clearAllMocks();
   });
 
   describe('given the default state', () => {
@@ -106,10 +105,23 @@ describe('Project Manager component', () => {
       expect(getProjectList().exists()).toBe(true);
     });
 
-    it('dispatches the right actions when the project-list emits a projectRemoved event', () => {
+    it('dispatches the right actions when the project-list emits a "bottomReached" event', () => {
+      const projectSelector = getProjectSelector();
+      const fetchSearchResultsNextPageAction = getMockAction('fetchSearchResultsNextPage');
+
+      expect(fetchSearchResultsNextPageAction).toHaveBeenCalledTimes(0);
+
+      projectSelector.vm.$emit('bottomReached');
+
+      expect(fetchSearchResultsNextPageAction).toHaveBeenCalledTimes(1);
+    });
+
+    it('dispatches the right actions when the project-list emits a "projectRemoved" event', () => {
       const mockProject = { remove_path: 'foo' };
-      const projectList = wrapper.find(ProjectList);
+      const projectList = getProjectList();
       const removeProjectAction = getMockAction('removeProject');
+
+      expect(removeProjectAction).toHaveBeenCalledTimes(0);
 
       projectList.vm.$emit('projectRemoved', mockProject);
 

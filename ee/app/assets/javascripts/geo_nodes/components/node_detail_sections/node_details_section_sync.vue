@@ -130,17 +130,14 @@ export default {
 </script>
 
 <template>
-  <div class="row-fluid clearfix node-detail-section sync-section">
+  <div class="row-fluid clearfix py-3 border-top border-color-default sync-section">
     <div class="col-md-12">
       <section-reveal-button
         :button-title="__('Sync information')"
         @toggleButton="handleSectionToggle"
       />
     </div>
-    <div
-      v-show="showSectionItems"
-      class="col-md-6 prepend-left-15 prepend-top-10 section-items-container"
-    >
+    <div v-if="showSectionItems" class="col-md-6 ml-2 mt-2 section-items-container">
       <geo-node-detail-item
         v-for="(nodeDetailItem, index) in nodeDetailItems"
         :key="index"

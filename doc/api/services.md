@@ -2,6 +2,63 @@
 
 >**Note:** This API requires an access token with Maintainer or Owner permissions
 
+## List all active services
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21330) in GitLab 12.7.
+
+Get a list of all active project services.
+
+```plaintext
+GET /projects/:id/services
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 75,
+    "title": "Jenkins CI",
+    "slug": "jenkins",
+    "created_at": "2019-11-20T11:20:25.297Z",
+    "updated_at": "2019-11-20T12:24:37.498Z",
+    "active": true,
+    "commit_events": true,
+    "push_events": true,
+    "issues_events": true,
+    "confidential_issues_events": true,
+    "merge_requests_events": true,
+    "tag_push_events": false,
+    "note_events": true,
+    "confidential_note_events": true,
+    "pipeline_events": true,
+    "wiki_page_events": true,
+    "job_events": true,
+    "comment_on_event_enabled": true
+  }
+  {
+    "id": 76,
+    "title": "Alerts endpoint",
+    "slug": "alerts",
+    "created_at": "2019-11-20T11:20:25.297Z",
+    "updated_at": "2019-11-20T12:24:37.498Z",
+    "active": true,
+    "commit_events": true,
+    "push_events": true,
+    "issues_events": true,
+    "confidential_issues_events": true,
+    "merge_requests_events": true,
+    "tag_push_events": true,
+    "note_events": true,
+    "confidential_note_events": true,
+    "pipeline_events": true,
+    "wiki_page_events": true,
+    "job_events": true,
+    "comment_on_event_enabled": true
+  }
+]
+```
+
 ## Asana
 
 Asana - Teamwork without email
@@ -12,7 +69,7 @@ Set Asana service for a project.
 
 > This service adds commit messages as comments to Asana tasks. Once enabled, commit messages are checked for Asana task URLs (for example, `https://app.asana.com/0/123456/987654`) or task IDs starting with # (for example, `#987654`). Every task ID found will get the commit comment added to it. You can also close a task with a message containing: `fix #123456`. You can find your API Keys here: <https://asana.com/developers/documentation/getting-started/auth#api-key>.
 
-```
+```plaintext
 PUT /projects/:id/services/asana
 ```
 
@@ -28,7 +85,7 @@ Parameters:
 
 Delete Asana service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/asana
 ```
 
@@ -36,7 +93,7 @@ DELETE /projects/:id/services/asana
 
 Get Asana service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/asana
 ```
 
@@ -48,7 +105,7 @@ Project Management Software (Source Commits Endpoint)
 
 Set Assembla service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/assembla
 ```
 
@@ -64,7 +121,7 @@ Parameters:
 
 Delete Assembla service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/assembla
 ```
 
@@ -72,7 +129,7 @@ DELETE /projects/:id/services/assembla
 
 Get Assembla service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/assembla
 ```
 
@@ -86,7 +143,7 @@ Set Atlassian Bamboo CI service for a project.
 
 > You must set up automatic revision labeling and a repository trigger in Bamboo.
 
-```
+```plaintext
 PUT /projects/:id/services/bamboo
 ```
 
@@ -104,7 +161,7 @@ Parameters:
 
 Delete Atlassian Bamboo CI service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/bamboo
 ```
 
@@ -112,7 +169,7 @@ DELETE /projects/:id/services/bamboo
 
 Get Atlassian Bamboo CI service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/bamboo
 ```
 
@@ -124,7 +181,7 @@ Bugzilla Issue Tracker
 
 Set Bugzilla service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/bugzilla
 ```
 
@@ -143,7 +200,7 @@ Parameters:
 
 Delete Bugzilla service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/bugzilla
 ```
 
@@ -151,7 +208,7 @@ DELETE /projects/:id/services/bugzilla
 
 Get Bugzilla service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/bugzilla
 ```
 
@@ -163,7 +220,7 @@ Continuous integration and deployments
 
 Set Buildkite service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/buildkite
 ```
 
@@ -180,7 +237,7 @@ Parameters:
 
 Delete Buildkite service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/buildkite
 ```
 
@@ -188,7 +245,7 @@ DELETE /projects/:id/services/buildkite
 
 Get Buildkite service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/buildkite
 ```
 
@@ -200,7 +257,7 @@ Simple web-based real-time group chat
 
 Set Campfire service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/campfire
 ```
 
@@ -217,7 +274,7 @@ Parameters:
 
 Delete Campfire service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/campfire
 ```
 
@@ -225,8 +282,53 @@ DELETE /projects/:id/services/campfire
 
 Get Campfire service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/campfire
+```
+
+## Unify Circuit
+
+Unify Circuit RTC and collaboration tool.
+
+### Create/Edit Unify Circuit service
+
+Set Unify Circuit service for a project.
+
+```plaintext
+PUT /projects/:id/services/unify-circuit
+```
+
+Parameters:
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `webhook` | string | true | The Unify Circuit webhook. For example, `https://circuit.com/rest/v2/webhooks/incoming/...`. |
+| `notify_only_broken_pipelines` | boolean | false | Send notifications for broken pipelines |
+| `branches_to_be_notified` | string | all | Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected" |
+| `push_events` | boolean | false | Enable notifications for push events |
+| `issues_events` | boolean | false | Enable notifications for issue events |
+| `confidential_issues_events` | boolean | false | Enable notifications for confidential issue events |
+| `merge_requests_events` | boolean | false | Enable notifications for merge request events |
+| `tag_push_events` | boolean | false | Enable notifications for tag push events |
+| `note_events` | boolean | false | Enable notifications for note events |
+| `confidential_note_events` | boolean | false | Enable notifications for confidential note events |
+| `pipeline_events` | boolean | false | Enable notifications for pipeline events |
+| `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
+
+### Delete Unify Circuit service
+
+Delete Unify Circuit service for a project.
+
+```plaintext
+DELETE /projects/:id/services/unify-circuit
+```
+
+### Get Unify Circuit service settings
+
+Get Unify Circuit service settings for a project.
+
+```plaintext
+GET /projects/:id/services/unify-circuit
 ```
 
 ## Custom Issue Tracker
@@ -237,7 +339,7 @@ Custom issue tracker
 
 Set Custom Issue Tracker service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/custom-issue-tracker
 ```
 
@@ -256,7 +358,7 @@ Parameters:
 
 Delete Custom Issue Tracker service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/custom-issue-tracker
 ```
 
@@ -264,7 +366,7 @@ DELETE /projects/:id/services/custom-issue-tracker
 
 Get Custom Issue Tracker service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/custom-issue-tracker
 ```
 
@@ -276,7 +378,7 @@ Drone is a Continuous Integration platform built on Docker, written in Go
 
 Set Drone CI service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/drone-ci
 ```
 
@@ -295,7 +397,7 @@ Parameters:
 
 Delete Drone CI service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/drone-ci
 ```
 
@@ -303,7 +405,7 @@ DELETE /projects/:id/services/drone-ci
 
 Get Drone CI service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/drone-ci
 ```
 
@@ -315,7 +417,7 @@ Email the commits and diff of each push to a list of recipients.
 
 Set Emails on push service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/emails-on-push
 ```
 
@@ -328,12 +430,13 @@ Parameters:
 | `send_from_committer_email` | boolean | false | Send from committer |
 | `push_events` | boolean | false | Enable notifications for push events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
+| `branches_to_be_notified` | string | all | Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected". Notifications will be always fired for tag pushes. |
 
 ### Delete Emails on push service
 
 Delete Emails on push service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/emails-on-push
 ```
 
@@ -341,7 +444,7 @@ DELETE /projects/:id/services/emails-on-push
 
 Get Emails on push service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/emails-on-push
 ```
 
@@ -353,7 +456,7 @@ Replaces the link to the internal wiki with a link to an external wiki.
 
 Set External Wiki service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/external-wiki
 ```
 
@@ -367,7 +470,7 @@ Parameters:
 
 Delete External Wiki service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/external-wiki
 ```
 
@@ -375,7 +478,7 @@ DELETE /projects/:id/services/external-wiki
 
 Get External Wiki service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/external-wiki
 ```
 
@@ -387,7 +490,7 @@ Flowdock is a collaboration web app for technical teams.
 
 Set Flowdock service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/flowdock
 ```
 
@@ -402,7 +505,7 @@ Parameters:
 
 Delete Flowdock service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/flowdock
 ```
 
@@ -410,7 +513,7 @@ DELETE /projects/:id/services/flowdock
 
 Get Flowdock service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/flowdock
 ```
 
@@ -422,7 +525,7 @@ Code collaboration software.
 
 Set GitHub service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/github
 ```
 
@@ -438,7 +541,7 @@ Parameters:
 
 Delete GitHub service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/github
 ```
 
@@ -446,7 +549,7 @@ DELETE /projects/:id/services/github
 
 Get GitHub service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/github
 ```
 
@@ -454,17 +557,17 @@ GET /projects/:id/services/github
 
 Google GSuite team collaboration tool.
 
->**Note:** This service was [introduced in v11.2](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/20290)
+>**Note:** This service was [introduced in v11.2](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20290)
 
 ### Create/Edit Hangouts Chat service
 
 Set Hangouts Chat service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/hangouts-chat
 ```
 
->**Note:** Specific event parameters (e.g. `push_events` flag) were [introduced in v10.4][11435]
+>**Note:** Specific event parameters (for example, `push_events` flag) were [introduced in v10.4][11435]
 
 Parameters:
 
@@ -480,6 +583,7 @@ Parameters:
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
 | `note_events` | boolean | false | Enable notifications for note events |
+| `confidential_note_events` | boolean | false | Enable notifications for confidential note events |
 | `pipeline_events` | boolean | false | Enable notifications for pipeline events |
 | `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
 
@@ -487,7 +591,7 @@ Parameters:
 
 Delete Hangouts Chat service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/hangouts-chat
 ```
 
@@ -495,7 +599,7 @@ DELETE /projects/:id/services/hangouts-chat
 
 Get Hangouts Chat service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/hangouts-chat
 ```
 
@@ -507,7 +611,7 @@ Private group chat and IM
 
 Set HipChat service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/hipchat
 ```
 
@@ -534,7 +638,7 @@ Parameters:
 
 Delete HipChat service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/hipchat
 ```
 
@@ -542,7 +646,7 @@ DELETE /projects/:id/services/hipchat
 
 Get HipChat service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/hipchat
 ```
 
@@ -554,9 +658,9 @@ Send IRC messages, on update, to a list of recipients through an Irker gateway.
 
 Set Irker (IRC gateway) service for a project.
 
-> NOTE: Irker does NOT have built-in authentication, which makes it vulnerable to spamming IRC channels if it is hosted outside of a  firewall. Please make sure you run the daemon within a secured network  to prevent abuse. For more details, read: <http://www.catb.org/~esr/irker/security.html>.
+> NOTE: Irker does NOT have built-in authentication, which makes it vulnerable to spamming IRC channels if it is hosted outside of a firewall. Please make sure you run the daemon within a secured network to prevent abuse. For more details, read: <http://www.catb.org/~esr/irker/security.html>.
 
-```
+```plaintext
 PUT /projects/:id/services/irker
 ```
 
@@ -575,7 +679,7 @@ Parameters:
 
 Delete Irker (IRC gateway) service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/irker
 ```
 
@@ -583,7 +687,7 @@ DELETE /projects/:id/services/irker
 
 Get Irker (IRC gateway) service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/irker
 ```
 
@@ -595,7 +699,7 @@ Jira issue tracker.
 
 Get Jira service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/jira
 ```
 
@@ -607,7 +711,7 @@ Set Jira service for a project.
 > `project_url` are replaced by `url`. If you are using an
 > older version, [follow this documentation](https://gitlab.com/gitlab-org/gitlab/blob/8-13-stable-ee/doc/api/services.md#jira).
 
-```
+```plaintext
 PUT /projects/:id/services/jira
 ```
 
@@ -623,12 +727,13 @@ Parameters:
 | `jira_issue_transition_id` | string | no | The ID of a transition that moves issues to a closed state. You can find this number under the Jira workflow administration (**Administration > Issues > Workflows**) by selecting **View** under **Operations** of the desired workflow of your project. The ID of each state can be found inside the parenthesis of each transition name under the **Transitions (id)** column. By default, this ID is set to `2`. |
 | `commit_events` | boolean | false | Enable notifications for commit events |
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
+| `comment_on_event_enabled` | boolean | false | Enable comments inside Jira issues on each GitLab event (commit / merge request) |
 
 ### Delete Jira service
 
 Remove all previously Jira settings from a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/jira
 ```
 
@@ -640,7 +745,7 @@ Ability to receive slash commands from a Slack chat instance.
 
 Get Slack slash command service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/slack-slash-commands
 ```
 
@@ -650,6 +755,7 @@ Example response:
 {
   "id": 4,
   "title": "Slack slash commands",
+  "slug": "slack-slash-commands",
   "created_at": "2017-06-27T05:51:39-07:00",
   "updated_at": "2017-06-27T05:51:39-07:00",
   "active": true,
@@ -661,6 +767,7 @@ Example response:
   "note_events": true,
   "job_events": true,
   "pipeline_events": true,
+  "comment_on_event_enabled": false,
   "properties": {
     "token": "<your_access_token>"
   }
@@ -671,7 +778,7 @@ Example response:
 
 Set Slack slash command for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/slack-slash-commands
 ```
 
@@ -685,7 +792,7 @@ Parameters:
 
 Delete Slack slash command service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/slack-slash-commands
 ```
 
@@ -697,7 +804,7 @@ Ability to receive slash commands from a Mattermost chat instance.
 
 Get Mattermost slash command service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/mattermost-slash-commands
 ```
 
@@ -705,7 +812,7 @@ GET /projects/:id/services/mattermost-slash-commands
 
 Set Mattermost slash command for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/mattermost-slash-commands
 ```
 
@@ -720,19 +827,19 @@ Parameters:
 
 Delete Mattermost slash command service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/mattermost-slash-commands
 ```
 
 ## Packagist
 
-Update your project on Packagist, the main Composer repository, when commits or tags are pushed to GitLab.
+Update your project on Packagist (the main Composer repository) when commits or tags are pushed to GitLab.
 
 ### Create/Edit Packagist service
 
 Set Packagist service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/packagist
 ```
 
@@ -751,7 +858,7 @@ Parameters:
 
 Delete Packagist service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/packagist
 ```
 
@@ -759,19 +866,19 @@ DELETE /projects/:id/services/packagist
 
 Get Packagist service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/packagist
 ```
 
 ## Pipeline-Emails
 
-Get emails for GitLab CI pipelines.
+Get emails for GitLab CI/CD pipelines.
 
 ### Create/Edit Pipeline-Emails service
 
 Set Pipeline-Emails service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/pipelines-email
 ```
 
@@ -783,14 +890,14 @@ Parameters:
 | `add_pusher` | boolean | no | Add pusher to recipients list |
 | `notify_only_broken_pipelines` | boolean | no | Notify only broken pipelines |
 | `branches_to_be_notified` | string | all | Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected" |
-| `notify_only_default_branch` | boolean | no | Send notifications only for the default branch ([introduced in GitLab 12.0](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/28271)) |
+| `notify_only_default_branch` | boolean | no | Send notifications only for the default branch ([introduced in GitLab 12.0](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/28271)) |
 | `pipeline_events` | boolean | false | Enable notifications for pipeline events |
 
 ### Delete Pipeline-Emails service
 
 Delete Pipeline-Emails service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/pipelines-email
 ```
 
@@ -798,7 +905,7 @@ DELETE /projects/:id/services/pipelines-email
 
 Get Pipeline-Emails service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/pipelines-email
 ```
 
@@ -810,7 +917,7 @@ Project Management Software (Source Commits Endpoint)
 
 Set PivotalTracker service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/pivotaltracker
 ```
 
@@ -826,7 +933,7 @@ Parameters:
 
 Delete PivotalTracker service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/pivotaltracker
 ```
 
@@ -834,7 +941,7 @@ DELETE /projects/:id/services/pivotaltracker
 
 Get PivotalTracker service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/pivotaltracker
 ```
 
@@ -846,7 +953,7 @@ Prometheus is a powerful time-series monitoring service.
 
 Set Prometheus service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/prometheus
 ```
 
@@ -860,7 +967,7 @@ Parameters:
 
 Delete Prometheus service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/prometheus
 ```
 
@@ -868,7 +975,7 @@ DELETE /projects/:id/services/prometheus
 
 Get Prometheus service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/prometheus
 ```
 
@@ -880,7 +987,7 @@ Pushover makes it easy to get real-time notifications on your Android device, iP
 
 Set Pushover service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/pushover
 ```
 
@@ -899,7 +1006,7 @@ Parameters:
 
 Delete Pushover service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/pushover
 ```
 
@@ -907,7 +1014,7 @@ DELETE /projects/:id/services/pushover
 
 Get Pushover service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/pushover
 ```
 
@@ -919,7 +1026,7 @@ Redmine issue tracker
 
 Set Redmine service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/redmine
 ```
 
@@ -937,7 +1044,7 @@ Parameters:
 
 Delete Redmine service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/redmine
 ```
 
@@ -945,7 +1052,7 @@ DELETE /projects/:id/services/redmine
 
 Get Redmine service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/redmine
 ```
 
@@ -957,11 +1064,11 @@ Receive event notifications in Slack
 
 Set Slack service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/slack
 ```
 
->**Note:** Specific event parameters (e.g. `push_events` flag and `push_channel`) were [introduced in v10.4][11435]
+>**Note:** Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4][11435]
 
 Parameters:
 
@@ -1000,7 +1107,7 @@ Parameters:
 
 Delete Slack service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/slack
 ```
 
@@ -1008,7 +1115,7 @@ DELETE /projects/:id/services/slack
 
 Get Slack service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/slack
 ```
 
@@ -1020,7 +1127,7 @@ Group Chat Software
 
 Set Microsoft Teams service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/microsoft-teams
 ```
 
@@ -1038,7 +1145,7 @@ Parameters:
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
 | `note_events` | boolean | false | Enable notifications for note events |
-| `confidental_note_events` | boolean | false | Enable notifications for confidential note events |
+| `confidential_note_events` | boolean | false | Enable notifications for confidential note events |
 | `pipeline_events` | boolean | false | Enable notifications for pipeline events |
 | `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
 
@@ -1046,7 +1153,7 @@ Parameters:
 
 Delete Microsoft Teams service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/microsoft-teams
 ```
 
@@ -1054,7 +1161,7 @@ DELETE /projects/:id/services/microsoft-teams
 
 Get Microsoft Teams service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/microsoft-teams
 ```
 
@@ -1066,11 +1173,11 @@ Receive event notifications in Mattermost
 
 Set Mattermost service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/mattermost
 ```
 
->**Note:** Specific event parameters (e.g. `push_events` flag and `push_channel`) were [introduced in v10.4][11435]
+>**Note:** Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4][11435]
 
 Parameters:
 
@@ -1088,6 +1195,7 @@ Parameters:
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
 | `note_events` | boolean | false | Enable notifications for note events |
+| `confidential_note_events` | boolean | false | Enable notifications for confidential note events |
 | `pipeline_events` | boolean | false | Enable notifications for pipeline events |
 | `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
 | `push_channel` | string | false | The name of the channel to receive push events notifications |
@@ -1095,6 +1203,7 @@ Parameters:
 | `confidential_issue_channel` | string | false | The name of the channel to receive confidential issues events notifications |
 | `merge_request_channel` | string | false | The name of the channel to receive merge request events notifications |
 | `note_channel` | string | false | The name of the channel to receive note events notifications |
+| `confidential_note_channel` | boolean | The name of the channel to receive confidential note events notifications |
 | `tag_push_channel` | string | false | The name of the channel to receive tag push events notifications |
 | `pipeline_channel` | string | false | The name of the channel to receive pipeline events notifications |
 | `wiki_page_channel` | string | false | The name of the channel to receive wiki page events notifications |
@@ -1103,7 +1212,7 @@ Parameters:
 
 Delete Mattermost Notifications service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/mattermost
 ```
 
@@ -1111,7 +1220,7 @@ DELETE /projects/:id/services/mattermost
 
 Get Mattermost notifications service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/mattermost
 ```
 
@@ -1125,7 +1234,7 @@ Set JetBrains TeamCity CI service for a project.
 
 > The build configuration in Teamcity must use the build format number %build.vcs.number% you will also want to configure monitoring of all branches so merge requests build, that setting is in the vsc root advanced settings.
 
-```
+```plaintext
 PUT /projects/:id/services/teamcity
 ```
 
@@ -1143,7 +1252,7 @@ Parameters:
 
 Delete JetBrains TeamCity CI service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/teamcity
 ```
 
@@ -1151,7 +1260,7 @@ DELETE /projects/:id/services/teamcity
 
 Get JetBrains TeamCity CI service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/teamcity
 ```
 
@@ -1163,7 +1272,7 @@ A continuous integration and build server
 
 Set Jenkins CI service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/jenkins
 ```
 
@@ -1178,7 +1287,7 @@ Parameters:
 
 Delete Jenkins CI service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/jenkins
 ```
 
@@ -1186,7 +1295,7 @@ DELETE /projects/:id/services/jenkins
 
 Get Jenkins CI service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/jenkins
 ```
 
@@ -1198,7 +1307,7 @@ A continuous integration and build server
 
 Set Jenkins CI (Deprecated) service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/jenkins-deprecated
 ```
 
@@ -1212,7 +1321,7 @@ Parameters:
 
 Delete Jenkins CI (Deprecated) service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/jenkins-deprecated
 ```
 
@@ -1220,7 +1329,7 @@ DELETE /projects/:id/services/jenkins-deprecated
 
 Get Jenkins CI (Deprecated) service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/jenkins-deprecated
 ```
 
@@ -1234,7 +1343,7 @@ This service is only available when your environment is set to development.
 
 Set MockCI service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/mock-ci
 ```
 
@@ -1248,7 +1357,7 @@ Parameters:
 
 Delete MockCI service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/mock-ci
 ```
 
@@ -1256,11 +1365,11 @@ DELETE /projects/:id/services/mock-ci
 
 Get MockCI service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/mock-ci
 ```
 
-[11435]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/11435
+[11435]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435
 
 ## YouTrack
 
@@ -1270,7 +1379,7 @@ YouTrack issue tracker
 
 Set YouTrack service for a project.
 
-```
+```plaintext
 PUT /projects/:id/services/youtrack
 ```
 
@@ -1287,7 +1396,7 @@ Parameters:
 
 Delete YouTrack service for a project.
 
-```
+```plaintext
 DELETE /projects/:id/services/youtrack
 ```
 
@@ -1295,6 +1404,6 @@ DELETE /projects/:id/services/youtrack
 
 Get YouTrack service settings for a project.
 
-```
+```plaintext
 GET /projects/:id/services/youtrack
 ```

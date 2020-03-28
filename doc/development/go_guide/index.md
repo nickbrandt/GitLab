@@ -40,7 +40,7 @@ of possible security breaches in our code:
 - SQL injections
 
 Remember to run
-[SAST](../../user/application_security/sast/index.md)
+[SAST](../../user/application_security/sast/index.md) and [Dependency Scanning](../../user/application_security/dependency_scanning/index.md)
 **(ULTIMATE)** on your project (or at least the [gosec
 analyzer](https://gitlab.com/gitlab-org/security-products/analyzers/gosec)),
 and to follow our [Security
@@ -52,9 +52,9 @@ Web servers can take advantages of middlewares like [Secure](https://github.com/
 
 Many of our projects are too small to have full-time maintainers. That's why we
 have a shared pool of Go reviewers at GitLab. To find a reviewer, use the
-[Engineering Projects](https://about.gitlab.com/handbook/engineering/projects/)
-page in the handbook. "GitLab Community Edition (CE)" and "GitLab Community
-Edition (EE)" both have a "Go" section with its list of reviewers.
+["Go" section](https://about.gitlab.com/handbook/engineering/projects/#gitlab_reviewers_go)
+of the "GitLab" project on the Engineering Projects
+page in the handbook.
 
 To add yourself to this list, add the following to your profile in the
 [team.yml](https://gitlab.com/gitlab-com/www-gitlab-com/blob/master/data/team.yml)
@@ -72,18 +72,33 @@ projects:
   effects if the package is included multiple times.
 - Use `go fmt` before committing ([Gofmt](https://golang.org/cmd/gofmt/) is a
   tool that automatically formats Go source code).
+- Place private methods below the first caller method in the source file.
 
 ### Automatic linting
 
 All Go projects should include these GitLab CI/CD jobs:
 
 ```yaml
-go lint:
-  image: golang:1.11
+lint:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  stage: test
   script:
-    - go get -u golang.org/x/lint/golint
-    - golint -set_exit_status $(go list ./... | grep -v "vendor/")
+    # Use default .golangci.yml file from the image if one is not present in the project root.
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    # Write the code coverage report to gl-code-quality-report.json
+    # and print linting issues to stdout in the format: path/to/file:line description
+    - golangci-lint run --out-format code-climate | tee gl-code-quality-report.json | jq -r '.[] | "\(.location.path):\(.location.lines.begin) \(.description)"'
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
+  allow_failure: true
 ```
+
+Including a `.golangci.yml` in the root directory of the project allows for
+configuration of `golangci-lint`. All options for `golangci-lint` are listed in
+this [example](https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml).
 
 Once [recursive includes](https://gitlab.com/gitlab-org/gitlab-foss/issues/56836)
 become available, you will be able to share job templates like this
@@ -94,7 +109,7 @@ become available, you will be able to share job templates like this
 Dependencies should be kept to the minimum. The introduction of a new
 dependency should be argued in the merge request, as per our [Approval
 Guidelines](../code_review.md#approval-guidelines). Both [License
-Management](../../user/application_security/license_compliance/index.md)
+Management](../../user/compliance/license_compliance/index.md)
 **(ULTIMATE)** and [Dependency
 Scanning](../../user/application_security/dependency_scanning/index.md)
 **(ULTIMATE)** should be activated on all projects to ensure new dependencies
@@ -174,13 +189,13 @@ code readability and test output.
 ### Better output in tests
 
 When comparing expected and actual values in tests, use
-[testify/require.Equal](https://godoc.org/github.com/stretchr/testify/require#Equal),
-[testify/require.EqualError](https://godoc.org/github.com/stretchr/testify/require#EqualError),
-[testify/require.EqualValues](https://godoc.org/github.com/stretchr/testify/require#EqualValues),
+[`testify/require.Equal`](https://godoc.org/github.com/stretchr/testify/require#Equal),
+[`testify/require.EqualError`](https://godoc.org/github.com/stretchr/testify/require#EqualError),
+[`testify/require.EqualValues`](https://godoc.org/github.com/stretchr/testify/require#EqualValues),
 and others to improve readability when comparing structs, errors,
 large portions of text, or JSON documents:
 
-```go
+```golang
 type TestData struct {
     // ...
 }
@@ -227,7 +242,7 @@ to make the test output easily readable.
 - Ideally, each test case should have a field with a unique identifier
   to use for naming subtests. In the Go standard library, this is commonly the
   `name string` field.
-- Use `want`/`expect`/`actual` when you are specifcing something in the
+- Use `want`/`expect`/`actual` when you are specifying something in the
   test case that will be used for assertion.
 
 #### Variable names
@@ -288,7 +303,7 @@ There are a few guidelines one should follow when using the
   fields in the context of that code path, such as the URI of the request using
   [`WithField`](https://godoc.org/github.com/sirupsen/logrus#WithField) or
   [`WithFields`](https://godoc.org/github.com/sirupsen/logrus#WithFields). For
-  example, `logrus.WithField("file", "/app/go).Info("Opening dir")`. If you
+  example, `logrus.WithField("file", "/app/go").Info("Opening dir")`. If you
   have to log multiple keys, always use `WithFields` instead of calling
   `WithField` more than once.
 
@@ -335,6 +350,49 @@ builds](https://docs.docker.com/develop/develop-images/multistage-build/):
 Generated docker images should have the program at their `Entrypoint` to create
 portable commands. That way, anyone can run the image, and without parameters
 it will display its help message (if `cli` has been used).
+
+## Distributing Go binaries
+
+With the exception of [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner),
+which publishes its own binaries, our Go binaries are created by projects
+managed by the [Distribution group](https://about.gitlab.com/handbook/product/categories/#distribution-group).
+
+The [Omnibus GitLab](https://gitlab.com/gitlab-org/omnibus-gitlab) project creates a
+single, monolithic operating system package containing all the binaries, while
+the [Cloud-Native GitLab (CNG)](https://gitlab.com/gitlab-org/build/CNG) project
+publishes a set of Docker images and Helm charts to glue them together.
+
+Both approaches use the same version of Go for all projects, so it's important
+to ensure all our Go-using projects have at least one Go version in common in
+their test matrices. You can check the version of Go currently being used by
+[Omnibus](https://gitlab.com/gitlab-org/gitlab-omnibus-builder/blob/master/docker/Dockerfile_debian_10#L59),
+and the version being used for [CNG](https://gitlab.com/gitlab-org/build/cng/blob/master/ci_files/variables.yml#L12).
+
+### Updating Go version
+
+We should always use a [supported version](https://golang.org/doc/devel/release.html#policy)
+of Go, i.e., one of the three most recent minor releases, and should always use
+the most recent patch-level for that version, as it may contain security fixes.
+
+Changing the version affects every project being compiled, so it's important to
+ensure that all projects have been updated to test against the new Go version
+before changing the package builders to use it. Despite [Go's compatibility promise](https://golang.org/doc/go1compat),
+changes between minor versions can expose bugs or cause problems in our projects.
+
+Once you've picked a new Go version to use, the steps to update Omnibus and CNG
+are:
+
+- [Create a merge request in the CNG project](https://gitlab.com/gitlab-org/build/CNG/edit/master/ci_files/variables.yml?branch_name=update-go-version),
+   updating the `GO_VERSION` in `ci_files/variables.yml`.
+- Create a merge request in the [`gitlab-omnibus-builder` project](https://gitlab.com/gitlab-org/gitlab-omnibus-builder),
+   updating every file in the `docker/` directory so the `GO_VERSION` is set
+   appropriately. [Here's an example](https://gitlab.com/gitlab-org/gitlab-omnibus-builder/-/merge_requests/125/diffs).
+- Tag a new release of `gitlab-omnibus-builder` containing the change.
+- [Create a merge request in the `gitlab-omnibus` project](https://gitlab.com/gitlab-org/omnibus-gitlab/edit/master/.gitlab-ci.yml?branch_name=update-gitlab-omnibus-builder-version),
+   updating the `BUILDER_IMAGE_REVISION` to match the newly-created tag.
+
+To reduce unnecessary differences between two distribution methods, Omnibus and
+CNG **should always use the same Go version**.
 
 ---
 

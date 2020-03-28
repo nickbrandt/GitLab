@@ -11,9 +11,11 @@ export default function notificationsDropdown() {
     }
 
     const notificationLevel = $(this).data('notificationLevel');
-    const form = $(this).parents('.notification-form:first');
+    const form = $(this)
+      .parents('.notification-form')
+      .first();
 
-    form.find('.js-notification-loading').toggleClass('fa-bell fa-spin fa-spinner');
+    form.find('.js-notification-loading').toggleClass('spinner');
     if (form.hasClass('no-label')) {
       form.find('.js-notification-loading').toggleClass('hidden');
       form.find('.js-notifications-icon').toggleClass('hidden');

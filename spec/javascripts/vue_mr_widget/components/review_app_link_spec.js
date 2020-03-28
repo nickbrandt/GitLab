@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import component from '~/vue_merge_request_widget/components/review_app_link.vue';
 import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
+import component from '~/vue_merge_request_widget/components/review_app_link.vue';
 import mountComponent from '../../helpers/vue_mount_component_helper';
 
 describe('review app link', () => {
@@ -8,6 +8,10 @@ describe('review app link', () => {
   const props = {
     link: '/review',
     cssClass: 'js-link',
+    display: {
+      text: 'View app',
+      tooltip: '',
+    },
   };
   let vm;
   let el;

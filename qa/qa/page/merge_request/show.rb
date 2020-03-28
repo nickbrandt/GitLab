@@ -6,10 +6,15 @@ module QA
       class Show < Page::Base
         include Page::Component::Note
 
+        view 'app/assets/javascripts/mr_tabs_popover/components/popover.vue' do
+          element :dismiss_popover_button
+        end
+
         view 'app/assets/javascripts/vue_merge_request_widget/components/mr_widget_header.vue' do
           element :dropdown_toggle
           element :download_email_patches
           element :download_plain_diff
+          element :open_in_web_ide_button
         end
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/mr_widget_pipeline.vue' do
@@ -26,7 +31,11 @@ module QA
         end
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_merged.vue' do
-          element :merged_status, 'The changes were merged into' # rubocop:disable QA/ElementWithPattern
+          element :merged_status_content
+        end
+
+        view 'app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_failed_to_merge.vue' do
+          element :merge_request_error_content
         end
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_rebase.vue' do
@@ -38,12 +47,16 @@ module QA
           element :squash_checkbox
         end
 
+        view 'app/assets/javascripts/vue_shared/components/notes/skeleton_note.vue' do
+          element :skeleton_note
+        end
+
         view 'app/views/projects/merge_requests/show.html.haml' do
           element :notes_tab
           element :diffs_tab
         end
 
-        view 'app/assets/javascripts/diffs/components/diff_line_gutter_content.vue' do
+        view 'app/assets/javascripts/diffs/components/diff_table_cell.vue' do
           element :diff_comment
         end
 
@@ -60,16 +73,35 @@ module QA
           element :edit_button
         end
 
+        def add_comment_to_diff(text)
+          wait_until(sleep_interval: 5) do
+            has_text?("No newline at end of file")
+          end
+          all_elements(:new_diff_line, minimum: 1).first.hover
+          click_element(:diff_comment)
+          fill_element(:reply_input, text)
+        end
+
         def click_discussions_tab
-          click_element :notes_tab
+          click_element(:notes_tab)
+
+          wait_for_loading
         end
 
         def click_diffs_tab
-          click_element :diffs_tab
+          click_element(:diffs_tab)
+
+          wait_for_loading
+
+          click_element(:dismiss_popover_button) if has_element?(:dismiss_popover_button)
         end
 
         def click_pipeline_link
-          click_element :pipeline_link
+          click_element(:pipeline_link)
+        end
+
+        def edit!
+          click_element(:edit_button)
         end
 
         def fast_forward_possible?
@@ -82,39 +114,6 @@ module QA
           has_element?(:merge_button)
         end
 
-        def has_merge_options?
-          has_element?(:merge_moment_dropdown)
-        end
-
-        def merge_immediately
-          if has_merge_options?
-            click_element :merge_moment_dropdown
-            click_element :merge_immediately_option
-          else
-            click_element :merge_button
-          end
-        end
-
-        def rebase!
-          # The rebase button is disabled on load
-          wait do
-            has_element?(:mr_rebase_button)
-          end
-
-          # The rebase button is enabled via JS
-          wait(reload: false) do
-            !find_element(:mr_rebase_button).disabled?
-          end
-
-          click_element :mr_rebase_button
-
-          success = wait do
-            has_text?('Fast-forward merge without a merge commit')
-          end
-
-          raise "Rebase did not appear to be successful" unless success
-        end
-
         def has_assignee?(username)
           page.within(element_selector_css(:assignee_block)) do
             has_text?(username)
@@ -122,9 +121,8 @@ module QA
         end
 
         def has_label?(label)
-          page.within(element_selector_css(:labels_block)) do
-            element = find('span', text: label)
-            !element.nil?
+          within_element(:labels_block) do
+            !!has_element?(:label, label_name: label)
           end
         end
 
@@ -141,57 +139,66 @@ module QA
           has_element?(:description, text: description)
         end
 
-        def try_to_merge!
-          merge_immediately if ready_to_merge?
-        end
-
-        def merge!
-          try_to_merge!
-
-          success = wait do
-            has_text?('The changes were merged into')
-          end
-
-          raise "Merge did not appear to be successful" unless success
-        end
-
         def mark_to_squash
           # The squash checkbox is disabled on load
-          wait do
+          wait_until do
             has_element?(:squash_checkbox)
           end
 
           # The squash checkbox is enabled via JS
-          wait(reload: false) do
+          wait_until(reload: false) do
             !find_element(:squash_checkbox).disabled?
           end
 
           click_element :squash_checkbox
         end
 
-        def add_comment_to_diff(text)
-          wait(interval: 5) do
-            has_text?("No newline at end of file")
-          end
-          all_elements(:new_diff_line).first.hover
-          click_element :diff_comment
-          fill_element :reply_input, text
+        def merge!
+          click_element :merge_button if ready_to_merge?
+
+          finished_loading?
+
+          raise "Merge did not appear to be successful" unless merged?
         end
 
-        def edit!
-          click_element :edit_button
+        def merged?
+          has_element?(:merged_status_content, text: 'The changes were merged into', wait: 30)
         end
 
         def ready_to_merge?
           # The merge button is disabled on load
-          wait do
+          wait_until do
             has_element?(:merge_button)
           end
 
           # The merge button is enabled via JS
-          wait(reload: false) do
+          wait_until(reload: false) do
             !find_element(:merge_button).disabled?
           end
+        end
+
+        def rebase!
+          # The rebase button is disabled on load
+          wait_until do
+            has_element?(:mr_rebase_button)
+          end
+
+          # The rebase button is enabled via JS
+          wait_until(reload: false) do
+            !find_element(:mr_rebase_button).disabled?
+          end
+
+          click_element :mr_rebase_button
+
+          success = wait_until do
+            has_text?('Fast-forward merge without a merge commit')
+          end
+
+          raise "Rebase did not appear to be successful" unless success
+        end
+
+        def try_to_merge!
+          click_element :merge_button if ready_to_merge?
         end
 
         def view_email_patches
@@ -202,6 +209,20 @@ module QA
         def view_plain_diff
           click_element :dropdown_toggle
           visit_link_in_element(:download_plain_diff)
+        end
+
+        def wait_for_merge_request_error_message
+          wait_until(max_duration: 30, reload: false) do
+            has_element?(:merge_request_error_content)
+          end
+        end
+
+        def wait_for_loading
+          finished_loading? && has_no_element?(:skeleton_note)
+        end
+
+        def click_open_in_web_ide
+          click_element :open_in_web_ide_button
         end
       end
     end

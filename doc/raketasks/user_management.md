@@ -2,7 +2,7 @@
 
 ## Add user as a developer to all projects
 
-```bash
+```shell
 # omnibus-gitlab
 sudo gitlab-rake gitlab:import:user_to_projects[username@domain.tld]
 
@@ -16,7 +16,7 @@ Notes:
 
 - admin users are added as maintainers
 
-```bash
+```shell
 # omnibus-gitlab
 sudo gitlab-rake gitlab:import:all_users_to_all_projects
 
@@ -26,7 +26,7 @@ bundle exec rake gitlab:import:all_users_to_all_projects RAILS_ENV=production
 
 ## Add user as a developer to all groups
 
-```bash
+```shell
 # omnibus-gitlab
 sudo gitlab-rake gitlab:import:user_to_groups[username@domain.tld]
 
@@ -40,7 +40,7 @@ Notes:
 
 - admin users are added as owners so they can add additional users to the group
 
-```bash
+```shell
 # omnibus-gitlab
 sudo gitlab-rake gitlab:import:all_users_to_all_groups
 
@@ -52,7 +52,7 @@ bundle exec rake gitlab:import:all_users_to_all_groups RAILS_ENV=production
 
 - Enable this setting to keep new users blocked until they have been cleared by the admin (default: false).
 
-```
+```plaintext
 block_auto_created_users: false
 ```
 
@@ -62,7 +62,7 @@ This task will disable 2FA for all users that have it enabled. This can be
 useful if GitLab's `config/secrets.yml` file has been lost and users are unable
 to login, for example.
 
-```bash
+```shell
 # omnibus-gitlab
 sudo gitlab-rake gitlab:two_factor:disable_for_all_users
 
@@ -91,7 +91,7 @@ production:
 
 Next, generate a new secret:
 
-```
+```shell
 # omnibus-gitlab
 sudo gitlab-rake secret
 
@@ -102,7 +102,7 @@ bundle exec rake secret RAILS_ENV=production
 Now you need to stop the GitLab server, back up the existing secrets file and
 update the database:
 
-```
+```shell
 # omnibus-gitlab
 sudo gitlab-ctl stop
 sudo cp config/secrets.yml config/secrets.yml.bak
@@ -122,7 +122,7 @@ error.
 Finally, change `config/secrets.yml` to set `otp_key_base` to `<new key>` and
 restart. Again, make sure you're operating in the **production** section.
 
-```
+```shell
 # omnibus-gitlab
 sudo gitlab-ctl start
 
@@ -133,7 +133,7 @@ sudo /etc/init.d/gitlab start
 If there are any problems (perhaps using the wrong value for `old_key`), you can
 restore your backup of `config/secrets.yml` and rollback the changes:
 
-```
+```shell
 # omnibus-gitlab
 sudo gitlab-ctl stop
 sudo gitlab-rake gitlab:two_factor:rotate_key:rollback filename=backup.csv

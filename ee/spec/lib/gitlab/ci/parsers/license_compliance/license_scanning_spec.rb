@@ -7,7 +7,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
     let(:report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     context 'when parsing a valid v1 report' do
-      let(:v1_json) { fixture_file('security_reports/master/gl-license-management-report.json', dir: 'ee') }
+      let(:v1_json) { fixture_file('security_reports/master/gl-license-scanning-report.json', dir: 'ee') }
 
       before do
         subject.parse!(v1_json, report)

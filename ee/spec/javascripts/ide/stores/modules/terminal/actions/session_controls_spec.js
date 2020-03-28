@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import httpStatus from '~/lib/utils/http_status';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { STARTING, PENDING, STOPPING, STOPPED } from 'ee/ide/constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
 import actionsModule, * as actions from 'ee/ide/stores/modules/terminal/actions/session_controls';
+import httpStatus from '~/lib/utils/http_status';
+import axios from '~/lib/utils/axios_utils';
 
 const TEST_PROJECT_PATH = 'lorem/root';
 const TEST_BRANCH_ID = 'master';

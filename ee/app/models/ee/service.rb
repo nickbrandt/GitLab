@@ -13,7 +13,6 @@ module EE
           github
           jenkins
           jenkins_deprecated
-          alerts
         ]
 
         if ::Gitlab.dev_env_or_com?

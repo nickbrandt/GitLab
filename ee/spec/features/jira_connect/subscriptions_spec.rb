@@ -3,10 +3,6 @@
 require 'spec_helper'
 
 describe 'Subscriptions Content Security Policy' do
-  before do
-    stub_feature_flags(jira_connect_app: true)
-  end
-
   let(:installation) { create(:jira_connect_installation) }
   let(:qsh) { Atlassian::Jwt.create_query_string_hash('https://gitlab.test/subscriptions', 'GET', 'https://gitlab.test') }
   let(:jwt) { Atlassian::Jwt.encode({ iss: installation.client_key, qsh: qsh }, installation.shared_secret) }

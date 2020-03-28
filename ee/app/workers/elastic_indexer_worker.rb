@@ -1,10 +1,12 @@
 # frozen_string_literal: true
-class ElasticIndexerWorker
+
+class ElasticIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include Elasticsearch::Model::Client::ClassMethods
 
   sidekiq_options retry: 2
-  feature_category :search
+  feature_category :global_search
+  urgency :throttled
 
   def perform(operation, class_name, record_id, es_id, options = {})
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?
@@ -31,13 +33,16 @@ class ElasticIndexerWorker
         client.delete index: klass.index_name, type: klass.document_type, id: es_id
       end
     end
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound
+  rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound => e
     # These errors can happen in several cases, including:
     # - A record is updated, then removed before the update is handled
     # - Indexing is enabled, but not every item has been indexed yet - updating
     #   and deleting the un-indexed records will raise exception
     #
     # We can ignore these.
+
+    logger.error(message: 'elastic_indexer_worker_caught_exception', error_class: e.class.name, error_message: e.message)
+
     true
   end
 
@@ -46,17 +51,6 @@ class ElasticIndexerWorker
   def clear_project_data(record_id, es_id)
     remove_children_documents('project', record_id, es_id)
     IndexStatus.for_project(record_id).delete_all
-  end
-
-  def remove_documents_by_project_id(record_id)
-    client.delete_by_query({
-      index: Project.__elasticsearch__.index_name,
-      body: {
-        query: {
-          term: { "project_id" => record_id }
-        }
-      }
-    })
   end
 
   def remove_children_documents(parent_type, parent_record_id, parent_es_id)
@@ -74,5 +68,9 @@ class ElasticIndexerWorker
         }
       }
     })
+  end
+
+  def logger
+    @logger ||= ::Gitlab::Elasticsearch::Logger.build
   end
 end

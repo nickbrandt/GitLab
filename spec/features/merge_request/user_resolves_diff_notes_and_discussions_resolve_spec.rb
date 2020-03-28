@@ -10,20 +10,14 @@ describe 'Merge request > User resolves diff notes and threads', :js do
   let!(:note)         { create(:diff_note_on_merge_request, project: project, noteable: merge_request, note: "| Markdown | Table |\n|-------|---------|\n| first | second |") }
   let(:path)          { "files/ruby/popen.rb" }
   let(:position) do
-    Gitlab::Diff::Position.new(
-      old_path: path,
-      new_path: path,
-      old_line: nil,
-      new_line: 9,
-      diff_refs: merge_request.diff_refs
-    )
+    build(:text_diff_position,
+          file: path, old_line: nil, new_line: 9,
+          diff_refs: merge_request.diff_refs)
   end
 
   before do
-    stub_feature_flags(single_mr_diff_view: false)
+    stub_feature_flags(diffs_batch_load: false)
   end
-
-  it_behaves_like 'rendering a single diff version'
 
   context 'no threads' do
     before do
@@ -370,16 +364,6 @@ describe 'Merge request > User resolves diff notes and threads', :js do
         end
       end
 
-      it 'shows jump to next discussion button on all discussions' do
-        wait_for_requests
-
-        all_discussion_replies = page.all('.discussion-reply-holder')
-
-        expect(all_discussion_replies.count).to eq(2)
-        expect(all_discussion_replies.first.all('.discussion-next-btn').count).to eq(1)
-        expect(all_discussion_replies.last.all('.discussion-next-btn').count).to eq(1)
-      end
-
       it 'displays next thread even if hidden' do
         page.all('.note-discussion', count: 2).each do |discussion|
           page.within discussion do
@@ -584,5 +568,8 @@ describe 'Merge request > User resolves diff notes and threads', :js do
   def visit_merge_request(mr = nil)
     mr ||= merge_request
     visit project_merge_request_path(mr.project, mr)
+
+    # Wait for MR widget to load
+    wait_for_requests
   end
 end

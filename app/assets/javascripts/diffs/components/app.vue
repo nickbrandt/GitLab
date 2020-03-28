@@ -1,11 +1,12 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlLoadingIcon } from '@gitlab/ui';
+import Mousetrap from 'mousetrap';
 import { __ } from '~/locale';
 import createFlash from '~/flash';
-import { GlLoadingIcon } from '@gitlab/ui';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
-import Mousetrap from 'mousetrap';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { isSingleViewStyle } from '~/helpers/diffs_helper';
 import eventHub from '../../notes/event_hub';
 import CompareVersions from './compare_versions.vue';
 import DiffFile from './diff_file.vue';
@@ -26,7 +27,6 @@ import {
 export default {
   name: 'DiffsApp',
   components: {
-    Icon,
     CompareVersions,
     DiffFile,
     NoChanges,
@@ -36,10 +36,24 @@ export default {
     GlLoadingIcon,
     PanelResizer,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     endpoint: {
       type: String,
       required: true,
+    },
+    endpointMetadata: {
+      type: String,
+      required: true,
+    },
+    endpointBatch: {
+      type: String,
+      required: true,
+    },
+    endpointCoverage: {
+      type: String,
+      required: false,
+      default: '',
     },
     projectPath: {
       type: String,
@@ -85,13 +99,14 @@ export default {
       parseInt(localStorage.getItem(TREE_LIST_WIDTH_STORAGE_KEY), 10) || INITIAL_TREE_WIDTH;
 
     return {
-      assignedDiscussions: false,
       treeWidth,
+      diffFilesLength: 0,
     };
   },
   computed: {
     ...mapState({
       isLoading: state => state.diffs.isLoading,
+      isBatchLoading: state => state.diffs.isBatchLoading,
       diffFiles: state => state.diffs.diffFiles,
       diffViewType: state => state.diffs.diffViewType,
       mergeRequestDiffs: state => state.diffs.mergeRequestDiffs,
@@ -103,6 +118,7 @@ export default {
       numVisibleFiles: state => state.diffs.size,
       plainDiffPath: state => state.diffs.plainDiffPath,
       emailPatchPath: state => state.diffs.emailPatchPath,
+      retrievingBatches: state => state.diffs.retrievingBatches,
     }),
     ...mapState('diffs', ['showTreeList', 'isLoading', 'startVersion']),
     ...mapGetters('diffs', ['isParallelView', 'currentDiffIndex']),
@@ -136,6 +152,9 @@ export default {
   },
   watch: {
     diffViewType() {
+      if (this.needsReload() || this.needsFirstLoad()) {
+        this.refetchDiffData();
+      }
       this.adjustView();
     },
     shouldShow() {
@@ -153,9 +172,13 @@ export default {
   mounted() {
     this.setBaseConfig({
       endpoint: this.endpoint,
+      endpointMetadata: this.endpointMetadata,
+      endpointBatch: this.endpointBatch,
+      endpointCoverage: this.endpointCoverage,
       projectPath: this.projectPath,
       dismissEndpoint: this.dismissEndpoint,
       showSuggestPopover: this.showSuggestPopover,
+      useSingleDiffStyle: this.glFeatures.singleMrDiffView,
     });
 
     if (this.shouldShow) {
@@ -170,10 +193,24 @@ export default {
   },
   created() {
     this.adjustView();
-    eventHub.$once('fetchedNotesData', this.setDiscussions);
     eventHub.$once('fetchDiffData', this.fetchData);
     eventHub.$on('refetchDiffData', this.refetchDiffData);
     this.CENTERED_LIMITED_CONTAINER_CLASSES = CENTERED_LIMITED_CONTAINER_CLASSES;
+
+    this.unwatchDiscussions = this.$watch(
+      () => `${this.diffFiles.length}:${this.$store.state.notes.discussions.length}`,
+      () => this.setDiscussions(),
+    );
+
+    this.unwatchRetrievingBatches = this.$watch(
+      () => `${this.retrievingBatches}:${this.$store.state.notes.discussions.length}`,
+      () => {
+        if (!this.retrievingBatches && this.$store.state.notes.discussions.length) {
+          this.unwatchDiscussions();
+          this.unwatchRetrievingBatches();
+        }
+      },
+    );
   },
   beforeDestroy() {
     eventHub.$off('fetchDiffData', this.fetchData);
@@ -185,6 +222,9 @@ export default {
     ...mapActions('diffs', [
       'setBaseConfig',
       'fetchDiffFiles',
+      'fetchDiffFilesMeta',
+      'fetchDiffFilesBatch',
+      'fetchCoverageFiles',
       'startRenderDiffsQueue',
       'assignDiscussionsToDiff',
       'setHighlightedRow',
@@ -193,44 +233,88 @@ export default {
       'toggleShowTreeList',
     ]),
     refetchDiffData() {
-      this.assignedDiscussions = false;
       this.fetchData(false);
     },
+    startDiffRendering() {
+      requestIdleCallback(
+        () => {
+          this.startRenderDiffsQueue();
+        },
+        { timeout: 1000 },
+      );
+    },
+    needsReload() {
+      return (
+        this.glFeatures.singleMrDiffView &&
+        this.diffFiles.length &&
+        isSingleViewStyle(this.diffFiles[0])
+      );
+    },
+    needsFirstLoad() {
+      return this.glFeatures.singleMrDiffView && !this.diffFiles.length;
+    },
     fetchData(toggleTree = true) {
-      this.fetchDiffFiles()
-        .then(() => {
-          if (toggleTree) {
-            this.hideTreeListIfJustOneFile();
-          }
+      if (this.glFeatures.diffsBatchLoad) {
+        this.fetchDiffFilesMeta()
+          .then(({ real_size }) => {
+            this.diffFilesLength = parseInt(real_size, 10);
+            if (toggleTree) this.hideTreeListIfJustOneFile();
 
-          requestIdleCallback(
-            () => {
-              this.setDiscussions();
-              this.startRenderDiffsQueue();
-            },
-            { timeout: 1000 },
-          );
-        })
-        .catch(() => {
-          createFlash(__('Something went wrong on our end. Please try again!'));
-        });
+            this.startDiffRendering();
+          })
+          .catch(() => {
+            createFlash(__('Something went wrong on our end. Please try again!'));
+          });
+
+        this.fetchDiffFilesBatch()
+          .then(() => {
+            // Guarantee the discussions are assigned after the batch finishes.
+            // Just watching the length of the discussions or the diff files
+            // isn't enough, because with split diff loading, neither will
+            // change when loading the other half of the diff files.
+            this.setDiscussions();
+          })
+          .then(() => this.startDiffRendering())
+          .catch(() => {
+            createFlash(__('Something went wrong on our end. Please try again!'));
+          });
+      } else {
+        this.fetchDiffFiles()
+          .then(({ real_size }) => {
+            this.diffFilesLength = parseInt(real_size, 10);
+            if (toggleTree) {
+              this.hideTreeListIfJustOneFile();
+            }
+
+            requestIdleCallback(
+              () => {
+                this.setDiscussions();
+                this.startRenderDiffsQueue();
+              },
+              { timeout: 1000 },
+            );
+          })
+          .catch(() => {
+            createFlash(__('Something went wrong on our end. Please try again!'));
+          });
+      }
+
+      if (this.endpointCoverage) {
+        this.fetchCoverageFiles();
+      }
 
       if (!this.isNotesFetched) {
         eventHub.$emit('fetchNotesData');
       }
     },
     setDiscussions() {
-      if (this.isNotesFetched && !this.assignedDiscussions && !this.isLoading) {
-        this.assignedDiscussions = true;
-
-        requestIdleCallback(
-          () =>
-            this.assignDiscussionsToDiff()
-              .then(this.$nextTick)
-              .then(this.startTaskList),
-          { timeout: 1000 },
-        );
-      }
+      requestIdleCallback(
+        () =>
+          this.assignDiscussionsToDiff()
+            .then(this.$nextTick)
+            .then(this.startTaskList),
+        { timeout: 1000 },
+      );
     },
     adjustView() {
       if (this.shouldShow) {
@@ -281,13 +365,14 @@ export default {
 
 <template>
   <div v-show="shouldShow">
-    <div v-if="isLoading" class="loading"><gl-loading-icon /></div>
+    <div v-if="isLoading" class="loading"><gl-loading-icon size="lg" /></div>
     <div v-else id="diffs" :class="{ active: shouldShow }" class="diffs tab-pane">
       <compare-versions
         :merge-request-diffs="mergeRequestDiffs"
         :merge-request-diff="mergeRequestDiff"
         :target-branch="targetBranch"
         :is-limited-container="isLimitedContainer"
+        :diff-files-length="diffFilesLength"
       />
 
       <hidden-files-warning
@@ -300,7 +385,7 @@ export default {
 
       <div
         :data-can-create-note="getNoteableData.current_user.can_create_note"
-        class="files d-flex prepend-top-default"
+        class="files d-flex"
       >
         <div
           v-show="showTreeList"
@@ -324,7 +409,8 @@ export default {
           }"
         >
           <commit-widget v-if="commit" :commit="commit" />
-          <template v-if="renderDiffFiles">
+          <div v-if="isBatchLoading" class="loading"><gl-loading-icon size="lg" /></div>
+          <template v-else-if="renderDiffFiles">
             <diff-file
               v-for="file in diffFiles"
               :key="file.newPath"

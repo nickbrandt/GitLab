@@ -29,11 +29,15 @@ module Gitlab
           #         Used by embedded dashboards.
           # @param options - y_label [String] Y-Axis label of
           #         a panel. Used by embedded dashboards.
-          # @param options - cluster [Cluster]
+          # @param options - cluster [Cluster]. Used by
+          #         embedded and un-embedded dashboards.
           # @param options - cluster_type [Symbol] The level of
-          #         cluster, one of [:admin, :project, :group]
+          #         cluster, one of [:admin, :project, :group]. Used by
+          #         embedded and un-embedded dashboards.
           # @param options - grafana_url [String] URL pointing
           #         to a grafana dashboard panel
+          # @param options - prometheus_alert_id [Integer] ID of
+          #         a PrometheusAlert. For dashboard embeds.
           # @return [Hash]
           def find(project, user, options = {})
             service_for(options)
@@ -63,7 +67,7 @@ module Gitlab
           def find_all_paths_from_source(project)
             Gitlab::Metrics::Dashboard::Cache.delete_all!
 
-            system_service.all_dashboard_paths(project)
+            default_dashboard_path(project)
             .+ project_service.all_dashboard_paths(project)
           end
 
@@ -74,7 +78,19 @@ module Gitlab
           end
 
           def project_service
-            ::Metrics::Dashboard::ProjectDashboardService
+            ::Metrics::Dashboard::CustomDashboardService
+          end
+
+          def self_monitoring_service
+            ::Metrics::Dashboard::SelfMonitoringDashboardService
+          end
+
+          def default_dashboard_path(project)
+            if project.self_monitoring?
+              self_monitoring_service.all_dashboard_paths(project)
+            else
+              system_service.all_dashboard_paths(project)
+            end
           end
 
           def service_for(options)

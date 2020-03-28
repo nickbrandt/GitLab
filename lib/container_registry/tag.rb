@@ -83,6 +83,8 @@ module ContainerRegistry
 
       strong_memoize(:created_at) do
         DateTime.rfc3339(config['created'])
+      rescue ArgumentError
+        nil
       end
     end
 
@@ -116,7 +118,7 @@ module ContainerRegistry
     def unsafe_delete
       return unless digest
 
-      client.delete_repository_tag(repository.path, digest)
+      client.delete_repository_tag_by_digest(repository.path, digest)
     end
   end
 end

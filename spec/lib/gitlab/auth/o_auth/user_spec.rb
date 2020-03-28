@@ -22,7 +22,7 @@ describe Gitlab::Auth::OAuth::User do
       }
     }
   end
-  let(:ldap_user) { Gitlab::Auth::LDAP::Person.new(Net::LDAP::Entry.new, 'ldapmain') }
+  let(:ldap_user) { Gitlab::Auth::Ldap::Person.new(Net::LDAP::Entry.new, 'ldapmain') }
 
   describe '#persisted?' do
     let!(:existing_user) { create(:omniauth_user, extern_uid: 'my-uid', provider: 'my-provider') }
@@ -83,6 +83,20 @@ describe Gitlab::Auth::OAuth::User do
 
           expect(gl_user).to be_persisted
           expect(gl_user).to be_confirmed
+        end
+      end
+
+      context 'when the current minimum password length is different from the default minimum password length' do
+        before do
+          stub_application_setting minimum_password_length: 21
+        end
+
+        it 'creates the user' do
+          stub_omniauth_config(allow_single_sign_on: [provider])
+
+          oauth_user.save
+
+          expect(gl_user).to be_persisted
         end
       end
 
@@ -216,7 +230,7 @@ describe Gitlab::Auth::OAuth::User do
 
             context "and no account for the LDAP user" do
               before do
-                allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(ldap_user)
+                allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
                 oauth_user.save
               end
@@ -253,8 +267,9 @@ describe Gitlab::Auth::OAuth::User do
 
             context "and LDAP user has an account already" do
               let!(:existing_user) { create(:omniauth_user, name: 'John Doe', email: 'john@example.com', extern_uid: dn, provider: 'ldapmain', username: 'john') }
+
               it "adds the omniauth identity to the LDAP account" do
-                allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(ldap_user)
+                allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
                 oauth_user.save
 
@@ -275,8 +290,8 @@ describe Gitlab::Auth::OAuth::User do
 
             context 'when an LDAP person is not found by uid' do
               it 'tries to find an LDAP person by email and adds the omniauth identity to the user' do
-                allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(nil)
-                allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_email).and_return(ldap_user)
+                allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(nil)
+                allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_email).and_return(ldap_user)
 
                 oauth_user.save
 
@@ -286,9 +301,9 @@ describe Gitlab::Auth::OAuth::User do
 
               context 'when also not found by email' do
                 it 'tries to find an LDAP person by DN and adds the omniauth identity to the user' do
-                  allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(nil)
-                  allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_email).and_return(nil)
-                  allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_dn).and_return(ldap_user)
+                  allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(nil)
+                  allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_email).and_return(nil)
+                  allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_dn).and_return(ldap_user)
 
                   oauth_user.save
 
@@ -329,7 +344,7 @@ describe Gitlab::Auth::OAuth::User do
 
             context 'and no account for the LDAP user' do
               it 'creates a user favoring the LDAP username and strips email domain' do
-                allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(ldap_user)
+                allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
                 oauth_user.save
 
@@ -341,7 +356,7 @@ describe Gitlab::Auth::OAuth::User do
 
           context "and no corresponding LDAP person" do
             before do
-              allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(nil)
+              allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(nil)
             end
 
             include_examples "to verify compliance with allow_single_sign_on"
@@ -390,13 +405,15 @@ describe Gitlab::Auth::OAuth::User do
           allow(ldap_user).to receive(:username) { uid }
           allow(ldap_user).to receive(:email) { ['johndoe@example.com', 'john2@example.com'] }
           allow(ldap_user).to receive(:dn) { dn }
-          allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_uid).and_return(ldap_user)
+          allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
         end
 
         context "and no account for the LDAP user" do
           context 'dont block on create (LDAP)' do
             before do
-              allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: false)
+              allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+                allow(instance).to receive_messages(block_auto_created_users: false)
+              end
             end
 
             it do
@@ -408,7 +425,9 @@ describe Gitlab::Auth::OAuth::User do
 
           context 'block on create (LDAP)' do
             before do
-              allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: true)
+              allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+                allow(instance).to receive_messages(block_auto_created_users: true)
+              end
             end
 
             it do
@@ -424,7 +443,9 @@ describe Gitlab::Auth::OAuth::User do
 
           context 'dont block on create (LDAP)' do
             before do
-              allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: false)
+              allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+                allow(instance).to receive_messages(block_auto_created_users: false)
+              end
             end
 
             it do
@@ -436,7 +457,9 @@ describe Gitlab::Auth::OAuth::User do
 
           context 'block on create (LDAP)' do
             before do
-              allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: true)
+              allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+                allow(instance).to receive_messages(block_auto_created_users: true)
+              end
             end
 
             it do
@@ -480,7 +503,9 @@ describe Gitlab::Auth::OAuth::User do
 
         context 'dont block on create (LDAP)' do
           before do
-            allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: false)
+            allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+              allow(instance).to receive_messages(block_auto_created_users: false)
+            end
           end
 
           it do
@@ -492,7 +517,9 @@ describe Gitlab::Auth::OAuth::User do
 
         context 'block on create (LDAP)' do
           before do
-            allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive_messages(block_auto_created_users: true)
+            allow_next_instance_of(Gitlab::Auth::Ldap::Config) do |instance|
+              allow(instance).to receive_messages(block_auto_created_users: true)
+            end
           end
 
           it do
@@ -779,7 +806,7 @@ describe Gitlab::Auth::OAuth::User do
       end
 
       it 'returns nil' do
-        adapter = Gitlab::Auth::LDAP::Adapter.new('ldapmain')
+        adapter = Gitlab::Auth::Ldap::Adapter.new('ldapmain')
         hash = OmniAuth::AuthHash.new(uid: 'whatever', provider: 'ldapmain')
 
         expect(oauth_user.send(:find_ldap_person, hash, adapter)).to be_nil

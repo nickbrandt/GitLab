@@ -11,13 +11,10 @@ describe 'EE Clusters', :js do
   before do
     project.add_maintainer(user)
     gitlab_sign_in(user)
+    stub_feature_flags(clusters_list_redesign: false)
   end
 
   context 'when user has a cluster' do
-    before do
-      stub_feature_flags(create_eks_clusters: false)
-    end
-
     context 'when license has multiple clusters feature' do
       before do
         allow(License).to receive(:feature_available?).and_call_original
@@ -55,7 +52,7 @@ describe 'EE Clusters', :js do
           before do
             click_link 'default-cluster'
             fill_in 'cluster_environment_scope', with: 'production/*'
-            within '.cluster_integration_form' do
+            within '.js-cluster-integration-form' do
               click_button 'Save changes'
             end
           end
@@ -115,7 +112,8 @@ describe 'EE Clusters', :js do
         context 'when user filled form with environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster on GKE'
+            click_link 'Create new cluster'
+            click_link 'Google GKE'
 
             sleep 2 # wait for ajax
             execute_script('document.querySelector(".js-gcp-project-id-dropdown input").setAttribute("type", "text")')
@@ -137,7 +135,7 @@ describe 'EE Clusters', :js do
           end
 
           it 'user sees a cluster details page' do
-            expect(page).to have_content('Enable or disable GitLab\'s connection to your Kubernetes cluster.')
+            expect(page).to have_content('GitLab Integration')
             expect(page.find_field('cluster[environment_scope]').value).to eq('staging/*')
           end
         end
@@ -146,7 +144,7 @@ describe 'EE Clusters', :js do
           before do
             click_link 'default-cluster'
             fill_in 'cluster_environment_scope', with: 'production/*'
-            within ".cluster_integration_form" do
+            within ".js-cluster-integration-form" do
               click_button 'Save changes'
             end
           end
@@ -159,7 +157,8 @@ describe 'EE Clusters', :js do
         context 'when user updates duplicated environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster on GKE'
+            click_link 'Create new cluster'
+            click_link 'Google GKE'
 
             sleep 2 # wait for ajax
             execute_script('document.querySelector(".js-gcp-project-id-dropdown input").setAttribute("type", "text")')

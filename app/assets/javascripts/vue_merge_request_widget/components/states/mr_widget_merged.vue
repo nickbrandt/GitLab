@@ -1,5 +1,6 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
+/* eslint-disable @gitlab/vue-require-i18n-strings */
+import { GlLoadingIcon } from '@gitlab/ui';
 import Flash from '~/flash';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { s__, __ } from '~/locale';
@@ -7,7 +8,6 @@ import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import MrWidgetAuthorTime from '../../components/mr_widget_author_time.vue';
 import statusIcon from '../mr_widget_status_icon.vue';
 import eventHub from '../../event_hub';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   name: 'MRWidgetMerged',
@@ -86,7 +86,7 @@ export default {
         .then(res => res.data)
         .then(data => {
           // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           if (data.message === 'Branch was deleted') {
             eventHub.$emit('MRWidgetUpdateRequested', () => {
               this.isMakingRequest = false;
@@ -155,7 +155,7 @@ export default {
           {{ cherryPickLabel }}
         </a>
       </div>
-      <section class="mr-info-list">
+      <section class="mr-info-list" data-qa-selector="merged_status_content">
         <p>
           {{ s__('mrWidget|The changes were merged into') }}
           <span class="label-branch">

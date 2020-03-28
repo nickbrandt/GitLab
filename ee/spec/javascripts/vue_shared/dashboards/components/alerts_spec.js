@@ -7,7 +7,10 @@ describe('alerts component', () => {
   const AlertsComponent = localVue.extend(Alerts);
   let wrapper;
 
-  const mount = (propsData = {}) => shallowMount(AlertsComponent, { propsData, sync: false });
+  const mount = (propsData = {}) =>
+    shallowMount(AlertsComponent, {
+      propsData,
+    });
 
   afterEach(() => {
     wrapper.destroy();

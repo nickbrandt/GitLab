@@ -1,5 +1,0 @@
----
-title: Nullify user roles that have been accidentaly set to a value of 0
-merge_request: 19569
-author:
-type: fixed

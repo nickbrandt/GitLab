@@ -7,7 +7,7 @@
       %a.gutter-toggle.float-right.js-sidebar-toggle.has-tooltip{ role: "button", href: "#", "aria-label" => "Toggle sidebar", title: sidebar_gutter_tooltip_text, data: { container: 'body', placement: 'left', boundary: 'viewport' } }
         = sidebar_gutter_toggle_icon
       .title.hide-collapsed
-        %strong.bold== #{milestone.percent_complete(current_user)}%
+        %strong.bold== #{milestone.percent_complete}%
         %span.hide-collapsed
           complete
       .value.hide-collapsed
@@ -15,7 +15,7 @@
 
     .block.milestone-progress.hide-expanded
       .sidebar-collapsed-icon.has-tooltip{ title: milestone_progress_tooltip_text(milestone), data: { container: 'body', html: 'true', placement: 'left', boundary: 'viewport' } }
-        %span== #{milestone.percent_complete(current_user)}%
+        %span== #{milestone.percent_complete}%
         = milestone_progress_bar(milestone)
 
     .block.start_date.hide-collapsed
@@ -98,45 +98,42 @@
         human_time_estimate: @milestone.human_total_issue_time_estimate,
         human_time_spent: @milestone.human_total_issue_time_spent,
         limit_to_hours: Gitlab::CurrentSettings.time_tracking_limit_to_hours.to_s } }
-        // Fallback while content is loading
-        .title.hide-collapsed
-          = _('Time tracking')
-          = icon('spinner spin')
 
     = render_if_exists 'shared/milestones/weight', milestone: milestone
 
-    .block.merge-requests
-      .sidebar-collapsed-icon.has-tooltip{ title: milestone_merge_requests_tooltip_text(milestone), data: { container: 'body', html: 'true', placement: 'left', boundary: 'viewport' } }
-        %strong
-          = custom_icon('mr_bold')
-        %span= milestone.merge_requests.count
-      .title.hide-collapsed
-        Merge requests
-        %span.badge.badge-pill= milestone.merge_requests.count
-      .value.hide-collapsed.bold
-        - if !project || can?(current_user, :read_merge_request, project)
-          %span.milestone-stat
-            = link_to milestones_browse_issuables_path(milestone, type: :merge_requests) do
+    - if milestone.merge_requests_enabled?
+      .block.merge-requests
+        .sidebar-collapsed-icon.has-tooltip{ title: milestone_merge_requests_tooltip_text(milestone), data: { container: 'body', html: 'true', placement: 'left', boundary: 'viewport' } }
+          %strong
+            = custom_icon('mr_bold')
+          %span= milestone.merge_requests.count
+        .title.hide-collapsed
+          Merge requests
+          %span.badge.badge-pill= milestone.merge_requests.count
+        .value.hide-collapsed.bold
+          - if !project || can?(current_user, :read_merge_request, project)
+            %span.milestone-stat
+              = link_to milestones_browse_issuables_path(milestone, type: :merge_requests) do
+                Open:
+                = milestone.merge_requests.opened.count
+            %span.milestone-stat
+              = link_to milestones_browse_issuables_path(milestone, type: :merge_requests, state: 'closed') do
+                Closed:
+                = milestone.merge_requests.closed.count
+            %span.milestone-stat
+              = link_to milestones_browse_issuables_path(milestone, type: :merge_requests, state: 'merged') do
+                Merged:
+                = milestone.merge_requests.merged.count
+          - else
+            %span.milestone-stat
               Open:
               = milestone.merge_requests.opened.count
-          %span.milestone-stat
-            = link_to milestones_browse_issuables_path(milestone, type: :merge_requests, state: 'closed') do
+            %span.milestone-stat
               Closed:
               = milestone.merge_requests.closed.count
-          %span.milestone-stat
-            = link_to milestones_browse_issuables_path(milestone, type: :merge_requests, state: 'merged') do
+            %span.milestone-stat
               Merged:
               = milestone.merge_requests.merged.count
-        - else
-          %span.milestone-stat
-            Open:
-            = milestone.merge_requests.opened.count
-          %span.milestone-stat
-            Closed:
-            = milestone.merge_requests.closed.count
-          %span.milestone-stat
-            Merged:
-            = milestone.merge_requests.merged.count
 
     - if project
       - recent_releases, total_count, more_count = recent_releases_with_counts(milestone)

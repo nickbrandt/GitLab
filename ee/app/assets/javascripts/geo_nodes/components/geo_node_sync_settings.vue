@@ -108,18 +108,18 @@ export default {
 </script>
 
 <template>
-  <div class="node-detail-value">
-    <span v-if="syncStatusUnavailable" class="node-detail-value-bold"> {{ __('Unknown') }} </span>
+  <div class="mt-1 node-sync-settings">
+    <strong v-if="syncStatusUnavailable"> {{ __('Unknown') }} </strong>
     <span
       v-else
       v-tooltip
       :title="syncStatusTooltip"
-      class="node-sync-settings"
+      class="d-flex align-items-center"
       data-placement="bottom"
     >
       <strong>{{ syncType }}</strong>
-      <icon name="retry" class="sync-status-icon prepend-left-5" />
-      <span v-if="!eventTimestampEmpty" class="sync-status-event-info prepend-left-5">
+      <icon name="retry" class="ml-2" />
+      <span v-if="!eventTimestampEmpty" class="ml-2">
         {{ syncStatusEventInfo }}
       </span>
     </span>

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::HookData::IssueBuilder do
-  set(:label) { create(:label) }
-  set(:issue) { create(:labeled_issue, labels: [label], project: label.project) }
+  let_it_be(:label) { create(:label) }
+  let_it_be(:issue) { create(:labeled_issue, labels: [label], project: label.project) }
   let(:builder) { described_class.new(issue) }
 
   describe '#build' do

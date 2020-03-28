@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class RemoveExpiredGroupLinksWorker
+class RemoveExpiredGroupLinksWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :authentication_and_authorization
 

@@ -26,7 +26,7 @@ describe 'projects/settings/operations/show' do
       end
 
       it 'links to project.tracing_external_url' do
-        render
+        render template: "projects/settings/operations/show", locals: { prometheus_service: project.find_or_initialize_service('prometheus') }
 
         expect(rendered).to have_link('Tracing', href: tracing_url)
       end
@@ -40,7 +40,7 @@ describe 'projects/settings/operations/show' do
         end
 
         it 'sanitizes external_url' do
-          render
+          render template: "projects/settings/operations/show", locals: { prometheus_service: project.find_or_initialize_service('prometheus') }
 
           expect(tracing_setting.external_url).to eq(malicious_tracing_url)
           expect(rendered).to have_link('Tracing', href: cleaned_url)
@@ -59,7 +59,7 @@ describe 'projects/settings/operations/show' do
       end
 
       it 'links to Tracing page' do
-        render
+        render template: "projects/settings/operations/show", locals: { prometheus_service: project.find_or_initialize_service('prometheus') }
 
         expect(rendered).to have_link('Tracing', href: project_tracing_path(project))
       end

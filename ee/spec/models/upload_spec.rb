@@ -9,8 +9,8 @@ describe Upload do
     subject { create(:upload, checksum: '8710d2c16809c79fee211a9693b64038a8aae99561bc86ce98a9b46b45677fe4') }
 
     context 'when running in a Geo primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
+      let_it_be(:primary) { create(:geo_node, :primary) }
+      let_it_be(:secondary) { create(:geo_node) }
 
       it 'logs an event to the Geo event log' do
         stub_current_geo_node(primary)

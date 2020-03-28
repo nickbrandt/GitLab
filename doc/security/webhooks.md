@@ -4,6 +4,9 @@ type: concepts, reference, howto
 
 # Webhooks and insecure internal web services
 
+NOTE: **Note:**
+On GitLab.com the [maximum number of webhooks](../user/gitlab_com/index.md#maximum-number-of-webhooks) per project is limited.
+
 If you have non-GitLab web services running on your GitLab server or within its
 local network, these may be vulnerable to exploitation via Webhooks.
 
@@ -35,13 +38,12 @@ to endpoints like `http://localhost:123/some-resource/delete`.
 To prevent this type of exploitation from happening, starting with GitLab 10.6,
 all Webhook requests to the current GitLab instance server address and/or in a
 private network will be forbidden by default. That means that all requests made
-to 127.0.0.1, ::1 and 0.0.0.0, as well as IPv4 10.0.0.0/8, 172.16.0.0/12,
-192.168.0.0/16 and IPv6 site-local (ffc0::/10) addresses won't be allowed.
+to `127.0.0.1`, `::1` and `0.0.0.0`, as well as IPv4 `10.0.0.0/8`, `172.16.0.0/12`,
+`192.168.0.0/16` and IPv6 site-local (`ffc0::/10`) addresses won't be allowed.
 
 This behavior can be overridden by enabling the option *"Allow requests to the
 local network from web hooks and services"* in the *"Outbound requests"* section
-inside the Admin area under **Settings**
-(`/admin/application_settings/network`):
+inside the **Admin Area > Settings** (`/admin/application_settings/network`):
 
 ![Outbound requests admin settings](img/outbound_requests_section_v12_2.png)
 
@@ -61,7 +63,7 @@ and expand **Outbound requests**:
 
 ![Outbound local requests whitelist](img/whitelist.png)
 
-The whilelist entries can be separated by semicolons, commas or whitespaces
+The whitelist entries can be separated by semicolons, commas or whitespaces
 (including newlines) and be in different formats like hostnames, IP addresses and/or
 IP ranges. IPv6 is supported. Hostnames that contain unicode characters should
 use IDNA encoding.
@@ -69,16 +71,24 @@ use IDNA encoding.
 The whitelist can hold a maximum of 1000 entries. Each entry can be a maximum of
 255 characters.
 
+You can whitelist a particular port by specifying it in the whitelist entry.
+For example `127.0.0.1:8080` will only allow connections to port 8080 on `127.0.0.1`.
+If no port is mentioned, all ports on that IP/domain are whitelisted. An IP range
+will whitelist all ports on all IPs in that range.
+
 Example:
 
 ```text
 example.com;gitlab.example.com
 127.0.0.1,1:0:0:0:0:0:0:1
 127.0.0.0/8 1:0:0:0:0:0:0:0/124
+[1:0:0:0:0:0:0:1]:8080
+127.0.0.1:8080
+example.com:8080
 ```
 
 NOTE: **Note:**
-Wildcards (`*.example.com`) and ports (`127.0.0.1:3000`) are not currently supported.
+Wildcards (`*.example.com`) are not currently supported.
 
 <!-- ## Troubleshooting
 

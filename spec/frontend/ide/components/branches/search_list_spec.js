@@ -1,13 +1,15 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import List from '~/ide/components/branches/search_list.vue';
 import Item from '~/ide/components/branches/item.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 import { branches } from '../../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+
+jest.mock('lodash/debounce', () => jest.fn);
 
 describe('IDE branches search list', () => {
   let wrapper;
@@ -33,7 +35,6 @@ describe('IDE branches search list', () => {
     wrapper = shallowMount(List, {
       localVue,
       store: fakeStore,
-      sync: false,
     });
   };
 

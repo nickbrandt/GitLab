@@ -47,6 +47,8 @@ export default {
     />
     <div v-for="rule in rules" :key="rule.id">
       <input v-if="!rule.isNew" :value="rule.id" :name="$options.INPUT_ID" type="hidden" />
+      <input v-else :name="$options.INPUT_ID" type="hidden" />
+
       <input
         v-if="rule.isNew && rule.hasSource"
         :value="rule.sourceId"

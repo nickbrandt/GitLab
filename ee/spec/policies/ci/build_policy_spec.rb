@@ -6,7 +6,7 @@ describe Ci::BuildPolicy do
 
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
-  let(:pipeline) { create(:ci_empty_pipeline, project: project) }
+  let(:pipeline) { create(:ci_empty_pipeline, project: project, sha: 'b83d6e391c22777fca1ed3012fce84f633d7fed0') }
 
   describe '#update_build?' do
     let(:environment) { create(:environment, project: project, name: 'production') }
@@ -35,7 +35,7 @@ describe Ci::BuildPolicy do
 
   describe 'manage a web ide terminal' do
     let(:build_permissions) { %i[read_web_ide_terminal create_build_terminal update_web_ide_terminal create_build_service_proxy] }
-    set(:maintainer) { create(:user) }
+    let_it_be(:maintainer) { create(:user) }
     let(:owner) { create(:owner) }
     let(:admin) { create(:admin) }
     let(:maintainer) { create(:user) }

@@ -6,13 +6,20 @@ describe 'Admin updates EE-only settings' do
   include StubENV
 
   before do
+    stub_feature_flags(instance_level_integrations: false)
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     sign_in(create(:admin))
     allow(License).to receive(:feature_available?).and_return(true)
+    allow(Gitlab::Elastic::Helper).to receive(:index_exists?).and_return(true)
   end
 
   context 'Geo settings' do
     context 'when the license has Geo feature' do
+      it 'hides JS alert' do
+        visit admin_geo_settings_path
+        expect(page).not_to have_content("Geo is only available for users who have at least a Premium license.")
+      end
+
       it 'allows users to change Geo settings' do
         visit admin_geo_settings_path
         page.within('section') do
@@ -28,12 +35,12 @@ describe 'Admin updates EE-only settings' do
     end
 
     context 'when the license does not have Geo feature' do
-      it 'shows empty page' do
+      it 'shows JS alert' do
         allow(License).to receive(:feature_available?).and_return(false)
 
         visit admin_geo_settings_path
 
-        expect(page).to have_content 'You need a different license to use Geo replication'
+        expect(page).to have_content("Geo is only available for users who have at least a Premium license.")
       end
     end
   end
@@ -63,6 +70,9 @@ describe 'Admin updates EE-only settings' do
         check 'Search with Elasticsearch enabled'
         fill_in 'Number of Elasticsearch shards', with: '120'
         fill_in 'Number of Elasticsearch replicas', with: '2'
+        fill_in 'Maximum field length', with: '100000'
+        fill_in 'Maximum bulk request size (MiB)', with: '17'
+        fill_in 'Bulk request concurrency', with: '23'
 
         click_button 'Save changes'
       end
@@ -72,6 +82,9 @@ describe 'Admin updates EE-only settings' do
         expect(current_settings.elasticsearch_search).to be_truthy
         expect(current_settings.elasticsearch_shards).to eq(120)
         expect(current_settings.elasticsearch_replicas).to eq(2)
+        expect(current_settings.elasticsearch_indexed_field_length_limit).to eq(100000)
+        expect(current_settings.elasticsearch_max_bulk_size_mb).to eq(17)
+        expect(current_settings.elasticsearch_max_bulk_concurrency).to eq(23)
         expect(page).to have_content 'Application settings saved successfully'
       end
     end
@@ -154,7 +167,6 @@ describe 'Admin updates EE-only settings' do
   end
 
   it 'Enable Slack application' do
-    visit integrations_admin_application_settings_path
     allow(Gitlab).to receive(:com?).and_return(true)
     visit integrations_admin_application_settings_path
 
@@ -186,7 +198,7 @@ describe 'Admin updates EE-only settings' do
 
   describe 'LDAP settings' do
     before do
-      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(ldap_setting)
+      allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(ldap_setting)
 
       visit general_admin_application_settings_path
     end
@@ -211,6 +223,21 @@ describe 'Admin updates EE-only settings' do
       it 'Does not show option to allow group owners to manage ldap' do
         expect(page).not_to have_css('#application_setting_allow_group_owners_to_manage_ldap')
       end
+    end
+  end
+
+  context 'package registry settings' do
+    before do
+      visit ci_cd_admin_application_settings_path
+    end
+
+    it 'allows you to change the npm_forwaring setting' do
+      page.within('#js-package-settings') do
+        check 'Enable forwarding of NPM package requests to npmjs.org'
+        click_button 'Save'
+      end
+
+      expect(current_settings.npm_package_requests_forwarding).to be true
     end
   end
 

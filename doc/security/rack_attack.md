@@ -53,13 +53,14 @@ default['gitlab']['gitlab-rails']['rack_attack_protected_paths'] = [
   '/users',
   '/users/confirmation',
   '/unsubscribes/',
-  '/import/github/personal_access_token'
+  '/import/github/personal_access_token',
+  '/admin/session'
 ]
 ```
 
 This header is included in responses to blocked requests:
 
-```
+```plaintext
 Retry-After: 60
 ```
 
@@ -108,7 +109,7 @@ No response headers are provided.
 
 1. Reconfigure GitLab:
 
-   ```
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 
@@ -145,7 +146,7 @@ taken in order to enable protection for your GitLab instance:
    `paths_to_be_protected`, and add any other path you need protecting
 1. Restart GitLab:
 
-   ```sh
+   ```shell
    sudo service gitlab restart
    ```
 
@@ -163,26 +164,26 @@ In case you want to remove a blocked IP, follow these steps:
 
 1. Find the IPs that have been blocked in the production log:
 
-   ```sh
+   ```shell
    grep "Rack_Attack" /var/log/gitlab/gitlab-rails/auth.log
    ```
 
 1. Since the blacklist is stored in Redis, you need to open up `redis-cli`:
 
-   ```sh
+   ```shell
    /opt/gitlab/embedded/bin/redis-cli -s /var/opt/gitlab/redis/redis.socket
    ```
 
 1. You can remove the block using the following syntax, replacing `<ip>` with
    the actual IP that is blacklisted:
 
-   ```
+   ```plaintext
    del cache:gitlab:rack::attack:allow2ban:ban:<ip>
    ```
 
 1. Confirm that the key with the IP no longer shows up:
 
-   ```
+   ```plaintext
    keys *rack::attack*
    ```
 
@@ -201,7 +202,7 @@ the load balancer. In that case, you will need to:
 1. Whitelist the load balancer's IP address(es) in the Rack Attack [settings](#settings).
 1. Reconfigure GitLab:
 
-   ```
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 

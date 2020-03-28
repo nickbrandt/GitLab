@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :request_store, :clean_gitlab_redis_cache do
+describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :request_store, :clean_gitlab_redis_cache, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
   let!(:secondary) { create(:geo_node) }
-  let(:shard_name) { Gitlab.config.repositories.storages.keys.first }
+  let(:shard_name) { Gitlab.config.repositories.storages.each_key.first }
   let(:secondary_single_worker) { Geo::RepositoryVerification::Secondary::SingleWorker }
   let!(:project) { create(:project) }
 

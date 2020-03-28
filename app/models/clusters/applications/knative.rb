@@ -3,7 +3,7 @@
 module Clusters
   module Applications
     class Knative < ApplicationRecord
-      VERSION = '0.7.0'
+      VERSION = '0.9.0'
       REPOSITORY = 'https://storage.googleapis.com/triggermesh-charts'
       METRICS_CONFIG = 'https://storage.googleapis.com/triggermesh-charts/istio-metrics.yaml'
       FETCH_IP_ADDRESS_DELAY = 30.seconds
@@ -11,17 +11,19 @@ module Clusters
 
       self.table_name = 'clusters_applications_knative'
 
+      has_one :serverless_domain_cluster, class_name: '::Serverless::DomainCluster', foreign_key: 'clusters_applications_knative_id', inverse_of: :knative
+
       include ::Clusters::Concerns::ApplicationCore
       include ::Clusters::Concerns::ApplicationStatus
       include ::Clusters::Concerns::ApplicationVersion
       include ::Clusters::Concerns::ApplicationData
       include AfterCommitQueue
 
+      alias_method :original_set_initial_status, :set_initial_status
       def set_initial_status
-        return unless not_installable?
-        return unless verify_cluster?
+        return unless cluster&.platform_kubernetes_rbac?
 
-        self.status = status_states[:installable]
+        original_set_initial_status
       end
 
       state_machine :status do
@@ -29,6 +31,12 @@ module Clusters
           application.run_after_commit do
             ClusterWaitForIngressIpAddressWorker.perform_in(
               FETCH_IP_ADDRESS_DELAY, application.name, application.id)
+          end
+        end
+
+        after_transition any => [:installed, :updated] do |application|
+          application.run_after_commit do
+            ClusterConfigureIstioWorker.perform_async(application.cluster_id)
           end
         end
       end
@@ -39,12 +47,22 @@ module Clusters
 
       scope :for_cluster, -> (cluster) { where(cluster: cluster) }
 
+      has_one :pages_domain, through: :serverless_domain_cluster
+
       def chart
         'knative/knative'
       end
 
       def values
         { "domain" => hostname }.to_yaml
+      end
+
+      def available_domains
+        PagesDomain.instance_serverless
+      end
+
+      def find_available_domain(pages_domain_id)
+        available_domains.find_by(id: pages_domain_id)
       end
 
       def allowed_to_uninstall?
@@ -72,7 +90,7 @@ module Clusters
       end
 
       def ingress_service
-        cluster.kubeclient.get_service('istio-ingressgateway', 'istio-system')
+        cluster.kubeclient.get_service('istio-ingressgateway', Clusters::Kubernetes::ISTIO_SYSTEM_NAMESPACE)
       end
 
       def uninstall_command
@@ -130,10 +148,6 @@ module Clusters
         return [] unless cluster.application_prometheus_available?
 
         [Gitlab::Kubernetes::KubectlCmd.delete("--ignore-not-found", "-f", METRICS_CONFIG)]
-      end
-
-      def verify_cluster?
-        cluster&.application_helm_available? && cluster&.platform_kubernetes_rbac?
       end
     end
   end

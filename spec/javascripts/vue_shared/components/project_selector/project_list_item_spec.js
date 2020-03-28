@@ -1,6 +1,6 @@
-import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { trimText } from 'spec/helpers/text_helper';
+import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
 
 const localVue = createLocalVue();
 
@@ -18,7 +18,6 @@ describe('ProjectListItem component', () => {
         project,
         selected: false,
       },
-      sync: false,
       localVue,
     };
   });

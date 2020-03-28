@@ -24,8 +24,8 @@ describe Groups::EpicIssuesController do
       subject
     end
 
-    it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(404)
+    it 'returns 403 status' do
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -59,7 +59,7 @@ describe Groups::EpicIssuesController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -84,7 +84,7 @@ describe Groups::EpicIssuesController do
           subject
           list_service_response = EpicIssues::ListService.new(epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq('message' => nil, 'issuables' => list_service_response.as_json)
         end
 
@@ -97,7 +97,7 @@ describe Groups::EpicIssuesController do
         it 'returns correct response for the correct issue reference' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not create a new EpicIssue record' do
@@ -132,7 +132,7 @@ describe Groups::EpicIssuesController do
       end
 
       context 'when user does not have permissions to delete the link' do
-        it 'returns status 404' do
+        it 'returns status 403' do
           subject
 
           expect(response.status).to eq(403)
@@ -167,9 +167,11 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic_issue record does not exists' do
         it 'returns status 404' do
-          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 9999 }
+          group.add_developer(user)
 
-          expect(response.status).to eq(403)
+          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 0 }
+
+          expect(response.status).to eq(404)
         end
       end
     end

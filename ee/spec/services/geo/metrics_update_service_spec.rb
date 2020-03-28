@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Geo::MetricsUpdateService, :geo, :prometheus do
   include ::EE::GeoHelpers
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:another_secondary) { create(:geo_node) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:another_secondary) { create(:geo_node) }
 
   subject { described_class.new }
 
@@ -195,7 +195,9 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       end
 
       it 'increments a counter when metrics fail to retrieve' do
-        allow_any_instance_of(Geo::NodeStatusPostService).to receive(:execute).and_return(false)
+        allow_next_instance_of(Geo::NodeStatusPostService) do |instance|
+          allow(instance).to receive(:execute).and_return(false)
+        end
 
         # Run once to get the gauge set
         subject.execute

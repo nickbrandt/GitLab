@@ -5,5 +5,6 @@ mutation destroyDesign($filenames: [String!]!, $projectPath: ID!, $iid: ID!) {
     version {
       ...VersionListItem
     }
+    errors
   }
 }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class HashedStorageMigrationWorker
+  class HashedStorageMigrationWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include GeoQueue
 

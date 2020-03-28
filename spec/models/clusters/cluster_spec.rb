@@ -16,6 +16,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to have_many(:projects) }
   it { is_expected.to have_many(:cluster_groups) }
   it { is_expected.to have_many(:groups) }
+  it { is_expected.to have_many(:groups_projects) }
   it { is_expected.to have_one(:provider_gcp) }
   it { is_expected.to have_one(:provider_aws) }
   it { is_expected.to have_one(:platform_kubernetes) }
@@ -25,6 +26,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to have_one(:application_runner) }
   it { is_expected.to have_many(:kubernetes_namespaces) }
   it { is_expected.to have_one(:cluster_project) }
+  it { is_expected.to have_many(:deployment_clusters) }
 
   it { is_expected.to delegate_method(:status).to(:provider) }
   it { is_expected.to delegate_method(:status_reason).to(:provider) }
@@ -543,7 +545,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   end
 
   describe '#applications' do
-    set(:cluster) { create(:cluster) }
+    let_it_be(:cluster, reload: true) { create(:cluster) }
 
     subject { cluster.applications }
 
@@ -571,17 +573,17 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   end
 
   describe '#allow_user_defined_namespace?' do
-    let(:cluster) { create(:cluster, :provided_by_gcp) }
-
     subject { cluster.allow_user_defined_namespace? }
 
     context 'project type cluster' do
       context 'gitlab managed' do
+        let(:cluster) { build(:cluster, :provided_by_gcp) }
+
         it { is_expected.to be_truthy }
       end
 
       context 'not managed' do
-        let(:cluster) { create(:cluster, :provided_by_gcp, managed: false) }
+        let(:cluster) { build(:cluster, :provided_by_gcp, managed: false) }
 
         it { is_expected.to be_truthy }
       end
@@ -589,13 +591,13 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
 
     context 'group type cluster' do
       context 'gitlab managed' do
-        let(:cluster) { create(:cluster, :provided_by_gcp, :group) }
+        let(:cluster) { build(:cluster, :provided_by_gcp, :group) }
 
         it { is_expected.to be_falsey }
       end
 
       context 'not managed' do
-        let(:cluster) { create(:cluster, :provided_by_gcp, :group, managed: false) }
+        let(:cluster) { build(:cluster, :provided_by_gcp, :group, managed: false) }
 
         it { is_expected.to be_truthy }
       end
@@ -603,32 +605,62 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
 
     context 'instance type cluster' do
       context 'gitlab managed' do
-        let(:cluster) { create(:cluster, :provided_by_gcp, :instance) }
+        let(:cluster) { build(:cluster, :provided_by_gcp, :instance) }
 
         it { is_expected.to be_falsey }
       end
 
       context 'not managed' do
-        let(:cluster) { create(:cluster, :provided_by_gcp, :instance, managed: false) }
+        let(:cluster) { build(:cluster, :provided_by_gcp, :instance, managed: false) }
 
         it { is_expected.to be_truthy }
       end
     end
   end
 
+  describe '#all_projects' do
+    context 'cluster_type is project_type' do
+      let(:project) { create(:project) }
+      let(:cluster) { create(:cluster, :with_installed_helm, projects: [project]) }
+
+      it 'returns projects' do
+        expect(cluster.all_projects).to match_array [project]
+      end
+    end
+
+    context 'cluster_type is group_type' do
+      let(:group) { create(:group) }
+      let!(:project) { create(:project, group: group) }
+      let(:cluster) { create(:cluster_for_group, :with_installed_helm, groups: [group]) }
+
+      it 'returns group projects' do
+        expect(cluster.all_projects.ids).to match_array [project.id]
+      end
+    end
+
+    context 'cluster_type is instance_type' do
+      let!(:project) { create(:project) }
+      let(:cluster) { create(:cluster, :instance) }
+
+      it "returns all instance's projects" do
+        expect(cluster.all_projects.ids).to match_array [project.id]
+      end
+    end
+  end
+
   describe '#kube_ingress_domain' do
-    let(:cluster) { create(:cluster, :provided_by_gcp) }
+    let(:cluster) { build(:cluster, :provided_by_gcp) }
 
     subject { cluster.kube_ingress_domain }
 
     context 'with domain set in cluster' do
-      let(:cluster) { create(:cluster, :provided_by_gcp, :with_domain) }
+      let(:cluster) { build(:cluster, :provided_by_gcp, :with_domain) }
 
       it { is_expected.to eq(cluster.domain) }
     end
 
     context 'with no domain on cluster' do
-      let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+      let(:cluster) { build(:cluster, :project, :provided_by_gcp) }
       let(:project) { cluster.project }
 
       context 'with domain set at instance level' do
@@ -642,38 +674,59 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   end
 
   describe '#kubernetes_namespace_for' do
-    let(:cluster) { create(:cluster, :group) }
-    let(:environment) { create(:environment) }
+    subject { cluster.kubernetes_namespace_for(environment, deployable: build) }
 
-    subject { cluster.kubernetes_namespace_for(environment) }
+    let(:environment_name) { 'the-environment-name' }
+    let(:environment) { create(:environment, name: environment_name, project: cluster.project, last_deployable: build) }
+    let(:build) { create(:ci_build, environment: environment_name, project: cluster.project) }
+    let(:cluster) { create(:cluster, :project, managed: managed_cluster) }
+    let(:managed_cluster) { true }
+    let(:default_namespace) { Gitlab::Kubernetes::DefaultNamespace.new(cluster, project: cluster.project).from_environment_slug(environment.slug) }
+    let(:build_options) { {} }
 
-    before do
-      expect(Clusters::KubernetesNamespaceFinder).to receive(:new)
-        .with(cluster, project: environment.project, environment_name: environment.name)
-        .and_return(double(execute: persisted_namespace))
+    it 'validates the project id' do
+      environment.project_id = build.project_id + 1
+      expect { subject }.to raise_error ArgumentError, 'environment.project_id must match deployable.project_id'
     end
 
-    context 'a persisted namespace exists' do
-      let(:persisted_namespace) { create(:cluster_kubernetes_namespace) }
-
-      it { is_expected.to eq persisted_namespace.namespace }
-    end
-
-    context 'no persisted namespace exists' do
-      let(:persisted_namespace) { nil }
-      let(:namespace_generator) { double }
-      let(:default_namespace) { 'a-default-namespace' }
-
-      before do
-        expect(Gitlab::Kubernetes::DefaultNamespace).to receive(:new)
-          .with(cluster, project: environment.project)
-          .and_return(namespace_generator)
-        expect(namespace_generator).to receive(:from_environment_slug)
-          .with(environment.slug)
-          .and_return(default_namespace)
-      end
+    context 'when environment has no last_deployable' do
+      let(:build) { nil }
 
       it { is_expected.to eq default_namespace }
+    end
+
+    context 'when cluster is managed' do
+      before do
+        build.options = { environment: { kubernetes: { namespace: 'ci yaml namespace' } } }
+      end
+
+      it 'returns the cached namespace if present, ignoring CI config' do
+        cached_namespace = create(:cluster_kubernetes_namespace, cluster: cluster, environment: environment, namespace: 'the name', service_account_token: 'some token')
+        expect(subject).to eq cached_namespace.namespace
+      end
+
+      it 'returns the default namespace when no cached namespace, ignoring CI config' do
+        expect(subject).to eq default_namespace
+      end
+    end
+
+    context 'when cluster is not managed' do
+      let(:managed_cluster) { false }
+
+      it 'returns the cached namespace if present, regardless of CI config' do
+        cached_namespace = create(:cluster_kubernetes_namespace, cluster: cluster, environment: environment, namespace: 'the name', service_account_token: 'some token')
+        build.options = { environment: { kubernetes: { namespace: 'ci yaml namespace' } } }
+        expect(subject).to eq cached_namespace.namespace
+      end
+
+      it 'returns the CI YAML namespace when configured' do
+        build.options = { environment: { kubernetes: { namespace: 'ci yaml namespace' } } }
+        expect(subject).to eq 'ci yaml namespace'
+      end
+
+      it 'returns the default namespace when no namespace is configured' do
+        expect(subject).to eq default_namespace
+      end
     end
   end
 
@@ -701,7 +754,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
 
     context 'with no domain' do
-      let(:cluster) { create(:cluster, :provided_by_gcp, :project) }
+      let(:cluster) { build(:cluster, :provided_by_gcp, :project) }
 
       it 'returns an empty array' do
         expect(subject.to_hash).to be_empty
@@ -729,7 +782,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     subject { cluster.status_name }
 
     context 'the cluster has a provider' do
-      let(:cluster) { create(:cluster, :provided_by_gcp) }
+      let(:cluster) { build(:cluster, :provided_by_gcp) }
       let(:provider_status) { :errored }
 
       before do
@@ -763,7 +816,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
 
     context 'there is a cached connection status' do
-      let(:cluster) { create(:cluster, :provided_by_user) }
+      let(:cluster) { build(:cluster, :provided_by_user) }
 
       before do
         allow(cluster).to receive(:connection_status).and_return(:connected)
@@ -773,7 +826,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
 
     context 'there is no connection status in the cache' do
-      let(:cluster) { create(:cluster, :provided_by_user) }
+      let(:cluster) { build(:cluster, :provided_by_user) }
 
       before do
         allow(cluster).to receive(:connection_status).and_return(nil)
@@ -952,11 +1005,61 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
         it { is_expected.to eq(connection_status: :unknown_failure) }
 
         it 'notifies Sentry' do
-          expect(Gitlab::Sentry).to receive(:track_acceptable_exception)
-            .with(instance_of(StandardError), hash_including(extra: { cluster_id: cluster.id }))
+          expect(Gitlab::ErrorTracking).to receive(:track_exception)
+            .with(instance_of(StandardError), hash_including(cluster_id: cluster.id))
 
           subject
         end
+      end
+    end
+  end
+
+  describe '#delete_cached_resources!' do
+    let!(:cluster) { create(:cluster, :project) }
+    let!(:staging_namespace) { create(:cluster_kubernetes_namespace, cluster: cluster, namespace: 'staging') }
+    let!(:production_namespace) { create(:cluster_kubernetes_namespace, cluster: cluster, namespace: 'production') }
+
+    subject { cluster.delete_cached_resources! }
+
+    it 'deletes associated namespace records' do
+      expect(cluster.kubernetes_namespaces).to match_array([staging_namespace, production_namespace])
+
+      subject
+
+      expect(cluster.kubernetes_namespaces).to be_empty
+    end
+  end
+
+  describe '#clusterable' do
+    subject { cluster.clusterable }
+
+    context 'project type' do
+      let(:cluster) { create(:cluster, :project) }
+
+      it { is_expected.to eq(cluster.project) }
+    end
+
+    context 'group type' do
+      let(:cluster) { create(:cluster, :group) }
+
+      it { is_expected.to eq(cluster.group) }
+    end
+
+    context 'instance type' do
+      let(:cluster) { create(:cluster, :instance) }
+
+      it { is_expected.to be_a(Clusters::Instance) }
+    end
+
+    context 'unknown type' do
+      let(:cluster) { create(:cluster, :project) }
+
+      before do
+        allow(cluster).to receive(:cluster_type).and_return('unknown_type')
+      end
+
+      it 'raises NotImplementedError' do
+        expect { subject }.to raise_error(NotImplementedError)
       end
     end
   end

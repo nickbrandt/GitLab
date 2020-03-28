@@ -6,8 +6,8 @@ type: index, reference
 
 # GitLab Pages
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/80) in GitLab Enterprise Edition 8.3.
-> - Custom CNAMEs with TLS support were [introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/173) in GitLab Enterprise Edition 8.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/80) in GitLab Enterprise Edition 8.3.
+> - Custom CNAMEs with TLS support were [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173) in GitLab Enterprise Edition 8.5.
 > - [Ported](https://gitlab.com/gitlab-org/gitlab-foss/issues/14605) to GitLab Community Edition in GitLab 8.17.
 > - Support for subgroup project's websites was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/30548) in GitLab 11.8.
 > - Bundled project templates were [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/47857) in GitLab 11.8.
@@ -30,7 +30,7 @@ instances (GitLab Core, Starter, Premium, and Ultimate).
 <div class="col-md-9">
 <p style="margin-top: 18px;">
 To publish a website with Pages, you can use any Static Site Generator (SSG),
-such as Jekyll, Hugo, Middleman, Harp, Hexo, and Brunch, just to name a few. You can also
+such as Gatsby, Jekyll, Hugo, Middleman, Harp, Hexo, and Brunch, just to name a few. You can also
 publish any website written directly in plain HTML, CSS, and JavaScript.</p>
 <p>Pages does <strong>not</strong> support dynamic server-side processing, for instance, as <code>.php</code> and <code>.asp</code> requires. See this article to learn more about
 <a href="https://about.gitlab.com/blog/2016/06/03/ssg-overview-gitlab-pages-part-1-dynamic-x-static/">static websites vs dynamic websites</a>.</p>
@@ -95,7 +95,7 @@ To learn more about configuration options for GitLab Pages, read the following:
 | --- | --- |
 | [GitLab Pages domain names, URLs, and baseurls](getting_started_part_one.md) | Understand how GitLab Pages default domains work. |
 | [GitLab CI/CD for GitLab Pages](getting_started_part_four.md) | Understand how to create your own `.gitlab-ci.yml` for your site. |
-| [Exploring GitLab Pages](introduction.md) | Requirements, technical aspects, specific GitLab CI's configuration options, Access Control, custom 404 pages, limitations, FAQ. |
+| [Exploring GitLab Pages](introduction.md) | Requirements, technical aspects, specific GitLab CI/CD's configuration options, Access Control, custom 404 pages, limitations, FAQ. |
 |---+---|
 | [Custom domains and SSL/TLS Certificates](custom_domains_ssl_tls_certification/index.md) | How to add custom domains and subdomains to your website, configure DNS records and SSL/TLS certificates. |
 | [Let's Encrypt integration](custom_domains_ssl_tls_certification/lets_encrypt_integration.md) | Secure your Pages sites with Let's Encrypt certificates automatically obtained and renewed by GitLab. |
@@ -126,5 +126,5 @@ the [admin guide](../../../administration/pages/index.md).
 
 ## More information about GitLab Pages
 
-- Announcement (2016-12-24): ["We're bringing GitLab Pages to CE"](https://about.gitlab.com/blog/2016/12/24/were-bringing-gitlab-pages-to-community-edition/)
-- Announcement (2017-03-06): ["We are changing the IP of GitLab Pages on GitLab.com"](https://about.gitlab.com/blog/2017/03/06/we-are-changing-the-ip-of-gitlab-pages-on-gitlab-com/)
+- Announcement (2016-12-24): ["We're bringing GitLab Pages to CE"](https://about.gitlab.com/releases/2016/12/24/were-bringing-gitlab-pages-to-community-edition/)
+- Announcement (2017-03-06): ["We are changing the IP of GitLab Pages on GitLab.com"](https://about.gitlab.com/releases/2017/03/06/we-are-changing-the-ip-of-gitlab-pages-on-gitlab-com/)

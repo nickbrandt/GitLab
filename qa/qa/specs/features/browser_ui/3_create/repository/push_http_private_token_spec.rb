@@ -4,8 +4,7 @@ module QA
   context 'Create' do
     describe 'Git push over HTTP', :ldap_no_tls do
       it 'user using a personal access token pushes code to the repository' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         access_token = Resource::PersonalAccessToken.fabricate!.access_token
 
@@ -25,8 +24,10 @@ module QA
 
         Page::Project::Show.perform(&:wait_for_viewers_to_load)
 
-        expect(page).to have_content('README.md')
-        expect(page).to have_content('This is a test project')
+        Page::Project::Show.perform do |project|
+          expect(project).to have_file('README.md')
+          expect(project).to have_readme_content('This is a test project')
+        end
       end
     end
   end

@@ -89,6 +89,33 @@ describe MergeRequests::ApprovalService do
           service.execute(merge_request)
         end
       end
+
+      context 'approvals metrics calculation' do
+        context 'when code_review_analytics project feature is available' do
+          before do
+            stub_licensed_features(code_review_analytics: true)
+          end
+
+          it 'schedules RefreshApprovalsData' do
+            expect(Analytics::CodeReviewMetricsWorker)
+              .to receive(:perform_async).with('Analytics::RefreshApprovalsData', merge_request.id, {})
+
+            service.execute(merge_request)
+          end
+        end
+
+        context 'when code_review_analytics is not available' do
+          before do
+            stub_licensed_features(code_review_analytics: false)
+          end
+
+          it 'does not schedule for RefreshApprovalsData' do
+            expect(Analytics::CodeReviewMetricsWorker).not_to receive(:perform_async)
+
+            service.execute(merge_request)
+          end
+        end
+      end
     end
 
     context 'when project requires force auth for approval' do
@@ -106,6 +133,7 @@ describe MergeRequests::ApprovalService do
         let(:params) do
           { approval_password: 'incorrect' }
         end
+
         it 'raises an error' do
           service_with_params = described_class.new(project, user, params)
           expect { service_with_params.execute(merge_request) }.to raise_error(::MergeRequests::ApprovalService::IncorrectApprovalPasswordError)
@@ -116,6 +144,7 @@ describe MergeRequests::ApprovalService do
         let(:params) do
           { approval_password: 'password' }
         end
+
         it 'does not raise an error' do
           service_with_params = described_class.new(project, user, params)
           expect { service_with_params.execute(merge_request) }.not_to raise_error(::MergeRequests::ApprovalService::IncorrectApprovalPasswordError)

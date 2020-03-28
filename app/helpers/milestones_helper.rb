@@ -26,7 +26,7 @@ module MilestonesHelper
     end
   end
 
-  def milestones_label_path(opts = {})
+  def milestones_issues_path(opts = {})
     if @project
       project_issues_path(@project, opts)
     elsif @group
@@ -92,12 +92,12 @@ module MilestonesHelper
   end
 
   def milestone_progress_tooltip_text(milestone)
-    has_issues = milestone.total_issues_count(current_user) > 0
+    has_issues = milestone.total_issues_count > 0
 
     if has_issues
       [
         _('Progress'),
-        _("%{percent}%% complete") % { percent: milestone.percent_complete(current_user) }
+        _("%{percent}%% complete") % { percent: milestone.percent_complete }
       ].join('<br />')
     else
       _('Progress')
@@ -107,7 +107,7 @@ module MilestonesHelper
   def milestone_progress_bar(milestone)
     options = {
       class: 'progress-bar bg-success',
-      style: "width: #{milestone.percent_complete(current_user)}%;"
+      style: "width: #{milestone.percent_complete}%;"
     }
 
     content_tag :div, class: 'progress' do
@@ -151,18 +151,20 @@ module MilestonesHelper
   end
 
   def milestone_issues_tooltip_text(milestone)
-    issues = milestone.count_issues_by_state(current_user)
+    total = milestone.total_issues_count
+    opened = milestone.opened_issues_count
+    closed = milestone.closed_issues_count
 
-    return _("Issues") if issues.empty?
+    return _("Issues") if total.zero?
 
     content = []
 
-    if issues["opened"]
-      content << n_("1 open issue", "%{issues} open issues", issues["opened"]) % { issues: issues["opened"] }
+    if opened > 0
+      content << n_("1 open issue", "%{issues} open issues", opened) % { issues: opened }
     end
 
-    if issues["closed"]
-      content << n_("1 closed issue", "%{issues} closed issues", issues["closed"]) % { issues: issues["closed"] }
+    if closed > 0
+      content << n_("1 closed issue", "%{issues} closed issues", closed) % { issues: closed }
     end
 
     content.join('<br />').html_safe
@@ -280,6 +282,27 @@ module MilestonesHelper
     strong_memoize(:can_admin_group_milestones) do
       can?(current_user, :admin_milestone, @project.group)
     end
+  end
+
+  def display_issues_count_warning?(milestone)
+    milestone_visible_issues_count(milestone) > Milestone::DISPLAY_ISSUES_LIMIT
+  end
+
+  def milestone_issues_count_message(milestone)
+    total_count = milestone_visible_issues_count(milestone)
+    limit = Milestone::DISPLAY_ISSUES_LIMIT
+    link_options = { milestone_title: @milestone.title }
+
+    message = _('Showing %{limit} of %{total_count} issues. ') % { limit: limit, total_count: total_count }
+    message += link_to(_('View all issues'), milestones_issues_path(link_options))
+
+    message.html_safe
+  end
+
+  private
+
+  def milestone_visible_issues_count(milestone)
+    @milestone_visible_issues_count ||= milestone.issues_visible_to_user(current_user).size
   end
 end
 

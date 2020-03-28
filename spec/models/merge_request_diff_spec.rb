@@ -54,20 +54,20 @@ describe MergeRequestDiff do
   end
 
   describe '.ids_for_external_storage_migration' do
-    set(:merge_request) { create(:merge_request) }
-    set(:outdated) { merge_request.merge_request_diff }
-    set(:latest) { merge_request.create_merge_request_diff }
+    let_it_be(:merge_request) { create(:merge_request) }
+    let_it_be(:outdated) { merge_request.merge_request_diff }
+    let_it_be(:latest) { merge_request.create_merge_request_diff }
 
-    set(:closed_mr) { create(:merge_request, :closed_last_month) }
+    let_it_be(:closed_mr) { create(:merge_request, :closed_last_month) }
     let(:closed) { closed_mr.merge_request_diff }
 
-    set(:merged_mr) { create(:merge_request, :merged_last_month) }
+    let_it_be(:merged_mr) { create(:merge_request, :merged_last_month) }
     let(:merged) { merged_mr.merge_request_diff }
 
-    set(:recently_closed_mr) { create(:merge_request, :closed) }
+    let_it_be(:recently_closed_mr) { create(:merge_request, :closed) }
     let(:closed_recently) { recently_closed_mr.merge_request_diff }
 
-    set(:recently_merged_mr) { create(:merge_request, :merged) }
+    let_it_be(:recently_merged_mr) { create(:merge_request, :merged) }
     let(:merged_recently) { recently_merged_mr.merge_request_diff }
 
     before do
@@ -156,6 +156,41 @@ describe MergeRequestDiff do
     end
   end
 
+  describe '#migrate_files_to_database!' do
+    let(:diff) { create(:merge_request).merge_request_diff }
+
+    it 'converts from external to in-database storage' do
+      stub_external_diffs_setting(enabled: true)
+
+      expect(diff).to be_stored_externally
+      expect(diff).to receive(:update!).and_call_original
+
+      file = diff.external_diff
+      file_data = file.read
+      diff.migrate_files_to_database!
+
+      expect(diff).not_to be_stored_externally
+      expect(file).not_to exist
+      expect(diff.merge_request_diff_files.map(&:diff).join('')).to eq(file_data)
+    end
+
+    it 'does nothing with an in-database diff' do
+      expect(diff).not_to be_stored_externally
+      expect(diff).not_to receive(:update!)
+
+      diff.migrate_files_to_database!
+    end
+
+    it 'does nothing with an empty diff' do
+      stub_external_diffs_setting(enabled: true)
+      MergeRequestDiffFile.where(merge_request_diff_id: diff.id).delete_all
+
+      expect(diff).not_to receive(:update!)
+
+      diff.migrate_files_to_database!
+    end
+  end
+
   describe '#latest?' do
     let!(:mr) { create(:merge_request, :with_diffs) }
     let!(:first_diff) { mr.merge_request_diff }
@@ -208,6 +243,65 @@ describe MergeRequestDiff do
         diff.update!(start_commit_sha: nil, base_commit_sha: nil)
 
         diff.diffs.diff_files
+      end
+    end
+
+    describe '#diffs_in_batch' do
+      let(:diff_options) { {} }
+
+      shared_examples_for 'fetching full diffs' do
+        it 'returns diffs from repository comparison' do
+          expect_next_instance_of(Compare) do |comparison|
+            expect(comparison).to receive(:diffs_in_batch)
+              .with(1, 10, diff_options: diff_options)
+              .and_call_original
+          end
+
+          diff_with_commits.diffs_in_batch(1, 10, diff_options: diff_options)
+        end
+
+        it 'returns a Gitlab::Diff::FileCollection::Compare with full diffs' do
+          diffs = diff_with_commits.diffs_in_batch(1, 10, diff_options: diff_options)
+
+          expect(diffs).to be_a(Gitlab::Diff::FileCollection::Compare)
+          expect(diffs.diff_files.size).to be > 10
+        end
+
+        it 'returns empty pagination data' do
+          diffs = diff_with_commits.diffs_in_batch(1, 10, diff_options: diff_options)
+
+          expect(diffs.pagination_data).to eq(current_page: nil,
+                                              next_page: nil,
+                                              total_pages: nil)
+        end
+      end
+
+      context 'when no persisted files available' do
+        before do
+          diff_with_commits.clean!
+        end
+
+        it_behaves_like 'fetching full diffs'
+      end
+
+      context 'when diff_options include ignore_whitespace_change' do
+        it_behaves_like 'fetching full diffs' do
+          let(:diff_options) do
+            { ignore_whitespace_change: true }
+          end
+        end
+      end
+
+      context 'when persisted files available' do
+        it 'returns paginated diffs' do
+          diffs = diff_with_commits.diffs_in_batch(1, 10, diff_options: {})
+
+          expect(diffs).to be_a(Gitlab::Diff::FileCollection::MergeRequestDiffBatch)
+          expect(diffs.diff_files.size).to eq(10)
+          expect(diffs.pagination_data).to eq(current_page: 1,
+                                              next_page: 2,
+                                              total_pages: 2)
+        end
       end
     end
 
@@ -426,24 +520,38 @@ describe MergeRequestDiff do
     end
   end
 
-  describe '#commits_by_shas' do
-    let(:commit_shas) { diff_with_commits.commit_shas }
-
-    it 'returns empty if no SHAs were provided' do
-      expect(diff_with_commits.commits_by_shas([])).to be_empty
+  describe '#includes_any_commits?' do
+    let(:non_existent_shas) do
+      Array.new(30) { Digest::SHA1.hexdigest(SecureRandom.hex) }
     end
 
-    it 'returns one SHA' do
-      commits = diff_with_commits.commits_by_shas([commit_shas.first, Gitlab::Git::BLANK_SHA])
+    subject { diff_with_commits }
 
-      expect(commits.count).to eq(1)
+    context 'processes the passed shas in batches' do
+      context 'number of existing commits is greater than batch size' do
+        it 'performs a separate request for each batch' do
+          stub_const('MergeRequestDiff::BATCH_SIZE', 5)
+
+          commit_shas = subject.commit_shas
+
+          query_count = ActiveRecord::QueryRecorder.new do
+            subject.includes_any_commits?(non_existent_shas + commit_shas)
+          end.count
+
+          expect(query_count).to eq(7)
+        end
+      end
     end
 
-    it 'returns all matching SHAs' do
-      commits = diff_with_commits.commits_by_shas(commit_shas)
+    it 'returns false if passed commits do not exist' do
+      expect(subject.includes_any_commits?([])).to eq(false)
+      expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to eq(false)
+    end
 
-      expect(commits.count).to eq(commit_shas.count)
-      expect(commits.map(&:sha)).to match_array(commit_shas)
+    it 'returns true if passed commits exists' do
+      args_with_existing_commits = non_existent_shas << subject.head_commit_sha
+
+      expect(subject.includes_any_commits?(args_with_existing_commits)).to eq(true)
     end
   end
 

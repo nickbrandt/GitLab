@@ -1,15 +1,17 @@
 <script>
-import { mapActions } from 'vuex';
-import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { mapActions, mapState } from 'vuex';
+import { GlButton, GlSkeletonLoading, GlFormCheckbox } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
+import { DASHBOARD_TYPES } from '../store/constants';
 
 export default {
   name: 'SecurityDashboardTableRow',
   components: {
     GlButton,
+    GlFormCheckbox,
     GlSkeletonLoading,
     Icon,
     SeverityBadge,
@@ -29,15 +31,17 @@ export default {
     },
   },
   computed: {
-    confidence() {
-      return this.vulnerability.confidence || '–';
-    },
+    ...mapState(['dashboardType']),
+    ...mapState('vulnerabilities', ['selectedVulnerabilities']),
     severity() {
       return this.vulnerability.severity || ' ';
     },
-    projectFullName() {
-      const { project } = this.vulnerability;
-      return project && project.full_name;
+    vulnerabilityNamepace() {
+      const { project, location } = this.vulnerability;
+      if (this.dashboardType === DASHBOARD_TYPES.GROUP) {
+        return project && project.full_name;
+      }
+      return location && (location.image || location.file || location.path);
     },
     isDismissed() {
       return Boolean(this.vulnerability.dismissal_feedback);
@@ -55,28 +59,46 @@ export default {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
       return Boolean(path) && !this.hasIssue;
     },
+    isSelected() {
+      return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
+    },
   },
   methods: {
-    ...mapActions('vulnerabilities', ['openModal']),
+    ...mapActions('vulnerabilities', ['openModal', 'selectVulnerability', 'deselectVulnerability']),
+    toggleVulnerability() {
+      if (this.isSelected) {
+        return this.deselectVulnerability(this.vulnerability);
+      }
+      return this.selectVulnerability(this.vulnerability);
+    },
   },
 };
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row p-2" :class="{ dismissed: isDismissed }">
+  <div
+    class="gl-responsive-table-row vulnerabilities-row p-2"
+    :class="{ dismissed: isDismissed, 'gl-bg-blue-50': isSelected }"
+  >
+    <div class="table-section">
+      <gl-form-checkbox
+        :checked="isSelected"
+        class="my-0 ml-1 mr-3"
+        @change="toggleVulnerability"
+      />
+    </div>
+
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
-    <div class="table-section section-10 ml-md-2">
-      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
-      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
-    </div>
-
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
-      <div class="table-mobile-content vulnerability-info">
+      <div
+        class="table-mobile-content vulnerability-info"
+        data-qa-selector="vulnerability_info_content"
+      >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-button
@@ -102,8 +124,8 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <span v-if="projectFullName" class="vulnerability-namespace">
-            {{ projectFullName }}
+          <span v-if="vulnerabilityNamepace" class="vulnerability-namespace">
+            {{ vulnerabilityNamepace }}
           </span>
         </template>
       </div>

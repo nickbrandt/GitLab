@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
+  using RSpec::Parameterized::TableSyntax
+
   around do |example|
     Timecop.freeze(Time.utc(2019, 3, 5)) { example.run }
   end
@@ -14,9 +16,32 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     }
   end
 
+  describe '#issuable_type' do
+    subject { described_class.new(build(:project), nil, query: { issuable_type: issuable_type_in_query }).issuable_type }
+
+    where(:issuable_type_in_query, :expected_issuable_type) do
+      'issue' | :issue
+      'issues' | :issue
+      'merge_request' | :merge_request
+      'merge_requests' | :merge_request
+    end
+
+    with_them do
+      it { is_expected.to eq(expected_issuable_type) }
+    end
+  end
+
   describe '#find' do
     def find(entity, query:, projects: {})
       described_class.new(entity, nil, query: query, projects: projects).find
+    end
+
+    it 'calls issuable_type' do
+      finder = described_class.new(build(:project), nil, query: { issuable_type: 'issue' })
+
+      expect(finder).to receive(:issuable_type).and_call_original
+
+      finder.find
     end
 
     it 'raises an error for an invalid :issuable_type option' do
@@ -54,11 +79,11 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       let(:label_create) { create(label_type, label_entity_association_key => entity, name: 'Create') }
       let(:label_quality) { create(label_type, label_entity_association_key => entity, name: 'Quality') }
       let(:extra_issuable_attrs) { [{}, {}, {}, {}, {}, {}] }
-      let!(:issuable0) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2018, 1, 1), project_association_key => project, **extra_issuable_attrs[0]) }
-      let!(:issuable1) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2018, 2, 1), labels: [label_bug, label_manage], project_association_key => project, **extra_issuable_attrs[1]) }
-      let!(:issuable2) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 2, 6), labels: [label_bug, label_plan], project_association_key => project, **extra_issuable_attrs[2]) }
-      let!(:issuable3) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 2, 20), labels: [label_bug, label_create], project_association_key => project, **extra_issuable_attrs[3]) }
-      let!(:issuable4) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug, label_quality], project_association_key => project, **extra_issuable_attrs[4]) }
+      let!(:issuable0) { create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2018, 1, 1), project_association_key => project, **extra_issuable_attrs[0]) }
+      let!(:issuable1) { create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2018, 2, 1), labels: [label_bug, label_manage], project_association_key => project, **extra_issuable_attrs[1]) }
+      let!(:issuable2) { create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2019, 2, 6), labels: [label_bug, label_plan], project_association_key => project, **extra_issuable_attrs[2]) }
+      let!(:issuable3) { create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2019, 2, 20), labels: [label_bug, label_create], project_association_key => project, **extra_issuable_attrs[3]) }
+      let!(:issuable4) { create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug, label_quality], project_association_key => project, **extra_issuable_attrs[4]) }
       let(:query) do
         base_query.merge(
           issuable_type: issuable_type,
@@ -71,7 +96,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
       it 'avoids N + 1 queries' do
         control_queries = ActiveRecord::QueryRecorder.new { subject.map { |issuable| issuable.labels.map(&:title) } }
-        create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug], project_association_key => project, **extra_issuable_attrs[5])
+        create(:"labeled_#{issuable_type.singularize}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug], project_association_key => project, **extra_issuable_attrs[5])
 
         expect do
           find(entity, query: query).map { |issuable| issuable.labels.map(&:title) }

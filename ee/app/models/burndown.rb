@@ -4,7 +4,6 @@ class Burndown
   include Gitlab::Utils::StrongMemoize
 
   attr_reader :issues, :start_date, :end_date, :due_date, :accurate
-  alias_method :accurate?, :accurate
 
   def initialize(issues, start_date, due_date)
     @start_date = start_date
@@ -16,7 +15,6 @@ class Burndown
                 end
 
     @issues = filter_issues_created_before(@end_date, issues)
-    @accurate = true
   end
 
   # Returns an array of milestone issue event data in the following format:
@@ -28,7 +26,7 @@ class Burndown
   end
 
   def empty?
-    burndown_events.any? && legacy_data?
+    issues.any? && legacy_data?
   end
 
   def valid?
@@ -38,12 +36,26 @@ class Burndown
   # If all closed issues have no closed events, mark burndown chart as containing legacy data
   def legacy_data?
     strong_memoize(:legacy_data) do
-      closed_events = issues.select(&:closed?)
-      closed_events.any? && !Event.closed.where(target: closed_events, action: Event::CLOSED).exists?
+      closed_events = closed_issues
+      closed_events.any? && closed_issues_events_count == 0
     end
   end
 
+  def accurate?
+    closed_issues.count == closed_issues_events_count
+  end
+
   private
+
+  def closed_issues
+    issues.select(&:closed?)
+  end
+
+  def closed_issues_events_count
+    strong_memoize(:closed_issues_events_count) do
+      Event.closed.where(target: closed_issues).count
+    end
+  end
 
   def burndown_events
     issues
@@ -101,9 +113,6 @@ class Burndown
     return [] unless issue.closed?
     return [] if milestone_events_per_issue[issue.id]&.any?(&:closed_action?)
 
-    # Mark burndown chart as inaccurate
-    @accurate = false
-
     build_burndown_event(start_date.beginning_of_day, issue.weight, 'closed')
   end
 
@@ -114,6 +123,6 @@ class Burndown
   def filter_issues_created_before(date, issues)
     return [] unless valid?
 
-    issues.where('issues.created_at <= ?', date.end_of_day)
+    issues.where('issues.created_at <= ?', date.end_of_day).includes(:project)
   end
 end

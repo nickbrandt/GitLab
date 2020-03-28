@@ -37,7 +37,7 @@ describe GroupsController, type: :request do
                 expect { subject }
                   .to(change { group.reload.ip_restrictions.map(&:range) }
                     .from([]).to(range.split(',')))
-                expect(response).to have_gitlab_http_status(302)
+                expect(response).to have_gitlab_http_status(:found)
               end
             end
 
@@ -60,7 +60,7 @@ describe GroupsController, type: :request do
             it 'adds error message' do
               expect { subject }
                 .not_to(change { group.reload.ip_restrictions.count }.from(0))
-              expect(response).to have_gitlab_http_status(200)
+              expect(response).to have_gitlab_http_status(:ok)
               expect(response.body).to include('Ip restrictions range is an invalid IP address range')
             end
           end
@@ -77,7 +77,7 @@ describe GroupsController, type: :request do
                   expect { subject }
                     .to(change { group.reload.ip_restrictions.map(&:range) }
                       .from(['10.0.0.0/8']).to(range.split(',')))
-                  expect(response).to have_gitlab_http_status(302)
+                  expect(response).to have_gitlab_http_status(:found)
                 end
               end
 
@@ -113,7 +113,7 @@ describe GroupsController, type: :request do
                 it 'adds error message' do
                   subject
 
-                  expect(response).to have_gitlab_http_status(200)
+                  expect(response).to have_gitlab_http_status(:ok)
                   expect(response.body).to include('Ip restrictions range is an invalid IP address range')
                 end
               end
@@ -140,7 +140,7 @@ describe GroupsController, type: :request do
             it 'deletes ip restriction' do
               expect { subject }
                 .to(change { group.reload.ip_restrictions.count }.to(0))
-              expect(response).to have_gitlab_http_status(302)
+              expect(response).to have_gitlab_http_status(:found)
             end
           end
         end
@@ -152,7 +152,7 @@ describe GroupsController, type: :request do
         it 'does not create ip restriction' do
           expect { subject }
             .not_to change { group.reload.ip_restrictions.count }.from(0)
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.body).to include('Ip restrictions base IP subnet restriction only allowed for top-level groups')
         end
       end
@@ -166,7 +166,7 @@ describe GroupsController, type: :request do
         it 'updates group setting' do
           expect { subject }
             .to change { group.reload.two_factor_grace_period }.from(48).to(42)
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
 
         it 'does not create ip restriction' do
@@ -182,7 +182,7 @@ describe GroupsController, type: :request do
         it 'does not create ip restriction' do
           expect { subject }
             .not_to change { group.reload.ip_restrictions.count }.from(0)
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
     end

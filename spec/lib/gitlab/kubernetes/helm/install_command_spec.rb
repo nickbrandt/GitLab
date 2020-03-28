@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Kubernetes::Helm::InstallCommand do
@@ -21,22 +23,14 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     )
   end
 
-  let(:tls_flags) do
-    <<~EOS.squish
-    --tls
-    --tls-ca-cert /data/helm/app-name/config/ca.pem
-    --tls-cert /data/helm/app-name/config/cert.pem
-    --tls-key /data/helm/app-name/config/key.pem
-    EOS
-  end
-
   subject { install_command }
 
   it_behaves_like 'helm commands' do
     let(:commands) do
       <<~EOS
-      helm init --upgrade
-      for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+      export HELM_HOST="localhost:44134"
+      tiller -listen ${HELM_HOST} -alsologtostderr &
+      helm init --client-only
       helm repo add app-name https://repository.example.com
       helm repo update
       #{helm_install_comand}
@@ -47,13 +41,56 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
       <<~EOS.squish
       helm upgrade app-name chart-name
         --install
+        --atomic
+        --cleanup-on-fail
+        --reset-values
+        --version 1.2.3
+        --set rbac.create\\=false,rbac.enabled\\=false
+        --namespace gitlab-managed-apps
+        -f /data/helm/app-name/config/values.yaml
+      EOS
+    end
+  end
+
+  context 'tillerless feature disabled' do
+    before do
+      stub_feature_flags(managed_apps_local_tiller: false)
+    end
+
+    let(:tls_flags) do
+      <<~EOS.squish
+      --tls
+      --tls-ca-cert /data/helm/app-name/config/ca.pem
+      --tls-cert /data/helm/app-name/config/cert.pem
+      --tls-key /data/helm/app-name/config/key.pem
+      EOS
+    end
+
+    it_behaves_like 'helm commands' do
+      let(:commands) do
+        <<~EOS
+        helm init --upgrade
+        for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        helm repo add app-name https://repository.example.com
+        helm repo update
+        #{helm_install_comand}
+        EOS
+      end
+
+      let(:helm_install_comand) do
+        <<~EOS.squish
+        helm upgrade app-name chart-name
+        --install
+        --atomic
+        --cleanup-on-fail
         --reset-values
         #{tls_flags}
         --version 1.2.3
         --set rbac.create\\=false,rbac.enabled\\=false
         --namespace gitlab-managed-apps
         -f /data/helm/app-name/config/values.yaml
-      EOS
+        EOS
+      end
     end
   end
 
@@ -63,8 +100,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     it_behaves_like 'helm commands' do
       let(:commands) do
         <<~EOS
-        helm init --upgrade
-        for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        export HELM_HOST="localhost:44134"
+        tiller -listen ${HELM_HOST} -alsologtostderr &
+        helm init --client-only
         helm repo add app-name https://repository.example.com
         helm repo update
         #{helm_install_command}
@@ -75,8 +113,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
         <<~EOS.squish
         helm upgrade app-name chart-name
           --install
+          --atomic
+          --cleanup-on-fail
           --reset-values
-          #{tls_flags}
           --version 1.2.3
           --set rbac.create\\=true,rbac.enabled\\=true
           --namespace gitlab-managed-apps
@@ -92,8 +131,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     it_behaves_like 'helm commands' do
       let(:commands) do
         <<~EOS
-        helm init --upgrade
-        for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        export HELM_HOST="localhost:44134"
+        tiller -listen ${HELM_HOST} -alsologtostderr &
+        helm init --client-only
         helm repo add app-name https://repository.example.com
         helm repo update
         /bin/date
@@ -106,8 +146,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
         <<~EOS.squish
         helm upgrade app-name chart-name
           --install
+          --atomic
+          --cleanup-on-fail
           --reset-values
-          #{tls_flags}
           --version 1.2.3
           --set rbac.create\\=false,rbac.enabled\\=false
           --namespace gitlab-managed-apps
@@ -123,8 +164,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     it_behaves_like 'helm commands' do
       let(:commands) do
         <<~EOS
-        helm init --upgrade
-        for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        export HELM_HOST="localhost:44134"
+        tiller -listen ${HELM_HOST} -alsologtostderr &
+        helm init --client-only
         helm repo add app-name https://repository.example.com
         helm repo update
         #{helm_install_command}
@@ -137,8 +179,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
         <<~EOS.squish
         helm upgrade app-name chart-name
           --install
+          --atomic
+          --cleanup-on-fail
           --reset-values
-          #{tls_flags}
           --version 1.2.3
           --set rbac.create\\=false,rbac.enabled\\=false
           --namespace gitlab-managed-apps
@@ -154,8 +197,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     it_behaves_like 'helm commands' do
       let(:commands) do
         <<~EOS
-        helm init --upgrade
-        for i in $(seq 1 30); do helm version && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        export HELM_HOST="localhost:44134"
+        tiller -listen ${HELM_HOST} -alsologtostderr &
+        helm init --client-only
         helm repo add app-name https://repository.example.com
         helm repo update
         #{helm_install_command}
@@ -166,6 +210,8 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
         <<~EOS.squish
         helm upgrade app-name chart-name
            --install
+           --atomic
+           --cleanup-on-fail
            --reset-values
            --version 1.2.3
            --set rbac.create\\=false,rbac.enabled\\=false
@@ -182,8 +228,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     it_behaves_like 'helm commands' do
       let(:commands) do
         <<~EOS
-        helm init --upgrade
-        for i in $(seq 1 30); do helm version #{tls_flags} && s=0 && break || s=$?; sleep 1s; echo \"Retrying ($i)...\"; done; (exit $s)
+        export HELM_HOST="localhost:44134"
+        tiller -listen ${HELM_HOST} -alsologtostderr &
+        helm init --client-only
         helm repo add app-name https://repository.example.com
         helm repo update
         #{helm_install_command}
@@ -194,8 +241,9 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
         <<~EOS.squish
         helm upgrade app-name chart-name
           --install
+          --atomic
+          --cleanup-on-fail
           --reset-values
-          #{tls_flags}
           --set rbac.create\\=false,rbac.enabled\\=false
           --namespace gitlab-managed-apps
           -f /data/helm/app-name/config/values.yaml

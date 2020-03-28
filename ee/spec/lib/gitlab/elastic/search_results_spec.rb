@@ -67,6 +67,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
   end
 
   describe 'parse_search_result' do
+    let(:project) { double(:project) }
     let(:blob) do
       {
         'blob' => {
@@ -78,11 +79,12 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     end
 
     it 'returns an unhighlighted blob when no highlight data is present' do
-      parsed = described_class.parse_search_result('_source' => blob)
+      parsed = described_class.parse_search_result({ '_source' => blob }, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         startline: 1,
+        project: project,
         data: "foo\n"
       )
     end
@@ -95,7 +97,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         }
       }
 
-      parsed = described_class.parse_search_result(result)
+      parsed = described_class.parse_search_result(result, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
@@ -104,6 +106,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         basename: 'path/file',
         ref: 'sha',
         startline: 2,
+        project: project,
         data: "bar\n"
       )
     end
@@ -131,7 +134,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         iid: 2
       )
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it_behaves_like 'a paginated object', 'issues'
@@ -194,7 +197,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         note: 'bar baz'
       )
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it_behaves_like 'a paginated object', 'notes'
@@ -214,45 +217,6 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
       expect(results.objects('notes')).to be_empty
       expect(results.notes_count).to eq 0
-    end
-
-    it 'redacts issue comments on public projects where issue has lower access_level' do
-      project_1.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
-
-      results = described_class.new(user, 'foo', limit_project_ids)
-
-      expect(results.send(:logger))
-        .to receive(:error)
-        .with(hash_including(message: "redacted_search_results", filtered: array_including([
-          { class_name: "Note", id: @note_1.id, ability: :read_note },
-          { class_name: "Note", id: @note_2.id, ability: :read_note }
-      ])))
-
-      expect(results.notes_count).to eq(2) # 2 because redacting only happens when we instantiate the results
-      expect(results.objects('notes')).to be_empty
-    end
-
-    it 'redacts commit comments when user is a guest on a private project' do
-      project_1.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-      project_1.add_guest(user)
-      note_on_commit = create(
-        :note_on_commit,
-        project: project_1,
-        note: 'foo note on commit'
-      )
-
-      Gitlab::Elastic::Helper.refresh_index
-
-      results = described_class.new(user, 'foo', limit_project_ids)
-
-      expect(results.send(:logger))
-        .to receive(:error)
-        .with(hash_including(message: "redacted_search_results", filtered: array_including([
-          { class_name: "Note", id: note_on_commit.id, ability: :read_note }
-      ])))
-
-      expect(results.notes_count).to eq(3) # 3 because redacting only happens when we instantiate the results
-      expect(results.objects('notes')).to match_array([@note_1, @note_2])
     end
   end
 
@@ -274,7 +238,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       @security_issue_4 = create(:issue, :confidential, project: project_3, title: 'Security issue 4', assignees: [assignee], iid: 1)
       @security_issue_5 = create(:issue, :confidential, project: project_4, title: 'Security issue 5', iid: 1)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     context 'search by term' do
@@ -474,7 +438,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         iid: 2
       )
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it_behaves_like 'a paginated object', 'merge_requests'
@@ -539,7 +503,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       # The Milestone you have no access to
       create :milestone, title: 'bla-bla term'
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       result = described_class.new(user, 'term', [project.id])
 
@@ -554,15 +518,11 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     before do
       project_1.repository.index_commits_and_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     def search_for(term)
-      blobs = described_class.new(user, term, [project_1.id]).objects('blobs')
-
-      blobs.map do |blob|
-        blob['_source']['blob']['path']
-      end
+      described_class.new(user, term, [project_1.id]).objects('blobs').map(&:path)
     end
 
     it_behaves_like 'a paginated object', 'blobs'
@@ -571,7 +531,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       results = described_class.new(user, 'def', limit_project_ids)
       blobs = results.objects('blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include('def')
+      expect(blobs.first.data).to include('def')
       expect(results.blobs_count).to eq 7
     end
 
@@ -579,11 +539,11 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       project_2 = create :project, :repository, :private
       project_2.repository.index_commits_and_blobs
       project_2.add_reporter(user)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       results = described_class.new(user, 'def', [project_1.id])
       expect(results.blobs_count).to eq 7
-      result_project_ids = results.objects('blobs').map { |r| r.dig('_source', 'project_id') }
+      result_project_ids = results.objects('blobs').map(&:project_id)
       expect(result_project_ids.uniq).to eq([project_1.id])
 
       results = described_class.new(user, 'def', [project_1.id, project_2.id])
@@ -608,7 +568,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
         project_1.repository.index_commits_and_blobs
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       it 'find by first word' do
@@ -654,7 +614,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       before do
         project_1.repository.create_file(user, file_name, file_content, message: 'Some commit message', branch_name: 'master')
         project_1.repository.index_commits_and_blobs
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       it 'finds files with dashes' do
@@ -678,6 +638,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
   describe 'Wikis' do
     let(:results) { described_class.new(user, 'term', limit_project_ids) }
+
     subject(:wiki_blobs) { results.objects('wiki_blobs') }
 
     before do
@@ -686,7 +647,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         project_1.wiki.index_wiki_blobs
       end
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it_behaves_like 'a paginated object', 'wiki_blobs'
@@ -694,7 +655,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     it 'finds wiki blobs' do
       blobs = results.objects('wiki_blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include("term")
+      expect(blobs.first.data).to include('term')
       expect(results.wiki_blobs_count).to eq 1
     end
 
@@ -702,7 +663,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       project_1.add_guest(user)
       blobs = results.objects('wiki_blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include("term")
+      expect(blobs.first.data).to include('term')
       expect(results.wiki_blobs_count).to eq 1
     end
 
@@ -711,7 +672,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       project_2.wiki.create_page('index_page', 'term')
       project_2.wiki.index_wiki_blobs
       project_2.add_guest(user)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       expect(results.wiki_blobs_count).to eq 1
 
@@ -765,7 +726,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
   describe 'Commits' do
     before do
       project_1.repository.index_commits_and_blobs
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it_behaves_like 'a paginated object', 'commits'
@@ -782,7 +743,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       project_2 = create :project, :private, :repository
       project_2.repository.index_commits_and_blobs
       project_2.add_reporter(user)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       results = described_class.new(user, 'add', [project_1.id])
       expect(results.commits_count).to eq 24
@@ -816,7 +777,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         issue_3 = create :issue, project: private_project2, title: "Private project where I'm a member"
         issue_4 = create :issue, project: public_project, title: "Public project"
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
@@ -843,7 +804,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       let!(:milestone_4) { create(:milestone, project: public_project, title: "Public project") }
 
       before do
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       it_behaves_like 'a paginated object', 'milestones'
@@ -857,7 +818,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
               public_project.project_feature.update!(merge_requests_access_level: ProjectFeature::PRIVATE)
               public_project.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
               internal_project.project_feature.update!(issues_access_level: ProjectFeature::DISABLED)
-              Gitlab::Elastic::Helper.refresh_index
+              ensure_elasticsearch_index!
 
               project_ids = user.authorized_projects.pluck(:id)
               results = described_class.new(user, 'project', project_ids)
@@ -874,7 +835,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
               public_project.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
               internal_project.project_feature.update!(issues_access_level: ProjectFeature::DISABLED)
               internal_project.project_feature.update!(merge_requests_access_level: ProjectFeature::DISABLED)
-              Gitlab::Elastic::Helper.refresh_index
+              ensure_elasticsearch_index!
 
               results = described_class.new(user, 'project', :any)
               milestones = results.objects('milestones')
@@ -908,18 +869,15 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
       context 'when project_ids is not present' do
         context 'when project_ids is :any' do
-          it 'returns all milestones and redacts them when the user has no access' do
+          it 'returns all milestones' do
             results = described_class.new(user, 'project', :any)
-            expect(results.send(:logger))
-              .to receive(:error)
-              .with(hash_including(message: "redacted_search_results", filtered: [{ class_name: "Milestone", id: milestone_2.id, ability: :read_milestone }]))
 
             milestones = results.objects('milestones')
 
-            expect(results.milestones_count).to eq(4) # 4 because redacting only happens when we instantiate the results
+            expect(results.milestones_count).to eq(4)
 
             expect(milestones).to include(milestone_1)
-            expect(milestones).not_to include(milestone_2)
+            expect(milestones).to include(milestone_2)
             expect(milestones).to include(milestone_3)
             expect(milestones).to include(milestone_4)
           end
@@ -947,7 +905,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
             other_public_project_1 = create(:project, :public)
             milestone_5 = create(:milestone, project: other_public_project_1, title: 'Public project milestone 2')
             other_public_project_1.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
-            Gitlab::Elastic::Helper.refresh_index
+            ensure_elasticsearch_index!
 
             results = described_class.new(nil, 'project', [])
             milestones = results.objects('milestones')
@@ -968,7 +926,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         private_project2
         public_project
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
@@ -995,7 +953,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         merge_request_3 = create :merge_request, target_project: private_project2, source_project: private_project2, title: "Private project where I'm a member"
         merge_request_4 = create :merge_request, target_project: public_project, source_project: public_project, title: "Public project"
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
@@ -1022,7 +980,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
           project.wiki.index_wiki_blobs
         end
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       it 'finds the right set of wiki blobs' do
@@ -1030,14 +988,14 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         results = described_class.new(user, 'term', limit_project_ids)
         blobs = results.objects('wiki_blobs')
 
-        expect(blobs.map { |blob| blob.join_field.parent }).to match_array [internal_project.es_id, private_project2.es_id, public_project.es_id]
+        expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
         expect(results.wiki_blobs_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'term', [])
         blobs = results.objects('wiki_blobs')
 
-        expect(blobs.first.join_field.parent).to eq public_project.es_id
+        expect(blobs.first.project).to eq public_project
         expect(results.wiki_blobs_count).to eq 1
       end
     end
@@ -1056,7 +1014,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
           project.repository.index_commits_and_blobs
         end
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         # Authenticated search
         results = described_class.new(user, 'search', limit_project_ids)
@@ -1088,20 +1046,20 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
           project.repository.index_commits_and_blobs
         end
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         # Authenticated search
         results = described_class.new(user, 'tesla', limit_project_ids)
         blobs = results.objects('blobs')
 
-        expect(blobs.map { |blob| blob.join_field.parent }).to match_array [internal_project.es_id, private_project2.es_id, public_project.es_id]
+        expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
         expect(results.blobs_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'tesla', [])
         blobs = results.objects('blobs')
 
-        expect(blobs.first.join_field.parent).to eq public_project.es_id
+        expect(blobs.first.project).to eq public_project
         expect(results.blobs_count).to eq 1
       end
     end

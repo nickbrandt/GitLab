@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import * as types from 'ee/vue_shared/dashboards/store/mutation_types';
 import defaultActions, * as actions from 'ee/vue_shared/dashboards/store/actions';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 import clearState from '../helpers';
 import { mockHeaders, mockText, mockProjectData } from '../mock_data';
 

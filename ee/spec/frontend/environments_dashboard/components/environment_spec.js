@@ -1,14 +1,11 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Commit from '~/vue_shared/components/commit.vue';
+import { shallowMount } from '@vue/test-utils';
 import component from 'ee/environments_dashboard/components/dashboard/environment.vue';
 import EnvironmentHeader from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Alert from 'ee/vue_shared/dashboards/components/alerts.vue';
+import Commit from '~/vue_shared/components/commit.vue';
 import environment from './mock_environment.json';
 
-const localVue = createLocalVue();
-
 describe('Environment', () => {
-  const Component = localVue.extend(component);
   let wrapper;
   let propsData;
 
@@ -16,10 +13,7 @@ describe('Environment', () => {
     propsData = {
       environment,
     };
-    wrapper = shallowMount(Component, {
-      sync: false,
-      attachToDocument: true,
-      localVue,
+    wrapper = shallowMount(component, {
       propsData,
     });
   });
@@ -95,10 +89,7 @@ describe('Environment', () => {
         last_deployment: null,
       },
     };
-    wrapper = shallowMount(Component, {
-      sync: false,
-      attachToDocument: true,
-      localVue,
+    wrapper = shallowMount(component, {
       propsData,
     });
 
@@ -115,10 +106,7 @@ describe('Environment', () => {
         },
       },
     };
-    wrapper = shallowMount(Component, {
-      sync: false,
-      attachToDocument: true,
-      localVue,
+    wrapper = shallowMount(component, {
       propsData,
     });
 

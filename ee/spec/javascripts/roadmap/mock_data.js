@@ -100,7 +100,12 @@ export const mockEpic = {
   groupName: 'Gitlab Org',
   groupFullName: 'Gitlab Org',
   startDate: new Date('2017-07-10'),
+  originalStartDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+  },
   webUrl: '/groups/gitlab-org/-/epics/1',
 };
 
@@ -356,6 +361,118 @@ export const mockEpicChildEpicsQueryResponse = {
         children: {
           edges: mockGroupEpicsQueryResponse.data.group.epics.edges,
         },
+      },
+    },
+  },
+};
+
+export const rawMilestones = [
+  {
+    id: 'gid://gitlab/Milestone/40',
+    iid: 1,
+    state: 'active',
+    description: null,
+    title: 'Milestone 1',
+    startDate: '2017-12-25',
+    dueDate: '2018-03-09',
+    webPath: '/groups/gitlab-org/-/milestones/1',
+  },
+  {
+    id: 'gid://gitlab/Milestone/41',
+    iid: 2,
+    state: 'active',
+    description: null,
+    title: 'Milestone 2',
+    startDate: '2017-12-26',
+    dueDate: '2018-03-10',
+    webPath: '/groups/gitlab-org/-/milestones/2',
+  },
+];
+
+export const mockMilestone = {
+  id: 1,
+  iid: 1,
+  state: 'active',
+  description:
+    'Explicabo et soluta minus praesentium minima ab et voluptatem. Quas architecto vero corrupti voluptatibus labore accusantium consectetur. Aliquam aut impedit voluptates illum molestias aut harum. Aut non odio praesentium aut.\n\nQuo asperiores aliquid sed nobis. Omnis sint iste provident numquam. Qui voluptatem tempore aut aut voluptas dolorem qui.\n\nEst est nemo quod est. Odit modi eos natus cum illo aut. Expedita nostrum ea est omnis magnam ut eveniet maxime. Itaque ipsam provident minima et occaecati ut. Dicta est perferendis sequi perspiciatis rerum voluptatum deserunt.',
+  title:
+    'Cupiditate exercitationem unde harum reprehenderit maxime eius velit recusandae incidunt quia.',
+  groupId: 2,
+  groupName: 'Gitlab Org',
+  groupFullName: 'Gitlab Org',
+  startDate: new Date('2017-07-10'),
+  endDate: new Date('2018-06-02'),
+  webPath: '/groups/gitlab-org/-/milestones/1',
+};
+
+export const mockMilestone2 = {
+  id: 2,
+  iid: 2,
+  state: 'active',
+  description:
+    'Explicabo et soluta minus praesentium minima ab et voluptatem. Quas architecto vero corrupti voluptatibus labore accusantium consectetur. Aliquam aut impedit voluptates illum molestias aut harum. Aut non odio praesentium aut.\n\nQuo asperiores aliquid sed nobis. Omnis sint iste provident numquam. Qui voluptatem tempore aut aut voluptas dolorem qui.\n\nEst est nemo quod est. Odit modi eos natus cum illo aut. Expedita nostrum ea est omnis magnam ut eveniet maxime. Itaque ipsam provident minima et occaecati ut. Dicta est perferendis sequi perspiciatis rerum voluptatum deserunt.',
+  title: 'Milestone 2',
+  groupId: 2,
+  groupName: 'Gitlab Org',
+  groupFullName: 'Gitlab Org',
+  startDate: new Date('2017-11-10'),
+  endDate: new Date('2018-07-02'),
+  webPath: '/groups/gitlab-org/-/milestones/1',
+};
+
+export const mockFormattedMilestone = {
+  id: 1,
+  iid: 1,
+  state: 'active',
+  title:
+    'Cupiditate exercitationem unde harum reprehenderit maxime eius velit recusandae incidunt quia.',
+  description:
+    'Explicabo et soluta minus praesentium minima ab et voluptatem. Quas architecto vero corrupti voluptatibus labore accusantium consectetur. Aliquam aut impedit voluptates illum molestias aut harum. Aut non odio praesentium aut.\n\nQuo asperiores aliquid sed nobis. Omnis sint iste provident numquam. Qui voluptatem tempore aut aut voluptas dolorem qui.\n\nEst est nemo quod est. Odit modi eos natus cum illo aut. Expedita nostrum ea est omnis magnam ut eveniet maxime. Itaque ipsam provident minima et occaecati ut. Dicta est perferendis sequi perspiciatis rerum voluptatum deserunt.',
+  groupId: 2,
+  groupName: 'Gitlab Org',
+  groupFullName: 'Gitlab Org',
+  startDate: new Date(2017, 10, 1),
+  originalStartDate: new Date(2017, 5, 26),
+  endDate: new Date(2018, 2, 10),
+  originalEndDate: new Date(2018, 2, 10),
+  startDateOutOfRange: true,
+  endDateOutOfRange: false,
+  webPath: '/groups/gitlab-org/-/milestones/1',
+  newMilestone: undefined,
+};
+
+export const mockGroupMilestonesQueryResponse = {
+  data: {
+    group: {
+      id: 'gid://gitlab/Group/2',
+      name: 'Gitlab Org',
+      milestones: {
+        edges: [
+          {
+            node: {
+              iid: 1,
+              id: 'gid://gitlab/Milestone/40',
+              state: 'active',
+              description: null,
+              title: 'Milestone 1',
+              startDate: '2017-12-25',
+              dueDate: '2018-03-09',
+              webPath: '/groups/gitlab-org/-/milestones/1',
+            },
+          },
+          {
+            node: {
+              iid: 2,
+              id: 'gid://gitlab/Milestone/41',
+              state: 'active',
+              description: null,
+              title: 'Milestone 2',
+              startDate: '2017-12-26',
+              dueDate: '2018-03-10',
+              webPath: '/groups/gitlab-org/-/milestones/2',
+            },
+          },
+        ],
       },
     },
   },

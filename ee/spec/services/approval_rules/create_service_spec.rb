@@ -76,12 +76,105 @@ describe ApprovalRules::CreateService do
         expect(result[:message]).to include('Prohibited')
       end
     end
+
+    context 'when approval rule with empty users and groups is being created' do
+      subject { described_class.new(target, user, { user_ids: [], group_ids: [] }) }
+
+      it 'sets default attributes for any-approver rule' do
+        rule = subject.execute[:rule]
+
+        expect(rule[:rule_type]).to eq('any_approver')
+        expect(rule[:name]).to eq('All Members')
+      end
+    end
+
+    context 'when any-approver rule exists' do
+      before do
+        target.approval_rules.create!(rule_type: :any_approver, name: 'All members')
+      end
+
+      context 'multiple approval rules are not enabled' do
+        subject { described_class.new(target, user, { user_ids: [1], group_ids: [] }) }
+
+        it 'removes the rule if a regular one is created' do
+          expect { subject.execute }.to change(
+            target.approval_rules.any_approver, :count
+          ).from(1).to(0)
+        end
+      end
+
+      context 'multiple approval rules are enabled' do
+        subject { described_class.new(target, user, { user_ids: [1], group_ids: [] }) }
+
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+        end
+
+        it 'does not remove any approval rule' do
+          expect { subject.execute }.not_to change(target.approval_rules.any_approver, :count)
+        end
+      end
+    end
   end
 
   context 'when target is project' do
     let(:target) { project }
 
     it_behaves_like "creatable"
+
+    context 'when protected_branch_ids param is present' do
+      let(:protected_branch) { create(:protected_branch, project: target) }
+
+      subject do
+        described_class.new(
+          target,
+          user,
+          name: 'developers',
+          approvals_required: 1,
+          protected_branch_ids: [protected_branch.id]
+        ).execute
+      end
+
+      context 'and multiple approval rules is enabled' do
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+        end
+
+        it 'associates the approval rule to the protected branch' do
+          expect(subject[:status]).to eq(:success)
+          expect(subject[:rule].protected_branches).to eq([protected_branch])
+        end
+
+        context 'but user cannot administer project' do
+          before do
+            allow(Ability).to receive(:allowed?).and_call_original
+            allow(Ability).to receive(:allowed?).with(user, :admin_project, target).and_return(false)
+          end
+
+          it 'does not associate the approval rule to the protected branch' do
+            expect(subject[:status]).to eq(:success)
+            expect(subject[:rule].protected_branches).to be_empty
+          end
+        end
+
+        context 'but protected branch is for another project' do
+          let(:another_project) { create(:project) }
+          let(:protected_branch) { create(:protected_branch, project: another_project) }
+
+          it 'does not associate the approval rule to the protected branch' do
+            expect(subject[:status]).to eq(:success)
+            expect(subject[:rule].protected_branches).to be_empty
+          end
+        end
+      end
+
+      context 'and multiple approval rules is disabled' do
+        it 'does not associate the approval rule to the protected branch' do
+          expect(subject[:status]).to eq(:success)
+          expect(subject[:rule].protected_branches).to be_empty
+        end
+      end
+    end
 
     ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
       context "when the rule name is `#{rule_name}`" do

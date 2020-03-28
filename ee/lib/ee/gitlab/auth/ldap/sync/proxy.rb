@@ -5,7 +5,7 @@ require 'net/ldap/dn'
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Sync
           class Proxy
             attr_reader :provider, :adapter
@@ -13,7 +13,7 @@ module EE
             # Open a connection and run all queries through it.
             # It's more efficient than the default of opening/closing per LDAP query.
             def self.open(provider, &block)
-              ::Gitlab::Auth::LDAP::Adapter.open(provider) do |adapter|
+              ::Gitlab::Auth::Ldap::Adapter.open(provider) do |adapter|
                 block.call(self.new(provider, adapter))
               end
             end
@@ -43,7 +43,7 @@ module EE
             private
 
             def ldap_group_member_dns(ldap_group_cn)
-              ldap_group = LDAP::Group.find_by_cn(ldap_group_cn, adapter)
+              ldap_group = Ldap::Group.find_by_cn(ldap_group_cn, adapter)
               unless ldap_group.present?
                 logger.warn { "Cannot find LDAP group with CN '#{ldap_group_cn}'. Skipping" }
                 return []
@@ -77,9 +77,9 @@ module EE
             def ensure_full_dns!(dns)
               dns.map! do |dn|
                 begin
-                  dn_obj = ::Gitlab::Auth::LDAP::DN.new(dn)
+                  dn_obj = ::Gitlab::Auth::Ldap::DN.new(dn)
                   parsed_dn = dn_obj.to_a
-                rescue ::Gitlab::Auth::LDAP::DN::FormatError => e
+                rescue ::Gitlab::Auth::Ldap::DN::FormatError => e
                   logger.error { "Found malformed DN: '#{dn}'. Skipping. Error: \"#{e.message}\"" }
                   next
                 end
@@ -124,7 +124,7 @@ module EE
                 # Use the DN on record in GitLab when it's available
                 identity.extern_uid
               else
-                ldap_user = ::Gitlab::Auth::LDAP::Person.find_by_uid(uid, adapter)
+                ldap_user = ::Gitlab::Auth::Ldap::Person.find_by_uid(uid, adapter)
 
                 # Can't find a matching user
                 return unless ldap_user.present?

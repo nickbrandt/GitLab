@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlLink } from '@gitlab/ui';
 import AlertWidgetForm from 'ee/monitoring/components/alert_widget_form.vue';
-import { GlModal } from '@gitlab/ui';
+import ModalStub from '../stubs/modal_stub';
 
 describe('AlertWidgetForm', () => {
   let wrapper;
@@ -8,6 +9,11 @@ describe('AlertWidgetForm', () => {
   const metricId = '8';
   const alertPath = 'alert';
   const relevantQueries = [{ metricId, alert_path: alertPath, label: 'alert-label' }];
+  const dataTrackingOptions = {
+    create: { action: 'click_button', label: 'create_alert' },
+    delete: { action: 'click_button', label: 'delete_alert' },
+    update: { action: 'click_button', label: 'update_alert' },
+  };
 
   const defaultProps = {
     disabled: false,
@@ -30,12 +36,17 @@ describe('AlertWidgetForm', () => {
 
     wrapper = shallowMount(AlertWidgetForm, {
       propsData,
+      stubs: {
+        GlModal: ModalStub,
+      },
     });
   }
 
-  const modal = () => wrapper.find(GlModal);
+  const modal = () => wrapper.find(ModalStub);
   const modalTitle = () => modal().attributes('title');
-  const submitText = () => modal().attributes('ok-title');
+  const submitButton = () => modal().find(GlLink);
+  const submitButtonTrackingOpts = () =>
+    JSON.parse(submitButton().attributes('data-tracking-options'));
   const e = {
     preventDefault: jest.fn(),
   };
@@ -62,14 +73,20 @@ describe('AlertWidgetForm', () => {
 
   it('shows correct title and button text', () => {
     expect(modalTitle()).toBe('Add alert');
-    expect(submitText()).toBe('Add');
+    expect(submitButton().text()).toBe('Add');
+  });
+
+  it('sets tracking options for create alert', () => {
+    expect(submitButtonTrackingOpts()).toEqual(dataTrackingOptions.create);
   });
 
   it('emits a "create" event when form submitted without existing alert', () => {
     createComponent();
 
     wrapper.vm.selectQuery('9');
-    wrapper.vm.threshold = 900;
+    wrapper.setData({
+      threshold: 900,
+    });
 
     wrapper.vm.handleSubmit(e);
 
@@ -89,9 +106,11 @@ describe('AlertWidgetForm', () => {
 
     wrapper.vm.selectQuery('9');
     wrapper.vm.selectQuery('>');
-    wrapper.vm.threshold = 800;
+    wrapper.setData({
+      threshold: 800,
+    });
 
-    wrapper.find(GlModal).vm.$emit('hidden');
+    modal().vm.$emit('hidden');
 
     expect(wrapper.vm.selectedAlert).toEqual({});
     expect(wrapper.vm.operator).toBe(null);
@@ -106,9 +125,13 @@ describe('AlertWidgetForm', () => {
       wrapper.vm.selectQuery(metricId);
     });
 
+    it('sets tracking options for delete alert', () => {
+      expect(submitButtonTrackingOpts()).toEqual(dataTrackingOptions.delete);
+    });
+
     it('updates button text', () => {
       expect(modalTitle()).toBe('Edit alert');
-      expect(submitText()).toBe('Delete');
+      expect(submitButton().text()).toBe('Delete');
     });
 
     it('emits "delete" event when form values unchanged', () => {
@@ -126,7 +149,9 @@ describe('AlertWidgetForm', () => {
     });
 
     it('emits "update" event when form changed', () => {
-      wrapper.vm.threshold = 11;
+      wrapper.setData({
+        threshold: 11,
+      });
 
       wrapper.vm.handleSubmit(e);
 
@@ -139,6 +164,16 @@ describe('AlertWidgetForm', () => {
         },
       ]);
       expect(e.preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it('sets tracking options for update alert', () => {
+      wrapper.setData({
+        threshold: 11,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(submitButtonTrackingOpts()).toEqual(dataTrackingOptions.update);
+      });
     });
   });
 });

@@ -1,5 +1,6 @@
 import DropdownUtils from './dropdown_utils';
 import FilteredSearchDropdownManager from './filtered_search_dropdown_manager';
+import FilteredSearchVisualTokens from './filtered_search_visual_tokens';
 
 const DATA_DROPDOWN_TRIGGER = 'data-dropdown-trigger';
 
@@ -11,7 +12,7 @@ export default class FilteredSearchDropdown {
     this.filter = filter;
     this.dropdown = dropdown;
     this.loadingTemplate = `<div class="filter-dropdown-loading">
-      <i class="fa fa-spinner fa-spin"></i>
+      <span class="spinner"></span>
     </div>`;
     this.bindEvents();
   }
@@ -31,13 +32,26 @@ export default class FilteredSearchDropdown {
 
   itemClicked(e, getValueFunction) {
     const { selected } = e.detail;
-
     if (selected.tagName === 'LI' && selected.innerHTML) {
-      const dataValueSet = DropdownUtils.setDataValueIfSelected(this.filter, selected);
+      const {
+        lastVisualToken: visualToken,
+      } = FilteredSearchVisualTokens.getLastVisualTokenBeforeInput();
+      const { tokenOperator } = DropdownUtils.getVisualTokenValues(visualToken);
+
+      const dataValueSet = DropdownUtils.setDataValueIfSelected(
+        this.filter,
+        tokenOperator,
+        selected,
+      );
 
       if (!dataValueSet) {
         const value = getValueFunction(selected);
-        FilteredSearchDropdownManager.addWordToInput(this.filter, value, true);
+        FilteredSearchDropdownManager.addWordToInput({
+          tokenName: this.filter,
+          tokenOperator,
+          tokenValue: value,
+          clicked: true,
+        });
       }
 
       this.resetFilters();

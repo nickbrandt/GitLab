@@ -9,11 +9,11 @@ values.
 
 Get a list of all persisted features, with its gate values.
 
-```
+```plaintext
 GET /features
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/features
 ```
 
@@ -50,7 +50,7 @@ Set a feature's gate value. If a feature with the given name doesn't exist yet
 it will be created. The value can be a boolean, or an integer to indicate
 percentage of time.
 
-```
+```plaintext
 POST /features/:name
 ```
 
@@ -66,7 +66,7 @@ POST /features/:name
 Note that you can enable or disable a feature for a `feature_group`, a `user`,
 a `group`, and a `project` in a single API call.
 
-```bash
+```shell
 curl --data "value=30" --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/features/new_library
 ```
 
@@ -93,6 +93,6 @@ Example response:
 
 Removes a feature gate. Response is equal when the gate exists, or doesn't.
 
-```
+```plaintext
 DELETE /features/:name
 ```

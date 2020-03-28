@@ -12,7 +12,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   end
 
   describe 'initialize with empty ref' do
-    subject(:results) { described_class.new(user, query, project.id, '') }
+    subject(:results) { described_class.new(user, query, project, '') }
 
     it { expect(results.project).to eq(project) }
     it { expect(results.repository_ref).to eq('master') }
@@ -21,7 +21,8 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
   describe 'initialize with ref' do
     let(:ref) { 'refs/heads/test' }
-    subject(:results) { described_class.new(user, query, project.id, ref) }
+
+    subject(:results) { described_class.new(user, query, project, ref) }
 
     it { expect(results.project).to eq(project) }
     it { expect(results.repository_ref).to eq(ref) }
@@ -46,14 +47,14 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
       project1.wiki.create_page('index_page', ' term')
       project1.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
-      result = described_class.new(user, 'term', project.id)
+      result = described_class.new(user, 'term', project)
       expect(result.notes_count).to eq(1)
       expect(result.wiki_blobs_count).to eq(1)
       expect(result.blobs_count).to eq(1)
 
-      result1 = described_class.new(user, 'initial', project.id)
+      result1 = described_class.new(user, 'initial', project)
       expect(result1.commits_count).to eq(1)
     end
 
@@ -67,9 +68,9 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
         project.wiki.create_page('index_page', 'term')
         project.wiki.index_wiki_blobs
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
-        result = described_class.new(guest, 'term', project.id)
+        result = described_class.new(guest, 'term', project)
         expect(result.wiki_blobs_count).to eq(1)
       end
     end
@@ -78,7 +79,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   describe "search for commits in non-default branch" do
     let(:project) { create(:project, :public, :repository, visibility) }
     let(:visibility) { :repository_enabled }
-    let(:result) { described_class.new(user, 'initial', project.id, 'test') }
+    let(:result) { described_class.new(user, 'initial', project, 'test') }
 
     subject(:commits) { result.objects('commits') }
 
@@ -121,22 +122,14 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
   describe 'search for blobs in non-default branch' do
     let(:project) { create(:project, :public, :repository, :repository_private) }
-    let(:result) { described_class.new(user, 'initial', project.id, 'test') }
+    let(:result) { described_class.new(user, 'initial', project, 'test') }
 
     subject(:blobs) { result.objects('blobs') }
 
-    it 'uses FileFinder instead of ES search' do
-      project.add_reporter(user)
-
-      expect_any_instance_of(Gitlab::FileFinder).to receive(:find).with('initial').and_return([])
-
-      _ = blobs
-    end
-
-    it 'respects project visibility' do
+    it 'always returns zero results' do
       expect_any_instance_of(Gitlab::FileFinder).to receive(:find).never
 
-      is_expected.to be_empty
+      expect(blobs).to be_empty
     end
   end
 
@@ -152,11 +145,11 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     let!(:security_issue_2) { create(:issue, :confidential, title: 'Security issue 2', project: project, assignees: [assignee]) }
 
     before do
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'does not list project confidential issues for non project members' do
-      results = described_class.new(non_member, query, project.id)
+      results = described_class.new(non_member, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -166,7 +159,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
 
     it 'lists project confidential issues for author' do
-      results = described_class.new(author, query, project.id)
+      results = described_class.new(author, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -176,7 +169,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
 
     it 'lists project confidential issues for assignee' do
-      results = described_class.new(assignee, query, project.id)
+      results = described_class.new(assignee, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -188,7 +181,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     it 'lists project confidential issues for project members' do
       project.add_developer(member)
 
-      results = described_class.new(member, query, project.id)
+      results = described_class.new(member, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -200,7 +193,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     it 'does not list project confidential issues for project members with guest role' do
       project.add_guest(member)
 
-      results = described_class.new(member, query, project.id)
+      results = described_class.new(member, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -210,7 +203,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
 
     it 'lists all project issues for admin' do
-      results = described_class.new(admin, query, project.id)
+      results = described_class.new(admin, query, project)
       issues = results.objects('issues')
 
       expect(issues).to include issue
@@ -221,7 +214,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   end
 
   context 'user search' do
-    subject(:results) { described_class.new(user, project.owner.username, project.id) }
+    subject(:results) { described_class.new(user, project.owner.username, project) }
 
     before do
       expect(Gitlab::ProjectSearchResults).to receive(:new).and_call_original

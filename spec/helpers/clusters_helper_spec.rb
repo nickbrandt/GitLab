@@ -37,53 +37,25 @@ describe ClustersHelper do
     context 'GCP provider' do
       let(:provider) { 'gcp' }
 
-      it { is_expected.to eq('Create new Cluster on GKE') }
+      it { is_expected.to eq('Create new cluster on GKE') }
     end
 
     context 'AWS provider' do
       let(:provider) { 'aws' }
 
-      it { is_expected.to eq('Create new Cluster on EKS') }
+      it { is_expected.to eq('Create new cluster on EKS') }
     end
 
     context 'other provider' do
       let(:provider) { 'other' }
 
-      it { is_expected.to eq('Create new Cluster') }
+      it { is_expected.to eq('Create new cluster') }
     end
 
     context 'no provider' do
       let(:provider) { nil }
 
-      it { is_expected.to eq('Create new Cluster') }
-    end
-  end
-
-  describe '#render_new_provider_form' do
-    subject { helper.new_cluster_partial(provider: provider) }
-
-    context 'GCP provider' do
-      let(:provider) { 'gcp' }
-
-      it { is_expected.to eq('clusters/clusters/gcp/new') }
-    end
-
-    context 'AWS provider' do
-      let(:provider) { 'aws' }
-
-      it { is_expected.to eq('clusters/clusters/aws/new') }
-    end
-
-    context 'other provider' do
-      let(:provider) { 'other' }
-
-      it { is_expected.to eq('clusters/clusters/cloud_providers/cloud_provider_selector') }
-    end
-
-    context 'no provider' do
-      let(:provider) { nil }
-
-      it { is_expected.to eq('clusters/clusters/cloud_providers/cloud_provider_selector') }
+      it { is_expected.to eq('Create new cluster') }
     end
   end
 end

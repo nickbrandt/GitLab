@@ -4,7 +4,7 @@ This API is a project-specific version of these endpoints:
 
 - [Dockerfile templates](templates/dockerfiles.md)
 - [Gitignore templates](templates/gitignores.md)
-- [GitLab CI Config templates](templates/gitlab_ci_ymls.md)
+- [GitLab CI/CD Config templates](templates/gitlab_ci_ymls.md)
 - [Open source license templates](templates/licenses.md)
 
 It deprecates these endpoints, which will be removed for API version 5.
@@ -21,7 +21,7 @@ in GitLab 11.5
 
 ## Get all templates of a particular type
 
-```
+```plaintext
 GET /projects/:id/templates/:type
 ```
 
@@ -87,7 +87,7 @@ Example response (licenses):
 
 ## Get one template of a particular type
 
-```
+```plaintext
 GET /projects/:id/templates/:type/:key
 ```
 
@@ -106,7 +106,6 @@ Example response (Dockerfile):
   "name": "Binary",
   "content": "# This file is a template, and might need editing before it works on your project.\n# This Dockerfile installs a compiled binary into a bare system.\n# You must either commit your compiled binary into source control (not recommended)\n# or build the binary first as part of a CI/CD pipeline.\n\nFROM buildpack-deps:jessie\n\nWORKDIR /usr/local/bin\n\n# Change `app` to whatever your binary is called\nAdd app .\nCMD [\"./app\"]\n"
 }
-
 ```
 
 Example response (license):

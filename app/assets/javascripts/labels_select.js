@@ -45,6 +45,7 @@ export default class LabelsSelect {
       const $sidebarLabelTooltip = $block.find('.js-sidebar-labels-tooltip');
       const $value = $block.find('.value');
       const $dropdownMenu = $dropdown.parent().find('.dropdown-menu');
+      // eslint-disable-next-line no-jquery/no-fade
       const $loading = $block.find('.block-loading').fadeOut();
       const fieldName = $dropdown.data('fieldName');
       let initialSelected = $selectbox
@@ -84,6 +85,7 @@ export default class LabelsSelect {
         if (!selected.length) {
           data[abilityName].label_ids = [''];
         }
+        // eslint-disable-next-line no-jquery/no-fade
         $loading.removeClass('hidden').fadeIn();
         $dropdown.trigger('loading.gl.dropdown');
         axios
@@ -91,6 +93,7 @@ export default class LabelsSelect {
           .then(({ data }) => {
             let labelTooltipTitle;
             let template;
+            // eslint-disable-next-line no-jquery/no-fade
             $loading.fadeOut();
             $dropdown.trigger('loaded.gl.dropdown');
             $selectbox.hide();
@@ -361,6 +364,7 @@ export default class LabelsSelect {
           const label = clickEvent.selectedObj;
 
           const fadeOutLoader = () => {
+            // eslint-disable-next-line no-jquery/no-fade
             $loading.fadeOut();
           };
 
@@ -422,6 +426,7 @@ export default class LabelsSelect {
               boardsStore.detail.issue.labels = labels;
             }
 
+            // eslint-disable-next-line no-jquery/no-fade
             $loading.fadeIn();
             const oldLabels = boardsStore.detail.issue.labels;
 
@@ -474,21 +479,47 @@ export default class LabelsSelect {
     // concatenation
     // see: http://2ality.com/2016/05/template-literal-whitespace.html#joining-arrays
 
+    const linkOpenTag =
+      '<a href="<%- issueUpdateURL.slice(0, issueUpdateURL.lastIndexOf("/")) %>?label_name[]=<%- encodeURIComponent(label.title) %>" class="gl-link gl-label-link has-tooltip" <%= linkAttrs %> title="<%= tooltipTitleTemplate({ label, isScopedLabel, enableScopedLabels, escapeStr }) %>">';
+    const spanOpenTag =
+      '<span class="gl-label-text" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;">';
     const labelTemplate = _.template(
       [
-        '<a href="<%- issueUpdateURL.slice(0, issueUpdateURL.lastIndexOf("/")) %>?label_name[]=<%- encodeURIComponent(label.title) %>">',
-        '<span class="badge label has-tooltip color-label" <%= linkAttrs %> title="<%= tooltipTitleTemplate({ label, isScopedLabel, enableScopedLabels, escapeStr }) %>" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;">',
+        '<span class="gl-label">',
+        linkOpenTag,
+        spanOpenTag,
         '<%- label.title %>',
         '</span>',
+        '</a>',
+        '</span>',
+      ].join(''),
+    );
+
+    const rightLabelTextColor = ({ label, escapeStr }) => {
+      return escapeStr(label.text_color === '#FFFFFF' ? label.color : label.text_color);
+    };
+
+    const infoIconTemplate = _.template(
+      [
+        '<a href="<%= scopedLabelsDocumentationLink %>" class="gl-link gl-label-icon" target="_blank" rel="noopener">',
+        '<i class="fa fa-question-circle"></i>',
         '</a>',
       ].join(''),
     );
 
-    const infoIconTemplate = _.template(
+    const scopedLabelTemplate = _.template(
       [
-        '<a href="<%= scopedLabelsDocumentationLink %>" class="label scoped-label" target="_blank" rel="noopener">',
-        '<i class="fa fa-question-circle" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;"></i>',
+        '<span class="gl-label gl-label-scoped" style="color: <%= escapeStr(label.color) %>;">',
+        linkOpenTag,
+        spanOpenTag,
+        '<%- label.title.slice(0, label.title.lastIndexOf("::")) %>',
+        '</span>',
+        '<span class="gl-label-text" style="color: <%= rightLabelTextColor({ label, escapeStr }) %>;">',
+        '<%- label.title.slice(label.title.lastIndexOf("::") + 2) %>',
+        '</span>',
         '</a>',
+        '<%= infoIconTemplate({ label, scopedLabelsDocumentationLink, escapeStr }) %>',
+        '</span>',
       ].join(''),
     );
 
@@ -509,8 +540,7 @@ export default class LabelsSelect {
         '<% _.each(labels, function(label){ %>',
         '<% if (isScopedLabel(label) && enableScopedLabels) { %>',
         '<span class="d-inline-block position-relative scoped-label-wrapper">',
-        '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
-        '<%= infoIconTemplate({ label, scopedLabelsDocumentationLink, escapeStr }) %>',
+        '<%= scopedLabelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, rightLabelTextColor, infoIconTemplate, scopedLabelsDocumentationLink, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
         '</span>',
         '<% } else { %>',
         '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: "" }) %>',
@@ -522,7 +552,9 @@ export default class LabelsSelect {
     return tpl({
       ...tplData,
       labelTemplate,
+      rightLabelTextColor,
       infoIconTemplate,
+      scopedLabelTemplate,
       tooltipTitleTemplate,
       isScopedLabel,
       escapeStr: _.escape,

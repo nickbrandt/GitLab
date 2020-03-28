@@ -7,6 +7,14 @@ module EE
         extend ActiveSupport::Concern
 
         class_methods do
+          def metrics_filters
+            [
+              ::Banzai::Filter::InlineAlertMetricsFilter,
+              ::Banzai::Filter::InlineClusterMetricsFilter,
+              *super
+            ]
+          end
+
           def reference_filters
             [
               ::Banzai::Filter::EpicReferenceFilter,

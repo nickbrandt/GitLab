@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import reportIssues from '~/reports/components/report_item.vue';
-import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import { componentNames } from 'ee/reports/components/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
 import mountComponent, { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
@@ -10,6 +8,8 @@ import {
   dockerReportParsed,
   parsedDast,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
+import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
+import reportIssues from '~/reports/components/report_item.vue';
 
 describe('Report issues', () => {
   let vm;
@@ -90,7 +90,7 @@ describe('Report issues', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssues, {
         issue: dockerReportParsed.unapproved[0],
-        component: componentNames.SastContainerIssueBody,
+        component: componentNames.ContainerScanningIssueBody,
         status: STATUS_FAILED,
       });
     });
@@ -118,11 +118,9 @@ describe('Report issues', () => {
       });
     });
 
-    it('renders severity (confidence) and title', () => {
+    it('renders severity and title', () => {
       expect(vm.$el.textContent).toContain(parsedDast[0].title);
-      expect(vm.$el.textContent).toContain(
-        `${parsedDast[0].severity} (${parsedDast[0].confidence})`,
-      );
+      expect(vm.$el.textContent).toContain(`${parsedDast[0].severity}`);
     });
   });
 });

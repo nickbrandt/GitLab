@@ -29,7 +29,7 @@ module API
         optional :move_after_id, type: Integer, desc: 'The id of the epic issue association that should be positioned after the actual issue'
       end
       put ':id/(-/)epics/:epic_iid/issues/:epic_issue_id' do
-        authorize_can_admin!
+        authorize_can_admin_epic!
 
         update_params = {
           move_before_id: params[:move_before_id],
@@ -71,7 +71,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/(-/)epics/:epic_iid/issues/:issue_id' do
-        authorize_can_admin!
+        authorize_can_admin_epic!
 
         issue = Issue.find(params[:issue_id])
 
@@ -97,7 +97,7 @@ module API
         requires :epic_issue_id, type: Integer, desc: 'The id of the association'
       end
       delete ':id/(-/)epics/:epic_iid/issues/:epic_issue_id' do
-        authorize_can_admin!
+        authorize_can_admin_epic!
 
         result = ::EpicIssues::DestroyService.new(link, current_user).execute
 

@@ -16,12 +16,20 @@ module Gitlab
           private
 
           def endpoint_for_metric(metric)
-            Gitlab::Routing.url_helpers.prometheus_api_project_environment_path(
-              project,
-              params[:environment],
-              proxy_path: query_type(metric),
-              query: query_for_metric(metric)
-            )
+            if params[:sample_metrics]
+              Gitlab::Routing.url_helpers.sample_metrics_project_environment_path(
+                project,
+                params[:environment],
+                identifier: metric[:id]
+              )
+            else
+              Gitlab::Routing.url_helpers.prometheus_api_project_environment_path(
+                project,
+                params[:environment],
+                proxy_path: query_type(metric),
+                query: query_for_metric(metric)
+              )
+            end
           end
 
           def query_type(metric)

@@ -24,13 +24,21 @@ namespace :admin do
   end
 
   resource :session, only: [:new, :create] do
-    get 'destroy', action: :destroy, as: :destroy
+    post 'destroy', action: :destroy, as: :destroy
   end
 
   resource :impersonation, only: :destroy
 
   resources :abuse_reports, only: [:index, :destroy]
   resources :gitaly_servers, only: [:index]
+
+  namespace :serverless do
+    resources :domains, only: [:index, :create, :update, :destroy] do
+      member do
+        post '/verify', to: 'domains#verify'
+      end
+    end
+  end
 
   resources :spam_logs, only: [:index, :destroy] do
     member do
@@ -45,7 +53,6 @@ namespace :admin do
   scope(path: 'groups/*id',
         controller: :groups,
         constraints: { id: Gitlab::PathRegex.full_namespace_route_regex, format: /(html|json|atom)/ }) do
-
     scope(as: :group) do
       put :members_update
       get :edit, action: :edit
@@ -90,7 +97,6 @@ namespace :admin do
               path: '/',
               constraints: { id: Gitlab::PathRegex.project_route_regex },
               only: [:show, :destroy]) do
-
       member do
         put :transfer
         post :repository_check
@@ -109,8 +115,17 @@ namespace :admin do
     end
   end
 
-  resource :application_settings, only: [:show, :update] do
+  resource :application_settings, only: :update do
+    # This redirect should be removed with 13.0 release.
+    # https://gitlab.com/gitlab-org/gitlab/issues/199427
+    get '/', to: redirect('admin/application_settings/general'), as: nil
+
     resources :services, only: [:index, :edit, :update]
+    resources :integrations, only: [:edit, :update] do
+      member do
+        put :test
+      end
+    end
 
     get :usage_data
     put :reset_registration_token
@@ -118,6 +133,11 @@ namespace :admin do
     put :clear_repository_check_states
     match :general, :integrations, :repository, :ci_cd, :reporting, :metrics_and_profiling, :network, :preferences, via: [:get, :patch]
     get :lets_encrypt_terms_of_service
+
+    post :create_self_monitoring_project
+    get :status_create_self_monitoring_project
+    delete :delete_self_monitoring_project
+    get :status_delete_self_monitoring_project
   end
 
   resources :labels

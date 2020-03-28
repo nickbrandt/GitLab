@@ -5,7 +5,7 @@ require 'spec_helper'
 describe BuildDetailsEntity do
   include ProjectForksHelper
 
-  set(:user) { create(:admin) }
+  let_it_be(:user) { create(:admin) }
 
   it 'inherits from JobEntity' do
     expect(described_class).to be < JobEntity
@@ -174,6 +174,23 @@ describe BuildDetailsEntity do
       it 'exposes the report artifacts' do
         expect(subject[:reports].count).to eq(1)
         expect(subject[:reports].first[:file_type]).to eq('codequality')
+      end
+    end
+
+    context 'when the build has no archive type artifacts' do
+      let!(:report) { create(:ci_job_artifact, :codequality, job: build) }
+
+      it 'does not expose any artifact actions path' do
+        expect(subject[:artifact].keys).not_to include(:download_path, :browse_path, :keep_path)
+      end
+    end
+
+    context 'when the build has archive type artifacts' do
+      let!(:build) { create(:ci_build, :artifacts, artifacts_expire_at: 7.days.from_now) }
+      let!(:report) { create(:ci_job_artifact, :codequality, job: build) }
+
+      it 'exposes artifact details' do
+        expect(subject[:artifact].keys).to include(:download_path, :browse_path, :keep_path, :expire_at, :expired)
       end
     end
   end

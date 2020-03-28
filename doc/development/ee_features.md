@@ -350,6 +350,55 @@ resolve when you add the indentation to the equation.
 EE-specific views should be placed in `ee/app/views/`, using extra
 sub-directories if appropriate.
 
+### Code in `lib/gitlab/background_migration/`
+
+When you create EE-only background migrations, you have to plan for users that
+downgrade GitLab EE to CE. In other words, every EE-only migration has to be present in
+CE code but with no implementation, instead you need to extend it on EE side.
+
+GitLab CE:
+
+```ruby
+# lib/gitlab/background_migration/prune_orphaned_geo_events.rb
+
+module Gitlab
+  module BackgroundMigration
+    class PruneOrphanedGeoEvents
+      def perform(table_name)
+      end
+    end
+  end
+end
+
+Gitlab::BackgroundMigration::PruneOrphanedGeoEvents.prepend_if_ee('EE::Gitlab::BackgroundMigration::PruneOrphanedGeoEvents')
+```
+
+GitLab EE:
+
+```ruby
+# ee/lib/ee/gitlab/background_migration/prune_orphaned_geo_events.rb
+
+module EE
+  module Gitlab
+    module BackgroundMigration
+      module PruneOrphanedGeoEvents
+        extend ::Gitlab::Utils::Override
+
+        override :perform
+        def perform(table_name = EVENT_TABLES.first)
+          return if ::Gitlab::Database.read_only?
+
+          deleted_rows = prune_orphaned_rows(table_name)
+          table_name   = next_table(table_name) if deleted_rows.zero?
+
+          ::BackgroundMigrationWorker.perform_in(RESCHEDULE_DELAY, self.class.name.demodulize, table_name) if table_name
+        end
+      end
+    end
+  end
+end
+```
+
 #### Using `render_if_exists`
 
 Instead of using regular `render`, we should use `render_if_exists`, which
@@ -457,17 +506,17 @@ end
 Note that due to namespace differences, we need to use the full qualifier for some
 constants.
 
-#### EE params
+#### EE parameters
 
 We can define `params` and utilize `use` in another `params` definition to
-include params defined in EE. However, we need to define the "interface" first
+include parameters defined in EE. However, we need to define the "interface" first
 in CE in order for EE to override it. We don't have to do this in other places
 due to `prepend_if_ee`, but Grape is complex internally and we couldn't easily
 do that, so we'll follow regular object-oriented practices that we define the
 interface first here.
 
-For example, suppose we have a few more optional params for EE. We can move the
-params out of the `Grape::API` class to a helper module, so we can inject it
+For example, suppose we have a few more optional parameters for EE. We can move the
+paramters out of the `Grape::API` class to a helper module, so we can inject it
 before it would be used in the class.
 
 ```ruby
@@ -835,7 +884,7 @@ information on managing page-specific JavaScript within EE.
 
 To separate Vue template differences we should [async import the components](https://vuejs.org/v2/guide/components-dynamic-async.html#Async-Components).
 
-Doing this allows for us to load the correct component in EE whilst in CE
+Doing this allows for us to load the correct component in EE while in CE
 we can load a empty component that renders nothing. This code **should**
 exist in the CE repository as well as the EE repository.
 
@@ -873,7 +922,7 @@ import mixin from 'ee_else_ce/path/mixin';
 - Computed Properties/methods and getters only used in the child import still need a counterpart in CE
 
 - For store modules, we will need a CE counterpart too.
-- You can see an MR with an example [here](https://gitlab.com/gitlab-org/gitlab/merge_requests/9762)
+- You can see an MR with an example [here](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9762)
 
 #### `template` tag
 

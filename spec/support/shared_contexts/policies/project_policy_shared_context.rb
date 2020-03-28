@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 RSpec.shared_context 'ProjectPolicy context' do
-  set(:guest) { create(:user) }
-  set(:reporter) { create(:user) }
-  set(:developer) { create(:user) }
-  set(:maintainer) { create(:user) }
-  set(:owner) { create(:user) }
-  set(:admin) { create(:admin) }
+  let_it_be(:guest) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:owner) { create(:user) }
+  let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
   let(:base_guest_permissions) do
     %i[
       read_project read_board read_list read_wiki read_issue
       read_project_for_iids read_issue_iid read_label
-      read_milestone read_project_snippet read_project_member read_note
+      read_milestone read_snippet read_project_member read_note
       create_project create_issue create_note upload_file create_merge_request_in
       award_emoji
     ]
@@ -21,7 +21,7 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:base_reporter_permissions) do
     %i[
-      download_code fork_project create_project_snippet update_issue
+      download_code fork_project create_snippet update_issue
       admin_issue admin_label admin_list read_commit_status read_build
       read_container_image read_pipeline read_environment read_deployment
       read_merge_request download_wiki_code read_sentry_issue read_prometheus
@@ -39,13 +39,14 @@ RSpec.shared_context 'ProjectPolicy context' do
       update_pipeline create_merge_request_from create_wiki push_code
       resolve_note create_container_image update_container_image
       create_environment create_deployment update_deployment create_release update_release
+      update_environment
     ]
   end
 
   let(:base_maintainer_permissions) do
     %i[
-      push_to_delete_protected_branch update_project_snippet update_environment
-      admin_project_snippet admin_project_member admin_note admin_wiki admin_project
+      push_to_delete_protected_branch update_snippet
+      admin_snippet admin_project_member admin_note admin_wiki admin_project
       admin_commit_status admin_build admin_container_image
       admin_pipeline admin_environment admin_deployment destroy_release add_cluster
       daily_statistics

@@ -4,11 +4,11 @@ require 'prometheus/client'
 def prometheus_default_multiproc_dir
   return unless Rails.env.development? || Rails.env.test?
 
-  if Sidekiq.server?
+  if Gitlab::Runtime.sidekiq?
     Rails.root.join('tmp/prometheus_multiproc_dir/sidekiq')
-  elsif defined?(Unicorn::Worker)
+  elsif Gitlab::Runtime.unicorn?
     Rails.root.join('tmp/prometheus_multiproc_dir/unicorn')
-  elsif defined?(::Puma)
+  elsif Gitlab::Runtime.puma?
     Rails.root.join('tmp/prometheus_multiproc_dir/puma')
   else
     Rails.root.join('tmp/prometheus_multiproc_dir')
@@ -32,15 +32,8 @@ end
 
 Sidekiq.configure_server do |config|
   config.on(:startup) do
-    # webserver metrics are cleaned up in config.ru: `warmup` block
-    Prometheus::CleanupMultiprocDirService.new.execute
-    # In production, sidekiq is run in a multi-process setup where processes might interfere
-    # with each other cleaning up and reinitializing prometheus database files, which is why
-    # we're re-doing the work every time here.
-    # A cleaner solution would be to run the cleanup pre-fork, and the initialization once
-    # after all workers have forked, but I don't know how at this point.
-    ::Prometheus::Client.reinitialize_on_pid_change(force: true)
-
+    # Do not clean the metrics directory here - the supervisor script should
+    # have already taken care of that
     Gitlab::Metrics::Exporter::SidekiqExporter.instance.start
   end
 end
@@ -50,22 +43,28 @@ if !Rails.env.test? && Gitlab::Metrics.prometheus_metrics_enabled?
     defined?(::Prometheus::Client.reinitialize_on_pid_change) && Prometheus::Client.reinitialize_on_pid_change
 
     Gitlab::Metrics::Samplers::RubySampler.initialize_instance(Settings.monitoring.ruby_sampler_interval).start
+  rescue IOError => e
+    Gitlab::ErrorTracking.track_exception(e)
+    Gitlab::Metrics.error_detected!
   end
 
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     ::Prometheus::Client.reinitialize_on_pid_change(force: true)
 
-    if defined?(::Unicorn)
+    if Gitlab::Runtime.unicorn?
       Gitlab::Metrics::Samplers::UnicornSampler.instance(Settings.monitoring.unicorn_sampler_interval).start
-    elsif defined?(::Puma)
+    elsif Gitlab::Runtime.puma?
       Gitlab::Metrics::Samplers::PumaSampler.instance(Settings.monitoring.puma_sampler_interval).start
     end
 
     Gitlab::Metrics::RequestsRackMiddleware.initialize_http_request_duration_seconds
+  rescue IOError => e
+    Gitlab::ErrorTracking.track_exception(e)
+    Gitlab::Metrics.error_detected!
   end
 end
 
-if defined?(::Unicorn) || defined?(::Puma)
+if Gitlab::Runtime.web_server?
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     Gitlab::Metrics::Exporter::WebExporter.instance.start
   end

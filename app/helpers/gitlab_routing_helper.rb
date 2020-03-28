@@ -4,6 +4,7 @@
 module GitlabRoutingHelper
   extend ActiveSupport::Concern
 
+  include API::Helpers::RelatedResourcesHelpers
   included do
     Gitlab::Routing.includes_helpers(self)
   end
@@ -27,6 +28,10 @@ module GitlabRoutingHelper
 
   def environment_metrics_path(environment, *args)
     metrics_project_environment_path(environment.project, environment, *args)
+  end
+
+  def environment_delete_path(environment, *args)
+    expose_path(api_v4_projects_environments_path(id: environment.project.id, environment_id: environment.id))
   end
 
   def issue_path(entity, *args)
@@ -153,6 +158,29 @@ module GitlabRoutingHelper
 
   # Artifacts
 
+  # Rails path generators are slow because they need to do large regex comparisons
+  # against the arguments. We can speed this up 10x by generating the strings directly.
+
+  # /*namespace_id/:project_id/-/jobs/:job_id/artifacts/download(.:format)
+  def fast_download_project_job_artifacts_path(project, job)
+    expose_fast_artifacts_path(project, job, :download)
+  end
+
+  # /*namespace_id/:project_id/-/jobs/:job_id/artifacts/keep(.:format)
+  def fast_keep_project_job_artifacts_path(project, job)
+    expose_fast_artifacts_path(project, job, :keep)
+  end
+
+  #  /*namespace_id/:project_id/-/jobs/:job_id/artifacts/browse(/*path)
+  def fast_browse_project_job_artifacts_path(project, job)
+    expose_fast_artifacts_path(project, job, :browse)
+  end
+
+  def expose_fast_artifacts_path(project, job, action)
+    path = "#{project.full_path}/-/jobs/#{job.id}/artifacts/#{action}"
+    Gitlab::Utils.append_path(Gitlab.config.gitlab.relative_url_root, path)
+  end
+
   def artifacts_action_path(path, project, build)
     action, path_params = path.split('/', 2)
     args = [project, build, path_params]
@@ -192,6 +220,97 @@ module GitlabRoutingHelper
   def take_ownership_pipeline_schedule_path(schedule, *args)
     project = schedule.project
     take_ownership_project_pipeline_schedule_path(project, schedule, *args)
+  end
+
+  def gitlab_snippet_path(snippet, *args)
+    if snippet.is_a?(ProjectSnippet)
+      project_snippet_path(snippet.project, snippet, *args)
+    else
+      new_args = snippet_query_params(snippet, *args)
+      snippet_path(snippet, *new_args)
+    end
+  end
+
+  def gitlab_snippet_url(snippet, *args)
+    if snippet.is_a?(ProjectSnippet)
+      project_snippet_url(snippet.project, snippet, *args)
+    else
+      new_args = snippet_query_params(snippet, *args)
+      snippet_url(snippet, *new_args)
+    end
+  end
+
+  def gitlab_raw_snippet_path(snippet, *args)
+    if snippet.is_a?(ProjectSnippet)
+      raw_project_snippet_path(snippet.project, snippet, *args)
+    else
+      new_args = snippet_query_params(snippet, *args)
+      raw_snippet_path(snippet, *new_args)
+    end
+  end
+
+  def gitlab_raw_snippet_url(snippet, *args)
+    if snippet.is_a?(ProjectSnippet)
+      raw_project_snippet_url(snippet.project, snippet, *args)
+    else
+      new_args = snippet_query_params(snippet, *args)
+      raw_snippet_url(snippet, *new_args)
+    end
+  end
+
+  def gitlab_snippet_notes_path(snippet, *args)
+    new_args = snippet_query_params(snippet, *args)
+    snippet_notes_path(snippet, *new_args)
+  end
+
+  def gitlab_snippet_notes_url(snippet, *args)
+    new_args = snippet_query_params(snippet, *args)
+    snippet_notes_url(snippet, *new_args)
+  end
+
+  def gitlab_snippet_note_path(snippet, note, *args)
+    new_args = snippet_query_params(snippet, *args)
+    snippet_note_path(snippet, note, *new_args)
+  end
+
+  def gitlab_snippet_note_url(snippet, note, *args)
+    new_args = snippet_query_params(snippet, *args)
+    snippet_note_url(snippet, note, *new_args)
+  end
+
+  def gitlab_toggle_award_emoji_snippet_note_path(snippet, note, *args)
+    new_args = snippet_query_params(snippet, *args)
+    toggle_award_emoji_snippet_note_path(snippet, note, *new_args)
+  end
+
+  def gitlab_toggle_award_emoji_snippet_note_url(snippet, note, *args)
+    new_args = snippet_query_params(snippet, *args)
+    toggle_award_emoji_snippet_note_url(snippet, note, *new_args)
+  end
+
+  def gitlab_toggle_award_emoji_snippet_path(snippet, *args)
+    new_args = snippet_query_params(snippet, *args)
+    toggle_award_emoji_snippet_path(snippet, *new_args)
+  end
+
+  def gitlab_toggle_award_emoji_snippet_url(snippet, *args)
+    new_args = snippet_query_params(snippet, *args)
+    toggle_award_emoji_snippet_url(snippet, *new_args)
+  end
+
+  private
+
+  def snippet_query_params(snippet, *args)
+    opts = case args.last
+           when Hash
+             args.pop
+           when ActionController::Parameters
+             args.pop.to_h
+           else
+             {}
+           end
+
+    args << opts
   end
 end
 

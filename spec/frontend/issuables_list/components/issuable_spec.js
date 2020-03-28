@@ -44,7 +44,6 @@ describe('Issuable component', () => {
         baseUrl: TEST_BASE_URL,
         ...props,
       },
-      sync: false,
     });
   };
 
@@ -69,7 +68,7 @@ describe('Issuable component', () => {
   const findTaskStatus = () => wrapper.find('.task-status');
   const findOpenedAgoContainer = () => wrapper.find({ ref: 'openedAgoByContainer' });
   const findMilestone = () => wrapper.find('.js-milestone');
-  const findMilestoneTooltip = () => findMilestone().attributes('data-original-title');
+  const findMilestoneTooltip = () => findMilestone().attributes('title');
   const findDueDate = () => wrapper.find('.js-due-date');
   const findLabelContainer = () => wrapper.find('.js-labels');
   const findLabelLinks = () => findLabelContainer().findAll(GlLink);
@@ -121,6 +120,10 @@ describe('Issuable component', () => {
       ${'downvotes'}             | ${findDownvotes}
     `('does not render $desc', ({ finder }) => {
       expect(finder().exists()).toBe(false);
+    });
+
+    it('show relative reference path', () => {
+      expect(wrapper.find('.js-ref-path').text()).toBe(issuable.references.relative);
     });
 
     it('does not have closed text', () => {
@@ -239,7 +242,7 @@ describe('Issuable component', () => {
       const labels = findLabelLinks().wrappers.map(label => ({
         href: label.attributes('href'),
         text: label.text(),
-        tooltip: label.find('span').attributes('data-original-title'),
+        tooltip: label.find('span').attributes('title'),
       }));
 
       const expected = testLabels.map(label => ({
@@ -338,7 +341,9 @@ describe('Issuable component', () => {
 
         findBulkCheckbox().trigger('click');
 
-        expect(wrapper.emitted().select).toEqual([[{ issuable, selected: !selected }]]);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.emitted().select).toEqual([[{ issuable, selected: !selected }]]);
+        });
       });
     });
   });

@@ -1,3 +1,5 @@
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+
 class RelatedIssuesStore {
   constructor() {
     this.state = {
@@ -9,7 +11,7 @@ class RelatedIssuesStore {
   }
 
   setRelatedIssues(issues = []) {
-    this.state.relatedIssues = issues;
+    this.state.relatedIssues = convertObjectPropsToCamelCase(issues, { deep: true });
   }
 
   removeRelatedIssue(idToRemove) {

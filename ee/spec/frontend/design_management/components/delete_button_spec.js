@@ -13,7 +13,6 @@ describe('Batch delete button component', () => {
       propsData: {
         isDeleting,
       },
-      sync: false,
       directives: {
         GlModalDirective,
       },
@@ -39,8 +38,14 @@ describe('Batch delete button component', () => {
   it('emits `deleteSelectedDesigns` event on modal ok click', () => {
     createComponent();
     findButton().vm.$emit('click');
-    findModal().vm.$emit('ok');
-
-    expect(wrapper.emitted().deleteSelectedDesigns).toBeTruthy();
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findModal().vm.$emit('ok');
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        expect(wrapper.emitted().deleteSelectedDesigns).toBeTruthy();
+      });
   });
 });

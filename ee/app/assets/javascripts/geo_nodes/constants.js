@@ -23,6 +23,14 @@ export const HEALTH_STATUS_ICON = {
   offline: 'status_canceled',
 };
 
+export const HEALTH_STATUS_CLASS = {
+  healthy: 'text-success-500',
+  unhealthy: 'text-danger-500',
+  disabled: 'text-secondary-950',
+  unknown: 'cdark',
+  offline: 'cdark',
+};
+
 export const TIME_DIFF = {
   FIVE_MINS: 300,
   HOUR: 3600,

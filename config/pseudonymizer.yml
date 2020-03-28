@@ -47,7 +47,6 @@ tables:
   epics:
     whitelist:
     - id
-    - milestone_id
     - group_id
     - author_id
     - assignee_id
@@ -470,6 +469,7 @@ tables:
     - ghost
     - last_activity_on
     - notified_of_own_activity
+    - user_type
     - bot_type
     - preferred_language
     - theme_id

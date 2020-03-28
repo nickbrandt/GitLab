@@ -4,9 +4,9 @@ require 'spec_helper'
 
 module Ci
   describe RegisterJobService do
-    set(:group) { create(:group) }
-    set(:project) { create(:project, group: group, shared_runners_enabled: false, group_runners_enabled: false) }
-    set(:pipeline) { create(:ci_pipeline, project: project) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project, reload: true) { create(:project, group: group, shared_runners_enabled: false, group_runners_enabled: false) }
+    let_it_be(:pipeline) { create(:ci_pipeline, project: project) }
     let!(:shared_runner) { create(:ci_runner, :instance) }
     let!(:specific_runner) { create(:ci_runner, :project, projects: [project]) }
     let!(:group_runner) { create(:ci_runner, :group, groups: [group]) }
@@ -514,8 +514,8 @@ module Ci
         subject { execute(specific_runner, {}) }
 
         it 'does drop the build and logs both failures' do
-          expect(Gitlab::Sentry).to receive(:track_acceptable_exception)
-            .with(anything, a_hash_including(extra: a_hash_including(build_id: pending_job.id)))
+          expect(Gitlab::ErrorTracking).to receive(:track_exception)
+            .with(anything, a_hash_including(build_id: pending_job.id))
             .twice
             .and_call_original
 
@@ -540,8 +540,8 @@ module Ci
         subject { execute(specific_runner, {}) }
 
         it 'does drop the build and logs failure' do
-          expect(Gitlab::Sentry).to receive(:track_acceptable_exception)
-            .with(anything, a_hash_including(extra: a_hash_including(build_id: pending_job.id)))
+          expect(Gitlab::ErrorTracking).to receive(:track_exception)
+            .with(anything, a_hash_including(build_id: pending_job.id))
             .once
             .and_call_original
 
@@ -612,7 +612,8 @@ module Ci
           allow(attempt_counter).to receive(:increment)
           expect(job_queue_duration_seconds).to receive(:observe)
             .with({ shared_runner: expected_shared_runner,
-                    jobs_running_for_project: expected_jobs_running_for_project_first_job }, 1800)
+                    jobs_running_for_project: expected_jobs_running_for_project_first_job,
+                    shard: expected_shard }, 1800)
 
           execute(runner)
         end
@@ -625,7 +626,8 @@ module Ci
             allow(attempt_counter).to receive(:increment)
             expect(job_queue_duration_seconds).to receive(:observe)
               .with({ shared_runner: expected_shared_runner,
-                      jobs_running_for_project: expected_jobs_running_for_project_third_job }, 1800)
+                      jobs_running_for_project: expected_jobs_running_for_project_third_job,
+                      shard: expected_shard }, 1800)
 
             execute(runner)
           end
@@ -638,12 +640,27 @@ module Ci
       end
 
       context 'when shared runner is used' do
-        let(:runner) { shared_runner }
+        let(:runner) { create(:ci_runner, :instance, tag_list: %w(tag1 tag2)) }
         let(:expected_shared_runner) { true }
+        let(:expected_shard) { Ci::RegisterJobService::DEFAULT_METRICS_SHARD }
         let(:expected_jobs_running_for_project_first_job) { 0 }
         let(:expected_jobs_running_for_project_third_job) { 2 }
 
         it_behaves_like 'metrics collector'
+
+        context 'when metrics_shard tag is defined' do
+          let(:runner) { create(:ci_runner, :instance, tag_list: %w(tag1 metrics_shard::shard_tag tag2)) }
+          let(:expected_shard) { 'shard_tag' }
+
+          it_behaves_like 'metrics collector'
+        end
+
+        context 'when multiple metrics_shard tag is defined' do
+          let(:runner) { create(:ci_runner, :instance, tag_list: %w(tag1 metrics_shard::shard_tag metrics_shard::shard_tag_2 tag2)) }
+          let(:expected_shard) { 'shard_tag' }
+
+          it_behaves_like 'metrics collector'
+        end
 
         context 'when pending job with queued_at=nil is used' do
           before do
@@ -662,8 +679,9 @@ module Ci
       end
 
       context 'when specific runner is used' do
-        let(:runner) { specific_runner }
+        let(:runner) { create(:ci_runner, :project, projects: [project], tag_list: %w(tag1 metrics_shard::shard_tag tag2)) }
         let(:expected_shared_runner) { false }
+        let(:expected_shard) { Ci::RegisterJobService::DEFAULT_METRICS_SHARD }
         let(:expected_jobs_running_for_project_first_job) { '+Inf' }
         let(:expected_jobs_running_for_project_third_job) { '+Inf' }
 

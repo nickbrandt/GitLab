@@ -9,20 +9,42 @@ description: 'Learn how to contribute to GitLab.'
 
 - Set up GitLab's development environment with [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/README.md)
 - [GitLab contributing guide](contributing/index.md)
-- [Architecture](architecture.md) of GitLab
+  - [Issues workflow](contributing/issue_workflow.md). For information on:
+    - Issue tracker guidelines.
+    - Triaging.
+    - Labels.
+    - Feature proposals.
+    - Issue weight.
+    - Regression issues.
+    - Technical or UX debt.
+  - [Merge requests workflow](contributing/merge_request_workflow.md). For
+    information on:
+    - Merge request guidelines.
+    - Contribution acceptance criteria.
+    - Definition of done.
+    - Dependencies.
+  - [Style guides](contributing/style_guides.md)
+  - [Implement design & UI elements](contributing/design.md)
+- [GitLab Architecture Overview](architecture.md)
 - [Rake tasks](rake_tasks.md) for development
 
 ## Processes
 
-- [GitLab core team & GitLab Inc. contribution process](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md)
-- [Generate a changelog entry with `bin/changelog`](changelog.md)
+**Must-reads:**
+
 - [Code review guidelines](code_review.md) for reviewing code and having code reviewed
-- [Database review guidelines](database_review.md) for reviewing database-related changes and complex SQL queries
+- [Database review guidelines](database_review.md) for reviewing database-related changes and complex SQL queries, and having them reviewed
+- [Secure coding guidelines](https://gitlab.com/gitlab-com/gl-security/security-guidelines)
 - [Pipelines for the GitLab project](pipelines.md)
-- [Guidelines for implementing Enterprise Edition features](ee_features.md)
+
+Complementary reads:
+
+- [GitLab core team & GitLab Inc. contribution process](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md)
 - [Security process for developers](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md#security-releases-critical-non-critical-as-a-developer)
-- [Requesting access to Chatops on GitLab.com](chatops_on_gitlabcom.md#requesting-access) (for GitLabbers)
+- [Guidelines for implementing Enterprise Edition features](ee_features.md)
 - [Danger bot](dangerbot.md)
+- [Generate a changelog entry with `bin/changelog`](changelog.md)
+- [Requesting access to Chatops on GitLab.com](chatops_on_gitlabcom.md#requesting-access) (for GitLab team members)
 
 ## UX and Frontend guides
 
@@ -54,11 +76,12 @@ description: 'Learn how to contribute to GitLab.'
 - [How to dump production data to staging](db_dump.md)
 - [Working with the GitHub importer](github_importer.md)
 - [Import/Export development documentation](import_export.md)
+- [Test Import Project](import_project.md)
 - [Elasticsearch integration docs](elasticsearch.md)
 - [Working with Merge Request diffs](diffs.md)
 - [Kubernetes integration guidelines](kubernetes.md)
 - [Permissions](permissions.md)
-- [Prometheus metrics](prometheus_metrics.md)
+- [Prometheus](prometheus.md)
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
 - [How Git object deduplication works in GitLab](git_object_deduplication.md)
@@ -69,6 +92,12 @@ description: 'Learn how to contribute to GitLab.'
 - [Developing against interacting components or features](interacting_components.md)
 - [File uploads](uploads.md)
 - [Auto DevOps development guide](auto_devops.md)
+- [Mass Inserting Models](mass_insert.md)
+- [Value Stream Analytics development guide](value_stream_analytics.md)
+- [Issue types vs first-class types](issue_types.md)
+- [Application limits](application_limits.md)
+- [Redis guidelines](redis.md)
+- [Rails initializers](rails_initializers.md)
 
 ## Performance guides
 
@@ -101,9 +130,13 @@ description: 'Learn how to contribute to GitLab.'
 - [Swapping tables](swapping_tables.md)
 - [Deleting migrations](deleting_migrations.md)
 
+### Debugging
+
+- Tracing the source of an SQL query using query comments with [Marginalia](database_query_comments.md)
+- Tracing the source of an SQL query in Rails console using [Verbose Query Logs](https://guides.rubyonrails.org/debugging_rails_applications.html#verbose-query-logs)
+
 ### Best practices
 
-- [Merge Request checklist](database_merge_request_checklist.md)
 - [Adding database indexes](adding_database_indexes.md)
 - [Foreign keys & associations](foreign_keys.md)
 - [Single table inheritance](single_table_inheritance.md)
@@ -112,13 +145,14 @@ description: 'Learn how to contribute to GitLab.'
 - [Hash indexes](hash_indexes.md)
 - [Storing SHA1 hashes as binary](sha1_as_binary.md)
 - [Iterating tables in batches](iterating_tables_in_batches.md)
+- [Insert into tables in batches](insert_into_tables_in_batches.md)
 - [Ordering table columns](ordering_table_columns.md)
 - [Verifying database capabilities](verifying_database_capabilities.md)
 - [Database Debugging and Troubleshooting](database_debugging.md)
 - [Query Count Limits](query_count_limits.md)
-- [Database helper modules](database_helpers.md)
 - [Code comments](code_comments.md)
 - [Creating enums](creating_enums.md)
+- [Renaming features](renaming_features.md)
 
 ### Case studies
 
@@ -128,6 +162,9 @@ description: 'Learn how to contribute to GitLab.'
 ## Integration guides
 
 - [Jira Connect app](integrations/jira_connect.md)
+- [Security Scanners](integrations/secure.md)
+- [Secure Partner Integration](integrations/secure_partner_integration.md)
+- [How to run Jenkins in development environment](integrations/jenkins.md)
 
 ## Testing guides
 
@@ -146,11 +183,11 @@ description: 'Learn how to contribute to GitLab.'
 - [Externalization](i18n/externalization.md)
 - [Translation](i18n/translation.md)
 
-## Event tracking guides
+## Telemetry guides
 
-- [Introduction](event_tracking/index.md)
-- [Frontend tracking guide](event_tracking/frontend.md)
-- [Backend tracking guide](event_tracking/backend.md)
+- [Introduction](../telemetry/index.md)
+- [Frontend tracking guide](../telemetry/frontend.md)
+- [Backend tracking guide](../telemetry/backend.md)
 
 ## Experiment Guide
 
@@ -172,9 +209,14 @@ description: 'Learn how to contribute to GitLab.'
 
 - [Shell scripting standards and style guidelines](shell_scripting_guide/index.md)
 
+## Domain-specific guides
+
+- [CI/CD development documentation](cicd/index.md)
+
 ## Other Development guides
 
 - [Defining relations between files using projections](projections.md)
+- [Reference processing](./reference_processing.md)
 
 ## Other GitLab Development Kit (GDK) guides
 

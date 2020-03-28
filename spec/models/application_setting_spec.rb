@@ -19,6 +19,7 @@ describe ApplicationSetting do
     let(:http)  { 'http://example.com' }
     let(:https) { 'https://example.com' }
     let(:ftp)   { 'ftp://example.com' }
+    let(:javascript) { 'javascript:alert(window.opener.document.location)' }
 
     it { is_expected.to allow_value(nil).for(:home_page_url) }
     it { is_expected.to allow_value(http).for(:home_page_url) }
@@ -65,6 +66,68 @@ describe ApplicationSetting do
     it { is_expected.to allow_value(3).for(:push_event_activities_limit) }
     it { is_expected.not_to allow_value('three').for(:push_event_activities_limit) }
     it { is_expected.not_to allow_value(nil).for(:push_event_activities_limit) }
+
+    it { is_expected.to validate_numericality_of(:snippet_size_limit).only_integer.is_greater_than(0) }
+    it { is_expected.to validate_presence_of(:max_artifacts_size) }
+    it { is_expected.to validate_numericality_of(:max_artifacts_size).only_integer.is_greater_than(0) }
+    it { is_expected.to validate_presence_of(:max_pages_size) }
+    it 'ensures max_pages_size is an integer greater than 0 (or equal to 0 to indicate unlimited/maximum)' do
+      is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than_or_equal_to(0)
+                       .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
+    end
+
+    it { is_expected.not_to allow_value(7).for(:minimum_password_length) }
+    it { is_expected.not_to allow_value(129).for(:minimum_password_length) }
+    it { is_expected.not_to allow_value(nil).for(:minimum_password_length) }
+    it { is_expected.not_to allow_value('abc').for(:minimum_password_length) }
+    it { is_expected.to allow_value(10).for(:minimum_password_length) }
+
+    context 'grafana_url validations' do
+      before do
+        subject.instance_variable_set(:@parsed_grafana_url, nil)
+      end
+
+      it { is_expected.to allow_value(http).for(:grafana_url) }
+      it { is_expected.to allow_value(https).for(:grafana_url) }
+      it { is_expected.not_to allow_value(ftp).for(:grafana_url) }
+      it { is_expected.not_to allow_value(javascript).for(:grafana_url) }
+      it { is_expected.to allow_value('/-/grafana').for(:grafana_url) }
+      it { is_expected.to allow_value('http://localhost:9000').for(:grafana_url) }
+
+      context 'when local URLs are not allowed in system hooks' do
+        before do
+          stub_application_setting(allow_local_requests_from_system_hooks: false)
+        end
+
+        it { is_expected.not_to allow_value('http://localhost:9000').for(:grafana_url) }
+      end
+
+      context 'with invalid grafana URL' do
+        it 'adds an error' do
+          subject.grafana_url = ' ' + http
+          expect(subject.save).to be false
+
+          expect(subject.errors[:grafana_url]).to eq([
+            'must be a valid relative or absolute URL. ' \
+            'Please check your Grafana URL setting in ' \
+            'Admin Area > Settings > Metrics and profiling > Metrics - Grafana'
+          ])
+        end
+      end
+
+      context 'with blocked grafana URL' do
+        it 'adds an error' do
+          subject.grafana_url = javascript
+          expect(subject.save).to be false
+
+          expect(subject.errors[:grafana_url]).to eq([
+            'is blocked: Only allowed schemes are http, https. Please check your ' \
+            'Grafana URL setting in ' \
+            'Admin Area > Settings > Metrics and profiling > Metrics - Grafana'
+          ])
+        end
+      end
+    end
 
     context 'when snowplow is enabled' do
       before do
@@ -304,6 +367,11 @@ describe ApplicationSetting do
     end
 
     context 'gitaly timeouts' do
+      it "validates that the default_timeout is lower than the max_request_duration" do
+        is_expected.to validate_numericality_of(:gitaly_timeout_default)
+          .is_less_than_or_equal_to(Settings.gitlab.max_request_duration_seconds)
+      end
+
       [:gitaly_timeout_default, :gitaly_timeout_medium, :gitaly_timeout_fast].each do |timeout_name|
         it do
           is_expected.to validate_presence_of(timeout_name)
@@ -359,6 +427,12 @@ describe ApplicationSetting do
         subject.gitaly_timeout_fast = 20
 
         expect(subject).to be_invalid
+      end
+
+      it 'does not prevent from saving when gitaly timeouts were previously invalid' do
+        subject.update_column(:gitaly_timeout_default, Settings.gitlab.max_request_duration_seconds + 1)
+
+        expect(subject.reload).to be_valid
       end
     end
 
@@ -609,6 +683,57 @@ describe ApplicationSetting do
         setting.sourcegraph_url = url
 
         expect(setting.sourcegraph_url_is_com?).to eq(is_com)
+      end
+    end
+  end
+
+  describe 'email_restrictions' do
+    context 'when email restrictions are enabled' do
+      before do
+        subject.email_restrictions_enabled = true
+      end
+
+      it 'allows empty email restrictions' do
+        subject.email_restrictions = ''
+
+        expect(subject).to be_valid
+      end
+
+      it 'accepts valid email restrictions regex' do
+        subject.email_restrictions = '\+'
+
+        expect(subject).to be_valid
+      end
+
+      it 'does not accept invalid email restrictions regex' do
+        subject.email_restrictions = '+'
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'sets an error when regex is not valid' do
+        subject.email_restrictions = '+'
+
+        expect(subject).not_to be_valid
+        expect(subject.errors.messages[:email_restrictions].first).to eq(_('not valid RE2 syntax: no argument for repetition operator: +'))
+      end
+    end
+
+    context 'when email restrictions are disabled' do
+      before do
+        subject.email_restrictions_enabled = false
+      end
+
+      it 'allows empty email restrictions' do
+        subject.email_restrictions = ''
+
+        expect(subject).to be_valid
+      end
+
+      it 'invalid regex is not valid' do
+        subject.email_restrictions = '+'
+
+        expect(subject).not_to be_valid
       end
     end
   end

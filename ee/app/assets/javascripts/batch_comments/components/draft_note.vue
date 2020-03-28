@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import Icon from '~/vue_shared/components/icon.vue';
 import NoteableNote from '~/notes/components/noteable_note.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import PublishButton from './publish_button.vue';
@@ -9,7 +8,6 @@ export default {
   components: {
     NoteableNote,
     PublishButton,
-    Icon,
     LoadingButton,
   },
   props: {

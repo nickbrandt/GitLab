@@ -66,11 +66,23 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
         end
       end
 
+      it 'can query when local requests are allowed' do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+
+        aggregate_failures do
+          ['127.0.0.1', '192.168.2.3'].each do |url|
+            allow(Addrinfo).to receive(:getaddrinfo).with(domain, any_args).and_return([Addrinfo.tcp(url, 80)])
+
+            expect(service.can_query?).to be true
+          end
+        end
+      end
+
       context 'with self-monitoring project and internal Prometheus' do
         before do
           service.api_url = 'http://localhost:9090'
 
-          stub_application_setting(instance_administration_project_id: project.id)
+          stub_application_setting(self_monitoring_project_id: project.id)
           stub_config(prometheus: { enable: true, listen_address: 'localhost:9090' })
         end
 
@@ -152,15 +164,95 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
         expect(service.prometheus_client).to be_nil
       end
     end
+
+    context 'when local requests are allowed' do
+      let(:manual_configuration) { true }
+      let(:api_url) { 'http://192.168.1.1:9090' }
+
+      before do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+
+        stub_prometheus_request("#{api_url}/api/v1/query?query=1")
+      end
+
+      it 'allows local requests' do
+        expect(service.prometheus_client).not_to be_nil
+        expect { service.prometheus_client.ping }.not_to raise_error
+      end
+    end
+
+    context 'when local requests are blocked' do
+      let(:manual_configuration) { true }
+      let(:api_url) { 'http://192.168.1.1:9090' }
+
+      before do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: false)
+
+        stub_prometheus_request("#{api_url}/api/v1/query?query=1")
+      end
+
+      it 'blocks local requests' do
+        expect(service.prometheus_client).to be_nil
+      end
+
+      context 'with self monitoring project and internal Prometheus URL' do
+        before do
+          stub_application_setting(allow_local_requests_from_web_hooks_and_services: false)
+          stub_application_setting(self_monitoring_project_id: project.id)
+
+          stub_config(prometheus: {
+            enable: true,
+            listen_address: api_url
+          })
+        end
+
+        it 'allows local requests' do
+          expect(service.prometheus_client).not_to be_nil
+          expect { service.prometheus_client.ping }.not_to raise_error
+        end
+      end
+    end
   end
 
   describe '#prometheus_available?' do
     context 'clusters with installed prometheus' do
-      let!(:cluster) { create(:cluster, projects: [project]) }
-      let!(:prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
+      before do
+        create(:clusters_applications_prometheus, :installed, cluster: cluster)
+      end
 
-      it 'returns true' do
-        expect(service.prometheus_available?).to be(true)
+      context 'cluster belongs to project' do
+        let(:cluster) { create(:cluster, projects: [project]) }
+
+        it 'returns true' do
+          expect(service.prometheus_available?).to be(true)
+        end
+      end
+
+      context 'cluster belongs to projects group' do
+        let_it_be(:group) { create(:group) }
+        let(:project) { create(:prometheus_project, group: group) }
+        let(:cluster) { create(:cluster_for_group, :with_installed_helm, groups: [group]) }
+
+        it 'returns true' do
+          expect(service.prometheus_available?).to be(true)
+        end
+
+        it 'avoids N+1 queries' do
+          service
+          5.times do |i|
+            other_cluster = create(:cluster_for_group, :with_installed_helm, groups: [group], environment_scope: i)
+            create(:clusters_applications_prometheus, :installing, cluster: other_cluster)
+          end
+          expect { service.prometheus_available? }.not_to exceed_query_limit(1)
+        end
+      end
+
+      context 'cluster belongs to gitlab instance' do
+        let(:cluster) { create(:cluster, :instance) }
+
+        it 'returns true' do
+          expect(service.prometheus_available?).to be(true)
+        end
       end
     end
 
@@ -259,6 +351,30 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
         it 'keeps service active when manual_configuration is disabled' do
           expect { service.update!(manual_configuration: false) }.not_to change { service.active }.from(true)
         end
+      end
+    end
+  end
+
+  describe '#track_events after_commit callback' do
+    before do
+      allow(service).to receive(:prometheus_available?).and_return(true)
+    end
+
+    context "enabling manual_configuration" do
+      it "tracks enable event" do
+        service.update!(manual_configuration: false)
+
+        expect(Gitlab::Tracking).to receive(:event).with('cluster:services:prometheus', 'enabled_manual_prometheus')
+
+        service.update!(manual_configuration: true)
+      end
+
+      it "tracks disable event" do
+        service.update!(manual_configuration: true)
+
+        expect(Gitlab::Tracking).to receive(:event).with('cluster:services:prometheus', 'disabled_manual_prometheus')
+
+        service.update!(manual_configuration: false)
       end
     end
   end

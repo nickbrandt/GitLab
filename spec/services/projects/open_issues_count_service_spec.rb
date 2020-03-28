@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Projects::OpenIssuesCountService, :use_clean_rails_memory_store_caching do
   let(:project) { create(:project) }
+
   subject { described_class.new(project) }
 
   it_behaves_like 'a counter caching service'
@@ -56,7 +57,7 @@ describe Projects::OpenIssuesCountService, :use_clean_rails_memory_store_caching
       end
     end
 
-    context '#refresh_cache' do
+    describe '#refresh_cache' do
       before do
         create(:issue, :opened, project: project)
         create(:issue, :opened, project: project)

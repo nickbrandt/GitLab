@@ -161,7 +161,7 @@ of the staging tree. You also have an option to discard all changes with
 Lets start the example by editing a file, with your favorite editor, to change the
 content and add it to staging
 
-```sh
+```shell
 vim <file>
 git add <file>
 ```
@@ -253,7 +253,7 @@ In our example we will end up with commit `B`, that introduced bug/error. We hav
 - Undo changes on a single file or directory from commit `B`, but retain them in the unstaged state:
 
   ```shell
-  git reset  commit-B-id <file>
+  git reset commit-B-id <file>
   ```
 
 - There is one command we also must not forget: **creating a new branch**
@@ -487,8 +487,8 @@ git filter-branch --tree-filter 'rm filename' HEAD
 Since `git filter-branch` command might be slow on big repositories, there are
 tools that can use some of Git specifics to enable faster execution of common
 tasks (which is exactly what removing sensitive information file is about).
-An alternative is the open source community-maintained tool [BFG][bfg-repo-cleaner].  
-Keep in mind that these tools are faster because they do not provide the same  
+An alternative is the open source community-maintained tool [BFG][bfg-repo-cleaner].
+Keep in mind that these tools are faster because they do not provide the same
 feature set as `git filter-branch` does, but focus on specific use cases.
 
 ## Conclusion

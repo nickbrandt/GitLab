@@ -1,10 +1,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { GlTooltipDirective } from '@gitlab/ui';
+import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import { s__, __ } from '~/locale';
 import { clearDraft, getDiscussionReplyKey } from '~/lib/utils/autosave';
 import icon from '~/vue_shared/components/icon.vue';
-import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import Flash from '../../flash';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -14,7 +14,6 @@ import noteForm from './note_form.vue';
 import diffWithNote from './diff_with_note.vue';
 import noteable from '../mixins/noteable';
 import resolvable from '../mixins/resolvable';
-import discussionNavigation from '../mixins/discussion_navigation';
 import eventHub from '../event_hub';
 import DiscussionNotes from './discussion_notes.vue';
 import DiscussionActions from './discussion_actions.vue';
@@ -35,7 +34,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [noteable, resolvable, discussionNavigation, diffLineNoteFormMixin],
+  mixins: [noteable, resolvable, diffLineNoteFormMixin],
   props: {
     discussion: {
       type: Object,
@@ -79,14 +78,14 @@ export default {
       'convertedDisscussionIds',
       'getNoteableData',
       'userCanReply',
-      'nextUnresolvedDiscussionId',
-      'unresolvedDiscussionsCount',
-      'hasUnresolvedDiscussions',
       'showJumpToNextDiscussion',
       'getUserData',
     ]),
     currentUser() {
       return this.getUserData;
+    },
+    isLoggedIn() {
+      return Boolean(gon.current_user_id);
     },
     autosaveKey() {
       return getDiscussionReplyKey(this.firstNote.noteable_type, this.discussion.id);
@@ -148,7 +147,6 @@ export default {
       'saveNote',
       'removePlaceholderNotes',
       'toggleResolveNote',
-      'expandDiscussion',
       'removeConvertedDiscussion',
     ]),
     showReplyForm() {
@@ -197,32 +195,23 @@ export default {
         data: postData,
       };
 
-      this.isReplying = false;
       this.saveNote(replyData)
-        .then(() => {
-          clearDraft(this.autosaveKey);
+        .then(res => {
+          if (res.hasFlash !== true) {
+            this.isReplying = false;
+            clearDraft(this.autosaveKey);
+          }
           callback();
         })
         .catch(err => {
           this.removePlaceholderNotes();
-          this.isReplying = true;
-          this.$nextTick(() => {
-            const msg = __(
-              'Your comment could not be submitted! Please check your network connection and try again.',
-            );
-            Flash(msg, 'alert', this.$el);
-            this.$refs.noteForm.note = noteText;
-            callback(err);
-          });
+          const msg = __(
+            'Your comment could not be submitted! Please check your network connection and try again.',
+          );
+          Flash(msg, 'alert', this.$el);
+          this.$refs.noteForm.note = noteText;
+          callback(err);
         });
-    },
-    jumpToNextDiscussion() {
-      const nextId = this.nextUnresolvedDiscussionId(
-        this.discussion.id,
-        this.discussionsByDiffOrder,
-      );
-
-      this.jumpToDiscussion(nextId);
     },
     deleteNoteHandler(note) {
       this.$emit('noteDeleted', this.discussion, note);
@@ -290,7 +279,6 @@ export default {
                     :should-show-jump-to-next-discussion="shouldShowJumpToNextDiscussion"
                     @showReplyForm="showReplyForm"
                     @resolve="resolveHandler"
-                    @jumpToNextDiscussion="jumpToNextDiscussion"
                   />
                   <div v-if="isReplying" class="avatar-note-form-holder">
                     <user-avatar-link
@@ -313,7 +301,7 @@ export default {
                       @cancelForm="cancelReplyForm"
                     />
                   </div>
-                  <note-signed-out-widget v-if="!userCanReply" />
+                  <note-signed-out-widget v-if="!isLoggedIn" />
                 </div>
               </template>
             </discussion-notes>

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }
@@ -15,7 +15,6 @@ module QA
         Flow::Login.sign_in
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'Issue to test scoped labels'
           issue.labels = [initial_label, initial_label_multi_colon]
         end
 
@@ -45,17 +44,13 @@ module QA
 
           show.select_all_activities_filter
 
-          initial_labels = "#{initial_label} #{initial_label_multi_colon}"
-          new_labels = "#{new_label_same_scope} #{new_label_same_scope_multi_colon} #{new_label_different_scope_multi_colon} #{new_label_different_scope}"
+          expect(show.text_of_labels_block).to have_content(new_label_same_scope.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content(new_label_different_scope.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content('group::car porsche')
+          expect(show.text_of_labels_block).to have_content('group::truck mercedes-bens')
 
-          expect(page).to have_content("added #{initial_labels}")
-          expect(page).to have_content("added #{new_labels} scoped labels and automatically removed #{initial_labels}")
-          expect(show.text_of_labels_block).to have_content(new_label_same_scope)
-          expect(show.text_of_labels_block).to have_content(new_label_different_scope)
-          expect(show.text_of_labels_block).not_to have_content(initial_label)
-          expect(show.text_of_labels_block).to have_content(new_label_same_scope_multi_colon)
-          expect(show.text_of_labels_block).to have_content(new_label_different_scope_multi_colon)
-          expect(show.text_of_labels_block).not_to have_content(initial_label_multi_colon)
+          expect(show.text_of_labels_block).not_to have_content(initial_label.gsub('::', ' '))
+          expect(show.text_of_labels_block).not_to have_content('group::car ferrari')
         end
       end
     end

@@ -22,6 +22,11 @@ export default {
   components: {
     SplitButton,
   },
+  methods: {
+    change(item) {
+      this.$emit(item.eventName);
+    },
+  },
 };
 </script>
 
@@ -33,5 +38,6 @@ export default {
     right
     size="sm"
     v-on="$listeners"
+    @change="change"
   />
 </template>

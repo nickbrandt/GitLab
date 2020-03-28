@@ -5,16 +5,11 @@ class JiraConnect::ApplicationController < ApplicationController
 
   skip_before_action :authenticate_user!
   skip_before_action :verify_authenticity_token
-  before_action :check_feature_flag_enabled!
   before_action :verify_atlassian_jwt!
 
   attr_reader :current_jira_installation
 
   private
-
-  def check_feature_flag_enabled!
-    render_404 unless Feature.enabled?(:jira_connect_app)
-  end
 
   def verify_atlassian_jwt!
     return render_403 unless atlassian_jwt_valid?

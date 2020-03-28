@@ -1,12 +1,13 @@
 <script>
+/* global Mousetrap */
+import 'mousetrap';
 import { s__, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import PaginationButton from './pagination_button.vue';
 import allDesignsMixin from '../../mixins/all_designs';
+import { DESIGN_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
-    Icon,
     PaginationButton,
   },
   mixins: [allDesignsMixin],
@@ -38,6 +39,24 @@ export default {
       if (!this.designsCount) return null;
 
       return this.designs[this.currentIndex + 1];
+    },
+  },
+  mounted() {
+    Mousetrap.bind('left', () => this.navigateToDesign(this.previousDesign));
+    Mousetrap.bind('right', () => this.navigateToDesign(this.nextDesign));
+  },
+  beforeDestroy() {
+    Mousetrap.unbind(['left', 'right'], this.navigateToDesign);
+  },
+  methods: {
+    navigateToDesign(design) {
+      if (design) {
+        this.$router.push({
+          name: DESIGN_ROUTE_NAME,
+          params: { id: design.filename },
+          query: this.$route.query,
+        });
+      }
     },
   },
 };

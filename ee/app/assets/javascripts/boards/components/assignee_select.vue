@@ -1,8 +1,8 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import UsersSelect from '~/users_select';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {

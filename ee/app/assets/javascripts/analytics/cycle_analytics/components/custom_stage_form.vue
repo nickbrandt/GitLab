@@ -1,8 +1,20 @@
 <script>
-import { isEqual } from 'underscore';
-import { GlButton, GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
+import { mapGetters } from 'vuex';
+import { isEqual } from 'lodash';
+import {
+  GlFormGroup,
+  GlFormInput,
+  GlFormSelect,
+  GlLoadingIcon,
+  GlDropdown,
+  GlDropdownHeader,
+  GlDropdownItem,
+  GlSprintf,
+} from '@gitlab/ui';
 import { s__ } from '~/locale';
+import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
+import { STAGE_ACTIONS, DEFAULT_STAGE_NAMES } from '../constants';
 import {
   isStartEvent,
   isLabelEvent,
@@ -12,22 +24,48 @@ import {
   getLabelEventsIdentifiers,
 } from '../utils';
 
-const initFields = {
-  name: '',
-  startEvent: '',
-  startEventLabel: null,
-  stopEvent: '',
-  stopEventLabel: null,
+const defaultFields = {
+  id: null,
+  name: null,
+  startEventIdentifier: null,
+  startEventLabelId: null,
+  endEventIdentifier: null,
+  endEventLabelId: null,
+};
+
+export const initializeFormData = ({ emptyFieldState, initialFields, errors }) => {
+  const defaultErrors = initialFields?.endEventIdentifier
+    ? { ...emptyFieldState, endEventIdentifier: null }
+    : {
+        ...emptyFieldState,
+        endEventIdentifier:
+          initialFields && !initialFields.startEventIdentifier
+            ? [s__('CustomCycleAnalytics|Please select a start event first')]
+            : null,
+      };
+  return {
+    fields: {
+      ...emptyFieldState,
+      ...initialFields,
+    },
+    fieldErrors: {
+      ...defaultErrors,
+      ...errors,
+    },
+  };
 };
 
 export default {
   components: {
-    GlButton,
     GlFormGroup,
     GlFormInput,
     GlFormSelect,
     GlLoadingIcon,
     LabelsSelector,
+    GlDropdown,
+    GlDropdownHeader,
+    GlDropdownItem,
+    GlSprintf,
   },
   props: {
     events: {
@@ -41,111 +79,216 @@ export default {
     initialFields: {
       type: Object,
       required: false,
-      default: () => ({
-        ...initFields,
-      }),
+      default: () => {},
     },
     isSavingCustomStage: {
       type: Boolean,
       required: false,
       default: false,
     },
+    isEditingCustomStage: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    errors: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
+    const { initialFields = {}, errors = null } = this;
+    const { fields, fieldErrors } = initializeFormData({
+      emptyFieldState: defaultFields,
+      initialFields,
+      errors,
+    });
     return {
-      fields: {
-        ...initFields,
-      },
+      labelEvents: getLabelEventsIdentifiers(this.events),
+      fields,
+      fieldErrors,
     };
   },
   computed: {
+    ...mapGetters(['hiddenStages']),
     startEventOptions() {
       return [
         { value: null, text: s__('CustomCycleAnalytics|Select start event') },
         ...this.events.filter(isStartEvent).map(eventToOption),
       ];
     },
-    stopEventOptions() {
-      const stopEvents = getAllowedEndEvents(this.events, this.fields.startEvent);
+    endEventOptions() {
+      const endEvents = getAllowedEndEvents(this.events, this.fields.startEventIdentifier);
       return [
         { value: null, text: s__('CustomCycleAnalytics|Select stop event') },
-        ...eventsByIdentifier(this.events, stopEvents).map(eventToOption),
+        ...eventsByIdentifier(this.events, endEvents).map(eventToOption),
       ];
     },
     hasStartEvent() {
-      return this.fields.startEvent;
+      return this.fields.startEventIdentifier;
     },
     startEventRequiresLabel() {
-      return isLabelEvent(this.labelEvents, this.fields.startEvent);
+      return isLabelEvent(this.labelEvents, this.fields.startEventIdentifier);
     },
-    stopEventRequiresLabel() {
-      return isLabelEvent(this.labelEvents, this.fields.stopEvent);
+    endEventRequiresLabel() {
+      return isLabelEvent(this.labelEvents, this.fields.endEventIdentifier);
+    },
+    hasErrors() {
+      return (
+        this.eventMismatchError ||
+        Object.values(this.fieldErrors).some(errArray => errArray?.length)
+      );
     },
     isComplete() {
-      if (!this.hasValidStartAndStopEventPair) return false;
-      const requiredFields = [this.fields.startEvent, this.fields.stopEvent, this.fields.name];
-      if (this.startEventRequiresLabel) {
-        requiredFields.push(this.fields.startEventLabel);
+      if (this.hasErrors) {
+        return false;
       }
-      if (this.stopEventRequiresLabel) {
-        requiredFields.push(this.fields.stopEventLabel);
+      const {
+        fields: {
+          name,
+          startEventIdentifier,
+          startEventLabelId,
+          endEventIdentifier,
+          endEventLabelId,
+        },
+      } = this;
+
+      const requiredFields = [startEventIdentifier, endEventIdentifier, name];
+      if (this.startEventRequiresLabel) {
+        requiredFields.push(startEventLabelId);
+      }
+      if (this.endEventRequiresLabel) {
+        requiredFields.push(endEventLabelId);
       }
       return requiredFields.every(
         fieldValue => fieldValue && (fieldValue.length > 0 || fieldValue > 0),
       );
     },
     isDirty() {
-      return !isEqual(this.initialFields, this.fields);
+      return !isEqual(this.initialFields, this.fields) && !isEqual(defaultFields, this.fields);
     },
-    hasValidStartAndStopEventPair() {
+    eventMismatchError() {
       const {
-        fields: { startEvent, stopEvent },
+        fields: { startEventIdentifier = null, endEventIdentifier = null },
       } = this;
-      if (startEvent && stopEvent) {
-        const stopEvents = getAllowedEndEvents(this.events, startEvent);
-        return stopEvents.length && stopEvents.includes(stopEvent);
-      }
-      return true;
+
+      if (!startEventIdentifier || !endEventIdentifier) return true;
+      const endEvents = getAllowedEndEvents(this.events, startEventIdentifier);
+      return !endEvents.length || !endEvents.includes(endEventIdentifier);
     },
-    stopEventError() {
-      return !this.hasValidStartAndStopEventPair
-        ? s__('CustomCycleAnalytics|Start event changed, please select a valid stop event')
-        : null;
+    saveStageText() {
+      return this.isEditingCustomStage
+        ? s__('CustomCycleAnalytics|Update stage')
+        : s__('CustomCycleAnalytics|Add stage');
+    },
+    formTitle() {
+      return this.isEditingCustomStage
+        ? s__('CustomCycleAnalytics|Editing stage')
+        : s__('CustomCycleAnalytics|New stage');
+    },
+    hasHiddenStages() {
+      return this.hiddenStages.length;
     },
   },
-  mounted() {
-    this.labelEvents = getLabelEventsIdentifiers(this.events);
+  watch: {
+    initialFields(newFields) {
+      this.fields = {
+        ...defaultFields,
+        ...newFields,
+      };
+    },
+    errors(newErrors) {
+      this.fieldErrors = {
+        ...defaultFields,
+        ...newErrors,
+      };
+    },
   },
   methods: {
     handleCancel() {
-      this.fields = { ...this.initialFields };
+      const { initialFields = {}, errors = null } = this;
+      const formData = initializeFormData({
+        emptyFieldState: defaultFields,
+        initialFields,
+        errors,
+      });
+      this.$set(this, 'fields', formData.fields);
+      this.$set(this, 'fieldErrors', formData.fieldErrors);
       this.$emit('cancel');
     },
     handleSave() {
-      const { startEvent, startEventLabel, stopEvent, stopEventLabel, name } = this.fields;
-      this.$emit('submit', {
-        name,
-        start_event_identifier: startEvent,
-        start_event_label_id: startEventLabel,
-        end_event_identifier: stopEvent,
-        end_event_label_id: stopEventLabel,
-      });
+      const data = convertObjectPropsToSnakeCase(this.fields);
+      if (this.isEditingCustomStage) {
+        const { id } = this.initialFields;
+        this.$emit(STAGE_ACTIONS.UPDATE, { ...data, id });
+      } else {
+        this.$emit(STAGE_ACTIONS.CREATE, data);
+      }
     },
-    handleSelectLabel(key, labelId = null) {
+    handleSelectLabel(key, labelId) {
       this.fields[key] = labelId;
     },
     handleClearLabel(key) {
       this.fields[key] = null;
+    },
+    hasFieldErrors(key) {
+      return this.fieldErrors[key]?.length > 0;
+    },
+    fieldErrorMessage(key) {
+      return this.fieldErrors[key]?.join('\n');
+    },
+    onUpdateNameField() {
+      if (DEFAULT_STAGE_NAMES.includes(this.fields.name.toLowerCase())) {
+        this.$set(this.fieldErrors, 'name', [
+          s__('CustomCycleAnalytics|Stage name already exists'),
+        ]);
+      } else {
+        this.$set(this.fieldErrors, 'name', []);
+      }
+    },
+    onUpdateStartEventField() {
+      const initVal = this.initialFields?.endEventIdentifier
+        ? this.initialFields.endEventIdentifier
+        : null;
+      this.$set(this.fields, 'endEventIdentifier', initVal);
+      this.$set(this.fieldErrors, 'endEventIdentifier', [
+        s__('CustomCycleAnalytics|Start event changed, please select a valid stop event'),
+      ]);
+    },
+    onUpdateEndEventField() {
+      this.$set(this.fieldErrors, 'endEventIdentifier', null);
+    },
+    handleRecoverStage(id) {
+      this.$emit(STAGE_ACTIONS.UPDATE, { id, hidden: false });
     },
   },
 };
 </script>
 <template>
   <form class="custom-stage-form m-4 mt-0">
-    <div class="mb-1">
-      <h4>{{ s__('CustomCycleAnalytics|New stage') }}</h4>
+    <div class="mb-1 d-flex flex-row justify-content-between">
+      <h4>{{ formTitle }}</h4>
+      <gl-dropdown :text="__('Recover hidden stage')" class="js-recover-hidden-stage-dropdown">
+        <gl-dropdown-header>{{ __('Default stages') }}</gl-dropdown-header>
+        <template v-if="hasHiddenStages">
+          <gl-dropdown-item
+            v-for="stage in hiddenStages"
+            :key="stage.id"
+            @click="handleRecoverStage(stage.id)"
+            >{{ stage.title }}</gl-dropdown-item
+          >
+        </template>
+        <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
+      </gl-dropdown>
     </div>
-    <gl-form-group :label="s__('CustomCycleAnalytics|Name')">
+    <gl-form-group
+      ref="name"
+      :label="s__('CustomCycleAnalytics|Name')"
+      label-for="custom-stage-name"
+      :state="!hasFieldErrors('name')"
+      :invalid-feedback="fieldErrorMessage('name')"
+    >
       <gl-form-input
         v-model="fields.name"
         class="form-control"
@@ -153,58 +296,78 @@ export default {
         name="custom-stage-name"
         :placeholder="s__('CustomCycleAnalytics|Enter a name for the stage')"
         required
+        @change.native="onUpdateNameField"
       />
     </gl-form-group>
     <div class="d-flex" :class="{ 'justify-content-between': startEventRequiresLabel }">
       <div :class="[startEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Start event')">
+        <gl-form-group
+          ref="startEventIdentifier"
+          :label="s__('CustomCycleAnalytics|Start event')"
+          label-for="custom-stage-start-event"
+          :state="!hasFieldErrors('startEventIdentifier')"
+          :invalid-feedback="fieldErrorMessage('startEventIdentifier')"
+        >
           <gl-form-select
-            v-model="fields.startEvent"
+            v-model="fields.startEventIdentifier"
             name="custom-stage-start-event"
             :required="true"
             :options="startEventOptions"
+            @change.native="onUpdateStartEventField"
           />
         </gl-form-group>
       </div>
       <div v-if="startEventRequiresLabel" class="w-50 ml-1">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Start event label')">
+        <gl-form-group
+          ref="startEventLabelId"
+          :label="s__('CustomCycleAnalytics|Start event label')"
+          label-for="custom-stage-start-event-label"
+          :state="!hasFieldErrors('startEventLabelId')"
+          :invalid-feedback="fieldErrorMessage('startEventLabelId')"
+        >
           <labels-selector
             :labels="labels"
-            :selected-label-id="fields.startEventLabel"
+            :selected-label-id="fields.startEventLabelId"
             name="custom-stage-start-event-label"
-            @selectLabel="labelId => handleSelectLabel('startEventLabel', labelId)"
-            @clearLabel="handleClearLabel('startEventLabel')"
+            @selectLabel="handleSelectLabel('startEventLabelId', $event)"
+            @clearLabel="handleClearLabel('startEventLabelId')"
           />
         </gl-form-group>
       </div>
     </div>
-    <div class="d-flex" :class="{ 'justify-content-between': stopEventRequiresLabel }">
-      <div :class="[stopEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
+    <div class="d-flex" :class="{ 'justify-content-between': endEventRequiresLabel }">
+      <div :class="[endEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
         <gl-form-group
+          ref="endEventIdentifier"
           :label="s__('CustomCycleAnalytics|Stop event')"
-          :description="
-            !hasStartEvent ? s__('CustomCycleAnalytics|Please select a start event first') : ''
-          "
-          :state="hasValidStartAndStopEventPair"
-          :invalid-feedback="stopEventError"
+          label-for="custom-stage-stop-event"
+          :state="!hasFieldErrors('endEventIdentifier')"
+          :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
         >
           <gl-form-select
-            v-model="fields.stopEvent"
+            v-model="fields.endEventIdentifier"
             name="custom-stage-stop-event"
-            :options="stopEventOptions"
+            :options="endEventOptions"
             :required="true"
             :disabled="!hasStartEvent"
+            @change.native="onUpdateEndEventField"
           />
         </gl-form-group>
       </div>
-      <div v-if="stopEventRequiresLabel" class="w-50 ml-1">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Stop event label')">
+      <div v-if="endEventRequiresLabel" class="w-50 ml-1">
+        <gl-form-group
+          ref="endEventLabelId"
+          :label="s__('CustomCycleAnalytics|Stop event label')"
+          label-for="custom-stage-stop-event-label"
+          :state="!hasFieldErrors('endEventLabelId')"
+          :invalid-feedback="fieldErrorMessage('endEventLabelId')"
+        >
           <labels-selector
             :labels="labels"
-            :selected-label-id="fields.stopEventLabel"
+            :selected-label-id="fields.endEventLabelId"
             name="custom-stage-stop-event-label"
-            @selectLabel="labelId => handleSelectLabel('stopEventLabel', labelId)"
-            @clearLabel="handleClearLabel('stopEventLabel')"
+            @selectLabel="handleSelectLabel('endEventLabelId', $event)"
+            @clearLabel="handleClearLabel('endEventLabelId')"
           />
         </gl-form-group>
       </div>
@@ -213,7 +376,7 @@ export default {
     <div class="custom-stage-form-actions">
       <button
         :disabled="!isDirty"
-        class="btn btn-cancel js-custom-stage-form-cancel"
+        class="btn btn-cancel js-save-stage-cancel"
         type="button"
         @click="handleCancel"
       >
@@ -222,12 +385,26 @@ export default {
       <button
         :disabled="!isComplete || !isDirty"
         type="button"
-        class="js-custom-stage-form-submit btn btn-success"
+        class="js-save-stage btn btn-success"
         @click="handleSave"
       >
         <gl-loading-icon v-if="isSavingCustomStage" size="sm" inline />
-        {{ s__('CustomCycleAnalytics|Add stage') }}
+        {{ saveStageText }}
       </button>
+    </div>
+
+    <div class="mt-2">
+      <gl-sprintf
+        :message="
+          __(
+            '%{strongStart}Note:%{strongEnd} Once a custom stage has been added you can re-order stages by dragging them into the desired position.',
+          )
+        "
+      >
+        <template #strong="{ content }">
+          <strong>{{ content }}</strong>
+        </template>
+      </gl-sprintf>
     </div>
   </form>
 </template>

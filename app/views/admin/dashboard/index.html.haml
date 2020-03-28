@@ -3,6 +3,12 @@
 - if show_license_breakdown?
   = render_if_exists 'admin/licenses/breakdown', license: @license
 
+- if @notices
+  - @notices.each do |notice|
+    .js-vue-alert{ 'v-cloak': true, data: { variant: notice[:type],
+      dismissible: true.to_s } }
+      = notice[:message].html_safe
+
 .admin-dashboard.prepend-top-default
   .row
     .col-sm-4
@@ -42,22 +48,25 @@
         .well-segment.admin-well.admin-well-features
           %h4 Features
           = feature_entry(_('Sign up'),
-            href: admin_application_settings_path(anchor: 'js-signup-settings'),
+            href: general_admin_application_settings_path(anchor: 'js-signup-settings'),
             enabled: allow_signup?)
 
           = feature_entry(_('LDAP'),
-            enabled: Gitlab.config.ldap.enabled)
+            enabled: Gitlab.config.ldap.enabled,
+            doc_href: help_page_path('administration/auth/ldap'))
 
           = feature_entry(_('Gravatar'),
-            href: admin_application_settings_path(anchor: 'js-account-settings'),
+            href: general_admin_application_settings_path(anchor: 'js-account-settings'),
             enabled: gravatar_enabled?)
 
           = feature_entry(_('OmniAuth'),
-            href: admin_application_settings_path(anchor: 'js-signin-settings'),
-            enabled: Gitlab::Auth.omniauth_enabled?)
+            href: general_admin_application_settings_path(anchor: 'js-signin-settings'),
+            enabled: Gitlab::Auth.omniauth_enabled?,
+            doc_href: help_page_path('integration/omniauth'))
 
           = feature_entry(_('Reply by email'),
-            enabled: Gitlab::IncomingEmail.enabled?)
+            enabled: Gitlab::IncomingEmail.enabled?,
+            doc_href: help_page_path('administration/reply_by_email'))
 
           = render_if_exists 'admin/dashboard/elastic_and_geo'
 
@@ -82,7 +91,7 @@
               .float-right
                 = version_status_badge
           %p
-            %a{ href: admin_application_settings_path }
+            %a{ href: general_admin_application_settings_path }
               GitLab
             %span.float-right
               = Gitlab::VERSION
@@ -90,7 +99,7 @@
           %p
             GitLab Shell
             %span.float-right
-              = Gitlab::Shell.new.version
+              = Gitlab::Shell.version
           %p
             GitLab Workhorse
             %span.float-right

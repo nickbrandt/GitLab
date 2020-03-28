@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe JiraService do
-  include Gitlab::Routing
   include AssetsHelpers
 
   let(:title) { 'custom title' }
@@ -153,7 +152,7 @@ describe JiraService do
         end
       end
 
-      context '#update' do
+      describe '#update' do
         context 'basic update' do
           let(:new_username) { 'new_username' }
           let(:new_url) { 'http://jira-new.example.com' }
@@ -344,7 +343,7 @@ describe JiraService do
 
       it 'returns default values' do
         expect(service.title).to eq('Jira')
-        expect(service.description).to eq('Jira issue tracker')
+        expect(service.description).to eq(s_('JiraService|Jira issue tracker'))
       end
     end
   end
@@ -422,13 +421,44 @@ describe JiraService do
             GlobalID: 'GitLab',
             relationship: 'mentioned on',
             object: {
-              url: "#{Gitlab.config.gitlab.url}/#{project.full_path}/commit/#{commit_id}",
+              url: "#{Gitlab.config.gitlab.url}/#{project.full_path}/-/commit/#{commit_id}",
               title: "Solved by commit #{commit_id}.",
               icon: { title: 'GitLab', url16x16: favicon_path },
               status: { resolved: true }
             }
           )
         ).once
+      end
+
+      context 'when "comment_on_event_enabled" is set to false' do
+        it 'creates Remote Link reference but does not create comment' do
+          allow(@jira_service).to receive_messages(comment_on_event_enabled: false)
+          @jira_service.close_issue(resource, ExternalIssue.new('JIRA-123', project))
+
+          expect(WebMock).not_to have_requested(:post, @comment_url)
+          expect(WebMock).to have_requested(:post, @remote_link_url)
+        end
+      end
+
+      context 'when Remote Link already exists' do
+        let(:remote_link) do
+          double(
+            'remote link',
+            object: {
+              url: "#{Gitlab.config.gitlab.url}/#{project.full_path}/-/commit/#{commit_id}"
+            }.with_indifferent_access
+          )
+        end
+
+        it 'does not create comment' do
+          allow(JIRA::Resource::Remotelink).to receive(:all).and_return([remote_link])
+
+          expect(remote_link).to receive(:save!)
+
+          @jira_service.close_issue(resource, ExternalIssue.new('JIRA-123', project))
+
+          expect(WebMock).not_to have_requested(:post, @comment_url)
+        end
       end
 
       it 'does not send comment or remote links to issues already closed' do
@@ -455,7 +485,7 @@ describe JiraService do
         @jira_service.close_issue(resource, ExternalIssue.new('JIRA-123', project))
 
         expect(WebMock).to have_requested(:post, @comment_url).with(
-          body: %r{#{custom_base_url}/#{project.full_path}/commit/#{commit_id}}
+          body: %r{#{custom_base_url}/#{project.full_path}/-/commit/#{commit_id}}
         ).once
       end
 
@@ -470,7 +500,7 @@ describe JiraService do
         @jira_service.close_issue(resource, ExternalIssue.new('JIRA-123', project))
 
         expect(WebMock).to have_requested(:post, @comment_url).with(
-          body: %r{#{Gitlab.config.gitlab.url}/#{project.full_path}/commit/#{commit_id}}
+          body: %r{#{Gitlab.config.gitlab.url}/#{project.full_path}/-/commit/#{commit_id}}
         ).once
       end
 
@@ -480,7 +510,14 @@ describe JiraService do
 
         @jira_service.close_issue(resource, ExternalIssue.new('JIRA-123', project))
 
-        expect(@jira_service).to have_received(:log_error).with("Issue transition failed", error: "Bad Request", client_url: "http://jira.example.com")
+        expect(@jira_service).to have_received(:log_error).with(
+          "Issue transition failed",
+          error: hash_including(
+            exception_class: 'StandardError',
+            exception_message: "Bad Request"
+          ),
+          client_url: "http://jira.example.com"
+        )
       end
 
       it 'calls the api with jira_issue_transition_id' do
@@ -533,47 +570,55 @@ describe JiraService do
     end
   end
 
-  describe '#test_settings' do
+  describe '#test' do
     let(:jira_service) do
       described_class.new(
-        project: create(:project),
-        url: 'http://jira.example.com',
-        username: 'jira_username',
-        password: 'jira_password'
+        url: url,
+        username: username,
+        password: password
       )
     end
 
-    def test_settings(api_url = nil)
-      api_url ||= 'jira.example.com'
-      test_url = "http://#{api_url}/rest/api/2/serverInfo"
+    def test_settings(url = 'jira.example.com')
+      test_url = "http://#{url}/rest/api/2/serverInfo"
 
-      WebMock.stub_request(:get, test_url).with(basic_auth: %w(jira_username jira_password)).to_return(body: { url: 'http://url' }.to_json )
+      WebMock.stub_request(:get, test_url).with(basic_auth: [username, password])
+        .to_return(body: { url: 'http://url' }.to_json )
 
       jira_service.test(nil)
     end
 
     context 'when the test succeeds' do
-      it 'tries to get Jira project with URL when API URL not set' do
-        test_settings('jira.example.com')
+      it 'gets Jira project with URL when API URL not set' do
+        expect(test_settings).to eq(success: true, result: { 'url' => 'http://url' })
       end
 
-      it 'returns correct result' do
-        expect(test_settings).to eq( { success: true, result: { 'url' => 'http://url' } })
-      end
-
-      it 'tries to get Jira project with API URL if set' do
+      it 'gets Jira project with API URL if set' do
         jira_service.update(api_url: 'http://jira.api.com')
-        test_settings('jira.api.com')
+
+        expect(test_settings('jira.api.com')).to eq(success: true, result: { 'url' => 'http://url' })
       end
     end
 
     context 'when the test fails' do
       it 'returns result with the error' do
         test_url = 'http://jira.example.com/rest/api/2/serverInfo'
-        WebMock.stub_request(:get, test_url).with(basic_auth: %w(jira_username jira_password))
+
+        WebMock.stub_request(:get, test_url).with(basic_auth: [username, password])
           .to_raise(JIRA::HTTPError.new(double(message: 'Some specific failure.')))
 
-        expect(jira_service.test(nil)).to eq( { success: false, result: 'Some specific failure.' })
+        expect(jira_service).to receive(:log_error).with(
+          "Error sending message",
+          hash_including(
+            client_url: url,
+            error: hash_including(
+              exception_class: 'JIRA::HTTPError',
+              exception_message: 'Some specific failure.'
+            )
+          )
+        )
+
+        expect(jira_service.test(nil)).to eq(success: false, result: 'Some specific failure.')
       end
     end
   end
@@ -596,7 +641,7 @@ describe JiraService do
         service = create(:jira_service)
 
         expect(service.title).to eq('Jira')
-        expect(service.description).to eq('Jira issue tracker')
+        expect(service.description).to eq(s_('JiraService|Jira issue tracker'))
       end
     end
 

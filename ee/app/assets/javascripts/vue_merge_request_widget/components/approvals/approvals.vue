@@ -2,7 +2,6 @@
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import createFlash, { hideFlash } from '~/flash';
 import { s__ } from '~/locale';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
 import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
@@ -15,7 +14,6 @@ import { FETCH_LOADING, FETCH_ERROR, APPROVE_ERROR, UNAPPROVE_ERROR } from './me
 export default {
   name: 'MRWidgetMultipleRuleApprovals',
   components: {
-    UserAvatarList,
     MrWidgetContainer,
     MrWidgetIcon,
     ApprovalsSummary,
@@ -50,7 +48,7 @@ export default {
       return this.mr.approvals || {};
     },
     hasFooter() {
-      return Boolean(this.approvals.has_approval_rules);
+      return Boolean(this.mr.approvals);
     },
     approvedBy() {
       return this.approvals.approved_by ? this.approvals.approved_by.map(x => x.user) : [];
@@ -243,6 +241,7 @@ export default {
       :approval-rules="mr.approvalRules"
       :is-loading-rules="isLoadingRules"
       :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
+      :eligible-approvers-docs-path="mr.eligibleApproversDocsPath"
     />
   </mr-widget-container>
 </template>

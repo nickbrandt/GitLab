@@ -6,8 +6,15 @@ module API
     class Base < Grape::API
       before { authenticate_by_gitlab_shell_token! }
 
+      before do
+        Gitlab::ApplicationContext.push(
+          user: -> { actor&.user },
+          project: -> { project },
+          caller_id: route.origin
+        )
+      end
+
       helpers ::API::Helpers::InternalHelpers
-      helpers ::Gitlab::Identifier
 
       UNKNOWN_CHECK_RESULT_ERROR = 'Unknown check result'.freeze
 
@@ -33,9 +40,8 @@ module API
 
           # Stores some Git-specific env thread-safely
           env = parse_env
-          Gitlab::Git::HookEnv.set(gl_repository, env) if project
+          Gitlab::Git::HookEnv.set(gl_repository, env) if container
 
-          actor = Support::GitAccessActor.from_params(params)
           actor.update_last_used_at!
           access_checker = access_checker_for(actor, params[:protocol])
 
@@ -43,7 +49,11 @@ module API
                            result = access_checker.check(params[:action], params[:changes])
                            @project ||= access_checker.project
                            result
-                         rescue Gitlab::GitAccess::UnauthorizedError => e
+                         rescue Gitlab::GitAccess::ForbiddenError => e
+                           # The return code needs to be 401. If we return 403
+                           # the custom message we return won't be shown to the user
+                           # and, instead, the default message 'GitLab: API is not accessible'
+                           # will be displayed
                            return response_with_status(code: 401, success: false, message: e.message)
                          rescue Gitlab::GitAccess::TimeoutError => e
                            return response_with_status(code: 503, success: false, message: e.message)
@@ -57,7 +67,7 @@ module API
           when ::Gitlab::GitAccessResult::Success
             payload = {
               gl_repository: gl_repository,
-              gl_project_path: gl_project_path,
+              gl_project_path: gl_repository_path,
               gl_id: Gitlab::GlId.gl_id(actor.user),
               gl_username: actor.username,
               git_config_options: [],
@@ -98,41 +108,39 @@ module API
         #   check_ip - optional, only in EE version, may limit access to
         #     group resources based on its IP restrictions
         post "/allowed" do
+          if repo_type.snippet? && Feature.disabled?(:version_snippets, actor.user)
+            break response_with_status(code: 404, success: false, message: 'The project you were looking for could not be found.')
+          end
+
           # It was moved to a separate method so that EE can alter its behaviour more
           # easily.
           check_allowed(params)
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         post "/lfs_authenticate" do
           status 200
 
-          if params[:key_id]
-            actor = Key.find(params[:key_id])
-            actor.update_last_used_at
-          elsif params[:user_id]
-            actor = User.find_by(id: params[:user_id])
-            raise ActiveRecord::RecordNotFound.new("No such user id!") unless actor
-          else
-            raise ActiveRecord::RecordNotFound.new("No key_id or user_id passed!")
+          unless actor.key_or_user
+            raise ActiveRecord::RecordNotFound.new('User not found!')
           end
 
+          actor.update_last_used_at!
+
           Gitlab::LfsToken
-            .new(actor)
+            .new(actor.key_or_user)
             .authentication_payload(lfs_authentication_url(project))
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         #
         # Get a ssh key using the fingerprint
         #
         # rubocop: disable CodeReuse/ActiveRecord
-        get "/authorized_keys" do
+        get '/authorized_keys' do
           fingerprint = params.fetch(:fingerprint) do
             Gitlab::InsecureKeyFingerprint.new(params.fetch(:key)).fingerprint
           end
           key = Key.find_by(fingerprint: fingerprint)
-          not_found!("Key") if key.nil?
+          not_found!('Key') if key.nil?
           present key, with: Entities::SSHKey
         end
         # rubocop: enable CodeReuse/ActiveRecord
@@ -141,16 +149,10 @@ module API
         # Discover user by ssh key, user id or username
         #
         get '/discover' do
-          if params[:key_id]
-            user = UserFinder.new(params[:key_id]).find_by_ssh_key_id
-          elsif params[:username]
-            user = UserFinder.new(params[:username]).find_by_username
-          end
-
-          present user, with: Entities::UserSafe
+          present actor.user, with: Entities::UserSafe
         end
 
-        get "/check" do
+        get '/check' do
           {
             api_version: API.version,
             gitlab_version: Gitlab::VERSION,
@@ -158,35 +160,26 @@ module API
             redis: redis_ping
           }
         end
-
-        # rubocop: disable CodeReuse/ActiveRecord
         post '/two_factor_recovery_codes' do
           status 200
 
-          if params[:key_id]
-            key = Key.find_by(id: params[:key_id])
+          actor.update_last_used_at!
+          user = actor.user
 
-            if key
-              key.update_last_used_at
-            else
-              break { 'success' => false, 'message' => 'Could not find the given key' }
+          if params[:key_id]
+            unless actor.key
+              break { success: false, message: 'Could not find the given key' }
             end
 
-            if key.is_a?(DeployKey)
+            if actor.key.is_a?(DeployKey)
               break { success: false, message: 'Deploy keys cannot be used to retrieve recovery codes' }
             end
-
-            user = key.user
 
             unless user
               break { success: false, message: 'Could not find a user for the given key' }
             end
-          elsif params[:user_id]
-            user = User.find_by(id: params[:user_id])
-
-            unless user
-              break { success: false, message: 'Could not find the given user' }
-            end
+          elsif params[:user_id] && user.nil?
+            break { success: false, message: 'Could not find the given user' }
           end
 
           unless user.two_factor_enabled?
@@ -201,7 +194,6 @@ module API
 
           { success: true, recovery_codes: codes }
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         post '/pre_receive' do
           status 200
@@ -211,7 +203,7 @@ module API
           { reference_counter_increased: reference_counter_increased }
         end
 
-        post "/notify_post_receive" do
+        post '/notify_post_receive' do
           status 200
 
           # TODO: Re-enable when Gitaly is processing the post-receive notification
@@ -228,36 +220,7 @@ module API
         post '/post_receive' do
           status 200
 
-          response = Gitlab::InternalPostReceive::Response.new
-          user = identify(params[:identifier])
-          project = Gitlab::GlRepository.parse(params[:gl_repository]).first
-          push_options = Gitlab::PushOptions.new(params[:push_options])
-
-          response.reference_counter_decreased = Gitlab::ReferenceCounter.new(params[:gl_repository]).decrease
-
-          PostReceive.perform_async(params[:gl_repository], params[:identifier],
-                                    params[:changes], push_options.as_json)
-
-          mr_options = push_options.get(:merge_request)
-          if mr_options.present?
-            message = process_mr_push_options(mr_options, project, user, params[:changes])
-            response.add_alert_message(message)
-          end
-
-          broadcast_message = BroadcastMessage.current&.last&.message
-          response.add_alert_message(broadcast_message)
-
-          response.add_merge_request_urls(merge_request_urls)
-
-          # A user is not guaranteed to be returned; an orphaned write deploy
-          # key could be used
-          if user
-            redirect_message = Gitlab::Checks::ProjectMoved.fetch_message(user.id, project.id)
-            project_created_message = Gitlab::Checks::ProjectCreated.fetch_message(user.id, project.id)
-
-            response.add_basic_message(redirect_message)
-            response.add_basic_message(project_created_message)
-          end
+          response = PostReceiveService.new(actor.user, repository, project, params).execute
 
           ee_post_receive_response_hook(response)
 

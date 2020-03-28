@@ -69,7 +69,6 @@
   &.footer-block {
     margin-top: $gl-padding-24;
     border-bottom: 0;
-    margin-bottom: -$gl-padding;
   }
 
   &.content-component-block {
@@ -162,13 +161,17 @@
   }
 
   .cover-controls {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    @include media-breakpoint-up(sm) {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+    }
 
     &.left {
-      left: 10px;
-      right: auto;
+      @include media-breakpoint-up(sm) {
+        left: 1.25rem;
+        right: auto;
+      }
     }
   }
 
@@ -326,11 +329,11 @@
   }
 
   .btn {
-    margin: $btn-side-margin 5px;
+    margin: $gl-padding-8 $gl-padding-4;
 
     @include media-breakpoint-down(xs) {
       width: 100%;
-      margin: $btn-side-margin 0;
+      margin: $gl-padding-8 0;
     }
   }
 }

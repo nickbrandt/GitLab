@@ -1,13 +1,6 @@
 <script>
-import {
-  GlFormInput,
-  GlButton,
-  GlLink,
-  GlFormGroup,
-  GlFormRadioGroup,
-  GlLoadingIcon,
-} from '@gitlab/ui';
-import { debounce } from 'underscore';
+import { GlFormInput, GlLink, GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
+import { debounce } from 'lodash';
 import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import csrf from '~/lib/utils/csrf';
@@ -16,37 +9,30 @@ import statusCodes from '~/lib/utils/http_status';
 import { backOff } from '~/lib/utils/common_utils';
 import { queryTypes, formDataValidator } from '../constants';
 
-const MAX_REQUESTS = 4;
+const VALIDATION_REQUEST_TIMEOUT = 10000;
 const axiosCancelToken = axios.CancelToken;
 let cancelTokenSource;
 
 function backOffRequest(makeRequestCallback) {
-  let requestsCount = 0;
   return backOff((next, stop) => {
     makeRequestCallback()
       .then(resp => {
         if (resp.status === statusCodes.OK) {
           stop(resp);
         } else {
-          requestsCount += 1;
-          if (requestsCount < MAX_REQUESTS) {
-            next();
-          } else {
-            stop(resp);
-          }
+          next();
         }
       })
       // If the request is cancelled by axios
       // then consider it as noop so that its not
       // caught by subsequent catches
       .catch(thrown => (axios.isCancel(thrown) ? undefined : stop(thrown)));
-  });
+  }, VALIDATION_REQUEST_TIMEOUT);
 }
 
 export default {
   components: {
     GlFormInput,
-    GlButton,
     GlLink,
     GlFormGroup,
     GlFormRadioGroup,
@@ -193,6 +179,7 @@ export default {
         name="prometheus_metric[title]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. Throughput')"
+        data-qa-selector="custom_metric_prometheus_title_field"
         required
       />
       <span class="form-text text-muted">{{ s__('Metrics|Used as a title for the chart') }}</span>
@@ -216,6 +203,7 @@ export default {
       <gl-form-input
         id="prometheus_metric_query"
         v-model.trim="query"
+        data-qa-selector="custom_metric_prometheus_query_field"
         name="prometheus_metric[query]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. rate(http_requests_total[5m])')"
@@ -253,6 +241,7 @@ export default {
       <gl-form-input
         id="prometheus_metric_y_label"
         v-model="yLabel"
+        data-qa-selector="custom_metric_prometheus_y_label_field"
         name="prometheus_metric[y_label]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. Requests/second')"
@@ -272,6 +261,7 @@ export default {
       <gl-form-input
         id="prometheus_metric_unit"
         v-model="unit"
+        data-qa-selector="custom_metric_prometheus_unit_label_field"
         name="prometheus_metric[unit]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. req/sec')"
@@ -286,6 +276,7 @@ export default {
       <gl-form-input
         id="prometheus_metric_legend"
         v-model="legend"
+        data-qa-selector="custom_metric_prometheus_legend_label_field"
         name="prometheus_metric[legend]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. HTTP requests')"

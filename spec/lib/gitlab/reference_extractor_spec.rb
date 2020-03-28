@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::ReferenceExtractor do
-  let(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   before do
     project.add_developer(project.creator)
@@ -225,6 +225,24 @@ describe Gitlab::ReferenceExtractor do
     end
   end
 
+  context 'with an inactive external issue tracker' do
+    let(:project) { create(:project) }
+    let!(:jira_service) { create(:jira_service, project: project, active: false) }
+    let(:issue)   { create(:issue, project: project) }
+
+    context 'when GitLab issues are enabled' do
+      it 'returns only internal issue' do
+        subject.analyze("JIRA-123 and FOOBAR-4567 and #{issue.to_reference}")
+        expect(subject.issues).to eq([issue])
+      end
+
+      it 'does not return any issue if the internal one does not exists' do
+        subject.analyze("JIRA-123 and FOOBAR-4567 and #999")
+        expect(subject.issues).to be_empty
+      end
+    end
+  end
+
   context 'with a project with an underscore' do
     let(:other_project) { create(:project, path: 'test_project') }
     let(:issue) { create(:issue, project: other_project) }
@@ -291,6 +309,36 @@ describe Gitlab::ReferenceExtractor do
         expected_count = multiple_allowed[prefix] || 1
         expect(referables.count).to eq(expected_count)
       end
+    end
+  end
+
+  describe '#references' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:issue) { create(:issue, project: project) }
+    let(:text) { "Ref. #{issue.to_reference}" }
+
+    subject { described_class.new(project, user) }
+
+    before do
+      subject.analyze(text)
+    end
+
+    context 'when references are visible' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'returns visible references of given type' do
+        expect(subject.references(:issue)).to eq([issue])
+      end
+
+      it 'does not increase stateful_not_visible_counter' do
+        expect { subject.references(:issue) }.not_to change { subject.stateful_not_visible_counter }
+      end
+    end
+
+    it 'increases stateful_not_visible_counter' do
+      expect { subject.references(:issue) }.to change { subject.stateful_not_visible_counter }.by(1)
     end
   end
 end

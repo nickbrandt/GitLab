@@ -23,10 +23,9 @@ describe('FilterDropdowns component', () => {
   const projectId = 10;
 
   beforeEach(() => {
-    wrapper = shallowMount(localVue.extend(FilterDropdowns), {
+    wrapper = shallowMount(FilterDropdowns, {
       localVue,
       store,
-      sync: false,
       propsData: {},
       methods: {
         ...actionSpies,

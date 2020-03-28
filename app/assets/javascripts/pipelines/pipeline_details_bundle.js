@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
+import { setUrlFragment, redirectTo } from '~/lib/utils/url_utility';
 import pipelineGraph from './components/graph/graph_component.vue';
 import GraphBundleMixin from './mixins/graph_pipeline_bundle_mixin';
 import PipelinesMediator from './pipeline_details_mediator';
@@ -9,6 +10,7 @@ import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
 import TestReports from './components/test_reports/test_reports.vue';
 import testReportsStore from './stores/test_reports';
+import axios from '~/lib/utils/axios_utils';
 
 Vue.use(Translate);
 
@@ -62,16 +64,25 @@ export default () => {
     },
     created() {
       eventHub.$on('headerPostAction', this.postAction);
+      eventHub.$on('headerDeleteAction', this.deleteAction);
     },
     beforeDestroy() {
       eventHub.$off('headerPostAction', this.postAction);
+      eventHub.$off('headerDeleteAction', this.deleteAction);
     },
     methods: {
-      postAction(action) {
+      postAction(path) {
         this.mediator.service
-          .postAction(action.path)
+          .postAction(path)
           .then(() => this.mediator.refreshPipeline())
           .catch(() => Flash(__('An error occurred while making the request.')));
+      },
+      deleteAction(path) {
+        this.mediator.stopPipelinePoll();
+        this.mediator.service
+          .deleteAction(path)
+          .then(({ request }) => redirectTo(setUrlFragment(request.responseURL, 'delete_success')))
+          .catch(() => Flash(__('An error occurred while deleting the pipeline.')));
       },
     },
     render(createElement) {
@@ -84,12 +95,30 @@ export default () => {
     },
   });
 
+  const tabsElement = document.querySelector('.pipelines-tabs');
   const testReportsEnabled =
     window.gon && window.gon.features && window.gon.features.junitPipelineView;
 
-  if (testReportsEnabled) {
+  if (tabsElement && testReportsEnabled) {
+    const fetchReportsAction = 'fetchReports';
     testReportsStore.dispatch('setEndpoint', dataset.testReportEndpoint);
-    testReportsStore.dispatch('fetchReports');
+
+    const isTestTabActive = Boolean(
+      document.querySelector('.pipelines-tabs > li > a.test-tab.active'),
+    );
+
+    if (isTestTabActive) {
+      testReportsStore.dispatch(fetchReportsAction);
+    } else {
+      const tabClickHandler = e => {
+        if (e.target.className === 'test-tab') {
+          testReportsStore.dispatch(fetchReportsAction);
+          tabsElement.removeEventListener('click', tabClickHandler);
+        }
+      };
+
+      tabsElement.addEventListener('click', tabClickHandler);
+    }
 
     // eslint-disable-next-line no-new
     new Vue({
@@ -101,5 +130,16 @@ export default () => {
         return createElement('test-reports');
       },
     });
+
+    axios
+      .get(dataset.testReportsCountEndpoint)
+      .then(({ data }) => {
+        if (!data.total_count) {
+          return;
+        }
+
+        document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
+      })
+      .catch(() => {});
   }
 };

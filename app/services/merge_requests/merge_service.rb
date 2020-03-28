@@ -79,6 +79,8 @@ module MergeRequests
       end
 
       merge_request.update!(merge_commit_sha: commit_id)
+    ensure
+      merge_request.update_column(:in_progress_merge_commit_sha, nil)
     end
 
     def try_merge
@@ -89,8 +91,6 @@ module MergeRequests
     rescue => e
       handle_merge_error(log_message: e.message)
       raise_error('Something went wrong during merge')
-    ensure
-      merge_request.update!(in_progress_merge_commit_sha: nil)
     end
 
     def after_merge
@@ -99,7 +99,7 @@ module MergeRequests
       log_info("Post merge finished on JID #{merge_jid} with state #{state}")
 
       if delete_source_branch?
-        DeleteBranchService.new(@merge_request.source_project, branch_deletion_user)
+        ::Branches::DeleteService.new(@merge_request.source_project, branch_deletion_user)
           .execute(merge_request.source_branch)
       end
     end

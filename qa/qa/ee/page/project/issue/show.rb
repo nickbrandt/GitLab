@@ -19,9 +19,12 @@ module QA
                 end
 
                 view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
+                  element :related_issues_plus_button
+                end
+
+                view 'ee/app/assets/javascripts/related_issues/components/related_issues_list.vue' do
                   element :related_issuable_item
                   element :related_issues_loading_icon
-                  element :related_issues_plus_button
                 end
 
                 view 'ee/app/assets/javascripts/sidebar/components/weight/weight.vue' do
@@ -65,9 +68,7 @@ module QA
             end
 
             def wait_for_related_issues_to_load
-              wait(reload: false) do
-                has_no_element?(:related_issues_loading_icon)
-              end
+              has_no_element?(:related_issues_loading_icon, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
             end
 
             def weight_label_value
@@ -76,6 +77,17 @@ module QA
 
             def weight_no_value_content
               find_element(:weight_no_value_content)
+            end
+
+            def wait_for_attachment_replication(image_url, max_wait: Runtime::Geo.max_file_replication_time)
+              QA::Runtime::Logger.debug(%Q[#{self.class.name} - wait_for_attachment_replication])
+              wait_until_geo_max_replication_time(max_wait: max_wait) do
+                asset_exists?(image_url)
+              end
+            end
+
+            def wait_until_geo_max_replication_time(max_wait: Runtime::Geo.max_file_replication_time)
+              wait_until(max_duration: max_wait) { yield }
             end
           end
         end

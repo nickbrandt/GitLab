@@ -1,11 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import { GlBadge, GlButton, GlLoadingIcon } from '@gitlab/ui';
-import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
-
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
-
-const localVue = createLocalVue();
+import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 const getArrayWithLength = n => [...Array(n).keys()];
 const generateMockProjects = (projectsCount, mockProject = {}) =>
@@ -17,12 +14,10 @@ describe('Project List component', () => {
   const factory = ({ projects = [], stubs = {}, showLoadingIndicator = false } = {}) => {
     wrapper = shallowMount(ProjectList, {
       stubs,
-      localVue,
       propsData: {
         projects,
         showLoadingIndicator,
       },
-      sync: false,
     });
   };
 
@@ -94,9 +89,11 @@ describe('Project List component', () => {
 
     factory({ projects: mockProjects, stubs: { GlButton } });
 
-    getFirstRemoveButton().trigger('click');
+    getFirstRemoveButton().vm.$emit('click');
 
-    expect(wrapper.emitted('projectRemoved')).toHaveLength(1);
-    expect(wrapper.emitted('projectRemoved')).toEqual([[projectData]]);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted('projectRemoved')).toHaveLength(1);
+      expect(wrapper.emitted('projectRemoved')).toEqual([[projectData]]);
+    });
   });
 });

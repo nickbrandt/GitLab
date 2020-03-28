@@ -1,13 +1,10 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Environments from 'ee/clusters/components/environments.vue';
 import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import environments from './mock_data';
 
-const localVue = createLocalVue();
-
 describe('Environments', () => {
-  const Component = localVue.extend(Environments);
   let wrapper;
   let propsData;
 
@@ -20,9 +17,8 @@ describe('Environments', () => {
       isFetching: false,
     };
 
-    wrapper = mount(Component, {
+    wrapper = mount(Environments, {
       propsData,
-      localVue,
     });
   });
 
@@ -33,7 +29,7 @@ describe('Environments', () => {
   it('renders an empty state if no deployments are found', () => {
     const emptyState = wrapper.find(GlEmptyState);
     const emptyStateText =
-      'No deployments found Ensure your environment is part of the deploy stage of your CI pipeline to track deployments to your cluster. Learn more about deploying to a cluster';
+      'No deployments found Ensure your environment is part of the deploy stage of your CI pipeline to track deployments to your cluster.  Learn more about deploying to a cluster';
 
     expect(emptyState.exists()).toBe(true);
     expect(emptyState.text()).toEqual(emptyStateText);
@@ -43,11 +39,9 @@ describe('Environments', () => {
     let table;
 
     beforeAll(() => {
-      wrapper = mount(Component, {
+      wrapper = mount(Environments, {
         propsData: { ...propsData, environments },
-        localVue,
         stubs: { deploymentInstance: '<div class="js-deployment-instance"></div>' },
-        sync: false,
       });
 
       table = wrapper.find(GlTable);
@@ -64,6 +58,10 @@ describe('Environments', () => {
       expect(headers.length).toBe(tableHeaders.length);
 
       tableHeaders.forEach((headerText, i) => expect(headers.at(i).text()).toEqual(headerText));
+    });
+
+    it('should stack on smaller devices', () => {
+      expect(table.classes()).toContain('b-table-stacked-md');
     });
 
     describe('deployment instances', () => {

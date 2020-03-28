@@ -8,7 +8,7 @@ Troubleshooting Elasticsearch requires:
 ## Common terminology
 
 - **Lucene**: A full-text search library written in Java.
-- **Near Realtime (NRT)**: Refers to the slight latency from the time to index a
+- **Near real time (NRT)**: Refers to the slight latency from the time to index a
   document to the time when it becomes searchable.
 - **Cluster**: A collection of one or more nodes that work together to hold all
   the data, providing indexing and search capabilities.
@@ -106,7 +106,7 @@ graph TD;
   D2 --> |Yes| D4
   D4 --> |No| D5
   D4 --> |Yes| D6
-  D{Is the error concerning<br>the beta indexer?}
+  D{Is the error concerning<br>the Go indexer?}
   D1[It would be best<br>to speak with an<br>Elasticsearch admin.]
   D2{Is the ICU development<br>package installed?}
   D3>This package is required.<br>Install the package<br>and retry.]
@@ -245,12 +245,13 @@ much to "integrate" here.
 
 If the issue is:
 
-- Not concerning the beta indexer, it is almost always an
+- With the Go indexer, check if the ICU development package is installed.
+  This is a required package so make sure you install it.
+  Go indexer was a beta indexer which can be optionally turned on/off, but in 12.3 it reached stable status and is now the default.
+- Not concerning the Go indexer, it is almost always an
   Elasticsearch-side issue. This means you should reach out to your Elasticsearch admin
   regarding the error(s) you are seeing. If you are unsure here, it never hurts to reach
   out to GitLab support.
-- With the beta indexer, check if the ICU development package is installed.
-  This is a required package so make sure you install it.
 
 Beyond that, you will want to review the error. If it is:
 
@@ -270,7 +271,7 @@ Generally speaking, ensure:
 - The Elasticsearch server have enough RAM and CPU cores.
 - That sharding **is** being used.
 
-Going into some more detail here, if Elasticsearch is running on the same server as GitLab, resource contention is **very** likely to occur. Ideally, Elasticsearch, which requires ample resources, should be running on its own server (maybe coupled with logstash and kibana).
+Going into some more detail here, if Elasticsearch is running on the same server as GitLab, resource contention is **very** likely to occur. Ideally, Elasticsearch, which requires ample resources, should be running on its own server (maybe coupled with Logstash and Kibana).
 
 When it comes to Elasticsearch, RAM is the key resource. Elasticsearch themselves recommend:
 
@@ -324,14 +325,14 @@ feel free to update that page with issues you encounter and solutions.
 
 ## Replication
 
-Setting up Elasticsearch isn't too bad, but it can be a bit finnicky and time consuming.
+Setting up Elasticsearch isn't too bad, but it can be a bit finicky and time consuming.
 
 The easiest method is to spin up a docker container with the required version and
 bind ports 9200/9300 so it can be used.
 
 The following is an example of running a docker container of Elasticsearch v7.2.0:
 
-```bash
+```shell
 docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 ```

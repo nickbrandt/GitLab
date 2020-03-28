@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-resources :groups, only: [:index, :new, :create] do
-  post :preview_markdown
-end
-
 constraints(::Constraints::GroupUrlConstrainer.new) do
   scope(path: 'groups/*id',
         controller: :groups,
@@ -33,6 +29,13 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
         put :reset_registration_token
         patch :update_auto_devops
+        post :create_deploy_token, path: 'deploy_token/create'
+      end
+
+      resources :integrations, only: [:index, :edit, :update] do
+        member do
+          put :test
+        end
       end
     end
 
@@ -53,6 +56,12 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
+    resources :deploy_tokens, constraints: { id: /\d+/ }, only: [] do
+      member do
+        put :revoke
+      end
+    end
+
     resource :avatar, only: [:destroy]
 
     concerns :clusterable
@@ -66,7 +75,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :uploads, only: [:create] do
       collection do
-        get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
+        get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }, format: false, defaults: { format: nil }
         post :authorize
       end
     end
@@ -80,7 +89,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :container_registries, only: [:index], controller: 'registry/repositories'
+    resources :container_registries, only: [:index, :show], controller: 'registry/repositories'
   end
 
   scope(path: '*id',

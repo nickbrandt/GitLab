@@ -61,8 +61,7 @@ module QA
           CI
         end
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
           merge_request.project = upstream_project
@@ -86,7 +85,7 @@ module QA
         end
 
         Page::Project::Pipeline::Show.perform do |show|
-          expect(show).to be_successful
+          expect(show).to be_passed
           expect(show).to have_no_job("downstream_job")
 
           show.click_linked_job(downstream_project_name)

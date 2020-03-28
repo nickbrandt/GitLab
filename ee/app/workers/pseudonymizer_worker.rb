@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-class PseudonymizerWorker
+class PseudonymizerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
+  # rubocop:disable Scalability/CronWorkerContext
+  # This worker does not perform work scoped to a context
   include CronjobQueue
+  # rubocop:enable Scalability/CronWorkerContext
 
   feature_category :integrations
 

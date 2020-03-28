@@ -5,7 +5,6 @@ module Operations
     include TokenAuthenticatable
 
     self.table_name = 'operations_feature_flags_clients'
-    self.ignored_columns += %i[token]
 
     belongs_to :project
 

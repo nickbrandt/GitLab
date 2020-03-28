@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import discussionNavigation from '../mixins/discussion_navigation';
@@ -17,14 +17,11 @@ export default {
       'getUserData',
       'getNoteableData',
       'resolvableDiscussionsCount',
-      'firstUnresolvedDiscussionId',
       'unresolvedDiscussionsCount',
+      'discussions',
     ]),
     isLoggedIn() {
       return this.getUserData.id;
-    },
-    hasNextButton() {
-      return this.isLoggedIn && !this.allResolved;
     },
     allResolved() {
       return this.unresolvedDiscussionsCount === 0;
@@ -35,23 +32,33 @@ export default {
     resolvedDiscussionsCount() {
       return this.resolvableDiscussionsCount - this.unresolvedDiscussionsCount;
     },
+    toggeableDiscussions() {
+      return this.discussions.filter(discussion => !discussion.individual_note);
+    },
+    allExpanded() {
+      return this.toggeableDiscussions.every(discussion => discussion.expanded);
+    },
   },
   methods: {
-    ...mapActions(['expandDiscussion']),
-    jumpToFirstUnresolvedDiscussion() {
-      const diffTab = window.mrTabs.currentAction === 'diffs';
-      const discussionId = this.firstUnresolvedDiscussionId(diffTab);
-
-      this.jumpToDiscussion(discussionId);
+    ...mapActions(['setExpandDiscussions']),
+    handleExpandDiscussions() {
+      this.setExpandDiscussions({
+        discussionIds: this.toggeableDiscussions.map(discussion => discussion.id),
+        expanded: !this.allExpanded,
+      });
     },
   },
 };
 </script>
 
 <template>
-  <div v-if="resolvableDiscussionsCount > 0" class="line-resolve-all-container full-width-mobile">
-    <div class="full-width-mobile d-flex d-sm-block">
-      <div :class="{ 'has-next-btn': hasNextButton }" class="line-resolve-all">
+  <div
+    v-if="resolvableDiscussionsCount > 0"
+    ref="discussionCounter"
+    class="line-resolve-all-container full-width-mobile"
+  >
+    <div class="full-width-mobile d-flex d-sm-flex">
+      <div class="line-resolve-all">
         <span
           :class="{ 'is-active': allResolved }"
           class="line-resolve-btn is-disabled"
@@ -81,11 +88,24 @@ export default {
       <div v-if="isLoggedIn && !allResolved" class="btn-group btn-group-sm" role="group">
         <button
           v-gl-tooltip
-          title="Jump to first unresolved thread"
+          :title="__('Jump to next unresolved thread')"
           class="btn btn-default discussion-next-btn"
-          @click="jumpToFirstUnresolvedDiscussion"
+          data-track-event="click_button"
+          data-track-label="mr_next_unresolved_thread"
+          data-track-property="click_next_unresolved_thread_top"
+          @click="jumpToNextDiscussion"
         >
           <icon name="comment-next" />
+        </button>
+      </div>
+      <div v-if="isLoggedIn" class="btn-group btn-group-sm" role="group">
+        <button
+          v-gl-tooltip
+          :title="__('Toggle all threads')"
+          class="btn btn-default toggle-all-discussions-btn"
+          @click="handleExpandDiscussions"
+        >
+          <icon :name="allExpanded ? 'angle-up' : 'angle-down'" />
         </button>
       </div>
     </div>

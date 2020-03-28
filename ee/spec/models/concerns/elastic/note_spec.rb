@@ -8,14 +8,14 @@ describe Note, :elastic do
   end
 
   it_behaves_like 'limited indexing is enabled' do
-    set(:object) { create :note, project: project }
-    set(:group) { create(:group) }
+    let_it_be(:object) { create :note, project: project }
+    let_it_be(:group) { create(:group) }
     let(:group_object) do
       project = create :project, name: 'test1', group: group
       create :note, project: project
     end
 
-    context '#searchable?' do
+    describe '#searchable?' do
       before do
         create :elasticsearch_indexed_project, project: project
       end
@@ -36,24 +36,23 @@ describe Note, :elastic do
     end
   end
 
-  it "searches notes", :sidekiq_might_not_need_inline do
-    issue = create :issue
+  it "searches notes", :sidekiq_inline do
+    project = create :project, :public
+    issue = create :issue, project: project
 
-    Sidekiq::Testing.inline! do
-      create :note, note: 'bla-bla term1', project: issue.project
-      create :note, project: issue.project
+    note = create :note, note: 'bla-bla term1', project: issue.project
+    create :note, project: issue.project
 
-      # The note in the project you have no access to except as an administrator
-      create :note, note: 'bla-bla term2'
+    # The note in the project you have no access to except as an administrator
+    outside_note = create :note, note: 'bla-bla term2'
 
-      Gitlab::Elastic::Helper.refresh_index
-    end
+    ensure_elasticsearch_index!
 
     options = { project_ids: [issue.project.id] }
 
-    expect(described_class.elastic_search('term1 | term2', options: options).total_count).to eq(1)
-    expect(described_class.elastic_search('bla-bla', options: options).total_count).to eq(1)
-    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any }).total_count).to eq(2)
+    expect(described_class.elastic_search('term1 | term2', options: options).records).to contain_exactly(note)
+    expect(described_class.elastic_search('bla-bla', options: options).records).to contain_exactly(note)
+    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any }).records).to contain_exactly(outside_note)
   end
 
   it "indexes && searches diff notes" do
@@ -65,7 +64,11 @@ describe Note, :elastic do
       notes << create(:legacy_diff_note_on_merge_request, note: "term")
       notes << create(:legacy_diff_note_on_commit, note: "term")
 
-      Gitlab::Elastic::Helper.refresh_index
+      notes.each do |note|
+        note.project.update!(visibility: Gitlab::VisibilityLevel::PUBLIC)
+      end
+
+      ensure_elasticsearch_index!
     end
 
     project_ids = notes.map { |note| note.noteable.project.id }
@@ -103,14 +106,12 @@ describe Note, :elastic do
     expect(note.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
-  it "does not create ElasticIndexerWorker job for system messages" do
-    project = create :project, :repository
-    # We have to set one minute delay because of https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15682
-    issue = create :issue, project: project, updated_at: 1.minute.ago
+  it 'does not track system note updates' do
+    note = create(:note, :system)
 
-    # Only issue should be updated
-    expect(ElasticIndexerWorker).to receive(:perform_async).with(:update, 'Issue', anything, anything, anything)
-    create :note, :system, project: project, noteable: issue
+    expect(Elastic::ProcessBookkeepingService).not_to receive(:track!)
+
+    note.update!(note: 'some other text here')
   end
 
   it 'uses same index for Note subclasses' do
@@ -127,7 +128,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id] }
@@ -138,10 +139,11 @@ describe Note, :elastic do
     it "finds note when user is authorized to see it", :sidekiq_might_not_need_inline do
       user = create :user
       issue = create :issue, :confidential, author: user
+      issue.project.add_guest user
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: user }
@@ -156,7 +158,7 @@ describe Note, :elastic do
 
         Sidekiq::Testing.inline! do
           create_notes_for(issue, 'bla-bla term')
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end
 
         options = { project_ids: [issue.project.id], current_user: superuser }
@@ -174,7 +176,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: member }
@@ -191,7 +193,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: member }

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import InsightsPage from 'ee/insights/components/insights_page.vue';
 import { createStore } from 'ee/insights/stores';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { chartInfo, pageInfo, pageInfoNoCharts, chartData } from '../mock_data';
+import { chartInfo, pageInfo, pageInfoNoCharts } from '../mock_data';
 
 describe('Insights page component', () => {
   let component;
@@ -72,55 +72,6 @@ describe('Insights page component', () => {
           expect(component.$el.querySelector('.js-insights-page-container .insights-charts')).toBe(
             null,
           );
-          done();
-        });
-      });
-    });
-
-    describe('when charts loaded', () => {
-      beforeEach(() => {
-        component.$store.state.insights.pageLoading = false;
-        component.$store.state.insights.chartData[chartInfo.title] = {
-          type: chartInfo.type,
-          data: chartData,
-          loaded: true,
-        };
-      });
-
-      it('displays correct chart post load', done => {
-        component.$nextTick(() => {
-          const chartCanvas = component.$el.querySelectorAll(
-            '.js-insights-page-container .insights-charts .insights-chart canvas',
-          );
-
-          expect(chartCanvas.length).toEqual(1);
-          expect(chartCanvas[0].classList).toContain('bar');
-          done();
-        });
-      });
-    });
-
-    describe('chart data retrieve error', () => {
-      const error = 'my error';
-
-      beforeEach(() => {
-        component.$store.state.insights.pageLoading = false;
-        component.$store.state.insights.chartData[chartInfo.title] = {
-          type: chartInfo.type,
-          data: null,
-          loaded: false,
-          error,
-        };
-      });
-
-      it('displays info about the error', done => {
-        component.$nextTick(() => {
-          const errorElements = component.$el.querySelectorAll(
-            '.js-insights-page-container .insights-charts .insights-chart .js-empty-state',
-          );
-
-          expect(errorElements.length).toEqual(1);
-          expect(errorElements[0].textContent).toContain(error);
           done();
         });
       });

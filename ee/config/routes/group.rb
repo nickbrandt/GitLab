@@ -17,9 +17,10 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       patch :override, on: :member
     end
 
-    resource :analytics, only: [:show]
-    resource :cycle_analytics, only: [:show]
-    namespace :cycle_analytics do
+    get '/analytics', to: redirect('groups/%{group_id}/-/contribution_analytics')
+    resource :contribution_analytics, only: [:show]
+    resource :cycle_analytics, only: [:show], path: 'value_stream_analytics'
+    scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
       scope :events, controller: 'events' do
         get :issue
         get :plan
@@ -29,6 +30,10 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         get :staging
         get :production
       end
+    end
+    namespace :analytics do
+      resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
+      resource :cycle_analytics, path: 'value_stream_analytics', only: :show, constraints: -> (req) { Feature.enabled?(:group_level_cycle_analytics, default_enabled: true) && Gitlab::Analytics.cycle_analytics_enabled? }
     end
 
     resource :ldap, only: [] do
@@ -51,7 +56,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :audit_events, only: [:index]
     resources :usage_quotas, only: [:index]
 
-    resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ } do
+    resources :hooks, only: [:index, :create, :edit, :update, :destroy], constraints: { id: /\d+/ } do
       member do
         post :test
       end
@@ -73,6 +78,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
         get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
+        delete '/descriptions/:version_id', action: :delete_description_version, as: :delete_description_version
         get :discussions, format: :json
         get :realtime_changes
         post :toggle_subscription
@@ -111,18 +117,11 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     namespace :security do
       resource :dashboard, only: [:show], controller: :dashboard
+      resource :compliance_dashboard, only: [:show]
       resources :vulnerable_projects, only: [:index]
-      # We have to define both legacy and new routes for Vulnerability Findings
-      # because they are loaded upon application initialization and preloaded by
-      # web server.
-      # TODO: remove this comment and `resources :vulnerabilities` when feature flag is removed
-      # see https://gitlab.com/gitlab-org/gitlab/issues/33488
-      resources :vulnerabilities, only: [:index] do
-        collection do
-          get :summary
-          get :history
-        end
-      end
+      resource :discover, only: [:show], controller: :discover
+      resources :credentials, only: [:index]
+
       resources :vulnerability_findings, only: [:index] do
         collection do
           get :summary
@@ -142,20 +141,23 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     get :sign_up, to: 'sso#sign_up_form'
     post :sign_up, to: 'sso#sign_up'
+    post :authorize_managed_account, to: 'sso#authorize_managed_account'
 
     resource :roadmap, only: [:show], controller: 'roadmap'
 
     resource :dependency_proxy, only: [:show, :update]
     resources :packages, only: [:index]
+
+    post '/restore' => '/groups#restore', as: :restore
   end
 end
 
 # Dependency proxy for containers
 # Because docker adds v2 prefix to URI this need to be outside of usual group routes
-scope constraints: { format: nil } do
+scope format: false do
   get 'v2', to: proc { [200, {}, ['']] }
 
-  constraints image: Gitlab::PathRegex.container_image_regex do
+  constraints image: Gitlab::PathRegex.container_image_regex, sha: Gitlab::PathRegex.container_image_blob_sha_regex do
     get 'v2/*group_id/dependency_proxy/containers/*image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest'
     get 'v2/*group_id/dependency_proxy/containers/*image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob'
   end

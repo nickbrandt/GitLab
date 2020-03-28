@@ -25,7 +25,6 @@ describe('MetricChart component', () => {
 
   const factory = (props = defaultProps) => {
     wrapper = shallowMount(MetricChart, {
-      sync: false,
       propsData: { ...props },
       slots: {
         default: mockChart,
@@ -139,12 +138,14 @@ describe('MetricChart component', () => {
           it('should set the `invisible` class on the icon of the first dropdown item', () => {
             wrapper.setProps({ selectedMetric: 'time_to_last_commit' });
 
-            expect(
-              findMetricDropdownItems()
-                .at(0)
-                .find(Icon)
-                .classes(),
-            ).toContain('invisible');
+            return wrapper.vm.$nextTick().then(() => {
+              expect(
+                findMetricDropdownItems()
+                  .at(0)
+                  .find(Icon)
+                  .classes(),
+              ).toContain('invisible');
+            });
           });
         });
 

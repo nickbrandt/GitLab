@@ -1,7 +1,6 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import EditButton from '~/diffs/components/edit_button.vue';
 
-const localVue = createLocalVue();
 const editPath = 'test-path';
 
 describe('EditButton', () => {
@@ -9,8 +8,6 @@ describe('EditButton', () => {
 
   const createComponent = (props = {}) => {
     wrapper = shallowMount(EditButton, {
-      localVue,
-      sync: false,
       propsData: { ...props },
     });
   };
@@ -35,7 +32,9 @@ describe('EditButton', () => {
     });
     wrapper.trigger('click');
 
-    expect(wrapper.emitted('showForkMessage')).toBeTruthy();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted('showForkMessage')).toBeTruthy();
+    });
   });
 
   it('doesnt emit a show fork message event if current user cannot fork', () => {
@@ -45,7 +44,9 @@ describe('EditButton', () => {
     });
     wrapper.trigger('click');
 
-    expect(wrapper.emitted('showForkMessage')).toBeFalsy();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted('showForkMessage')).toBeFalsy();
+    });
   });
 
   it('doesnt emit a show fork message event if current user can modify blob', () => {
@@ -56,6 +57,8 @@ describe('EditButton', () => {
     });
     wrapper.trigger('click');
 
-    expect(wrapper.emitted('showForkMessage')).toBeFalsy();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted('showForkMessage')).toBeFalsy();
+    });
   });
 });

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :dependency, class: Hash do
+  factory :dependency, class: 'Hash' do
     sequence(:name) { |n| "library#{n}" }
     packager { 'Ruby (Bundler)' }
     version { '1.8.0' }

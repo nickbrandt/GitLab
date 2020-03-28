@@ -14,9 +14,7 @@ module QA
           end
 
           def wait_for_insight_charts_to_load
-            wait(reload: false) do
-              has_element?(:insights_charts)
-            end
+            has_element?(:insights_charts, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
           end
 
           def select_insights_dashboard(title)

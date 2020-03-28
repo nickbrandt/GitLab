@@ -26,19 +26,22 @@ module Operations
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
 
-    def userwithid_strategy
-      strong_memoize(:userwithid_strategy) do
-        strategies.select { |s| s['name'] == FeatureFlagStrategiesValidator::STRATEGY_USERWITHID }
-      end
-    end
-
     def self.with_name_and_description
       joins(:feature_flag)
         .select(FeatureFlag.arel_table[:name], FeatureFlag.arel_table[:description])
     end
 
     def self.for_unleash_client(project, environment)
-      select('DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.*')
+      select_columns = [
+        'DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.id',
+        '(operations_feature_flags.active AND operations_feature_flag_scopes.active) AS active',
+        'operations_feature_flag_scopes.strategies',
+        'operations_feature_flag_scopes.environment_scope',
+        'operations_feature_flag_scopes.created_at',
+        'operations_feature_flag_scopes.updated_at'
+      ]
+
+      select(select_columns)
         .with_name_and_description
         .where(feature_flag_id: project.operations_feature_flags.select(:id))
         .order(:feature_flag_id)

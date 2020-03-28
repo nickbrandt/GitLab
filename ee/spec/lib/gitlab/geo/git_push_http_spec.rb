@@ -8,7 +8,9 @@ describe Gitlab::Geo::GitPushHttp, :geo, :use_clean_rails_memory_store_caching d
   let(:gl_id) { 'user-1234' }
   let(:gl_repository) { 'project-77777' }
   let(:cache_key) { "#{described_class::CACHE_KEY_PREFIX}:#{gl_id}:#{gl_repository}" }
-  set(:secondary) { create(:geo_node) }
+
+  let_it_be(:secondary) { create(:geo_node) }
+
   subject { described_class.new(gl_id, gl_repository) }
 
   describe '#cache_referrer_node' do

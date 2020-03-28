@@ -9,7 +9,12 @@ export default {
     LogLine,
   },
   computed: {
-    ...mapState(['traceEndpoint', 'trace', 'isTraceComplete']),
+    ...mapState([
+      'traceEndpoint',
+      'trace',
+      'isTraceComplete',
+      'isScrolledToBottomBeforeReceivingTrace',
+    ]),
   },
   updated() {
     this.$nextTick(() => {
@@ -44,7 +49,7 @@ export default {
 };
 </script>
 <template>
-  <code class="job-log d-block">
+  <code class="job-log d-block" data-qa-selector="job_log_content">
     <template v-for="(section, index) in trace">
       <collpasible-log-section
         v-if="section.isHeader"

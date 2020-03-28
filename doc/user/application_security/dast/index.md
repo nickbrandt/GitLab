@@ -4,8 +4,7 @@ type: reference, howto
 
 # Dynamic Application Security Testing (DAST) **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4348)
-in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4348) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
 
 NOTE: **4 of the top 6 attacks were application based.**
 Download our whitepaper,
@@ -31,12 +30,16 @@ that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 GitLab checks the DAST report, compares the found vulnerabilities between the source and target
 branches, and shows the information right on the merge request.
 
-![DAST Widget](img/dast_all.png)
+NOTE: **Note:**
+This comparison logic uses only the latest pipeline executed for the target branch's base commit.
+Running the pipeline on any other commit has no effect on the merge request.
+
+![DAST Widget](img/dast_all_v12_9.png)
 
 By clicking on one of the detected linked vulnerabilities, you will be able to
 see the details and the URL(s) affected.
 
-![DAST Widget Clicked](img/dast_single.png)
+![DAST Widget Clicked](img/dast_single_v12_9.png)
 
 [Dynamic Application Security Testing (DAST)](https://en.wikipedia.org/wiki/Dynamic_Application_Security_Testing)
 is using the popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
@@ -47,8 +50,6 @@ By default, DAST executes [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy
 However, DAST can be [configured](#full-scan)
 to also perform a so-called "active scan". That is, attack your application and produce a more extensive security report.
 It can be very useful combined with [Review Apps](../../../ci/review_apps/index.md).
-
-The [`dast`](https://gitlab.com/gitlab-org/security-products/dast/container_registry) Docker image in GitLab container registry is updated on a weekly basis to have all [`owasp2docker-weekly`](https://hub.docker.com/r/owasp/zap2docker-weekly/) updates in it.
 
 ## Use cases
 
@@ -73,7 +74,7 @@ Add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 variables:
   DAST_WEBSITE: https://example.com
@@ -85,7 +86,7 @@ There are two ways to define the URL to be scanned by DAST:
 
 1. Add it in an `environment_url.txt` file at the root of your project.
     This is great for testing in dynamic environments. In order to run DAST against
-    an app that is dynamically created during a Gitlab CI pipeline, have the app
+    an app that is dynamically created during a GitLab CI/CD pipeline, have the app
     persist its domain in an `environment_url.txt` file, and DAST will
     automatically parse that file to find its scan target.
     You can see an [example](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml)
@@ -103,13 +104,17 @@ always take the latest DAST artifact available. Behind the scenes, the
 [GitLab DAST Docker image](https://gitlab.com/gitlab-org/security-products/dast)
 is used to run the tests on the specified URL and scan it for possible vulnerabilities.
 
+By default, the DAST template will use the latest major version of the DAST Docker image. Using the `DAST_VERSION` variable,
+you can choose to automatically update DAST with new features and fixes by pinning to a major version (e.g. 1), only update fixes by pinning to a minor version (e.g. 1.6) or prevent all updates by pinning to a specific version (e.g. 1.6.4).
+Find the latest DAST versions on the [Releases](https://gitlab.com/gitlab-org/security-products/dast/-/releases) page.
+
 ### Authenticated scan
 
 It's also possible to authenticate the user before performing the DAST checks:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 variables:
   DAST_WEBSITE: https://example.com
@@ -133,7 +138,7 @@ includes both passive and active scanning against the same target website:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 variables:
   DAST_FULL_SCAN_ENABLED: "true"
@@ -149,7 +154,7 @@ Domain validation is not required by default. It can be required by setting the 
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 variables:
   DAST_FULL_SCAN_ENABLED: "true"
@@ -212,7 +217,7 @@ It's also possible to add the `Gitlab-DAST-Permission` header via a proxy.
 
 The following config allows NGINX to act as a reverse proxy and add the `Gitlab-DAST-Permission` [header](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header):
 
-```
+```nginx
 # default.conf
 server {
     listen 80;
@@ -228,11 +233,11 @@ server {
 ###### Apache
 
 Apache can also be used as a [reverse proxy](https://httpd.apache.org/docs/2.4/mod/mod_proxy.html)
-to add the Gitlab-DAST-Permission [header](https://httpd.apache.org/docs/current/mod/mod_headers.html).
+to add the `Gitlab-DAST-Permission` [header](https://httpd.apache.org/docs/current/mod/mod_headers.html).
 
 To do so, add the following lines to `httpd.conf`:
 
-```
+```plaintext
 # httpd.conf
 LoadModule proxy_module modules/mod_proxy.so
 LoadModule proxy_connect_module modules/mod_proxy_connect.so
@@ -258,7 +263,7 @@ For example:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 variables:
   DAST_WEBSITE: https://example.com
@@ -276,7 +281,7 @@ template inclusion and specify any additional keys under it. For example:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 dast:
   stage: dast # IMPORTANT: don't forget to add this
@@ -289,15 +294,9 @@ As the DAST job belongs to a separate `dast` stage that runs after all
 [default stages](../../../ci/yaml/README.md#stages),
 don't forget to add `stage: dast` when you override the template job definition.
 
-## Available variables
+### Available variables
 
 DAST can be [configured](#customizing-the-dast-settings) using environment variables.
-Since it's a wrapper around the ZAP scanning scripts
-([baseline](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan)
-or [full](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan) scan), it
-accepts all arguments those scripts recognize (the arguments are the same).
-The choice of the scan type depends on the `DAST_FULL_SCAN_ENABLED` environment
-variable value.
 
 | Environment variable        | Required   | Description                                                                    |
 |-----------------------------| ----------|--------------------------------------------------------------------------------|
@@ -311,12 +310,135 @@ variable value.
 | `DAST_TARGET_AVAILABILITY_TIMEOUT` | no | Time limit in seconds to wait for target availability. Scan is attempted nevertheless if it runs out. Integer. Defaults to `60`. |
 | `DAST_FULL_SCAN_ENABLED` | no | Switches the tool to execute [ZAP Full Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan) instead of [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan). Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
 | `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` | no | Requires [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
+| `DAST_AUTO_UPDATE_ADDONS` | no | Set to `false` to pin the versions of ZAProxy add-ons to those provided with the DAST image. Defaults to `true`. |
+
+### DAST command-line options
+
+Not all DAST configuration is available via environment variables. To find out all possible options, run the following configuration.
+Available command-line options will be printed to the job log:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - /analyze --help
+```
+
+You must then overwrite the `script` command to pass in the appropriate argument. For example, AJAX spidering can be enabled by using `-j`, as shown in the following configuration:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - /analyze -j -t $DAST_WEBSITE
+```
+
+### Custom ZAProxy configuration
+
+The ZAProxy server contains many [useful configurable values](https://gitlab.com/gitlab-org/gitlab/issues/36437#note_245801885).
+Many key/values for `-config` remain undocumented, but there is an untested list of [possible keys](https://gitlab.com/gitlab-org/gitlab/issues/36437#note_244981023).
+Note that these options are not supported by DAST, and may break the DAST scan when used. An example of how to rewrite the Authorization header value with `TOKEN` follows:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - /analyze -z"-config replacer.full_list\(0\).description=auth -config replacer.full_list\(0\).enabled=true -config replacer.full_list\(0\).matchtype=REQ_HEADER -config replacer.full_list\(0\).matchstr=Authorization -config replacer.full_list\(0\).regex=false -config replacer.full_list\(0\).replacement=TOKEN" -t $DAST_WEBSITE
+```
+
+### Cloning the project's repository
+
+The DAST job does not require the project's repository to be present when running, so by default
+[`GIT_STRATEGY`](../../../ci/yaml/README.md#git-strategy) is set to `none`.
+
+## Running DAST in an offline air-gapped installation
+
+DAST can be executed on an offline air-gapped GitLab Ultimate installation using the following process:
+
+1. Host the DAST image `registry.gitlab.com/gitlab-org/security-products/dast:latest` in your local
+   Docker container registry.
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+   to the DAST Docker image hosted on your local Docker container registry:
+
+   ```yaml
+   include:
+     - template: DAST.gitlab-ci.yml
+
+   dast:
+     image: registry.example.com/namespace/dast:latest
+     script:
+        - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+        - /analyze -t $DAST_WEBSITE --auto-update-addons false -z"-silent"
+   ```
+
+The option `--auto-update-addons false` instructs ZAP not to update add-ons.
+
+The option `-z` passes the quoted `-silent` parameter to ZAP. The `-silent` parameter ensures ZAP
+does not make any unsolicited requests including checking for updates.
+
+## Reports
+
+The DAST job can emit various reports.
+
+### JSON
+
+CAUTION: **Caution:**
+The JSON report artifacts are not a public API of DAST and their format is expected to change in the future.
+
+The DAST tool always emits a JSON report report file called `gl-dast-report.json` and sample reports can be found in the [DAST repository](https://gitlab.com/gitlab-org/security-products/dast/-/tree/master/test/end-to-end/expect).
+
+There are two formats of data in the JSON report that are used side by side: the proprietary ZAP format which will be eventually deprecated, and a "common" format which will be the default in the future.
+
+### Other formats
+
+Reports can also be generated in Markdown, HTML, and XML.
+
+Reports can be published as artifacts using the following configuration:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - /analyze -r report.html -w report.md -x report.xml -t $DAST_WEBSITE
+    - cp /zap/wrk/report.{html,md,xml} "$PWD"
+  artifacts:
+    paths:
+      - report.html
+      - report.md
+      - report.xml
+      - gl-dast-report.json
+```
 
 ## Security Dashboard
 
 The Security Dashboard is a good place to get an overview of all the security
 vulnerabilities in your groups, projects and pipelines. Read more about the
 [Security Dashboard](../security_dashboard/index.md).
+
+## Bleeding-edge vulnerability definitions
+
+ZAProxy first creates rules in the `alpha` class. After a testing period with the community, they are promoted to `beta`. DAST uses `beta` definitions by default. To request `alpha` definitions, use `-a` as shown in the following configuration:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - /analyze -a -t $DAST_WEBSITE
+```
 
 ## Interacting with the vulnerabilities
 
@@ -350,7 +472,7 @@ Since it keeps most of its information in memory during a scan,
 it is possible for DAST to run out of memory while scanning large applications.
 This results in the following error:
 
-```
+```plaintext
 [zap.out] java.lang.OutOfMemoryError: Java heap space
 ```
 
@@ -359,7 +481,7 @@ for DAST by overwriting the `script` key in the DAST template:
 
 ```yaml
 include:
-  template: DAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
 
 dast:
   script:

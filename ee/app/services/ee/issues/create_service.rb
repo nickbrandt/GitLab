@@ -5,23 +5,18 @@ module EE
     module CreateService
       extend ::Gitlab::Utils::Override
 
-      override :filter_params
-      def filter_params(issue)
-        epic_iid = params.delete(:epic_iid)
-        group = issue.project.group
-        if epic_iid.present? && group && can?(current_user, :admin_epic, group)
-          finder = EpicsFinder.new(current_user, group_id: group.id)
-          params[:epic] = finder.find_by!(iid: epic_iid) # rubocop: disable CodeReuse/ActiveRecord
-        end
-
-        super
-      end
-
       override :before_create
       def before_create(issue)
         handle_issue_epic_link(issue)
 
         super
+      end
+
+      override :after_create
+      def after_create(issue)
+        super
+
+        StatusPage.trigger_publish(project, current_user, issue)
       end
 
       def handle_issue_epic_link(issue)

@@ -11,27 +11,19 @@ module EE
 
         relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
         relation.pluck(:id, 'labels.title').each do |issue_id, label|
-          issue_labels[issue_id] << label
+          issue_labels[issue_id] << label if label.present?
         end
 
         issue_labels
       end
     end
 
-    override :milestone_available?
-    def milestone_available?
-      return true if is_a?(Epic)
-
-      super
-    end
-
-    override :supports_milestone?
-    def supports_milestone?
-      super && !is_a?(Epic)
-    end
-
     def supports_epic?
       is_a?(Issue) && project.group
+    end
+
+    def supports_health_status?
+      false
     end
   end
 end

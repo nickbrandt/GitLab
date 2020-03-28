@@ -44,8 +44,24 @@ describe AuditEventsHelper do
       expect(select_keys('target_name', 'John Doe')).to eq ''
     end
 
+    it 'returns empty string if key is ip_address and the value is blank' do
+      expect(select_keys('ip_address', nil)).to eq ''
+    end
+
+    it 'returns formatted text if key is ip_address and the value is not blank' do
+      expect(select_keys('ip_address', '127.0.0.1')).to eq 'ip_address <strong>127.0.0.1</strong>'
+    end
+
     it 'returns formatted text if key does not start with author_, or target_' do
       expect(select_keys('remove', 'user_access')).to eq 'remove <strong>user_access</strong>'
+    end
+
+    it 'returns formatted text with `never expires` if key is expiry_from and the value is blank' do
+      expect(select_keys('expiry_from', nil)).to eq 'expiry_from <strong>never expires</strong>'
+    end
+
+    it 'returns formatted text with `never expires` if key is expiry_to and the value is blank' do
+      expect(select_keys('expiry_to', nil)).to eq 'expiry_to <strong>never expires</strong>'
     end
   end
 end

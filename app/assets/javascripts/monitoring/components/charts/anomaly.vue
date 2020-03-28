@@ -1,6 +1,6 @@
 <script>
-import { flatten, isNumber } from 'underscore';
-import { GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
+import { flattenDeep, isNumber } from 'lodash';
+import { GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import { roundOffFloat } from '~/lib/utils/common_utils';
 import { hexToRgb } from '~/lib/utils/color_utils';
 import { areaOpacityValues, symbolSizes, colorValues } from '../../constants';
@@ -29,7 +29,7 @@ const AREA_COLOR_RGBA = `rgba(${hexToRgb(AREA_COLOR).join(',')},${AREA_OPACITY})
  * time series chart, the boundary band shows the normal
  * range of values the metric should take.
  *
- * This component accepts 3 queries, which contain the
+ * This component accepts 3 metrics, which contain the
  * "metric", "upper" limit and "lower" limit.
  *
  * The upper and lower series are "stacked areas" visually
@@ -48,7 +48,6 @@ const AREA_COLOR_RGBA = `rgba(${hexToRgb(AREA_COLOR).join(',')},${AREA_OPACITY})
  */
 export default {
   components: {
-    GlLineChart,
     GlChartSeriesLabel,
     MonitorTimeSeriesChart,
   },
@@ -62,10 +61,10 @@ export default {
   },
   computed: {
     series() {
-      return this.graphData.queries.map(query => {
-        const values = query.result[0] ? query.result[0].values : [];
+      return this.graphData.metrics.map(metric => {
+        const values = metric.result && metric.result[0] ? metric.result[0].values : [];
         return {
-          label: query.label,
+          label: metric.label,
           // NaN values may disrupt avg., max. & min. calculations in the legend, filter them out
           data: values.filter(([, value]) => !Number.isNaN(value)),
         };
@@ -78,12 +77,12 @@ export default {
      * This offset is the lowest value.
      */
     yOffset() {
-      const values = flatten(this.series.map(ser => ser.data.map(([, y]) => y)));
+      const values = flattenDeep(this.series.map(ser => ser.data.map(([, y]) => y)));
       const min = values.length ? Math.floor(Math.min(...values)) : 0;
       return min < 0 ? -min : 0;
     },
     metricData() {
-      const originalMetricQuery = this.graphData.queries[0];
+      const originalMetricQuery = this.graphData.metrics[0];
 
       const metricQuery = { ...originalMetricQuery };
       metricQuery.result[0].values = metricQuery.result[0].values.map(([x, y]) => [
@@ -93,7 +92,7 @@ export default {
       return {
         ...this.graphData,
         type: 'line-chart',
-        queries: [metricQuery],
+        metrics: [metricQuery],
       };
     },
     metricSeriesConfig() {
@@ -128,7 +127,6 @@ export default {
         });
 
       const yAxisWithOffset = {
-        name: this.yAxisLabel,
         axisLabel: {
           formatter: num => roundOffFloat(num - this.yOffset, 3).toString(),
         },
@@ -163,6 +161,7 @@ export default {
           }),
         );
       }
+
       return { yAxis: yAxisWithOffset, series: boundarySeries };
     },
   },

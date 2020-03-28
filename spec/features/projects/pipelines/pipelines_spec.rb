@@ -270,7 +270,7 @@ describe 'Pipelines', :js do
         it 'contains badge with tooltip which contains error' do
           expect(pipeline).to have_yaml_errors
           expect(page).to have_selector(
-            %Q{span[data-original-title="#{pipeline.yaml_errors}"]})
+            %Q{span[title="#{pipeline.yaml_errors}"]})
         end
 
         it 'contains badge that indicates failure reason' do
@@ -280,7 +280,7 @@ describe 'Pipelines', :js do
         it 'contains badge with tooltip which contains failure reason' do
           expect(pipeline.failure_reason?).to eq true
           expect(page).to have_selector(
-            %Q{span[data-original-title="#{pipeline.present.failure_reason}"]})
+            %Q{span[title="#{pipeline.present.failure_reason}"]})
         end
       end
 
@@ -569,7 +569,7 @@ describe 'Pipelines', :js do
 
             within('.js-builds-dropdown-list') do
               build_element = page.find('.mini-pipeline-graph-dropdown-item')
-              expect(build_element['data-original-title']).to eq('build - failed - (unknown failure)')
+              expect(build_element['title']).to eq('build - failed - (unknown failure)')
             end
           end
         end
@@ -592,15 +592,15 @@ describe 'Pipelines', :js do
           visit project_pipelines_path(project, page: '2')
           wait_for_requests
 
-          expect(page).to have_selector('.gl-pagination .page', count: 2)
+          expect(page).to have_selector('.gl-pagination .page-link', count: 4)
         end
 
         it 'shows updated content' do
           visit project_pipelines_path(project)
           wait_for_requests
-          page.find('.js-next-button .page-link').click
+          page.find('.page-link.next-page-item').click
 
-          expect(page).to have_selector('.gl-pagination .page', count: 2)
+          expect(page).to have_selector('.gl-pagination .page-link', count: 4)
         end
       end
     end
@@ -706,7 +706,7 @@ describe 'Pipelines', :js do
             click_on 'Run Pipeline'
           end
 
-          it { expect(page).to have_content('Missing .gitlab-ci.yml file') }
+          it { expect(page).to have_content('Missing CI config file') }
           it 'creates a pipeline after first request failed and a valid gitlab-ci.yml file is available when trying again' do
             click_button project.default_branch
 

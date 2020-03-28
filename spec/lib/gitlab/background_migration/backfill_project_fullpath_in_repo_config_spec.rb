@@ -2,14 +2,15 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::BackfillProjectFullpathInRepoConfig, :migration, schema: 20181010133639 do
+describe Gitlab::BackgroundMigration::BackfillProjectFullpathInRepoConfig, schema: 20181010133639 do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:group) { namespaces.create!(name: 'foo', path: 'foo') }
   let(:subgroup) { namespaces.create!(name: 'bar', path: 'bar', parent_id: group.id) }
 
-  describe described_class::Storage::HashedProject do
+  describe described_class::Storage::Hashed do
     let(:project) { double(id: 555) }
+
     subject(:project_storage) { described_class.new(project) }
 
     it 'has the correct disk_path' do
@@ -19,6 +20,7 @@ describe Gitlab::BackgroundMigration::BackfillProjectFullpathInRepoConfig, :migr
 
   describe described_class::Storage::LegacyProject do
     let(:project) { double(full_path: 'this/is/the/full/path') }
+
     subject(:project_storage) { described_class.new(project) }
 
     it 'has the correct disk_path' do
@@ -28,6 +30,7 @@ describe Gitlab::BackgroundMigration::BackfillProjectFullpathInRepoConfig, :migr
 
   describe described_class::Project do
     let(:project_record) { projects.create!(namespace_id: subgroup.id, name: 'baz', path: 'baz') }
+
     subject(:project) { described_class.find(project_record.id) }
 
     describe '#full_path' do

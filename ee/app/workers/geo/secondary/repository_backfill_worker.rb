@@ -2,7 +2,7 @@
 
 module Geo
   module Secondary
-    class RepositoryBackfillWorker
+    class RepositoryBackfillWorker # rubocop:disable Scalability/IdempotentWorker
       include Geo::Secondary::BackfillWorker
 
       private

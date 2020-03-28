@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import LinkedPipelinesColumn from '~/pipelines/components/graph/linked_pipelines_column.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import LinkedPipelinesColumn from '~/pipelines/components/graph/linked_pipelines_column.vue';
 import mockData from './linked_pipelines_mock_data';
 
 describe('Linked Pipelines Column', () => {
@@ -9,6 +9,7 @@ describe('Linked Pipelines Column', () => {
     columnTitle: 'Upstream',
     linkedPipelines: mockData.triggered,
     graphPosition: 'right',
+    projectId: 19,
   };
   let vm;
 
@@ -34,5 +35,9 @@ describe('Linked Pipelines Column', () => {
     const linkedPipelineElements = vm.$el.querySelectorAll('.linked-pipeline');
 
     expect(linkedPipelineElements.length).toBe(props.linkedPipelines.length);
+  });
+
+  it('renders cross project triangle when column is upstream', () => {
+    expect(vm.$el.querySelector('.cross-project-triangle')).toBeDefined();
   });
 });

@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 describe GitlabSchema do
+  let_it_be(:implementations) { GraphQL::Relay::BaseConnection::CONNECTION_IMPLEMENTATIONS }
   let(:user) { build :user }
 
   it 'uses batch loading' do
@@ -26,17 +27,29 @@ describe GitlabSchema do
   end
 
   it 'has the base mutation' do
-    expect(described_class.mutation).to eq(::Types::MutationType.to_graphql)
+    expect(described_class.mutation).to eq(::Types::MutationType)
   end
 
   it 'has the base query' do
-    expect(described_class.query).to eq(::Types::QueryType.to_graphql)
+    expect(described_class.query).to eq(::Types::QueryType)
   end
 
-  it 'paginates active record relations using `Gitlab::Graphql::Connections::KeysetConnection`' do
-    connection = GraphQL::Relay::BaseConnection::CONNECTION_IMPLEMENTATIONS[ActiveRecord::Relation.name]
+  it 'paginates active record relations using `Connections::Keyset::Connection`' do
+    connection = implementations[ActiveRecord::Relation.name]
 
     expect(connection).to eq(Gitlab::Graphql::Connections::Keyset::Connection)
+  end
+
+  it 'paginates ExternallyPaginatedArray using `Connections::ExternallyPaginatedArrayConnection`' do
+    connection = implementations[Gitlab::Graphql::ExternallyPaginatedArray.name]
+
+    expect(connection).to eq(Gitlab::Graphql::Connections::ExternallyPaginatedArrayConnection)
+  end
+
+  it 'paginates FilterableArray using `Connections::FilterableArrayConnection`' do
+    connection = implementations[Gitlab::Graphql::FilterableArray.name]
+
+    expect(connection).to eq(Gitlab::Graphql::Connections::FilterableArrayConnection)
   end
 
   describe '.execute' do
@@ -124,12 +137,24 @@ describe GitlabSchema do
 
   describe '.object_from_id' do
     context 'for subclasses of `ApplicationRecord`' do
-      it 'returns the correct record' do
-        user = create(:user)
+      let_it_be(:user) { create(:user) }
 
+      it 'returns the correct record' do
         result = described_class.object_from_id(user.to_global_id.to_s)
 
         expect(result.sync).to eq(user)
+      end
+
+      it 'returns the correct record, of the expected type' do
+        result = described_class.object_from_id(user.to_global_id.to_s, expected_type: ::User)
+
+        expect(result.sync).to eq(user)
+      end
+
+      it 'fails if the type does not match' do
+        expect do
+          described_class.object_from_id(user.to_global_id.to_s, expected_type: ::Project)
+        end.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
       end
 
       it 'batchloads the queries' do

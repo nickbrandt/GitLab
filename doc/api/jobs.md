@@ -2,9 +2,9 @@
 
 ## List project jobs
 
-Get a list of jobs in a project.
+Get a list of jobs in a project. Jobs are sorted in descending order of their IDs.
 
-```
+```plaintext
 GET /projects/:id/jobs
 ```
 
@@ -13,7 +13,7 @@ GET /projects/:id/jobs
 | `id`      | integer/string                 | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user.                                                                                               |
 | `scope`   | string **or** array of strings | no       | Scope of jobs to show. Either one of or an array of the following: `created`, `pending`, `running`, `failed`, `success`, `canceled`, `skipped`, or `manual`. All jobs are returned if `scope` is not provided. |
 
-```sh
+```shell
 curl --globoff --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/projects/1/jobs?scope[]=pending&scope[]=running'
 ```
 
@@ -21,56 +21,6 @@ Example of response
 
 ```json
 [
-  {
-    "commit": {
-      "author_email": "admin@example.com",
-      "author_name": "Administrator",
-      "created_at": "2015-12-24T16:51:14.000+01:00",
-      "id": "0ff3ae198f8601a285adcf5c0fff204ee6fba5fd",
-      "message": "Test the CI integration.",
-      "short_id": "0ff3ae19",
-      "title": "Test the CI integration."
-    },
-    "coverage": null,
-    "allow_failure": false,
-    "created_at": "2015-12-24T15:51:21.727Z",
-    "started_at": "2015-12-24T17:54:24.729Z",
-    "finished_at": "2015-12-24T17:54:24.921Z",
-    "duration": 0.192,
-    "artifacts_expire_at": "2016-01-23T17:54:24.921Z",
-    "id": 6,
-    "name": "rspec:other",
-    "pipeline": {
-      "id": 6,
-      "ref": "master",
-      "sha": "0ff3ae198f8601a285adcf5c0fff204ee6fba5fd",
-      "status": "pending"
-    },
-    "ref": "master",
-    "artifacts": [],
-    "runner": null,
-    "stage": "test",
-    "status": "failed",
-    "tag": false,
-    "web_url": "https://example.com/foo/bar/-/jobs/6",
-    "user": {
-      "id": 1,
-      "name": "Administrator",
-      "username": "root",
-      "state": "active",
-      "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
-      "web_url": "http://gitlab.dev/root",
-      "created_at": "2015-12-21T13:14:24.077Z",
-      "bio": null,
-      "location": null,
-      "public_email": "",
-      "skype": "",
-      "linkedin": "",
-      "twitter": "",
-      "website_url": "",
-      "organization": ""
-    }
-  },
   {
     "commit": {
       "author_email": "admin@example.com",
@@ -130,6 +80,56 @@ Example of response
       "website_url": "",
       "organization": ""
     }
+  },
+  {
+    "commit": {
+      "author_email": "admin@example.com",
+      "author_name": "Administrator",
+      "created_at": "2015-12-24T16:51:14.000+01:00",
+      "id": "0ff3ae198f8601a285adcf5c0fff204ee6fba5fd",
+      "message": "Test the CI integration.",
+      "short_id": "0ff3ae19",
+      "title": "Test the CI integration."
+    },
+    "coverage": null,
+    "allow_failure": false,
+    "created_at": "2015-12-24T15:51:21.727Z",
+    "started_at": "2015-12-24T17:54:24.729Z",
+    "finished_at": "2015-12-24T17:54:24.921Z",
+    "duration": 0.192,
+    "artifacts_expire_at": "2016-01-23T17:54:24.921Z",
+    "id": 6,
+    "name": "rspec:other",
+    "pipeline": {
+      "id": 6,
+      "ref": "master",
+      "sha": "0ff3ae198f8601a285adcf5c0fff204ee6fba5fd",
+      "status": "pending"
+    },
+    "ref": "master",
+    "artifacts": [],
+    "runner": null,
+    "stage": "test",
+    "status": "failed",
+    "tag": false,
+    "web_url": "https://example.com/foo/bar/-/jobs/6",
+    "user": {
+      "id": 1,
+      "name": "Administrator",
+      "username": "root",
+      "state": "active",
+      "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
+      "web_url": "http://gitlab.dev/root",
+      "created_at": "2015-12-21T13:14:24.077Z",
+      "bio": null,
+      "location": null,
+      "public_email": "",
+      "skype": "",
+      "linkedin": "",
+      "twitter": "",
+      "website_url": "",
+      "organization": ""
+    }
   }
 ]
 ```
@@ -138,7 +138,7 @@ Example of response
 
 Get a list of jobs for a pipeline.
 
-```
+```plaintext
 GET /projects/:id/pipelines/:pipeline_id/jobs
 ```
 
@@ -148,7 +148,7 @@ GET /projects/:id/pipelines/:pipeline_id/jobs
 | `pipeline_id` | integer                        | yes      | ID of a pipeline.                                                                                                                                                                                          |
 | `scope`       | string **or** array of strings | no       | Scope of jobs to show. Either one of or an array of the following: `created`, `pending`, `running`, `failed`, `success`, `canceled`, `skipped`, or `manual`. All jobs are returned if `scope` is not provided. |
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/projects/1/pipelines/6/jobs?scope[]=pending&scope[]=running'
 ```
 
@@ -273,7 +273,7 @@ Example of response
 
 Get a single job of a project
 
-```
+```plaintext
 GET /projects/:id/jobs/:job_id
 ```
 
@@ -282,7 +282,7 @@ GET /projects/:id/jobs/:job_id
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `job_id`  | integer        | yes      | ID of a job.                                                                                                 |
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/8"
 ```
 
@@ -351,7 +351,7 @@ Example of response
 
 Get the job's artifacts zipped archive of a project.
 
-```
+```plaintext
 GET /projects/:id/jobs/:job_id/artifacts
 ```
 
@@ -363,7 +363,7 @@ GET /projects/:id/jobs/:job_id/artifacts
 
 Example request using the `PRIVATE-TOKEN` header:
 
-```sh
+```shell
 curl --output artifacts.zip --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/42/artifacts"
 ```
 
@@ -399,7 +399,7 @@ Possible response status codes:
 | 200       | Serves the artifacts file.      |
 | 404       | Build not found or no artifacts.|
 
-[ce-2893]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2893
+[ce-2893]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/2893
 
 ## Download the artifacts archive
 
@@ -414,7 +414,7 @@ the given reference name and job, provided the job finished successfully. This
 is the same as [getting the job's artifacts](#get-job-artifacts), but by
 defining the job's name instead of its ID.
 
-```
+```plaintext
 GET /projects/:id/jobs/artifacts/:ref_name/download?job=name
 ```
 
@@ -429,7 +429,7 @@ Parameters
 
 Example request using the `PRIVATE-TOKEN` header:
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/master/download?job=test"
 ```
 
@@ -466,7 +466,7 @@ Possible response status codes:
 | 200       | Serves the artifacts file.      |
 | 404       | Build not found or no artifacts.|
 
-[ce-5347]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5347
+[ce-5347]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5347
 
 ## Download a single artifact file by job ID
 
@@ -476,7 +476,7 @@ Download a single artifact file from a job with a specified ID from within
 the job's artifacts zipped archive. The file is extracted from the archive and
 streamed to the client.
 
-```
+```plaintext
 GET /projects/:id/jobs/:job_id/artifacts/*artifact_path
 ```
 
@@ -490,7 +490,7 @@ Parameters
 
 Example request:
 
-```sh
+```shell
 curl --location --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/5/artifacts/some/release/file.pdf"
 ```
 
@@ -504,13 +504,13 @@ Possible response status codes:
 
 ## Download a single artifact file from specific tag or branch
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/23538) in GitLab 11.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/23538) in GitLab 11.5.
 
 Download a single artifact file for a specific job of the latest successful
 pipeline for the given reference name from within the job's artifacts archive.
 The file is extracted from the archive and streamed to the client.
 
-```
+```plaintext
 GET /projects/:id/jobs/artifacts/:ref_name/raw/*artifact_path?job=name
 ```
 
@@ -525,7 +525,7 @@ Parameters:
 
 Example request:
 
-```sh
+```shell
 curl --location --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/master/raw/some/release/file.pdf?job=pdf"
 ```
 
@@ -541,7 +541,7 @@ Possible response status codes:
 
 Get a log (trace) of a specific job of a project:
 
-```
+```plaintext
 GET /projects/:id/jobs/:job_id/trace
 ```
 
@@ -550,7 +550,7 @@ GET /projects/:id/jobs/:job_id/trace
 | id        | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | job_id    | integer        | yes      | ID of a job.                                                                                                 |
 
-```sh
+```shell
 curl --location --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/8/trace"
 ```
 
@@ -565,7 +565,7 @@ Possible response status codes:
 
 Cancel a single job of a project
 
-```
+```plaintext
 POST /projects/:id/jobs/:job_id/cancel
 ```
 
@@ -574,7 +574,7 @@ POST /projects/:id/jobs/:job_id/cancel
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `job_id`  | integer        | yes      | ID of a job.                                                                                                 |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/cancel"
 ```
 
@@ -614,7 +614,7 @@ Example of response
 
 Retry a single job of a project
 
-```
+```plaintext
 POST /projects/:id/jobs/:job_id/retry
 ```
 
@@ -623,7 +623,7 @@ POST /projects/:id/jobs/:job_id/retry
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `job_id`  | integer        | yes      | ID of a job.                                                                                                 |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/retry"
 ```
 
@@ -663,7 +663,7 @@ Example of response
 
 Erase a single job of a project (remove job artifacts and a job log)
 
-```
+```plaintext
 POST /projects/:id/jobs/:job_id/erase
 ```
 
@@ -676,7 +676,7 @@ Parameters
 
 Example of request
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/erase"
 ```
 
@@ -717,7 +717,7 @@ Example of response
 
 Prevents artifacts from being deleted when expiration is set.
 
-```
+```plaintext
 POST /projects/:id/jobs/:job_id/artifacts/keep
 ```
 
@@ -730,7 +730,7 @@ Parameters
 
 Example request:
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/artifacts/keep"
 ```
 
@@ -769,11 +769,11 @@ Example response:
 
 ## Delete artifacts
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25522) in GitLab 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25522) in GitLab 11.9.
 
 Delete artifacts of a job.
 
-```
+```plaintext
 DELETE /projects/:id/jobs/:job_id/artifacts
 ```
 
@@ -784,7 +784,7 @@ DELETE /projects/:id/jobs/:job_id/artifacts
 
 Example request:
 
-```sh
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/artifacts"
 ```
 
@@ -797,7 +797,7 @@ If the artifacts were deleted successfully, a response with status `204 No Conte
 
 Triggers a manual action to start a job.
 
-```
+```plaintext
 POST /projects/:id/jobs/:job_id/play
 ```
 
@@ -806,7 +806,7 @@ POST /projects/:id/jobs/:job_id/play
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `job_id`  | integer        | yes      | ID of a job.                                                                                                 |
 
-```sh
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/jobs/1/play"
 ```
 
@@ -843,5 +843,5 @@ Example of response
 ```
 
 [ee]: https://about.gitlab.com/pricing/
-[ee-2346]: https://gitlab.com/gitlab-org/gitlab/merge_requests/2346
+[ee-2346]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346
 [triggers]: ../ci/triggers/README.md#when-a-pipeline-depends-on-the-artifacts-of-another-pipeline-premium

@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'User updates wiki page' do
+  include WikiHelpers
+
   let(:user) { create(:user) }
 
   before do
@@ -11,8 +13,11 @@ describe 'User updates wiki page' do
   end
 
   context 'when wiki is empty' do
-    before do
+    before do |example|
       visit(project_wikis_path(project))
+
+      wait_for_svg_to_be_loaded(example)
+
       click_link "Create your first page"
     end
 
@@ -83,15 +88,15 @@ describe 'User updates wiki page' do
       end
 
       it 'updates the commit message as the title is changed', :js do
+        fill_in(:wiki_title, with: '& < > \ \ { } &')
+
+        expect(page).to have_field('wiki[message]', with: 'Update & < > \ \ { } &')
+      end
+
+      it 'correctly escapes the commit message entities', :js do
         fill_in(:wiki_title, with: 'Wiki title')
 
         expect(page).to have_field('wiki[message]', with: 'Update Wiki title')
-      end
-
-      it 'does not allow XSS', :js do
-        fill_in(:wiki_title, with: '<script>')
-
-        expect(page).to have_field('wiki[message]', with: 'Update &lt;script&gt;')
       end
 
       it 'shows a validation error message' do

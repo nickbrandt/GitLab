@@ -8,6 +8,7 @@ If you want the TL;DR versions, jump to:
 - [Omnibus GitLab restart](#omnibus-gitlab-restart)
 - [Omnibus GitLab reconfigure](#omnibus-gitlab-reconfigure)
 - [Source installation restart](#installations-from-source)
+- [Helm chart installation restart](#helm-chart-installations)
 
 ## Omnibus installations
 
@@ -30,13 +31,13 @@ GitLab Rails application (Unicorn) as well as the other components, like:
 There may be times in the documentation where you will be asked to _restart_
 GitLab. In that case, you need to run the following command:
 
-```bash
+```shell
 sudo gitlab-ctl restart
 ```
 
 The output should be similar to this:
 
-```
+```plaintext
 ok: run: gitlab-workhorse: (pid 11291) 1s
 ok: run: logrotate: (pid 11299) 0s
 ok: run: mailroom: (pid 11306) 0s
@@ -50,13 +51,13 @@ ok: run: unicorn: (pid 11338) 0s
 To restart a component separately, you can append its service name to the
 `restart` command. For example, to restart **only** NGINX you would run:
 
-```bash
+```shell
 sudo gitlab-ctl restart nginx
 ```
 
 To check the status of GitLab services, run:
 
-```bash
+```shell
 sudo gitlab-ctl status
 ```
 
@@ -78,7 +79,7 @@ GitLab. Remember that this method applies only for the Omnibus packages.
 
 Reconfigure Omnibus GitLab with:
 
-```bash
+```shell
 sudo gitlab-ctl reconfigure
 ```
 
@@ -86,8 +87,8 @@ Reconfiguring GitLab should occur in the event that something in its
 configuration (`/etc/gitlab/gitlab.rb`) has changed.
 
 When you run this command, [Chef], the underlying configuration management
-application that powers Omnibus GitLab, will make sure that all directories,
-permissions, services, etc., are in place and in the same shape that they were
+application that powers Omnibus GitLab, will make sure that all things like directories,
+permissions, and services are in place and in the same shape that they were
 initially shipped.
 
 It will also restart GitLab components where needed, if any of their
@@ -102,13 +103,13 @@ depend on those files.
 If you have followed the official installation guide to [install GitLab from
 source][install], run the following command to restart GitLab:
 
-```
+```shell
 sudo service gitlab restart
 ```
 
 The output should be similar to this:
 
-```
+```plaintext
 Shutting down GitLab Unicorn
 Shutting down GitLab Sidekiq
 Shutting down GitLab Workhorse
@@ -127,7 +128,7 @@ The GitLab MailRoom email processor with pid 28114 is running.
 GitLab and all its components are up and running.
 ```
 
-This should restart Unicorn, Sidekiq, GitLab Workhorse and [Mailroom][]
+This should restart Unicorn, Sidekiq, GitLab Workhorse, and [Mailroom][]
 (if enabled). The init service file that does all the magic can be found on
 your server in `/etc/init.d/gitlab`.
 
@@ -143,3 +144,16 @@ If you are using other init systems, like systemd, you can check the
 [chef]: https://www.chef.io/products/chef-infra/ "Chef official website"
 [src-service]: https://gitlab.com/gitlab-org/gitlab/blob/master/lib/support/init.d/gitlab "GitLab init service file"
 [gl-recipes]: https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/init "GitLab Recipes repository"
+
+## Helm chart installations
+
+There is no single command to restart the entire GitLab application installed via
+the [cloud native Helm Chart](https://docs.gitlab.com/charts/). Usually, it should be
+enough to restart a specific component separately (for example, `gitaly`, `unicorn`,
+`workhorse`, or `gitlab-shell`) by deleting all the pods related to it:
+
+```shell
+kubectl delete pods -l release=<helm release name>,app=<component name>
+```
+
+The release name can be obtained from the output of the `helm list` command.

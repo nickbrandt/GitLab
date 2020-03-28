@@ -3,12 +3,15 @@
 # EE-only
 FactoryBot.define do
   factory :plan do
-    factory :default_plan do
-      name { Plan::DEFAULT }
-      title { name.titleize }
+    Plan::DEFAULT_PLANS.each do |plan|
+      factory :"#{plan}_plan" do
+        name { plan }
+        title { name.titleize }
+        initialize_with { Plan.find_or_create_by(name: plan) }
+      end
     end
 
-    EE::Namespace::PLANS.each do |plan|
+    Plan::ALL_HOSTED_PLANS.each do |plan|
       factory :"#{plan}_plan" do
         name { plan }
         title { name.titleize }

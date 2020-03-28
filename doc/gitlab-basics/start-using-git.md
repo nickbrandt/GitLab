@@ -21,7 +21,7 @@ Here are some suggestions:
 
 Git is usually preinstalled on Mac and Linux, so run the following command:
 
-```bash
+```shell
 git --version
 ```
 
@@ -39,38 +39,40 @@ commit will use this information to identify you as the author.
 
 In your shell, type the following command to add your username:
 
-```bash
+```shell
 git config --global user.name "YOUR_USERNAME"
 ```
 
 Then verify that you have the correct username:
 
-```bash
+```shell
 git config --global user.name
 ```
 
 To set your email address, type the following command:
 
-```bash
+```shell
 git config --global user.email "your_email_address@example.com"
 ```
 
 To verify that you entered your email correctly, type:
 
-```bash
+```shell
 git config --global user.email
 ```
 
-You'll need to do this only once, since you are using the `--global` option. It tells
-Git to always use this information for anything you do on that system. If you want
-to override this with a different username or email address for specific projects or repositories,
-you can run the command without the `--global` option when you’re in that project, and that will default to `--local`. You can read more on how Git manages configurations in the [Git Config](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration) documentation.
+You'll need to do this only once, since you are using the `--global` option. It
+tells Git to always use this information for anything you do on that system. If
+you want to override this with a different username or email address for specific
+projects or repositories, you can run the command without the `--global` option
+when you’re in that project, and that will default to `--local`. You can read more
+on how Git manages configurations in the [Git Config](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration) documentation.
 
 ## Check your information
 
 To view the information that you entered, along with other global options, type:
 
-```bash
+```shell
 git config --global --list
 ```
 
@@ -83,7 +85,7 @@ Start using Git via the command line with the most basic commands as described b
 If you have an existing local directory that you want to *initialize* for version
 control, use the `init` command to instruct Git to begin tracking the directory:
 
-```bash
+```shell
 git init
 ```
 
@@ -91,7 +93,7 @@ This creates a `.git` directory that contains the Git configuration files.
 
 Once the directory has been initialized, you can [add a remote repository](#add-a-remote-repository)
 and [send changes to GitLab.com](#send-changes-to-gitlabcom). You will also need to
-[create a new project in GitLab](../gitlab-basics/create-project.html#push-to-create-a-new-project)
+[create a new project in GitLab](../gitlab-basics/create-project.md#push-to-create-a-new-project)
 for your Git repository.
 
 ### Clone a repository
@@ -102,7 +104,10 @@ files to your local computer, automatically preserving the Git connection with t
 remote repository.
 
 You can either clone it via HTTPS or [SSH](../ssh/README.md). If you chose to clone
-it via HTTPS, you'll have to enter your credentials every time you pull and push. You can read more about credential storage in the [Git Credentials documentation](https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage). With SSH, you enter your credentials only once.
+it via HTTPS, you'll have to enter your credentials every time you pull and push.
+You can read more about credential storage in the
+[Git Credentials documentation](https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage).
+With SSH, you enter your credentials only once.
 
 You can find both paths (HTTPS and SSH) by navigating to your project's landing page
 and clicking **Clone**. GitLab will prompt you with both paths, from which you can copy
@@ -113,18 +118,18 @@ As an example, consider this repository path:
 - HTTPS: `https://gitlab.com/gitlab-org/gitlab.git`
 - SSH: `git@gitlab.com:gitlab-org/gitlab.git`
 
-To get started, open a terminal window in the directory you wish to clone the repository
-files into, and run one of the following commands.
+To get started, open a terminal window in the directory you wish to clone the
+repository files into, and run one of the following commands.
 
 Clone via HTTPS:
 
-```bash
+```shell
 git clone https://gitlab.com/gitlab-org/gitlab.git
 ```
 
 Clone via SSH:
 
-```bash
+```shell
 git clone git@gitlab.com:gitlab-org/gitlab.git
 ```
 
@@ -134,38 +139,39 @@ on it locally.
 
 ### Switch to the master branch
 
-You are always in a branch when working with Git. The main branch is the master branch,
-but you can use the same command to switch to a different branch by changing `master`
-to the branch name.
+You are always in a branch when working with Git. The main branch is the master
+branch, but you can use the same command to switch to a different branch by
+changing `master` to the branch name.
 
-```bash
+```shell
 git checkout master
 ```
 
 ### Download the latest changes in the project
 
 To work on an up-to-date copy of the project (it is important to do this every time
-you start working on a project), you `pull` to get all the changes made by users since
-the last time you cloned or pulled the project. Use `master` for the `<name-of-branch>`
-to get the main branch code, or the branch name of the branch you are currently working
-in.
+you start working on a project), you `pull` to get all the changes made by users
+since the last time you cloned or pulled the project. Use `master` for the
+`<name-of-branch>` to get the main branch code, or the branch name of the branch
+you are currently working in.
 
-```bash
+```shell
 git pull <REMOTE> <name-of-branch>
 ```
 
 When you clone a repository, `REMOTE` is typically `origin`. This is where the
 repository was cloned from, and it indicates the SSH or HTTPS URL of the repository
-on the remote server. `<name-of-branch>` is usually `master`, but it may be any existing
-branch. You can create additional named remotes and branches as necessary.
+on the remote server. `<name-of-branch>` is usually `master`, but it may be any
+existing branch. You can create additional named remotes and branches as necessary.
 
-You can learn more on how Git manages remote repositories in the [Git Remote documentation](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes).
+You can learn more on how Git manages remote repositories in the
+[Git Remote documentation](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes).
 
 ### View your remote repositories
 
 To view your remote repositories, type:
 
-```bash
+```shell
 git remote -v
 ```
 
@@ -175,7 +181,7 @@ The `-v` flag stands for verbose.
 
 To add a link to a remote repository:
 
-```bash
+```shell
 git remote add <source-name> <repository-path>
 ```
 
@@ -184,11 +190,11 @@ so use something easy to remember and type.
 
 ### Create a branch
 
-To create a new branch, to work from without affecting the `master` branch, type the
-following (spaces won't be recognized in the branch name, so you will need to use a
-hyphen or underscore):
+To create a new branch, to work from without affecting the `master` branch, type
+the following (spaces won't be recognized in the branch name, so you will need to
+use a hyphen or underscore):
 
-```bash
+```shell
 git checkout -b <name-of-branch>
 ```
 
@@ -196,7 +202,7 @@ git checkout -b <name-of-branch>
 
 To switch to an existing branch, so you can work on it:
 
-```bash
+```shell
 git checkout <name-of-branch>
 ```
 
@@ -206,7 +212,7 @@ It's important to be aware of what's happening and the status of your changes. W
 you add, change, or delete files/folders, Git knows about it. To check the status of
 your changes:
 
-```bash
+```shell
 git status
 ```
 
@@ -215,7 +221,7 @@ git status
 To view the differences between your local, unstaged changes and the repository versions
 that you cloned or pulled, type:
 
-```bash
+```shell
 git diff
 ```
 
@@ -226,7 +232,7 @@ be new, modified, or deleted files/folders. Use `git add` to first stage (prepar
 a local file/folder for committing. Then use `git commit` to commit (save) the staged
 files:
 
-```bash
+```shell
 git add <file-name OR folder-name>
 git commit -m "COMMENT TO DESCRIBE THE INTENTION OF THE COMMIT"
 ```
@@ -235,7 +241,7 @@ git commit -m "COMMENT TO DESCRIBE THE INTENTION OF THE COMMIT"
 
 To add and commit (save) all local changes quickly:
 
-```bash
+```shell
 git add .
 git commit -m "COMMENT TO DESCRIBE THE INTENTION OF THE COMMIT"
 ```
@@ -245,15 +251,19 @@ The `.` character means _all file changes in the current directory and all subdi
 
 ### Send changes to GitLab.com
 
+NOTE: **Note:**
+To create a merge request from a fork to an upstream repository, see the
+[forking workflow](../user/project/repository/forking_workflow.md)
+
 To push all local commits (saved changes) to the remote repository:
 
-```bash
+```shell
 git push <remote> <name-of-branch>
 ```
 
 For example, to push your local commits to the _`master`_ branch of the _`origin`_ remote:
 
-```bash
+```shell
 git push origin master
 ```
 
@@ -262,7 +272,7 @@ git push origin master
 To delete all local changes in the branch that have not been added to the staging
 area, and leave unstaged files/folders, type:
 
-```bash
+```shell
 git checkout .
 ```
 
@@ -272,7 +282,7 @@ Note that this removes *changes* to files, not the files themselves.
 
 To undo the most recently added, but not committed, changes to files/folders:
 
-```bash
+```shell
 git reset .
 ```
 
@@ -280,7 +290,7 @@ git reset .
 
 To undo the most recent commit, type:
 
-```bash
+```shell
 git reset HEAD~1
 ```
 
@@ -296,10 +306,25 @@ the situation altogether by working carefully.
 When you are ready to make all the changes in a branch a permanent addition to
 the master branch, you `merge` the two together:
 
-```bash
+```shell
 git checkout <name-of-branch>
 git merge master
 ```
+
+### Synchronize changes in a forked repository with the upstream
+
+[Forking a repository](../user/project/repository/forking_workflow.md) lets you create
+a copy of a repository in your namespace. Changes made to your copy of the repository
+are not synchronized automatically with the original.
+Your local fork (copy) contains changes made by you only, so to keep the project
+in sync with the original project, you need to `pull` from the original repository.
+
+You must [create a link to the remote repository](#add-a-remote-repository) to pull
+changes from the original repository. It is common to call this remote the `upstream`.
+
+You can now use the `upstream` as a [`<remote>` to `pull` new updates](#download-the-latest-changes-in-the-project)
+from the original repository, and use the `origin`
+to [push local changes](#send-changes-to-gitlabcom) and create merge requests.
 
 <!-- ## Troubleshooting
 

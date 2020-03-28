@@ -230,6 +230,50 @@ describe GithubService do
       end
     end
 
+    context 'when an external pull request pipeline exists' do
+      let(:external_pr) { create(:external_pull_request, project: project) }
+
+      let!(:external_pipeline) do
+        create(:ci_pipeline,
+          source: :external_pull_request_event,
+          external_pull_request: external_pr,
+          project: project)
+      end
+
+      it 'does not send notification' do
+        expect(subject).not_to receive(:update_status)
+        expect(GithubService::StatusMessage).not_to receive(:from_pipeline_data)
+
+        expect(subject.execute(pipeline_sample_data)).to be_nil
+      end
+
+      it 'sends notification if the sha is not present' do
+        pipeline_sample_data[:object_attributes].delete(:sha)
+
+        expect(subject).to receive(:update_status)
+        expect(GithubService::StatusMessage).to receive(:from_pipeline_data)
+
+        subject.execute(pipeline_sample_data)
+      end
+    end
+
+    context 'when the pipeline is an external pull request pipeline' do
+      let(:external_pr) { create(:external_pull_request, project: project) }
+
+      before do
+        pipeline.update!(
+          source: :external_pull_request_event,
+          external_pull_request: external_pr)
+      end
+
+      it 'sends notification' do
+        expect(subject).to receive(:update_status)
+        expect(GithubService::StatusMessage).to receive(:from_pipeline_data)
+
+        subject.execute(pipeline_sample_data)
+      end
+    end
+
     context 'without a license' do
       it 'does nothing' do
         stub_licensed_features(github_project_service_integration: false)

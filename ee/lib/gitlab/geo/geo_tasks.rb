@@ -27,7 +27,7 @@ module Gitlab
 
         $stdout.puts "Updating primary Geo node with URL #{node.url} ..."
 
-        if node.update(url: GeoNode.current_node_url)
+        if node.update(name: GeoNode.current_node_name, url: GeoNode.current_node_url)
           $stdout.puts "#{node.url} is now the primary Geo node URL".color(:green)
         else
           $stdout.puts "Error saving Geo node:\n#{node.errors.full_messages.join("\n")}".color(:red)

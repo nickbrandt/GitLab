@@ -53,7 +53,7 @@ module Geo
         end
       end
 
-      Geo::FileRemovalWorker.bulk_perform_async(paths_to_remove)
+      Geo::FileRemovalWorker.bulk_perform_async(paths_to_remove) # rubocop:disable Scalability/BulkPerformWithContext
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -66,14 +66,12 @@ module Geo
     # This is called by LogHelpers to build json log with context info
     #
     # @see ::Gitlab::Geo::LogHelpers
-    def base_log_data(message)
+    def extra_log_data
       {
-        class: self.class.name,
         project_id: project.id,
         project_path: project.full_path,
-        project_old_path: old_full_path,
-        message: message
-      }
+        project_old_path: old_full_path
+      }.compact
     end
   end
 end

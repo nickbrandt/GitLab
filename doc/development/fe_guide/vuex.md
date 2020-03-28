@@ -1,12 +1,19 @@
 # Vuex
 
-To manage the state of an application you should use [Vuex][vuex-docs].
+When there's a clear benefit to separating state management from components (e.g. due to state complexity) we recommend using [Vuex][vuex-docs] over any other Flux pattern. Otherwise, feel free to manage state within the components.
+
+Vuex should be strongly considered when:
+
+- You expect multiple parts of the application to react to state changes
+- There's a need to share data between multiple components
+- There are complex interactions with Backend, e.g. multiple API calls
+- The app involves interacting with backend via both traditional REST API and GraphQL (especially when moving the REST API over to GraphQL is a pending backend task)
 
 _Note:_ All of the below is explained in more detail in the official [Vuex documentation][vuex-docs].
 
 ## Separation of concerns
 
-Vuex is composed of State, Getters, Mutations, Actions and Modules.
+Vuex is composed of State, Getters, Mutations, Actions, and Modules.
 
 When a user clicks on an action, we need to `dispatch` it. This action will `commit` a mutation that will change the state.
 _Note:_ The action itself will not update the state, only a mutation should update the state.
@@ -15,7 +22,7 @@ _Note:_ The action itself will not update the state, only a mutation should upda
 
 When using Vuex at GitLab, separate these concerns into different files to improve readability:
 
-```
+```plaintext
 └── store
   ├── index.js          # where we assemble modules and export the store
   ├── actions.js        # actions
@@ -239,20 +246,95 @@ From [vuex mutations docs](https://vuex.vuejs.org/guide/mutations.html):
 export const ADD_USER = 'ADD_USER';
 ```
 
-### How to include the store in your application
+### Initializing a store's state
 
-The store should be included in the main component of your application:
+It's common for a Vuex store to need some initial state before its `action`s can
+be used. Often this includes data like API endpoints, documentation URLs, or
+IDs.
+
+To set this initial state, pass it as a parameter to your store's creation
+function when mounting your Vue component:
 
 ```javascript
-  // app.vue
-  import store from './store'; // it will include the index.js file
+// in the Vue app's initialization script (e.g. mount_show.js)
 
-  export default {
-    name: 'application',
-    store,
-    ...
-  };
+import Vue from 'vue';
+import createStore from './stores';
+import AwesomeVueApp from './components/awesome_vue_app.vue'
+
+export default () => {
+  const el = document.getElementById('js-awesome-vue-app');
+
+  return new Vue({
+    el,
+    store: createStore(el.dataset),
+    render: h => h(AwesomeVueApp)
+  });
+};
 ```
+
+The store function, in turn, can pass this data along to the state's creation
+function:
+
+```javascript
+// in store/index.js
+
+import * as actions from './actions';
+import mutations from './mutations';
+import createState from './state';
+
+export default initialState => ({
+  actions,
+  mutations,
+  state: createState(initialState),
+});
+```
+
+And the state function can accept this initial data as a parameter and bake it
+into the `state` object it returns:
+
+```javascript
+// in store/state.js
+
+export default ({
+  projectId,
+  documentationPath,
+  anOptionalProperty = true
+}) => ({
+  projectId,
+  documentationPath,
+  anOptionalProperty,
+
+  // other state properties here
+});
+```
+
+#### Why not just ...spread the initial state?
+
+The astute reader will see an opportunity to cut out a few lines of code from
+the example above:
+
+```javascript
+// Don't do this!
+
+export default initialState => ({
+  ...initialState,
+
+  // other state properties here
+});
+```
+
+We've made the conscious decision to avoid this pattern to aid in the
+discoverability and searchability of our frontend codebase. The reasoning for
+this is described in [this
+discussion](https://gitlab.com/gitlab-org/frontend/rfcs/-/issues/56#note_302514865):
+
+> Consider a `someStateKey` is being used in the store state. You _may_ not be
+> able to grep for it directly if it was provided only by `el.dataset`. Instead,
+> you'd have to grep for `some_state_key`, since it could have come from a rails
+> template. The reverse is also true: if you're looking at a rails template, you
+> might wonder what uses `some_state_key`, but you'd _have_ to grep for
+> `someStateKey`
 
 ### Communicating with the Store
 
@@ -396,3 +478,93 @@ export default () => {};
 ```
 
 [vuex-docs]: https://vuex.vuejs.org
+
+### Two way data binding
+
+When storing form data in Vuex, it is sometimes necessary to update the value stored. The store should never be mutated directly, and an action should be used instead.
+In order to still use `v-model` in our code, we need to create computed properties in this form:
+
+```javascript
+export default {
+  computed: {
+    someValue: {
+      get() {
+        return this.$store.state.someValue;
+      },
+      set(value) {
+        this.$store.dispatch("setSomeValue", value);
+      }
+    }
+  }
+};
+```
+
+An alternative is to use `mapState` and `mapActions`:
+
+```javascript
+export default {
+  computed: {
+    ...mapState(['someValue']),
+    localSomeValue: {
+      get() {
+        return this.someValue;
+      },
+      set(value) {
+        this.setSomeValue(value)
+      }
+    }
+  },
+  methods: {
+    ...mapActions(['setSomeValue'])
+  }
+};
+```
+
+Adding a few of these properties becomes cumbersome, and makes the code more repetitive with more tests to write. To simplify this there is a helper in `~/vuex_shared/bindings.js`
+
+The helper can be used like so:
+
+```javascript
+// this store is non-functional and only used to give context to the example
+export default {
+  state: {
+    baz: '',
+    bar: '',
+    foo: ''
+  },
+  actions: {
+    updateBar() {...}
+    updateAll() {...}
+  },
+  getters: {
+    getFoo() {...}
+  }
+}
+```
+
+```javascript
+import { mapComputed } from '~/vuex_shared/bindings'
+export default {
+  computed: {
+    /**
+     * @param {(string[]|Object[])} list - list of string matching state keys or list objects
+     * @param {string} list[].key - the key matching the key present in the vuex state
+     * @param {string} list[].getter - the name of the getter, leave it empty to not use a getter
+     * @param {string} list[].updateFn - the name of the action, leave it empty to use the default action
+     * @param {string} defaultUpdateFn - the default function to dispatch
+     * @param {string} root - optional key of the state where to search fo they keys described in list
+     * @returns {Object} a dictionary with all the computed properties generated
+    */
+    ...mapComputed(
+      [
+        'baz',
+        { key: 'bar', updateFn: 'updateBar' }
+        { key: 'foo', getter: 'getFoo' },
+      ],
+      'updateAll',
+    ),
+  }
+}
+```
+
+`mapComputed` will then generate the appropriate computed properties that get the data from the store and dispatch the correct action when updated.

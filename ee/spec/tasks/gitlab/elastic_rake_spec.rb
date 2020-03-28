@@ -2,7 +2,7 @@
 
 require 'rake_helper'
 
-describe 'gitlab:elastic namespace rake tasks', :elastic, :sidekiq do
+describe 'gitlab:elastic namespace rake tasks', :elastic do
   before do
     Rake.application.rake_require 'tasks/gitlab/elastic'
     stub_ee_application_setting(elasticsearch_indexing: true)
@@ -70,6 +70,14 @@ describe 'gitlab:elastic namespace rake tasks', :elastic, :sidekiq do
       expect(Snippet).to receive(:es_import)
 
       run_rake_task 'gitlab:elastic:index_snippets'
+    end
+  end
+
+  describe 'reindex_to_another_cluster' do
+    it 'calls reindex_to_another_cluster' do
+      expect(Gitlab::Elastic::Helper).to receive(:reindex_to_another_cluster).with('http://oldcluster.example.com:9300/', 'http://newcluster.example.com:9300/')
+
+      run_rake_task 'gitlab:elastic:reindex_to_another_cluster', 'http://oldcluster.example.com:9300/', 'http://newcluster.example.com:9300/'
     end
   end
 end

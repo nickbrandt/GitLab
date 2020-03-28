@@ -9,7 +9,9 @@ describe Gitlab::Cache::Ci::ProjectPipelineStatus, :clean_gitlab_redis_cache do
 
   describe '.load_for_project' do
     it "loads the status" do
-      expect_any_instance_of(described_class).to receive(:load_status)
+      expect_next_instance_of(described_class) do |instance|
+        expect(instance).to receive(:load_status)
+      end
 
       described_class.load_for_project(project)
     end
@@ -111,6 +113,24 @@ describe Gitlab::Cache::Ci::ProjectPipelineStatus, :clean_gitlab_redis_cache do
 
       pipeline_status.load_status
       pipeline_status.load_status
+    end
+
+    it 'handles Gitaly unavailable exceptions gracefully' do
+      allow(pipeline_status).to receive(:commit).and_raise(GRPC::Unavailable)
+
+      expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
+        an_instance_of(GRPC::Unavailable), project_id: project.id
+      )
+      expect { pipeline_status.load_status }.not_to raise_error
+    end
+
+    it 'handles Gitaly timeout exceptions gracefully' do
+      allow(pipeline_status).to receive(:commit).and_raise(GRPC::DeadlineExceeded)
+
+      expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
+        an_instance_of(GRPC::DeadlineExceeded), project_id: project.id
+      )
+      expect { pipeline_status.load_status }.not_to raise_error
     end
   end
 

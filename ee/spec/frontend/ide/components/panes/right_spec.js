@@ -1,7 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import RightPane from '~/ide/components/panes/right.vue';
 import EERightPane from 'ee/ide/components/panes/right.vue';
+import RightPane from '~/ide/components/panes/right.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -20,7 +20,7 @@ describe('IDE EERightPane', () => {
       },
     });
 
-    wrapper = shallowMount(localVue.extend(EERightPane), { localVue, store });
+    wrapper = shallowMount(EERightPane, { localVue, store });
   };
 
   beforeEach(() => {
@@ -29,6 +29,7 @@ describe('IDE EERightPane', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   it('adds terminal tab', () => {

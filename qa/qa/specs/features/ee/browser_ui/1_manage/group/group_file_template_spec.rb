@@ -99,14 +99,17 @@ module QA
           Page::File::Form.perform do |form|
             form.select_template template[:type], template[:template]
 
-            expect(form).to have_content(template[:content])
+            expect(form).to have_normalized_ws_text(template[:content])
 
             form.commit_changes
+            form.finished_loading?
 
-            expect(form).to have_content('The file has been successfully created.')
-            expect(form).to have_content(template[:type])
-            expect(form).to have_content('Add new file')
-            expect(form).to have_content(template[:content])
+            aggregate_failures "indications of file created" do
+              expect(form).to have_content('The file has been successfully created.')
+              expect(form).to have_content(template[:type])
+              expect(form).to have_content('Add new file')
+              expect(form).to have_normalized_ws_text(template[:content].chomp)
+            end
           end
         end
       end

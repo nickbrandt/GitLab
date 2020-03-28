@@ -2,7 +2,7 @@
 
 module Geo
   module Scheduler
-    class SchedulerWorker
+    class SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
       include GeoQueue
       include ExclusiveLeaseGuard
@@ -170,7 +170,7 @@ module Geo
 
       def update_pending_resources
         if reload_queue?
-          @pending_resources = load_pending_resources
+          @pending_resources = Gitlab::Database.geo_uncached_queries { load_pending_resources }
           set_backoff_time! if should_apply_backoff?
         end
       end

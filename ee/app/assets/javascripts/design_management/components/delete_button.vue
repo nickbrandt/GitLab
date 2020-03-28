@@ -1,12 +1,11 @@
 <script>
-import { GlButton, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
-import _ from 'underscore';
+import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
+import { uniqueId } from 'lodash';
 
 export default {
   name: 'DeleteButton',
   components: {
     GlButton,
-    GlLoadingIcon,
     GlModal,
   },
   directives: {
@@ -36,7 +35,7 @@ export default {
   },
   data() {
     return {
-      modalId: _.uniqueId('design-deletion-confirmation-'),
+      modalId: uniqueId('design-deletion-confirmation-'),
     };
   },
 };

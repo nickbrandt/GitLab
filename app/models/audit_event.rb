@@ -16,16 +16,39 @@ class AuditEvent < ApplicationRecord
 
   after_initialize :initialize_details
 
+  def self.order_by(method)
+    case method.to_s
+    when 'created_asc'
+      order(id: :asc)
+    else
+      order(id: :desc)
+    end
+  end
+
   def initialize_details
     self.details = {} if details.nil?
   end
 
   def author_name
-    self.user.name
+    lazy_author.name
   end
 
   def formatted_details
     details.merge(details.slice(:from, :to).transform_values(&:to_s))
+  end
+
+  def lazy_author
+    BatchLoader.for(author_id).batch(default_value: default_author_value) do |author_ids, loader|
+      User.where(id: author_ids).find_each do |user|
+        loader.call(user.id, user)
+      end
+    end
+  end
+
+  private
+
+  def default_author_value
+    ::Gitlab::Audit::NullAuthor.for(author_id, details[:author_name])
   end
 end
 

@@ -1,8 +1,8 @@
 <script>
 import { GlFormInput } from '@gitlab/ui';
-import { sprintf, s__, __ } from '~/locale';
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { mapState, mapActions } from 'vuex';
+import { sprintf, s__, __ } from '~/locale';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      roleArn: '',
+      roleArn: this.$store.state.roleArn,
     };
   },
   computed: {
@@ -42,7 +42,7 @@ export default {
         : s__('ClusterIntegration|Authenticate with AWS');
     },
     accountAndExternalIdsHelpText() {
-      const escapedUrl = _.escape(this.accountAndExternalIdsHelpPath);
+      const escapedUrl = esc(this.accountAndExternalIdsHelpPath);
 
       return sprintf(
         s__(
@@ -59,7 +59,7 @@ export default {
       );
     },
     provisionRoleArnHelpText() {
-      const escapedUrl = _.escape(this.createRoleArnHelpPath);
+      const escapedUrl = esc(this.createRoleArnHelpPath);
 
       return sprintf(
         s__(
@@ -82,8 +82,8 @@ export default {
 };
 </script>
 <template>
-  <form name="service-credentials-form" @submit.prevent="createRole({ roleArn, externalId })">
-    <h2>{{ s__('ClusterIntegration|Authenticate with Amazon Web Services') }}</h2>
+  <form name="service-credentials-form">
+    <h4>{{ s__('ClusterIntegration|Authenticate with Amazon Web Services') }}</h4>
     <p>
       {{
         s__(
@@ -136,6 +136,7 @@ export default {
       :disabled="submitButtonDisabled"
       :loading="isCreatingRole"
       :label="submitButtonLabel"
+      @click.prevent="createRole({ roleArn, externalId })"
     />
   </form>
 </template>

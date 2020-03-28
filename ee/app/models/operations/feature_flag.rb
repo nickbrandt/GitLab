@@ -1,19 +1,21 @@
 # frozen_string_literal: true
 
 module Operations
-  ##
-  # NOTE:
-  # "operations_feature_flags.active" column is not used in favor of
-  # operations_feature_flag_scopes's override policy.
-  # You can calculate actual `active` values with `for_environment` method.
   class FeatureFlag < ApplicationRecord
+    include AtomicInternalId
+
     self.table_name = 'operations_feature_flags'
 
     belongs_to :project
 
+    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }, backfill: true, presence: false
+
     default_value_for :active, true
 
+    # scopes exists only for the first version
     has_many :scopes, class_name: 'Operations::FeatureFlagScope'
+    # strategies exists only for the second version
+    has_many :strategies, class_name: 'Operations::FeatureFlags::Strategy'
     has_one :default_scope, -> { where(environment_scope: '*') }, class_name: 'Operations::FeatureFlagScope'
 
     validates :project, presence: true
@@ -27,40 +29,46 @@ module Operations
     validates :name, uniqueness: { scope: :project_id }
     validates :description, allow_blank: true, length: 0..255
     validate :first_default_scope, on: :create, if: :has_scopes?
+    validate :version_associations
 
-    before_create :build_default_scope, unless: :has_scopes?
-    after_update :update_default_scope
+    before_create :build_default_scope, if: -> { legacy_flag? && scopes.none? }
 
     accepts_nested_attributes_for :scopes, allow_destroy: true
+    accepts_nested_attributes_for :strategies, allow_destroy: true
 
     scope :ordered, -> { order(:name) }
 
-    scope :enabled, -> do
-      where('EXISTS (?)', join_enabled_scopes)
-    end
+    scope :enabled, -> { where(active: true) }
+    scope :disabled, -> { where(active: false) }
 
-    scope :disabled, -> do
-      where('NOT EXISTS (?)', join_enabled_scopes)
-    end
-
-    scope :for_list, -> do
-      select("operations_feature_flags.*" \
-             ", COALESCE((#{join_enabled_scopes.to_sql}), FALSE) AS active")
-    end
+    enum version: {
+      legacy_flag: 1,
+      new_version_flag: 2
+    }
 
     class << self
-      def join_enabled_scopes
-        Operations::FeatureFlagScope
-          .where('operations_feature_flags.id = feature_flag_id')
-          .enabled.limit(1).select('TRUE')
+      def preload_relations
+        preload(:scopes, strategies: :scopes)
       end
 
-      def preload_relations
-        preload(:scopes)
+      def for_unleash_client(project, environment)
+        includes(strategies: :scopes)
+          .where(project: project)
+          .merge(Operations::FeatureFlags::Scope.on_environment(environment))
+          .reorder(:id)
+          .references(:operations_scopes)
       end
     end
 
     private
+
+    def version_associations
+      if new_version_flag? && scopes.any?
+        errors.add(:version_associations, 'version 2 feature flags may not have scopes')
+      elsif legacy_flag? && strategies.any?
+        errors.add(:version_associations, 'version 1 feature flags may not have strategies')
+      end
+    end
 
     def first_default_scope
       unless scopes.first.environment_scope == '*'
@@ -74,10 +82,6 @@ module Operations
 
     def has_scopes?
       scopes.any?
-    end
-
-    def update_default_scope
-      default_scope.update(active: self.active) if saved_change_to_active?
     end
   end
 end

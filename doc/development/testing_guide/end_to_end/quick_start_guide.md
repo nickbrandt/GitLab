@@ -2,7 +2,12 @@
 
 In this tutorial, you will find different examples, and the steps involved, in the creation of end-to-end (_e2e_) tests for GitLab CE and GitLab EE, using GitLab QA.
 
-> When referring to end-to-end tests in this document, this means testing a specific feature end-to-end, such as a user logging in, the creation of a project, the management of labels, breaking down epics into sub-epics and issues, etc.
+When referring to end-to-end tests in this document, this means testing a specific feature end-to-end such as:
+
+- A user logging in.
+- The creation of a project.
+- The management of labels.
+- Breaking down epics into sub-epics and issues.
 
 ## Important information before we start writing tests
 
@@ -26,7 +31,17 @@ If you don't exactly understand what we mean by **not everything needs to happen
 
 At GitLab we respect the [test pyramid](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/development/testing_guide/testing_levels.md), and so, we recommend you check the code coverage of a specific feature before writing end-to-end tests, for both [CE](https://gitlab-org.gitlab.io/gitlab-foss/coverage-ruby/#_AllFiles) and [EE](https://gitlab-org.gitlab.io/gitlab/coverage-ruby/#_AllFiles) projects.
 
-Sometimes you may notice that there is already good coverage in other test levels, and we can stay confident that if we break a feature, we will still have quick feedback about it, even without having end-to-end tests.
+Sometimes you may notice that there is already good coverage in lower test levels, and we can stay confident that if we break a feature, we will still have quick feedback about it, even without having end-to-end tests.
+
+> For analyzing the code coverage, you will also need to understand which application files implement specific functionalities.
+
+#### Some other guidelines are as follows
+
+- Take a look at the [How to test at the correct level?](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/development/testing_guide/testing_levels.md#how-to-test-at-the-correct-level) section of the [Testing levels](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/development/testing_guide/testing_levels.md) document
+
+- Look into the frequency in which such a feature is changed (_Stable features that don't change very often might not be worth covering with end-to-end tests if they're already covered in lower levels_)
+
+- Finally, discuss with the developer(s) involved in developing the feature and the tests themselves, to get their feeling
 
 If after this analysis you still think that end-to-end tests are needed, keep reading.
 
@@ -38,7 +53,7 @@ The GitLab QA end-to-end tests are organized by the different [stages in the Dev
 
 > There may be sub-directories inside the stages directories, for different features. For example: `.../browser_ui/2_plan/ee_epics/` and `.../browser_ui/2_plan/issues/`.
 
-Now, let's say we want to create tests for the [scoped labels](https://about.gitlab.com/blog/2019/04/22/gitlab-11-10-released/#scoped-labels) feature, available on GitLab EE Premium (this feature is part of the Plan stage.)
+Now, let's say we want to create tests for the [scoped labels](https://about.gitlab.com/releases/2019/04/22/gitlab-11-10-released/#scoped-labels) feature, available on GitLab EE Premium (this feature is part of the Plan stage.)
 
 > Because these tests are for a feature available only on GitLab EE, we need to create them in the [EE repository](https://gitlab.com/gitlab-org/gitlab).
 
@@ -199,7 +214,11 @@ First, we remove the duplication of strings by defining the global variables `@i
 
 Then, by creating a reusable `select_label_and_refresh` method, we remove the code duplication of this action, and later we can move this method to a Page Object class that will be created for easier maintenance purposes.
 
-> Notice that the reusable method is created at the bottom of the file. The reason for that is that reading the code should be similar to reading a newspaper, where high-level information is at the top, like the title and summary of the news, while low level, or more specific information, is at the bottom (this helps readability).
+Notice that the reusable method is created at the bottom of the file. This helps readability,
+where reading the code should be similar to reading a newspaper:
+
+- High-level information is at the top, like the title and summary of the news.
+- Low level, or more specific information, is at the bottom.
 
 ### 5. Tests' pre-conditions using resources and Page Objects
 
@@ -343,7 +362,7 @@ You can think of [Resources] as anything that can be created on GitLab CE or EE,
 
 With that in mind, resources can be a project, an epic, an issue, a label, a commit, etc.
 
-As you saw in the tests' pre-conditions and the optimization sections, we're already creating some of these resources, and we are doing that by calling the `fabricate_via_api!` method.
+As you saw in the tests' pre-conditions and the optimization sections, we're already creating some of these resources. We are doing that by calling the `fabricate_via_api!` method.
 
 > We could be using the `fabricate!` method instead, which would use the `fabricate_via_api!` method if it exists, and fallback to GUI fabrication otherwise, but we recommend being explicit to make it clear what the test does. Also, we always recommend fabricating resources via API since this makes tests faster and more reliable.
 
@@ -435,7 +454,7 @@ end
 
 By defining the `resource_web_url(resource)` method, we override the one from the [`ApiFabricator`](https://gitlab.com/gitlab-org/gitlab/blob/master/qa/qa/resource/api_fabricator.rb#L44) module. We do that to avoid failing the test due to this particular resource not exposing a `web_url` property.
 
-By defining the `api_get_path` method, we **would** allow for the [`ApiFabricator`](https://gitlab.com/gitlab-org/gitlab/blob/master/qa/qa/resource/api_fabricator.rb) module to know which path to use to get a single label, but since there's no path available for that in the publich API, we raise a `NotImplementedError` instead.
+By defining the `api_get_path` method, we **would** allow for the [`ApiFabricator`](https://gitlab.com/gitlab-org/gitlab/blob/master/qa/qa/resource/api_fabricator.rb) module to know which path to use to get a single label, but since there's no path available for that in the public API, we raise a `NotImplementedError` instead.
 
 By defining the `api_post_path` method, we allow for the [`ApiFabricator`](https://gitlab.com/gitlab-org/gitlab/blob/master/qa/qa/resource/api_fabricator.rb) module to know which path to use to create a new label in a specific project.
 
@@ -581,7 +600,7 @@ filter_output = search_field_tag search_id, nil, class: "dropdown-input-field", 
 > `data-qa-*` data attributes and CSS classes starting with `qa-` are used solely for the purpose of QA and testing.
 > By defining these, we add **testability** to the application.
 >
-> When defining a data attribute like: `qa_selector: 'labels_block'`, it should match the element definition: `element :labels_block`. We use a [sanity test](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/qa/qa/page#how-did-we-solve-fragile-tests-problem) to check that defined elements have their respective selectors in the specified views.
+> When defining a data attribute like: `qa_selector: 'labels_block'`, it should match the element definition: `element :labels_block`. We use a [sanity test](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/doc/development/testing_guide/end_to_end/page_objects.md#how-did-we-solve-fragile-tests-problem) to check that defined elements have their respective selectors in the specified views.
 
 #### Updates in the `QA::Page::Base` class
 

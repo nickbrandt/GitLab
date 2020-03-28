@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class RepositoryShardSyncWorker < Geo::Scheduler::Secondary::SchedulerWorker
+  class RepositoryShardSyncWorker < Geo::Scheduler::Secondary::SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
     sidekiq_options retry: false
 
     attr_accessor :shard_name

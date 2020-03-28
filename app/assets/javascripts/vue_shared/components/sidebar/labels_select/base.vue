@@ -1,10 +1,10 @@
 <script>
 import $ from 'jquery';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import LabelsSelect from '~/labels_select';
 import DropdownHiddenInput from '~/vue_shared/components/dropdown/dropdown_hidden_input.vue';
 
-import { GlLoadingIcon } from '@gitlab/ui';
 import DropdownTitle from './dropdown_title.vue';
 import DropdownValue from './dropdown_value.vue';
 import DropdownValueCollapsed from './dropdown_value_collapsed.vue';
@@ -77,12 +77,12 @@ export default {
     },
     enableScopedLabels: {
       type: Boolean,
-      require: false,
+      required: false,
       default: false,
     },
     scopedLabelsDocumentationLink: {
       type: String,
-      require: false,
+      required: false,
       default: '#',
     },
   },

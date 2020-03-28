@@ -22,6 +22,8 @@ class PrometheusService < MonitoringService
 
   after_save :clear_reactive_cache!
 
+  after_commit :track_events
+
   def initialize_properties
     if properties.nil?
       self.properties = {}
@@ -79,28 +81,39 @@ class PrometheusService < MonitoringService
   def prometheus_client
     return unless should_return_client?
 
-    Gitlab::PrometheusClient.new(api_url)
+    Gitlab::PrometheusClient.new(api_url, allow_local_requests: allow_local_api_url?)
   end
 
   def prometheus_available?
     return false if template?
     return false unless project
 
-    project.clusters.enabled.any? { |cluster| cluster.application_prometheus_available? }
+    project.all_clusters.enabled.eager_load(:application_prometheus).any? do |cluster|
+      cluster.application_prometheus&.available?
+    end
   end
 
   def allow_local_api_url?
-    self_monitoring_project? && internal_prometheus_url?
+    allow_local_requests_from_web_hooks_and_services? ||
+    (self_monitoring_project? && internal_prometheus_url?)
+  end
+
+  def configured?
+    should_return_client?
   end
 
   private
 
   def self_monitoring_project?
-    project && project.id == current_settings.instance_administration_project_id
+    project && project.id == current_settings.self_monitoring_project_id
   end
 
   def internal_prometheus_url?
     api_url.present? && api_url == ::Gitlab::Prometheus::Internal.uri
+  end
+
+  def allow_local_requests_from_web_hooks_and_services?
+    current_settings.allow_local_requests_from_web_hooks_and_services?
   end
 
   def should_return_client?
@@ -115,5 +128,23 @@ class PrometheusService < MonitoringService
     self.active = prometheus_available? || manual_configuration?
 
     true
+  end
+
+  def track_events
+    if enabled_manual_prometheus?
+      Gitlab::Tracking.event('cluster:services:prometheus', 'enabled_manual_prometheus')
+    elsif disabled_manual_prometheus?
+      Gitlab::Tracking.event('cluster:services:prometheus', 'disabled_manual_prometheus')
+    end
+
+    true
+  end
+
+  def enabled_manual_prometheus?
+    manual_configuration_changed? && manual_configuration?
+  end
+
+  def disabled_manual_prometheus?
+    manual_configuration_changed? && !manual_configuration?
   end
 end

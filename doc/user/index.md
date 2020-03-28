@@ -14,7 +14,7 @@ and upgrade your GitLab instance.
 
 Admin privileges for [GitLab.com](https://gitlab.com/) are restricted to the GitLab team.
 
-For more information on configuring GitLab self-managed instances, see [Administrator documentation](../administration/index.md).
+For more information on configuring GitLab self-managed instances, see the [Administrator documentation](../administration/index.md).
 
 ## Overview
 
@@ -45,7 +45,7 @@ GitLab is a Git-based platform that integrates a great number of essential tools
 - Building, testing, and deploying with built-in [Continuous Integration](../ci/README.md).
 - Deploying personal and professional static websites with [GitLab Pages](project/pages/index.md).
 - Integrating with Docker by using [GitLab Container Registry](packages/container_registry/index.md).
-- Tracking the development lifecycle by using [GitLab Cycle Analytics](project/cycle_analytics.md).
+- Tracking the development lifecycle by using [GitLab Value Stream Analytics](project/cycle_analytics.md).
 
 With GitLab Enterprise Edition, you can also:
 

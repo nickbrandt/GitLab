@@ -5,7 +5,7 @@ This document provides a development guide for contributors to
 
 ## Development
 
-Auto DevOps builds on top of GitLab CI to create an automatic pipeline
+Auto DevOps builds on top of GitLab CI/CD to create an automatic pipeline
 based on your project contents. When Auto DevOps is enabled for a
 project, the user does not need to explicitly include any pipeline configuration
 through a [`.gitlab-ci.yml` file](../ci/yaml/README.md).
@@ -40,3 +40,10 @@ found in
 
 Configuring [GDK for Auto
 DevOps](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/auto_devops.md).
+
+## Monitoring on GitLab.com
+
+The metric
+[`auto_devops_completed_pipelines_total`](https://thanos-query.ops.gitlab.net/graph?g0.range_input=72h&g0.max_source_resolution=0s&g0.expr=sum(increase(auto_devops_pipelines_completed_total%7Benvironment%3D%22gprd%22%7D%5B60m%5D))%20by%20(status)&g0.tab=0)
+(only available to GitLab team members) counts completed Auto DevOps
+pipelines, labeled by status.

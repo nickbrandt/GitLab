@@ -1,12 +1,13 @@
 <script>
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { mapState, mapActions } from 'vuex';
 import {
-  GlLoadingIcon,
   GlModal,
   GlModalDirective,
   GlButton,
   GlDashboardSkeleton,
+  GlSprintf,
+  GlLink,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
@@ -32,8 +33,9 @@ export default {
   components: {
     GlModal,
     GlDashboardSkeleton,
-    GlLoadingIcon,
     GlButton,
+    GlSprintf,
+    GlLink,
     ProjectSelector,
     Environment,
     ProjectHeader,
@@ -59,6 +61,10 @@ export default {
       type: String,
       required: true,
     },
+    environmentsDashboardHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState([
@@ -70,12 +76,13 @@ export default {
       'searchCount',
       'searchQuery',
       'messages',
+      'pageInfo',
     ]),
     isSearchingProjects() {
       return this.searchCount > 0;
     },
     okDisabled() {
-      return _.isEmpty(this.selectedProjects);
+      return isEmpty(this.selectedProjects);
     },
   },
   created() {
@@ -90,6 +97,7 @@ export default {
       'fetchSearchResults',
       'addProjectsToDashboard',
       'fetchProjects',
+      'fetchNextPage',
       'setProjectEndpoints',
       'clearSearchResults',
       'toggleSelectedProject',
@@ -135,8 +143,10 @@ export default {
         :show-loading-indicator="isSearchingProjects"
         :show-minimum-search-query-message="messages.minimumQuery"
         :show-search-error-message="messages.searchError"
+        :total-results="pageInfo.totalResults"
         @searched="searched"
         @projectClicked="projectClicked"
+        @bottomReached="fetchNextPage"
       />
     </gl-modal>
     <div class="page-title-holder flex-fill d-flex align-items-center">
@@ -147,6 +157,21 @@ export default {
         {{ $options.addProjectsButton }}
       </gl-button>
     </div>
+    <p class="mt-2 mb-4 js-page-limits-message">
+      <gl-sprintf
+        :message="
+          s__(
+            'EnvironmentsDashboard|This dashboard displays a maximum of 7 projects and 3 environments per project. %{readMoreLink}',
+          )
+        "
+      >
+        <template #readMoreLink>
+          <gl-link :href="environmentsDashboardHelpPath" target="_blank" rel="noopener noreferrer">
+            {{ s__('EnvironmentsDashboard|Read more.') }}
+          </gl-link>
+        </template>
+      </gl-sprintf>
+    </p>
     <div class="prepend-top-default">
       <div v-if="projects.length" class="dashboard-cards">
         <div v-for="project in projects" :key="project.id" class="column prepend-top-default">

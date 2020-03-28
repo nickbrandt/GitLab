@@ -1,9 +1,9 @@
 <script>
-import { sprintf, n__, s__, __ } from '~/locale';
 import $ from 'jquery';
-import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
+import { escape as esc } from 'lodash';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { n__, s__, __ } from '~/locale';
 import Api from '~/api';
 import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
@@ -35,25 +35,31 @@ export default {
       required: false,
       default: () => ({}),
     },
+    defaultProjects: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
       loading: true,
-      selectedProjects: [],
+      selectedProjects: this.defaultProjects || [],
     };
   },
   computed: {
     selectedProjectsLabel() {
-      return this.selectedProjects.length
-        ? sprintf(
-            n__(
-              'CycleAnalytics|%{projectName}',
-              'CycleAnalytics|%d projects selected',
-              this.selectedProjects.length,
-            ),
-            { projectName: this.selectedProjects[0].name },
-          )
-        : this.selectedProjectsPlaceholder;
+      if (this.selectedProjects.length === 1) {
+        return this.selectedProjects[0].name;
+      } else if (this.selectedProjects.length > 1) {
+        return n__(
+          'CycleAnalytics|Project selected',
+          'CycleAnalytics|%d projects selected',
+          this.selectedProjects.length,
+        );
+      }
+
+      return this.selectedProjectsPlaceholder;
     },
     selectedProjectsPlaceholder() {
       return this.multiSelect ? __('Select projects') : __('Select a project');
@@ -74,7 +80,7 @@ export default {
       },
       clicked: this.onClick.bind(this),
       data: this.fetchData.bind(this),
-      renderRow: group => this.rowTemplate(group),
+      renderRow: project => this.rowTemplate(project),
       text: project => project.name,
       opened: e => e.target.querySelector('.dropdown-input-field').focus(),
     });
@@ -106,11 +112,15 @@ export default {
       });
     },
     rowTemplate(project) {
+      const selected = this.defaultProjects
+        ? this.defaultProjects.find(p => p.id === project.id)
+        : false;
+      const isActiveClass = selected ? 'is-active' : '';
       return `
           <li>
-            <a href='#' class='dropdown-menu-link'>
+            <a href='#' class='dropdown-menu-link ${isActiveClass}'>
               ${this.avatarTemplate(project)}
-              <div class="align-middle">${_.escape(project.name)}</div>
+              <div class="align-middle">${esc(project.name)}</div>
             </a>
           </li>
         `;

@@ -4,9 +4,13 @@ type: reference
 
 # Protected paths **(CORE ONLY)**
 
-GitLab protects the following paths with Rack Attack by default:
+Rate limiting is a common technique used to improve the security and durability
+of a web application. For more details, see
+[Rate limits](../../../security/rate_limits.md).
 
-```
+GitLab rate limits the following paths with Rack Attack by default:
+
+```plaintext
 '/users/password',
 '/users/sign_in',
 '/api/#{API::API.version}/session.json',
@@ -14,7 +18,8 @@ GitLab protects the following paths with Rack Attack by default:
 '/users',
 '/users/confirmation',
 '/unsubscribes/',
-'/import/github/personal_access_token'
+'/import/github/personal_access_token',
+'/admin/session'
 ```
 
 GitLab responds with HTTP status code `429` to POST requests at protected paths
@@ -22,7 +27,7 @@ that exceed 10 requests per minute per IP address.
 
 This header is included in responses to blocked requests:
 
-```
+```plaintext
 Retry-After: 60
 ```
 
@@ -37,7 +42,7 @@ try again.
 
 ## Configure using GitLab UI
 
-> Introduced in [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31246).
+> Introduced in [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/31246).
 
 Throttling of protected paths is enabled by default and can be disabled or
 customized on **Admin > Network > Protected Paths**, along with these options:
@@ -59,18 +64,14 @@ NOTE: **Note:** If Omnibus settings are present, applications settings will be a
 
 To migrate from Omnibus GitLab 12.3 and earlier settings:
 
-1. Disable the Protected Paths throttle from Omnibus, by changing `rack_attack_enabled` value to `false` on [`rack_attack.rb.erb`](https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-cookbooks/gitlab/templates/default/rack_attack.rb.erb#L18):
-
-   ```ruby
-   rack_attack_enabled = false
-   ```
-
 1. Customize and enable your protected paths settings by following [Configure using GitLab UI](#configure-using-gitlab-ui) section.
 
-1. Restart GitLab:
+1. SSH into your frontend nodes and add to `/etc/gitlab/gitlab.rb`:
 
-   ```bash
-   sudo gitlab-ctl restart
+   ```ruby
+   gitlab_rails['rack_attack_admin_area_protected_paths_enabled'] = true
    ```
+
+1. [Reconfigure GitLab](../../../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 That's it. Protected paths throttle are now managed by GitLab admin settings.

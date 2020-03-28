@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ee_ci_job_artifact, class: ::Ci::JobArtifact, parent: :ci_job_artifact do
+  factory :ee_ci_job_artifact, class: '::Ci::JobArtifact', parent: :ci_job_artifact do
     trait :sast do
       file_type { :sast }
       file_format { :raw }
@@ -42,13 +42,25 @@ FactoryBot.define do
       end
     end
 
-    trait :dast_deprecated do
+    trait :dast_deprecated_no_spider do
       file_format { :raw }
       file_type { :dast }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-dast-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-dast-report-no-spider.json'), 'application/json')
+      end
+    end
+
+    trait :dast_deprecated_no_common_fields do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-dast-report-no-common-fields.json'),
+          'application/json'
+        )
       end
     end
 
@@ -108,7 +120,17 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-license-management-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-license-management-report.json'), 'application/json')
+      end
+    end
+
+    trait :license_scanning do
+      file_type { :license_scanning }
+      file_format { :raw }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-license-scanning-report.json'), 'application/json')
       end
     end
 
@@ -122,29 +144,9 @@ FactoryBot.define do
       end
     end
 
-    trait :corrupted_license_management_report do
-      file_type { :license_management }
-      file_format { :raw }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/trace/sample_trace'), 'application/json')
-      end
-    end
-
     trait :performance do
       file_format { :raw }
       file_type { :performance }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/trace/sample_trace'), 'text/plain')
-      end
-    end
-
-    trait :license_management do
-      file_format { :raw }
-      file_type { :license_management }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -269,6 +271,28 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('ee/spec/fixtures/security_reports/dependency_list/gl-dependency-scanning-report.json'), 'application/json')
+      end
+    end
+
+    trait :license_scan do
+      file_type { :license_management }
+      file_format { :raw }
+    end
+
+    %w[1 1_1 2].each do |version|
+      trait :"v#{version}" do
+        after(:build) do |artifact, _|
+          filename = "gl-#{artifact.file_type.dasherize}-report-v#{version.sub(/_/, '.')}.json"
+          path = Rails.root.join("ee/spec/fixtures/security_reports/#{filename}")
+          artifact.file = fixture_file_upload(path, "application/json")
+        end
+      end
+    end
+
+    trait :with_corrupted_data do
+      after :build do |artifact, _|
+        path = Rails.root.join('spec/fixtures/trace/sample_trace')
+        artifact.file = fixture_file_upload(path, 'application/json')
       end
     end
   end

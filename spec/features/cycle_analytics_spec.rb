@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Cycle Analytics', :js do
+describe 'Value Stream Analytics', :js do
   let(:user) { create(:user) }
   let(:guest) { create(:user) }
   let(:project) { create(:project, :repository) }
@@ -23,7 +23,7 @@ describe 'Cycle Analytics', :js do
       end
 
       it 'shows introductory message' do
-        expect(page).to have_content('Introducing Cycle Analytics')
+        expect(page).to have_content('Introducing Value Stream Analytics')
       end
 
       it 'shows pipeline summary' do
@@ -38,11 +38,8 @@ describe 'Cycle Analytics', :js do
       end
     end
 
-    context "when there's cycle analytics data" do
+    context "when there's value stream analytics data" do
       before do
-        allow_next_instance_of(Gitlab::ReferenceExtractor) do |instance|
-          allow(instance).to receive(:issues).and_return([issue])
-        end
         project.add_maintainer(user)
 
         @build = create_cycle(user, project, issue, mr, milestone, pipeline)
@@ -76,7 +73,7 @@ describe 'Cycle Analytics', :js do
         click_stage('Staging')
         expect_build_to_be_present
 
-        click_stage('Production')
+        click_stage('Total')
         expect_issue_to_be_present
       end
 
@@ -101,15 +98,16 @@ describe 'Cycle Analytics', :js do
       project.add_developer(user)
       project.add_guest(guest)
 
-      allow_next_instance_of(Gitlab::ReferenceExtractor) do |instance|
-        allow(instance).to receive(:issues).and_return([issue])
-      end
       create_cycle(user, project, issue, mr, milestone, pipeline)
       deploy_master(user, project)
 
       sign_in(guest)
       visit project_cycle_analytics_path(project)
       wait_for_requests
+    end
+
+    it 'does not show the commit stats' do
+      expect(page).to have_no_selector(:xpath, commits_counter_selector)
     end
 
     it 'needs permissions to see restricted stages' do
@@ -127,8 +125,12 @@ describe 'Cycle Analytics', :js do
     find(:xpath, "//p[contains(text(),'New Issue')]/preceding-sibling::h3")
   end
 
+  def commits_counter_selector
+    "//p[contains(text(),'Commits')]/preceding-sibling::h3"
+  end
+
   def commits_counter
-    find(:xpath, "//p[contains(text(),'Commits')]/preceding-sibling::h3")
+    find(:xpath, commits_counter_selector)
   end
 
   def deploys_counter

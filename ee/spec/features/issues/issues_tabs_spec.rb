@@ -9,8 +9,6 @@ describe 'Issue page tabs', :js do
 
   describe 'discussions tab counter' do
     before do
-      stub_licensed_features(design_management: true)
-      stub_feature_flags(design_management_flag: true)
       allow(Ability).to receive(:allowed?) { true }
     end
 

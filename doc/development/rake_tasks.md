@@ -4,7 +4,7 @@
 
 Note that if your db user does not have advanced privileges you must create the db manually before running this command.
 
-```
+```shell
 bundle exec rake setup
 ```
 
@@ -54,12 +54,23 @@ By default, this seeds an average of 10 issues per week for the last 52 weeks
 per project. All issues will also be randomly labeled with team, type, severity,
 and priority.
 
+#### Seeding groups with sub-groups
+
+You can seed groups with sub-groups that contain milestones/projects/issues
+with the `gitlab:seed:group_seed` task:
+
+```shell
+bin/rake "gitlab:seed:group_seed[subgroup_depth, username]"
+```
+
+Group are additionally seeded with epics if GitLab instance has epics feature available.
+
 ### Automation
 
 If you're very sure that you want to **wipe the current database** and refill
 seeds, you could:
 
-``` shell
+```shell
 echo 'yes' | bundle exec rake setup
 ```
 
@@ -72,7 +83,7 @@ your terminal, and it would generate more than 20G logs if you just redirect
 it to a file. If we don't care about the output, we could just redirect it to
 `/dev/null`:
 
-``` shell
+```shell
 echo 'yes' | bundle exec rake setup > /dev/null
 ```
 
@@ -93,10 +104,10 @@ There are a few environment flags you can pass to change how projects are seeded
 In order to run the test you can use the following commands:
 
 - `bin/rake spec` to run the rspec suite
-- `bin/rake spec:unit` to run the only the unit tests
-- `bin/rake spec:integration` to run the only the integration tests
-- `bin/rake spec:system` to run the only the system tests
-- `bin/rake karma` to run the karma test suite
+- `bin/rake spec:unit` to run only the unit tests
+- `bin/rake spec:integration` to run only the integration tests
+- `bin/rake spec:system` to run only the system tests
+- `bin/rake karma` to run the Karma test suite
 
 Note: `bin/rake spec` takes significant time to pass.
 Instead of running full test suite locally you can save a lot of time by running
@@ -127,13 +138,13 @@ you don't need to boot it every time you run a test, rake task or migration.
 If you want to use it, you'll need to export the `ENABLE_SPRING` environment
 variable to `1`:
 
-```
+```shell
 export ENABLE_SPRING=1
 ```
 
 Alternatively you can use the following on each spec run,
 
-```
+```shell
 bundle exec spring rspec some_spec.rb
 ```
 
@@ -143,7 +154,7 @@ You shouldn't ever need to compile frontend assets manually in development, but
 if you ever need to test how the assets get compiled in a production
 environment you can do so with the following command:
 
-```
+```shell
 RAILS_ENV=production NODE_ENV=production bundle exec rake gitlab:assets:compile
 ```
 
@@ -156,7 +167,7 @@ they can be easily inspected.
 To update the Emoji aliases file (used for Emoji autocomplete) you must run the
 following:
 
-```
+```shell
 bundle exec rake gemojione:aliases
 ```
 
@@ -165,7 +176,7 @@ bundle exec rake gemojione:aliases
 To update the Emoji digests file (used for Emoji autocomplete) you must run the
 following:
 
-```
+```shell
 bundle exec rake gemojione:digests
 ```
 
@@ -176,7 +187,7 @@ available Emoji.
 
 Generating a sprite file containing all the Emoji can be done by running:
 
-```
+```shell
 bundle exec rake gemojione:sprite
 ```
 
@@ -188,11 +199,10 @@ task, then check the dimensions of the new spritesheet and update the
 ## Updating project templates
 
 Starting a project from a template needs this project to be exported. On a
-up to date master branch with run:
+up to date master branch run:
 
-```
-gdk run
-# In a new terminal window
+```shell
+gdk start
 bundle exec rake gitlab:update_project_templates
 git checkout -b update-project-templates
 git add vendor/project_templates
@@ -223,7 +233,7 @@ a file for quick reference.
 
 To see a list of all obsolete `ignored_columns` run:
 
-```
+```shell
 bundle exec rake db:obsolete_ignored_columns
 ```
 

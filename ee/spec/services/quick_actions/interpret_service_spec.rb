@@ -241,6 +241,17 @@ describe QuickActions::InterpretService do
               expect(updates).to be_empty
             end
           end
+
+          context 'when issue is already added to epic' do
+            it 'returns error message' do
+              issue = create(:issue, project: project, epic: epic)
+
+              _, updates, message = service.execute(content, issue)
+
+              expect(updates).to be_empty
+              expect(message).to eq("Issue #{issue.to_reference} has already been added to epic #{epic.to_reference}.")
+            end
+          end
         end
 
         context 'when epic does not exist' do
@@ -281,56 +292,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    context 'promote command' do
-      let(:content) { "/promote" }
-
-      context 'when epics are enabled' do
-        context 'when a user does not have permissions to promote an issue' do
-          it 'does not promote an issue to an epic' do
-            expect { service.execute(content, issue) }.not_to change { Epic.count }
-          end
-        end
-
-        context 'when a user has permissions to promote an issue' do
-          before do
-            group.add_developer(current_user)
-          end
-
-          context 'when epics are enabled' do
-            before do
-              stub_licensed_features(epics: true)
-            end
-
-            it 'promotes an issue to an epic' do
-              expect { service.execute(content, issue) }.to change { Epic.count }.by(1)
-            end
-
-            context 'when an issue belongs to a project without group' do
-              let(:user_project) { create(:project) }
-              let(:issue)        { create(:issue, project: user_project) }
-
-              before do
-                user_project.add_developer(user)
-              end
-
-              it 'does not promote an issue to an epic' do
-                expect { service.execute(content, issue) }
-                  .to raise_error(Epics::IssuePromoteService::PromoteError)
-              end
-            end
-          end
-        end
-      end
-
-      context 'when epics are disabled' do
-        it 'does not promote an issue to an epic' do
-          group.add_developer(current_user)
-
-          expect { service.execute(content, issue) }.not_to change { Epic.count }
-        end
-      end
-    end
-
     context 'child_epic command' do
       let(:subgroup) { create(:group, parent: group) }
       let(:another_group) { create(:group) }
@@ -357,9 +318,9 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'when epics are enabled' do
+      context 'when subepics are enabled' do
         before do
-          stub_licensed_features(epics: true)
+          stub_licensed_features(epics: true, subepics: true)
         end
 
         context 'when a user does not have permissions to add epic relations' do
@@ -490,9 +451,9 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'when epics are enabled' do
+      context 'when subepics are enabled' do
         before do
-          stub_licensed_features(epics: true)
+          stub_licensed_features(epics: true, subepics: true)
           epic.reload
         end
 
@@ -554,6 +515,7 @@ describe QuickActions::InterpretService do
 
           context 'when child and parent epics are in different groups' do
             let(:child_epic) { create(:epic, group: group, parent: epic) }
+
             context 'when child epic is in a parent group of the parent epic' do
               before do
                 epic.update!(group: subgroup)
@@ -583,8 +545,9 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'when epics are disabled' do
+      context 'when subepics are disabled' do
         before do
+          stub_licensed_features(epics: true, subepics: false)
           group.add_developer(current_user)
         end
 
@@ -659,9 +622,9 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'when epics are enabled' do
+      context 'when subepics are enabled' do
         before do
-          stub_licensed_features(epics: true)
+          stub_licensed_features(epics: true, subepics: true)
         end
 
         it 'unassigns an issue from an epic' do
@@ -692,6 +655,34 @@ describe QuickActions::InterpretService do
           service.execute(content, merge_request)
 
           expect(merge_request.approved_by_users).to be_empty
+        end
+      end
+    end
+
+    context 'submit_review command' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:note) do
+        [
+          'I like it',
+          '/submit_review'
+        ]
+      end
+
+      with_them do
+        let(:merge_request) { create(:merge_request, source_project: project) }
+        let(:content) { '/submit_review' }
+        let!(:draft_note) { create(:draft_note, note: note, merge_request: merge_request, author: current_user) }
+
+        before do
+          stub_licensed_features(batch_comments: true)
+        end
+
+        it 'submits the users current review' do
+          _, _, message = service.execute(content, merge_request)
+
+          expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          expect(message).to eq('Submitted the current review.')
         end
       end
     end
@@ -924,17 +915,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    describe 'unassign command with non-existent assignee reference' do
-      let(:content) { "/unassign @#{user.username} @#{user3.username}" }
-      let(:issue) { create(:issue, project: project, assignees: [user, user2]) }
-
-      it 'ignores non-existent assignee references' do
-        _, explanations = service.explain(content, issue)
-
-        expect(explanations).to eq(["Removes assignee @#{user.username}."])
-      end
-    end
-
     describe 'weight command' do
       let(:content) { '/weight 4' }
 
@@ -949,7 +929,7 @@ describe QuickActions::InterpretService do
       let(:epic2) { create(:epic, group: group) }
 
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
         group.add_developer(current_user)
       end
 

@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191104142124_nullify_users_role.rb')
 
-describe NullifyUsersRole, :migration do
+describe NullifyUsersRole do
   let(:users) { table(:users) }
 
   before do
@@ -18,16 +18,16 @@ describe NullifyUsersRole, :migration do
 
   it 'nullifies the role of the user with updated_at < 2019-11-05 12:08:00 and a role of 0' do
     expect(users.where(role: nil).count).to eq(1)
-    expect(users.where(role: nil).first.email).to eq('1')
+    expect(users.find_by(role: nil).email).to eq('1')
   end
 
   it 'leaves the user with role of 1' do
     expect(users.where(role: 1).count).to eq(1)
-    expect(users.where(role: 1).first.email).to eq('2')
+    expect(users.find_by(role: 1).email).to eq('2')
   end
 
   it 'leaves the user with updated_at > 2019-11-05 12:08:00' do
     expect(users.where(role: 0).count).to eq(1)
-    expect(users.where(role: 0).first.email).to eq('3')
+    expect(users.find_by(role: 0).email).to eq('3')
   end
 end

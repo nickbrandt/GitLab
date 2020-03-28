@@ -38,16 +38,32 @@ module EE
           attrs << :default_project_deletion_protection
         end
 
+        if License.feature_available?(:adjourned_deletion_for_projects_and_groups)
+          attrs << :deletion_adjourned_period
+        end
+
         if License.feature_available?(:required_ci_templates)
           attrs << :required_instance_ci_template
+        end
+
+        if License.feature_available?(:disable_name_update_for_users)
+          attrs << :updating_name_disabled_for_users
+        end
+
+        if License.feature_available?(:admin_merge_request_approvers_rules)
+          attrs += EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes
+        end
+
+        if License.feature_available?(:packages)
+          attrs << :npm_package_requests_forwarding
         end
 
         attrs
       end
 
       def geo_redirection
-        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Setting</strong><br /> '\
-                                                    'From GitLab 12.7 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
+        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Settings</strong><br /> '\
+                                                    'From GitLab 13.0 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
       end
 
       private

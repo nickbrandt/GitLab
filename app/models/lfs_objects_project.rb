@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class LfsObjectsProject < ApplicationRecord
+  include ::EachBatch
+
   belongs_to :project
   belongs_to :lfs_object
 
@@ -15,6 +17,8 @@ class LfsObjectsProject < ApplicationRecord
     wiki: 1,
     design: 2 ## EE-specific
   }
+
+  scope :project_id_in, ->(ids) { where(project_id: ids) }
 
   private
 

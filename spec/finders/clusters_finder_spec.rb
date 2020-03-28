@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe ClustersFinder do
   let(:project) { create(:project) }
-  set(:user) { create(:user) }
+
+  let_it_be(:user) { create(:user) }
 
   describe '#execute' do
     let(:enabled_cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }

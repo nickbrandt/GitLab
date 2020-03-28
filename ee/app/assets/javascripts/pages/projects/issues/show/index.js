@@ -1,6 +1,6 @@
-import initShow from '~/pages/projects/issues/show';
 import initSidebarBundle from 'ee/sidebar/sidebar_bundle';
 import initRelatedIssues from 'ee/related_issues';
+import initShow from '~/pages/projects/issues/show';
 import UserCallout from '~/user_callout';
 
 document.addEventListener('DOMContentLoaded', () => {

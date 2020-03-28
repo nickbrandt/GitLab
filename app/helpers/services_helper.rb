@@ -31,6 +31,26 @@ module ServicesHelper
     "#{event}_events"
   end
 
+  def service_event_action_field_name(action)
+    "#{action}_on_event_enabled"
+  end
+
+  def event_action_title(action)
+    case action
+    when "comment"
+      s_("ProjectService|Comment")
+    else
+      action.humanize
+    end
+  end
+
+  def event_action_description(action)
+    case action
+    when "comment"
+      s_("ProjectService|Comment will be posted on each event")
+    end
+  end
+
   def service_save_button(service)
     button_tag(class: 'btn btn-success', type: 'submit', disabled: service.deprecated?, data: { qa_selector: 'save_changes_button' }) do
       icon('spinner spin', class: 'hidden js-btn-spinner') +
@@ -40,6 +60,40 @@ module ServicesHelper
 
   def disable_fields_service?(service)
     !current_controller?("admin/services") && service.deprecated?
+  end
+
+  def edit_integration_path(integration)
+    edit_admin_application_settings_integration_path(integration)
+  end
+
+  def scoped_integrations_path
+    if @project.present?
+      project_settings_integrations_path(@project)
+    elsif @group.present?
+      group_settings_integrations_path(@group)
+    else
+      integrations_admin_application_settings_path
+    end
+  end
+
+  def scoped_integration_path(integration)
+    if @project.present?
+      project_settings_integration_path(@project, integration)
+    elsif @group.present?
+      group_settings_integration_path(@group, integration)
+    else
+      admin_application_settings_integration_path(integration)
+    end
+  end
+
+  def scoped_test_integration_path(integration)
+    if @project.present?
+      test_project_settings_integration_path(@project, integration)
+    elsif @group.present?
+      test_group_settings_integration_path(@group, integration)
+    else
+      test_admin_application_settings_integration_path(integration)
+    end
   end
 
   extend self

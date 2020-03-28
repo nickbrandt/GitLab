@@ -171,7 +171,7 @@ describe License do
 
           context 'but active users exceeds restricted user count' do
             it 'is invalid' do
-              6.times { create(:user) }
+              create_list(:user, 6)
 
               expect(license).not_to be_valid
             end
@@ -192,14 +192,14 @@ describe License do
           end
 
           it 'uses current active user count to calculate the expected true-up' do
-            3.times { create(:user) }
+            create_list(:user, 3)
 
             expect(license).to be_valid
           end
 
           context 'with wrong true-up quantity' do
             it 'is invalid' do
-              2.times { create(:user) }
+              create_list(:user, 2)
 
               expect(license).not_to be_valid
             end
@@ -304,6 +304,7 @@ describe License do
 
     describe '.plan_includes_feature?' do
       let(:feature) { :deploy_board }
+
       subject { described_class.plan_includes_feature?(plan, feature) }
 
       context 'when addon included' do
@@ -669,6 +670,7 @@ describe License do
 
       context 'when the license is the very first trial' do
         let(:tomorrow) { Date.tomorrow }
+
         before do
           gl_license.restrictions = { trial: true }
           gl_license.expires_at = tomorrow
@@ -689,6 +691,7 @@ describe License do
 
       context 'when the license is a repeated trial' do
         let(:yesterday) { Date.yesterday }
+
         before do
           gl_license.restrictions = { trial: true }
           gl_license.expires_at = Date.tomorrow
@@ -705,6 +708,46 @@ describe License do
           expect(described_class.eligible_for_trial?).to be_falsey
         end
       end
+    end
+  end
+
+  describe '#promo_feature_available?' do
+    subject { described_class.promo_feature_available?(feature) }
+
+    shared_examples 'CI CD trial features' do |status|
+      before do
+        stub_feature_flags(free_period_for_pull_mirroring: status)
+      end
+
+      License::ANY_PLAN_FEATURES.each do |feature_name|
+        context "with #{feature_name}" do
+          let(:feature) { feature_name }
+
+          it { is_expected.to eq(status) }
+        end
+      end
+    end
+
+    context 'with free_period_for_pull_mirroring enabled' do
+      it_behaves_like 'CI CD trial features', true
+    end
+
+    context 'with free_period_for_pull_mirroring disabled' do
+      it_behaves_like 'CI CD trial features', false
+    end
+  end
+
+  describe '#edition' do
+    let(:ultimate) { build(:license, plan: 'ultimate') }
+    let(:premium) { build(:license, plan: 'premium') }
+    let(:starter) { build(:license, plan: 'starter') }
+    let(:old) { build(:license, plan: 'other') }
+
+    it 'have expected values' do
+      expect(ultimate.edition).to eq('EEU')
+      expect(premium.edition).to eq('EEP')
+      expect(starter.edition).to eq('EES')
+      expect(old.edition).to eq('EE')
     end
   end
 

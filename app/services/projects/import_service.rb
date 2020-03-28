@@ -2,8 +2,6 @@
 
 module Projects
   class ImportService < BaseService
-    include Gitlab::ShellAdapter
-
     Error = Class.new(StandardError)
 
     # Returns true if this importer is supposed to perform its work in the
@@ -25,13 +23,13 @@ module Projects
 
       success
     rescue Gitlab::UrlBlocker::BlockedUrlError => e
-      Gitlab::Sentry.track_acceptable_exception(e, extra: { project_path: project.full_path, importer: project.import_type })
+      Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path, importer: project.import_type)
 
       error(s_("ImportProjects|Error importing repository %{project_safe_import_url} into %{project_full_path} - %{message}") % { project_safe_import_url: project.safe_import_url, project_full_path: project.full_path, message: e.message })
     rescue => e
       message = Projects::ImportErrorFilter.filter_message(e.message)
 
-      Gitlab::Sentry.track_acceptable_exception(e, extra: { project_path: project.full_path, importer: project.import_type })
+      Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path, importer: project.import_type)
 
       error(s_("ImportProjects|Error importing repository %{project_safe_import_url} into %{project_full_path} - %{message}") % { project_safe_import_url: project.safe_import_url, project_full_path: project.full_path, message: message })
     end
@@ -66,23 +64,21 @@ module Projects
     end
 
     def import_repository
-      begin
-        refmap = importer_class.try(:refmap) if has_importer?
+      refmap = importer_class.try(:refmap) if has_importer?
 
-        if refmap
-          project.ensure_repository
-          project.repository.fetch_as_mirror(project.import_url, refmap: refmap)
-        else
-          gitlab_shell.import_project_repository(project)
-        end
-      rescue Gitlab::Shell::Error => e
-        # Expire cache to prevent scenarios such as:
-        # 1. First import failed, but the repo was imported successfully, so +exists?+ returns true
-        # 2. Retried import, repo is broken or not imported but +exists?+ still returns true
-        project.repository.expire_content_cache if project.repository_exists?
-
-        raise Error, e.message
+      if refmap
+        project.ensure_repository
+        project.repository.fetch_as_mirror(project.import_url, refmap: refmap)
+      else
+        project.repository.import_repository(project.import_url)
       end
+    rescue ::Gitlab::Git::CommandError => e
+      # Expire cache to prevent scenarios such as:
+      # 1. First import failed, but the repo was imported successfully, so +exists?+ returns true
+      # 2. Retried import, repo is broken or not imported but +exists?+ still returns true
+      project.repository.expire_content_cache if project.repository_exists?
+
+      raise Error, e.message
     end
 
     def download_lfs_objects

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab-foss/issues/58158
-  context 'Manage', :github, :quarantine do
+  context 'Manage', :github, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/26952', type: :bug } do
     describe 'Project import from GitHub' do
       let(:imported_project) do
         Resource::ProjectImportedFromGithub.fabricate! do |project|
@@ -20,11 +19,12 @@ module QA
         delete delete_project_request.url
 
         expect_status(202)
+
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       it 'user imports a GitHub repo' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         imported_project # import the project
 

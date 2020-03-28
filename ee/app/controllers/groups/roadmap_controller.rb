@@ -8,10 +8,11 @@ module Groups
     EPICS_ROADMAP_LIMIT = 1000
 
     before_action :check_epics_available!
-    before_action :group
     before_action :persist_roadmap_layout, only: [:show]
     before_action do
-      push_frontend_feature_flag(:roadmap_graphql, @group)
+      push_frontend_feature_flag(:roadmap_graphql, @group, default_enabled: true)
+      push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
+      push_frontend_feature_flag(:milestones_in_roadmap, @group)
     end
 
     # show roadmap for a group

@@ -35,35 +35,35 @@ module QA
       context 'using group cn method' do
         let(:ldap_users) do
           [
-              {
-                  name: 'ENG User 1',
-                  username: 'enguser1',
-                  email: 'enguser1@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=enguser1,ou=people,ou=global groups,dc=example,dc=org'
-              },
-              {
-                  name: 'ENG User 2',
-                  username: 'enguser2',
-                  email: 'enguser2@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=enguser2,ou=people,ou=global groups,dc=example,dc=org'
-              },
-              {
-                  name: 'ENG User 3',
-                  username: 'enguser3',
-                  email: 'enguser3@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=enguser3,ou=people,ou=global groups,dc=example,dc=org'
-              }
+            {
+              name: 'ENG User 1',
+              username: 'enguser1',
+              email: 'enguser1@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=enguser1,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+              name: 'ENG User 2',
+              username: 'enguser2',
+              email: 'enguser2@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=enguser2,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+              name: 'ENG User 3',
+              username: 'enguser3',
+              email: 'enguser3@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=enguser3,ou=people,ou=global groups,dc=example,dc=org'
+            }
           ]
         end
         let(:owner_user) { 'enguser1' }
         let(:sync_users) { ['ENG User 2', 'ENG User 3'] }
 
         before do
-          create_users_via_api(ldap_users)
-          group = create_group_and_add_user_via_api(owner_user, 'Synched-engineering-group')
+          @created_users = create_users_via_api(ldap_users)
+          group = create_group_and_add_user_via_api(owner_user, 'Synched-engineering-group', Resource::Members::AccessLevel::OWNER)
           signin_and_visit_group_as_user(owner_user, group)
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
@@ -85,35 +85,37 @@ module QA
       context 'user filter method' do
         let(:ldap_users) do
           [
-              {
-                  name: 'HR User 1',
-                  username: 'hruser1',
-                  email: 'hruser1@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=hruser1,ou=people,ou=global groups,dc=example,dc=org'
-              },
-              {
-                  name: 'HR User 2',
-                  username: 'hruser2',
-                  email: 'hruser2@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=hruser2,ou=people,ou=global groups,dc=example,dc=org'
-              },
-              {
-                  name: 'HR User 3',
-                  username: 'hruser3',
-                  email: 'hruser3@example.org',
-                  provider: 'ldapmain',
-                  extern_uid: 'uid=hruser3,ou=people,ou=global groups,dc=example,dc=org'
-              }
+            {
+              name: 'HR User 1',
+              username: 'hruser1',
+              email: 'hruser1@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=hruser1,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+              name: 'HR User 2',
+              username: 'hruser2',
+              email: 'hruser2@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=hruser2,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+              name: 'HR User 3',
+              username: 'hruser3',
+              email: 'hruser3@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=hruser3,ou=people,ou=global groups,dc=example,dc=org'
+            }
           ]
         end
         let(:owner_user) { 'hruser1' }
         let(:sync_users) { ['HR User 2', 'HR User 3'] }
 
         before do
-          create_users_via_api(ldap_users)
-          group = create_group_and_add_user_via_api(owner_user, 'Synched-human-resources-group')
+          @created_users = create_users_via_api(ldap_users)
+
+          group = create_group_and_add_user_via_api(owner_user, 'Synched-human-resources-group', Resource::Members::AccessLevel::OWNER)
+
           signin_and_visit_group_as_user(owner_user, group)
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
@@ -132,8 +134,10 @@ module QA
       end
 
       def create_users_via_api(users)
+        created_users = {}
+
         users.each do |user|
-          Resource::User.fabricate_via_api! do |resource|
+          created_users[user[:username]] = Resource::User.fabricate_via_api! do |resource|
             resource.username = user[:username]
             resource.name = user[:name]
             resource.email = user[:email]
@@ -141,20 +145,15 @@ module QA
             resource.provider = user[:provider]
           end
         end
+        created_users
       end
 
-      def add_user_to_group_via_api(user, group)
-        api_client = Runtime::API::Client.new(:gitlab)
-        response = get Runtime::API::Request.new(api_client, "/users?username=#{user}").url
-        post Runtime::API::Request.new(api_client, group.api_members_path).url, { user_id: parse_body(response).first[:id], access_level: '50' }
-      end
-
-      def create_group_and_add_user_via_api(user_name, group_name)
+      def create_group_and_add_user_via_api(user_name, group_name, role)
         group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "#{group_name}-#{SecureRandom.hex(4)}"
         end
 
-        add_user_to_group_via_api(user_name, group)
+        group.add_member(@created_users[user_name], role)
 
         group
       end

@@ -11,9 +11,9 @@ module Gitlab
       delegate :users, to: :generic_search_results
       delegate :limited_users_count, to: :generic_search_results
 
-      def initialize(current_user, query, project_id, repository_ref = nil)
+      def initialize(current_user, query, project, repository_ref = nil)
         @current_user = current_user
-        @project = Project.find(project_id)
+        @project = project
         @repository_ref = repository_ref.presence || project.default_branch
         @query = query
         @public_and_internal_projects = false
@@ -24,9 +24,9 @@ module Gitlab
         when 'notes'
           notes.page(page).per(per_page).records
         when 'blobs'
-          blobs.page(page).per(per_page)
+          blobs(page: page, per_page: per_page)
         when 'wiki_blobs'
-          wiki_blobs.page(page).per(per_page)
+          wiki_blobs(page: page, per_page: per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
         when 'users'
@@ -42,36 +42,27 @@ module Gitlab
 
       private
 
-      def blobs
+      def blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :download_code, project)
+        return Kaminari.paginate_array([]) if project.empty_repo? || query.blank?
+        return Kaminari.paginate_array([]) unless root_ref?
 
-        if project.empty_repo? || query.blank?
-          Kaminari.paginate_array([])
-        else
-          # We use elastic for default branch only
-          if root_ref?
-            project.repository.search(
-              query,
-              type: :blob,
-              options: { highlight: true }
-            )[:blobs][:results].response
-          else
-            Kaminari.paginate_array(
-              Gitlab::FileFinder.new(project, repository_ref).find(query)
-            )
-          end
-        end
+        project.repository.__elasticsearch__.elastic_search_as_found_blob(
+          query,
+          page: (page || 1).to_i,
+          per: per_page
+        )
       end
 
-      def wiki_blobs
+      def wiki_blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :read_wiki, project)
 
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
-          project.wiki.search(
+          project.wiki.__elasticsearch__.elastic_search_as_wiki_page(
             query,
-            type: :wiki_blob,
-            options: { highlight: true }
-          )[:wiki_blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page
+          )
         else
           Kaminari.paginate_array([])
         end

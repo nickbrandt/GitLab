@@ -94,6 +94,25 @@ module ApplicationHelper
     sanitize(str, tags: %w(a span))
   end
 
+  def body_data
+    {
+      page: body_data_page,
+      page_type_id: controller.params[:id],
+      find_file: find_file_path,
+      group: "#{@group&.path}"
+    }.merge(project_data)
+  end
+
+  def project_data
+    return {} unless @project
+
+    {
+      project_id: @project.id,
+      project: @project.path,
+      namespace_id: @project.namespace&.id
+    }
+  end
+
   def body_data_page
     [*controller.controller_path.split('/'), controller.action_name].compact.join(':')
   end
@@ -179,7 +198,7 @@ module ApplicationHelper
   end
 
   def external_storage_url_or_path(path, project = @project)
-    return path unless static_objects_external_storage_enabled?
+    return path if @snippet || !static_objects_external_storage_enabled?
 
     uri = URI(Gitlab::CurrentSettings.static_objects_external_storage_url)
     path = URI(path) # `path` could have query parameters, so we need to split query and path apart
@@ -208,7 +227,7 @@ module ApplicationHelper
   end
 
   def outdated_browser?
-    browser.ie? && browser.version.to_i < 10
+    browser.ie?
   end
 
   def path_to_key(key, admin = false)

@@ -5,6 +5,13 @@
  */
 import ReportLink from '~/reports/components/report_link.vue';
 
+function formatScore(value) {
+  if (Math.floor(value) !== value) {
+    return parseFloat(value).toFixed(2);
+  }
+  return value;
+}
+
 export default {
   name: 'PerformanceIssueBody',
 
@@ -19,12 +26,18 @@ export default {
     },
   },
 
-  methods: {
-    formatScore(value) {
-      if (Math.floor(value) !== value) {
-        return parseFloat(value).toFixed(2);
+  computed: {
+    issueScore() {
+      return this.issue.score ? formatScore(this.issue.score) : false;
+    },
+    issueDelta() {
+      if (!this.issue.delta) {
+        return false;
       }
-      return value;
+      if (this.issue.delta >= 0) {
+        return `+${formatScore(this.issue.delta)}`;
+      }
+      return formatScore(this.issue.delta);
     },
   },
 };
@@ -32,13 +45,14 @@ export default {
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      {{ issue.name
-      }}<template v-if="issue.score"
-        >: <strong>{{ formatScore(issue.score) }}</strong></template
-      >
-
-      <template v-if="issue.delta != null">
-        ({{ issue.delta >= 0 ? '+' : '' }}{{ formatScore(issue.delta) }})
+      <template v-if="issueScore">
+        {{ issue.name }}: <strong>{{ issueScore }}</strong>
+      </template>
+      <template v-else>
+        {{ issue.name }}
+      </template>
+      <template v-if="issueDelta">
+        ({{ issueDelta }})
       </template>
     </div>
 

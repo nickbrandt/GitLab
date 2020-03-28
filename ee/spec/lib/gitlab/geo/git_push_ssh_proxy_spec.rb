@@ -7,8 +7,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
 
   # TODO This spec doesn't work with a relative_url_root https://gitlab.com/gitlab-org/gitlab/issues/11173
   # TODO This spec doesn't work with non-localhost
-  set(:primary_node) { create(:geo_node, :primary, url: 'http://localhost:3001') }
-  set(:secondary_node) { create(:geo_node, url: 'http://localhost:3002') }
+  let_it_be(:primary_node) { create(:geo_node, :primary, url: 'http://localhost:3001') }
+  let_it_be(:secondary_node) { create(:geo_node, url: 'http://localhost:3002') }
 
   let(:current_node) { nil }
   let(:project) { create(:project, :repository) }

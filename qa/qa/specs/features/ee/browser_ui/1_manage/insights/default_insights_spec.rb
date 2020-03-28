@@ -20,8 +20,7 @@ module QA
       before do
         Flow::Login.sign_in
 
-        group = Resource::Group.fabricate_via_api!
-        group.visit!
+        Resource::Group.fabricate_via_api!.visit!
 
         Page::Group::Menu.perform(&:click_group_insights_link)
       end

@@ -5,8 +5,6 @@ require 'spec_helper'
 describe Mutations::DesignManagement::Delete do
   include DesignManagementTestHelpers
 
-  Errors = Gitlab::Graphql::Errors
-
   let(:issue) { create(:issue) }
   let(:current_designs) { issue.designs.current }
   let(:user) { issue.author }
@@ -16,10 +14,14 @@ describe Mutations::DesignManagement::Delete do
   let(:design_c) { create(:design, :with_file, issue: issue) }
   let(:filenames) { [design_a, design_b, design_c].map(&:filename) }
 
-  let(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
+  let(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
+
+  before do
+    stub_const('Errors', Gitlab::Graphql::Errors, transfer_nested_constants: true)
+  end
 
   def run_mutation
-    mutation = described_class.new(object: nil, context: { current_user: user })
+    mutation = described_class.new(object: nil, context: { current_user: user }, field: nil)
     mutation.resolve(project_path: project.full_path, iid: issue.iid, filenames: filenames)
   end
 
@@ -28,7 +30,7 @@ describe Mutations::DesignManagement::Delete do
       { errors: [], version: DesignManagement::Version.for_issue(issue).ordered.first }
     end
 
-    shared_examples "failures" do |error: Errors::ResourceNotAvailable|
+    shared_examples "failures" do |error: Gitlab::Graphql::Errors::ResourceNotAvailable|
       it "raises #{error.name}" do
         expect { run_mutation }.to raise_error(error)
       end
@@ -63,7 +65,7 @@ describe Mutations::DesignManagement::Delete do
         end
 
         it 'fails with an argument error' do
-          expect { run_mutation }.to raise_error(Errors::ArgumentError)
+          expect { run_mutation }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
         end
       end
 

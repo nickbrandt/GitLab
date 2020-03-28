@@ -5,13 +5,7 @@ module Types
     # rubocop: disable Graphql/AuthorizeTypes
     class EpicTreeNodeInputType < BaseInputObject
       graphql_name 'EpicTreeNodeFieldsInputType'
-
-      MoveTypeEnum = GraphQL::EnumType.define do
-        name 'MoveType'
-        description 'The position the adjacent object should be moved.'
-        value('before', 'The adjacent object will be moved before the object that is being moved.')
-        value('after', 'The adjacent object will be moved after the object that is being moved.')
-      end
+      description 'A node of an epic tree.'
 
       argument :id,
                GraphQL::ID_TYPE,

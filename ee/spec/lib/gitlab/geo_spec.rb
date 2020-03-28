@@ -6,8 +6,8 @@ describe Gitlab::Geo, :geo, :request_store do
   using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 
-  set(:primary_node)   { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node)   { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   shared_examples 'a Geo cached value' do |method, key|
     it 'includes GitLab version and Rails.version in the cache key' do
@@ -288,7 +288,7 @@ describe Gitlab::Geo, :geo, :request_store do
     end
   end
 
-  context '.allowed_ip?' do
+  describe '.allowed_ip?' do
     where(:allowed_ips, :ip, :allowed) do
       "192.1.1.1"                  | "192.1.1.1"     | true
       "192.1.1.1, 192.1.2.1"       | "192.1.2.1"     | true
@@ -305,6 +305,34 @@ describe Gitlab::Geo, :geo, :request_store do
 
         expect(described_class.allowed_ip?(ip)).to eq(allowed)
       end
+    end
+  end
+
+  describe '.proxying_to_primary_message' do
+    it 'returns a message as a string' do
+      url = 'ssh://git@primary.com/namespace/repo.git'
+      message = <<~STR
+      You're pushing to a Geo secondary! We'll help you by proxying this
+      request to the primary:
+
+        #{url}
+      STR
+
+      expect(described_class.proxying_push_to_primary_message(url)).to eq(message)
+    end
+  end
+
+  describe '.redirecting_to_primary_message' do
+    it 'returns a message as a string' do
+      url = 'http://primary.com/namespace/repo.git'
+      message = <<~STR
+      You're pushing to a Geo secondary! We'll help you by redirecting this
+      request to the primary:
+
+        #{url}
+      STR
+
+      expect(described_class.redirecting_push_to_primary_message(url)).to eq(message)
     end
   end
 end

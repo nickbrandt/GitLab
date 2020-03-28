@@ -7,10 +7,17 @@ import mutations from './mutations';
 
 Vue.use(Vuex);
 
+export const licenseManagementModule = () => ({
+  namespaced: true,
+  state: createState(),
+  actions,
+  getters,
+  mutations,
+});
+
 export default () =>
   new Vuex.Store({
-    state: createState(),
-    actions,
-    getters,
-    mutations,
+    modules: {
+      licenseManagement: licenseManagementModule(),
+    },
   });

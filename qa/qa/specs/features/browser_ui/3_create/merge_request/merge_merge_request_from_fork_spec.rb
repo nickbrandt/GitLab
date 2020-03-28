@@ -4,10 +4,9 @@ module QA
   context 'Create' do
     describe 'Merge request creation from fork' do
       it 'user forks a project, submits a merge request and maintainer merges it' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
-        merge_request = Resource::MergeRequestFromFork.fabricate! do |merge_request|
+        merge_request = Resource::MergeRequestFromFork.fabricate_via_browser_ui! do |merge_request|
           merge_request.fork_branch = 'feature-branch'
         end
 

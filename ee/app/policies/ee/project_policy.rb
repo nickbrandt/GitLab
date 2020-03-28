@@ -10,6 +10,7 @@ module EE
       issue_link
       approvers
       vulnerability_feedback
+      vulnerability
       license_management
       feature_flag
       feature_flags_client
@@ -32,6 +33,9 @@ module EE
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
 
+      with_scope :subject
+      condition(:requirements_available) { @subject.feature_available?(:requirements) }
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -45,6 +49,32 @@ module EE
         !PushRule.global&.commit_committer_check
       end
 
+      with_scope :global
+      condition(:owner_cannot_modify_approvers_rules) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .disable_overriding_approvers_per_merge_request
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_author_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_author_approval
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_committer_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_committers_approval
+      end
+
+      with_scope :global
+      condition(:cluster_health_available) do
+        License.feature_available?(:cluster_health)
+      end
+
       with_scope :subject
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
@@ -56,32 +86,23 @@ module EE
       end
 
       with_scope :subject
-      condition(:pod_logs_enabled) do
-        @subject.feature_available?(:pod_logs, @user)
+      condition(:security_dashboard_enabled) do
+        @subject.feature_available?(:security_dashboard)
       end
 
       with_scope :subject
-      condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
-      end
-
-      condition(:prometheus_alerts_enabled) do
-        @subject.feature_available?(:prometheus_alerts, @user)
+      condition(:license_scanning_enabled) do
+        @subject.feature_available?(:license_scanning) || @subject.feature_available?(:license_management)
       end
 
       with_scope :subject
-      condition(:license_management_enabled) do
-        @subject.feature_available?(:license_management)
+      condition(:dependency_scanning_enabled) do
+        @subject.feature_available?(:dependency_scanning)
       end
 
       with_scope :subject
-      condition(:dependency_list_enabled) do
-        @subject.feature_available?(:dependency_list)
-      end
-
-      with_scope :subject
-      condition(:licenses_list_enabled) do
-        @subject.feature_available?(:licenses_list)
+      condition(:threat_monitoring_enabled) do
+        @subject.feature_available?(:threat_monitoring)
       end
 
       with_scope :subject
@@ -94,7 +115,19 @@ module EE
         !@subject.design_management_enabled?
       end
 
-      rule { admin }.enable :change_repository_storage
+      with_scope :subject
+      condition(:code_review_analytics_enabled) do
+        @subject.feature_available?(:code_review_analytics, @user)
+      end
+
+      condition(:status_page_available) do
+        @subject.feature_available?(:status_page, @user) &&
+          @subject.beta_feature_available?(:status_page)
+      end
+
+      condition(:group_timelogs_available) do
+        @subject.feature_available?(:group_timelogs)
+      end
 
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
@@ -119,6 +152,8 @@ module EE
         prevent :admin_issue_link
       end
 
+      rule { ~group_timelogs_available }.prevent :read_group_timelogs
+
       rule { can?(:read_issue) }.policy do
         enable :read_issue_link
         enable :read_design
@@ -130,10 +165,12 @@ module EE
         enable :admin_issue_link
         enable :admin_epic_issue
         enable :read_package
+        enable :read_group_timelogs
       end
 
       rule { can?(:developer_access) }.policy do
         enable :admin_board
+        enable :read_vulnerability_feedback
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
@@ -149,28 +186,25 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:developer_access) }.policy do
+      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
+
+      rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
+
+      rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
-      end
-
-      rule { security_dashboard_feature_disabled }.policy do
-        prevent :read_project_security_dashboard
-      end
-
-      rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
-        enable :read_vulnerability
         enable :create_vulnerability
-        enable :resolve_vulnerability
-        enable :dismiss_vulnerability
+        enable :create_vulnerability_export
+        enable :admin_vulnerability
+        enable :admin_vulnerability_issue_link
       end
 
-      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
+      rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
 
-      rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
+      rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
-      rule { dependency_list_enabled & can?(:download_code) }.enable :read_dependencies
+      rule { license_scanning_enabled & can?(:download_code) }.enable :read_licenses
 
-      rule { licenses_list_enabled & can?(:read_software_license_policy) }.enable :read_licenses_list
+      rule { can?(:read_licenses) }.enable :read_software_license_policy
 
       rule { repository_mirrors_enabled & ((mirror_available & can?(:admin_project)) | admin) }.enable :admin_mirror
 
@@ -190,12 +224,13 @@ module EE
         enable :update_approvers
         enable :destroy_package
         enable :admin_feature_flags_client
+        enable :modify_approvers_rules
+        enable :modify_approvers_list
+        enable :modify_merge_request_author_setting
+        enable :modify_merge_request_committer_setting
       end
 
-      rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
-
-      rule { pod_logs_enabled & can?(:maintainer_access) }.enable :read_pod_logs
-      rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
+      rule { license_scanning_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
 
       rule { auditor }.policy do
         enable :public_user_access
@@ -205,11 +240,16 @@ module EE
         enable :read_environment
         enable :read_deployment
         enable :read_pages
-        enable :read_project_security_dashboard
       end
 
-      rule { auditor & can?(:read_project_security_dashboard) }.policy do
+      rule { auditor & security_dashboard_enabled }.policy do
         enable :read_vulnerability
+      end
+
+      rule { auditor & ~developer }.policy do
+        prevent :create_vulnerability
+        prevent :admin_vulnerability
+        prevent :admin_vulnerability_issue_link
       end
 
       rule { auditor & ~guest }.policy do
@@ -282,6 +322,24 @@ module EE
         prevent :read_project
       end
 
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_rules
+      end
+
+      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
+        prevent :modify_merge_request_author_setting
+      end
+
+      rule { owner_cannot_modify_merge_request_committer_setting & ~admin }.policy do
+        prevent :modify_merge_request_committer_setting
+      end
+
+      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_list
+      end
+
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
 
       # Design abilities could also be prevented in the issue policy.
@@ -293,13 +351,26 @@ module EE
       end
 
       rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
+
+      rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
+
+      rule { can?(:read_project) & requirements_available }.enable :read_requirement
+
+      rule { requirements_available & reporter }.policy do
+        enable :create_requirement
+        enable :admin_requirement
+        enable :update_requirement
+      end
+
+      rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end
 
     override :lookup_access_level!
     def lookup_access_level!
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
-      return ::Gitlab::Access::REPORTER if alert_bot?
-      return ::Gitlab::Access::GUEST if support_bot? && service_desk_enabled?
+      return ::Gitlab::Access::REPORTER if support_bot? && service_desk_enabled?
       return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 
       super

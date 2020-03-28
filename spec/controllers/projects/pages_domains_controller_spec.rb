@@ -32,10 +32,11 @@ describe Projects::PagesDomainsController do
       get(:show, params: request_params.merge(id: pages_domain.domain))
     end
 
-    it "redirects to the 'edit' page" do
+    it "displays to the 'show' page" do
       make_request
 
-      expect(response).to redirect_to(edit_project_pages_domain_path(project, pages_domain.domain))
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to render_template('show')
     end
 
     context 'when user is developer' do
@@ -46,7 +47,7 @@ describe Projects::PagesDomainsController do
       it 'renders 404 page' do
         make_request
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -55,7 +56,7 @@ describe Projects::PagesDomainsController do
     it "displays the 'new' page" do
       get(:new, params: request_params)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to render_template('new')
     end
   end
@@ -69,16 +70,16 @@ describe Projects::PagesDomainsController do
       created_domain = PagesDomain.reorder(:id).last
 
       expect(created_domain).to be_present
-      expect(response).to redirect_to(edit_project_pages_domain_path(project, created_domain))
+      expect(response).to redirect_to(project_pages_domain_path(project, created_domain))
     end
   end
 
-  describe 'GET edit' do
-    it "displays the 'edit' page" do
-      get(:edit, params: request_params.merge(id: pages_domain.domain))
+  describe 'GET show' do
+    it "displays the 'show' page" do
+      get(:show, params: request_params.merge(id: pages_domain.domain))
 
-      expect(response).to have_gitlab_http_status(200)
-      expect(response).to render_template('edit')
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to render_template('show')
     end
   end
 
@@ -128,10 +129,10 @@ describe Projects::PagesDomainsController do
     context 'the domain is invalid' do
       let(:pages_domain_params) { { user_provided_certificate: 'blabla' } }
 
-      it 'renders the edit action' do
+      it 'renders the show action' do
         patch(:update, params: params)
 
-        expect(response).to render_template('edit')
+        expect(response).to render_template('show')
       end
     end
 
@@ -160,7 +161,7 @@ describe Projects::PagesDomainsController do
 
       post :verify, params: params
 
-      expect(response).to redirect_to edit_project_pages_domain_path(project, pages_domain)
+      expect(response).to redirect_to project_pages_domain_path(project, pages_domain)
       expect(flash[:notice]).to eq('Successfully verified domain ownership')
     end
 
@@ -169,14 +170,14 @@ describe Projects::PagesDomainsController do
 
       post :verify, params: params
 
-      expect(response).to redirect_to edit_project_pages_domain_path(project, pages_domain)
+      expect(response).to redirect_to project_pages_domain_path(project, pages_domain)
       expect(flash[:alert]).to eq('Failed to verify domain ownership')
     end
 
     it 'returns a 404 response for an unknown domain' do
       post :verify, params: request_params.merge(id: 'unknown-domain')
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -195,10 +196,10 @@ describe Projects::PagesDomainsController do
       delete(:clean_certificate, params: request_params.merge(id: pages_domain.domain))
     end
 
-    it 'redirects to edit page' do
+    it 'redirects to show page' do
       subject
 
-      expect(response).to redirect_to(edit_project_pages_domain_path(project, pages_domain))
+      expect(response).to redirect_to(project_pages_domain_path(project, pages_domain))
     end
 
     it 'removes certificate' do
@@ -230,12 +231,12 @@ describe Projects::PagesDomainsController do
         expect(pages_domain.key).to be_present
       end
 
-      it 'redirects to edit page with a flash message' do
+      it 'redirects to show page with a flash message' do
         subject
 
         expect(flash[:alert]).to include('Certificate')
         expect(flash[:alert]).to include('Key')
-        expect(response).to redirect_to(edit_project_pages_domain_path(project, pages_domain))
+        expect(response).to redirect_to(project_pages_domain_path(project, pages_domain))
       end
     end
   end
@@ -249,7 +250,7 @@ describe Projects::PagesDomainsController do
       it 'returns 404 status' do
         get(:show, params: request_params.merge(id: pages_domain.domain))
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -257,7 +258,7 @@ describe Projects::PagesDomainsController do
       it 'returns 404 status' do
         get :new, params: request_params
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -265,7 +266,7 @@ describe Projects::PagesDomainsController do
       it "returns 404 status" do
         post(:create, params: request_params.merge(pages_domain: pages_domain_params))
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -273,7 +274,7 @@ describe Projects::PagesDomainsController do
       it "deletes the pages domain" do
         delete(:destroy, params: request_params.merge(id: pages_domain.domain))
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

@@ -4,23 +4,49 @@ type: reference, howto
 
 # GitLab Secure **(ULTIMATE)**
 
-Check your application for security vulnerabilities that may lead to
-unauthorized access, data leaks, and denial of services.
-
-GitLab will perform static and dynamic tests on the code of your application,
-looking for known flaws and report them in the merge request so you can fix
-them before merging.
-
-Security teams can use dashboards to get a high-level view on projects and
-groups, and start remediation processes when needed.
+GitLab can check your application for security vulnerabilities that may lead to unauthorized access,
+data leaks, denial of services, and more. GitLab reports vulnerabilities in the merge request so you
+can fix them before merging. The [Security Dashboard](security_dashboard/index.md) provides a
+high-level view of vulnerabilities detected in your projects, pipeline, and groups. The [Threat Monitoring](threat_monitoring/index.md)
+page provides runtime security metrics for application environments. With the information provided,
+you can immediately begin risk analysis and remediation.
 
 <i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
 For an overview of application security with GitLab, see
 [Security Deep Dive](https://www.youtube.com/watch?v=k4vEJnGYy84).
 
+## Quick start
+
+Get started quickly with Dependency Scanning, License Scanning, and Static Application Security
+Testing (SAST) by adding the following to your `.gitlab-ci.yml`:
+
+```yaml
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: License-Scanning.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+```
+
+To add Dynamic Application Security Testing (DAST) scanning, add the following to your
+`.gitlab-ci.yml` and replace `https://staging.example.com` with a staging server's web address:
+
+```yaml
+include:
+  - template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_WEBSITE: https://staging.example.com
+```
+
+To ensure the DAST scanner runs *after* deploying the application to the staging server, review the [DAST full documentation](dast/index.md).
+
+To add Container Scanning, follow the steps listed in the [Container Scanning documentation](container_scanning/index.md#requirements).
+
+To further configure any of the other scanners, refer to each scanner's documentation.
+
 ## Security scanning tools
 
-GitLab can scan and report any vulnerabilities found in your project.
+GitLab uses the following tools to scan and report known vulnerabilities found in your project.
 
 | Secure scanning tool                                                         | Description                                                            |
 |:-----------------------------------------------------------------------------|:-----------------------------------------------------------------------|
@@ -28,32 +54,27 @@ GitLab can scan and report any vulnerabilities found in your project.
 | [Dependency List](dependency_list/index.md) **(ULTIMATE)**                   | View your project's dependencies and their known vulnerabilities.      |
 | [Dependency Scanning](dependency_scanning/index.md) **(ULTIMATE)**           | Analyze your dependencies for known vulnerabilities.                   |
 | [Dynamic Application Security Testing (DAST)](dast/index.md) **(ULTIMATE)**  | Analyze running web applications for known vulnerabilities.            |
-| [License Compliance](license_compliance/index.md) **(ULTIMATE)**             | Search your project's dependencies for their licenses.                 |
 | [Security Dashboard](security_dashboard/index.md) **(ULTIMATE)**             | View vulnerabilities in all your projects and groups.                  |
 | [Static Application Security Testing (SAST)](sast/index.md) **(ULTIMATE)**   | Analyze source code for known vulnerabilities.                         |
 
 ## Maintenance and update of the vulnerabilities database
 
-The various scanning tools and the vulnerabilities database are updated regularly.
+The scanning tools and vulnerabilities database are updated regularly.
 
 | Secure scanning tool                                         | Vulnerabilities database updates          |
 |:-------------------------------------------------------------|-------------------------------------------|
-| [Container Scanning](container_scanning/index.md)            | Uses `clair` underneath and the latest `clair-db` version is used for each job run by running the [`latest` docker image tag](https://gitlab.com/gitlab-org/gitlab/blob/438a0a56dc0882f22bdd82e700554525f552d91b/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L37). The `clair-db` database [is updated daily according to the author](https://github.com/arminc/clair-local-scan#clair-server-or-local). |
-| [Dependency Scanning](dependency_scanning/index.md)          | Relies on `bundler-audit` (for Rubygems), `retire.js` (for NPM packages) and `gemnasium` (GitLab's own tool for all libraries). `bundler-audit` and `retire.js` both fetch their vulnerabilities data from GitHub repositories, so vulnerabilities added to `ruby-advisory-db` and `retire.js` are immediately available. The tools themselves are updated once per month if there's a new version. The [Gemnasium DB](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is updated at least once a week. |
-| [Dynamic Application Security Testing (DAST)](dast/index.md) | Updated weekly on Sundays. The underlying tool, `zaproxy`, downloads fresh rules at startup. |
-| [Static Application Security Testing (SAST)](sast/index.md)  | Relies exclusively on [the tools GitLab is wrapping](sast/index.md#supported-languages-and-frameworks). The underlying analyzers are updated at least once per month if a relevant update is available. The vulnerabilities database is updated by the upstream tools. |
+| [Container Scanning](container_scanning/index.md)            | Uses `clair`. The latest `clair-db` version is used for each job by running the [`latest` docker image tag](https://gitlab.com/gitlab-org/gitlab/blob/438a0a56dc0882f22bdd82e700554525f552d91b/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L37). The `clair-db` database [is updated daily according to the author](https://github.com/arminc/clair-local-scan#clair-server-or-local). |
+| [Dependency Scanning](dependency_scanning/index.md)          | Relies on `bundler-audit` (for Rubygems), `retire.js` (for NPM packages), and `gemnasium` (GitLab's own tool for all libraries). Both `bundler-audit` and `retire.js` fetch their vulnerabilities data from GitHub repositories, so vulnerabilities added to `ruby-advisory-db` and `retire.js` are immediately available. The tools themselves are updated once per month if there's a new version. The [Gemnasium DB](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is updated at least once a week. See our [current measurement of time from CVE being issued to our product being updated](https://about.gitlab.com/handbook/engineering/development/performance-indicators/#cve-issue-to-update). |
+| [Dynamic Application Security Testing (DAST)](dast/index.md) | The scanning engine is updated on a periodic basis. See the [version of the underlying tool `zaproxy`](https://gitlab.com/gitlab-org/security-products/dast/blob/master/Dockerfile#L1). The scanning rules are downloaded at scan runtime. |
+| [Static Application Security Testing (SAST)](sast/index.md)  | Relies exclusively on [the tools GitLab wraps](sast/index.md#supported-languages-and-frameworks). The underlying analyzers are updated at least once per month if a relevant update is available. The vulnerabilities database is updated by the upstream tools. |
 
-You don't have to update GitLab to benefit from the latest vulnerabilities definitions,
-but you may have to in the future.
-
-The security tools are released as Docker images, and the vendored job definitions
-to enable them are using the `x-y-stable` image tags that get overridden each time a new
-release of the tools is pushed. The Docker images are updated to match the
-previous GitLab releases, so they automatically get the latest versions of the
-scanning tools without the user having to do anything.
-
-This workflow comes with some drawbacks and there's a
-[plan to change this](https://gitlab.com/gitlab-org/gitlab/issues/9725).
+Currently, you do not have to update GitLab to benefit from the latest vulnerabilities definitions.
+The security tools are released as Docker images. The vendored job definitions to enable them use
+the `x-y-stable` image tags that get overridden each time a new release of the tools is pushed. The
+Docker images are updated to match the previous GitLab releases, so users automatically get the
+latest versions of the scanning tools without having to do anything. There are some known issues
+with this approach, however, and there is a
+[plan to resolve them](https://gitlab.com/gitlab-org/gitlab/issues/9725).
 
 ## Interacting with the vulnerabilities
 
@@ -63,14 +84,14 @@ CAUTION: **Warning:**
 This feature is currently [Alpha](https://about.gitlab.com/handbook/product/#alpha-beta-ga) and while you can start using it, it may receive important changes in the future.
 
 Each security vulnerability in the merge request report or the
-[Security Dashboard](security_dashboard/index.md) is actionable. Clicking on an
-entry, a detailed information will pop up with different possible options:
+[Security Dashboard](security_dashboard/index.md) is actionable. Click an entry to view detailed
+information with several options:
 
-- [Dismiss vulnerability](#dismissing-a-vulnerability): Dismissing a vulnerability
-  will place a ~~strikethrough~~ styling on it.
-- [Create issue](#creating-an-issue-for-a-vulnerability): The new issue will
-  have the title and description pre-populated with the information from the
-  vulnerability report and will be created as [confidential](../project/issues/confidential_issues.md) by default.
+- [Dismiss vulnerability](#dismissing-a-vulnerability): Dismissing a vulnerability styles it in
+  strikethrough.
+- [Create issue](#creating-an-issue-for-a-vulnerability): Create a new issue with the title and
+  description prepopulated with information from the vulnerability report. By default, such issues
+  are [confidential](../project/issues/confidential_issues.md).
 - [Solution](#solutions-for-vulnerabilities-auto-remediation): For some vulnerabilities,
   a solution is provided for how to fix the vulnerability.
 
@@ -88,25 +109,38 @@ If you wish to undo this dismissal, you can click the **Undo dismiss** button.
 
 When dismissing a vulnerability, it's often helpful to provide a reason for doing so.
 If you press the comment button next to **Dismiss vulnerability** in the modal,
-a text box will appear, allowing you to add a comment with your dismissal.
-Once added, you can edit it or delete it. This allows you to add and update
+a text box appears for you to add a comment with your dismissal.
+Once added, you can edit or delete it. This allows you to add and update
 context for a vulnerability as you learn more over time.
 
 ![Dismissed vulnerability comment](img/dismissed_info_v12_3.png)
 
+#### Dismissing multiple vulnerabilities
+
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+
+You can dismiss multiple vulnerabilities at once, providing an optional reason.
+Selecting the checkboxes on the side of each vulnerability in the list will select that individual vulnerability.
+Alternatively, you can select all the vulnerabilities in the list by selecting the checkbox in the table header.
+Deselecting the checkbox in the header will deselect all the vulnerabilities in the list.
+Once you have selected some vulnerabilities, a menu appears at the top of the table that allows you to select a dismissal reason.
+Pressing the "Dismiss Selected" button will dismiss all the selected vulnerabilities at once, with the reason you chose.
+
+![Multiple vulnerability dismissal](img/multi_select_v12_9.png)
+
 ### Creating an issue for a vulnerability
 
 You can create an issue for a vulnerability by selecting the **Create issue**
-button from within the vulnerability modal or using the action buttons to the right of
-a vulnerability row when in the group security dashboard.
+button from within the vulnerability modal, or by using the action buttons to the right of
+a vulnerability row in the group security dashboard.
 
-This will create a [confidential issue](../project/issues/confidential_issues.md)
-on the project this vulnerability came from and pre-fill it with some useful
-information taken from the vulnerability report. Once the issue is created, you
-will be redirected to it so you can edit, assign, or comment on it.
+This creates a [confidential issue](../project/issues/confidential_issues.md) in the project the
+vulnerability came from, and prepopulates it with some useful information taken from the vulnerability
+report. Once the issue is created, you are redirected to it so you can edit, assign, or comment on
+it.
 
-Upon returning to the group security dashboard, you'll see that
-the vulnerability will now have an associated issue next to the name.
+Upon returning to the group security dashboard, the vulnerability now has an associated issue next
+to the name.
 
 ![Linked issue in the group security dashboard](img/issue.png)
 
@@ -118,15 +152,16 @@ Some vulnerabilities can be fixed by applying the solution that GitLab
 automatically generates. The following scanners are supported:
 
 - [Dependency Scanning](dependency_scanning/index.md):
-  Automatic Patch creation is only available for Node.JS projects managed with
+  Automatic Patch creation is only available for Node.js projects managed with
   `yarn`.
+- [Container Scanning](container_scanning/index.md)
 
 #### Manually applying the suggested patch
 
 Some vulnerabilities can be fixed by applying a patch that is automatically
 generated by GitLab. To apply the fix:
 
-1. Click on the vulnerability.
+1. Click the vulnerability.
 1. Download and review the patch file `remediation.patch`.
 1. Ensure your local project has the same commit checked out that was used to generate the patch.
 1. Run `git apply remediation.patch`.
@@ -138,86 +173,127 @@ generated by GitLab. To apply the fix:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9224) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.9.
 
-In certain cases, GitLab will allow you to create a merge request that will
-automatically remediate the vulnerability. Any vulnerability that has a
+In certain cases, GitLab allows you to create a merge request that automatically remediates the
+vulnerability. Any vulnerability that has a
 [solution](#solutions-for-vulnerabilities-auto-remediation) can have a merge
 request created to automatically solve the issue.
 
-If this action is available there will be a **Create merge request** button in the vulnerability modal.
-Clicking on this button will create a merge request to apply the solution onto the source branch.
+If this action is available, the vulnerability modal contains a **Create merge request** button.
+Click this button to create a merge request to apply the solution onto the source branch.
 
 ![Create merge request from vulnerability](img/create_issue_with_list_hover.png)
 
-## Security approvals in merge requests **(ULTIMATE)**
+## Security approvals in merge requests
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9928) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.2.
 
-Merge Request Approvals can be configured to require approval from a member
-of your security team when a vulnerability, or a software license compliance violation would be introduced by a merge request.
+Merge Request Approvals can be configured to require approval from a member of your
+security team when a merge request would introduce one of the following security issues:
 
-This threshold is defined as `high`, `critical`, or `unknown`
-severity. When any vulnerabilities are present within a merge request, an
-approval will be required from the `Vulnerability-Check` approver group.
+- A security vulnerability
+- A software license compliance violation
+
+This threshold is defined as `high`, `critical`, or `unknown` severity. When any vulnerabilities are
+present within a merge request, an approval is required from the `Vulnerability-Check` approver
+group.
 
 ### Enabling Security Approvals within a project
 
 To enable Security Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#multiple-approval-rules-premium)
-must be created with the case-sensitive name `Vulnerability-Check`. This approval
-group must be set with an "Approvals required" count greater than zero.
+must be created with the case-sensitive name `Vulnerability-Check`. This approval group must be set
+with the number of approvals required greater than zero.
 
-Once this group has been added to your project, the approval rule will be enabled
-for all Merge Requests.
+Once this group is added to your project, the approval rule is enabled for all merge requests.
 
-Any code changes made will cause the count of approvals required to reset.
+Any code changes cause the approvals required to reset.
 
-An approval will be required when a security report:
+An approval is required when a security report:
 
 - Contains a new vulnerability of `high`, `critical`, or `unknown` severity.
 - Is not generated during pipeline execution.
 
-An approval will be optional when a security report:
+An approval is optional when a security report:
 
 - Contains no new vulnerabilities.
 - Contains only new vulnerabilities of `low` or `medium` severity.
 
-### Enabling License Approvals within a project
+## Enabling License Approvals within a project
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/13067) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.3.
 
 To enable License Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#multiple-approval-rules-premium)
-must be created with the case-sensitive name `License-Check`. This approval
-group must be set with an "Approvals required" count greater than zero.
+must be created with the case-sensitive name `License-Check`. This approval group must be set
+with the number of approvals required greater than zero.
 
-Once this group has been added to your project, the approval rule will be enabled
-for all Merge Requests. To configure how this rule behaves, you can choose which
-licenses to `approve` or `blacklist` in the
-[project policies for License Compliance](license_compliance/index.md#project-policies-for-license-compliance) section.
+Once this group is added to your project, the approval rule is enabled for all Merge Requests. To
+configure how this rule behaves, you can choose which licenses to `approve` or `blacklist` in the
+[project policies for License Compliance](../compliance/license_compliance/index.md#project-policies-for-license-compliance)
+section.
 
-Any code changes made will cause the count of approvals required to reset.
+Any code changes cause the approvals required to reset.
 
-An approval will be required when a license report:
+An approval is required when a license report:
 
 - Contains a dependency that includes a software license that is `blacklisted`.
 - Is not generated during pipeline execution.
 
-An approval will be optional when a license report:
+An approval is optional when a license report:
 
 - Contains no software license violations.
 - Contains only new licenses that are `approved` or unknown.
+
+## Working in an offline environment
+
+It is possible to run most of the GitLab security scanners when not
+connected to the internet, in what is sometimes known as an offline,
+limited connectivity, Local Area Network (LAN), Intranet, or "air-gap"
+environment.
+
+Read how to [operate the Secure scanners in an offline environment](offline_deployments/index.md).
+
+## Outdated security reports
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4913) in GitLab 12.7.
+
+When a security report generated for a merge request becomes outdated, the merge request shows a warning
+message in the security widget and prompts you to take an appropriate action.
+
+This can happen in two scenarios:
+
+1. Your [source branch is behind the target branch](#source-branch-is-behind-the-target-branch).
+1. The [target branch security report is out of date](#target-branch-security-report-is-out-of-date).
+
+### Source branch is behind the target branch
+
+This means the most recent common ancestor commit between the target branch and the source branch is
+not the most recent commit on the target branch. This is by far the most common situation.
+
+In this case you must rebase or merge to incorporate the changes from the target branch.
+
+![Incorporate target branch changes](img/outdated_report_branch_v12_9.png)
+
+### Target branch security report is out of date
+
+This can happen for many reasons, including failed jobs or new advisories. When the merge request shows that a
+security report is out of date, you must run a new pipeline on the target branch.
+You can do it quickly by following the hyperlink given to run a new pipeline.
+
+![Run a new pipeline](img/outdated_report_pipeline_v12_9.png)
 
 ## Troubleshooting
 
 ### Getting error message `sast job: stage parameter should be [some stage name here]`
 
 When including a security job template like [`SAST`](sast/index.md#configuration),
-the following error can be raised, depending on your GitLab CI/CD configuration:
+the following error may occur, depending on your GitLab CI/CD configuration:
 
-```
+```plaintext
 Found errors in your .gitlab-ci.yml:
 
 * sast job: stage parameter should be unit-tests
 ```
 
-This error appears when the stage (nammed `test`) of the included job isn't declared
-in `.gitlab-ci.yml`.
+This error appears when the included job's stage (named `test`) isn't declared in `.gitlab-ci.yml`.
 To fix this issue, you can either:
 
 - Add a `test` stage in your `.gitlab-ci.yml`.
@@ -232,5 +308,4 @@ To fix this issue, you can either:
   ```
 
 [Learn more on overriding the SAST template](sast/index.md#overriding-the-sast-template).
-All the security scanning tools define their stage, so this error can occur with
-all of them.
+All the security scanning tools define their stage, so this error can occur with all of them.

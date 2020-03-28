@@ -12,12 +12,15 @@ module Gitlab
           validations do
             validates :config, type: Hash
             validates :config, allowed_keys: ALLOWED_KEYS
-            validates :config, presence: true
           end
 
           entry :rules, Entry::Rules,
             description: 'List of evaluable Rules to determine Pipeline status.',
             metadata: { allowed_when: %w[always never] }
+
+          def has_rules?
+            @config.try(:key?, :rules)
+          end
         end
       end
     end

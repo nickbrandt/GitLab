@@ -3,6 +3,7 @@ export default () => ({
   parentItem: {},
   epicsEndpoint: '',
   issuesEndpoint: '',
+  projectsEndpoint: null,
   userSignedIn: false,
 
   children: {},
@@ -21,19 +22,27 @@ export default () => ({
   itemInputValue: '',
   pendingReferences: [],
   itemAutoCompleteSources: {},
+  itemAddFailureType: null,
+  itemAddFailureMessage: '',
 
   // UI Flags
   itemsFetchInProgress: false,
   itemsFetchFailure: false,
   itemsFetchResultEmpty: false,
   itemAddInProgress: false,
+  itemAddFailure: false,
   itemCreateInProgress: false,
+  projectsFetchInProgress: false,
   showAddItemForm: false,
   showCreateEpicForm: false,
+  showCreateIssueForm: false,
   autoCompleteEpics: false,
   autoCompleteIssues: false,
+  allowSubEpics: false,
   removeItemModalProps: {
     parentItem: {},
     item: {},
   },
+
+  projects: [],
 });

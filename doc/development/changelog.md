@@ -33,7 +33,10 @@ the `author` field. GitLab team members **should not**.
 
 ## What warrants a changelog entry?
 
-- Any change that introduces a database migration **must** have a changelog entry.
+- Any change that introduces a database migration, whether it's regular, post,
+  or data migration, **must** have a changelog entry.
+- [Security fixes] **must** have a changelog entry, without `merge_request` value
+  and with `type` set to `security`.
 - Any user-facing change **should** have a changelog entry. Example: "GitLab now
   uses system fonts for all text."
 - Performance improvements **should** have a changelog entry.
@@ -41,10 +44,11 @@ the `author` field. GitLab team members **should not**.
   a changelog entry regardless of these guidelines if the contributor wants one.
   Example: "Fixed a typo on the search results page."
 - Any docs-only changes **should not** have a changelog entry.
-- Any change behind a feature flag **should not** have a changelog entry. The
-  entry should be added [in the merge request removing the feature flags](feature_flags/development.md).
-  If the change includes a database migration, there should be a changelog entry
-  for the migration change.
+- Any change behind a feature flag **should not** have a changelog entry - unless
+  the feature flag has been defaulted to true. The entry should be added
+  [in the merge request removing the feature flags](feature_flags/development.md).
+  If the change includes a database migration (regular, post, or data migration),
+  there should be a changelog entry for the migration change.
 - A fix for a regression introduced and then fixed in the same release (i.e.,
   fixing a bug introduced during a monthly release candidate) **should not**
   have a changelog entry.
@@ -288,6 +292,7 @@ and then compiling the entries into the overall `CHANGELOG.md` file during the
 [release managers]: https://gitlab.com/gitlab-org/release/docs/blob/master/quickstart/release-manager.md
 [started brainstorming]: https://gitlab.com/gitlab-org/gitlab-foss/issues/17826
 [release process]: https://gitlab.com/gitlab-org/release-tools
+[Security fixes]: https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md
 
 ---
 

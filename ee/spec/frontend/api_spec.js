@@ -1,7 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import Api from 'ee/api';
 import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
+import axios from '~/lib/utils/axios_utils';
+import httpStatus from '~/lib/utils/http_status';
+import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';
@@ -89,11 +91,45 @@ describe('Api', () => {
   describe('groupEpics', () => {
     it('calls `axios.get` using param `groupId`', done => {
       const groupId = 2;
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics?include_ancestor_groups=false&include_descendant_groups=true`;
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics`;
 
-      mock.onGet(expectedUrl).reply(200, mockEpics);
+      mock
+        .onGet(expectedUrl, {
+          params: {
+            include_ancestor_groups: false,
+            include_descendant_groups: true,
+          },
+        })
+        .reply(200, mockEpics);
 
       Api.groupEpics({ groupId })
+        .then(({ data }) => {
+          data.forEach((epic, index) => {
+            expect(epic.id).toBe(mockEpics[index].id);
+            expect(epic.iid).toBe(mockEpics[index].iid);
+            expect(epic.group_id).toBe(mockEpics[index].group_id);
+            expect(epic.title).toBe(mockEpics[index].title);
+          });
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` using param `search` when it is provided', done => {
+      const groupId = 2;
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics`;
+
+      mock
+        .onGet(expectedUrl, {
+          params: {
+            include_ancestor_groups: false,
+            include_descendant_groups: true,
+            search: 'foo',
+          },
+        })
+        .reply(200, mockEpics);
+
+      Api.groupEpics({ groupId, search: 'foo' })
         .then(({ data }) => {
           data.forEach((epic, index) => {
             expect(epic.id).toBe(mockEpics[index].id);
@@ -158,56 +194,6 @@ describe('Api', () => {
           expect(data.id).toBe(expectedRes.id);
           expect(data.epic).toEqual(expect.objectContaining({ ...expectedRes.epic }));
           expect(data.issue).toEqual(expect.objectContaining({ ...expectedRes.issue }));
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('getPodLogs', () => {
-    const projectPath = 'root/test-project';
-    const environmentId = 2;
-    const podName = 'pod';
-    const containerName = 'container';
-
-    const lastUrl = () => mock.history.get[0].url;
-
-    beforeEach(() => {
-      mock.onAny().reply(200);
-    });
-
-    afterEach(() => {
-      mock.reset();
-    });
-
-    it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
-
-      Api.getPodLogs({ projectPath, environmentId, podName, containerName })
-        .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/containers/logs.json`;
-
-      Api.getPodLogs({ projectPath, environmentId })
-        .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
-
-      Api.getPodLogs({ projectPath, environmentId, podName })
-        .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
         })
         .then(done)
         .catch(done.fail);
@@ -290,6 +276,11 @@ describe('Api', () => {
     const createdBefore = '2019-11-18';
     const createdAfter = '2019-08-18';
     const stageId = 'thursday';
+    const defaultParams = {
+      group_id: groupId,
+      created_after: createdAfter,
+      created_before: createdBefore,
+    };
 
     const expectRequestWithCorrectParameters = (responseObj, { params, expectedUrl, response }) => {
       const {
@@ -322,20 +313,43 @@ describe('Api', () => {
         ];
         const labelIds = [10, 9, 8, 7];
         const params = {
-          group_id: groupId,
-          created_after: createdAfter,
-          created_before: createdBefore,
+          ...defaultParams,
           project_ids: null,
           subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
           label_ids: labelIds,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/type_of_work/tasks_by_type`;
+        const expectedUrl = analyticsMockData.endpoints.tasksByTypeData;
         mock.onGet(expectedUrl).reply(200, tasksByTypeResponse);
 
-        Api.cycleAnalyticsTasksByType({ params })
+        Api.cycleAnalyticsTasksByType(params)
           .then(({ data, config: { params: reqParams } }) => {
             expect(data).toEqual(tasksByTypeResponse);
-            expect(reqParams.params).toEqual(params);
+            expect(reqParams).toEqual(params);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsTopLabels', () => {
+      it('fetches top group level labels', done => {
+        const response = [];
+        const labelIds = [10, 9, 8, 7];
+        const params = {
+          ...defaultParams,
+          project_ids: null,
+          subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
+          label_ids: labelIds,
+        };
+
+        const expectedUrl = analyticsMockData.endpoints.tasksByTypeTopLabelsData;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsTopLabels(params)
+          .then(({ data, config: { url, params: reqParams } }) => {
+            expect(data).toEqual(response);
+            expect(url).toMatch(expectedUrl);
+            expect(reqParams).toEqual(params);
           })
           .then(done)
           .catch(done.fail);
@@ -343,16 +357,16 @@ describe('Api', () => {
     });
 
     describe('cycleAnalyticsSummaryData', () => {
-      it('fetches cycle analytics summary, stage stats and permissions data', done => {
-        const response = { summary: [], stats: [], permissions: {} };
+      it('fetches value stream analytics summary data', done => {
+        const response = [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }];
         const params = {
-          'cycle_analytics[created_after]': createdAfter,
-          'cycle_analytics[created_before]': createdBefore,
+          ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/groups/${groupId}/-/cycle_analytics`;
+
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/summary`;
         mock.onGet(expectedUrl).reply(200, response);
 
-        Api.cycleAnalyticsSummaryData(groupId, params)
+        Api.cycleAnalyticsSummaryData(params)
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -373,7 +387,7 @@ describe('Api', () => {
           'cycle_analytics[created_after]': createdAfter,
           'cycle_analytics[created_before]': createdBefore,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsGroupStagesAndEvents(groupId, params)
@@ -393,14 +407,34 @@ describe('Api', () => {
       it('fetches stage events', done => {
         const response = { events: [] };
         const params = {
-          'cycle_analytics[group_id]': groupId,
-          'cycle_analytics[created_after]': createdAfter,
-          'cycle_analytics[created_before]': createdBefore,
+          ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/groups/${groupId}/-/cycle_analytics/events/${stageId}.json`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/records`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageEvents(groupId, stageId, params)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              params,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsStageMedian', () => {
+      it('fetches stage events', done => {
+        const response = { value: '5 days ago' };
+        const params = {
+          ...defaultParams,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/median`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsStageMedian(groupId, stageId, params)
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -423,7 +457,7 @@ describe('Api', () => {
           end_event_identifier: 'issue_closed',
           end_event_label_id: null,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onPost(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsCreateStage(groupId, customStage)
@@ -435,6 +469,260 @@ describe('Api', () => {
           })
           .then(done)
           .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsUpdateStage', () => {
+      it('updates the stage data', done => {
+        const response = { id: stageId, custom: false, hidden: true, name: 'nice-stage' };
+        const stageData = {
+          name: 'nice-stage',
+          hidden: true,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
+        mock.onPut(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsUpdateStage(stageId, groupId, stageData)
+          .then(({ data, config: { params: reqParams, data: reqData, url } }) => {
+            expect(data).toEqual(response);
+            expect(reqParams).toEqual({ group_id: groupId });
+            expect(JSON.parse(reqData)).toMatchObject(stageData);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsRemoveStage', () => {
+      it('deletes the specified data', done => {
+        const response = { id: stageId, hidden: true, custom: true };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
+        mock.onDelete(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsRemoveStage(stageId, groupId)
+          .then(({ data, config: { params: reqParams, url } }) => {
+            expect(data).toEqual(response);
+            expect(reqParams).toEqual({ group_id: groupId });
+
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsDurationChart', () => {
+      it('fetches stage duration data', done => {
+        const response = [];
+        const params = {
+          ...defaultParams,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/thursday/duration_chart`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsDurationChart(stageId, params)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              params,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsGroupLabels', () => {
+      it('fetches group level labels', done => {
+        const response = [];
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/labels`;
+        mock.onGet(expectedUrl).reply(httpStatus.OK, response);
+
+        Api.cycleAnalyticsGroupLabels(groupId)
+          .then(({ data, config: { url } }) => {
+            expect(data).toEqual(response);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+  });
+
+  describe('GroupActivityAnalytics', () => {
+    const groupId = 'gitlab-org';
+
+    describe('groupActivityMergeRequestsCount', () => {
+      it('fetches the number of MRs created for a given group', () => {
+        const response = { merge_requests_count: 10 };
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/analytics/group_activity/merge_requests_count`;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).reply(200, response);
+
+        return Api.groupActivityMergeRequestsCount(groupId).then(({ data }) => {
+          expect(data).toEqual(response);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
+        });
+      });
+    });
+
+    describe('groupActivityIssuesCount', () => {
+      it('fetches the number of issues created for a given group', () => {
+        const response = { issues_count: 20 };
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/analytics/group_activity/issues_count`;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, response);
+
+        return Api.groupActivityIssuesCount(groupId).then(({ data }) => {
+          expect(data).toEqual(response);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
+        });
+      });
+    });
+  });
+
+  describe('GeoReplicable', () => {
+    let expectedUrl;
+    let apiResponse;
+    let mockParams;
+    let mockReplicableType;
+
+    beforeEach(() => {
+      mockReplicableType = 'designs';
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/${mockReplicableType}`;
+    });
+
+    describe('getGeoReplicableItems', () => {
+      it('fetches replicableItems based on replicableType', () => {
+        apiResponse = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
+        mockParams = { page: 1 };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.getGeoReplicableItems(mockReplicableType, mockParams).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: mockParams });
+        });
+      });
+    });
+
+    describe('initiateAllGeoReplicableSyncs', () => {
+      it('POSTs with correct action', () => {
+        apiResponse = [{ status: 'ok' }];
+        mockParams = {};
+
+        const mockAction = 'reverify';
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'post');
+        mock.onPost(`${expectedUrl}/${mockAction}`).replyOnce(201, apiResponse);
+
+        return Api.initiateAllGeoReplicableSyncs(mockReplicableType, mockAction).then(
+          ({ data }) => {
+            expect(data).toEqual(apiResponse);
+            expect(axios.post).toHaveBeenCalledWith(`${expectedUrl}/${mockAction}`, mockParams);
+          },
+        );
+      });
+    });
+
+    describe('initiateGeoReplicableSync', () => {
+      it('PUTs with correct action and projectId', () => {
+        apiResponse = [{ status: 'ok' }];
+        mockParams = {};
+
+        const mockAction = 'reverify';
+        const mockProjectId = 1;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(`${expectedUrl}/${mockProjectId}/${mockAction}`).replyOnce(201, apiResponse);
+
+        return Api.initiateGeoReplicableSync(mockReplicableType, {
+          projectId: mockProjectId,
+          action: mockAction,
+        }).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.put).toHaveBeenCalledWith(
+            `${expectedUrl}/${mockProjectId}/${mockAction}`,
+            mockParams,
+          );
+        });
+      });
+    });
+  });
+
+  describe('changeVulnerabilityState', () => {
+    it.each`
+      id    | action
+      ${5}  | ${'dismiss'}
+      ${7}  | ${'confirm'}
+      ${38} | ${'resolve'}
+    `('POSTS to correct endpoint ($id, $action)', ({ id, action }) => {
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/vulnerabilities/${id}/${action}`;
+      const expectedResponse = { id, action, test: 'test' };
+
+      mock.onPost(expectedUrl).replyOnce(200, expectedResponse);
+
+      return Api.changeVulnerabilityState(id, action).then(({ data }) => {
+        expect(mock.history.post).toContainEqual(expect.objectContaining({ url: expectedUrl }));
+        expect(data).toEqual(expectedResponse);
+      });
+    });
+  });
+
+  describe('GeoNode', () => {
+    let expectedUrl;
+    let mockNode;
+
+    beforeEach(() => {
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_nodes`;
+    });
+
+    describe('createGeoNode', () => {
+      it('POSTs with correct action', () => {
+        mockNode = {
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'post');
+        mock.onPost(expectedUrl).replyOnce(201, mockNode);
+
+        return Api.createGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.post).toHaveBeenCalledWith(expectedUrl, mockNode);
+        });
+      });
+    });
+
+    describe('updateGeoNode', () => {
+      it('PUTs with correct action', () => {
+        mockNode = {
+          id: 1,
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(`${expectedUrl}/${mockNode.id}`).replyOnce(201, mockNode);
+
+        return Api.updateGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.put).toHaveBeenCalledWith(`${expectedUrl}/${mockNode.id}`, mockNode);
+        });
       });
     });
   });

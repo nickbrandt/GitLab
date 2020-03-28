@@ -2,12 +2,10 @@
 
 class Analytics::AnalyticsController < Analytics::ApplicationController
   def index
-    if Gitlab::Analytics.productivity_analytics_enabled?
-      redirect_to analytics_productivity_analytics_path
-    elsif Gitlab::Analytics.cycle_analytics_enabled?
+    if Feature.disabled?(:group_level_cycle_analytics, default_enabled: true) && Gitlab::Analytics.cycle_analytics_enabled?
       redirect_to analytics_cycle_analytics_path
-    elsif Gitlab::Analytics.code_analytics_enabled?
-      redirect_to analytics_code_analytics_path
+    elsif can?(current_user, :read_instance_statistics)
+      redirect_to instance_statistics_dev_ops_score_index_path
     else
       render_404
     end

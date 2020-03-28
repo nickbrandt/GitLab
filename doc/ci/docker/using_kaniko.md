@@ -4,8 +4,7 @@ type: howto
 
 # Building images with kaniko and GitLab CI/CD
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/45512) in GitLab 11.2.
-Requires GitLab Runner 11.2 and above.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/45512) in GitLab 11.2. Requires GitLab Runner 11.2 and above.
 
 [kaniko](https://github.com/GoogleContainerTools/kaniko) is a tool to build
 container images from a Dockerfile, inside a container or Kubernetes cluster.
@@ -72,7 +71,7 @@ build:
 When trying to push to a Docker registry that uses a certificate that is signed
 by a custom CA, you might get the following error:
 
-```sh
+```shell
 $ /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --no-push
 INFO[0000] Downloading base image registry.gitlab.example.com/group/docker-image
 error building image: getting stage builder for stage 0: Get https://registry.gitlab.example.com/v2/: x509: certificate signed by unknown authority

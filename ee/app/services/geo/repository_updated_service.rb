@@ -16,7 +16,6 @@ module Geo
 
     def execute
       return false unless Gitlab::Geo.primary?
-      return false if design? && Feature.disabled?(:enable_geo_design_sync)
 
       reset_repository_checksum!
       create_repository_updated_event!

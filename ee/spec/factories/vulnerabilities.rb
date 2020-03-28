@@ -10,18 +10,35 @@ FactoryBot.define do
     confidence { :medium }
     report_type { :sast }
 
-    trait :opened do
-      state { :opened }
+    trait :detected do
+      state { Vulnerability.states[:detected] }
     end
 
     trait :resolved do
-      state { :resolved }
+      state { Vulnerability.states[:resolved] }
       resolved_at { Time.current }
     end
 
-    trait :closed do
-      state { :closed }
-      closed_at { Time.current }
+    trait :dismissed do
+      state { Vulnerability.states[:dismissed] }
+      dismissed_at { Time.current }
+    end
+
+    trait :confirmed do
+      state { Vulnerability.states[:confirmed] }
+      confirmed_at { Time.current }
+    end
+
+    ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |severity_level|
+      trait severity_level do
+        severity { severity_level }
+      end
+    end
+
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |report_type|
+      trait report_type do
+        report_type { report_type }
+      end
     end
 
     trait :with_findings do
@@ -32,6 +49,14 @@ FactoryBot.define do
           vulnerability: vulnerability,
           report_type: vulnerability.report_type,
           project: vulnerability.project)
+      end
+    end
+
+    trait :with_issue_links do
+      after(:create) do |vulnerability|
+        create_list(:issue, 2).each do |issue|
+          create(:vulnerabilities_issue_link, vulnerability: vulnerability, issue: issue)
+        end
       end
     end
   end

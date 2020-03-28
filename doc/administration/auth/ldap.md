@@ -52,7 +52,7 @@ If a user is deleted from the LDAP server, they will be blocked in GitLab as
 well. Users will be immediately blocked from logging in. However, there is an
 LDAP check cache time of one hour (see note) which means users that
 are already logged in or are using Git over SSH will still be able to access
-GitLab for up to one hour. Manually block the user in the GitLab Admin area to
+GitLab for up to one hour. Manually block the user in the GitLab Admin Area to
 immediately block all access.
 
 NOTE: **Note**:
@@ -405,7 +405,7 @@ production:
 Tip: If you want to limit access to the nested members of an Active Directory
 group, you can use the following syntax:
 
-```text
+```plaintext
 (memberOf:1.2.840.113556.1.4.1941:=CN=My Group,DC=Example,DC=com)
 ```
 
@@ -423,13 +423,13 @@ The `user_filter` DN can contain special characters. For example:
 
 - A comma:
 
-  ```text
+  ```plaintext
   OU=GitLab, Inc,DC=gitlab,DC=com
   ```
 
 - Open and close brackets:
 
-  ```text
+  ```plaintext
   OU=Gitlab (Inc),DC=gitlab,DC=com
   ```
 
@@ -438,13 +438,13 @@ The `user_filter` DN can contain special characters. For example:
 
 - Escape commas with `\2C`. For example:
 
-  ```text
+  ```plaintext
   OU=GitLab\2C Inc,DC=gitlab,DC=com
   ```
 
 - Escape open and close brackets with `\28` and `\29`, respectively. For example:
 
-  ```text
+  ```plaintext
   OU=Gitlab \28Inc\29,DC=gitlab,DC=com
   ```
 
@@ -461,7 +461,8 @@ LDAP email address, and then sign into GitLab via their LDAP credentials.
 
 ## Enabling LDAP username lowercase
 
-Some LDAP servers, depending on their configurations, can return uppercase usernames. This can lead to several confusing issues like, for example, creating links or namespaces with uppercase names.
+Some LDAP servers, depending on their configurations, can return uppercase usernames.
+This can lead to several confusing issues such as creating links or namespaces with uppercase names.
 
 GitLab can automatically lowercase usernames provided by the LDAP server by enabling
 the configuration option `lowercase_usernames`. By default, this configuration option is `false`.
@@ -551,61 +552,4 @@ be mandatory and clients cannot be authenticated with the TLS protocol.
 
 ## Troubleshooting
 
-If a user account is blocked or unblocked due to the LDAP configuration, a
-message will be logged to `application.log`.
-
-If there is an unexpected error during an LDAP lookup (configuration error,
-timeout), the login is rejected and a message will be logged to
-`production.log`.
-
-### Debug LDAP user filter with ldapsearch
-
-This example uses `ldapsearch` and assumes you are using ActiveDirectory. The
-following query returns the login names of the users that will be allowed to
-log in to GitLab if you configure your own user_filter.
-
-```sh
-ldapsearch -H ldaps://$host:$port -D "$bind_dn" -y bind_dn_password.txt  -b "$base" "$user_filter" sAMAccountName
-```
-
-- Variables beginning with a `$` refer to a variable from the LDAP section of
-  your configuration file.
-- Replace `ldaps://` with `ldap://` if you are using the plain authentication method.
-  Port `389` is the default `ldap://` port and `636` is the default `ldaps://`
-  port.
-- We are assuming the password for the bind_dn user is in bind_dn_password.txt.
-
-### Invalid credentials when logging in
-
-- Make sure the user you are binding with has enough permissions to read the user's
-  tree and traverse it.
-- Check that the `user_filter` is not blocking otherwise valid users.
-- Run the following check command to make sure that the LDAP settings are
-  correct and GitLab can see your users:
-
-  ```bash
-  # For Omnibus installations
-  sudo gitlab-rake gitlab:ldap:check
-
-  # For installations from source
-  sudo -u git -H bundle exec rake gitlab:ldap:check RAILS_ENV=production
-  ```
-
-### Connection refused
-
-If you are getting 'Connection Refused' errors when trying to connect to the
-LDAP server please double-check the LDAP `port` and `encryption` settings used by
-GitLab. Common combinations are `encryption: 'plain'` and `port: 389`, OR
-`encryption: 'simple_tls'` and `port: 636`.
-
-### Connection times out
-
-If GitLab cannot reach your LDAP endpoint, you will see a message like this:
-
-```
-Could not authenticate you from Ldapmain because "Connection timed out - user specified timeout".
-```
-
-If your configured LDAP provider and/or endpoint is offline or otherwise unreachable by GitLab, no LDAP user will be able to authenticate and log in. GitLab does not cache or store credentials for LDAP users to provide authentication during an LDAP outage.
-
-Contact your LDAP provider or administrator if you are seeing this error.
+Please see our [administrator guide to troubleshooting LDAP](ldap-troubleshooting.md).

@@ -42,6 +42,13 @@ describe 'shared/_mirror_status.html.haml' do
       expect(rendered).to have_content("The repository failed to update")
     end
 
+    it 'renders failure message with icon' do
+      render 'shared/mirror_status'
+
+      expect(rendered).to have_content('The repository failed to update')
+      expect(rendered).to have_css('i', class: 'fa-warning fa-triangle')
+    end
+
     context 'with a previous successful update' do
       it 'renders failure message' do
         @project.import_state.last_successful_update_at = Time.now - 1.minute

@@ -1,6 +1,6 @@
 # Issue Boards
 
-> [Introduced][ce-5554] in [GitLab 8.11](https://about.gitlab.com/blog/2016/08/22/gitlab-8-11-released/#issue-board).
+> [Introduced][ce-5554] in [GitLab 8.11](https://about.gitlab.com/releases/2016/08/22/gitlab-8-11-released/#issue-board).
 
 ## Overview
 
@@ -147,7 +147,7 @@ Create lists for each of your team members and quickly drag-and-drop issues onto
 ## Permissions
 
 [Reporters and up](../permissions.md) can use all the functionality of the
-Issue Board, that is, create or delete lists and drag issues from one list to another.
+Issue Board to create or delete lists, and drag issues from one list to another.
 
 ## GitLab Enterprise features for Issue Boards
 
@@ -180,21 +180,9 @@ These are shortcuts to your last 4 visited boards.
 When you're revisiting an issue board in a project or group with multiple boards,
 GitLab will automatically load the last board you visited.
 
-### Multi-select Issue Cards
-
-As the name suggest, multi-select issue cards allows more than one issue card
-to be dragged and dropped across different lists. This becomes helpful while
-moving and grooming a lot of issues at once.
-
-You can multi-select an issue card by pressing `CTRL` + `Left mouse click` on
-Windows or `CMD` + `Left mouse click` on MacOS. Once done, start by dragging one
-of the issue card you have selected and drop it in the new list you want.
-
-![Multi-select Issue Cards](img/issue_boards_multi_select.png)
-
 ### Configurable Issue Boards **(STARTER)**
 
-> Introduced in [GitLab Starter Edition 10.2](https://about.gitlab.com/blog/2017/11/22/gitlab-10-2-released/#issue-boards-configuration).
+> Introduced in [GitLab Starter Edition 10.2](https://about.gitlab.com/releases/2017/11/22/gitlab-10-2-released/#issue-boards-configuration).
 
 An Issue Board can be associated with a GitLab [Milestone](milestones/index.md#milestones),
 [Labels](labels.md), Assignee and Weight
@@ -214,7 +202,7 @@ If you don't have editing permission in a board, you're still able to see the co
 
 ### Focus mode **(STARTER)**
 
-> Introduced in [GitLab Starter 9.1](https://about.gitlab.com/blog/2017/04/22/gitlab-9-1-released/#issue-boards-focus-mode-ees-eep).
+> Introduced in [GitLab Starter 9.1](https://about.gitlab.com/releases/2017/04/22/gitlab-9-1-released/#issue-boards-focus-mode-ees-eep).
 
 Click the button at the top right to toggle focus mode on and off. In focus mode, the navigation UI is hidden, allowing you to focus on issues in the board.
 
@@ -230,7 +218,7 @@ especially in combination with [assignee lists](#assignee-lists-premium).
 
 ### Group Issue Boards **(PREMIUM)**
 
-> Introduced in [GitLab Premium 10.0](https://about.gitlab.com/blog/2017/09/22/gitlab-10-0-released/#group-issue-boards).
+> Introduced in [GitLab Premium 10.0](https://about.gitlab.com/releases/2017/09/22/gitlab-10-0-released/#group-issue-boards).
 
 Accessible at the group navigation level, a group issue board offers the same features as a project-level board,
 but it can display issues from all projects in that
@@ -239,7 +227,7 @@ boards. When updating milestones and labels for an issue through the sidebar upd
 group-level objects are available.
 
 NOTE: **Note:**
-Multiple group issue boards were originally introduced in [GitLab 10.0 Premium](https://about.gitlab.com/blog/2017/09/22/gitlab-10-0-released/#group-issue-boards) and
+Multiple group issue boards were originally introduced in [GitLab 10.0 Premium](https://about.gitlab.com/releases/2017/09/22/gitlab-10-0-released/#group-issue-boards) and
 one group issue board per group was made available in GitLab 10.6 Core.
 
 ![Group issue board](img/group_issue_board.png)
@@ -281,6 +269,17 @@ As on another list types, click on the trash icon to remove it.
 
 ![Milestone lists](img/issue_board_milestone_lists.png)
 
+## Work In Progress limits **(STARTER)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.7
+
+You can set Work In Progress (WIP) limits per issues list. When a limit is set, the list's header shows the number of issues in the list and the soft limit of issues. For example, for a list with 4 issues, and a limit of 5, the header will show `4/5`. If you exceed the limit, the current number of issues is shown in red. For example, you have a list with 5 issues with a limit of 5. When you move another issue to that list, the list's header displays `6/5`, with the `6` shown in red.
+
+To set a WIP limit for a list:
+
+1. Navigate to a Project or Group board for which you have membership and click on the Settings icon (gear) in a list's header.
+1. Next to **Work In Progress Limit**, click **Edit** and enter the maximum number of issues. Press `Enter` to save.
+
 ### Summary of features per tier
 
 Different issue board features are available in different [GitLab tiers](https://about.gitlab.com/pricing/), as shown in the following table:
@@ -291,6 +290,14 @@ Different issue board features are available in different [GitLab tiers](https:/
 | Starter / Bronze  | Multiple                       | 1                            | Yes                       | No             |
 | Premium / Silver | Multiple                       | Multiple                     | Yes                       | Yes            |
 | Ultimate / Gold | Multiple                       | Multiple                     | Yes                       | Yes            |
+
+## Blocked issues
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34723) in GitLab 12.8.
+
+If an issue is blocked by another issue, an icon will display next to its title to differentiate it from unblocked issues.
+
+![Blocked issues](img/issue_boards_blocked_icon_v12_8.png)
 
 ## Actions you can take on an Issue Board
 
@@ -354,7 +361,7 @@ window where you can see all the issues that do not belong to any list.
 
 Select one or more issues by clicking on the cards and then click **Add issues**
 to add them to the selected list. You can limit the issues you want to add to
-the list by filtering by author, assignee, milestone and label.
+the list by filtering by author, assignee, milestone, and label.
 
 ![Bulk adding issues to lists](img/issue_boards_add_issues_modal.png)
 
@@ -400,7 +407,7 @@ You should be able to use the filters on top of your Issue Board to show only
 the results you want. This is similar to the filtering used in the issue tracker
 since the metadata from the issues and labels are re-used in the Issue Board.
 
-You can filter by author, assignee, milestone and label.
+You can filter by author, assignee, milestone, and label.
 
 ### Creating workflows
 
@@ -412,7 +419,7 @@ something between lists by changing a label.
 
 A typical workflow of using the Issue Board would be:
 
-1. You have [created](labels.md#creating-labels) and [prioritized](labels.md#label-priority)
+1. You have [created](labels.md#label-management) and [prioritized](labels.md#label-priority)
    labels so that you can easily categorize your issues.
 1. You have a bunch of issues (ideally labeled).
 1. You visit the Issue Board and start [creating lists](#creating-a-new-list) to
@@ -448,6 +455,19 @@ When dragging issues between lists, different behavior occurs depending on the s
 | From label `A` list        | `A` removed        | Issue closed | `A` removed<br/>`B` added    | `Bob` assigned                        |
 | From assignee `Alice` list | `Alice` unassigned | Issue closed | `B` added                    | `Alice` unassigned<br/>`Bob` assigned |
 
+### Multi-select issue cards
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/18954) in GitLab 12.4.
+
+You can select multiple issue cards, then drag the group to another position within the list, or to another list. This makes it faster to reorder many issues at once.
+
+To select and move multiple cards:
+
+1. Select each card with <kbd>Ctrl</kbd>+`Click` on Windows or Linux, or <kbd>Cmd</kbd>+`Click` on MacOS.
+1. Drag one of the selected cards to another position or list and all selected cards will be moved.
+
+![Multi-select Issue Cards](img/issue_boards_multi_select_v12_4.png)
+
 ## Tips
 
 A few things to remember:
@@ -463,6 +483,6 @@ A few things to remember:
   by default. If you have more than 20 issues start scrolling down and the next
   20 will appear.
 
-[ce-5554]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5554
+[ce-5554]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5554
 [scrum]: https://en.wikipedia.org/wiki/Scrum_(software_development)
 [kanban]: https://en.wikipedia.org/wiki/Kanban_(development)

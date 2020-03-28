@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Backup::Repository do
   let(:progress) { StringIO.new }
   let!(:project) { create(:project, :wiki_repo) }
+
   subject { described_class.new(progress) }
 
   before do
@@ -49,9 +50,9 @@ describe Backup::Repository do
 
     describe 'command failure' do
       before do
-        allow_next_instance_of(Gitlab::Shell) do |instance|
-          allow(instance).to receive(:create_repository).and_return(false)
-        end
+        # Allow us to set expectations on the project directly
+        expect(Project).to receive(:find_each).and_yield(project)
+        expect(project.repository).to receive(:create_repository) { raise 'Fail in tests' }
       end
 
       context 'hashed storage' do
@@ -84,6 +85,22 @@ describe Backup::Repository do
         expect(pool_repository).not_to be_failed
         expect(pool_repository.object_pool.exists?).to be(true)
       end
+    end
+
+    it 'cleans existing repositories' do
+      wiki_repository_spy = spy(:wiki)
+
+      allow_next_instance_of(ProjectWiki) do |project_wiki|
+        allow(project_wiki).to receive(:repository).and_return(wiki_repository_spy)
+      end
+
+      expect_next_instance_of(Repository) do |repo|
+        expect(repo).to receive(:remove)
+      end
+
+      subject.restore
+
+      expect(wiki_repository_spy).to have_received(:remove)
     end
   end
 

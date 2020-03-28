@@ -44,6 +44,19 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
     end
   end
 
+  describe '#public_id' do
+    it 'returns an encrypted, url-encoded session id' do
+      original_session_id = "!*'();:@&\n=+$,/?%abcd#123[4567]8"
+      active_session = ActiveSession.new(session_id: original_session_id)
+      encrypted_encoded_id = active_session.public_id
+
+      encrypted_id = CGI.unescape(encrypted_encoded_id)
+      derived_session_id = Gitlab::CryptoHelper.aes256_gcm_decrypt(encrypted_id)
+
+      expect(original_session_id).to eq derived_session_id
+    end
+  end
+
   describe '.list' do
     it 'returns all sessions by user' do
       Gitlab::Redis::SharedState.with do |redis|
@@ -139,7 +152,7 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
       redis = double(:redis)
       expect(Gitlab::Redis::SharedState).to receive(:with).and_yield(redis)
 
-      sessions = ['session-a', 'session-b']
+      sessions = %w[session-a session-b]
       mget_responses = sessions.map { |session| [Marshal.dump(session)]}
       expect(redis).to receive(:mget).twice.and_return(*mget_responses)
 
@@ -173,8 +186,7 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
           device_name: 'iPhone 6',
           device_type: 'smartphone',
           created_at: Time.zone.parse('2018-03-12 09:06'),
-          updated_at: Time.zone.parse('2018-03-12 09:06'),
-          session_id: '6919a6f1bb119dd7396fadc38fd18d0d'
+          updated_at: Time.zone.parse('2018-03-12 09:06')
         )
       end
     end
@@ -242,23 +254,47 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
         expect(redis.scan_each(match: "session:gitlab:*").to_a).to be_empty
       end
     end
+  end
 
-    it 'does not remove the devise session if the active session could not be found' do
-      Gitlab::Redis::SharedState.with do |redis|
-        redis.set("session:gitlab:6919a6f1bb119dd7396fadc38fd18d0d", '')
-      end
+  describe '.destroy_with_public_id' do
+    it 'receives a user and public id and destroys the associated session' do
+      ActiveSession.set(user, request)
+      session = ActiveSession.list(user).first
 
-      other_user = create(:user)
+      ActiveSession.destroy_with_public_id(user, session.public_id)
 
-      ActiveSession.destroy(other_user, request.session.id)
+      total_sessions = ActiveSession.list(user).count
+      expect(total_sessions).to eq 0
+    end
 
-      Gitlab::Redis::SharedState.with do |redis|
-        expect(redis.scan_each(match: "session:gitlab:*").to_a).not_to be_empty
-      end
+    it 'handles invalid input for public id' do
+      expect do
+        ActiveSession.destroy_with_public_id(user, nil)
+      end.not_to raise_error
+
+      expect do
+        ActiveSession.destroy_with_public_id(user, "")
+      end.not_to raise_error
+
+      expect do
+        ActiveSession.destroy_with_public_id(user, "aaaaaaaa")
+      end.not_to raise_error
+    end
+
+    it 'does not attempt to destroy session when given invalid input for public id' do
+      expect(ActiveSession).not_to receive(:destroy)
+
+      ActiveSession.destroy_with_public_id(user, nil)
+      ActiveSession.destroy_with_public_id(user, "")
+      ActiveSession.destroy_with_public_id(user, "aaaaaaaa")
     end
   end
 
   describe '.cleanup' do
+    before do
+      stub_const("ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS", 5)
+    end
+
     it 'removes obsolete lookup entries' do
       Gitlab::Redis::SharedState.with do |redis|
         redis.set("session:user:gitlab:#{user.id}:6919a6f1bb119dd7396fadc38fd18d0d", '')
@@ -275,6 +311,99 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
 
     it 'does not bail if there are no lookup entries' do
       ActiveSession.cleanup(user)
+    end
+
+    context 'cleaning up old sessions' do
+      let(:max_number_of_sessions_plus_one) { ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS + 1 }
+      let(:max_number_of_sessions_plus_two) { ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS + 2 }
+
+      before do
+        Gitlab::Redis::SharedState.with do |redis|
+          (1..max_number_of_sessions_plus_two).each do |number|
+            redis.set(
+              "session:user:gitlab:#{user.id}:#{number}",
+              Marshal.dump(ActiveSession.new(session_id: "#{number}", updated_at: number.days.ago))
+            )
+            redis.sadd(
+              "session:lookup:user:gitlab:#{user.id}",
+              "#{number}"
+            )
+          end
+        end
+      end
+
+      it 'removes obsolete active sessions entries' do
+        ActiveSession.cleanup(user)
+
+        Gitlab::Redis::SharedState.with do |redis|
+          sessions = redis.scan_each(match: "session:user:gitlab:#{user.id}:*").to_a
+
+          expect(sessions.count).to eq(ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
+          expect(sessions).not_to include("session:user:gitlab:#{user.id}:#{max_number_of_sessions_plus_one}", "session:user:gitlab:#{user.id}:#{max_number_of_sessions_plus_two}")
+        end
+      end
+
+      it 'removes obsolete lookup entries' do
+        ActiveSession.cleanup(user)
+
+        Gitlab::Redis::SharedState.with do |redis|
+          lookup_entries = redis.smembers("session:lookup:user:gitlab:#{user.id}")
+
+          expect(lookup_entries.count).to eq(ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
+          expect(lookup_entries).not_to include(max_number_of_sessions_plus_one.to_s, max_number_of_sessions_plus_two.to_s)
+        end
+      end
+
+      it 'removes obsolete lookup entries even without active session' do
+        Gitlab::Redis::SharedState.with do |redis|
+          redis.sadd(
+            "session:lookup:user:gitlab:#{user.id}",
+            "#{max_number_of_sessions_plus_two + 1}"
+          )
+        end
+
+        ActiveSession.cleanup(user)
+
+        Gitlab::Redis::SharedState.with do |redis|
+          lookup_entries = redis.smembers("session:lookup:user:gitlab:#{user.id}")
+
+          expect(lookup_entries.count).to eq(ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
+          expect(lookup_entries).not_to include(
+            max_number_of_sessions_plus_one.to_s,
+            max_number_of_sessions_plus_two.to_s,
+            (max_number_of_sessions_plus_two + 1).to_s
+          )
+        end
+      end
+
+      context 'when the number of active sessions is lower than the limit' do
+        before do
+          Gitlab::Redis::SharedState.with do |redis|
+            ((max_number_of_sessions_plus_two - 4)..max_number_of_sessions_plus_two).each do |number|
+              redis.del("session:user:gitlab:#{user.id}:#{number}")
+            end
+          end
+        end
+
+        it 'does not remove active session entries, but removes lookup entries' do
+          lookup_entries_before_cleanup = Gitlab::Redis::SharedState.with do |redis|
+            redis.smembers("session:lookup:user:gitlab:#{user.id}")
+          end
+
+          sessions_before_cleanup = Gitlab::Redis::SharedState.with do |redis|
+            redis.scan_each(match: "session:user:gitlab:#{user.id}:*").to_a
+          end
+
+          ActiveSession.cleanup(user)
+
+          Gitlab::Redis::SharedState.with do |redis|
+            lookup_entries = redis.smembers("session:lookup:user:gitlab:#{user.id}")
+            sessions = redis.scan_each(match: "session:user:gitlab:#{user.id}:*").to_a
+            expect(sessions.count).to eq(sessions_before_cleanup.count)
+            expect(lookup_entries.count).to be < lookup_entries_before_cleanup.count
+          end
+        end
+      end
     end
   end
 end

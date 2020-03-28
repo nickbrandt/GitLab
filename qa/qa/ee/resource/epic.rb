@@ -33,9 +33,7 @@ module QA
             index.click_new_epic
             index.set_title(@title)
             index.create_new_epic
-            index.wait(interval: 1) do
-              index.has_text?(@title)
-            end
+            index.has_text?(@title, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
           end
         end
 

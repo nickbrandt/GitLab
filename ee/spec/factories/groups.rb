@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :group_with_members, parent: :group do
     after(:create) do |group, evaluator|
-      group.add_developer(create :user)
+      group.add_developer(create(:user))
     end
   end
 
@@ -35,6 +35,29 @@ FactoryBot.define do
             provider: evaluator.provider
         )
       end
+    end
+  end
+
+  factory :group_with_deletion_schedule, parent: :group do
+    transient do
+      deleting_user { create(:user) }
+      marked_for_deletion_on { nil }
+    end
+
+    after(:create) do |group, evaluator|
+      create(:group_deletion_schedule,
+        group: group,
+        deleting_user: evaluator.deleting_user,
+        marked_for_deletion_on: evaluator.marked_for_deletion_on
+      )
+    end
+  end
+
+  factory :group_with_managed_accounts, parent: :group do
+    after(:create) do |group, evaluator|
+      create(:saml_provider,
+        :enforced_group_managed_accounts,
+        group: group)
     end
   end
 end

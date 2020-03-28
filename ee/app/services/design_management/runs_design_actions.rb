@@ -17,7 +17,7 @@ module DesignManagement
                                     message: commit_message,
                                     actions: actions.map(&:gitaly_action))
 
-      ::DesignManagement::Version.create_for_designs(actions, sha)
+      ::DesignManagement::Version.create_for_designs(actions, sha, current_user)
     end
   end
 end

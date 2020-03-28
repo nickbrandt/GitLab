@@ -1,17 +1,20 @@
 <script>
-import { __, s__ } from '~/locale';
+import { mapState } from 'vuex';
+import Sortable from 'sortablejs';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { __, s__ } from '~/locale';
 import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
 import CustomStageForm from './custom_stage_form.vue';
+import { STAGE_ACTIONS } from '../constants';
+import { NO_DRAG_CLASS } from '../../shared/constants';
+import sortableDefaultOptions from '../../shared/mixins/sortable_default_options';
 
 export default {
   name: 'StageTable',
   components: {
-    Icon,
     GlLoadingIcon,
     GlEmptyState,
     StageEventList,
@@ -28,6 +31,10 @@ export default {
       type: Array,
       required: true,
     },
+    medians: {
+      type: Object,
+      required: true,
+    },
     currentStage: {
       type: Object,
       required: true,
@@ -40,7 +47,11 @@ export default {
       type: Boolean,
       required: true,
     },
-    isAddingCustomStage: {
+    isCreatingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isEditingCustomStage: {
       type: Boolean,
       required: true,
     },
@@ -55,6 +66,11 @@ export default {
     customStageFormEvents: {
       type: Array,
       required: true,
+    },
+    customStageFormErrors: {
+      type: Object,
+      required: false,
+      default: () => {},
     },
     labels: {
       type: Array,
@@ -72,14 +88,42 @@ export default {
       type: Boolean,
       required: true,
     },
+    customOrdering: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    errorSavingStageOrder: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      stageNavHeight: 0,
+    };
   },
   computed: {
+    ...mapState(['customStageFormInitialData']),
+    stageEventsHeight() {
+      return `${this.stageNavHeight}px`;
+    },
     stageName() {
       return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
     shouldDisplayStage() {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
       return currentStageEvents.length && !isLoading && !isEmptyStage;
+    },
+    customStageFormActive() {
+      return this.isCreatingCustomStage;
+    },
+    allowCustomOrdering() {
+      return this.customOrdering && !this.errorSavingStageOrder;
+    },
+    manualOrderingClass() {
+      return this.allowCustomOrdering ? 'js-manual-ordering' : '';
     },
     stageHeaders() {
       return [
@@ -99,17 +143,44 @@ export default {
           title: this.stageName,
           description: __('The collection of events added to the data gathered for that stage.'),
           classes: 'event-header pl-3',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
         {
-          title: __('Total Time'),
+          title: __('Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
       ];
     },
   },
+  mounted() {
+    this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
+
+    if (this.allowCustomOrdering) {
+      const options = Object.assign({}, sortableDefaultOptions(), {
+        onUpdate: event => {
+          const el = event.item;
+
+          const { previousElementSibling, nextElementSibling } = el;
+
+          const { id } = el.dataset;
+          const moveAfterId = previousElementSibling?.dataset?.id || null;
+          const moveBeforeId = nextElementSibling?.dataset?.id || null;
+
+          this.$emit('reorderStage', { id, moveAfterId, moveBeforeId });
+        },
+      });
+      this.sortable = Sortable.create(this.$refs.list, options);
+    }
+  },
+  methods: {
+    medianValue(id) {
+      return this.medians[id] ? this.medians[id] : null;
+    },
+  },
+  STAGE_ACTIONS,
+  noDragClass: NO_DRAG_CLASS,
 };
 </script>
 <template>
@@ -130,32 +201,44 @@ export default {
         </nav>
       </div>
       <div class="stage-panel-body">
-        <nav class="stage-nav">
-          <ul>
+        <nav ref="stageNav" class="stage-nav pl-2">
+          <ul ref="list" :class="manualOrderingClass">
             <stage-nav-item
               v-for="stage in stages"
+              :id="stage.id"
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
-              :value="stage.value"
-              :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :value="medianValue(stage.id)"
+              :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
+              :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
-              @select="$emit('selectStage', stage)"
+              @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
+              @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
+              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
+              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
             />
             <add-stage-button
               v-if="canEditStages"
-              :active="isAddingCustomStage"
+              :class="$options.noDragClass"
+              :active="customStageFormActive"
               @showform="$emit('showAddStageForm')"
             />
           </ul>
         </nav>
-        <div class="section stage-events">
+        <div class="section stage-events" :style="{ height: stageEventsHeight }">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <custom-stage-form
-            v-else-if="isAddingCustomStage"
+            v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
+            :initial-fields="customStageFormInitialData"
+            :is-editing-custom-stage="isEditingCustomStage"
+            :errors="customStageFormErrors"
             @submit="$emit('submit', $event)"
+            @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
+            @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
+            @clearErrors="$emit('clearCustomStageFormErrors')"
           />
           <template v-else>
             <stage-event-list

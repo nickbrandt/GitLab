@@ -13,6 +13,7 @@ describe Packages::GroupPackagesFinder do
 
   describe '#execute' do
     let(:params) { { exclude_subgroups: false } }
+
     subject { described_class.new(user, group, params).execute }
 
     shared_examples 'with package type' do |package_type|
@@ -45,6 +46,18 @@ describe Packages::GroupPackagesFinder do
           it { is_expected.to match_array([package1, package2]) }
         end
       end
+
+      context 'when there are processing packages' do
+        let!(:package4) { create(:nuget_package, project: project, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+        it { is_expected.to match_array([package1, package2]) }
+      end
+
+      context 'does not include packages without version number' do
+        let!(:package_without_version) { create(:maven_package, project: project, version: nil) }
+
+        it { is_expected.not_to include(package_without_version) }
+      end
     end
 
     context 'group has package of all types' do
@@ -74,7 +87,7 @@ describe Packages::GroupPackagesFinder do
     end
 
     context 'when project is public' do
-      set(:other_user) { create(:user) }
+      let_it_be(:other_user) { create(:user) }
       let(:finder) { described_class.new(other_user, group) }
 
       before do

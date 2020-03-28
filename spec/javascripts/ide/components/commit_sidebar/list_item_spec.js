@@ -1,9 +1,9 @@
 import Vue from 'vue';
+import { trimText } from 'spec/helpers/text_helper';
+import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import store from '~/ide/stores';
 import listItem from '~/ide/components/commit_sidebar/list_item.vue';
 import router from '~/ide/ide_router';
-import { trimText } from 'spec/helpers/text_helper';
-import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { file, resetStore } from '../../helpers';
 
 describe('Multi-file editor commit sidebar list item', () => {
@@ -20,7 +20,6 @@ describe('Multi-file editor commit sidebar list item', () => {
 
     vm = createComponentWithStore(Component, store, {
       file: f,
-      actionComponent: 'stage-button',
       activeFileKey: `staged-${f.key}`,
     }).$mount();
 

@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::CodeOwners::Loader do
   include FakeBlobHelpers
-  set(:group) { create(:group) }
-  set(:project) { create(:project, namespace: group) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, namespace: group) }
   subject(:loader) { described_class.new(project, 'with-codeowners', paths) }
 
   let(:codeowner_content) do

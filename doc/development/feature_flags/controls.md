@@ -12,14 +12,14 @@ Follow the Chatops document to [request access](../chatops_on_gitlabcom.md#reque
 Once you are added to the project test if your access propagated,
 run:
 
-```
+```shell
 /chatops run feature --help
 ```
 
 ## Where to run commands
 
 To increase visibility, we recommend that GitLab team members run feature flag
-related Chatops commands within certain slack channels based on the environment
+related Chatops commands within certain Slack channels based on the environment
 and related feature. For the [staging](https://staging.gitlab.com)
 and [development](https://dev.gitlab.org) environments of GitLab.com,
 the commands should run in a channel for the stage the feature is relevant too.
@@ -51,7 +51,7 @@ easier to measure the impact of both separately.
 GitLab's feature library (using
 [Flipper](https://github.com/jnunemaker/flipper), and covered in the [Feature
 Flags process](process.md) guide) supports rolling out changes to a percentage of
-users. This in turn can be controlled using [GitLab Chatops](../../ci/chatops/README.md).
+time to users. This in turn can be controlled using [GitLab Chatops](../../ci/chatops/README.md).
 
 For an up to date list of feature flag commands please see [the source
 code](https://gitlab.com/gitlab-com/chatops/blob/master/lib/chatops/commands/feature.rb).
@@ -70,7 +70,7 @@ and <https://dev.gitlab.org>.
 For example, to enable a feature for 25% of all users, run the following in
 Slack:
 
-```
+```shell
 /chatops run feature set new_navigation_bar 25 --dev
 /chatops run feature set new_navigation_bar 25 --staging
 ```
@@ -92,7 +92,7 @@ feature enabled, you can roll out the change to GitLab.com.
 Similar to above, to enable a feature for 25% of all users, run the following in
 Slack:
 
-```
+```shell
 /chatops run feature set new_navigation_bar 25
 ```
 
@@ -117,20 +117,37 @@ Feature gates can also be actor based, for example a feature could first be
 enabled for only the `gitlab` project. The project is passed by supplying a
 `--project` flag:
 
-```
+```shell
 /chatops run feature set --project=gitlab-org/gitlab some_feature true
 ```
 
 For groups the `--group` flag is available:
 
-```
+```shell
 /chatops run feature set --group=gitlab-org some_feature true
 ```
+
+Note that actor-based gates are applied before percentages. For example, considering the
+`group/project` as `gitlab-org/gitlab` and a given example feature as `some_feature`, if
+you run these 2 commands:
+
+```shell
+/chatops run feature set --project=gitlab-org/gitlab some_feature true
+/chatops run feature set some_feature 25
+```
+
+Then `some_feature` will be enabled for 25% of the time the users are interacting with
+`gitlab-org/gitlab`. Note that the the feature is not enabled to 25%
+of the users, rather a simple randomization is made each time the `enabled?` is checked.
+
+NOTE: **Note:**
+**Percentage of time** rollout is not a good idea if what you want is to make sure a feature
+is always on or off to the users.
 
 ## Cleaning up
 
 Once the change is deemed stable, submit a new merge request to remove the
-feature flag. This ensures the change is available to all users and self-hosted
+feature flag. This ensures the change is available to all users and self-managed
 instances. Make sure to add the ~"feature flag" label to this merge request so
 release managers are aware the changes are hidden behind a feature flag. If the
 merge request has to be picked into a stable branch, make sure to also add the
@@ -141,13 +158,13 @@ When a feature gate has been removed from the code base, the feature
 record still exists in the database that the flag was deployed too.
 The record can be deleted once the MR is deployed to each environment:
 
-```sh
+```shell
 /chatops run feature delete some_feature --dev
 /chatops run feature delete some_feature --staging
 ```
 
 Then, you can delete it from production after the MR is deployed to prod:
 
-```sh
+```shell
 /chatops run feature delete some_feature
 ```

@@ -19,8 +19,7 @@ module QA
         project.add_member(approver, Resource::Members::AccessLevel::DEVELOPER)
         project.add_member(non_approver, Resource::Members::AccessLevel::DEVELOPER)
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         project.visit!
       end
@@ -74,6 +73,7 @@ module QA
           show.edit!
           approvers = show.approvers
 
+          expect(approvers.size).to eq(1)
           expect(approvers).to include(approver.name)
           expect(approvers).not_to include(non_approver.name)
         end

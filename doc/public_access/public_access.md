@@ -49,7 +49,7 @@ They will appear in the public access directory (`/public`) for project members 
 ## Visibility of groups
 
 NOTE: **Note:**
-[Starting with](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/3323) GitLab 8.6,
+[Starting with](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/3323) GitLab 8.6,
 the group visibility has changed and can be configured the same way as projects.
 In previous versions, a group's page was always visible to all users.
 
@@ -76,6 +76,16 @@ snippet. This is useful to prevent users from publicly exposing their repositori
 by accident. The restricted visibility settings do not apply to admin users.
 
 For details, see [Restricted visibility levels](../user/admin_area/settings/visibility_and_access_controls.md#restricted-visibility-levels).
+
+## Reducing visibility
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33358) in GitLab 12.6.
+
+Reducing a project's visibility level will remove the fork relationship between the project and
+any forked project. This is a potentially destructive action which requires confirmation before
+this can be saved.
+
+![Project visibility change confirmation](img/project_visibility_confirmation_v12_6.png)
 
 <!-- ## Troubleshooting
 

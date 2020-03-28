@@ -12,16 +12,17 @@ module EE
         def failure_reasons
           super.merge(
             activity_limit_exceeded: 'Pipeline activity limit exceeded!',
-            size_limit_exceeded: 'Pipeline size limit exceeded!'
+            size_limit_exceeded: 'Pipeline size limit exceeded!',
+            job_activity_limit_exceeded: 'Pipeline job activity limit exceeded!'
           )
         end
       end
 
       def expose_security_dashboard?
-        any_report_artifact_for_type(:sast) ||
-          any_report_artifact_for_type(:dependency_scanning) ||
-          any_report_artifact_for_type(:dast) ||
-          any_report_artifact_for_type(:container_scanning)
+        batch_lookup_report_artifact_for_file_type(:sast) ||
+          batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
+          batch_lookup_report_artifact_for_file_type(:dast) ||
+          batch_lookup_report_artifact_for_file_type(:container_scanning)
       end
 
       def downloadable_path_for_report_type(file_type)

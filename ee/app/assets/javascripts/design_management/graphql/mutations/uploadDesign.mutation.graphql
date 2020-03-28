@@ -11,7 +11,11 @@ mutation uploadDesign($files: [Upload!]!, $projectPath: ID!, $iid: ID!) {
             sha
           }
         }
-      }
+      },
     }
+    skippedDesigns {
+      filename
+    }
+    errors
   }
 }

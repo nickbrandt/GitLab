@@ -14,7 +14,6 @@ describe('EE IDE TerminalEmptyState', () => {
     const localVue = createLocalVue();
 
     wrapper = shallowMount(localVue.extend(TerminalEmptyState), {
-      sync: false,
       localVue,
       ...options,
     });

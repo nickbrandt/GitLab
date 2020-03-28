@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe PipelineSerializer do
-  set(:project) { create(:project, :repository) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
 
   let(:serializer) do
     described_class.new(current_user: user, project: project)
@@ -130,10 +130,10 @@ describe PipelineSerializer do
 
       it 'preloads related merge requests' do
         recorded = ActiveRecord::QueryRecorder.new { subject }
+        expected_query = "SELECT \"merge_requests\".* FROM \"merge_requests\" " \
+        "WHERE \"merge_requests\".\"id\" IN (#{merge_request_1.id}, #{merge_request_2.id})"
 
-        expect(recorded.log)
-          .to include("SELECT \"merge_requests\".* FROM \"merge_requests\" " \
-                      "WHERE \"merge_requests\".\"id\" IN (#{merge_request_1.id}, #{merge_request_2.id})")
+        expect(recorded.log).to include(a_string_starting_with(expected_query))
       end
     end
 
@@ -159,7 +159,7 @@ describe PipelineSerializer do
 
         it 'verifies number of queries', :request_store do
           recorded = ActiveRecord::QueryRecorder.new { subject }
-          expected_queries = Gitlab.ee? ? 38 : 35
+          expected_queries = Gitlab.ee? ? 43 : 40
 
           expect(recorded.count).to be_within(2).of(expected_queries)
           expect(recorded.cached_count).to eq(0)
@@ -180,7 +180,7 @@ describe PipelineSerializer do
           # pipeline. With the same ref this check is cached but if refs are
           # different then there is an extra query per ref
           # https://gitlab.com/gitlab-org/gitlab-foss/issues/46368
-          expected_queries = Gitlab.ee? ? 41 : 38
+          expected_queries = Gitlab.ee? ? 46 : 43
 
           expect(recorded.count).to be_within(2).of(expected_queries)
           expect(recorded.cached_count).to eq(0)

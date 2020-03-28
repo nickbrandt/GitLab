@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ci_bridge, class: Ci::Bridge do
+  factory :ci_bridge, class: 'Ci::Bridge' do
     name { 'bridge' }
     stage { 'test' }
     stage_idx { 0 }
@@ -9,6 +9,7 @@ FactoryBot.define do
     tag { false }
     created_at { 'Di 29. Okt 09:50:00 CET 2013' }
     status { :created }
+    scheduling_type { 'stage' }
 
     pipeline factory: :ci_pipeline
 

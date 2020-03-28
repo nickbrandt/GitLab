@@ -28,6 +28,42 @@ describe Vulnerabilities::Feedback do
     it { is_expected.to validate_presence_of(:category) }
     it { is_expected.to validate_presence_of(:project_fingerprint) }
 
+    context 'pipeline is nil' do
+      let(:feedback) { build(:vulnerability_feedback, pipeline_id: nil) }
+
+      it 'is valid' do
+        expect(feedback).to be_valid
+      end
+    end
+
+    context 'pipeline has the same project_id' do
+      let(:feedback) { build(:vulnerability_feedback) }
+
+      it 'is valid' do
+        expect(feedback.project_id).to eq(feedback.pipeline.project_id)
+        expect(feedback).to be_valid
+      end
+    end
+
+    context 'pipeline_id does not exist' do
+      let(:feedback) { build(:vulnerability_feedback, pipeline_id: -100) }
+
+      it 'is invalid' do
+        expect(feedback.project_id).not_to eq(feedback.pipeline_id)
+        expect(feedback).not_to be_valid
+      end
+    end
+    context 'pipeline has a different project_id' do
+      let(:project) { create(:project) }
+      let(:pipeline) { create(:ci_pipeline, project: create(:project)) }
+      let(:feedback) { build(:vulnerability_feedback, project: project, pipeline: pipeline) }
+
+      it 'is invalid' do
+        expect(feedback.project_id).not_to eq(feedback.pipeline_id)
+        expect(feedback).not_to be_valid
+      end
+    end
+
     context 'comment is set' do
       let(:feedback) { build(:vulnerability_feedback, comment: 'a comment' ) }
 
@@ -38,6 +74,56 @@ describe Vulnerabilities::Feedback do
       it 'validates presence of comment_author' do
         expect(feedback).to validate_presence_of(:comment_author)
       end
+    end
+  end
+
+  describe '.with_category' do
+    it 'filters by category' do
+      described_class.categories.each do |category, _|
+        create(:vulnerability_feedback, category: category)
+      end
+
+      expect(described_class.count).to eq described_class.categories.length
+
+      expected, _ = described_class.categories.first
+
+      feedback = described_class.with_category(expected)
+
+      expect(feedback.length).to eq 1
+      expect(feedback.first.category).to eq expected
+    end
+  end
+
+  describe '.with_feedback_type' do
+    it 'filters by feedback_type' do
+      create(:vulnerability_feedback, :dismissal)
+      create(:vulnerability_feedback, :issue)
+      create(:vulnerability_feedback, :merge_request)
+
+      feedback = described_class.with_feedback_type('issue')
+
+      expect(feedback.length).to eq 1
+      expect(feedback.first.feedback_type).to eq 'issue'
+    end
+  end
+
+  # TODO remove once filtered data has been cleaned
+  describe '::only_valid_feedback' do
+    let(:project) { create(:project) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+
+    let!(:feedback) { create(:vulnerability_feedback, :dismissal, :sast, project: project, pipeline: pipeline) }
+    let!(:invalid_feedback) do
+      feedback = build(:vulnerability_feedback, project: project, pipeline: create(:ci_pipeline))
+
+      feedback.save(validate: false)
+    end
+
+    it 'filters out invalid feedback' do
+      feedback_records = described_class.only_valid_feedback
+
+      expect(feedback_records.length).to eq 1
+      expect(feedback_records.first).to eq feedback
     end
   end
 

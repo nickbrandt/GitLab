@@ -1,6 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { handleLocationHash } from '~/lib/utils/common_utils';
 import Preview from '~/repository/components/preview/index.vue';
+
+jest.mock('~/lib/utils/common_utils');
 
 let vm;
 let $apollo;
@@ -33,7 +36,25 @@ describe('Repository file preview component', () => {
 
     vm.setData({ readme: { html: '<div class="blob">test</div>' } });
 
-    expect(vm.element).toMatchSnapshot();
+    return vm.vm.$nextTick(() => {
+      expect(vm.element).toMatchSnapshot();
+    });
+  });
+
+  it('handles hash after render', () => {
+    factory({
+      webUrl: 'http://test.com',
+      name: 'README.md',
+    });
+
+    vm.setData({ readme: { html: '<div class="blob">test</div>' } });
+
+    return vm.vm
+      .$nextTick()
+      .then(vm.vm.$nextTick())
+      .then(() => {
+        expect(handleLocationHash).toHaveBeenCalled();
+      });
   });
 
   it('renders loading icon', () => {
@@ -44,6 +65,8 @@ describe('Repository file preview component', () => {
 
     vm.setData({ loading: 1 });
 
-    expect(vm.find(GlLoadingIcon).exists()).toBe(true);
+    return vm.vm.$nextTick(() => {
+      expect(vm.find(GlLoadingIcon).exists()).toBe(true);
+    });
   });
 });

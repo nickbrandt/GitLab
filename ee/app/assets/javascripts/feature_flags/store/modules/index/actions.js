@@ -33,6 +33,24 @@ export const receiveFeatureFlagsSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_FEATURE_FLAGS_SUCCESS, response);
 export const receiveFeatureFlagsError = ({ commit }) => commit(types.RECEIVE_FEATURE_FLAGS_ERROR);
 
+export const toggleFeatureFlag = ({ dispatch }, flag) => {
+  dispatch('updateFeatureFlag', flag);
+
+  axios
+    .put(flag.update_path, {
+      operations_feature_flag: flag,
+    })
+    .then(response => dispatch('receiveUpdateFeatureFlagSuccess', response.data))
+    .catch(() => dispatch('receiveUpdateFeatureFlagError', flag.id));
+};
+
+export const updateFeatureFlag = ({ commit }, flag) => commit(types.UPDATE_FEATURE_FLAG, flag);
+
+export const receiveUpdateFeatureFlagSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS, data);
+export const receiveUpdateFeatureFlagError = ({ commit }, id) =>
+  commit(types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR, id);
+
 export const rotateInstanceId = ({ state, dispatch }) => {
   dispatch('requestRotateInstanceId');
 

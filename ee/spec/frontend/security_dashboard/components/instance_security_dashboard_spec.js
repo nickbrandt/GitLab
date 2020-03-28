@@ -2,7 +2,7 @@ import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import InstanceSecurityDashboard from 'ee/security_dashboard/components/instance_security_dashboard.vue';
-import SecurityDashboard from 'ee/security_dashboard/components/app.vue';
+import SecurityDashboard from 'ee/security_dashboard/components/security_dashboard_vuex.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 
 const localVue = createLocalVue();
@@ -14,9 +14,9 @@ const emptyDashboardStateSvgPath = '/svgs/empty-dash.svg';
 const projectAddEndpoint = '/projects/add';
 const projectListEndpoint = '/projects/list';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
-const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
+const vulnerableProjectsEndpoint = '/vulnerable_projects_endpoint';
 
 describe('Instance Security Dashboard component', () => {
   let store;
@@ -50,7 +50,6 @@ describe('Instance Security Dashboard component', () => {
     wrapper = shallowMount(InstanceSecurityDashboard, {
       localVue,
       store,
-      sync: false,
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,
@@ -58,9 +57,9 @@ describe('Instance Security Dashboard component', () => {
         projectAddEndpoint,
         projectListEndpoint,
         vulnerabilitiesEndpoint,
-        vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       },
     });
   };
@@ -161,12 +160,10 @@ describe('Instance Security Dashboard component', () => {
       expect(wrapper.find(ProjectManager).exists()).toBe(false);
 
       expectComponentWithProps(SecurityDashboard, {
-        dashboardDocumentation,
-        emptyStateSvgPath: emptyDashboardStateSvgPath,
         vulnerabilitiesEndpoint,
-        vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       });
     });
 

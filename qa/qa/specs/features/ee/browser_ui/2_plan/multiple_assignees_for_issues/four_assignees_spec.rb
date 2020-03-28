@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Multiple assignees per issue' do
       before do
         Flow::Login.sign_in
@@ -11,8 +11,8 @@ module QA
         user_3 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_3, Runtime::Env.gitlab_qa_password_3)
         user_4 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_4, Runtime::Env.gitlab_qa_password_4)
 
-        project = Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'project-to-test-issue-with-multiple-assignees'
+        project = Resource::Project.fabricate_via_api! do |project|
+          project.name = 'project-to-test-issue-with-multiple-assignees'
         end
 
         project.add_member(user_1)
@@ -21,7 +21,6 @@ module QA
         project.add_member(user_4)
 
         Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = issue.title = 'issue-to-test-multiple-assignees'
           issue.project = project
           issue.assignee_ids = [
             user_1.id,
@@ -38,7 +37,7 @@ module QA
         Page::Project::Menu.perform(&:click_issues)
 
         Page::Project::Issue::Index.perform do |index|
-          expect(index.assignee_link_count).to be 4
+          expect(index).to have_assignee_link_count(4)
         end
       end
     end

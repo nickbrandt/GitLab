@@ -22,7 +22,11 @@ describe('Batch comments diff file drafts component', () => {
       },
     });
 
-    vm = shallowMount(DiffFileDrafts, { store, localVue, propsData: { fileHash: 'filehash' } });
+    vm = shallowMount(localVue.extend(DiffFileDrafts), {
+      store,
+      localVue,
+      propsData: { fileHash: 'filehash' },
+    });
   }
 
   afterEach(() => {

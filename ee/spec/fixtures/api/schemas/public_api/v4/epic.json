@@ -45,6 +45,11 @@
     "web_edit_url": { "type":  "string" },
     "web_url": { "type":  "string" },
     "reference": { "type":  "string" },
+    "references": {
+      "short": {"type": "string"},
+      "relative": {"type": "string"},
+      "full": {"type": "string"}
+    },
     "subscribed": { "type": ["boolean", "null"] }
   },
   "required": [

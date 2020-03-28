@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Burndown do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:start_date) { "2017-03-01" }
   let(:due_date) { "2017-03-03" }
 
@@ -35,7 +35,7 @@ describe Burndown do
     end
 
     context 'when issues belong to a public project' do
-      set(:non_member) { create(:user) }
+      let_it_be(:non_member) { create(:user) }
 
       subject do
         project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
@@ -83,7 +83,7 @@ describe Burndown do
       new_milestone = create(:milestone)
       burndown = described_class.new(new_milestone.issues_visible_to_user(user), new_milestone.start_date, new_milestone.due_date)
 
-      new_milestone.project.add_master(user)
+      new_milestone.project.add_maintainer(user)
 
       expect(burndown).to be_accurate
     end
@@ -209,8 +209,35 @@ describe Burndown do
     end
   end
 
+  describe 'load burndown events' do
+    let(:project) { create(:project) }
+    let(:milestone) { create(:milestone, project: project, start_date: start_date, due_date: due_date) }
+
+    subject { described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date).as_json }
+
+    before do
+      project.add_developer(user)
+    end
+
+    it 'avoids N+1 database queries' do
+      Timecop.freeze(milestone.due_date) do
+        create(:issue, milestone: milestone, weight: 2, project: project, author: user)
+
+        control_count = ActiveRecord::QueryRecorder.new(skip_cached: false) do
+          subject
+        end.count
+
+        create_list(:issue, 3, milestone: milestone, weight: 2, project: project, author: user)
+
+        expect do
+          subject
+        end.not_to exceed_all_query_limit(control_count)
+      end
+    end
+  end
+
   def build_sample(milestone, issue_params)
-    project.add_master(user)
+    project.add_maintainer(user)
 
     issues = []
     confidential_issues = []

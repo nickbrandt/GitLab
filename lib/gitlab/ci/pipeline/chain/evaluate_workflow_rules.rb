@@ -9,17 +9,11 @@ module Gitlab
           include Chain::Helpers
 
           def perform!
-            return unless Feature.enabled?(:workflow_rules, @pipeline.project)
-
-            unless workflow_passed?
-              error('Pipeline filtered out by workflow rules.')
-            end
+            error('Pipeline filtered out by workflow rules.') unless workflow_passed?
           end
 
           def break?
-            return false unless Feature.enabled?(:workflow_rules, @pipeline.project)
-
-            !workflow_passed?
+            @pipeline.errors.any? || @pipeline.persisted?
           end
 
           private
@@ -38,6 +32,10 @@ module Gitlab
           def global_context
             Gitlab::Ci::Build::Context::Global.new(
               @pipeline, yaml_variables: workflow_config[:yaml_variables])
+          end
+
+          def has_workflow_rules?
+            workflow_config[:rules].present?
           end
 
           def workflow_config

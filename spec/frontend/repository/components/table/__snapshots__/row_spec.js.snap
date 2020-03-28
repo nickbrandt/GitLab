@@ -2,24 +2,28 @@
 
 exports[`Repository table row component renders table row 1`] = `
 <tr
-  class="tree-item file_1"
+  class="tree-item"
 >
   <td
-    class="tree-item-file-name"
+    class="tree-item-file-name cursor-default position-relative"
   >
-    <i
-      aria-label="file"
-      class="fa fa-fw fa-file-text-o"
-      role="img"
-    />
+    <!---->
      
     <a
-      class="str-truncated"
+      class="tree-item-link str-truncated"
+      data-qa-selector="file_name_link"
       href="https://test.com"
     >
-      
-      test
-    
+      <i
+        aria-label="file"
+        class="fa fa-fw mr-1 fa-file-text-o"
+        role="img"
+      />
+      <span
+        class="position-relative"
+      >
+        test
+      </span>
     </a>
      
     <!---->
@@ -30,18 +34,71 @@ exports[`Repository table row component renders table row 1`] = `
   </td>
    
   <td
-    class="d-none d-sm-table-cell tree-commit"
+    class="d-none d-sm-table-cell tree-commit cursor-default"
   >
-    <glskeletonloading-stub
+    <gl-skeleton-loading-stub
       class="h-auto"
       lines="1"
     />
   </td>
    
   <td
-    class="tree-time-ago text-right"
+    class="tree-time-ago text-right cursor-default"
   >
-    <glskeletonloading-stub
+    <gl-skeleton-loading-stub
+      class="ml-auto h-auto w-50"
+      lines="1"
+    />
+  </td>
+</tr>
+`;
+
+exports[`Repository table row component renders table row for path with special character 1`] = `
+<tr
+  class="tree-item"
+>
+  <td
+    class="tree-item-file-name cursor-default position-relative"
+  >
+    <!---->
+     
+    <a
+      class="tree-item-link str-truncated"
+      data-qa-selector="file_name_link"
+      href="https://test.com"
+    >
+      <i
+        aria-label="file"
+        class="fa fa-fw mr-1 fa-file-text-o"
+        role="img"
+      />
+      <span
+        class="position-relative"
+      >
+        test
+      </span>
+    </a>
+     
+    <!---->
+     
+    <!---->
+     
+    <!---->
+  </td>
+   
+  <td
+    class="d-none d-sm-table-cell tree-commit cursor-default"
+  >
+    <gl-skeleton-loading-stub
+      class="h-auto"
+      lines="1"
+    />
+  </td>
+   
+  <td
+    class="tree-time-ago text-right cursor-default"
+  >
+    <gl-skeleton-loading-stub
       class="ml-auto h-auto w-50"
       lines="1"
     />

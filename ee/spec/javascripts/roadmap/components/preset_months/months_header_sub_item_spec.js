@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import MonthsHeaderSubItemComponent from 'ee/roadmap/components/preset_months/months_header_sub_item.vue';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
@@ -25,6 +26,15 @@ describe('MonthsHeaderSubItemComponent', () => {
 
   afterEach(() => {
     vm.$destroy();
+  });
+
+  describe('data', () => {
+    it('initializes `presetType` and `indicatorStyles` data props', () => {
+      vm = createComponent({});
+
+      expect(vm.presetType).toBe(PRESET_TYPES.MONTHS);
+      expect(vm.indicatorStyle).toBeDefined();
+    });
   });
 
   describe('computed', () => {
@@ -55,23 +65,6 @@ describe('MonthsHeaderSubItemComponent', () => {
         expect(vm.headerSubItemClass).toBe('');
       });
     });
-
-    describe('hasToday', () => {
-      it('returns true when current month and year is same as timeframe month and year', () => {
-        vm = createComponent({});
-
-        expect(vm.hasToday).toBe(true);
-      });
-
-      it('returns false when current month and year is different from timeframe month and year', () => {
-        vm = createComponent({
-          currentDate: new Date(2017, 10, 1), // Nov 1, 2017
-          timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
-        });
-
-        expect(vm.hasToday).toBe(false);
-      });
-    });
   });
 
   describe('methods', () => {
@@ -98,6 +91,10 @@ describe('MonthsHeaderSubItemComponent', () => {
 
     it('renders sub item element with class `sublabel-value`', () => {
       expect(vm.$el.querySelector('.sublabel-value')).not.toBeNull();
+    });
+
+    it('renders element with class `current-day-indicator-header` when hasToday is true', () => {
+      expect(vm.$el.querySelector('.current-day-indicator-header.preset-months')).not.toBeNull();
     });
   });
 });

@@ -425,6 +425,24 @@ module Gitlab
           create_file(current_file, "= AsciiDoc\n")
         end
 
+        def many_includes(target)
+          Array.new(10, "include::#{target}[]").join("\n")
+        end
+
+        context 'cyclic imports' do
+          before do
+            create_file('doc/api/a.adoc', many_includes('b.adoc'))
+            create_file('doc/api/b.adoc', many_includes('a.adoc'))
+          end
+
+          let(:include_path) { 'a.adoc' }
+          let(:requested_path) { 'doc/api/README.md' }
+
+          it 'completes successfully' do
+            is_expected.to include('<p>Include this:</p>')
+          end
+        end
+
         context 'with path to non-existing file' do
           let(:include_path) { 'not-exists.adoc' }
 
@@ -451,6 +469,7 @@ module Gitlab
 
         context 'with path to a binary file' do
           let(:blob) { fake_blob(path: 'dk.png', binary: true) }
+
           include_examples :invalid_include
         end
 
@@ -480,7 +499,6 @@ module Gitlab
               ['../sample.adoc',    'doc/sample.adoc',     'relative path to a file up one directory'],
               ['../../sample.adoc', 'sample.adoc',         'relative path for a file up multiple directories']
             ].each do |include_path_, file_path_, desc|
-
               context "the file is specified by #{desc}" do
                 let(:include_path) { include_path_ }
                 let(:file_path) { file_path_ }
@@ -500,6 +518,7 @@ module Gitlab
 
             context 'without a commit (only ref)' do
               let(:commit) { nil }
+
               include_examples :valid_include
             end
           end
@@ -511,8 +530,31 @@ module Gitlab
 
             context 'without a commit (only ref)' do
               let(:commit) { nil }
+
               include_examples :valid_include
             end
+          end
+        end
+
+        context 'when repository is passed into the context' do
+          let(:wiki_repo) { project.wiki.repository }
+          let(:include_path) { 'wiki_file.adoc' }
+
+          before do
+            project.create_wiki
+            context.merge!(repository: wiki_repo)
+          end
+
+          context 'when the file exists' do
+            before do
+              create_file(include_path, 'Content from wiki', repository: wiki_repo)
+            end
+
+            it { is_expected.to include('<p>Content from wiki</p>') }
+          end
+
+          context 'when the file does not exist' do
+            it { is_expected.to include("[ERROR: include::#{include_path}[] - unresolved directive]")}
           end
         end
 
@@ -560,8 +602,8 @@ module Gitlab
           end
         end
 
-        def create_file(path, content)
-          project.repository.create_file(project.creator, path, content,
+        def create_file(path, content, repository: project.repository)
+          repository.create_file(project.creator, path, content,
             message: "Add #{path}", branch_name: 'asciidoc')
         end
       end

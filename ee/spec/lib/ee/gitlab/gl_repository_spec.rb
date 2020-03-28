@@ -8,7 +8,7 @@ describe ::EE::Gitlab::GlRepository do
     end
 
     it "builds a design repository" do
-      expect(described_class::DESIGN.repository_accessor.call(create(:project)))
+      expect(described_class::DESIGN.repository_resolver.call(create(:project)))
         .to be_a(::DesignManagement::Repository)
     end
   end

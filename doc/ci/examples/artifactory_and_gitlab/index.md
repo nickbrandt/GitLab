@@ -12,7 +12,7 @@ date: 2017-08-15
 
 ## Introduction
 
-In this article, we will show how you can leverage the power of [GitLab CI/CD](https://about.gitlab.com/product/continuous-integration/)
+In this article, we show how you can leverage the power of [GitLab CI/CD](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/)
 to build a [Maven](https://maven.apache.org/) project, deploy it to [Artifactory](https://jfrog.com/artifactory/), and then use it from another Maven application as a dependency.
 
 You'll create two different projects:
@@ -20,7 +20,7 @@ You'll create two different projects:
 - `simple-maven-dep`: the app built and deployed to Artifactory (see the [simple-maven-dep](https://gitlab.com/gitlab-examples/maven/simple-maven-dep) example project)
 - `simple-maven-app`: the app using the previous one as a dependency (see the [simple-maven-app](https://gitlab.com/gitlab-examples/maven/simple-maven-app) example project)
 
-We assume that you already have a GitLab account on [GitLab.com](https://gitlab.com/), and that you know the basic usage of Git and [GitLab CI/CD](https://about.gitlab.com/product/continuous-integration/).
+We assume that you already have a GitLab account on [GitLab.com](https://gitlab.com/), and that you know the basic usage of Git and [GitLab CI/CD](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/).
 We also assume that an Artifactory instance is available and reachable from the internet, and that you have valid credentials to deploy on it.
 
 ## Create the simple Maven dependency
@@ -39,7 +39,7 @@ project:
 1. Create a new project by selecting **Import project from ➔ Repo by URL**
 1. Add the following URL:
 
-   ```
+   ```plaintext
    https://gitlab.com/gitlab-examples/maven/simple-maven-dep.git
    ```
 
@@ -104,7 +104,7 @@ parameter in `.gitlab-ci.yml` to use the custom location instead of the default 
 
 ### Configure GitLab CI/CD for `simple-maven-dep`
 
-Now it's time we set up [GitLab CI/CD](https://about.gitlab.com/product/continuous-integration/) to automatically build, test and deploy the dependency!
+Now it's time we set up [GitLab CI/CD](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/) to automatically build, test and deploy the dependency!
 
 GitLab CI/CD uses a file in the root of the repo, named `.gitlab-ci.yml`, to read the definitions for jobs
 that will be executed by the configured GitLab Runners. You can read more about this file in the [GitLab Documentation](../../yaml/README.md).
@@ -164,7 +164,7 @@ The deployment occurs only if we're pushing or merging to `master` branch, so th
 Done! Now you have all the changes in the GitLab repo, and a pipeline has already been started for this commit. In the **Pipelines** tab you can see what's happening.
 If the deployment has been successful, the deploy job log will output:
 
-```
+```plaintext
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
@@ -188,7 +188,7 @@ We'll use again a Maven app that can be cloned from our example project:
 1. Create a new project by selecting **Import project from ➔ Repo by URL**
 1. Add the following URL:
 
-   ```
+   ```plaintext
    https://gitlab.com/gitlab-examples/maven/simple-maven-app.git
    ```
 
@@ -233,7 +233,7 @@ Now you are ready to use the Artifactory repository to resolve dependencies and 
 
 You need a last step to have everything in place: configure the `.gitlab-ci.yml` file for this project, as you already did for `simple-maven-dep`.
 
-You want to leverage [GitLab CI/CD](https://about.gitlab.com/product/continuous-integration/) to automatically build, test and run your awesome application,
+You want to leverage [GitLab CI/CD](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/) to automatically build, test and run your awesome application,
 and see if you can get the greeting as expected!
 
 All you need to do is to add the following `.gitlab-ci.yml` to the repo:

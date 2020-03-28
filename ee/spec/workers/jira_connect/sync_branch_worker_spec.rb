@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe JiraConnect::SyncBranchWorker do
   describe '#perform' do
-    set(:project) { create(:project, :repository) }
+    let_it_be(:project) { create(:project, :repository) }
     let(:project_id) { project.id }
     let(:branch_name) { 'master' }
     let(:commit_shas) { %w(b83d6e3 5a62481) }
@@ -12,8 +12,9 @@ describe JiraConnect::SyncBranchWorker do
     subject { described_class.new.perform(project_id, branch_name, commit_shas) }
 
     def expect_jira_sync_service_execute(args)
-      expect_any_instance_of(JiraConnect::SyncService)
-        .to receive(:execute).with(args)
+      expect_next_instance_of(JiraConnect::SyncService) do |instance|
+        expect(instance).to receive(:execute).with(args)
+      end
     end
 
     it 'calls JiraConnect::SyncService#execute' do

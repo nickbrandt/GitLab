@@ -16,6 +16,7 @@ module QA
 
       attribute :id
       attribute :name
+      attribute :runners_token
 
       def initialize
         @path = Runtime::Namespace.name
@@ -39,7 +40,7 @@ module QA
             end
 
             # Ensure that the group was actually created
-            group_show.wait(interval: 1) do
+            group_show.wait_until(sleep_interval: 1) do
               group_show.has_text?(path) &&
                 group_show.has_new_project_or_subgroup_dropdown?
             end
@@ -68,6 +69,10 @@ module QA
           name: path,
           visibility: 'public'
         }
+      end
+
+      def api_delete_path
+        "/groups/#{id}"
       end
 
       def full_path

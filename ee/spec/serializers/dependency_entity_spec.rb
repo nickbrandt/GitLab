@@ -6,7 +6,7 @@ describe DependencyEntity do
   describe '#as_json' do
     subject { described_class.represent(dependency, request: request).as_json }
 
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
     let(:project) { create(:project, :repository, :private) }
     let(:request) { double('request') }
     let(:dependency) { build(:dependency, :with_vulnerabilities, :with_licenses) }
@@ -18,7 +18,7 @@ describe DependencyEntity do
 
     context 'when all required features available' do
       before do
-        stub_licensed_features(security_dashboard: true, license_management: true)
+        stub_licensed_features(security_dashboard: true, license_scanning: true)
         allow(request).to receive(:project).and_return(project)
         allow(request).to receive(:user).and_return(user)
       end

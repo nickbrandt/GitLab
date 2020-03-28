@@ -119,6 +119,17 @@ module ApplicationSettingsHelper
     options_for_select(options, selected)
   end
 
+  def repository_storages_options_json
+    options = Gitlab.config.repositories.storages.map do |name, storage|
+      {
+        label: "#{name} - #{storage['gitaly_address']}",
+        value: name
+      }
+    end
+
+    options.to_json
+  end
+
   def external_authorization_description
     _("If enabled, access to projects will be validated on an external service"\
         " using their classification label.")
@@ -202,6 +213,7 @@ module ApplicationSettingsHelper
       :enabled_git_access_protocol,
       :enforce_terms,
       :first_day_of_week,
+      :force_pages_access_control,
       :gitaly_timeout_default,
       :gitaly_timeout_medium,
       :gitaly_timeout_fast,
@@ -232,6 +244,7 @@ module ApplicationSettingsHelper
       :metrics_port,
       :metrics_sample_interval,
       :metrics_timeout,
+      :minimum_password_length,
       :mirror_available,
       :pages_domain_verification_enabled,
       :password_authentication_enabled_for_web,
@@ -301,7 +314,10 @@ module ApplicationSettingsHelper
       :snowplow_iglu_registry_url,
       :push_event_hooks_limit,
       :push_event_activities_limit,
-      :custom_http_clone_url_root
+      :custom_http_clone_url_root,
+      :snippet_size_limit,
+      :email_restrictions_enabled,
+      :email_restrictions
     ]
   end
 
@@ -331,6 +347,28 @@ module ApplicationSettingsHelper
 
   def omnibus_protected_paths_throttle?
     Rack::Attack.throttles.key?('protected paths')
+  end
+
+  def self_monitoring_project_data
+    {
+      'create_self_monitoring_project_path' =>
+        create_self_monitoring_project_admin_application_settings_path,
+
+      'status_create_self_monitoring_project_path' =>
+        status_create_self_monitoring_project_admin_application_settings_path,
+
+      'delete_self_monitoring_project_path' =>
+        delete_self_monitoring_project_admin_application_settings_path,
+
+      'status_delete_self_monitoring_project_path' =>
+        status_delete_self_monitoring_project_admin_application_settings_path,
+
+      'self_monitoring_project_exists' =>
+        Gitlab::CurrentSettings.self_monitoring_project.present?.to_s,
+
+      'self_monitoring_project_full_path' =>
+        Gitlab::CurrentSettings.self_monitoring_project&.full_path
+    }
   end
 end
 

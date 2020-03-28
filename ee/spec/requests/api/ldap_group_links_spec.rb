@@ -13,12 +13,54 @@ describe API::LdapGroupLinks, api: true do
     group = create(:group)
     group.ldap_group_links.create cn: 'ldap-group1', group_access: Gitlab::Access::MAINTAINER, provider: 'ldap1'
     group.ldap_group_links.create cn: 'ldap-group2', group_access: Gitlab::Access::MAINTAINER, provider: 'ldap2'
+    group.ldap_group_links.create filter: '(uid=mary)', group_access: Gitlab::Access::DEVELOPER, provider: 'ldap3'
     group
   end
+
+  let(:group_with_no_ldap_links) { create(:group) }
 
   before do
     group_with_ldap_links.add_owner owner
     group_with_ldap_links.add_user user, Gitlab::Access::DEVELOPER
+    group_with_no_ldap_links.add_owner owner
+  end
+
+  describe "GET /groups/:id/ldap_group_links" do
+    context "when unauthenticated" do
+      it "returns authentication error" do
+        get api("/groups/#{group_with_ldap_links.id}/ldap_group_links")
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+    end
+
+    context "when a less priviledged user" do
+      it "returns forbidden" do
+        get api("/groups/#{group_with_ldap_links.id}/ldap_group_links", user)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+
+    context "when owner of the group" do
+      it "returns ldap group links" do
+        get api("/groups/#{group_with_ldap_links.id}/ldap_group_links", owner)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to(
+          match([
+            a_hash_including('cn' => 'ldap-group1', 'provider' => 'ldap1'),
+            a_hash_including('cn' => 'ldap-group2', 'provider' => 'ldap2'),
+            a_hash_including('cn' => nil, 'provider' => 'ldap3')
+            ]))
+      end
+
+      it "returns error if no ldap group links found" do
+        get api("/groups/#{group_with_no_ldap_links.id}/ldap_group_links", owner)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
   end
 
   describe "POST /groups/:id/ldap_group_links" do

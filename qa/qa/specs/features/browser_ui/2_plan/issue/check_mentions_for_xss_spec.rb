@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'check xss occurence in @mentions in issues', :requires_admin do
-      it 'user mentions a user in comment' do
+      it 'mentions a user in a comment' do
         QA::Runtime::Env.personal_access_token = QA::Runtime::Env.admin_personal_access_token
 
         unless QA::Runtime::Env.personal_access_token
@@ -21,28 +21,22 @@ module QA
 
         Flow::Login.sign_in
 
-        project = Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'xss-test-for-mentions-project'
-        end
-        project.visit!
-
-        Page::Project::Show.perform(&:go_to_members_settings)
-        Page::Project::Settings::Members.perform do |members|
-          members.add_member(user.username)
+        project = Resource::Project.fabricate_via_api! do |project|
+          project.name = 'xss-test-for-mentions-project'
         end
 
-        issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'issue title'
+        Flow::Project.add_member(project: project, username: user.username)
+
+        Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-        end
-        issue.visit!
+        end.visit!
 
         Page::Project::Issue::Show.perform do |show|
           show.select_all_activities_filter
           show.comment("cc-ing you here @#{user.username}")
 
           expect do
-            expect(show).to have_content("cc-ing you here")
+            expect(show).to have_comment("cc-ing you here")
           end.not_to raise_error # Selenium::WebDriver::Error::UnhandledAlertError
         end
       end

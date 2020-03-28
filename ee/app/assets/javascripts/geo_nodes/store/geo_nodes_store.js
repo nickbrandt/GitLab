@@ -41,9 +41,10 @@ export default class GeoNodesStore {
   }
 
   static formatNode(rawNode) {
-    const { id, url, primary, current, enabled } = rawNode;
+    const { id, name, url, primary, current, enabled } = rawNode;
     return {
       id,
+      name,
       url,
       primary,
       current,

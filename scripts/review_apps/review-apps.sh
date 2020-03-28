@@ -48,9 +48,29 @@ function delete_release() {
     return
   fi
 
-  echoinfo "Deleting release '${release}'..." true
+  helm_delete_release "${namespace}" "${release}"
+  kubectl_cleanup_release "${namespace}" "${release}"
+}
+
+function helm_delete_release() {
+  local namespace="${1}"
+  local release="${2}"
+
+  echoinfo "Deleting Helm release '${release}'..." true
 
   helm delete --tiller-namespace "${namespace}" --purge "${release}"
+}
+
+function kubectl_cleanup_release() {
+  local namespace="${1}"
+  local release="${2}"
+
+  echoinfo "Deleting all K8s resources matching '${release}'..." true
+  kubectl --namespace "${namespace}" get ingress,svc,pdb,hpa,deploy,statefulset,job,pod,secret,configmap,pvc,secret,clusterrole,clusterrolebinding,role,rolebinding,sa,crd 2>&1 \
+    | grep "${release}" \
+    | awk '{print $1}' \
+    | xargs kubectl --namespace "${namespace}" delete \
+    || true
 }
 
 function delete_failed_release() {
@@ -141,6 +161,7 @@ function install_tiller() {
     --tiller-namespace "${namespace}" \
     --wait \
     --upgrade \
+    --force-upgrade \
     --node-selectors "app=helm" \
     --replicas 3 \
     --override "spec.template.spec.tolerations[0].key"="dedicated" \
@@ -168,10 +189,12 @@ function install_external_dns() {
     helm repo update --tiller-namespace "${namespace}"
 
     # Default requested: CPU => 0, memory => 0
+    # Chart > 2.6.1 has a problem with AWS so we're pinning it for now.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/37269 and https://github.com/kubernetes-sigs/external-dns/issues/1262
     helm install stable/external-dns \
       --tiller-namespace "${namespace}" \
       --namespace "${namespace}" \
-      --version '^2.2.1' \
+      --version '2.6.1' \
       --name "${release}" \
       --set provider="aws" \
       --set aws.credentials.secretKey="${REVIEW_APPS_AWS_SECRET_KEY}" \
@@ -194,24 +217,33 @@ function install_external_dns() {
 function create_application_secret() {
   local namespace="${KUBE_NAMESPACE}"
   local release="${CI_ENVIRONMENT_SLUG}"
+  local initial_root_password_shared_secret
+  local gitlab_license_shared_secret
 
-  echoinfo "Creating the ${release}-gitlab-initial-root-password secret in the ${namespace} namespace..." true
-
-  kubectl create secret generic --namespace "${namespace}" \
-    "${release}-gitlab-initial-root-password" \
-    --from-literal="password=${REVIEW_APPS_ROOT_PASSWORD}" \
-    --dry-run -o json | kubectl apply -f -
+  initial_root_password_shared_secret=$(kubectl get secret --namespace ${namespace} --no-headers -o=custom-columns=NAME:.metadata.name shared-gitlab-initial-root-password | tail -n 1)
+  if [[ "${initial_root_password_shared_secret}" == "" ]]; then
+    echoinfo "Creating the 'shared-gitlab-initial-root-password' secret in the ${namespace} namespace..." true
+    kubectl create secret generic --namespace "${namespace}" \
+      "shared-gitlab-initial-root-password" \
+      --from-literal="password=${REVIEW_APPS_ROOT_PASSWORD}" \
+      --dry-run -o json | kubectl apply -f -
+  else
+    echoinfo "The 'shared-gitlab-initial-root-password' secret already exists in the ${namespace} namespace."
+  fi
 
   if [ -z "${REVIEW_APPS_EE_LICENSE}" ]; then echo "License not found" && return; fi
 
-  echoinfo "Creating the ${release}-gitlab-license secret in the ${namespace} namespace..." true
-
-  echo "${REVIEW_APPS_EE_LICENSE}" > /tmp/license.gitlab
-
-  kubectl create secret generic --namespace "${namespace}" \
-    "${release}-gitlab-license" \
-    --from-file=license=/tmp/license.gitlab \
-    --dry-run -o json | kubectl apply -f -
+  gitlab_license_shared_secret=$(kubectl get secret --namespace ${namespace} --no-headers -o=custom-columns=NAME:.metadata.name shared-gitlab-license | tail -n 1)
+  if [[ "${gitlab_license_shared_secret}" == "" ]]; then
+    echoinfo "Creating the 'shared-gitlab-license' secret in the ${namespace} namespace..." true
+    echo "${REVIEW_APPS_EE_LICENSE}" > /tmp/license.gitlab
+    kubectl create secret generic --namespace "${namespace}" \
+      "shared-gitlab-license" \
+      --from-file=license=/tmp/license.gitlab \
+      --dry-run -o json | kubectl apply -f -
+  else
+    echoinfo "The 'shared-gitlab-license' secret already exists in the ${namespace} namespace."
+  fi
 }
 
 function download_chart() {
@@ -247,7 +279,7 @@ function deploy() {
   IMAGE_REPOSITORY="registry.gitlab.com/gitlab-org/build/cng-mirror"
   gitlab_migrations_image_repository="${IMAGE_REPOSITORY}/gitlab-rails-${edition}"
   gitlab_sidekiq_image_repository="${IMAGE_REPOSITORY}/gitlab-sidekiq-${edition}"
-  gitlab_unicorn_image_repository="${IMAGE_REPOSITORY}/gitlab-unicorn-${edition}"
+  gitlab_unicorn_image_repository="${IMAGE_REPOSITORY}/gitlab-webservice-${edition}"
   gitlab_task_runner_image_repository="${IMAGE_REPOSITORY}/gitlab-task-runner-${edition}"
   gitlab_gitaly_image_repository="${IMAGE_REPOSITORY}/gitaly"
   gitlab_shell_image_repository="${IMAGE_REPOSITORY}/gitlab-shell"
@@ -289,7 +321,7 @@ EOF
 if [ -n "${REVIEW_APPS_EE_LICENSE}" ]; then
 HELM_CMD=$(cat << EOF
   ${HELM_CMD} \
-  --set global.gitlab.license.secret="${release}-gitlab-license"
+  --set global.gitlab.license.secret="shared-gitlab-license"
 EOF
 )
 fi

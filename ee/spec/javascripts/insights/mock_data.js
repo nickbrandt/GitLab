@@ -1,6 +1,8 @@
+import { CHART_TYPES } from 'ee/insights/constants';
+
 export const chartInfo = {
   title: 'Bugs Per Team',
-  type: 'bar',
+  type: CHART_TYPES.BAR,
   query: {
     name: 'filter_issues_by_label_category',
     filter_label: 'bug',
@@ -8,22 +10,37 @@ export const chartInfo = {
   },
 };
 
-export const chartData = {
-  labels: ['January'],
+export const barChartData = {
+  labels: ['January', 'February'],
+  datasets: {
+    all: [['January', 1], ['February', 2]],
+  },
+  xAxisTitle: 'Months',
+  yAxisTitle: 'Issues',
+};
+
+export const lineChartData = {
+  labels: ['January', 'February'],
   datasets: [
     {
-      label: 'Dataset 1',
-      fill: true,
-      backgroundColor: ['rgba(255, 99, 132)'],
-      data: [1],
+      data: [['January', 1], ['February', 2]],
+      name: 'Alpha',
     },
     {
-      label: 'Dataset 2',
-      fill: true,
-      backgroundColor: ['rgba(54, 162, 235)'],
-      data: [2],
+      data: [['January', 1], ['February', 2]],
+      name: 'Beta',
     },
   ],
+  xAxisTitle: 'Months',
+  yAxisTitle: 'Issues',
+};
+
+export const stackedBarChartData = {
+  labels: ['January', 'February'],
+  datasets: [[1, 2], [1, 2]],
+  seriesNames: ['Series 1', 'Series 2'],
+  xAxisTitle: 'Months',
+  yAxisTitle: 'Issues',
 };
 
 export const pageInfo = {

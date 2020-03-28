@@ -6,7 +6,7 @@ type: tutorial
 
 This guide covers the building of dependencies of a PHP project while compiling assets via an NPM script using [GitLab CI/CD](../../README.md).
 
-While it is possible to create your own image with custom PHP and Node JS versions, for brevity, we will use an existing [Docker image](https://hub.docker.com/r/tetraweb/php/) that contains both PHP and NodeJS installed.
+While it is possible to create your own image with custom PHP and Node.js versions, for brevity, we will use an existing [Docker image](https://hub.docker.com/r/tetraweb/php/) that contains both PHP and Node.js installed.
 
 ```yaml
 image: tetraweb/php
@@ -23,7 +23,7 @@ before_script:
   - php -r "unlink('composer-setup.php');"
 ```
 
-This will make sure we have all requirements ready. Next, we want to run `composer install` to fetch all PHP dependencies  and `npm install` to load node packages, then run the `npm` script. We need to append them  into `before_script` section:
+This will make sure we have all requirements ready. Next, we want to run `composer install` to fetch all PHP dependencies and `npm install` to load Node.js packages, then run the `npm` script. We need to append them into `before_script` section:
 
 ```yaml
 before_script:
@@ -44,7 +44,7 @@ All these operations will put all files into a `build` folder, which is ready to
 
 ## How to transfer files to a live server
 
-You have multiple options: rsync, scp, sftp and so on. For now, we will use scp.
+You have multiple options: rsync, scp, sftp, and so on. For now, we will use scp.
 
 To make this work, you need to add a GitLab CI/CD Variable (accessible on `gitlab.example/your-project-name/variables`). That variable will be called `STAGING_PRIVATE_KEY` and it's the  **private** SSH key of your server.
 
@@ -100,7 +100,7 @@ Here's the breakdown:
 1. We will connect again via `ssh` and move the `live` folder to an `_old` folder, then move `_tmp` to `live`.
 1. We connect to SSH and remove the `_old` folder
 
-What's the deal with the artifacts? We just tell GitLab CI to keep the `build` directory (later on, you can download that as needed).
+What's the deal with the artifacts? We just tell GitLab CI/CD to keep the `build` directory (later on, you can download that as needed).
 
 ### Why we do it this way
 

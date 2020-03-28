@@ -1,11 +1,11 @@
 - @registries.each do |project_registry|
   .card.project-card.prepend-top-15
     .card-header{ id: "project-#{project_registry.project_id}-header" }
-      .d-flex
+      .d-flex.align-items-center
         - if project_registry.project.nil?
           = render partial: 'removed', locals: { project_registry: project_registry }
         - else
-          %strong.header-text-primary.flex-fill
+          %strong.text-truncate.flex-fill
             = link_to project_registry.project.full_name, admin_namespace_project_path(project_registry.project.namespace, project_registry.project)
           = link_to(reverify_admin_geo_project_path(project_registry), method: :post, class: 'btn btn-default btn-sm mr-2') do
             = s_('Geo|Reverify')

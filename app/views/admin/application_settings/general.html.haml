@@ -20,7 +20,7 @@
     %button.btn.js-settings-toggle{ type: 'button' }
       = expanded_by_default? ? _('Collapse') : _('Expand')
     %p
-      = _('Session expiration, projects limit and attachment size.')
+      = _('Set projects and maximum size limits, session duration, user options, and check feature availability for namespace plan.')
   .settings-content
     = render 'account_and_limit'
 
@@ -103,3 +103,12 @@
               = s_('IDE|Allow live previews of JavaScript projects in the Web IDE using CodeSandbox client side evaluation.')
 
       = f.submit _('Save changes'), class: "btn btn-success"
+
+- if Feature.enabled?(:instance_level_integrations)
+  = render_if_exists 'admin/application_settings/elasticsearch_form'
+  = render 'admin/application_settings/plantuml'
+  = render 'admin/application_settings/sourcegraph'
+  = render_if_exists 'admin/application_settings/slack'
+  = render 'admin/application_settings/third_party_offers'
+  = render 'admin/application_settings/snowplow'
+  = render 'admin/application_settings/eks'

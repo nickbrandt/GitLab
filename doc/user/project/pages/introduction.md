@@ -1,6 +1,6 @@
 ---
 type: reference
-last_updated: 2018-06-04
+last_updated: 2020-01-06
 ---
 
 # Exploring GitLab Pages
@@ -102,7 +102,7 @@ Learn how to set up GitLab CI/CD for specific use cases.
 
 Supposed your repository contained the following files:
 
-```
+```plaintext
 ├── index.html
 ├── css
 │   └── main.css
@@ -144,7 +144,7 @@ orphan branch (let's name it `pages`) that will host your static generator site.
 
 You can create a new empty branch like this:
 
-```bash
+```shell
 git checkout --orphan pages
 ```
 
@@ -155,8 +155,8 @@ commits. Push the source files of your static generator in the `pages` branch.
 Below is a copy of `.gitlab-ci.yml` where the most significant line is the last
 one, specifying to execute everything in the `pages` branch:
 
-```
-image: ruby:2.1
+```yaml
+image: ruby:2.6
 
 pages:
   script:
@@ -188,7 +188,7 @@ compressed files, it will serve that version instead of the uncompressed one.
 To take advantage of this feature, the artifact you upload to the Pages should
 have this structure:
 
-```
+```plaintext
 public/
 ├─┬ index.html
 │ └ index.html.gz
@@ -226,7 +226,7 @@ request for a URL that does not include an extension.
 
 Consider a Pages site deployed with the following files:
 
-```
+```plaintext
 public/
 ├─┬ index.html
 │ ├ data.html
@@ -288,17 +288,6 @@ No, you don't. You can create your project first and it will be accessed under
 
 For a list of known issues, visit GitLab's [public issue tracker].
 
-[jekyll]: http://jekyllrb.com/
-[pages-daemon]: https://gitlab.com/gitlab-org/gitlab-pages
-[gitlab ci]: https://about.gitlab.com/gitlab-ci
-[gitlab runner]: https://docs.gitlab.com/runner/
 [pages]: ../../../ci/yaml/README.md#pages
-[yaml]: ../../../ci/yaml/README.md
-[staticgen]: https://www.staticgen.com/
-[pages-jekyll]: https://gitlab.com/pages/jekyll
 [metarefresh]: https://en.wikipedia.org/wiki/Meta_refresh
-[public issue tracker]: https://gitlab.com/gitlab-org/gitlab-foss/issues?label_name=pages
-[quick start guide]: ../../../ci/quick_start/README.md
-[pages-index-guide]: index.md
-[pages-quick]: getting_started_part_one.md
-[video-pages-fork]: https://youtu.be/TWqh9MtT4Bg
+[public issue tracker]: https://gitlab.com/gitlab-org/gitlab/-/issues?label_name[]=Category%3APages

@@ -36,13 +36,15 @@ module Security
     end
 
     def create_vulnerability_finding(occurrence)
-      vulnerability = create_or_find_vulnerability_finding(occurrence)
+      vulnerability_finding = create_or_find_vulnerability_finding(occurrence)
 
       occurrence.identifiers.map do |identifier|
-        create_vulnerability_identifier_object(vulnerability, identifier)
+        create_vulnerability_identifier_object(vulnerability_finding, identifier)
       end
 
-      create_vulnerability_pipeline_object(vulnerability, pipeline)
+      create_vulnerability_pipeline_object(vulnerability_finding, pipeline)
+
+      create_vulnerability(vulnerability_finding, pipeline)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -67,15 +69,21 @@ module Security
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def create_vulnerability_identifier_object(vulnerability, identifier)
-      vulnerability.occurrence_identifiers.find_or_create_by!( # rubocop: disable CodeReuse/ActiveRecord
+    def create_vulnerability_identifier_object(vulnerability_finding, identifier)
+      vulnerability_finding.occurrence_identifiers.find_or_create_by!( # rubocop: disable CodeReuse/ActiveRecord
         identifier: identifiers_objects[identifier.key])
     rescue ActiveRecord::RecordNotUnique
     end
 
-    def create_vulnerability_pipeline_object(vulnerability, pipeline)
-      vulnerability.occurrence_pipelines.find_or_create_by!(pipeline: pipeline) # rubocop: disable CodeReuse/ActiveRecord
+    def create_vulnerability_pipeline_object(vulnerability_finding, pipeline)
+      vulnerability_finding.occurrence_pipelines.find_or_create_by!(pipeline: pipeline) # rubocop: disable CodeReuse/ActiveRecord
     rescue ActiveRecord::RecordNotUnique
+    end
+
+    def create_vulnerability(vulnerability_finding, pipeline)
+      return if vulnerability_finding.vulnerability_id
+
+      Vulnerabilities::CreateService.new(vulnerability_finding.project, pipeline.user, finding_id: vulnerability_finding.id).execute
     end
 
     def scanners_objects

@@ -48,7 +48,34 @@ describe GroupPolicy do
       stub_licensed_features(contribution_analytics: true)
     end
 
-    it { is_expected.to be_allowed(:read_group_contribution_analytics) }
+    context 'when signed in user is a member of the group' do
+      it { is_expected.to be_allowed(:read_group_contribution_analytics) }
+    end
+
+    describe 'when user is not a member of the group' do
+      let(:current_user) { non_group_member }
+      let(:private_group) { create(:group, :private) }
+
+      subject { described_class.new(non_group_member, private_group) }
+
+      context 'when user is not invited to any of the group projects' do
+        it do
+          is_expected.not_to be_allowed(:read_group_contribution_analytics)
+        end
+      end
+
+      context 'when user is invited to a group project, but not to the group' do
+        let(:private_project) { create(:project, :private, group: private_group) }
+
+        before do
+          private_project.add_guest(non_group_member)
+        end
+
+        it do
+          is_expected.not_to be_allowed(:read_group_contribution_analytics)
+        end
+      end
+    end
   end
 
   context 'when contribution analytics is not available' do
@@ -59,6 +86,84 @@ describe GroupPolicy do
     end
 
     it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
+  end
+
+  context 'when group activity analytics is available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: true)
+    end
+
+    it { is_expected.to be_allowed(:read_group_activity_analytics) }
+  end
+
+  context 'when group activity analytics is not available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: false)
+    end
+
+    it { is_expected.not_to be_allowed(:read_group_activity_analytics) }
+  end
+
+  context 'when timelogs report feature is enabled' do
+    before do
+      stub_licensed_features(group_timelogs: true)
+    end
+
+    context 'admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+  end
+
+  context 'when timelogs report feature is disabled' do
+    let(:current_user) { admin }
+
+    before do
+      stub_licensed_features(group_timelogs: false)
+    end
+
+    it { is_expected.to be_disallowed(:read_group_timelogs) }
   end
 
   describe 'per group SAML' do
@@ -80,7 +185,12 @@ describe GroupPolicy do
 
     context 'with sso enforcement enabled' do
       let(:current_user) { guest }
+
       let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+
+      before do
+        stub_licensed_features(group_saml: true)
+      end
 
       context 'when the session has been set globally' do
         around do |example|
@@ -312,6 +422,64 @@ describe GroupPolicy do
     end
   end
 
+  describe 'read_group_credentials_inventory' do
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+
+      context 'when security dashboard features is not available' do
+        before do
+          stub_licensed_features(security_dashboard: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+      end
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+  end
+
   describe 'read_group_security_dashboard' do
     before do
       stub_licensed_features(security_dashboard: true)
@@ -434,10 +602,6 @@ describe GroupPolicy do
     end
   end
 
-  describe 'view_code_analytics' do
-    include_examples 'analytics policy', :view_code_analytics
-  end
-
   describe 'view_productivity_analytics' do
     include_examples 'analytics policy', :view_productivity_analytics
   end
@@ -468,6 +632,48 @@ describe GroupPolicy do
         let(:current_user) { public_send(role) }
 
         it { is_expected.to be_disallowed(:read_group_saml_identity) }
+      end
+    end
+  end
+
+  describe 'read_cluster_health' do
+    let(:current_user) { owner }
+
+    context 'when cluster is readable' do
+      context 'and cluster health is available' do
+        before do
+          stub_licensed_features(cluster_health: true)
+        end
+
+        it { is_expected.to be_allowed(:read_cluster_health) }
+      end
+
+      context 'and cluster health is unavailable' do
+        before do
+          stub_licensed_features(cluster_health: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
+      end
+    end
+
+    context 'when cluster is not readable to user' do
+      let(:current_user) { build(:user) }
+
+      context 'when cluster health is available' do
+        before do
+          stub_licensed_features(cluster_health: true)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
+      end
+
+      context 'when cluster health is unavailable' do
+        before do
+          stub_licensed_features(cluster_health: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
       end
     end
   end

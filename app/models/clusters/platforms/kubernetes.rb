@@ -63,7 +63,7 @@ module Clusters
 
       default_value_for :authorization_type, :rbac
 
-      def predefined_variables(project:, environment_name:)
+      def predefined_variables(project:, environment_name:, kubernetes_namespace: nil)
         Gitlab::Ci::Variables::Collection.new.tap do |variables|
           variables.append(key: 'KUBE_URL', value: api_url)
 
@@ -74,15 +74,15 @@ module Clusters
           end
 
           if !cluster.managed? || cluster.management_project == project
-            namespace = Gitlab::Kubernetes::DefaultNamespace.new(cluster, project: project).from_environment_name(environment_name)
+            namespace = kubernetes_namespace || default_namespace(project, environment_name: environment_name)
 
             variables
               .append(key: 'KUBE_TOKEN', value: token, public: false, masked: true)
               .append(key: 'KUBE_NAMESPACE', value: namespace)
               .append(key: 'KUBECONFIG', value: kubeconfig(namespace), public: false, file: true)
 
-          elsif kubernetes_namespace = find_persisted_namespace(project, environment_name: environment_name)
-            variables.concat(kubernetes_namespace.predefined_variables)
+          elsif persisted_namespace = find_persisted_namespace(project, environment_name: environment_name)
+            variables.concat(persisted_namespace.predefined_variables)
           end
 
           variables.concat(cluster.predefined_variables)
@@ -92,7 +92,10 @@ module Clusters
       def calculate_reactive_cache_for(environment)
         return unless enabled?
 
-        { pods: read_pods(environment.deployment_namespace) }
+        pods = read_pods(environment.deployment_namespace)
+
+        # extract_relevant_pod_data avoids uploading all the pod info into ReactiveCaching
+        { pods: extract_relevant_pod_data(pods) }
       end
 
       def terminals(environment, data)
@@ -106,6 +109,13 @@ module Clusters
       end
 
       private
+
+      def default_namespace(project, environment_name:)
+        Gitlab::Kubernetes::DefaultNamespace.new(
+          cluster,
+          project: project
+        ).from_environment_name(environment_name)
+      end
 
       def find_persisted_namespace(project, environment_name:)
         Clusters::KubernetesNamespaceFinder.new(
@@ -195,6 +205,21 @@ module Clusters
 
       def nullify_blank_namespace
         self.namespace = nil if namespace.blank?
+      end
+
+      def extract_relevant_pod_data(pods)
+        pods.map do |pod|
+          {
+            'metadata' => pod.fetch('metadata', {})
+                             .slice('name', 'generateName', 'labels', 'annotations', 'creationTimestamp'),
+            'status' => pod.fetch('status', {}).slice('phase'),
+            'spec' => {
+              'containers' => pod.fetch('spec', {})
+                                 .fetch('containers', [])
+                                 .map { |c| c.slice('name') }
+            }
+          }
+        end
       end
     end
   end

@@ -50,8 +50,8 @@ describe 'epics list', :js do
 
     it 'shows epic start and/or end dates when present' do
       page.within('.issuable-list') do
-        expect(find("li[data-id='#{epic1.id}'] .issuable-info .issuable-dates")).to have_content("Until #{epic1.end_date.strftime('%b %d, %Y')}")
-        expect(find("li[data-id='#{epic2.id}'] .issuable-info .issuable-dates")).to have_content("From #{epic2.start_date.strftime('%b %d, %Y')}")
+        expect(find("li[data-id='#{epic1.id}'] .issuable-info .issuable-dates")).to have_content("No start date – #{epic1.end_date.strftime('%b %d, %Y')}")
+        expect(find("li[data-id='#{epic2.id}'] .issuable-info .issuable-dates")).to have_content("#{epic2.start_date.strftime('%b %d, %Y')} – No end date")
       end
     end
 

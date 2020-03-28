@@ -22,9 +22,19 @@ FactoryBot.define do
       action { Event::CLOSED }
       target factory: :closed_issue
     end
+
+    factory :wiki_page_event do
+      action { Event::CREATED }
+      project { @overrides[:wiki_page]&.project || create(:project, :wiki_repo) }
+      target { create(:wiki_page_meta, :for_wiki_page, wiki_page: wiki_page) }
+
+      transient do
+        wiki_page { create(:wiki_page, project: project) }
+      end
+    end
   end
 
-  factory :push_event, class: PushEvent do
+  factory :push_event, class: 'PushEvent' do
     project factory: :project_empty_repo
     author(factory: :user) { project.creator }
     action { Event::PUSHED }

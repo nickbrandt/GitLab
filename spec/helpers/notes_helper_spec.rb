@@ -62,10 +62,8 @@ describe NotesHelper do
 
         context 'when the discussion is on an older merge request version' do
           let(:position) do
-            Gitlab::Diff::Position.new(
-              old_path: ".gitmodules",
-              new_path: ".gitmodules",
-              old_line: nil,
+            build(:text_diff_position, :added,
+              file: ".gitmodules",
               new_line: 4,
               diff_refs: merge_request_diff1.diff_refs
             )
@@ -86,9 +84,8 @@ describe NotesHelper do
 
         context 'when the discussion is on a comparison between merge request versions' do
           let(:position) do
-            Gitlab::Diff::Position.new(
-              old_path: ".gitmodules",
-              new_path: ".gitmodules",
+            build(:text_diff_position,
+              file: ".gitmodules",
               old_line: 4,
               new_line: 4,
               diff_refs: merge_request_diff3.compare_with(merge_request_diff1.head_commit_sha).diff_refs
@@ -275,7 +272,7 @@ describe NotesHelper do
     let(:note) { create(:note_on_issue, noteable: issue, project: project) }
 
     it 'returns the noteable url with an anchor to the note' do
-      expect(noteable_note_url(note)).to match("/#{project.namespace.path}/#{project.path}/issues/#{issue.iid}##{dom_id(note)}")
+      expect(noteable_note_url(note)).to match("/#{project.namespace.path}/#{project.path}/-/issues/#{issue.iid}##{dom_id(note)}")
     end
   end
 

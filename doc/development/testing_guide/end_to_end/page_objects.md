@@ -40,7 +40,7 @@ the time it would take to build packages and test everything.
 That is why when someone changes `t.text_field :login` to
 `t.text_field :username` in the _new session_ view we won't know about this
 change until our GitLab QA nightly pipeline fails, or until someone triggers
-`package-and-qa-manual` action in their merge request.
+`package-and-qa` action in their merge request.
 
 Obviously such a change would break all tests. We call this problem a _fragile
 tests problem_.
@@ -152,7 +152,7 @@ Things to note:
 - The name of the element and the qa_selector must match and be snake_cased
 - If the element appears on the page unconditionally, add `required: true` to the element. See
   [Dynamic element validation](dynamic_element_validation.md)
-- You may see `.qa-selector` classes in existing Page Objects.  We should prefer the [`data-qa-selector`](#data-qa-selector-vs-qa-selector)
+- You may see `.qa-selector` classes in existing Page Objects. We should prefer the [`data-qa-selector`](#data-qa-selector-vs-qa-selector)
   method of definition over the `.qa-selector` CSS class
 
 ### `data-qa-selector` vs `.qa-selector`
@@ -171,9 +171,9 @@ and we should prefer the `data-qa-selector` method of definition.
 
 > Introduced in GitLab 12.5
 
-A common occurrence in automated testing is selecting a single "one-of-many" element.  
-In a list of several items, how do you differentiate what you are selecting on?  
-The most common workaround for this is via text matching.  Instead, a better practice is
+A common occurrence in automated testing is selecting a single "one-of-many" element.
+In a list of several items, how do you differentiate what you are selecting on?
+The most common workaround for this is via text matching. Instead, a better practice is
 by matching on that specific element by a unique identifier, rather than by text.
 
 We got around this by adding the `data-qa-*` extensible selection mechanism.

@@ -55,8 +55,35 @@ The process of configuring Review Apps is as follows:
 
 1. Set up the infrastructure to host and deploy the Review Apps (check the [examples](#review-apps-examples) below).
 1. [Install](https://docs.gitlab.com/runner/install/) and [configure](https://docs.gitlab.com/runner/commands/) a Runner to do deployment.
-1. Set up a job in `.gitlab-ci.yml` that uses the [predefined CI environment variable](../variables/README.md) `${CI_COMMIT_REF_NAME}` to create dynamic environments and restrict it to run only on branches.
+1. Set up a job in `.gitlab-ci.yml` that uses the [predefined CI environment variable](../variables/README.md) `${CI_COMMIT_REF_NAME}`
+   to create dynamic environments and restrict it to run only on branches.
+   Alternatively, you can get a YML template for this job by [enabling review apps](#enable-review-apps-button) for your project.
 1. Optionally, set a job that [manually stops](../environments.md#stopping-an-environment) the Review Apps.
+
+### Enable Review Apps button
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/118844) in GitLab 12.8.
+
+When configuring Review Apps for a project, you need to add a new job to `.gitlab-ci.yml`,
+as mentioned above. To facilitate this and if you are using Kubernetes, you can click
+the **Enable Review Apps** button and GitLab will prompt you with a template code block that
+you can copy and paste into `.gitlab-ci.yml` as a starting point. To do so:
+
+1. Go to the project your want to create a Review App job for.
+1. From the left nav, go to **Operations** > **Environments**.
+1. Click on the **Enable Review Apps** button. It is available to you
+   if you have Developer or higher [permissions](../../user/permissions.md) to that project.
+1. Copy the provided code snippet and paste it into your
+   `.gitlab-ci.yml` file:
+
+   ![Enable Review Apps modal](img/enable_review_app_v12_8.png)
+
+1. Feel free to tune this template to your own needs.
+
+## Review Apps auto-stop
+
+See how to [configure Review Apps environments to expire and auto-stop](../environments.md#environments-auto-stop)
+after a given period of time.
 
 ## Review Apps examples
 
@@ -161,19 +188,23 @@ With Visual Reviews, you can provide a feedback form to your Review Apps so
 that reviewers can post comments directly from the app back to the merge request
 that spawned the Review App.
 
+NOTE: **Note:** Visual Reviews currently only work for public projects. Support for private
+and internal projects [is planned](https://gitlab.com/gitlab-org/gitlab/-/issues/42750).
+
 ### Configuring Visual Reviews
 
 Ensure that the `anonymous_visual_review_feedback` feature flag is enabled.
 Administrators can enable with a Rails console as follows:
 
 ```ruby
-Feature.enabled(:anonymous_visual_review_feedback)
+Feature.enable(:anonymous_visual_review_feedback)
 ```
 
 The feedback form is served through a script you add to pages in your Review App.
 If you have [Developer permissions](../../user/permissions.md) to the project,
 you can access it by clicking the **Review** button in the **Pipeline** section
-of the merge request.
+of the merge request. The form modal will also show a dropdown for changed pages
+if [route maps](#route-maps) are configured in the project.
 
 ![review button](img/review_button.png)
 

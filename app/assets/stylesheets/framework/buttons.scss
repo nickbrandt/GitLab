@@ -29,7 +29,7 @@
   &:focus,
   &:active {
     background-color: $btn-active-gray;
-    box-shadow: $gl-btn-active-background;
+    box-shadow: none;
   }
 }
 
@@ -371,8 +371,11 @@
 }
 
 .btn-loading {
-  &:not(.disabled) .fa {
-    display: none;
+  &:not(.disabled) {
+    .fa,
+    .spinner {
+      display: none;
+    }
   }
 
   .fa {

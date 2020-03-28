@@ -6,8 +6,8 @@ module LicenseHelper
 
   delegate :new_admin_license_path, to: 'Gitlab::Routing.url_helpers'
 
-  def active_user_count
-    User.active.count
+  def current_active_user_count
+    License.current&.current_active_users_count || active_user_count
   end
 
   def guest_user_count
@@ -23,48 +23,12 @@ module LicenseHelper
     return unless signed_in
     return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
 
-    is_trial = current_license.trial?
-    message = ["Your #{'trial ' if is_trial}license"]
+    message = []
 
-    message << expiration_message
+    message << license_message_subject
+    message << expiration_blocking_message
 
-    message << link_to('Buy now!', ::EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank') if is_trial
-
-    if current_license.expired? && current_license.will_block_changes?
-      message << 'Pushing code and creation of issues and merge requests'
-
-      message << block_changes_message
-
-      message <<
-
-        if is_admin
-          'Upload a new license in the admin area'
-        else
-          'Ask an admin to upload a new license'
-        end
-
-      message << 'to'
-      message << (current_license.block_changes? ? 'restore' : 'ensure uninterrupted')
-      message << 'service.'
-    end
-
-    message.join(' ').html_safe
-  end
-
-  def expiration_message
-    if current_license.expired?
-      "expired on #{current_license.expires_at}."
-    else
-      "will expire in #{pluralize(current_license.remaining_days, 'day')}."
-    end
-  end
-
-  def block_changes_message
-    if current_license.block_changes?
-      'has been disabled.'
-    else
-      "will be disabled on #{current_license.block_changes_at}."
-    end
+    message.reject {|string| string.blank? }.join(' ').html_safe
   end
 
   def seats_calculation_message
@@ -79,6 +43,10 @@ module LicenseHelper
     return @current_license if defined?(@current_license)
 
     @current_license = License.current
+  end
+
+  def current_license_title
+    @current_license_title ||= License.current ? License.current.plan.titleize : 'Core'
   end
 
   def new_trial_url
@@ -131,4 +99,50 @@ module LicenseHelper
   end
 
   extend self
+
+  private
+
+  def active_user_count
+    User.active.count
+  end
+
+  def license_message_subject
+    if current_license.expired?
+      message = if current_license.block_changes?
+                  _('Your subscription has been downgraded')
+                else
+                  _('Your subscription expired!')
+                end
+    else
+      remaining_days = pluralize(current_license.remaining_days, 'day')
+
+      message = _('Your subscription will expire in %{remaining_days}') % { remaining_days: remaining_days }
+    end
+
+    message = content_tag(:strong, message)
+
+    content_tag(:p, message, class: 'mb-2')
+  end
+
+  def expiration_blocking_message
+    return '' unless current_license.will_block_changes?
+
+    plan_name = current_license.plan.titleize
+    strong = "<strong>".html_safe
+    strong_close = "</strong>".html_safe
+
+    if current_license.expired?
+      if current_license.block_changes?
+        message = _('You didn\'t renew your %{strong}%{plan_name}%{strong_close} subscription so it was downgraded to the GitLab Core Plan.') % { plan_name: plan_name, strong: strong, strong_close: strong_close }
+      else
+        remaining_days = pluralize((current_license.block_changes_at - Date.today).to_i, 'day')
+
+        message = _('No worries, you can still use all the %{strong}%{plan_name}%{strong_close} features for now. You have %{remaining_days} to renew your subscription.') % { plan_name: plan_name, remaining_days: remaining_days, strong: strong, strong_close: strong_close }
+      end
+    else
+      message = _('Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features.') % { expires_on: current_license.expires_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close }
+    end
+
+    content_tag(:p, message.html_safe)
+  end
 end

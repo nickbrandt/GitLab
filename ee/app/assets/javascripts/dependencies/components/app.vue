@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlLink } from '@gitlab/ui';
+import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlLink, GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import DependenciesActions from './dependencies_actions.vue';
@@ -8,6 +8,7 @@ import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vu
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
 import PaginatedDependenciesTable from './paginated_dependencies_table.vue';
 import { DEPENDENCY_LIST_TYPES } from '../store/constants';
+import { REPORT_STATUS } from '../store/modules/list/constants';
 
 export default {
   name: 'DependenciesApp',
@@ -19,6 +20,7 @@ export default {
     GlTab,
     GlTabs,
     GlLink,
+    GlButton,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
     Icon,
@@ -37,6 +39,10 @@ export default {
       type: String,
       required: true,
     },
+    supportDocumentationPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -52,6 +58,7 @@ export default {
       'isJobNotSetUp',
       'isJobFailed',
       'isIncomplete',
+      'hasNoDependencies',
       'reportInfo',
       'totals',
     ]),
@@ -69,13 +76,37 @@ export default {
       const { jobPath } = this.reportInfo;
 
       const body = __(
-        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest pipeline%{linkEnd} scan',
+        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest successful%{linkEnd} scan',
       );
 
       const linkStart = jobPath ? `<a href="${jobPath}">` : '';
       const linkEnd = jobPath ? '</a>' : '';
 
       return sprintf(body, { linkStart, linkEnd }, false);
+    },
+    showEmptyState() {
+      return this.isJobNotSetUp || this.hasNoDependencies;
+    },
+    emptyStateOptions() {
+      const map = {
+        [REPORT_STATUS.jobNotSetUp]: {
+          title: __('View dependency details for your project'),
+          description: __(
+            'The dependency list details information about the components used within your project.',
+          ),
+          buttonLabel: __('Learn more about the dependency list'),
+          link: this.documentationPath,
+        },
+        [REPORT_STATUS.noDependencies]: {
+          title: __('Dependency List has no entries'),
+          description: __(
+            'It seems like the Dependency Scanning job ran successfully, but no dependencies have been detected in your project.',
+          ),
+          buttonLabel: __('View supported languages and frameworks'),
+          link: this.supportDocumentationPath,
+        },
+      };
+      return map[this.reportInfo.status];
     },
   },
   created() {
@@ -104,26 +135,28 @@ export default {
   <gl-loading-icon v-if="!isInitialized" size="md" class="mt-4" />
 
   <gl-empty-state
-    v-else-if="isJobNotSetUp"
-    :title="__('View dependency details for your project')"
-    :description="
-      __('The dependency list details information about the components used within your project.')
-    "
+    v-else-if="showEmptyState"
+    :title="emptyStateOptions.title"
+    :description="emptyStateOptions.description"
     :svg-path="emptyStateSvgPath"
-    :primary-button-link="documentationPath"
-    :primary-button-text="__('Learn more about the dependency list')"
-  />
+  >
+    <template #actions>
+      <gl-button variant="info" :href="emptyStateOptions.link">
+        {{ emptyStateOptions.buttonLabel }}
+      </gl-button>
+    </template>
+  </gl-empty-state>
 
   <section v-else>
     <dependency-list-incomplete-alert
       v-if="isIncomplete && !isIncompleteAlertDismissed"
-      @close="dismissIncompleteListAlert"
+      @dismiss="dismissIncompleteListAlert"
     />
 
     <dependency-list-job-failed-alert
       v-if="isJobFailed && !isJobFailedAlertDismissed"
       :job-path="reportInfo.jobPath"
-      @close="dismissJobFailedAlert"
+      @dismiss="dismissJobFailedAlert"
     />
 
     <header class="my-3">
@@ -133,15 +166,16 @@ export default {
           target="_blank"
           :href="documentationPath"
           :aria-label="__('Dependencies help page link')"
-          ><icon name="question"
-        /></gl-link>
+        >
+          <icon name="question" />
+        </gl-link>
       </h2>
       <p class="mb-0">
         <span v-html="subHeadingText"></span>
-        <span v-if="generatedAtTimeAgo"
-          ><span aria-hidden="true">&bull;</span>
-          <span class="text-secondary"> {{ generatedAtTimeAgo }}</span></span
-        >
+        <span v-if="generatedAtTimeAgo">
+          <span aria-hidden="true">&bull;</span>
+          <span class="text-secondary">{{ generatedAtTimeAgo }}</span>
+        </span>
       </p>
     </header>
 
@@ -153,13 +187,13 @@ export default {
       >
         <template #title>
           {{ listType.label }}
-          <gl-badge pill :data-qa-selector="qaCountSelector(listType.label)">{{
-            totals[listType.namespace]
-          }}</gl-badge>
+          <gl-badge pill :data-qa-selector="qaCountSelector(listType.label)">
+            {{ totals[listType.namespace] }}
+          </gl-badge>
         </template>
         <paginated-dependencies-table :namespace="listType.namespace" />
       </gl-tab>
-      <template #tabs>
+      <template #tabs-end>
         <li class="d-flex align-items-center ml-sm-auto">
           <dependencies-actions :namespace="currentList" class="my-2 my-sm-0" />
         </li>

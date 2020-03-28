@@ -1,12 +1,11 @@
 <script>
 import { GlSkeletonLoading } from '@gitlab/ui';
-import { Cell, SkeletonCell, SkeletonHeaderCell } from '../cells';
+import { SkeletonCell, SkeletonHeaderCell } from '../cells';
 
 export default {
   name: 'SkeletonLicenseCard',
   components: {
     GlSkeletonLoading,
-    Cell,
     SkeletonCell,
     SkeletonHeaderCell,
   },

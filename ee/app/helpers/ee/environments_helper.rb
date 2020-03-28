@@ -30,15 +30,6 @@ module EE
       project.feature_available?(:custom_prometheus_metrics) && can?(current_user, :admin_project, project)
     end
 
-    def environment_logs_data(project, environment)
-      {
-        "current-environment-name": environment.name,
-        "environments-path": project_environments_path(project, format: :json),
-        "project-full-path": project.full_path,
-        "environment-id": environment.id
-      }
-    end
-
     def metrics_data(project, environment)
       ee_metrics_data = {
         "custom-metrics-path" => project_prometheus_metrics_path(project),
@@ -47,6 +38,7 @@ module EE
         "alerts-endpoint" => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
         "prometheus-alerts-available" => "#{can?(current_user, :read_prometheus_alerts, project)}"
       }
+      ee_metrics_data["logs_path"] = project_logs_path(project, environment_name: environment.name) if can?(current_user, :read_pod_logs, project)
 
       super.merge(ee_metrics_data)
     end

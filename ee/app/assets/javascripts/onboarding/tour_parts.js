@@ -36,7 +36,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/tree/master$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/tree/master$`, ''),
     getHelpContent: ({ projectName }) => [
       {
         text: sprintf(
@@ -69,7 +69,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/commits/master$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/commits/master$`, ''),
     getHelpContent: () => [
       {
         text: s__(
@@ -191,7 +191,7 @@ const GUIDED_GITLAB_TOUR = [
           {
             text: s__('UserOnboardingTour|Ok, show me'),
             btnClass: 'btn-primary',
-            // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+            // eslint-disable-next-line @gitlab/require-i18n-strings
             redirectPath: `issues?${LABEL_SEARCH_QUERY}`,
           },
         ],
@@ -253,7 +253,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/merge_requests$`, ''),
     getHelpContent: () => [
       {
         text: s__(
@@ -270,7 +270,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests/[0-9]+$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/merge_requests/[0-9]+$`, ''),
     getHelpContent: () => [
       {
         text: sprintf(

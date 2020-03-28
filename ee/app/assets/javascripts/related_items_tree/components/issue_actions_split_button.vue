@@ -22,6 +22,11 @@ export default {
   components: {
     SplitButton,
   },
+  methods: {
+    change(item) {
+      this.$emit(item.eventName);
+    },
+  },
 };
 </script>
 
@@ -29,9 +34,11 @@ export default {
   <split-button
     :action-items="$options.actionItems"
     class="js-issue-actions-split-button"
+    data-qa-selector="issue_actions_split_button"
     menu-class="dropdown-menu-large"
     right
     size="sm"
     v-on="$listeners"
+    @change="change"
   />
 </template>

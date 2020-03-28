@@ -32,9 +32,9 @@ describe Gitlab::Geo::Oauth::LogoutToken do
     end
 
     it 'returns false when token has an incorrect encoding' do
-      allow_any_instance_of(Gitlab::Geo::Oauth::LogoutState)
-        .to receive(:decode)
-        .and_return("\xD800\xD801\xD802")
+      allow_next_instance_of(Gitlab::Geo::Oauth::LogoutState) do |instance|
+        allow(instance).to receive(:decode).and_return("\xD800\xD801\xD802")
+      end
 
       token = described_class.new(user, state)
 

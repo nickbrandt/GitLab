@@ -13,7 +13,7 @@ class Geo::DeletedProject
   alias_method :full_path, :disk_path
 
   def repository
-    @repository ||= Repository.new(disk_path, self)
+    @repository ||= Repository.new(disk_path, self, shard: repository_storage)
   end
 
   def repository_storage

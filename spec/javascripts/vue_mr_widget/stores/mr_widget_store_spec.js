@@ -83,4 +83,30 @@ describe('MergeRequestStore', () => {
       });
     });
   });
+
+  describe('setPaths', () => {
+    it('should set the add ci config path', () => {
+      store.setData({ ...mockData });
+
+      expect(store.mergeRequestAddCiConfigPath).toEqual('/group2/project2/new/pipeline');
+    });
+
+    it('should set humanAccess=Maintainer when user has that role', () => {
+      store.setData({ ...mockData });
+
+      expect(store.humanAccess).toEqual('Maintainer');
+    });
+
+    it('should set pipelinesEmptySvgPath', () => {
+      store.setData({ ...mockData });
+
+      expect(store.pipelinesEmptySvgPath).toBe('/path/to/svg');
+    });
+
+    it('should set newPipelinePath', () => {
+      store.setData({ ...mockData });
+
+      expect(store.newPipelinePath).toBe('/group2/project2/pipelines/new');
+    });
+  });
 });

@@ -15,11 +15,20 @@ module QA
       # supports the given feature
       SUPPORTED_FEATURES = {
         git_protocol_v2: 'QA_CAN_TEST_GIT_PROTOCOL_V2',
-        admin: 'QA_CAN_TEST_ADMIN_FEATURES'
+        admin: 'QA_CAN_TEST_ADMIN_FEATURES',
+        praefect: 'QA_CAN_TEST_PRAEFECT'
       }.freeze
 
       def supported_features
         SUPPORTED_FEATURES
+      end
+
+      def additional_repository_storage
+        ENV['QA_ADDITIONAL_REPOSITORY_STORAGE']
+      end
+
+      def praefect_repository_storage
+        ENV['QA_PRAEFECT_REPOSITORY_STORAGE']
       end
 
       def admin_password
@@ -226,7 +235,7 @@ module QA
       end
 
       def gcloud_region
-        ENV.fetch('GCLOUD_REGION')
+        ENV['GCLOUD_REGION']
       end
 
       def gcloud_num_nodes
@@ -248,6 +257,10 @@ module QA
         raise ArgumentError, "Please provide GITHUB_ACCESS_TOKEN"
       end
 
+      def require_admin_access_token!
+        admin_personal_access_token || (raise ArgumentError, "GITLAB_QA_ADMIN_ACCESS_TOKEN is required!")
+      end
+
       # Returns true if there is an environment variable that indicates that
       # the feature is supported in the environment under test.
       # All features are supported by default.
@@ -261,8 +274,28 @@ module QA
         ENV['QA_RUNTIME_SCENARIO_ATTRIBUTES']
       end
 
+      def disable_rspec_retry?
+        enabled?(ENV['QA_DISABLE_RSPEC_RETRY'], default: false)
+      end
+
+      def simulate_slow_connection?
+        enabled?(ENV['QA_SIMULATE_SLOW_CONNECTION'], default: false)
+      end
+
+      def slow_connection_latency
+        ENV.fetch('QA_SLOW_CONNECTION_LATENCY_MS', 2000).to_i
+      end
+
+      def slow_connection_throughput
+        ENV.fetch('QA_SLOW_CONNECTION_THROUGHPUT_KBPS', 32).to_i
+      end
+
       def gitlab_qa_loop_runner_minutes
         ENV.fetch('GITLAB_QA_LOOP_RUNNER_MINUTES', 1).to_i
+      end
+
+      def mailhog_hostname
+        ENV['MAILHOG_HOSTNAME']
       end
 
       private

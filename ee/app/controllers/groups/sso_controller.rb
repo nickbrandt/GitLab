@@ -9,7 +9,7 @@ class Groups::SsoController < Groups::ApplicationController
   before_action :require_enabled_provider!, except: [:unlink]
   before_action :check_user_can_sign_in_with_provider, only: [:saml]
   before_action :redirect_if_group_moved
-  before_action :check_oauth_data, only: [:sign_up_form, :sign_up]
+  before_action :check_oauth_data, only: [:sign_up_form, :sign_up, :authorize_managed_account]
 
   layout 'devise'
 
@@ -43,6 +43,20 @@ class Groups::SsoController < Groups::ApplicationController
       sign_out
       flash[:notice] = _('Sign up was successful! Please confirm your email to sign in.')
       redirect_to_sign_in
+    else
+      render_sign_up_form
+    end
+  end
+
+  def authorize_managed_account
+    transfer_membership_service = GroupSaml::GroupManagedAccounts::TransferMembershipService.new(current_user, unauthenticated_group, session)
+
+    if transfer_membership_service.execute
+      session['oauth_data'] = nil
+      flash[:notice] = nil
+      store_active_saml_session
+
+      redirect_to group_url(unauthenticated_group)
     else
       render_sign_up_form
     end
@@ -92,6 +106,10 @@ class Groups::SsoController < Groups::ApplicationController
 
   def unauthenticated_group
     @unauthenticated_group ||= Group.find_by_full_path(params[:group_id], follow_redirects: true)
+  end
+
+  def store_active_saml_session
+    Gitlab::Auth::GroupSaml::SsoEnforcer.new(unauthenticated_group.saml_provider).update_session
   end
 
   def require_configured_provider!

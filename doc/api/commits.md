@@ -4,7 +4,7 @@
 
 Get a list of repository commits in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits
 ```
 
@@ -18,8 +18,9 @@ GET /projects/:id/repository/commits
 | `all` | boolean | no | Retrieve every commit from the repository |
 | `with_stats` | boolean | no | Stats about each commit will be added to the response |
 | `first_parent` | boolean | no | Follow only the first parent commit upon seeing a merge commit |
+| `order` | string | no | List commits in order. Possible values: `default`, [`topo`](https://git-scm.com/docs/git-log#Documentation/git-log.txt---topo-order). Defaults to `default`, the commits are shown in reverse chronological order. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits"
 ```
 
@@ -31,8 +32,8 @@ Example response:
     "id": "ed899a2f4b50b4370feeea94676502b42383c746",
     "short_id": "ed899a2f4b5",
     "title": "Replace sanitize with escape once",
-    "author_name": "Dmitriy Zaporozhets",
-    "author_email": "dzaporozhets@sphereconsultinginc.com",
+    "author_name": "Example User",
+    "author_email": "user@example.com",
     "authored_date": "2012-09-20T11:50:22+03:00",
     "committer_name": "Administrator",
     "committer_email": "admin@example.com",
@@ -41,21 +42,23 @@ Example response:
     "message": "Replace sanitize with escape once",
     "parent_ids": [
       "6104942438c14ec7bd21c6cd5bd995272b3faff6"
-    ]
+    ],
+    "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/ed899a2f4b50b4370feeea94676502b42383c746"
   },
   {
     "id": "6104942438c14ec7bd21c6cd5bd995272b3faff6",
     "short_id": "6104942438c",
     "title": "Sanitize for network graph",
     "author_name": "randx",
-    "author_email": "dmitriy.zaporozhets@gmail.com",
-    "committer_name": "Dmitriy",
-    "committer_email": "dmitriy.zaporozhets@gmail.com",
+    "author_email": "user@example.com",
+    "committer_name": "ExampleName",
+    "committer_email": "user@example.com",
     "created_at": "2012-09-20T09:06:12+03:00",
     "message": "Sanitize for network graph",
     "parent_ids": [
       "ae1d9fb46aa2b07ee9836d49862ec4e2c46fbbba"
-    ]
+    ],
+    "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/ed899a2f4b50b4370feeea94676502b42383c746"
   }
 ]
 ```
@@ -66,7 +69,7 @@ Example response:
 
 Create a commit by posting a JSON payload
 
-```
+```plaintext
 POST /projects/:id/repository/commits
 ```
 
@@ -94,7 +97,7 @@ POST /projects/:id/repository/commits
 | `last_commit_id` | string | no | Last known file commit id. Will be only considered in update, move and delete actions. |
 | `execute_filemode` | boolean | no | When `true/false` enables/disables the execute flag on the file. Only considered for `chmod` action. |
 
-```bash
+```shell
 PAYLOAD=$(cat << 'JSON'
 {
   "branch": "master",
@@ -139,10 +142,10 @@ Example response:
   "id": "ed899a2f4b50b4370feeea94676502b42383c746",
   "short_id": "ed899a2f4b5",
   "title": "some commit message",
-  "author_name": "Dmitriy Zaporozhets",
-  "author_email": "dzaporozhets@sphereconsultinginc.com",
-  "committer_name": "Dmitriy Zaporozhets",
-  "committer_email": "dzaporozhets@sphereconsultinginc.com",
+  "author_name": "Example User",
+  "author_email": "user@example.com",
+  "committer_name": "Example User",
+  "committer_email": "user@example.com",
   "created_at": "2016-09-20T09:26:24.000-07:00",
   "message": "some commit message",
   "parent_ids": [
@@ -155,13 +158,14 @@ Example response:
     "deletions": 2,
     "total": 4
   },
-  "status": null
+  "status": null,
+  "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/ed899a2f4b50b4370feeea94676502b42383c746"
 }
 ```
 
 GitLab supports [form encoding](README.md#encoding-api-parameters-of-array-and-hash-types). The following is an example using Commit API with form encoding:
 
-```bash
+```shell
 curl --request POST \
      --form "branch=master" \
      --form "commit_message=some commit message" \
@@ -189,7 +193,7 @@ curl --request POST \
 
 Get a specific commit identified by the commit hash or name of a branch or tag.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha
 ```
 
@@ -201,7 +205,7 @@ Parameters:
 | `sha` | string | yes | The commit hash or name of a repository branch or tag |
 | `stats` | boolean | no | Include commit stats. Default is true |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master
 ```
 
@@ -213,9 +217,9 @@ Example response:
   "short_id": "6104942438c",
   "title": "Sanitize for network graph",
   "author_name": "randx",
-  "author_email": "dmitriy.zaporozhets@gmail.com",
+  "author_email": "user@example.com",
   "committer_name": "Dmitriy",
-  "committer_email": "dmitriy.zaporozhets@gmail.com",
+  "committer_email": "user@example.com",
   "created_at": "2012-09-20T09:06:12+03:00",
   "message": "Sanitize for network graph",
   "committed_date": "2012-09-20T09:06:12+03:00",
@@ -234,7 +238,8 @@ Example response:
     "deletions": 10,
     "total": 25
   },
-  "status": "running"
+  "status": "running",
+  "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/6104942438c14ec7bd21c6cd5bd995272b3faff6"
 }
 ```
 
@@ -245,7 +250,7 @@ Example response:
 Get all references (from branches or tags) a commit is pushed to.
 The pagination parameters `page` and `per_page` can be used to restrict the list of references.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/refs
 ```
 
@@ -257,7 +262,7 @@ Parameters:
 | `sha` | string | yes | The commit hash  |
 | `type` | string | no | The scope of commits. Possible values `branch`, `tag`, `all`. Default is `all`.  |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits/5937ac0a7beb003549fc5fd26fc247adbce4a52e/refs?type=all"
 ```
 
@@ -279,7 +284,7 @@ Example response:
 
 Cherry picks a commit to a given branch.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/cherry_pick
 ```
 
@@ -291,7 +296,7 @@ Parameters:
 | `sha` | string | yes | The commit hash  |
 | `branch` | string | yes | The name of the branch  |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master/cherry_pick"
 ```
 
@@ -302,18 +307,19 @@ Example response:
   "id": "8b090c1b79a14f2bd9e8a738f717824ff53aebad",
   "short_id": "8b090c1b",
   "title": "Feature added",
-  "author_name": "Dmitriy Zaporozhets",
-  "author_email": "dmitriy.zaporozhets@gmail.com",
+  "author_name": "Example User",
+  "author_email": "user@example.com",
   "authored_date": "2016-12-12T20:10:39.000+01:00",
   "created_at": "2016-12-12T20:10:39.000+01:00",
   "committer_name": "Administrator",
   "committer_email": "admin@example.com",
   "committed_date": "2016-12-12T20:10:39.000+01:00",
   "title": "Feature added",
-  "message": "Feature added\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n",
+  "message": "Feature added\n\nSigned-off-by: Example User <user@example.com>\n",
   "parent_ids": [
     "a738f717824ff53aebad8b090c1b79a14f2bd9e8"
-  ]
+  ],
+  "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/8b090c1b79a14f2bd9e8a738f717824ff53aebad"
 }
 ```
 
@@ -338,7 +344,7 @@ conflict.
 
 Reverts a commit in a given branch.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/revert
 ```
 
@@ -350,7 +356,7 @@ Parameters:
 | `sha`     | string         | yes      | Commit SHA to revert                                                            |
 | `branch`  | string         | yes      | Target branch name                                                              |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/a738f717824ff53aebad8b090c1b79a14f2bd9e8/revert"
 ```
 
@@ -369,7 +375,8 @@ Example response:
   "authored_date":"2018-11-08T15:55:26.000Z",
   "committer_name":"Administrator",
   "committer_email":"admin@example.com",
-  "committed_date":"2018-11-08T15:55:26.000Z"
+  "committed_date":"2018-11-08T15:55:26.000Z",
+  "web_url": "https://gitlab.example.com/thedude/gitlab-foss/-/commit/8b090c1b79a14f2bd9e8a738f717824ff53aebad"
 }
 ```
 
@@ -390,7 +397,7 @@ changeset was empty, likely due to the change having already been reverted.
 
 Get the diff of a commit in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/diff
 ```
 
@@ -401,7 +408,7 @@ Parameters:
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 | `sha` | string | yes | The commit hash or name of a repository branch or tag |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master/diff"
 ```
 
@@ -426,7 +433,7 @@ Example response:
 
 Get the comments of a commit in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/comments
 ```
 
@@ -437,7 +444,7 @@ Parameters:
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 | `sha` | string | yes | The commit hash or name of a repository branch or tag |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master/comments"
 ```
 
@@ -477,7 +484,7 @@ cases below is valid:
 In any of the above cases, the response of `line`, `line_type` and `path` is
 set to `null`.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/comments
 ```
 
@@ -490,7 +497,7 @@ POST /projects/:id/repository/commits/:sha/comments
 | `line`      | integer | no  | The line number where the comment should be placed |
 | `line_type` | string  | no  | The line type. Takes `new` or `old` as arguments |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "note=Nice picture man\!" --form "path=dudeism.md" --form "line=11" --form "line_type=new" https://gitlab.example.com/api/v4/projects/17/repository/commits/18f3e63d05582537db6d183d9d557be09e1f90c8/comments
 ```
 
@@ -523,7 +530,7 @@ Since GitLab 8.1, this is the new commit status API.
 List the statuses of a commit in a project.
 The pagination parameters `page` and `per_page` can be used to restrict the list of references.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/statuses
 ```
 
@@ -536,7 +543,7 @@ GET /projects/:id/repository/commits/:sha/statuses
 | `name`    | string  | no  | Filter by [job name](../ci/yaml/README.md#introduction), e.g., `bundler:audit`
 | `all`     | boolean | no  | Return all statuses, not only the latest ones
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/17/repository/commits/18f3e63d05582537db6d183d9d557be09e1f90c8/statuses
 ```
 
@@ -597,7 +604,7 @@ Example response:
 
 Adds or updates a build status of a commit.
 
-```
+```plaintext
 POST /projects/:id/statuses/:sha
 ```
 
@@ -613,7 +620,7 @@ POST /projects/:id/statuses/:sha
 | `coverage` | float  | no    | The total code coverage
 | `pipeline_id` |  integer  | no  | The ID of the pipeline to set status. Use in case of several pipeline on same SHA.
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/17/statuses/18f3e63d05582537db6d183d9d557be09e1f90c8?state=success"
 ```
 
@@ -650,7 +657,7 @@ Example response:
 
 Get a list of Merge Requests related to the specified commit.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/merge_requests
 ```
 
@@ -659,7 +666,7 @@ GET /projects/:id/repository/commits/:sha/merge_requests
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 | `sha`     | string  | yes   | The commit SHA
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits/af5b13261899fb2c0db30abdd0af8b07cb44fdc5/merge_requests"
 ```
 
@@ -719,7 +726,7 @@ Example response:
 Get the [GPG signature from a commit](../user/project/repository/gpg_signed_commits/index.md),
 if it is signed. For unsigned commits, it results in a 404 response.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/signature
 ```
 
@@ -730,7 +737,7 @@ Parameters:
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 | `sha` | string | yes | The commit hash or name of a repository branch or tag |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/repository/commits/da738facbc19eb2fc2cef57c49be0e6038570352/signature"
 ```
 
@@ -755,8 +762,8 @@ Example response if commit is unsigned:
 }
 ```
 
-[ce-6096]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/6096 "Multi-file commit"
-[ce-8047]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/8047
-[ce-15026]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15026
-[ce-18004]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18004
-[ce-22919]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22919
+[ce-6096]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6096 "Multi-file commit"
+[ce-8047]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8047
+[ce-15026]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15026
+[ce-18004]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18004
+[ce-22919]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22919

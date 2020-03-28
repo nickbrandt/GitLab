@@ -13,7 +13,6 @@ describe TrialsController do
 
   before do
     allow(::Gitlab).to receive(:com?).and_return(true)
-    stub_feature_flags(improved_trial_signup: true)
   end
 
   describe '#new' do
@@ -22,16 +21,6 @@ describe TrialsController do
     context 'when invalid - instance is not GL.com' do
       it 'returns 404 not found' do
         allow(::Gitlab).to receive(:com?).and_return(false)
-
-        get :new
-
-        expect(response.status).to eq(404)
-      end
-    end
-
-    context 'when feature is turned off' do
-      it 'returns 404 not found' do
-        stub_feature_flags(improved_trial_signup: false)
 
         get :new
 
@@ -84,13 +73,13 @@ describe TrialsController do
           params = {
               company_name: 'Gitlab',
               company_size: '1-99',
+              first_name: user.first_name,
+              last_name: user.last_name,
               phone_number: '1111111111',
               number_of_users: "20",
               country: 'IN'
           }
           extra_params = {
-              first_name: user.first_name,
-              last_name: user.last_name,
               work_email: user.email,
               uid: user.id,
               skip_email_confirmation: true,
@@ -162,6 +151,26 @@ describe TrialsController do
           expect(Group.count).to eq(0)
         end
       end
+    end
+
+    it "calls the ApplyTrialService with correct parameters" do
+      gl_com_params = { gitlab_com_trial: true, sync_to_gl: true }
+      post_params = {
+        namespace_id: namespace.id.to_s,
+        trial_entity: 'company',
+        glm_source: 'source',
+        glm_content: 'content'
+      }
+      apply_trial_params = {
+        uid: user.id,
+        trial_user:  ActionController::Parameters.new(post_params).permit(:namespace_id, :trial_entity, :glm_source, :glm_content).merge(gl_com_params)
+      }
+
+      expect_next_instance_of(GitlabSubscriptions::ApplyTrialService) do |service|
+        expect(service).to receive(:execute).with(apply_trial_params).and_return({ success: true })
+      end
+
+      post :apply, params: post_params
     end
   end
 end

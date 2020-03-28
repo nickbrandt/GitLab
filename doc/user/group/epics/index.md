@@ -2,21 +2,36 @@
 type: reference, howto
 ---
 
-# Epics **(ULTIMATE)**
+# Epics **(PREMIUM)**
 
-> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.2.
+> - Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.2.
+> - In [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/37081), single-level Epics were moved to the Premium tier.
 
 Epics let you manage your portfolio of projects more efficiently and with less
 effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
-![epics list view](img/epics_list_view_v12.5.png)
+## Relationships between epics and issues
+
+The possible relationships between epics and issues are:
+
+- An epic is the parent of one or more issues.
+- An epic is the parent of one or more child epics. For details see [Multi-level child epics](#multi-level-child-epics-ultimate). **(ULTIMATE)**
+
+```mermaid
+graph TD
+    Parent_epic --> Issue1
+    Parent_epic --> Child_epic
+    Child_epic --> Issue2
+```
 
 ## Use cases
 
 - Suppose your team is working on a large feature that involves multiple discussions throughout different issues created in distinct projects within a [Group](../index.md). With Epics, you can track all the related activities that together contribute to that single feature.
 - Track when the work for the group of issues is targeted to begin, and when it is targeted to end.
 - Discuss and collaborate on feature ideas and scope at a high level.
+
+![epics list view](img/epics_list_view_v12.5.png)
 
 ## Creating an epic
 
@@ -40,14 +55,19 @@ An epic's page contains the following tabs:
 
 - **Epics and Issues**: epics and issues added to this epic. Child epics, and their issues, are shown in a tree view.
   - Click on the <kbd>></kbd> beside a parent epic to reveal the child epics and issues.
+  - Hover over the total counts to see a breakdown of open and closed items.
 - **Roadmap**: a roadmap view of child epics which have start and due dates.
 
 ![epic view](img/epic_view_v12.3.png)
 
 ## Adding an issue to an epic
 
-Any issue that belongs to a project in the epic's group, or any of the epic's
-subgroups, are eligible to be added.  New issues appear at the top of the list of issues in the **Epics and Issues** tab.
+You can add an existing issue to an epic, or, from an epic's page, create a new issue that is automatically added to the epic.
+
+### Adding an existing issue to an epic
+
+Existing issues that belong to a project in an epic's group, or any of the epic's
+subgroups, are eligible to be added to the epic. Newly added issues appear at the top of the list of issues in the **Epics and Issues** tab.
 
 An epic contains a list of issues and an issue can be associated with at most
 one epic. When you add an issue that is already linked to an epic,
@@ -63,12 +83,25 @@ To add an issue to an epic:
    If there are multiple issues to be added, press <kbd>Spacebar</kbd> and repeat this step.
 1. Click **Add**.
 
+### Creating an issue from an epic
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/5419) in GitLab 12.7.
+
+Creating an issue from an epic enables you to maintain focus on the broader context of the epic while dividing work into smaller parts.
+
+To create an issue from an epic:
+
+1. On the epic's page, under **Epics and Issues**, click the arrow next to **Add an issue** and select **Create new issue**.
+1. Under **Title**, enter the title for the new issue.
+1. From the **Project** dropdown, select the project in which the issue should be created.
+1. Click **Create issue**.
+
 To remove an issue from an epic:
 
 1. Click on the <kbd>x</kbd> button in the epic's issue list.
 1. Click **Remove** in the **Remove issue** warning message.
 
-## Multi-level child epics
+## Multi-level child epics **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8333) in GitLab Ultimate 11.7.
 
@@ -100,10 +133,13 @@ To remove a child epic from a parent epic:
 To set a **Start date** and **Due date** for an epic, select one of the following:
 
 - **Fixed**: Enter a fixed value.
-- **From milestones**: Inherit a dynamic value from the issues added to the epic.
-- **Inherited**: Inherit a dynamic value from the issues added to the epic. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7332) in GitLab 12.5 to replace **From milestones**).
+- **From milestones**: Inherit a dynamic value from the milestones currently assigned to the epic's issues.
+  Note that GitLab 12.5 replaced this option with **Inherited**.
+- **Inherited**: Inherit a dynamic value from the epic's issues, child epics, and milestones ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7332) in GitLab 12.5 to replace **From milestones**).
 
-### Milestones
+### From milestones
+
+> [Replaced](https://gitlab.com/gitlab-org/gitlab/issues/7332) in GitLab 12.5 by **Inherited**.
 
 If you select **From milestones** for the start date, GitLab will automatically set the date to be earliest
 start date across all milestones that are currently assigned to the issues that are added to the epic.
@@ -118,10 +154,14 @@ These are dynamic dates which are recalculated if any of the following occur:
 
 ### Inherited
 
-If you select **Inherited** for the start date, GitLab will scan all child epics and issues assigned to the epic,
-and will set the start date to match the earliest found start date or milestone. Similarly, if you select
-**Inherited** for the due date, GitLab will set the due date to match the latest due date or milestone
-found among its child epics and issues.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7332) in GitLab 12.5 to replace **From milestones**.
+
+If you select:
+
+- **Inherited** for the start date, GitLab will scan all child epics and issues assigned to the epic,
+  and will set the start date to match the earliest found start date or milestone.
+- **Inherited** for the due date, GitLab will set the due date to match the latest due date or
+  milestone found among its child epics and issues.
 
 These are dynamic dates and recalculated if any of the following occur:
 
@@ -138,11 +178,13 @@ then the parent epic's start date will reflect the change and this will propagat
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7327) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.10.
 
-If your epic contains one or more [child epics](#multi-level-child-epics) which
+If your epic contains one or more [child epics](#multi-level-child-epics-ultimate) which
 have a [start or due date](#start-date-and-due-date), a
 [roadmap](../roadmap/index.md) view of the child epics is listed under the parent epic.
 
-![Child epics roadmap](img/epic_view_roadmap_v12.3.png)
+![Child epics roadmap](img/epic_view_roadmap_v12_9.png)
+
+---
 
 ## Reordering issues and child epics
 
@@ -200,6 +242,8 @@ You can always reopen it using the reopen button.
 
 ![reopen epic - button](img/button_reopen_epic.png)
 
+---
+
 ### Using quick actions
 
 You can close or reopen an epic using [Quick actions](../../project/quick_actions.md)
@@ -211,14 +255,19 @@ link in the issue sidebar.
 
 ![containing epic](img/containing_epic.png)
 
+---
+
 ## Promoting an issue to an epic
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3777) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.6.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3777) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.6.
+> - In [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/37081), it was moved to the Premium tier.
 
 If you have [permissions](../../permissions.md) to close an issue and create an
 epic in the parent group, you can promote an issue to an epic with the `/promote`
 [quick action](../../project/quick_actions.md#quick-actions-for-issues-merge-requests-and-epics).
-Only issues from projects that are in groups can be promoted.
+Only issues from projects that are in groups can be promoted. When attempting to promote a confidential
+issue, a warning will display. Promoting a confidential issue to an epic will make all information
+related to the issue public as epics are public to group members.
 
 When the quick action is executed:
 
@@ -234,10 +283,11 @@ The following issue metadata will be copied to the epic:
 
 ## Searching for an epic from epics list page
 
-> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.5.
+> - Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.5.
+> - In [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/37081), it was moved to the Premium tier.
 
 You can search for an epic from the list of epics using filtered search bar (similar to
-that of Issues and Merge requests) based on following parameters:
+that of Issues and Merge Requests) based on following parameters:
 
 - Title or description
 - Author name / username
@@ -245,21 +295,25 @@ that of Issues and Merge requests) based on following parameters:
 
 ![epics search](img/epics_search.png)
 
-To search, go to the list of epics and click on the field **Search or filter results...**.
+To search, go to the list of epics and click on the field **Search or filter results**.
 It will display a dropdown menu, from which you can add an author. You can also enter plain
 text to search by epic title or description. When done, press <kbd>Enter</kbd> on your
 keyboard to filter the list.
 
 You can also sort epics list by:
 
-- **Created date**
-- **Last updated**
-- **Start date**
-- **Due date**
+- Created date
+- Last updated
+- Start date
+- Due date
 
-Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [roadmap](../roadmap/index.md).
+Each option contains a button that can toggle the order between **Ascending** and **Descending**.
+The sort option and order is saved and used wherever you browse epics, including the
+[Roadmap](../roadmap/index.md).
 
 ![epics sort](img/epics_sort.png)
+
+---
 
 ## Permissions
 
@@ -273,7 +327,7 @@ Note that for a given group, the visibility of all projects must be the same as
 the group, or less restrictive. That means if you have access to a group's epic,
 then you already have access to its projects' issues.
 
-You may also consult the [group permissions table](../../permissions.md#group-members-permissions).
+You can also consult the [group permissions table](../../permissions.md#group-members-permissions).
 
 ## Thread
 
@@ -281,20 +335,28 @@ You may also consult the [group permissions table](../../permissions.md#group-me
   These text fields also fully support
   [GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm).
 
-## Comment, or start a thread
+## Comment or start a thread
 
-Once you wrote your comment, you can either:
+Once you write your comment, you can either:
 
-- Click "Comment" and your comment will be published.
-- Click "Start thread": start a thread within that epic's discussion to discuss specific points.
+- Click **Comment**, and your comment will be published.
+- Click **Start thread**, and you will start a thread within that epic's discussion.
 
 ## Award emoji
 
-- You can [award an emoji](../../award_emojis.md) to that epic or its comments.
+You can [award an emoji](../../award_emojis.md) to that epic or its comments.
 
 ## Notifications
 
-- [Receive notifications](../../profile/notifications.md) for epic events.
+You can [turn on notifications](../../profile/notifications.md) to be alerted about epic events.
+
+## Limits
+
+This section gives an overview of limits of Epics and an overview of their background.
+
+### Description and comment length
+
+See [Issues: Description and comment length](../../project/issues/index.md#description-and-comment-length)
 
 <!-- ## Troubleshooting
 

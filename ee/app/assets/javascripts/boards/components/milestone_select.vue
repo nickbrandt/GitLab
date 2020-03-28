@@ -1,7 +1,7 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
-import MilestoneSelect from '~/milestone_select';
+/* eslint-disable @gitlab/vue-require-i18n-strings */
 import { GlLoadingIcon } from '@gitlab/ui';
+import MilestoneSelect from '~/milestone_select';
 
 const ANY_MILESTONE = 'Any Milestone';
 const NO_MILESTONE = 'No Milestone';

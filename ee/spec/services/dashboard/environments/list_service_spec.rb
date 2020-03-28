@@ -6,7 +6,7 @@ describe Dashboard::Environments::ListService do
   describe '#execute' do
     def setup
       user = create(:user)
-      project = create(:project)
+      project = create(:project, :repository)
       project.add_developer(user)
       user.update!(ops_dashboard_projects: [project])
 

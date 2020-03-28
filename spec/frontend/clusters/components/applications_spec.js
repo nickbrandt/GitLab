@@ -1,12 +1,13 @@
 import Vue from 'vue';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { shallowMount } from '@vue/test-utils';
 import applications from '~/clusters/components/applications.vue';
 import { CLUSTER_TYPE } from '~/clusters/constants';
-import mountComponent from 'helpers/vue_mount_component_helper';
 import { APPLICATIONS_MOCK_STATE } from '../services/mock_data';
 import eventHub from '~/clusters/event_hub';
-import { shallowMount } from '@vue/test-utils';
 import KnativeDomainEditor from '~/clusters/components/knative_domain_editor.vue';
 import CrossplaneProviderStack from '~/clusters/components/crossplane_provider_stack.vue';
+import IngressModsecuritySettings from '~/clusters/components/ingress_modsecurity_settings.vue';
 
 describe('Applications', () => {
   let vm;
@@ -16,8 +17,7 @@ describe('Applications', () => {
     Applications = Vue.extend(applications);
 
     gon.features = gon.features || {};
-    gon.features.enableClusterApplicationElasticStack = true;
-    gon.features.enableClusterApplicationCrossplane = true;
+    gon.features.managedAppsLocalTiller = false;
   });
 
   afterEach(() => {
@@ -159,7 +159,47 @@ describe('Applications', () => {
     });
   });
 
+  describe('Helm application', () => {
+    describe('when managedAppsLocalTiller enabled', () => {
+      beforeEach(() => {
+        gon.features.managedAppsLocalTiller = true;
+      });
+
+      it('does not render a row for Helm Tiller', () => {
+        vm = mountComponent(Applications, {
+          applications: APPLICATIONS_MOCK_STATE,
+        });
+
+        expect(vm.$el.querySelector('.js-cluster-application-row-helm')).toBeNull();
+      });
+    });
+  });
+
   describe('Ingress application', () => {
+    describe('with nested component', () => {
+      const propsData = {
+        applications: {
+          ...APPLICATIONS_MOCK_STATE,
+          ingress: {
+            title: 'Ingress',
+            status: 'installed',
+          },
+        },
+      };
+
+      let wrapper;
+      beforeEach(() => {
+        wrapper = shallowMount(Applications, { propsData });
+      });
+      afterEach(() => {
+        wrapper.destroy();
+      });
+      it('renders IngressModsecuritySettings', () => {
+        const modsecuritySettings = wrapper.find(IngressModsecuritySettings);
+        expect(modsecuritySettings.exists()).toBe(true);
+      });
+    });
+
     describe('when installed', () => {
       describe('with ip address', () => {
         it('renders ip address with a clipboard button', () => {
@@ -190,6 +230,7 @@ describe('Applications', () => {
                 title: 'Ingress',
                 status: 'installed',
                 externalHostname: 'localhost.localdomain',
+                modsecurity_enabled: false,
               },
               helm: { title: 'Helm Tiller' },
               cert_manager: { title: 'Cert-Manager' },
@@ -198,7 +239,7 @@ describe('Applications', () => {
               prometheus: { title: 'Prometheus' },
               jupyter: { title: 'JupyterHub', hostname: '' },
               knative: { title: 'Knative', hostname: '' },
-              elastic_stack: { title: 'Elastic Stack', kibana_hostname: '' },
+              elastic_stack: { title: 'Elastic Stack' },
             },
           });
 
@@ -432,74 +473,33 @@ describe('Applications', () => {
   });
 
   describe('Elastic Stack application', () => {
-    describe('with ingress installed with ip & elastic stack installable', () => {
+    describe('with elastic stack installable', () => {
       it('renders hostname active input', () => {
         vm = mountComponent(Applications, {
           applications: {
             ...APPLICATIONS_MOCK_STATE,
-            ingress: {
-              title: 'Ingress',
-              status: 'installed',
-              externalIp: '1.1.1.1',
-            },
           },
         });
 
         expect(
           vm.$el
-            .querySelector('.js-cluster-application-row-elastic_stack .js-hostname')
-            .getAttribute('readonly'),
-        ).toEqual(null);
+            .querySelector(
+              '.js-cluster-application-row-elastic_stack .js-cluster-application-install-button',
+            )
+            .getAttribute('disabled'),
+        ).toEqual('disabled');
       });
     });
 
-    describe('with ingress installed without external ip', () => {
-      it('does not render hostname input', () => {
+    describe('elastic stack installed', () => {
+      it('renders uninstall button', () => {
         vm = mountComponent(Applications, {
           applications: {
             ...APPLICATIONS_MOCK_STATE,
-            ingress: { title: 'Ingress', status: 'installed' },
+            elastic_stack: { title: 'Elastic Stack', status: 'installed' },
           },
         });
 
-        expect(vm.$el.querySelector('.js-cluster-application-row-elastic_stack .js-hostname')).toBe(
-          null,
-        );
-      });
-    });
-
-    describe('with ingress & elastic stack installed', () => {
-      it('renders readonly input', () => {
-        vm = mountComponent(Applications, {
-          applications: {
-            ...APPLICATIONS_MOCK_STATE,
-            ingress: { title: 'Ingress', status: 'installed', externalIp: '1.1.1.1' },
-            elastic_stack: { title: 'Elastic Stack', status: 'installed', kibana_hostname: '' },
-          },
-        });
-
-        expect(
-          vm.$el
-            .querySelector('.js-cluster-application-row-elastic_stack .js-hostname')
-            .getAttribute('readonly'),
-        ).toEqual('readonly');
-      });
-    });
-
-    describe('without ingress installed', () => {
-      beforeEach(() => {
-        vm = mountComponent(Applications, {
-          applications: APPLICATIONS_MOCK_STATE,
-        });
-      });
-
-      it('does not render input', () => {
-        expect(vm.$el.querySelector('.js-cluster-application-row-elastic_stack .js-hostname')).toBe(
-          null,
-        );
-      });
-
-      it('renders disabled install button', () => {
         expect(
           vm.$el
             .querySelector(

@@ -35,7 +35,8 @@ describe "User tests hooks", :js do
       before do
         stub_full_request(hook.url, method: :post).to_raise(SocketError.new("Failed to open"))
 
-        click_link("Test")
+        click_button('Test')
+        click_link('Push events')
       end
 
       it { expect(page).to have_selector(".flash-alert", text: "Hook execution failed: Failed to open") }
@@ -57,6 +58,7 @@ describe "User tests hooks", :js do
   def trigger_hook
     stub_full_request(hook.url, method: :post).to_return(status: 200)
 
-    click_link("Test")
+    click_button('Test')
+    click_link('Push events')
   end
 end

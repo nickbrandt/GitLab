@@ -272,7 +272,7 @@ describe ObjectStorage do
             end
 
             it "to raise an error" do
-              expect { subject }.to raise_error(/Object Storage is not enabled/)
+              expect { subject }.to raise_error(/Object Storage is not enabled for JobArtifactUploader/)
             end
           end
 
@@ -711,6 +711,19 @@ describe ObjectStorage do
 
           it 'raises an error' do
             expect { subject }.to raise_error(uploader_class::RemoteStoreError, /Missing file/)
+          end
+        end
+
+        context 'when empty remote_id is specified' do
+          let(:uploaded_file) do
+            UploadedFile.new(temp_file.path, remote_id: '')
+          end
+
+          it 'uses local storage' do
+            subject
+
+            expect(uploader).to be_file_storage
+            expect(uploader.object_store).to eq(described_class::Store::LOCAL)
           end
         end
 

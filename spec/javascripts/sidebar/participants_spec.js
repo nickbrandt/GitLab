@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import participants from '~/sidebar/components/participants/participants.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import participants from '~/sidebar/components/participants/participants.vue';
 
 const PARTICIPANT = {
   id: 1,
@@ -180,6 +180,23 @@ describe('Participants', function() {
       participantsIconEl.click();
 
       expect(vm.$emit).toHaveBeenCalledWith('toggleSidebar');
+    });
+  });
+
+  describe('when not showing participants label', () => {
+    beforeEach(() => {
+      vm = mountComponent(Participants, {
+        participants: PARTICIPANT_LIST,
+        showParticipantLabel: false,
+      });
+    });
+
+    it('does not show sidebar collapsed icon', () => {
+      expect(vm.$el.querySelector('.sidebar-collapsed-icon')).not.toBeTruthy();
+    });
+
+    it('does not show participants label title', () => {
+      expect(vm.$el.querySelector('.title')).not.toBeTruthy();
     });
   });
 });

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GroupActivity component matches the snapshot 1`] = `
+<div
+  class="card"
+>
+  <!---->
+  <div
+    class="card-header"
+  >
+    <strong>
+      Recent activity (last 90 days)
+    </strong>
+  </div>
+  <div
+    class="card-body"
+  >
+    <!---->
+    <!---->
+     
+    <div
+      class="d-flex"
+    >
+      <div
+        class="flex-grow text-center"
+      >
+        <h3
+          class="my-2"
+        >
+          10
+        </h3>
+         
+        <p
+          class="text-secondary gl-font-size-small mb-2"
+        >
+          Merge Requests created
+        </p>
+      </div>
+      <div
+        class="flex-grow text-center"
+      >
+        <h3
+          class="my-2"
+        >
+          20
+        </h3>
+         
+        <p
+          class="text-secondary gl-font-size-small mb-2"
+        >
+          Issues created
+        </p>
+      </div>
+    </div>
+     
+  </div>
+  <!---->
+  <!---->
+</div>
+`;

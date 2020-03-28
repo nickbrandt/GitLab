@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class JiraService < IssueTrackerService
+  extend ::Gitlab::Utils::Override
   include Gitlab::Routing
   include ApplicationHelper
   include ActionView::Helpers::AssetUrlHelper
@@ -30,6 +31,10 @@ class JiraService < IssueTrackerService
   # comments on Jira except when an issue gets transitioned.
   def self.supported_events
     %w(commit merge_request)
+  end
+
+  def self.supported_event_actions
+    %w(comment)
   end
 
   # {PROJECT-KEY}-{NUMBER} Examples: JIRA-1, PROJECT-1
@@ -190,7 +195,7 @@ class JiraService < IssueTrackerService
   def test(_)
     result = test_settings
     success = result.present?
-    result = @error if @error && !success
+    result = @error&.message unless success
 
     { success: success, result: result }
   end
@@ -201,14 +206,24 @@ class JiraService < IssueTrackerService
     nil
   end
 
+  override :support_close_issue?
+  def support_close_issue?
+    true
+  end
+
+  override :support_cross_reference?
+  def support_cross_reference?
+    true
+  end
+
+  private
+
   def test_settings
     return unless client_url.present?
 
     # Test settings by getting the project
     jira_request { client.ServerInfo.all.attrs }
   end
-
-  private
 
   def can_cross_reference?(noteable)
     case noteable
@@ -225,7 +240,15 @@ class JiraService < IssueTrackerService
     jira_issue_transition_id.scan(Gitlab::Regex.jira_transition_id_regex).each do |transition_id|
       issue.transitions.build.save!(transition: { id: transition_id })
     rescue => error
-      log_error("Issue transition failed", error: error.message, client_url: client_url)
+      log_error(
+        "Issue transition failed",
+          error: {
+            exception_class: error.class.name,
+            exception_message: error.message,
+            exception_backtrace: Gitlab::BacktraceCleaner.clean_backtrace(error.backtrace)
+          },
+         client_url: client_url
+      )
       return false
     end
   end
@@ -269,16 +292,20 @@ class JiraService < IssueTrackerService
 
     jira_request do
       remote_link = find_remote_link(issue, remote_link_props[:object][:url])
-      if remote_link
-        remote_link.save!(remote_link_props)
-      elsif issue.comments.build.save!(body: message)
-        new_remote_link = issue.remotelink.build
-        new_remote_link.save!(remote_link_props)
-      end
+
+      create_issue_comment(issue, message) unless remote_link
+      remote_link ||= issue.remotelink.build
+      remote_link.save!(remote_link_props)
 
       log_info("Successfully posted", client_url: client_url)
       "SUCCESS: Successfully posted to #{client_url}."
     end
+  end
+
+  def create_issue_comment(issue, message)
+    return unless comment_on_event_enabled
+
+    issue.comments.build.save!(body: message)
   end
 
   def find_remote_link(issue, url)
@@ -334,9 +361,17 @@ class JiraService < IssueTrackerService
   # Handle errors when doing Jira API calls
   def jira_request
     yield
-  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, URI::InvalidURIError, JIRA::HTTPError, OpenSSL::SSL::SSLError => e
-    @error = e.message
-    log_error("Error sending message", client_url: client_url, error: @error)
+  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, URI::InvalidURIError, JIRA::HTTPError, OpenSSL::SSL::SSLError => error
+    @error = error
+    log_error(
+      "Error sending message",
+      client_url: client_url,
+      error: {
+        exception_class: error.class.name,
+        exception_message: error.message,
+        exception_backtrace: Gitlab::BacktraceCleaner.clean_backtrace(error.backtrace)
+      }
+    )
     nil
   end
 

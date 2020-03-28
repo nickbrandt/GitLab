@@ -1,6 +1,6 @@
 # Monitoring NGINX
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/12621) in GitLab 9.4
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/12621) in GitLab 9.4
 
 GitLab has support for automatically detecting and monitoring NGINX. This is provided by leveraging the [NGINX VTS exporter](https://github.com/hnlq715/nginx-vts-exporter), which translates [VTS statistics](https://github.com/vozlt/nginx-module-vts) into a Prometheus readable form.
 
@@ -20,9 +20,9 @@ NGINX server metrics are detected, which tracks the pages and content directly s
 
 ## Configuring Prometheus to monitor for NGINX metrics
 
-To get started with NGINX monitoring, you should first enable the [VTS statistics](https://github.com/vozlt/nginx-module-vts)) module for your NGINX server. This will capture and display statistics in an HTML readable form. Next, you should install and configure the [NGINX VTS exporter](https://github.com/hnlq715/nginx-vts-exporter) which parses these statistics and translates them into a Prometheus monitoring endpoint.
+To get started with NGINX monitoring, you should first enable the [VTS statistics](https://github.com/vozlt/nginx-module-vts) module for your NGINX server. This will capture and display statistics in an HTML readable form. Next, you should install and configure the [NGINX VTS exporter](https://github.com/hnlq715/nginx-vts-exporter) which parses these statistics and translates them into a Prometheus monitoring endpoint.
 
-If you are using NGINX as your Kubernetes ingress, GitLab will [automatically detect](nginx_ingress.md) the metrics once enabled in 0.9.0 and later releases.
+If you are using NGINX as your Kubernetes Ingress, GitLab will [automatically detect](nginx_ingress.md) the metrics once enabled in 0.9.0 and later releases.
 
 ## Specifying the Environment label
 

@@ -1,6 +1,5 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import _ from 'underscore';
 
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
@@ -34,7 +33,6 @@ export default {
   data() {
     const roadmapGraphQL = gon.features && gon.features.roadmapGraphql;
     return {
-      handleResizeThrottled: {},
       // TODO
       // Remove these method alias and call actual
       // method once feature flag is removed.
@@ -48,6 +46,7 @@ export default {
     ...mapState([
       'currentGroupId',
       'epics',
+      'milestones',
       'timeframe',
       'extendedTimeframe',
       'windowResizeInProgress',
@@ -56,6 +55,7 @@ export default {
       'epicsFetchResultEmpty',
       'epicsFetchFailure',
       'isChildEpics',
+      'milestonesFetchFailure',
     ]),
     timeframeStart() {
       return this.timeframe[0];
@@ -73,25 +73,9 @@ export default {
       );
     },
   },
-  watch: {
-    epicsFetchInProgress(value) {
-      if (!value && this.epics.length) {
-        this.$nextTick(() => {
-          eventHub.$emit('refreshTimeline', {
-            todayBarReady: true,
-            initialRender: true,
-          });
-        });
-      }
-    },
-  },
   mounted() {
     this.fetchEpicsFn();
-    this.handleResizeThrottled = _.throttle(this.handleResize, 600);
-    window.addEventListener('resize', this.handleResizeThrottled, false);
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleResizeThrottled, false);
+    this.fetchMilestones();
   },
   methods: {
     ...mapActions([
@@ -102,29 +86,9 @@ export default {
       'fetchEpicsForTimeframeGQL',
       'extendTimeframe',
       'refreshEpicDates',
+      'fetchMilestones',
+      'refreshMilestoneDates',
     ]),
-    /**
-     * Roadmap view works with absolute sizing and positioning
-     * of following child components of RoadmapShell;
-     *
-     * - RoadmapTimelineSection
-     * - TimelineTodayIndicator
-     * - EpicItemTimeline
-     *
-     * And hence when window is resized, any size attributes passed
-     * down to child components are no longer valid, so best approach
-     * to refresh entire app is to re-render it on resize, hence
-     * we toggle `windowResizeInProgress` variable which is bound
-     * to `RoadmapShell`.
-     */
-    handleResize() {
-      this.setWindowResizeInProgress(true);
-      // We need to debounce the toggle to make sure loading animation
-      // shows up while app is being rerendered.
-      _.debounce(() => {
-        this.setWindowResizeInProgress(false);
-      }, 200)();
-    },
     /**
      * Once timeline is expanded (either with prepend or append)
      * We need performing following actions;
@@ -154,6 +118,7 @@ export default {
     handleScrollToExtend(roadmapTimelineEl, extendType = EXTEND_AS.PREPEND) {
       this.extendTimeframe({ extendAs: extendType });
       this.refreshEpicDates();
+      this.refreshMilestoneDates();
 
       this.$nextTick(() => {
         this.fetchEpicsForTimeframeFn({
@@ -182,6 +147,7 @@ export default {
       v-if="showRoadmap"
       :preset-type="presetType"
       :epics="epics"
+      :milestones="milestones"
       :timeframe="timeframe"
       :current-group-id="currentGroupId"
       @onScrollToStart="handleScrollToExtend"

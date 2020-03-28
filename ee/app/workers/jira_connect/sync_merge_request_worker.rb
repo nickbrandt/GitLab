@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JiraConnect
-  class SyncMergeRequestWorker
+  class SyncMergeRequestWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
 
     queue_namespace :jira_connect

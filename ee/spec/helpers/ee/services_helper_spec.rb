@@ -13,7 +13,7 @@ describe EE::ServicesHelper do
     end
   end
 
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   subject { controller_class.new }
 

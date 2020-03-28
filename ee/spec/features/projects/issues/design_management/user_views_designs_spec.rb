@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'User views issue designs', :js do
   include DesignManagementTestHelpers
 
-  set(:project) { create(:project_empty_repo, :public) }
-  set(:issue) { create(:issue, project: project) }
-  set(:design) { create(:design, :with_file, issue: issue) }
+  let_it_be(:project) { create(:project_empty_repo, :public) }
+  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:design) { create(:design, :with_file, issue: issue) }
 
   before do
     enable_design_management
@@ -25,13 +25,23 @@ describe 'User views issue designs', :js do
     end
   end
 
-  context 'navigates directly to the design view' do
+  context 'navigates directly to the design collection view' do
     before do
       visit designs_project_issue_path(project, issue)
     end
 
     it 'expands the sidebar' do
       expect(page).to have_selector('.layout-page.right-sidebar-expanded')
+    end
+  end
+
+  context 'navigates directly to the individual design view' do
+    before do
+      visit designs_project_issue_path(project, issue, vueroute: design.filename)
+    end
+
+    it 'sees the design' do
+      expect(page).to have_selector('.js-design-detail')
     end
   end
 end

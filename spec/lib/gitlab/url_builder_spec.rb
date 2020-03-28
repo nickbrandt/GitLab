@@ -10,7 +10,19 @@ describe Gitlab::UrlBuilder do
 
         url = described_class.build(commit)
 
-        expect(url).to eq "#{Settings.gitlab['url']}/#{commit.project.full_path}/commit/#{commit.id}"
+        expect(url).to eq "#{Settings.gitlab['url']}/#{commit.project.full_path}/-/commit/#{commit.id}"
+      end
+    end
+
+    context 'when passing a batch loaded Commit' do
+      it 'returns a proper URL' do
+        commit = BatchLoader.for(:commit).batch do |batch, loader|
+          batch.each { |commit| loader.call(:commit, build_stubbed(:commit)) }
+        end
+
+        url = described_class.build(commit)
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{commit.project.full_path}/-/commit/#{commit.id}"
       end
     end
 
@@ -20,7 +32,7 @@ describe Gitlab::UrlBuilder do
 
         url = described_class.build(issue)
 
-        expect(url).to eq "#{Settings.gitlab['url']}/#{issue.project.full_path}/issues/#{issue.iid}"
+        expect(url).to eq "#{Settings.gitlab['url']}/#{issue.project.full_path}/-/issues/#{issue.iid}"
       end
     end
 
@@ -55,7 +67,27 @@ describe Gitlab::UrlBuilder do
 
         url = described_class.build(merge_request)
 
-        expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}"
+        expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/-/merge_requests/#{merge_request.iid}"
+      end
+    end
+
+    context 'when passing a ProjectSnippet' do
+      it 'returns a proper URL' do
+        project_snippet = create(:project_snippet)
+
+        url = described_class.build(project_snippet)
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{project_snippet.project.full_path}/snippets/#{project_snippet.id}"
+      end
+    end
+
+    context 'when passing a PersonalSnippet' do
+      it 'returns a proper URL' do
+        personal_snippet = create(:personal_snippet)
+
+        url = described_class.build(personal_snippet)
+
+        expect(url).to eq "#{Settings.gitlab['url']}/snippets/#{personal_snippet.id}"
       end
     end
 
@@ -66,7 +98,7 @@ describe Gitlab::UrlBuilder do
 
           url = described_class.build(note)
 
-          expect(url).to eq "#{Settings.gitlab['url']}/#{note.project.full_path}/commit/#{note.commit_id}#note_#{note.id}"
+          expect(url).to eq "#{Settings.gitlab['url']}/#{note.project.full_path}/-/commit/#{note.commit_id}#note_#{note.id}"
         end
       end
 
@@ -76,7 +108,7 @@ describe Gitlab::UrlBuilder do
 
           url = described_class.build(note)
 
-          expect(url).to eq "#{Settings.gitlab['url']}/#{note.project.full_path}/commit/#{note.commit_id}#note_#{note.id}"
+          expect(url).to eq "#{Settings.gitlab['url']}/#{note.project.full_path}/-/commit/#{note.commit_id}#note_#{note.id}"
         end
       end
 
@@ -87,7 +119,7 @@ describe Gitlab::UrlBuilder do
 
           url = described_class.build(note)
 
-          expect(url).to eq "#{Settings.gitlab['url']}/#{issue.project.full_path}/issues/#{issue.iid}#note_#{note.id}"
+          expect(url).to eq "#{Settings.gitlab['url']}/#{issue.project.full_path}/-/issues/#{issue.iid}#note_#{note.id}"
         end
       end
 
@@ -98,7 +130,7 @@ describe Gitlab::UrlBuilder do
 
           url = described_class.build(note)
 
-          expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}#note_#{note.id}"
+          expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/-/merge_requests/#{merge_request.iid}#note_#{note.id}"
         end
       end
 
@@ -109,7 +141,7 @@ describe Gitlab::UrlBuilder do
 
           url = described_class.build(note)
 
-          expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}#note_#{note.id}"
+          expect(url).to eq "#{Settings.gitlab['url']}/#{merge_request.project.full_path}/-/merge_requests/#{merge_request.iid}#note_#{note.id}"
         end
       end
 
@@ -140,7 +172,7 @@ describe Gitlab::UrlBuilder do
           project = build_stubbed(:project)
 
           expect { described_class.build(project) }
-            .to raise_error(NotImplementedError, 'No URL builder defined for Project')
+            .to raise_error(NotImplementedError, "No URL builder defined for #{project.inspect}")
         end
       end
     end

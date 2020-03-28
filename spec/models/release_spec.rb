@@ -15,12 +15,11 @@ RSpec.describe Release do
     it { is_expected.to have_many(:links).class_name('Releases::Link') }
     it { is_expected.to have_many(:milestones) }
     it { is_expected.to have_many(:milestone_releases) }
-    it { is_expected.to have_one(:evidence) }
+    it { is_expected.to have_many(:evidences).class_name('Releases::Evidence') }
   end
 
   describe 'validation' do
     it { is_expected.to validate_presence_of(:project) }
-    it { is_expected.to validate_presence_of(:description) }
     it { is_expected.to validate_presence_of(:tag) }
 
     context 'when a release exists in the database without a name' do
@@ -50,12 +49,6 @@ RSpec.describe Release do
         milestone = build(:milestone, project: project)
         expect { release.milestones << milestone }.to change { MilestoneRelease.count }.by(1)
       end
-    end
-  end
-
-  describe 'callbacks' do
-    it 'creates a new Evidence object on after_commit', :sidekiq_inline do
-      expect { release }.to change(Evidence, :count).by(1)
     end
   end
 
@@ -104,7 +97,7 @@ RSpec.describe Release do
     describe '#create_evidence!' do
       context 'when a release is created' do
         it 'creates one Evidence object too' do
-          expect { release_with_evidence }.to change(Evidence, :count).by(1)
+          expect { release_with_evidence }.to change(Releases::Evidence, :count).by(1)
         end
       end
     end
@@ -113,7 +106,7 @@ RSpec.describe Release do
       it 'also deletes the associated evidence' do
         release_with_evidence
 
-        expect { release_with_evidence.destroy }.to change(Evidence, :count).by(-1)
+        expect { release_with_evidence.destroy }.to change(Releases::Evidence, :count).by(-1)
       end
     end
   end
@@ -162,7 +155,7 @@ RSpec.describe Release do
     context 'when a release was created with evidence collection' do
       let!(:release) { create(:release, :with_evidence) }
 
-      it { is_expected.to eq(release.evidence.summary_sha) }
+      it { is_expected.to eq(release.evidences.first.summary_sha) }
     end
   end
 
@@ -178,7 +171,13 @@ RSpec.describe Release do
     context 'when a release was created with evidence collection' do
       let!(:release) { create(:release, :with_evidence) }
 
-      it { is_expected.to eq(release.evidence.summary) }
+      it { is_expected.to eq(release.evidences.first.summary) }
     end
+  end
+
+  describe '#milestone_titles' do
+    let(:release) { create(:release, :with_milestones) }
+
+    it { expect(release.milestone_titles).to eq(release.milestones.map {|m| m.title }.sort.join(", "))}
   end
 end

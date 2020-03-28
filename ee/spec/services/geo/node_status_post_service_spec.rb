@@ -6,8 +6,8 @@ describe Geo::NodeStatusPostService, :geo do
   include ::EE::GeoHelpers
   include ApiHelpers
 
-  set(:primary)   { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:primary)   { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   subject { described_class.new }
 

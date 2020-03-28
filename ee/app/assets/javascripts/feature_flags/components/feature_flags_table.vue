@@ -1,6 +1,6 @@
 <script>
-import _ from 'underscore';
-import { GlButton, GlLink, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
+import { escape as esc } from 'lodash';
+import { GlButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -9,12 +9,11 @@ import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 export default {
   components: {
     GlButton,
-    GlLink,
     Icon,
     GlModal,
+    GlToggle,
   },
   directives: {
-    GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
   mixins: [glFeatureFlagMixin()],
@@ -38,14 +37,11 @@ export default {
     permissions() {
       return this.glFeatures.featureFlagPermissions;
     },
-    hasIIDs() {
-      return this.glFeatures.featureFlagIID;
-    },
     modalTitle() {
       return sprintf(
         s__('FeatureFlags|Delete %{name}?'),
         {
-          name: _.escape(this.deleteFeatureFlagName),
+          name: esc(this.deleteFeatureFlagName),
         },
         false,
       );
@@ -54,7 +50,7 @@ export default {
       return sprintf(
         s__('FeatureFlags|Feature flag %{name} will be removed. Are you sure?'),
         {
-          name: _.escape(this.deleteFeatureFlagName),
+          name: esc(this.deleteFeatureFlagName),
         },
         false,
       );
@@ -84,15 +80,26 @@ export default {
 
       return `${displayName}${displayPercentage}`;
     },
+    featureFlagIidText(featureFlag) {
+      return featureFlag.iid ? `^${featureFlag.iid}` : '';
+    },
     canDeleteFlag(flag) {
       return !this.permissions || (flag.scopes || []).every(scope => scope.can_update);
     },
     setDeleteModalData(featureFlag) {
       this.deleteFeatureFlagUrl = featureFlag.destroy_path;
       this.deleteFeatureFlagName = featureFlag.name;
+
+      this.$refs[this.modalId].show();
     },
     onSubmit() {
       this.$refs.form.submit();
+    },
+    toggleFeatureFlag(flag) {
+      this.$emit('toggle-flag', {
+        ...flag,
+        active: !flag.active,
+      });
     },
   },
 };
@@ -100,7 +107,7 @@ export default {
 <template>
   <div class="table-holder js-feature-flag-table">
     <div class="gl-responsive-table-row table-row-header" role="row">
-      <div v-if="hasIIDs" class="table-section section-10">
+      <div class="table-section section-10">
         {{ s__('FeatureFlags|ID') }}
       </div>
       <div class="table-section section-10" role="columnheader">
@@ -116,14 +123,21 @@ export default {
 
     <template v-for="featureFlag in featureFlags">
       <div :key="featureFlag.id" class="gl-responsive-table-row" role="row">
-        <div v-if="hasIIDs" class="table-section section-10" role="gridcell">
+        <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|ID') }}</div>
-          <div class="table-mobile-content js-feature-flag-id">^{{ featureFlag.iid }}</div>
+          <div class="table-mobile-content js-feature-flag-id">
+            {{ featureFlagIidText(featureFlag) }}
+          </div>
         </div>
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
-            <span v-if="featureFlag.active" class="badge badge-success">
+            <gl-toggle
+              v-if="featureFlag.update_path"
+              :value="featureFlag.active"
+              @change="toggleFeatureFlag(featureFlag)"
+            />
+            <span v-else-if="featureFlag.active" class="badge badge-success">
               {{ s__('FeatureFlags|Active') }}
             </span>
             <span v-else class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>
@@ -178,7 +192,6 @@ export default {
             <template v-if="featureFlag.destroy_path">
               <gl-button
                 v-gl-tooltip.hover.bottom="__('Delete')"
-                v-gl-modal-directive="modalId"
                 class="js-feature-flag-delete-button"
                 variant="danger"
                 :disabled="!canDeleteFlag(featureFlag)"
@@ -193,6 +206,7 @@ export default {
     </template>
 
     <gl-modal
+      :ref="modalId"
       :title="modalTitle"
       :ok-title="s__('FeatureFlags|Delete feature flag')"
       :modal-id="modalId"

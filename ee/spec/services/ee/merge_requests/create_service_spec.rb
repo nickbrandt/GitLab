@@ -36,7 +36,7 @@ describe MergeRequests::CreateService do
 
     context 'report approvers' do
       let(:sha) { project.repository.commits(opts[:source_branch], limit: 1).first.id }
-      let(:pipeline) { instance_double(Ci::Pipeline, id: 42, project_id: project.id, triggered_by_merge_request?: true) }
+      let(:pipeline) { instance_double(Ci::Pipeline, id: 42, project_id: project.id, merge_request?: true) }
 
       it 'refreshes report approvers for the merge request' do
         expect_next_instance_of(::MergeRequests::SyncReportApproverApprovalRules) do |service|

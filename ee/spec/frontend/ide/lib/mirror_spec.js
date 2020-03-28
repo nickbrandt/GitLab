@@ -1,4 +1,3 @@
-import { getWebSocketUrl } from '~/lib/utils/url_utility';
 import createDiff from 'ee/ide/lib/create_diff';
 import {
   canConnect,
@@ -8,6 +7,7 @@ import {
   MSG_CONNECTION_ERROR,
   SERVICE_DELAY,
 } from 'ee/ide/lib/mirror';
+import { getWebSocketUrl } from '~/lib/utils/url_utility';
 
 jest.mock('ee/ide/lib/create_diff', () => jest.fn());
 

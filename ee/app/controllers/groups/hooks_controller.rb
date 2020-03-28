@@ -7,6 +7,7 @@ class Groups::HooksController < Groups::ApplicationController
   before_action :group
   before_action :authorize_admin_group!
   before_action :check_group_webhooks_available!
+  before_action :set_hook, only: [:edit, :update, :test, :destroy]
 
   respond_to :html
 
@@ -29,9 +30,21 @@ class Groups::HooksController < Groups::ApplicationController
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @hook.update(hook_params)
+      flash[:notice] = _('Hook was successfully updated.')
+      redirect_to group_hooks_path(@group)
+    else
+      render 'edit'
+    end
+  end
+
   def test
     if @group.first_non_empty_project
-      service = TestHooks::ProjectService.new(hook, current_user, 'push_events')
+      service = TestHooks::ProjectService.new(@hook, current_user, params[:trigger] || 'push_events')
       service.project = @group.first_non_empty_project
       result = service.execute
 
@@ -44,14 +57,14 @@ class Groups::HooksController < Groups::ApplicationController
   end
 
   def destroy
-    hook.destroy
+    @hook.destroy
 
     redirect_to group_hooks_path(@group), status: :found
   end
 
   private
 
-  def hook
+  def set_hook
     @hook ||= @group.hooks.find(params[:id])
   end
 

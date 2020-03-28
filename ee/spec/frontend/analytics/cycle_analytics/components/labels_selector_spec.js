@@ -4,7 +4,13 @@ import { groupLabels } from '../mock_data';
 
 const selectedLabel = groupLabels[groupLabels.length - 1];
 
-describe('Cycle Analytics LabelsSelector', () => {
+const findActiveItem = wrapper =>
+  wrapper
+    .findAll('gl-dropdown-item-stub')
+    .filter(d => d.attributes('active'))
+    .at(0);
+
+describe('Value Stream Analytics LabelsSelector', () => {
   function createComponent({ props = {}, shallow = true } = {}) {
     const func = shallow ? shallowMount : mount;
     return func(LabelsSelector, {
@@ -12,7 +18,6 @@ describe('Cycle Analytics LabelsSelector', () => {
         labels: groupLabels,
         selectedLabelId: props.selectedLabelId || null,
       },
-      sync: false,
     });
   }
 
@@ -26,6 +31,11 @@ describe('Cycle Analytics LabelsSelector', () => {
 
     afterEach(() => {
       wrapper.destroy();
+      wrapper = null;
+    });
+
+    it('will render the label selector', () => {
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it.each(labelNames)('generate a label item for the label %s', name => {
@@ -33,7 +43,7 @@ describe('Cycle Analytics LabelsSelector', () => {
     });
 
     it('will render with the default option selected', () => {
-      const activeItem = wrapper.find('[active="true"]');
+      const activeItem = findActiveItem(wrapper);
 
       expect(activeItem.exists()).toBe(true);
       expect(activeItem.text()).toEqual('Select a label');
@@ -50,8 +60,10 @@ describe('Cycle Analytics LabelsSelector', () => {
         const elem = wrapper.findAll('.dropdown-item').at(2);
         elem.trigger('click');
 
-        expect(wrapper.emitted('selectLabel').length > 0).toBe(true);
-        expect(wrapper.emitted('selectLabel')[0]).toContain(groupLabels[1].id);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.emitted('selectLabel').length > 0).toBe(true);
+          expect(wrapper.emitted('selectLabel')[0]).toContain(groupLabels[1].id);
+        });
       });
 
       it('will emit the "clearLabel" event if it is the default item', () => {
@@ -60,7 +72,9 @@ describe('Cycle Analytics LabelsSelector', () => {
         const elem = wrapper.findAll('.dropdown-item').at(0);
         elem.trigger('click');
 
-        expect(wrapper.emitted('clearLabel').length > 0).toBe(true);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.emitted('clearLabel').length > 0).toBe(true);
+        });
       });
     });
   });
@@ -74,8 +88,12 @@ describe('Cycle Analytics LabelsSelector', () => {
       wrapper.destroy();
     });
 
-    it('will set the active class', () => {
-      const activeItem = wrapper.find('[active="true"]');
+    it('will render the label selector', () => {
+      expect(wrapper.html()).toMatchSnapshot();
+    });
+
+    it('will set the active label', () => {
+      const activeItem = findActiveItem(wrapper);
 
       expect(activeItem.exists()).toBe(true);
       expect(activeItem.text()).toEqual(selectedLabel.name);

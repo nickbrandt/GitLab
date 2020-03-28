@@ -26,6 +26,7 @@ describe NotificationSetting do
             :reassign_merge_request,
             :merge_merge_request,
             :failed_pipeline,
+            :fixed_pipeline,
             :success_pipeline,
             :new_epic
           ]
@@ -53,6 +54,7 @@ describe NotificationSetting do
             :reassign_merge_request,
             :merge_merge_request,
             :failed_pipeline,
+            :fixed_pipeline,
             :success_pipeline
           ]
         )
@@ -79,6 +81,7 @@ describe NotificationSetting do
             :reassign_merge_request,
             :merge_merge_request,
             :failed_pipeline,
+            :fixed_pipeline,
             :success_pipeline,
             :new_epic
           ]

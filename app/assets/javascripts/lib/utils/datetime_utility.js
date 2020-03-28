@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import _ from 'underscore';
-import timeago from 'timeago.js';
+import { isString, mapValues, isNumber, reduce } from 'lodash';
+import * as timeago from 'timeago.js';
 import dateFormat from 'dateformat';
 import { languageCode, s__, __, n__ } from '../../locale';
 
@@ -79,7 +79,7 @@ export const getDayName = date =>
  * @returns {String}
  */
 export const formatDate = (datetime, format = 'mmm d, yyyy h:MMtt Z') => {
-  if (_.isString(datetime) && datetime.match(/\d+-\d+\d+ /)) {
+  if (isString(datetime) && datetime.match(/\d+-\d+\d+ /)) {
     throw new Error(__('Invalid date'));
   }
   return dateFormat(datetime, format);
@@ -92,79 +92,71 @@ export const formatDate = (datetime, format = 'mmm d, yyyy h:MMtt Z') => {
  */
 const timeagoLanguageCode = languageCode().replace(/-/g, '_');
 
-let timeagoInstance;
-
 /**
- * Sets a timeago Instance
+ * Registers timeago locales
  */
-export const getTimeago = () => {
-  if (!timeagoInstance) {
-    const memoizedLocaleRemaining = () => {
-      const cache = [];
+const memoizedLocaleRemaining = () => {
+  const cache = [];
 
-      const timeAgoLocaleRemaining = [
-        () => [s__('Timeago|just now'), s__('Timeago|right now')],
-        () => [s__('Timeago|just now'), s__('Timeago|%s seconds remaining')],
-        () => [s__('Timeago|1 minute ago'), s__('Timeago|1 minute remaining')],
-        () => [s__('Timeago|%s minutes ago'), s__('Timeago|%s minutes remaining')],
-        () => [s__('Timeago|1 hour ago'), s__('Timeago|1 hour remaining')],
-        () => [s__('Timeago|%s hours ago'), s__('Timeago|%s hours remaining')],
-        () => [s__('Timeago|1 day ago'), s__('Timeago|1 day remaining')],
-        () => [s__('Timeago|%s days ago'), s__('Timeago|%s days remaining')],
-        () => [s__('Timeago|1 week ago'), s__('Timeago|1 week remaining')],
-        () => [s__('Timeago|%s weeks ago'), s__('Timeago|%s weeks remaining')],
-        () => [s__('Timeago|1 month ago'), s__('Timeago|1 month remaining')],
-        () => [s__('Timeago|%s months ago'), s__('Timeago|%s months remaining')],
-        () => [s__('Timeago|1 year ago'), s__('Timeago|1 year remaining')],
-        () => [s__('Timeago|%s years ago'), s__('Timeago|%s years remaining')],
-      ];
+  const timeAgoLocaleRemaining = [
+    () => [s__('Timeago|just now'), s__('Timeago|right now')],
+    () => [s__('Timeago|just now'), s__('Timeago|%s seconds remaining')],
+    () => [s__('Timeago|1 minute ago'), s__('Timeago|1 minute remaining')],
+    () => [s__('Timeago|%s minutes ago'), s__('Timeago|%s minutes remaining')],
+    () => [s__('Timeago|1 hour ago'), s__('Timeago|1 hour remaining')],
+    () => [s__('Timeago|%s hours ago'), s__('Timeago|%s hours remaining')],
+    () => [s__('Timeago|1 day ago'), s__('Timeago|1 day remaining')],
+    () => [s__('Timeago|%s days ago'), s__('Timeago|%s days remaining')],
+    () => [s__('Timeago|1 week ago'), s__('Timeago|1 week remaining')],
+    () => [s__('Timeago|%s weeks ago'), s__('Timeago|%s weeks remaining')],
+    () => [s__('Timeago|1 month ago'), s__('Timeago|1 month remaining')],
+    () => [s__('Timeago|%s months ago'), s__('Timeago|%s months remaining')],
+    () => [s__('Timeago|1 year ago'), s__('Timeago|1 year remaining')],
+    () => [s__('Timeago|%s years ago'), s__('Timeago|%s years remaining')],
+  ];
 
-      return (number, index) => {
-        if (cache[index]) {
-          return cache[index];
-        }
-        cache[index] = timeAgoLocaleRemaining[index] && timeAgoLocaleRemaining[index]();
-        return cache[index];
-      };
-    };
-
-    const memoizedLocale = () => {
-      const cache = [];
-
-      const timeAgoLocale = [
-        () => [s__('Timeago|just now'), s__('Timeago|right now')],
-        () => [s__('Timeago|just now'), s__('Timeago|in %s seconds')],
-        () => [s__('Timeago|1 minute ago'), s__('Timeago|in 1 minute')],
-        () => [s__('Timeago|%s minutes ago'), s__('Timeago|in %s minutes')],
-        () => [s__('Timeago|1 hour ago'), s__('Timeago|in 1 hour')],
-        () => [s__('Timeago|%s hours ago'), s__('Timeago|in %s hours')],
-        () => [s__('Timeago|1 day ago'), s__('Timeago|in 1 day')],
-        () => [s__('Timeago|%s days ago'), s__('Timeago|in %s days')],
-        () => [s__('Timeago|1 week ago'), s__('Timeago|in 1 week')],
-        () => [s__('Timeago|%s weeks ago'), s__('Timeago|in %s weeks')],
-        () => [s__('Timeago|1 month ago'), s__('Timeago|in 1 month')],
-        () => [s__('Timeago|%s months ago'), s__('Timeago|in %s months')],
-        () => [s__('Timeago|1 year ago'), s__('Timeago|in 1 year')],
-        () => [s__('Timeago|%s years ago'), s__('Timeago|in %s years')],
-      ];
-
-      return (number, index) => {
-        if (cache[index]) {
-          return cache[index];
-        }
-        cache[index] = timeAgoLocale[index] && timeAgoLocale[index]();
-        return cache[index];
-      };
-    };
-
-    timeago.register(timeagoLanguageCode, memoizedLocale());
-    timeago.register(`${timeagoLanguageCode}-remaining`, memoizedLocaleRemaining());
-
-    timeagoInstance = timeago();
-  }
-
-  return timeagoInstance;
+  return (number, index) => {
+    if (cache[index]) {
+      return cache[index];
+    }
+    cache[index] = timeAgoLocaleRemaining[index] && timeAgoLocaleRemaining[index]();
+    return cache[index];
+  };
 };
+
+const memoizedLocale = () => {
+  const cache = [];
+
+  const timeAgoLocale = [
+    () => [s__('Timeago|just now'), s__('Timeago|right now')],
+    () => [s__('Timeago|just now'), s__('Timeago|in %s seconds')],
+    () => [s__('Timeago|1 minute ago'), s__('Timeago|in 1 minute')],
+    () => [s__('Timeago|%s minutes ago'), s__('Timeago|in %s minutes')],
+    () => [s__('Timeago|1 hour ago'), s__('Timeago|in 1 hour')],
+    () => [s__('Timeago|%s hours ago'), s__('Timeago|in %s hours')],
+    () => [s__('Timeago|1 day ago'), s__('Timeago|in 1 day')],
+    () => [s__('Timeago|%s days ago'), s__('Timeago|in %s days')],
+    () => [s__('Timeago|1 week ago'), s__('Timeago|in 1 week')],
+    () => [s__('Timeago|%s weeks ago'), s__('Timeago|in %s weeks')],
+    () => [s__('Timeago|1 month ago'), s__('Timeago|in 1 month')],
+    () => [s__('Timeago|%s months ago'), s__('Timeago|in %s months')],
+    () => [s__('Timeago|1 year ago'), s__('Timeago|in 1 year')],
+    () => [s__('Timeago|%s years ago'), s__('Timeago|in %s years')],
+  ];
+
+  return (number, index) => {
+    if (cache[index]) {
+      return cache[index];
+    }
+    cache[index] = timeAgoLocale[index] && timeAgoLocale[index]();
+    return cache[index];
+  };
+};
+
+timeago.register(timeagoLanguageCode, memoizedLocale());
+timeago.register(`${timeagoLanguageCode}-remaining`, memoizedLocaleRemaining());
+
+export const getTimeago = () => timeago;
 
 /**
  * For the given elements, sets a tooltip with a formatted date.
@@ -172,10 +164,8 @@ export const getTimeago = () => {
  * @param {Boolean} setTimeago
  */
 export const localTimeAgo = ($timeagoEls, setTimeago = true) => {
-  getTimeago();
-
   $timeagoEls.each((i, el) => {
-    $(el).text(timeagoInstance.format($(el).attr('datetime'), timeagoLanguageCode));
+    $(el).text(timeago.format($(el).attr('datetime'), timeagoLanguageCode));
   });
 
   if (!setTimeago) {
@@ -185,6 +175,7 @@ export const localTimeAgo = ($timeagoEls, setTimeago = true) => {
   function addTimeAgoTooltip() {
     $timeagoEls.each((i, el) => {
       // Recreate with custom template
+      el.setAttribute('title', formatDate(el.dateTime));
       $(el).tooltip({
         template:
           '<div class="tooltip local-timeago" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
@@ -207,9 +198,7 @@ export const timeFor = (time, expiredLabel) => {
   if (new Date(time) < new Date()) {
     return expiredLabel || s__('Timeago|Past due');
   }
-  return getTimeago()
-    .format(time, `${timeagoLanguageCode}-remaining`)
-    .trim();
+  return timeago.format(time, `${timeagoLanguageCode}-remaining`).trim();
 };
 
 export const getDayDifference = (a, b) => {
@@ -404,15 +393,21 @@ export const getTimeframeWindowFrom = (initialStartDate, length) => {
  * @param {Date} date
  * @param {Array} quarter
  */
-export const dayInQuarter = (date, quarter) =>
-  quarter.reduce((acc, month) => {
-    if (date.getMonth() > month.getMonth()) {
+export const dayInQuarter = (date, quarter) => {
+  const dateValues = {
+    date: date.getDate(),
+    month: date.getMonth(),
+  };
+
+  return quarter.reduce((acc, month) => {
+    if (dateValues.month > month.getMonth()) {
       return acc + totalDaysInMonth(month);
-    } else if (date.getMonth() === month.getMonth()) {
-      return acc + date.getDate();
+    } else if (dateValues.month === month.getMonth()) {
+      return acc + dateValues.date;
     }
     return acc + 0;
   }, 0);
+};
 
 window.gl = window.gl || {};
 window.gl.utils = {
@@ -459,7 +454,7 @@ export const parsePikadayDate = dateString => {
 /**
  * Used `onSelect` method in pickaday
  * @param {Date} date UTC format
- * @return {String} Date formated in yyyy-mm-dd
+ * @return {String} Date formatted in yyyy-mm-dd
  */
 export const pikadayToString = date => {
   const day = pad(date.getDate());
@@ -476,7 +471,7 @@ export const pikadayToString = date => {
  */
 export const parseSeconds = (
   seconds,
-  { daysPerWeek = 5, hoursPerDay = 8, limitToHours = false } = {},
+  { daysPerWeek = 5, hoursPerDay = 8, limitToHours = false, limitToDays = false } = {},
 ) => {
   const DAYS_PER_WEEK = daysPerWeek;
   const HOURS_PER_DAY = hoursPerDay;
@@ -492,14 +487,17 @@ export const parseSeconds = (
     minutes: 1,
   };
 
-  if (limitToHours) {
+  if (limitToDays || limitToHours) {
     timePeriodConstraints.weeks = 0;
+  }
+
+  if (limitToHours) {
     timePeriodConstraints.days = 0;
   }
 
   let unorderedMinutes = Math.abs(seconds / SECONDS_PER_MINUTE);
 
-  return _.mapObject(timePeriodConstraints, minutesPerPeriod => {
+  return mapValues(timePeriodConstraints, minutesPerPeriod => {
     if (minutesPerPeriod === 0) {
       return 0;
     }
@@ -518,15 +516,15 @@ export const parseSeconds = (
  * If the 'fullNameFormat' param is passed it returns a non condensed string eg '1 week 3 days'
  */
 export const stringifyTime = (timeObject, fullNameFormat = false) => {
-  const reducedTime = _.reduce(
+  const reducedTime = reduce(
     timeObject,
     (memo, unitValue, unitName) => {
       const isNonZero = Boolean(unitValue);
 
       if (fullNameFormat && isNonZero) {
         // Remove traling 's' if unit value is singular
-        const formatedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
-        return `${memo} ${unitValue} ${formatedUnitName}`;
+        const formattedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
+        return `${memo} ${unitValue} ${formattedUnitName}`;
       }
 
       return isNonZero ? `${memo} ${unitValue}${unitName.charAt(0)}` : memo;
@@ -557,6 +555,24 @@ export const calculateRemainingMilliseconds = endDate => {
  */
 export const getDateInPast = (date, daysInPast) =>
   new Date(newDate(date).setDate(date.getDate() - daysInPast));
+
+/**
+ * Adds a given number of days to a given date and returns the new date.
+ *
+ * @param {Date} date the date that we will add days to
+ * @param {Number} daysInFuture number of days that are added to a given date
+ * @returns {Date} Date in future as Date object
+ */
+export const getDateInFuture = (date, daysInFuture) =>
+  new Date(newDate(date).setDate(date.getDate() + daysInFuture));
+
+/**
+ * Checks if a given date-instance was created with a valid date
+ *
+ * @param  {Date} date
+ * @returns boolean
+ */
+export const isValidDate = date => date instanceof Date && !Number.isNaN(date.getTime());
 
 /*
  * Appending T00:00:00 makes JS assume local time and prevents it from shifting the date
@@ -602,3 +618,60 @@ export const getDatesInRange = (d1, d2, formatter = x => x) => {
  * @return {Number} number of milliseconds
  */
 export const secondsToMilliseconds = seconds => seconds * 1000;
+
+/**
+ * Converts the supplied number of seconds to days.
+ *
+ * @param {Number} seconds
+ * @return {Number} number of days
+ */
+export const secondsToDays = seconds => Math.round(seconds / 86400);
+
+/**
+ * Returns the date after the date provided
+ *
+ * @param {Date} date the initial date
+ * @return {Date} the date following the date provided
+ */
+export const dayAfter = date => new Date(newDate(date).setDate(date.getDate() + 1));
+
+/**
+ * Mimics the behaviour of the rails distance_of_time_in_words function
+ * https://api.rubyonrails.org/v6.0.1/classes/ActionView/Helpers/DateHelper.html#method-i-distance_of_time_in_words
+ * 0 < -> 29 secs                                         => less than a minute
+ * 30 secs < -> 1 min, 29 secs                            => 1 minute
+ * 1 min, 30 secs < -> 44 mins, 29 secs                   => [2..44] minutes
+ * 44 mins, 30 secs < -> 89 mins, 29 secs                 => about 1 hour
+ * 89 mins, 30 secs < -> 23 hrs, 59 mins, 29 secs         => about[2..24]hours
+ * 23 hrs, 59 mins, 30 secs < -> 41 hrs, 59 mins, 29 secs => 1 day
+ * 41 hrs, 59 mins, 30 secs                               => x days
+ *
+ * @param {Number} seconds
+ * @return {String} approximated time
+ */
+export const approximateDuration = (seconds = 0) => {
+  if (!isNumber(seconds) || seconds < 0) {
+    return '';
+  }
+
+  const ONE_MINUTE_LIMIT = 90; // 1 minute 30s
+  const MINUTES_LIMIT = 2670; // 44 minutes 30s
+  const ONE_HOUR_LIMIT = 5370; // 89 minutes 30s
+  const HOURS_LIMIT = 86370; // 23 hours 59 minutes 30s
+  const ONE_DAY_LIMIT = 151170; // 41 hours 59 minutes 30s
+
+  const { days = 0, hours = 0, minutes = 0 } = parseSeconds(seconds, {
+    daysPerWeek: 7,
+    hoursPerDay: 24,
+    limitToDays: true,
+  });
+
+  if (seconds < 30) {
+    return __('less than a minute');
+  } else if (seconds < MINUTES_LIMIT) {
+    return n__('1 minute', '%d minutes', seconds < ONE_MINUTE_LIMIT ? 1 : minutes);
+  } else if (seconds < HOURS_LIMIT) {
+    return n__('about 1 hour', 'about %d hours', seconds < ONE_HOUR_LIMIT ? 1 : hours);
+  }
+  return n__('1 day', '%d days', seconds < ONE_DAY_LIMIT ? 1 : days);
+};

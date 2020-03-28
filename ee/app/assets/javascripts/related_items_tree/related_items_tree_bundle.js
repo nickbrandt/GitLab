@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mapActions } from 'vuex';
+import Vuex from 'vuex';
 
 import { parseBoolean } from '~/lib/utils/common_utils';
 
@@ -9,6 +9,8 @@ import RelatedItemsTreeApp from './components/related_items_tree_app.vue';
 import TreeRoot from './components/tree_root.vue';
 import TreeItem from './components/tree_item.vue';
 
+Vue.use(Vuex);
+
 export default () => {
   const el = document.getElementById('js-tree');
 
@@ -16,7 +18,15 @@ export default () => {
     return false;
   }
 
-  const { id, iid, fullPath, autoCompleteEpics, autoCompleteIssues, userSignedIn } = el.dataset;
+  const {
+    id,
+    iid,
+    fullPath,
+    autoCompleteEpics,
+    autoCompleteIssues,
+    userSignedIn,
+    allowSubEpics,
+  } = el.dataset;
   const initialData = JSON.parse(el.dataset.initial);
 
   Vue.component('tree-root', TreeRoot);
@@ -42,13 +52,15 @@ export default () => {
       this.setInitialConfig({
         epicsEndpoint: initialData.epicLinksEndpoint,
         issuesEndpoint: initialData.issueLinksEndpoint,
+        projectsEndpoint: initialData.projectsEndpoint,
         autoCompleteEpics: parseBoolean(autoCompleteEpics),
         autoCompleteIssues: parseBoolean(autoCompleteIssues),
         userSignedIn: parseBoolean(userSignedIn),
+        allowSubEpics: parseBoolean(allowSubEpics),
       });
     },
     methods: {
-      ...mapActions(['setInitialParentItem', 'setInitialConfig']),
+      ...Vuex.mapActions(['setInitialParentItem', 'setInitialConfig']),
     },
     render: createElement => createElement('related-items-tree-app'),
   });

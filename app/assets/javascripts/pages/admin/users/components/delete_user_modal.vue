@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { GlModal, GlButton, GlFormInput } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
@@ -56,7 +56,7 @@ export default {
       return sprintf(
         this.content,
         {
-          username: `<strong>${_.escape(this.username)}</strong>`,
+          username: `<strong>${esc(this.username)}</strong>`,
           strong_start: '<strong>',
           strong_end: '</strong>',
         },
@@ -67,7 +67,7 @@ export default {
       return sprintf(
         s__('AdminUsers|To confirm, type %{username}'),
         {
-          username: `<code>${_.escape(this.username)}</code>`,
+          username: `<code>${esc(this.username)}</code>`,
         },
         false,
       );
@@ -109,7 +109,7 @@ export default {
     <template>
       <p v-html="text"></p>
       <p v-html="confirmationTextLabel"></p>
-      <form ref="form" :action="deleteUserUrl" method="post">
+      <form ref="form" :action="deleteUserUrl" method="post" @submit.prevent>
         <input ref="method" type="hidden" name="_method" value="delete" />
         <input :value="csrfToken" type="hidden" name="authenticity_token" />
         <gl-form-input

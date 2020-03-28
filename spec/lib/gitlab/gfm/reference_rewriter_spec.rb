@@ -8,7 +8,7 @@ describe Gitlab::Gfm::ReferenceRewriter do
   let(:new_project) { create(:project, name: 'new-project', group: group) }
   let(:user) { create(:user) }
 
-  let(:old_project_ref) { old_project.to_reference(new_project) }
+  let(:old_project_ref) { old_project.to_reference_base(new_project) }
   let(:text) { 'some text' }
 
   before do
@@ -35,7 +35,7 @@ describe Gitlab::Gfm::ReferenceRewriter do
 
       context 'description with ignored elements' do
         let(:text) do
-          "Hi. This references #1, but not `#2`\n" +
+          "Hi. This references #1, but not `#2`\n" \
             '<pre>and not !1</pre>'
         end
 
@@ -54,11 +54,13 @@ describe Gitlab::Gfm::ReferenceRewriter do
 
         context 'code' do
           let(:text) { "#1, but not `[#1]`" }
+
           it { is_expected.to eq "#{issue_first.to_reference(new_project)}, but not `[#1]`" }
         end
 
         context 'code reverse' do
           let(:text) { "not `#1`, but #1" }
+
           it { is_expected.to eq "not `#1`, but #{issue_first.to_reference(new_project)}" }
         end
 
@@ -74,11 +76,13 @@ describe Gitlab::Gfm::ReferenceRewriter do
 
           context 'label referenced by id' do
             let(:text) { '#1 and ~123' }
+
             it { is_expected.to eq %Q{#{old_project_ref}#1 and #{old_project_ref}~123} }
           end
 
           context 'label referenced by text' do
             let(:text) { '#1 and ~"test"' }
+
             it { is_expected.to eq %Q{#{old_project_ref}#1 and #{old_project_ref}~123} }
           end
         end
@@ -93,11 +97,13 @@ describe Gitlab::Gfm::ReferenceRewriter do
 
           context 'label referenced by id' do
             let(:text) { '#1 and ~321' }
+
             it { is_expected.to eq %Q{#{old_project_ref}#1 and #{old_project_ref}~321} }
           end
 
           context 'label referenced by text' do
             let(:text) { '#1 and ~"group label"' }
+
             it { is_expected.to eq %Q{#{old_project_ref}#1 and #{old_project_ref}~321} }
           end
         end

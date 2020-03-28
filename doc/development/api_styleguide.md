@@ -11,6 +11,12 @@ to access them as we do in Rails views), local variables are fine.
 
 Always use an [Entity] to present the endpoint's payload.
 
+## Documentation
+
+API endpoints must come with [documentation](documentation/styleguide.md#api), unless it is internal or behind a feature flag.
+The docs should be in the same merge request, or, if strictly necessary,
+in a follow-up with the same milestone as the original merge request.  
+
 ## Methods and parameters description
 
 Every method must be described using the [Grape DSL](https://github.com/ruby-grape/grape#describing-methods)
@@ -19,10 +25,10 @@ for a good example):
 
 - `desc` for the method summary. You should pass it a block for additional
   details such as:
-  - The GitLab version when the endpoint was added
+  - The GitLab version when the endpoint was added. If it is behind a feature flag, mention that instead: _This feature is gated by the :feature\_flag\_symbol feature flag._
   - If the endpoint is deprecated, and if so, when will it be removed
 
-- `params` for the method params. This acts as description,
+- `params` for the method parameters. This acts as description,
   [validation, and coercion of the parameters]
 
 A good example is as follows:
@@ -43,22 +49,22 @@ get do
 end
 ```
 
-## Declared params
+## Declared parameters
 
 > Grape allows you to access only the parameters that have been declared by your
-`params` block. It filters out the params that have been passed, but are not
+`params` block. It filters out the parameters that have been passed, but are not
 allowed.
 
 – <https://github.com/ruby-grape/grape#declared>
 
-### Exclude params from parent namespaces
+### Exclude parameters from parent namespaces
 
 > By default `declared(params)`includes parameters that were defined in all
 parent namespaces.
 
 – <https://github.com/ruby-grape/grape#include-parent-namespaces>
 
-In most cases you will want to exclude params from the parent namespaces:
+In most cases you will want to exclude parameters from the parent namespaces:
 
 ```ruby
 declared(params, include_parent_namespaces: false)
@@ -66,7 +72,7 @@ declared(params, include_parent_namespaces: false)
 
 ### When to use `declared(params)`
 
-You should always use `declared(params)` when you pass the params hash as
+You should always use `declared(params)` when you pass the parameters hash as
 arguments to a method call.
 
 For instance:
@@ -92,6 +98,12 @@ For instance:
 Model.create(foo: params[:foo])
 ```
 
+## Using HTTP status helpers
+
+For non-200 HTTP responses, use the provided helpers in `lib/api/helpers.rb` to ensure correct behaviour (`not_found!`, `no_content!` etc.). These will `throw` inside Grape and abort the execution of your endpoint.
+
+For `DELETE` requests, you should also generally use the `destroy_conditionally!` helper which by default returns a `204 No Content` response on success, or a `412 Precondition Failed` response if the given `If-Unmodified-Since` header is out of range. This helper calls `#destroy` on the passed resource, but you can also implement a custom deletion method by passing a block.
+
 ## Using API path helpers in GitLab Rails codebase
 
 Because we support [installing GitLab under a relative URL], one must take this
@@ -112,3 +124,11 @@ different components are making use of.
 [Entity]: https://gitlab.com/gitlab-org/gitlab/blob/master/lib/api/entities.rb
 [validation, and coercion of the parameters]: https://github.com/ruby-grape/grape#parameter-validation-and-coercion
 [installing GitLab under a relative URL]: https://docs.gitlab.com/ee/install/relative_url.html
+
+## Testing
+
+When writing tests for new API endpoints, consider using a schema [fixture](./testing_guide/best_practices.md#fixtures) located in `/spec/fixtures/api/schemas`. You can `expect` a response to match a given schema:
+
+```ruby
+expect(response).to match_response_schema('merge_requests')
+```

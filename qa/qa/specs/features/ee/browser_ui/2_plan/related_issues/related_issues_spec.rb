@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Related issues' do
       let(:project) do
         Resource::Project.fabricate_via_api! do |project|
@@ -12,14 +12,12 @@ module QA
       let(:issue_1) do
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-          issue.title = 'Issue 1'
         end
       end
 
       let(:issue_2) do
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-          issue.title = 'Issue 2'
         end
       end
 
@@ -36,15 +34,13 @@ module QA
 
           show.relate_issue(issue_2)
 
-          show.wait(reload: false, max: max_wait, interval: wait_interval) do
-            expect(show).to have_content("marked this issue as related to ##{issue_2.iid}")
+          show.wait_until(reload: false, max_duration: max_wait, sleep_interval: wait_interval) do
             expect(show.related_issuable_item).to have_content(issue_2.title)
           end
 
           show.click_remove_related_issue_button
 
-          show.wait(reload: false, max: max_wait, interval: wait_interval) do
-            expect(show).to have_content("removed the relation with ##{issue_2.iid}")
+          show.wait_until(reload: false, max_duration: max_wait, sleep_interval: wait_interval) do
             expect(show).not_to have_content(issue_2.title)
           end
         end

@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
-  set(:project) { create(:project, :repository) }
-  set(:user) { create(:user) }
+  let_it_be(:project, reload: true) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
   let(:service) { described_class.new(project, user) }
 
   let(:merge_request) do
@@ -16,9 +16,10 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
   let(:pipeline) { merge_request.reload.all_pipelines.first }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     stub_licensed_features(merge_trains: true, merge_pipelines: true)
     project.add_maintainer(user)
-    project.update!(merge_trains_enabled: true, merge_pipelines_enabled: true)
+    project.update!(merge_pipelines_enabled: true)
     allow(AutoMergeProcessWorker).to receive(:perform_async) { }
     merge_request.update_head_pipeline
   end
@@ -61,7 +62,11 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
         end
 
         it 'aborts auto merge' do
-          expect(service).to receive(:abort).once
+          expect(service).to receive(:abort).once.and_call_original
+
+          expect(SystemNoteService)
+            .to receive(:abort_add_to_merge_train_when_pipeline_succeeds).once
+            .with(merge_request, project, user, 'This merge request cannot be added to the merge train')
 
           subject
         end

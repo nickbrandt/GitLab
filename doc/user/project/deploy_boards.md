@@ -14,7 +14,7 @@ With Deploy Boards you can gain more insight into deploys with benefits such as:
 
 - Following a deploy from the start, not just when it's done
 - Watching the rollout of a build across multiple servers
-- Finer state detail (Waiting, Deploying, Finished, Unknown)
+- Finer state detail (Succeeded, Running, Failed, Pending, Unknown)
 - See [Canary Deployments](canary_deployments.md)
 
 Here's an example of a Deploy Board of the production environment.
@@ -27,7 +27,7 @@ deploy rolling out. The percentage is the percent of the pods that are updated
 to the latest release.
 
 Since Deploy Boards are tightly coupled with Kubernetes, there is some required
-knowledge. In particular you should be familiar with:
+knowledge. In particular, you should be familiar with:
 
 - [Kubernetes pods](https://kubernetes.io/docs/concepts/workloads/pods/pod/)
 - [Kubernetes labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
@@ -37,7 +37,7 @@ knowledge. In particular you should be familiar with:
 ## Use cases
 
 Since the Deploy Board is a visual representation of the Kubernetes pods for a
-specific environment, there are lot of uses cases. To name a few:
+specific environment, there are a lot of use cases. To name a few:
 
 - You want to promote what's running in staging, to production. You go to the
   environments list, verify that what's running in staging is what you think is
@@ -65,7 +65,7 @@ To display the Deploy Boards for a specific [environment] you should:
 
    NOTE: **Running on OpenShift:**
    If you are using OpenShift, ensure that you're using the `Deployment` resource
-   instead of `DeploymentConfiguration`, otherwise the Deploy Boards won't render
+   instead of `DeploymentConfiguration`. Otherwise, the Deploy Boards won't render
    correctly. For more information, read the
    [OpenShift docs](https://docs.openshift.com/container-platform/3.7/dev_guide/deployments/kubernetes_deployments.html#kubernetes-deployments-vs-deployment-configurations)
    and [GitLab issue #4584](https://gitlab.com/gitlab-org/gitlab/issues/4584).
@@ -89,7 +89,7 @@ To display the Deploy Boards for a specific [environment] you should:
 
    NOTE: **Note:**
    Matching based on the Kubernetes `app` label was removed in [GitLab
-   12.1](https://gitlab.com/gitlab-org/gitlab/merge_requests/14020).
+   12.1](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/14020).
    To migrate, please apply the required annotations (see above) and
    re-deploy your application. If you are using Auto DevOps, this will
    be done automatically and no action is necessary.
@@ -102,6 +102,34 @@ navigate to the environments page under **Operations > Environments**.
 Deploy Boards are visible by default. You can explicitly click
 the triangle next to their respective environment name in order to hide them.
 
+### Example manifest file
+
+The following example is an extract of a Kubernetes manifest deployment file, using the two annotations `app.gitlab.com/env` and `app.gitlab.com/app` to enable the **Deploy Boards**:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "APPLICATION_NAME"
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "APPLICATION_NAME"
+  template:
+    metadata:
+      labels:
+        app: "APPLICATION_NAME"
+      annotations:
+        app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+        app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+```
+
+The annotations will be applied to the deployments, replica sets, and pods. By changing the number of replicas, like `kubectl scale --replicas=3 deploy APPLICATION_NAME -n ${KUBE_NAMESPACE}`, you can follow the instances' pods from the board.
+
 ## Canary Deployments
 
 A popular CI strategy, where a small portion of the fleet is updated to the new
@@ -112,7 +140,7 @@ version of your application.
 ## Further reading
 
 - [GitLab Autodeploy][autodeploy]
-- [GitLab CI environment variables][variables]
+- [GitLab CI/CD environment variables][variables]
 - [Environments and deployments][environment]
 - [Kubernetes deploy example][kube-deploy]
 
@@ -125,7 +153,7 @@ version of your application.
 [kube-exec]: https://docs.gitlab.com/runner/executors/kubernetes.html "GitLab Runner Kubernetes executor"
 [kube-service]: integrations/kubernetes.md "Kubernetes project service"
 [review apps]: ../../ci/review_apps/index.md "Review Apps documentation"
-[variables]: ../../ci/variables/README.md "GitLab CI variables"
+[variables]: ../../ci/variables/README.md "GitLab CI/CD variables"
 [autodeploy]: ../../topics/autodevops/index.md#auto-deploy "GitLab Autodeploy"
 [kube-image]: https://gitlab.com/gitlab-examples/kubernetes-deploy/container_registry "Kubernetes deploy Container Registry"
 [runners]: ../../ci/runners/README.md

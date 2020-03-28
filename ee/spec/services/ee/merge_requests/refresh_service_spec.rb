@@ -36,17 +36,37 @@ describe MergeRequests::RefreshService do
   end
   let(:oldrev) { TestEnv::BRANCH_SHA[source_branch] }
   let(:newrev) { TestEnv::BRANCH_SHA['after-create-delete-modify-move'] } # Pretend source_branch is now updated
+  let(:service) { described_class.new(project, current_user) }
+  let(:current_user) { merge_request.author }
 
   subject { service.execute(oldrev, newrev, "refs/heads/#{source_branch}") }
 
   describe '#execute' do
-    context '#update_approvers' do
+    it 'checks merge train status' do
+      expect_next_instance_of(MergeTrains::CheckStatusService, project, current_user) do |service|
+        expect(service).to receive(:execute).with(project, source_branch, newrev)
+      end
+
+      subject
+    end
+
+    context 'when branch is deleted' do
+      let(:newrev) { Gitlab::Git::BLANK_SHA }
+
+      it 'does not check merge train status' do
+        expect(MergeTrains::CheckStatusService).not_to receive(:new)
+
+        subject
+      end
+    end
+
+    describe '#update_approvers' do
       let(:owner) { create(:user) }
       let(:current_user) { merge_request.author }
       let(:service) { described_class.new(project, current_user) }
       let(:enable_code_owner) { true }
       let(:enable_report_approver_rules) { true }
-      let(:todo_service) { double(:todo_service) }
+      let(:todo_service) { double(:todo_service, add_merge_request_approvers: true) }
       let(:notification_service) { double(:notification_service) }
 
       before do
@@ -59,7 +79,7 @@ describe MergeRequests::RefreshService do
         allow(service).to receive(:todo_service).and_return(todo_service)
         allow(service).to receive(:notification_service).and_return(notification_service)
 
-        group.add_master(fork_user)
+        group.add_maintainer(fork_user)
 
         merge_request
         another_merge_request

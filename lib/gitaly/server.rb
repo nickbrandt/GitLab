@@ -2,6 +2,8 @@
 
 module Gitaly
   class Server
+    SHA_VERSION_REGEX = /\A\d+\.\d+\.\d+-\d+-g([a-f0-9]{8})\z/.freeze
+
     class << self
       def all
         Gitlab.config.repositories.storages.keys.map { |s| Gitaly::Server.new(s) }
@@ -30,9 +32,10 @@ module Gitaly
       info.git_version
     end
 
-    def up_to_date?
-      server_version == Gitlab::GitalyClient.expected_server_version
+    def expected_version?
+      server_version == Gitlab::GitalyClient.expected_server_version || matches_sha?
     end
+    alias_method :up_to_date?, :expected_version?
 
     def read_writeable?
       readable? && writeable?
@@ -50,6 +53,20 @@ module Gitaly
       storage_status&.fs_type
     end
 
+    def disk_used
+      disk_statistics_storage_status&.used
+    end
+
+    def disk_available
+      disk_statistics_storage_status&.available
+    end
+
+    # Simple convenience method for when obtaining both used and available
+    # statistics at once is preferred.
+    def disk_stats
+      disk_statistics_storage_status
+    end
+
     def address
       Gitlab::GitalyClient.address(@storage)
     rescue RuntimeError => e
@@ -62,11 +79,34 @@ module Gitaly
       @storage_status ||= info.storage_statuses.find { |s| s.storage_name == storage }
     end
 
+    def disk_statistics_storage_status
+      @disk_statistics_storage_status ||= disk_statistics.storage_statuses.find { |s| s.storage_name == storage }
+    end
+
+    def matches_sha?
+      match = server_version.match(SHA_VERSION_REGEX)
+      return false unless match
+
+      Gitlab::GitalyClient.expected_server_version.start_with?(match[1])
+    end
+
     def info
       @info ||=
         begin
           Gitlab::GitalyClient::ServerService.new(@storage).info
-        rescue GRPC::Unavailable, GRPC::DeadlineExceeded
+        rescue GRPC::Unavailable, GRPC::DeadlineExceeded => ex
+          Gitlab::ErrorTracking.track_exception(ex)
+          # This will show the server as being out of date
+          Gitaly::ServerInfoResponse.new(git_version: '', server_version: '', storage_statuses: [])
+        end
+    end
+
+    def disk_statistics
+      @disk_statistics ||=
+        begin
+          Gitlab::GitalyClient::ServerService.new(@storage).disk_statistics
+        rescue GRPC::Unavailable, GRPC::DeadlineExceeded => ex
+          Gitlab::ErrorTracking.track_exception(ex)
           # This will show the server as being out of date
           Gitaly::ServerInfoResponse.new(git_version: '', server_version: '', storage_statuses: [])
         end

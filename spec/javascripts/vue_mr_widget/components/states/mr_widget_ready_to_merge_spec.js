@@ -1,11 +1,11 @@
 import Vue from 'vue';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import ReadyToMerge from '~/vue_merge_request_widget/components/states/ready_to_merge.vue';
 import SquashBeforeMerge from '~/vue_merge_request_widget/components/states/squash_before_merge.vue';
 import CommitsHeader from '~/vue_merge_request_widget/components/states/commits_header.vue';
 import CommitEdit from '~/vue_merge_request_widget/components/states/commit_edit.vue';
 import CommitMessageDropdown from '~/vue_merge_request_widget/components/states/commit_message_dropdown.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { MWPS_MERGE_STRATEGY, MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 const commitMessage = 'This is the commit message';
@@ -145,34 +145,30 @@ describe('ReadyToMerge', () => {
       });
     });
 
-    describe('mergeButtonClass', () => {
-      const defaultClass = 'btn btn-sm btn-success accept-merge-request';
-      const failedClass = `${defaultClass} btn-danger`;
-      const inActionClass = `${defaultClass} btn-info`;
-
+    describe('mergeButtonVariant', () => {
       it('defaults to success class', () => {
         Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.mergeButtonClass).toEqual(defaultClass);
+        expect(vm.mergeButtonVariant).toEqual('success');
       });
 
       it('returns success class for success status', () => {
         Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
         Vue.set(vm.mr, 'pipeline', true);
 
-        expect(vm.mergeButtonClass).toEqual(defaultClass);
+        expect(vm.mergeButtonVariant).toEqual('success');
       });
 
       it('returns info class for pending status', () => {
         Vue.set(vm.mr, 'availableAutoMergeStrategies', [MTWPS_MERGE_STRATEGY]);
 
-        expect(vm.mergeButtonClass).toEqual(inActionClass);
+        expect(vm.mergeButtonVariant).toEqual('info');
       });
 
-      it('returns failed class for failed status', () => {
+      it('returns danger class for failed status', () => {
         vm.mr.hasCI = true;
 
-        expect(vm.mergeButtonClass).toEqual(failedClass);
+        expect(vm.mergeButtonVariant).toEqual('danger');
       });
     });
 
@@ -286,6 +282,12 @@ describe('ReadyToMerge', () => {
         Vue.set(vm, 'isMakingRequest', true);
 
         expect(vm.isMergeButtonDisabled).toBe(true);
+      });
+    });
+
+    describe('isMergeImmediatelyDangerous', () => {
+      it('should always return false in CE', () => {
+        expect(vm.isMergeImmediatelyDangerous).toBe(false);
       });
     });
   });
@@ -628,20 +630,18 @@ describe('ReadyToMerge', () => {
     });
 
     describe('when user can merge and can delete branch', () => {
-      let customVm;
-
       beforeEach(() => {
-        customVm = createComponent({
+        vm = createComponent({
           mr: { canRemoveSourceBranch: true },
         });
       });
 
       it('isRemoveSourceBranchButtonDisabled should be false', () => {
-        expect(customVm.isRemoveSourceBranchButtonDisabled).toBe(false);
+        expect(vm.isRemoveSourceBranchButtonDisabled).toBe(false);
       });
 
-      it('should be enabled in rendered output', () => {
-        const checkboxElement = customVm.$el.querySelector('#remove-source-branch-input');
+      it('removed source branch should be enabled in rendered output', () => {
+        const checkboxElement = vm.$el.querySelector('#remove-source-branch-input');
 
         expect(checkboxElement).not.toBeNull();
       });
@@ -920,22 +920,63 @@ describe('ReadyToMerge', () => {
   });
 
   describe('Commit message area', () => {
-    it('when using merge commits, should show "Modify commit message" button', () => {
-      const customVm = createComponent({
-        mr: { ffOnlyEnabled: false },
+    describe('when using merge commits', () => {
+      beforeEach(() => {
+        vm = createComponent({
+          mr: { ffOnlyEnabled: false },
+        });
       });
 
-      expect(customVm.$el.querySelector('.mr-fast-forward-message')).toBeNull();
-      expect(customVm.$el.querySelector('.js-modify-commit-message-button')).toBeDefined();
+      it('should not show fast forward message', () => {
+        expect(vm.$el.querySelector('.mr-fast-forward-message')).toBeNull();
+      });
+
+      it('should show "Modify commit message" button', () => {
+        expect(vm.$el.querySelector('.js-modify-commit-message-button')).toBeDefined();
+      });
     });
 
-    it('when fast-forward merge is enabled, only show fast-forward message', () => {
-      const customVm = createComponent({
-        mr: { ffOnlyEnabled: true },
+    describe('when fast-forward merge is enabled', () => {
+      beforeEach(() => {
+        vm = createComponent({
+          mr: { ffOnlyEnabled: true },
+        });
       });
 
-      expect(customVm.$el.querySelector('.mr-fast-forward-message')).toBeDefined();
-      expect(customVm.$el.querySelector('.js-modify-commit-message-button')).toBeNull();
+      it('should show fast forward message', () => {
+        expect(vm.$el.querySelector('.mr-fast-forward-message')).toBeDefined();
+      });
+
+      it('should not show "Modify commit message" button', () => {
+        expect(vm.$el.querySelector('.js-modify-commit-message-button')).toBeNull();
+      });
+    });
+  });
+
+  describe('with a mismatched SHA', () => {
+    const findMismatchShaBlock = () => vm.$el.querySelector('.js-sha-mismatch');
+
+    beforeEach(() => {
+      vm = createComponent({
+        mr: {
+          isSHAMismatch: true,
+          mergeRequestDiffsPath: '/merge_requests/1/diffs',
+        },
+      });
+    });
+
+    it('displays a warning message', () => {
+      expect(findMismatchShaBlock()).toExist();
+    });
+
+    it('warns the user to refresh to review', () => {
+      expect(findMismatchShaBlock().textContent.trim()).toBe(
+        'New changes were added. Reload the page to review them',
+      );
+    });
+
+    it('displays link to the diffs tab', () => {
+      expect(findMismatchShaBlock().querySelector('a').href).toContain(vm.mr.mergeRequestDiffsPath);
     });
   });
 });

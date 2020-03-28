@@ -8,10 +8,12 @@ module QA
     module ApiFabricator
       include Capybara::DSL
 
-      ResourceNotFoundError = Class.new(RuntimeError)
       ResourceFabricationFailedError = Class.new(RuntimeError)
-      ResourceURLMissingError = Class.new(RuntimeError)
       ResourceNotDeletedError = Class.new(RuntimeError)
+      ResourceNotFoundError = Class.new(RuntimeError)
+      ResourceQueryError = Class.new(RuntimeError)
+      ResourceUpdateFailedError = Class.new(RuntimeError)
+      ResourceURLMissingError = Class.new(RuntimeError)
 
       attr_reader :api_resource, :api_response
       attr_writer :api_client
@@ -19,8 +21,8 @@ module QA
 
       def api_support?
         respond_to?(:api_get_path) &&
-          respond_to?(:api_post_path) &&
-          respond_to?(:api_post_body)
+          (respond_to?(:api_post_path) && respond_to?(:api_post_body)) ||
+          (respond_to?(:api_put_path) && respond_to?(:api_put_body))
       end
 
       def fabricate_via_api!
@@ -29,6 +31,12 @@ module QA
         end
 
         resource_web_url(api_post)
+      end
+
+      def reload!
+        api_get
+
+        self
       end
 
       def remove_via_api!
@@ -84,11 +92,23 @@ module QA
         process_api_response(parse_body(response))
       end
 
+      def api_put
+        response = put(
+          Runtime::API::Request.new(api_client, api_put_path).url,
+          api_put_body)
+
+        unless response.code == HTTP_STATUS_OK
+          raise ResourceFabricationFailedError, "Updating #{self.class.name} using the API failed (#{response.code}) with `#{response}`."
+        end
+
+        process_api_response(parse_body(response))
+      end
+
       def api_delete
         url = Runtime::API::Request.new(api_client, api_delete_path).url
         response = delete(url)
 
-        unless response.code == HTTP_STATUS_NO_CONTENT
+        unless [HTTP_STATUS_NO_CONTENT, HTTP_STATUS_ACCEPTED].include? response.code
           raise ResourceNotDeletedError, "Resource at #{url} could not be deleted (#{response.code}): `#{response}`."
         end
 

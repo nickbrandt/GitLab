@@ -42,7 +42,7 @@ export default {
       :size="14"
     />
     <gl-popover
-      :target="() => $refs.reportInfo"
+      :target="() => $refs.reportInfo.$el"
       placement="top"
       triggers="click blur"
       :title="title"

@@ -1,10 +1,10 @@
 <script>
 import { GlButton } from '@gitlab/ui';
+import { isString } from 'lodash';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import highlight from '~/lib/utils/highlight';
 import { truncateNamespace } from '~/lib/utils/text_utility';
-import _ from 'underscore';
 
 export default {
   name: 'ProjectListItem',
@@ -17,7 +17,7 @@ export default {
     project: {
       type: Object,
       required: true,
-      validator: p => _.isFinite(p.id) && _.isString(p.name) && _.isString(p.name_with_namespace),
+      validator: p => Number.isFinite(p.id) && isString(p.name) && isString(p.name_with_namespace),
     },
     selected: {
       type: Boolean,

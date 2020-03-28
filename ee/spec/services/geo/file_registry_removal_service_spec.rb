@@ -6,7 +6,7 @@ describe Geo::FileRegistryRemovalService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   before do
     stub_current_geo_node(secondary)
@@ -190,7 +190,7 @@ describe Geo::FileRegistryRemovalService do
     end
 
     context 'with namespace_file' do
-      set(:group) { create(:group) }
+      let_it_be(:group) { create(:group) }
       let(:file) { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
       let!(:upload) do
         NamespaceFileUploader.new(group).store!(file)

@@ -7,9 +7,11 @@ class MergeRequestDiff < ApplicationRecord
   include EachBatch
   include Gitlab::Utils::StrongMemoize
   include ObjectStorage::BackgroundMove
+  include BulkInsertableAssociations
 
   # Don't display more than 100 commits at once
   COMMITS_SAFE_SIZE = 100
+  BATCH_SIZE = 1000
 
   # Applies to closed or merged MRs when determining whether to migrate their
   # diffs to external storage
@@ -137,7 +139,7 @@ class MergeRequestDiff < ApplicationRecord
   # All diff information is collected from repository after object is created.
   # It allows you to override variables like head_commit_sha before getting diff.
   after_create :save_git_content, unless: :importing?
-  after_create_commit :set_as_latest_diff
+  after_create_commit :set_as_latest_diff, unless: :importing?
 
   after_save :update_external_diff_store, if: -> { !importing? && saved_change_to_external_diff? }
 
@@ -163,7 +165,7 @@ class MergeRequestDiff < ApplicationRecord
     # hooks that run when an attribute was changed are run twice.
     reset
 
-    keep_around_commits
+    keep_around_commits unless importing?
   end
 
   def set_as_latest_diff
@@ -254,10 +256,14 @@ class MergeRequestDiff < ApplicationRecord
     merge_request_diff_commits.limit(limit).pluck(:sha)
   end
 
-  def commits_by_shas(shas)
-    return MergeRequestDiffCommit.none unless shas.present?
+  def includes_any_commits?(shas)
+    return false if shas.blank?
 
-    merge_request_diff_commits.where(sha: shas)
+    # when the number of shas is huge (1000+) we don't want
+    # to pass them all as an SQL param, let's pass them in batches
+    shas.each_slice(BATCH_SIZE).any? do |batched_shas|
+      merge_request_diff_commits.where(sha: batched_shas).exists?
+    end
   end
 
   def diff_refs=(new_diff_refs)
@@ -304,20 +310,25 @@ class MergeRequestDiff < ApplicationRecord
   end
 
   def diffs_in_batch(batch_page, batch_size, diff_options:)
-    Gitlab::Diff::FileCollection::MergeRequestDiffBatch.new(self,
-                                                            batch_page,
-                                                            batch_size,
-                                                            diff_options: diff_options)
+    fetching_repository_diffs(diff_options) do |comparison|
+      if comparison
+        comparison.diffs_in_batch(batch_page, batch_size, diff_options: diff_options)
+      else
+        diffs_in_batch_collection(batch_page, batch_size, diff_options: diff_options)
+      end
+    end
   end
 
   def diffs(diff_options = nil)
-    if without_files? && comparison = diff_refs&.compare_in(project)
+    fetching_repository_diffs(diff_options) do |comparison|
       # It should fetch the repository when diffs are cleaned by the system.
       # We don't keep these for storage overload purposes.
       # See https://gitlab.com/gitlab-org/gitlab-foss/issues/37639
-      comparison.diffs(diff_options)
-    else
-      diffs_collection(diff_options)
+      if comparison
+        comparison.diffs(diff_options)
+      else
+        diffs_collection(diff_options)
+      end
     end
   end
 
@@ -423,7 +434,56 @@ class MergeRequestDiff < ApplicationRecord
     merge_request_diff_files.reset
   end
 
+  # Transactionally migrate the current merge_request_diff_files entries from
+  # external storage, back to the database. This is the rollback operation for
+  # +migrate_files_to_external_storage!+
+  #
+  # If this diff isn't in external storage, the method is a no-op.
+  def migrate_files_to_database!
+    return unless stored_externally?
+    return if merge_request_diff_files.count == 0
+
+    rows = convert_external_diffs_to_database
+
+    transaction do
+      MergeRequestDiffFile.where(merge_request_diff_id: id).delete_all
+      Gitlab::Database.bulk_insert('merge_request_diff_files', rows)
+      update!(stored_externally: false)
+    end
+
+    # Only delete the external diff file after the contents have been saved to
+    # the database
+    remove_external_diff!
+    merge_request_diff_files.reset
+  end
+
   private
+
+  def convert_external_diffs_to_database
+    opening_external_diff do |external_file|
+      merge_request_diff_files.map do |diff_file|
+        row = diff_file.attributes.except('diff')
+
+        raise "Diff file lacks external diff offset or size: #{row.inspect}" unless
+          row['external_diff_offset'] && row['external_diff_size']
+
+        # The diff in the external file is already base64-encoded if necessary,
+        # matching the 'binary' attribute of the row. Reading it directly allows
+        # a cycle of decode-encode to be skipped
+        external_file.seek(row.delete('external_diff_offset'))
+        row['diff'] = external_file.read(row.delete('external_diff_size'))
+
+        row
+      end
+    end
+  end
+
+  def diffs_in_batch_collection(batch_page, batch_size, diff_options:)
+    Gitlab::Diff::FileCollection::MergeRequestDiffBatch.new(self,
+                                                            batch_page,
+                                                            batch_size,
+                                                            diff_options: diff_options)
+  end
 
   def encode_in_base64?(diff_text)
     (diff_text.encoding == Encoding::BINARY && !diff_text.ascii_only?) ||
@@ -482,6 +542,25 @@ class MergeRequestDiff < ApplicationRecord
     end
   end
 
+  # Yields the block with the repository Compare object if it should
+  # fetch diffs from the repository instead DB.
+  def fetching_repository_diffs(diff_options)
+    return unless block_given?
+
+    diff_options ||= {}
+
+    # Can be read as: fetch the persisted diffs if yielded without the
+    # Compare object.
+    return yield unless without_files? || diff_options[:ignore_whitespace_change]
+    return yield unless diff_refs&.complete?
+
+    comparison = diff_refs.compare_in(repository.project)
+
+    return yield unless comparison
+
+    yield(comparison)
+  end
+
   def use_external_diff?
     return false unless has_attribute?(:external_diff)
     return false unless Gitlab.config.external_diffs.enabled
@@ -523,6 +602,10 @@ class MergeRequestDiff < ApplicationRecord
     # present. This reduces file open/close overhead.
     opening_external_diff do
       collection = merge_request_diff_files
+
+      if options[:include_context_commits]
+        collection += merge_request.merge_request_context_commit_diff_files
+      end
 
       if paths = options[:paths]
         collection = collection.where('old_path IN (?) OR new_path IN (?)', paths, paths)

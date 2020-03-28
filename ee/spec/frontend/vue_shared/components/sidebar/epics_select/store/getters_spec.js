@@ -1,8 +1,7 @@
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import * as getters from 'ee/vue_shared/components/sidebar/epics_select/store/getters';
 
 import createDefaultState from 'ee/vue_shared/components/sidebar/epics_select/store/state';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { mockEpics } from '../../mock_data';
 

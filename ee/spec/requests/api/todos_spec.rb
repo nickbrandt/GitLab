@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe API::Todos do
-  set(:group) { create(:group) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }
-  set(:project) { create(:project, group: group) }
 
   describe 'GET /todos' do
     let(:author_1) { create(:user) }
@@ -75,39 +75,24 @@ describe API::Todos do
         get api('/todos', personal_access_token: pat)
       end
 
-      context 'when the feature is enabled' do
-        before do
-          api_request
-        end
-
-        it_behaves_like 'an endpoint that responds with success'
-
-        it 'avoids N+1 queries', :request_store do
-          control = ActiveRecord::QueryRecorder.new { api_request }
-
-          create_todo_for_mentioned_in_design
-
-          expect { api_request }.not_to exceed_query_limit(control)
-        end
-
-        it 'includes the Design Todo in the response' do
-          expect(json_response).to include(
-            a_hash_including('id' => design_todo.id)
-          )
-        end
+      before do
+        api_request
       end
 
-      context 'when the feature is disabled' do
-        before do
-          stub_feature_flags(design_management_todos_api: false)
-          api_request
-        end
+      it_behaves_like 'an endpoint that responds with success'
 
-        it_behaves_like 'an endpoint that responds with success'
+      it 'avoids N+1 queries', :request_store do
+        control = ActiveRecord::QueryRecorder.new { api_request }
 
-        it 'does not include the Design Todo in the response' do
-          expect(json_response).to be_empty
-        end
+        create_todo_for_mentioned_in_design
+
+        expect { api_request }.not_to exceed_query_limit(control)
+      end
+
+      it 'includes the Design Todo in the response' do
+        expect(json_response).to include(
+          a_hash_including('id' => design_todo.id)
+        )
       end
     end
   end
@@ -119,7 +104,7 @@ describe API::Todos do
       it 'returns 403 forbidden error' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -163,7 +148,7 @@ describe API::Todos do
 
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

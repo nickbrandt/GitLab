@@ -8,22 +8,22 @@ Managing a large number of users in GitLab can become a burden for system admini
 
 In this guide we will focus on configuring GitLab with Active Directory. [Active Directory](https://en.wikipedia.org/wiki/Active_Directory) is a popular LDAP compatible directory service provided by Microsoft, included in all modern Windows Server operating systems.
 
-GitLab has supported LDAP integration since [version 2.2](https://about.gitlab.com/blog/2012/02/22/gitlab-version-2-2/). With GitLab LDAP [group syncing](../how_to_configure_ldap_gitlab_ee/index.html#group-sync) being added to GitLab Enterprise Edition in [version 6.0](https://about.gitlab.com/blog/2013/08/20/gitlab-6-dot-0-released/). LDAP integration has become one of the most popular features in GitLab.
+GitLab has supported LDAP integration since [version 2.2](https://about.gitlab.com/releases/2012/02/22/gitlab-version-2-2/). With GitLab LDAP [group syncing](../how_to_configure_ldap_gitlab_ee/index.md#group-sync) being added to GitLab Enterprise Edition in [version 6.0](https://about.gitlab.com/releases/2013/08/20/gitlab-6-dot-0-released/). LDAP integration has become one of the most popular features in GitLab.
 
 ## Getting started
 
 ### Choosing an LDAP Server
 
-The main reason organizations choose to utilize a LDAP server is to keep the entire organization's user base consolidated into a central repository. Users can access multiple applications and systems across the  IT environment using a single login. Because LDAP is an open, vendor-neutral, industry standard application protocol, the number of applications using LDAP authentication continues to increase.
+The main reason organizations choose to utilize a LDAP server is to keep the entire organization's user base consolidated into a central repository. Users can access multiple applications and systems across the IT environment using a single login. Because LDAP is an open, vendor-neutral, industry standard application protocol, the number of applications using LDAP authentication continues to increase.
 
 There are many commercial and open source [directory servers](https://en.wikipedia.org/wiki/Directory_service#LDAP_implementations) that support the LDAP protocol. Deciding on the right directory server highly depends on the existing IT environment in which the server will be integrated with.
 
 For example, [Active Directory](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/hh831484(v=ws.11)) is generally favored in a primarily Windows environment, as this allows quick integration with existing services. Other popular directory services include:
 
 - [Oracle Internet Directory](https://www.oracle.com/middleware/technologies/internet-directory.html)
-- [OpenLDAP](http://www.openldap.org/)
+- [OpenLDAP](https://www.openldap.org/)
 - [389 Directory](http://directory.fedoraproject.org/)
-- [OpenDJ (Renamed to Foregerock Directory Services)](https://www.forgerock.com/platform/directory-services)
+- [OpenDJ (Renamed to Forgerock Directory Services)](https://www.forgerock.com/platform/directory-services)
 - [ApacheDS](https://directory.apache.org/)
 
 > GitLab uses the [Net::LDAP](https://rubygems.org/gems/net-ldap) library under the hood. This means it supports all [IETF](https://tools.ietf.org/html/rfc2251) compliant LDAPv3 servers.
@@ -32,9 +32,9 @@ For example, [Active Directory](https://docs.microsoft.com/en-us/previous-versio
 
 We won't cover the installation and configuration of Windows Server or Active Directory Domain Services in this tutorial. There are a number of resources online to guide you through this process:
 
-- Install Windows Server 2012  - (`technet.microsoft.com`) - [Installing Windows Server 2012](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/jj134246(v=ws.11))
+- Install Windows Server 2012 - (`technet.microsoft.com`) - [Installing Windows Server 2012](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/jj134246(v=ws.11))
 
-- Install Active Directory Domain Services (AD DS) (`technet.microsoft.com`)- [Install Active Directory Domain Services](https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-#BKMK_PS)
+- Install Active Directory Domain Services (AD DS) (`technet.microsoft.com`) - [Install Active Directory Domain Services](https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-#BKMK_PS)
 
 > **Shortcut:** You can quickly install AD DS via PowerShell using
 `Install-WindowsFeature AD-Domain-Services -IncludeManagementTools`
@@ -56,7 +56,7 @@ Using PowerShell you can output the **OU** structure as a table (_all names are 
 Get-ADObject -LDAPFilter "(objectClass=*)" -SearchBase 'OU=GitLab INT,DC=GitLab,DC=org' -Properties CanonicalName | Format-Table Name,CanonicalName -A
 ```
 
-```
+```plaintext
 OU                CanonicalName
 ----              -------------
 GitLab INT        GitLab.org/GitLab INT
@@ -105,11 +105,11 @@ The initial configuration of LDAP in GitLab requires changes to the `gitlab.rb` 
 
 The two Active Directory specific values are `active_directory: true` and `uid: 'sAMAccountName'`. `sAMAccountName` is an attribute returned by Active Directory used for GitLab usernames. See the example output from `ldapsearch` for a full list of attributes a "person" object (user) has in **AD** - [`ldapsearch` example](#using-ldapsearch-unix)
 
-> Both group_base and admin_group configuration options are only available in GitLab Enterprise Edition. See [GitLab EE - LDAP Features](../how_to_configure_ldap_gitlab_ee/index.html#gitlab-enterprise-edition---ldap-features) **(STARTER ONLY)**
+> Both group_base and admin_group configuration options are only available in GitLab Enterprise Edition. See [GitLab EE - LDAP Features](../how_to_configure_ldap_gitlab_ee/index.md#gitlab-enterprise-edition---ldap-features) **(STARTER ONLY)**
 
 ### Example `gitlab.rb` LDAP
 
-```
+```ruby
 gitlab_rails['ldap_enabled'] = true
 gitlab_rails['ldap_servers'] = {
 'main' => {
@@ -149,7 +149,7 @@ You can use the [`AdFind`](https://social.technet.microsoft.com/wiki/contents/ar
 
 You can use the filter `objectclass=*` to return all directory objects.
 
-```sh
+```shell
 adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -up Password1 -b "OU=GitLab INT,DC=GitLab,DC=org" -f (objectClass=*)
 ```
 
@@ -157,7 +157,7 @@ adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -u
 
 You can also retrieve a single object by **specifying** the object name or full **DN**. In this example we specify the object name only `CN=Leroy Fox`.
 
-```sh
+```shell
 adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -up Password1 -b "OU=GitLab INT,DC=GitLab,DC=org" -f (&(objectcategory=person)(CN=Leroy Fox))”
 ```
 
@@ -169,7 +169,7 @@ You can use the `ldapsearch` utility (on Unix based systems) to test that your L
 
 You can use the filter `objectclass=*` to return all directory objects.
 
-```sh
+```shell
 ldapsearch -D "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" \
 -w Password1 -p 636 -h ad.example.org \
 -b "OU=GitLab INT,DC=GitLab,DC=org" -Z \
@@ -180,13 +180,13 @@ ldapsearch -D "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" \
 
 You can also retrieve a single object by **specifying** the object name or full **DN**. In this example we specify the object name only `CN=Leroy Fox`.
 
-```sh
+```shell
 ldapsearch -D "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -w Password1 -p 389 -h ad.example.org -b "OU=GitLab INT,DC=GitLab,DC=org" -Z -s sub "CN=Leroy Fox"
 ```
 
 **Full output of `ldapsearch` command:** - Filtering for _CN=Leroy Fox_
 
-```
+```plaintext
 # LDAPv3
 # base <OU=GitLab INT,DC=GitLab,DC=org> with scope subtree
 # filter: CN=Leroy Fox

@@ -1,6 +1,6 @@
 import '~/pages/projects/tree/show/index';
-import { parseBoolean } from '~/lib/utils/common_utils';
 import initPathLocks from 'ee/path_locks';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 document.addEventListener('DOMContentLoaded', () => {
   const treeContent = document.querySelector('.js-tree-content');

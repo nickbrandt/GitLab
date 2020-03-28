@@ -17,7 +17,7 @@ describe CountriesController do
       get :index
 
       # response is returned as [["Afghanistan", "AF"], ["Albania", "AL"], ..]
-      resultant_countries = JSON.parse(response.body).map {|row| row[0]}
+      resultant_countries = json_response.map {|row| row[0]}
 
       expect(resultant_countries).not_to include(World::DENYLIST)
     end

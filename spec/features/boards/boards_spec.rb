@@ -163,9 +163,7 @@ describe 'Issue Boards', :js do
     end
 
     it 'infinite scrolls list' do
-      50.times do
-        create(:labeled_issue, project: project, labels: [planning])
-      end
+      create_list(:labeled_issue, 50, project: project, labels: [planning])
 
       visit project_board_path(project, board)
       wait_for_requests
@@ -475,9 +473,7 @@ describe 'Issue Boards', :js do
       end
 
       it 'infinite scrolls list with label filter' do
-        50.times do
-          create(:labeled_issue, project: project, labels: [planning, testing])
-        end
+        create_list(:labeled_issue, 50, project: project, labels: [planning, testing])
 
         set_filter("label", testing.title)
         click_filter_link(testing.title)
@@ -523,7 +519,7 @@ describe 'Issue Boards', :js do
         page.within(find('.board:nth-child(2)')) do
           expect(page).to have_selector('.board-card', count: 8)
           expect(find('.board-card', match: :first)).to have_content(bug.title)
-          click_button(bug.title)
+          click_link(bug.title)
           wait_for_requests
         end
 
@@ -540,7 +536,7 @@ describe 'Issue Boards', :js do
       it 'removes label filter by clicking label button on issue' do
         page.within(find('.board:nth-child(2)')) do
           page.within(find('.board-card', match: :first)) do
-            click_button(bug.title)
+            click_link(bug.title)
           end
 
           wait_for_requests
@@ -628,7 +624,7 @@ describe 'Issue Boards', :js do
   end
 
   def set_filter(type, text)
-    find('.filtered-search').native.send_keys("#{type}:#{text}")
+    find('.filtered-search').native.send_keys("#{type}:=#{text}")
   end
 
   def submit_filter

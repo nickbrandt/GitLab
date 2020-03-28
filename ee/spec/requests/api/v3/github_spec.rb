@@ -4,12 +4,13 @@ require 'spec_helper'
 
 describe API::V3::Github do
   let(:user) { create(:user) }
-  let!(:project) { create(:project, :repository, creator: user) }
-  let!(:project2) { create(:project, :repository, creator: user) }
+  let(:unauthorized_user) { create(:user) }
+  let(:admin) { create(:user, :admin) }
+  let(:project) { create(:project, :repository, creator: user) }
 
   before do
     project.add_maintainer(user)
-    project2.add_maintainer(user)
+    stub_licensed_features(jira_dev_panel_integration: true)
   end
 
   describe 'GET /orgs/:namespace/repos' do
@@ -18,7 +19,7 @@ describe API::V3::Github do
 
       jira_get v3_api("/orgs/#{group.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
 
@@ -27,7 +28,7 @@ describe API::V3::Github do
 
       jira_get v3_api("/orgs/#{group.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -35,51 +36,41 @@ describe API::V3::Github do
     it 'returns an empty array' do
       jira_get v3_api('/user/repos', user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
   end
 
   shared_examples_for 'Jira-specific mimicked GitHub endpoints' do
     describe 'GET /.../issues/:id/comments' do
+      let(:merge_request) do
+        create(:merge_request, source_project: project, target_project: project)
+      end
+      let!(:note) do
+        create(:note, project: project, noteable: merge_request)
+      end
+
       context 'when user has access to the merge request' do
-        let(:merge_request) do
-          create(:merge_request, source_project: project, target_project: project)
-        end
-        let!(:note) do
-          create(:note, project: project, noteable: merge_request)
-        end
-
         it 'returns an array of notes' do
-          stub_licensed_features(jira_dev_panel_integration: true)
-
           jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(1)
         end
       end
 
       context 'when user has no access to the merge request' do
-        let(:private_project) { create(:project, :private) }
-        let(:merge_request) do
-          create(:merge_request, source_project: private_project, target_project: private_project)
-        end
-        let!(:note) do
-          create(:note, project: private_project, noteable: merge_request)
-        end
+        let(:project) { create(:project, :private) }
 
         before do
-          private_project.add_guest(user)
+          project.add_guest(user)
         end
 
         it 'returns 404' do
-          stub_licensed_features(jira_dev_panel_integration: true)
-
           jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -88,7 +79,7 @@ describe API::V3::Github do
       it 'returns an empty array' do
         jira_get v3_api("/repos/#{path}/pulls/xpto/commits", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq([])
       end
     end
@@ -97,7 +88,7 @@ describe API::V3::Github do
       it 'returns an empty array' do
         jira_get v3_api("/repos/#{path}/pulls/xpto/comments", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq([])
       end
     end
@@ -113,7 +104,7 @@ describe API::V3::Github do
     it 'returns an empty Array for events' do
       jira_get v3_api('/repos/-/jira/events', user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
   end
@@ -126,15 +117,11 @@ describe API::V3::Github do
     describe 'GET /users/:username' do
       let!(:user1) { create(:user, username: 'jane.porter') }
 
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
-
       context 'user exists' do
         it 'responds with the expected user' do
           jira_get v3_api("/users/#{user.username}", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/github/user', dir: 'ee')
         end
       end
@@ -143,13 +130,11 @@ describe API::V3::Github do
         it 'responds with the expected status' do
           jira_get v3_api('/users/unknown_user_name', user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
       context 'no rights to request user lists' do
-        let(:unauthorized_user) { create(:user) }
-
         before do
           expect(Ability).to receive(:allowed?).with(unauthorized_user, :read_users_list, :global).and_return(false)
           expect(Ability).to receive(:allowed?).at_least(:once).and_call_original
@@ -158,7 +143,7 @@ describe API::V3::Github do
         it 'responds with forbidden' do
           jira_get v3_api("/users/#{user.username}", unauthorized_user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -168,15 +153,11 @@ describe API::V3::Github do
       let(:project) { create(:project, :empty_repo, path: 'project.with.dot', group: group) }
       let(:events_path) { "/repos/#{group.path}/#{project.path}/events" }
 
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
-
       context 'if there are no merge requests' do
         it 'returns an empty array' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq([])
         end
       end
@@ -187,7 +168,7 @@ describe API::V3::Github do
         it 'returns an event' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(1)
         end
@@ -200,7 +181,7 @@ describe API::V3::Github do
         it 'returns the expected amount of events' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(2)
         end
@@ -216,6 +197,7 @@ describe API::V3::Github do
   end
 
   describe 'repo pulls' do
+    let(:project2) { create(:project, :repository, creator: user) }
     let(:assignee) { create(:user) }
     let(:assignee2) { create(:user) }
     let!(:merge_request) do
@@ -225,13 +207,15 @@ describe API::V3::Github do
       create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
     end
 
+    before do
+      project2.add_maintainer(user)
+    end
+
     describe 'GET /-/jira/pulls' do
       it 'returns an array of merge requests with github format' do
-        stub_licensed_features(jira_dev_panel_integration: true)
-
         jira_get v3_api('/repos/-/jira/pulls', user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(2)
         expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
@@ -240,11 +224,9 @@ describe API::V3::Github do
 
     describe 'GET /repos/:namespace/:project/pulls' do
       it 'returns an array of merge requests for the proper project in github format' do
-        stub_licensed_features(jira_dev_panel_integration: true)
-
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(1)
         expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
@@ -252,13 +234,32 @@ describe API::V3::Github do
     end
 
     describe 'GET /repos/:namespace/:project/pulls/:id' do
-      it 'returns the requested merge request in github format' do
-        stub_licensed_features(jira_dev_panel_integration: true)
+      context 'when user has access to the merge requests' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
 
-        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
+      end
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+      context 'when user has no access to the merge request' do
+        it 'returns 404' do
+          project.add_guest(unauthorized_user)
+
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", unauthorized_user)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'when instance admin' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", admin)
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
       end
     end
   end
@@ -269,7 +270,7 @@ describe API::V3::Github do
     def expect_project_under_namespace(projects, namespace, user)
       jira_get v3_api("/users/#{namespace.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to include_pagination_headers
       expect(response).to match_response_schema('entities/github/repositories', dir: 'ee')
 
@@ -285,28 +286,20 @@ describe API::V3::Github do
       expect(json_response.size).to eq(projects.size)
     end
 
-    context 'when instance admin' do
-      let(:project) { create(:project, group: group) }
-
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
-
-      it 'returns an array of projects belonging to group with github format' do
-        expect_project_under_namespace([project], group, create(:user, :admin))
-      end
-    end
-
     context 'group namespace' do
       let(:project) { create(:project, group: group) }
+      let!(:project2) { create(:project, :public, group: group) }
 
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-        group.add_maintainer(user)
+      it 'returns an array of projects belonging to group excluding the ones user is not directly a member of, even when public' do
+        expect_project_under_namespace([project], group, user)
       end
 
-      it 'returns an array of projects belonging to group with github format' do
-        expect_project_under_namespace([project], group, user)
+      context 'when instance admin' do
+        let(:user) { create(:user, :admin) }
+
+        it 'returns an array of projects belonging to group' do
+          expect_project_under_namespace([project, project2], group, user)
+        end
       end
     end
 
@@ -316,7 +309,6 @@ describe API::V3::Github do
       let!(:child_group_project) { create(:project, group: group, name: 'child_group_project') }
 
       before do
-        stub_licensed_features(jira_dev_panel_integration: true)
         group.parent.add_maintainer(user)
       end
 
@@ -333,7 +325,7 @@ describe API::V3::Github do
           it 'returns not found' do
             jira_get v3_api("/users/#{group.parent.path}/repos", user)
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -351,7 +343,7 @@ describe API::V3::Github do
             create(:project, :repository, group: new_group, creator: user)
 
             expect { jira_get v3_api("/users/#{group.parent.path}/repos", user) }.not_to exceed_query_limit(control)
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
       end
@@ -359,10 +351,6 @@ describe API::V3::Github do
 
     context 'user namespace' do
       let(:project) { create(:project, namespace: user.namespace) }
-
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
 
       it 'returns an array of projects belonging to user namespace with github format' do
         expect_project_under_namespace([project], user.namespace, user)
@@ -374,7 +362,6 @@ describe API::V3::Github do
       let(:group) { create(:group, name: 'foo.bar') }
 
       before do
-        stub_licensed_features(jira_dev_panel_integration: true)
         group.add_maintainer(user)
       end
 
@@ -387,7 +374,7 @@ describe API::V3::Github do
       it 'returns 401' do
         jira_get v3_api('/users/foo/repos', nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -397,7 +384,6 @@ describe API::V3::Github do
 
       create(:gitlab_subscription, :silver, namespace: licensed_project.namespace)
 
-      stub_licensed_features(jira_dev_panel_integration: true)
       stub_application_setting_on_object(project, should_check_namespace_plan: true)
       stub_application_setting_on_object(licensed_project, should_check_namespace_plan: true)
 
@@ -406,21 +392,15 @@ describe API::V3::Github do
 
     context 'namespace does not exist' do
       it 'responds with not found status' do
-        stub_licensed_features(jira_dev_panel_integration: true)
-
         jira_get v3_api('/users/noo/repos', user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
 
   describe 'GET /repos/:namespace/:project/branches' do
     context 'authenticated' do
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
-
       context 'updating project feature usage' do
         it 'counts Jira Cloud integration as enabled' do
           user_agent = 'Jira DVCS Connector Vertigo/4.42.0'
@@ -446,7 +426,7 @@ describe API::V3::Github do
       it 'returns an array of project branches with github format' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an(Array)
 
@@ -458,7 +438,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns 200 when namespace path include a dot' do
@@ -468,29 +448,34 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{group.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
     context 'unauthenticated' do
       it 'returns 401' do
-        stub_licensed_features(jira_dev_panel_integration: true)
-
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
     context 'unauthorized' do
+      it 'returns 404 when lower access level' do
+        project.add_guest(unauthorized_user)
+
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       it 'returns 404 when not licensed' do
         stub_licensed_features(jira_dev_panel_integration: false)
-        unauthorized_user = create(:user)
         project.add_reporter(unauthorized_user)
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -500,14 +485,10 @@ describe API::V3::Github do
     let(:commit_id) { commit.id }
 
     context 'authenticated' do
-      before do
-        stub_licensed_features(jira_dev_panel_integration: true)
-      end
-
       it 'returns commit with github format' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('entities/github/commit', dir: 'ee')
       end
 
@@ -516,7 +497,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns 200 when namespace path include a dot' do
@@ -526,7 +507,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{group.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -534,30 +515,28 @@ describe API::V3::Github do
       it 'returns 401' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
     context 'unauthorized' do
       it 'returns 404 when lower access level' do
-        unauthorized_user = create(:user)
         project.add_guest(unauthorized_user)
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns 404 when not licensed' do
         stub_licensed_features(jira_dev_panel_integration: false)
-        unauthorized_user = create(:user)
         project.add_reporter(unauthorized_user)
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

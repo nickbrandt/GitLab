@@ -31,8 +31,12 @@ module QA
         end
 
         def wait_for_search_to_complete
-          has_css?('.select2-active')
+          has_css?('.select2-active', wait: 1)
           has_no_css?('.select2-active', wait: 30)
+        end
+
+        def dropdown_open?
+          has_css?('.select2-input')
         end
       end
     end

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 module API
   class NpmPackages < Grape::API
+    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::Packages::DependencyProxyHelpers
+
     NPM_ENDPOINT_REQUIREMENTS = {
       package_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
@@ -14,11 +17,86 @@ module API
       authenticate_non_get!
     end
 
-    helpers ::API::Helpers::PackagesHelpers
-
     helpers do
-      def find_project_by_package_name(name)
-        ::Packages::Package.npm.with_name(name).first&.project
+      def project_by_package_name
+        strong_memoize(:project_by_package_name) do
+          ::Packages::Package.npm.with_name(params[:package_name]).first&.project
+        end
+      end
+    end
+
+    desc 'Get all tags for a given an NPM package' do
+      detail 'This feature was introduced in GitLab 12.7'
+      success EE::API::Entities::NpmPackageTag
+    end
+    params do
+      requires :package_name, type: String, desc: 'Package name'
+    end
+    get 'packages/npm/-/package/*package_name/dist-tags', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
+      package_name = params[:package_name]
+
+      bad_request!('Package Name') if package_name.blank?
+
+      authorize_read_package!(project_by_package_name)
+      authorize_packages_feature!(project_by_package_name)
+
+      packages = ::Packages::Npm::PackageFinder.new(project_by_package_name, package_name)
+                                              .execute
+
+      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
+              with: EE::API::Entities::NpmPackageTag
+    end
+
+    params do
+      requires :package_name, type: String, desc: 'Package name'
+      requires :tag, type: String, desc: "Package dist-tag"
+    end
+    namespace 'packages/npm/-/package/*package_name/dist-tags/:tag', requirements: NPM_ENDPOINT_REQUIREMENTS do
+      desc 'Create or Update the given tag for the given NPM package and version' do
+        detail 'This feature was introduced in GitLab 12.7'
+      end
+      put format: false do
+        package_name = params[:package_name]
+        version = env['api.request.body']
+        tag = params[:tag]
+
+        bad_request!('Package Name') if package_name.blank?
+        bad_request!('Version') if version.blank?
+        bad_request!('Tag') if tag.blank?
+
+        authorize_create_package!(project_by_package_name)
+
+        package = ::Packages::Npm::PackageFinder
+          .new(project_by_package_name, package_name)
+          .find_by_version(version)
+        not_found!('Package') unless package
+
+        ::Packages::Npm::CreateTagService.new(package, tag).execute
+
+        no_content!
+      end
+
+      desc 'Deletes the given tag' do
+        detail 'This feature was introduced in GitLab 12.7'
+      end
+      delete format: false do
+        package_name = params[:package_name]
+        tag = params[:tag]
+
+        bad_request!('Package Name') if package_name.blank?
+        bad_request!('Tag') if tag.blank?
+
+        authorize_destroy_package!(project_by_package_name)
+
+        package_tag = ::Packages::TagsFinder
+          .new(project_by_package_name, package_name, package_type: :npm)
+          .find_by_name(tag)
+
+        not_found!('Package tag') unless package_tag
+
+        ::Packages::RemoveTagService.new(package_tag).execute
+
+        no_content!
       end
     end
 
@@ -28,19 +106,20 @@ module API
     params do
       requires :package_name, type: String, desc: 'Package name'
     end
+    route_setting :authentication, job_token_allowed: true
     get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
-      project = find_project_by_package_name(package_name)
+      redirect_registry_request(project_by_package_name.blank?, :npm, package_name: package_name) do
+        authorize_read_package!(project_by_package_name)
+        authorize_packages_feature!(project_by_package_name)
 
-      authorize_read_package!(project)
-      authorize_packages_feature!(project)
+        packages = ::Packages::Npm::PackageFinder
+          .new(project_by_package_name, package_name).execute
 
-      packages = ::Packages::NpmPackagesFinder
-        .new(project, package_name).execute
-
-      present NpmPackagePresenter.new(project, package_name, packages),
-        with: EE::API::Entities::NpmPackage
+        present ::Packages::Npm::PackagePresenter.new(package_name, packages),
+          with: EE::API::Entities::NpmPackage
+      end
     end
 
     params do
@@ -58,6 +137,7 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :file_name, type: String, desc: 'Package file name'
       end
+      route_setting :authentication, job_token_allowed: true
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_read_package!(user_project)
 
@@ -66,6 +146,8 @@ module API
 
         package_file = ::Packages::PackageFileFinder
           .new(package, params[:file_name]).execute!
+
+        track_event('pull_package')
 
         present_carrierwave_file!(package_file.file)
       end
@@ -79,10 +161,12 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
-        authorize_create_package!
+        authorize_create_package!(user_project)
 
-        created_package = ::Packages::CreateNpmPackageService
-          .new(user_project, current_user, params).execute
+        track_event('push_package')
+
+        created_package = ::Packages::Npm::CreatePackageService
+          .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
 
         if created_package[:status] == :error
           render_api_error!(created_package[:message], created_package[:http_status])

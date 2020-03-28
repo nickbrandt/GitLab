@@ -15,16 +15,6 @@ describe Geo::DesignRepositorySyncWorker, :geo do
       expect(service).to have_received(:execute)
     end
 
-    it 'does not run DesignRepositorySyncService if feature is disabled' do
-      project = create(:project)
-
-      stub_feature_flags(enable_geo_design_sync: false)
-
-      expect(Geo::DesignRepositorySyncService).not_to receive(:new)
-
-      described_class.new.perform(project.id)
-    end
-
     it 'logs error when repository does not exist' do
       worker = described_class.new
 

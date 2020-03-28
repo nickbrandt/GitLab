@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'User uploads new design', :js do
   include DesignManagementTestHelpers
 
-  set(:project) { create(:project_empty_repo, :public) }
-  set(:user) { project.owner }
-  set(:issue) { create(:issue, project: project) }
+  let_it_be(:project) { create(:project_empty_repo, :public) }
+  let_it_be(:user) { project.owner }
+  let_it_be(:issue) { create(:issue, project: project) }
 
   before do
     sign_in(user)
@@ -29,7 +29,7 @@ describe 'User uploads new design', :js do
 
       expect(page).to have_selector('.js-design-list-item', count: 1)
 
-      within first('#designs-tab .card') do
+      within first('#designs-tab .js-design-list-item') do
         expect(page).to have_content('dk.png')
       end
 
@@ -42,10 +42,14 @@ describe 'User uploads new design', :js do
   context 'when the feature is not available' do
     before do
       visit project_issue_path(project, issue)
+
+      click_link 'Designs'
+
+      wait_for_requests
     end
 
-    it 'does not show the designs link' do
-      expect(page).not_to have_link('Designs')
+    it 'shows the message about requirements' do
+      expect(page).to have_content("To enable design management, you'll need to meet the requirements.")
     end
   end
 

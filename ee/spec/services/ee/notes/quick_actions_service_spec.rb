@@ -5,6 +5,7 @@ describe Notes::QuickActionsService do
   let(:group)   { create(:group) }
   let(:project) { create(:project, group: group) }
   let(:user) { create(:user) }
+  let(:assignee) { create(:user) }
   let(:issue) { create(:issue, project: project) }
   let(:epic) { create(:epic, group: group)}
 
@@ -232,28 +233,81 @@ describe Notes::QuickActionsService do
     end
   end
 
-  context 'Issue assignees' do
-    describe '/assign' do
-      let(:project) { create(:project) }
-      let(:maintainer) { create(:user).tap { |u| project.add_maintainer(u) } }
-      let(:assignee) { create(:user) }
-      let(:service) { described_class.new(project, maintainer) }
+  describe '/assign' do
+    let(:note_text) { %(/assign @#{user.username} @#{assignee.username}\n) }
+    let(:multiline_assign_note_text) { %(/assign @#{user.username}\n/assign @#{assignee.username}) }
+
+    before do
+      project.add_maintainer(assignee)
+      project.add_maintainer(user)
+    end
+
+    context 'Issue assignees' do
       let(:note) { create(:note_on_issue, note: note_text, project: project) }
 
-      let(:note_text) do
-        %(/assign @#{assignee.username} @#{maintainer.username}\n")
-      end
-
-      before do
-        project.add_maintainer(maintainer)
-        project.add_maintainer(assignee)
-      end
-
       it 'adds multiple assignees from the list' do
-        _, update_params = service.execute(note)
+        _, update_params, message = service.execute(note)
         service.apply_updates(update_params, note)
 
+        expect(message).to eq("Assigned @#{assignee.username} and @#{user.username}.")
         expect(note.noteable.assignees.count).to eq(2)
+      end
+
+      it_behaves_like 'assigning an already assigned user', false do
+        let(:target) { note.noteable }
+      end
+
+      it_behaves_like 'assigning an already assigned user', true do
+        let(:note) { create(:note_on_issue, note: multiline_assign_note_text, project: project) }
+        let(:target) { note.noteable }
+      end
+    end
+
+    context 'MergeRequest' do
+      let(:note) { create(:note_on_merge_request, note: note_text, project: project) }
+
+      it_behaves_like 'assigning an already assigned user', false do
+        let(:target) { note.noteable }
+      end
+
+      it_behaves_like 'assigning an already assigned user', true do
+        let(:note) { create(:note_on_merge_request, note: multiline_assign_note_text, project: project) }
+        let(:target) { note.noteable }
+      end
+    end
+  end
+
+  describe '/unassign' do
+    let(:note_text) { %(/unassign @#{assignee.username} @#{user.username}\n) }
+    let(:multiline_unassign_note_text) { %(/unassign @#{assignee.username}\n/unassign @#{user.username}) }
+
+    before do
+      project.add_maintainer(user)
+    end
+
+    context 'Issue assignees' do
+      let(:note) { create(:note_on_issue, note: note_text, project: project) }
+
+      it_behaves_like 'unassigning a not assigned user', false do
+        let(:target) { note.noteable }
+      end
+
+      it_behaves_like 'unassigning a not assigned user', true do
+        let(:note) { create(:note_on_issue, note: multiline_unassign_note_text, project: project) }
+        let(:target) { note.noteable }
+      end
+    end
+
+    context 'MergeRequest' do
+      let(:note) { create(:note_on_merge_request, note: note_text, project: project) }
+
+      it_behaves_like 'unassigning a not assigned user', false do
+        let(:target) { note.noteable }
+      end
+
+      it_behaves_like 'unassigning a not assigned user', true do
+        let(:note) { create(:note_on_merge_request, note: multiline_unassign_note_text, project: project) }
+        let(:target) { note.noteable }
       end
     end
   end
@@ -296,6 +350,71 @@ describe Notes::QuickActionsService do
         it 'creates issue relation' do
           expect { execute(note) }.to change { IssueLink.count }.by(1)
         end
+      end
+    end
+  end
+
+  context '/promote' do
+    let(:note_text) { "/promote" }
+    let(:note) { create(:note_on_issue, noteable: issue, project: project, note: note_text) }
+
+    context 'when epics are enabled' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when a user does not have permissions to promote an issue' do
+        it 'does not promote an issue to an epic' do
+          expect { execute(note) }.not_to change { Epic.count }
+          expect(issue.promoted_to_epic_id).to be_nil
+        end
+      end
+
+      context 'when a user has permissions to promote an issue' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'promotes an issue to an epic' do
+          expect { execute(note) }.to change { Epic.count }.by(1)
+          expect(issue.promoted_to_epic_id).to be_present
+        end
+
+        context 'with a double promote' do
+          let(:note_text) do
+            <<~HEREDOC
+            /promote
+            /promote
+            HEREDOC
+          end
+
+          it 'only creates one epic' do
+            expect { execute(note) }.to change { Epic.count }.by(1)
+          end
+        end
+
+        context 'when an issue belongs to a project without group' do
+          let(:user_project) { create(:project) }
+          let(:issue) { create(:issue, project: user_project) }
+          let(:note) { create(:note_on_issue, noteable: issue, project: user_project, note: note_text) }
+
+          before do
+            user_project.add_developer(user)
+          end
+
+          it 'does not promote an issue to an epic' do
+            expect { execute(note) }
+              .to raise_error(Epics::IssuePromoteService::PromoteError)
+          end
+        end
+      end
+    end
+
+    context 'when epics are disabled' do
+      it 'does not promote an issue to an epic' do
+        group.add_developer(user)
+
+        expect { execute(note) }.not_to change { Epic.count }
       end
     end
   end

@@ -28,7 +28,7 @@ describe 'Protected Environments' do
     end
 
     it 'does not have access to Protected Environments settings' do
-      expect(page).to have_gitlab_http_status(404)
+      expect(page).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -40,7 +40,7 @@ describe 'Protected Environments' do
     end
 
     it 'has access to Protected Environments settings' do
-      expect(page).to have_gitlab_http_status(200)
+      expect(page).to have_gitlab_http_status(:ok)
     end
 
     it 'allows seeing a list of protected environments' do
@@ -103,7 +103,7 @@ describe 'Protected Environments' do
         it 'shows setting page correctly' do
           visit project_settings_ci_cd_path(project)
 
-          expect(page).to have_gitlab_http_status(200)
+          expect(page).to have_gitlab_http_status(:ok)
         end
       end
     end

@@ -1,9 +1,9 @@
-import eventHub from '~/ide/eventhub';
-import { createStore } from '~/ide/stores';
 import createTerminalPlugin from 'ee/ide/stores/plugins/terminal';
 import createTerminalSyncPlugin from 'ee/ide/stores/plugins/terminal_sync';
 import { SET_SESSION_STATUS } from 'ee/ide/stores/modules/terminal/mutation_types';
 import { RUNNING, STOPPING } from 'ee/ide/constants';
+import { createStore } from '~/ide/stores';
+import eventHub from '~/ide/eventhub';
 
 jest.mock('ee/ide/lib/mirror');
 

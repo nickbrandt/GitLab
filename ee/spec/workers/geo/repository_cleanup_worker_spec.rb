@@ -6,9 +6,9 @@ describe Geo::RepositoryCleanupWorker, :geo do
   include ::EE::GeoHelpers
 
   describe '#perform' do
-    set(:primary) { create(:geo_node, :primary) }
-    set(:secondary) { create(:geo_node) }
-    set(:project) { create(:project) }
+    let_it_be(:primary) { create(:geo_node, :primary) }
+    let_it_be(:secondary) { create(:geo_node) }
+    let_it_be(:project) { create(:project) }
 
     before do
       stub_current_geo_node(secondary)

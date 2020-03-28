@@ -58,6 +58,11 @@ describe Issues::UpdateService do
         end
       end
 
+      it_behaves_like 'updating issuable health status' do
+        let(:issuable) { issue }
+        let(:parent) { project }
+      end
+
       context 'updating other fields' do
         it 'does not call UpdateDatesService' do
           expect(Epics::UpdateDatesService).not_to receive(:new)
@@ -129,7 +134,7 @@ describe Issues::UpdateService do
         end
       end
 
-      context 'when issue does belongs to an epic' do
+      context 'when issue belongs to an epic' do
         before do
           issue.update!(epic: epic)
         end
@@ -153,6 +158,62 @@ describe Issues::UpdateService do
     it_behaves_like 'existing issuable with scoped labels' do
       let(:issuable) { issue }
       let(:parent) { project }
+    end
+
+    it_behaves_like 'issue with epic_id parameter' do
+      let(:execute) { described_class.new(project, user, params).execute(issue) }
+      let(:epic) { create(:epic, group: group) }
+    end
+
+    context 'promoting to epic' do
+      before do
+        stub_licensed_features(epics: true)
+        group.add_developer(user)
+      end
+
+      context 'when promote_to_epic param is present' do
+        it 'promotes issue to epic' do
+          expect { update_issue(promote_to_epic: true) }.to change { Epic.count }.by(1)
+          expect(issue.promoted_to_epic_id).not_to be_nil
+        end
+      end
+
+      context 'when promote_to_epic param is not present' do
+        it 'does not promote issue to epic' do
+          expect { update_issue(promote_to_epic: false) }.not_to change { Epic.count }
+          expect(issue.promoted_to_epic_id).to be_nil
+        end
+      end
+    end
+
+    describe 'publish to status page' do
+      let(:execute) { update_issue(params) }
+      let(:issue_id) { execute&.id }
+
+      context 'when update succeeds' do
+        let(:params) { { title: 'New title' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when closing' do
+        let(:params) { { state_event: 'close' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when reopening' do
+        let(:issue) { create(:issue, :closed, project: project) }
+        let(:params) { { state_event: 'reopen' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when update fails' do
+        let(:params) { { title: nil } }
+
+        include_examples 'no trigger status page publish'
+      end
     end
   end
 end

@@ -1,11 +1,11 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { GlLoadingIcon } from '@gitlab/ui';
+import { TEST_HOST } from 'helpers/test_constants';
 import List from '~/ide/components/pipelines/list.vue';
 import JobsList from '~/ide/components/jobs/list.vue';
 import Tab from '~/vue_shared/components/tabs/tab.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
-import { TEST_HOST } from 'helpers/test_constants';
 import { pipelines } from '../../../../javascripts/ide/mock_data';
 
 const localVue = createLocalVue();
@@ -63,7 +63,6 @@ describe('IDE pipelines list', () => {
     wrapper = shallowMount(List, {
       localVue,
       store: fakeStore,
-      sync: false,
     });
   };
 

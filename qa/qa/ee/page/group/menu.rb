@@ -19,6 +19,8 @@ module QA
               end
 
               view 'ee/app/views/layouts/nav/ee/_security_link.html.haml' do
+                element :security_compliance_link
+                element :group_secure_submenu
                 element :security_dashboard_link
               end
 
@@ -69,8 +71,10 @@ module QA
           end
 
           def click_group_insights_link
-            within_sidebar do
-              click_element(:group_insights_link)
+            hover_element(:analytics_link) do
+              within_submenu(:analytics_sidebar_submenu) do
+                click_element(:group_insights_link)
+              end
             end
           end
 
@@ -95,8 +99,10 @@ module QA
           end
 
           def click_group_security_link
-            within_sidebar do
-              click_element(:security_dashboard_link)
+            hover_element(:security_compliance_link) do
+              within_submenu(:group_secure_submenu) do
+                click_element(:security_dashboard_link)
+              end
             end
           end
         end

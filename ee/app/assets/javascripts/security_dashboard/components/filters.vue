@@ -1,5 +1,5 @@
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import DashboardFilter from './filter.vue';
 import GlToggleVuex from '~/vue_shared/components/gl_toggle_vuex.vue';
 
@@ -8,31 +8,26 @@ export default {
     DashboardFilter,
     GlToggleVuex,
   },
-  props: {
-    showHideDismissedToggle: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   computed: {
-    ...mapGetters({
-      filters: 'filters/visibleFilters',
-    }),
+    ...mapGetters('filters', ['visibleFilters']),
+  },
+  methods: {
+    ...mapActions('filters', ['setFilter']),
   },
 };
 </script>
 
 <template>
-  <div class="dashboard-filters border-bottom bg-light">
+  <div class="dashboard-filters border-bottom bg-gray-light">
     <div class="row mx-0 p-2">
       <dashboard-filter
-        v-for="filter in filters"
+        v-for="filter in visibleFilters"
         :key="filter.id"
         class="col-sm-6 col-md-4 col-lg-2 p-2 js-filter"
-        :filter-id="filter.id"
+        :filter="filter"
+        @setFilter="setFilter"
       />
-      <div v-if="showHideDismissedToggle" class="ml-lg-auto p-2">
+      <div class="ml-lg-auto p-2">
         <strong>{{ s__('SecurityDashboard|Hide dismissed') }}</strong>
         <gl-toggle-vuex
           class="d-block mt-1 js-toggle"

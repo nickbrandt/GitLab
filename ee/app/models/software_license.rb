@@ -5,7 +5,7 @@
 class SoftwareLicense < ApplicationRecord
   include Presentable
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: true
   validates :spdx_identifier, length: { maximum: 255 }
 
   scope :by_name, -> (names) { where(name: names) }
@@ -15,9 +15,9 @@ class SoftwareLicense < ApplicationRecord
   scope :unknown, -> { where(spdx_identifier: nil) }
   scope :grouped_by_name, -> { group(:name) }
 
-  def self.create_policy_for!(project:, name:, approval_status:)
+  def self.create_policy_for!(project:, name:, classification:)
     project.software_license_policies.create!(
-      approval_status: approval_status,
+      classification: classification,
       software_license: safe_find_or_create_by!(name: name)
     )
   end

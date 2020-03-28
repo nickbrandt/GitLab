@@ -10,7 +10,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
     perform_enqueued_jobs { snippet }
-    Snippet.__elasticsearch__.refresh_index!
+    ensure_elasticsearch_index!
   end
 
   describe '#snippet_titles_count' do
@@ -52,7 +52,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     end
   end
 
-  context 'when user has full_private_access', :do_not_mock_admin_mode do
+  context 'when user has read_all_resources', :do_not_mock_admin_mode do
     include_context 'custom session'
 
     let(:user) { create(:admin) }
@@ -67,6 +67,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
 
     context 'admin mode enabled' do
       before do
+        Gitlab::Auth::CurrentUserMode.new(user).request_admin_mode!
         Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
       end
 

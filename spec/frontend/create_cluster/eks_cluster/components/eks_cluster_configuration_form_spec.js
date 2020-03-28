@@ -5,7 +5,7 @@ import { GlFormCheckbox } from '@gitlab/ui';
 
 import EksClusterConfigurationForm from '~/create_cluster/eks_cluster/components/eks_cluster_configuration_form.vue';
 import eksClusterFormState from '~/create_cluster/eks_cluster/store/state';
-import clusterDropdownStoreState from '~/create_cluster/eks_cluster/store/cluster_dropdown/state';
+import clusterDropdownStoreState from '~/create_cluster/store/cluster_dropdown/state';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -13,6 +13,7 @@ localVue.use(Vuex);
 describe('EksClusterConfigurationForm', () => {
   let store;
   let actions;
+  let getters;
   let state;
   let rolesState;
   let regionsState;
@@ -27,13 +28,10 @@ describe('EksClusterConfigurationForm', () => {
   let subnetsActions;
   let keyPairsActions;
   let securityGroupsActions;
-  let instanceTypesActions;
   let vm;
 
-  beforeEach(() => {
-    state = eksClusterFormState();
+  const createStore = (config = {}) => {
     actions = {
-      signOut: jest.fn(),
       createCluster: jest.fn(),
       setClusterName: jest.fn(),
       setEnvironmentScope: jest.fn(),
@@ -66,32 +64,44 @@ describe('EksClusterConfigurationForm', () => {
     securityGroupsActions = {
       fetchItems: jest.fn(),
     };
-    instanceTypesActions = {
-      fetchItems: jest.fn(),
+    state = {
+      ...eksClusterFormState(),
+      ...config.initialState,
     };
     rolesState = {
       ...clusterDropdownStoreState(),
+      ...config.rolesState,
     };
     regionsState = {
       ...clusterDropdownStoreState(),
+      ...config.regionsState,
     };
     vpcsState = {
       ...clusterDropdownStoreState(),
+      ...config.vpcsState,
     };
     subnetsState = {
       ...clusterDropdownStoreState(),
+      ...config.subnetsState,
     };
     keyPairsState = {
       ...clusterDropdownStoreState(),
+      ...config.keyPairsState,
     };
     securityGroupsState = {
       ...clusterDropdownStoreState(),
+      ...config.securityGroupsState,
     };
     instanceTypesState = {
       ...clusterDropdownStoreState(),
+      ...config.instanceTypesState,
+    };
+    getters = {
+      subnetValid: config?.getters?.subnetValid || (() => false),
     };
     store = new Vuex.Store({
       state,
+      getters,
       actions,
       modules: {
         vpcs: {
@@ -127,13 +137,32 @@ describe('EksClusterConfigurationForm', () => {
         instanceTypes: {
           namespaced: true,
           state: instanceTypesState,
-          actions: instanceTypesActions,
         },
       },
     });
-  });
+  };
 
-  beforeEach(() => {
+  const createValidStateStore = initialState => {
+    createStore({
+      initialState: {
+        clusterName: 'cluster name',
+        environmentScope: '*',
+        selectedRegion: 'region',
+        selectedRole: 'role',
+        selectedKeyPair: 'key pair',
+        selectedVpc: 'vpc',
+        selectedSubnet: ['subnet 1', 'subnet 2'],
+        selectedSecurityGroup: 'group',
+        selectedInstanceType: 'small-1',
+        ...initialState,
+      },
+      getters: {
+        subnetValid: () => true,
+      },
+    });
+  };
+
+  const buildWrapper = () => {
     vm = shallowMount(EksClusterConfigurationForm, {
       localVue,
       store,
@@ -143,28 +172,17 @@ describe('EksClusterConfigurationForm', () => {
         externalLinkIcon: '',
       },
     });
+  };
+
+  beforeEach(() => {
+    createStore();
+    buildWrapper();
   });
 
   afterEach(() => {
     vm.destroy();
   });
 
-  const setAllConfigurationFields = () => {
-    store.replaceState({
-      ...state,
-      clusterName: 'cluster name',
-      environmentScope: '*',
-      selectedRegion: 'region',
-      selectedRole: 'role',
-      selectedKeyPair: 'key pair',
-      selectedVpc: 'vpc',
-      selectedSubnet: 'subnet',
-      selectedSecurityGroup: 'group',
-      selectedInstanceType: 'small-1',
-    });
-  };
-
-  const findSignOutButton = () => vm.find('.js-sign-out');
   const findCreateClusterButton = () => vm.find('.js-create-cluster');
   const findClusterNameInput = () => vm.find('[id=eks-cluster-name]');
   const findEnvironmentScopeInput = () => vm.find('[id=eks-environment-scope]');
@@ -187,15 +205,6 @@ describe('EksClusterConfigurationForm', () => {
     it('fetches available roles', () => {
       expect(rolesActions.fetchItems).toHaveBeenCalled();
     });
-
-    it('fetches available instance types', () => {
-      expect(instanceTypesActions.fetchItems).toHaveBeenCalled();
-    });
-  });
-
-  it('dispatches signOut action when sign out button is clicked', () => {
-    findSignOutButton().trigger('click');
-    expect(actions.signOut).toHaveBeenCalled();
   });
 
   it('sets isLoadingRoles to RoleDropdown loading property', () => {
@@ -213,7 +222,9 @@ describe('EksClusterConfigurationForm', () => {
   it('sets RoleDropdown hasErrors to true when loading roles failed', () => {
     rolesState.loadingItemsError = new Error();
 
-    expect(findRoleDropdown().props('hasErrors')).toEqual(true);
+    return Vue.nextTick().then(() => {
+      expect(findRoleDropdown().props('hasErrors')).toEqual(true);
+    });
   });
 
   it('sets isLoadingRegions to RegionDropdown loading property', () => {
@@ -231,7 +242,9 @@ describe('EksClusterConfigurationForm', () => {
   it('sets loadingRegionsError to RegionDropdown error property', () => {
     regionsState.loadingItemsError = new Error();
 
-    expect(findRegionDropdown().props('hasErrors')).toEqual(true);
+    return Vue.nextTick().then(() => {
+      expect(findRegionDropdown().props('hasErrors')).toEqual(true);
+    });
   });
 
   it('disables KeyPairDropdown when no region is selected', () => {
@@ -261,7 +274,9 @@ describe('EksClusterConfigurationForm', () => {
   it('sets KeyPairDropdown hasErrors to true when loading key pairs fails', () => {
     keyPairsState.loadingItemsError = new Error();
 
-    expect(findKeyPairDropdown().props('hasErrors')).toEqual(true);
+    return Vue.nextTick().then(() => {
+      expect(findKeyPairDropdown().props('hasErrors')).toEqual(true);
+    });
   });
 
   it('disables VpcDropdown when no region is selected', () => {
@@ -291,7 +306,9 @@ describe('EksClusterConfigurationForm', () => {
   it('sets VpcDropdown hasErrors to true when loading vpcs fails', () => {
     vpcsState.loadingItemsError = new Error();
 
-    expect(findVpcDropdown().props('hasErrors')).toEqual(true);
+    return Vue.nextTick().then(() => {
+      expect(findVpcDropdown().props('hasErrors')).toEqual(true);
+    });
   });
 
   it('disables SubnetDropdown when no vpc is selected', () => {
@@ -318,10 +335,29 @@ describe('EksClusterConfigurationForm', () => {
     expect(findSubnetDropdown().props('items')).toBe(subnetsState.items);
   });
 
-  it('sets SubnetDropdown hasErrors to true when loading subnets fails', () => {
-    subnetsState.loadingItemsError = new Error();
+  it('displays a validation error in the subnet dropdown when loading subnets fails', () => {
+    createStore({
+      subnetsState: {
+        loadingItemsError: new Error(),
+      },
+    });
+    buildWrapper();
 
     expect(findSubnetDropdown().props('hasErrors')).toEqual(true);
+  });
+
+  it('displays a validation error in the subnet dropdown  when a single subnet is selected', () => {
+    createStore({
+      initialState: {
+        selectedSubnet: ['subnet 1'],
+      },
+    });
+    buildWrapper();
+
+    expect(findSubnetDropdown().props('hasErrors')).toEqual(true);
+    expect(findSubnetDropdown().props('errorMessage')).toEqual(
+      'You should select at least two subnets',
+    );
   });
 
   it('disables SecurityGroupDropdown when no vpc is selected', () => {
@@ -351,7 +387,9 @@ describe('EksClusterConfigurationForm', () => {
   it('sets SecurityGroupDropdown hasErrors to true when loading security groups fails', () => {
     securityGroupsState.loadingItemsError = new Error();
 
-    expect(findSecurityGroupDropdown().props('hasErrors')).toEqual(true);
+    return Vue.nextTick().then(() => {
+      expect(findSecurityGroupDropdown().props('hasErrors')).toEqual(true);
+    });
   });
 
   describe('when region is selected', () => {
@@ -390,11 +428,7 @@ describe('EksClusterConfigurationForm', () => {
     });
 
     it('cleans selected subnet', () => {
-      expect(actions.setSubnet).toHaveBeenCalledWith(
-        expect.anything(),
-        { subnet: null },
-        undefined,
-      );
+      expect(actions.setSubnet).toHaveBeenCalledWith(expect.anything(), { subnet: [] }, undefined);
     });
 
     it('cleans selected security group', () => {
@@ -468,11 +502,7 @@ describe('EksClusterConfigurationForm', () => {
     });
 
     it('cleans selected subnet', () => {
-      expect(actions.setSubnet).toHaveBeenCalledWith(
-        expect.anything(),
-        { subnet: null },
-        undefined,
-      );
+      expect(actions.setSubnet).toHaveBeenCalledWith(expect.anything(), { subnet: [] }, undefined);
     });
 
     it('cleans selected security group', () => {
@@ -577,22 +607,19 @@ describe('EksClusterConfigurationForm', () => {
   });
 
   describe('when all cluster configuration fields are set', () => {
-    beforeEach(() => {
-      setAllConfigurationFields();
-    });
-
     it('enables create cluster button', () => {
+      createValidStateStore();
+      buildWrapper();
       expect(findCreateClusterButton().props('disabled')).toBe(false);
     });
   });
 
   describe('when at least one cluster configuration field is not set', () => {
     beforeEach(() => {
-      setAllConfigurationFields();
-      store.replaceState({
-        ...state,
-        clusterName: '',
+      createValidStateStore({
+        clusterName: null,
       });
+      buildWrapper();
     });
 
     it('disables create cluster button', () => {
@@ -600,13 +627,12 @@ describe('EksClusterConfigurationForm', () => {
     });
   });
 
-  describe('when isCreatingCluster', () => {
+  describe('when is creating cluster', () => {
     beforeEach(() => {
-      setAllConfigurationFields();
-      store.replaceState({
-        ...state,
+      createValidStateStore({
         isCreatingCluster: true,
       });
+      buildWrapper();
     });
 
     it('sets create cluster button as loading', () => {

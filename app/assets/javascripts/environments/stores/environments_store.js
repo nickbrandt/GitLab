@@ -1,5 +1,5 @@
-import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { setDeployBoard } from 'ee_else_ce/environments/stores/helpers';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 
 /**
  * Environments Store.
@@ -14,6 +14,7 @@ export default class EnvironmentsStore {
     this.state.stoppedCounter = 0;
     this.state.availableCounter = 0;
     this.state.paginationInformation = {};
+    this.state.reviewAppDetails = {};
 
     return this;
   }
@@ -102,6 +103,11 @@ export default class EnvironmentsStore {
 
     this.state.paginationInformation = paginationInformation;
     return paginationInformation;
+  }
+
+  setReviewAppDetails(details = {}) {
+    this.state.reviewAppDetails = details;
+    return details;
   }
 
   /**

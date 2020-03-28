@@ -1,11 +1,11 @@
 /* eslint-disable no-new */
 
 import '~/pages/projects/edit';
+import mountApprovals from 'ee/approvals/mount_project_settings';
+import initServiceDesk from 'ee/projects/settings_service_desk';
 import UsersSelect from '~/users_select';
 import UserCallout from '~/user_callout';
 import groupsSelect from '~/groups_select';
-import mountApprovals from 'ee/approvals/mount_project_settings';
-import initServiceDesk from 'ee/projects/settings_service_desk';
 
 document.addEventListener('DOMContentLoaded', () => {
   new UsersSelect();

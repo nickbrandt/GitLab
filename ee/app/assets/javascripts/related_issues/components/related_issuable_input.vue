@@ -166,7 +166,7 @@ export default {
   <div
     ref="issuableFormWrapper"
     :class="{ focus: isInputFocused }"
-    class="add-issuable-form-input-wrapper form-control"
+    class="add-issuable-form-input-wrapper form-control gl-field-error-outline"
     role="button"
     @click="onIssuableFormWrapperClick"
   >

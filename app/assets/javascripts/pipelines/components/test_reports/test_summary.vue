@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlLink, GlProgressBar } from '@gitlab/ui';
+import { GlButton, GlProgressBar } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { formatTime, secondsToMilliseconds } from '~/lib/utils/datetime_utility';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -8,7 +8,6 @@ export default {
   name: 'TestSummary',
   components: {
     GlButton,
-    GlLink,
     GlProgressBar,
     Icon,
   },
@@ -28,7 +27,9 @@ export default {
       return this.report.name || __('Summary');
     },
     successPercentage() {
-      return Math.round((this.report.success_count / this.report.total_count) * 100) || 0;
+      // Returns a full number when the decimals equal .00.
+      // Otherwise returns a float to two decimal points
+      return Number(((this.report.success_count / this.report.total_count) * 100 || 0).toFixed(2));
     },
     formattedDuration() {
       return formatTime(secondsToMilliseconds(this.report.total_time));

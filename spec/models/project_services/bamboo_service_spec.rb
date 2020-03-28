@@ -8,9 +8,11 @@ describe BambooService, :use_clean_rails_memory_store_caching do
 
   let(:bamboo_url) { 'http://gitlab.com/bamboo' }
 
+  let_it_be(:project) { create(:project) }
+
   subject(:service) do
     described_class.create(
-      project: create(:project),
+      project: project,
       properties: {
         bamboo_url: bamboo_url,
         username: 'mic',
@@ -148,7 +150,7 @@ describe BambooService, :use_clean_rails_memory_store_caching do
   end
 
   shared_examples 'reactive cache calculation' do
-    context '#build_page' do
+    describe '#build_page' do
       subject { service.calculate_reactive_cache('123', 'unused')[:build_page] }
 
       it 'returns a specific URL when status is 500' do
@@ -180,7 +182,7 @@ describe BambooService, :use_clean_rails_memory_store_caching do
       end
     end
 
-    context '#commit_status' do
+    describe '#commit_status' do
       subject { service.calculate_reactive_cache('123', 'unused')[:commit_status] }
 
       it 'sets commit status to :error when status is 500' do
@@ -223,6 +225,19 @@ describe BambooService, :use_clean_rails_memory_store_caching do
         stub_request(body: bamboo_response(build_state: 'FOO BAR!'))
 
         is_expected.to eq(:error)
+      end
+
+      Gitlab::HTTP::HTTP_ERRORS.each do |http_error|
+        it "sets commit status to :error with a #{http_error.name} error" do
+          WebMock.stub_request(:get, 'http://gitlab.com/bamboo/rest/api/latest/result/byChangeset/123?os_authType=basic')
+            .to_raise(http_error)
+
+          expect(Gitlab::ErrorTracking)
+            .to receive(:log_exception)
+            .with(instance_of(http_error), project_id: project.id)
+
+          is_expected.to eq(:error)
+        end
       end
     end
   end

@@ -54,7 +54,7 @@ export default {
             itemTitle: s__('GeoNodes|Replication slot WAL'),
             itemValue: numberToHumanSize(this.nodeDetails.replicationSlotWAL),
             itemValueType: VALUE_TYPE.PLAIN,
-            cssClass: 'node-detail-value-bold',
+            cssClass: 'font-weight-bold',
           });
         }
 
@@ -63,7 +63,7 @@ export default {
             itemTitle: s__('GeoNodes|Internal URL'),
             itemValue: this.node.internalUrl,
             itemValueType: VALUE_TYPE.PLAIN,
-            cssClass: 'node-detail-value-bold',
+            cssClass: 'font-weight-bold',
           });
         }
 
@@ -76,7 +76,7 @@ export default {
           itemTitle: s__('GeoNodes|Storage config'),
           itemValue: this.storageShardsStatus,
           itemValueType: VALUE_TYPE.PLAIN,
-          cssClass: this.storageShardsCssClass,
+          cssClass: this.storageShardsCssClass.join(' '),
         },
       ];
     },
@@ -89,10 +89,7 @@ export default {
         : s__('GeoNodes|Does not match the primary storage configuration');
     },
     storageShardsCssClass() {
-      const cssClass = 'node-detail-value-bold';
-      return !this.nodeDetails.storageShardsMatch
-        ? `${cssClass} node-detail-value-error`
-        : cssClass;
+      return ['font-weight-bold', { 'text-danger-500': !this.nodeDetails.storageShardsMatch }];
     },
   },
   methods: {
@@ -104,17 +101,14 @@ export default {
 </script>
 
 <template>
-  <div class="row-fluid clearfix node-detail-section other-section">
+  <div class="row-fluid clearfix py-3 border-top border-color-default other-section">
     <div class="col-md-12">
       <section-reveal-button
         :button-title="__('Other information')"
         @toggleButton="handleSectionToggle"
       />
     </div>
-    <div
-      v-show="showSectionItems"
-      class="col-md-6 prepend-left-15 prepend-top-10 section-items-container"
-    >
+    <div v-if="showSectionItems" class="col-md-6 ml-2 mt-2 section-items-container">
       <geo-node-detail-item
         v-for="(nodeDetailItem, index) in nodeDetailItems"
         :key="index"

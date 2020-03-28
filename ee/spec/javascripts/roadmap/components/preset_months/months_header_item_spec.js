@@ -4,7 +4,7 @@ import MonthsHeaderItemComponent from 'ee/roadmap/components/preset_months/month
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 const mockTimeframeIndex = 0;
@@ -13,8 +13,6 @@ const createComponent = ({
   timeframeIndex = mockTimeframeIndex,
   timeframeItem = mockTimeframeMonths[mockTimeframeIndex],
   timeframe = mockTimeframeMonths,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(MonthsHeaderItemComponent);
 
@@ -22,8 +20,6 @@ const createComponent = ({
     timeframeIndex,
     timeframeItem,
     timeframe,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -46,14 +42,6 @@ describe('MonthsHeaderItemComponent', () => {
   });
 
   describe('computed', () => {
-    describe('itemStyles', () => {
-      it('returns style object for container element based on value of `itemWidth` prop', () => {
-        vm = createComponent({});
-
-        expect(vm.itemStyles.width).toBe('180px');
-      });
-    });
-
     describe('timelineHeaderLabel', () => {
       it('returns string containing Year and Month for current timeline header item', () => {
         vm = createComponent({});

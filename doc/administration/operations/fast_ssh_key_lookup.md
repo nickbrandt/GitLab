@@ -1,15 +1,12 @@
 # Fast lookup of authorized SSH keys in the database
 
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1631) in [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
+> - [Available in](https://gitlab.com/gitlab-org/gitlab/issues/3953) GitLab Community Edition 10.4.
+
 NOTE: **Note:** This document describes a drop-in replacement for the
 `authorized_keys` file for normal (non-deploy key) users. Consider
 using [SSH certificates](ssh_certificates.md), they are even faster,
 but are not a drop-in replacement.
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1631) in
-> [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
->
-> [Available in](https://gitlab.com/gitlab-org/gitlab/issues/3953) GitLab
-> Community Edition 10.4.
 
 Regular SSH operations become slow as the number of users grows because OpenSSH
 searches for a key to authorize a user via a linear search. In the worst case,
@@ -53,14 +50,16 @@ Add the following to your `sshd_config` file. This is usually located at
 `/etc/ssh/sshd_config`, but it will be `/assets/sshd_config` if you're using
 Omnibus Docker:
 
-```
-AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
-AuthorizedKeysCommandUser git
+```plaintext
+Match User git    # Apply the AuthorizedKeysCommands to the git user only
+  AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
+  AuthorizedKeysCommandUser git
+Match all    # End match, settings apply to all users again
 ```
 
 Reload OpenSSH:
 
-```bash
+```shell
 # Debian or Ubuntu installations
 sudo service ssh reload
 
@@ -99,7 +98,7 @@ This is a brief overview. Please refer to the above instructions for more contex
 1. [Rebuild the `authorized_keys` file](../raketasks/maintenance.md#rebuild-authorized_keys-file)
 1. Enable writes to the `authorized_keys` file in Application Settings
 1. Remove the `AuthorizedKeysCommand` lines from `/etc/ssh/sshd_config` or from `/assets/sshd_config` if you are using Omnibus Docker.
-1. Reload sshd: `sudo service sshd reload`
+1. Reload `sshd`: `sudo service sshd reload`
 1. Remove the `/opt/gitlab-shell/authorized_keys` file
 
 ## Compiling a custom version of OpenSSH for CentOS 6
@@ -117,7 +116,7 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
 1. First, download the package and install the required packages:
 
-   ```
+   ```shell
    sudo su -
    cd /tmp
    curl --remote-name https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-7.5p1.tar.gz
@@ -127,7 +126,7 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
 1. Prepare the build by copying files to the right place:
 
-   ```
+   ```shell
    mkdir -p /root/rpmbuild/{SOURCES,SPECS}
    cp ./openssh-7.5p1/contrib/redhat/openssh.spec /root/rpmbuild/SPECS/
    cp openssh-7.5p1.tar.gz /root/rpmbuild/SOURCES/
@@ -136,7 +135,7 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
 1. Next, set the spec settings properly:
 
-   ```
+   ```shell
    sed -i -e "s/%define no_gnome_askpass 0/%define no_gnome_askpass 1/g" openssh.spec
    sed -i -e "s/%define no_x11_askpass 0/%define no_x11_askpass 1/g" openssh.spec
    sed -i -e "s/BuildPreReq/BuildRequires/g" openssh.spec
@@ -144,19 +143,19 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
 1. Build the RPMs:
 
-   ```
+   ```shell
    rpmbuild -bb openssh.spec
    ```
 
 1. Ensure the RPMs were built:
 
-   ```
+   ```shell
    ls -al /root/rpmbuild/RPMS/x86_64/
    ```
 
    You should see something as the following:
 
-   ```
+   ```plaintext
    total 1324
    drwxr-xr-x. 2 root root   4096 Jun 20 19:37 .
    drwxr-xr-x. 3 root root     19 Jun 20 19:37 ..
@@ -170,7 +169,7 @@ the database. The following instructions can be used to build OpenSSH 7.5:
    with its own version, which may prevent users from logging in, so be sure
    that the file is backed up and restored after installation:
 
-   ```
+   ```shell
    timestamp=$(date +%s)
    cp /etc/pam.d/sshd pam-ssh-conf-$timestamp
    rpm -Uvh /root/rpmbuild/RPMS/x86_64/*.rpm
@@ -179,19 +178,19 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
 1. Verify the installed version. In another window, attempt to login to the server:
 
-   ```
+   ```shell
    ssh -v <your-centos-machine>
    ```
 
    You should see a line that reads: "debug1: Remote protocol version 2.0, remote software version OpenSSH_7.5"
 
-   If not, you may need to restart sshd (e.g. `systemctl restart sshd.service`).
+   If not, you may need to restart `sshd` (e.g. `systemctl restart sshd.service`).
 
 1. *IMPORTANT!* Open a new SSH session to your server before exiting to make
    sure everything is working! If you need to downgrade, simple install the
    older package:
 
-   ```
+   ```shell
    # Only run this if you run into a problem logging in
    yum downgrade openssh-server openssh openssh-clients
    ```

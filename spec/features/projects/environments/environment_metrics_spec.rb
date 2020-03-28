@@ -6,7 +6,7 @@ describe 'Environment > Metrics' do
   include PrometheusHelpers
 
   let(:user) { create(:user) }
-  let(:project) { create(:prometheus_project) }
+  let(:project) { create(:prometheus_project, :repository) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:build) { create(:ci_build, pipeline: pipeline) }
   let(:environment) { create(:environment, project: project) }
@@ -30,9 +30,9 @@ describe 'Environment > Metrics' do
       click_link('See metrics')
 
       expect(page).to have_metrics_path(environment)
-      expect(page).to have_css('div.js-environments-dropdown')
+      expect(page).to have_css('[data-qa-selector="environments_dropdown"]')
 
-      within('div.js-environments-dropdown') do
+      within('[data-qa-selector="environments_dropdown"]') do
         # Click on the dropdown
         click_on(environment.name)
 

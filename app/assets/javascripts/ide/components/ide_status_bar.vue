@@ -1,7 +1,8 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
+/* eslint-disable @gitlab/vue-require-i18n-strings */
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IdeStatusList from 'ee_else_ce/ide/components/ide_status_list.vue';
+import IdeStatusMr from './ide_status_mr.vue';
 import icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import timeAgoMixin from '~/vue_shared/mixins/timeago';
@@ -15,6 +16,7 @@ export default {
     userAvatarImage,
     CiIcon,
     IdeStatusList,
+    IdeStatusMr,
   },
   directives: {
     tooltip,
@@ -22,12 +24,12 @@ export default {
   mixins: [timeAgoMixin],
   data() {
     return {
-      lastCommitFormatedAge: null,
+      lastCommitFormattedAge: null,
     };
   },
   computed: {
     ...mapState(['currentBranchId', 'currentProjectId']),
-    ...mapGetters(['currentProject', 'lastCommit']),
+    ...mapGetters(['currentProject', 'lastCommit', 'currentMergeRequest']),
     ...mapState('pipelines', ['latestPipeline']),
   },
   watch: {
@@ -62,7 +64,7 @@ export default {
     },
     commitAgeUpdate() {
       if (this.lastCommit) {
-        this.lastCommitFormatedAge = this.timeFormated(this.lastCommit.committed_date);
+        this.lastCommitFormattedAge = this.timeFormatted(this.lastCommit.committed_date);
       }
     },
     getCommitPath(shortSha) {
@@ -79,7 +81,7 @@ export default {
       <span v-if="latestPipeline && latestPipeline.details" class="ide-status-pipeline">
         <button
           type="button"
-          class="p-0 border-0 h-50"
+          class="p-0 border-0 bg-transparent"
           @click="openRightPane($options.rightSidebarViews.pipelines)"
         >
           <ci-icon
@@ -118,9 +120,15 @@ export default {
         :title="tooltipTitle(lastCommit.committed_date)"
         data-placement="top"
         data-container="body"
-        >{{ lastCommitFormatedAge }}</time
+        >{{ lastCommitFormattedAge }}</time
       >
     </div>
+    <ide-status-mr
+      v-if="currentMergeRequest"
+      class="mx-3"
+      :url="currentMergeRequest.web_url"
+      :text="currentMergeRequest.references.short"
+    />
     <ide-status-list class="ml-auto" />
   </footer>
 </template>

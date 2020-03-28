@@ -33,6 +33,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    nodeRemovalAllowed: {
+      type: Boolean,
+      required: true,
+    },
     geoTroubleshootingHelpPath: {
       type: String,
       required: true,
@@ -66,12 +70,13 @@ export default {
 </script>
 
 <template>
-  <div class="card-body">
+  <div class="card-body p-0">
     <node-details-section-main
       :node="node"
       :node-details="nodeDetails"
       :node-actions-allowed="nodeActionsAllowed"
       :node-edit-allowed="nodeEditAllowed"
+      :node-removal-allowed="nodeRemovalAllowed"
       :version-mismatch="hasVersionMismatch"
     />
     <node-details-section-sync v-if="!node.primary" :node-details="nodeDetails" />
@@ -85,8 +90,8 @@ export default {
       :node-details="nodeDetails"
       :node-type-primary="node.primary"
     />
-    <div v-if="hasError || hasVersionMismatch" class="node-health-message-container">
-      <p class="node-health-message">
+    <div v-if="hasError || hasVersionMismatch">
+      <p class="p-3 mb-0 bg-danger-100 text-danger-500">
         {{ errorMessage }}
         <gl-link :href="geoTroubleshootingHelpPath">{{
           s__('Geo|Please refer to Geo Troubleshooting.')

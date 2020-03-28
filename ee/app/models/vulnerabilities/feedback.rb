@@ -26,11 +26,19 @@ module Vulnerabilities
     validates :feedback_type, presence: true
     validates :category, presence: true
     validates :project_fingerprint, presence: true, uniqueness: { scope: [:project_id, :category, :feedback_type] }
+    validates :pipeline, same_project_association: true, if: :pipeline_id?
 
     scope :with_associations, -> { includes(:pipeline, :issue, :merge_request, :author, :comment_author) }
 
     scope :all_preloaded, -> do
       preload(:author, :comment_author, :project, :issue, :merge_request, :pipeline)
+    end
+
+    # TODO remove once filtered data has been cleaned
+    def self.only_valid_feedback
+      pipeline = Ci::Pipeline.arel_table
+      feedback = arel_table
+      joins(:pipeline).where(pipeline[:project_id].eq(feedback[:project_id]))
     end
 
     def self.find_or_init_for(feedback_params)
@@ -52,6 +60,14 @@ module Vulnerabilities
       unless categories.include?(feedback_params[:category])
         raise ArgumentError.new("'#{feedback_params[:category]}' is not a valid category")
       end
+    end
+
+    def self.with_category(category)
+      where(category: category)
+    end
+
+    def self.with_feedback_type(feedback_type)
+      where(feedback_type: feedback_type)
     end
 
     # A hard delete of the comment_author will cause the comment_author to be nil, but the comment

@@ -6,6 +6,10 @@ module Projects
     UpdateError = Class.new(Error)
 
     def execute
+      unless can?(current_user, :access_git)
+        return error('The mirror user is not allowed to perform any git operations.')
+      end
+
       unless project.mirror?
         return success
       end
@@ -20,12 +24,17 @@ module Projects
         return error("The mirror user is not allowed to push code to all branches on this project.")
       end
 
+      checksum_before = project.repository.checksum
+
       update_tags do
         project.fetch_mirror(forced: true)
       end
 
       update_branches
-      update_lfs_objects
+
+      # Updating LFS objects is expensive since it requires scanning for blobs with pointers.
+      # Let's skip this if the repository hasn't changed.
+      update_lfs_objects if project.repository.checksum != checksum_before
 
       success
     rescue Gitlab::Shell::Error, Gitlab::Git::BaseError, UpdateError => e
@@ -47,7 +56,7 @@ module Projects
         local_branch = local_branches[name]
 
         if local_branch.nil?
-          result = CreateBranchService.new(project, current_user).execute(name, upstream_branch.dereferenced_target.sha, create_master_if_empty: false)
+          result = ::Branches::CreateService.new(project, current_user).execute(name, upstream_branch.dereferenced_target.sha, create_master_if_empty: false)
           if result[:status] == :error
             errors << result[:message]
           end

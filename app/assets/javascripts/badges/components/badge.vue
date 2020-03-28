@@ -1,10 +1,10 @@
 <script>
-import Icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   // name: 'Badge' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/25
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   name: 'Badge',
   components: {
     Icon,

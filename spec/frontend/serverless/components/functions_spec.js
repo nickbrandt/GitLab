@@ -1,13 +1,13 @@
 import Vuex from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import AxiosMockAdapter from 'axios-mock-adapter';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { TEST_HOST } from 'helpers/test_constants';
 import axios from '~/lib/utils/axios_utils';
 import functionsComponent from '~/serverless/components/functions.vue';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { createStore } from '~/serverless/store';
 import EmptyState from '~/serverless/components/empty_state.vue';
 import EnvironmentRow from '~/serverless/components/environment_row.vue';
-import { TEST_HOST } from 'helpers/test_constants';
 import { mockServerlessFunctions } from '../mock_data';
 
 describe('functionsComponent', () => {
@@ -43,7 +43,6 @@ describe('functionsComponent', () => {
         helpPath: '',
         statusPath: '',
       },
-      sync: false,
     });
 
     expect(component.find(EmptyState).exists()).toBe(true);
@@ -59,7 +58,6 @@ describe('functionsComponent', () => {
         helpPath: '',
         statusPath: '',
       },
-      sync: false,
     });
 
     expect(component.find(GlLoadingIcon).exists()).toBe(true);
@@ -75,7 +73,6 @@ describe('functionsComponent', () => {
         helpPath: '',
         statusPath: '',
       },
-      sync: false,
     });
 
     expect(
@@ -102,7 +99,6 @@ describe('functionsComponent', () => {
         helpPath: '',
         statusPath: '',
       },
-      sync: false,
     });
 
     expect(component.find('.js-functions-wrapper').exists()).toBe(true);
@@ -118,7 +114,6 @@ describe('functionsComponent', () => {
         helpPath: 'helpPath',
         statusPath,
       },
-      sync: false,
     });
 
     component.vm.$store.dispatch('receiveFunctionsSuccess', mockServerlessFunctions);

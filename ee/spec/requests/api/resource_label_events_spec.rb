@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe API::ResourceLabelEvents do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   before do
     parent.add_developer(user)

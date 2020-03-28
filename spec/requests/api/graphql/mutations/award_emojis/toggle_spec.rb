@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'Toggling an AwardEmoji' do
   include GraphqlHelpers
 
-  set(:current_user) { create(:user) }
-  set(:project) { create(:project) }
-  set(:awardable) { create(:note, project: project) }
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:project, reload: true) { create(:project) }
+  let_it_be(:awardable) { create(:note, project: project) }
   let(:emoji_name) { 'thumbsup' }
   let(:mutation) do
     variables = {
@@ -83,6 +83,7 @@ describe 'Toggling an AwardEmoji' do
 
         describe 'marking Todos as done' do
           let(:user) { current_user}
+
           subject { post_graphql_mutation(mutation, current_user: user) }
 
           include_examples 'creating award emojis marks Todos as done'

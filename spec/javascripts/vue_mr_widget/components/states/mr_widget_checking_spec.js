@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import checkingComponent from '~/vue_merge_request_widget/components/states/mr_widget_checking.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import checkingComponent from '~/vue_merge_request_widget/components/states/mr_widget_checking.vue';
 
 describe('MRWidgetChecking', () => {
   let Component;
@@ -25,7 +25,7 @@ describe('MRWidgetChecking', () => {
 
   it('renders information about merging', () => {
     expect(vm.$el.querySelector('.media-body').textContent.trim()).toEqual(
-      'Checking ability to merge automatically',
+      'Checking ability to merge automatically…',
     );
   });
 });

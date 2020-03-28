@@ -8,10 +8,6 @@ module QA
           class Show < QA::Page::Base
             include QA::Page::Component::Issuable::Common
 
-            view 'app/assets/javascripts/issue_show/components/title.vue' do
-              element :title, required: true
-            end
-
             view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
               element :close_reopen_epic_button
             end
@@ -24,6 +20,10 @@ module QA
               element :add_issue_input
             end
 
+            view 'ee/app/assets/javascripts/related_items_tree/components/issue_actions_split_button.vue' do
+              element :issue_actions_split_button
+            end
+
             view 'ee/app/assets/javascripts/related_items_tree/components/tree_item.vue' do
               element :related_issue_item
             end
@@ -32,14 +32,11 @@ module QA
               element :remove_issue_button
             end
 
-            view 'ee/app/assets/javascripts/related_issues/constants.js' do
-              element :add_issues_button
-            end
-
             def add_issue_to_epic(issue_url)
-              click_element :add_issues_button
+              find_element(:issue_actions_split_button).find('button', text: 'Add an issue').click
               fill_element :add_issue_input, issue_url
-              click_body
+              # Clicking the title blurs the input
+              click_element :title
               click_element :add_issue_button
             end
 
@@ -56,12 +53,6 @@ module QA
 
             def click_edit_button
               click_element :edit_button
-            end
-
-            def delete_epic
-              page.accept_alert("Epic will be removed! Are you sure?") do
-                click_element :delete_epic_button
-              end
             end
 
             def close_reopen_epic

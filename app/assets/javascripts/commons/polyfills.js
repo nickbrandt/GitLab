@@ -1,26 +1,24 @@
-// ECMAScript polyfills
-import 'core-js/es/array/fill';
-import 'core-js/es/array/find';
-import 'core-js/es/array/find-index';
-import 'core-js/es/array/from';
-import 'core-js/es/array/includes';
-import 'core-js/es/object/assign';
-import 'core-js/es/object/values';
-import 'core-js/es/object/entries';
-import 'core-js/es/promise';
-import 'core-js/es/promise/finally';
-import 'core-js/es/string/code-point-at';
-import 'core-js/es/string/from-code-point';
-import 'core-js/es/string/includes';
-import 'core-js/es/string/starts-with';
-import 'core-js/es/string/ends-with';
-import 'core-js/es/symbol';
-import 'core-js/es/map';
-import 'core-js/es/weak-map';
-import 'core-js/modules/web.url';
-
 // Browser polyfills
+
+/**
+ * Polyfill: fetch
+ * @what https://fetch.spec.whatwg.org/
+ * @why Because Apollo GraphQL client relies on fetch
+ * @browsers Internet Explorer 11
+ * @see https://caniuse.com/#feat=fetch
+ */
+import 'unfetch/polyfill/index';
+
+/**
+ * Polyfill: FormData APIs
+ * @what delete(), get(), getAll(), has(), set(), entries(), keys(), values(),
+ *    and support for for...of
+ * @why Because Apollo GraphQL client relies on fetch
+ * @browsers Internet Explorer 11, Edge < 18
+ * @see https://caniuse.com/#feat=mdn-api_formdata and subfeatures
+ */
 import 'formdata-polyfill';
+
 import './polyfills/custom_event';
 import './polyfills/element';
 import './polyfills/event';

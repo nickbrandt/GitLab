@@ -42,30 +42,30 @@ sprite_icon(icon_name, size: nil, css_class: '')
 
 ### Usage in Vue
 
-We have a special Vue component for our sprite icons in `\vue_shared\components\icon.vue`.
+[GitLab UI][gitlab-ui], our components library, provides a component to display sprite icons.
 
 Sample usage :
 
-```javascript
+```html
 <script>
-import Icon from "~/vue_shared/components/icon.vue"
+import { GlIcon } from "@gitlab/ui";
 
 export default {
   components: {
-    Icon,
+    GlIcon,
   },
 };
 <script>
+
 <template>
-  <icon
+  <gl-icon
     name="issues"
     :size="24"
-    class="icon-danger"
   />
 </template>
 ```
 
-- **name** Name of the Icon in the SVG Sprite  ([Overview is available here][svg-preview]).
+- **name** Name of the Icon in the SVG Sprite ([Overview is available here][svg-preview]).
 - **size (optional)** Number value for the size which is then mapped to a specific CSS class
   (Available Sizes: 8, 12, 16, 18, 24, 32, 48, 72 are mapped to `sXX` css classes)
 - **css-classes (optional)** Additional CSS Classes to add to the svg tag.
@@ -95,7 +95,7 @@ To use an SVG illustrations in a template provide the path as a property and dis
 
 Component:
 
-```js
+```html
 <script>
 export default {
   props: {
@@ -106,6 +106,7 @@ export default {
   },
 };
 <script>
+
 <template>
   <img :src="svgIllustrationPath" />
 </template>
@@ -114,3 +115,4 @@ export default {
 [npm]: https://www.npmjs.com/package/@gitlab/svgs
 [gitlab-svgs]: https://gitlab.com/gitlab-org/gitlab-svgs
 [svg-preview]: https://gitlab-org.gitlab.io/gitlab-svgs
+[gitlab-ui]: https://gitlab-org.gitlab.io/gitlab-ui/

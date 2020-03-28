@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sidekiq/web'
 
 def enable_reliable_fetch?
@@ -31,18 +33,9 @@ enable_json_logs = Gitlab.config.sidekiq.log_format == 'json'
 enable_sidekiq_memory_killer = ENV['SIDEKIQ_MEMORY_KILLER_MAX_RSS'].to_i.nonzero?
 use_sidekiq_daemon_memory_killer = ENV["SIDEKIQ_DAEMON_MEMORY_KILLER"].to_i.nonzero?
 use_sidekiq_legacy_memory_killer = !use_sidekiq_daemon_memory_killer
-use_request_store = ENV['SIDEKIQ_REQUEST_STORE'].to_i.nonzero?
+use_request_store = ENV.fetch('SIDEKIQ_REQUEST_STORE', 1).to_i.nonzero?
 
 Sidekiq.configure_server do |config|
-  config.redis = queues_config_hash
-
-  config.server_middleware(&Gitlab::SidekiqMiddleware.server_configurator({
-    metrics: Settings.monitoring.sidekiq_exporter,
-    arguments_logger: ENV['SIDEKIQ_LOG_ARGUMENTS'] && !enable_json_logs,
-    memory_killer: enable_sidekiq_memory_killer && use_sidekiq_legacy_memory_killer,
-    request_store: use_request_store
-  }))
-
   if enable_json_logs
     Sidekiq.logger.formatter = Gitlab::SidekiqLogging::JSONFormatter.new
     config.options[:job_logger] = Gitlab::SidekiqLogging::StructuredLogger
@@ -51,6 +44,15 @@ Sidekiq.configure_server do |config|
     config.error_handlers.reject! { |handler| handler.is_a?(Sidekiq::ExceptionHandler::Logger) }
     config.error_handlers << Gitlab::SidekiqLogging::ExceptionHandler.new
   end
+
+  config.redis = queues_config_hash
+
+  config.server_middleware(&Gitlab::SidekiqMiddleware.server_configurator({
+    metrics: Settings.monitoring.sidekiq_exporter,
+    arguments_logger: ENV['SIDEKIQ_LOG_ARGUMENTS'] && !enable_json_logs,
+    memory_killer: enable_sidekiq_memory_killer && use_sidekiq_legacy_memory_killer,
+    request_store: use_request_store
+  }))
 
   config.client_middleware(&Gitlab::SidekiqMiddleware.client_configurator)
 
@@ -71,6 +73,8 @@ Sidekiq.configure_server do |config|
     Sidekiq::ReliableFetch.setup_reliable_fetch!(config)
   end
 
+  Gitlab.config.load_dynamic_cron_schedules!
+
   # Sidekiq-cron: load recurring jobs from gitlab.yml
   # UGLY Hack to get nested hash from settingslogic
   cron_jobs = JSON.parse(Gitlab.config.cron_jobs.to_json)
@@ -88,23 +92,10 @@ Sidekiq.configure_server do |config|
 
   Gitlab::SidekiqVersioning.install!
 
-  db_config = Gitlab::Database.config ||
-    Rails.application.config.database_configuration[Rails.env]
-  db_config['pool'] = Sidekiq.options[:concurrency]
-  ActiveRecord::Base.establish_connection(db_config)
-  Rails.logger.debug("Connection Pool size for Sidekiq Server is now: #{ActiveRecord::Base.connection.pool.instance_variable_get('@size')}") # rubocop:disable Gitlab/RailsLogger
-
   Gitlab.ee do
     Gitlab::Mirror.configure_cron_job!
 
     Gitlab::Geo.configure_cron_jobs!
-
-    if Gitlab::Geo.geo_database_configured?
-      Rails.configuration.geo_database['pool'] = Sidekiq.options[:concurrency]
-      Geo::TrackingBase.establish_connection(Rails.configuration.geo_database)
-
-      Rails.logger.debug("Connection Pool size for Sidekiq Server is now: #{Geo::TrackingBase.connection_pool.size} (Geo tracking database)") # rubocop:disable Gitlab/RailsLogger
-    end
   end
 
   # Avoid autoload issue such as 'Mail::Parsers::AddressStruct'
@@ -117,9 +108,11 @@ end
 
 Sidekiq.configure_client do |config|
   config.redis = queues_config_hash
+  # We only need to do this for other clients. If Sidekiq-server is the
+  # client scheduling jobs, we have access to the regular sidekiq logger that
+  # writes to STDOUT
+  Sidekiq.logger = Gitlab::SidekiqLogging::ClientLogger.build
+  Sidekiq.logger.formatter = Gitlab::SidekiqLogging::JSONFormatter.new if enable_json_logs
 
-  config.client_middleware do |chain|
-    chain.add Gitlab::SidekiqMiddleware::CorrelationInjector
-    chain.add Gitlab::SidekiqStatus::ClientMiddleware
-  end
+  config.client_middleware(&Gitlab::SidekiqMiddleware.client_configurator)
 end

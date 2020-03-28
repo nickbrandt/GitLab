@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import ConfidentialIssueSidebar from '~/sidebar/components/confidential/confidential_issue_sidebar.vue';
 import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
+import ConfidentialIssueSidebar from '~/sidebar/components/confidential/confidential_issue_sidebar.vue';
 import EditForm from '~/sidebar/components/confidential/edit_form.vue';
 import SidebarService from '~/sidebar/services/sidebar_service';
 import createFlash from '~/flash';
-import RecaptchaModal from '~/vue_shared/components/recaptcha_modal';
+import RecaptchaModal from '~/vue_shared/components/recaptcha_modal.vue';
 
 jest.mock('~/flash');
 jest.mock('~/sidebar/services/sidebar_service');
@@ -37,12 +37,10 @@ describe('Confidential Issue Sidebar Block', () => {
         service,
         ...propsData,
       },
-      sync: false,
     });
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
     jest.spyOn(window.location, 'reload').mockImplementation();
   });
 
@@ -79,21 +77,29 @@ describe('Confidential Issue Sidebar Block', () => {
     it('displays the edit form when editable', () => {
       wrapper.setData({ edit: false });
 
-      wrapper.find({ ref: 'editLink' }).trigger('click');
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.find(EditForm).exists()).toBe(true);
-      });
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          wrapper.find({ ref: 'editLink' }).trigger('click');
+          return wrapper.vm.$nextTick();
+        })
+        .then(() => {
+          expect(wrapper.find(EditForm).exists()).toBe(true);
+        });
     });
 
     it('displays the edit form when opened from collapsed state', () => {
       wrapper.setData({ edit: false });
 
-      wrapper.find({ ref: 'collapseIcon' }).trigger('click');
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.find(EditForm).exists()).toBe(true);
-      });
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          wrapper.find({ ref: 'collapseIcon' }).trigger('click');
+          return wrapper.vm.$nextTick();
+        })
+        .then(() => {
+          expect(wrapper.find(EditForm).exists()).toBe(true);
+        });
     });
 
     it('tracks the event when "Edit" is clicked', () => {

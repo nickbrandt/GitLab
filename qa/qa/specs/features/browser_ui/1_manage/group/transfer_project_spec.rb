@@ -4,8 +4,7 @@ module QA
   context 'Manage' do
     describe 'Project transfer between groups' do
       it 'user transfers a project between groups' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         source_group = Resource::Group.fabricate_via_api! do |group|
           group.path = 'source-group'
@@ -48,8 +47,8 @@ module QA
         Page::Project::Settings::Main.perform(&:click_project)
 
         Page::Project::Show.perform do |project|
-          expect(project).to have_text(target_group.path)
-          expect(project).to have_text(edited_readme_content)
+          expect(project).to have_breadcrumb(target_group.path)
+          expect(project).to have_readme_content(edited_readme_content)
         end
       end
     end

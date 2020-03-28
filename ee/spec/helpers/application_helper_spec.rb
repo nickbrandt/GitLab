@@ -169,21 +169,21 @@ describe ApplicationHelper do
       it 'finds the CE partial' do
         ce_partial = helper.find_ce_template(partial)
 
-        expect(ce_partial.inspect).to eq(expected_partial_path)
+        expect(ce_partial.short_identifier).to eq(expected_partial_path)
 
         # And it could still find the EE partial
         ee_partial = helper.lookup_context.find(partial, [], true)
-        expect(ee_partial.inspect).to eq("ee/#{expected_partial_path}")
+        expect(ee_partial.short_identifier).to eq("ee/#{expected_partial_path}")
       end
 
       it 'finds the CE view' do
         ce_view = helper.find_ce_template(view)
 
-        expect(ce_view.inspect).to eq(expected_view_path)
+        expect(ce_view.short_identifier).to eq(expected_view_path)
 
         # And it could still find the EE view
         ee_view = helper.lookup_context.find(view, [], false)
-        expect(ee_view.inspect).to eq("ee/#{expected_view_path}")
+        expect(ee_view.short_identifier).to eq("ee/#{expected_view_path}")
       end
     end
   end

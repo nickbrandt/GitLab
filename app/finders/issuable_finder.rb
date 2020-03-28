@@ -13,6 +13,7 @@
 #     group_id: integer
 #     project_id: integer
 #     milestone_title: string
+#     release_tag: string
 #     author_id: integer
 #     author_username: string
 #     assignee_id: integer or 'None' or 'Any'
@@ -59,6 +60,7 @@ class IssuableFinder
       author_username
       label_name
       milestone_title
+      release_tag
       my_reaction_emoji
       search
       in
@@ -85,7 +87,7 @@ class IssuableFinder
     end
 
     def valid_params
-      @valid_params ||= scalar_params + [array_params] + [{ not: [] }]
+      @valid_params ||= scalar_params + [array_params.merge(not: {})]
     end
   end
 
@@ -126,6 +128,7 @@ class IssuableFinder
     items = by_non_archived(items)
     items = by_iids(items)
     items = by_milestone(items)
+    items = by_release(items)
     items = by_label(items)
     by_my_reaction_emoji(items)
   end
@@ -311,18 +314,21 @@ class IssuableFinder
     params[:assignee_username].present?
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def assignee
-    return @assignee if defined?(@assignee)
+    assignees.first
+  end
 
-    @assignee =
+  # rubocop: disable CodeReuse/ActiveRecord
+  def assignees
+    strong_memoize(:assignees) do
       if assignee_id?
-        User.find_by(id: params[:assignee_id])
+        User.where(id: params[:assignee_id])
       elsif assignee_username?
-        User.find_by_username(params[:assignee_username])
+        User.where(username: params[:assignee_username])
       else
-        nil
+        User.none
       end
+    end
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
@@ -362,6 +368,10 @@ class IssuableFinder
 
       attempt_group_search_optimizations? || attempt_project_search_optimizations?
     end
+  end
+
+  def releases?
+    params[:release_tag].present?
   end
 
   private
@@ -408,7 +418,7 @@ class IssuableFinder
       # These are "helper" params that are required inside the NOT to get the right results. They usually come in
       # at the top-level params, but if they do come in inside the `:not` params, they should take precedence.
       not_helpers = params.slice(*NEGATABLE_PARAMS_HELPER_KEYS).merge(params[:not].slice(*NEGATABLE_PARAMS_HELPER_KEYS))
-      not_param = { key => value }.with_indifferent_access.merge(not_helpers)
+      not_param = { key => value }.with_indifferent_access.merge(not_helpers).merge(not_query: true)
 
       items_to_negate = self.class.new(current_user, not_param).execute
 
@@ -536,6 +546,8 @@ class IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   def by_assignee(items)
+    return items.assigned_to(assignees) if not_query? && assignees.any?
+
     if filter_by_no_assignee?
       items.unassigned
     elsif filter_by_any_assignee?
@@ -570,6 +582,18 @@ class IssuableFinder
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  def by_release(items)
+    return items unless releases?
+
+    if filter_by_no_release?
+      items.without_release
+    elsif filter_by_any_release?
+      items.any_release
+    else
+      items.with_release(params[:release_tag], params[:project_id])
+    end
+  end
+
   def filter_by_no_milestone?
     # Accepts `No Milestone` for compatibility
     params[:milestone_title].to_s.downcase == FILTER_NONE || params[:milestone_title] == Milestone::None.title
@@ -588,6 +612,14 @@ class IssuableFinder
     params[:milestone_title] == Milestone::Started.name
   end
 
+  def filter_by_no_release?
+    params[:release_tag].to_s.downcase == FILTER_NONE
+  end
+
+  def filter_by_any_release?
+    params[:release_tag].to_s.downcase == FILTER_ANY
+  end
+
   def by_label(items)
     return items unless labels?
 
@@ -597,7 +629,7 @@ class IssuableFinder
       elsif filter_by_any_label?
         items.any_label
       else
-        items.with_label(label_names, params[:sort])
+        items.with_label(label_names, params[:sort], not_query: not_query?)
       end
 
     items
@@ -645,5 +677,9 @@ class IssuableFinder
 
   def min_access_level
     ProjectFeature.required_minimum_access_level(klass)
+  end
+
+  def not_query?
+    !!params[:not_query]
   end
 end

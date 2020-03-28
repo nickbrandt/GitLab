@@ -10,19 +10,22 @@ module EE
       WEIGHT_ALL = 'Everything'.freeze
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
+      ELASTICSEARCH_PERMISSION_TRACKED_FIELDS = %w(assignee_ids author_id confidential).freeze
 
       include Elastic::ApplicationVersionedSearch
       include UsageStatistics
+      include WeightEventable
+      include HealthStatus
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
-      scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
-
+      scope :no_epic, -> { left_outer_joins(:epic_issue).where(epic_issues: { epic_id: nil }) }
       scope :in_epics, ->(epics) do
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
@@ -62,6 +65,20 @@ module EE
       project.feature_available?(:multiple_issue_assignees)
     end
 
+    def blocked?
+      blocking_issues_ids.any?
+    end
+
+    # Used on EE::IssueEntity to expose blocking issues URLs
+    def blocked_by_issues(user)
+      return ::Issue.none unless blocked?
+
+      issues =
+        ::IssuesFinder.new(user).execute.where(id: blocking_issues_ids)
+
+      issues.preload(project: [:route, { namespace: [:route] }])
+    end
+
     # override
     def subscribed_without_subscriptions?(user, *)
       # TODO: this really shouldn't be necessary, because the support
@@ -86,19 +103,39 @@ module EE
       super if supports_weight?
     end
 
+    # override
+    def maintain_elasticsearch_update
+      super
+
+      maintain_elasticsearch_issue_notes_update if elasticsearch_issue_notes_need_updating?
+    end
+
+    def maintain_elasticsearch_issue_notes_update
+      ::Note.searchable.where(noteable: self).find_each do |note|
+        note.maintain_elasticsearch_update
+      end
+    end
+
+    def elasticsearch_issue_notes_need_updating?
+      changed_fields = self.previous_changes.keys
+      changed_fields && (changed_fields & ELASTICSEARCH_PERMISSION_TRACKED_FIELDS).any?
+    end
+
     def supports_weight?
       project&.feature_available?(:issue_weights)
     end
 
     def related_issues(current_user, preload: nil)
       related_issues = ::Issue
-                           .select(['issues.*', 'issue_links.id AS issue_link_id'])
-                           .joins("INNER JOIN issue_links ON
-                                 (issue_links.source_id = issues.id AND issue_links.target_id = #{id})
-                                 OR
-                                 (issue_links.target_id = issues.id AND issue_links.source_id = #{id})")
-                           .preload(preload)
-                           .reorder('issue_link_id')
+        .select(['issues.*', 'issue_links.id AS issue_link_id',
+                 'issue_links.link_type as issue_link_type_value',
+                 'issue_links.target_id as issue_link_source_id'])
+        .joins("INNER JOIN issue_links ON
+               (issue_links.source_id = issues.id AND issue_links.target_id = #{id})
+               OR
+               (issue_links.target_id = issues.id AND issue_links.source_id = #{id})")
+        .preload(preload)
+        .reorder('issue_link_id')
 
       cross_project_filter = -> (issues) { issues.where(project: project) }
       Ability.issues_readable_by_user(related_issues,
@@ -110,7 +147,7 @@ module EE
     def parent_ids
       return super unless has_group_boards?
 
-      board_group.projects.select(:id)
+      board_group.all_projects.select(:id)
     end
 
     def has_group_boards?
@@ -129,8 +166,34 @@ module EE
       !!promoted_to_epic_id
     end
 
+    def issue_link_type
+      return unless respond_to?(:issue_link_type_value) && respond_to?(:issue_link_source_id)
+
+      type = IssueLink.link_types.key(issue_link_type_value) || IssueLink::TYPE_RELATES_TO
+      return type if issue_link_source_id == id
+
+      IssueLink.inverse_link_type(type)
+    end
+
+    def from_service_desk?
+      author.id == ::User.support_bot.id
+    end
+
     class_methods do
-      # override
+      extend ::Gitlab::Utils::Override
+
+      override :simple_sorts
+      def simple_sorts
+        super.merge(
+          {
+            'weight' => -> { order_weight_asc.with_order_id_desc },
+            'weight_asc' => -> { order_weight_asc.with_order_id_desc },
+            'weight_desc' => -> { order_weight_desc.with_order_id_desc }
+          }
+        )
+      end
+
+      override :sort_by_attribute
       def sort_by_attribute(method, excluded_labels: [])
         case method.to_s
         when 'weight', 'weight_asc' then order_weight_asc.with_order_id_desc
@@ -146,6 +209,10 @@ module EE
     end
 
     private
+
+    def blocking_issues_ids
+      @blocking_issues_ids ||= ::IssueLink.blocking_issue_ids_for(self)
+    end
 
     def update_generic_alert_title
       update(title: "#{title} #{iid}")

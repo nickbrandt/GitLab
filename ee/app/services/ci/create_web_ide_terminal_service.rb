@@ -32,7 +32,7 @@ module Ci
 
         Ci::ProcessPipelineService
           .new(pipeline)
-          .execute
+          .execute(nil, initial_process: true)
 
         pipeline_created_counter.increment(source: :webide)
       end
@@ -65,7 +65,8 @@ module Ci
       terminal.merge(
         name: TERMINAL_NAME,
         stage: TERMINAL_NAME,
-        user: current_user)
+        user: current_user,
+        scheduling_type: :stage)
     end
 
     def load_terminal_config!

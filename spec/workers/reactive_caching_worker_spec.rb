@@ -14,6 +14,28 @@ describe ReactiveCachingWorker do
 
         described_class.new.perform("Environment", environment.id)
       end
+
+      context 'when ReactiveCaching::ExceededReactiveCacheLimit is raised' do
+        it 'avoids failing the job and tracks via Gitlab::ErrorTracking' do
+          allow_any_instance_of(Environment).to receive(:exclusively_update_reactive_cache!)
+            .and_raise(ReactiveCaching::ExceededReactiveCacheLimit)
+
+          expect(Gitlab::ErrorTracking).to receive(:track_exception)
+            .with(kind_of(ReactiveCaching::ExceededReactiveCacheLimit))
+
+          described_class.new.perform("Environment", environment.id)
+        end
+      end
+    end
+  end
+
+  describe 'worker context' do
+    it 'sets the related class on the job' do
+      described_class.perform_async('Environment', 1, 'other', 'argument')
+
+      scheduled_job = described_class.jobs.first
+
+      expect(scheduled_job).to include('meta.related_class' => 'Environment')
     end
   end
 end

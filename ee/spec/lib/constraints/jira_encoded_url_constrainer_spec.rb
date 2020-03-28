@@ -3,26 +3,34 @@
 require 'spec_helper'
 
 describe Constraints::JiraEncodedUrlConstrainer do
+  let(:namespace_id) { 'group' }
+  let(:project_id) { 'project' }
+  let(:path) { "/#{namespace_id}/#{project_id}" }
+  let(:request) { double(:request, path: path, params: { namespace_id: namespace_id, project_id: project_id }) }
+
   describe '#matches?' do
-    using RSpec::Parameterized::TableSyntax
+    subject { described_class.new.matches?(request) }
 
-    where(:path, :match_result) do
-      "/-/jira/group/project"                                                  | true
-      "/-/jira/group/sub_group#{Gitlab::Jira::Dvcs::ENCODED_SLASH}sub_project" | true
-      "/group/sub_group#{Gitlab::Jira::Dvcs::ENCODED_SLASH}sub_project"        | true
-      "/group/project"                                                         | false
+    context 'when there is no /-/jira prefix and no encoded slash' do
+      it { is_expected.to eq(false) }
     end
 
-    with_them do
-      it 'matches path with /-/jira prefix or encoded slash' do
-        request = build_request(path)
+    context 'when tree path contains encoded slash' do
+      let(:path) { "/#{namespace_id}/#{project_id}/tree/folder-with-#{Gitlab::Jira::Dvcs::ENCODED_SLASH}" }
 
-        expect(subject.matches?(request)).to eq(match_result)
-      end
+      it { is_expected.to eq(false) }
     end
-  end
 
-  def build_request(path)
-    double(:request, path: path)
+    context 'when path has /-/jira prefix' do
+      let(:path) { "/-/jira/#{namespace_id}/#{project_id}" }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when project_id has encoded slash' do
+      let(:project_id) { "sub_group#{Gitlab::Jira::Dvcs::ENCODED_SLASH}sub_project" }
+
+      it { is_expected.to eq(true) }
+    end
   end
 end

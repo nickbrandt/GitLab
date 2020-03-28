@@ -34,21 +34,29 @@ to be enabled:
   and enable **Git Large File Storage**.
 
 Design Management requires that projects are using
-[hashed storage](../../../administration/repository_storage_types.html#hashed-storage)
+[hashed storage](../../../administration/repository_storage_types.md#hashed-storage)
 (the default storage type since v10.0).
+
+If the requirements are not met, the **Designs** tab displays a message to the user.
+
+## Supported files
+
+Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`,
+`gif`, `bmp`, `tiff` or `ico`.
+
+Support for [SVG files](https://gitlab.com/gitlab-org/gitlab/issues/12771)
+and [PDFs](https://gitlab.com/gitlab-org/gitlab/issues/32811) is planned for a future release.
 
 ## Limitations
 
-- Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`, `gif`, `bmp`, `tiff` or `ico`.
-  The [`svg` extension is not yet supported](https://gitlab.com/gitlab-org/gitlab/issues/12771).
 - Design uploads are limited to 10 files at a time.
 - Design Management data
   [isn't deleted when a project is destroyed](https://gitlab.com/gitlab-org/gitlab/issues/13429) yet.
 - Design Management data [won't be moved](https://gitlab.com/gitlab-org/gitlab/issues/13426)
   when an issue is moved, nor [deleted](https://gitlab.com/gitlab-org/gitlab/issues/13427)
   when an issue is deleted.
-- Design Management
-  [isn't supported by Geo](https://gitlab.com/groups/gitlab-org/-/epics/1633) yet.
+- From GitLab 12.7, Design Management data [can be replicated](../../../administration/geo/replication/datatypes.md#limitations-on-replicationverification)
+  by Geo but [not verified](https://gitlab.com/gitlab-org/gitlab/issues/32467).
 - Only the latest version of the designs can be deleted.
 - Deleted designs cannot be recovered but you can see them on previous designs versions.
 
@@ -62,17 +70,31 @@ Navigate to the **Design Management** page from any issue by clicking the **Desi
 
 To upload design images, click the **Upload Designs** button and select images to upload.
 
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9,
+you can drag and drop designs onto the dedicated dropzone to upload them.
+
+![Drag and drop design uploads](img/design_drag_and_drop_uploads_v12_9.png)
+
 Designs with the same filename as an existing uploaded design will create a new version
-of the design, and will replace the previous version.
+of the design, and will replace the previous version. [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9, dropping a design on an existing uploaded design will also create a new version,
+provided the filenames are the same.
 
 Designs cannot be added if the issue has been moved, or its
 [discussion is locked](../../discussions/#lock-discussions).
 
+### Skipped designs
+
+Designs with the same filename as an existing uploaded design _and_ whose content has not changed will be skipped.
+This means that no new version of the design will be created. When designs are skipped, you will be made aware via a warning
+message on the Issue.
+
 ## Viewing designs
 
 Images on the Design Management page can be enlarged by clicking on them.
+You can navigate through designs by clicking on the navigation buttons on the
+top-right corner or with <kbd>Left</kbd>/<kbd>Right</kbd> keyboard buttons.
 
-The number of comments on a design — if any — is listed to the right
+The number of discussions on a design — if any — is listed to the right
 of the design filename. Clicking on this number enlarges the design
 just like clicking anywhere else on the design.
 When a design is added or modified, an icon is displayed on the item
@@ -80,9 +102,19 @@ to help summarize changes between versions.
 
 | Indicator | Example |
 | --------- | ------- |
-| Comments | ![Comments Icon](img/design_comments_v12_3.png) |
+| Discussions | ![Discussions Icon](img/design_comments_v12_3.png) |
 | Modified (in the selected version) | ![Design Modified](img/design_modified_v12_3.png) |
 | Added (in the selected version) | ![Design Added](img/design_added_v12_3.png) |
+
+### Exploring designs by zooming
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/13217) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
+
+Designs can be explored in greater detail by zooming in and out of the image.
+Control the amount of zoom with the `+` and `-` buttons at the bottom of the image.
+While zoomed, you can still [start new discussions](#starting-discussions-on-designs) on the image, and see any existing ones.
+
+![Design zooming](img/design_zooming_v12_7.png)
 
 ## Deleting designs
 
@@ -107,23 +139,27 @@ Once selected, click the **Delete selected** button to confirm the deletion:
 
 ![Delete multiple designs](img/delete_multiple_designs_v12_4.png)
 
-NOTE: **Note:**
+**Note:**
 Only the latest version of the designs can be deleted.
 Deleted designs are not permanently lost; they can be
 viewed by browsing previous versions.
 
-## Adding annotations to designs
+## Starting discussions on designs
 
-When a design is uploaded, you can add annotations by clicking on
-the image on the exact location you'd like to add the note to.
-A badge is added to the image identifying the annotation, from
-which you can start a new discussion:
+When a design is uploaded, you can start a discussion by clicking on
+the image on the exact location you would like the discussion to be focused on.
+A pin is added to the image, identifying the discussion's location.
 
 ![Starting a new discussion on design](img/adding_note_to_design_1.png)
 
-Different discussions have different badge numbers:
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.8,
+you can adjust a pin's position by dragging it around the image. This is useful
+for when your design layout has changed between revisions, or if you need to move an
+existing pin to add a new one in its place.
 
-![Discussions on design annotations](img/adding_note_to_design_2.png)
+Different discussions have different pin numbers:
 
-From GitLab 12.5 on, new annotations will be outputted to the issue activity,
+![Discussions on designs](img/adding_note_to_design_2.png)
+
+From GitLab 12.5 on, new discussions will be outputted to the issue activity,
 so that everyone involved can participate in the discussion.

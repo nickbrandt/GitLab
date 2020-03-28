@@ -55,7 +55,7 @@ describe 'Git LFS API and storage' do
           end
 
           it 'responds with status 406' do
-            expect(response).to have_gitlab_http_status(406)
+            expect(response).to have_gitlab_http_status(:not_acceptable)
             expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 99 MB by 1 MB. Please contact your GitLab administrator for more information.')
           end
         end
@@ -68,7 +68,7 @@ describe 'Git LFS API and storage' do
           end
 
           it 'responds with status 406' do
-            expect(response).to have_gitlab_http_status(406)
+            expect(response).to have_gitlab_http_status(:not_acceptable)
             expect(json_response['documentation_url']).to include('/help')
             expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 300 MB by 50 MB. Please contact your GitLab administrator for more information.')
           end
@@ -125,7 +125,7 @@ describe 'Git LFS API and storage' do
             end
 
             it 'responds with status 200' do
-              expect(response).to have_gitlab_http_status(200)
+              expect(response).to have_gitlab_http_status(:ok)
             end
           end
         end

@@ -22,18 +22,15 @@ class Packages::PackageFileFinder
     files = package.package_files
 
     files = by_file_name(files)
-    files = by_conan_file_type(files)
 
     files
   end
 
   def by_file_name(files)
-    files.where(file_name: file_name) # rubocop: disable CodeReuse/ActiveRecord
-  end
-
-  def by_conan_file_type(files)
-    return files unless params[:conan_file_type]
-
-    files.with_conan_file_type(params[:conan_file_type])
+    if params[:with_file_name_like]
+      files.with_file_name_like(file_name)
+    else
+      files.with_file_name(file_name)
+    end
   end
 end

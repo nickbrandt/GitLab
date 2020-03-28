@@ -3,7 +3,7 @@
 require 'json'
 require 'socket'
 
-class IrkerWorker
+class IrkerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category :integrations
@@ -133,7 +133,7 @@ class IrkerWorker
     commit = commit_from_id project, hook_attrs['id']
     sha = colorize_sha Commit.truncate_sha(hook_attrs['id'])
     author = hook_attrs['author']['name']
-    files = colorize_nb_files(files_count commit)
+    files = colorize_nb_files(files_count(commit))
     title = commit.title
 
     sendtoirker "#{repo_name}/#{branch} #{sha} #{author} (#{files}): #{title}"

@@ -1,12 +1,11 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlTooltip } from '@gitlab/ui';
 
-import { sprintf, s__ } from '~/locale';
+import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import Icon from '~/vue_shared/components/icon.vue';
-import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import EpicActionsSplitButton from './epic_actions_split_button.vue';
 
@@ -14,19 +13,11 @@ export default {
   components: {
     Icon,
     GlButton,
+    GlTooltip,
     EpicActionsSplitButton,
   },
-  directives: {
-    GlTooltip: GlTooltipDirective,
-  },
   computed: {
-    ...mapState(['parentItem', 'descendantCounts']),
-    badgeTooltip() {
-      return sprintf(s__('Epics|%{epicsCount} epics and %{issuesCount} issues'), {
-        epicsCount: this.totalEpicsCount,
-        issuesCount: this.totalIssuesCount,
-      });
-    },
+    ...mapState(['parentItem', 'descendantCounts', 'allowSubEpics']),
     totalEpicsCount() {
       return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
     },
@@ -59,16 +50,36 @@ export default {
 <template>
   <div class="card-header d-flex px-2">
     <div class="d-inline-flex flex-grow-1 lh-100 align-middle">
-      <div
-        v-gl-tooltip.hover:tooltipcontainer.bottom
-        class="issue-count-badge"
-        :title="badgeTooltip"
-      >
-        <span class="d-inline-flex align-items-center">
+      <gl-tooltip :target="() => $refs.countBadge">
+        <p v-if="allowSubEpics" class="font-weight-bold m-0">
+          {{ __('Epics') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openedEpics} open, %{closedEpics} closed'), {
+                openedEpics: descendantCounts.openedEpics,
+                closedEpics: descendantCounts.closedEpics,
+              })
+            }}
+          </span>
+        </p>
+        <p class="font-weight-bold m-0">
+          {{ __('Issues') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openedIssues} open, %{closedIssues} closed'), {
+                openedIssues: descendantCounts.openedIssues,
+                closedIssues: descendantCounts.closedIssues,
+              })
+            }}
+          </span>
+        </p>
+      </gl-tooltip>
+      <div ref="countBadge" class="issue-count-badge">
+        <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
           <icon :size="16" name="epic" class="text-secondary mr-1" />
           {{ totalEpicsCount }}
         </span>
-        <span class="ml-2 d-inline-flex align-items-center">
+        <span class="d-inline-flex align-items-center" :class="{ 'ml-2': allowSubEpics }">
           <icon :size="16" name="issues" class="text-secondary mr-1" />
           {{ totalIssuesCount }}
         </span>
@@ -77,6 +88,7 @@ export default {
     <div class="d-inline-flex js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">
         <epic-actions-split-button
+          v-if="allowSubEpics"
           class="qa-add-epics-button"
           @showAddEpicForm="showAddEpicForm"
           @showCreateEpicForm="showCreateEpicForm"

@@ -2,8 +2,8 @@
 import $ from 'jquery';
 import 'select2/select2';
 import _ from 'underscore';
-import { __ } from '~/locale';
 import Api from 'ee/api';
+import { __ } from '~/locale';
 import { TYPE_USER, TYPE_GROUP } from '../constants';
 import { renderAvatar } from '~/helpers/avatar_helper';
 

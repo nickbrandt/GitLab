@@ -22,7 +22,7 @@ module API
       get ':id/pipeline_schedules' do
         authorize! :read_pipeline_schedule, user_project
 
-        schedules = PipelineSchedulesFinder.new(user_project).execute(scope: params[:scope])
+        schedules = Ci::PipelineSchedulesFinder.new(user_project).execute(scope: params[:scope])
           .preload([:owner, :last_pipeline])
         present paginate(schedules), with: Entities::PipelineSchedule
       end
@@ -109,6 +109,25 @@ module API
         authorize! :admin_pipeline_schedule, pipeline_schedule
 
         destroy_conditionally!(pipeline_schedule)
+      end
+
+      desc 'Play a scheduled pipeline immediately' do
+        detail 'This feature was added in GitLab 12.8'
+      end
+      params do
+        requires :pipeline_schedule_id, type: Integer, desc: 'The pipeline schedule id'
+      end
+      post ':id/pipeline_schedules/:pipeline_schedule_id/play' do
+        authorize! :play_pipeline_schedule, pipeline_schedule
+
+        job_id = RunPipelineScheduleWorker # rubocop:disable CodeReuse/Worker
+          .perform_async(pipeline_schedule.id, current_user.id)
+
+        if job_id
+          created!
+        else
+          render_api_error!('Unable to schedule pipeline run immediately', 500)
+        end
       end
 
       desc 'Create a new pipeline schedule variable' do

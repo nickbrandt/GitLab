@@ -4,17 +4,17 @@ type: reference
 
 # Continuous Integration and Deployment Admin settings **(CORE ONLY)**
 
-In this area, you will find settings for Auto DevOps, Runners and job artifacts.
-You can find it in the admin area, under **Settings > Continuous Integration and Deployment**.
+In this area, you will find settings for Auto DevOps, Runners, and job artifacts.
+You can find it in the **Admin Area > Settings > CI/CD**.
 
-![Admin area settings button](../img/admin_area_settings_button.png)
+![Admin Area settings button](../img/admin_area_settings_button.png)
 
 ## Auto DevOps **(CORE ONLY)**
 
 To enable (or disable) [Auto DevOps](../../../topics/autodevops/index.md)
 for all projects:
 
-1. Go to **Admin area > Settings > Continuous Integration and Deployment**
+1. Go to **Admin Area > Settings > CI/CD**
 1. Check (or uncheck to disable) the box that says "Default to Auto DevOps pipeline for all projects"
 1. Optionally, set up the [Auto DevOps base domain](../../../topics/autodevops/index.md#auto-devops-base-domain)
    which is going to be used for Auto Deploy and Auto Review Apps.
@@ -43,7 +43,7 @@ To change it at the:
 
 - Instance level:
 
-   1. Go to **Admin area > Settings > Continuous Integration and Deployment**.
+   1. Go to **Admin Area > Settings > CI/CD**.
    1. Change the value of maximum artifacts size (in MB).
    1. Hit **Save changes** for the changes to take effect.
 
@@ -53,7 +53,7 @@ To change it at the:
   1. Change the value of **maximum artifacts size (in MB)**.
   1. Press **Save changes** for the changes to take effect.
 
-- [Project level](../../project/pipelines/settings.md) (this will override the instance and group settings):
+- [Project level](../../../ci/pipelines/settings.md) (this will override the instance and group settings):
 
   1. Go to the project's **Settings > CI / CD > General Pipelines**.
   1. Change the value of **maximum artifacts size (in MB)**.
@@ -65,12 +65,12 @@ The setting at all levels is only available to GitLab administrators.
 ## Default artifacts expiration **(CORE ONLY)**
 
 The default expiration time of the [job artifacts](../../../administration/job_artifacts.md)
-can be set in the Admin area of your GitLab instance. The syntax of duration is
+can be set in the Admin Area of your GitLab instance. The syntax of duration is
 described in [`artifacts:expire_in`](../../../ci/yaml/README.md#artifactsexpire_in)
 and the default value is `30 days`. On GitLab.com they
 [never expire](../../gitlab_com/index.md#gitlab-cicd).
 
-1. Go to **Admin area > Settings > Continuous Integration and Deployment**.
+1. Go to **Admin Area > Settings > CI/CD**.
 1. Change the value of default expiration time.
 1. Hit **Save changes** for the changes to take effect.
 
@@ -78,10 +78,15 @@ This setting is set per job and can be overridden in
 [`.gitlab-ci.yml`](../../../ci/yaml/README.md#artifactsexpire_in).
 To disable the expiration, set it to `0`. The default unit is in seconds.
 
+NOTE: **Note**
+Any changes to this setting will apply to new artifacts only. The expiration time will not
+be updated for artifacts created before this setting was changed.
+The administrator may need to manually search for and expire previously-created
+artifacts, as described in the [troubleshooting documentation](../../../administration/troubleshooting/gitlab_rails_cheat_sheet.md#remove-artifacts-more-than-a-week-old).
+
 ## Shared Runners pipeline minutes quota **(STARTER ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1078)
-in GitLab Starter 8.16.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1078) in GitLab Starter 8.16.
 
 If you have enabled shared Runners for your GitLab instance, you can limit their
 usage by setting a maximum number of pipeline minutes that a group can use on
@@ -93,17 +98,17 @@ On GitLab.com, the quota is calculated based on your
 
 To change the pipelines minutes quota:
 
-1. Go to **Admin area > Settings > Continuous Integration and Deployment**
+1. Go to **Admin Area > Settings > CI/CD**
 1. Set the pipeline minutes quota limit.
 1. Hit **Save changes** for the changes to take effect
 
 ---
 
-While the setting in the Admin area has a global effect, as an admin you can
+While the setting in the Admin Area has a global effect, as an admin you can
 also change each group's pipeline minutes quota to override the global value.
 
-1. Navigate to the **Groups** admin area and hit the **Edit** button for the
-   group you wish to change the pipeline minutes quota.
+1. Navigate to the **Admin Area > Overview > Groups** and hit the **Edit**
+   button for the group you wish to change the pipeline minutes quota.
 1. Set the pipeline minutes quota to the desired value
 1. Hit **Save changes** for the changes to take effect.
 
@@ -126,8 +131,9 @@ but persisting the traces and artifacts for auditing purposes.
 
 To set the duration for which the jobs will be considered as old and expired:
 
-1. Go to **Admin area > Settings > CI/CD > Continuous Integration and Deployment**.
-1. Change the value of "Archive jobs".
+1. Go to **Admin Area > Settings > CI/CD**.
+1. Expand the **Continuous Integration and Deployment** section.
+1. Set the value of **Archive jobs**.
 1. Hit **Save changes** for the changes to take effect.
 
 Once that time passes, the jobs will be archived and no longer able to be
@@ -136,16 +142,16 @@ for example: <code>15 days</code>, <code>1 month</code>, <code>2 years</code>.
 
 ## Default CI configuration path
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18073) in GitLab 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18073) in GitLab 12.5.
 
 The default CI configuration file path for new projects can be set in the Admin
-area of your GitLab instance (`.gitlab-ci.yml` if not set):
+Area of your GitLab instance (`.gitlab-ci.yml` if not set):
 
-1. Go to **Admin area > Settings > Continuous Integration and Deployment**.
+1. Go to **Admin Area > Settings > CI/CD**.
 1. Input the new path in the **Default CI configuration path** field.
 1. Hit **Save changes** for the changes to take effect.
 
-It is also possible to specify a [custom CI configuration path for a specific project](../../project/pipelines/settings.md#custom-ci-configuration-path).
+It is also possible to specify a [custom CI configuration path for a specific project](../../../ci/pipelines/settings.md#custom-ci-configuration-path).
 
 <!-- ## Troubleshooting
 
@@ -161,6 +167,12 @@ but commented out to help encourage others to add to it in the future. -->
 
 ## Required pipeline configuration **(PREMIUM ONLY)**
 
+CAUTION: **Caution:**
+This feature is being re-evaluated in favor of a different
+[compliance solution](https://gitlab.com/gitlab-org/gitlab/issues/34830).
+We recommend that users who haven't yet implemented this feature wait for
+the new solution.
+
 GitLab administrators can force a pipeline configuration to run on every
 pipeline.
 
@@ -172,9 +184,22 @@ sourced from:
 
 To set required pipeline configuration:
 
-1. Go to **Admin area > Settings > CI/CD**.
+1. Go to **Admin Area > Settings > CI/CD**.
 1. Expand the **Required pipeline configuration** section.
 1. Select the required configuration from the provided dropdown.
 1. Click **Save changes**.
 
 ![Required pipeline](img/admin_required_pipeline.png)
+
+## Package Registry configuration **(PREMIUM ONLY)**
+
+GitLab administrators can disable the forwarding of NPM requests to [npmjs.com](https://www.npmjs.com/).
+
+To disable it:
+
+1. Go to **Admin Area > Settings > CI/CD**.
+1. Expand the **Package Registry** section.
+1. Uncheck **Enable forwarding of NPM package requests to npmjs.org**.
+1. Click **Save changes**.
+
+![NPM package requests forwarding](img/admin_package_registry_npm_package_requests_forward.png)

@@ -1,6 +1,6 @@
 # Import/Export development documentation
 
-Troubleshooing and general development guidelines and tips for the [Import/Export feature](../user/project/settings/import_export.md).
+Troubleshooting and general development guidelines and tips for the [Import/Export feature](../user/project/settings/import_export.md).
 
 <i class="fa fa-youtube-play youtube" aria-hidden="true"></i> This document is originally based on the [Import/Export 201 presentation available on YouTube](https://www.youtube.com/watch?v=V3i1OfExotE).
 
@@ -14,7 +14,7 @@ Project.find_by_full_path('group/project').import_state.slice(:jid, :status, :la
 > {"jid"=>"414dec93f941a593ea1a6894", "status"=>"finished", "last_error"=>nil}
 ```
 
-```bash
+```shell
 # Logs
 grep JID /var/log/gitlab/sidekiq/current
 grep "Import/Export error" /var/log/gitlab/sidekiq/current
@@ -30,7 +30,7 @@ Read through the current performance problems using the Import/Export below.
 
 Out of memory (OOM) errors are normally caused by the [Sidekiq Memory Killer](../administration/operations/sidekiq_memory_killer.md):
 
-```bash
+```shell
 SIDEKIQ_MEMORY_KILLER_MAX_RSS = 2000000
 SIDEKIQ_MEMORY_KILLER_HARD_LIMIT_RSS = 3000000
 SIDEKIQ_MEMORY_KILLER_GRACE_TIME = 900
@@ -38,7 +38,7 @@ SIDEKIQ_MEMORY_KILLER_GRACE_TIME = 900
 
 An import status `started`, and the following Sidekiq logs will signal a memory issue:
 
-```bash
+```shell
 WARN: Work still in progress <struct with JID>
 ```
 
@@ -59,11 +59,11 @@ class StuckImportJobsWorker
     ...
 ```
 
-```bash
+```shell
 Marked stuck import jobs as failed. JIDs: xyz
 ```
 
-```
+```plaintext
   +-----------+    +-----------------------------------+
   |Export Job |--->| Calls ActiveRecord `as_json` and  |
   +-----------+    | `to_json` on all project models   |
@@ -79,11 +79,11 @@ Marked stuck import jobs as failed. JIDs: xyz
 
 | Problem | Possible solutions |
 | -------- | -------- |
-| [Slow JSON](https://gitlab.com/gitlab-org/gitlab-foss/issues/54084) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab-foss/issues/54085) |
+| [Slow JSON](https://gitlab.com/gitlab-org/gitlab/-/issues/25251) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab/-/issues/25252) |
 | | Batch export
 | | Optimize SQL
 | | Move away from `ActiveRecord` callbacks (difficult)
-| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab-foss/issues/35389) | DB Commit sweet spot that uses less memory |
+| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab/-/issues/18857) | DB Commit sweet spot that uses less memory |
 | | [Netflix Fast JSON API](https://github.com/Netflix/fast_jsonapi) may help |
 | | Batch reading/writing to disk and any SQL
 
@@ -195,20 +195,21 @@ module Gitlab
 The [current version history](../user/project/settings/import_export.md) also displays the equivalent GitLab version
 and it is useful for knowing which versions won't be compatible between them.
 
-| GitLab version   | Import/Export version |
-| ---------------- | --------------------- |
-| 11.1 to current  | 0.2.4                 |
-| 10.8             | 0.2.3                 |
-| 10.4             | 0.2.2                 |
-| ...              | ...                   |
-| 8.10.3           | 0.1.3                 |
-| 8.10.0           | 0.1.2                 |
-| 8.9.5            | 0.1.1                 |
-| 8.9.0            | 0.1.0                 |
+| Exporting GitLab version   | Importing GitLab version   |
+| -------------------------- | -------------------------- |
+| 11.7 to current            | 11.7 to current            |
+| 11.1 to 11.6               | 11.1 to 11.6               |
+| 10.8 to 11.0               | 10.8 to 11.0               |
+| 10.4 to 10.7               | 10.4 to 10.7               |
+| ...                        | ...                        |
+| 8.10.3 to 8.11             | 8.10.3 to 8.11             |
+| 8.10.0 to 8.10.2           | 8.10.0 to 8.10.2           |
+| 8.9.5 to 8.9.11            | 8.9.5 to 8.9.11            |
+| 8.9.0 to 8.9.4             | 8.9.0 to 8.9.4             |
 
 ### When to bump the version up
 
-We will have to bump the verision if we rename model/columns or perform any format
+We will have to bump the version if we rename model/columns or perform any format
 modifications in the JSON structure or the file structure of the archive file.
 
 We do not need to bump the version up in any of the following cases:
@@ -219,30 +220,8 @@ We do not need to bump the version up in any of the following cases:
 
 Every time we bump the version, the integration specs will fail and can be fixed with:
 
-```bash
+```shell
 bundle exec rake gitlab:import_export:bump_version
-```
-
-### Renaming columns or models
-
-This is a relatively common occurrence that will require a version bump.
-
-There is also the _RC problem_ - GitLab.com runs an RC, prior to any customers,
-meaning that we want to bump the version up in the next version (or patch release).
-
-For example:
-
-1. Add rename to `RelationRenameService` in X.Y
-1. Remove it from `RelationRenameService` in X.Y + 1
-1. Bump Import/Export version in X.Y + 1
-
-```ruby
-module Gitlab
-  module ImportExport
-    class RelationRenameService
-      RENAMES = {
-        'pipelines' => 'ci_pipelines' # Added in 11.6, remove in 11.7
-      }.freeze
 ```
 
 ## A quick dive into the code

@@ -63,14 +63,14 @@ class GeoNode < ApplicationRecord
   class << self
     # Set in gitlab.rb as external_url
     def current_node_url
-      RequestStore.fetch('geo_node:current_node_url') do
+      Gitlab::SafeRequestStore.fetch('geo_node:current_node_url') do
         Gitlab.config.gitlab.url
       end
     end
 
     # Set in gitlab.rb as geo_node_name
     def current_node_name
-      RequestStore.fetch('geo_node:current_node_name') do
+      Gitlab::SafeRequestStore.fetch('geo_node:current_node_name') do
         Gitlab.config.geo.node_name
       end
     end
@@ -102,7 +102,7 @@ class GeoNode < ApplicationRecord
 
     # Tries to find a GeoNode by oauth_application_id, returning nil if none could be found.
     def find_by_oauth_application_id(oauth_application_id)
-      where(oauth_application_id: oauth_application_id).take
+      find_by(oauth_application_id: oauth_application_id)
     end
 
     private
@@ -219,9 +219,22 @@ class GeoNode < ApplicationRecord
   end
 
   def job_artifacts
-    Ci::JobArtifact.all unless selective_sync?
+    return Ci::JobArtifact.all unless selective_sync?
 
-    Ci::JobArtifact.project_id_in(projects)
+    query = Ci::JobArtifact.project_id_in(projects).select(:id)
+    cte = Gitlab::SQL::CTE.new(:restricted_job_artifacts, query)
+    job_artifact_table = Ci::JobArtifact.arel_table
+
+    inner_join_restricted_job_artifacts =
+      cte.table
+        .join(job_artifact_table, Arel::Nodes::InnerJoin)
+        .on(cte.table[:id].eq(job_artifact_table[:id]))
+        .join_sources
+
+    Ci::JobArtifact
+      .with(cte.to_arel)
+      .from(cte.table)
+      .joins(inner_join_restricted_job_artifacts)
   end
 
   def container_repositories
@@ -233,7 +246,20 @@ class GeoNode < ApplicationRecord
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
-    LfsObject.project_id_in(projects)
+    query = LfsObjectsProject.project_id_in(projects).select(:lfs_object_id)
+    cte = Gitlab::SQL::CTE.new(:restricted_lfs_objects, query)
+    lfs_object_table = LfsObject.arel_table
+
+    inner_join_restricted_lfs_objects =
+      cte.table
+        .join(lfs_object_table, Arel::Nodes::InnerJoin)
+        .on(cte.table[:lfs_object_id].eq(lfs_object_table[:id]))
+        .join_sources
+
+    LfsObject
+      .with(cte.to_arel)
+      .from(cte.table)
+      .joins(inner_join_restricted_lfs_objects)
   end
 
   def projects
@@ -305,7 +331,9 @@ class GeoNode < ApplicationRecord
 
   def update_dependents_attributes
     if self.primary?
+      self.oauth_application&.destroy
       self.oauth_application = nil
+
       update_clone_url
     else
       update_oauth_application!
@@ -315,14 +343,14 @@ class GeoNode < ApplicationRecord
   # Prevent locking yourself out
   def require_current_node_to_be_primary
     if name == self.class.current_node_name
-      errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
+      errors.add(:base, _('Current node must be the primary node or you will be locking yourself out'))
     end
   end
 
   # Prevent creating a Geo Node unless Hashed Storage is enabled
   def require_hashed_storage
     unless Gitlab::CurrentSettings.hashed_storage_enabled?
-      errors.add(:base, 'Hashed Storage must be enabled to use Geo')
+      errors.add(:base, _('Hashed Storage must be enabled to use Geo'))
     end
   end
 

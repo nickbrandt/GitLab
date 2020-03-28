@@ -5,10 +5,10 @@ module QA
     class DeployKey < Base
       attr_accessor :title, :key
 
-      attribute :fingerprint do
-        Page::Project::Settings::Repository.perform do |setting|
+      attribute :md5_fingerprint do
+        Page::Project::Settings::CICD.perform do |setting|
           setting.expand_deploy_keys do |key|
-            key.find_fingerprint(title)
+            key.find_md5_fingerprint(title)
           end
         end
       end
@@ -23,9 +23,9 @@ module QA
       def fabricate!
         project.visit!
 
-        Page::Project::Menu.perform(&:go_to_repository_settings)
+        Page::Project::Menu.perform(&:go_to_ci_cd_settings)
 
-        Page::Project::Settings::Repository.perform do |setting|
+        Page::Project::Settings::CICD.perform do |setting|
           setting.expand_deploy_keys do |page|
             page.fill_key_title(title)
             page.fill_key_value(key)

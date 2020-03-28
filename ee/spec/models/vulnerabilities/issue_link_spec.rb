@@ -16,39 +16,66 @@ describe Vulnerabilities::IssueLink do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:vulnerability) }
     it { is_expected.to validate_presence_of(:issue) }
-  end
 
-  context 'when there is a link between the same vulnerability and issue' do
-    let!(:existing_link) { create(:vulnerabilities_issue_link) }
+    describe 'uniqueness' do
+      before do
+        create(:vulnerabilities_issue_link)
+      end
 
-    it 'raises the uniqueness violation error' do
-      expect do
-        create(:vulnerabilities_issue_link,
-          issue: existing_link.issue,
-          vulnerability: existing_link.vulnerability)
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      it do
+        is_expected.to(
+          validate_uniqueness_of(:issue_id)
+            .scoped_to(:vulnerability_id)
+            .with_message('has already been linked to another vulnerability'))
+      end
+    end
+
+    describe 'only one "created" link allowed per vulnerability' do
+      let!(:existing_link) { create(:vulnerabilities_issue_link, :created) }
+
+      subject(:issue_link) do
+        build(:vulnerabilities_issue_link, :created, vulnerability: existing_link.vulnerability)
+      end
+
+      it do
+        is_expected.to(
+          validate_uniqueness_of(:vulnerability_id)
+            .with_message('already has a "created" issue link'))
+      end
     end
   end
 
-  context 'when there is an existing "created" issue link for vulnerability' do
-    let!(:existing_link) { create(:vulnerabilities_issue_link, :created) }
+  describe 'data consistency constraints' do
+    context 'when a link between the same vulnerability and issue already exists' do
+      let!(:existing_link) { create(:vulnerabilities_issue_link) }
 
-    it 'prevents the creation of a new "created" issue link' do
-      expect do
-        create(:vulnerabilities_issue_link,
-               :created,
-               vulnerability: existing_link.vulnerability,
-               issue: create(:issue))
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      it 'raises the uniqueness violation error' do
+        expect do
+          issue_link = build(
+            :vulnerabilities_issue_link,
+            issue_id: existing_link.issue_id,
+            vulnerability_id: existing_link.vulnerability_id)
+          issue_link.save(validate: false)
+        end.to raise_error(ActiveRecord::RecordNotUnique)
+      end
     end
 
-    it 'allows the creation of a new "related" issue link' do
-      expect do
-        create(:vulnerabilities_issue_link,
-               :related,
-               vulnerability: existing_link.vulnerability,
-               issue: create(:issue))
-      end.not_to raise_error
+    context 'when there is an existing "created" issue link for vulnerability' do
+      let!(:existing_link) { create(:vulnerabilities_issue_link, :created) }
+
+      it 'prevents the creation of a new "created" issue link' do
+        expect do
+          issue_link = build(:vulnerabilities_issue_link, :created, vulnerability: existing_link.vulnerability)
+          issue_link.save(validate: false)
+        end.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+
+      it 'allows the creation of a new "related" issue link' do
+        expect do
+          issue_link = build(:vulnerabilities_issue_link, :related, vulnerability: existing_link.vulnerability)
+          issue_link.save(validate: false)
+        end.not_to raise_error
+      end
     end
   end
 end

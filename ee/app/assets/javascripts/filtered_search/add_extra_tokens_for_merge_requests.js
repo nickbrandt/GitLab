@@ -9,15 +9,30 @@ export default IssuableTokenKeys => {
       url: 'approver_usernames[]=None',
       tokenKey: 'approver',
       value: __('None'),
+      operator: '=',
+    },
+    {
+      url: 'not[approver_usernames][]=None',
+      tokenKey: 'approver',
+      value: __('None'),
+      operator: '!=',
     },
     {
       url: 'approver_usernames[]=Any',
       tokenKey: 'approver',
       value: __('Any'),
+      operator: '=',
+    },
+    {
+      url: 'not[approver_usernames][]=Any',
+      tokenKey: 'approver',
+      value: __('Any'),
+      operator: '!=',
     },
   ];
 
   const approversToken = {
+    formattedKey: __('Approver'),
     key: 'approver',
     type: 'array',
     param: 'usernames[]',

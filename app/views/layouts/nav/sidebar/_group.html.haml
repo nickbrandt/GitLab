@@ -11,7 +11,8 @@
           = @group.name
     %ul.sidebar-top-level-items.qa-group-sidebar
       - if group_sidebar_link?(:overview)
-        = nav_link(path: group_overview_nav_link_paths, html_options: { class: 'home' }) do
+        - paths = group_overview_nav_link_paths
+        = nav_link(path: paths, unless: -> { current_path?('groups/contribution_analytics#show') }, html_options: { class: 'home' }) do
           = link_to group_path(@group) do
             .nav-icon-container
               = sprite_icon('home')
@@ -42,18 +43,10 @@
                   %span
                     = _('Activity')
 
-            - if group_sidebar_link?(:contribution_analytics)
-              = nav_link(path: 'analytics#show') do
-                = link_to group_analytics_path(@group), title: _('Contribution Analytics'), data: { placement: 'right' } do
-                  %span
-                    = _('Contribution Analytics')
-
-            = render_if_exists 'layouts/nav/group_insights_link'
-
       = render_if_exists "layouts/nav/ee/epic_link", group: @group
 
       - if group_sidebar_link?(:issues)
-        = nav_link(path: group_issues_sub_menu_items) do
+        = nav_link(path: group_issues_sub_menu_items, unless: -> { current_path?('issues_analytics#show') }) do
           = link_to issues_group_path(@group), data: { qa_selector: 'group_issues_item' } do
             .nav-icon-container
               = sprite_icon('issues')
@@ -79,8 +72,6 @@
                 = link_to group_boards_path(@group), title: boards_link_text, data: { qa_selector: 'group_issue_boards_link' } do
                   %span
                     = boards_link_text
-
-            = render_if_exists 'layouts/nav/issues_analytics_link'
 
             - if group_sidebar_link?(:labels)
               = nav_link(path: 'labels#index') do
@@ -125,6 +116,8 @@
                   = _('Kubernetes')
 
       = render_if_exists 'groups/sidebar/packages'
+
+      = render 'layouts/nav/sidebar/analytics_links', links: group_analytics_navbar_links(@group, current_user)
 
       - if group_sidebar_link?(:group_members)
         = nav_link(path: 'group_members#index') do

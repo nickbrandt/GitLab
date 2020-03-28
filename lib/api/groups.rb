@@ -31,7 +31,7 @@ module API
         find_params = params.slice(:all_available, :custom_attributes, :owned, :min_access_level)
         find_params[:parent] = find_group!(parent_id) if parent_id
         find_params[:all_available] =
-          find_params.fetch(:all_available, current_user&.full_private_access?)
+          find_params.fetch(:all_available, current_user&.can_read_all_resources?)
 
         groups = GroupsFinder.new(current_user, find_params).execute
         groups = groups.search(params[:search]) if params[:search].present?
@@ -91,6 +91,15 @@ module API
         groups, options = with_custom_attributes(groups, options)
 
         present paginate(groups), options
+      end
+
+      def delete_group(group)
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/46285')
+        destroy_conditionally!(group) do |group|
+          ::Groups::DestroyService.new(group, current_user).async_execute
+        end
+
+        accepted!
       end
     end
 
@@ -187,12 +196,7 @@ module API
         group = find_group!(params[:id])
         authorize! :admin_group, group
 
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/46285')
-        destroy_conditionally!(group) do |group|
-          ::Groups::DestroyService.new(group, current_user).async_execute
-        end
-
-        accepted!
+        delete_group(group)
       end
 
       desc 'Get a list of projects in this group.' do

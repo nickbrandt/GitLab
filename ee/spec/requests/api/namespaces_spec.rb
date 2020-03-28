@@ -5,7 +5,7 @@ require 'spec_helper'
 describe API::Namespaces do
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
-  let!(:group1) { create(:group) }
+  let!(:group1) { create(:group, name: 'test.test-group.2') }
   let!(:group2) { create(:group, :nested) }
   let!(:gold_plan) { create(:gold_plan) }
 
@@ -17,17 +17,17 @@ describe API::Namespaces do
         group_kind_json_response = json_response.find { |resource| resource['kind'] == 'group' }
         user_kind_json_response = json_response.find { |resource| resource['kind'] == 'user' }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(group_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                  'parent_id', 'members_count_with_descendants',
                                                                  'plan', 'shared_runners_minutes_limit',
-                                                                 'avatar_url', 'web_url',
+                                                                 'avatar_url', 'web_url', 'trial_ends_on', 'trial',
                                                                  'extra_shared_runners_minutes_limit', 'billable_members_count')
 
         expect(user_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                 'parent_id', 'plan', 'shared_runners_minutes_limit',
-                                                                'avatar_url', 'web_url',
+                                                                'avatar_url', 'web_url', 'trial_ends_on', 'trial',
                                                                 'extra_shared_runners_minutes_limit', 'billable_members_count')
       end
     end
@@ -40,8 +40,8 @@ describe API::Namespaces do
 
         owned_group_response = json_response.find { |resource| resource['id'] == group1.id }
 
-        expect(owned_group_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
-                                                             'plan', 'parent_id', 'members_count_with_descendants',
+        expect(owned_group_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path', 'trial_ends_on',
+                                                             'plan', 'parent_id', 'members_count_with_descendants', 'trial',
                                                              'avatar_url', 'web_url', 'billable_members_count')
       end
 
@@ -116,18 +116,20 @@ describe API::Namespaces do
     end
 
     context 'when authenticated as admin' do
-      it 'updates namespace using full_path' do
+      it 'updates namespace using full_path when full_path contains dots' do
         put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['plan']).to eq('silver')
-        expect(json_response['shared_runners_minutes_limit']).to eq(9001)
+        aggregate_failures do
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['plan']).to eq('silver')
+          expect(json_response['shared_runners_minutes_limit']).to eq(9001)
+        end
       end
 
       it 'updates namespace using id' do
         put api("/namespaces/#{group1.id}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['plan']).to eq('silver')
         expect(json_response['shared_runners_minutes_limit']).to eq(9001)
       end
@@ -137,7 +139,7 @@ describe API::Namespaces do
       it 'retuns 403' do
         put api("/namespaces/#{group1.id}", user), params: { plan: 'silver' }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -145,7 +147,7 @@ describe API::Namespaces do
       it 'returns 404' do
         put api("/namespaces/12345", admin), params: { plan: 'silver' }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response).to eq('message' => '404 Namespace Not Found')
       end
     end
@@ -154,7 +156,7 @@ describe API::Namespaces do
       it 'returns validation error' do
         put api("/namespaces/#{group1.id}", admin), params: { plan: 'unknown' }
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response['message']).to eq('plan' => ['is not included in the list'])
       end
     end
@@ -200,7 +202,7 @@ describe API::Namespaces do
       it 'returns an unauthroized error' do
         do_post(user, params)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -208,14 +210,30 @@ describe API::Namespaces do
       it 'fails when some attrs are missing' do
         do_post(admin, params.except(:start_date))
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
 
       it 'creates a subscription for the Group' do
         do_post(admin, params)
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(group1.gitlab_subscription).to be_present
+      end
+
+      it 'sets the trial_starts_on to the start_date' do
+        do_post(admin, params.merge(trial: true))
+
+        expect(group1.gitlab_subscription.trial_starts_on).to be_present
+        expect(group1.gitlab_subscription.trial_starts_on.strftime('%d/%m/%Y')).to eq(params[:start_date])
+      end
+
+      it 'creates a subscription using full_path when the namespace path contains dots' do
+        post api("/namespaces/#{group1.full_path}/gitlab_subscription", admin), params: params
+
+        aggregate_failures do
+          expect(response).to have_gitlab_http_status(:created)
+          expect(group1.gitlab_subscription).to be_present
+        end
       end
     end
   end
@@ -225,11 +243,11 @@ describe API::Namespaces do
       get api("/namespaces/#{namespace.id}/gitlab_subscription", current_user)
     end
 
-    set(:silver_plan) { create(:silver_plan) }
-    set(:owner) { create(:user) }
-    set(:developer) { create(:user) }
-    set(:namespace) { create(:group) }
-    set(:gitlab_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan, namespace: namespace) }
+    let_it_be(:silver_plan) { create(:silver_plan) }
+    let_it_be(:owner) { create(:user) }
+    let_it_be(:developer) { create(:user) }
+    let_it_be(:namespace) { create(:group) }
+    let_it_be(:gitlab_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan, namespace: namespace) }
 
     before do
       namespace.add_owner(owner)
@@ -240,7 +258,7 @@ describe API::Namespaces do
       it 'returns an unauthroized error' do
         do_get(developer)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -248,14 +266,20 @@ describe API::Namespaces do
       it 'has access to the object' do
         do_get(owner)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'is successful using full_path when namespace path contains dots' do
+        get api("/namespaces/#{group1.full_path}/gitlab_subscription", admin)
+
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns data in a proper format' do
         do_get(owner)
 
         expect(json_response.keys).to match_array(%w[plan usage billing])
-        expect(json_response['plan'].keys).to match_array(%w[name code trial upgradable])
+        expect(json_response['plan'].keys).to match_array(%w[name code trial upgradable auto_renew])
         expect(json_response['plan']['name']).to eq('Silver')
         expect(json_response['plan']['code']).to eq('silver')
         expect(json_response['plan']['trial']).to eq(false)
@@ -271,8 +295,9 @@ describe API::Namespaces do
       put api("/namespaces/#{namespace_id}/gitlab_subscription", current_user), params: payload
     end
 
-    set(:namespace) { create(:group) }
-    set(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
+    let_it_be(:silver_plan) { create(:silver_plan) }
+    let_it_be(:namespace) { create(:group, name: 'test.test-group.22') }
+    let_it_be(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
     let(:params) do
       {
@@ -287,7 +312,7 @@ describe API::Namespaces do
       it 'returns an unauthroized error' do
         do_put(namespace.id, user, { seats: 150 })
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -296,17 +321,17 @@ describe API::Namespaces do
         it 'returns a 404 error', :quarantine do
           do_put(1111, admin, params)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
       context 'when namespace does not have a subscription' do
-        set(:namespace_2) { create(:group) }
+        let_it_be(:namespace_2) { create(:group) }
 
         it 'returns a 404 error' do
           do_put(namespace_2.id, admin, params)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -314,7 +339,7 @@ describe API::Namespaces do
         it 'returns a 400 error' do
           do_put(namespace.id, admin, params.merge(seats: nil))
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
 
@@ -322,10 +347,16 @@ describe API::Namespaces do
         it 'updates the subscription for the Group' do
           do_put(namespace.id, admin, params)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(gitlab_subscription.reload.seats).to eq(150)
           expect(gitlab_subscription.plan_name).to eq('silver')
           expect(gitlab_subscription.plan_title).to eq('Silver')
+        end
+
+        it 'is sucessful using full_path when namespace path contains dots' do
+          put api("/namespaces/#{namespace.full_path}/gitlab_subscription", admin), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -337,7 +368,7 @@ describe API::Namespaces do
 
           do_put(namespace.id, admin, params.merge(trial_ends_on: date))
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(gitlab_subscription.reload.trial_ends_on).to eq(date)
         end
       end
@@ -346,7 +377,7 @@ describe API::Namespaces do
         it 'returns 400' do
           do_put(namespace.id, admin, params.merge(trial_ends_on: 2.days.ago.to_date))
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(gitlab_subscription.reload.trial_ends_on).to be_nil
         end
       end

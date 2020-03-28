@@ -3,14 +3,6 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab wiki HTTP push' do
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       context 'wiki commit' do
         it 'is replicated to the secondary node' do
           wiki_title = 'Geo Replication Wiki'
@@ -19,10 +11,8 @@ module QA
           project_name = "geo-wiki-project-#{SecureRandom.hex(8)}"
 
           # Create new wiki and push wiki commit
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
-            project = Resource::Project.fabricate! do |project|
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = project_name
               project.description = 'Geo project for wiki repo test'
             end
@@ -48,9 +38,9 @@ module QA
           end
 
           # Validate that wiki is synced on secondary node
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            Page::Main::Login.perform(&:sign_in_using_credentials)
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end

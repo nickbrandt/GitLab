@@ -7,16 +7,15 @@ consistent performance of GitLab.
 
 The process of solving performance problems is roughly as follows:
 
-1. Make sure there's an issue open somewhere (e.g., on the GitLab CE issue
-   tracker), create one if there isn't. See [#15607][#15607] for an example.
+1. Make sure there's an issue open somewhere (for example, on the GitLab CE issue
+   tracker), and create one if there is not. See [#15607][#15607] for an example.
 1. Measure the performance of the code in a production environment such as
    GitLab.com (see the [Tooling](#tooling) section below). Performance should be
    measured over a period of _at least_ 24 hours.
 1. Add your findings based on the measurement period (screenshots of graphs,
    timings, etc) to the issue mentioned in step 1.
 1. Solve the problem.
-1. Create a merge request, assign the "Performance" label and assign it to
-   [@yorickpeterse][yorickpeterse] for reviewing.
+1. Create a merge request, assign the "Performance" label and follow the [performance review process](merge_request_performance_guidelines.md).
 1. Once a change has been deployed make sure to _again_ measure for at least 24
    hours to see if your changes have any impact on the production environment.
 1. Repeat until you're done.
@@ -44,16 +43,16 @@ GitLab provides built-in tools to help improve performance and availability:
 - [QueryRecoder](query_recorder.md) for preventing `N+1` regressions.
 - [Chaos endpoints](chaos_endpoints.md) for testing failure scenarios. Intended mainly for testing availability.
 
-GitLab employees can use GitLab.com's performance monitoring systems located at
+GitLab team members can use [GitLab.com's performance monitoring systems](https://about.gitlab.com/handbook/engineering/monitoring/) located at
 <https://dashboards.gitlab.net>, this requires you to log in using your
-`@gitlab.com` Email address. Non-GitLab employees are advised to set up their
-own InfluxDB + Grafana stack.
+`@gitlab.com` email address. Non-GitLab team-members are advised to set up their
+own InfluxDB and Grafana stack.
 
 ## Benchmarks
 
 Benchmarks are almost always useless. Benchmarks usually only test small bits of
 code in isolation and often only measure the best case scenario. On top of that,
-benchmarks for libraries (e.g., a Gem) tend to be biased in favour of the
+benchmarks for libraries (such as a Gem) tend to be biased in favour of the
 library. After all there's little benefit to an author publishing a benchmark
 that shows they perform worse than their competitors.
 
@@ -68,8 +67,8 @@ When writing benchmarks you should almost always use
 [benchmark-ips](https://github.com/evanphx/benchmark-ips). Ruby's `Benchmark`
 module that comes with the standard library is rarely useful as it runs either a
 single iteration (when using `Benchmark.bm`) or two iterations (when using
-`Benchmark.bmbm`). Running this few iterations means external factors (e.g. a
-video streaming in the background) can very easily skew the benchmark
+`Benchmark.bmbm`). Running this few iterations means external factors, such as a
+video streaming in the background, can very easily skew the benchmark
 statistics.
 
 Another problem with the `Benchmark` module is that it displays timings, not
@@ -114,17 +113,18 @@ the behaviour of suspect code in detail.
 
 It's important to note that profiling an application *alters its performance*,
 and will generally be done *in an unrepresentative environment*. In particular,
-a method is not necessarily troublesome just because it is executed many times,
+a method is not necessarily troublesome just because it's executed many times,
 or takes a long time to execute. Profiles are tools you can use to better
 understand what is happening in an application - using that information wisely
 is up to you!
 
 Keeping that in mind, to create a profile, identify (or create) a spec that
 exercises the troublesome code path, then run it using the `bin/rspec-stackprof`
-helper, e.g.:
+helper, for example:
 
-```sh
+```shell
 $ LIMIT=10 bin/rspec-stackprof spec/policies/project_policy_spec.rb
+
 8/8 |====== 100 ======>| Time: 00:00:18
 
 Finished in 18.19 seconds (files took 4.8 seconds to load)
@@ -157,23 +157,24 @@ it calls, were being executed.
 
 To create a graphical view of the call stack:
 
-```sh
+```shell
 stackprof tmp/project_policy_spec.rb.dump --graphviz > project_policy_spec.dot
 dot -Tsvg project_policy_spec.dot > project_policy_spec.svg
 ```
 
 To load the profile in [kcachegrind](https://kcachegrind.github.io/):
 
-```sh
+```shell
 stackprof tmp/project_policy_spec.dump --callgrind > project_policy_spec.callgrind
 kcachegrind project_policy_spec.callgrind # Linux
 qcachegrind project_policy_spec.callgrind # Mac
 ```
 
-It may be useful to zoom in on a specific method, e.g.:
+It may be useful to zoom in on a specific method, for example:
 
-```sh
+```shell
 $ stackprof tmp/project_policy_spec.rb.dump --method warm_asset_cache
+
 TestEnv#warm_asset_cache (/Users/lupine/dev/gitlab.com/gitlab-org/gitlab-development-kit/gitlab/spec/support/test_env.rb:164)
   samples:     0 self (0.0%)  /   6288 total (36.9%)
   callers:
@@ -225,7 +226,7 @@ may have changed over time.
 
 To activate profiling in your local environment, run the following:
 
-```sh
+```shell
 export RSPEC_PROFILING=yes
 rake rspec_profiling:install
 ```
@@ -237,8 +238,9 @@ variable set.
 Ad-hoc investigation of the collected results can be performed in an interactive
 shell:
 
-```sh
+```shell
 $ rake rspec_profiling:console
+
 irb(main):001:0> results.count
 => 231
 irb(main):002:0> results.last.attributes.keys
@@ -257,10 +259,10 @@ One of the reasons of the increased memory footprint could be Ruby memory fragme
 
 To diagnose it, you can visualize Ruby heap as described in [this post by Aaron Patterson](https://tenderlovemaking.com/2017/09/27/visualizing-your-ruby-heap.html).
 
-To start, you want to dump the heap of the process you are investigating to a JSON file.  
+To start, you want to dump the heap of the process you're investigating to a JSON file.
 
-You need to run the command inside the process you are exploring, you may do that with `rbtrace`.  
-`rbtrace` is already present in GitLab `Gemfile`, you just need to require it.  
+You need to run the command inside the process you're exploring, you may do that with `rbtrace`.
+`rbtrace` is already present in GitLab `Gemfile`, you just need to require it.
 It could be achieved running webserver or Sidekiq with the environment variable set to `ENABLE_RBTRACE=1`.
 
 To get the heap dump:
@@ -271,15 +273,15 @@ bundle exec rbtrace -p <PID> -e 'File.open("heap.json", "wb") { |t| ObjectSpace.
 
 Having the JSON, you finally could render a picture using the script [provided by Aaron](https://gist.github.com/tenderlove/f28373d56fdd03d8b514af7191611b88) or similar:
 
-```sh
+```shell
 ruby heapviz.rb heap.json
 ```
-  
+
 Fragmented Ruby heap snapshot could look like this:
 
 ![Ruby heap fragmentation](img/memory_ruby_heap_fragmentation.png)
 
-Memory fragmentation could be reduced by tuning GC parameters as described in [this post by Nate Berkopec](https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html), which should be considered as a tradeoff, as it may affect overall performance of memory allocation and GC cycles.
+Memory fragmentation could be reduced by tuning GC parameters as described in [this post by Nate Berkopec](https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html). This should be considered as a tradeoff, as it may affect overall performance of memory allocation and GC cycles.
 
 ## Importance of Changes
 
@@ -295,11 +297,11 @@ There is no clear set of steps that you can follow to determine if a certain
 piece of code is worth optimizing. The only two things you can do are:
 
 1. Think about what the code does, how it's used, how many times it's called and
-   how much time is spent in it relative to the total execution time (e.g., the
+   how much time is spent in it relative to the total execution time (for example, the
    total time spent in a web request).
 1. Ask others (preferably in the form of an issue).
 
-Some examples of changes that aren't really important/worth the effort:
+Some examples of changes that are not really important/worth the effort:
 
 - Replacing double quotes with single quotes.
 - Replacing usage of Array with Set when the list of values is very small.
@@ -309,7 +311,7 @@ Some examples of changes that aren't really important/worth the effort:
 
 ## Slow Operations & Sidekiq
 
-Slow operations (e.g. merging branches) or operations that are prone to errors
+Slow operations, like merging branches, or operations that are prone to errors
 (using external APIs) should be performed in a Sidekiq worker instead of
 directly in a web request as much as possible. This has numerous benefits such
 as:
@@ -382,7 +384,7 @@ end
 ## String Freezing
 
 In recent Ruby versions calling `freeze` on a String leads to it being allocated
-only once and re-used. For example, on Ruby 2.3 this will only allocate the
+only once and re-used. For example, on Ruby 2.3 or later this will only allocate the
 "foo" String once:
 
 ```ruby
@@ -413,10 +415,88 @@ test += " world"
 When adding new Ruby files, please check that you can add the above header,
 as omitting it may lead to style check failures.
 
+## Reading from files and other data sources
+
+Ruby offers several convenience functions that deal with file contents specifically
+or I/O streams in general. Functions such as `IO.read` and `IO.readlines` make
+it easy to read data into memory, but they can be inefficient when the
+data grows large. Because these functions read the entire contents of a data
+source into memory, memory use will grow by _at least_ the size of the data source.
+In the case of `readlines`, it will grow even further, due to extra bookkeeping
+the Ruby VM has to perform to represent each line.
+
+Consider the following program, which reads a text file that is 750MB on disk:
+
+```ruby
+File.readlines('large_file.txt').each do |line|
+  puts line
+end
+```
+
+Here is a process memory reading from while the program was running, showing
+how we indeed kept the entire file in memory (RSS reported in kilobytes):
+
+```shell
+$ ps -o rss -p <pid>
+
+RSS
+783436
+```
+
+And here is an excerpt of what the garbage collector was doing:
+
+```ruby
+pp GC.stat
+
+{
+ :heap_live_slots=>2346848,
+ :malloc_increase_bytes=>30895288,
+ ...
+}
+```
+
+We can see that `heap_live_slots` (the number of reachable objects) jumped to ~2.3M,
+which is roughly two orders of magnitude more compared to reading the file line by
+line instead. It was not just the raw memory usage that increased, but also how the garbage collector (GC)
+responded to this change in anticipation of future memory use. We can see that `malloc_increase_bytes` jumped
+to ~30MB, which compares to just ~4kB for a "fresh" Ruby program. This figure specifies how
+much additional heap space the Ruby GC will claim from the operating system next time it runs out of memory.
+Not only did we occupy more memory, we also changed the behavior of the application
+to increase memory use at a faster rate.
+
+The `IO.read` function exhibits similar behavior, with the difference that no extra memory will
+be allocated for each line object.
+
+### Recommendations
+
+Instead of reading data sources into memory in full, it is better to read them line by line
+instead. This is not always an option, for instance when you need to convert a YAML file
+into a Ruby `Hash`, but whenever you have data where each row represents some entity that
+can be processed and then discarded, you can use the following approaches.
+
+First, replace calls to `readlines.each` with either `each` or `each_line`.
+The `each_line` and `each` functions read the data source line by line without keeping
+already visited lines in memory:
+
+```ruby
+File.new('file').each { |line| puts line }
+```
+
+Alternatively, you can read individual lines explicitly using `IO.readline` or `IO.gets` functions:
+
+```ruby
+while line = file.readline
+   # process line
+end
+```
+
+This might be preferable if there is a condition that allows exiting the loop early, saving not
+just memory but also unnecessary time spent in CPU and I/O for processing lines you're not interested in.
+
 ## Anti-Patterns
 
 This is a collection of [anti-patterns][anti-pattern] that should be avoided
-unless these changes have a measurable, significant and positive impact on
+unless these changes have a measurable, significant, and positive impact on
 production environments.
 
 ### Moving Allocations to Constants
@@ -446,9 +526,12 @@ SOME_CONSTANT = 'bar'
 
 You might want millions of project rows in your local database, for example,
 in order to compare relative query performance, or to reproduce a bug. You could
-do this by hand with SQL commands, but since you have ActiveRecord models, you
-might find using these gems more convenient:
+do this by hand with SQL commands or using [Mass Inserting Rails
+Models](mass_insert.md) functionality.
 
+Assuming you are working with ActiveRecord models, you might also find these links helpful:
+
+- [Insert records in batches](insert_into_tables_in_batches.md)
 - [BulkInsert gem](https://github.com/jamis/bulk_insert)
 - [ActiveRecord::PgGenerateSeries gem](https://github.com/ryu39/active_record-pg_generate_series)
 
@@ -458,5 +541,4 @@ You may find some useful examples in this snippet:
 <https://gitlab.com/gitlab-org/gitlab-foss/snippets/33946>
 
 [#15607]: https://gitlab.com/gitlab-org/gitlab-foss/issues/15607
-[yorickpeterse]: https://gitlab.com/yorickpeterse
 [anti-pattern]: https://en.wikipedia.org/wiki/Anti-pattern

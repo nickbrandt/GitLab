@@ -59,10 +59,6 @@ describe('Roadmap AppComponent', () => {
   });
 
   describe('data', () => {
-    it('returns default data props', () => {
-      expect(vm.handleResizeThrottled).toBeDefined();
-    });
-
     describe('when `gon.feature.roadmapGraphql` is true', () => {
       const originalGonFeatures = Object.assign({}, gon.features);
 
@@ -220,6 +216,7 @@ describe('Roadmap AppComponent', () => {
       it('updates the store and refreshes roadmap with extended timeline based on provided extendType', () => {
         spyOn(vm, 'extendTimeframe');
         spyOn(vm, 'refreshEpicDates');
+        spyOn(vm, 'refreshMilestoneDates');
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -227,11 +224,13 @@ describe('Roadmap AppComponent', () => {
 
         expect(vm.extendTimeframe).toHaveBeenCalledWith({ extendAs: extendType });
         expect(vm.refreshEpicDates).toHaveBeenCalled();
+        expect(vm.refreshMilestoneDates).toHaveBeenCalled();
       });
 
       it('calls `fetchEpicsForTimeframe` with extended timeframe array', done => {
         spyOn(vm, 'extendTimeframe').and.stub();
         spyOn(vm, 'refreshEpicDates').and.stub();
+        spyOn(vm, 'refreshMilestoneDates').and.stub();
         spyOn(vm, 'fetchEpicsForTimeframeFn').and.callFake(() => new Promise(() => {}));
 
         const extendType = EXTEND_AS.PREPEND;
@@ -249,35 +248,6 @@ describe('Roadmap AppComponent', () => {
           .then(done)
           .catch(done.fail);
       });
-    });
-  });
-
-  describe('mounted', () => {
-    it('binds window resize event listener', () => {
-      spyOn(window, 'addEventListener');
-      const vmX = createComponent();
-
-      expect(vmX.handleResizeThrottled).toBeDefined();
-      expect(window.addEventListener).toHaveBeenCalledWith(
-        'resize',
-        vmX.handleResizeThrottled,
-        false,
-      );
-      vmX.$destroy();
-    });
-  });
-
-  describe('beforeDestroy', () => {
-    it('unbinds window resize event listener', () => {
-      spyOn(window, 'removeEventListener');
-      const vmX = createComponent();
-      vmX.$destroy();
-
-      expect(window.removeEventListener).toHaveBeenCalledWith(
-        'resize',
-        vmX.handleResizeThrottled,
-        false,
-      );
     });
   });
 

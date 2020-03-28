@@ -37,8 +37,9 @@ describe MicrosoftTeamsService do
   end
 
   describe "#execute" do
-    let(:user)    { create(:user) }
-    set(:project) { create(:project, :repository, :wiki_repo) }
+    let(:user) { create(:user) }
+
+    let_it_be(:project) { create(:project, :repository, :wiki_repo) }
 
     before do
       allow(chat_service).to receive_messages(

@@ -41,6 +41,11 @@ describe "User browses files" do
 
     it "shows the `Browse Directory` link" do
       click_link("files")
+
+      page.within('.repo-breadcrumb') do
+        expect(page).to have_link('files')
+      end
+
       click_link("History")
 
       expect(page).to have_link("Browse Directory").and have_no_link("Browse Code")
@@ -166,6 +171,31 @@ describe "User browses files" do
     end
   end
 
+  context "when browsing a `improve/awesome` branch", :js do
+    before do
+      visit(project_tree_path(project, "improve/awesome"))
+    end
+
+    it "shows files from a repository" do
+      expect(page).to have_content("VERSION")
+        .and have_content(".gitignore")
+        .and have_content("LICENSE")
+    end
+  end
+
+  context "when browsing a `test-#` branch", :js do
+    before do
+      project.repository.create_branch('test-#', project.repository.root_ref)
+      visit(project_tree_path(project, "test-#"))
+    end
+
+    it "shows files from a repository" do
+      expect(page).to have_content("VERSION")
+        .and have_content(".gitignore")
+        .and have_content("LICENSE")
+    end
+  end
+
   context "when browsing a specific ref", :js do
     let(:ref) { project_tree_path(project, "6d39438") }
 
@@ -229,6 +259,16 @@ describe "User browses files" do
       expect(page).to have_content("*.rb")
                  .and have_content("Dmitriy Zaporozhets")
                  .and have_content("Initial commit")
+                 .and have_content("Ignore DS files")
+
+      previous_commit_anchor = "//a[@title='Ignore DS files']/parent::span/following-sibling::span/a"
+      find(:xpath, previous_commit_anchor).click
+
+      expect(page).to have_content("*.rb")
+                 .and have_content("Dmitriy Zaporozhets")
+                 .and have_content("Initial commit")
+
+      expect(page).not_to have_content("Ignore DS files")
     end
   end
 

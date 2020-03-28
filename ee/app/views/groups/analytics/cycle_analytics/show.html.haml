@@ -1,0 +1,6 @@
+- page_title _("Value Stream Analytics")
+- data_attributes = @request_params.valid? ? @request_params.to_data_attributes : {}
+
+- data_attributes.merge!({ empty_state_svg_path: image_path("illustrations/analytics/cycle-analytics-empty-chart.svg"), no_data_svg_path: image_path("illustrations/analytics/cycle-analytics-empty-chart.svg"), no_access_svg_path: image_path("illustrations/analytics/no-access.svg"), hide_group_drop_down: 'true' })
+
+#js-cycle-analytics-app{ data: data_attributes }

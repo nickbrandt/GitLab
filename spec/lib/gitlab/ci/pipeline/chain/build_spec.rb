@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Pipeline::Chain::Build do
-  set(:project) { create(:project, :repository) }
-  set(:user) { create(:user, developer_projects: [project]) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:user) { create(:user, developer_projects: [project]) }
   let(:pipeline) { Ci::Pipeline.new }
 
   let(:variables_attributes) do
@@ -30,7 +30,7 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
   let(:step) { described_class.new(pipeline, command) }
 
   before do
-    stub_repository_ci_yaml_file(sha: anything)
+    stub_ci_pipeline_yaml_file(gitlab_ci_yaml)
   end
 
   it 'never breaks the chain' do

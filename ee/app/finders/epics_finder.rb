@@ -18,8 +18,13 @@
 #   updated_before: datetime
 #   include_ancestor_groups: boolean
 #   include_descendant_groups: boolean
+#   starts_with_iid: string (containing a number)
 
 class EpicsFinder < IssuableFinder
+  include TimeFrameFilter
+
+  IID_STARTS_WITH_PATTERN = %r{\A(\d)+\z}.freeze
+
   def self.scalar_params
     @scalar_params ||= %i[
       parent_id
@@ -34,6 +39,10 @@ class EpicsFinder < IssuableFinder
 
   def self.array_params
     @array_params ||= { label_name: [] }
+  end
+
+  def self.valid_iid_query?(query)
+    query.match?(IID_STARTS_WITH_PATTERN)
   end
 
   def klass
@@ -53,6 +62,7 @@ class EpicsFinder < IssuableFinder
     items = by_label(items)
     items = by_parent(items)
     items = by_iids(items)
+    items = starts_with_iid(items)
 
     sort(items)
   end
@@ -78,7 +88,9 @@ class EpicsFinder < IssuableFinder
                # The `group` method takes care of checking permissions
                [group]
              else
-               groups_user_can_read_epics(related_groups)
+               # `same_root` should be set only if we are sure that all groups
+               # in related_groups have the same ancestor root group
+               ::Group.groups_user_can_read_epics(related_groups, current_user, same_root: true)
              end
 
     Epic.where(group: groups)
@@ -86,6 +98,15 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def starts_with_iid(items)
+    return items unless params[:iid_starts_with].present?
+
+    query = params[:iid_starts_with]
+    raise ArgumentError unless self.class.valid_iid_query?(query)
+
+    items.iid_starts_with(query)
+  end
 
   def related_groups
     include_ancestors = params.fetch(:include_ancestor_groups, false)
@@ -111,32 +132,6 @@ class EpicsFinder < IssuableFinder
       last_value.to_sym
     end
   end
-
-  # rubocop: disable CodeReuse/ActiveRecord
-  def groups_user_can_read_epics(groups)
-    groups = Gitlab::GroupPlansPreloader.new.preload(groups)
-
-    DeclarativePolicy.user_scope do
-      groups.select { |g| Ability.allowed?(current_user, :read_epic, g) }
-    end
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
-
-  # rubocop: disable CodeReuse/ActiveRecord
-  def by_timeframe(items)
-    return items unless params[:start_date] && params[:end_date]
-
-    end_date = params[:end_date].to_date
-    start_date = params[:start_date].to_date
-
-    items
-      .where('epics.start_date is not NULL or epics.end_date is not NULL')
-      .where('epics.start_date is NULL or epics.start_date <= ?', end_date)
-      .where('epics.end_date is NULL or epics.end_date >= ?', start_date)
-  rescue ArgumentError
-    items
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def parent_id?
     params[:parent_id].present?

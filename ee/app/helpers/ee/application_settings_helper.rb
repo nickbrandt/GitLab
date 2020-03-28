@@ -26,7 +26,10 @@ module EE
         :elasticsearch_aws_region,
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_indexing,
+        :elasticsearch_max_bulk_concurrency,
+        :elasticsearch_max_bulk_size_mb,
         :elasticsearch_replicas,
+        :elasticsearch_indexed_field_length_limit,
         :elasticsearch_search,
         :elasticsearch_shards,
         :elasticsearch_url,
@@ -37,6 +40,7 @@ module EE
         :geo_node_allowed_ips,
         :help_text,
         :lock_memberships_to_ldap,
+        :max_personal_access_token_lifetime,
         :pseudonymizer_enabled,
         :repository_size_limit,
         :shared_runners_minutes,
@@ -52,6 +56,18 @@ module EE
 
     def elasticsearch_objects_options(objects)
       objects.map { |g| { id: g.id, text: g.full_name } }
+    end
+
+    # The admin UI cannot handle so many namespaces so we just hide it. We
+    # assume people doing this are using automation anyway.
+    def elasticsearch_too_many_namespaces?
+      ElasticsearchIndexedNamespace.count > 50
+    end
+
+    # The admin UI cannot handle so many projects so we just hide it. We
+    # assume people doing this are using automation anyway.
+    def elasticsearch_too_many_projects?
+      ElasticsearchIndexedProject.count > 50
     end
 
     def elasticsearch_namespace_ids
@@ -71,10 +87,22 @@ module EE
     end
 
     def self.possible_licensed_attributes
-      repository_mirror_attributes + %i[
+      repository_mirror_attributes + merge_request_appovers_rules_attributes +
+       %i[
         email_additional_text
         file_template_project_id
         default_project_deletion_protection
+        deletion_adjourned_period
+        updating_name_disabled_for_users
+        npm_package_requests_forwarding
+      ]
+    end
+
+    def self.merge_request_appovers_rules_attributes
+      %i[
+        disable_overriding_approvers_per_merge_request
+        prevent_merge_requests_author_approval
+        prevent_merge_requests_committers_approval
       ]
     end
   end

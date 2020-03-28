@@ -13,6 +13,7 @@ module Gitlab
 
       def initialize(command_definitions)
         @command_definitions = command_definitions
+        @commands_regex = {}
       end
 
       # Extracts commands from content and return an array of commands.
@@ -34,26 +35,56 @@ module Gitlab
       def extract_commands(content, only: nil)
         return [content, []] unless content
 
-        content = content.dup
+        content, commands = perform_regex(content, only: only)
 
-        commands = []
+        perform_substitutions(content, commands)
+      end
 
-        content.delete!("\r")
-        content.gsub!(commands_regex(only: only)) do
-          if $~[:cmd]
-            commands << [$~[:cmd].downcase, $~[:arg]].reject(&:blank?)
-            ''
-          else
-            $~[0]
-          end
-        end
+      # Encloses quick action commands into code span markdown
+      # avoiding them being executed, for example, when sent via email
+      # to GitLab service desk.
+      # Example: /label ~label1 becomes `/label ~label1`
+      def redact_commands(content)
+        return "" unless content
 
-        content, commands = perform_substitutions(content, commands)
+        content, _ = perform_regex(content, redact: true)
 
-        [content.rstrip, commands]
+        content
       end
 
       private
+
+      def perform_regex(content, only: nil, redact: false)
+        commands = []
+        content = content.dup
+        content.delete!("\r")
+
+        names = command_names(limit_to_commands: only).map(&:to_s)
+        content.gsub!(commands_regex(names: names)) do
+          command, output = process_commands($~, redact)
+          commands << command
+          output
+        end
+
+        [content.rstrip, commands.reject(&:empty?)]
+      end
+
+      def process_commands(matched_text, redact)
+        output = matched_text[0]
+        command = []
+
+        if matched_text[:cmd]
+          command = [matched_text[:cmd].downcase, matched_text[:arg]].reject(&:blank?)
+          output = ''
+
+          if redact
+            output = "`/#{matched_text[:cmd]}#{" " + matched_text[:arg] if matched_text[:arg]}`"
+            output += "\n" if matched_text[0].include?("\n")
+          end
+        end
+
+        [command, output]
+      end
 
       # Builds a regular expression to match known commands.
       # First match group captures the command name and
@@ -62,10 +93,8 @@ module Gitlab
       # It looks something like:
       #
       #   /^\/(?<cmd>close|reopen|...)(?:( |$))(?<arg>[^\/\n]*)(?:\n|$)/
-      def commands_regex(only:)
-        names = command_names(limit_to_commands: only).map(&:to_s)
-
-        @commands_regex ||= %r{
+      def commands_regex(names:)
+        @commands_regex[names] ||= %r{
             (?<code>
               # Code blocks:
               # ```
@@ -75,6 +104,17 @@ module Gitlab
               ^```
               .+?
               \n```$
+            )
+          |
+            (?<inline_code>
+              # Inline code on separate rows:
+              # `
+              # Anything, including `/cmd arg` which are ignored by this filter
+              # `
+
+              ^.*`\n*
+              .+?
+              \n*`$
             )
           |
             (?<html>
@@ -122,14 +162,18 @@ module Gitlab
         end
 
         substitution_definitions.each do |substitution|
-          match_data = substitution.match(content.downcase)
-          if match_data
-            command = [substitution.name.to_s]
-            command << match_data[1] unless match_data[1].empty?
-            commands << command
-          end
+          regex = commands_regex(names: substitution.all_names)
+          content = content.gsub(regex) do |text|
+            if $~[:cmd]
+              command = [substitution.name.to_s]
+              command << $~[:arg] if $~[:arg].present?
+              commands << command
 
-          content = substitution.perform_substitution(self, content)
+              substitution.perform_substitution(self, text)
+            else
+              text
+            end
+          end
         end
 
         [content, commands]

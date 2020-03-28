@@ -4,8 +4,8 @@ type: reference, concepts
 
 # Squash and merge
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1024) in [GitLab Starter](https://about.gitlab.com/pricing/) 8.17.
-> - [Ported](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18956) to GitLab Core 11.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1024) in [GitLab Starter](https://about.gitlab.com/pricing/) 8.17.
+> - [Ported](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18956) to GitLab Core 11.0.
 
 With squash and merge you can combine all your merge request's commits into one
 and retain a clean history.
@@ -28,6 +28,9 @@ The squashed commit's commit message will be either:
 
 - Taken from the first multi-line commit message in the merge.
 - The merge request's title if no multi-line commit message is found.
+
+NOTE: **Note:**
+This only takes effect if there are at least 2 commits. As there is nothing to squash, the commit message does not change if there is only 1 commit.
 
 It can be customized before merging a merge request.
 

@@ -69,6 +69,13 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     super
   end
 
+  override :locked_user_redirect
+  def locked_user_redirect(user)
+    flash[:alert] = locked_user_redirect_alert(user)
+
+    redirect_to sso_group_saml_providers_path(@unauthenticated_group, token: @unauthenticated_group.saml_discovery_token)
+  end
+
   def store_active_saml_session
     Gitlab::Auth::GroupSaml::SsoEnforcer.new(@saml_provider).update_session
   end

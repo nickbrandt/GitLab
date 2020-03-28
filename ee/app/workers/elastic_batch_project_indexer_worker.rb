@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class ElasticBatchProjectIndexerWorker
+class ElasticBatchProjectIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
-  feature_category :search
+  feature_category :global_search
 
   # Batch indexing is a generally a onetime option, so give finer control over
   # queuing and concurrency

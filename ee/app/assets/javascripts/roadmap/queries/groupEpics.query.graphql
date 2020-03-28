@@ -24,10 +24,15 @@ query groupEpics(
         node {
           id
           title
+          description
           state
           webUrl
           startDate
           dueDate
+          descendantWeightSum {
+            closedIssues
+            openedIssues
+          }
           group {
             name
             fullName

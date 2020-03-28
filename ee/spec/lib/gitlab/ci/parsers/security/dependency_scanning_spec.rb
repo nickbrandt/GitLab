@@ -9,7 +9,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
     let(:artifact) { create(:ee_ci_job_artifact, :dependency_scanning) }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha, 2.weeks.ago) }
     let(:parser) { described_class.new }
 
     where(:report_format, :occurrence_count, :identifier_count, :scanner_count, :file_path, :package_name, :package_version, :version) do

@@ -4,13 +4,13 @@ type: reference
 
 # GitLab CI YMLs API
 
-In GitLab, there is an API endpoint available to work with CI YMLs. For more
+In GitLab, there is an API endpoint available to work with GitLab CI/CD YMLs. For more
 information on CI/CD pipeline configuration in GitLab, see the
 [configuration reference documentation](../../ci/yaml/README.md).
 
 ## List GitLab CI YML templates
 
-Get all GitLab CI YML templates.
+Get all GitLab CI/CD YML templates.
 
 ```plaintext
 GET /templates/gitlab_ci_ymls
@@ -18,7 +18,7 @@ GET /templates/gitlab_ci_ymls
 
 Example request:
 
-```bash
+```shell
 curl https://gitlab.example.com/api/v4/templates/gitlab_ci_ymls
 ```
 
@@ -111,7 +111,7 @@ Example response:
 
 ## Single GitLab CI YML template
 
-Get a single GitLab CI YML template.
+Get a single GitLab CI/CD YML template.
 
 ```plaintext
 GET /templates/gitlab_ci_ymls/:key
@@ -119,11 +119,11 @@ GET /templates/gitlab_ci_ymls/:key
 
 | Attribute  | Type   | Required | Description                           |
 | ---------- | ------ | -------- | ------------------------------------- |
-| `key`      | string | yes      | The key of the GitLab CI YML template |
+| `key`      | string | yes      | The key of the GitLab CI/CD YML template |
 
 Example request:
 
-```bash
+```shell
 curl https://gitlab.example.com/api/v4/templates/gitlab_ci_ymls/Ruby
 ```
 

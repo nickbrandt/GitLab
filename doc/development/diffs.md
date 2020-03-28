@@ -8,7 +8,7 @@ Currently we rely on different sources to present diffs, these include:
 
 ## Deep Dive
 
-In Jaunary 2019, Oswaldo Ferreira hosted a [Deep Dive] on GitLab's Diffs and Commenting on Diffs functionality to share his domain specific knowledge with anyone who may work in this part of the code base in the future. You can find the [recording on YouTube], and the slides on [Google Slides] and in [PDF]. Everything covered in this deep dive was accurate as of GitLab 11.7, and while specific details may have changed since then, it should still serve as a good introduction.
+In January 2019, Oswaldo Ferreira hosted a [Deep Dive] on GitLab's Diffs and Commenting on Diffs functionality to share his domain specific knowledge with anyone who may work in this part of the code base in the future. You can find the [recording on YouTube], and the slides on [Google Slides] and in [PDF]. Everything covered in this deep dive was accurate as of GitLab 11.7, and while specific details may have changed since then, it should still serve as a good introduction.
 
 [Deep Dive]: https://gitlab.com/gitlab-org/create-stage/issues/1
 [recording on YouTube]: https://www.youtube.com/watch?v=K6G3gMcFyek
@@ -26,7 +26,7 @@ The diffs fetching process _limits_ single file diff sizes and the overall size 
 then persisted on `merge_request_diff_files` table.
 
 Even though diffs larger than 10% of the value of `ApplicationSettings#diff_max_patch_bytes` are collapsed,
-we still keep them on Postgres. However, diff files larger than defined _safety limits_
+we still keep them on PostgreSQL. However, diff files larger than defined _safety limits_
 (see the [Diff limits section](#diff-limits)) are _not_ persisted in the database.
 
 In order to present diffs information on the Merge Request diffs page, we:

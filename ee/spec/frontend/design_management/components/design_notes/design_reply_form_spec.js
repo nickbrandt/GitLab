@@ -1,16 +1,16 @@
-import { shallowMount } from '@vue/test-utils';
-
+import { mount } from '@vue/test-utils';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
 
 describe('Design reply form component', () => {
   let wrapper;
 
   const findTextarea = () => wrapper.find('textarea');
-  const findSubmitButton = () => wrapper.find('.js-comment-submit-button');
+  const findSubmitButton = () => wrapper.find({ ref: 'submitButton' });
+  const findCancelButton = () => wrapper.find({ ref: 'cancelButton' });
+  const findModal = () => wrapper.find({ ref: 'cancelCommentModal' });
 
   function createComponent(props = {}) {
-    wrapper = shallowMount(DesignReplyForm, {
-      sync: false,
+    wrapper = mount(DesignReplyForm, {
       propsData: {
         value: '',
         isSaving: false,
@@ -45,7 +45,9 @@ describe('Design reply form component', () => {
         ctrlKey: true,
       });
 
-      expect(wrapper.emitted('submitForm')).toBeFalsy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('submitForm')).toBeFalsy();
+      });
     });
 
     it('does not emit submitForm event on textarea meta+enter keydown', () => {
@@ -53,7 +55,21 @@ describe('Design reply form component', () => {
         metaKey: true,
       });
 
-      expect(wrapper.emitted('submitForm')).toBeFalsy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('submitForm')).toBeFalsy();
+      });
+    });
+
+    it('emits cancelForm event on pressing escape button on textarea', () => {
+      findTextarea().trigger('keyup.esc');
+
+      expect(wrapper.emitted('cancelForm')).toBeTruthy();
+    });
+
+    it('emits cancelForm event on clicking Cancel button', () => {
+      findCancelButton().vm.$emit('click');
+
+      expect(wrapper.emitted('cancelForm')).toHaveLength(1);
     });
   });
 
@@ -68,10 +84,12 @@ describe('Design reply form component', () => {
       expect(findSubmitButton().attributes().disabled).toBeFalsy();
     });
 
-    it('emits submitForm event on button click', () => {
-      findSubmitButton().trigger('click');
+    it('emits submitForm event on Comment button click', () => {
+      findSubmitButton().vm.$emit('click');
 
-      expect(wrapper.emitted('submitForm')).toBeTruthy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('submitForm')).toBeTruthy();
+      });
     });
 
     it('emits submitForm event on textarea ctrl+enter keydown', () => {
@@ -79,7 +97,9 @@ describe('Design reply form component', () => {
         ctrlKey: true,
       });
 
-      expect(wrapper.emitted('submitForm')).toBeTruthy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('submitForm')).toBeTruthy();
+      });
     });
 
     it('emits submitForm event on textarea meta+enter keydown', () => {
@@ -87,17 +107,34 @@ describe('Design reply form component', () => {
         metaKey: true,
       });
 
-      expect(wrapper.emitted('submitForm')).toBeTruthy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('submitForm')).toBeTruthy();
+      });
     });
 
     it('emits input event on changing textarea content', () => {
       findTextarea().setValue('test2');
 
-      expect(wrapper.emitted('input')).toBeTruthy();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('input')).toBeTruthy();
+      });
     });
 
-    it('emits cancelForm event on pressing escape button on textarea', () => {
+    it('opens confirmation modal on pressing Escape button', () => {
       findTextarea().trigger('keyup.esc');
+
+      expect(findModal().exists()).toBe(true);
+    });
+
+    it('opens confirmation modal on Cancel button click', () => {
+      findCancelButton().vm.$emit('click');
+
+      expect(findModal().exists()).toBe(true);
+    });
+
+    it('emits cancelForm event on modal Ok button click', () => {
+      findTextarea().trigger('keyup.esc');
+      findModal().vm.$emit('ok');
 
       expect(wrapper.emitted('cancelForm')).toBeTruthy();
     });

@@ -12,11 +12,17 @@ describe Projects::UpdateService do
   end
 
   describe '#execute' do
-    let(:gitlab_shell) { Gitlab::Shell.new }
     let(:admin) { create(:admin) }
 
     context 'when changing visibility level' do
-      context 'when visibility_level is INTERNAL' do
+      def expect_to_call_unlink_fork_service
+        service = Projects::UnlinkForkService.new(project, user)
+
+        expect(Projects::UnlinkForkService).to receive(:new).with(project, user).and_return(service)
+        expect(service).to receive(:execute).and_call_original
+      end
+
+      context 'when visibility_level changes to INTERNAL' do
         it 'updates the project to internal' do
           expect(TodosDestroyer::ProjectPrivateWorker).not_to receive(:perform_in)
 
@@ -25,9 +31,21 @@ describe Projects::UpdateService do
           expect(result).to eq({ status: :success })
           expect(project).to be_internal
         end
+
+        context 'and project is PUBLIC' do
+          before do
+            project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+          end
+
+          it 'unlinks project from fork network' do
+            expect_to_call_unlink_fork_service
+
+            update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+          end
+        end
       end
 
-      context 'when visibility_level is PUBLIC' do
+      context 'when visibility_level changes to PUBLIC' do
         it 'updates the project to public' do
           expect(TodosDestroyer::ProjectPrivateWorker).not_to receive(:perform_in)
 
@@ -36,9 +54,17 @@ describe Projects::UpdateService do
           expect(result).to eq({ status: :success })
           expect(project).to be_public
         end
+
+        context 'and project is PRIVATE' do
+          it 'does not unlink project from fork network' do
+            expect(Projects::UnlinkForkService).not_to receive(:new)
+
+            update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+          end
+        end
       end
 
-      context 'when visibility_level is PRIVATE' do
+      context 'when visibility_level changes to PRIVATE' do
         before do
           project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
         end
@@ -51,6 +77,30 @@ describe Projects::UpdateService do
 
           expect(result).to eq({ status: :success })
           expect(project).to be_private
+        end
+
+        context 'and project is PUBLIC' do
+          before do
+            project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+          end
+
+          it 'unlinks project from fork network' do
+            expect_to_call_unlink_fork_service
+
+            update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          end
+        end
+
+        context 'and project is INTERNAL' do
+          before do
+            project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+          end
+
+          it 'unlinks project from fork network' do
+            expect_to_call_unlink_fork_service
+
+            update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          end
         end
       end
 
@@ -107,28 +157,48 @@ describe Projects::UpdateService do
       let(:project) { create(:project, :internal) }
       let(:forked_project) { fork_project(project) }
 
-      it 'updates forks visibility level when parent set to more restrictive' do
-        opts = { visibility_level: Gitlab::VisibilityLevel::PRIVATE }
+      context 'and unlink forks feature flag is off' do
+        before do
+          stub_feature_flags(unlink_fork_network_upon_visibility_decrease: false)
+        end
 
-        expect(project).to be_internal
-        expect(forked_project).to be_internal
+        it 'updates forks visibility level when parent set to more restrictive' do
+          opts = { visibility_level: Gitlab::VisibilityLevel::PRIVATE }
 
-        expect(update_project(project, admin, opts)).to eq({ status: :success })
+          expect(project).to be_internal
+          expect(forked_project).to be_internal
 
-        expect(project).to be_private
-        expect(forked_project.reload).to be_private
+          expect(update_project(project, admin, opts)).to eq({ status: :success })
+
+          expect(project).to be_private
+          expect(forked_project.reload).to be_private
+        end
+
+        it 'does not update forks visibility level when parent set to less restrictive' do
+          opts = { visibility_level: Gitlab::VisibilityLevel::PUBLIC }
+
+          expect(project).to be_internal
+          expect(forked_project).to be_internal
+
+          expect(update_project(project, admin, opts)).to eq({ status: :success })
+
+          expect(project).to be_public
+          expect(forked_project.reload).to be_internal
+        end
       end
 
-      it 'does not update forks visibility level when parent set to less restrictive' do
-        opts = { visibility_level: Gitlab::VisibilityLevel::PUBLIC }
+      context 'and unlink forks feature flag is on' do
+        it 'does not change visibility of forks' do
+          opts = { visibility_level: Gitlab::VisibilityLevel::PRIVATE }
 
-        expect(project).to be_internal
-        expect(forked_project).to be_internal
+          expect(project).to be_internal
+          expect(forked_project).to be_internal
 
-        expect(update_project(project, admin, opts)).to eq({ status: :success })
+          expect(update_project(project, admin, opts)).to eq({ status: :success })
 
-        expect(project).to be_public
-        expect(forked_project.reload).to be_internal
+          expect(project).to be_private
+          expect(forked_project.reload).to be_internal
+        end
       end
     end
 
@@ -232,18 +302,17 @@ describe Projects::UpdateService do
     end
 
     context 'when renaming a project' do
-      let(:repository_storage) { 'default' }
-      let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage].legacy_disk_path }
+      let(:fake_repo_path) { File.join(TestEnv.repos_path, user.namespace.full_path, 'existing.git') }
 
       context 'with legacy storage' do
         let(:project) { create(:project, :legacy_storage, :repository, creator: user, namespace: user.namespace) }
 
         before do
-          gitlab_shell.create_repository(repository_storage, "#{user.namespace.full_path}/existing", user.namespace.full_path)
+          TestEnv.create_bare_repository(fake_repo_path)
         end
 
         after do
-          gitlab_shell.remove_repository(repository_storage, "#{user.namespace.full_path}/existing")
+          FileUtils.rm_rf(fake_repo_path)
         end
 
         it 'does not allow renaming when new path matches existing repository on disk' do
@@ -426,6 +495,63 @@ describe Projects::UpdateService do
         update_project(project, user, { name: 'New name' })
       end
     end
+
+    context 'when updating nested attributes for prometheus service' do
+      context 'prometheus service exists' do
+        let(:prometheus_service_attributes) do
+          attributes_for(:prometheus_service,
+                         project: project,
+                         properties: { api_url: "http://new.prometheus.com", manual_configuration: "0" }
+          )
+        end
+
+        let!(:prometheus_service) do
+          create(:prometheus_service,
+                 project: project,
+                 properties: { api_url: "http://old.prometheus.com", manual_configuration: "0" }
+          )
+        end
+
+        it 'updates existing record' do
+          expect { update_project(project, user, prometheus_service_attributes: prometheus_service_attributes) }
+            .to change { prometheus_service.reload.api_url }
+            .from("http://old.prometheus.com")
+            .to("http://new.prometheus.com")
+        end
+      end
+
+      context 'prometheus service does not exist' do
+        context 'valid parameters' do
+          let(:prometheus_service_attributes) do
+            attributes_for(:prometheus_service,
+                           project: project,
+                           properties: { api_url: "http://example.prometheus.com", manual_configuration: "0" }
+            )
+          end
+
+          it 'creates new record' do
+            expect { update_project(project, user, prometheus_service_attributes: prometheus_service_attributes) }
+              .to change { ::PrometheusService.where(project: project).count }
+              .from(0)
+              .to(1)
+          end
+        end
+
+        context 'invalid parameters' do
+          let(:prometheus_service_attributes) do
+            attributes_for(:prometheus_service,
+                           project: project,
+                           properties: { api_url: nil, manual_configuration: "1" }
+            )
+          end
+
+          it 'does not create new record' do
+            expect { update_project(project, user, prometheus_service_attributes: prometheus_service_attributes) }
+              .not_to change { ::PrometheusService.where(project: project).count }
+          end
+        end
+      end
+    end
   end
 
   describe '#run_auto_devops_pipeline?' do
@@ -482,6 +608,25 @@ describe Projects::UpdateService do
 
         it { is_expected.to eq(false) }
       end
+    end
+  end
+
+  describe 'repository_storage' do
+    let(:admin) { create(:admin) }
+    let(:user) { create(:user) }
+    let(:project) { create(:project, :repository) }
+    let(:opts) { { repository_storage: 'test_second_storage' } }
+
+    it 'calls the change repository storage method if the storage changed' do
+      expect(project).to receive(:change_repository_storage).with('test_second_storage')
+
+      update_project(project, admin, opts).inspect
+    end
+
+    it "doesn't call the change repository storage for non-admin users" do
+      expect(project).not_to receive(:change_repository_storage)
+
+      update_project(project, user, opts).inspect
     end
   end
 

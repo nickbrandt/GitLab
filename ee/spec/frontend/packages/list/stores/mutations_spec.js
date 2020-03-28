@@ -1,7 +1,7 @@
-import * as commonUtils from '~/lib/utils/common_utils';
 import mutations from 'ee/packages/list/stores/mutations';
 import * as types from 'ee/packages/list/stores/mutation_types';
 import createState from 'ee/packages/list/stores/state';
+import * as commonUtils from '~/lib/utils/common_utils';
 import { npmPackage, mavenPackage } from '../../mock_data';
 
 describe('Mutations Registry Store', () => {
@@ -63,6 +63,25 @@ describe('Mutations Registry Store', () => {
       expect(commonUtils.normalizeHeaders).toHaveBeenCalledWith('foo');
       expect(commonUtils.parseIntPagination).toHaveBeenCalledWith('baz');
       expect(mockState.pagination).toEqual(mockPagination);
+    });
+  });
+
+  describe('SET_SORTING', () => {
+    it('should merge the sorting object with sort value', () => {
+      mutations[types.SET_SORTING](mockState, { sort: 'desc' });
+      expect(mockState.sorting).toEqual({ ...mockState.sorting, sort: 'desc' });
+    });
+
+    it('should merge the sorting object with order_by value', () => {
+      mutations[types.SET_SORTING](mockState, { orderBy: 'foo' });
+      expect(mockState.sorting).toEqual({ ...mockState.sorting, orderBy: 'foo' });
+    });
+  });
+
+  describe('SET_SELECTED_TYPE', () => {
+    it('should set the selected type', () => {
+      mutations[types.SET_SELECTED_TYPE](mockState, { type: 'maven' });
+      expect(mockState.selectedType).toEqual({ type: 'maven' });
     });
   });
 });

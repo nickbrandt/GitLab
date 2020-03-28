@@ -1,6 +1,6 @@
 namespace :gitlab do
   namespace :gitaly do
-    desc "GitLab | Install or upgrade gitaly"
+    desc 'GitLab | Gitaly | Install or upgrade gitaly'
     task :install, [:dir, :storage_path, :repo] => :gitlab_environment do |t, args|
       warn_user_is_not_gitlab
 
@@ -27,7 +27,7 @@ Usage: rake "gitlab:gitaly:install[/installation/dir,/storage/path]")
       end
 
       storage_paths = { 'default' => args.storage_path }
-      Gitlab::SetupHelper.create_gitaly_configuration(args.dir, storage_paths)
+      Gitlab::SetupHelper::Gitaly.create_configuration(args.dir, storage_paths)
       Dir.chdir(args.dir) do
         # In CI we run scripts/gitaly-test-build instead of this command
         unless ENV['CI'].present?

@@ -7,8 +7,8 @@ describe Projects::AfterRenameService do
 
   describe '#execute' do
     context 'when running on a primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
+      let_it_be(:primary) { create(:geo_node, :primary) }
+      let_it_be(:secondary) { create(:geo_node) }
       let(:project) { create(:project, :repository, :legacy_storage) }
       let!(:path_before_rename) { project.path }
       let!(:full_path_before_rename) { project.full_path }

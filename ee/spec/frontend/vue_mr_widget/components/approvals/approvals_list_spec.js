@@ -1,10 +1,8 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import _ from 'underscore';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovedIcon from 'ee/vue_merge_request_widget/components/approvals/approved_icon.vue';
 import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/approvals_list.vue';
-
-const localVue = createLocalVue();
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 
 const testApprovers = () => _.range(1, 11).map(id => ({ id }));
 const testRuleApproved = () => ({
@@ -35,6 +33,7 @@ const testRuleFallback = () => ({
   id: 'fallback',
   name: '',
   fallback: true,
+  rule_type: 'any_approver',
   approvals_required: 3,
   approved_by: [{ id: 1 }, { id: 2 }],
   approvers: [],
@@ -56,10 +55,8 @@ describe('EE MRWidget approvals list', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(ApprovalsList), {
+    wrapper = shallowMount(ApprovalsList, {
       propsData: props,
-      localVue,
-      sync: false,
     });
   };
 

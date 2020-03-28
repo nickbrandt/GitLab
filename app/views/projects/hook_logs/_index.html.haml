@@ -1,4 +1,4 @@
-.row.prepend-top-default.append-bottom-default
+.row.prepend-top-32.append-bottom-default
   .col-lg-3
     %h4.prepend-top-0
       Recent Deliveries
@@ -28,7 +28,7 @@
             %td.light
               = time_ago_with_tooltip(hook_log.created_at)
             %td
-              = link_to 'View details', project_hook_hook_log_path(project, hook, hook_log)
+              = link_to 'View details', hook_log.present.details_path
 
       = paginate hook_logs, theme: 'gitlab'
 

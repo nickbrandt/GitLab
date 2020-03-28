@@ -74,11 +74,6 @@ export default {
       required: false,
       default: false,
     },
-    helpInfo: {
-      type: [Boolean, Object],
-      required: false,
-      default: false,
-    },
     featureDisabled: {
       type: Boolean,
       required: false,
@@ -101,44 +96,19 @@ export default {
     isCustomTypeSync() {
       return this.customType === CUSTOM_TYPE.SYNC;
     },
-    popoverConfig() {
-      return {
-        html: true,
-        trigger: 'click',
-        placement: 'top',
-        template: `
-            <div class="popover geo-node-detail-popover" role="tooltip">
-              <div class="arrow"></div>
-              <p class="popover-header"></p>
-              <div class="popover-body"></div>
-            </div>
-          `,
-        title: this.helpInfo.title,
-        content: `
-            <a href="${this.helpInfo.url}">
-              ${this.helpInfo.urlText}
-            </a>
-          `,
-      };
-    },
   },
 };
 </script>
 
 <template>
-  <div v-if="!featureDisabled" class="prepend-top-15 prepend-left-10 node-detail-item">
-    <div class="node-detail-title">
-      <span>{{ itemTitle }}</span>
-      <icon
-        v-if="hasHelpInfo"
-        v-popover="popoverConfig"
-        :size="12"
-        class="node-detail-help-text prepend-left-5"
-        name="question"
-      />
+  <div v-if="!featureDisabled" class="mt-2 ml-2 node-detail-item">
+    <div class="d-flex align-items-center text-secondary-700">
+      <span class="node-detail-title">{{ itemTitle }}</span>
     </div>
-    <div v-if="isValueTypePlain" :class="cssClass" class="node-detail-value">{{ itemValue }}</div>
-    <div v-if="isValueTypeGraph" :class="{ 'd-flex': itemValueStale }" class="node-detail-value">
+    <div v-if="isValueTypePlain" :class="cssClass" class="mt-1 node-detail-value">
+      {{ itemValue }}
+    </div>
+    <div v-if="isValueTypeGraph" :class="{ 'd-flex': itemValueStale }" class="mt-1">
       <stacked-progress-bar
         :css-class="itemValueStale ? 'flex-fill' : ''"
         :success-label="successLabel"
@@ -153,7 +123,7 @@ export default {
         v-tooltip
         :title="itemValueStaleTooltip"
         name="time-out"
-        class="prepend-left-10 detail-value-stale-icon"
+        class="ml-2 text-warning-500"
         data-container="body"
       />
     </div>

@@ -4,7 +4,7 @@ type: concepts, howto
 
 # Using Docker images
 
-GitLab CI in conjunction with [GitLab Runner](../runners/README.md) can use
+GitLab CI/CD in conjunction with [GitLab Runner](../runners/README.md) can use
 [Docker Engine](https://www.docker.com/) to test and build any application.
 
 Docker is an open-source project that allows you to use predefined images to
@@ -12,7 +12,7 @@ run applications in independent "containers" that are run within a single Linux
 instance. [Docker Hub][hub] has a rich database of pre-built images that can be
 used to test and build your applications.
 
-Docker, when used with GitLab CI, runs each job in a separate and isolated
+When used with GitLab CI/CD, Docker runs each job in a separate and isolated
 container using the predefined image that is set up in
 [`.gitlab-ci.yml`](../yaml/README.md).
 
@@ -28,18 +28,18 @@ to use the `docker` executor.
 
 A one-line example can be seen below:
 
-```bash
+```shell
 sudo gitlab-runner register \
   --url "https://gitlab.example.com/" \
   --registration-token "PROJECT_REGISTRATION_TOKEN" \
-  --description "docker-ruby-2.1" \
+  --description "docker-ruby:2.6" \
   --executor "docker" \
-  --docker-image ruby:2.1 \
+  --docker-image ruby:2.6 \
   --docker-services postgres:latest \
   --docker-services mysql:latest
 ```
 
-The registered runner will use the `ruby:2.1` Docker image and will run two
+The registered runner will use the `ruby:2.6` Docker image and will run two
 services, `postgres:latest` and `mysql:latest`, both of which will be
 accessible during the build process.
 
@@ -194,7 +194,7 @@ services that you want to use during build time:
 
 ```yaml
 default:
-  image: ruby:2.2
+  image: ruby:2.6
 
   services:
     - postgres:9.3
@@ -214,15 +214,15 @@ default:
   before_script:
     - bundle install
 
-test:2.1:
-  image: ruby:2.1
+test:2.6:
+  image: ruby:2.6
   services:
   - postgres:9.3
   script:
   - bundle exec rake spec
 
-test:2.2:
-  image: ruby:2.2
+test:2.7:
+  image: ruby:2.7
   services:
   - postgres:9.4
   script:
@@ -235,7 +235,7 @@ for `image` and `services`:
 ```yaml
 default:
   image:
-    name: ruby:2.2
+    name: ruby:2.6
     entrypoint: ["/bin/bash"]
 
   services:
@@ -277,7 +277,7 @@ services:
   command: ["postgres"]
 
 image:
-  name: ruby:2.2
+  name: ruby:2.6
   entrypoint: ["/bin/bash"]
 
 before_script:
@@ -345,10 +345,12 @@ For example, the following two definitions are equal:
 | `command`    | no       | 9.4 |Command or script that should be used as the container's command. It will be translated to arguments passed to Docker after the image's name. The syntax is similar to [`Dockerfile`'s `CMD`][cmd] directive, where each shell token is a separate string in the array. |
 | `alias`      | no       | 9.4 |Additional alias that can be used to access the service from the job's container. Read [Accessing the services](#accessing-the-services) for more information. |
 
+NOTE: **Note:**
+Alias support for the Kubernetes executor was [introduced](https://gitlab.com/gitlab-org/gitlab-runner/issues/2229) in GitLab Runner 12.8, and is only available for Kubernetes version 1.7 or later.
+
 ### Starting multiple services from the same image
 
-> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended
-configuration options](#extended-docker-configuration-options).
+> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended configuration options](#extended-docker-configuration-options).
 
 Before the new extended Docker configuration options, the following configuration
 would not work properly:
@@ -381,8 +383,7 @@ in `.gitlab-ci.yml` file.
 
 ### Setting a command for the service
 
-> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended
-configuration options](#extended-docker-configuration-options).
+> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended configuration options](#extended-docker-configuration-options).
 
 Let's assume you have a `super/sql:latest` image with some SQL database
 inside it and you would like to use it as a service for your job. Let's also
@@ -394,7 +395,7 @@ Before the new extended Docker configuration options, you would need to create
 your own image based on the `super/sql:latest` image, add the default command,
 and then use it in job's configuration, like:
 
-```Dockerfile
+```dockerfile
 # my-super-sql:latest image's Dockerfile
 
 FROM super/sql:latest
@@ -423,8 +424,7 @@ As you can see, the syntax of `command` is similar to [Dockerfile's `CMD`][cmd].
 
 ### Overriding the entrypoint of an image
 
-> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended
-configuration options](#extended-docker-configuration-options).
+> Introduced in GitLab and GitLab Runner 9.4. Read more about the [extended configuration options](#extended-docker-configuration-options).
 
 Before showing the available entrypoint override methods, let's describe shortly
 how the Runner starts and uses a Docker image for the containers used in the
@@ -486,7 +486,7 @@ Look for the `[runners.docker]` section:
 
 ```toml
 [runners.docker]
-  image = "ruby:2.1"
+  image = "ruby:latest"
   services = ["mysql:latest", "postgres:latest"]
 ```
 
@@ -513,7 +513,7 @@ To define which should be used, the GitLab Runner process reads the configuratio
 
 NOTE: **Note:**
 GitLab Runner reads this configuration **only** from `config.toml` and ignores it if
-it's provided as an environment variable. This is because GitLab Runnner uses **only**
+it's provided as an environment variable. This is because GitLab Runner uses **only**
 `config.toml` configuration and doesn't interpolate **ANY** environment variables at
 runtime.
 
@@ -559,7 +559,7 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
 
 - **First way -** Do a `docker login` on your local machine:
 
-  ```bash
+  ```shell
   docker login registry.example.com:5000 --username my_username --password my_password
   ```
 
@@ -568,7 +568,7 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
   If you don't need access to the registry from your computer, you
   can do a `docker logout`:
 
-  ```bash
+  ```shell
   docker logout registry.example.com:5000
   ```
 
@@ -576,14 +576,26 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
   will use the available system keystore to store the result of `docker
   login`. In that case, it's impossible to read `~/.docker/config.json`,
   so you will need to prepare the required base64-encoded version of
-  `${username}:${password}` manually. Open a terminal and execute the
-  following command:
+  `${username}:${password}` and create the Docker configuration JSON manually.
+  Open a terminal and execute the following command:
 
-  ```bash
+  ```shell
   echo -n "my_username:my_password" | base64
 
   # Example output to copy
   bXlfdXNlcm5hbWU6bXlfcGFzc3dvcmQ=
+  ```
+
+  Create the Docker JSON configuration content as follows:
+
+  ```json
+  {
+      "auths": {
+          "registry.example.com:5000": {
+              "auth": "(Base64 content from above)"
+          }
+      }
+  }
   ```
 
 #### Configuring a job
@@ -627,7 +639,7 @@ Specifying only `registry.example.com` will not work.
 ### Configuring a Runner
 
 If you have many pipelines that access the same registry, it'll
-probably be better to setup registry access at the runner level.  This
+probably be better to setup registry access at the runner level. This
 allows pipeline authors to have access to a private registry just by
 running a job on the appropriate runner. It also makes registry
 changes and credential rotations much simpler.
@@ -678,7 +690,7 @@ To configure credentials store, follow these steps:
        }
      ```
 
-   - Or, if you are running self-hosted Runners, add the above JSON to
+   - Or, if you are running self-managed Runners, add the above JSON to
      `${GITLAB_RUNNER_HOME}/.docker/config.json`. GitLab Runner will read this config file
      and will use the needed helper for this specific repository.
 
@@ -711,7 +723,7 @@ To configure access for `aws_account_id.dkr.ecr.region.amazonaws.com`, follow th
      }
      ```
 
-   - Or, if you are running self-hosted Runners,
+   - Or, if you are running self-managed Runners,
      add the above JSON to `${GITLAB_RUNNER_HOME}/.docker/config.json`.
      GitLab Runner will read this config file and will use the needed helper for this
      specific repository.
@@ -761,7 +773,7 @@ time.
 
 1. Create any service container: `mysql`, `postgresql`, `mongodb`, `redis`.
 1. Create cache container to store all volumes as defined in `config.toml` and
-   `Dockerfile` of build image (`ruby:2.1` as in above example).
+   `Dockerfile` of build image (`ruby:2.6` as in above example).
 1. Create build container and link any service container to build container.
 1. Start build container and send job script to the container.
 1. Run job script.
@@ -778,7 +790,7 @@ able to run Docker with your regular user account.
 
 First start with creating a file named `build_script`:
 
-```bash
+```shell
 cat <<EOF > build_script
 git clone https://gitlab.com/gitlab-org/gitlab-runner.git /builds/gitlab-org/gitlab-runner
 cd /builds/gitlab-org/gitlab-runner
@@ -793,7 +805,7 @@ is specific to your project.
 
 Then create some service containers:
 
-```sh
+```shell
 docker run -d --name service-mysql mysql:latest
 docker run -d --name service-postgres postgres:latest
 ```
@@ -805,19 +817,19 @@ respectively. They will both run in the background (`-d`).
 Finally, create a build container by executing the `build_script` file we
 created earlier:
 
-```sh
-docker run --name build -i --link=service-mysql:mysql --link=service-postgres:postgres ruby:2.1 /bin/bash < build_script
+```shell
+docker run --name build -i --link=service-mysql:mysql --link=service-postgres:postgres ruby:2.6 /bin/bash < build_script
 ```
 
 The above command will create a container named `build` that is spawned from
-the `ruby:2.1` image and has two services linked to it. The `build_script` is
+the `ruby:2.6` image and has two services linked to it. The `build_script` is
 piped using STDIN to the bash interpreter which in turn executes the
 `build_script` in the `build` container.
 
 When you finish testing and no longer need the containers, you can remove them
 with:
 
-```sh
+```shell
 docker rm -f -v build service-mysql service-postgres
 ```
 

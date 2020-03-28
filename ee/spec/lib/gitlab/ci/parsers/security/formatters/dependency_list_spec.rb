@@ -20,7 +20,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
     let(:package_manager) { 'bundler' }
     let(:file_path) { 'rails/Gemfile.lock' }
     let(:data) { formatter.format(dependency, package_manager, file_path, parsed_report['vulnerabilities']) }
-    let(:blob_path) { "/#{project.full_path}/blob/#{sha}/rails/Gemfile.lock" }
+    let(:blob_path) { "/#{project.full_path}/-/blob/#{sha}/rails/Gemfile.lock" }
 
     context 'with secure dependency' do
       let(:dependency) { parsed_report['dependency_files'][0]['dependencies'][0] }

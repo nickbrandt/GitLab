@@ -1,10 +1,13 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 import { n__, __ } from '~/locale';
+import { DESIGN_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
+    GlLoadingIcon,
     Icon,
     Timeago,
   },
@@ -34,6 +37,16 @@ export default {
       required: false,
       default: null,
     },
+    isUploading: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      imageLoading: true,
+    };
   },
   computed: {
     icon() {
@@ -61,30 +74,42 @@ export default {
     notesLabel() {
       return n__('%d comment', '%d comments', this.notesCount);
     },
+    showLoadingSpinner() {
+      return this.imageLoading || this.isUploading;
+    },
   },
+  methods: {
+    onImageLoad() {
+      this.imageLoading = false;
+    },
+  },
+  DESIGN_ROUTE_NAME,
 };
 </script>
 
 <template>
   <router-link
     :to="{
-      name: 'design',
+      name: $options.DESIGN_ROUTE_NAME,
       params: { id: filename },
       query: $route.query,
     }"
     class="card cursor-pointer text-plain js-design-list-item design-list-item"
   >
-    <div class="card-body p-0 d-flex align-items-center overflow-hidden position-relative">
+    <div class="card-body p-0 d-flex-center overflow-hidden position-relative">
       <div v-if="icon.name" class="design-event position-absolute">
         <span :title="icon.tooltip" :aria-label="icon.tooltip">
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
+      <gl-loading-icon v-show="showLoadingSpinner" size="md" />
       <img
+        v-show="!showLoadingSpinner"
         :src="image"
         :alt="filename"
         class="block ml-auto mr-auto mw-100 mh-100 design-img"
         data-qa-selector="design_image"
+        @load="onImageLoad"
       />
     </div>
     <div class="card-footer d-flex w-100">

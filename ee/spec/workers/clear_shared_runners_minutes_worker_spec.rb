@@ -9,8 +9,9 @@ describe ClearSharedRunnersMinutesWorker do
     let(:namespace) { create(:namespace) }
 
     before do
-      expect_any_instance_of(described_class)
-        .to receive(:try_obtain_lease).and_return(true)
+      expect_next_instance_of(described_class) do |instance|
+        expect(instance).to receive(:try_obtain_lease).and_return(true)
+      end
     end
 
     subject { worker.perform }
@@ -33,6 +34,21 @@ describe ClearSharedRunnersMinutesWorker do
         subject
 
         expect(statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.now)
+      end
+
+      context 'when there are namespaces that were not reset after the reset steps' do
+        let(:namespace_ids) { [namespace.id] }
+
+        before do
+          allow(Namespace).to receive(:each_batch).and_yield(Namespace.all)
+          allow(Namespace).to receive(:transaction).and_raise(ActiveRecord::ActiveRecordError)
+        end
+
+        it 'raises an exception' do
+          expect { worker.perform }.to raise_error(
+            EE::Namespace::NamespaceStatisticsNotResetError,
+            "#{namespace_ids.count} namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: #{namespace_ids}")
+        end
       end
     end
 

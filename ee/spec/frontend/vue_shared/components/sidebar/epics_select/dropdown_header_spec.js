@@ -1,9 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
 
 import { GlButton } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
-
 import DropdownHeader from 'ee/vue_shared/components/sidebar/epics_select/dropdown_header.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 describe('EpicsSelect', () => {
   describe('DropdownHeader', () => {

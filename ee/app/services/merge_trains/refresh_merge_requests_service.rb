@@ -15,16 +15,6 @@ module MergeTrains
     def execute(merge_request)
       return unless merge_request.on_train?
 
-      if Feature.enabled?(:merge_trains_efficient_refresh, default_enabled: true)
-        efficient_refresh(merge_request)
-      else
-        legacy_refresh(merge_request)
-      end
-    end
-
-    private
-
-    def efficient_refresh(merge_request)
       queue = Gitlab::BatchPopQueueing.new('merge_trains', queue_id(merge_request))
 
       result = queue.safe_execute([merge_request.id], lock_timeout: 15.minutes) do |items|
@@ -33,16 +23,13 @@ module MergeTrains
       end
 
       if result[:status] == :finished && result[:new_items].present?
-        first_merge_request = MergeTrain.first_in_train_from(result[:new_items])
-        AutoMergeProcessWorker.perform_async(first_merge_request.id)
+        MergeTrain.first_in_train_from(result[:new_items]).try do |merge_request|
+          AutoMergeProcessWorker.perform_async(merge_request.id)
+        end
       end
     end
 
-    def legacy_refresh(merge_request)
-      in_lock("merge_train:#{merge_request.target_project_id}-#{merge_request.target_branch}") do
-        unsafe_refresh(merge_request)
-      end
-    end
+    private
 
     def unsafe_refresh(merge_request)
       require_next_recreate = false

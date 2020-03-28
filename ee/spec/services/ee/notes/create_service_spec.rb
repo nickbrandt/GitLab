@@ -4,9 +4,9 @@ require 'spec_helper'
 
 describe Notes::CreateService do
   context 'notes for designs' do
-    set(:design) { create(:design, :with_file) }
-    set(:project) { design.project }
-    set(:user) { project.owner }
+    let_it_be(:design) { create(:design, :with_file) }
+    let_it_be(:project) { design.project }
+    let_it_be(:user) { project.owner }
 
     subject(:service) { described_class.new(project, user, opts) }
 

@@ -25,6 +25,15 @@ module API
       end
 
       def verify_update_project_attrs!(project, attrs)
+        attrs.delete(:repository_storage) unless can?(current_user, :change_repository_storage, project)
+      end
+
+      def delete_project(user_project)
+        destroy_conditionally!(user_project) do
+          ::Projects::DestroyService.new(user_project, current_user, {}).async_execute
+        end
+
+        accepted!
       end
     end
 
@@ -54,6 +63,7 @@ module API
         optional :visibility, type: String, values: Gitlab::VisibilityLevel.string_values,
                               desc: 'Limit by visibility'
         optional :search, type: String, desc: 'Return list of projects matching the search criteria'
+        optional :search_namespaces, type: Boolean, desc: "Include ancestor namespaces when matching search criteria"
         optional :owned, type: Boolean, default: false, desc: 'Limit by owned by authenticated user'
         optional :starred, type: Boolean, default: false, desc: 'Limit by starred status'
         optional :membership, type: Boolean, default: false, desc: 'Limit by projects that the current user is a member of'
@@ -82,18 +92,22 @@ module API
       def present_projects(projects, options = {})
         projects = reorder_projects(projects)
         projects = apply_filters(projects)
-        projects = paginate(projects)
-        projects, options = with_custom_attributes(projects, options)
 
-        options = options.reverse_merge(
-          with: current_user ? Entities::ProjectWithAccess : Entities::BasicProjectDetails,
-          statistics: params[:statistics],
-          current_user: current_user,
-          license: false
-        )
-        options[:with] = Entities::BasicProjectDetails if params[:simple]
+        records, options = paginate_with_strategies(projects) do |projects|
+          projects, options = with_custom_attributes(projects, options)
 
-        present options[:with].prepare_relation(projects, options), options
+          options = options.reverse_merge(
+            with: current_user ? Entities::ProjectWithAccess : Entities::BasicProjectDetails,
+            statistics: params[:statistics],
+            current_user: current_user,
+            license: false
+          )
+          options[:with] = Entities::BasicProjectDetails if params[:simple]
+
+          [options[:with].prepare_relation(projects, options), options]
+        end
+
+        present records, options
       end
 
       def translate_params_for_compatibility(params)
@@ -164,6 +178,7 @@ module API
         use :create_params
       end
       post do
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/21139')
         attrs = declared_params(include_missing: false)
         attrs = translate_params_for_compatibility(attrs)
         filter_attributes_using_license!(attrs)
@@ -191,10 +206,12 @@ module API
         optional :path, type: String, desc: 'The path of the repository'
         optional :default_branch, type: String, desc: 'The default branch of the project'
         use :optional_project_params
+        use :optional_create_project_params
         use :create_params
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post "user/:user_id" do
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/21139')
         authenticated_as_admin!
         user = User.find_by(id: params.delete(:user_id))
         not_found!('User') unless user
@@ -247,32 +264,40 @@ module API
         success Entities::Project
       end
       params do
-        optional :namespace, type: String, desc: 'The ID or name of the namespace that the project will be forked into'
+        optional :namespace, type: String, desc: '(deprecated) The ID or name of the namespace that the project will be forked into'
+        optional :namespace_id, type: Integer, desc: 'The ID of the namespace that the project will be forked into'
+        optional :namespace_path, type: String, desc: 'The path of the namespace that the project will be forked into'
         optional :path, type: String, desc: 'The path that will be assigned to the fork'
         optional :name, type: String, desc: 'The name that will be assigned to the fork'
       end
       post ':id/fork' do
         Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42284')
 
+        not_found! unless can?(current_user, :fork_project, user_project)
+
         fork_params = declared_params(include_missing: false)
-        namespace_id = fork_params[:namespace]
 
-        if namespace_id.present?
-          fork_params[:namespace] = find_namespace(namespace_id)
-
-          unless fork_params[:namespace] && can?(current_user, :create_projects, fork_params[:namespace])
-            not_found!('Target Namespace')
+        fork_params[:namespace] =
+          if fork_params[:namespace_id].present?
+            find_namespace!(fork_params[:namespace_id])
+          elsif fork_params[:namespace_path].present?
+            find_namespace_by_path!(fork_params[:namespace_path])
+          elsif fork_params[:namespace].present?
+            find_namespace!(fork_params[:namespace])
           end
-        end
 
-        forked_project = ::Projects::ForkService.new(user_project, current_user, fork_params).execute
+        service = ::Projects::ForkService.new(user_project, current_user, fork_params)
+
+        not_found!('Target Namespace') unless service.valid_fork_target?
+
+        forked_project = service.execute
 
         if forked_project.errors.any?
           conflict!(forked_project.errors.messages)
         else
           present forked_project, with: Entities::Project,
-                                  user_can_admin_project: can?(current_user, :admin_project, forked_project),
-                                  current_user: current_user
+                  user_can_admin_project: can?(current_user, :admin_project, forked_project),
+                  current_user: current_user
         end
       end
 
@@ -346,7 +371,7 @@ module API
       post ':id/unarchive' do
         authorize!(:archive_project, user_project)
 
-        ::Projects::UpdateService.new(@project, current_user, archived: false).execute
+        ::Projects::UpdateService.new(user_project, current_user, archived: false).execute
 
         present user_project, with: Entities::Project, current_user: current_user
       end
@@ -403,11 +428,7 @@ module API
       delete ":id" do
         authorize! :remove_project, user_project
 
-        destroy_conditionally!(user_project) do
-          ::Projects::DestroyService.new(user_project, current_user, {}).async_execute
-        end
-
-        accepted!
+        delete_project(user_project)
       end
 
       desc 'Mark this project as forked from another'
@@ -438,7 +459,7 @@ module API
           ::Projects::UnlinkForkService.new(user_project, current_user).execute
         end
 
-        result ? status(204) : not_modified!
+        not_modified! unless result
       end
 
       desc 'Share the project with a group' do
@@ -487,7 +508,9 @@ module API
         requires :file, type: File, desc: 'The file to be uploaded' # rubocop:disable Scalability/FileUploads
       end
       post ":id/uploads" do
-        UploadService.new(user_project, params[:file]).execute.to_h
+        upload = UploadService.new(user_project, params[:file]).execute
+
+        present upload, with: Entities::ProjectUpload
       end
 
       desc 'Get the users list of a project' do

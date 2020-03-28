@@ -29,6 +29,8 @@ module DiffHelper
     if action_name == 'diff_for_path'
       options[:expanded] = true
       options[:paths] = params.values_at(:old_path, :new_path)
+    elsif action_name == 'show'
+      options[:include_context_commits] = true unless @project.context_commits_enabled?
     end
 
     options
@@ -161,6 +163,18 @@ module DiffHelper
     end
   end
 
+  def render_overflow_warning?(diffs_collection)
+    diff_files = diffs_collection.raw_diff_files
+
+    if diff_files.any?(&:too_large?)
+      Gitlab::Metrics.add_event(:diffs_overflow_single_file_limits)
+    end
+
+    diff_files.overflow?.tap do |overflown|
+      Gitlab::Metrics.add_event(:diffs_overflow_collection_limits) if overflown
+    end
+  end
+
   private
 
   def diff_btn(title, name, selected)
@@ -201,12 +215,6 @@ module DiffHelper
   def toggle_whitespace_link(url, options)
     options[:class] = [*options[:class], 'btn btn-default'].join(' ')
     link_to "#{hide_whitespace? ? 'Show' : 'Hide'} whitespace changes", url, class: options[:class]
-  end
-
-  def render_overflow_warning?(diffs_collection)
-    diffs = @merge_request_diff.presence || diffs_collection.diff_files
-
-    diffs.overflow?
   end
 
   def diff_file_path_text(diff_file, max: 60)

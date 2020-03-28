@@ -12,15 +12,15 @@ QA::Runtime::Browser.configure!
 
 QA::Runtime::Scenario.from_env(QA::Runtime::Env.runtime_scenario_attributes) if QA::Runtime::Env.runtime_scenario_attributes
 
-%w[helpers shared_examples].each do |d|
-  Dir[::File.join(__dir__, d, '**', '*.rb')].each { |f| require f }
-end
+Dir[::File.join(__dir__, "support/helpers/*.rb")].each { |f| require f }
+Dir[::File.join(__dir__, "support/shared_contexts/*.rb")].each { |f| require f }
+Dir[::File.join(__dir__, "support/shared_examples/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
   QA::Specs::Helpers::Quarantine.configure_rspec
 
   config.before do |example|
-    QA::Runtime::Logger.debug("\nStarting test: #{example.full_description}\n") if QA::Runtime::Env.debug?
+    QA::Runtime::Logger.debug("\nStarting test: #{example.full_description}\n")
   end
 
   config.after(:context) do
@@ -62,7 +62,7 @@ RSpec.configure do |config|
   # show exception that triggers a retry if verbose_retry is set to true
   config.display_try_failure_messages = true
 
-  if ENV['CI']
+  if ENV['CI'] && !QA::Runtime::Env.disable_rspec_retry?
     config.around do |example|
       retry_times = example.metadata.key?(:quarantine) ? 1 : 2
       example.run_with_retry retry: retry_times

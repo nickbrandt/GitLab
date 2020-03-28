@@ -1,6 +1,6 @@
 # Feature Flags **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/11845) in GitLab 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/7433) in GitLab 11.4.
 
 Feature flags allow you to ship a project in different flavors by
 dynamically toggling certain functionality.
@@ -51,7 +51,10 @@ with ability to edit or remove them.
 To make a feature flag active or inactive, click the pencil icon to edit it,
 and toggle the status for each [spec](#define-environment-specs).
 
-![Feature flags list](img/feature_flags_list.png)
+The toggles next to each feature flag on the list page function as global shutoff switches.
+If a toggle is off, that feature flag is disabled for every environment.
+
+![Feature flags list](img/feature_flags_list_v12_7.png)
 
 ## Define environment specs
 
@@ -75,7 +78,7 @@ To define specs for each environment:
 1. Set the status and rollout strategy of the additional spec. This status and rollout strategy combination takes precedence over the default spec since we always use the most specific match available.
 1. Click **Create feature flag** or **Update feature flag**.
 
-![Feature flag specs list](img/specs_list.png)
+![Feature flag specs list](img/specs_list_v12_6.png)
 
 NOTE: **NOTE**
 We'd highly recommend you to use the [Environment](../../../ci/environments.md)
@@ -119,17 +122,15 @@ CAUTION: **Caution:**
 If this strategy is selected, then the Unleash client **must** be given a user
 ID for the feature to be enabled. See the [Ruby example](#ruby-application-example) below.
 
-### Target users strategy
+#### User IDs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8240) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8240) in GitLab 12.2. [Updated](https://gitlab.com/gitlab-org/gitlab/issues/34363) to be defined per environment in GitLab 12.6.
 
 A feature flag may be enabled for a list of target users. It is implemented
 using the Unleash [`userWithId`](https://unleash.github.io/docs/activation_strategy#userwithid)
 activation strategy.
 
-The feature will always be enabled for all users in the list across all environments even if the matching environment spec **Status** is disabled.
-
-![Feature flag target users](img/target_users_v12_2.png)
+User IDs should be a comma separated list of values. For example, `user@example.com, user2@example.com`, or `username1,username2,username3`, etc.
 
 CAUTION: **Caution:**
 The Unleash client **must** be given a user ID for the feature to be enabled for

@@ -3,32 +3,25 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       it 'user renames project' do
-        # create the project and push code
-        Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+        original_project_name = 'geo-before-rename'
+        original_readme_content = "The original project name was #{original_project_name}"
+        readme_file_name = 'README.md'
 
-          project = Resource::Project.fabricate! do |project|
-            project.name = 'geo-before-rename'
+        # create the project and push code
+        QA::Flow::Login.while_signed_in(address: :geo_primary) do
+          project = Resource::Project.fabricate_via_api! do |project|
+            project.name = original_project_name
             project.description = 'Geo project to be renamed'
           end
 
           geo_project_name = project.name
-          expect(project.name).to include 'geo-before-rename'
 
           Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
-            push.file_name = 'README.md'
-            push.file_content = '# This is Geo project!'
-            push.commit_message = 'Add README.md'
+            push.file_name = readme_file_name
+            push.file_content = original_readme_content
+            push.commit_message = "Add #{readme_file_name}"
           end
 
           # rename the project
@@ -52,9 +45,9 @@ module QA
         end
 
         # check renamed project exist on secondary node
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+        QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
+        QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
           end
@@ -72,8 +65,8 @@ module QA
           Page::Project::Show.perform do |show|
             show.wait_for_repository_replication
 
-            expect(page).to have_content 'README.md'
-            expect(page).to have_content 'This is Geo project!'
+            expect(page).to have_content readme_file_name
+            expect(page).to have_content original_readme_content
           end
         end
       end

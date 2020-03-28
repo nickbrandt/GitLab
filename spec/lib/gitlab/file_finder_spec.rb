@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Gitlab::FileFinder do
   describe '#find' do
     let(:project) { create(:project, :public, :repository) }
+
     subject { described_class.new(project, project.default_branch) }
 
     it_behaves_like 'file finder' do
@@ -28,6 +29,12 @@ describe Gitlab::FileFinder do
       results = subject.find('files extension:svg')
 
       expect(results.count).to eq(1)
+    end
+
+    it 'does not cause N+1 query' do
+      expect(Gitlab::GitalyClient).to receive(:call).at_most(10).times.and_call_original
+
+      subject.find(': filename:wm.svg')
     end
   end
 end

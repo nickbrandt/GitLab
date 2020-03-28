@@ -49,6 +49,15 @@ describe 'Issue promotion', :js do
         visit project_issue_path(project, issue)
       end
 
+      it 'displays warning' do
+        note = find('#note-body')
+        type(note, '/promote')
+
+        wait_for_requests
+
+        expect(page).to have_content 'Promote issue to an epic'
+      end
+
       it 'promotes the issue' do
         add_note('/promote')
 
@@ -62,6 +71,49 @@ describe 'Issue promotion', :js do
         expect(epic.description).to eq(issue.description)
         expect(epic.author).to eq(user)
       end
+    end
+
+    context 'when issue is confidential' do
+      let(:confidential_issue) { create(:issue, :confidential, project: project) }
+
+      before do
+        group.add_developer(user)
+        visit project_issue_path(project, confidential_issue)
+      end
+
+      it 'displays warning' do
+        note = find('#note-body')
+        type(note, '/promote')
+
+        wait_for_requests
+
+        expect(page).to have_content 'Promote confidential issue to a non-confidential epic'
+      end
+
+      it 'promotes the issue' do
+        add_note('/promote')
+
+        wait_for_requests
+
+        epic = Epic.last
+
+        expect(page).to have_content 'Promoted confidential issue to a non-confidential epic. Information in this issue is no longer confidential as epics are public to group members.'
+        expect(confidential_issue.reload).to be_closed
+        expect(epic.title).to eq(confidential_issue.title)
+        expect(epic.description).to eq(confidential_issue.description)
+        expect(epic.author).to eq(user)
+      end
+    end
+  end
+
+  private
+
+  # `note` is a textarea where the given text should be typed.
+  # We don't want to find it each time this function gets called.
+  def type(note, text)
+    page.within('.timeline-content-form') do
+      note.set('')
+      note.native.send_keys(text)
     end
   end
 end

@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Ci::CreateWebIdeTerminalService do
-  set(:project) { create(:project, :repository) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
   let(:ref) { 'master' }
 
   before do
@@ -56,7 +56,7 @@ describe Ci::CreateWebIdeTerminalService do
             <<-EOS
               terminal:
                 image:
-                  name: ruby:2.2
+                  name: ruby:2.7
                   ports:
                     - 80
                 script: rspec

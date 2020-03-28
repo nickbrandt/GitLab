@@ -44,8 +44,14 @@ class Projects::IssuesController < Projects::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_sidebar, project.group)
-    push_frontend_feature_flag(:release_search_filter, project)
+    push_frontend_feature_flag(:save_issuable_health_status, project.group)
   end
+
+  before_action only: :show do
+    push_frontend_feature_flag(:sort_discussions, @project)
+  end
+
+  around_action :allow_gitaly_ref_name_caching, only: [:discussions]
 
   respond_to :html
 
@@ -186,7 +192,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def import_csv
     if uploader = UploadService.new(project, params[:file]).execute
-      ImportIssuesCsvWorker.perform_async(current_user.id, project.id, uploader.upload.id)
+      ImportIssuesCsvWorker.perform_async(current_user.id, project.id, uploader.upload.id) # rubocop:disable CodeReuse/Worker
 
       flash[:notice] = _("Your issues are being imported. Once finished, you'll get a confirmation email.")
     else
@@ -237,7 +243,10 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def issue_params
-    params.require(:issue).permit(*issue_params_attributes)
+    params.require(:issue).permit(
+      *issue_params_attributes,
+      sentry_issue_attributes: [:sentry_issue_identifier]
+    )
   end
 
   def issue_params_attributes

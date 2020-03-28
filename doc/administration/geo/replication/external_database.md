@@ -13,13 +13,13 @@ developed and tested. We aim to be compatible with most external
 
 1. SSH into a GitLab **primary** application server and login as root:
 
-   ```sh
+   ```shell
    sudo -i
    ```
 
 1. Execute the command below to define the node as **primary** node:
 
-   ```sh
+   ```shell
    gitlab-ctl set-geo-primary-node
    ```
 
@@ -47,7 +47,7 @@ configures the **primary** node's database to be replicated by making changes to
 `pg_hba.conf` and `postgresql.conf`. Make the following configuration changes
 manually to your external database configuration:
 
-```
+```plaintext
 ##
 ## Geo Primary Role
 ## - pg_hba.conf
@@ -55,7 +55,7 @@ manually to your external database configuration:
 host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ```
 
-```
+```plaintext
 ##
 ## Geo Primary Role
 ## - postgresql.conf
@@ -75,7 +75,7 @@ hot_standby = on
 Make the following configuration changes manually to your `postgresql.conf`
 of external replica database:
 
-```
+```plaintext
 ##
 ## Geo Secondary Role
 ## - postgresql.conf
@@ -100,7 +100,7 @@ To configure the connection to the external read-replica database and enable Log
 
 1. SSH into a GitLab **secondary** application server and login as root:
 
-   ```bash
+   ```shell
    sudo -i
    ```
 
@@ -147,11 +147,11 @@ the tracking database on port 5432.
 
 1. SSH into a GitLab **secondary** server and login as root:
 
-   ```bash
+   ```shell
    sudo -i
    ```
 
-1. Edit `/etc/gitlab/gitlab.rb` with the connection params and credentials for
+1. Edit `/etc/gitlab/gitlab.rb` with the connection parameters and credentials for
    the machine with the PostgreSQL instance:
 
    ```ruby
@@ -168,7 +168,7 @@ the tracking database on port 5432.
 
 1. Run the tracking database migrations:
 
-   ```bash
+   ```shell
    gitlab-rake geo:db:create
    gitlab-rake geo:db:migrate
    ```
@@ -177,9 +177,9 @@ the tracking database on port 5432.
    connection and credentials:
 
    Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
-   params to match your environment. Execute it to set up the FDW connection.
+   parameters to match your environment. Execute it to set up the FDW connection.
 
-   ```bash
+   ```shell
    #!/bin/bash
 
    # Secondary Database connection params:
@@ -196,7 +196,7 @@ the tracking database on port 5432.
    GEO_DB_PORT="5432"
 
    query_exec () {
-     gitlab-psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
+     gitlab-psql -h $GEO_DB_HOST -U $GEO_DB_USER -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
    }
 
    query_exec "CREATE EXTENSION postgres_fdw;"
@@ -213,6 +213,6 @@ the tracking database on port 5432.
 1. Save the file and [restart GitLab](../../restart_gitlab.md#omnibus-gitlab-restart)
 1. Populate the FDW tables:
 
-   ```bash
+   ```shell
    gitlab-rake geo:db:refresh_foreign_tables
    ```

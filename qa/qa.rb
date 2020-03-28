@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-$: << File.expand_path(File.dirname(__FILE__))
+$: << File.expand_path(__dir__)
 
 Encoding.default_external = 'UTF-8'
 
@@ -15,6 +15,9 @@ module QA
   #
   module Flow
     autoload :Login, 'qa/flow/login'
+    autoload :Project, 'qa/flow/project'
+    autoload :Saml, 'qa/flow/saml'
+    autoload :User, 'qa/flow/user'
   end
 
   ##
@@ -33,6 +36,11 @@ module QA
     autoload :Fixtures, 'qa/runtime/fixtures'
     autoload :Logger, 'qa/runtime/logger'
     autoload :GPG, 'qa/runtime/gpg'
+    autoload :MailHog, 'qa/runtime/mail_hog'
+    autoload :IPAddress, 'qa/runtime/ip_address'
+    autoload :Search, 'qa/runtime/search'
+    autoload :Project, 'qa/runtime/project'
+    autoload :ApplicationSettings, 'qa/runtime/application_settings'
 
     module API
       autoload :Client, 'qa/runtime/api/client'
@@ -126,10 +134,10 @@ module QA
         autoload :LDAPNoServer, 'qa/scenario/test/integration/ldap_no_server'
         autoload :LDAPTLS, 'qa/scenario/test/integration/ldap_tls'
         autoload :InstanceSAML, 'qa/scenario/test/integration/instance_saml'
-        autoload :OAuth, 'qa/scenario/test/integration/oauth'
         autoload :Kubernetes, 'qa/scenario/test/integration/kubernetes'
         autoload :Mattermost, 'qa/scenario/test/integration/mattermost'
         autoload :ObjectStorage, 'qa/scenario/test/integration/object_storage'
+        autoload :SMTP, 'qa/scenario/test/integration/smtp'
       end
 
       module Sanity
@@ -150,6 +158,10 @@ module QA
     autoload :Element, 'qa/page/element'
     autoload :Validator, 'qa/page/validator'
     autoload :Validatable, 'qa/page/validatable'
+
+    module SubMenus
+      autoload :Common, 'qa/page/sub_menus/common'
+    end
 
     module Main
       autoload :Login, 'qa/page/main/login'
@@ -283,6 +295,10 @@ module QA
           autoload :AddExisting, 'qa/page/project/operations/kubernetes/add_existing'
           autoload :Show, 'qa/page/project/operations/kubernetes/show'
         end
+
+        module Metrics
+          autoload :Show, 'qa/page/project/operations/metrics/show'
+        end
       end
 
       module Wiki
@@ -369,6 +385,7 @@ module QA
     # Classes describing components that are used by several pages.
     #
     module Component
+      autoload :Breadcrumbs, 'qa/page/component/breadcrumbs'
       autoload :CiBadgeLink, 'qa/page/component/ci_badge_link'
       autoload :ClonePanel, 'qa/page/component/clone_panel'
       autoload :LazyLoader, 'qa/page/component/lazy_loader'
@@ -413,6 +430,7 @@ module QA
       autoload :Gcloud, 'qa/service/cluster_provider/gcloud'
       autoload :Minikube, 'qa/service/cluster_provider/minikube'
       autoload :K3d, 'qa/service/cluster_provider/k3d'
+      autoload :K3s, 'qa/service/cluster_provider/k3s'
     end
 
     module DockerRun
@@ -422,6 +440,9 @@ module QA
       autoload :Maven, 'qa/service/docker_run/maven'
       autoload :NodeJs, 'qa/service/docker_run/node_js'
       autoload :GitlabRunner, 'qa/service/docker_run/gitlab_runner'
+      autoload :MailHog, 'qa/service/docker_run/mail_hog'
+      autoload :SamlIdp, 'qa/service/docker_run/saml_idp'
+      autoload :K3s, 'qa/service/docker_run/k3s'
     end
   end
 
@@ -457,19 +478,9 @@ module QA
         autoload :Configure, 'qa/vendor/jenkins/page/configure'
         autoload :NewCredentials, 'qa/vendor/jenkins/page/new_credentials'
         autoload :NewJob, 'qa/vendor/jenkins/page/new_job'
+        autoload :LastJobConsole, 'qa/vendor/jenkins/page/last_job_console'
         autoload :ConfigureJob, 'qa/vendor/jenkins/page/configure_job'
       end
-    end
-
-    module Github
-      module Page
-        autoload :Base, 'qa/vendor/github/page/base'
-        autoload :Login, 'qa/vendor/github/page/login'
-      end
-    end
-
-    module OnePassword
-      autoload :CLI, 'qa/vendor/one_password/cli'
     end
   end
 
@@ -481,8 +492,10 @@ module QA
     end
     autoload :Api, 'qa/support/api'
     autoload :Dates, 'qa/support/dates'
-    autoload :Waiter, 'qa/support/waiter'
+    autoload :Repeater, 'qa/support/repeater'
     autoload :Retrier, 'qa/support/retrier'
+    autoload :Waiter, 'qa/support/waiter'
+    autoload :WaitForRequests, 'qa/support/wait_for_requests'
   end
 end
 

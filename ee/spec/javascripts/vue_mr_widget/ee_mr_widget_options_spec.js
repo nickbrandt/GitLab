@@ -1,15 +1,11 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import mrWidgetOptions from 'ee/vue_merge_request_widget/mr_widget_options.vue';
-import MRWidgetService from 'ee/vue_merge_request_widget/services/mr_widget_service';
 import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
-import state from 'ee/vue_shared/security_reports/store/state';
 import mockData, {
   baseIssues,
   headIssues,
@@ -19,17 +15,21 @@ import mockData, {
   parsedHeadIssues,
 } from 'ee_spec/vue_mr_widget/mock_data';
 
-import {
-  sastIssues,
-  sastIssuesBase,
-  dockerReport,
-  dockerBaseReport,
-  dast,
-  dastBase,
-  sastBaseAllIssues,
-  sastHeadAllIssues,
-} from 'ee_spec/vue_shared/security_reports/mock_data';
+import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import axios from '~/lib/utils/axios_utils';
 import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import {
+  sastDiffSuccessMock,
+  dastDiffSuccessMock,
+  containerScanningDiffSuccessMock,
+  dependencyScanningDiffSuccessMock,
+} from 'ee_spec/vue_shared/security_reports/mock_data';
+
+const SAST_SELECTOR = '.js-sast-widget';
+const DAST_SELECTOR = '.js-dast-widget';
+const DEPENDENCY_SCANNING_SELECTOR = '.js-dependency-scanning-widget';
+const CONTAINER_SCANNING_SELECTOR = '.js-container-scanning';
 
 describe('ee merge request widget options', () => {
   let vm;
@@ -46,90 +46,70 @@ describe('ee merge request widget options', () => {
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
+    gon.features = { asyncMrWidget: true };
+
     Component = Vue.extend(mrWidgetOptions);
     mock = new MockAdapter(axios);
+
+    mock.onGet(mockData.merge_request_widget_path).reply(() => [200, gl.mrWidgetData]);
+    mock.onGet(mockData.merge_request_cached_widget_path).reply(() => [200, gl.mrWidgetData]);
   });
 
   afterEach(() => {
     vm.$destroy();
     mock.restore();
-
-    if (Component.mr) {
-      // Clean security reports state
-      Component.mr.sast = state().sast;
-      Component.mr.sastContainer = state().sastContainer;
-      Component.mr.dast = state().dast;
-      Component.mr.dependencyScanning = state().dependencyScanning;
-    }
+    gon.features = {};
   });
 
-  describe('security widget', () => {
+  const findSecurityWidget = () => vm.$el.querySelector('.js-security-widget');
+
+  const VULNERABILITY_FEEDBACK_ENDPOINT = 'vulnerability_feedback_path';
+
+  describe('SAST', () => {
+    const SAST_DIFF_ENDPOINT = 'sast_diff_endpoint';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        sast: {
-          base_path: 'path.json',
-          head_path: 'head_path.json',
+        enabled_reports: {
+          sast: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        sast_comparison_path: SAST_DIFF_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastHeadAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(vm.$el.querySelector('.js-sast-widget').textContent.trim()).toContain(
-          'SAST is loading',
-        );
+        expect(
+          findSecurityWidget()
+            .querySelector(SAST_SELECTOR)
+            .textContent.trim(),
+        ).toContain('SAST is loading');
       });
     });
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
-        vm = mountComponent(Component);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector('.js-sast-widget .report-block-list-issue-description')
-                .textContent,
+              findSecurityWidget().querySelector(
+                `${SAST_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
             ),
-          ).toEqual('SAST detected 2 new, and 1 fixed vulnerabilities');
-          done();
-        }, 0);
-      });
-    });
-
-    describe('with full report and no added or fixed issues', () => {
-      beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
-
-        vm = mountComponent(Component);
-      });
-
-      it('renders no new vulnerabilities message', done => {
-        setTimeout(() => {
-          expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-sast-widget .report-block-list-issue-description')
-                .textContent,
-            ),
-          ).toEqual('SAST detected no new vulnerabilities');
+          ).toEqual('SAST detected 1 new, and 2 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -137,19 +117,19 @@ describe('ee merge request widget options', () => {
 
     describe('with empty successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, []);
-        mock.onGet('head_path.json').reply(200, []);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, { added: [], existing: [] });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector('.js-sast-widget .report-block-list-issue-description')
-                .textContent,
+              findSecurityWidget().querySelector(
+                `${SAST_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
             ).trim(),
           ).toEqual('SAST detected no vulnerabilities');
           done();
@@ -159,68 +139,66 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(500, []);
-        mock.onGet('head_path.json').reply(500, []);
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(removeBreakLine(vm.$el.querySelector('.js-sast-widget').textContent)).toContain(
-            'SAST: Loading resulted in an error',
-          );
+          expect(
+            removeBreakLine(findSecurityWidget().querySelector(SAST_SELECTOR).textContent),
+          ).toContain('SAST: Loading resulted in an error');
           done();
         }, 0);
       });
     });
   });
 
-  describe('dependency scanning widget', () => {
+  describe('Dependency Scanning', () => {
+    const DEPENDENCY_SCANNING_ENDPOINT = 'dependency_scanning_diff_endpoint';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        dependency_scanning: {
-          base_path: 'path.json',
-          head_path: 'head_path.json',
+        enabled_reports: {
+          dependency_scanning: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        dependency_scanning_comparison_path: DEPENDENCY_SCANNING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(vm.$el.querySelector('.js-dependency-scanning-widget').textContent),
+          removeBreakLine(
+            findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
+          ),
         ).toContain('Dependency scanning is loading');
       });
     });
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
-                '.js-dependency-scanning-widget .report-block-list-issue-description',
+              findSecurityWidget().querySelector(
+                `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected 2 new, and 1 fixed vulnerabilities');
@@ -231,19 +209,22 @@ describe('ee merge request widget options', () => {
 
     describe('with full report and no added or fixed issues', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, {
+          added: [],
+          fixed: [],
+          existing: [{ title: 'Mock finding' }],
+        });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('renders no new vulnerabilities message', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
-                '.js-dependency-scanning-widget .report-block-list-issue-description',
+              findSecurityWidget().querySelector(
+                `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected no new vulnerabilities');
@@ -254,19 +235,18 @@ describe('ee merge request widget options', () => {
 
     describe('with empty successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, []);
-        mock.onGet('head_path.json').reply(200, []);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, { added: [], fixed: [], existing: [] });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
-                '.js-dependency-scanning-widget .report-block-list-issue-description',
+              findSecurityWidget().querySelector(
+                `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected no vulnerabilities');
@@ -277,17 +257,17 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(500, []);
-        mock.onGet('head_path.json').reply(500, []);
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onAny().reply(500);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render error indicator', done => {
         setTimeout(() => {
           expect(
-            removeBreakLine(vm.$el.querySelector('.js-dependency-scanning-widget').textContent),
+            removeBreakLine(
+              findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
+            ),
           ).toContain('Dependency scanning: Loading resulted in an error');
           done();
         }, 0);
@@ -299,25 +279,28 @@ describe('ee merge request widget options', () => {
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        codeclimate: {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        },
+        codeclimate: {},
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
-      it('should render loading indicator', () => {
+      it('should render loading indicator', done => {
         mock.onGet('head.json').reply(200, headIssues);
         mock.onGet('base.json').reply(200, baseIssues);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(
-          removeBreakLine(vm.$el.querySelector('.js-codequality-widget').textContent),
-        ).toContain('Loading codeclimate report');
+        vm.mr.codeclimate = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+
+        vm.$nextTick(() => {
+          expect(
+            removeBreakLine(vm.$el.querySelector('.js-codequality-widget').textContent),
+          ).toContain('Loading codeclimate report');
+
+          done();
+        });
       });
     });
 
@@ -325,7 +308,14 @@ describe('ee merge request widget options', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(200, headIssues);
         mock.onGet('base.json').reply(200, baseIssues);
-        vm = mountComponent(Component);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
         spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
@@ -383,7 +373,13 @@ describe('ee merge request widget options', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(200, []);
         mock.onGet('base.json').reply(200, []);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
         spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
@@ -410,11 +406,48 @@ describe('ee merge request widget options', () => {
       });
     });
 
+    describe('with a head_path but no base_path', () => {
+      beforeEach(() => {
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: null,
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
+      });
+
+      it('should render error indicator', done => {
+        setTimeout(() => {
+          expect(
+            removeBreakLine(
+              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
+            ),
+          ).toContain('Failed to load codeclimate report');
+          done();
+        }, 0);
+      });
+
+      it('should render a help icon with more information', done => {
+        setTimeout(() => {
+          expect(vm.$el.querySelector('.js-codequality-widget .btn-help')).not.toBeNull();
+          expect(vm.codequalityPopover.title).toBe('Base pipeline codequality artifact not found');
+          done();
+        }, 0);
+      });
+    });
+
     describe('with codeclimate comparison worker rejection', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(200, headIssues);
         mock.onGet('base.json').reply(200, baseIssues);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker rejection
         spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() => Promise.reject());
@@ -436,7 +469,13 @@ describe('ee merge request widget options', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(500, []);
         mock.onGet('base.json').reply(500, []);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
       });
 
       it('should render error indicator', done => {
@@ -456,25 +495,28 @@ describe('ee merge request widget options', () => {
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        performance: {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        },
+        performance: {},
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
-      it('should render loading indicator', () => {
+      it('should render loading indicator', done => {
         mock.onGet('head.json').reply(200, headPerformance);
         mock.onGet('base.json').reply(200, basePerformance);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(
-          removeBreakLine(vm.$el.querySelector('.js-performance-widget').textContent),
-        ).toContain('Loading performance report');
+        vm.mr.performance = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+
+        vm.$nextTick(() => {
+          expect(
+            removeBreakLine(vm.$el.querySelector('.js-performance-widget').textContent),
+          ).toContain('Loading performance report');
+
+          done();
+        });
       });
     });
 
@@ -482,7 +524,13 @@ describe('ee merge request widget options', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(200, headPerformance);
         mock.onGet('base.json').reply(200, basePerformance);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.performance = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.performance = gl.mrWidgetData.performance;
       });
 
       it('should render provided data', done => {
@@ -533,8 +581,15 @@ describe('ee merge request widget options', () => {
       beforeEach(done => {
         mock.onGet('head.json').reply(200, []);
         mock.onGet('base.json').reply(200, []);
-        vm = mountComponent(Component);
-        // wait for network request from component created() method
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.performance = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.performance = gl.mrWidgetData.performance;
+
+        // wait for network request from component watch update method
         setTimeout(done, 0);
       });
 
@@ -561,7 +616,13 @@ describe('ee merge request widget options', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(500, []);
         mock.onGet('base.json').reply(500, []);
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.performance = {
+          head_path: 'head.json',
+          base_path: 'base.json',
+        };
+        vm.mr.performance = gl.mrWidgetData.performance;
       });
 
       it('should render error indicator', done => {
@@ -577,52 +638,52 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('sast container report', () => {
+  describe('Container Scanning', () => {
+    const CONTAINER_SCANNING_ENDPOINT = 'container_scanning';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        sast_container: {
-          head_path: 'gl-sast-container.json',
-          base_path: 'sast-container-base.json',
+        enabled_reports: {
+          container_scanning: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        container_scanning_comparison_path: CONTAINER_SCANNING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('gl-sast-container.json').reply(200, dockerReport);
-        mock.onGet('sast-container-base.json').reply(200, dockerBaseReport);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(removeBreakLine(vm.$el.querySelector('.js-sast-container').textContent)).toContain(
-          'Container scanning is loading',
-        );
+        expect(
+          removeBreakLine(
+            findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent,
+          ),
+        ).toContain('Container scanning is loading');
       });
     });
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('gl-sast-container.json').reply(200, dockerReport);
-        mock.onGet('sast-container-base.json').reply(200, dockerBaseReport);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector('.js-sast-container .report-block-list-issue-description')
-                .textContent,
+              findSecurityWidget().querySelector(
+                `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
             ),
-          ).toEqual('Container scanning detected 1 new, and 1 fixed vulnerabilities');
+          ).toEqual('Container scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -630,69 +691,69 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('gl-sast-container.json').reply(500, {});
-        mock.onGet('sast-container-base.json').reply(500, {});
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(vm.$el.querySelector('.js-sast-container').textContent.trim()).toContain(
-            'Container scanning: Loading resulted in an error',
-          );
+          expect(
+            findSecurityWidget()
+              .querySelector(CONTAINER_SCANNING_SELECTOR)
+              .textContent.trim(),
+          ).toContain('Container scanning: Loading resulted in an error');
           done();
         }, 0);
       });
     });
   });
 
-  describe('dast report', () => {
+  describe('DAST', () => {
+    const DAST_ENDPOINT = 'dast_report';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        dast: {
-          head_path: 'dast.json',
-          base_path: 'dast_base.json',
+        enabled_reports: {
+          dast: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        dast_comparison_path: DAST_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
-
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('dast.json').reply(200, dast);
-        mock.onGet('dast_base.json').reply(200, dastBase);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DAST_ENDPOINT).reply(200, dastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(vm.$el.querySelector('.js-dast-widget').textContent.trim()).toContain(
-          'DAST is loading',
-        );
+        expect(
+          findSecurityWidget()
+            .querySelector(DAST_SELECTOR)
+            .textContent.trim(),
+        ).toContain('DAST is loading');
       });
     });
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('dast.json').reply(200, dast);
-        mock.onGet('dast_base.json').reply(200, dastBase);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DAST_ENDPOINT).reply(200, dastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
-            vm.$el
-              .querySelector('.js-dast-widget .report-block-list-issue-description')
+            findSecurityWidget()
+              .querySelector(`${DAST_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
-          ).toEqual('DAST detected 1 new vulnerability');
+          ).toEqual('DAST detected 1 new, and 2 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -700,18 +761,19 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('dast.json').reply(500, {});
-        mock.onGet('dast_base.json').reply(500, {});
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(DAST_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, {});
 
-        vm = mountComponent(Component);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(vm.$el.querySelector('.js-dast-widget').textContent.trim()).toContain(
-            'DAST: Loading resulted in an error',
-          );
+          expect(
+            findSecurityWidget()
+              .querySelector(DAST_SELECTOR)
+              .textContent.trim(),
+          ).toContain('DAST: Loading resulted in an error');
           done();
         }, 0);
       });
@@ -719,24 +781,21 @@ describe('ee merge request widget options', () => {
   });
 
   describe('license management report', () => {
-    const headPath = `${TEST_HOST}/head.json`;
-    const basePath = `${TEST_HOST}/base.json`;
     const licenseManagementApiUrl = `${TEST_HOST}/manage_license_api`;
 
     it('should be rendered if license management data is set', () => {
       gl.mrWidgetData = {
         ...mockData,
+        enabled_reports: {
+          license_management: true,
+        },
         license_management: {
-          head_path: headPath,
-          base_path: basePath,
           managed_licenses_path: licenseManagementApiUrl,
           can_manage_licenses: false,
         },
       };
 
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
-      vm = mountComponent(Component);
+      vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
       expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
     });
@@ -747,9 +806,7 @@ describe('ee merge request widget options', () => {
         license_management: {},
       };
 
-      Component.mr = new MRWidgetStore(gl.mrWidgetData);
-      Component.service = new MRWidgetService({});
-      vm = mountComponent(Component);
+      vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
       expect(vm.$el.querySelector('.license-report-widget')).toBeNull();
     });
@@ -861,6 +918,7 @@ describe('ee merge request widget options', () => {
       external_url_formatted: 'diplo.',
       deployed_at: '2017-03-22T22:44:42.258Z',
       deployed_at_formatted: 'Mar 22, 2017 10:44pm',
+      status: SUCCESS,
     };
 
     beforeEach(done => {
@@ -1030,6 +1088,42 @@ describe('ee merge request widget options', () => {
       });
 
       expect(vm.service).toEqual(jasmine.objectContaining(convertObjectPropsToCamelCase(paths)));
+    });
+  });
+
+  describe('when no security reports are enabled', () => {
+    const noSecurityReportsEnabledCases = [
+      undefined,
+      {},
+      { foo: true },
+      { license_management: true },
+      {
+        dast: false,
+        sast: false,
+        container_scanning: false,
+        dependency_scanning: false,
+      },
+    ];
+
+    noSecurityReportsEnabledCases.forEach(noSecurityReportsEnabled => {
+      it('does not render the security reports widget', () => {
+        gl.mrWidgetData = {
+          ...mockData,
+          enabled_reports: noSecurityReportsEnabled,
+        };
+
+        if (noSecurityReportsEnabled?.license_management) {
+          // Provide license report config if it's going to be rendered
+          gl.mrWidgetData.license_management = {
+            managed_licenses_path: `${TEST_HOST}/manage_license_api`,
+            can_manage_licenses: false,
+          };
+        }
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        expect(findSecurityWidget()).toBe(null);
+      });
     });
   });
 });

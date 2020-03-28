@@ -402,7 +402,7 @@ describe 'Promotions', :js do
     end
 
     it 'appears on the page' do
-      visit group_analytics_path(group)
+      visit group_contribution_analytics_path(group)
 
       expect(find('.user-callout-copy')).to have_content 'Track activity with Contribution Analytics.'
     end

@@ -21,9 +21,9 @@ module MembershipActions
     member = Members::UpdateService
       .new(current_user, update_params)
       .execute(member)
-      .present(current_user: current_user)
 
-    present_members([member])
+    member = present_members([member]).first
+
     respond_to do |format|
       format.js { render 'shared/members/update', locals: { member: member } }
     end
@@ -143,5 +143,16 @@ module MembershipActions
           raise "Unknown membershipable type: #{membershipable}!"
         end
       end
+  end
+
+  def requested_relations
+    case params[:with_inherited_permissions].presence
+    when 'exclude'
+      [:direct]
+    when 'only'
+      [:inherited]
+    else
+      [:inherited, :direct]
+    end
   end
 end

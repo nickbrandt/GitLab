@@ -1,5 +1,4 @@
 <script>
-import _ from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
 import StageColumnComponent from './stage_column_component.vue';
 import GraphMixin from '../../mixins/graph_component_mixin';
@@ -43,7 +42,7 @@ export default {
   downstream: 'downstream',
   data() {
     return {
-      triggeredTopIndex: 1,
+      downstreamMarginTop: null,
     };
   },
   computed: {
@@ -70,20 +69,12 @@ export default {
     expandedTriggeredBy() {
       return (
         this.pipeline.triggered_by &&
-        _.isArray(this.pipeline.triggered_by) &&
+        Array.isArray(this.pipeline.triggered_by) &&
         this.pipeline.triggered_by.find(el => el.isExpanded)
       );
     },
     expandedTriggered() {
       return this.pipeline.triggered && this.pipeline.triggered.find(el => el.isExpanded);
-    },
-
-    /**
-     * Calculates the margin top of the clicked downstream pipeline by
-     * adding the height of each linked pipeline and the margin
-     */
-    marginTop() {
-      return `${this.triggeredTopIndex * 52}px`;
     },
     pipelineTypeUpstream() {
       return this.type !== this.$options.downstream && this.expandedTriggeredBy;
@@ -91,17 +82,30 @@ export default {
     pipelineTypeDownstream() {
       return this.type !== this.$options.upstream && this.expandedTriggered;
     },
+    pipelineProjectId() {
+      return this.pipeline.project.id;
+    },
   },
   methods: {
-    handleClickedDownstream(pipeline, clickedIndex) {
-      this.triggeredTopIndex = clickedIndex;
+    handleClickedDownstream(pipeline, clickedIndex, downstreamNode) {
+      /**
+       * Calculates the margin top of the clicked downstream pipeline by
+       * subtracting the clicked downstream pipelines offsetTop by it's parent's
+       * offsetTop and then subtracting either 15 (if child) or 30 (if not a child)
+       * due to the height of node and stage name margin bottom.
+       */
+      this.downstreamMarginTop = this.calculateMarginTop(
+        downstreamNode,
+        downstreamNode.classList.contains('child-pipeline') ? 15 : 30,
+      );
+
       this.$emit('onClickTriggered', this.pipeline, pipeline);
+    },
+    calculateMarginTop(downstreamNode, pixelDiff) {
+      return `${downstreamNode.offsetTop - downstreamNode.offsetParent.offsetTop - pixelDiff}px`;
     },
     hasOnlyOneJob(stage) {
       return stage.groups.length === 1;
-    },
-    hasDownstream(index, length) {
-      return index === length - 1 && this.hasTriggered;
     },
     hasUpstream(index) {
       return index === 0 && this.hasTriggeredBy;
@@ -142,6 +146,7 @@ export default {
           v-if="hasTriggeredBy"
           :linked-pipelines="triggeredByPipelines"
           :column-title="__('Upstream')"
+          :project-id="pipelineProjectId"
           graph-position="left"
           @linkedPipelineClick="
             linkedPipeline => $emit('onClickTriggeredBy', pipeline, linkedPipeline)
@@ -160,7 +165,6 @@ export default {
             :key="stage.name"
             :class="{
               'has-upstream prepend-left-64': hasUpstream(index),
-              'has-downstream': hasDownstream(index, graph.length),
               'has-only-one-job': hasOnlyOneJob(stage),
               'append-right-46': shouldAddRightMargin(index),
             }"
@@ -178,6 +182,7 @@ export default {
           v-if="hasTriggered"
           :linked-pipelines="triggeredPipelines"
           :column-title="__('Downstream')"
+          :project-id="pipelineProjectId"
           graph-position="right"
           @linkedPipelineClick="handleClickedDownstream"
         />
@@ -190,7 +195,7 @@ export default {
           :is-loading="false"
           :pipeline="expandedTriggered"
           :is-linked-pipeline="true"
-          :style="{ 'margin-top': marginTop }"
+          :style="{ 'margin-top': downstreamMarginTop }"
           :mediator="mediator"
           @onClickTriggered="
             (parentPipeline, pipeline) => clickTriggeredPipeline(parentPipeline, pipeline)

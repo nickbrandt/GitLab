@@ -279,19 +279,30 @@ module IssuablesHelper
       initialDescriptionText: issuable.description,
       initialTaskStatus: issuable.task_status
     }
-
-    data[:hasClosingMergeRequest] = issuable.merge_requests_count(current_user) != 0 if issuable.is_a?(Issue)
-    data[:zoomMeetingUrl] = ZoomMeeting.canonical_meeting_url(issuable) if issuable.is_a?(Issue)
-
-    if parent.is_a?(Group)
-      data[:groupPath] = parent.path
-    else
-      data.merge!(projectPath: ref_project.path, projectNamespace: ref_project.namespace.full_path)
-    end
-
+    data.merge!(issue_only_initial_data(issuable))
+    data.merge!(path_data(parent))
     data.merge!(updated_at_by(issuable))
 
     data
+  end
+
+  def issue_only_initial_data(issuable)
+    return {} unless issuable.is_a?(Issue)
+
+    {
+      hasClosingMergeRequest: issuable.merge_requests_count(current_user) != 0,
+      zoomMeetingUrl: ZoomMeeting.canonical_meeting_url(issuable),
+      sentryIssueIdentifier: SentryIssue.find_by(issue: issuable)&.sentry_issue_identifier # rubocop:disable CodeReuse/ActiveRecord
+    }
+  end
+
+  def path_data(parent)
+    return { groupPath: parent.path } if parent.is_a?(Group)
+
+    {
+        projectPath: ref_project.path,
+        projectNamespace: ref_project.namespace.full_path
+    }
   end
 
   def updated_at_by(issuable)
@@ -391,6 +402,10 @@ module IssuablesHelper
       end
   end
 
+  def issuable_templates_names(issuable)
+    issuable_templates(issuable).map { |template| template[:name] }
+  end
+
   def selected_template(issuable)
     params[:issuable_template] if issuable_templates(issuable).any? { |template| template[:name] == params[:issuable_template] }
   end
@@ -448,6 +463,7 @@ module IssuablesHelper
       currentUser: issuable[:current_user],
       rootPath: root_path,
       fullPath: issuable[:project_full_path],
+      iid: issuable[:iid],
       timeTrackingLimitToHours: Gitlab::CurrentSettings.time_tracking_limit_to_hours
     }
   end

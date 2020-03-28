@@ -37,6 +37,10 @@ describe YoutrackService do
     it 'does allow project prefix on the reference' do
       expect(described_class.reference_pattern.match('YT-123')[:issue]).to eq('YT-123')
     end
+
+    it 'allows lowercase project key on the reference' do
+      expect(described_class.reference_pattern.match('yt-123')[:issue]).to eq('yt-123')
+    end
   end
 
   context 'overriding properties' do
@@ -79,7 +83,7 @@ describe YoutrackService do
 
       it 'returns default values' do
         expect(service.title).to eq('YouTrack')
-        expect(service.description).to eq('YouTrack issue tracker')
+        expect(service.description).to eq(s_('IssueTracker|YouTrack issue tracker'))
       end
     end
   end

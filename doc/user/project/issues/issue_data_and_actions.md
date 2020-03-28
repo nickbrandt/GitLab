@@ -157,7 +157,7 @@ The plain text title and description of the issue fill the top center of the iss
 The description fully supports [GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm),
 allowing many formatting options.
 
-> [Since GitLab 12.5](https://gitlab.com/gitlab-org/gitlab/issues/10103), changes to an issue's description are listed in the [issue history](#23-issue-history).**(STARTER)**
+> [Since GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/10103), changes to an issue's description are listed in the [issue history](#23-issue-history).**(STARTER)**
 
 #### 17. Mentions
 
@@ -200,8 +200,12 @@ to let them know your reaction without spamming them.
 #### 21. Show all activity
 
 You can filter what is displayed in the issue history by clicking on **Show all activity**
-and selecting either **Show comments only**, which only shows threads and hides
-updates to the issue, or **Show history only**, which hides threads and only shows updates.
+and selecting either:
+
+- **Show comments only**, which only shows threads and hides updates to the issue.
+- **Show history only**, which hides threads and only shows updates.
+
+Also:
 
 - You can mention a user or a group present in your GitLab instance with
   `@username` or `@groupname` and they will be notified via To-Do items

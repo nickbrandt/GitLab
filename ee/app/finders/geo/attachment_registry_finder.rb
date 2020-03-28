@@ -34,64 +34,119 @@ module Geo
       Upload
     end
 
+    # Returns untracked IDs as well as tracked IDs that are unused.
+    #
+    # Untracked IDs are model IDs that are supposed to be synced but don't yet
+    # have a registry entry.
+    #
+    # Unused tracked IDs are model IDs that are not supposed to be synced but
+    # already have a registry entry. For example:
+    #
+    #   - orphaned registries
+    #   - records that became excluded from selective sync
+    #   - records that are in object storage, and `sync_object_storage` became
+    #     disabled
+    #
+    # We compute both sets in this method to reduce the number of DB queries
+    # performed.
+    #
+    # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
+    def find_registry_differences(range)
+      source = attachments(fdw: false).where(id: range).pluck(::Upload.arel_table[:id], ::Upload.arel_table[:uploader]) # rubocop:disable CodeReuse/ActiveRecord
+      tracked = Geo::UploadRegistry.where(file_id: range).pluck(:file_id, :file_type) # rubocop:disable CodeReuse/ActiveRecord
+
+      untracked = source - tracked
+      unused_tracked = tracked - source
+
+      [untracked, unused_tracked]
+    end
+
+    # Returns Geo::UploadRegistry records that have never been synced.
+    #
+    # Does not care about selective sync, because it considers the Registry
+    # table to be the single source of truth. The contract is that other
+    # processes need to ensure that the table only contains records that should
+    # be synced.
+    #
+    # Any registries that have ever been synced that currently need to be
+    # resynced will be handled by other find methods (like
+    # #find_retryable_failed_registries)
+    #
+    # You can pass a list with `except_ids:` so you can exclude items you
+    # already scheduled but haven't finished and aren't persisted to the database yet
+    #
+    # @param [Integer] batch_size used to limit the results returned
+    # @param [Array<Integer>] except_ids ids that will be ignored from the query
+    # rubocop:disable CodeReuse/ActiveRecord
+    def find_never_synced_registries(batch_size:, except_ids: [])
+      Geo::UploadRegistry
+        .never
+        .model_id_not_in(except_ids)
+        .limit(batch_size)
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
+
+    # Deprecated in favor of the process using
+    # #find_registry_differences and #find_never_synced_registries
+    #
     # Find limited amount of non replicated attachments.
     #
-    # You can pass a list with `except_file_ids:` so you can exclude items you
+    # You can pass a list with `except_ids:` so you can exclude items you
     # already scheduled but haven't finished and aren't persisted to the database yet
     #
     # TODO: Alternative here is to use some sort of window function with a cursor instead
     #       of simply limiting the query and passing a list of items we don't want
     #
     # @param [Integer] batch_size used to limit the results returned
-    # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
+    # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_unsynced(batch_size:, except_file_ids: [])
+    def find_unsynced(batch_size:, except_ids: [])
       attachments
         .missing_registry
-        .id_not_in(except_file_ids)
+        .id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_migrated_local(batch_size:, except_file_ids: [])
+    def find_migrated_local(batch_size:, except_ids: [])
       all_attachments
         .inner_join_registry
         .with_files_stored_remotely
-        .id_not_in(except_file_ids)
+        .id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_retryable_failed_registries(batch_size:, except_file_ids: [])
+    def find_retryable_failed_registries(batch_size:, except_ids: [])
       Geo::UploadRegistry
         .failed
         .retry_due
-        .file_id_not_in(except_file_ids)
+        .model_id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
+    def find_retryable_synced_missing_on_primary_registries(batch_size:, except_ids: [])
       Geo::UploadRegistry
         .synced
         .missing_on_primary
         .retry_due
-        .file_id_not_in(except_file_ids)
+        .model_id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     private
 
-    def attachments
-      local_storage_only? ? all_attachments.with_files_stored_locally : all_attachments
+    def attachments(fdw: true)
+      local_storage_only?(fdw: fdw) ? all_attachments(fdw: fdw).with_files_stored_locally : all_attachments(fdw: fdw)
     end
 
-    def all_attachments
-      current_node.attachments
+    def all_attachments(fdw: true)
+      current_node(fdw: fdw).attachments
     end
 
     def registries_for_attachments

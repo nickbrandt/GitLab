@@ -2,7 +2,11 @@
 
 module DesignManagement
   class Action < ApplicationRecord
+    include WithUploads
+
     self.table_name = "#{DesignManagement.table_name_prefix}designs_versions"
+
+    mount_uploader :image_v432x230, DesignManagement::DesignV432x230Uploader
 
     belongs_to :design, class_name: "DesignManagement::Design", inverse_of: :actions
     belongs_to :version, class_name: "DesignManagement::Version", inverse_of: :actions
@@ -26,8 +30,12 @@ module DesignManagement
         all
       when DesignManagement::Version
         where(arel_table[:version_id].lteq(version.id))
+      when ::Gitlab::Git::COMMIT_ID
+        versions = DesignManagement::Version.arel_table
+        subquery = versions.project(versions[:id]).where(versions[:sha].eq(version))
+        where(arel_table[:version_id].lteq(subquery))
       else
-        raise "Expected a DesignManagement::Version, got #{version}"
+        raise ArgumentError, "Expected a DesignManagement::Version, got #{version}"
       end
     end
   end

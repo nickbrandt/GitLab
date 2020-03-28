@@ -27,7 +27,7 @@ module DesignManagement
 
     # Parameters:
     # - design [DesignManagement::Design]: the design that was changed
-    # - gitaly_action [Symbol]: the action that gitlay performed
+    # - action [Symbol]: the action that gitaly performed
     def initialize(design, action, content = nil)
       @design, @action, @content = design, action, content
       validate!

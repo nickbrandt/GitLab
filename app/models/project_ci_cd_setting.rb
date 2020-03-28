@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectCiCdSetting < ApplicationRecord
-  # TODO: remove once GitLab 12.7 is released
-  # https://gitlab.com/gitlab-org/gitlab/issues/36651
-  self.ignored_columns += %i[merge_trains_enabled]
   belongs_to :project, inverse_of: :ci_cd_settings
 
   # The version of the schema that first introduced this model/table.
@@ -21,6 +18,8 @@ class ProjectCiCdSetting < ApplicationRecord
     },
     allow_nil: true
 
+  default_value_for :forward_deployment_enabled, true
+
   def self.available?
     @available ||=
       ActiveRecord::Migrator.current_version >= MINIMUM_SCHEMA_VERSION
@@ -29,6 +28,10 @@ class ProjectCiCdSetting < ApplicationRecord
   def self.reset_column_information
     @available = nil
     super
+  end
+
+  def forward_deployment_enabled?
+    super && ::Feature.enabled?(:forward_deployment_enabled, project, default_enabled: true)
   end
 
   private

@@ -1,16 +1,13 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import TerminalControls from 'ee/ide/components/terminal/terminal_controls.vue';
 import ScrollButton from '~/ide/components/jobs/detail/scroll_button.vue';
-
-const localVue = createLocalVue();
 
 describe('EE IDE TerminalControls', () => {
   let wrapper;
   let buttons;
 
   const factory = (options = {}) => {
-    wrapper = shallowMount(localVue.extend(TerminalControls), {
-      localVue,
+    wrapper = shallowMount(TerminalControls, {
       ...options,
     });
 
@@ -49,7 +46,9 @@ describe('EE IDE TerminalControls', () => {
 
     buttons.at(0).vm.$emit('click');
 
-    expect(wrapper.emittedByOrder()).toEqual([{ name: 'scroll-up', args: [] }]);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emittedByOrder()).toEqual([{ name: 'scroll-up', args: [] }]);
+    });
   });
 
   it('emits "scroll-down" when click down button', () => {
@@ -59,6 +58,8 @@ describe('EE IDE TerminalControls', () => {
 
     buttons.at(1).vm.$emit('click');
 
-    expect(wrapper.emittedByOrder()).toEqual([{ name: 'scroll-down', args: [] }]);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emittedByOrder()).toEqual([{ name: 'scroll-down', args: [] }]);
+    });
   });
 });

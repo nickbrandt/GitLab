@@ -8,7 +8,7 @@ Every API call to search must be authenticated.
 
 Search globally across the GitLab instance.
 
-```
+```plaintext
 GET /search
 ```
 
@@ -25,8 +25,8 @@ The response depends on the requested scope.
 
 ### Scope: projects
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=projects&search=flight
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=projects&search=flight
 ```
 
 Example response:
@@ -56,8 +56,8 @@ Example response:
 
 ### Scope: issues
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=issues&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=issues&search=file
 ```
 
 Example response:
@@ -121,8 +121,8 @@ Example response:
 
 ### Scope: merge_requests
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=merge_requests&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=merge_requests&search=file
 ```
 
 Example response:
@@ -199,8 +199,8 @@ Example response:
 
 ### Scope: milestones
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=milestones&search=release
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=milestones&search=release
 ```
 
 Example response:
@@ -224,8 +224,8 @@ Example response:
 
 ### Scope: snippet_titles
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=snippet_titles&search=sample
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=snippet_titles&search=sample
 ```
 
 Example response:
@@ -255,8 +255,10 @@ Example response:
 
 ### Scope: snippet_blobs
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=snippet_blobs&search=test
+This scope will be disabled after GitLab 13.0.
+
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=snippet_blobs&search=test
 ```
 
 Example response:
@@ -288,8 +290,8 @@ Example response:
 
 This scope is available only if [Elasticsearch](../integration/elasticsearch.md) is enabled.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=wiki_blobs&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=wiki_blobs&search=bye
 ```
 
 Example response:
@@ -316,8 +318,8 @@ Example response:
 
 This scope is available only if [Elasticsearch](../integration/elasticsearch.md) is enabled.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=commits&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=commits&search=bye
 ```
 
 Example response:
@@ -359,8 +361,8 @@ to use a filter simply include it in your query like so: `a query filename:some_
 
 You may use wildcards (`*`) to use glob matching.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=blobs&search=installation
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=blobs&search=installation
 ```
 
 Example response:
@@ -385,8 +387,8 @@ Example response:
 
 ### Scope: users
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=users&search=doe
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=users&search=doe
 ```
 
 Example response:
@@ -410,7 +412,7 @@ Search within the specified group.
 
 If a user is not a member of a group and the group is private, a `GET` request on that group will result to a `404` status code.
 
-```
+```plaintext
 GET /groups/:id/search
 ```
 
@@ -428,8 +430,8 @@ The response depends on the requested scope.
 
 ### Scope: projects
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=projects&search=flight
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=projects&search=flight
 ```
 
 Example response:
@@ -459,8 +461,8 @@ Example response:
 
 ### Scope: issues
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=issues&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=issues&search=file
 ```
 
 Example response:
@@ -524,8 +526,8 @@ Example response:
 
 ### Scope: merge_requests
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=merge_requests&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=merge_requests&search=file
 ```
 
 Example response:
@@ -602,8 +604,8 @@ Example response:
 
 ### Scope: milestones
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=milestones&search=release
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=milestones&search=release
 ```
 
 Example response:
@@ -629,8 +631,8 @@ Example response:
 
 This scope is available only if [Elasticsearch](../integration/elasticsearch.md) is enabled.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=wiki_blobs&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=wiki_blobs&search=bye
 ```
 
 Example response:
@@ -657,8 +659,8 @@ Example response:
 
 This scope is available only if [Elasticsearch](../integration/elasticsearch.md) is enabled.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=commits&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=commits&search=bye
 ```
 
 Example response:
@@ -700,8 +702,8 @@ to use a filter simply include it in your query like so: `a query filename:some_
 
 You may use wildcards (`*`) to use glob matching.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=blobs&search=installation
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/6/search?scope=blobs&search=installation
 ```
 
 Example response:
@@ -726,8 +728,8 @@ Example response:
 
 ### Scope: users
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=users&search=doe
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/3/search?scope=users&search=doe
 ```
 
 Example response:
@@ -751,7 +753,7 @@ Search within the specified project.
 
 If a user is not a member of a project and the project is private, a `GET` request on that project will result to a `404` status code.
 
-```
+```plaintext
 GET /projects/:id/search
 ```
 
@@ -760,6 +762,7 @@ GET /projects/:id/search
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user                |
 | `scope`       | string   | yes        | The scope to search in                |
 | `search`      | string   | yes        | The search query  |
+| `ref`         | string   | no         | The name of a repository branch or tag to search on. The project's default branch is used by default. This is only applicable for scopes: commits, blobs, and wiki_blobs.  |
 
 Search the expression within the specified scope. Currently these scopes are supported: issues, merge_requests, milestones, notes, wiki_blobs, commits, blobs, users.
 
@@ -767,8 +770,8 @@ The response depends on the requested scope.
 
 ### Scope: issues
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/12/search?scope=issues&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/12/search?scope=issues&search=file
 ```
 
 Example response:
@@ -832,8 +835,8 @@ Example response:
 
 ### Scope: merge_requests
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=merge_requests&search=file
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=merge_requests&search=file
 ```
 
 Example response:
@@ -910,8 +913,8 @@ Example response:
 
 ### Scope: milestones
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/12/search?scope=milestones&search=release
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/12/search?scope=milestones&search=release
 ```
 
 Example response:
@@ -935,8 +938,8 @@ Example response:
 
 ### Scope: notes
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=notes&search=maxime
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=notes&search=maxime
 ```
 
 Example response:
@@ -984,8 +987,8 @@ results:
   might be found in both the filename and content, or might appear multiple
   times in the content.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=wiki_blobs&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=wiki_blobs&search=bye
 ```
 
 Example response:
@@ -1010,8 +1013,8 @@ Example response:
 
 ### Scope: commits
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=commits&search=bye
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=commits&search=bye
 ```
 
 Example response:
@@ -1057,8 +1060,8 @@ Blobs searches are performed on both filenames and contents. Search results:
   might be found in both the filename and content, or might appear multiple
   times in the content.
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=blobs&search=installation
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=blobs&search=installation&ref=feature
 ```
 
 Example response:
@@ -1072,7 +1075,7 @@ Example response:
     "path": "README.md",
     "filename": "README.md",
     "id": null,
-    "ref": "master",
+    "ref": "feature",
     "startline": 46,
     "project_id": 6
   }
@@ -1083,8 +1086,8 @@ Example response:
 
 ### Scope: users
 
-```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=users&search=doe
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=users&search=doe
 ```
 
 Example response:

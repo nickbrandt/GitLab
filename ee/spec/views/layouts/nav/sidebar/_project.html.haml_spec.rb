@@ -106,7 +106,7 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_pod_logs) { true }
 
       it 'link is visible ' do
-        expect(rendered).to have_link('Pod logs', href: logs_project_environments_path(project))
+        expect(rendered).to have_link('Logs', href: project_logs_path(project))
       end
     end
 
@@ -115,7 +115,7 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_pod_logs) { false }
 
       it 'link is not visible ' do
-        expect(rendered).not_to have_link 'Pod logs'
+        expect(rendered).not_to have_link 'Logs'
       end
     end
 
@@ -124,7 +124,7 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_pod_logs) { false }
 
       it 'link is not visible ' do
-        expect(rendered).not_to have_link 'Pod logs'
+        expect(rendered).not_to have_link 'Logs'
       end
     end
   end
@@ -141,11 +141,15 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dependencies) { true }
 
       it 'top level navigation link is visible' do
-        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is visible' do
-        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
+      end
+
+      it 'security configuration link is visible' do
+        expect(rendered).to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is visible' do
@@ -158,11 +162,15 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dependencies) { false }
 
       it 'top level navigation link is visible' do
-        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is visible' do
-        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
+      end
+
+      it 'security configuration link is visible' do
+        expect(rendered).to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is not visible' do
@@ -179,7 +187,11 @@ describe 'layouts/nav/sidebar/_project' do
       end
 
       it 'security dashboard link is not visible' do
-        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
+      end
+
+      it 'security configuration link is not visible' do
+        expect(rendered).not_to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is visible' do
@@ -192,11 +204,15 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dashboard) { false }
 
       it 'top level navigation link is visible' do
-        expect(rendered).not_to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is not visible' do
-        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
+      end
+
+      it 'security configuration link is not visible' do
+        expect(rendered).not_to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is not visible' do

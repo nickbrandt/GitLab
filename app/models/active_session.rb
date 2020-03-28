@@ -4,10 +4,13 @@ class ActiveSession
   include ActiveModel::Model
 
   SESSION_BATCH_SIZE = 200
+  ALLOWED_NUMBER_OF_ACTIVE_SESSIONS = 100
+
+  attr_writer :session_id
 
   attr_accessor :created_at, :updated_at,
-    :session_id, :ip_address,
-    :browser, :os, :device_name, :device_type,
+    :ip_address, :browser, :os,
+    :device_name, :device_type,
     :is_impersonated
 
   def current?(session)
@@ -18,6 +21,11 @@ class ActiveSession
 
   def human_device_type
     device_type&.titleize
+  end
+
+  def public_id
+    encrypted_id = Gitlab::CryptoHelper.aes256_gcm_encrypt(session_id)
+    CGI.escape(encrypted_id)
   end
 
   def self.set(user, request)
@@ -65,21 +73,27 @@ class ActiveSession
 
   def self.destroy(user, session_id)
     Gitlab::Redis::SharedState.with do |redis|
-      redis.srem(lookup_key_name(user.id), session_id)
-
-      deleted_keys = redis.del(key_name(user.id, session_id))
-
-      # only allow deleting the devise session if we could actually find a
-      # related active session. this prevents another user from deleting
-      # someone else's session.
-      if deleted_keys > 0
-        redis.del("#{Gitlab::Redis::SharedState::SESSION_NAMESPACE}:#{session_id}")
-      end
+      destroy_sessions(redis, user, [session_id])
     end
+  end
+
+  def self.destroy_with_public_id(user, public_id)
+    session_id = decrypt_public_id(public_id)
+    destroy(user, session_id) unless session_id.nil?
+  end
+
+  def self.destroy_sessions(redis, user, session_ids)
+    key_names = session_ids.map {|session_id| key_name(user.id, session_id) }
+    session_names = session_ids.map {|session_id| "#{Gitlab::Redis::SharedState::SESSION_NAMESPACE}:#{session_id}" }
+
+    redis.srem(lookup_key_name(user.id), session_ids)
+    redis.del(key_names)
+    redis.del(session_names)
   end
 
   def self.cleanup(user)
     Gitlab::Redis::SharedState.with do |redis|
+      clean_up_old_sessions(redis, user)
       cleaned_up_lookup_entries(redis, user)
     end
   end
@@ -118,19 +132,40 @@ class ActiveSession
     end
   end
 
-  def self.raw_active_session_entries(session_ids, user_id)
+  def self.raw_active_session_entries(redis, session_ids, user_id)
     return [] if session_ids.empty?
 
-    Gitlab::Redis::SharedState.with do |redis|
-      entry_keys = session_ids.map { |session_id| key_name(user_id, session_id) }
+    entry_keys = session_ids.map { |session_id| key_name(user_id, session_id) }
 
-      redis.mget(entry_keys)
+    redis.mget(entry_keys)
+  end
+
+  def self.active_session_entries(session_ids, user_id, redis)
+    return [] if session_ids.empty?
+
+    entry_keys = raw_active_session_entries(redis, session_ids, user_id)
+
+    entry_keys.compact.map do |raw_session|
+      Marshal.load(raw_session) # rubocop:disable Security/MarshalLoad
     end
+  end
+
+  def self.clean_up_old_sessions(redis, user)
+    session_ids = session_ids_for_user(user.id)
+
+    return if session_ids.count <= ALLOWED_NUMBER_OF_ACTIVE_SESSIONS
+
+    # remove sessions if there are more than ALLOWED_NUMBER_OF_ACTIVE_SESSIONS.
+    sessions = active_session_entries(session_ids, user.id, redis)
+    sessions.sort_by! {|session| session.updated_at }.reverse!
+    destroyable_sessions = sessions.drop(ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
+    destroyable_session_ids = destroyable_sessions.map { |session| session.send :session_id } # rubocop:disable GitlabSecurity/PublicSend
+    destroy_sessions(redis, user, destroyable_session_ids) if destroyable_session_ids.any?
   end
 
   def self.cleaned_up_lookup_entries(redis, user)
     session_ids = session_ids_for_user(user.id)
-    entries = raw_active_session_entries(session_ids, user.id)
+    entries = raw_active_session_entries(redis, session_ids, user.id)
 
     # remove expired keys.
     # only the single key entries are automatically expired by redis, the
@@ -144,4 +179,15 @@ class ActiveSession
 
     entries.compact
   end
+
+  private_class_method def self.decrypt_public_id(public_id)
+    decoded_id = CGI.unescape(public_id)
+    Gitlab::CryptoHelper.aes256_gcm_decrypt(decoded_id)
+  rescue
+    nil
+  end
+
+  private
+
+  attr_reader :session_id
 end

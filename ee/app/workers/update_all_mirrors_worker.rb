@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UpdateAllMirrorsWorker
+class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include CronjobQueue
 
@@ -47,11 +47,12 @@ class UpdateAllMirrorsWorker
       projects = pull_mirrors_batch(freeze_at: now, batch_size: batch_size, offset_at: last).to_a
       break if projects.empty?
 
-      project_ids = projects.lazy.select(&:mirror?).take(capacity).map(&:id).force
-      capacity -= project_ids.length
+      projects_to_schedule = projects.lazy.select(&:mirror?).take(capacity).force
+      capacity -= projects_to_schedule.size
 
-      ProjectImportScheduleWorker.bulk_perform_async(project_ids.map { |id| [id] })
-      scheduled += project_ids.length
+      schedule_projects_in_batch(projects_to_schedule)
+
+      scheduled += projects_to_schedule.length
 
       # If fewer than `batch_size` projects were returned, we don't need to query again
       break if projects.length < batch_size
@@ -92,14 +93,45 @@ class UpdateAllMirrorsWorker
   # rubocop: disable CodeReuse/ActiveRecord
   def pull_mirrors_batch(freeze_at:, batch_size:, offset_at: nil)
     relation = Project
+      .non_archived
       .mirrors_to_sync(freeze_at)
       .reorder('import_state.next_execution_timestamp')
       .limit(batch_size)
-      .includes(:namespace) # Used by `project.mirror?`
+      .with_route
+      .with_namespace # Used by `project.mirror?`
 
     relation = relation.where('import_state.next_execution_timestamp > ?', offset_at) if offset_at
+
+    if check_mirror_plans_in_query?
+      root_namespaces_sql = Gitlab::ObjectHierarchy
+        .new(Namespace.where('id = projects.namespace_id'))
+        .roots
+        .select(:id)
+        .to_sql
+
+      root_namespaces_join = "INNER JOIN namespaces AS root_namespaces ON root_namespaces.id = (#{root_namespaces_sql})"
+
+      relation = relation
+        .joins(root_namespaces_join)
+        .joins('LEFT JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id = root_namespaces.id')
+        .joins('LEFT JOIN plans ON plans.id = gitlab_subscriptions.hosted_plan_id')
+        .where(['plans.name IN (?) OR projects.visibility_level = ?', ::Plan::ALL_HOSTED_PLANS, ::Gitlab::VisibilityLevel::PUBLIC])
+    end
 
     relation
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def schedule_projects_in_batch(projects)
+    ProjectImportScheduleWorker.bulk_perform_async_with_contexts(
+      projects,
+      arguments_proc: -> (project) { project.id },
+      context_proc: -> (project) { { project: project } }
+    )
+  end
+
+  def check_mirror_plans_in_query?
+    ::Gitlab::CurrentSettings.should_check_namespace_plan? &&
+      !::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
+  end
 end

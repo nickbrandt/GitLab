@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module EnvironmentsHelper
+  include ActionView::Helpers::AssetUrlHelper
   prepend_if_ee('::EE::EnvironmentsHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def environments_list_data
@@ -21,21 +22,36 @@ module EnvironmentsHelper
     {
       "settings-path" => edit_project_service_path(project, 'prometheus'),
       "clusters-path" => project_clusters_path(project),
-      "current-environment-name": environment.name,
+      "current-environment-name" => environment.name,
       "documentation-path" => help_page_path('administration/monitoring/prometheus/index.md'),
       "empty-getting-started-svg-path" => image_path('illustrations/monitoring/getting_started.svg'),
       "empty-loading-svg-path" => image_path('illustrations/monitoring/loading.svg'),
       "empty-no-data-svg-path" => image_path('illustrations/monitoring/no_data.svg'),
+      "empty-no-data-small-svg-path" => image_path('illustrations/chart-empty-state-small.svg'),
       "empty-unable-to-connect-svg-path" => image_path('illustrations/monitoring/unable_to_connect.svg'),
       "metrics-endpoint" => additional_metrics_project_environment_path(project, environment, format: :json),
+      "dashboards-endpoint" => project_performance_monitoring_dashboards_path(project, format: :json),
       "dashboard-endpoint" => metrics_dashboard_project_environment_path(project, environment, format: :json),
       "deployments-endpoint" => project_environment_deployments_path(project, environment, format: :json),
-      "environments-endpoint": project_environments_path(project, format: :json),
+      "default-branch" => project.default_branch,
       "project-path" => project_path(project),
       "tags-path" => project_tags_path(project),
       "has-metrics" => "#{environment.has_metrics?}",
       "prometheus-status" => "#{environment.prometheus_status}",
       "external-dashboard-url" => project.metrics_setting_external_dashboard_url
     }
+  end
+
+  def environment_logs_data(project, environment)
+    {
+      "environment-name": environment.name,
+      "environments-path": project_environments_path(project, format: :json),
+      "environment-id": environment.id,
+      "cluster-applications-documentation-path" => help_page_path('user/clusters/applications.md', anchor: 'elastic-stack')
+    }
+  end
+
+  def can_destroy_environment?(environment)
+    can?(current_user, :destroy_environment, environment)
   end
 end

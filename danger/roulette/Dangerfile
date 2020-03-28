@@ -16,6 +16,10 @@ To spread load more evenly across eligible reviewers, Danger has randomly picked
 a candidate for each review slot. Feel free to override this selection if you
 think someone else would be better-suited, or the chosen person is unavailable.
 
+To read more on how to use the reviewer roulette, please take a look at the
+[Engineering workflow](https://about.gitlab.com/handbook/engineering/workflow/#basics)
+and [code review guidelines](https://docs.gitlab.com/ee/development/code_review.html).
+
 Once you've decided who will review this merge request, mention them as you
 normally would! Danger does not (yet?) automatically notify them for you.
 
@@ -27,7 +31,7 @@ UNKNOWN_FILES_MESSAGE = <<MARKDOWN
 
 These files couldn't be categorised, so Danger was unable to suggest a reviewer.
 Please consider creating a merge request to
-[add support](https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/danger/helper.rb)
+[add support](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/danger/helper.rb)
 for them.
 MARKDOWN
 
@@ -46,7 +50,7 @@ def spin_for_category(team, project, category, branch_name)
     end
 
   # TODO: take CODEOWNERS into account?
-  # https://gitlab.com/gitlab-org/gitlab-foss/issues/57653
+  # https://gitlab.com/gitlab-org/gitlab/issues/26723
 
   # Make traintainers have triple the chance to be picked as a reviewer
   reviewer = roulette.spin_for_person(reviewers + traintainers + traintainers, random: random)
@@ -64,11 +68,9 @@ categories = changes.keys - [:unknown]
 # Ensure to spin for database reviewer/maintainer when ~database is applied (e.g. to review SQL queries)
 categories << :database if gitlab.mr_labels.include?('database') && !categories.include?(:database)
 
-# Single codebase MRs are reviewed using a slightly different process, so we
-# disable the review roulette for such MRs.
 # CSS Clean up MRs are reviewed using a slightly different process, so we
 # disable the review roulette for such MRs.
-if changes.any? && !gitlab.mr_labels.include?('single codebase') && !gitlab.mr_labels.include?('CSS cleanup')
+if changes.any? && !gitlab.mr_labels.include?('CSS cleanup')
   # Strip leading and trailing CE/EE markers
   canonical_branch_name =
     roulette.canonical_branch_name(gitlab.mr_json['source_branch'])

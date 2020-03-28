@@ -82,10 +82,18 @@ describe 'Billing plan pages', :feature do
     end
   end
 
+  shared_examples 'plan with subscription table' do
+    before do
+      visit page_path
+    end
+
+    it 'displays subscription table', :js do
+      expect(page).to have_selector('.js-subscription-table')
+    end
+  end
+
   context 'users profile billing page' do
     let(:page_path) { profile_billings_path }
-
-    it_behaves_like 'billings gold trial callout'
 
     context 'on free' do
       let(:plan) { free_plan }
@@ -131,6 +139,8 @@ describe 'Billing plan pages', :feature do
           end
         end
       end
+
+      it_behaves_like 'plan with subscription table'
     end
 
     context 'on bronze plan' do
@@ -143,10 +153,88 @@ describe 'Billing plan pages', :feature do
       it_behaves_like 'plan with header'
       it_behaves_like 'downgradable plan'
       it_behaves_like 'upgradable plan'
+      it_behaves_like 'plan with subscription table'
     end
 
     context 'on silver plan' do
       let(:plan) { silver_plan }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
+      end
+
+      it_behaves_like 'plan with header'
+      it_behaves_like 'downgradable plan'
+      it_behaves_like 'upgradable plan'
+      it_behaves_like 'plan with subscription table'
+    end
+
+    context 'on gold plan' do
+      let(:plan) { gold_plan }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
+      end
+
+      it_behaves_like 'plan with header'
+      it_behaves_like 'downgradable plan'
+      it_behaves_like 'non-upgradable plan'
+      it_behaves_like 'plan with subscription table'
+    end
+  end
+
+  context 'users profile billing page with a trial' do
+    let(:page_path) { profile_billings_path }
+
+    context 'on free' do
+      let(:plan) { free_plan }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan,
+               trial: true, trial_ends_on: Date.current.tomorrow, seats: 15)
+      end
+
+      before do
+        visit page_path
+      end
+
+      it 'displays all plans' do
+        page.within('.billing-plans') do
+          panels = page.all('.card')
+
+          expect(panels.length).to eq(plans_data.length)
+
+          plans_data.each.with_index do |data, index|
+            expect(panels[index].find('.card-header')).to have_content(data[:name])
+          end
+        end
+      end
+
+      it 'displays correct plan actions' do
+        expected_actions = plans_data.map { |data| data.fetch(:purchase_link).fetch(:action) }
+        plan_actions = page.all('.billing-plans .card .card-footer')
+        expect(plan_actions.length).to eq(expected_actions.length)
+
+        expected_actions.each_with_index do |expected_action, index|
+          action = plan_actions[index]
+
+          case expected_action
+          when 'downgrade'
+            expect(action).not_to have_link('Upgrade')
+            expect(action).not_to have_css('.disabled')
+          when 'current_plan'
+            expect(action).to have_link('Upgrade')
+            expect(action).not_to have_css('.disabled')
+          when 'upgrade'
+            expect(action).to have_link('Upgrade')
+            expect(action).not_to have_css('.disabled')
+          end
+        end
+      end
+    end
+
+    context 'on bronze plan' do
+      let(:plan) { bronze_plan }
 
       let!(:subscription) do
         create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
@@ -177,7 +265,33 @@ describe 'Billing plan pages', :feature do
     context 'top-most group' do
       let(:page_path) { group_billings_path(namespace) }
 
-      it_behaves_like 'billings gold trial callout'
+      context 'on gold' do
+        let(:plan) { gold_plan }
+
+        let!(:subscription) do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
+        end
+
+        before do
+          visit page_path
+        end
+
+        it 'displays plan header' do
+          page.within('.billing-plan-header') do
+            expect(page).to have_content("#{namespace.name} is currently using the Gold plan")
+
+            expect(page).to have_css('.billing-plan-logo .identicon')
+          end
+        end
+
+        it 'does not display the billing plans table' do
+          expect(page).not_to have_css('.billing-plans')
+        end
+
+        it 'displays subscription table', :js do
+          expect(page).to have_selector('.js-subscription-table')
+        end
+      end
 
       context 'on bronze' do
         let(:plan) { bronze_plan }
@@ -209,6 +323,52 @@ describe 'Billing plan pages', :feature do
     end
   end
 
+  context 'group billing page with a trial' do
+    let(:namespace) { create(:group) }
+    let!(:group_member) { create(:group_member, :owner, group: namespace, user: user) }
+
+    before do
+      stub_full_request("#{EE::SUBSCRIPTIONS_URL}/gitlab_plans?plan=free")
+        .to_return(status: 200, body: plans_data.to_json)
+    end
+
+    context 'top-most group' do
+      let(:page_path) { group_billings_path(namespace) }
+
+      context 'on gold' do
+        let(:plan) { gold_plan }
+
+        let!(:subscription) do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: plan,
+                 trial: true, trial_ends_on: Date.current.tomorrow, seats: 15)
+        end
+
+        before do
+          visit page_path
+        end
+
+        it 'displays plan header' do
+          page.within('.billing-plan-header') do
+            expect(page).to have_content("#{namespace.name} is currently using the Gold plan")
+
+            expect(page).to have_css('.billing-plan-logo .identicon')
+          end
+        end
+
+        it 'does display the billing plans table' do
+          expect(page).to have_css('.billing-plans')
+        end
+
+        it 'displays subscription table', :js do
+          expect(page).to have_selector('.js-subscription-table')
+        end
+
+        it_behaves_like 'downgradable plan'
+        it_behaves_like 'non-upgradable plan'
+      end
+    end
+  end
+
   context 'on sub-group' do
     let(:user2) { create(:user) }
     let(:user3) { create(:user) }
@@ -220,8 +380,6 @@ describe 'Billing plan pages', :feature do
     let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
     let(:page_path) { group_billings_path(subgroup2) }
     let(:namespace) { group }
-
-    it_behaves_like 'billings gold trial callout'
 
     context 'on bronze' do
       let(:plan) { bronze_plan }

@@ -7,7 +7,7 @@ GitLab has several features based on receiving incoming emails:
 - [New issue by email](../user/project/issues/managing_issues.md#new-issue-via-email):
   allow GitLab users to create a new issue by sending an email to a
   user-specific email address.
-- [New merge request by email](../user/project/merge_requests/creating_merge_requests.md#create-new-merge-requests-by-email):
+- [New merge request by email](../user/project/merge_requests/creating_merge_requests.md#new-merge-request-by-email-core-only):
   allow GitLab users to create a new merge request by sending an email to a
   user-specific email address.
 - [Service Desk](../user/project/service_desk.md): provide e-mail support to
@@ -79,9 +79,9 @@ email address in order to sign up.
 If you also host a public-facing GitLab instance at `hooli.com` and set your
 incoming email domain to `hooli.com`, an attacker could abuse the "Create new
 issue by email" or
-"[Create new merge request by email](../user/project/merge_requests/creating_merge_requests.md#create-new-merge-requests-by-email)"
+"[Create new merge request by email](../user/project/merge_requests/creating_merge_requests.md#new-merge-request-by-email-core-only)"
 features by using a project's unique address as the email when signing up for
-Slack, which would send a confirmation email, which would create a new issue or
+Slack. This would send a confirmation email, which would create a new issue or
 merge request on the project owned by the attacker, allowing them to click the
 confirmation link and validate their account on your company's private Slack
 instance.
@@ -102,14 +102,14 @@ for a real-world example of this exploit.
 
 1. Reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    sudo gitlab-ctl restart
    ```
 
 1. Verify that everything is configured correctly:
 
-   ```sh
+   ```shell
    sudo gitlab-rake gitlab:incoming_email:check
    ```
 
@@ -119,7 +119,7 @@ Reply by email should now be working.
 
 1. Go to the GitLab installation directory:
 
-   ```sh
+   ```shell
    cd /home/git/gitlab
    ```
 
@@ -128,20 +128,20 @@ Reply by email should now be working.
 
 1. Enable `mail_room` in the init script at `/etc/default/gitlab`:
 
-   ```sh
+   ```shell
    sudo mkdir -p /etc/default
    echo 'mail_room_enabled=true' | sudo tee -a /etc/default/gitlab
    ```
 
 1. Restart GitLab:
 
-   ```sh
+   ```shell
    sudo service gitlab restart
    ```
 
 1. Verify that everything is configured correctly:
 
-   ```sh
+   ```shell
    sudo -u git -H bundle exec rake gitlab:incoming_email:check RAILS_ENV=production
    ```
 
@@ -283,10 +283,17 @@ incoming_email:
     idle_timeout: 60
 ```
 
-#### MS Exchange
+#### Microsoft Exchange Server
 
-Example configuration for Microsoft Exchange mail server with IMAP enabled. Assumes the
-catch-all mailbox incoming@exchange.example.com.
+Example configurations for Microsoft Exchange Server with IMAP enabled. Since
+Exchange does not support sub-addressing, only two options exist:
+
+- Catch-all mailbox (recommended for Exchange-only)
+- Dedicated email address (supports Reply by Email only)
+
+##### Catch-all mailbox
+
+Assumes the catch-all mailbox `incoming@exchange.example.com`.
 
 Example for Omnibus installs:
 
@@ -335,11 +342,53 @@ incoming_email:
     port: 993
     # Whether the IMAP server uses SSL
     ssl: true
-    # Whether the IMAP server uses StartTLS
-    start_tls: false
+```
 
-    # The mailbox where incoming mail will end up. Usually "inbox".
-    mailbox: "inbox"
-    # The IDLE command timeout.
-    idle_timeout: 60
+##### Dedicated email address
+
+Assumes the dedicated email address `incoming@exchange.example.com`.
+
+Example for Omnibus installs:
+
+```ruby
+gitlab_rails['incoming_email_enabled'] = true
+
+# Exchange does not support sub-addressing, and we're not using a catch-all mailbox so %{key} is not used here
+gitlab_rails['incoming_email_address'] = "incoming@exchange.example.com"
+
+# Email account username
+# Typically this is the userPrincipalName (UPN)
+gitlab_rails['incoming_email_email'] = "incoming@ad-domain.example.com"
+# Email account password
+gitlab_rails['incoming_email_password'] = "[REDACTED]"
+
+# IMAP server host
+gitlab_rails['incoming_email_host'] = "exchange.example.com"
+# IMAP server port
+gitlab_rails['incoming_email_port'] = 993
+# Whether the IMAP server uses SSL
+gitlab_rails['incoming_email_ssl'] = true
+```
+
+Example for source installs:
+
+```yaml
+incoming_email:
+    enabled: true
+
+    # Exchange does not support sub-addressing, and we're not using a catch-all mailbox so %{key} is not used here
+    address: "incoming@exchange.example.com"
+
+    # Email account username
+    # Typically this is the userPrincipalName (UPN)
+    user: "incoming@ad-domain.example.com"
+    # Email account password
+    password: "[REDACTED]"
+
+    # IMAP server host
+    host: "exchange.example.com"
+    # IMAP server port
+    port: 993
+    # Whether the IMAP server uses SSL
+    ssl: true
 ```

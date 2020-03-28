@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::HashedStorageAttachmentsEventStore do
   include EE::GeoHelpers
 
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:project) { create(:project, path: 'bar') }
   let(:attachments_event) { build(:geo_hashed_storage_attachments_event, project: project) }

@@ -25,7 +25,9 @@ module API
         optional :yaml_errors, type: Boolean, desc: 'Returns pipelines with invalid configurations'
         optional :name,     type: String, desc: 'The name of the user who triggered pipelines'
         optional :username, type: String, desc: 'The username of the user who triggered pipelines'
-        optional :order_by, type: String, values: PipelinesFinder::ALLOWED_INDEXED_COLUMNS, default: 'id',
+        optional :updated_before, type: DateTime, desc: 'Return pipelines updated before the specified datetime. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ'
+        optional :updated_after, type: DateTime, desc: 'Return pipelines updated after the specified datetime. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ'
+        optional :order_by, type: String, values: Ci::PipelinesFinder::ALLOWED_INDEXED_COLUMNS, default: 'id',
                             desc: 'Order pipelines'
         optional :sort,     type: String, values: %w[asc desc], default: 'desc',
                             desc: 'Sort pipelines'
@@ -34,7 +36,7 @@ module API
         authorize! :read_pipeline, user_project
         authorize! :read_build, user_project
 
-        pipelines = PipelinesFinder.new(user_project, current_user, params).execute
+        pipelines = Ci::PipelinesFinder.new(user_project, current_user, params).execute
         present paginate(pipelines), with: Entities::PipelineBasic
       end
 

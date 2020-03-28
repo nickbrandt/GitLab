@@ -98,13 +98,13 @@ most commonly-used RPCs can be enabled via feature flags:
 A convenience Rake task can be used to enable or disable these flags
 all together. To enable:
 
-```sh
+```shell
 bundle exec rake gitlab:features:enable_rugged
 ```
 
 To disable:
 
-```sh
+```shell
 bundle exec rake gitlab:features:disable_rugged
 ```
 
@@ -167,8 +167,15 @@ end
 Normally, GitLab CE/EE tests use a local clone of Gitaly in
 `tmp/tests/gitaly` pinned at the version specified in
 `GITALY_SERVER_VERSION`. The `GITALY_SERVER_VERSION` file supports also
-branches and SHA to use a custom commit in <https://gitlab.com/gitlab-org/gitaly>. If
-you want to run tests locally against a modified version of Gitaly you
+branches and SHA to use a custom commit in <https://gitlab.com/gitlab-org/gitaly>.
+
+NOTE: **Note:**
+With the introduction of auto-deploy for Gitaly, the format of
+`GITALY_SERVER_VERSION` was aligned with Omnibus syntax.
+It no longer supports `=revision`, it will evaluate the file content as a Git
+reference (branch or SHA), only if it matches a semver it will prepend a `v`.
+
+If you want to run tests locally against a modified version of Gitaly you
 can replace `tmp/tests/gitaly` with a symlink. This is much faster
 because if will avoid a Gitaly re-install each time you run `rspec`.
 
@@ -185,8 +192,7 @@ to manually run `make` again.
 
 Note that CI tests will not use your locally modified version of
 Gitaly. To use a custom Gitaly version in CI you need to update
-GITALY_SERVER_VERSION. You can use the format `=revision` to use a
-non-tagged commit from <https://gitlab.com/gitlab-org/gitaly> in CI.
+GITALY_SERVER_VERSION as described at the beginning of this paragraph.
 
 To use a different Gitaly repository, e.g., if your changes are present
 on a fork, you can specify a `GITALY_REPO_URL` environment variable when
@@ -207,6 +213,21 @@ To use a custom Gitaly repository in CI, for instance if you want your
 GitLab fork to always use your own Gitaly fork, set `GITALY_REPO_URL`
 as a [CI environment variable](../ci/variables/README.md#gitlab-cicd-environment-variables).
 
+### Use a locally modified version of Gitaly RPC client
+
+If you are making changes to the RPC client, such as adding a new endpoint or adding a new
+parameter to an existing endpoint, follow the guide for
+[Gitaly proto](https://gitlab.com/gitlab-org/gitaly/blob/master/proto/README.md). After pushing
+the branch with the changes (`new-feature-branch`, for example):
+
+1. Change the `gitaly` line in the Rails' `Gemfile` to:
+
+   ```ruby
+   gem 'gitaly', git: 'https://gitlab.com/gitlab-org/gitaly.git', branch: 'new-feature-branch'
+   ```
+
+1. Run `bundle install` to use the modified RPC client.
+
 ---
 
 [Return to Development documentation](README.md)
@@ -219,13 +240,13 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Create a package scoped flag name:
 
-   ```go
+   ```golang
    var findAllTagsFeatureFlag = "go-find-all-tags"
    ```
 
 1. Create a switch in the code using the `featureflag` package:
 
-   ```go
+   ```golang
    if featureflag.IsEnabled(ctx, findAllTagsFeatureFlag) {
      // go implementation
    } else {
@@ -235,7 +256,7 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Create Prometheus metrics:
 
-   ```go
+   ```golang
    var findAllTagsRequests = prometheus.NewCounterVec(
      prometheus.CounterOpts{
        Name: "gitaly_find_all_tags_requests_total",
@@ -259,7 +280,7 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Set headers in tests:
 
-   ```go
+   ```golang
    import (
      "google.golang.org/grpc/metadata"
 
@@ -277,14 +298,66 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 ### GitLab Rails
 
-1. Add feature flag to `lib/gitlab/gitaly_client.rb` (in GitLab Rails):
+1. Test in a Rails console by setting the feature flag:
+
+   NOTE: **Note:**
+   Pay attention to the name of the flag and the one used in the Rails console.
+   There is a difference between them (dashes replaced by underscores and name
+   prefix is changed). Make sure to prefix all flags with `gitaly_`.
 
    ```ruby
-   SERVER_FEATURE_FLAGS = %w[go-find-all-tags].freeze
+   Feature.enable('gitaly_go_find_all_tags')
    ```
 
-1. Test in rails console by setting feature flag:
+### Testing with GDK
 
-   ```ruby
-   Feature.enable('gitaly_go-find-all-tags')
-   ```
+To be sure that the flag is set correctly and it goes into Gitaly, you can check
+the integration by using GDK:
+
+1. The state of the flag must be observable. To check it, you need to enable it
+   by fetching the Prometheus metrics:
+   1. Navigate to GDK's root directory.
+   1. Make sure you have the proper branch checked out for Gitaly.
+   1. Recompile it with `make gitaly-setup` and restart the service with `gdk restart gitaly`.
+   1. Make sure your setup is runnig: `gdk status | grep praefect`.
+   1. Check what config file is used: `cat ./services/praefect/run | grep praefect` value of the `-config` flag
+   1. Uncomment `prometheus_listen_addr` in the configuration file and run `gdk restart gitaly`.
+
+1. Make sure that the flag is not enabled yet:
+   1. Perform whatever action is required to trigger your changes (project creation,
+      submitting commit, observing history, etc.).
+   1. Check that the list of current metrics has the new counter for the feature flag:
+
+      ```shell
+      curl --silent http://localhost:9236/metrics | grep go_find_all_tags
+      ```
+
+1. Once you observe the metrics for the new feature flag and it increments, you
+   can enable the new feature:
+   1. Navigate to GDK's root directory.
+   1. Start a Rails console:
+
+      ```shell
+      bundle install && bundle exec rails console
+      ```
+
+   1. Check the list of feature flags:
+
+      ```ruby
+      Feature::Gitaly.server_feature_flags
+      ```
+
+      It should be disabled `"gitaly-feature-go-find-all-tags"=>"false"`.
+   1. Enable it:
+
+      ```ruby
+      Feature.enable('gitaly_go_find_all_tags')
+      ```
+
+   1. Exit the Rails console and perform whatever action is required to trigger
+      your changes (project creation, submitting commit, observing history, etc.).
+   1. Verify the feature is on by observing the metrics for it:
+
+      ```shell
+      curl --silent http://localhost:9236/metrics | grep go_find_all_tags
+      ```

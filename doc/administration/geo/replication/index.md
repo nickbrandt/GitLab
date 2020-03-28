@@ -12,7 +12,8 @@ Replication with Geo is the solution for widely distributed development teams.
 
 Fetching large repositories can take a long time for teams located far from a single GitLab instance.
 
-Geo provides local, read-only instances of your GitLab instances, reducing the time it takes to clone and fetch large repositories and speeding up development.
+Geo provides local, read-only instances of your GitLab instances. This can reduce the time it takes
+to clone and fetch large repositories, speeding up development.
 
 NOTE: **Note:**
 Check the [requirements](#requirements-for-running-geo) carefully before setting up Geo.
@@ -30,7 +31,7 @@ Implementing Geo provides the following benefits:
 
 - Reduce from minutes to seconds the time taken for your distributed developers to clone and fetch large repositories and projects.
 - Enable all of your developers to contribute ideas and work in parallel, no matter where they are.
-- Balance the load between your **primary** and **secondary** nodes, or offload your automated tests to a **secondary** node.
+- Balance the read-only load between your **primary** and **secondary** nodes.
 
 In addition, it:
 
@@ -63,7 +64,7 @@ Keep in mind that:
   - Get user data for logins (API).
   - Replicate repositories, LFS Objects, and Attachments (HTTPS + JWT).
 - Since GitLab Premium 10.0, the **primary** node no longer talks to **secondary** nodes to notify for changes (API).
-- Pushing directly to a **secondary** node (for both HTTP and SSH, including Git LFS) was [introduced](https://about.gitlab.com/blog/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
+- Pushing directly to a **secondary** node (for both HTTP and SSH, including Git LFS) was [introduced](https://about.gitlab.com/releases/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
 - There are [limitations](#current-limitations) in the current implementation.
 
 ### Architecture
@@ -243,17 +244,16 @@ CAUTION: **Caution:**
 This list of limitations only reflects the latest version of GitLab. If you are using an older version, extra limitations may be in place.
 
 - Pushing directly to a **secondary** node redirects (for HTTP) or proxies (for SSH) the request to the **primary** node instead of [handling it directly](https://gitlab.com/gitlab-org/gitlab/issues/1381), except when using Git over HTTP with credentials embedded within the URI. For example, `https://user:password@secondary.tld`.
+- Cloning, pulling, or pushing repositories that exist on the **primary** node but not on the **secondary** nodes where [selective synchronization](configuration.md#selective-synchronization) does not include the project is not supported over SSH [but support is planned](https://gitlab.com/groups/gitlab-org/-/epics/2562). HTTP(S) is supported.
 - The **primary** node has to be online for OAuth login to happen. Existing sessions and Git are not affected.
 - The installation takes multiple manual steps that together can take about an hour depending on circumstances. We are working on improving this experience. See [Omnibus GitLab issue #2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
 - Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the **secondary** node.
 - [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the **secondary** node in full, making it inappropriate for use as an access control mechanism.
 - Object pools for forked project deduplication work only on the **primary** node, and are duplicated on the **secondary** node.
 - [External merge request diffs](../../merge_request_diffs.md) will not be replicated if they are on-disk, and viewing merge requests will fail. However, external MR diffs in object storage **are** supported. The default configuration (in-database) does work.
+- GitLab Runners cannot register with a **secondary** node. Support for this is [planned for the future](https://gitlab.com/gitlab-org/gitlab/issues/3294).
 
 ### Limitations on replication/verification
-
-The following table lists the GitLab features along with their replication
-and verification status on a **secondary** node.
 
 You can keep track of the progress to implement the missing items in
 these epics/issues:
@@ -261,65 +261,7 @@ these epics/issues:
 - [Unreplicated Data Types](https://gitlab.com/groups/gitlab-org/-/epics/893)
 - [Verify all replicated data](https://gitlab.com/groups/gitlab-org/-/epics/1430)
 
-| Feature                                             | Replicated               | Verified                    | Notes                                      |
-|-----------------------------------------------------|--------------------------|-----------------------------|--------------------------------------------|
-| All database content                                | **Yes**                  | **Yes**                     |                                            |
-| Project repository                                  | **Yes**                  | **Yes**                     |                                            |
-| Project wiki repository                             | **Yes**                  | **Yes**                     |                                            |
-| Project designs repository                          | **Yes**                  | [No][design-verification]   | Behind feature flag (2)                    |
-| Uploads                                             | **Yes**                  | [No][upload-verification]   | Verified only on transfer, or manually (1) |
-| LFS Objects                                         | **Yes**                  | [No][lfs-verification]      | Verified only on transfer, or manually (1) |
-| CI job artifacts (other than traces)                | **Yes**                  | [No][artifact-verification] | Verified only manually (1)                 |
-| Archived traces                                     | **Yes**                  | [No][artifact-verification] | Verified only on transfer, or manually (1) |
-| Personal snippets                                   | **Yes**                  | **Yes**                     |                                            |
-| Version-controlled personal snippets                | No                       | No                          | [Not yet supported][unsupported-snippets]  |
-| Project snippets                                    | **Yes**                  | **Yes**                     |                                            |
-| Version-controlled project snippets                 | No                       | No                          | [Not yet supported][unsupported-snippets]  |
-| Object pools for forked project deduplication       | **Yes**                  | No                          |                                            |
-| [Server-side Git Hooks][custom-hooks]               | No                       | No                          |                                            |
-| [Elasticsearch integration][elasticsearch]          | No                       | No                          |                                            |
-| [GitLab Pages][gitlab-pages]                        | [No][pages-replication]  | No                          |                                            |
-| [Container Registry][container-registry]            | **Yes**                  | No                          |                                            |
-| [NPM Registry][npm-registry]                        | No                       | No                          |                                            |
-| [Maven Repository][maven-repository]                | No                       | No                          |                                            |
-| [Conan Repository][conan-repository]                | No                       | No                          |                                            |
-| [External merge request diffs][merge-request-diffs] | [No][diffs-replication]  | No                          |                                            |
-| Content in object storage                           | **Yes**                  | No                          |                                            |
-
-[design-replication]: https://gitlab.com/groups/gitlab-org/-/epics/1633
-[design-verification]: https://gitlab.com/gitlab-org/gitlab/issues/32467
-[upload-verification]: https://gitlab.com/groups/gitlab-org/-/epics/1817
-[lfs-verification]: https://gitlab.com/gitlab-org/gitlab/issues/8922
-[artifact-verification]: https://gitlab.com/gitlab-org/gitlab/issues/8923
-[diffs-replication]: https://gitlab.com/gitlab-org/gitlab/issues/33817
-[pages-replication]: https://gitlab.com/groups/gitlab-org/-/epics/589
-
-[unsupported-snippets]: https://gitlab.com/gitlab-org/gitlab/issues/14228
-[custom-hooks]: ../../custom_hooks.md
-[elasticsearch]: ../../../integration/elasticsearch.md
-[gitlab-pages]: ../../pages/index.md
-[container-registry]: ../../packages/container_registry.md
-[npm-registry]: ../../../user/packages/npm_registry/index.md
-[maven-repository]: ../../../user/packages/maven_repository/index.md
-[conan-repository]: ../../../user/packages/conan_repository/index.md
-[merge-request-diffs]: ../../merge_request_diffs.md
-
-1. The integrity can be verified manually using
-[Integrity Check Rake Task](../../raketasks/check.md)
-on both nodes and comparing the output between them.
-1. Enable the `enable_geo_design_sync` feature flag by running the
-following in a Rails console:
-
-    ```ruby
-    Feature.disable(:enable_geo_design_sync)
-    ```
-
-DANGER: **DANGER**
-Features not on this list, or with **No** in the **Replicated** column,
-are not replicated on the **secondary** node. Failing over without manually
-replicating data from those features will cause the data to be **lost**.
-If you wish to use those features on a **secondary** node, or to execute a failover
-successfully, you must replicate their data using some other means.
+There is a complete list of all GitLab [data types](datatypes.md) and [existing support for replication and verification](datatypes.md#limitations-on-replicationverification).
 
 ## Frequently Asked Questions
 
@@ -329,7 +271,7 @@ For answers to common questions, see the [Geo FAQ](faq.md).
 
 Since GitLab 9.5, Geo stores structured log messages in a `geo.log` file. For Omnibus installations, this file is at `/var/log/gitlab/gitlab-rails/geo.log`.
 
-This file contains information about when Geo attempts to sync repositories and files. Each line in the file contains a separate JSON entry that can be ingested into Elasticsearch, Splunk, etc.
+This file contains information about when Geo attempts to sync repositories and files. Each line in the file contains a separate JSON entry that can be ingested into. For example, Elasticsearch or Splunk.
 
 For example:
 

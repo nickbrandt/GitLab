@@ -4,21 +4,22 @@ exports[`dashboard should match the snapshot 1`] = `
 <div
   class="operations-dashboard"
 >
-  <glmodal-stub
+  <gl-modal-stub
     modalclass=""
     modalid="add-projects-modal"
     ok-disabled="true"
     ok-title="Add projects"
     ok-variant="success"
+    size="md"
     title="Add projects"
     titletag="h4"
   >
-    <projectselector-stub
+    <project-selector-stub
       projectsearchresults=""
       selectedprojects=""
       totalresults="0"
     />
-  </glmodal-stub>
+  </gl-modal-stub>
    
   <div
     class="page-title-holder flex-fill d-flex align-items-center"
@@ -31,15 +32,33 @@ exports[`dashboard should match the snapshot 1`] = `
     
     </h1>
      
-    <glbutton-stub
+    <gl-button-stub
       class="js-add-projects-button btn btn-success"
       role="button"
+      size="md"
+      tabindex="0"
+      variant="secondary"
     >
       
       Add projects
     
-    </glbutton-stub>
+    </gl-button-stub>
   </div>
+   
+  <p
+    class="mt-2 mb-4 js-page-limits-message"
+  >
+    This dashboard displays a maximum of 7 projects and 3 environments per project. 
+    <gl-link-stub
+      href="/help/user/operations_dashboard/index.html"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      
+          Read more.
+        
+    </gl-link-stub>
+  </p>
    
   <div
     class="prepend-top-default"

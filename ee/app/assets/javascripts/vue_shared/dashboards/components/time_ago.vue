@@ -26,7 +26,7 @@ export default {
       return this.tooltipTitle(this.time);
     },
     formattedTime() {
-      return this.timeFormated(this.time);
+      return this.timeFormatted(this.time);
     },
   },
 };

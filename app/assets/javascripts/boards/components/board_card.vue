@@ -13,29 +13,36 @@ export default {
     list: {
       type: Object,
       default: () => ({}),
+      required: false,
     },
     issue: {
       type: Object,
       default: () => ({}),
+      required: false,
     },
     issueLinkBase: {
       type: String,
       default: '',
+      required: false,
     },
     disabled: {
       type: Boolean,
       default: false,
+      required: false,
     },
     index: {
       type: Number,
       default: 0,
+      required: false,
     },
     rootPath: {
       type: String,
       default: '',
+      required: false,
     },
     groupId: {
       type: Number,
+      required: false,
     },
   },
   data() {
@@ -65,11 +72,12 @@ export default {
     },
     showIssue(e) {
       if (e.target.classList.contains('js-no-trigger')) return;
-      if (this.showDetail) {
-        this.showDetail = false;
 
-        // If CMD or CTRL is clicked
-        const isMultiSelect = this.canMultiSelect && (e.ctrlKey || e.metaKey);
+      // If CMD or CTRL is clicked
+      const isMultiSelect = this.canMultiSelect && (e.ctrlKey || e.metaKey);
+
+      if (this.showDetail || isMultiSelect) {
+        this.showDetail = false;
 
         if (boardsStore.detail.issue && boardsStore.detail.issue.id === this.issue.id) {
           eventHub.$emit('clearDetailIssue', isMultiSelect);

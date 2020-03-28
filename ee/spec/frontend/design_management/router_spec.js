@@ -4,6 +4,11 @@ import App from 'ee/design_management/components/app.vue';
 import Designs from 'ee/design_management/pages/index.vue';
 import DesignDetail from 'ee/design_management/pages/design/index.vue';
 import createRouter from 'ee/design_management/router';
+import {
+  ROOT_ROUTE_NAME,
+  DESIGNS_ROUTE_NAME,
+  DESIGN_ROUTE_NAME,
+} from 'ee/design_management/router/constants';
 import '~/commons/bootstrap';
 
 jest.mock('mousetrap', () => ({
@@ -50,30 +55,34 @@ describe('Design management router', () => {
     window.location.hash = '';
   });
 
-  describe('root', () => {
+  describe.each([['/'], [{ name: ROOT_ROUTE_NAME }]])('root route', pushArg => {
     it('pushes home component', () => {
-      router.push('/');
+      router.push(pushArg);
 
       expect(vm.find(Designs).exists()).toBe(true);
     });
   });
 
-  describe('designs', () => {
+  describe.each([['/designs'], [{ name: DESIGNS_ROUTE_NAME }]])('designs route', pushArg => {
     it('pushes designs root component', () => {
-      router.push('/designs');
+      router.push(pushArg);
 
       expect(vm.find(Designs).exists()).toBe(true);
     });
   });
 
-  describe('designs detail', () => {
-    it('pushes designs detail component', () => {
-      router.push('/designs/1');
+  describe.each([['/designs/1'], [{ name: DESIGN_ROUTE_NAME, params: { id: '1' } }]])(
+    'designs detail route',
+    pushArg => {
+      it('pushes designs detail component', () => {
+        router.push(pushArg);
 
-      const detail = vm.find(DesignDetail);
-
-      expect(detail.exists()).toBe(true);
-      expect(detail.props('id')).toEqual('1');
-    });
-  });
+        return vm.vm.$nextTick().then(() => {
+          const detail = vm.find(DesignDetail);
+          expect(detail.exists()).toBe(true);
+          expect(detail.props('id')).toEqual('1');
+        });
+      });
+    },
+  );
 });

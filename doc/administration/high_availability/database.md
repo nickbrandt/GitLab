@@ -22,11 +22,9 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 1. Configure the GitLab application servers with the appropriate details.
    This step is covered in [Configuring GitLab for HA](gitlab.md).
 
-## PostgreSQL in a Scaled Environment
+## PostgreSQL in a Scaled and Highly Available Environment
 
-This section is relevant for [Scaled Architecture](README.md#scalable-architecture-examples)
-environments including [Basic Scaling](README.md#basic-scaling) and
-[Full Scaling](README.md#full-scaling).
+This section is relevant for [Scalable and Highly Available Setups](README.md).
 
 ### Provide your own PostgreSQL instance **(CORE ONLY)**
 
@@ -46,7 +44,7 @@ deploy the bundled PostgreSQL.
    and confirmation. Use the value that is output by this command in the next
    step as the value of `POSTGRESQL_PASSWORD_HASH`.
 
-   ```sh
+   ```shell
    sudo gitlab-ctl pg-password-md5 gitlab
    ```
 
@@ -93,23 +91,6 @@ deploy the bundled PostgreSQL.
 
 Advanced configuration options are supported and can be added if
 needed.
-
-Continue configuration of other components by going
-[back to Scaled Architectures](README.md#scalable-architecture-examples)
-
-## PostgreSQL with High Availability
-
-This section is relevant for [High Availability Architecture](README.md#high-availability-architecture-examples)
-environments including [Horizontal](README.md#horizontal),
-[Hybrid](README.md#hybrid), and
-[Fully Distributed](README.md#fully-distributed).
-
-### Provide your own PostgreSQL instance **(CORE ONLY)**
-
-If you want to use your own deployed PostgreSQL instance(s),
-see [Provide your own PostgreSQL instance](#provide-your-own-postgresql-instance-core-only)
-for more details. However, you can use the GitLab Omnibus package to easily
-deploy the bundled PostgreSQL.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 
@@ -165,7 +146,7 @@ Each service in the package comes with a set of [default ports](https://docs.git
 - Application servers connect to either PgBouncer directly via its [default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#pgbouncer) or via a configured Internal Load Balancer (TCP) that serves multiple PgBouncers.
 - PgBouncer connects to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
 - Repmgr connects to the database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
-- Postgres secondaries connect to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
+- PostgreSQL secondaries connect to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
 - Consul servers and agents connect to each others [Consul default ports](https://docs.gitlab.com/omnibus/package-information/defaults.html#consul)
 
 #### Required information
@@ -182,7 +163,7 @@ Similarly, PostgreSQL access is controlled based on the network source.
 This is why you will need:
 
 - IP address of each nodes network interface. This can be set to `0.0.0.0` to
-  listen on all interfaces. It cannot be set to the loopack address `127.0.0.1`.
+  listen on all interfaces. It cannot be set to the loopback address `127.0.0.1`.
 - Network Address. This can be in subnet (i.e. `192.168.0.0/255.255.255.0`)
   or CIDR (i.e. `192.168.0.0/24`) form.
 
@@ -202,7 +183,7 @@ When using default setup, minimum configuration requires:
 - `CONSUL_PASSWORD_HASH`. This is a hash generated out of Consul username/password pair.
    Can be generated with:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl pg-password-md5 CONSUL_USERNAME
    ```
 
@@ -229,7 +210,7 @@ available database connections.
 
 In this document we are assuming 3 database nodes, which makes this configuration:
 
-```
+```ruby
 postgresql['max_wal_senders'] = 4
 ```
 
@@ -245,7 +226,7 @@ We will need the following password information for the application's database u
 - `POSTGRESQL_PASSWORD_HASH`. This is a hash generated out of the username/password pair.
   Can be generated with:
 
-  ```sh
+  ```shell
   sudo gitlab-ctl pg-password-md5 POSTGRESQL_USERNAME
   ```
 
@@ -258,7 +239,7 @@ When using default setup, minimum configuration requires:
 - `PGBOUNCER_PASSWORD_HASH`. This is a hash generated out of PgBouncer username/password pair.
   Can be generated with:
 
-  ```sh
+  ```shell
   sudo gitlab-ctl pg-password-md5 PGBOUNCER_USERNAME
   ```
 
@@ -352,7 +333,7 @@ When installing the GitLab package, do not supply `EXTERNAL_URL` value.
    to inform `gitlab-ctl` that they are standby nodes initially and it need not
    attempt to register them as primary node
 
-   ```
+   ```ruby
    # HA setting to specify if a node should attempt to be master on initialization
    repmgr['master_on_initialization'] = false
    ```
@@ -376,13 +357,13 @@ Select one node as a primary node.
 
 1. Open a database prompt:
 
-   ```sh
+   ```shell
    gitlab-psql -d gitlabhq_production
    ```
 
 1. Enable the `pg_trgm` extension:
 
-   ```sh
+   ```shell
    CREATE EXTENSION pg_trgm;
    ```
 
@@ -390,19 +371,19 @@ Select one node as a primary node.
 
 1. Verify the cluster is initialized with one node:
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr cluster show
    ```
 
    The output should be similar to the following:
 
-   ```
+   ```plaintext
    Role      | Name     | Upstream | Connection String
    ----------+----------|----------|----------------------------------------
    * master  | HOSTNAME |          | host=HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
    ```
 
-1. Note down the hostname/ip in the connection string: `host=HOSTNAME`. We will
+1. Note down the hostname or IP address in the connection string: `host=HOSTNAME`. We will
    refer to the hostname in the next section as `MASTER_NODE_NAME`. If the value
    is not an IP address, it will need to be a resolvable name (via DNS or
    `/etc/hosts`)
@@ -411,7 +392,7 @@ Select one node as a primary node.
 
 1. Set up the repmgr standby:
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr standby setup MASTER_NODE_NAME
    ```
 
@@ -436,13 +417,13 @@ Select one node as a primary node.
 
 1. Verify the node now appears in the cluster:
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr cluster show
    ```
 
    The output should be similar to the following:
 
-   ```
+   ```plaintext
    Role      | Name    | Upstream  | Connection String
    ----------+---------|-----------|------------------------------------------------
    * master  | MASTER  |           | host=MASTER_NODE_NAME user=gitlab_repmgr dbname=gitlab_repmgr
@@ -457,13 +438,13 @@ Before moving on, make sure the databases are configured correctly. Run the
 following command on the **primary** node to verify that replication is working
 properly:
 
-```sh
+```shell
 gitlab-ctl repmgr cluster show
 ```
 
 The output should be similar to:
 
-```
+```plaintext
 Role      | Name         | Upstream     | Connection String
 ----------+--------------|--------------|--------------------------------------------------------------------
 * master  | MASTER  |        | host=MASTER port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
@@ -475,7 +456,7 @@ If the 'Role' column for any node says "FAILED", check the
 
 Also, check that the check master command works successfully on each node:
 
-```sh
+```shell
 su - gitlab-consul
 gitlab-ctl repmgr-check-master || echo 'This node is a standby repmgr node'
 ```
@@ -512,7 +493,7 @@ attributes set, but the following need to be set.
 
 Ensure that all migrations ran:
 
-```sh
+```shell
 gitlab-rake gitlab:db:configure
 ```
 
@@ -554,7 +535,7 @@ Here is a list and description of each machine and the assigned IP:
 - `10.6.0.33`: PostgreSQL secondary
 - `10.6.0.41`: GitLab application
 
-All passwords are set to `toomanysecrets`, please do not use this password or derived hashes and the external_url for GitLab is `http://gitlab.example.com`.
+All passwords are set to `toomanysecrets`, please do not use this password or derived hashes and the `external_url` for GitLab is `http://gitlab.example.com`.
 
 Please note that after the initial configuration, if a failover occurs, the PostgresSQL master will change to one of the available secondaries until it is failed back.
 
@@ -652,7 +633,7 @@ On secondary nodes, edit `/etc/gitlab/gitlab.rb` and add all the configuration
 added to primary node, noted above. In addition, append the following
 configuration:
 
-```
+```ruby
 # HA setting to specify if a node should attempt to be master on initialization
 repmgr['master_on_initialization'] = false
 ```
@@ -702,11 +683,11 @@ After deploying the configuration follow these steps:
 
    Enable the `pg_trgm` extension
 
-   ```sh
+   ```shell
    gitlab-psql -d gitlabhq_production
    ```
 
-   ```
+   ```shell
    CREATE EXTENSION pg_trgm;
    ```
 
@@ -714,7 +695,7 @@ After deploying the configuration follow these steps:
 
    Make this node a standby of the primary
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr standby setup 10.6.0.21
    ```
 
@@ -722,7 +703,7 @@ After deploying the configuration follow these steps:
 
    Make this node a standby of the primary
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr standby setup 10.6.0.21
    ```
 
@@ -730,13 +711,13 @@ After deploying the configuration follow these steps:
 
    Set `gitlab-consul` user's PgBouncer password to `toomanysecrets`
 
-   ```sh
+   ```shell
    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
    ```
 
    Run database migrations
 
-   ```sh
+   ```shell
    gitlab-rake gitlab:db:configure
    ```
 
@@ -758,7 +739,7 @@ Here is a list and description of each machine and the assigned IP:
 
 All passwords are set to `toomanysecrets`, please do not use this password or derived hashes.
 
-The external_url for GitLab is `http://gitlab.example.com`
+The `external_url` for GitLab is `http://gitlab.example.com`
 
 Please note that after the initial configuration, if a failover occurs, the PostgresSQL master will change to one of the available secondaries until it is failed back.
 
@@ -804,7 +785,7 @@ consul['configuration'] = {
 On secondary nodes, edit `/etc/gitlab/gitlab.rb` and add all the information added
 to primary node, noted above. In addition, append the following configuration
 
-```
+```ruby
 # HA setting to specify if a node should attempt to be master on initialization
 repmgr['master_on_initialization'] = false
 ```
@@ -863,7 +844,7 @@ If you need to failover manually, you have two options:
 
 Run:
 
-```sh
+```shell
 gitlab-ctl stop postgresql
 ```
 
@@ -875,14 +856,14 @@ standby nodes.
 1. Ensure the old master node is not still active.
 1. Login to the server that should become the new master and run:
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr standby promote
    ```
 
 1. If there are any other standby servers in the cluster, have them follow
    the new master server:
 
-   ```sh
+   ```shell
    gitlab-ctl repmgr standby follow NEW_MASTER
    ```
 
@@ -891,10 +872,11 @@ standby nodes.
 If a node fails, it can be removed from the cluster, or added back as a standby
 after it has been restored to service.
 
-- If you want to remove the node from the cluster, on any other node in the
-  cluster, run:
+##### Remove a standby from the cluster
 
-  ```sh
+  From any other node in the cluster, run:
+
+  ```shell
   gitlab-ctl repmgr standby unregister --node=X
   ```
 
@@ -902,25 +884,27 @@ after it has been restored to service.
 
   To find this, you can use:
 
-  ```sh
+  ```shell
   awk -F = '$1 == "node" { print $2 }' /var/opt/gitlab/postgresql/repmgr.conf
   ```
 
   It will output something like:
 
-  ```
+  ```plaintext
   959789412
   ```
 
-  Then you will use this id to unregister the node:
+  Then you will use this ID to unregister the node:
 
-  ```sh
+  ```shell
   gitlab-ctl repmgr standby unregister --node=959789412
   ```
 
-- To add the node as a standby server:
+##### Add a node as a standby server
 
-  ```sh
+  From the stnadby node, run:
+
+  ```shell
   gitlab-ctl repmgr standby follow NEW_MASTER
   gitlab-ctl restart repmgrd
   ```
@@ -930,6 +914,28 @@ after it has been restored to service.
   If there are any clients that are still attempting to write to the old master,
   this will cause a split, and the old master will need to be resynced from
   scratch by performing a `gitlab-ctl repmgr standby setup NEW_MASTER`.
+
+##### Add a failed master back into the cluster as a standby node
+
+  Once `repmgrd` and PostgreSQL are runnning, the node will need to follow the new
+  as a standby node.
+
+  ```shell
+  gitlab-ctl repmgr standby follow NEW_MASTER
+  ```
+
+  Once the node is following the new master as a standby, the node needs to be
+  [unregistered from the cluster on the new master node](#remove-a-standby-from-the-cluster).
+
+  Once the old master node has been unregistered from the cluster, it will need
+  to be setup as a new standby:
+
+  ```shell
+  gitlab-ctl repmgr standby setup NEW_MASTER
+  ```
+
+  Failure to unregister and readd the old master node can lead to subsequent failovers
+  not working.
 
 #### Alternate configurations
 
@@ -963,7 +969,7 @@ repmgr['trust_auth_cidr_addresses'] = %w(192.168.1.44/32 db2.example.com)
 ##### MD5 Authentication
 
 If you are running on an untrusted network, repmgr can use md5 authentication
-with a [.pgpass file](https://www.postgresql.org/docs/9.6/libpq-pgpass.html)
+with a [`.pgpass` file](https://www.postgresql.org/docs/9.6/libpq-pgpass.html)
 to authenticate.
 
 You can specify by IP address, FQDN, or by subnet, using the same format as in
@@ -972,7 +978,7 @@ the previous section:
 1. On the current master node, create a password for the `gitlab` and
    `gitlab_repmgr` user:
 
-   ```sh
+   ```shell
    gitlab-psql -d template1
    template1=# \password gitlab_repmgr
    Enter password: ****
@@ -992,7 +998,7 @@ the previous section:
    1. Create a `.pgpass` file. Enter the `gitlab_repmgr` password twice to
       when asked:
 
-      ```sh
+      ```shell
       gitlab-ctl write-pgpass --user gitlab_repmgr --hostuser gitlab-psql --database '*'
       ```
 
@@ -1052,7 +1058,7 @@ Now there should not be errors. If errors still occur then there is another prob
 You may get this error when running `gitlab-rake gitlab:db:configure` or you
 may see the error in the PgBouncer log file.
 
-```
+```plaintext
 PG::ConnectionBad: ERROR:  pgbouncer cannot connect to server
 ```
 
@@ -1063,13 +1069,13 @@ You can confirm that this is the issue by checking the PostgreSQL log on the mas
 database node. If you see the following error then `trust_auth_cidr_addresses`
 is the problem.
 
-```
+```plaintext
 2018-03-29_13:59:12.11776 FATAL:  no pg_hba.conf entry for host "123.123.123.123", user "pgbouncer", database "gitlabhq_production", SSL off
 ```
 
 To fix the problem, add the IP address to `/etc/gitlab/gitlab.rb`.
 
-```
+```ruby
 postgresql['trust_auth_cidr_addresses'] = %w(123.123.123.123/32 <other_cidrs>)
 ```
 

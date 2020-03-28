@@ -11,7 +11,7 @@ module EE
       def branch_change_hooks
         super
 
-        return unless jira_subscription_exists?
+        return unless project.jira_subscription_exists?
 
         branch_to_sync = branch_name if Atlassian::JiraIssueKeyExtractor.has_keys?(branch_name)
         commits_to_sync = limited_commits.select { |commit| Atlassian::JiraIssueKeyExtractor.has_keys?(commit.safe_message) }.map(&:sha)
@@ -19,12 +19,6 @@ module EE
         if branch_to_sync || commits_to_sync.any?
           JiraConnect::SyncBranchWorker.perform_async(project.id, branch_to_sync, commits_to_sync)
         end
-      end
-
-      def jira_subscription_exists?
-        ::Feature.enabled?(:jira_connect_app) &&
-          project.feature_available?(:jira_dev_panel_integration) &&
-          JiraConnectSubscription.for_project(project).exists?
       end
 
       override :pipeline_options

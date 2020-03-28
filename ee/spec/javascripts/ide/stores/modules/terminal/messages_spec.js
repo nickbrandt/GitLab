@@ -1,8 +1,8 @@
 import _ from 'underscore';
-import { sprintf } from '~/locale';
-import httpStatus from '~/lib/utils/http_status';
 import { TEST_HOST } from 'spec/test_constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
+import { sprintf } from '~/locale';
+import httpStatus from '~/lib/utils/http_status';
 
 const TEST_HELP_URL = `${TEST_HOST}/help`;
 

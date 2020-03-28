@@ -18,6 +18,8 @@ describe Snippet do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:notes).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:user_mentions).class_name("SnippetUserMention") }
+    it { is_expected.to have_one(:snippet_repository) }
   end
 
   describe 'validation' do
@@ -31,6 +33,62 @@ describe Snippet do
     it { is_expected.to validate_presence_of(:content) }
 
     it { is_expected.to validate_inclusion_of(:visibility_level).in_array(Gitlab::VisibilityLevel.values) }
+
+    it do
+      allow(Gitlab::CurrentSettings).to receive(:snippet_size_limit).and_return(1)
+
+      is_expected
+        .to validate_length_of(:content)
+              .is_at_most(Gitlab::CurrentSettings.snippet_size_limit)
+              .with_message("is too long (2 Bytes). The maximum size is 1 Byte.")
+    end
+
+    context 'content validations' do
+      context 'with existing snippets' do
+        let(:snippet) { create(:personal_snippet, content: 'This is a valid content at the time of creation') }
+
+        before do
+          expect(snippet).to be_valid
+
+          stub_application_setting(snippet_size_limit: 2)
+        end
+
+        it 'does not raise a validation error if the content is not changed' do
+          snippet.title = 'new title'
+
+          expect(snippet).to be_valid
+        end
+
+        it 'raises and error if the content is changed and the size is bigger than limit' do
+          snippet.content = snippet.content + "test"
+
+          expect(snippet).not_to be_valid
+        end
+      end
+
+      context 'with new snippets' do
+        let(:limit) { 15 }
+
+        before do
+          stub_application_setting(snippet_size_limit: limit)
+        end
+
+        it 'is valid when content is smaller than the limit' do
+          snippet = build(:personal_snippet, content: 'Valid Content')
+
+          expect(snippet).to be_valid
+        end
+
+        it 'raises error when content is bigger than setting limit' do
+          snippet = build(:personal_snippet, content: 'This is an invalid content')
+
+          aggregate_failures do
+            expect(snippet).not_to be_valid
+            expect(snippet.errors[:content]).to include("is too long (#{snippet.content.size} Bytes). The maximum size is #{limit} Bytes.")
+          end
+        end
+      end
+    end
   end
 
   describe '#to_reference' do
@@ -84,13 +142,14 @@ describe Snippet do
 
   describe "#content_html_invalidated?" do
     let(:snippet) { create(:snippet, content: "md", content_html: "html", file_name: "foo.md") }
+
     it "invalidates the HTML cache of content when the filename changes" do
       expect { snippet.file_name = "foo.rb" }.to change { snippet.content_html_invalidated? }.from(false).to(true)
     end
   end
 
   describe '.search' do
-    let(:snippet) { create(:snippet, title: 'test snippet') }
+    let(:snippet) { create(:snippet, title: 'test snippet', description: 'description') }
 
     it 'returns snippets with a matching title' do
       expect(described_class.search(snippet.title)).to eq([snippet])
@@ -114,6 +173,10 @@ describe Snippet do
 
     it 'returns snippets with a matching file name regardless of the casing' do
       expect(described_class.search(snippet.file_name.upcase)).to eq([snippet])
+    end
+
+    it 'returns snippets with a matching description' do
+      expect(described_class.search(snippet.description)).to eq([snippet])
     end
   end
 
@@ -452,6 +515,32 @@ describe Snippet do
     end
   end
 
+  describe '#blobs' do
+    let(:snippet) { create(:snippet) }
+
+    context 'when repository does not exist' do
+      it 'returns empty array' do
+        expect(snippet.blobs).to be_empty
+      end
+    end
+
+    context 'when repository exists' do
+      let(:snippet) { create(:snippet, :repository) }
+
+      it 'returns array of blobs' do
+        expect(snippet.blobs).to all(be_a(Blob))
+      end
+    end
+
+    it 'returns a blob representing the snippet data' do
+      blob = snippet.blob
+
+      expect(blob).to be_a(Blob)
+      expect(blob.path).to eq(snippet.file_name)
+      expect(blob.data).to eq(snippet.content)
+    end
+  end
+
   describe '#to_json' do
     let(:snippet) { build(:snippet) }
 
@@ -465,6 +554,211 @@ describe Snippet do
 
     def to_json(params = {})
       snippet.to_json(params)
+    end
+  end
+
+  describe '#storage' do
+    let(:snippet) { create(:snippet) }
+
+    it "stores snippet in #{Storage::Hashed::SNIPPET_REPOSITORY_PATH_PREFIX} dir" do
+      expect(snippet.storage.disk_path).to start_with Storage::Hashed::SNIPPET_REPOSITORY_PATH_PREFIX
+    end
+  end
+
+  describe '#track_snippet_repository' do
+    let(:snippet) { create(:snippet) }
+    let(:shard_name) { 'foo' }
+
+    subject { snippet.track_snippet_repository(shard_name) }
+
+    context 'when a snippet repository entry does not exist' do
+      it 'creates a new entry' do
+        expect { subject }.to change(snippet, :snippet_repository)
+      end
+
+      it 'tracks the snippet storage location' do
+        subject
+
+        expect(snippet.snippet_repository).to have_attributes(
+          disk_path: snippet.disk_path,
+          shard_name: shard_name
+        )
+      end
+    end
+
+    context 'when a tracking entry exists' do
+      let!(:snippet) { create(:snippet, :repository) }
+      let(:snippet_repository) { snippet.snippet_repository }
+      let(:shard_name) { 'bar' }
+
+      it 'does not create a new entry in the database' do
+        expect { subject }.not_to change(snippet, :snippet_repository)
+      end
+
+      it 'updates the snippet storage location' do
+        allow(snippet).to receive(:disk_path).and_return('fancy/new/path')
+
+        subject
+
+        expect(snippet.snippet_repository).to have_attributes(
+          disk_path: 'fancy/new/path',
+          shard_name: shard_name
+        )
+      end
+    end
+  end
+
+  describe '#create_repository' do
+    let(:snippet) { create(:snippet) }
+
+    subject { snippet.create_repository }
+
+    it 'creates the repository' do
+      expect(snippet.repository).to receive(:after_create).and_call_original
+
+      expect(subject).to be_truthy
+      expect(snippet.repository.exists?).to be_truthy
+    end
+
+    it 'tracks snippet repository' do
+      expect do
+        subject
+      end.to change(SnippetRepository, :count).by(1)
+    end
+
+    it 'sets same shard in snippet repository as in the repository storage' do
+      expect(snippet).to receive(:repository_storage).and_return('picked')
+      expect(snippet).to receive(:repository_exists?).and_return(false)
+      expect(snippet.repository).to receive(:create_if_not_exists)
+
+      subject
+
+      expect(snippet.snippet_repository.shard_name).to eq 'picked'
+    end
+
+    context 'when repository exists' do
+      let!(:snippet) { create(:snippet, :repository) }
+
+      it 'does not try to create repository' do
+        expect(snippet.repository).not_to receive(:after_create)
+
+        expect(snippet.create_repository).to be_nil
+      end
+
+      context 'when snippet_repository exists' do
+        it 'does not create a new snippet repository' do
+          expect do
+            snippet.create_repository
+          end.not_to change(SnippetRepository, :count)
+        end
+      end
+
+      context 'when snippet_repository does not exist' do
+        it 'creates a snippet_repository' do
+          snippet.snippet_repository.destroy
+          snippet.reload
+
+          expect do
+            snippet.create_repository
+          end.to change(SnippetRepository, :count).by(1)
+        end
+      end
+    end
+  end
+
+  describe '#repository_storage' do
+    let(:snippet) { create(:snippet) }
+
+    subject { snippet.repository_storage }
+
+    before do
+      expect_next_instance_of(ApplicationSetting) do |instance|
+        expect(instance).to receive(:pick_repository_storage).and_return('picked')
+      end
+    end
+
+    it 'returns repository storage from ApplicationSetting' do
+      expect(described_class).to receive(:pick_repository_storage).and_call_original
+
+      expect(subject).to eq 'picked'
+    end
+
+    context 'when snippet_project is already created' do
+      let!(:snippet_repository) { create(:snippet_repository, snippet: snippet) }
+
+      before do
+        allow(snippet_repository).to receive(:shard_name).and_return('foo')
+      end
+
+      it 'returns repository_storage from snippet_project' do
+        expect(subject).to eq 'foo'
+      end
+    end
+  end
+
+  describe '#can_cache_field?' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:snippet) { create(:snippet, file_name: file_name) }
+
+    subject { snippet.can_cache_field?(field) }
+
+    where(:field, :file_name, :result) do
+      :title       | nil           | true
+      :title       | 'foo.bar'     | true
+      :description | nil           | true
+      :description | 'foo.bar'     | true
+      :content     | nil           | false
+      :content     | 'bar.foo'     | false
+      :content     | 'markdown.md' | true
+    end
+
+    with_them do
+      it { is_expected.to eq result }
+    end
+  end
+
+  describe '#url_to_repo' do
+    subject { snippet.url_to_repo }
+
+    context 'with personal snippet' do
+      let(:snippet) { create(:personal_snippet) }
+
+      it { is_expected.to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + "snippets/#{snippet.id}.git") }
+    end
+
+    context 'with project snippet' do
+      let(:snippet) { create(:project_snippet) }
+
+      it { is_expected.to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + "#{snippet.project.full_path}/snippets/#{snippet.id}.git") }
+    end
+  end
+
+  describe '#versioned_enabled_for?' do
+    let_it_be(:user) { create(:user) }
+
+    subject { snippet.versioned_enabled_for?(user) }
+
+    context 'with repository and version_snippets enabled' do
+      let!(:snippet) { create(:personal_snippet, :repository, author: user) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'without repository' do
+      let!(:snippet) { create(:personal_snippet, author: user) }
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'without version_snippets feature disabled' do
+      let!(:snippet) { create(:personal_snippet, :repository, author: user) }
+
+      before do
+        stub_feature_flags(version_snippets: false)
+      end
+
+      it { is_expected.to be_falsy }
     end
   end
 end

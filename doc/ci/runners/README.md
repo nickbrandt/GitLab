@@ -4,12 +4,12 @@ type: reference
 
 # Configuring GitLab Runners
 
-In GitLab CI, Runners run the code defined in [`.gitlab-ci.yml`](../yaml/README.md).
+In GitLab CI/CD, Runners run the code defined in [`.gitlab-ci.yml`](../yaml/README.md).
 They are isolated (virtual) machines that pick up jobs through the coordinator
-API of GitLab CI.
+API of GitLab CI/CD.
 
 A Runner can be specific to a certain project or serve any project
-in GitLab CI. A Runner that serves all projects is called a shared Runner.
+in GitLab CI/CD. A Runner that serves all projects is called a shared Runner.
 
 Ideally, the GitLab Runner should not be installed on the same machine as GitLab.
 Read the [requirements documentation](../../install/requirements.md#gitlab-runner)
@@ -62,13 +62,13 @@ You can only register a shared Runner if you are an admin of the GitLab instance
 
 1. Grab the shared-Runner token on the `admin/runners` page
 
-   ![Shared Runners admin area](img/shared_runners_admin.png)
+   ![Shared Runners Admin Area](img/shared_runners_admin.png)
 
 1. [Register the Runner][register]
 
 Shared Runners are enabled by default as of GitLab 8.2, but can be disabled
 with the **Disable shared Runners** button which is present under each project's
-**Settings ➔ CI/CD** page. Previous versions of GitLab defaulted shared
+**Settings > CI/CD** page. Previous versions of GitLab defaulted shared
 Runners to disabled.
 
 ## Registering a specific Runner
@@ -100,7 +100,7 @@ If you are an admin on your GitLab instance, you can turn any shared Runner into
 a specific one, but not the other way around. Keep in mind that this is a one
 way transition.
 
-1. Go to the Runners in the admin area **Overview > Runners** (`/admin/runners`)
+1. Go to the Runners in the **Admin Area > Overview > Runners** (`/admin/runners`)
    and find your Runner
 1. Enable any projects under **Restrict projects for this Runner** to be used
    with the Runner
@@ -156,7 +156,7 @@ An admin can enable/disable a specific Runner for projects:
 
 ## Protected Runners
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/13194) in GitLab 10.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13194) in GitLab 10.0.
 
 You can protect Runners from revealing sensitive information.
 Whenever a Runner is protected, the Runner picks only jobs created on
@@ -195,11 +195,11 @@ We have following jobs in queue:
 
 With the fair usage algorithm jobs are assigned in following order:
 
-1. Job 1 is chosen first, because it has the lowest job number from projects with no running jobs (i.e. all projects)
+1. Job 1 is chosen first, because it has the lowest job number from projects with no running jobs (that is, all projects)
 1. Job 4 is next, because 4 is now the lowest job number from projects with no running jobs (Project 1 has a job running)
 1. Job 6 is next, because 6 is now the lowest job number from projects with no running jobs (Projects 1 and 2 have jobs running)
 1. Job 2 is next, because, of projects with the lowest number of jobs running (each has 1), it is the lowest job number
-1. Job 5 is next, because Project 1 now has 2 jobs running, and between Projects 2 and 3, Job 5 is the lowest remaining job number
+1. Job 5 is next, because Project 1 now has 2 jobs running and Job 5 is the lowest remaining job number between Projects 2 and 3.
 1. Lastly we choose Job 3... because it's the only job left
 
 ---
@@ -217,7 +217,7 @@ We have following jobs in queue:
 
 With the fair usage algorithm jobs are assigned in following order:
 
-1. Job 1 is chosen first, because it has the lowest job number from projects with no running jobs (i.e. all projects)
+1. Job 1 is chosen first, because it has the lowest job number from projects with no running jobs (that is, all projects)
 1. We finish job 1
 1. Job 2 is next, because, having finished Job 1, all projects have 0 jobs running again, and 2 is the lowest available job number
 1. Job 4 is next, because with Project 1 running a job, 4 is the lowest number from projects running no jobs (Projects 2 and 3)
@@ -307,7 +307,7 @@ Example 2:
 For each Runner you can specify a _maximum job timeout_. Such timeout,
 if smaller than [project defined timeout], will take the precedence. This
 feature can be used to prevent Shared Runner from being appropriated
-by a project by setting a ridiculous big timeout (e.g. one week).
+by a project by setting a ridiculous big timeout (for example, one week).
 
 When not configured, Runner will not override project timeout.
 
@@ -337,8 +337,8 @@ How this feature will work:
 ### Be careful with sensitive information
 
 With some [Runner Executors](https://docs.gitlab.com/runner/executors/README.html),
-if you can run a job on the Runner, you can get access to any code it runs
-and get the token of the Runner. With shared Runners, this means that anyone
+if you can run a job on the Runner, you can get full access to the file system,
+and thus any code it runs as well as the token of the Runner. With shared Runners, this means that anyone
 that runs jobs on the Runner, can access anyone else's code that runs on the
 Runner.
 
@@ -386,7 +386,7 @@ value of the new token.
 
 ## Determining the IP address of a Runner
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17286) in GitLab 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17286) in GitLab 10.6.
 
 It may be useful to know the IP address of a Runner so you can troubleshoot
 issues with that Runner. GitLab stores and displays the IP address by viewing
@@ -402,7 +402,7 @@ different places.
 To view the IP address of a shared Runner you must have admin access to
 the GitLab instance. To determine this:
 
-1. Visit **Admin area ➔ Overview ➔ Runners**
+1. Visit **Admin Area > Overview > Runners**
 1. Look for the Runner in the table and you should see a column for "IP Address"
 
 ![shared Runner IP address](img/shared_runner_ip_address.png)
@@ -411,7 +411,7 @@ the GitLab instance. To determine this:
 
 You can find the IP address of a Runner for a specific project by:
 
-1. Visit your project's **Settings ➔ CI/CD**
+1. Visit your project's **Settings > CI/CD**
 1. Find the Runner and click on it's ID which links you to the details page
 1. On the details page you should see a row for "IP Address"
 
@@ -422,4 +422,4 @@ You can find the IP address of a Runner for a specific project by:
 [register]: https://docs.gitlab.com/runner/register/
 [protected branches]: ../../user/project/protected_branches.md
 [protected tags]: ../../user/project/protected_tags.md
-[project defined timeout]: ../../user/project/pipelines/settings.html#timeout
+[project defined timeout]: ../pipelines/settings.md#timeout

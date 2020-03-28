@@ -9,30 +9,6 @@ describe ProjectsHelper do
     helper.instance_variable_set(:@project, project)
   end
 
-  describe '#project_incident_management_setting' do
-    context 'when incident_management_setting exists' do
-      let(:project_incident_management_setting) do
-        create(:project_incident_management_setting, project: project)
-      end
-
-      it 'return project_incident_management_setting' do
-        expect(helper.project_incident_management_setting).to(
-          eq(project_incident_management_setting)
-        )
-      end
-    end
-
-    context 'when incident_management_setting does not exist' do
-      it 'builds incident_management_setting' do
-        expect(helper.project_incident_management_setting.persisted?).to be(false)
-
-        expect(helper.project_incident_management_setting.send_email).to be(false)
-        expect(helper.project_incident_management_setting.create_issue).to be(true)
-        expect(helper.project_incident_management_setting.issue_template_key).to be(nil)
-      end
-    end
-  end
-
   describe 'default_clone_protocol' do
     context 'when gitlab.config.kerberos is enabled and user is logged in' do
       it 'returns krb5 as default protocol' do
@@ -128,30 +104,121 @@ describe ProjectsHelper do
     context 'project with pipeline' do
       subject { helper.project_security_dashboard_config(project, pipeline) }
 
+      it 'checks if first vulnerability class is enabled' do
+        expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project)
+
+        subject
+      end
+
+      context 'when first first class vulnerabilities is enabled for project' do
+        before do
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(true)
+        end
+
+        it 'checks if first vulnerability class is enabled' do
+          expect(subject[:vulnerabilities_export_endpoint]).to(
+            eq(
+              api_v4_projects_vulnerability_exports_path(id: project.id)
+            ))
+        end
+      end
+
+      context 'when first first class vulnerabilities is disabled for project' do
+        before do
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(false)
+        end
+
+        it 'checks if first vulnerability class is enabled' do
+          expect(subject).not_to have_key(:vulnerabilities_export_endpoint)
+        end
+      end
+
       it 'returns config containing pipeline details' do
         expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
 
-      context 'when new Vulnerability Findings API enabled' do
-        it 'returns new "vulnerability findings" endpoint paths' do
-          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
-          expect(subject[:vulnerabilities_summary_endpoint]).to(
-            eq(
-              summary_project_security_vulnerability_findings_path(project)
-            ))
+      it 'returns the "vulnerability findings" endpoint paths' do
+        expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
+        expect(subject[:vulnerabilities_summary_endpoint]).to(
+          eq(
+            summary_project_security_vulnerability_findings_path(project)
+          ))
+      end
+    end
+  end
+
+  describe '#get_project_nav_tabs' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:ability, :nav_tab) do
+      :read_dependencies               | :dependencies
+      :read_feature_flag               | :operations
+      :read_licenses                   | :licenses
+      :read_project_security_dashboard | :security
+      :read_threat_monitoring          | :threat_monitoring
+    end
+
+    with_them do
+      let(:project) { create(:project) }
+      let(:user)    { create(:user) }
+
+      before do
+        allow(helper).to receive(:can?) { false }
+      end
+
+      subject do
+        helper.send(:get_project_nav_tabs, project, user)
+      end
+
+      context 'when the feature is disabled' do
+        before do
+          allow(helper).to receive(:can?).with(user, ability, project).and_return(false)
+        end
+
+        it 'does not include the nav tab' do
+          is_expected.not_to include(nav_tab)
         end
       end
 
-      context 'when new Vulnerability Findings API disabled' do
+      context 'when threat monitoring is enabled' do
         before do
-          stub_feature_flags(first_class_vulnerabilities: false)
+          allow(helper).to receive(:can?).with(user, ability, project).and_return(true)
         end
 
-        it 'returns legacy "vulnerabilities" endpoint paths' do
-          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerabilities_path(project)
-          expect(subject[:vulnerabilities_summary_endpoint]).to eq summary_project_security_vulnerabilities_path(project)
+        it 'includes the nav tab' do
+          is_expected.to include(nav_tab)
         end
+      end
+    end
+  end
+
+  describe '#show_discover_project_security?' do
+    using RSpec::Parameterized::TableSyntax
+    let(:user) { create(:user) }
+
+    where(
+      ab_feature_enabled?: [true, false],
+      gitlab_com?: [true, false],
+       user?: [true, false],
+      created_at: [Time.mktime(2010, 1, 20), Time.mktime(2030, 1, 20)],
+      security_dashboard_feature_available?: [true, false],
+      can_admin_namespace?: [true, false]
+    )
+
+    with_them do
+      it 'returns the expected value' do
+        allow(::Gitlab).to receive(:com?) { gitlab_com? }
+        allow(user).to receive(:ab_feature_enabled?) { ab_feature_enabled? }
+        allow(helper).to receive(:current_user) { user? ? user : nil }
+        allow(user).to receive(:created_at) { created_at }
+        allow(project).to receive(:feature_available?) { security_dashboard_feature_available? }
+        allow(helper).to receive(:can?) { can_admin_namespace? }
+
+        expected_value = user? && created_at > DateTime.new(2019, 11, 1) && gitlab_com? &&
+                         ab_feature_enabled? && !security_dashboard_feature_available? && can_admin_namespace?
+
+        expect(helper.show_discover_project_security?(project)).to eq(expected_value)
       end
     end
   end

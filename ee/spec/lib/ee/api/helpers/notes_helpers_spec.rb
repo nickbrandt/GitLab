@@ -36,12 +36,18 @@ describe 'NotesHelpers' do
       stub_licensed_features(epics: true)
     end
 
-    it 'returns the expected epic' do
-      expect(subject.find_noteable(Group, parent_id, noteable_type, epic.id)).to eq(epic)
-    end
+    describe '#find_noteable' do
+      it 'returns the expected epic' do
+        allow(subject).to receive(:user_group).and_return(group)
 
-    it 'raises not found exception when epic does not belong to group' do
-      expect { subject.find_noteable(Group, other_group.id, noteable_type, epic.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(subject.find_noteable(noteable_type, epic.id)).to eq(epic)
+      end
+
+      it 'raises not found exception when epic does not belong to group' do
+        allow(subject).to receive(:user_group).and_return(other_group)
+
+        expect { subject.find_noteable(noteable_type, epic.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 end

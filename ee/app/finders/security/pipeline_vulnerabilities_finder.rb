@@ -24,13 +24,9 @@ module Security
     end
 
     def execute
-      reports = pipeline_reports
+      requested_reports = pipeline_reports.select { |report_type| requested_type?(report_type) }
 
-      return [] if reports.nil?
-
-      occurrences = reports.each_with_object([]) do |(type, report), occurrences|
-        next unless requested_type?(type)
-
+      occurrences = requested_reports.each_with_object([]) do |(type, report), occurrences|
         raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
 
         normalized_occurrences = normalize_report_occurrences(
@@ -41,7 +37,7 @@ module Security
         occurrences.concat(filtered_occurrences)
       end
 
-      sort_occurrences(occurrences)
+      Gitlab::Ci::Reports::Security::AggregatedReport.new(requested_reports.values, sort_occurrences(occurrences))
     end
 
     private
@@ -63,7 +59,7 @@ module Security
     end
 
     def pipeline_reports
-      pipeline&.security_reports&.reports
+      pipeline&.security_reports&.reports || {}
     end
 
     def vulnerabilities_by_finding_fingerprint(report_type, report)
@@ -77,6 +73,11 @@ module Security
       end
     end
 
+    # This finder is used for fetching vulnerabilities for any pipeline, if we used it to fetch
+    # vulnerabilities for a non-default-branch, the occurrences will be unpersisted, so we
+    # coerce the POROs into unpersisted AR records to give them a common object.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/33588#note_291849433 for more context
+    # on why this happens.
     def normalize_report_occurrences(report_occurrences, vulnerabilities)
       report_occurrences.map do |report_occurrence|
         occurrence_hash = report_occurrence.to_hash

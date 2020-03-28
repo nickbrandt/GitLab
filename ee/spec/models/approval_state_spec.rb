@@ -10,6 +10,7 @@ describe ApprovalState do
       case params.delete(:rule_type)
       when :code_owner then :code_owner_rule
       when :report_approver then :report_approver_rule
+      when :any_approver then :any_approver_rule
       else :approval_merge_request_rule
       end
 
@@ -56,37 +57,125 @@ describe ApprovalState do
       create_rule(users: committers)
     end
 
-    context 'when self approval is disabled' do
+    context 'when self approval is disabled on project level' do
       let(:merge_requests_author_approval) { false }
 
       it 'excludes authors' do
         expect(results).not_to include(merge_request.author)
       end
+
+      context 'when self approval is enabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_author_approval: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'excludes author' do
+          expect(results).not_to include(merge_request.author)
+        end
+      end
+
+      context 'when self approval is disabled on instance level' do
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+          stub_application_setting(prevent_merge_requests_author_approval: true)
+        end
+
+        it 'excludes authors' do
+          expect(results).not_to include(merge_request.author)
+        end
+      end
     end
 
-    context 'when self approval is enabled' do
+    context 'when self approval is enabled on project level' do
       let(:merge_requests_author_approval) { true }
 
       it 'includes author' do
         expect(results).to include(merge_request.author)
       end
-    end
 
-    context 'when committers approval is enabled' do
-      let(:merge_requests_author_approval) { true }
-      let(:merge_requests_disable_committers_approval) { false }
+      context 'when self approval is enabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_author_approval: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
 
-      it 'excludes committers' do
-        expect(results).to include(*committers)
+        it 'includes author' do
+          expect(results).to include(merge_request.author)
+        end
+      end
+
+      context 'when self approval is disabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_author_approval: true)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'excludes authors' do
+          expect(results).not_to include(merge_request.author)
+        end
       end
     end
 
-    context 'when committers approval is disabled' do
+    context 'when committers approval is enabled on project level' do
+      let(:merge_requests_author_approval) { true }
+      let(:merge_requests_disable_committers_approval) { false }
+
+      it 'includes committers' do
+        expect(results).to include(*committers)
+      end
+
+      context 'when committers approval is enabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_committers_approval: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'includes committers' do
+          expect(results).to include(*committers)
+        end
+      end
+
+      context 'when committers approval is disabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_committers_approval: true)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'excludes committers' do
+          expect(results).not_to include(*committers)
+        end
+      end
+    end
+
+    context 'when committers approval is disabled on project level' do
       let(:merge_requests_author_approval) { true }
       let(:merge_requests_disable_committers_approval) { true }
 
-      it 'includes committers' do
+      it 'excludes committers' do
         expect(results).not_to include(*committers)
+      end
+
+      context 'when committers approval is enabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_committers_approval: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'excludes committers' do
+          expect(results).not_to include(*committers)
+        end
+      end
+
+      context 'when committers approval is disabled on instance level' do
+        before do
+          stub_application_setting(prevent_merge_requests_committers_approval: true)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+        end
+
+        it 'excludes committers' do
+          expect(results).not_to include(*committers)
+        end
       end
     end
   end
@@ -98,39 +187,15 @@ describe ApprovalState do
     it { expect(subject.can_approve?(nil)).to be_falsey }
   end
 
-  context '#approval_rules_overwritten?' do
+  describe '#approval_rules_overwritten?' do
     context 'when approval rule on the merge request does not exist' do
       it 'returns false' do
         expect(subject.approval_rules_overwritten?).to eq(false)
       end
     end
 
-    context 'when approval rule on the merge request exists' do
-      before do
-        create(:approval_merge_request_rule, merge_request: merge_request, users: approvers)
-      end
-
-      context 'without approvers' do
-        let(:approvers) { [] }
-
-        it 'returns false' do
-          expect(subject.approval_rules_overwritten?).to eq(false)
-        end
-      end
-
-      context 'with approvers' do
-        let(:approvers) { [create(:user)] }
-
-        it 'returns true' do
-          expect(subject.approval_rules_overwritten?).to eq(true)
-        end
-      end
-    end
-
-    context 'when `approvals_before_merge` is set on a merge request' do
-      before do
-        merge_request.update!(approvals_before_merge: 7)
-      end
+    context 'when merge request has any approver rule' do
+      let!(:any_approver_rule) { create(:any_approver_rule, merge_request: merge_request) }
 
       it 'returns true' do
         expect(subject.approval_rules_overwritten?).to eq(true)
@@ -140,6 +205,7 @@ describe ApprovalState do
         before do
           project.update!(disable_overriding_approvers_per_merge_request: true)
         end
+
         it 'returns true' do
           expect(subject.approval_rules_overwritten?).to eq(false)
         end
@@ -181,8 +247,8 @@ describe ApprovalState do
       end
 
       context 'when overall approvals required is not zero' do
-        before do
-          project.update!(approvals_before_merge: 1)
+        let!(:any_approver_rule) do
+          create(:approval_project_rule, project: project, rule_type: :any_approver, approvals_required: 1)
         end
 
         it 'returns true' do
@@ -244,9 +310,9 @@ describe ApprovalState do
         end
       end
 
-      shared_examples_for 'checking fallback_approvals_required' do
-        before do
-          project.update!(approvals_before_merge: 1)
+      shared_examples_for 'checking any_approver rule' do
+        let!(:any_approver_rule) do
+          create(:approval_project_rule, project: project, rule_type: :any_approver, approvals_required: 1)
         end
 
         context 'when it is not met' do
@@ -265,7 +331,7 @@ describe ApprovalState do
       end
 
       context 'when no rules' do
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when only code owner rules present' do
@@ -274,7 +340,7 @@ describe ApprovalState do
         end
 
         it_behaves_like 'when rules are present'
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when only report approver rules present' do
@@ -283,12 +349,11 @@ describe ApprovalState do
         end
 
         it_behaves_like 'when rules are present'
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when regular rules present' do
         before do
-          project.update!(approvals_before_merge: 999)
           2.times { create_rule(users: [create(:user)]) }
         end
 
@@ -301,40 +366,6 @@ describe ApprovalState do
           create_rule(users: [create(:user)], approvals_required: 1)
 
           expect(subject.approved?).to eq(true)
-        end
-      end
-    end
-
-    describe '#any_approver_allowed?' do
-      context 'when no rules' do
-        it 'returns true' do
-          expect(subject.any_approver_allowed?).to eq(true)
-        end
-      end
-
-      context 'when with rules' do
-        before do
-          create_rule(approvals_required: 1, users: [approver1])
-        end
-
-        context 'when approved' do
-          before do
-            allow(subject).to receive(:approved?).and_return(true)
-          end
-
-          it 'returns true' do
-            expect(subject.any_approver_allowed?).to eq(true)
-          end
-        end
-
-        context 'when not approved' do
-          before do
-            allow(subject).to receive(:approved?).and_return(false)
-          end
-
-          it 'returns false' do
-            expect(subject.approved?).to eq(false)
-          end
         end
       end
     end
@@ -380,6 +411,15 @@ describe ApprovalState do
       end
     end
 
+    describe '#approvals_required' do
+      it "correctly sums the approvals" do
+        create_rule(approvals_required: 3)
+        create_rule(approvals_required: 10)
+
+        expect(subject.approvals_required).to eq(13)
+      end
+    end
+
     describe '#approvers' do
       it 'includes all approvers, including code owner and group members' do
         create_rule(users: [approver1])
@@ -394,7 +434,7 @@ describe ApprovalState do
     end
 
     describe '#filtered_approvers' do
-      describe 'only direct users, without code owners or report_approvers' do
+      describe 'only direct users, without code owners' do
         it 'includes only rule user members' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
@@ -402,28 +442,8 @@ describe ApprovalState do
           create_rule(users: [approver3], rule_type: :report_approver)
 
           expect(
-            subject.filtered_approvers(code_owner: false, report_approver: false, target: :users)
-          ).to contain_exactly(approver1)
-        end
-      end
-
-      describe 'only code owners' do
-        it 'includes only code owners' do
-          create_rule(users: [approver1])
-          create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], rule_type: :code_owner)
-
-          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
-        end
-      end
-
-      describe 'only report approvers' do
-        it 'includes only report approvers' do
-          create_rule(users: [approver1])
-          create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], rule_type: :report_approver)
-
-          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
+            subject.filtered_approvers(code_owner: false, target: :users)
+          ).to contain_exactly(approver1, approver3)
         end
       end
 
@@ -470,12 +490,6 @@ describe ApprovalState do
           it 'allows the author to approve the MR if within the approvers list' do
             expect(subject.can_approve?(author)).to be_truthy
           end
-
-          it 'does not allow the author to approve the MR if not within the approvers list' do
-            allow(subject).to receive(:approvers).and_return([])
-
-            expect(subject.can_approve?(author)).to be_falsey
-          end
         end
 
         context 'when authors are not authorized to approve their own MRs' do
@@ -502,16 +516,12 @@ describe ApprovalState do
       let(:reporter) { create_project_member(:reporter) }
       let(:stranger) { create(:user) }
 
-      context 'when there are no approval rules' do
-        before do
-          project.update!(approvals_before_merge: 1)
+      context 'when there are no regular approval rules' do
+        let!(:any_approver_rule) do
+          create(:approval_project_rule, project: project, rule_type: :any_approver, approvals_required: 1)
         end
 
         it_behaves_like 'a MR that all members with write access can approve'
-
-        it 'has fallback rules apply' do
-          expect(subject.use_fallback?).to be_truthy
-        end
 
         it 'requires one approval' do
           expect(subject.approvals_left).to eq(1)
@@ -659,14 +669,10 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1, users: []) }
+        let!(:any_approver_rule) { create_rule(rule_type: :any_approver, approvals_required: 1) }
+        let!(:rule) { create_rule(approvals_required: 1, users: [author]) }
 
         context 'when that approver is the MR author' do
-          before do
-            project.update!(approvals_before_merge: 2)
-            rule.users << author
-          end
-
           it_behaves_like 'authors self-approval authorization'
 
           it_behaves_like 'a MR that all members with write access can approve'
@@ -675,60 +681,9 @@ describe ApprovalState do
             expect(subject.can_approve?(nil)).to be_falsey
           end
 
-          it 'fallback rule is used' do
-            expect(subject.approvals_left).to eq(2)
-          end
-
           it 'is not approved' do
+            expect(subject.approvals_left).to eq(2)
             expect(subject.approved?).to eq(false)
-          end
-
-          context 'with project approval rule' do
-            before do
-              create(:approval_project_rule, project: project, approvals_required: 1, users: [approver])
-            end
-
-            context 'with approvers' do
-              let(:approver) { create(:user) }
-
-              it 'requires one approval' do
-                rule = subject.wrapped_approval_rules.last.approval_rule
-
-                expect(rule).to be_a(ApprovalProjectRule)
-                expect(subject.approvers).to eq([approver])
-              end
-            end
-
-            context 'without approvers' do
-              let(:approver) { author }
-
-              it 'requires one approval' do
-                rule = subject.wrapped_approval_rules.last
-
-                expect(rule).to be_a(ApprovalMergeRequestFallback)
-                expect(subject.approvers).to eq([])
-              end
-            end
-          end
-        end
-
-        context 'when that approver is not the MR author' do
-          before do
-            rule.users << approver
-          end
-
-          it 'requires one approval' do
-            expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'only allows the approver to approve the MR' do
-            expect(subject.can_approve?(approver)).to be_truthy
-
-            expect(subject.can_approve?(author)).to be_falsey
-            expect(subject.can_approve?(developer)).to be_falsey
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
-            expect(subject.can_approve?(nil)).to be_falsey
           end
         end
       end
@@ -826,7 +781,7 @@ describe ApprovalState do
             expect(subject.approvals_left).to eq(3)
           end
 
-          it 'only allows the approvers to approve the MR' do
+          it 'allows anyone with write access except for author to approve the MR' do
             expect(subject.can_approve?(developer)).to be_truthy
             expect(subject.can_approve?(approver)).to be_truthy
             expect(subject.can_approve?(approver2)).to be_truthy
@@ -836,34 +791,60 @@ describe ApprovalState do
             expect(subject.can_approve?(stranger)).to be_falsey
             expect(subject.can_approve?(nil)).to be_falsey
           end
+        end
+      end
 
-          context 'when only 1 approval approved' do
-            it 'only allows the approvers to approve the MR' do
-              create(:approval, user: approver, merge_request: merge_request)
+      describe '#any_approver_rules' do
+        let(:approval_rule) { subject.wrapped_approval_rules.last.approval_rule }
 
-              expect(subject.can_approve?(developer)).to be_truthy
-              expect(subject.can_approve?(approver)).to be_falsey
-              expect(subject.can_approve?(approver2)).to be_truthy
-
-              expect(subject.can_approve?(author)).to be_falsey
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(other_developer)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
-            end
+        context 'a project with any_approver rule' do
+          let!(:project_rule) do
+            create(:approval_project_rule, rule_type: :any_approver, project: project)
           end
 
-          context 'when all approvals received' do
-            it 'allows anyone with write access except for author to approve the MR' do
-              create(:approval, user: approver, merge_request: merge_request)
-              create(:approval, user: approver2, merge_request: merge_request)
-              create(:approval, user: developer, merge_request: merge_request)
+          it 'returns project rules' do
+            expect(subject.wrapped_approval_rules.size).to eq(1)
+            expect(approval_rule).to eq(project_rule)
+          end
 
-              expect(subject.can_approve?(author)).to be_falsey
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(other_developer)).to be_truthy
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
+          context 'a merge request with regular rule' do
+            let!(:rule) { create_rule(rule_type: :any_approver, approvals_required: 2) }
+
+            it 'returns merge request rules' do
+              expect(subject.wrapped_approval_rules.size).to eq(1)
+              expect(approval_rule).to eq(rule)
+            end
+          end
+        end
+      end
+
+      context 'when any_approver rule with 2 approvals required exist' do
+        let!(:rule) { create_rule(rule_type: :any_approver, approvals_required: 2) }
+
+        it_behaves_like 'a MR that all members with write access can approve'
+
+        it 'requires the 2 approvals' do
+          expect(subject.approvals_left).to eq(2)
+        end
+
+        context 'a user approves the MR' do
+          before do
+            create(:approval, merge_request: merge_request, user: approver)
+          end
+
+          it 'requires 1 approval' do
+            expect(subject.has_approved?(approver)).to eq(true)
+            expect(subject.approvals_left).to eq(1)
+          end
+
+          context 'another user approves the MR' do
+            before do
+              create(:approval, merge_request: merge_request, user: approver1)
+            end
+
+            it 'becomes approved' do
+              expect(subject.has_approved?(approver1)).to eq(true)
+              expect(subject.approved?).to eq(true)
             end
           end
         end
@@ -976,24 +957,6 @@ describe ApprovalState do
       end
     end
 
-    describe '#has_non_fallback_rules?' do
-      it 'returns true when there are rules' do
-        create_rules
-
-        expect(subject.has_non_fallback_rules?).to be(true)
-      end
-
-      it 'returns false if there are no rules' do
-        expect(subject.has_non_fallback_rules?).to be(false)
-      end
-
-      it 'returns false if there are only fallback rules' do
-        project.update!(approvals_before_merge: 1)
-
-        expect(subject.has_non_fallback_rules?).to be(false)
-      end
-    end
-
     describe '#approval_needed?' do
       context 'when feature not available' do
         it 'returns false' do
@@ -1059,7 +1022,7 @@ describe ApprovalState do
         end
       end
 
-      shared_examples_for 'checking fallback_approvals_required' do
+      shared_examples_for 'checking any_approver rule' do
         before do
           project.update!(approvals_before_merge: 1)
         end
@@ -1080,7 +1043,7 @@ describe ApprovalState do
       end
 
       context 'when no rules' do
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when only code owner rules present' do
@@ -1090,7 +1053,7 @@ describe ApprovalState do
         end
 
         it_behaves_like 'when rules are present'
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when only report approver rules present' do
@@ -1099,7 +1062,7 @@ describe ApprovalState do
         end
 
         it_behaves_like 'when rules are present'
-        it_behaves_like 'checking fallback_approvals_required'
+        it_behaves_like 'checking any_approver rule'
       end
 
       context 'when regular rules present' do
@@ -1132,7 +1095,7 @@ describe ApprovalState do
             merge_request.update!(approvals_before_merge: 1)
           end
 
-          it_behaves_like 'checking fallback_approvals_required'
+          it_behaves_like 'checking any_approver rule'
         end
       end
 
@@ -1142,29 +1105,7 @@ describe ApprovalState do
           merge_request.update!(approvals_before_merge: 1)
         end
 
-        it_behaves_like 'checking fallback_approvals_required'
-      end
-    end
-
-    describe '#any_approver_allowed?' do
-      context 'when approved' do
-        before do
-          allow(subject).to receive(:approved?).and_return(true)
-        end
-
-        it 'returns true' do
-          expect(subject.any_approver_allowed?).to eq(true)
-        end
-      end
-
-      context 'when not approved' do
-        before do
-          allow(subject).to receive(:approved?).and_return(false)
-        end
-
-        it 'returns false' do
-          expect(subject.approved?).to eq(false)
-        end
+        it_behaves_like 'checking any_approver rule'
       end
     end
 
@@ -1204,34 +1145,16 @@ describe ApprovalState do
     end
 
     describe '#filtered_approvers' do
-      describe 'only direct users, without code owners or report approvers' do
-        it 'includes only rule user members' do
+      describe 'only direct users, without code owners' do
+        it 'excludes code owners' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
           create_rule(users: [approver2], rule_type: :code_owner)
           create_rule(users: [approver3], rule_type: :report_approver)
 
           expect(
-            subject.filtered_approvers(code_owner: false, report_approver: false, target: :users)
-          ).to contain_exactly(approver1)
-        end
-      end
-
-      describe 'excludes regular rule' do
-        it 'includes only code owners' do
-          create_rule(users: [approver1])
-          create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], rule_type: :code_owner)
-
-          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
-        end
-
-        it 'includes only report approvers' do
-          create_rule(users: [approver1])
-          create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], rule_type: :report_approver)
-
-          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
+            subject.filtered_approvers(code_owner: false, target: :users)
+          ).to contain_exactly(approver1, approver3)
         end
       end
 
@@ -1277,12 +1200,6 @@ describe ApprovalState do
 
           it 'allows the author to approve the MR if within the approvers list' do
             expect(subject.can_approve?(author)).to be_truthy
-          end
-
-          it 'does not allow the author to approve the MR if not within the approvers list' do
-            allow(subject).to receive(:approvers).and_return([])
-
-            expect(subject.can_approve?(author)).to be_falsey
           end
         end
 
@@ -1385,14 +1302,10 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1, users: []) }
+        let!(:rule) { create_rule(approvals_required: 1, users: [author]) }
+        let!(:any_approver_rule) { create_rule(rule_type: :any_approver, approvals_required: 1) }
 
         context 'when that approver is the MR author' do
-          before do
-            project.update!(approvals_before_merge: 1)
-            rule.users << author
-          end
-
           it_behaves_like 'authors self-approval authorization'
 
           it_behaves_like 'a MR that all members with write access can approve'
@@ -1407,26 +1320,6 @@ describe ApprovalState do
 
           it 'is not approved' do
             expect(subject.approved?).to eq(false)
-          end
-        end
-
-        context 'when that approver is not the MR author' do
-          before do
-            rule.users << approver
-          end
-
-          it 'requires one approval' do
-            expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'only allows the approver to approve the MR' do
-            expect(subject.can_approve?(approver)).to be_truthy
-
-            expect(subject.can_approve?(author)).to be_falsey
-            expect(subject.can_approve?(developer)).to be_falsey
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
-            expect(subject.can_approve?(nil)).to be_falsey
           end
         end
       end
@@ -1524,7 +1417,7 @@ describe ApprovalState do
             expect(subject.approvals_left).to eq(3)
           end
 
-          it 'only allows the approvers to approve the MR' do
+          it 'allows anyone with write access except for author to approve the MR' do
             expect(subject.can_approve?(developer)).to be_truthy
             expect(subject.can_approve?(approver)).to be_truthy
             expect(subject.can_approve?(approver2)).to be_truthy
@@ -1536,34 +1429,13 @@ describe ApprovalState do
             expect(subject.can_approve?(nil)).to be_falsey
           end
 
-          context 'when only 1 approval approved' do
-            it 'only allows the approvers to approve the MR' do
-              create(:approval, user: approver, merge_request: merge_request)
-
-              expect(subject.can_approve?(developer)).to be_truthy
-              expect(subject.can_approve?(approver)).to be_falsey
-              expect(subject.can_approve?(approver2)).to be_truthy
-
-              expect(subject.can_approve?(author)).to be_falsey
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(other_developer)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
+          context 'when an approver does not have access to the merge request' do
+            before do
+              project.members.find_by(user_id: developer.id).destroy
             end
-          end
 
-          context 'when all approvals received' do
-            it 'allows anyone with write access except for author to approve the MR' do
-              create(:approval, user: approver, merge_request: merge_request)
-              create(:approval, user: approver2, merge_request: merge_request)
-              create(:approval, user: developer, merge_request: merge_request)
-
-              expect(subject.can_approve?(author)).to be_falsey
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(other_developer)).to be_truthy
-              expect(subject.can_approve?(guest)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
+            it 'the user cannot approver' do
+              expect(subject.can_approve?(developer)).to be_falsey
             end
           end
         end
@@ -1601,6 +1473,152 @@ describe ApprovalState do
 
         it 'returns true' do
           expect(subject.authors_can_approve?).to eq(false)
+        end
+      end
+    end
+  end
+
+  describe '#user_defined_rules' do
+    context 'when approval rules are not overwritten' do
+      let!(:project_rule) { create(:approval_project_rule, project: project) }
+      let!(:another_project_rule) { create(:approval_project_rule, project: project) }
+
+      context 'and multiple approval rules is disabled' do
+        it 'returns the first rule' do
+          expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+            project_rule
+          ])
+        end
+      end
+
+      context 'and multiple approval rules is enabled' do
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+        end
+
+        it 'returns the rules as is' do
+          expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+            project_rule,
+            another_project_rule
+          ])
+        end
+
+        context 'and rules are scoped by protected branches' do
+          let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+          let(:another_protected_branch) { create(:protected_branch, project: project, name: '*-stable') }
+
+          before do
+            merge_request.update!(target_branch: 'stable-1')
+            another_project_rule.update!(protected_branches: [protected_branch])
+            project_rule.update!(protected_branches: [another_protected_branch])
+          end
+
+          context 'and scoped_approval_rules feature is enabled' do
+            it 'returns the rules that are applicable to the merge request target branch' do
+              expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                another_project_rule
+              ])
+            end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  project_rule
+                ])
+              end
+            end
+          end
+
+          context 'but scoped_approval_rules feature is disabled' do
+            before do
+              stub_feature_flags(scoped_approval_rules: false)
+            end
+
+            it 'returns unscoped rules' do
+              expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+                project_rule,
+                another_project_rule
+              ])
+            end
+          end
+        end
+      end
+    end
+
+    context 'when approval rules are overwritten' do
+      let!(:mr_rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
+      let!(:another_mr_rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
+
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: false)
+      end
+
+      context 'when multiple approval rules is disabled' do
+        it 'returns the first rule' do
+          expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+            mr_rule
+          ])
+        end
+      end
+
+      context 'when multiple approval rules is enabled' do
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+        end
+
+        it 'returns the rules as is' do
+          expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+            mr_rule,
+            another_mr_rule
+          ])
+        end
+
+        context 'and rules have source rules that are scoped by protected branches' do
+          let(:source_rule) { create(:approval_project_rule, project: project) }
+          let(:another_source_rule) { create(:approval_project_rule, project: project) }
+          let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+          let(:another_protected_branch) { create(:protected_branch, project: project, name: '*-stable') }
+
+          before do
+            merge_request.update!(target_branch: 'stable-1')
+            source_rule.update!(protected_branches: [protected_branch])
+            another_source_rule.update!(protected_branches: [another_protected_branch])
+            mr_rule.update!(approval_project_rule: another_source_rule)
+            another_mr_rule.update!(approval_project_rule: source_rule)
+          end
+
+          context 'and scoped_approval_rules feature is enabled' do
+            it 'returns the rules that are applicable to the merge request target branch' do
+              expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                another_mr_rule
+              ])
+            end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  mr_rule
+                ])
+              end
+            end
+          end
+
+          context 'but scoped_approval_rules feature is disabled' do
+            before do
+              stub_feature_flags(scoped_approval_rules: false)
+            end
+
+            it 'returns unscoped rules' do
+              expect(subject.user_defined_rules.map(&:approval_rule)).to match_array([
+                mr_rule,
+                another_mr_rule
+              ])
+            end
+          end
         end
       end
     end

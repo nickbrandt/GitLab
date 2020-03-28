@@ -4,7 +4,7 @@ import WeeksHeaderItemComponent from 'ee/roadmap/components/preset_weeks/weeks_h
 import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
 
 const mockTimeframeIndex = 0;
 const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
@@ -13,8 +13,6 @@ const createComponent = ({
   timeframeIndex = mockTimeframeIndex,
   timeframeItem = mockTimeframeWeeks[mockTimeframeIndex],
   timeframe = mockTimeframeWeeks,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(WeeksHeaderItemComponent);
 
@@ -22,8 +20,6 @@ const createComponent = ({
     timeframeIndex,
     timeframeItem,
     timeframe,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -44,14 +40,6 @@ describe('WeeksHeaderItemComponent', () => {
   });
 
   describe('computed', () => {
-    describe('itemStyles', () => {
-      it('returns style object for container element based on value of `itemWidth` prop', () => {
-        vm = createComponent({});
-
-        expect(vm.itemStyles.width).toBe('180px');
-      });
-    });
-
     describe('lastDayOfCurrentWeek', () => {
       it('returns date object representing last day of the week as set in `timeframeItem`', () => {
         expect(vm.lastDayOfCurrentWeek.getDate()).toBe(

@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import { mapActions, mapGetters, mapState } from 'vuex';
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import Autosize from 'autosize';
 import { __, sprintf } from '~/locale';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
@@ -161,7 +161,7 @@ export default {
       'toggleStateButtonLoading',
     ]),
     setIsSubmitButtonDisabled(note, isSubmitting) {
-      if (!_.isEmpty(note) && !isSubmitting) {
+      if (!isEmpty(note) && !isSubmitting) {
         this.isSubmitButtonDisabled = false;
       } else {
         this.isSubmitButtonDisabled = true;
@@ -193,23 +193,10 @@ export default {
         this.stopPolling();
 
         this.saveNote(noteData)
-          .then(res => {
+          .then(() => {
             this.enableButton();
             this.restartPolling();
-
-            if (res.errors) {
-              if (res.errors.commands_only) {
-                this.discard();
-              } else {
-                Flash(
-                  __('Something went wrong while adding your comment. Please try again.'),
-                  'alert',
-                  this.$refs.commentForm,
-                );
-              }
-            } else {
-              this.discard();
-            }
+            this.discard();
 
             if (withIssueAction) {
               this.toggleIssueState();
@@ -349,6 +336,7 @@ export default {
 
             <markdown-field
               ref="markdownField"
+              :is-submitting="isSubmitting"
               :markdown-preview-path="markdownPreviewPath"
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"
