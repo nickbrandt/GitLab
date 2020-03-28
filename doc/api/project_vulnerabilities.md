@@ -167,12 +167,14 @@ Example response:
 }
 ```
 
-Errors:
+### Errors
 
-_A Vulnerability Finding is not found or already attached to a different Vulnerability_
+This error occurs when a Finding chosen to create a Vulnerability from is not found, or
+is already associated with a different Vulnerability:
 
-Occurs when a Finding chosen to create a Vulnerability from is not found or
-is already associated with a different Vulnerability.
+```plaintext
+A Vulnerability Finding is not found or already attached to a different Vulnerability
+```
 
 Status code: `400`
 
