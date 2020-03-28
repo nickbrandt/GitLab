@@ -317,9 +317,8 @@ will not be able to browse the project's repository for example).
 TIP: **Tip:**
 To prevent a guest user from creating projects, as an admin, you can edit the
 user's profile to mark the user as [external](#external-users-core-only).
-Beware though that even if a user is external, if they already have Reporter or
-higher permissions in any project or group, they will **not** be counted as a
-free guest user.
+Be aware that even if an external user already has Reporter or higher permissions
+in any project or group, they will **not** be counted as a free guest user.
 
 ## Auditor users **(PREMIUM ONLY)**
 
