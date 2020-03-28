@@ -168,10 +168,9 @@ the [documentation on Cycle Analytics permissions](analytics/cycle_analytics.md#
 
 ### Issue Board permissions
 
-Developers and users with higher permission level can use all
-the functionality of the Issue Board, that is create/delete lists
-and drag issues around. Read though the
-[documentation on Issue Boards permissions](project/issue_board.md#permissions)
+Developers and users with higher permission levels can use all features of the
+Issue Board, including creating lists, deleting lists, and dragging-and-dropping
+issues. See the [Issue Boards permissions documentation](project/issue_board.md#permissions)
 to learn more.
 
 ### File Locking permissions **(PREMIUM)**
