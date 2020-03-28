@@ -81,15 +81,15 @@ If an authenticated user does not have permission to
 [confirm vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
 this request will result in a `403` status code.
 
-```
+```plaintext
 POST /vulnerabilities/:id/confirm
 ```
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of a vulnerability to confirm |
+| `id` | integer or string | yes | The ID of a vulnerability to confirm |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/vulnerabilities/5/confirm"
 ```
 
