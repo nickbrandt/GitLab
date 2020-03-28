@@ -327,8 +327,9 @@ in any project or group, they will **not** be counted as a free guest user.
 Auditor users are given read-only access to all projects, groups, and other
 resources on the GitLab instance.
 
-An Auditor user should be able to access all projects and groups of a GitLab instance
-with the permissions described on the documentation on [auditor users permissions](../administration/auditor_users.md#permissions-and-restrictions-of-an-auditor-user).
+An Auditor user can access all projects and groups of a GitLab instance
+with the permissions described on the [auditor users permissions](../administration/auditor_users.md#permissions-and-restrictions-of-an-auditor-user)
+documentation page.
 
 [Read more about Auditor users.](../administration/auditor_users.md)
 
