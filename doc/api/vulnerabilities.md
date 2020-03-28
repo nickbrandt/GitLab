@@ -31,15 +31,15 @@ belongs, requests to that project will return a `404 Not Found` status code.
 
 Gets a single vulnerability
 
-```
+```plaintext
 GET /vulnerabilities/:id
 ```
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of a Vulnerability to get |
+| `id` | integer or string | yes | The ID of a Vulnerability to get |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/vulnerabilities/1
 ```
 
