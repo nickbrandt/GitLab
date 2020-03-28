@@ -131,15 +131,15 @@ If an authenticated user does not have permission to
 [resolve vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
 this request will result in a `403` status code.
 
-```
+```plaintext
 POST /vulnerabilities/:id/resolve
 ```
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of a Vulnerability to resolve |
+| `id` | integer or string | yes | The ID of a Vulnerability to resolve |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/vulnerabilities/5/resolve"
 ```
 
