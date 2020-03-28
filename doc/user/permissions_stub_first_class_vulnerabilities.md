@@ -155,11 +155,11 @@ the visibility level you select in project settings:
 
 ### Protected branches
 
-Additional restrictions can be applied on a per-branch basis with [protected branches](project/protected_branches.md).
-Additionally, you can customize permissions to allow or prevent project
-Maintainers and Developers from pushing to a protected branch. Read through the documentation on
-[Allowed to Merge and Allowed to Push settings](project/protected_branches.md#using-the-allowed-to-merge-and-allowed-to-push-settings)
-to learn more.
+You can apply additional restrictions on a per-branch basis using [protected branches](project/protected_branches.md), and customize permissions to allow or prevent
+Maintainers or Developers from pushing to a protected branch. 
+
+For more information, see
+[Allowed to Merge and Allowed to Push settings](project/protected_branches.md#using-the-allowed-to-merge-and-allowed-to-push-settings).
 
 ### Cycle Analytics permissions
 
