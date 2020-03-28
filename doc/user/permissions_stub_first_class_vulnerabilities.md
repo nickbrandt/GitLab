@@ -271,11 +271,11 @@ as well as the permission level of the user.
 NOTE: **Note:**
 External users still count towards a license seat.
 
-An administrator can flag a user as external by either of the following methods:
+To mark a user as an external user, an administrator must perform one of the following actions:
 
-- Either [through the API](../api/users.md#user-modification).
-- Or by navigating to the **Admin area > Overview > Users** to create a new user
-  or edit an existing one. There, you will find the option to flag the user as
+- Mark the user as external [through the API](../api/users.md#user-modification).
+- Navigate to the **Admin area > Overview > Users** to create a new user
+  or edit an existing user. There, you will find the option to flag the user as
   external.
 
 ### Setting new users to external
