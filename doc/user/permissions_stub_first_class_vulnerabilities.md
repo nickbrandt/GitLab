@@ -182,9 +182,10 @@ For more information, see the
 
 ### Confidential Issues permissions
 
-Confidential issues can be accessed by reporters and higher permission levels,
-as well as by guest users that create a confidential issue. To learn more,
-read through the documentation on [permissions and access to confidential issues](project/issues/confidential_issues.md#permissions-and-access-to-confidential-issues).
+Confidential issues can be accessed by users with
+[Reporter and higher](permissions.md#project-members-permissions) permission levels.
+Guest users that create a confidential issue can view their own issues. To learn more,
+see the documentation on [permissions and access to confidential issues](project/issues/confidential_issues.md#permissions-and-access-to-confidential-issues).
 
 ### Releases permissions
 
