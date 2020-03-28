@@ -4,7 +4,7 @@
 
 CAUTION: **Caution:**
 This API is currently in development and is protected by a **disabled**
-[feature flag](https://docs.gitlab.com/ee/development/feature_flags/).
+[feature flag](../development/feature_flags/index.md).
 On a self-managed GitLab instance, an administrator can enable it by starting the Rails console
 (`sudo gitlab-rails console`) and then running the following command: `Feature.enable(:first_class_vulnerabilities)`.
 To test if the Vulnerabilities API was successfully enabled, run the following command:
