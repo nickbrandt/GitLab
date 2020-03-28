@@ -280,14 +280,13 @@ To mark a user as an external user, an administrator must perform one of the fol
 
 ### Setting new users to external
 
-By default, new users are not set as external users. This behavior can be changed
-by an administrator under the **Admin Area > Settings > General > Account and limit** page.
+New users are not set as external users by default. An administrator can change
+this behavior at the **Admin Area > Settings > General > Account and limit** page.
 
-If you change the default behavior of creating new users as external, you will
-have the option to narrow it down by defining a set of internal users.
-The **Internal users** field allows specifying an email address regex pattern to
-identify default internal users. New users whose email address matches the regex
-pattern will be set to internal by default rather than an external collaborator.
+After changing the default behavior of creating new users as external, you can
+optionally define a set of internal users in the **Internal users** field, by
+providing a regex pattern based on email address. New users with an email address
+matching the regex pattern will be marked as internal by default.
 
 The regex pattern format is Ruby, but it needs to be convertible to JavaScript,
 and the ignore case flag will be set (`/regex pattern/i`). Here are some examples:
