@@ -348,13 +348,13 @@ the visibility level you select in project settings:
 NOTE: **Note:**
 In GitLab 11.0, the Master role was renamed to Maintainer.
 
-GitLab CI/CD permissions rely on the role the user has in GitLab. There are four
-permission levels in total:
+GitLab CI/CD permissions rely on the role the user has in GitLab. The following
+permission levels are available:
 
-- admin
-- maintainer
-- developer
-- guest/reporter
+- Admin
+- Maintainer
+- Developer
+- Guest (Reporter)
 
 The admin user can perform any action on GitLab CI/CD in scope of the GitLab
 instance and project. In addition, all admins can use the admin interface under
