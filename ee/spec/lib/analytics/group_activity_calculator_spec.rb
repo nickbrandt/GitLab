@@ -5,12 +5,12 @@ require 'spec_helper'
 describe Analytics::GroupActivityCalculator do
   subject { described_class.new(group, current_user) }
 
-  set(:group) { create(:group) }
-  set(:current_user) { create(:user) }
-  set(:subgroup) { create(:group, parent: group) }
-  set(:project) { create(:project, group: subgroup) }
-  set(:secret_subgroup) { create(:group, parent: group) }
-  set(:secret_project) { create(:project, group: secret_subgroup) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:subgroup) { create(:group, parent: group) }
+  let_it_be(:project) { create(:project, group: subgroup) }
+  let_it_be(:secret_subgroup) { create(:group, parent: group) }
+  let_it_be(:secret_project) { create(:project, group: secret_subgroup) }
 
   before do
     subgroup.add_developer(current_user)
@@ -18,8 +18,8 @@ describe Analytics::GroupActivityCalculator do
   end
 
   context 'with issues' do
-    set(:recent_issue) { create(:issue, project: project) }
-    set(:old_issue) do
+    let_it_be(:recent_issue) { create(:issue, project: project) }
+    let_it_be(:old_issue) do
       create(:issue,
         project: project,
         created_at: 100.days.ago)

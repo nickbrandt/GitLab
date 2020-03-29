@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 describe MergeRequests::ByApprovalsFinder do
-  set(:first_user) { create(:user) }
-  set(:second_user) { create(:user) }
+  let_it_be(:first_user) { create(:user) }
+  let_it_be(:second_user) { create(:user) }
   let(:third_user) { create(:user) }
 
-  set(:merge_request_without_approvals) { create(:merge_request) }
-  set(:merge_request_with_first_user_approval) do
+  let_it_be(:merge_request_without_approvals) { create(:merge_request) }
+  let_it_be(:merge_request_with_first_user_approval) do
     create(:merge_request).tap do |mr|
       create(:approval, merge_request: mr, user: first_user)
     end
   end
-  set(:merge_request_with_both_approvals) do
+  let_it_be(:merge_request_with_both_approvals) do
     create(:merge_request).tap do |mr|
       create(:approval, merge_request: mr, user: first_user)
       create(:approval, merge_request: mr, user: second_user)

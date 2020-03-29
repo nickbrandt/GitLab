@@ -2,21 +2,19 @@
 
 require 'spec_helper'
 
-describe API::GeoNodes, :request_store, :geo, :prometheus, api: true do
+describe API::GeoNodes, :request_store, :geo_fdw, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
   include_context 'custom session'
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
-
+  let!(:admin) { create(:admin) }
+  let!(:user) { create(:user) }
+  let!(:primary) { create(:geo_node, :primary) }
+  let!(:secondary) { create(:geo_node) }
+  let!(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
   let(:unexisting_node_id) { GeoNode.maximum(:id).to_i.succ }
   let(:group_to_sync) { create(:group) }
-
-  set(:admin) { create(:admin) }
-  set(:user) { create(:user) }
 
   describe 'POST /geo_nodes' do
     it 'denies access if not admin' do

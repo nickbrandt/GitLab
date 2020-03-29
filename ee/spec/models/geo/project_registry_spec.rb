@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectRegistry do
+describe Geo::ProjectRegistry, :geo_fdw do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project, description: 'kitten mittens') }
-  set(:registry) { create(:geo_project_registry, project_id: project.id) }
+  let(:project) { create(:project, description: 'kitten mittens') }
+  let(:registry) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
 
