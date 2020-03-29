@@ -3,23 +3,23 @@
 require 'spec_helper'
 
 describe API::Todos do
-  let(:group)     { create(:group) }
-  let(:project_1) { create(:project, :repository, group: group) }
-  let(:project_2) { create(:project) }
-  let(:author_1) { create(:user) }
-  let(:author_2) { create(:user) }
-  let(:john_doe) { create(:user, username: 'john_doe') }
-  let(:merge_request) { create(:merge_request, source_project: project_1) }
-  let!(:merge_request_todo) { create(:todo, project: project_1, author: author_2, user: john_doe, target: merge_request) }
-  let!(:pending_1) { create(:todo, :mentioned, project: project_1, author: author_1, user: john_doe) }
-  let!(:pending_2) { create(:todo, project: project_2, author: author_2, user: john_doe) }
-  let!(:pending_3) { create(:on_commit_todo, project: project_1, author: author_2, user: john_doe) }
-  let!(:done) { create(:todo, :done, project: project_1, author: author_1, user: john_doe) }
-  let!(:award_emoji_1) { create(:award_emoji, awardable: merge_request, user: author_1, name: 'thumbsup') }
-  let!(:award_emoji_2) { create(:award_emoji, awardable: pending_1.target, user: author_1, name: 'thumbsup') }
-  let!(:award_emoji_3) { create(:award_emoji, awardable: pending_2.target, user: author_2, name: 'thumbsdown') }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project_1) { create(:project, :repository, group: group) }
+  let_it_be(:project_2) { create(:project) }
+  let_it_be(:author_1) { create(:user) }
+  let_it_be(:author_2) { create(:user) }
+  let_it_be(:john_doe) { create(:user, username: 'john_doe') }
+  let_it_be(:merge_request) { create(:merge_request, source_project: project_1) }
+  let_it_be(:merge_request_todo) { create(:todo, project: project_1, author: author_2, user: john_doe, target: merge_request) }
+  let_it_be(:pending_1) { create(:todo, :mentioned, project: project_1, author: author_1, user: john_doe) }
+  let_it_be(:pending_2) { create(:todo, project: project_2, author: author_2, user: john_doe) }
+  let_it_be(:pending_3) { create(:on_commit_todo, project: project_1, author: author_2, user: john_doe) }
+  let_it_be(:done) { create(:todo, :done, project: project_1, author: author_1, user: john_doe) }
+  let_it_be(:award_emoji_1) { create(:award_emoji, awardable: merge_request, user: author_1, name: 'thumbsup') }
+  let_it_be(:award_emoji_2) { create(:award_emoji, awardable: pending_1.target, user: author_1, name: 'thumbsup') }
+  let_it_be(:award_emoji_3) { create(:award_emoji, awardable: pending_2.target, user: author_2, name: 'thumbsdown') }
 
-  before do
+  before_all do
     project_1.add_developer(john_doe)
     project_2.add_developer(john_doe)
   end
@@ -246,7 +246,9 @@ describe API::Todos do
     end
 
     it 'returns 404 if the issuable is not found' do
-      post api("/projects/#{project_1.id}/#{issuable_type}/123/todo", john_doe)
+      unknown_id = 0
+
+      post api("/projects/#{project_1.id}/#{issuable_type}/#{unknown_id}/todo", john_doe)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -268,13 +270,17 @@ describe API::Todos do
   describe 'POST :id/issuable_type/:issueable_id/todo' do
     context 'for an issue' do
       it_behaves_like 'an issuable', 'issues' do
-        let(:issuable) { create(:issue, :confidential, author: author_1, project: project_1) }
+        let_it_be(:issuable) do
+          create(:issue, :confidential, author: author_1, project: project_1)
+        end
       end
     end
 
     context 'for a merge request' do
       it_behaves_like 'an issuable', 'merge_requests' do
-        let(:issuable) { create(:merge_request, :simple, source_project: project_1) }
+        let_it_be(:issuable) do
+          create(:merge_request, :simple, source_project: project_1)
+        end
       end
     end
   end
