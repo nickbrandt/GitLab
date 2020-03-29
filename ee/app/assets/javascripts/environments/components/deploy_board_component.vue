@@ -9,7 +9,7 @@
  * - Button Actions.
  * [Mockup](https://gitlab.com/gitlab-org/gitlab-foss/uploads/2f655655c0eadf655d0ae7467b53002a/environments__deploy-graphic.png)
  */
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { GlLoadingIcon, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
 import { n__, s__, sprintf } from '~/locale';
@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     canRenderDeployBoard() {
-      return !this.isEmpty && !_.isEmpty(this.deployBoardData);
+      return !this.isEmpty && !isEmpty(this.deployBoardData);
     },
     legacyLabelWarningMessage() {
       return sprintf(
