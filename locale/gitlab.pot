@@ -12191,7 +12191,7 @@ msgstr ""
 msgid "MRApprovals|Approvers"
 msgstr ""
 
-msgid "MRApprovals|Pending approvals"
+msgid "MRApprovals|Approvals"
 msgstr ""
 
 msgid "MRDiff|Show changes only"
