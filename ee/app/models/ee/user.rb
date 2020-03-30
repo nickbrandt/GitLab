@@ -237,14 +237,6 @@ module EE
         .any?
     end
 
-    def any_namespace_with_gold?
-      ::Namespace
-        .includes(:plan)
-        .where("namespaces.id IN (#{namespace_union})") # rubocop:disable GitlabSecurity/SqlInjection
-        .where.not(plans: { id: nil })
-        .any?
-    end
-
     def managed_free_namespaces
       manageable_groups
         .left_joins(:gitlab_subscription)

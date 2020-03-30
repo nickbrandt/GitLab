@@ -119,7 +119,7 @@ module EE
     end
 
     def has_no_trial_or_gold_plan?(user)
-      return false if user.any_namespace_with_gold?
+      return false if user.has_paid_namespace?
 
       !user.any_namespace_with_trial?
     end
