@@ -27,7 +27,14 @@ module API
       # This endpoint is used by Docker Registry to push a set of event
       # that took place recently.
       post 'events' do
-        ::ContainerRegistry::EventHandler.new(params['events']).execute
+        params['events'].each do |raw_event|
+          event = ::ContainerRegistry::Event.new(raw_event)
+
+          if event.supported?
+            event.handle!
+            event.track!
+          end
+        end
 
         status :ok
       end
