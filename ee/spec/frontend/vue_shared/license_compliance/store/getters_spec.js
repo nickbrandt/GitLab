@@ -91,6 +91,30 @@ describe('getters', () => {
     });
   });
 
+  describe('licenseReportGroups', () => {
+    it('returns an array of objects containing information about the group and licenses', () => {
+      const licenses = {
+        success: [{ status: 'success', value: 'foo' }, { status: 'success', value: 'bar' }],
+        neutral: [{ status: 'neutral', value: 'foo' }, { status: 'neutral', value: 'bar' }],
+        failed: [{ status: 'failed', value: 'foo' }, { status: 'failed', value: 'bar' }],
+      };
+      const licenseReport = [...licenses.success, ...licenses.neutral, ...licenses.failed];
+
+      const expectedSectionInformation = {
+        name: expect.any(String),
+        description: expect.any(String),
+      };
+
+      expect(getters.licenseReportGroups({}, { licenseReport })).toStrictEqual(
+        expect.arrayContaining([
+          { ...expectedSectionInformation, status: 'success', licenses: licenses.success },
+          { ...expectedSectionInformation, status: 'neutral', licenses: licenses.neutral },
+          { ...expectedSectionInformation, status: 'failed', licenses: licenses.failed },
+        ]),
+      );
+    });
+  });
+
   describe('licenseSummaryText', () => {
     describe('when licenses exist on both the HEAD and the BASE', () => {
       beforeEach(() => {

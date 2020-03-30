@@ -1,3 +1,4 @@
+import { range } from 'lodash';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
 
 export const approvedLicense = {
@@ -56,5 +57,15 @@ export const licenseReport = [
     ],
   },
 ];
+
+export const generateReportGroup = ({ status = 'some-status', numberOfLicenses = 0 } = {}) => ({
+  status,
+  name: status,
+  description: status,
+  licenses: range(numberOfLicenses).map(i => ({
+    name: `licenseName-${i}`,
+    status: 'success',
+  })),
+});
 
 export default () => {};

@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`License Report MR Widget report section should render correctly 1`] = `
+<section
+  class="media-section license-report-widget mr-report"
+  data-qa-selector="license_report_widget"
+>
+  <div
+    class="media"
+  >
+    <status-icon-stub
+      class="align-self-center"
+      size="24"
+      status="warning"
+    />
+     
+    <div
+      class="media-body d-flex flex-align-self-center align-items-center"
+    >
+      <div
+        class="js-code-text code-text"
+      >
+        <div>
+          
+          
+          
+      FOO
+      
+          <!---->
+           
+          <!---->
+        </div>
+         
+      </div>
+       
+      <div
+        class="append-right-default"
+      >
+        <a
+          class="btn btn-default btn-sm js-manage-licenses append-right-8"
+          href="http://test.host/lm_settings"
+        >
+          
+        Manage licenses
+      
+        </a>
+         
+        <a
+          class="btn btn-default btn-sm js-full-report"
+          href="http://test.host/path/to/the/full/report"
+          target="_blank"
+        >
+          
+        View full report 
+          <icon-stub
+            name="external-link"
+            size="16"
+          />
+        </a>
+      </div>
+       
+      <button
+        class="js-collapse-btn btn float-right btn-sm align-self-center qa-expand-report-button"
+        type="button"
+      >
+        
+        Expand
+      
+      </button>
+    </div>
+  </div>
+   
+  <div
+    class="js-report-section-container"
+    style="display: none;"
+  >
+    <smart-virtual-list-stub
+      class="report-block-container"
+      length="1"
+      remain="20"
+      rtag="div"
+      size="26"
+      wclass="report-block-list mb-2"
+      wtag="ul"
+    >
+      <li
+        class="ml-2 mb-1"
+      >
+        <h2
+          class="h5 m-0"
+        >
+          some-status
+        </h2>
+         
+        <p
+          class="m-0"
+        >
+          some-status
+        </p>
+      </li>
+       
+    </smart-virtual-list-stub>
+  </div>
+</section>
+`;
