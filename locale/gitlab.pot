@@ -7491,6 +7491,9 @@ msgstr ""
 msgid "Enable header and footer in emails"
 msgstr ""
 
+msgid "Enable maintenance mode"
+msgstr ""
+
 msgid "Enable mirror configuration"
 msgstr ""
 
@@ -9631,6 +9634,9 @@ msgid "GitLab is a single application for the entire software development lifecy
 msgstr ""
 
 msgid "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later."
+msgstr ""
+
+msgid "GitLab is undergoing maintenance and is operating in a read-only mode."
 msgstr ""
 
 msgid "GitLab member or Email address"
@@ -12139,6 +12145,9 @@ msgstr ""
 msgid "Made this issue confidential."
 msgstr ""
 
+msgid "Maintenance mode"
+msgstr ""
+
 msgid "Make and review changes in the browser with the Web IDE"
 msgstr ""
 
@@ -13487,6 +13496,9 @@ msgid "Node was successfully updated."
 msgstr ""
 
 msgid "Nodes"
+msgstr ""
+
+msgid "Non-admin users can sign in with read-only access and make read-only API requests."
 msgstr ""
 
 msgid "None"
@@ -14860,6 +14872,9 @@ msgid "Prevent users from changing their profile name"
 msgstr ""
 
 msgid "Prevent users from modifing merge request approvers list"
+msgstr ""
+
+msgid "Prevent users from performing write operations on GitLab while performing maintenance."
 msgstr ""
 
 msgid "Preview"
