@@ -7898,6 +7898,9 @@ msgstr ""
 msgid "Environments|Stopping"
 msgstr ""
 
+msgid "Environments|There was an error fetching the logs. Please try again."
+msgstr ""
+
 msgid "Environments|This action will relaunch the job for commit %{commit_id}, putting the environment in a previous version. Are you sure you want to continue?"
 msgstr ""
 
@@ -12809,9 +12812,6 @@ msgid "Metrics|There was an error creating the dashboard. %{error}"
 msgstr ""
 
 msgid "Metrics|There was an error fetching the environments data, please try again"
-msgstr ""
-
-msgid "Metrics|There was an error fetching the logs, please try again"
 msgstr ""
 
 msgid "Metrics|There was an error getting deployment information."
