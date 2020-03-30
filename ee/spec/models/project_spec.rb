@@ -1150,6 +1150,49 @@ describe Project do
     end
   end
 
+  describe '#visible_user_defined_inapplicable_rules' do
+    let_it_be(:project) { create(:project) }
+    let!(:rule) { create(:approval_project_rule, project: project) }
+    let!(:another_rule) { create(:approval_project_rule, project: project) }
+
+    context 'when multiple approval rules is available' do
+      before do
+        stub_licensed_features(multiple_approval_rules: true)
+      end
+
+      let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+      let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test-*') }
+
+      context 'when rules are scoped' do
+        before do
+          rule.update!(protected_branches: [protected_branch])
+          another_rule.update!(protected_branches: [another_protected_branch])
+        end
+
+        it 'returns rules that are not applicable to target_branch' do
+          expect(project.visible_user_defined_inapplicable_rules('stable-1'))
+            .to match_array([another_rule])
+        end
+      end
+
+      context 'when rules are not scoped' do
+        it 'returns empty array' do
+          expect(project.visible_user_defined_inapplicable_rules('stable-1')).to be_empty
+        end
+      end
+    end
+
+    context 'when multiple approval rules is not available' do
+      before do
+        stub_licensed_features(multiple_approval_rules: false)
+      end
+
+      it 'returns empty array' do
+        expect(project.visible_user_defined_inapplicable_rules('stable-1')).to be_empty
+      end
+    end
+  end
+
   describe '#min_fallback_approvals' do
     let(:project) { create(:project) }
 
