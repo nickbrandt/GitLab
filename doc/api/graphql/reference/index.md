@@ -925,6 +925,7 @@ Information about pagination in a connection.
 | `tagList` | String | List of project tags |
 | `userPermissions` | ProjectPermissions! | Permissions for the current user on the resource |
 | `visibility` | String | Visibility of the project |
+| `vulnerabilitySeveritiesCount` | VulnerabilitySeveritiesCount | Counts for each severity of vulnerability of the project. Available only when feature flag `first_class_vulnerabilities` is enabled |
 | `webUrl` | String | Web URL of the project |
 | `wikiEnabled` | Boolean | (deprecated) Does this project have wiki enabled?. Use `wiki_access_level` instead |
 
@@ -1442,3 +1443,16 @@ Represents a vulnerability.
 | `state` | VulnerabilityState | State of the vulnerability (DETECTED, DISMISSED, RESOLVED, CONFIRMED) |
 | `title` | String | Title of the vulnerability |
 | `vulnerabilityPath` | String | URL to the vulnerability's details page |
+
+## VulnerabilitySeveritiesCount
+
+Represents vulnerability counts by severity
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `critical` | Int | Number of vulnerabilities of CRITICAL severity of the project |
+| `high` | Int | Number of vulnerabilities of HIGH severity of the project |
+| `info` | Int | Number of vulnerabilities of INFO severity of the project |
+| `low` | Int | Number of vulnerabilities of LOW severity of the project |
+| `medium` | Int | Number of vulnerabilities of MEDIUM severity of the project |
+| `unknown` | Int | Number of vulnerabilities of UNKNOWN severity of the project |

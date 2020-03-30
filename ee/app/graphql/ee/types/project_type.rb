@@ -19,6 +19,13 @@ module EE
               resolver: Resolvers::VulnerabilitiesResolver,
               feature_flag: :first_class_vulnerabilities
 
+        field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
+               description: 'Counts for each severity of vulnerability of the project',
+               feature_flag: :first_class_vulnerabilities,
+               resolve: -> (obj, _args, ctx) do
+                 Hash.new(0).merge(obj.vulnerabilities.counts_by_severity)
+               end
+
         field :requirement, ::Types::RequirementType, null: true,
               description: 'Find a single requirement. Available only when feature flag `requirements_management` is enabled.',
               resolver: ::Resolvers::RequirementsResolver.single

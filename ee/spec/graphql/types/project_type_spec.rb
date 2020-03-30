@@ -3,10 +3,18 @@
 require 'spec_helper'
 
 describe GitlabSchema.types['Project'] do
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:vulnerability) { create(:vulnerability, project: project, severity: :high) }
+
+  before do
+    project.add_developer(user)
+  end
+
   it 'includes the ee specific fields' do
     expected_fields = %w[
       service_desk_enabled service_desk_address vulnerabilities
-      requirement_states_count
+      requirement_states_count vulnerability_severities_count
     ]
 
     expect(described_class).to include_graphql_fields(*expected_fields)
@@ -23,7 +31,6 @@ describe GitlabSchema.types['Project'] do
       %(
         query {
           project(fullPath:"#{project.full_path}") {
-            name
             vulnerabilities {
               nodes {
                 title
@@ -34,10 +41,6 @@ describe GitlabSchema.types['Project'] do
           }
         }
       )
-    end
-
-    before do
-      project.add_developer(user)
     end
 
     subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
