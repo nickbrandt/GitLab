@@ -55,9 +55,7 @@ export default {
   },
   methods: {
     trackOnShow() {
-      if (!this.popoverDismissed) {
-        this.track();
-      }
+      this.track();
     },
     disableModalFromRenderingAgain() {
       Cookies.remove(this.commitCookie);
