@@ -223,5 +223,5 @@
 }
 
 .popover.suggest-gitlab-ci-yml {
-  z-index: 240;
+  z-index: $header-zindex - 1;
 }
