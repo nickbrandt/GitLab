@@ -98,8 +98,28 @@ describe 'gitlab:db namespace rake task' do
     end
   end
 
+  describe 'clean_structure_sql' do
+    let_it_be(:clean_rake_task) { 'gitlab:db:clean_structure_sql' }
+    let_it_be(:structure_file) { 'db/structure.sql' }
+    let_it_be(:input) { 'this is structure data' }
+    let(:output) { StringIO.new }
+
+    it 'reenables the task after running' do
+      allow(File).to receive(:read).with(structure_file).and_return(input)
+      allow(File).to receive(:open).with(structure_file, any_args).and_yield(output)
+      expect_any_instance_of(Gitlab::Database::SchemaCleaner).to receive(:clean).with(output)
+
+      run_rake_task(clean_rake_task) do |rake_task|
+        expect(rake_task).to receive(:reenable)
+      end
+    end
+  end
+
   def run_rake_task(task_name)
-    Rake::Task[task_name].reenable
+    rake_task = Rake::Task[task_name]
+    rake_task.reenable
+
+    yield rake_task if block_given?
     Rake.application.invoke_task task_name
   end
 end
