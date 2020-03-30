@@ -15,7 +15,7 @@ describe DesignManagement::Action do
 
       let(:designs) { [design_a, design_b, design_c] }
 
-      before(:all) do
+      before_all do
         create(:design_version, designs: [design_a, design_b, design_c])
         create(:design_version, designs: [design_a, design_b])
         create(:design_version, designs: [design_a])

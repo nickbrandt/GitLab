@@ -244,7 +244,11 @@ so we need to set some guidelines for their use going forward:
 In some cases, there is no need to recreate the same object for tests
 again for each example. For example, a project and a guest of that project
 is needed to test issues on the same project, one project and user will do for the entire file.
-This can be achieved by using
+
+As much as possible, do not implement this using `before(:all)` or `before(:context)`. If you do,
+you would need to manually clean up the data as those hooks run outside a database transaction.
+
+Instead, this can be achieved by using
 [`let_it_be`](https://test-prof.evilmartians.io/#/let_it_be) variables and the
 [`before_all`](https://test-prof.evilmartians.io/#/before_all) hook
 from the [`test-prof` gem](https://rubygems.org/gems/test-prof).

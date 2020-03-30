@@ -4,7 +4,7 @@ RSpec.shared_examples 'Insights page' do
   let_it_be(:user) { create(:user) }
 
   describe 'as a permitted user' do
-    before(:context) do
+    before_all do
       entity.add_maintainer(user)
     end
 
