@@ -42,14 +42,14 @@ module MergeRequests
     #
     # @return [Boolean] whether special condition "None" is being used
     def by_no_approvals?
-      includes_special_label?(IssuableFinder::FILTER_NONE)
+      includes_special_label?(IssuableFinder::Params::FILTER_NONE)
     end
 
     # Is param using special condition: "Any" ?
     #
     # @return [Boolean] whether special condition "Any"" is being used
     def by_any_approvals?
-      includes_special_label?(IssuableFinder::FILTER_ANY)
+      includes_special_label?(IssuableFinder::Params::FILTER_ANY)
     end
 
     # Check if we have the special label in ids or usernames field
