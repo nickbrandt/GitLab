@@ -1,0 +1,5 @@
+---
+title: Append inapplicable rules when creating MR
+merge_request: 27886
+author:
+type: fixed

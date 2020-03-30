@@ -404,9 +404,13 @@ module EE
     end
 
     def visible_approval_rules(target_branch: nil)
-      strong_memoize(:"visible_approval_rules_#{target_branch}") do
-        visible_user_defined_rules(branch: target_branch) + approval_rules.report_approver
+      rules = strong_memoize(:visible_approval_rules) do
+        Hash.new do |h, key|
+          h[key] = visible_user_defined_rules(branch: key) + approval_rules.report_approver
+        end
       end
+
+      rules[target_branch]
     end
 
     def visible_user_defined_rules(branch: nil)
@@ -414,6 +418,12 @@ module EE
       return user_defined_rules unless branch
 
       user_defined_rules.applicable_to_branch(branch)
+    end
+
+    def visible_user_defined_inapplicable_rules(branch)
+      return [] unless multiple_approval_rules_available?
+
+      user_defined_rules.inapplicable_to_branch(branch)
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
