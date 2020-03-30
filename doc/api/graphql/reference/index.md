@@ -810,6 +810,7 @@ Represents a milestone.
 | `author` | User! | User who wrote this note |
 | `body` | String! | Content of the note |
 | `bodyHtml` | String | The GitLab Flavored Markdown rendering of `note` |
+| `confidential` | Boolean | Indicates if this note is confidential |
 | `createdAt` | Time! | Timestamp of the note creation |
 | `discussion` | Discussion | The discussion this note is a part of |
 | `id` | ID! | ID of the note |
