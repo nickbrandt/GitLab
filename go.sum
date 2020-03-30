@@ -267,6 +267,8 @@ gitlab.com/gitlab-org/labkit v0.0.0-20200219201213-4f4f5c1b0539 h1:I2xPr4WlOK3Gt
 gitlab.com/gitlab-org/labkit v0.0.0-20200219201213-4f4f5c1b0539/go.mod h1:WyFbg+j26WJmH44qGeINba3QlIVbLxepQ/+qMA2s2+U=
 gitlab.com/gitlab-org/labkit v0.0.0-20200227174525-4f8041c014c2 h1:CCfQxzBy7He5oakCE/3e5yJWFA4yHJqLnGQVje4HiJc=
 gitlab.com/gitlab-org/labkit v0.0.0-20200227174525-4f8041c014c2/go.mod h1:WyFbg+j26WJmH44qGeINba3QlIVbLxepQ/+qMA2s2+U=
+gitlab.com/gitlab-org/labkit v0.0.0-20200327153541-fac94cb428e6 h1:FZ/+I7jHVKUq3ev8SmD1fD743Kb7qYkjDcsaNg887vg=
+gitlab.com/gitlab-org/labkit v0.0.0-20200327153541-fac94cb428e6/go.mod h1:WyFbg+j26WJmH44qGeINba3QlIVbLxepQ/+qMA2s2+U=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2 h1:75k/FF0Q2YM8QYo07VPddOLBslDt1MZOdEslOHvmzAs=

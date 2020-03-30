@@ -128,7 +128,7 @@ func main() {
 	}
 
 	go func() {
-		err := monitoring.Serve(monitoringOpts...)
+		err := monitoring.Start(monitoringOpts...)
 		if err != nil {
 			log.WithError(err).Error("Failed to start monitoring")
 		}

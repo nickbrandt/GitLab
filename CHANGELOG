@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.29.0
+
+- Bump Labkit version to support Profiler sample versioning
+
 v 8.28.0
 
 - Reject parameters that override upload fields
