@@ -1,5 +1,7 @@
 # frozen_string_literal: true
-#
+
+require_dependency 'status_page'
+
 # Retrieves Notes specifically for the Status Page
 # which are rendered as comments.
 #
@@ -15,11 +17,7 @@
 #
 module StatusPage
   class IncidentCommentsFinder
-    # Only comments with this emoji are visible.
-    # This filter will change once we have confidential notes.
-    # See https://gitlab.com/gitlab-org/gitlab/issues/207468
-    AWARD_EMOJI = 'microphone'
-
+    AWARD_EMOJI = StatusPage::AWARD_EMOJI
     MAX_LIMIT = StatusPage::Storage::MAX_COMMENTS
 
     def initialize(issue:)

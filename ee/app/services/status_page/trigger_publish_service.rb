@@ -50,20 +50,44 @@ module StatusPage
     def eligable_issue_id
       case triggered_by
       when Issue then eligable_issue_id_from_issue
+      when Note then eligable_issue_id_from_note
       else
         raise ArgumentError, "unsupported trigger type #{triggered_by.class}"
       end
     end
 
+    # Trigger publish for public (non-confidential) issues
+    # - which were changed
+    # - just become confidential to unpublish
     def eligable_issue_id_from_issue
-      changes = triggered_by.previous_changes.keys & PUBLISH_WHEN_ISSUE_CHANGED
+      issue = triggered_by
+
+      changes = issue.previous_changes.keys & PUBLISH_WHEN_ISSUE_CHANGED
 
       return if changes.none?
-      # Ignore updates for already confidential issues
-      # Note: Issues becoming confidential _will_ be unpublished.
-      return if triggered_by.confidential? && changes.exclude?('confidential')
+      return if issue.confidential? && changes.exclude?('confidential')
 
-      triggered_by.id
+      issue.id
+    end
+
+    # Trigger publish for notes
+    # - on issues
+    # - which are user-generated (non-system)
+    # - which were changed or destroyed
+    # - had emoji `microphone` on it
+    def eligable_issue_id_from_note
+      note = triggered_by
+
+      return unless note.for_issue?
+      return if note.system?
+      # We can't know the emoji if the note was destroyed, so
+      # publish every time to make sure we remove the comment if needed
+      return note.noteable_id if note.destroyed?
+
+      return if note.previous_changes.none?
+      return if note.award_emoji.named(StatusPage::AWARD_EMOJI).none?
+
+      note.noteable_id
     end
   end
 end
