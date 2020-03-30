@@ -25,6 +25,11 @@ export default {
       type: String,
       required: true,
     },
+    showLoadingState: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     // { [alertPath]: { alert_attributes } }. Populated from subsequent API calls.
     // Includes only the metrics/alerts to be managed by this widget.
     alertsToManage: {
@@ -74,6 +79,9 @@ export default {
         count: this.thresholds.length,
         firingCount: this.firingAlerts.length,
       };
+    },
+    shouldShowLoadingIcon() {
+      return this.showLoadingState && this.isLoading;
     },
     thresholds() {
       const alertsToManage = Object.keys(this.alertsToManage);
@@ -213,7 +221,7 @@ export default {
 
 <template>
   <div class="prometheus-alert-widget dropdown flex-grow-2 overflow-hidden">
-    <gl-loading-icon v-if="isLoading" :inline="true" />
+    <gl-loading-icon v-if="shouldShowLoadingIcon" :inline="true" />
     <span v-else-if="errorMessage" ref="alertErrorMessage" class="alert-error-message">{{
       errorMessage
     }}</span>

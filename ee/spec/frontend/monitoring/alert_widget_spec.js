@@ -123,6 +123,30 @@ describe('AlertWidget', () => {
       });
   });
 
+  it('does not render loading spinner if showLoadingState is false', () => {
+    let resolveReadAlert;
+    mockReadAlert.mockReturnValue(
+      new Promise(resolve => {
+        resolveReadAlert = resolve;
+      }),
+    );
+    createComponent({
+      ...defaultProps,
+      showLoadingState: false,
+    });
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
+
+        resolveReadAlert({ operator: '==', threshold: 42 });
+      })
+      .then(() => waitForPromises())
+      .then(() => {
+        expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
+      });
+  });
+
   it('displays an error message when fetch fails', () => {
     mockReadAlert.mockRejectedValue();
     createComponent(propsWithAlert);
