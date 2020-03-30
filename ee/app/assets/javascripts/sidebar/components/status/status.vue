@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     handleFormSubmission() {
-      this.$emit('onFormSubmit', this.selectedStatus);
+      this.$emit('onStatusChange', this.selectedStatus);
       this.hideForm();
     },
     hideForm() {
@@ -84,7 +84,7 @@ export default {
       this.isFormShowing = !this.isFormShowing;
     },
     removeStatus() {
-      this.$emit('onFormSubmit', null);
+      this.$emit('onStatusChange', null);
     },
   },
 };

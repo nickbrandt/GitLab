@@ -112,7 +112,7 @@ describe('Status', () => {
       expect(getRemoveStatusButton(wrapper).exists()).toBe(true);
     });
 
-    it('emits an onFormSubmit event with argument null when clicked', () => {
+    it('emits an onStatusChange event with argument null when clicked', () => {
       const props = {
         isEditable: true,
         status: healthStatus.AT_RISK,
@@ -122,7 +122,7 @@ describe('Status', () => {
 
       getRemoveStatusButton(wrapper).trigger('click');
 
-      expect(wrapper.emitted().onFormSubmit[0]).toEqual([null]);
+      expect(wrapper.emitted().onStatusChange[0]).toEqual([null]);
     });
   });
 
@@ -267,7 +267,7 @@ describe('Status', () => {
 
       // Test that "onTrack", "needsAttention", and "atRisk" values are emitted when form is submitted
       it.each(Object.values(healthStatus))(
-        'emits onFormSubmit event with argument "%s" when user selects the option and submits form',
+        'emits onStatusChange event with argument "%s" when user selects the option and submits form',
         status => {
           getEditForm(wrapper)
             .find(`input[value="${status}"]`)
@@ -275,7 +275,7 @@ describe('Status', () => {
 
           return Vue.nextTick().then(() => {
             getEditForm(wrapper).trigger('submit');
-            expect(wrapper.emitted().onFormSubmit[0]).toEqual([status]);
+            expect(wrapper.emitted().onStatusChange[0]).toEqual([status]);
           });
         },
       );
