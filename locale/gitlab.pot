@@ -1060,6 +1060,9 @@ msgid_plural "Add %d issues"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Add %{linkStart}assets%{linkEnd} to your Release. GitLab automatically includes read-only assets, like source code and release evidence."
+msgstr ""
+
 msgid "Add CHANGELOG"
 msgstr ""
 
@@ -1136,6 +1139,9 @@ msgid "Add an existing issue to the epic."
 msgstr ""
 
 msgid "Add an issue"
+msgstr ""
+
+msgid "Add another link"
 msgstr ""
 
 msgid "Add approval rule"
@@ -11994,6 +12000,9 @@ msgstr ""
 msgid "Link copied"
 msgstr ""
 
+msgid "Link title"
+msgstr ""
+
 msgid "Linked emails (%{email_count})"
 msgstr ""
 
@@ -14795,6 +14804,9 @@ msgstr ""
 msgid "Pods in use"
 msgstr ""
 
+msgid "Point to any links you like: documentation, built binaries, or other related materials. These can be internal or external links from your GitLab instance."
+msgstr ""
+
 msgid "Preferences"
 msgstr ""
 
@@ -16539,6 +16551,12 @@ msgid_plural "Releases"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Release assets"
+msgstr ""
+
+msgid "Release assets documentation"
+msgstr ""
+
 msgid "Release does not have the same project as the milestone"
 msgstr ""
 
@@ -16606,6 +16624,9 @@ msgid "Remove approvers"
 msgstr ""
 
 msgid "Remove approvers?"
+msgstr ""
+
+msgid "Remove asset link"
 msgstr ""
 
 msgid "Remove assignee"
