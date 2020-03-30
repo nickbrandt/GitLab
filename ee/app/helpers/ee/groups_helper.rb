@@ -90,13 +90,7 @@ module EE
     end
 
     def show_administration_nav?(group)
-      group_sidebar_link?(:administration) &&
-      group.parent.nil? &&
-      (
-        show_saml_in_sidebar?(group) ||
-        show_usage_quotas_in_sidebar? ||
-        show_billing_in_sidebar?
-      )
+      group.parent.nil? && can?(current_user, :admin_group, @group)
     end
 
     def administration_nav_path(group)
@@ -122,10 +116,6 @@ module EE
 
       if can?(current_user, :read_epic, @group)
         links << :epics
-      end
-
-      if can?(current_user, :admin_group, @group)
-        links << :administration
       end
 
       if @group.feature_available?(:issues_analytics)
