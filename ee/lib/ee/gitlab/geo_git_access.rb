@@ -40,7 +40,7 @@ module EE
       end
 
       def messages
-        messages = ::Gitlab::Geo.proxying_push_to_primary_message(primary_ssh_url_to_repo).split("\n")
+        messages = ::Gitlab::Geo.interacting_with_primary_message(primary_ssh_url_to_repo).split("\n")
         lag_message = current_replication_lag_message
 
         return messages unless lag_message

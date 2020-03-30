@@ -101,8 +101,8 @@ describe API::Internal::Base do
 
       it 'includes a message advising a redirection occurred' do
         redirect_message = <<~STR
-        You're pushing to a Geo secondary! We'll help you by redirecting this
-        request to the primary:
+        This request to a Geo secondary node will be forwarded to the
+        Geo primary node:
 
           http://primary.example.com/#{project.full_path}.git
         STR

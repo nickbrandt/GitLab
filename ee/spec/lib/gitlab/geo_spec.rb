@@ -312,13 +312,13 @@ describe Gitlab::Geo, :geo, :request_store do
     it 'returns a message as a string' do
       url = 'ssh://git@primary.com/namespace/repo.git'
       message = <<~STR
-      You're pushing to a Geo secondary! We'll help you by proxying this
-      request to the primary:
+      This request to a Geo secondary node will be forwarded to the
+      Geo primary node:
 
         #{url}
       STR
 
-      expect(described_class.proxying_push_to_primary_message(url)).to eq(message)
+      expect(described_class.interacting_with_primary_message(url)).to eq(message)
     end
   end
 
@@ -326,13 +326,13 @@ describe Gitlab::Geo, :geo, :request_store do
     it 'returns a message as a string' do
       url = 'http://primary.com/namespace/repo.git'
       message = <<~STR
-      You're pushing to a Geo secondary! We'll help you by redirecting this
-      request to the primary:
+      This request to a Geo secondary node will be forwarded to the
+      Geo primary node:
 
         #{url}
       STR
 
-      expect(described_class.redirecting_push_to_primary_message(url)).to eq(message)
+      expect(described_class.interacting_with_primary_message(url)).to eq(message)
     end
   end
 end

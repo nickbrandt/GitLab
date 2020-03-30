@@ -137,33 +137,25 @@ module Gitlab
       Gitlab::CIDR.new(allowed_ips).match?(ip)
     end
 
-    def self.proxying_push_to_primary_message(url)
-      push_to_primary_message(url, 'proxying')
-    end
-
-    def self.redirecting_push_to_primary_message(url)
-      push_to_primary_message(url, 'redirecting')
-    end
-
-    def self.push_to_primary_message(url, action)
-      return unless url && action
+    def self.interacting_with_primary_message(url)
+      return unless url
 
       # This is formatted like this to fit into the console 'box', e.g.
       #
       # remote:
-      # remote: You're pushing to a Geo secondary! We'll help you by <action> this
-      # remote: request to the primary:
+      # remote: This request to a Geo secondary node will be forwarded to the
+      # remote: Geo primary node:
       # remote:
       # remote:   <url>
       # remote:
       template = <<~STR
-        You're pushing to a Geo secondary! We'll help you by %{action} this
-        request to the primary:
+        This request to a Geo secondary node will be forwarded to the
+        Geo primary node:
 
           %{url}
       STR
 
-      _(template) % { action: _(action), url: url }
+      _(template) % { url: url }
     end
   end
 end
