@@ -34,7 +34,7 @@ describe API::Members do
         get api("/groups/#{group.to_param}/members", owner)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/members')
+        expect(response).to match_response_schema('public_api/v4/members', dir: 'ee')
       end
 
       context 'when a group has SAML provider configured' do

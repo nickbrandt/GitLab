@@ -263,6 +263,7 @@ describe Projects::IssuesController do
       subject { get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid } }
 
       before do
+        sign_in(user)
         allow(Gitlab).to receive(:com?).and_return(true)
         note_user = discussion.author
         note_user.update(email: email)
@@ -275,7 +276,7 @@ describe Projects::IssuesController do
 
           note_json = json_response.first['notes'].first
 
-          expect(note_json['author']['is_gitlab_employee']).to be nil
+          expect(note_json['author']['is_gitlab_employee']).to be false
         end
       end
 
@@ -311,6 +312,36 @@ describe Projects::IssuesController do
 
           it_behaves_like 'non inclusion of gitlab employee badge'
         end
+      end
+    end
+  end
+
+  describe 'PUT #update' do
+    let(:issue) { create(:issue, project: project) }
+
+    def update_issue(issue_params: {}, additional_params: {}, id: nil)
+      id ||= issue.iid
+      params = {
+        namespace_id: project.namespace.to_param,
+        project_id: project,
+        id: id,
+        issue: { title: 'New title' }.merge(issue_params),
+        format: :json
+      }.merge(additional_params)
+
+      put :update, params: params
+    end
+
+    context 'changing the assignee' do
+      it 'limits the attributes exposed on the assignee' do
+        assignee = create(:user)
+        project.add_developer(assignee)
+        sign_in(assignee)
+
+        update_issue(issue_params: { assignee_ids: [assignee.id] })
+
+        expect(json_response['assignees'].first.keys)
+          .to match_array(%w(id name username avatar_url state web_url is_gitlab_employee))
       end
     end
   end

@@ -346,6 +346,41 @@ describe API::Projects do
     end
   end
 
+  describe 'GET /projects/:id/users' do
+    shared_examples_for 'project users response' do
+      it 'returns the project users' do
+        get api("/projects/#{project.id}/users", current_user)
+
+        user = project.namespace.owner
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to include_pagination_headers
+        expect(json_response).to be_an Array
+        expect(json_response.size).to eq(1)
+
+        first_user = json_response.first
+        expect(first_user['username']).to eq(user.username)
+        expect(first_user['name']).to eq(user.name)
+        expect(first_user.keys).to contain_exactly(*%w[name username id state avatar_url web_url is_gitlab_employee])
+      end
+    end
+
+    context 'when unauthenticated' do
+      it_behaves_like 'project users response' do
+        let(:project) { create(:project, :public) }
+        let(:current_user) { nil }
+      end
+    end
+
+    context 'when authenticated' do
+      context 'valid request' do
+        it_behaves_like 'project users response' do
+          let(:current_user) { user }
+        end
+      end
+    end
+  end
+
   describe 'POST /projects/user/:id' do
     let(:admin) { create(:admin) }
     let(:api_call) { post api("/projects/user/#{user.id}", admin), params: project_params }
