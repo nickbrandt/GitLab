@@ -239,6 +239,7 @@ describe EpicIssues::CreateService do
         before do
           group.add_developer(user)
           create(:epic_issue, epic: epic, issue: issue)
+          issue.reload
         end
 
         let(:another_epic) { create(:epic, group: group) }

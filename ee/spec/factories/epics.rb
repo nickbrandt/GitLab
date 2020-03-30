@@ -15,6 +15,10 @@ FactoryBot.define do
       due_date_is_fixed { true }
     end
 
+    trait :confidential do
+      confidential { true }
+    end
+
     trait :opened do
       state { :opened }
     end
