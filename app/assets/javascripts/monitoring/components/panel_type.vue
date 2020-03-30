@@ -239,7 +239,7 @@ export default {
               :data-clipboard-text="clipboardText"
               @click="showToast(clipboardText)"
             >
-              {{ __('Generate link to chart') }}
+              {{ __('Copy link to chart') }}
             </gl-dropdown-item>
             <gl-dropdown-item
               v-if="alertWidgetAvailable"
