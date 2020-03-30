@@ -333,7 +333,7 @@ rspec:
 
 Assuming your project is using [Go Modules](https://github.com/golang/go/wiki/Modules) to install
 the Go dependencies, the following example defines `cache` globally so that
-all jobs inherit it. Go modules are installed in `vendor/` and
+all jobs inherit it. Go modules are installed in `${GOPATH}/pkg/mod/` and
 are cached per-branch:
 
 ```yaml
@@ -345,7 +345,6 @@ image: golang:1.13
   before_script:
     - mkdir -p .go
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - .go/pkg/mod/
 
