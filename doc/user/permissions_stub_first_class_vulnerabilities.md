@@ -137,8 +137,8 @@ While Maintainer is the highest project-level role, some actions can only be per
 | Remove protected branches (*4*)                   |         |            |             |          |        |
 
 - (*1*): Guest users can perform this action on public and internal projects, but not private projects.
-- (*2*): Guest users can only view the confidential issues they created
-- (*3*): If **Public pipelines** is enabled in **{settings}** **Project Settings > CI/CD**
+- (*2*): Guest users can only view the confidential issues they created.
+- (*3*): If **Public pipelines** is enabled in **{settings}** **Project Settings > CI/CD**.
 - (*4*): Not allowed for Guest, Reporter, Developer, Maintainer, or Owner. See [Protected Branches](project/protected_branches.md).
 
 ## Project features permissions
