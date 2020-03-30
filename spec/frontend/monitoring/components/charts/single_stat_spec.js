@@ -20,7 +20,7 @@ describe('Single Stat Chart component', () => {
   describe('computed', () => {
     describe('statValue', () => {
       it('should interpolate the value and unit props', () => {
-        expect(singleStatChart.vm.statValue).toBe('91MB');
+        expect(singleStatChart.vm.statValue).toBe('91.00MB');
       });
 
       it('should change the value representation to a percentile one', () => {
@@ -31,7 +31,7 @@ describe('Single Stat Chart component', () => {
           },
         });
 
-        expect(singleStatChart.vm.statValue).toContain('75.8');
+        expect(singleStatChart.vm.statValue).toContain('75.83%');
       });
 
       it('should display NaN for non numeric max_value values', () => {

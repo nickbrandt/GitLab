@@ -1,7 +1,9 @@
 <script>
 import { GlSingleStat } from '@gitlab/ui/dist/charts';
-import { roundOffFloat } from '~/lib/utils/common_utils';
+import { SUPPORTED_FORMATS, getFormatter } from '~/lib/utils/unit_format';
 import { graphDataValidatorForValues } from '../../utils';
+
+const defaultPrecision = 2;
 
 export default {
   components: {
@@ -29,11 +31,18 @@ export default {
      * @returns {(String)}
      */
     statValue() {
-      const chartValue = this.graphData?.max_value
-        ? (this.queryResult / Number(this.graphData.max_value)) * 100
-        : this.queryResult;
+      let formatter;
+      let value;
 
-      return `${roundOffFloat(chartValue, 1)}${this.queryInfo.unit}`;
+      if (this.graphData?.max_value) {
+        formatter = getFormatter(SUPPORTED_FORMATS.percent);
+        value = formatter(this.queryResult / Number(this.graphData.max_value), defaultPrecision);
+      } else {
+        formatter = getFormatter(SUPPORTED_FORMATS.number);
+        value = `${formatter(this.queryResult, defaultPrecision)}${this.queryInfo.unit}`;
+      }
+
+      return value;
     },
     graphTitle() {
       return this.queryInfo.label;
