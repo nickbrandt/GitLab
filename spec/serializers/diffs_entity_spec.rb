@@ -29,21 +29,50 @@ describe DiffsEntity do
 
     context "when a commit_id is passed" do
       let(:commits) { [nil] + merge_request.commits + [nil] }
-      let(:commit) { commits.compact.sample }
       let(:entity) do
-        described_class.new(merge_request_diffs.first.diffs, request: request, merge_request: merge_request, merge_request_diffs: merge_request_diffs, commit: commit)
+        described_class.new(
+          merge_request_diffs.first.diffs,
+          request: request,
+          merge_request: merge_request,
+          merge_request_diffs: merge_request_diffs,
+          commit: @commit
+        )
       end
 
-      it 'includes commit references for previous and next' do
-        expect(subject[:commit]).to include(:prev_commit_id, :next_commit_id)
+      subject { entity.as_json }
 
-        index = commits.index(commit)
-        prev_commit = commits[index - 1]&.id
-        next_commit = commits[index + 1]&.id
+      context "when the passed commit is not the first or last in the group" do
+        it 'includes commit references for previous and next' do
+          @commit = commits.third
+          check_neighbor_commits(commits, @commit)
+        end
+      end
 
-        expect(subject[:commit][:prev_commit_id]).to eq(prev_commit)
-        expect(subject[:commit][:next_commit_id]).to eq(next_commit)
+      context "when the passed commit is the first in the group" do
+        it 'includes commit references for nil and next' do
+          @commit = commits.compact.last
+          check_neighbor_commits(commits, @commit)
+        end
+      end
+
+      context "when the passed commit is the last in the group" do
+        it 'includes commit references for previous and nil' do
+          @commit = commits.compact.first
+          check_neighbor_commits(commits, @commit)
+        end
       end
     end
+  end
+
+  private
+
+  def check_neighbor_commits(commits, commit)
+    index = commits.index(commit)
+    prev_commit = commits[index - 1]&.id
+    next_commit = commits[index + 1]&.id
+
+    expect(subject[:commit]).to include(:prev_commit_id, :next_commit_id)
+    expect(subject[:commit][:prev_commit_id]).to eq(prev_commit)
+    expect(subject[:commit][:next_commit_id]).to eq(next_commit)
   end
 end

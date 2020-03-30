@@ -80,20 +80,19 @@ class DiffsEntity < Grape::Entity
   private
 
   def commit_ids
-    strong_memoize(:commit_ids) do
-      [nil] + merge_request.commits.collect(&:id) + [nil]
-    end
+    @commit_ids ||= merge_request.commits.collect(&:id)
   end
 
-  def commit_with_neighbors(id)
-    commits = commit_ids.each_cons(3).find { |prev_commit, commit, next_commit| commit == id }
-    { prev_commit_id: commits.first, next_commit_id: commits.last } if commits
+  def commit_neighbors(commit_id)
+    index = commit_ids.index(commit_id)
+
+    return [] unless index
+
+    [(index > 0 ? commit_ids[index - 1] : nil), commit_ids[index + 1]]
   end
 
   def commit_options(options)
-    neighbors = commit_with_neighbors(options[:commit]&.id)
-    prev_commit_id = neighbors&.dig(:prev_commit_id)
-    next_commit_id = neighbors&.dig(:next_commit_id)
+    prev_commit_id, next_commit_id = *commit_neighbors(options[:commit]&.id)
 
     options.merge(
       type: :full,
