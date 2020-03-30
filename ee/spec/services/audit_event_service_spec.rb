@@ -216,7 +216,7 @@ describe AuditEventService do
 
   describe '#for_user' do
     let(:author_name) { 'Administrator' }
-    let(:current_user) { User.new(name: author_name) }
+    let(:current_user) { instance_spy(User, name: author_name) }
     let(:target_user_full_path) { 'ejohn' }
     let(:user) { instance_spy(User, full_path: target_user_full_path) }
     let(:custom_message) { 'Some strange event has occurred' }
