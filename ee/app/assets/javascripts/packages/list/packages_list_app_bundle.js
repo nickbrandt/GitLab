@@ -2,7 +2,10 @@ import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import { createStore } from './stores';
 import PackagesListApp from './components/packages_list_app.vue';
+import VueApollo from 'vue-apollo';
+import createDefaultClient from '~/lib/graphql';
 
+Vue.use(VueApollo);
 Vue.use(Translate);
 
 export default () => {
@@ -10,9 +13,14 @@ export default () => {
   const store = createStore();
   store.dispatch('setInitialState', el.dataset);
 
+  const apolloProvider = new VueApollo({
+    defaultClient: createDefaultClient(),
+  });
+
   return new Vue({
     el,
     store,
+    apolloProvider,
     components: {
       PackagesListApp,
     },
