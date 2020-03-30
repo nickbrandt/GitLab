@@ -57,21 +57,30 @@ describe VulnerabilitiesHelper do
 
     subject { helper.vulnerability_finding_data(finding) }
 
-    it 'returns finding information' do
-      puts finding.to_json
-      expect(subject[:name]).not_to be_nil
-      expect(subject[:description]).not_to be_nil
+    it "returns finding information" do
       expect(subject).to include(
-        :solution => finding.solution,
-        :remediation => nil,
-        :issue_feedback => finding.issue_feedback,
-        :project => finding.project,
-        :description => finding.description,
-        :identifiers => finding.identifiers,
-        :links => finding.links,
-        :location => finding.location,
-        :name => finding.name
+        description: finding.description,
+        identifiers: finding.identifiers,
+        links: finding.links,
+        location: finding.location,
+        name: finding.name
       )
+    end
+
+    context "when finding has a remediations key" do
+      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("remediations") }.first }
+
+      it "uses the first remediation summary" do
+        expect(subject[:solution]).to start_with "Use GCM mode"
+      end
+    end
+
+    context "when finding has a solution key" do
+      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("solution") }.first }
+
+      it "uses the solution key" do
+        expect(subject[:solution]).to start_with "GCM mode"
+      end
     end
   end
 end

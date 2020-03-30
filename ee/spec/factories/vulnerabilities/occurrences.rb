@@ -69,6 +69,19 @@ FactoryBot.define do
       end
     end
 
+    trait :with_remediation do
+      after(:build) do |finding|
+        raw_metadata = JSON.parse(finding.raw_metadata)
+        raw_metadata.delete(:solution)
+        raw_metadata[:remediations] = [
+          {
+            summary: "Use GCM mode which includes HMAC in the resulting encrypted data, providing integrity of the result."
+          }
+        ]
+        finding.raw_metadata = raw_metadata.to_json
+      end
+    end
+
     ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |security_report_type|
       trait security_report_type do
         report_type { security_report_type }
