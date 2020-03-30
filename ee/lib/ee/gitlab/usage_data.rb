@@ -232,7 +232,10 @@ module EE
             protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id),
             remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
             snippets: distinct_count(::Snippet.where(time_period), :author_id),
-            suggestions: distinct_count(::Note.with_suggestions.where(time_period), :author_id)
+            suggestions: distinct_count(::Note.with_suggestions.where(time_period),
+                                        :author_id,
+                                        start: ::User.minimum(:id),
+                                        finish: ::User.maximum(:id))
           }
         end
 
