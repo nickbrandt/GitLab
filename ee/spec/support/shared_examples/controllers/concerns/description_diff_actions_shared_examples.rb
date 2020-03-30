@@ -27,7 +27,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
           get_description_diff(version_id: version_3)
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'returns the diff with the previous version of the specified start_version_id' do
@@ -35,7 +35,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
           get_description_diff(version_id: version_3, start_version_id: version_2)
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         context 'when description version is from another issuable' do
@@ -44,7 +44,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             get_description_diff(version_id: other_version)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -54,7 +54,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             get_description_diff(version_id: version_3, start_version_id: other_version)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -64,7 +64,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             get_description_diff(version_id: version_3, start_version_id: version_2)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -74,7 +74,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             delete_description_version(version_id: version_3)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -89,7 +89,7 @@ RSpec.shared_examples DescriptionDiffActions do
         it 'returns 200' do
           delete_description_version(version_id: version_3)
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(version_3.reload.deleted_at).to be_present
         end
 
@@ -97,7 +97,7 @@ RSpec.shared_examples DescriptionDiffActions do
           it 'returns 200' do
             delete_description_version(version_id: version_3, start_version_id: version_1)
 
-            expect(response.status).to eq(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(version_1.reload.deleted_at).to be_present
             expect(version_2.reload.deleted_at).to be_present
             expect(version_3.reload.deleted_at).to be_present
@@ -110,7 +110,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             delete_description_version(version_id: version_3)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -122,7 +122,7 @@ RSpec.shared_examples DescriptionDiffActions do
 
             delete_description_version(version_id: version_3)
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(version_3.reload.deleted_at).to be_nil
           end
         end
@@ -138,7 +138,7 @@ RSpec.shared_examples DescriptionDiffActions do
         it 'returns 404' do
           get_description_diff(version_id: version_3)
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -146,7 +146,7 @@ RSpec.shared_examples DescriptionDiffActions do
         it 'returns 404' do
           delete_description_version(version_id: version_3)
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end

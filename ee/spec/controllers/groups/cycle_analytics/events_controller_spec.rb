@@ -69,7 +69,7 @@ describe Groups::CycleAnalytics::EventsController do
             },
             format: :json)
 
-        expect(response.status).to eq(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

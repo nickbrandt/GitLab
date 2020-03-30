@@ -22,7 +22,7 @@ describe API::Members do
           post api("/projects/#{project.id}/members", owner),
                params: { user_id: user.id, access_level: Member::MAINTAINER }
 
-          expect(response.status).to eq 405
+          expect(response).to have_gitlab_http_status(:method_not_allowed)
         end
       end
     end
