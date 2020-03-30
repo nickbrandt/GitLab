@@ -12,7 +12,7 @@ module Projects
         def show
           blob = design_repository.blob_at(ref, design.full_path)
 
-          send_blob(design_repository, blob, { inline: false })
+          send_blob(design_repository, blob, inline: false, allow_caching: project.public?)
         end
 
         private
