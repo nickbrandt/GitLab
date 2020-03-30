@@ -55,8 +55,6 @@ module MergeRequests
       error =
         if @merge_request.should_be_rebased?
           'Only fast-forward merge is allowed for your project. Please update your source branch'
-        elsif !@merge_request.merged? && !@merge_request.mergeable?
-          'Merge request is not mergeable'
         end
 
       raise_error(error) if error
