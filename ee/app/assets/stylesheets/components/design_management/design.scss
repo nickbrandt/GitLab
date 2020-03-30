@@ -28,7 +28,7 @@
   overflow-y: scroll;
   padding: 0 $gl-padding;
   padding-top: 50px;
-  background-color: $white-light;
+  background-color: $white;
   flex-shrink: 0;
   min-width: 400px;
   flex-basis: 28%;
@@ -36,8 +36,8 @@
   .badge.badge-pill {
     margin-left: $gl-padding;
     background-color: $blue-400;
-    color: $white-light;
-    border: $white-light 1px solid;
+    color: $white;
+    border: $white 1px solid;
     min-height: 28px;
     padding: 7px 10px;
     border-radius: $gl-padding;

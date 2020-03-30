@@ -15,7 +15,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
   }
 
   to {
-    background-color: $white-light;
+    background-color: $white;
   }
 }
 
@@ -170,7 +170,7 @@ html.group-epics-roadmap-html {
     float: left;
     height: $header-item-height;
     border-bottom: $border-style;
-    background-color: $white-light;
+    background-color: $white;
   }
 
   .timeline-header-blank {
@@ -243,7 +243,7 @@ html.group-epics-roadmap-html {
     position: absolute;
     left: 0;
     bottom: -$grid-size;
-    border-top: 1px solid $white-light;
+    border-top: 1px solid $white;
     background: $scroll-top-gradient;
   }
 }
@@ -266,7 +266,7 @@ html.group-epics-roadmap-html {
     &:hover {
       .epic-details-cell,
       .epic-timeline-cell {
-        background-color: $white-light;
+        background-color: $white;
       }
     }
 
@@ -299,7 +299,7 @@ html.group-epics-roadmap-html {
   width: $details-cell-width;
   padding: $gl-padding-8 $gl-padding;
   font-size: $code-font-size;
-  background-color: $white-light;
+  background-color: $white;
   z-index: 10;
 
   &::after {
@@ -373,14 +373,14 @@ html.group-epics-roadmap-html {
   position: -webkit-sticky;
   left: $details-cell-width;
   padding: $gl-padding-8;
-  color: $white-light;
+  color: $white;
 }
 
 .epic-bar-progress {
   background-color: $blue-300;
 
   .progress-bar {
-    background-color: $white-light;
+    background-color: $white;
   }
 }
 
@@ -525,7 +525,7 @@ html.group-epics-roadmap-html {
         width: 8px;
         border: 2px solid $gray-700;
         border-radius: 4px;
-        background-color: $white-light;
+        background-color: $white;
       }
     }
   }
@@ -535,7 +535,7 @@ html.group-epics-roadmap-html {
     left: 0;
     width: $details-cell-width;
     font-size: $code-font-size;
-    background-color: $white-light;
+    background-color: $white;
     z-index: 2;
 
     &::after {
