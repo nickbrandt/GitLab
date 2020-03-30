@@ -8,10 +8,6 @@ describe 'projects/pages/show' do
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
   let(:domain) { create(:pages_domain, project: project) }
-  let(:error_message) do
-    "Something went wrong while obtaining Let's Encrypt certificate for #{domain.domain}. "\
-    "To retry visit your domain details."
-  end
 
   before do
     allow(project).to receive(:pages_deployed?).and_return(true)
@@ -24,37 +20,53 @@ describe 'projects/pages/show' do
     assign(:domains, [domain])
   end
 
-  it "doesn't show auto ssl error warning" do
-    render
+  describe 'validation warning' do
+    let(:warning_message) do
+      "#{domain.domain} is not verified. To learn how to verify ownership, "\
+      "visit your domain details."
+    end
 
-    expect(rendered).not_to have_content(error_message)
+    it "doesn't show auto ssl error warning" do
+      render
+
+      expect(rendered).not_to have_content(warning_message)
+    end
+
+    context "when domain is not verified" do
+      before do
+        domain.update!(verified_at: nil)
+      end
+
+      it 'shows auto ssl error warning' do
+        render
+
+        expect(rendered).to have_content(warning_message)
+      end
+    end
   end
 
-  context "when we failed to obtain Let's Encrypt's certificate" do
-    before do
-      domain.update!(auto_ssl_failed: true)
+  describe "warning about failed Let's Encrypt" do
+    let(:error_message) do
+      "Something went wrong while obtaining Let's Encrypt certificate for #{domain.domain}. "\
+      "To retry visit your domain details."
     end
 
-    it 'shows auto ssl error warning' do
-      render
-
-      expect(rendered).to have_content(error_message)
-    end
-
-    it "doesn't show warning if lets_encrypt_error feature flag is disabled" do
-      stub_feature_flags(pages_letsencrypt_errors: false)
-
+    it "doesn't show auto ssl error warning" do
       render
 
       expect(rendered).not_to have_content(error_message)
     end
 
-    it "doesn't show warning if Let's Encrypt integration is disabled" do
-      allow(::Gitlab::LetsEncrypt).to receive(:enabled?).and_return false
+    context "when we failed to obtain Let's Encrypt's certificate" do
+      before do
+        domain.update!(auto_ssl_failed: true)
+      end
 
-      render
+      it 'shows auto ssl error warning' do
+        render
 
-      expect(rendered).not_to have_content(error_message)
+        expect(rendered).to have_content(error_message)
+      end
     end
   end
 end
