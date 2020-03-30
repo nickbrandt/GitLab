@@ -5,8 +5,11 @@
         .row
           .col-sm-10.offset-sm-2
             .bs-callout.bs-callout-warning.mt-0
-              = _("Something went wrong while obtaining the Let's Encrypt certificate.")
-              = link_to s_('GitLabPagesDomains|Retry'), retry_auto_ssl_project_pages_domain_path(@project, @domain), class: "btn btn-sm btn-grouped btn-warning btn-inverted", method: :post
+              .row.align-items-center.mx-2
+                = icon('warning', class: 'mr-2')
+                = _("Something went wrong while the obtaining Let's Encrypt certificate.")
+              .row.mx-0.mt-3
+                = link_to s_('GitLabPagesDomains|Retry'), retry_auto_ssl_project_pages_domain_path(@project, @domain), class: "btn btn-sm btn-grouped btn-warning", method: :post
     - else
       .form-group.border-section.js-shown-if-auto-ssl{ class: ("d-none" unless auto_ssl_available_and_enabled) }
         .row
