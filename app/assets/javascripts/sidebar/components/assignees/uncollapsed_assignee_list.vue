@@ -1,12 +1,14 @@
 <script>
 import { __, sprintf } from '~/locale';
 import AssigneeAvatarLink from './assignee_avatar_link.vue';
+import EmployeeBadge from '~/vue_shared/components/user_avatar/badges/employee_badge.vue';
 
 const DEFAULT_RENDER_COUNT = 5;
 
 export default {
   components: {
     AssigneeAvatarLink,
+    EmployeeBadge,
   },
   props: {
     users: {
@@ -75,7 +77,10 @@ export default {
   >
     <div class="ml-2">
       <span class="author"> {{ user.name }} </span>
-      <span class="username"> {{ username }} </span>
+      <span class="username">
+        <span>{{ username }}</span>
+        <employee-badge v-if="user.is_gitlab_employee" />
+      </span>
     </div>
   </assignee-avatar-link>
   <div v-else>

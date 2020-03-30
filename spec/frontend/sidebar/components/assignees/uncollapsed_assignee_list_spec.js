@@ -4,6 +4,7 @@ import UncollapsedAssigneeList from '~/sidebar/components/assignees/uncollapsed_
 import AssigneeAvatarLink from '~/sidebar/components/assignees/assignee_avatar_link.vue';
 import userDataMock from '../../user_data_mock';
 import UsersMockHelper from '../../../helpers/user_mock_data_helper';
+import EmployeeBadge from '~/vue_shared/components/user_avatar/badges/employee_badge.vue';
 
 const DEFAULT_RENDER_COUNT = 5;
 
@@ -51,6 +52,14 @@ describe('UncollapsedAssigneeList component', () => {
     it('Shows one user with avatar, username and author name', () => {
       expect(wrapper.text()).toContain(user.name);
       expect(wrapper.text()).toContain(`@${user.username}`);
+    });
+
+    it('renders GitLab employee badge when `author.is_gitlab_employee` is `true`', () => {
+      createComponent({
+        users: [{ ...userDataMock(), is_gitlab_employee: true }],
+      });
+
+      expect(wrapper.find(EmployeeBadge).exists()).toBe(true);
     });
   });
 

@@ -7,7 +7,7 @@ import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { s__, __, sprintf } from './locale';
 import ModalStore from './boards/stores/modal_store';
-import { parseBoolean } from './lib/utils/common_utils';
+import { parseBoolean, spriteIcon } from './lib/utils/common_utils';
 
 // TODO: remove eventHub hack after code splitting refactor
 window.emitSidebarEvent = window.emitSidebarEvent || $.noop;
@@ -405,7 +405,12 @@ function UsersSelect(currentUser, els, options = {}) {
         const { $el, e, isMarking } = options;
         const user = options.selectedObj;
 
+        // Dispose of any tooltips attached to $el or child elements of $el
         $el.tooltip('dispose');
+        const $tooltip = $el.find('[data-toggle="tooltip"]');
+        if ($tooltip.length) {
+          $tooltip.tooltip('dispose');
+        }
 
         if ($dropdown.hasClass('js-multiselect')) {
           const isActive = $el.hasClass('is-active');
@@ -748,7 +753,24 @@ UsersSelect.prototype.renderRow = function(issuableType, user, selected, usernam
           <strong class="dropdown-menu-user-full-name">
             ${_.escape(user.name)}
           </strong>
-          ${username ? `<span class="dropdown-menu-user-username">${username}</span>` : ''}
+          ${
+            username
+              ? `<span class="dropdown-menu-user-username">
+                  <span class="d-inline-block">
+                    ${username}
+                  </span>
+                  ${
+                    user.is_gitlab_employee
+                      ? `<span class="d-inline-block vertical-align-middle" data-toggle="tooltip" data-title="${__(
+                          'GitLab Employee',
+                        )}">
+                          ${spriteIcon('tanuki-verified', 's16 gl-text-purple d-block')}
+                        </span>`
+                      : ''
+                  }
+                </span>`
+              : ''
+          }
         </span>
       </a>
     </li>
