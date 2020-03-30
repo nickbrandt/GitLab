@@ -10,7 +10,7 @@ class Admin::AuditLogsController < Admin::ApplicationController
   PER_PAGE = 25
 
   def index
-    @events = audit_log_events
+    @events = audit_log_events.page(params[:page]).per(PER_PAGE).without_count
 
     @entity = case audit_logs_params[:entity_type]
               when 'User'
@@ -27,10 +27,7 @@ class Admin::AuditLogsController < Admin::ApplicationController
   private
 
   def audit_log_events
-    events = AuditLogFinder.new(audit_logs_params).execute
-    events = events.page(params[:page]).per(PER_PAGE).without_count
-
-    Gitlab::Audit::Events::Preloader.preload!(events)
+    AuditLogFinder.new(audit_logs_params).execute
   end
 
   def check_license_admin_audit_log_available!

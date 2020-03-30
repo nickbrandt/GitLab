@@ -11,9 +11,7 @@ class Groups::AuditEventsController < Groups::ApplicationController
   layout 'group_settings'
 
   def index
-    events = AuditLogFinder.new(audit_logs_params).execute.page(params[:page])
-
-    @events = Gitlab::Audit::Events::Preloader.preload!(events)
+    @events = AuditLogFinder.new(audit_logs_params).execute.page(params[:page])
   end
 
   private

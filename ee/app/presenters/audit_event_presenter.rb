@@ -4,11 +4,13 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   presents :audit_event
 
   def author_name
-    author = audit_event.lazy_author
+    user = audit_event.user
 
-    return author.name if author.is_a?(Gitlab::Audit::NullAuthor)
-
-    link_to(author.name, user_path(author))
+    if user
+      link_to(user.name, user_path(user))
+    else
+      audit_event.author_name
+    end
   end
 
   def target
@@ -24,9 +26,9 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   end
 
   def object
-    entity = audit_event.lazy_entity
+    entity = audit_event.entity
 
-    return if entity.is_a?(Gitlab::Audit::NullEntity)
+    return unless entity
 
     link_to(details[:entity_path] || entity.name, entity).html_safe
   end

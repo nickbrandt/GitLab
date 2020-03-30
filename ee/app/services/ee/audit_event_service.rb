@@ -89,7 +89,7 @@ module EE
 
       @details = {
         failed_login: auth.upcase,
-        author_name: @author.name,
+        author_name: @author,
         target_details: @author,
         ip_address: ip
       }
@@ -141,7 +141,7 @@ module EE
       @details[:entity_path] = @entity&.full_path if admin_audit_log_enabled?
 
       SecurityEvent.create(
-        author_id: @author.id,
+        author_id: @author.respond_to?(:id) ? @author.id : AuditEvent::UNAUTH_USER_AUTHOR_ID,
         entity_id: @entity.respond_to?(:id) ? @entity.id : -1,
         entity_type: 'User',
         details: @details
@@ -213,7 +213,7 @@ module EE
     override :base_payload
     def base_payload
       {
-        author_id: @author.id,
+        author_id: @author.respond_to?(:id) ? @author.id : AuditEvent::UNAUTH_USER_AUTHOR_ID,
         # `@author.respond_to?(:id)` is to support cases where we need to log events
         # that could take place even when a user is unathenticated, Eg: downloading a public repo.
         # For such events, it is not mandatory that an author is always present.
