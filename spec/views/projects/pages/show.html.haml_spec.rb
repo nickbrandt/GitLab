@@ -47,7 +47,7 @@ describe 'projects/pages/show' do
 
   describe "warning about failed Let's Encrypt" do
     let(:error_message) do
-      "Something went wrong while obtaining Let's Encrypt certificate for #{domain.domain}. "\
+      "Something went wrong while obtaining the Let's Encrypt certificate for #{domain.domain}. "\
       "To retry visit your domain details."
     end
 

@@ -35,6 +35,6 @@
           %li.list-group-item.bs-callout-warning
             - details_link_start = "<a href='#{project_pages_domain_path(@project, domain)}'>".html_safe
             - details_link_end = '</a>'.html_safe
-            = s_("GitLabPages|Something went wrong while obtaining Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}.").html_safe % { domain: domain.domain,
+            = s_("GitLabPages|Something went wrong while obtaining the Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}.").html_safe % { domain: domain.domain,
                 link_start: details_link_start,
                 link_end: details_link_end }
