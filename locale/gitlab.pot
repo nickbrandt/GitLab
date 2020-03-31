@@ -5392,9 +5392,6 @@ msgstr[1] ""
 msgid "ContainerRegistry|Retention policy has been Enabled"
 msgstr ""
 
-msgid "ContainerRegistry|Size"
-msgstr ""
-
 msgid "ContainerRegistry|Something went wrong while deleting the image."
 msgstr ""
 
@@ -5476,16 +5473,7 @@ msgstr ""
 msgid "ContainerRegistry|You are about to remove %{item}. Are you sure?"
 msgstr ""
 
-msgid "ContainerRegistry|You are about to remove <b>%{count}</b> tags. Are you sure?"
-msgstr ""
-
-msgid "ContainerRegistry|You are about to remove <b>%{title}</b>. Are you sure?"
-msgstr ""
-
 msgid "ContainerRegistry|You are about to remove repository %{title}. Once you confirm, this repository will be permanently deleted."
-msgstr ""
-
-msgid "ContainerRegistry|You are about to remove repository <b>%{title}</b>. Once you confirm, this repository will be permanently deleted."
 msgstr ""
 
 msgid "ContainerRegistry|You can add an image to this registry with the following commands:"
@@ -10742,9 +10730,6 @@ msgid "Ignore"
 msgstr ""
 
 msgid "Ignored"
-msgstr ""
-
-msgid "Image %{imageName} was scheduled for deletion from the registry."
 msgstr ""
 
 msgid "Image: %{image}"
@@ -18652,12 +18637,6 @@ msgid "Something went wrong while fetching the package."
 msgstr ""
 
 msgid "Something went wrong while fetching the packages list."
-msgstr ""
-
-msgid "Something went wrong while fetching the projects."
-msgstr ""
-
-msgid "Something went wrong while fetching the registry list."
 msgstr ""
 
 msgid "Something went wrong while initializing the OpenAPI viewer"
