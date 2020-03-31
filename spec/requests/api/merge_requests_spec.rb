@@ -1525,7 +1525,7 @@ describe API::MergeRequests do
 
       it "returns 400 when target_branch is missing" do
         post api("/projects/#{forked_project.id}/merge_requests", user2),
-        params: { title: 'Test merge_request', target_branch: "master", author: user2, target_project_id: project.id }
+        params: { title: 'Test merge_request', source_branch: "master", author: user2, target_project_id: project.id }
         expect(response).to have_gitlab_http_status(:bad_request)
       end
 
