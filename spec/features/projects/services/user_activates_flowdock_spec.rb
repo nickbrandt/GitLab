@@ -3,22 +3,18 @@
 require 'spec_helper'
 
 describe 'User activates Flowdock' do
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
+  include_context 'project service activation'
+  let(:project) { create(:project, :repository) }
 
   before do
-    project.add_maintainer(user)
-    sign_in(user)
-
-    visit(project_settings_integrations_path(project))
-
-    click_link('Flowdock')
+    stub_request(:post, /.*api.flowdock.com.*/)
   end
 
-  it 'activates service' do
-    check('Active')
+  it 'activates service', :js do
+    visit_project_integration('Flowdock')
     fill_in('Token', with: 'verySecret')
-    click_button('Save')
+
+    click_test_integration
 
     expect(page).to have_content('Flowdock activated.')
   end
