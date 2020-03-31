@@ -42,6 +42,11 @@ FactoryBot.define do
       end
     end
 
+    trait :dast_with_missing_file do
+      file_format { :raw }
+      file_type { :dast }
+    end
+
     trait :dast_deprecated_no_spider do
       file_format { :raw }
       file_type { :dast }
@@ -71,6 +76,26 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-report-multiple-sites.json'), 'application/json')
+      end
+    end
+
+    trait :dast_missing_scan_field do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-missing-scan.json'), 'application/json')
+      end
+    end
+
+    trait :dast_missing_scanned_resources_field do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-missing-scanned-resources.json'), 'application/json')
       end
     end
 
