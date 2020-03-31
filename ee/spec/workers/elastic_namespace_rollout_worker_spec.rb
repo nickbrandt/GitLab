@@ -3,8 +3,10 @@
 require 'spec_helper'
 
 describe ElasticNamespaceRolloutWorker do
-  ROLLOUT = described_class::ROLLOUT
-  ROLLBACK = described_class::ROLLBACK
+  before do
+    stub_const('ROLLOUT', described_class::ROLLOUT)
+    stub_const('ROLLBACK', described_class::ROLLBACK)
+  end
 
   Plan::PAID_HOSTED_PLANS.each do |plan|
     plan_factory = "#{plan}_plan"
