@@ -36,6 +36,7 @@ class License < ApplicationRecord
     related_issues
     repository_mirrors
     repository_size_limit
+    seat_link
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -216,6 +217,7 @@ class License < ApplicationRecord
     project_aliases
     repository_size_limit
     required_ci_templates
+    seat_link
     usage_quotas
   ].freeze
 
