@@ -132,5 +132,13 @@ describe SyncSeatLinkWorker, type: :worker do
         end
       end
     end
+
+    context 'when seat link has been disabled' do
+      before do
+        allow(Gitlab::CurrentSettings).to receive(:seat_link_enabled?).and_return(false)
+      end
+
+      include_examples 'no seat link sync'
+    end
   end
 end
