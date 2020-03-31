@@ -51,6 +51,8 @@ class GeoNode < ApplicationRecord
 
   scope :with_url_prefix, ->(prefix) { where('url LIKE ?', "#{prefix}%") }
   scope :secondary_nodes, -> { where(primary: false) }
+  scope :name_in, -> (names) { where(name: names) }
+  scope :ordered, -> { order(:id) }
 
   attr_encrypted :secret_access_key,
                  key: Settings.attr_encrypted_db_key_base_truncated,

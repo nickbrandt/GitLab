@@ -13,6 +13,11 @@ module EE
               null: false,
               description: 'Fields related to design management'
 
+        field :geo_node, ::Types::Geo::GeoNodeType,
+              null: true,
+              resolver: Resolvers::Geo::GeoNodeResolver,
+              description: 'Find a Geo node'
+
         def design_management
           DesignManagementObject.new(nil)
         end

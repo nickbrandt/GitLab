@@ -16,7 +16,7 @@ describe API::GeoReplication, :request_store, :geo, :geo_fdw, api: true do
   let(:user) { create(:user) }
 
   before do
-    set_current_geo_node!(secondary)
+    stub_current_geo_node(secondary)
   end
 
   describe 'GET /geo_replication/designs' do
