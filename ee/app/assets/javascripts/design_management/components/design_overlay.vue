@@ -39,13 +39,14 @@ export default {
   },
   computed: {
     overlayStyle() {
-      const baseStyle = {
+      const cursor = this.disableCommenting ? 'unset' : undefined;
+
+      return {
+        cursor,
         width: `${this.dimensions.width}px`,
         height: `${this.dimensions.height}px`,
         ...this.position,
       };
-
-      return this.disableCommenting ? Object.assign(baseStyle, { cursor: 'unset' }) : baseStyle;
     },
     isMovingCurrentComment() {
       return Boolean(this.movingNoteStartPosition && !this.movingNoteStartPosition.noteId);

@@ -47,7 +47,6 @@ export default {
       },
       initialLoad: true,
       lastDragPosition: null,
-      isDraggingDesign: false,
     };
   },
   computed: {
@@ -58,11 +57,12 @@ export default {
       return (this.isAnnotating && this.currentAnnotationPosition) || null;
     },
     presentationStyle() {
-      return this.isDraggingDesign
-        ? {
-            cursor: 'grabbing',
-          }
-        : undefined;
+      return {
+        cursor: this.isDraggingDesign ? 'grabbing' : undefined,
+      };
+    },
+    isDraggingDesign() {
+      return Boolean(this.lastDragPosition);
     },
   },
   beforeDestroy() {
@@ -225,7 +225,6 @@ export default {
     },
     onPresentationMousemove({ clientX, clientY }) {
       if (!this.lastDragPosition) return;
-      this.isDraggingDesign = true;
 
       const { presentationViewport } = this.$refs;
       if (!presentationViewport) return;
@@ -242,7 +241,6 @@ export default {
     },
     onPresentationMouseup() {
       this.lastDragPosition = null;
-      this.isDraggingDesign = false;
     },
     isDesignOverflowing() {
       const { presentationContainer } = this.$refs;

@@ -128,7 +128,7 @@ describe('Design management design presentation component', () => {
   });
 
   describe('currentCommentForm', () => {
-    it('currentCommentForm is null when isAnnotating is false', () => {
+    it('is null when isAnnotating is false', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -143,7 +143,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is null when isAnnotating is true but annotation position is falsey', () => {
+    it('is null when isAnnotating is true but annotation position is falsey', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -159,7 +159,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is equal to current annotation position when isAnnotating is true', () => {
+    it('is equal to current annotation position when isAnnotating is true', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -176,6 +176,7 @@ describe('Design management design presentation component', () => {
           },
         },
       );
+
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.currentCommentForm).toEqual({
           x: 1,
@@ -384,21 +385,43 @@ describe('Design management design presentation component', () => {
     });
   });
 
-  describe('isDesignOverflowing', () => {
+  describe('onPresentationMousedown', () => {
     it.each`
-      scenario                        | width  | height | isOverflowing
-      ${'width overflows'}            | ${101} | ${100} | ${true}
-      ${'height overflows'}           | ${100} | ${101} | ${true}
-      ${'width and height overflows'} | ${200} | ${200} | ${true}
-      ${'is smaller than container'}  | ${100} | ${100} | ${false}
-    `('returns $isOverflowing when design $scenario', ({ width, height, isOverflowing }) => {
+      scenario                        | width  | height
+      ${'width overflows'}            | ${101} | ${100}
+      ${'height overflows'}           | ${100} | ${101}
+      ${'width and height overflows'} | ${200} | ${200}
+    `('sets lastDragPosition when design $scenario', ({ width, height }) => {
       createComponent();
       mockRefDimensions(
         wrapper.vm.$refs.presentationContainer,
         { width: 100, height: 100 },
         { width, height },
       );
-      expect(wrapper.vm.isDesignOverflowing()).toBe(isOverflowing);
+
+      const newLastDragPosition = { x: 2, y: 2 };
+      wrapper.vm.onPresentationMousedown({
+        clientX: newLastDragPosition.x,
+        clientY: newLastDragPosition.y,
+      });
+
+      expect(wrapper.vm.lastDragPosition).toStrictEqual(newLastDragPosition);
+    });
+
+    it('does not set lastDragPosition if design does not overflow', () => {
+      const lastDragPosition = { x: 1, y: 1 };
+
+      createComponent({}, { lastDragPosition });
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationContainer,
+        { width: 100, height: 100 },
+        { width: 50, height: 50 },
+      );
+
+      wrapper.vm.onPresentationMousedown({ clientX: 2, clientY: 2 });
+
+      // check lastDragPosition is unchanged
+      expect(wrapper.vm.lastDragPosition).toStrictEqual(lastDragPosition);
     });
   });
 
@@ -416,7 +439,7 @@ describe('Design management design presentation component', () => {
         mockOverlayData,
       );
       mockRefDimensions(
-        wrapper.vm.$refs.presentationViewport,
+        wrapper.vm.$refs.presentationContainer,
         { width: 10, height: 10 },
         { width: 20, height: 20 },
         0,
@@ -424,7 +447,6 @@ describe('Design management design presentation component', () => {
       );
 
       wrapper.element.scrollTo = jest.fn();
-      wrapper.vm.isDesignOverflowing = jest.fn().mockReturnValue(true);
       return clickDragExplore(
         { clientX: 0, clientY: 0 },
         { clientX: 10, clientY: 10 },
