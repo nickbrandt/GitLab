@@ -67,7 +67,7 @@ export default {
       // sidebar size.
       debounce(() => {
         this.sidebarExpandedOnClick = true;
-        if (contentContainer) {
+        if (this.canUpdate && contentContainer) {
           contentContainer
             .querySelector('.js-sidebar-dropdown-toggle')
             .dispatchEvent(new Event('click', { bubbles: true, cancelable: false }));
@@ -111,12 +111,14 @@ export default {
   <labels-select-vue
     :allow-label-edit="canUpdate"
     :allow-label-create="true"
+    :allow-multiselect="true"
     :allow-scoped-labels="scopedLabels"
     :selected-labels="labels"
     :labels-select-in-progress="epicLabelsSelectInProgress"
     :labels-fetch-path="labelsPath"
     :labels-manage-path="labelsWebUrl"
     :labels-filter-base-path="epicsWebUrl"
+    variant="sidebar"
     class="block labels js-labels-block"
     @updateSelectedLabels="handleUpdateSelectedLabels"
     @onDropdownClose="handleDropdownClose"
