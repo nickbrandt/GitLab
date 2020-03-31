@@ -298,7 +298,10 @@ module EE
       # ElasticSearch only exposes a RESTful API, hence we need
       # to use the HTTP protocol on all URLs.
       elasticsearch_url.each do |str|
-        ::Gitlab::UrlBlocker.validate!(str, schemes: %w[http https], allow_localhost: true)
+        ::Gitlab::UrlBlocker.validate!(str,
+                                       schemes: %w[http https],
+                                       allow_localhost: true,
+                                       dns_rebind_protection: false)
       end
     rescue ::Gitlab::UrlBlocker::BlockedUrlError
       errors.add(:elasticsearch_url, "only supports valid HTTP(S) URLs.")
