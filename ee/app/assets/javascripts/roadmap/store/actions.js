@@ -84,7 +84,7 @@ export const receiveEpicsSuccess = (
     formattedEpic.isChildEpicShowing = false;
 
     // Format child epics
-    if (formattedEpic?.children?.edges?.length > 0) {
+    if (formattedEpic.children?.edges?.length > 0) {
       formattedEpic.children.edges = formattedEpic.children.edges
         .map(epicUtils.flattenGroupProperty)
         .map(epicUtils.addIsChildEpicTrueProperty)
@@ -212,7 +212,7 @@ export const extendTimeframe = ({ commit, state, getters }, { extendAs }) => {
 export const refreshEpicDates = ({ commit, state, getters }) => {
   const epics = state.epics.map(epic => {
     // Update child epic dates too
-    if (epic?.children?.edges?.length > 0) {
+    if (epic.children?.edges?.length > 0) {
       epic.children.edges.map(childEpic =>
         roadmapItemUtils.processRoadmapItemDates(
           childEpic,
@@ -320,6 +320,9 @@ export const refreshMilestoneDates = ({ commit, state, getters }) => {
 };
 
 export const setBufferSize = ({ commit }, bufferSize) => commit(types.SET_BUFFER_SIZE, bufferSize);
+
+export const toggleExpandedEpic = ({ commit }, epicId) =>
+  commit(types.TOGGLE_EXPANDED_EPIC, epicId);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

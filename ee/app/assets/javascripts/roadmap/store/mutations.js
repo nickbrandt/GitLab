@@ -76,4 +76,9 @@ export default {
   [types.SET_BUFFER_SIZE](state, bufferSize) {
     state.bufferSize = bufferSize;
   },
+
+  [types.TOGGLE_EXPANDED_EPIC](state, epicId) {
+    const epic = state.epics.find(e => e.id === epicId);
+    epic.isChildEpicShowing = !epic.isChildEpicShowing;
+  },
 };

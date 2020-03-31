@@ -1,10 +1,11 @@
 <script>
-import { GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
 import eventHub from '../event_hub';
 
 export default {
   components: {
+    GlNewButton,
     GlIcon,
     GlTooltip,
   },
@@ -27,7 +28,7 @@ export default {
       return this.currentGroupId !== this.epic.groupId;
     },
     isExpandIconHidden() {
-      return this.epic.isChildEpic || !this.epic?.children?.edges?.length;
+      return this.epic.isChildEpic || !this.epic.children?.edges?.length;
     },
     expandIconName() {
       return this.epic.isChildEpicShowing ? 'chevron-down' : 'chevron-right';
@@ -36,7 +37,7 @@ export default {
       return this.epic.isChildEpicShowing ? __('Collapse child epics') : __('Expand child epics');
     },
     childEpicsCount() {
-      return this.epic.isChildEpic ? '-' : this.epic?.children?.edges?.length || 0;
+      return this.epic.isChildEpic ? '-' : this.epic.children?.edges?.length || 0;
     },
     childEpicsCountText() {
       return Number.isInteger(this.childEpicsCount)
@@ -54,14 +55,14 @@ export default {
 
 <template>
   <div class="epic-details-cell d-flex align-items-start p-2" data-qa-selector="epic_details_cell">
-    <button
+    <gl-new-button
       :class="{ invisible: isExpandIconHidden }"
-      class="btn-link"
+      variant="link"
       :aria-label="expandIconLabel"
       @click="toggleIsEpicExpanded"
     >
       <gl-icon :name="expandIconName" class="text-secondary" aria-hidden="true" />
-    </button>
+    </gl-new-button>
     <div class="overflow-hidden flex-grow-1" :class="[epic.isChildEpic ? 'ml-4 mr-2' : 'mx-2']">
       <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
         {{ epic.title }}

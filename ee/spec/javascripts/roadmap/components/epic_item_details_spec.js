@@ -1,4 +1,4 @@
-import { GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import EpicItemDetails from 'ee/roadmap/components/epic_item_details.vue';
 import eventHub from 'ee/roadmap/event_hub';
@@ -27,7 +27,7 @@ const getTitle = wrapper => wrapper.find('.epic-title');
 
 const getGroupName = wrapper => wrapper.find('.epic-group');
 
-const getExpandIconDiv = wrapper => wrapper.find('.btn-link');
+const getExpandIconButton = wrapper => wrapper.find(GlNewButton);
 
 const getChildEpicsCount = wrapper => wrapper.find({ ref: 'childEpicsCount' });
 
@@ -111,7 +111,7 @@ describe('EpicItemDetails', () => {
       it('is hidden when epic has no child epics', () => {
         wrapper = createComponent();
 
-        expect(getExpandIconDiv(wrapper).classes()).toContain('invisible');
+        expect(getExpandIconButton(wrapper).classes()).toContain('invisible');
       });
 
       it('is shown when epic has child epics', () => {
@@ -123,7 +123,7 @@ describe('EpicItemDetails', () => {
         };
         wrapper = createComponent(epic);
 
-        expect(getExpandIconDiv(wrapper).classes()).not.toContain('invisible');
+        expect(getExpandIconButton(wrapper).classes()).not.toContain('invisible');
       });
 
       it('shows "chevron-right" icon when child epics are not expanded', () => {
@@ -145,7 +145,7 @@ describe('EpicItemDetails', () => {
       it('has "Expand child epics" label when child epics are not expanded', () => {
         wrapper = createComponent();
 
-        expect(getExpandIconDiv(wrapper).attributes('aria-label')).toBe('Expand child epics');
+        expect(getExpandIconButton(wrapper).attributes('aria-label')).toBe('Expand child epics');
       });
 
       it('has "Collapse child epics" label when child epics are expanded', () => {
@@ -155,7 +155,7 @@ describe('EpicItemDetails', () => {
         };
         wrapper = createComponent(epic);
 
-        expect(getExpandIconDiv(wrapper).attributes('aria-label')).toBe('Collapse child epics');
+        expect(getExpandIconButton(wrapper).attributes('aria-label')).toBe('Collapse child epics');
       });
 
       it('emits toggleIsEpicExpanded event when clicked', () => {
@@ -171,7 +171,7 @@ describe('EpicItemDetails', () => {
         };
         wrapper = createComponent(epic);
 
-        getExpandIconDiv(wrapper).trigger('click');
+        getExpandIconButton(wrapper).vm.$emit('click');
 
         expect(eventHub.$emit).toHaveBeenCalledWith('toggleIsEpicExpanded', id);
       });
@@ -183,7 +183,7 @@ describe('EpicItemDetails', () => {
         };
         wrapper = createComponent(epic);
 
-        expect(getExpandIconDiv(wrapper).classes()).toContain('invisible');
+        expect(getExpandIconButton(wrapper).classes()).toContain('invisible');
       });
     });
 

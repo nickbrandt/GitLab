@@ -172,7 +172,8 @@ export default {
         :id="generateKey(epic)"
         :href="epic.webUrl"
         :style="timelineBarStyles(epic)"
-        :class="['epic-bar', 'rounded', { 'epic-bar-child-epic': epic.isChildEpic }]"
+        :class="{ 'epic-bar-child-epic': epic.isChildEpic }"
+        class="epic-bar rounded"
       >
         <div class="epic-bar-inner px-2 py-1" :style="timelineBarInnerStyle">
           <p class="epic-bar-title text-nowrap text-truncate m-0">{{ timelineBarTitle }}</p>

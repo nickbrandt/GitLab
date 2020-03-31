@@ -63,17 +63,13 @@ export default {
       };
     },
     displayedEpics() {
-      const displayedEpics = [];
-
-      this.epics.forEach(epic => {
-        displayedEpics.push(epic);
-
+      return this.epics.reduce((acc, epic) => {
+        acc.push(epic);
         if (epic.isChildEpicShowing) {
-          displayedEpics.push(...epic.children.edges);
+          acc.push(...epic.children.edges);
         }
-      });
-
-      return displayedEpics;
+        return acc;
+      }, []);
     },
   },
   mounted() {
@@ -88,7 +84,7 @@ export default {
     window.removeEventListener('resize', this.syncClientWidth);
   },
   methods: {
-    ...mapActions(['setBufferSize']),
+    ...mapActions(['setBufferSize', 'toggleExpandedEpic']),
     initMounted() {
       this.roadmapShellEl = this.$root.$el && this.$root.$el.firstChild;
       this.setBufferSize(Math.ceil((window.innerHeight - this.$el.offsetTop) / EPIC_ITEM_HEIGHT));
@@ -146,8 +142,7 @@ export default {
       };
     },
     toggleIsEpicExpanded(epicId) {
-      const epic = this.epics.find(e => e.id === epicId);
-      epic.isChildEpicShowing = !epic.isChildEpicShowing;
+      this.toggleExpandedEpic(epicId);
     },
     generateKey,
   },

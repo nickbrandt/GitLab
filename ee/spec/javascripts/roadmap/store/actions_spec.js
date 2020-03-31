@@ -614,4 +614,17 @@ describe('Roadmap Vuex Actions', () => {
       );
     });
   });
+
+  describe('toggleExpandedEpic', () => {
+    it('should perform TOGGLE_EXPANDED_EPIC mutation with epic ID payload', done => {
+      testAction(
+        actions.toggleExpandedEpic,
+        10,
+        state,
+        [{ type: types.TOGGLE_EXPANDED_EPIC, payload: 10 }],
+        [],
+        done,
+      );
+    });
+  });
 });
