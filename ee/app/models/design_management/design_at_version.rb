@@ -98,8 +98,7 @@ module DesignManagement
       strong_memoize(:most_recent_action) do
         ::DesignManagement::Action
           .most_recent.up_to_version(version)
-          .where(design: design)
-          .first
+          .find_by(design: design)
       end
     end
 
