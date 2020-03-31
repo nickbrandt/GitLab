@@ -561,9 +561,9 @@ describe('Monitoring store actions', () => {
       const expectedParams = {
         start_time: '2019-08-06T12:40:02.184Z',
         end_time: '2019-08-06T20:40:02.184Z',
-        step: 60
+        step: 60,
       };
-  
+
       it('uses calculated step', done => {
         mock.onGet('http://test').reply(200, { data }); // One attempt
 
@@ -603,9 +603,9 @@ describe('Monitoring store actions', () => {
       const expectedParams = {
         start_time: '2019-08-06T12:40:02.184Z',
         end_time: '2019-08-06T20:40:02.184Z',
-        step: 10
+        step: 10,
       };
-  
+
       it('uses metric step', done => {
         mock.onGet('http://test').reply(200, { data }); // One attempt
 
@@ -634,8 +634,8 @@ describe('Monitoring store actions', () => {
             done();
           },
         ).catch(done.fail);
+      });
     });
-  });
 
     it('commits result, when waiting for results', done => {
       // Mock multiple attempts while the cache is filling up
