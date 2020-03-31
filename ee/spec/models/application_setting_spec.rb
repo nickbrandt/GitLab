@@ -111,12 +111,13 @@ describe ApplicationSetting do
         "http://10.0.0.1" | true
         "https://10.0.0.1" | true
         "http://10.0.0.1, https://10.0.0.1" | true
+        "http://localhost" | true
+        "http://127.0.0.1" | true
 
         "es.localdomain" | false
         "10.0.0.1" | false
         "http://es.localdomain, es.localdomain" | false
         "http://es.localdomain, 10.0.0.1" | false
-
         "this_isnt_a_url" | false
       end
 
