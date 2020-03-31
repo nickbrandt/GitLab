@@ -71,9 +71,6 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
-msgid "#L%{start_line}"
-msgstr ""
-
 msgid "%d changed file"
 msgid_plural "%d changed files"
 msgstr[0] ""
@@ -228,9 +225,6 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
-msgid "%{branch}"
-msgstr ""
-
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -311,9 +305,6 @@ msgstr ""
 msgid "%{filePath} deleted"
 msgstr ""
 
-msgid "%{file}"
-msgstr ""
-
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
@@ -359,9 +350,6 @@ msgstr ""
 msgid "%{link_start}Read more%{link_end} about role permissions"
 msgstr ""
 
-msgid "%{link_text}:%{line}"
-msgstr ""
-
 msgid "%{link} can be used for binding events when something is happening within the project."
 msgstr ""
 
@@ -375,9 +363,6 @@ msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
 msgid "%{mergeLength}/%{usersLength} can merge"
-msgstr ""
-
-msgid "%{method}"
 msgstr ""
 
 msgid "%{mrText}, this issue will be closed automatically."
@@ -4016,7 +4001,7 @@ msgstr ""
 msgid "Class"
 msgstr ""
 
-msgid "Class: %{className}"
+msgid "Class: "
 msgstr ""
 
 msgid "Classification Label (optional)"

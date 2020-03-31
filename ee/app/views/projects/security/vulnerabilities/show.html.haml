@@ -29,21 +29,18 @@
           %h3= _('Location')
           %ul
             %li
-              - link_text = _("%{file}") % { file: location['file'] }
-              - offset = _('')
-              - branch = _("%{branch}") % { branch: @vulnerability.finding.pipelines&.last&.sha || @vulnerability.project.default_branch }
-              - if location['start_line']
-                - link_text = _("%{link_text}:%{line}") % { link_text: link_text, line: location['start_line'] }
-                - offset = _("#L%{start_line}") % { start_line: location['start_line'] }
-              = _('File:')
+              - link_text = "#{location['file']}:#{location['start_line']}"
+              - offset = location['start_line'] ? "#L#{location['start_line']}" : ''
+              - branch = @vulnerability.finding.pipelines&.last&.sha || @vulnerability.project.default_branch
+              = _("File:")
               %a{ href: project_blob_path(@project, tree_join(branch, location['file'])) + offset,
                 target: '_blank', rel: 'noopener noreferrer' }= link_text
             - if location['class']
-              %li= _("Class: %{className}") % { className: location['class'] }
+              %li= _("Class: ") + location['class']
             - if location['method']
               %li
-                = _('Method:')
-                %code= _("%{method}") % { method: location['method'] }
+                = _("Method:")
+                %code= location['method']
 
         - if @vulnerability.finding.links.any?
           %h3= _("Links")
