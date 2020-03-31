@@ -281,7 +281,7 @@ module EE
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
-            service_desk_enabled_projects: distinct_count(::Project.with_active_services.service_desk_enabled.where(time_period), :creator_id),
+            service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
             service_desk_issues: count(::Issue.service_desk.where(time_period)),
             todos: distinct_count(::Todo.where(time_period), :author_id)
           }
@@ -335,6 +335,16 @@ module EE
 
           results
         end
+
+        private
+
+        def distinct_count_service_desk_enabled_projects(time_period)
+          project_creator_id_start = ::User.minimum(:id)
+          project_creator_id_finish = ::User.maximum(:id)
+
+          distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
+        end
+
         # rubocop:enable CodeReuse/ActiveRecord
       end
     end
