@@ -194,6 +194,15 @@ variables:
 
 This will create individual `<analyzer-name>-sast` jobs for each analyzer that runs in your CI/CD pipeline.
 
+By removing Docker-in-Docker (DIND), GitLab relies on [Linguist](https://github.com/github/linguist)
+to start relevant analyzers depending on the detected repository language(s) instead of the
+[orchestrator](https://gitlab.com/gitlab-org/security-products/dependency-scanning/). However, there
+are some differences in the way repository languages are detected between DIND and non-DIND. You can
+observe these differences by checking both Linguist and the common library. For instance, Linguist
+looks for `*.java` files to spin up the [spotbugs](https://gitlab.com/gitlab-org/security-products/analyzers/spotbugs)
+image, while orchestrator only looks for the existence of `pom.xml`, `build.xml`, `gradlew`,
+`grailsw`, or `mvnw`.
+
 #### Enabling kubesec analyzer
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12752) in GitLab Ultimate 12.6.
