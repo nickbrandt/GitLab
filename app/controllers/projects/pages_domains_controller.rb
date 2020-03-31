@@ -27,7 +27,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   end
 
   def retry_auto_ssl
-    PagesDomains::RetryAcmeOrderService.new(@domain).execute
+    PagesDomains::RetryAcmeOrderService.new(@domain.pages_domain).execute
 
     redirect_to project_pages_domain_path(@project, @domain)
   end
