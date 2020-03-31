@@ -222,12 +222,12 @@ describe('mapToDashboardViewModel', () => {
     });
 
     // This property allows single_stat panels to render percentile values
-    it('group max_value', () => {
+    it('group maxValue', () => {
       setupWithPanel({
         max_value: 100,
       });
 
-      expect(getMappedPanel().max_value).toBe(100);
+      expect(getMappedPanel().maxValue).toBe(100);
     });
   });
 

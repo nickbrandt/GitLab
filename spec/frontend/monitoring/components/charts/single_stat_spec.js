@@ -27,18 +27,18 @@ describe('Single Stat Chart component', () => {
         singleStatChart.setProps({
           graphData: {
             ...graphDataPrometheusQuery,
-            max_value: 120,
+            maxValue: 120,
           },
         });
 
         expect(singleStatChart.vm.statValue).toContain('75.83%');
       });
 
-      it('should display NaN for non numeric max_value values', () => {
+      it('should display NaN for non numeric maxValue values', () => {
         singleStatChart.setProps({
           graphData: {
             ...graphDataPrometheusQuery,
-            max_value: 'not a number',
+            maxValue: 'not a number',
           },
         });
 
@@ -60,7 +60,7 @@ describe('Single Stat Chart component', () => {
                 ],
               },
             ],
-            max_value: 120,
+            maxValue: 120,
           },
         });
 

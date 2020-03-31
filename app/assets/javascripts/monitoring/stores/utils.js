@@ -126,7 +126,7 @@ const mapPanelToViewModel = ({
     y_label: yAxis.name, // Changing y_label to yLabel is pending https://gitlab.com/gitlab-org/gitlab/issues/207198
     yAxis,
     xAxis,
-    max_value,
+    maxValue: max_value,
     metrics: mapToMetricsViewModel(metrics, yAxis.name),
   };
 };

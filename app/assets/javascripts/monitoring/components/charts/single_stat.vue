@@ -27,22 +27,19 @@ export default {
     /**
      * This method formats the query result from a promQL expression
      * allowing a user to format the data in percentile values
-     * by using the `max_value` inner property from the graphData prop
+     * by using the `maxValue` inner property from the graphData prop
      * @returns {(String)}
      */
     statValue() {
       let formatter;
-      let value;
 
-      if (this.graphData?.max_value) {
+      if (this.graphData?.maxValue) {
         formatter = getFormatter(SUPPORTED_FORMATS.percent);
-        value = formatter(this.queryResult / Number(this.graphData.max_value), defaultPrecision);
-      } else {
-        formatter = getFormatter(SUPPORTED_FORMATS.number);
-        value = `${formatter(this.queryResult, defaultPrecision)}${this.queryInfo.unit}`;
+        return formatter(this.queryResult / Number(this.graphData.maxValue), defaultPrecision);
       }
 
-      return value;
+      formatter = getFormatter(SUPPORTED_FORMATS.number);
+      return `${formatter(this.queryResult, defaultPrecision)}${this.queryInfo.unit}`;
     },
     graphTitle() {
       return this.queryInfo.label;
