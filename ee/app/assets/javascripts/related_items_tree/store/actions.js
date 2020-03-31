@@ -490,6 +490,7 @@ export const fetchProjects = ({ state, dispatch }, searchKey = '') => {
     order_by: 'last_activity_at',
     with_issues_enabled: true,
     with_shared: false,
+    search_namespaces: true,
   };
 
   if (searchKey) {
