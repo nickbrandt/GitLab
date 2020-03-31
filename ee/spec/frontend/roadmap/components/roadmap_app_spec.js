@@ -8,7 +8,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import {
   mockTimeframeInitialDate,
   mockGroupId,
@@ -18,7 +18,7 @@ import {
   mockSortedBy,
   basePath,
   epicsPath,
-} from '../mock_data';
+} from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -115,50 +115,43 @@ describe('Roadmap AppComponent', () => {
 
   describe('methods', () => {
     describe('processExtendedTimeline', () => {
-      it('updates timeline by extending timeframe from the start when called with extendType as `prepend`', done => {
+      it('updates timeline by extending timeframe from the start when called with extendType as `prepend`', () => {
         vm.$store.dispatch('receiveEpicsSuccess', { rawEpics });
         vm.$store.state.epicsFetchInProgress = false;
 
-        Vue.nextTick()
-          .then(() => {
-            const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+        return Vue.nextTick().then(() => {
+          const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
 
-            spyOn(eventHub, '$emit');
-            spyOn(roadmapTimelineEl.parentElement, 'scrollBy');
+          jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
-            vm.processExtendedTimeline({
-              extendType: EXTEND_AS.PREPEND,
-              roadmapTimelineEl,
-              itemsCount: 0,
-            });
+          vm.processExtendedTimeline({
+            extendType: EXTEND_AS.PREPEND,
+            roadmapTimelineEl,
+            itemsCount: 0,
+          });
 
-            expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Object));
-            expect(roadmapTimelineEl.parentElement.scrollBy).toHaveBeenCalled();
-          })
-          .then(done)
-          .catch(done.fail);
+          expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', expect.any(Object));
+          expect(roadmapTimelineEl.parentElement.scrollBy).toHaveBeenCalled();
+        });
       });
 
-      it('updates timeline by extending timeframe from the end when called with extendType as `append`', done => {
+      it('updates timeline by extending timeframe from the end when called with extendType as `append`', () => {
         vm.$store.dispatch('receiveEpicsSuccess', { rawEpics });
         vm.$store.state.epicsFetchInProgress = false;
 
-        Vue.nextTick()
-          .then(() => {
-            const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+        return Vue.nextTick().then(() => {
+          const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
 
-            spyOn(eventHub, '$emit');
+          jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
-            vm.processExtendedTimeline({
-              extendType: EXTEND_AS.PREPEND,
-              roadmapTimelineEl,
-              itemsCount: 0,
-            });
+          vm.processExtendedTimeline({
+            extendType: EXTEND_AS.PREPEND,
+            roadmapTimelineEl,
+            itemsCount: 0,
+          });
 
-            expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Object));
-          })
-          .then(done)
-          .catch(done.fail);
+          expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', expect.any(Object));
+        });
       });
     });
 
@@ -172,10 +165,10 @@ describe('Roadmap AppComponent', () => {
       });
 
       it('updates the store and refreshes roadmap with extended timeline based on provided extendType', () => {
-        spyOn(vm, 'extendTimeframe');
-        spyOn(vm, 'refreshEpicDates');
-        spyOn(vm, 'refreshMilestoneDates');
-        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
+        jest.spyOn(vm, 'extendTimeframe').mockImplementation(() => {});
+        jest.spyOn(vm, 'refreshEpicDates').mockImplementation(() => {});
+        jest.spyOn(vm, 'refreshMilestoneDates').mockImplementation(() => {});
+        jest.spyOn(vm, 'fetchEpicsForTimeframe').mockResolvedValue();
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -186,26 +179,23 @@ describe('Roadmap AppComponent', () => {
         expect(vm.refreshMilestoneDates).toHaveBeenCalled();
       });
 
-      it('calls `fetchEpicsForTimeframe` with extended timeframe array', done => {
-        spyOn(vm, 'extendTimeframe').and.stub();
-        spyOn(vm, 'refreshEpicDates').and.stub();
-        spyOn(vm, 'refreshMilestoneDates').and.stub();
-        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
+      it('calls `fetchEpicsForTimeframe` with extended timeframe array', () => {
+        jest.spyOn(vm, 'extendTimeframe').mockImplementation(() => {});
+        jest.spyOn(vm, 'refreshEpicDates').mockImplementation(() => {});
+        jest.spyOn(vm, 'refreshMilestoneDates').mockImplementation(() => {});
+        jest.spyOn(vm, 'fetchEpicsForTimeframe').mockResolvedValue();
 
         const extendType = EXTEND_AS.PREPEND;
 
         vm.handleScrollToExtend(roadmapTimelineEl, extendType);
 
-        vm.$nextTick()
-          .then(() => {
-            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
-              jasmine.objectContaining({
-                timeframe: vm.extendedTimeframe,
-              }),
-            );
-          })
-          .then(done)
-          .catch(done.fail);
+        return vm.$nextTick().then(() => {
+          expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
+            expect.objectContaining({
+              timeframe: vm.extendedTimeframe,
+            }),
+          );
+        });
       });
     });
   });
@@ -215,15 +205,13 @@ describe('Roadmap AppComponent', () => {
       expect(vm.$el.classList.contains('roadmap-container')).toBe(true);
     });
 
-    it('renders roadmap container with classes `roadmap-container overflow-reset` when isEpicsListEmpty prop is true', done => {
+    it('renders roadmap container with classes `roadmap-container overflow-reset` when isEpicsListEmpty prop is true', () => {
       vm.$store.state.epicsFetchResultEmpty = true;
-      Vue.nextTick()
-        .then(() => {
-          expect(vm.$el.classList.contains('roadmap-container')).toBe(true);
-          expect(vm.$el.classList.contains('overflow-reset')).toBe(true);
-        })
-        .then(done)
-        .catch(done.fail);
+
+      return Vue.nextTick().then(() => {
+        expect(vm.$el.classList.contains('roadmap-container')).toBe(true);
+        expect(vm.$el.classList.contains('overflow-reset')).toBe(true);
+      });
     });
   });
 });

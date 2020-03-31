@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import VirtualList from 'vue-virtual-scroll-list';
-import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
+import EpicsListSection from 'ee/roadmap/components/epics_list_section.vue';
 import EpicItem from 'ee/roadmap/components/epic_item.vue';
 import createStore from 'ee/roadmap/store';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
@@ -18,7 +18,7 @@ import {
   mockSortedBy,
   basePath,
   epicsPath,
-} from '../mock_data';
+} from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 const store = createStore();
@@ -39,6 +39,7 @@ const mockEpics = store.state.epics;
 store.state.epics[0].children = {
   edges: [mockFormattedChildEpic1, mockFormattedChildEpic2],
 };
+const localVue = createLocalVue();
 
 const createComponent = ({
   epics = mockEpics,
@@ -47,9 +48,7 @@ const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
   roadmapBufferedRendering = true,
 } = {}) => {
-  const localVue = createLocalVue();
-
-  return shallowMount(epicsListSectionComponent, {
+  return shallowMount(EpicsListSection, {
     localVue,
     store,
     stubs: {
@@ -82,6 +81,13 @@ describe('EpicsListSectionComponent', () => {
 
   describe('data', () => {
     it('returns default data props', () => {
+      // Destroy the existing wrapper, and create a new one. This works around
+      // a race condition between how Jest runs tests and the $nextTick call in
+      // EpicsListSectionComponent's mounted hook.
+      // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27992#note_319213990
+      wrapper.destroy();
+      wrapper = createComponent();
+
       expect(wrapper.vm.offsetLeft).toBe(0);
       expect(wrapper.vm.emptyRowContainerStyles).toEqual({});
       expect(wrapper.vm.showBottomShadow).toBe(false);
@@ -115,63 +121,69 @@ describe('EpicsListSectionComponent', () => {
 
   describe('methods', () => {
     describe('initMounted', () => {
+      beforeEach(() => {
+        // Destroy the existing wrapper, and create a new one. This works
+        // around a race condition between how Jest runs tests and the
+        // $nextTick call in EpicsListSectionComponent's mounted hook.
+        // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27992#note_319213990
+        wrapper.destroy();
+        wrapper = createComponent();
+
+        jest.spyOn(wrapper.vm, 'scrollToTodayIndicator').mockImplementation(() => {});
+      });
+
       it('sets value of `roadmapShellEl` with root component element', () => {
         expect(wrapper.vm.roadmapShellEl instanceof HTMLElement).toBe(true);
       });
 
       it('calls action `setBufferSize` with value based on window.innerHeight and component element position', () => {
-        expect(wrapper.vm.bufferSize).toBe(12);
+        expect(wrapper.vm.bufferSize).toBe(16);
       });
 
-      it('sets value of `offsetLeft` with parentElement.offsetLeft', done => {
-        wrapper.vm.$nextTick(() => {
+      it('sets value of `offsetLeft` with parentElement.offsetLeft', () => {
+        return wrapper.vm.$nextTick(() => {
           // During tests, there's no `$el.parentElement` present
           // hence offsetLeft is 0.
           expect(wrapper.vm.offsetLeft).toBe(0);
-          done();
         });
       });
 
-      it('calls `scrollToTodayIndicator` following the component render', done => {
-        spyOn(wrapper.vm, 'scrollToTodayIndicator');
-
+      it('calls `scrollToTodayIndicator` following the component render', () => {
         // Original method implementation waits for render cycle
         // to complete at 2 levels before scrolling.
-        wrapper.vm.$nextTick(() => {
-          wrapper.vm.$nextTick(() => {
+        return wrapper.vm
+          .$nextTick()
+          .then(() => wrapper.vm.$nextTick())
+          .then(() => {
             expect(wrapper.vm.scrollToTodayIndicator).toHaveBeenCalled();
-            done();
           });
-        });
       });
 
-      it('sets style object to `emptyRowContainerStyles`', done => {
-        wrapper.vm.$nextTick(() => {
+      it('sets style object to `emptyRowContainerStyles`', () => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.emptyRowContainerStyles).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               height: '0px',
             }),
           );
-          done();
         });
       });
     });
 
     describe('getEmptyRowContainerStyles', () => {
-      it('returns empty object when there are no epics available to render', done => {
+      it('returns empty object when there are no epics available to render', () => {
         wrapper.setProps({
           epics: [],
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual({});
-          done();
         });
       });
 
       it('returns object containing `height` when there epics available to render', () => {
         expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             height: '0px',
           }),
         );
@@ -203,7 +215,7 @@ describe('EpicsListSectionComponent', () => {
     describe('getEpicItemProps', () => {
       it('returns an object containing props for EpicItem component', () => {
         expect(wrapper.vm.getEpicItemProps(1)).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             key: 1,
             props: {
               epic: wrapper.vm.epics[1],
@@ -219,15 +231,14 @@ describe('EpicsListSectionComponent', () => {
 
   describe('template', () => {
     it('renders component container element with class `epics-list-section`', () => {
-      expect(wrapper.vm.$el.classList.contains('epics-list-section')).toBe(true);
+      expect(wrapper.classes('epics-list-section')).toBe(true);
     });
 
-    it('renders virtual-list when roadmapBufferedRendering is `true` and `epics.length` is more than `bufferSize`', done => {
+    it('renders virtual-list when roadmapBufferedRendering is `true` and `epics.length` is more than `bufferSize`', () => {
       wrapper.vm.setBufferSize(5);
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick(() => {
         expect(wrapper.find(VirtualList).exists()).toBe(true);
-        done();
       });
     });
 
@@ -267,7 +278,6 @@ describe('EpicsListSectionComponent', () => {
 
   it('expands to show child epics when epic is toggled', done => {
     const epic = mockEpics[0];
-    wrapper = createComponent();
 
     expect(wrapper.findAll(EpicItem).length).toBe(mockEpics.length);
 

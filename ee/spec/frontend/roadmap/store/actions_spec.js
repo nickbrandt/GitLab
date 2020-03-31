@@ -12,8 +12,9 @@ import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
 import groupMilestones from 'ee/roadmap/queries/groupMilestones.query.graphql';
 import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
 
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
 
 import {
   mockGroupId,
@@ -34,6 +35,8 @@ import {
   mockMilestone,
   mockFormattedMilestone,
 } from '../mock_data';
+
+jest.mock('~/flash');
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -57,32 +60,30 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('setInitialData', () => {
-    it('should set initial roadmap props', done => {
+    it('should set initial roadmap props', () => {
       const mockRoadmap = {
         foo: 'bar',
         bar: 'baz',
       };
 
-      testAction(
+      return testAction(
         actions.setInitialData,
         mockRoadmap,
         {},
         [{ type: types.SET_INITIAL_DATA, payload: mockRoadmap }],
         [],
-        done,
       );
     });
   });
 
   describe('setWindowResizeInProgress', () => {
-    it('should set value of `state.windowResizeInProgress` based on provided value', done => {
-      testAction(
+    it('should set value of `state.windowResizeInProgress` based on provided value', () => {
+      return testAction(
         actions.setWindowResizeInProgress,
         true,
         state,
         [{ type: types.SET_WINDOW_RESIZE_IN_PROGRESS, payload: true }],
         [],
-        done,
       );
     });
   });
@@ -110,27 +111,23 @@ describe('Roadmap Vuex Actions', () => {
       };
     });
 
-    it('should fetch Group Epics using GraphQL client when epicIid is not present in state', done => {
-      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+    it('should fetch Group Epics using GraphQL client when epicIid is not present in state', () => {
+      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
         Promise.resolve({
           data: mockGroupEpicsQueryResponse.data,
         }),
       );
 
-      actions
-        .fetchGroupEpics(mockState)
-        .then(() => {
-          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
-            query: groupEpics,
-            variables: expectedVariables,
-          });
-        })
-        .then(done)
-        .catch(done.fail);
+      return actions.fetchGroupEpics(mockState).then(() => {
+        expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+          query: groupEpics,
+          variables: expectedVariables,
+        });
+      });
     });
 
-    it('should fetch child Epics of an Epic using GraphQL client when epicIid is present in state', done => {
-      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+    it('should fetch child Epics of an Epic using GraphQL client when epicIid is present in state', () => {
+      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
         Promise.resolve({
           data: mockEpicChildEpicsQueryResponse.data,
         }),
@@ -138,44 +135,39 @@ describe('Roadmap Vuex Actions', () => {
 
       mockState.epicIid = '1';
 
-      actions
-        .fetchGroupEpics(mockState)
-        .then(() => {
-          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
-            query: epicChildEpics,
-            variables: {
-              iid: '1',
-              ...expectedVariables,
-            },
-          });
-        })
-        .then(done)
-        .catch(done.fail);
+      return actions.fetchGroupEpics(mockState).then(() => {
+        expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+          query: epicChildEpics,
+          variables: {
+            iid: '1',
+            ...expectedVariables,
+          },
+        });
+      });
     });
   });
 
   describe('requestEpics', () => {
-    it('should set `epicsFetchInProgress` to true', done => {
-      testAction(actions.requestEpics, {}, state, [{ type: 'REQUEST_EPICS' }], [], done);
+    it('should set `epicsFetchInProgress` to true', () => {
+      return testAction(actions.requestEpics, {}, state, [{ type: 'REQUEST_EPICS' }], []);
     });
   });
 
   describe('requestEpicsForTimeframe', () => {
-    it('should set `epicsFetchForTimeframeInProgress` to true', done => {
-      testAction(
+    it('should set `epicsFetchForTimeframeInProgress` to true', () => {
+      return testAction(
         actions.requestEpicsForTimeframe,
         {},
         state,
         [{ type: types.REQUEST_EPICS_FOR_TIMEFRAME }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveEpicsSuccess', () => {
-    it('should set formatted epics array and epicId to IDs array in state based on provided epics list', done => {
-      testAction(
+    it('should set formatted epics array and epicId to IDs array in state based on provided epics list', () => {
+      return testAction(
         actions.receiveEpicsSuccess,
         {
           rawEpics: [
@@ -207,12 +199,11 @@ describe('Roadmap Vuex Actions', () => {
           },
         ],
         [],
-        done,
       );
     });
 
-    it('should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', done => {
-      testAction(
+    it('should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', () => {
+      return testAction(
         actions.receiveEpicsSuccess,
         {
           rawEpics: [
@@ -236,33 +227,25 @@ describe('Roadmap Vuex Actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('receiveEpicsFailure', () => {
-    beforeEach(() => {
-      setFixtures('<div class="flash-container"></div>');
-    });
-
-    it('should set epicsFetchInProgress, epicsFetchForTimeframeInProgress to false and epicsFetchFailure to true', done => {
-      testAction(
+    it('should set epicsFetchInProgress, epicsFetchForTimeframeInProgress to false and epicsFetchFailure to true', () => {
+      return testAction(
         actions.receiveEpicsFailure,
         {},
         state,
         [{ type: types.RECEIVE_EPICS_FAILURE }],
         [],
-        done,
       );
     });
 
     it('should show flash error', () => {
       actions.receiveEpicsFailure({ commit: () => {} });
 
-      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-        'Something went wrong while fetching epics',
-      );
+      expect(createFlash).toHaveBeenCalledWith('Something went wrong while fetching epics');
     });
   });
 
@@ -278,14 +261,14 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('success', () => {
-      it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', done => {
-        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+      it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
           Promise.resolve({
             data: mockGroupEpicsQueryResponse.data,
           }),
         );
 
-        testAction(
+        return testAction(
           actions.fetchEpics,
           null,
           state,
@@ -299,18 +282,15 @@ describe('Roadmap Vuex Actions', () => {
               payload: { rawEpics: mockGroupEpicsQueryResponseFormatted },
             },
           ],
-          done,
         );
       });
     });
 
     describe('failure', () => {
-      it('should dispatch requestEpics and receiveEpicsFailure when request fails', done => {
-        spyOn(epicUtils.gqClient, 'query').and.returnValue(
-          Promise.reject(new Error('error message')),
-        );
+      it('should dispatch requestEpics and receiveEpicsFailure when request fails', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockRejectedValue(new Error('error message'));
 
-        testAction(
+        return testAction(
           actions.fetchEpics,
           null,
           state,
@@ -323,34 +303,21 @@ describe('Roadmap Vuex Actions', () => {
               type: 'receiveEpicsFailure',
             },
           ],
-          done,
         );
       });
     });
   });
 
   describe('fetchEpicsForTimeframe', () => {
-    const mockEpicsPath =
-      '/groups/gitlab-org/-/epics.json?state=&start_date=2017-11-1&end_date=2018-6-30';
-    let mock;
-
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     describe('success', () => {
-      it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', done => {
-        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+      it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
           Promise.resolve({
             data: mockGroupEpicsQueryResponse.data,
           }),
         );
 
-        testAction(
+        return testAction(
           actions.fetchEpicsForTimeframe,
           { timeframe: mockTimeframeMonths },
           state,
@@ -368,16 +335,15 @@ describe('Roadmap Vuex Actions', () => {
               },
             },
           ],
-          done,
         );
       });
     });
 
     describe('failure', () => {
-      it('should dispatch requestEpicsForTimeframe and requestEpicsFailure when request fails', done => {
-        mock.onGet(mockEpicsPath).replyOnce(500, {});
+      it('should dispatch requestEpicsForTimeframe and requestEpicsFailure when request fails', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockRejectedValue();
 
-        testAction(
+        return testAction(
           actions.fetchEpicsForTimeframe,
           { timeframe: mockTimeframeMonths },
           state,
@@ -390,38 +356,35 @@ describe('Roadmap Vuex Actions', () => {
               type: 'receiveEpicsFailure',
             },
           ],
-          done,
         );
       });
     });
   });
 
   describe('extendTimeframe', () => {
-    it('should prepend to timeframe when called with extend type prepend', done => {
-      testAction(
+    it('should prepend to timeframe when called with extend type prepend', () => {
+      return testAction(
         actions.extendTimeframe,
         { extendAs: EXTEND_AS.PREPEND },
         state,
         [{ type: types.PREPEND_TIMEFRAME, payload: mockTimeframeMonthsPrepend }],
         [],
-        done,
       );
     });
 
-    it('should append to timeframe when called with extend type append', done => {
-      testAction(
+    it('should append to timeframe when called with extend type append', () => {
+      return testAction(
         actions.extendTimeframe,
         { extendAs: EXTEND_AS.APPEND },
         state,
         [{ type: types.APPEND_TIMEFRAME, payload: mockTimeframeMonthsAppend }],
         [],
-        done,
       );
     });
   });
 
   describe('refreshEpicDates', () => {
-    it('should update epics after refreshing epic dates to match with updated timeframe', done => {
+    it('should update epics after refreshing epic dates to match with updated timeframe', () => {
       const epics = rawEpics.map(epic =>
         roadmapItemUtils.formatRoadmapItemDetails(
           epic,
@@ -430,26 +393,24 @@ describe('Roadmap Vuex Actions', () => {
         ),
       );
 
-      testAction(
+      return testAction(
         actions.refreshEpicDates,
         {},
         { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), epics },
         [{ type: types.SET_EPICS, payload: epics }],
         [],
-        done,
       );
     });
   });
 
   describe('setBufferSize', () => {
-    it('should set bufferSize in store state', done => {
-      testAction(
+    it('should set bufferSize in store state', () => {
+      return testAction(
         actions.setBufferSize,
         10,
         state,
         [{ type: types.SET_BUFFER_SIZE, payload: 10 }],
         [],
-        done,
       );
     });
   });
@@ -474,42 +435,38 @@ describe('Roadmap Vuex Actions', () => {
       };
     });
 
-    it('should fetch Group Milestones using GraphQL client when milestoneIid is not present in state', done => {
-      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+    it('should fetch Group Milestones using GraphQL client when milestoneIid is not present in state', () => {
+      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
         Promise.resolve({
           data: mockGroupMilestonesQueryResponse.data,
         }),
       );
 
-      actions
-        .fetchGroupMilestones(mockState)
-        .then(() => {
-          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
-            query: groupMilestones,
-            variables: expectedVariables,
-          });
-        })
-        .then(done)
-        .catch(done.fail);
+      return actions.fetchGroupMilestones(mockState).then(() => {
+        expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+          query: groupMilestones,
+          variables: expectedVariables,
+        });
+      });
     });
   });
 
   describe('requestMilestones', () => {
-    it('should set `milestonesFetchInProgress` to true', done => {
-      testAction(actions.requestMilestones, {}, state, [{ type: 'REQUEST_MILESTONES' }], [], done);
+    it('should set `milestonesFetchInProgress` to true', () => {
+      return testAction(actions.requestMilestones, {}, state, [{ type: 'REQUEST_MILESTONES' }], []);
     });
   });
 
   describe('fetchMilestones', () => {
     describe('success', () => {
-      it('should dispatch requestMilestones and receiveMilestonesSuccess when request is successful', done => {
-        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+      it('should dispatch requestMilestones and receiveMilestonesSuccess when request is successful', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
           Promise.resolve({
             data: mockGroupMilestonesQueryResponse.data,
           }),
         );
 
-        testAction(
+        return testAction(
           actions.fetchMilestones,
           null,
           state,
@@ -523,14 +480,15 @@ describe('Roadmap Vuex Actions', () => {
               payload: { rawMilestones },
             },
           ],
-          done,
         );
       });
     });
 
     describe('failure', () => {
-      it('should dispatch requestMilestones and receiveMilestonesFailure when request fails', done => {
-        testAction(
+      it('should dispatch requestMilestones and receiveMilestonesFailure when request fails', () => {
+        jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(Promise.reject());
+
+        return testAction(
           actions.fetchMilestones,
           null,
           state,
@@ -543,15 +501,14 @@ describe('Roadmap Vuex Actions', () => {
               type: 'receiveMilestonesFailure',
             },
           ],
-          done,
         );
       });
     });
   });
 
   describe('receiveMilestonesSuccess', () => {
-    it('should set formatted milestones array and milestoneId to IDs array in state based on provided milestones list', done => {
-      testAction(
+    it('should set formatted milestones array and milestoneId to IDs array in state based on provided milestones list', () => {
+      return testAction(
         actions.receiveMilestonesSuccess,
         {
           rawMilestones: [
@@ -579,38 +536,30 @@ describe('Roadmap Vuex Actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('receiveMilestonesFailure', () => {
-    beforeEach(() => {
-      setFixtures('<div class="flash-container"></div>');
-    });
-
-    it('should set milestonesFetchInProgress to false and milestonesFetchFailure to true', done => {
-      testAction(
+    it('should set milestonesFetchInProgress to false and milestonesFetchFailure to true', () => {
+      return testAction(
         actions.receiveMilestonesFailure,
         {},
         state,
         [{ type: types.RECEIVE_MILESTONES_FAILURE }],
         [],
-        done,
       );
     });
 
     it('should show flash error', () => {
       actions.receiveMilestonesFailure({ commit: () => {} });
 
-      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-        'Something went wrong while fetching milestones',
-      );
+      expect(createFlash).toHaveBeenCalledWith('Something went wrong while fetching milestones');
     });
   });
 
   describe('refreshMilestoneDates', () => {
-    it('should update milestones after refreshing milestone dates to match with updated timeframe', done => {
+    it('should update milestones after refreshing milestone dates to match with updated timeframe', () => {
       const milestones = rawMilestones.map(milestone =>
         roadmapItemUtils.formatRoadmapItemDetails(
           milestone,
@@ -619,13 +568,12 @@ describe('Roadmap Vuex Actions', () => {
         ),
       );
 
-      testAction(
+      return testAction(
         actions.refreshMilestoneDates,
         {},
         { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), milestones },
         [{ type: types.SET_MILESTONES, payload: milestones }],
         [],
-        done,
       );
     });
   });
