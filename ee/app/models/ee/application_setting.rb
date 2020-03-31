@@ -115,7 +115,8 @@ module EE
           slack_app_secret: nil,
           slack_app_verification_token: nil,
           custom_project_templates_group_id: nil,
-          geo_node_allowed_ips: '0.0.0.0/0, ::/0'
+          geo_node_allowed_ips: '0.0.0.0/0, ::/0',
+          seat_link_enabled: Settings.gitlab['seat_link_enabled']
         )
       end
     end
@@ -167,6 +168,18 @@ module EE
 
     def pseudonymizer_enabled?
       pseudonymizer_available? && super
+    end
+
+    def seat_link_available?
+      License.feature_available?(:seat_link)
+    end
+
+    def seat_link_can_be_configured?
+      Settings.gitlab.seat_link_enabled
+    end
+
+    def seat_link_enabled?
+      seat_link_available? && seat_link_can_be_configured? && super
     end
 
     def should_check_namespace_plan?

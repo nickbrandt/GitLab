@@ -26,10 +26,12 @@ class SyncSeatLinkWorker # rubocop:disable Scalability/IdempotentWorker
   private
 
   # Only sync paid licenses from start date until 14 days after expiration
+  # when seat link feature is enabled.
   def should_sync_seats?
-    License.current &&
-    !License.current.trial? &&
-    report_date.between?(License.current.starts_at, License.current.expires_at + 14.days)
+    Gitlab::CurrentSettings.seat_link_enabled? &&
+      License.current &&
+      !License.current.trial? &&
+      report_date.between?(License.current.starts_at, License.current.expires_at + 14.days)
   end
 
   def max_historical_user_count

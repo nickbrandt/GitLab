@@ -1,0 +1,5 @@
+---
+title: Allow Seat Link to be disabled through configuration or admin toggle
+merge_request: 28015
+author:
+type: fixed
