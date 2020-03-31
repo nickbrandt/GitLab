@@ -122,9 +122,9 @@ describe ApplicationSetting do
 
       with_them do
         it do
-          setting.update_column(:elasticsearch_url, elasticsearch_url)
+          setting.elasticsearch_url = elasticsearch_url
 
-          expect(setting.reload.valid?).to eq(is_valid)
+          expect(setting.valid?).to eq(is_valid)
         end
       end
     end
