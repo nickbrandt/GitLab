@@ -12,6 +12,8 @@ module EE
           design_url
         when Epic
           group_epic_url(object.group, object)
+        when Vulnerability
+          project_security_vulnerability_url(object.project, object)
         else
           super
         end
@@ -19,10 +21,15 @@ module EE
 
       override :note_url
       def note_url
-        return super unless object.for_epic?
+        noteable = object.noteable
 
-        epic = object.noteable
-        group_epic_url(epic.group, epic, anchor: dom_id(object))
+        if object.for_epic?
+          group_epic_url(noteable.group, noteable, anchor: dom_id(object))
+        elsif object.for_vulnerability?
+          project_security_vulnerability_url(noteable.project, noteable, anchor: dom_id(object))
+        else
+          super
+        end
       end
 
       private

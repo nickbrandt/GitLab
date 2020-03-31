@@ -9,7 +9,7 @@ module EE
       # We can't specify `override` here:
       # https://gitlab.com/gitlab-org/gitlab-foss/issues/50911
       def replyable_types
-        super + %w(Epic)
+        super + %w[Epic Vulnerability]
       end
 
       def resolvable_types
@@ -22,6 +22,8 @@ module EE
       case self
       when Epic
         ::Gitlab::Routing.url_helpers.group_epic_notes_path(group, self)
+      when Vulnerability
+        ::Gitlab::Routing.url_helpers.project_security_vulnerability_notes_path(project, self)
       when DesignManagement::Design
         ::Gitlab::Routing.url_helpers.designs_project_issue_path(project, issue, { vueroute: filename })
       else

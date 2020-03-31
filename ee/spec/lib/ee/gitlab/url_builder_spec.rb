@@ -42,5 +42,25 @@ describe Gitlab::UrlBuilder do
         expect(url).to eq "#{Settings.gitlab['url']}/groups/#{epic.group.full_path}/-/epics/#{epic.iid}#note_#{note.id}"
       end
     end
+
+    context 'when passing a vulnerability' do
+      it 'returns a proper URL' do
+        vulnerability = build_stubbed(:vulnerability, id: 42)
+
+        url = described_class.build(vulnerability)
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{vulnerability.project.full_path}/-/security/vulnerabilities/#{vulnerability.id}"
+      end
+    end
+
+    context 'when passing a vulnerability note' do
+      it 'returns a proper URL' do
+        vulnerability = create(:vulnerability)
+        note = build_stubbed(:note_on_vulnerability, noteable: vulnerability)
+        url = described_class.build(note)
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{vulnerability.project.full_path}/-/security/vulnerabilities/#{vulnerability.id}#note_#{note.id}"
+      end
+    end
   end
 end

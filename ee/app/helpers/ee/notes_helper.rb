@@ -7,6 +7,7 @@ module EE
     override :notes_url
     def notes_url(params = {})
       return group_epic_notes_path(@epic.group, @epic) if @epic.is_a?(Epic)
+      return project_security_vulnerability_notes_path(@vulnerability.project, @vulnerability) if @vulnerability.is_a?(Vulnerability)
 
       super
     end
@@ -14,6 +15,7 @@ module EE
     override :discussions_path
     def discussions_path(issuable)
       return discussions_group_epic_path(issuable.group, issuable, format: :json) if issuable.is_a?(Epic)
+      return discussions_project_security_vulnerability_path(issuable.project, issuable, format: :json) if issuable.is_a?(Vulnerability)
 
       super
     end

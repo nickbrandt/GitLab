@@ -95,7 +95,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
 
-          resources :vulnerabilities, only: [:show, :index]
+          resources :vulnerabilities, only: [:show, :index] do
+            member do
+              get :discussions, format: :json
+            end
+
+            scope module: :vulnerabilities do
+              resources :notes, only: [:index], concerns: :awardable, constraints: { id: /\d+/ }
+            end
+          end
         end
 
         namespace :analytics do

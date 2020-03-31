@@ -15,6 +15,8 @@
 
 module Security
   class VulnerabilitiesFinder
+    include FinderMethods
+
     def initialize(vulnerable, filters = {})
       @filters = filters
       @vulnerabilities = vulnerable.vulnerabilities
