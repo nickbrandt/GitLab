@@ -30,145 +30,8 @@ describe API::GoProxy do
     { sha: [sha1, sha2] }
   end
 
-  context 'with an invalid module directive' do
-    let_it_be(:project) { create :project_empty_repo, :public, creator: user }
-    let_it_be(:base) { "#{domain}/#{project.path_with_namespace}" }
-
-    # rubocop: disable Layout/IndentationWidth
-    let_it_be(:modules) do
-                              create_file('a.go', "package a\nfunc Hi() { println(\"Hello world!\") }\n")
-      create_version(1, 0, 0, create_file('go.mod', "module not/a/real/module\n"))
-                              create_file('v2/a.go', "package a\nfunc Hi() { println(\"Hello world!\") }\n")
-      create_version(2, 0, 0, create_file('v2/go.mod', "module #{base}\n"))
-
-      project.repository.head_commit
-    end
-
-    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
-      let(:resource) { "list" }
-
-      context 'with a completely wrong directive for v1' do
-        let(:module_name) { base }
-
-        it 'returns nothing' do
-          get_resource(user)
-
-          expect_module_version_list
-        end
-      end
-
-      context 'with a directive omitting the suffix for v2' do
-        let(:module_name) { "#{base}/v2" }
-
-        it 'returns nothing' do
-          get_resource(user)
-
-          expect_module_version_list
-        end
-      end
-    end
-
-    describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.info' do
-      context 'with a completely wrong directive for v1' do
-        let(:module_name) { base }
-        let(:resource) { "v1.0.0.info" }
-
-        it 'returns not found' do
-          get_resource(user)
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      context 'with a directive omitting the suffix for v2' do
-        let(:module_name) { "#{base}/v2" }
-        let(:resource) { "v2.0.0.info" }
-
-        it 'returns not found' do
-          get_resource(user)
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-    end
-  end
-
-  context 'with a case sensitive project and versions' do
-    let_it_be(:project) { create :project_empty_repo, :public, creator: user, path: 'MyGoLib' }
-    let_it_be(:base) { "#{domain}/#{project.path_with_namespace}" }
-    let_it_be(:base_encoded) { base.gsub(/[A-Z]/) { |s| "!#{s.downcase}"} }
-
-    let_it_be(:modules) do
-                              create_file('README.md', 'Hi', commit_message: 'Add README.md')
-      create_version(1, 0, 1, create_module, prerelease: 'prerelease')
-      create_version(1, 0, 1, create_package('pkg'), prerelease: 'Prerelease')
-
-      project.repository.head_commit
-    end
-
-    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
-      let(:resource) { "list" }
-
-      context 'with a case encoded path' do
-        let(:module_name) { base_encoded }
-
-        it 'returns the tags' do
-          get_resource(user)
-
-          expect_module_version_list('v1.0.1-prerelease', 'v1.0.1-Prerelease')
-        end
-      end
-
-      context 'without a case encoded path' do
-        let(:module_name) { base.downcase }
-
-        it 'returns not found' do
-          get_resource(user)
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-    end
-
-    describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.info' do
-      context 'with a case encoded path' do
-        let(:module_name) { base_encoded }
-        let(:resource) { "v1.0.1-!prerelease.info" }
-
-        it 'returns the uppercase tag' do
-          get_resource(user)
-
-          expect_module_version_info('v1.0.1-Prerelease')
-        end
-      end
-
-      context 'without a case encoded path' do
-        let(:module_name) { base_encoded }
-        let(:resource) { "v1.0.1-prerelease.info" }
-
-        it 'returns the lowercase tag' do
-          get_resource(user)
-
-          expect_module_version_info('v1.0.1-prerelease')
-        end
-      end
-    end
-  end
-
   describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
     let(:resource) { "list" }
-
-    # context 'with a private project', visibility: 'private' do
-    #   let(:module_name) { base }
-
-    #   it_behaves_like 'a module that requires auth'
-    # end
-
-    # context 'with a public project', visibility: 'public' do
-    #   let(:module_name) { base }
-
-    #   it_behaves_like 'a module that does not require auth'
-    # end
 
     context 'for the root module' do
       let(:module_name) { base }
@@ -454,6 +317,213 @@ describe API::GoProxy do
     end
   end
 
+  context 'with an invalid module directive' do
+    let_it_be(:project) { create :project_empty_repo, :public, creator: user }
+    let_it_be(:base) { "#{domain}/#{project.path_with_namespace}" }
+
+    # rubocop: disable Layout/IndentationWidth
+    let_it_be(:modules) do
+                              create_file('a.go', "package a\nfunc Hi() { println(\"Hello world!\") }\n")
+      create_version(1, 0, 0, create_file('go.mod', "module not/a/real/module\n"))
+                              create_file('v2/a.go', "package a\nfunc Hi() { println(\"Hello world!\") }\n")
+      create_version(2, 0, 0, create_file('v2/go.mod', "module #{base}\n"))
+
+      project.repository.head_commit
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
+      let(:resource) { "list" }
+
+      context 'with a completely wrong directive for v1' do
+        let(:module_name) { base }
+
+        it 'returns nothing' do
+          get_resource(user)
+
+          expect_module_version_list
+        end
+      end
+
+      context 'with a directive omitting the suffix for v2' do
+        let(:module_name) { "#{base}/v2" }
+
+        it 'returns nothing' do
+          get_resource(user)
+
+          expect_module_version_list
+        end
+      end
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.info' do
+      context 'with a completely wrong directive for v1' do
+        let(:module_name) { base }
+        let(:resource) { "v1.0.0.info" }
+
+        it 'returns not found' do
+          get_resource(user)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'with a directive omitting the suffix for v2' do
+        let(:module_name) { "#{base}/v2" }
+        let(:resource) { "v2.0.0.info" }
+
+        it 'returns not found' do
+          get_resource(user)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  context 'with a case sensitive project and versions' do
+    let_it_be(:project) { create :project_empty_repo, :public, creator: user, path: 'MyGoLib' }
+    let_it_be(:base) { "#{domain}/#{project.path_with_namespace}" }
+    let_it_be(:base_encoded) { base.gsub(/[A-Z]/) { |s| "!#{s.downcase}"} }
+
+    let_it_be(:modules) do
+                              create_file('README.md', 'Hi', commit_message: 'Add README.md')
+      create_version(1, 0, 1, create_module, prerelease: 'prerelease')
+      create_version(1, 0, 1, create_package('pkg'), prerelease: 'Prerelease')
+
+      project.repository.head_commit
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
+      let(:resource) { "list" }
+
+      context 'with a case encoded path' do
+        let(:module_name) { base_encoded }
+
+        it 'returns the tags' do
+          get_resource(user)
+
+          expect_module_version_list('v1.0.1-prerelease', 'v1.0.1-Prerelease')
+        end
+      end
+
+      context 'without a case encoded path' do
+        let(:module_name) { base.downcase }
+
+        it 'returns not found' do
+          get_resource(user)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.info' do
+      context 'with a case encoded path' do
+        let(:module_name) { base_encoded }
+        let(:resource) { "v1.0.1-!prerelease.info" }
+
+        it 'returns the uppercase tag' do
+          get_resource(user)
+
+          expect_module_version_info('v1.0.1-Prerelease')
+        end
+      end
+
+      context 'without a case encoded path' do
+        let(:module_name) { base_encoded }
+        let(:resource) { "v1.0.1-prerelease.info" }
+
+        it 'returns the lowercase tag' do
+          get_resource(user)
+
+          expect_module_version_info('v1.0.1-prerelease')
+        end
+      end
+    end
+  end
+
+  context 'with a private project' do
+    let(:module_name) { base }
+
+    before do
+      project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
+      let(:resource) { "list" }
+
+      it 'returns ok with an oauth token' do
+        get_resource(oauth_access_token: oauth)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'returns ok with a job token' do
+        get_resource(oauth_access_token: job)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'returns ok with a personal access token' do
+        get_resource(personal_access_token: pa_token)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'returns unauthorized with no authentication' do
+        get_resource
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+    end
+  end
+
+  context 'with a public project' do
+    let(:module_name) { base }
+
+    before do
+      project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
+      let(:resource) { "list" }
+
+      it 'returns ok with no authentication' do
+        get_resource
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+    end
+  end
+
+  context 'with a non-existent project' do
+    def get_resource(user = nil, **params)
+      get api("/projects/not%2fa%2fproject/packages/go/#{base}/@v/list", user, params)
+    end
+
+    describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
+      it 'returns not found with a user' do
+        get_resource(user)
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'returns not found with an oauth token' do
+        get_resource(oauth_access_token: oauth)
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'returns not found with a job token' do
+        get_resource(oauth_access_token: job)
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'returns not found with a personal access token' do
+        get_resource(personal_access_token: pa_token)
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'returns unauthorized with no authentication' do
+        get_resource
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+    end
+  end
+
   before do
     project.add_developer(user)
     stub_licensed_features(packages: true)
@@ -461,49 +531,8 @@ describe API::GoProxy do
     modules
   end
 
-  shared_context 'has a private project', visibility: 'private' do
-    before do
-      project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-    end
-  end
-
-  shared_context 'has a public project', visibility: 'public' do
-    before do
-      project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-    end
-  end
-
-  shared_examples 'a module that requires auth' do
-    it 'returns ok with oauth token' do
-      get_resource(access_token: oauth.token)
-      expect(response).to have_gitlab_http_status(:ok)
-    end
-
-    it 'returns ok with job token' do
-      get_resource(job_token: job.token)
-      expect(response).to have_gitlab_http_status(:ok)
-    end
-
-    it 'returns ok with personal access token' do
-      get_resource(personal_access_token: pa_token)
-      expect(response).to have_gitlab_http_status(:ok)
-    end
-
-    it 'returns not found with no authentication' do
-      get_resource
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
-  end
-
-  shared_examples 'a module that does not require auth' do
-    it 'returns ok with no authentication' do
-      get_resource
-      expect(response).to have_gitlab_http_status(:ok)
-    end
-  end
-
   def get_resource(user = nil, **params)
-    get api("/projects/#{project.id}/packages/go/#{module_name}/@v/#{resource}", user), params: params
+    get api("/projects/#{project.id}/packages/go/#{module_name}/@v/#{resource}", user, params)
   end
 
   def create_file(path, content, commit_message: 'Add file')

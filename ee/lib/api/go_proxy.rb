@@ -32,12 +32,28 @@ module API
 
         ver
       end
+
+      # override :find_project!
+      def find_project!(id)
+        project = find_project(id)
+
+        ability = job_token_authentication? ? :build_read_project : :read_project
+
+        if can?(current_user, ability, project)
+          project
+        elsif current_user.nil?
+          unauthorized!
+        else
+          not_found!('Project')
+        end
+      end
     end
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
       requires :module_name, type: String, desc: 'Module name'
     end
+    route_setting :authentication, job_token_allowed: true
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_read_package!
