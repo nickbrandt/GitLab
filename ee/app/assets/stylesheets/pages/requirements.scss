@@ -1,0 +1,29 @@
+.requirements-container {
+  // Following overrides will be removed once
+  // we add filtered search bar on the page
+  // see https://gitlab.com/gitlab-org/gitlab/-/issues/212543
+  @include media-breakpoint-down(xs) {
+    .top-area {
+      border-bottom: 0;
+
+      .nav-links.mobile-separator {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.requirements-list-container {
+  .issuable-info {
+    // The size here is specific to correctly
+    // align info row perfectly with action buttons & updated date.
+    margin-top: 9px;
+  }
+
+  .controls {
+    .requirement-edit .btn,
+    .requirement-archive .btn {
+      padding: $gl-padding-4 $gl-vert-padding;
+    }
+  }
+}
