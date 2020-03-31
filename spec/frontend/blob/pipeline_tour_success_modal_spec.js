@@ -8,8 +8,12 @@ import modalProps from './pipeline_tour_success_mock_data';
 describe('PipelineTourSuccessModal', () => {
   let wrapper;
   let cookieSpy;
+  let trackingSpy;
 
   beforeEach(() => {
+    document.body.dataset.page = 'projects:blob:show';
+
+    trackingSpy = mockTracking('_category_', undefined, jest.spyOn);
     wrapper = shallowMount(pipelineTourSuccess, {
       propsData: modalProps,
     });
@@ -19,6 +23,7 @@ describe('PipelineTourSuccessModal', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    unmockTracking();
   });
 
   it('has expected structure', () => {
@@ -36,21 +41,7 @@ describe('PipelineTourSuccessModal', () => {
   });
 
   describe('tracking', () => {
-    let trackingSpy;
-
-    beforeEach(() => {
-      trackingSpy = mockTracking('_category_', wrapper.element, jest.spyOn);
-    });
-
-    afterEach(() => {
-      unmockTracking();
-    });
-
     it('send event for basic view of popover', () => {
-      document.body.dataset.page = 'projects:blob:show';
-
-      wrapper.vm.trackOnShow();
-
       expect(trackingSpy).toHaveBeenCalledWith(undefined, undefined, {
         label: 'congratulate_first_pipeline',
         property: modalProps.humanAccess,

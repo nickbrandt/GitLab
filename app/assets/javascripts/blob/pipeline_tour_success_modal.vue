@@ -50,13 +50,10 @@ export default {
     };
   },
   mounted() {
-    this.trackOnShow();
+    this.track();
     this.disableModalFromRenderingAgain();
   },
   methods: {
-    trackOnShow() {
-      this.track();
-    },
     disableModalFromRenderingAgain() {
       Cookies.remove(this.commitCookie);
     },
