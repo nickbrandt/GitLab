@@ -32,7 +32,7 @@ export default {
     </div>
     <template v-if="canEdit">
       <gl-link
-        class="btn btn-blank float-right sidebar-dropdown-toggle"
+        class="edit-link float-right sidebar-dropdown-toggle"
         @click="$emit('onClickEdit', $event)"
         >{{ __('Edit') }}</gl-link
       >
