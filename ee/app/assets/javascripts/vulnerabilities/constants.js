@@ -1,6 +1,5 @@
 import { s__ } from '~/locale';
 
-// eslint-disable-next-line import/prefer-default-export
 export const VULNERABILITY_STATES = {
   dismissed: {
     action: 'dismiss',
@@ -21,3 +20,5 @@ export const VULNERABILITY_STATES = {
     description: s__('VulnerabilityManagement|Verified as fixed or mitigated'),
   },
 };
+
+export const VULNERABILITIES_PER_PAGE = 20;

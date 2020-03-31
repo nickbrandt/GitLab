@@ -12051,6 +12051,9 @@ msgstr ""
 msgid "Live preview"
 msgstr ""
 
+msgid "Load more vulnerabilities"
+msgstr ""
+
 msgid "Loading"
 msgstr ""
 
