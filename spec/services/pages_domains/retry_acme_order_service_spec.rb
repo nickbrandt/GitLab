@@ -18,4 +18,12 @@ describe PagesDomains::RetryAcmeOrderService do
 
     service.execute
   end
+
+  it "doesn't schedule renewal worker if acme order is already present" do
+    create(:pages_domain_acme_order, pages_domain: domain)
+
+    expect(PagesDomainSslRenewalWorker).not_to receive(:new)
+
+    service.execute
+  end
 end
