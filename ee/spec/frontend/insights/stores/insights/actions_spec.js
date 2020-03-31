@@ -1,12 +1,16 @@
 import MockAdapter from 'axios-mock-adapter';
 
 import axios from '~/lib/utils/axios_utils';
-import testAction from 'spec/helpers/vuex_action_helper';
+import createFlash from '~/flash';
+import testAction from 'helpers/vuex_action_helper';
+import { TEST_HOST } from 'helpers/test_constants';
 
-import actionsModule, * as actions from 'ee/insights/stores/modules/insights/actions';
+import * as actions from 'ee/insights/stores/modules/insights/actions';
 import { CHART_TYPES } from 'ee/insights/constants';
 
 const ERROR_MESSAGE = 'TEST_ERROR_MESSAGE';
+
+jest.mock('~/flash');
 
 describe('Insights store actions', () => {
   const key = 'bugsPerTeam';
@@ -32,59 +36,50 @@ describe('Insights store actions', () => {
   });
 
   describe('requestConfig', () => {
-    it('commits REQUEST_CONFIG', done => {
-      testAction(actions.requestConfig, null, null, [{ type: 'REQUEST_CONFIG' }], [], done);
+    it('commits REQUEST_CONFIG', () => {
+      return testAction(actions.requestConfig, null, null, [{ type: 'REQUEST_CONFIG' }], []);
     });
   });
 
   describe('receiveConfigSuccess', () => {
-    it('commits RECEIVE_CONFIG_SUCCESS', done => {
-      testAction(
+    it('commits RECEIVE_CONFIG_SUCCESS', () => {
+      return testAction(
         actions.receiveConfigSuccess,
         [configData],
         null,
         [{ type: 'RECEIVE_CONFIG_SUCCESS', payload: [configData] }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveConfigError', () => {
-    let flashSpy;
-
-    beforeEach(() => {
-      flashSpy = spyOnDependency(actionsModule, 'createFlash');
-    });
-
-    it('commits RECEIVE_CONFIG_ERROR and shows flash message', done => {
-      testAction(
+    it('commits RECEIVE_CONFIG_ERROR and shows flash message', () => {
+      return testAction(
         actions.receiveConfigError,
         ERROR_MESSAGE,
         null,
         [{ type: 'RECEIVE_CONFIG_ERROR' }],
         [],
         () => {
-          expect(flashSpy).toHaveBeenCalledWith(
+          expect(createFlash).toHaveBeenCalledWith(
             `There was an error fetching configuration for charts: ${ERROR_MESSAGE}`,
           );
-          done();
         },
       );
     });
 
-    it('flashes Unknown Error when error message is falsey', done => {
-      testAction(
+    it('flashes Unknown Error when error message is falsey', () => {
+      return testAction(
         actions.receiveConfigError,
         null,
         null,
         jasmine.any(Array),
         jasmine.any(Array),
         () => {
-          expect(flashSpy).toHaveBeenCalledWith(
+          expect(createFlash).toHaveBeenCalledWith(
             `There was an error fetching configuration for charts: Unknown Error`,
           );
-          done();
         },
       );
     });
@@ -103,51 +98,48 @@ describe('Insights store actions', () => {
 
     describe('success calls', () => {
       beforeEach(() => {
-        mock.onGet(gl.TEST_HOST).reply(200, configData);
+        mock.onGet(TEST_HOST).reply(200, configData);
       });
 
-      it('calls requestConfig and receiveConfigSuccess', done => {
-        testAction(
+      it('calls requestConfig and receiveConfigSuccess', () => {
+        return testAction(
           actions.fetchConfigData,
-          gl.TEST_HOST,
+          TEST_HOST,
           {},
           [],
           [{ type: 'requestConfig' }, { type: 'receiveConfigSuccess', payload: configData }],
-          done,
         );
       });
     });
 
     describe('failed calls', () => {
       beforeEach(() => {
-        mock.onGet(gl.TEST_HOST).reply(500, { message: ERROR_MESSAGE });
+        mock.onGet(TEST_HOST).reply(500, { message: ERROR_MESSAGE });
       });
 
-      it('calls receiveConfigError upon error from service', done => {
-        testAction(
+      it('calls receiveConfigError upon error from service', () => {
+        return testAction(
           actions.fetchConfigData,
-          gl.TEST_HOST,
+          TEST_HOST,
           {},
           [],
           [{ type: 'requestConfig' }, { type: 'receiveConfigError', payload: ERROR_MESSAGE }],
-          done,
         );
       });
     });
 
     describe('success calls with null data', () => {
       beforeEach(() => {
-        mock.onGet(gl.TEST_HOST).reply(200, null);
+        mock.onGet(TEST_HOST).reply(200, null);
       });
 
-      it('calls receiveConfigError upon null config data returned', done => {
-        testAction(
+      it('calls receiveConfigError upon null config data returned', () => {
+        return testAction(
           actions.fetchConfigData,
-          gl.TEST_HOST,
+          TEST_HOST,
           {},
           [],
           [{ type: 'requestConfig' }, { type: 'receiveConfigError' }],
-          done,
         );
       });
     });
@@ -156,8 +148,8 @@ describe('Insights store actions', () => {
   describe('receiveChartDataSuccess', () => {
     const chartData = { type: CHART_TYPES.BAR, data: {} };
 
-    it('commits RECEIVE_CHART_SUCCESS', done => {
-      testAction(
+    it('commits RECEIVE_CHART_SUCCESS', () => {
+      return testAction(
         actions.receiveChartDataSuccess,
         { chart, data: chartData },
         null,
@@ -168,7 +160,6 @@ describe('Insights store actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
@@ -176,8 +167,8 @@ describe('Insights store actions', () => {
   describe('receiveChartDataError', () => {
     const error = 'myError';
 
-    it('commits RECEIVE_CHART_ERROR', done => {
-      testAction(
+    it('commits RECEIVE_CHART_ERROR', () => {
+      return testAction(
         actions.receiveChartDataError,
         { chart, error },
         null,
@@ -188,7 +179,6 @@ describe('Insights store actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
@@ -196,7 +186,7 @@ describe('Insights store actions', () => {
   describe('fetchChartData', () => {
     let mock;
     let dispatch;
-    const payload = { endpoint: `${gl.TEST_HOST}/query`, chart };
+    const payload = { endpoint: `${TEST_HOST}/query`, chart };
 
     const chartData = {
       labels: ['January', 'February'],
@@ -217,7 +207,7 @@ describe('Insights store actions', () => {
     };
 
     beforeEach(() => {
-      dispatch = jasmine.createSpy('dispatch');
+      dispatch = jest.fn().mockName('dispatch');
       mock = new MockAdapter(axios);
     });
 
@@ -227,47 +217,39 @@ describe('Insights store actions', () => {
 
     describe('successful request', () => {
       beforeEach(() => {
-        mock.onPost(`${gl.TEST_HOST}/query`, chart).reply(200, chartData);
+        mock.onPost(`${TEST_HOST}/query`, chart).reply(200, chartData);
       });
 
-      it('calls receiveChartDataSuccess with chart data', done => {
+      it('calls receiveChartDataSuccess with chart data', () => {
         const context = {
           dispatch,
         };
 
-        actions
-          .fetchChartData(context, payload)
-          .then(() => {
-            expect(dispatch.calls.argsFor(0)).toEqual([
-              'receiveChartDataSuccess',
-              { chart, data: chartData },
-            ]);
-          })
-          .then(done)
-          .catch(done.fail);
+        return actions.fetchChartData(context, payload).then(() => {
+          expect(dispatch.mock.calls[0]).toEqual([
+            'receiveChartDataSuccess',
+            { chart, data: chartData },
+          ]);
+        });
       });
     });
 
     describe('failed request', () => {
       beforeEach(() => {
-        mock.onPost(`${gl.TEST_HOST}/query`, chart).reply(500);
+        mock.onPost(`${TEST_HOST}/query`, chart).reply(500);
       });
 
-      it('calls receiveChartDataError with error message', done => {
+      it('calls receiveChartDataError with error message', () => {
         const context = {
           dispatch,
         };
 
-        actions
-          .fetchChartData(context, payload)
-          .then(() => {
-            expect(dispatch.calls.argsFor(0)).toEqual([
-              'receiveChartDataError',
-              { chart, error: 'There was an error gathering the chart data' },
-            ]);
-          })
-          .then(done)
-          .catch(done.fail);
+        return actions.fetchChartData(context, payload).then(() => {
+          expect(dispatch.mock.calls[0]).toEqual([
+            'receiveChartDataError',
+            { chart, error: 'There was an error gathering the chart data' },
+          ]);
+        });
       });
     });
   });
@@ -279,54 +261,51 @@ describe('Insights store actions', () => {
       state = { configData };
     });
 
-    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
-      testAction(
+    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', () => {
+      return testAction(
         actions.setActiveTab,
         key,
         state,
         [{ type: 'SET_ACTIVE_TAB', payload: key }, { type: 'SET_ACTIVE_PAGE', payload: page }],
         [],
-        done,
       );
     });
 
-    it('does not mutate with no configData', done => {
+    it('does not mutate with no configData', () => {
       state = { configData: null };
 
-      testAction(actions.setActiveTab, key, state, [], [], done);
+      testAction(actions.setActiveTab, key, state, [], []);
     });
 
-    it('does not mutate with no matching tab', done => {
-      testAction(actions.setActiveTab, 'invalidTab', state, [], [], done);
+    it('does not mutate with no matching tab', () => {
+      testAction(actions.setActiveTab, 'invalidTab', state, [], []);
     });
   });
 
   describe('initChartData', () => {
-    it('commits INIT_CHART_DATA', done => {
+    it('commits INIT_CHART_DATA', () => {
       const keys = ['a', 'b'];
 
-      testAction(
+      return testAction(
         actions.initChartData,
         keys,
         null,
         [{ type: 'INIT_CHART_DATA', payload: keys }],
         [],
-        done,
       );
     });
   });
 
   describe('setPageLoading', () => {
-    it('commits SET_PAGE_LOADING', done => {
+    it('commits SET_PAGE_LOADING', () => {
       const pageLoading = false;
 
-      testAction(
+      return testAction(
         actions.setPageLoading,
         pageLoading,
         null,
         [{ type: 'SET_PAGE_LOADING', payload: false }],
         [],
-        done,
       );
     });
   });

@@ -20,11 +20,11 @@ describe('Insights chart error component', () => {
   });
 
   it('renders the component', () => {
-    expect(wrapper.find('.content-title').text()).toEqual(`${title}: "${chartName}"`);
+    expect(wrapper.find('.content-title').text()).toBe(`${title}: "${chartName}"`);
 
     const summaries = wrapper.findAll('.content-summary');
 
-    expect(summaries.at(0).text()).toEqual(summary);
-    expect(summaries.at(1).text()).toEqual(error);
+    expect(summaries.at(0).text()).toBe(summary);
+    expect(summaries.at(1).text()).toBe(error);
   });
 });

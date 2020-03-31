@@ -1,7 +1,12 @@
 import { GlColumnChart, GlLineChart, GlStackedColumnChart } from '@gitlab/ui/dist/charts';
 import { shallowMount } from '@vue/test-utils';
 
-import { chartInfo, barChartData, lineChartData, stackedBarChartData } from '../mock_data';
+import {
+  chartInfo,
+  barChartData,
+  lineChartData,
+  stackedBarChartData,
+} from 'ee_jest/insights/mock_data';
 import InsightsChart from 'ee/insights/components/insights_chart.vue';
 import InsightsChartError from 'ee/insights/components/insights_chart_error.vue';
 import { CHART_TYPES } from 'ee/insights/constants';
