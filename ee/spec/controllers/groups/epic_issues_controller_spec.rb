@@ -45,7 +45,7 @@ describe Groups::EpicIssuesController do
         end
 
         it 'returns status 200' do
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'returns the correct json' do
@@ -123,7 +123,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 200' do
           subject
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'destroys the link' do
@@ -135,7 +135,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 403' do
           subject
 
-          expect(response.status).to eq(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not destroy the link' do
@@ -157,7 +157,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 404' do
           subject
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'does not destroy the link' do
@@ -171,7 +171,7 @@ describe Groups::EpicIssuesController do
 
           delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 0 }
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -197,7 +197,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 200' do
           subject
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'updates the issue position value' do
@@ -209,7 +209,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 404' do
           subject
 
-          expect(response.status).to eq(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -227,7 +227,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 404' do
           subject
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -235,7 +235,7 @@ describe Groups::EpicIssuesController do
         it 'returns status 404' do
           delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 9999 }
 
-          expect(response.status).to eq(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end

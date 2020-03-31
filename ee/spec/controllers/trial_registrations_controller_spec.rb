@@ -62,7 +62,7 @@ describe TrialRegistrationsController do
       it 'returns 404 not found' do
         post :create, params: { user: user_params }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 

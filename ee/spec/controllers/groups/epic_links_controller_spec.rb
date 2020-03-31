@@ -195,7 +195,7 @@ describe Groups::EpicLinksController do
         it 'returns status 200' do
           subject
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'destroys the link' do
@@ -207,7 +207,7 @@ describe Groups::EpicLinksController do
         it 'returns status 404' do
           subject
 
-          expect(response.status).to eq(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not destroy the link' do
@@ -219,7 +219,7 @@ describe Groups::EpicLinksController do
         it 'returns status 404' do
           delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic2.id }
 
-          expect(response.status).to eq(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end

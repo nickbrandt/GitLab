@@ -30,7 +30,7 @@ describe UsernamesController do
       it 'returns bad request response' do
         get :suggest
 
-        expect(response.status).to eq(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
   end

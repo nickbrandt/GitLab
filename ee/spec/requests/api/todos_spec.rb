@@ -38,7 +38,7 @@ describe API::Todos do
 
     shared_examples 'an endpoint that responds with success' do
       it do
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -116,7 +116,7 @@ describe API::Todos do
       it 'creates a todo on an epic' do
         expect { subject }.to change { Todo.count }.by(1)
 
-        expect(response.status).to eq(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['project']).to be_nil
         expect(json_response['group']).to be_a(Hash)
         expect(json_response['author']).to be_a(Hash)
@@ -134,13 +134,13 @@ describe API::Todos do
 
         subject
 
-        expect(response.status).to eq(304)
+        expect(response).to have_gitlab_http_status(:not_modified)
       end
 
       it 'returns 404 if the epic is not found' do
         post api("/groups/#{group.id}/epics/9999/todo", user)
 
-        expect(response.status).to eq(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'returns an error if the epic is not accessible' do

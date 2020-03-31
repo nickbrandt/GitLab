@@ -17,7 +17,7 @@ describe 'OmniAuth Kerberos SPNEGO' do
   it 'asks for an SPNEGO token' do
     get path
 
-    expect(response.status).to eq(401)
+    expect(response).to have_gitlab_http_status(:unauthorized)
     expect(response.header['Www-Authenticate']).to eq('Negotiate')
   end
 

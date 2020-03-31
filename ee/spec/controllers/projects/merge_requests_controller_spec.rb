@@ -400,7 +400,7 @@ describe Projects::MergeRequestsController do
 
         post_rebase
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
