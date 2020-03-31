@@ -102,6 +102,33 @@ describe ApplicationSetting do
         end
       end
     end
+
+    context 'when validating elasticsearch_url' do
+      where(:elasticsearch_url, :is_valid) do
+        "http://es.localdomain" | true
+        "https://es.localdomain" | true
+        "http://es.localdomain, https://es.localdomain " | true
+        "http://10.0.0.1" | true
+        "https://10.0.0.1" | true
+        "http://10.0.0.1, https://10.0.0.1" | true
+        "http://localhost" | true
+        "http://127.0.0.1" | true
+
+        "es.localdomain" | false
+        "10.0.0.1" | false
+        "http://es.localdomain, es.localdomain" | false
+        "http://es.localdomain, 10.0.0.1" | false
+        "this_isnt_a_url" | false
+      end
+
+      with_them do
+        it do
+          setting.elasticsearch_url = elasticsearch_url
+
+          expect(setting.valid?).to eq(is_valid)
+        end
+      end
+    end
   end
 
   describe '#should_check_namespace_plan?' do
