@@ -259,7 +259,7 @@ export default class Clusters {
     eventHub.$on('installApplication', this.installApplication);
     eventHub.$on('updateApplication', data => this.updateApplication(data));
     eventHub.$on('saveKnativeDomain', data => this.saveKnativeDomain(data));
-    eventHub.$on('setKnativeHostname', data => this.setKnativeHostname(data));
+    eventHub.$on('setKnativeDomain', data => this.setKnativeDomain(data));
     eventHub.$on('uninstallApplication', data => this.uninstallApplication(data));
     eventHub.$on('setCrossplaneProviderStack', data => this.setCrossplaneProviderStack(data));
     eventHub.$on('setIngressModSecurityEnabled', data => this.setIngressModSecurityEnabled(data));
@@ -275,7 +275,7 @@ export default class Clusters {
     eventHub.$off('installApplication', this.installApplication);
     eventHub.$off('updateApplication', this.updateApplication);
     eventHub.$off('saveKnativeDomain');
-    eventHub.$off('setKnativeHostname');
+    eventHub.$off('setKnativeDomain');
     eventHub.$off('setCrossplaneProviderStack');
     eventHub.$off('uninstallApplication');
     eventHub.$off('setIngressModSecurityEnabled');
@@ -521,10 +521,15 @@ export default class Clusters {
     });
   }
 
-  setKnativeHostname(data) {
+  setKnativeDomain(data) {
     const appId = data.id;
-    this.store.updateAppProperty(appId, 'isEditingHostName', true);
-    this.store.updateAppProperty(appId, 'hostname', data.hostname);
+    this.store.updateAppProperty(appId, 'isEditingDomain', true);
+    this.store.updateAppProperty(appId, 'hostname', data.domain);
+    this.store.updateAppProperty(
+      appId,
+      'pagesDomain',
+      data.domainId ? { id: data.domainId, domain: data.domain } : null,
+    );
   }
 
   setCrossplaneProviderStack(data) {
