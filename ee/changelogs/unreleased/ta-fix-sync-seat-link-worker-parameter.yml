@@ -1,0 +1,5 @@
+---
+title: Allow active_users param to be optional for SyncSeatLinkRequestWorker#perform
+merge_request: 28241
+author:
+type: fixed

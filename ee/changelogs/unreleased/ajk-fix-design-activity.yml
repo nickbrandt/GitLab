@@ -1,0 +1,5 @@
+---
+title: Fix error when viewing events from design notes on project activity page
+merge_request: 27840
+author:
+type: fixed

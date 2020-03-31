@@ -1,0 +1,5 @@
+---
+title: Fix direct access to individual design on deprecated issue route
+merge_request: 27650
+author:
+type: fixed
