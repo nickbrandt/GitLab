@@ -4682,6 +4682,9 @@ msgstr ""
 msgid "ClusterIntegration|Search VPCs"
 msgstr ""
 
+msgid "ClusterIntegration|Search domains"
+msgstr ""
+
 msgid "ClusterIntegration|Search instance types"
 msgstr ""
 
@@ -4737,6 +4740,9 @@ msgid "ClusterIntegration|Select a stack to install Crossplane."
 msgstr ""
 
 msgid "ClusterIntegration|Select a zone to choose a network"
+msgstr ""
+
+msgid "ClusterIntegration|Select existing domain or use new"
 msgstr ""
 
 msgid "ClusterIntegration|Select machine type"
@@ -4857,6 +4863,9 @@ msgid "ClusterIntegration|Uninstall %{appTitle}"
 msgstr ""
 
 msgid "ClusterIntegration|Update failed. Please check the logs and try again."
+msgstr ""
+
+msgid "ClusterIntegration|Use %{query}"
 msgstr ""
 
 msgid "ClusterIntegration|Uses the Cloud Run, Istio, and HTTP Load Balancing addons for this cluster."
