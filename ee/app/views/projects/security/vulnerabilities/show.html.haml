@@ -4,7 +4,7 @@
 - page_title @vulnerability.title
 - page_description @vulnerability.description
 
-#js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline, current_user: @current_user) }
+#js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline) }
 
 .issue-details.issuable-details
   .detail-page-description
@@ -38,4 +38,4 @@
               %li
                 %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
 
-#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline, current_user: @current_user) }
+#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline) }
