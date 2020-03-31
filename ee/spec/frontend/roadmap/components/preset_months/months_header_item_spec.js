@@ -3,8 +3,8 @@ import Vue from 'vue';
 import MonthsHeaderItemComponent from 'ee/roadmap/components/preset_months/months_header_item.vue';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockTimeframeInitialDate } from '../../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 const mockTimeframeIndex = 0;

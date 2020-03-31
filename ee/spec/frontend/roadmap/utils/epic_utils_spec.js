@@ -9,7 +9,7 @@ describe('extractGroupEpics', () => {
 
     expect(extractedEpics.length).toBe(edges.length);
     expect(extractedEpics[0]).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         ...edges[0].node,
         groupName: edges[0].node.group.name,
         groupFullName: edges[0].node.group.fullName,

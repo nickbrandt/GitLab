@@ -7,7 +7,7 @@ import {
   mockFormattedEpic,
   mockFormattedChildEpic2,
   mockFormattedChildEpic1,
-} from '../mock_data';
+} from 'ee_jest/roadmap/mock_data';
 
 const createComponent = (
   epic = mockFormattedEpic,
@@ -159,7 +159,7 @@ describe('EpicItemDetails', () => {
       });
 
       it('emits toggleIsEpicExpanded event when clicked', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
         const id = 42;
         const epic = {

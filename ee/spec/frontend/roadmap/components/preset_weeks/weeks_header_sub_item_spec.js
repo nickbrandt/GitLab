@@ -1,19 +1,19 @@
 import Vue from 'vue';
 
-import MonthsHeaderSubItemComponent from 'ee/roadmap/components/preset_months/months_header_sub_item.vue';
-import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+import WeeksHeaderSubItemComponent from 'ee/roadmap/components/preset_weeks/weeks_header_sub_item.vue';
+import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockTimeframeInitialDate } from '../../mock_data';
 
-const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 const createComponent = ({
-  currentDate = mockTimeframeMonths[0],
-  timeframeItem = mockTimeframeMonths[0],
+  currentDate = mockTimeframeWeeks[0],
+  timeframeItem = mockTimeframeWeeks[0],
 }) => {
-  const Component = Vue.extend(MonthsHeaderSubItemComponent);
+  const Component = Vue.extend(WeeksHeaderSubItemComponent);
 
   return mountComponent(Component, {
     currentDate,
@@ -32,50 +32,44 @@ describe('MonthsHeaderSubItemComponent', () => {
     it('initializes `presetType` and `indicatorStyles` data props', () => {
       vm = createComponent({});
 
-      expect(vm.presetType).toBe(PRESET_TYPES.MONTHS);
+      expect(vm.presetType).toBe(PRESET_TYPES.WEEKS);
       expect(vm.indicatorStyle).toBeDefined();
     });
   });
 
   describe('computed', () => {
     describe('headerSubItems', () => {
-      it('returns array of dates containing Sundays from timeframeItem', () => {
+      it('returns `headerSubItems` array of dates containing days of week from timeframeItem', () => {
         vm = createComponent({});
 
         expect(Array.isArray(vm.headerSubItems)).toBe(true);
+        expect(vm.headerSubItems.length).toBe(7);
         vm.headerSubItems.forEach(subItem => {
           expect(subItem instanceof Date).toBe(true);
         });
-      });
-    });
-
-    describe('headerSubItemClass', () => {
-      it('returns string containing `label-dark` when timeframe year and month are greater than current year and month', () => {
-        vm = createComponent({});
-
-        expect(vm.headerSubItemClass).toBe('label-dark');
-      });
-
-      it('returns empty string when timeframe year and month are less than current year and month', () => {
-        vm = createComponent({
-          currentDate: new Date(2017, 10, 1), // Nov 1, 2017
-          timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
-        });
-
-        expect(vm.headerSubItemClass).toBe('');
       });
     });
   });
 
   describe('methods', () => {
     describe('getSubItemValueClass', () => {
-      it('returns string containing `label-dark` when provided subItem is greater than current date', () => {
+      it('returns string containing `label-dark` when provided subItem is greater than current week day', () => {
         vm = createComponent({
           currentDate: new Date(2018, 0, 1), // Jan 1, 2018
         });
-        const subItem = new Date(2018, 0, 15); // Jan 15, 2018
+        const subItem = new Date(2018, 0, 25); // Jan 25, 2018
 
         expect(vm.getSubItemValueClass(subItem)).toBe('label-dark');
+      });
+
+      it('returns string containing `label-dark label-bold` when provided subItem is same as current week day', () => {
+        const currentDate = new Date(2018, 0, 25);
+        vm = createComponent({
+          currentDate,
+        });
+        const subItem = currentDate;
+
+        expect(vm.getSubItemValueClass(subItem)).toBe('label-dark label-bold');
       });
     });
   });
@@ -94,7 +88,7 @@ describe('MonthsHeaderSubItemComponent', () => {
     });
 
     it('renders element with class `current-day-indicator-header` when hasToday is true', () => {
-      expect(vm.$el.querySelector('.current-day-indicator-header.preset-months')).not.toBeNull();
+      expect(vm.$el.querySelector('.current-day-indicator-header.preset-weeks')).not.toBeNull();
     });
   });
 });

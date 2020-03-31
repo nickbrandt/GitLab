@@ -4,7 +4,7 @@ import CurrentDayIndicator from 'ee/roadmap/components/current_day_indicator.vue
 import EpicItemTimeline from 'ee/roadmap/components/epic_item_timeline.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
-import { mockTimeframeInitialDate, mockFormattedEpic } from '../mock_data';
+import { mockTimeframeInitialDate, mockFormattedEpic } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 

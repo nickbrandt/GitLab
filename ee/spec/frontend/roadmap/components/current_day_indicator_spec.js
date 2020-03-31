@@ -8,7 +8,7 @@ import {
 } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import { mockTimeframeInitialDate } from '../mock_data';
+import { mockTimeframeInitialDate } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
@@ -46,7 +46,7 @@ describe('CurrentDayIndicator', () => {
 
   describe('computed', () => {
     describe('hasToday', () => {
-      it('returns true when presetType is QUARTERS and currentDate is within current quarter', done => {
+      it('returns true when presetType is QUARTERS and currentDate is within current quarter', () => {
         wrapper.setData({
           currentDate: mockTimeframeQuarters[0].range[1],
         });
@@ -56,13 +56,12 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: mockTimeframeQuarters[0],
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.hasToday).toBe(true);
-          done();
         });
       });
 
-      it('returns true when presetType is MONTHS and currentDate is within current month', done => {
+      it('returns true when presetType is MONTHS and currentDate is within current month', () => {
         wrapper.setData({
           currentDate: new Date(2020, 0, 15),
         });
@@ -72,13 +71,12 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: new Date(2020, 0, 1),
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.hasToday).toBe(true);
-          done();
         });
       });
 
-      it('returns true when presetType is WEEKS and currentDate is within current week', done => {
+      it('returns true when presetType is WEEKS and currentDate is within current week', () => {
         wrapper.setData({
           currentDate: mockTimeframeWeeks[0],
         });
@@ -88,9 +86,8 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: mockTimeframeWeeks[0],
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.hasToday).toBe(true);
-          done();
         });
       });
     });
@@ -98,7 +95,7 @@ describe('CurrentDayIndicator', () => {
 
   describe('methods', () => {
     describe('getIndicatorStyles', () => {
-      it('returns object containing `left` with value `34%` when presetType is QUARTERS', done => {
+      it('returns object containing `left` with value `34%` when presetType is QUARTERS', () => {
         wrapper.setData({
           currentDate: mockTimeframeQuarters[0].range[1],
         });
@@ -108,17 +105,16 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: mockTimeframeQuarters[0],
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.getIndicatorStyles()).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               left: '34%',
             }),
           );
-          done();
         });
       });
 
-      it('returns object containing `left` with value `48%` when presetType is MONTHS', done => {
+      it('returns object containing `left` with value `48%` when presetType is MONTHS', () => {
         wrapper.setData({
           currentDate: new Date(2020, 0, 15),
         });
@@ -128,17 +124,16 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: new Date(2020, 0, 1),
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.getIndicatorStyles()).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               left: '48%',
             }),
           );
-          done();
         });
       });
 
-      it('returns object containing `left` with value `7%` when presetType is WEEKS', done => {
+      it('returns object containing `left` with value `7%` when presetType is WEEKS', () => {
         wrapper.setData({
           currentDate: mockTimeframeWeeks[0],
         });
@@ -148,34 +143,33 @@ describe('CurrentDayIndicator', () => {
           timeframeItem: mockTimeframeWeeks[0],
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.getIndicatorStyles()).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               left: '7%',
             }),
           );
-          done();
         });
       });
     });
   });
 
   describe('template', () => {
-    beforeEach(done => {
+    beforeEach(() => {
+      wrapper = createComponent();
       wrapper.setData({
         currentDate: mockTimeframeMonths[0],
       });
-      wrapper.vm.$nextTick(() => {
-        done();
-      });
+
+      return wrapper.vm.$nextTick();
     });
 
     it('renders span element containing class `current-day-indicator`', () => {
-      expect(wrapper.element.classList.contains('current-day-indicator')).toBe(true);
+      expect(wrapper.classes('current-day-indicator')).toBe(true);
     });
 
     it('renders span element with style attribute containing `left: 3%;`', () => {
-      expect(wrapper.element.getAttribute('style')).toBe('left: 3%;');
+      expect(wrapper.attributes('style')).toBe('left: 3%;');
     });
   });
 });

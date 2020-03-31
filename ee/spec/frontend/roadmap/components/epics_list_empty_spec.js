@@ -10,8 +10,12 @@ import {
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockSvgPath, mockNewEpicEndpoint } from '../mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import {
+  mockTimeframeInitialDate,
+  mockSvgPath,
+  mockNewEpicEndpoint,
+} from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
