@@ -597,13 +597,13 @@ describe('Monitoring store actions', () => {
 
     describe('with metric defined step', () => {
       beforeEach(() => {
-        metric.step = 10;
+        metric.step = 7;
       });
 
       const expectedParams = {
         start_time: '2019-08-06T12:40:02.184Z',
         end_time: '2019-08-06T20:40:02.184Z',
-        step: 10,
+        step: 7,
       };
 
       it('uses metric step', done => {
