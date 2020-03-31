@@ -389,6 +389,7 @@ describe('RelatedItemsTree', () => {
 
           expect(state.showCreateEpicForm).toBe(data.toggleState);
           expect(state.showAddItemForm).toBe(false);
+          expect(state.issuableType).toEqual('epic');
         });
       });
 
