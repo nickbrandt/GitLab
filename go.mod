@@ -21,7 +21,7 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/testify v1.4.0
 	gitlab.com/gitlab-org/gitaly v1.74.0
-	gitlab.com/gitlab-org/labkit v0.0.0-20200227174525-4f8041c014c2
+	gitlab.com/gitlab-org/labkit v0.0.0-20200327153541-fac94cb428e6
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
