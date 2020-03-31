@@ -425,7 +425,6 @@ describe 'Billing plan pages', :feature do
     end
 
     before do
-      expect_any_instance_of(EE::Namespace).to receive(:plan).at_least(:once).and_return(nil)
       visit profile_billings_path
     end
 

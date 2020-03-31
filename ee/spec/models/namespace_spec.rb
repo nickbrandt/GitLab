@@ -715,17 +715,6 @@ describe Namespace do
   end
 
   describe '#actual_plan' do
-    context 'when namespace has a plan associated' do
-      before do
-        namespace.update_attribute(:plan, gold_plan)
-      end
-
-      it 'generates a subscription with that plan code' do
-        expect(namespace.actual_plan).to eq(gold_plan)
-        expect(namespace.gitlab_subscription).to be_present
-      end
-    end
-
     context 'when namespace has a subscription associated' do
       before do
         create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)

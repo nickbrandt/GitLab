@@ -444,7 +444,7 @@ module EE
       return if ::Gitlab::Database.read_only?
 
       create_gitlab_subscription(
-        plan_code: plan&.name,
+        plan_code: Plan::FREE,
         trial: trial_active?,
         start_date: created_at,
         seats: 0
