@@ -102,6 +102,7 @@ describe Projects::BoardsController do
 
       context 'with unauthorized user' do
         before do
+          expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
           allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
           allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
         end
@@ -178,6 +179,7 @@ describe Projects::BoardsController do
 
     context 'with unauthorized user' do
       before do
+        expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
         allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
         allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
       end
@@ -227,6 +229,7 @@ describe Projects::BoardsController do
 
     context 'with unauthorized user' do
       before do
+        expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
         allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
         allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
       end
