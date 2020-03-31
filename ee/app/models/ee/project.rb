@@ -496,6 +496,16 @@ module EE
       ::Gitlab::UrlSanitizer.new(bare_url, credentials: { user: import_data&.user }).full_url
     end
 
+    def repository_size_checker
+      strong_memoize(:repository_size_checker) do
+        ::Gitlab::RepositorySizeChecker.new(
+          current_size_proc: -> { statistics.total_repository_size },
+          limit: (repository_size_limit || namespace.actual_size_limit),
+          enabled: License.feature_available?(:repository_size_limit)
+        )
+      end
+    end
+
     def username_only_import_url=(value)
       unless ::Gitlab::UrlSanitizer.valid?(value)
         self.import_url = value
@@ -510,38 +520,6 @@ module EE
       create_or_update_import_data(credentials: creds)
 
       username_only_import_url
-    end
-
-    def repository_and_lfs_size
-      statistics.total_repository_size
-    end
-
-    def above_size_limit?
-      return false unless size_limit_enabled?
-
-      repository_and_lfs_size > actual_size_limit
-    end
-
-    def size_to_remove
-      repository_and_lfs_size - actual_size_limit
-    end
-
-    def actual_size_limit
-      return namespace.actual_size_limit if repository_size_limit.nil?
-
-      repository_size_limit
-    end
-
-    def size_limit_enabled?
-      return false unless License.feature_available?(:repository_size_limit)
-
-      actual_size_limit != 0
-    end
-
-    def changes_will_exceed_size_limit?(size_in_bytes)
-      size_limit_enabled? &&
-        (size_in_bytes > actual_size_limit ||
-         size_in_bytes + repository_and_lfs_size > actual_size_limit)
     end
 
     def remove_import_data

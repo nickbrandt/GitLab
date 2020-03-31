@@ -2,25 +2,18 @@
 
 require 'spec_helper'
 
-describe Gitlab::RepositorySizeError do
-  let(:project) do
-    create(:project, statistics: build(:project_statistics, repository_size: 15.megabytes))
+describe Gitlab::RepositorySizeErrorMessage do
+  let(:checker) do
+    Gitlab::RepositorySizeChecker.new(
+      current_size_proc: -> { 15.megabytes },
+      limit: 10.megabytes
+    )
   end
 
-  let(:message) { described_class.new(project) }
+  let(:message) { checker.error_message }
   let(:base_message) { 'because this repository has exceeded its size limit of 10 MB by 5 MB' }
 
-  before do
-    allow(project).to receive(:actual_size_limit).and_return(10.megabytes)
-  end
-
   describe 'error messages' do
-    describe '#to_s' do
-      it 'returns the correct message' do
-        expect(message.to_s).to eq('The size of this repository (15 MB) exceeds the limit of 10 MB by 5 MB.')
-      end
-    end
-
     describe '#commit_error' do
       it 'returns the correct message' do
         expect(message.commit_error).to eq("Your changes could not be committed, #{base_message}")
@@ -40,7 +33,7 @@ describe Gitlab::RepositorySizeError do
         end
 
         it 'returns the correct message' do
-          expect(message.push_error(15.megabytes))
+          expect(message.push_error(10.megabytes))
             .to eq("Your push has been rejected, #{rejection_message}. #{message.more_info_message}")
         end
       end

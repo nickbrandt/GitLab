@@ -15,7 +15,7 @@ describe MergeRequests::MergeService do
   describe '#execute' do
     context 'project has exceeded size limit' do
       before do
-        allow(project).to receive(:above_size_limit?).and_return(true)
+        allow(project.repository_size_checker).to receive(:above_size_limit?).and_return(true)
       end
 
       it 'persists the correct error message' do
