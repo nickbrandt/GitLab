@@ -12,7 +12,7 @@ RSpec.shared_examples 'rejects nuget packages access' do |user_type, status, add
       it 'has the correct response header' do
         subject
 
-        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Nuget Package Registry'
+        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Packages Registry'
       end
     end
   end
