@@ -3,7 +3,6 @@
 class DiffsEntity < Grape::Entity
   include DiffHelper
   include RequestAwareEntity
-  include Gitlab::Utils::StrongMemoize
 
   expose :real_size
   expose :size

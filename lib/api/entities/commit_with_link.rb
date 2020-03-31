@@ -33,14 +33,10 @@ module API
       end
 
       expose :prev_commit_id, if: { type: :full } do |commit|
-        next unless options[:prev_commit_id]
-
         options[:prev_commit_id]
       end
 
       expose :next_commit_id, if: { type: :full } do |commit|
-        next unless options[:next_commit_id]
-
         options[:next_commit_id]
       end
 
