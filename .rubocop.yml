@@ -7,6 +7,10 @@ require:
   - ./rubocop/rubocop
   - rubocop-rspec
 
+inherit_mode:
+  merge:
+    - Include
+
 AllCops:
   TargetRubyVersion: 2.6
   TargetRailsVersion: 5.0
@@ -160,6 +164,14 @@ Rails/ApplicationRecord:
     - spec/**/*.rb
     - ee/db/**/*.rb
     - ee/spec/**/*.rb
+
+Rails/FindBy:
+  Enabled: true
+  Include:
+    - 'ee/app/**/*.rb'
+    - 'ee/lib/**/*.rb'
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
 
 # GitLab ###################################################################
 
