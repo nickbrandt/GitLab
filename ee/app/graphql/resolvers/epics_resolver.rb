@@ -38,14 +38,18 @@ module Resolvers
 
     type Types::EpicType, null: true
 
+    def ready?(**args)
+      validate_timeframe_params!(args)
+      validate_starts_with_iid!(args)
+
+      super(args)
+    end
+
     def resolve(**args)
       @resolver_object = object.respond_to?(:sync) ? object.sync : object
 
       return [] unless resolver_object.present?
       return [] unless epic_feature_enabled?
-
-      validate_timeframe_params!(args)
-      validate_iid_starts_with_query!(args)
 
       find_epics(transform_args(args))
     end
@@ -86,16 +90,6 @@ module Resolvers
       parent.group
     end
 
-    def validate_iid_starts_with_query!(args)
-      return unless args[:iid_starts_with].present?
-
-      iid_starts_with_query = args[:iid_starts_with]
-
-      unless EpicsFinder.valid_iid_query?(iid_starts_with_query)
-        raise Gitlab::Graphql::Errors::ArgumentError, "#{iid_starts_with_query} is not a valid iid search term"
-      end
-    end
-
     # If we're querying for multiple iids and selecting issues, then ideally
     # we want to batch the epic and issue queries into one to reduce N+1 and memory.
     # https://gitlab.com/gitlab-org/gitlab/issues/11841
@@ -111,6 +105,14 @@ module Resolvers
     # https://gitlab.com/gitlab-org/gitlab/issues/205312
     def self.complexity_multiplier(args)
       0.001
+    end
+
+    def validate_starts_with_iid!(args)
+      return unless args[:iid_starts_with].present?
+
+      unless EpicsFinder.valid_iid_query?(args[:iid_starts_with])
+        raise Gitlab::Graphql::Errors::ArgumentError, 'Invalid `iidStartsWith` query'
+      end
     end
   end
 end
