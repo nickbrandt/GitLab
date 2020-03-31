@@ -40,4 +40,35 @@ export const requirement3 = {
   author: mockAuthor,
 };
 
-export const mockRequirements = [requirement1, requirement2, requirement3];
+export const requirementArchived = {
+  iid: '23',
+  title: 'Cuius quidem, quoniam Stoicus fuit',
+  createdAt: '2020-03-31T13:31:40Z',
+  updatedAt: '2020-03-31T13:31:40Z',
+  state: 'ARCHIVED',
+  userPermissions: mockUserPermissions,
+  author: mockAuthor,
+};
+
+export const mockRequirementsOpen = [requirement1, requirement2, requirement3];
+
+export const mockRequirementsArchived = [requirementArchived];
+
+export const mockRequirementsAll = [...mockRequirementsOpen, ...mockRequirementsArchived];
+
+export const mockRequirementsCount = {
+  OPENED: 3,
+  ARCHIVED: 1,
+  ALL: 4,
+};
+
+export const FilterState = {
+  opened: 'OPENED',
+  archived: 'ARCHIVED',
+  all: 'ALL',
+};
+
+export const mockPageInfo = {
+  startCursor: 'eyJpZCI6IjI1IiwiY3JlYXRlZF9hdCI6IjIwMjAtMDMtMzEgMTM6MzI6MTQgVVRDIn0',
+  endCursor: 'eyJpZCI6IjIxIiwiY3JlYXRlZF9hdCI6IjIwMjAtMDMtMzEgMTM6MzE6MTUgVVRDIn0',
+};

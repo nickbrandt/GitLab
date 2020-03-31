@@ -51,6 +51,19 @@ export default {
       return this.requirement.author;
     },
   },
+  methods: {
+    /**
+     * This is needed as an independent method since
+     * when user changes current page, `$refs.authorLink`
+     * will be null until next page results are loaded & rendered.
+     */
+    getAuthorPopoverTarget() {
+      if (this.$refs.authorLink) {
+        return this.$refs.authorLink.$el;
+      }
+      return '';
+    },
+  },
 };
 </script>
 
@@ -101,7 +114,7 @@ export default {
         </div>
       </div>
     </div>
-    <gl-popover :target="() => $refs.authorLink.$el" triggers="hover focus" placement="top">
+    <gl-popover :target="getAuthorPopoverTarget()" triggers="hover focus" placement="top">
       <div class="user-popover p-0 d-flex">
         <div class="p-1 flex-shrink-1">
           <gl-avatar :entity-name="author.name" :alt="author.name" :src="author.avatarUrl" />
