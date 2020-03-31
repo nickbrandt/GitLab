@@ -103,6 +103,16 @@ describe SystemNoteService do
     end
   end
 
+  describe '.change_health_status_note' do
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:change_health_status_note)
+      end
+
+      described_class.change_health_status_note(noteable, project, author)
+    end
+  end
+
   describe '.change_epic_date_note' do
     let(:date_type) { double }
     let(:date) { double }
