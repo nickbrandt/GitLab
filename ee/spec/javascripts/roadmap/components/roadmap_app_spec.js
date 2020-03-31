@@ -58,48 +58,6 @@ describe('Roadmap AppComponent', () => {
     vm.$destroy();
   });
 
-  describe('data', () => {
-    describe('when `gon.feature.roadmapGraphql` is true', () => {
-      const originalGonFeatures = Object.assign({}, gon.features);
-
-      beforeAll(() => {
-        gon.features = { roadmapGraphql: true };
-      });
-
-      afterAll(() => {
-        gon.features = originalGonFeatures;
-      });
-
-      it('returns data prop containing `fetchEpicsFn` mapped to `fetchEpicsGQL`', () => {
-        expect(vm.fetchEpicsFn).toBe(vm.fetchEpicsGQL);
-      });
-
-      it('returns data prop containing `fetchEpicsForTimeframeFn` mapped to `fetchEpicsForTimeframeGQL`', () => {
-        expect(vm.fetchEpicsForTimeframeFn).toBe(vm.fetchEpicsForTimeframeGQL);
-      });
-    });
-
-    describe('when `gon.feature.roadmapGraphql` is false', () => {
-      const originalGonFeatures = Object.assign({}, gon.features);
-
-      beforeAll(() => {
-        gon.features = { roadmapGraphql: false };
-      });
-
-      afterAll(() => {
-        gon.features = originalGonFeatures;
-      });
-
-      it('returns data prop containing `fetchEpicsFn` mapped to `fetchEpics`', () => {
-        expect(vm.fetchEpicsFn).toBe(vm.fetchEpics);
-      });
-
-      it('returns data prop containing `fetchEpicsForTimeframeFn` mapped to `fetchEpicsForTimeframe`', () => {
-        expect(vm.fetchEpicsForTimeframeFn).toBe(vm.fetchEpicsForTimeframe);
-      });
-    });
-  });
-
   describe('computed', () => {
     describe('timeframeStart', () => {
       it('returns first item of timeframe array', () => {
@@ -217,6 +175,7 @@ describe('Roadmap AppComponent', () => {
         spyOn(vm, 'extendTimeframe');
         spyOn(vm, 'refreshEpicDates');
         spyOn(vm, 'refreshMilestoneDates');
+        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -231,7 +190,7 @@ describe('Roadmap AppComponent', () => {
         spyOn(vm, 'extendTimeframe').and.stub();
         spyOn(vm, 'refreshEpicDates').and.stub();
         spyOn(vm, 'refreshMilestoneDates').and.stub();
-        spyOn(vm, 'fetchEpicsForTimeframeFn').and.callFake(() => new Promise(() => {}));
+        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -239,7 +198,7 @@ describe('Roadmap AppComponent', () => {
 
         vm.$nextTick()
           .then(() => {
-            expect(vm.fetchEpicsForTimeframeFn).toHaveBeenCalledWith(
+            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
               jasmine.objectContaining({
                 timeframe: vm.extendedTimeframe,
               }),

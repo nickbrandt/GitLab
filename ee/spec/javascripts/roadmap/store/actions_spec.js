@@ -27,6 +27,7 @@ import {
   mockFormattedEpic,
   mockSortedBy,
   mockGroupEpicsQueryResponse,
+  mockGroupEpicsQueryResponseFormatted,
   mockEpicChildEpicsQueryResponse,
   mockGroupMilestonesQueryResponse,
   rawMilestones,
@@ -262,7 +263,11 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('success', () => {
       it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', done => {
-        mock.onGet(epicsPath).replyOnce(200, rawEpics);
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.resolve({
+            data: mockGroupEpicsQueryResponse.data,
+          }),
+        );
 
         testAction(
           actions.fetchEpics,
@@ -275,7 +280,7 @@ describe('Roadmap Vuex Actions', () => {
             },
             {
               type: 'receiveEpicsSuccess',
-              payload: { rawEpics },
+              payload: { rawEpics: mockGroupEpicsQueryResponseFormatted },
             },
           ],
           done,
@@ -285,7 +290,9 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('failure', () => {
       it('should dispatch requestEpics and receiveEpicsFailure when request fails', done => {
-        mock.onGet(epicsPath).replyOnce(500, {});
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.reject(new Error('error message')),
+        );
 
         testAction(
           actions.fetchEpics,
@@ -321,7 +328,11 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('success', () => {
       it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', done => {
-        mock.onGet(mockEpicsPath).replyOnce(200, rawEpics);
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.resolve({
+            data: mockGroupEpicsQueryResponse.data,
+          }),
+        );
 
         testAction(
           actions.fetchEpicsForTimeframe,
@@ -334,7 +345,11 @@ describe('Roadmap Vuex Actions', () => {
             },
             {
               type: 'receiveEpicsSuccess',
-              payload: { rawEpics, newEpic: true, timeframeExtended: true },
+              payload: {
+                rawEpics: mockGroupEpicsQueryResponseFormatted,
+                newEpic: true,
+                timeframeExtended: true,
+              },
             },
           ],
           done,
