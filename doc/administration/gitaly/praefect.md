@@ -448,7 +448,7 @@ config.
    praefect['failover_enabled'] = true
    ```
 
-   When automatic failover is enabled, Praefect check the health of internal
+   When automatic failover is enabled, Praefect checks the health of internal
    Gitaly nodes. If the primary has a certain amount of health checks fail, it
    will promote one of the secondaries to be primary, and demote the primary to
    be a secondary.
@@ -459,8 +459,8 @@ config.
    NOTE: **Note:**: Automatic failover is not yet supported for setups with
    multiple Praefect nodes. There is currently no coordination between Praefect
    nodes, which could result in two Praefect instances thinking two different
-   Gitaly nodes are the primary. Follow
-   [gitaly#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for
+   Gitaly nodes are the primary. Follow issue
+   [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for
    updates.
 
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
@@ -635,6 +635,28 @@ To get started quickly:
 Congratulations! You've configured an observable highly available Praefect
 cluster.
 
+## Automatic failover and leader election
+
+Praefect regularly checks the health of each backend Gitaly node. This
+information can be used to automatically failover to a new primary node if the
+current primary node is found to be unhealthy.
+
+- **Manual:** Automatic failover is disabled. The primary node can be
+  reconfigured in `/etc/gitlab/gitlab.rb` on the Praefect node. Modify the
+  `praefect['virtual_storages']` field by moving the `primary = true` to promote
+  a different Gitaly node to primary. In the steps above, `gitaly-1` was set to
+  the primary.
+- **Memory:** Enabled by setting `praefect['failover_enabled'] = true` in
+  `/etc/gitlab/gitlab.rb` on the Praefect node. If a sufficient number of health
+  checks fail for the current primary backend Gitaly node, and new primary will
+  be elected. **Do not use with multiple Praefect nodes!** Using with multiple
+  Praefect nodes is likely to result in a split brain.
+- **PostgreSQL:** Coming soon. See isse
+  [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for updates.
+
+It is likely that we will implement support for Consul, and a cloud native
+strategy in the future.
+
 ## Backend Node Recovery
 
 When a Praefect backend node fails and is no longer able to
@@ -657,7 +679,6 @@ sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.t
 The command will return a list of repositories that were found to be
 inconsistent against the current primary. Each of these inconsistencies will
 also be logged with an accompanying replication job ID.
-
 
 ## Migrating existing repositories to Praefect
 
