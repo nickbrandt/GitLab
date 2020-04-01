@@ -9668,13 +9668,9 @@
               "name": "adjacentReferenceId",
               "description": "The id of the epic_issue or issue that the actual epic or issue is switched with",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "defaultValue": null
             },

@@ -34,7 +34,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['fetchNextPageItems', 'reorderItem']),
+    ...mapActions(['fetchNextPageItems', 'reorderItem', 'moveItem']),
     handleShowMoreClick() {
       this.fetchInProgress = true;
       this.fetchNextPageItems({

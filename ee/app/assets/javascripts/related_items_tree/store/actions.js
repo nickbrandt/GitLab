@@ -12,7 +12,7 @@ import httpStatusCodes from '~/lib/utils/http_status';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
-import { ChildType, ChildState } from '../constants';
+import { ChildType, ChildState, idProp, relativePositions } from '../constants';
 
 import epicChildren from '../queries/epicChildren.query.graphql';
 import epicChildReorder from '../queries/epicChildReorder.mutation.graphql';
@@ -450,6 +450,84 @@ export const reorderItem = (
         targetItem,
         oldIndex: newIndex,
         newIndex: oldIndex,
+      });
+    });
+};
+
+export const receiveMoveItemFailure = ({ commit }, data) => {
+  commit(types.MOVE_ITEM_FAILURE, data);
+  flash(s__('Epics|Something went wrong while moving item.'));
+};
+
+export const moveItem = (
+  { dispatch, commit, state },
+  { oldParentItem, newParentItem, targetItem, oldIndex, newIndex },
+) => {
+  let adjacentItem;
+  let adjacentReferenceId;
+  let relativePosition = relativePositions.After;
+
+  let isFirstChild = false;
+  const newParentChildren = state.children[newParentItem.parentReference];
+
+  if (newParentChildren !== undefined) {
+    adjacentItem = newParentChildren[newIndex];
+    if (adjacentItem === undefined) {
+      adjacentItem = newParentChildren[newParentChildren.length - 1];
+      relativePosition = relativePositions.Before;
+    }
+    adjacentReferenceId = adjacentItem[idProp[adjacentItem.type]];
+  } else {
+    isFirstChild = true;
+    relativePosition = relativePositions.Before;
+  }
+
+  commit(types.MOVE_ITEM, {
+    oldParentItem,
+    newParentItem,
+    targetItem,
+    oldIndex,
+    newIndex,
+    isFirstChild,
+  });
+
+  return gqClient
+    .mutate({
+      mutation: epicChildReorder,
+      variables: {
+        epicTreeReorderInput: {
+          baseEpicId: oldParentItem.id,
+          moved: {
+            id: targetItem[idProp[targetItem.type]],
+            adjacentReferenceId,
+            relativePosition,
+            newParentId: newParentItem.parentId,
+          },
+        },
+      },
+    })
+    .then(({ data }) => {
+      // Mutation was unsuccessful;
+      // revert to original order and show flash error
+      if (data.epicTreeReorder.errors.length) {
+        dispatch('receiveMoveItemFailure', {
+          oldParentItem,
+          newParentItem,
+          targetItem,
+          newIndex,
+          oldIndex,
+        });
+      }
+    })
+    .catch(() => {
+      // Mutation was unsuccessful;
+      // revert to original order and show flash error
+      dispatch('receiveMoveItemFailure', {
+        oldParentItem,
+        newParentItem,
+        targetItem,
+        newIndex,
+        oldIndex,
       });
     });
 };

@@ -42,7 +42,12 @@ module Epics
     end
 
     def move!
-      moving_object.move_between(before_object, after_object)
+      if adjacent_reference
+        moving_object.move_between(before_object, after_object)
+      else
+        moving_object.move_to_start
+      end
+
       moving_object.save!(touch: false)
     end
 
@@ -59,16 +64,20 @@ module Epics
     end
 
     def validate_objects
-      return 'Relative position is not valid.' unless valid_relative_position?
+      if adjacent_reference
+        return 'Relative position is not valid.' unless valid_relative_position?
 
-      unless supported_type?(moving_object) && supported_type?(adjacent_reference)
-        return 'Only epics and epic_issues are supported.'
+        unless supported_type?(moving_object) && supported_type?(adjacent_reference)
+          return 'Only epics and epic_issues are supported.'
+        end
       end
 
       return 'You don\'t have permissions to move the objects.' unless authorized?
 
-      if different_epic_parent?
-        return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
+      if adjacent_reference
+        if different_epic_parent?
+          return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
+        end
       end
     end
 
@@ -90,7 +99,10 @@ module Epics
 
     def authorized?
       return false unless can?(current_user, :admin_epic, base_epic.group)
-      return false unless can?(current_user, :admin_epic, adjacent_reference_group)
+
+      if adjacent_reference
+        return false unless can?(current_user, :admin_epic, adjacent_reference_group)
+      end
 
       if new_parent
         return false unless can?(current_user, :admin_epic, new_parent.group)
@@ -116,6 +128,8 @@ module Epics
     end
 
     def adjacent_reference
+      return unless params[:adjacent_reference_id]
+
       @adjacent_reference ||= find_object(params[:adjacent_reference_id])&.sync
     end
 

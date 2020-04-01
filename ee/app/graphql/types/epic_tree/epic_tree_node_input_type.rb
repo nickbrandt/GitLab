@@ -14,7 +14,7 @@ module Types
 
       argument :adjacent_reference_id,
                GraphQL::ID_TYPE,
-               required: true,
+               required: false,
                description: 'The id of the epic_issue or issue that the actual epic or issue is switched with'
 
       argument :relative_position,

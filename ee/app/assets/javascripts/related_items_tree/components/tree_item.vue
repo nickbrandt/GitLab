@@ -112,9 +112,9 @@ export default {
       />
     </div>
     <tree-root
-      v-if="itemExpanded"
+      v-if="item.type === $options.ChildType.Epic"
       :parent-item="item"
-      :children="children[itemReference]"
+      :children="children[itemReference] || []"
       class="sub-tree-root"
     />
   </li>

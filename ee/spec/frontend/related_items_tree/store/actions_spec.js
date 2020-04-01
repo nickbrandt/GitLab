@@ -19,6 +19,7 @@ import { TEST_HOST } from 'spec/test_constants';
 import {
   mockInitialConfig,
   mockParentItem,
+  mockParentItem2,
   mockQueryResponse,
   mockEpicTreeReorderInput,
   mockReorderMutationResponse,
@@ -1258,6 +1259,199 @@ describe('RelatedItemTree', () => {
                   targetItem: mockItems[1],
                   oldIndex: 0,
                   newIndex: 1,
+                },
+              },
+            ],
+          );
+        });
+      });
+
+      describe('receiveMoveItemFailure', () => {
+        it('should revert moved item back to its original position ion its original parent via MOVE_ITEM_FAILURE mutation', () => {
+          testAction(
+            actions.receiveMoveItemFailure,
+            {},
+            {},
+            [{ type: types.MOVE_ITEM_FAILURE, payload: {} }],
+            [],
+          );
+        });
+
+        it('should show flash error with message "Something went wrong while ordering item."', () => {
+          const message = 'Something went wrong while moving item.';
+          actions.receiveMoveItemFailure(
+            {
+              commit: () => {},
+            },
+            {
+              message,
+            },
+          );
+
+          expect(createFlash).toHaveBeenCalledWith(message);
+        });
+      });
+
+      describe('moveItem', () => {
+        beforeAll(() => {
+          state.children[mockParentItem2.parentReference] = [];
+        });
+
+        it('should perform MOVE_ITEM mutation with isFirstChild to true if parent has no children before request and do nothing on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
+            Promise.resolve({
+              data: mockReorderMutationResponse,
+            }),
+          );
+
+          testAction(
+            actions.moveItem,
+            {
+              oldParentItem: mockParentItem,
+              newParentItem: mockParentItem2,
+              targetItem: mockItems[1],
+              newIndex: 1,
+              oldIndex: 0,
+            },
+            state,
+            [
+              {
+                type: types.MOVE_ITEM,
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
+                  isFirstChild: true,
+                },
+              },
+            ],
+            [],
+          );
+        });
+
+        it('should perform MOVE_ITEM mutation with isFirstChild to false if parent has children before request and do nothing on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
+            Promise.resolve({
+              data: mockReorderMutationResponse,
+            }),
+          );
+
+          state.children[mockParentItem2.parentReference] = [{ id: '33' }];
+
+          testAction(
+            actions.moveItem,
+            {
+              oldParentItem: mockParentItem,
+              newParentItem: mockParentItem2,
+              targetItem: mockItems[1],
+              newIndex: 1,
+              oldIndex: 0,
+            },
+            state,
+            [
+              {
+                type: types.MOVE_ITEM,
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
+                  isFirstChild: false,
+                },
+              },
+            ],
+            [],
+          );
+        });
+
+        it('should perform MOVE_ITEM mutation before request and dispatch `receiveReorderItemFailure` when request response has errors on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
+            Promise.resolve({
+              data: {
+                epicTreeReorder: {
+                  ...mockReorderMutationResponse.epicTreeReorder,
+                  errors: [{ foo: 'bar' }],
+                },
+              },
+            }),
+          );
+
+          testAction(
+            actions.moveItem,
+            {
+              oldParentItem: mockParentItem,
+              newParentItem: mockParentItem2,
+              targetItem: mockItems[1],
+              newIndex: 1,
+              oldIndex: 0,
+            },
+            state,
+            [
+              {
+                type: types.MOVE_ITEM,
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
+                  isFirstChild: true,
+                },
+              },
+            ],
+            [
+              {
+                type: 'receiveMoveItemFailure',
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
+                },
+              },
+            ],
+          );
+        });
+
+        it('should perform MOVE_ITEM mutation before request and dispatch `receiveReorderItemFailure` on request failure', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(Promise.reject());
+
+          testAction(
+            actions.moveItem,
+            {
+              oldParentItem: mockParentItem,
+              newParentItem: mockParentItem2,
+              targetItem: mockItems[1],
+              newIndex: 1,
+              oldIndex: 0,
+            },
+            state,
+            [
+              {
+                type: types.MOVE_ITEM,
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
+                  isFirstChild: true,
+                },
+              },
+            ],
+            [
+              {
+                type: 'receiveMoveItemFailure',
+                payload: {
+                  oldParentItem: mockParentItem,
+                  newParentItem: mockParentItem2,
+                  targetItem: mockItems[1],
+                  newIndex: 1,
+                  oldIndex: 0,
                 },
               },
             ],
