@@ -10,8 +10,6 @@ describe 'Prometheus external alerts', :js do
   let(:alerts_section) { page.find(alerts_section_selector) }
 
   before do
-    stub_licensed_features(prometheus_alerts: true)
-
     sign_in(user)
     project.add_maintainer(user)
 
