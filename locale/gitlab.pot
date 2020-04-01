@@ -1584,6 +1584,9 @@ msgstr ""
 msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
 msgstr ""
 
+msgid "Administration"
+msgstr ""
+
 msgid "Advanced"
 msgstr ""
 
@@ -7364,9 +7367,6 @@ msgstr ""
 msgid "Email display name"
 msgstr ""
 
-msgid "Email domain is not editable in subgroups. Value inherited from top-level parent group."
-msgstr ""
-
 msgid "Email not verified. Please verify your email in Salesforce."
 msgstr ""
 
@@ -10695,9 +10695,6 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-msgid "IP address restriction is not editable in subgroups. Value inherited from top-level parent group."
-msgstr ""
-
 msgid "IP subnet restriction only allowed for top-level groups"
 msgstr ""
 
@@ -13509,9 +13506,6 @@ msgid "No test coverage"
 msgstr ""
 
 msgid "No thanks, don't show this again"
-msgstr ""
-
-msgid "No value set by top-level parent group."
 msgstr ""
 
 msgid "No vulnerabilities found for this group"

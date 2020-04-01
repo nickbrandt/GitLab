@@ -73,6 +73,31 @@ describe 'Group navbar' do
       group.add_owner(user)
 
       insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(_('Settings'), new_nav_item: administration_nav_item)
+
+      visit group_path(group)
+    end
+
+    it_behaves_like 'verified navigation bar'
+  end
+
+  context 'when SAML SSO is available' do
+    before do
+      stub_licensed_features(group_saml: true)
+
+      group.add_owner(user)
+
+      insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(
+        _('Settings'),
+        new_nav_item: {
+          nav_item: _('Administration'),
+          nav_sub_items: [
+            _('SAML SSO'),
+            s_('UsageQuota|Usage Quotas')
+          ]
+        }
+      )
 
       visit group_path(group)
     end
@@ -98,6 +123,7 @@ describe 'Group navbar' do
       )
 
       insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(_('Settings'), new_nav_item: administration_nav_item)
 
       visit group_path(group)
     end
