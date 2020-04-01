@@ -12,9 +12,8 @@ module EE
 
     override :board_data
     def board_data
-      show_feature_promotion = (@project && show_promotions? &&
-                                (!@project.feature_available?(:scoped_issue_board) ||
-                                 !@project.feature_available?(:issue_board_focus_mode)))
+      show_feature_promotion = @project && show_promotions? &&
+                               !@project.feature_available?(:scoped_issue_board)
 
       data = {
         board_milestone_title: board.milestone&.name,
@@ -23,7 +22,7 @@ module EE
         label_ids: board.label_ids,
         labels: board.labels.to_json(only: [:id, :title, :color, :text_color] ),
         board_weight: board.weight,
-        focus_mode_available: current_board_parent.feature_available?(:issue_board_focus_mode),
+        focus_mode_available: true,
         weight_feature_available: current_board_parent.feature_available?(:issue_weights).to_s,
         show_promotion: show_feature_promotion,
         scoped_labels: current_board_parent.feature_available?(:scoped_labels)&.to_s,

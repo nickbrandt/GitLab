@@ -22,7 +22,6 @@ class License < ApplicationRecord
     group_burndown_charts
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     ldap_group_sync
@@ -151,7 +150,6 @@ class License < ApplicationRecord
     file_locks
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     merge_request_approvers
