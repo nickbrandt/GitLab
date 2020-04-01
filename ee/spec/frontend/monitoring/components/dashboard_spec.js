@@ -58,7 +58,7 @@ describe('Dashboard', () => {
 
   function setupComponentStore(component) {
     component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
       metricsDashboardPayload,
     );
 
