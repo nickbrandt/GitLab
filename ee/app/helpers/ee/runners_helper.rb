@@ -19,6 +19,14 @@ module EE
       experiment_enabled?(:buy_ci_minutes_version_a)
     end
 
+    def show_user_notification_dot?(project, namespace)
+      return false unless experiment_enabled?(:ci_notification_dot)
+      return false unless project&.persisted? || namespace&.persisted?
+
+      ::Ci::MinutesNotificationService.call(current_user, project, namespace).show_notification? &&
+        current_user.pipelines.any?
+    end
+
     private
 
     def purchase_shared_runner_minutes_link
