@@ -121,6 +121,18 @@ describe Service do
           expect(service.can_test?).to be true
         end
       end
+
+      context 'when instance-level service' do
+        Service.available_services_types.each do |service_type|
+          let(:service) do
+            service_type.constantize.new(instance: true)
+          end
+
+          it 'returns false' do
+            expect(service.can_test?).to be_falsey
+          end
+        end
+      end
     end
 
     describe '#test' do
