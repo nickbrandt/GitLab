@@ -94,11 +94,13 @@ module EE
     end
 
     def administration_nav_path(group)
-      return group_saml_providers_path(group) if show_saml_in_sidebar?(group)
-
-      return group_usage_quotas_path(group) if show_usage_quotas_in_sidebar?
-
-      group_billings_path(group) if show_billing_in_sidebar?
+      if show_saml_in_sidebar?(group)
+        group_saml_providers_path(group)
+      elsif show_usage_quotas_in_sidebar?
+        group_usage_quotas_path(group)
+      elsif show_billing_in_sidebar?
+        group_billings_path(group)
+      end
     end
 
     private
