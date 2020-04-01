@@ -102,6 +102,8 @@ module API
         get 'index', format: :json do
           authorize_read_package!(authorized_user_project)
 
+          track_event('nuget_service_index')
+
           present ::Packages::Nuget::ServiceIndexPresenter.new(authorized_user_project),
             with: EE::API::Entities::Nuget::ServiceIndex
         end
@@ -201,6 +203,8 @@ module API
 
             not_found!('Package') unless package_file
 
+            track_event('pull_package')
+
             # nuget and dotnet don't support 302 Moved status codes, supports_direct_download has to be set to false
             present_carrierwave_file!(package_file.file, supports_direct_download: false)
           end
@@ -230,6 +234,8 @@ module API
             search = Packages::Nuget::SearchService
               .new(authorized_user_project, params[:q], search_options)
               .execute
+
+            track_event('search_package')
 
             present ::Packages::Nuget::SearchResultsPresenter.new(search),
               with: EE::API::Entities::Nuget::SearchResults
