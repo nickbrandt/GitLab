@@ -292,6 +292,9 @@ describe Gitlab::UsageData do
                 create(:cluster_platform_kubernetes)
                 create(:cluster, :group, :disabled, user: user)
                 create(:cluster, :group, user: user)
+                create(:cluster, :instance, :disabled, :production_environment)
+                create(:cluster, :instance, :production_environment)
+                create(:cluster, :management_project)
                 create(:slack_service, project: project)
                 create(:slack_slash_commands_service, project: project)
                 create(:prometheus_service, project: project)
@@ -302,15 +305,18 @@ describe Gitlab::UsageData do
                 clusters_applications_helm: 2,
                 clusters_applications_ingress: 2,
                 clusters_applications_knative: 2,
-                clusters_disabled: 2,
-                clusters_enabled: 8,
+                clusters_management_project: 2,
+                clusters_disabled: 4,
+                clusters_enabled: 12,
                 clusters_platforms_gke: 2,
                 clusters_platforms_eks: 2,
                 clusters_platforms_user: 2,
+                instance_clusters_disabled: 2,
+                instance_clusters_enabled: 2,
                 group_clusters_disabled: 2,
                 group_clusters_enabled: 2,
                 project_clusters_disabled: 2,
-                project_clusters_enabled: 8,
+                project_clusters_enabled: 10,
                 projects_slack_notifications_active: 2,
                 projects_slack_slash_active: 2,
                 projects_with_prometheus_alerts: 2
@@ -320,15 +326,18 @@ describe Gitlab::UsageData do
                 clusters_applications_helm: 1,
                 clusters_applications_ingress: 1,
                 clusters_applications_knative: 1,
-                clusters_disabled: 1,
-                clusters_enabled: 4,
+                clusters_management_project: 1,
+                clusters_disabled: 2,
+                clusters_enabled: 6,
                 clusters_platforms_gke: 1,
                 clusters_platforms_eks: 1,
                 clusters_platforms_user: 1,
+                instance_clusters_disabled: 1,
+                instance_clusters_enabled: 1,
                 group_clusters_disabled: 1,
                 group_clusters_enabled: 1,
                 project_clusters_disabled: 1,
-                project_clusters_enabled: 4,
+                project_clusters_enabled: 5,
                 projects_slack_notifications_active: 1,
                 projects_slack_slash_active: 1,
                 projects_with_prometheus_alerts: 1
