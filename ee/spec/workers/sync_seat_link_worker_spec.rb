@@ -43,8 +43,8 @@ describe SyncSeatLinkWorker, type: :worker do
       end
 
       context 'when the timezone makes date one day in advance' do
-        before do
-          Time.zone = 'Auckland'
+        around do |example|
+          Time.use_zone('Auckland') { example.run }
         end
 
         it 'executes the SyncSeatLinkRequestWorker with expected params' do
@@ -64,8 +64,8 @@ describe SyncSeatLinkWorker, type: :worker do
         end
 
         context 'when the timezone makes date one day before than UTC' do
-          before do
-            Time.zone = 'Central America'
+          around do |example|
+            Time.use_zone('Central America') { example.run }
           end
 
           it 'executes the SyncSeatLinkRequestWorker with expected params' do
