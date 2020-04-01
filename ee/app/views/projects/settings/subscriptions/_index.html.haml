@@ -1,11 +1,11 @@
 .row.prepend-top-default.append-bottom-default
   .col-lg-12
-    = form_for project_subscriptions_path(@project), method: :post, authenticity_token: true do |f|
+    = form_with url: project_subscriptions_path(@project), id: 'pipeline-subscriptions-form', method: :post, authenticity_token: true do |f|
       %fieldset
         .form-group
-          = f.label :upstream_project_id do
+          = f.label :upstream_project_path do
             = _("Project path")
-          = f.text_field :upstream_project_id, class: "form-control"
+          = f.text_field :upstream_project_path, class: "form-control"
         = f.submit _('Subscribe'), class: "btn btn-success float-right"
 
 .row.prepend-top-default.append-bottom-default
