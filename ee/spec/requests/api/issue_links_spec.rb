@@ -65,7 +65,7 @@ describe API::IssueLinks do
           target_project = create(:project, :public)
 
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: target_project.id, target_issue_iid: 999 }
+               params: { target_project_id: target_project.id, target_issue_iid: non_existing_record_iid }
 
           expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')
@@ -170,7 +170,7 @@ describe API::IssueLinks do
 
       context 'issue link not found' do
         it 'returns 404' do
-          delete api("/projects/#{project.id}/issues/#{issue.iid}/links/999", user)
+          delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{non_existing_record_id}", user)
 
           expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')

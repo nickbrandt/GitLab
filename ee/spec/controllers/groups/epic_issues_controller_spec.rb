@@ -206,7 +206,7 @@ describe Groups::EpicIssuesController do
       end
 
       context 'when user does not have permissions to admin the epic' do
-        it 'returns status 404' do
+        it 'returns status 403' do
           subject
 
           expect(response).to have_gitlab_http_status(:forbidden)
@@ -233,9 +233,11 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic_issue record does not exists' do
         it 'returns status 404' do
-          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 9999 }
+          group.add_developer(user)
 
-          expect(response).to have_gitlab_http_status(:forbidden)
+          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: non_existing_record_id }
+
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end

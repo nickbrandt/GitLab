@@ -138,7 +138,9 @@ describe API::Todos do
       end
 
       it 'returns 404 if the epic is not found' do
-        post api("/groups/#{group.id}/epics/9999/todo", user)
+        group.add_developer(user)
+
+        post api("/groups/#{group.id}/epics/#{non_existing_record_iid}/todo", user)
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end

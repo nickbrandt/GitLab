@@ -57,7 +57,7 @@ describe 'PackageFiles' do
   end
 
   it 'gives 404 when no package file exist' do
-    visit download_project_package_file_path(project, '9999')
+    visit download_project_package_file_path(project, non_existing_record_id)
 
     expect(status_code).to eq(404)
   end

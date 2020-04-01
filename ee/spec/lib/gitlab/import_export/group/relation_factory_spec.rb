@@ -120,6 +120,6 @@ describe Gitlab::ImportExport::Group::RelationFactory do
   end
 
   def random_id
-    rand(1000..10000)
+    rand(10_000..100_000)
   end
 end
