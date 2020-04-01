@@ -2,5 +2,5 @@
   %td
     = project.name
   %td
-    = user_avatar_without_link(user: project.user, size: 32)
-    = project.user.name
+    = user_avatar_without_link(user: project.owner, size: 32)
+    = project.owner.name
