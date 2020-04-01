@@ -206,6 +206,7 @@ describe API::GroupClusters do
           expect(cluster_result.name).to eq('test-cluster')
           expect(cluster_result.domain).to eq('domain.example.com')
           expect(cluster_result.managed).to be_falsy
+          expect(cluster_result.management_project_id).to eq management_project_id
           expect(platform_kubernetes.rbac?).to be_truthy
           expect(platform_kubernetes.api_url).to eq(api_url)
           expect(platform_kubernetes.token).to eq('sample-token')
@@ -234,6 +235,18 @@ describe API::GroupClusters do
           cluster_result = Clusters::Cluster.find(json_response['id'])
 
           expect(cluster_result.platform.abac?).to be_truthy
+        end
+      end
+
+      context 'current user does not have access to management_project_id' do
+        let(:management_project_id) { create(:project).id }
+
+        it 'responds with 400' do
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
+
+        it 'returns validation errors' do
+          expect(json_response['message']['management_project_id'].first).to match('don\'t have permission')
         end
       end
 
