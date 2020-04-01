@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe 'User activates Flowdock' do
-  include_context 'project service activation'
-  let(:project) { create(:project, :repository) }
+  include_context 'project service activation' do
+    let(:project) { create(:project, :repository) }
+  end
 
   before do
     stub_request(:post, /.*api.flowdock.com.*/)
