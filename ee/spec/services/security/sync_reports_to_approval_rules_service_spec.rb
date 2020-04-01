@@ -62,13 +62,13 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
       end
 
       context "license compliance policy" do
-        let!(:software_license_policy) { create(:software_license_policy, :denied, project: project, software_license: denied_license) }
-        let!(:license_compliance_rule) { create(:report_approver_rule, :license_management, merge_request: merge_request, approvals_required: 1) }
-        let!(:denied_license) { create(:software_license) }
+        let!(:license_compliance_rule) { create(:report_approver_rule, :license_scanning, merge_request: merge_request, approvals_required: 1) }
+        # let!(:denied_license) { create(:software_license) }
 
         context "when a license violates the license compliance policy" do
-          let!(:denied_license) { create(:software_license, name: license_name) }
-          let!(:license_name) { ci_build.pipeline.license_scanning_report.license_names[0] }
+          let!(:software_license_policy) { create(:software_license_policy, :denied, project: project, software_license: denied_license) }
+          let(:denied_license) { create(:software_license, name: license_name) }
+          let(:license_name) { ci_build.pipeline.license_scanning_report.license_names[0] }
 
           context 'with a new report' do
             let!(:ci_build) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline, project: project) }
