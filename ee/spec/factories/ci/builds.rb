@@ -96,13 +96,13 @@ FactoryBot.define do
       end
     end
 
-    trait :license_management_feature_branch do
+    trait :license_scanning_feature_branch do
       after(:build) do |build|
-        build.job_artifacts << create(:ee_ci_job_artifact, :license_management_feature_branch, job: build)
+        build.job_artifacts << create(:ee_ci_job_artifact, :license_scanning_feature_branch, job: build)
       end
     end
 
-    trait :corrupted_license_management_report do
+    trait :corrupted_license_scanning_report do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: build)
       end

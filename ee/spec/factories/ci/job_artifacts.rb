@@ -159,13 +159,13 @@ FactoryBot.define do
       end
     end
 
-    trait :license_management_feature_branch do
-      file_type { :license_management }
+    trait :license_scanning_feature_branch do
+      file_type { :license_scanning }
       file_format { :raw }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-license-management-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-license-scanning-report.json'), 'application/json')
       end
     end
 
@@ -300,7 +300,7 @@ FactoryBot.define do
     end
 
     trait :license_scan do
-      file_type { :license_management }
+      file_type { :license_scanning }
       file_format { :raw }
     end
 
