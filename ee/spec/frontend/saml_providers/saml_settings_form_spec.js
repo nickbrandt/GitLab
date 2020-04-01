@@ -54,12 +54,14 @@ describe('SamlSettingsForm', () => {
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
     expect(findProhibitForksSetting().toggle.hasAttribute('disabled')).toBe(false);
+    expect(findProhibitForksSetting().toggle.classList.contains('is-disabled')).toBe(false);
 
     findEnforcedGroupManagedAccountSetting().input.value = false;
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
 
     expect(findProhibitForksSetting().toggle.hasAttribute('disabled')).toBe(true);
+    expect(findProhibitForksSetting().toggle.classList.contains('is-disabled')).toBe(true);
     expect(findProhibitForksSetting().value).toBe(true);
   });
 
