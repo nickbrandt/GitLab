@@ -234,6 +234,13 @@ Set other user attributes and claims according to the [assertions table](#assert
 
 Under Okta's **Single sign on URL** field, check the option **Use this for Recipient URL and Destination URL**.
 
+Please note that Okta's generic SAML app does not have a **Login URL** field, where the **Identity provider single sign on URL** would normally go. The **Identity provider single sign on URL** may be required the first time a user is logging in if they are having any difficulties.
+
+We recommend:
+
+- **Application username** (NameID) set to **Custom** `user.getInternalProperty("id")`.
+- **Name ID Format** set to **Persistent**.
+
 Set attribute statements according to the [assertions table](#assertions).
 
 ### OneLogin setup notes
