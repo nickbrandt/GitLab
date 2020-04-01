@@ -143,8 +143,10 @@ export default {
           <input class="dropdown-input-field" type="search" :placeholder="__('Search groups')" />
           <icon name="search" class="dropdown-input-search" data-hidden="true" />
         </div>
+        <div class="dropdown-loading pt-8">
+          <gl-loading-icon size="lg" class="pt-8" />
+        </div>
         <div class="dropdown-content"></div>
-        <gl-loading-icon class="dropdown-loading" />
       </div>
     </div>
   </div>
