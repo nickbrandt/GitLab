@@ -27,7 +27,7 @@ module EE
     end
 
     def custom_metrics_available?(project)
-      project.feature_available?(:custom_prometheus_metrics) && can?(current_user, :admin_project, project)
+      can?(current_user, :admin_project, project)
     end
 
     def metrics_data(project, environment)

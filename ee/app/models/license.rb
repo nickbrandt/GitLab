@@ -59,7 +59,6 @@ class License < ApplicationRecord
     custom_file_templates
     custom_file_templates_for_namespace
     custom_project_templates
-    custom_prometheus_metrics
     cycle_analytics_for_groups
     db_load_balancing
     default_project_deletion_protection
