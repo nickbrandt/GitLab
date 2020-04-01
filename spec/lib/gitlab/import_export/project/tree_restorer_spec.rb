@@ -2,6 +2,10 @@
 
 require 'spec_helper'
 
+def match_mr1_note(content_regex)
+  MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{content_regex}/)}.first
+end
+
 describe Gitlab::ImportExport::Project::TreeRestorer do
   include ImportExport::CommonUtil
 
@@ -74,15 +78,14 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         context 'for a Merge Request' do
           it 'does not import note_html' do
             note_content = 'Sit voluptatibus eveniet architecto quidem'
-            merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+            merge_request_note = match_mr1_note(note_content)
 
             expect(merge_request_note.note_html).to match(/#{note_content}/)
           end
 
           context 'merge request system note metadata' do
             it 'restores title action for unmark wip' do
-              note_content = 'unmarked as a \\*\\*Work In Progress\\*\\*'
-              merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+              merge_request_note = match_mr1_note('unmarked as a \\*\\*Work In Progress\\*\\*')
 
               expect(merge_request_note.noteable_type).to eq('MergeRequest')
               expect(merge_request_note.system).to eq(true)
@@ -91,8 +94,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
             end
 
             it 'restores commit action and commit count for pushing 3 commits' do
-              note_content = 'added 3 commits'
-              merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+              merge_request_note = match_mr1_note('added 3 commits')
 
               expect(merge_request_note.noteable_type).to eq('MergeRequest')
               expect(merge_request_note.system).to eq(true)
@@ -395,8 +397,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
         context 'notes' do
           it 'has award emoji' do
-            note_content = 'Sit voluptatibus eveniet architecto quidem'
-            merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+            merge_request_note = match_mr1_note('Sit voluptatibus eveniet architecto quidem')
             award_emoji = merge_request_note.award_emoji.first
 
             expect(award_emoji.name).to eq('tada')
