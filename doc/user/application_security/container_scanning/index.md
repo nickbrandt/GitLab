@@ -413,7 +413,8 @@ Some vulnerabilities can be fixed by applying the solution that GitLab
 automatically generates.
 
 To enable remediation support, the scanning tool _must_ have access to the `Dockerfile` specified by
-the `DOCKERFILE_PATH` environment variable. To ensure that the scanning tool has access to this
+the [`DOCKERFILE_PATH`](#available-variables) environment variable. To ensure that the scanning tool
+has access to this
 file, it's necessary to set [`GIT_STRATEGY: fetch`](../../../ci/yaml/README.md#git-strategy) in
 your `.gitlab-ci.yml` file by following the instructions described in this document's
 [overriding the Container Scanning template](#overriding-the-container-scanning-template) section.
