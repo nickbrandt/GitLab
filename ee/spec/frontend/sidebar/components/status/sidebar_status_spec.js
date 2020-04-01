@@ -59,9 +59,12 @@ describe('SidebarStatus', () => {
         status: 'onTrack',
       },
       updateStatus(status) {
-        const newMediator = { ...this };
-        newMediator.store.status = status;
-        wrapper.setProps({ mediator: newMediator });
+        this.store.status = status;
+        wrapper.setProps({
+          mediator: {
+            ...this,
+          },
+        });
         return Promise.resolve();
       },
     };
@@ -77,7 +80,7 @@ describe('SidebarStatus', () => {
     wrapper.find('button.btn-link').trigger('click');
 
     return Vue.nextTick().then(() => {
-      expect(getStatusText(wrapper)).toContain('None');
+      expect(getStatusText(wrapper)).toBe('None');
     });
   });
 });

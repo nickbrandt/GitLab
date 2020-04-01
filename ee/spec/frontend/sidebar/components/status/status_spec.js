@@ -1,4 +1,4 @@
-import { GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
+import { GlButton, GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Status from 'ee/sidebar/components/status/status.vue';
@@ -12,7 +12,7 @@ const getStatusIconCssClasses = wrapper => wrapper.find('[name="severity-low"]')
 
 const getEditButton = wrapper => wrapper.find({ ref: 'editButton' });
 
-const getRemoveStatusButton = wrapper => wrapper.find('.value .btn-link');
+const getRemoveStatusButton = wrapper => wrapper.find(GlButton);
 
 const getEditForm = wrapper => wrapper.find('form');
 
@@ -120,7 +120,7 @@ describe('Status', () => {
 
       shallowMountStatus(props);
 
-      getRemoveStatusButton(wrapper).trigger('click');
+      getRemoveStatusButton(wrapper).vm.$emit('click');
 
       expect(wrapper.emitted().onStatusChange[0]).toEqual([null]);
     });

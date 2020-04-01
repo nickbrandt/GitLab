@@ -145,20 +145,20 @@ export default {
       </div>
 
       <gl-loading-icon v-if="isFetching" :inline="true" />
-      <p v-else class="value m-0" :class="{ 'no-value': !status }">
+      <p v-else class="value d-flex align-items-center m-0" :class="{ 'no-value': !status }">
         <gl-icon
           v-if="status"
           name="severity-low"
           :size="14"
-          class="align-bottom mr-2"
+          class="align-bottom append-right-10"
           :class="statusColor"
         />
         {{ statusText }}
         <template v-if="canRemoveStatus">
-          <span class="text-secondary" aria-hidden="true">-</span>
-          <button class="btn-link text-secondary" @click="removeStatus">
+          <span class="text-secondary mx-1" aria-hidden="true">-</span>
+          <gl-button variant="link" class="text-secondary" @click="removeStatus">
             {{ __('remove status') }}
-          </button>
+          </gl-button>
         </template>
       </p>
     </div>
