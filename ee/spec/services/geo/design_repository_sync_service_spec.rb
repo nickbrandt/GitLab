@@ -28,7 +28,8 @@ describe Geo::DesignRepositorySyncService do
     let(:url_to_repo) { "#{primary.url}#{project.full_path}.design.git" }
 
     before do
-      allow_any_instance_of(Member).to receive(:update_highest_role) # avoid stubbing exclusive lease for this method
+      # update_highest_role uses exclusive key too:
+      allow(Gitlab::ExclusiveLease).to receive(:new).and_call_original
 
       stub_exclusive_lease(lease_key, lease_uuid)
       stub_exclusive_lease("geo_project_housekeeping:#{project.id}")
