@@ -324,8 +324,6 @@ describe Group do
   end
 
   describe '#file_template_project' do
-    it { expect(group.private_methods).to include(:file_template_project) }
-
     before do
       stub_licensed_features(custom_file_templates_for_namespace: true)
     end
