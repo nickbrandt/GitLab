@@ -1,0 +1,5 @@
+---
+title: Fix missing autocomplete results in the ElasticSearch admin UI.
+merge_request: 29043
+author: mbergeron
+type: fixed

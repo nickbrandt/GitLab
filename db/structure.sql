@@ -8573,6 +8573,8 @@ CREATE UNIQUE INDEX design_management_designs_versions_uniqueness ON public.desi
 
 CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON public.design_user_mentions USING btree (design_id, note_id);
 
+CREATE INDEX dev_index_route_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
+
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.epic_user_mentions USING btree (epic_id, note_id);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON public.epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);

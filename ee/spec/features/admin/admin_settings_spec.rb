@@ -102,7 +102,7 @@ describe 'Admin updates EE-only settings' do
         expect(page).to have_content('Namespaces to index')
         expect(page).to have_content('Projects to index')
 
-        fill_in 'Namespaces to index', with: namespace.name
+        fill_in 'Namespaces to index', with: namespace.path
         wait_for_requests
       end
 
@@ -113,12 +113,12 @@ describe 'Admin updates EE-only settings' do
       page.within('.as-elasticsearch') do
         find('.js-limit-namespaces .select2-choices input[type=text]').native.send_keys(:enter)
 
-        fill_in 'Projects to index', with: project.name
+        fill_in 'Projects to index', with: project.path
         wait_for_requests
       end
 
       page.within('#select2-drop') do
-        expect(page).to have_content(project.full_name)
+        expect(page).to have_content(project.full_path)
       end
 
       page.within('.as-elasticsearch') do
@@ -148,14 +148,14 @@ describe 'Admin updates EE-only settings' do
 
         expect(page).to have_content('Namespaces to index')
         expect(page).to have_content('Projects to index')
-        expect(page).to have_content(namespace.full_name)
-        expect(page).to have_content(project.full_name)
+        expect(page).to have_content(namespace.full_path)
+        expect(page).to have_content(project.full_path)
 
         find('.js-limit-namespaces .select2-search-choice-close').click
         find('.js-limit-projects .select2-search-choice-close').click
 
-        expect(page).not_to have_content(namespace.full_name)
-        expect(page).not_to have_content(project.full_name)
+        expect(page).not_to have_content(namespace.full_path)
+        expect(page).not_to have_content(project.full_path)
 
         click_button 'Save changes'
       end

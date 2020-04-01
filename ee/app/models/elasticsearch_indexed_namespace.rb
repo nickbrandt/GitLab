@@ -19,7 +19,7 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
   end
 
   def self.limited(ignore_descendants: false)
-    namespaces = Namespace.where(id: target_ids)
+    namespaces = Namespace.with_route.where(id: target_ids)
 
     return namespaces if ignore_descendants
 
