@@ -376,7 +376,7 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_f
       end
 
       it 'performs Geo::FileDownloadWorker for failed-sync job artifacts' do
-        registry = create(:geo_job_artifact_registry, :with_artifact, :never_synced)
+        registry = create(:geo_job_artifact_registry, :with_artifact, :failed)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
           .with('job_artifact', registry.artifact_id).once.and_return(spy)

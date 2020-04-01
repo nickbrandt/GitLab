@@ -426,4 +426,3 @@ RSpec/RepeatedExample:
     - 'ee/spec/requests/api/merge_request_approvals_spec.rb'
     - 'ee/spec/services/boards/lists/update_service_spec.rb'
     - 'ee/spec/services/geo/repository_verification_primary_service_spec.rb'
-    - 'ee/spec/workers/geo/file_download_dispatch_worker_spec.rb'
