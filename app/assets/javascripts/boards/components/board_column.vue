@@ -5,6 +5,7 @@ import { GlButtonGroup, GlButton, GlLabel, GlTooltip, GlIcon } from '@gitlab/ui'
 import isWipLimitsOn from 'ee_else_ce/boards/mixins/is_wip_limits';
 import { s__, __, sprintf } from '~/locale';
 import Tooltip from '~/vue_shared/directives/tooltip';
+import EmptyComponent from '~/vue_shared/components/empty_component';
 import AccessorUtilities from '../../lib/utils/accessor';
 import BoardBlankState from './board_blank_state.vue';
 import BoardDelete from './board_delete';
@@ -17,7 +18,7 @@ import { isScopedLabel } from '~/lib/utils/common_utils';
 
 export default {
   components: {
-    BoardPromotionState: () => import('ee_component/boards/components/board_promotion_state.vue'),
+    BoardPromotionState: EmptyComponent,
     BoardBlankState,
     BoardDelete,
     BoardList,

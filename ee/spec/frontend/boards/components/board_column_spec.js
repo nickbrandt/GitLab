@@ -10,6 +10,10 @@ import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'helpers/test_constants';
 import { listObj } from 'jest/boards/mock_data';
 
+// board_promotion_state tries to mount on the real DOM,
+// so we are mocking it in this test
+jest.mock('ee/boards/components/board_promotion_state', () => ({}));
+
 describe('Board Column Component', () => {
   let wrapper;
   let axiosMock;

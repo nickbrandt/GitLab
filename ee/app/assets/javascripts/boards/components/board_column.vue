@@ -3,8 +3,12 @@ import { mapActions } from 'vuex';
 import BoardColumnFoss from '~/boards/components/board_column.vue';
 import { __, sprintf, s__ } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
+import BoardPromotionState from 'ee/boards/components/board_promotion_state';
 
 export default {
+  components: {
+    BoardPromotionState,
+  },
   extends: BoardColumnFoss,
   data() {
     return {
