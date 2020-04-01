@@ -24,6 +24,7 @@ maintainers. The release process is:
     versions (x.y.1, x.y.2 etc.) , use `x-y-stable`. Also see [below](#versioning)
 -   create a merge request to update CHANGELOG and VERSION on the
     release branch
+-   You can use `git log --first-parent <last-version>..master` to see the list of changes
 -   merge the merge request
 -   run `make tag` or `make signed_tag` on the release branch. This will
     make a tag matching the VERSION file.
