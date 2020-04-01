@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import NoteHeader from '~/notes/components/note_header.vue';
-import EmployeeBadge from '~/vue_shared/components/user_avatar/badges/employee_badge.vue';
+import GitLabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -145,9 +145,12 @@ describe('NoteHeader component', () => {
     ${{ author: { ...author, is_gitlab_employee: true } }}  | ${true}  | ${'renders'}        | ${'true'}
     ${{ author: { ...author, is_gitlab_employee: false } }} | ${false} | ${"doesn't render"} | ${'false'}
     ${{ author }}                                           | ${false} | ${"doesn't render"} | ${'undefined'}
-  `('$message1 employee badge when `is_gitlab_employee` is $message2', ({ props, expected }) => {
-    createComponent(props);
+  `(
+    '$message1 GitLab team member badge when `is_gitlab_employee` is $message2',
+    ({ props, expected }) => {
+      createComponent(props);
 
-    expect(wrapper.find(EmployeeBadge).exists()).toBe(expected);
-  });
+      expect(wrapper.find(GitLabTeamMemberBadge).exists()).toBe(expected);
+    },
+  );
 });

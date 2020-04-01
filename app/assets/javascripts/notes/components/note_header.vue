@@ -1,12 +1,12 @@
 <script>
 import { mapActions } from 'vuex';
 import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
-import EmployeeBadge from '../../vue_shared/components/user_avatar/badges/employee_badge.vue';
+import GitLabTeamMemberBadge from '../../vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 export default {
   components: {
     timeAgoTooltip,
-    EmployeeBadge,
+    'gitlab-team-member-badge': GitLabTeamMemberBadge,
   },
   props: {
     author: {
@@ -50,7 +50,7 @@ export default {
     hasAuthor() {
       return this.author && Object.keys(this.author).length;
     },
-    showGitLabEmployeeBadge() {
+    showGitLabTeamMemberBadge() {
       return this.author?.is_gitlab_employee;
     },
   },
@@ -91,7 +91,7 @@ export default {
         <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
         <span class="note-headline-light">@{{ author.username }}</span>
       </a>
-      <employee-badge v-if="showGitLabEmployeeBadge" />
+      <gitlab-team-member-badge v-if="showGitLabTeamMemberBadge" />
     </template>
     <span v-else>{{ __('A deleted user') }}</span>
     <span class="note-headline-light note-headline-meta">

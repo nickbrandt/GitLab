@@ -9620,9 +9620,6 @@ msgstr ""
 msgid "GitLab CI Linter has been moved"
 msgstr ""
 
-msgid "GitLab Employee"
-msgstr ""
-
 msgid "GitLab Enterprise Edition %{plan}"
 msgstr ""
 
