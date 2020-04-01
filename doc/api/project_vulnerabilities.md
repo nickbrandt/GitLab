@@ -119,8 +119,7 @@ POST /projects/:id/vulnerabilities?finding_id=<your_finding_id>
 | Attribute           | Type              | Required   | Description                                                                                                                  |
 | ------------------- | ----------------- | ---------- | -----------------------------------------------------------------------------------------------------------------------------|
 | `id`                | integer or string | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) which the authenticated user is a member of  |
-| `finding_id`        | integer or string | yes        | The ID of a Vulnerability Finding from which the new Vulnerability will be created   
-                                         |
+| `finding_id`        | integer or string | yes        | The ID of a Vulnerability Finding from which the new Vulnerability will be created |
 
 The other attributes of a newly created Vulnerability are populated from
 its source Vulnerability Finding, or with these default values:
