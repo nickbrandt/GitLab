@@ -4,7 +4,7 @@ import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_se
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
-import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
+import MrWidgetLicenses from 'ee/vue_shared/license_compliance/mr_widget_license_report.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 
@@ -161,7 +161,7 @@ export default {
       );
     },
     licensesApiPath() {
-      return (gl && gl.mrWidgetData && gl.mrWidgetData.license_management_comparison_path) || null;
+      return gl?.mrWidgetData?.license_scanning_comparison_path || null;
     },
   },
   watch: {
@@ -331,12 +331,12 @@ export default {
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
-        :api-url="mr.licenseManagement.managed_licenses_path"
+        :api-url="mr.licenseScanning.managed_licenses_path"
         :licenses-api-path="licensesApiPath"
         :pipeline-path="mr.pipeline.path"
-        :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
-        :full-report-path="mr.licenseManagement.license_management_full_report_path"
-        :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
+        :can-manage-licenses="mr.licenseScanning.can_manage_licenses"
+        :full-report-path="mr.licenseScanning.full_report_path"
+        :license-management-settings-path="mr.licenseScanning.settings_path"
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />
