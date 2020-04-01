@@ -467,7 +467,13 @@ module Issuable
   end
 
   def ensure_metrics
-    self.metrics || create_metrics
+    self.metrics || safe_create_metrics
+  end
+
+  def safe_create_metrics
+    create_metrics
+  rescue ActiveRecord::InvalidForeignKey
+    nil
   end
 
   ##

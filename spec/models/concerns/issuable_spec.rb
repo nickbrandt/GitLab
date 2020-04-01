@@ -752,4 +752,29 @@ describe Issuable do
       it_behaves_like 'matches_cross_reference_regex? fails fast'
     end
   end
+
+  describe '#ensure_metrics' do
+    let(:merge_request) { create(:merge_request) }
+
+    it 'creates metrics association on save' do
+      merge_request.metrics.destroy
+
+      merge_request.reload.update(title: 'new title')
+
+      expect(merge_request.metrics).to be_persisted
+    end
+
+    it 'does not fail when the issuable record is deleted in the meantime' do
+      merge_request.metrics.destroy
+      merge_request.reload
+
+      same_merge_request = MergeRequest.find(merge_request.id)
+
+      merge_request.delete
+
+      expect(same_merge_request).to receive(:ensure_metrics)
+
+      expect { same_merge_request.run_callbacks(:save) }.not_to raise_error
+    end
+  end
 end
