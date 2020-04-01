@@ -4,8 +4,6 @@ module Gitlab
   class UsageData
     BATCH_SIZE = 100
 
-    @alt_counters = {}
-
     class << self
       def data(force_refresh: false)
         Rails.cache.fetch('usage_data', force: force_refresh, expires_in: 2.weeks) do
@@ -26,8 +24,15 @@ module Gitlab
       end
 
       def license_usage_data
-        alt_counters
-          .merge(active_user_count: count(User.active))
+        {
+          uuid: alt_usage_data(:uuid) { Gitlab::CurrentSettings.uuid },
+          hostname: alt_usage_data(:hostname) { Gitlab.config.gitlab.host },
+          version: alt_usage_data(:version) { Gitlab::VERSION },
+          installation_type: alt_usage_data(:installation_type) { installation_type },
+          active_user_count: count(User.active),
+          recorded_at: alt_usage_data(:recorded_at) { Time.now },
+          edition: alt_usage_data(:edition, 'CE')
+        }
       end
 
       # rubocop: disable Metrics/AbcSize
@@ -253,8 +258,14 @@ module Gitlab
         fallback
       end
 
-      def alt_usage_data(attribute_key, value = nil, &block)
-        @alt_counters[attribute_key] = block_given? ? block : value
+      def alt_usage_data(attribute_key, value = nil, fallback: -1, &block)
+        if block_given?
+          instance_eval(&block)
+        else
+          value
+        end
+      rescue Errno::ENOENT
+        fallback
       end
 
       private
@@ -266,41 +277,7 @@ module Gitlab
           "gitlab-development-kit"
         end
       end
-
-      def alt_counters
-        @alt_counters.each_with_object({}) do |counter, result|
-          value = if counter[1].is_a?(Proc)
-                    instance_eval(&counter[1])
-                  else
-                    counter[1]
-                  end
-
-          result[counter[0]] = value
-        end
-      end
     end
-
-    alt_usage_data :uuid do
-      Gitlab::CurrentSettings.uuid
-    end
-
-    alt_usage_data :installation_type do
-      installation_type
-    end
-
-    alt_usage_data :hostname do
-      Gitlab.config.gitlab.host
-    end
-
-    alt_usage_data :version do
-      Gitlab::VERSION
-    end
-
-    alt_usage_data :recorded_at do
-      Time.now
-    end
-
-    alt_usage_data :edition, 'CE'
   end
 end
 
