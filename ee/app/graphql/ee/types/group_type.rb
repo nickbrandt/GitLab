@@ -25,6 +25,13 @@ module EE
               description: 'Time logged in issues by group members',
               complexity: 5,
               resolver: ::Resolvers::TimelogResolver
+
+        field :vulnerabilities,
+              ::Types::VulnerabilityType.connection_type,
+              null: true,
+              description: 'Vulnerabilities reported on the projects in the group and its subgroups',
+              resolver: Resolvers::VulnerabilitiesResolver,
+              feature_flag: :first_class_vulnerabilities
       end
     end
   end
