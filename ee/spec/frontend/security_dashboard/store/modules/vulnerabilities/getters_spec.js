@@ -65,26 +65,17 @@ describe('vulnerabilities module getters', () => {
         getters.getVulnerabilityHistoryByName(state)(name);
       return { getVulnerabilityHistoryByName };
     };
-    const realDate = Date;
 
     beforeEach(() => {
       state = createState();
       state.vulnerabilitiesHistory = mockHistoryData;
-      jest.useFakeTimers();
-      const currentDate = new Date(2019, 1, 2);
-      global.Date = class extends Date {
-        constructor(date) {
-          if (date) {
-            // eslint-disable-next-line constructor-super
-            return super(date);
-          }
-          return currentDate;
-        }
-      };
-    });
 
-    afterEach(() => {
-      global.Date = realDate;
+      const mockDate = new Date(2019, 1, 2);
+      const originalDate = Date;
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+      global.Date.now = originalDate.now;
+      global.Date.parse = originalDate.parse;
+      global.Date.UTC = originalDate.UTC;
     });
 
     it('should filter the data to the last 30 days and days we have data for', () => {

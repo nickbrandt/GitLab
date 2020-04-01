@@ -169,8 +169,7 @@ describe('filters actions', () => {
       },
     ].forEach(testCase => {
       it(testCase.description, done => {
-        const mockValue = testCase.returnValue;
-        getParameterValues.mockImplementation(() => mockValue);
+        getParameterValues.mockReturnValue(testCase.returnValue);
         const state = createState();
         testAction(
           actions.setHideDismissedToggleInitialState,
