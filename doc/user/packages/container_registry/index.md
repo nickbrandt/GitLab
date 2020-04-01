@@ -47,11 +47,51 @@ project:
 
 ## Control Container Registry from within GitLab
 
-GitLab offers a simple Container Registry management panel. Go to your project
-and click **Packages > Container Registry** in the project menu.
+GitLab offers a simple Container Registry management panel. This management panel is available
+both for projects and groups.
 
-This view will show you all Docker images in your project and will easily allow you to
-delete them.
+### Control Container Registry for your project
+
+Go to your project and click **Packages > Container Registry** in the project menu.
+
+![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v12_10.png)
+
+This view will:
+
+- Show all the **Image Repositories** that belong to the project
+- Allow to [delete](#delete-images-from-within-gitlab) one or more **Image repository**
+- Allow to navigate to the **Image repository** details page
+- Show a **quick start** dropdown with the most common commands to login, build and push **Image repositories**
+- Optionally a banner will be visible if the [expiration policy](#expiration-policy) is enabled for this project
+
+### Control Container Registry for your group
+
+Go to your group and click **Packages > Container Registry** in the group menu.
+
+![Container Registry group repositories](img/container_registry_group_repositories_v12_10.png)
+
+This view will:
+
+- Show all the **Image Repositories** that belong to all the project belonging to this group
+- Allow to [delete](#delete-images-from-within-gitlab) one or more **Image Repository**
+- Allow to navigate to the **Image repository** details page
+
+### Image Repository details page
+
+Clicking on the name of any **Image Repository** will navigate to the details
+
+![Container Registry project repository details](img/container_registry_repository_details_v12.10.png)
+
+NOTE: **Note:**
+The following page has the same functionalities both in the **Group level container registry**
+and in the **Project level container registry**
+
+This view will:
+
+- Show all the **Image Repository** details
+- Show all the tags of the **Image Repository**
+- Allow to quickly copy the tag path ( by clicking on the clipboard button near the tag name)
+- Allow to [delete one or more tags](#delete-images-from-within-gitlab)
 
 ## Use images from GitLab Container Registry
 
