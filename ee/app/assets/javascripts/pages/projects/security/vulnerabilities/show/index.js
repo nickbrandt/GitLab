@@ -45,7 +45,7 @@ function createFooterApp() {
 
 function createHeaderApp() {
   const el = document.getElementById('js-vulnerability-management-app');
-  const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
+  const initialVulnerability = JSON.parse(el.dataset.vulnerabilityJson);
   const pipeline = JSON.parse(el.dataset.pipelineJson);
 
   const { projectFingerprint, createIssueUrl } = el.dataset;
@@ -56,7 +56,7 @@ function createHeaderApp() {
     render: h =>
       h(HeaderApp, {
         props: {
-          vulnerability,
+          initialVulnerability,
           pipeline,
           projectFingerprint,
           createIssueUrl,

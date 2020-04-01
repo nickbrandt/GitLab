@@ -1,11 +1,13 @@
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
+import waitForPromises from 'helpers/wait_for_promises';
+import UsersMockHelper from 'helpers/user_mock_data_helper';
+import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import * as urlUtility from '~/lib/utils/url_utility';
-
 import createFlash from '~/flash';
 import App from 'ee/vulnerabilities/components/app.vue';
-import waitForPromises from 'helpers/wait_for_promises';
+import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
@@ -34,18 +36,24 @@ describe('Vulnerability management app', () => {
     },
   };
 
+  const createRandomUser = () => {
+    const user = UsersMockHelper.createRandomUser();
+    const url = Api.buildUrl(Api.userPath).replace(':id', user.id);
+    mockAxios.onGet(url).replyOnce(200, user);
+
+    return user;
+  };
+
   const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
   const findBadge = () => wrapper.find({ ref: 'badge' });
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
+  const findStatusDescription = () => wrapper.find(StatusDescription);
 
   const createWrapper = (vulnerability = {}) => {
     wrapper = shallowMount(App, {
       propsData: {
         ...dataset,
-        vulnerability: {
-          ...defaultVulnerability,
-          ...vulnerability,
-        },
+        initialVulnerability: { ...defaultVulnerability, ...vulnerability },
       },
     });
   };
@@ -145,7 +153,30 @@ describe('Vulnerability management app', () => {
     );
   });
 
-  describe('when the vulnerability is no-longer detected on the default branch', () => {
+  describe('status description', () => {
+    it('the status description is rendered and passed the correct data', () => {
+      const user = createRandomUser();
+      const vulnerability = {
+        ...defaultVulnerability,
+        ...{ state: 'confirmed', confirmed_by_id: user.id },
+      };
+
+      createWrapper(vulnerability);
+
+      return waitForPromises().then(() => {
+        expect(findStatusDescription().exists()).toBe(true);
+        expect(findStatusDescription().props()).toEqual({
+          vulnerability,
+          pipeline: dataset.pipeline,
+          user,
+          isLoadingVulnerability: wrapper.vm.isLoadingVulnerability,
+          isLoadingUser: wrapper.vm.isLoadingUser,
+        });
+      });
+    });
+  });
+
+  describe('when the vulnerability is no longer detected on the default branch', () => {
     const branchName = 'master';
 
     beforeEach(() => {
@@ -179,6 +210,53 @@ describe('Vulnerability management app', () => {
         const alert = findResolutionAlert();
 
         expect(alert.exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('vulnerability user watcher', () => {
+    it.each(vulnerabilityStateEntries)(
+      `loads the correct user for the vulnerability state "%s"`,
+      state => {
+        const user = createRandomUser();
+        createWrapper({ state, [`${state}_by_id`]: user.id });
+
+        return waitForPromises().then(() => {
+          expect(mockAxios.history.get.length).toBe(1);
+          expect(findStatusDescription().props('user')).toEqual(user);
+        });
+      },
+    );
+
+    it('does not load a user if there is no user ID', () => {
+      createWrapper({ state: 'detected' });
+
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.get.length).toBe(0);
+        expect(findStatusDescription().props('user')).toBeUndefined();
+      });
+    });
+
+    it('will show an error when the user cannot be loaded', () => {
+      createWrapper({ state: 'confirmed', confirmed_by_id: 1 });
+
+      mockAxios.onGet().replyOnce(500);
+
+      return waitForPromises().then(() => {
+        expect(createFlash).toHaveBeenCalledTimes(1);
+        expect(mockAxios.history.get.length).toBe(1);
+      });
+    });
+
+    it('will set the isLoadingUser property correctly when the user is loading and finished loading', () => {
+      const user = createRandomUser();
+      createWrapper({ state: 'confirmed', confirmed_by_id: user.id });
+
+      expect(findStatusDescription().props('isLoadingUser')).toBe(true);
+
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.get.length).toBe(1);
+        expect(findStatusDescription().props('isLoadingUser')).toBe(false);
       });
     });
   });

@@ -1,36 +1,34 @@
 <script>
-import { GlButton, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import UsersCache from '~/lib/utils/users_cache';
 import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
+import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATES } from '../constants';
 
 export default {
   name: 'VulnerabilityManagementApp',
   components: {
     GlButton,
-    GlLink,
     GlLoadingIcon,
-    GlSprintf,
     ResolutionAlert,
-    TimeAgoTooltip,
     VulnerabilityStateDropdown,
+    StatusDescription,
   },
 
   props: {
-    vulnerability: {
+    initialVulnerability: {
       type: Object,
       required: true,
     },
     pipeline: {
       type: Object,
-      required: false,
-      default: undefined,
+      required: true,
     },
     createIssueUrl: {
       type: String,
@@ -46,27 +44,55 @@ export default {
     return {
       isLoadingVulnerability: false,
       isCreatingIssue: false,
-      state: this.vulnerability.state,
+      isLoadingUser: false,
+      vulnerability: this.initialVulnerability,
+      user: undefined,
     };
   },
 
   computed: {
     statusBoxStyle() {
       // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
-      return VULNERABILITY_STATES[this.state]?.statusBoxStyle || 'expired';
+      return VULNERABILITY_STATES[this.vulnerability.state]?.statusBoxStyle || 'expired';
     },
     showResolutionAlert() {
-      return this.vulnerability.resolved_on_default_branch && this.state !== 'resolved';
+      return (
+        this.vulnerability.resolved_on_default_branch && this.vulnerability.state !== 'resolved'
+      );
+    },
+  },
+
+  watch: {
+    'vulnerability.state': {
+      immediate: true,
+      handler(state) {
+        const id = this.vulnerability[`${state}_by_id`];
+
+        if (id === undefined) return; // Don't do anything if there's no ID.
+
+        this.isLoadingUser = true;
+
+        UsersCache.retrieveById(id)
+          .then(userData => {
+            this.user = userData;
+          })
+          .catch(() => {
+            createFlash(s__('VulnerabilityManagement|Something went wrong, could not get user.'));
+          })
+          .finally(() => {
+            this.isLoadingUser = false;
+          });
+      },
     },
   },
 
   methods: {
-    onVulnerabilityStateChange(newState) {
+    changeVulnerabilityState(newState) {
       this.isLoadingVulnerability = true;
 
       Api.changeVulnerabilityState(this.vulnerability.id, newState)
         .then(({ data }) => {
-          this.state = data.state;
+          Object.assign(this.vulnerability, data);
         })
         .catch(() => {
           createFlash(
@@ -115,7 +141,7 @@ export default {
       :default-branch-name="vulnerability.default_branch_name"
     />
     <div class="detail-page-header">
-      <div class="detail-page-header-body lh-4 align-items-center">
+      <div class="detail-page-header-body align-items-center">
         <gl-loading-icon v-if="isLoadingVulnerability" class="mr-2" />
         <span
           v-else
@@ -124,21 +150,17 @@ export default {
             `text-capitalize align-self-center issuable-status-box status-box status-box-${statusBoxStyle}`
           "
         >
-          {{ state }}
+          {{ vulnerability.state }}
         </span>
 
-        <span v-if="pipeline" class="issuable-meta">
-          <gl-sprintf :message="__('Detected %{timeago} in pipeline %{pipelineLink}')">
-            <template #timeago>
-              <time-ago-tooltip :time="pipeline.created_at" />
-            </template>
-            <template v-if="pipeline.id" #pipelineLink>
-              <gl-link :href="pipeline.url" class="link" target="_blank">{{ pipeline.id }}</gl-link>
-            </template>
-          </gl-sprintf>
-        </span>
-
-        <time-ago-tooltip v-else class="issuable-meta" :time="vulnerability.created_at" />
+        <status-description
+          class="issuable-meta"
+          :vulnerability="vulnerability"
+          :pipeline="pipeline"
+          :user="user"
+          :is-loading-vulnerability="isLoadingVulnerability"
+          :is-loading-user="isLoadingUser"
+        />
       </div>
 
       <div class="detail-page-header-actions align-items-center">
@@ -146,8 +168,8 @@ export default {
         <gl-loading-icon v-if="isLoadingVulnerability" class="d-inline" />
         <vulnerability-state-dropdown
           v-else
-          :initial-state="state"
-          @change="onVulnerabilityStateChange"
+          :initial-state="vulnerability.state"
+          @change="changeVulnerabilityState"
         />
         <gl-button
           ref="create-issue-btn"
