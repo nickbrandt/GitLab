@@ -20745,10 +20745,16 @@ msgstr ""
 msgid "ThreatMonitoring|Anomalous Requests"
 msgstr ""
 
-msgid "ThreatMonitoring|At this time, threat monitoring only supports WAF data."
+msgid "ThreatMonitoring|Application firewall not detected"
 msgstr ""
 
 msgid "ThreatMonitoring|Container Network Policy"
+msgstr ""
+
+msgid "ThreatMonitoring|Container NetworkPolicies are not installed or has been disabled. To view this data, ensure you NetworkPolicies are installed and enabled for your cluster."
+msgstr ""
+
+msgid "ThreatMonitoring|Container NetworkPolicies not detected"
 msgstr ""
 
 msgid "ThreatMonitoring|Dropped Packets"
@@ -20757,7 +20763,7 @@ msgstr ""
 msgid "ThreatMonitoring|Environment"
 msgstr ""
 
-msgid "ThreatMonitoring|No traffic to display"
+msgid "ThreatMonitoring|No environments detected"
 msgstr ""
 
 msgid "ThreatMonitoring|Operations Per Second"
@@ -20778,6 +20784,9 @@ msgstr ""
 msgid "ThreatMonitoring|Something went wrong, unable to fetch statistics"
 msgstr ""
 
+msgid "ThreatMonitoring|The firewall is not installed or has been disabled. To view this data, ensure you firewall is installed and enabled for your cluster."
+msgstr ""
+
 msgid "ThreatMonitoring|The graph below is an overview of traffic coming to your application as tracked by the Web Application Firewall (WAF). View the docs for instructions on how to access the WAF logs to see what type of malicious traffic is trying to access your app. The docs link is also accessible by clicking the \"?\" icon next to the title below."
 msgstr ""
 
@@ -20787,13 +20796,10 @@ msgstr ""
 msgid "ThreatMonitoring|Threat Monitoring help page link"
 msgstr ""
 
-msgid "ThreatMonitoring|Threat monitoring is not enabled"
-msgstr ""
-
-msgid "ThreatMonitoring|Threat monitoring provides security monitoring and rules to protect production applications."
-msgstr ""
-
 msgid "ThreatMonitoring|Time"
+msgstr ""
+
+msgid "ThreatMonitoring|To view this data, ensure you have configured an environment for this project and that at least one threat monitoring feature is enabled."
 msgstr ""
 
 msgid "ThreatMonitoring|Total Packets"
@@ -20802,10 +20808,10 @@ msgstr ""
 msgid "ThreatMonitoring|Total Requests"
 msgstr ""
 
-msgid "ThreatMonitoring|Web Application Firewall"
+msgid "ThreatMonitoring|View documentation"
 msgstr ""
 
-msgid "ThreatMonitoring|While it's rare to have no traffic coming to your application, it can happen. In any event, we ask that you double check your settings to make sure you've set up the Network Policies correctly."
+msgid "ThreatMonitoring|Web Application Firewall"
 msgstr ""
 
 msgid "ThreatMonitoring|While it's rare to have no traffic coming to your application, it can happen. In any event, we ask that you double check your settings to make sure you've set up the WAF correctly."

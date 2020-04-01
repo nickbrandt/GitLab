@@ -8,10 +8,11 @@ exports[`ThreatMonitoringSection component given the statistics are loading show
 
 exports[`ThreatMonitoringSection component given there is a default environment with no data to display shows the chart empty state 1`] = `
 <gl-empty-state-stub
+  compact="true"
   description="Empty Text"
-  primarybuttonlink="documentation_path"
+  primarybuttonlink="documentation_path#anchor"
   primarybuttontext="Learn More"
   svgpath="svg_path"
-  title="No traffic to display"
+  title="Empty Title"
 />
 `;
