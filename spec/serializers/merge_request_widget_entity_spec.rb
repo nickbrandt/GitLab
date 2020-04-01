@@ -58,11 +58,11 @@ describe MergeRequestWidgetEntity do
       project.add_role(user, role)
     end
 
-    context 'when there are pipelines' do
+    context 'when there is a standard ci config file in the source project' do
       let(:role) { :developer }
 
       before do
-        create(:ci_empty_pipeline, project: project, sha: resource.all_commit_shas.first, ref: resource.source_branch)
+        project.repository.create_file(user, Gitlab::FileDetector::PATTERNS[:gitlab_ci], 'CONTENT', message: 'Add .gitlab-ci.yml', branch_name: 'master')
       end
 
       it 'no ci config path' do
@@ -70,7 +70,7 @@ describe MergeRequestWidgetEntity do
       end
     end
 
-    context 'when there are no pipelines' do
+    context 'when there is no standard ci config file in the source project' do
       context 'when user has permissions' do
         let(:role) { :developer }
 
