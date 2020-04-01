@@ -80,7 +80,8 @@ export default {
       return (
         !this.disabled &&
         this.list.type !== ListType.closed &&
-        this.list.type !== ListType.blank
+        this.list.type !== ListType.blank &&
+        this.list.type !== ListType.promotion
       );
     },
     issuesTooltip() {

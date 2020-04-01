@@ -4,6 +4,7 @@ import AxiosMockAdapter from 'axios-mock-adapter';
 
 import Board from '~/boards/components/board_column.vue';
 import List from '~/boards/models/list';
+import { ListType } from '~/boards/constants';
 import axios from '~/lib/utils/axios_utils';
 
 import { TEST_HOST } from 'helpers/test_constants';
@@ -28,20 +29,25 @@ describe('Board Column Component', () => {
   });
 
   const createComponent = ({
-    listType = 'backlog',
+    listType = ListType.backlog,
     collapsed = false,
     withLocalStorage = true,
   } = {}) => {
     const boardId = '1';
 
+    const listMock = {
+      ...listObj,
+      list_type: listType,
+      collapsed,
+    };
+
+    if (listType === ListType.assignee) {
+      delete listMock.label;
+      listMock.user = {};
+    }
+
     // Making List reactive
-    const list = Vue.observable(
-      new List({
-        ...listObj,
-        list_type: listType,
-        collapsed,
-      }),
-    );
+    const list = Vue.observable(new List(listMock));
 
     if (withLocalStorage) {
       localStorage.setItem(
@@ -64,23 +70,40 @@ describe('Board Column Component', () => {
   const isExpandable = () => wrapper.classes('is-expandable');
   const isCollapsed = () => wrapper.classes('is-collapsed');
 
-  describe('Add issue button', () => {
-    it('does not render when List Type is `blank`', () => {
-      createComponent({ listType: 'blank' });
+  const findAddIssueButton = () => wrapper.find({ ref: 'newIssueBtn' });
 
-      expect(wrapper.find('.issue-count-badge-add-button').exists()).toBe(false);
+  describe('Add issue button', () => {
+    const hasNoAddButton = [ListType.promotion, ListType.blank, ListType.closed];
+    const hasAddButton = [ListType.backlog, ListType.label, ListType.milestone, ListType.assignee];
+
+    it.each(hasNoAddButton)('does not render when List Type is `%s`', listType => {
+      createComponent({ listType });
+
+      expect(findAddIssueButton().exists()).toBe(false);
+    });
+
+    it.each(hasAddButton)('does render when List Type is `%s`', listType => {
+      createComponent({ listType });
+
+      expect(findAddIssueButton().exists()).toBe(true);
+    });
+
+    it('has a test for each list type', () => {
+      Object.values(ListType).forEach(value => {
+        expect([...hasAddButton, ...hasNoAddButton]).toContain(value);
+      });
     });
 
     it('does render when logged out', () => {
       createComponent();
 
-      expect(wrapper.find('.issue-count-badge-add-button').exists()).toBe(true);
+      expect(findAddIssueButton().exists()).toBe(true);
     });
   });
 
   describe('Given different list types', () => {
     it('is expandable when List Type is `backlog`', () => {
-      createComponent({ listType: 'backlog' });
+      createComponent({ listType: ListType.backlog });
 
       expect(isExpandable()).toBe(true);
     });

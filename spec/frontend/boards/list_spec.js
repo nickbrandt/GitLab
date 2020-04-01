@@ -56,7 +56,7 @@ describe('List model', () => {
       label: {
         id: 1,
         title: 'test',
-        color: 'red',
+        color: '#ff0000',
         text_color: 'white',
       },
     });
