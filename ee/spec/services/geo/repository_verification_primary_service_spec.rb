@@ -64,9 +64,9 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       repository_state =
         create(:repository_state,
-          project: project,
-          repository_verification_checksum: nil,
-          wiki_verification_checksum: nil)
+          :repository_outdated,
+          project: project
+        )
 
       subject.execute
 
