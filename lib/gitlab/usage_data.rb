@@ -25,13 +25,13 @@ module Gitlab
 
       def license_usage_data
         {
-          uuid: alt_usage_data(:uuid) { Gitlab::CurrentSettings.uuid },
-          hostname: alt_usage_data(:hostname) { Gitlab.config.gitlab.host },
-          version: alt_usage_data(:version) { Gitlab::VERSION },
-          installation_type: alt_usage_data(:installation_type) { installation_type },
+          uuid: alt_usage_data { Gitlab::CurrentSettings.uuid },
+          hostname: alt_usage_data { Gitlab.config.gitlab.host },
+          version: alt_usage_data { Gitlab::VERSION },
+          installation_type: alt_usage_data { installation_type },
           active_user_count: count(User.active),
-          recorded_at: alt_usage_data(:recorded_at) { Time.now },
-          edition: alt_usage_data(:edition, 'CE')
+          recorded_at: Time.now,
+          edition: 'CE'
         }
       end
 
@@ -132,18 +132,18 @@ module Gitlab
 
       def features_usage_data_ce
         {
-          container_registry_enabled: Gitlab.config.registry.enabled,
+          container_registry_enabled: alt_usage_data { Gitlab.config.registry.enabled },
           dependency_proxy_enabled: Gitlab.config.try(:dependency_proxy)&.enabled,
-          gitlab_shared_runners_enabled: Gitlab.config.gitlab_ci.shared_runners_enabled,
-          gravatar_enabled: Gitlab::CurrentSettings.gravatar_enabled?,
-          influxdb_metrics_enabled: Gitlab::Metrics.influx_metrics_enabled?,
-          ldap_enabled: Gitlab.config.ldap.enabled,
-          mattermost_enabled: Gitlab.config.mattermost.enabled,
-          omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
-          prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
-          reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
-          signup_enabled: Gitlab::CurrentSettings.allow_signup?,
-          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?,
+          gitlab_shared_runners_enabled: alt_usage_data { Gitlab.config.gitlab_ci.shared_runners_enabled },
+          gravatar_enabled: alt_usage_data { Gitlab::CurrentSettings.gravatar_enabled? },
+          influxdb_metrics_enabled: alt_usage_data { Gitlab::Metrics.influx_metrics_enabled? },
+          ldap_enabled: alt_usage_data { Gitlab.config.ldap.enabled },
+          mattermost_enabled: alt_usage_data { Gitlab.config.mattermost.enabled },
+          omniauth_enabled: alt_usage_data { Gitlab::Auth.omniauth_enabled? },
+          prometheus_metrics_enabled: alt_usage_data { Gitlab::Metrics.prometheus_metrics_enabled? },
+          reply_by_email_enabled: alt_usage_data { Gitlab::IncomingEmail.enabled? },
+          signup_enabled: alt_usage_data { Gitlab::CurrentSettings.allow_signup? },
+          web_ide_clientside_preview_enabled: alt_usage_data { Gitlab::CurrentSettings.web_ide_clientside_preview_enabled? },
           ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
         }
       end
@@ -170,10 +170,20 @@ module Gitlab
 
       def components_usage_data
         {
-          git: { version: Gitlab::Git.version },
-          gitaly: { version: Gitaly::Server.all.first.server_version, servers: Gitaly::Server.count, filesystems: Gitaly::Server.filesystems },
-          gitlab_pages: { enabled: Gitlab.config.pages.enabled, version: Gitlab::Pages::VERSION },
-          database: { adapter: Gitlab::Database.adapter_name, version: Gitlab::Database.version },
+          git: { version: alt_usage_data { Gitlab::Git.version } },
+          gitaly: {
+            version: alt_usage_data { Gitaly::Server.all.first.server_version },
+            servers: alt_usage_data { Gitaly::Server.count },
+            filesystems: alt_usage_data { Gitaly::Server.filesystems }
+          },
+          gitlab_pages: {
+            enabled: alt_usage_data { Gitlab.config.pages.enabled },
+            version: alt_usage_data { Gitlab::Pages::VERSION }
+          },
+          database: {
+            adapter: alt_usage_data { Gitlab::Database.adapter_name },
+            version: alt_usage_data { Gitlab::Database.version }
+          },
           app_server: { type: app_server_type }
         }
       end
@@ -258,13 +268,13 @@ module Gitlab
         fallback
       end
 
-      def alt_usage_data(attribute_key, value = nil, fallback: -1, &block)
+      def alt_usage_data(value = nil, fallback: -1, &block)
         if block_given?
           instance_eval(&block)
         else
           value
         end
-      rescue Errno::ENOENT
+      rescue StandardError
         fallback
       end
 
