@@ -313,6 +313,9 @@ msgstr ""
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
+msgid "%{firstMilestoneName} + %{numberOfOtherMilestones} more"
+msgstr ""
+
 msgid "%{global_id} is not a valid id for %{expected_type}."
 msgstr ""
 
@@ -2082,6 +2085,9 @@ msgstr ""
 msgid "An error occurred while loading merge requests."
 msgstr ""
 
+msgid "An error occurred while loading milestones"
+msgstr ""
+
 msgid "An error occurred while loading terraform report"
 msgstr ""
 
@@ -2155,6 +2161,9 @@ msgid "An error occurred while saving the approval settings"
 msgstr ""
 
 msgid "An error occurred while saving the template. Please check if the template exists."
+msgstr ""
+
+msgid "An error occurred while searching for milestones"
 msgstr ""
 
 msgid "An error occurred while subscribing to notifications."
@@ -6125,6 +6134,9 @@ msgid "Create merge request and branch"
 msgstr ""
 
 msgid "Create milestone"
+msgstr ""
+
+msgid "Create new"
 msgstr ""
 
 msgid "Create new board"
@@ -12545,6 +12557,9 @@ msgstr ""
 msgid "Manage labels"
 msgstr ""
 
+msgid "Manage milestones"
+msgstr ""
+
 msgid "Manage project labels"
 msgstr ""
 
@@ -13797,6 +13812,9 @@ msgid "No merge requests found"
 msgstr ""
 
 msgid "No messages were logged"
+msgstr ""
+
+msgid "No milestone"
 msgstr ""
 
 msgid "No milestones to show"
@@ -17895,6 +17913,9 @@ msgid "Search"
 msgstr ""
 
 msgid "Search Button"
+msgstr ""
+
+msgid "Search Milestones"
 msgstr ""
 
 msgid "Search an environment spec"
