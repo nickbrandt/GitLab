@@ -2,6 +2,7 @@
 import { GlPopover, GlProgressBar } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import { generateKey } from '../utils/epic_utils';
 
 import CommonMixin from '../mixins/common_mixin';
 import QuartersPresetMixin from '../mixins/quarters_preset_mixin';
@@ -16,7 +17,6 @@ import {
   PRESET_TYPES,
   SMALL_TIMELINE_BAR,
   TIMELINE_CELL_MIN_WIDTH,
-  VERY_SMALL_TIMELINE_BAR,
 } from '../constants';
 
 export default {
@@ -105,7 +105,7 @@ export default {
       }
       return false;
     },
-    epicBarInnerStyle() {
+    timelineBarInnerStyle() {
       return {
         maxWidth: `${this.clientWidth - EPIC_DETAILS_CELL_WIDTH}px`,
       };
@@ -122,16 +122,11 @@ export default {
       }
       return Infinity;
     },
-    showTimelineBarEllipsis() {
+    isTimelineBarSmall() {
       return this.timelineBarWidth < SMALL_TIMELINE_BAR;
     },
-    timelineBarEllipsis() {
-      if (this.timelineBarWidth < VERY_SMALL_TIMELINE_BAR) {
-        return '.';
-      } else if (this.timelineBarWidth < SMALL_TIMELINE_BAR) {
-        return '...';
-      }
-      return '';
+    timelineBarTitle() {
+      return this.isTimelineBarSmall ? '...' : this.epic.title;
     },
     epicTotalWeight() {
       if (this.epic.descendantWeightSum) {
@@ -147,6 +142,11 @@ export default {
           )
         : 0;
     },
+    epicWeightPercentageText() {
+      return sprintf(__(`%{percentage}%% weight completed`), {
+        percentage: this.epicWeightPercentage,
+      });
+    },
     popoverWeightText() {
       if (this.epic.descendantWeightSum) {
         return sprintf(__('%{completedWeight} of %{totalWeight} weight completed'), {
@@ -157,6 +157,9 @@ export default {
       return __('- of - weight completed');
     },
   },
+  methods: {
+    generateKey,
+  },
 };
 </script>
 
@@ -166,34 +169,33 @@ export default {
     <div class="epic-bar-wrapper">
       <a
         v-if="hasStartDate"
-        :id="`epic-bar-${epic.id}`"
+        :id="generateKey(epic)"
         :href="epic.webUrl"
         :style="timelineBarStyles(epic)"
-        class="epic-bar"
+        :class="{ 'epic-bar-child-epic': epic.isChildEpic }"
+        class="epic-bar rounded"
       >
-        <div class="epic-bar-inner" :style="epicBarInnerStyle">
-          <gl-progress-bar
-            class="epic-bar-progress append-bottom-2"
-            :value="epicWeightPercentage"
-          />
+        <div class="epic-bar-inner px-2 py-1" :style="timelineBarInnerStyle">
+          <p class="epic-bar-title text-nowrap text-truncate m-0">{{ timelineBarTitle }}</p>
 
-          <div v-if="showTimelineBarEllipsis" class="m-0">{{ timelineBarEllipsis }}</div>
-          <div v-else class="d-flex">
-            <span class="flex-grow-1 text-nowrap text-truncate mr-3">
-              {{ epic.title }}
-            </span>
-            <span class="d-flex align-items-center text-nowrap">
-              <icon class="append-right-2" :size="16" name="weight" />
-              {{ epicWeightPercentage }}%
-            </span>
+          <div v-if="!isTimelineBarSmall" class="d-flex align-items-center">
+            <gl-progress-bar
+              class="epic-bar-progress flex-grow-1 mr-1"
+              :value="epicWeightPercentage"
+              aria-hidden="true"
+            />
+            <div class="gl-font-size-small d-flex align-items-center text-nowrap">
+              <icon class="append-right-2" :size="12" name="weight" />
+              <p class="m-0" :aria-label="epicWeightPercentageText">{{ epicWeightPercentage }}%</p>
+            </div>
           </div>
         </div>
       </a>
       <gl-popover
-        :target="`epic-bar-${epic.id}`"
+        :target="generateKey(epic)"
         :title="epic.title"
-        triggers="hover focus"
-        placement="right"
+        triggers="hover"
+        placement="lefttop"
       >
         <p class="text-secondary m-0">{{ timeframeString(epic) }}</p>
         <p class="m-0">{{ popoverWeightText }}</p>

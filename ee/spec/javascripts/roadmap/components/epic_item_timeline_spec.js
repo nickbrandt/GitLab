@@ -1,173 +1,91 @@
-import Vue from 'vue';
-
-import epicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
-import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
-
+import { GlPopover, GlProgressBar } from '@gitlab/ui';
+import { shallowMount } from '@vue/test-utils';
+import CurrentDayIndicator from 'ee/roadmap/components/current_day_indicator.vue';
+import EpicItemTimeline from 'ee/roadmap/components/epic_item_timeline.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
-
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic } from '../mock_data';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+import { mockTimeframeInitialDate, mockFormattedEpic } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
+  epic = mockFormattedEpic,
   presetType = PRESET_TYPES.MONTHS,
   timeframe = mockTimeframeMonths,
   timeframeItem = mockTimeframeMonths[0],
-  epic = mockEpic,
   timeframeString = '',
-}) => {
-  const Component = Vue.extend(epicItemTimelineComponent);
-
-  return mountComponent(Component, {
-    presetType,
-    timeframe,
-    timeframeItem,
-    epic,
-    timeframeString,
+} = {}) => {
+  return shallowMount(EpicItemTimeline, {
+    propsData: {
+      epic,
+      presetType,
+      timeframe,
+      timeframeItem,
+      timeframeString,
+    },
   });
 };
 
+const getEpicBar = wrapper => wrapper.find('.epic-bar');
+
 describe('EpicItemTimelineComponent', () => {
-  let vm;
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('computed', () => {
+  describe('epic bar', () => {
     beforeEach(() => {
-      vm = createComponent({});
+      wrapper = createComponent();
     });
 
-    describe('startDateValues', () => {
-      it('returns object containing date parts from epic.startDate', () => {
-        expect(vm.startDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockEpic.startDate.getDay(),
-            date: mockEpic.startDate.getDate(),
-            month: mockEpic.startDate.getMonth(),
-            year: mockEpic.startDate.getFullYear(),
-            time: mockEpic.startDate.getTime(),
-          }),
-        );
-      });
+    it('shows the title', () => {
+      expect(getEpicBar(wrapper).text()).toContain(mockFormattedEpic.title);
     });
 
-    describe('endDateValues', () => {
-      it('returns object containing date parts from epic.endDate', () => {
-        expect(vm.endDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockEpic.endDate.getDay(),
-            date: mockEpic.endDate.getDate(),
-            month: mockEpic.endDate.getMonth(),
-            year: mockEpic.endDate.getFullYear(),
-            time: mockEpic.endDate.getTime(),
-          }),
-        );
-      });
+    it('shows the progress bar with correct value', () => {
+      expect(wrapper.find(GlProgressBar).attributes('value')).toBe('60');
     });
 
-    describe('epicTotalWeight', () => {
-      it('returns the correct percentage of completed to total weights', () => {
-        vm = createComponent({});
-
-        expect(vm.epicTotalWeight).toBe(5);
-      });
-
-      it('returns undefined if weights information is not present', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            descendantWeightSum: undefined,
-          }),
-        });
-
-        expect(vm.epicTotalWeight).toBe(undefined);
-      });
+    it('shows the percentage', () => {
+      expect(getEpicBar(wrapper).text()).toContain('60%');
     });
 
-    describe('epicWeightPercentage', () => {
-      it('returns the correct percentage of completed to total weights', () => {
-        vm = createComponent({});
-
-        expect(vm.epicWeightPercentage).toBe(60);
-      });
-
-      it('returns 0 when there is no total weight', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            descendantWeightSum: undefined,
-          }),
-        });
-
-        expect(vm.epicWeightPercentage).toBe(0);
-      });
-    });
-
-    describe('popoverWeightText', () => {
-      it('returns a description of the weight completed', () => {
-        vm = createComponent({});
-
-        expect(vm.popoverWeightText).toBe('3 of 5 weight completed');
-      });
-
-      it('returns a description with no numbers for weight completed when there is no weights information', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            descendantWeightSum: undefined,
-          }),
-        });
-
-        expect(vm.popoverWeightText).toBe('- of - weight completed');
-      });
+    it('contains a link to the epic', () => {
+      expect(getEpicBar(wrapper).attributes('href')).toBe(mockFormattedEpic.webUrl);
     });
   });
 
-  describe('template', () => {
-    it('renders component container element with class `epic-timeline-cell`', () => {
-      vm = createComponent({});
+  describe('popover', () => {
+    it('shows the start and end dates', () => {
+      wrapper = createComponent();
 
-      expect(vm.$el.classList.contains('epic-timeline-cell')).toBe(true);
+      expect(wrapper.find(GlPopover).text()).toContain('Jun 26, 2017 – Mar 10, 2018');
     });
 
-    it('renders current day indicator element', () => {
-      const currentDate = new Date();
-      vm = createComponent({
-        timeframeItem: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+    it('shows the weight completed', () => {
+      wrapper = createComponent();
+
+      expect(wrapper.find(GlPopover).text()).toContain('3 of 5 weight completed');
+    });
+
+    it('shows the weight completed with no numbers when there is no weights information', () => {
+      wrapper = createComponent({
+        epic: {
+          ...mockFormattedEpic,
+          descendantWeightSum: undefined,
+        },
       });
 
-      expect(vm.$el.querySelector('span.current-day-indicator')).not.toBeNull();
+      expect(wrapper.find(GlPopover).text()).toContain('- of - weight completed');
     });
+  });
 
-    it('renders timeline bar element with class `epic-bar` and class `epic-bar-wrapper` as container element', () => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, { startDate: mockTimeframeMonths[1] }),
-        timeframeItem: mockTimeframeMonths[1],
-      });
+  it('shows current day indicator element', () => {
+    wrapper = createComponent();
 
-      expect(vm.$el.querySelector('.epic-bar-wrapper .epic-bar')).not.toBeNull();
-    });
-
-    it('renders timeline bar with calculated `width` and `left` properties applied via style attribute', () => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDate: mockTimeframeMonths[0],
-          endDate: new Date(2018, 1, 15),
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.epic-bar-wrapper .epic-bar');
-
-      expect(timelineBarEl.getAttribute('style')).toContain('width');
-      expect(timelineBarEl.getAttribute('style')).toContain('left: 0px;');
-    });
-
-    it('renders component with the title in the epic bar', () => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, { startDate: mockTimeframeMonths[1] }),
-        timeframeItem: mockTimeframeMonths[1],
-      });
-
-      expect(vm.$el.querySelector('.epic-bar').textContent).toContain(mockEpic.title);
-    });
+    expect(wrapper.find(CurrentDayIndicator).exists()).toBe(true);
   });
 });

@@ -102,10 +102,6 @@ export const mockEpic = {
   startDate: new Date('2017-07-10'),
   originalStartDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
-  descendantWeightSum: {
-    closedIssues: 3,
-    openedIssues: 2,
-  },
   webUrl: '/groups/gitlab-org/-/epics/1',
 };
 
@@ -120,6 +116,52 @@ export const mockRawEpic = {
   start_date: '2017-6-26',
   end_date: '2018-03-10',
   web_url: '/groups/gitlab-org/marketing/-/epics/2',
+};
+
+export const mockFormattedChildEpic1 = {
+  id: 50,
+  iid: 52,
+  description: null,
+  title: 'Marketing child epic 1',
+  groupId: 56,
+  groupName: 'Marketing',
+  groupFullName: 'Gitlab Org / Marketing',
+  startDate: new Date(2017, 10, 1),
+  originalStartDate: new Date(2017, 5, 26),
+  endDate: new Date(2018, 2, 10),
+  originalEndDate: new Date(2018, 2, 10),
+  startDateOutOfRange: true,
+  endDateOutOfRange: false,
+  webUrl: '/groups/gitlab-org/marketing/-/epics/5',
+  newEpic: undefined,
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+  },
+  isChildEpic: true,
+};
+
+export const mockFormattedChildEpic2 = {
+  id: 51,
+  iid: 53,
+  description: null,
+  title: 'Marketing child epic 2',
+  groupId: 56,
+  groupName: 'Marketing',
+  groupFullName: 'Gitlab Org / Marketing',
+  startDate: new Date(2017, 10, 1),
+  originalStartDate: new Date(2017, 5, 26),
+  endDate: new Date(2018, 2, 10),
+  originalEndDate: new Date(2018, 2, 10),
+  startDateOutOfRange: true,
+  endDateOutOfRange: false,
+  webUrl: '/groups/gitlab-org/marketing/-/epics/6',
+  newEpic: undefined,
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+  },
+  isChildEpic: true,
 };
 
 export const mockFormattedEpic = {
@@ -138,6 +180,12 @@ export const mockFormattedEpic = {
   endDateOutOfRange: false,
   webUrl: '/groups/gitlab-org/marketing/-/epics/2',
   newEpic: undefined,
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+  },
+  isChildEpic: false,
+  isChildEpicShowing: false,
 };
 
 export const rawEpics = [

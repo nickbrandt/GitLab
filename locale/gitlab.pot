@@ -76,6 +76,11 @@ msgid_plural "%d changed files"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d child epic"
+msgid_plural "%d child epics"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d code quality issue"
 msgid_plural "%d code quality issues"
 msgstr[0] ""
@@ -388,6 +393,9 @@ msgid "%{openedEpics} open, %{closedEpics} closed"
 msgstr ""
 
 msgid "%{openedIssues} open, %{closedIssues} closed"
+msgstr ""
+
+msgid "%{percentage}%% weight completed"
 msgstr ""
 
 msgid "%{percent}%% complete"
@@ -4986,6 +4994,9 @@ msgstr ""
 msgid "Collapse approvers"
 msgstr ""
 
+msgid "Collapse child epics"
+msgstr ""
+
 msgid "Collapse sidebar"
 msgstr ""
 
@@ -8305,6 +8316,9 @@ msgid "Expand all"
 msgstr ""
 
 msgid "Expand approvers"
+msgstr ""
+
+msgid "Expand child epics"
 msgstr ""
 
 msgid "Expand down"

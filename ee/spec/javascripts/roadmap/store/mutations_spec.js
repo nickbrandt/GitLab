@@ -5,6 +5,8 @@ import defaultState from 'ee/roadmap/store/state';
 
 import { mockGroupId, basePath, epicsPath, mockSortedBy } from '../mock_data';
 
+const getEpic = (epicId, epics) => epics.find(e => e.id === epicId);
+
 describe('Roadmap Store Mutations', () => {
   let state;
 
@@ -193,6 +195,32 @@ describe('Roadmap Store Mutations', () => {
       mutations[types.SET_BUFFER_SIZE](state, bufferSize);
 
       expect(state.bufferSize).toBe(bufferSize);
+    });
+  });
+
+  describe('TOGGLE_EXPANDED_EPIC', () => {
+    it('should toggle collapsed epic to an expanded epic', () => {
+      const epicId = 1;
+      const epics = [
+        { id: 1, title: 'Collapsed epic', isChildEpicShowing: false },
+        { id: 2, title: 'Expanded epic', isChildEpicShowing: true },
+      ];
+
+      mutations[types.TOGGLE_EXPANDED_EPIC]({ ...state, epics }, epicId);
+
+      expect(getEpic(epicId, epics).isChildEpicShowing).toBe(true);
+    });
+
+    it('should toggle expanded epic to a collapsed epic', () => {
+      const epicId = 2;
+      const epics = [
+        { id: 1, title: 'Collapsed epic', isChildEpicShowing: false },
+        { id: 2, title: 'Expanded epic', isChildEpicShowing: true },
+      ];
+
+      mutations[types.TOGGLE_EXPANDED_EPIC]({ ...state, epics }, epicId);
+
+      expect(getEpic(epicId, epics).isChildEpicShowing).toBe(false);
     });
   });
 });

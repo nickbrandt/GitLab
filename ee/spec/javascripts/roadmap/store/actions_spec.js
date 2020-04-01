@@ -182,6 +182,10 @@ describe('Roadmap Vuex Actions', () => {
             Object.assign({}, mockRawEpic, {
               start_date: '2017-12-31',
               end_date: '2018-2-15',
+              descendantWeightSum: {
+                closedIssues: 3,
+                openedIssues: 2,
+              },
             }),
           ],
         },
@@ -210,7 +214,19 @@ describe('Roadmap Vuex Actions', () => {
     it('should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', done => {
       testAction(
         actions.receiveEpicsSuccess,
-        { rawEpics: [mockRawEpic], newEpic: true, timeframeExtended: true },
+        {
+          rawEpics: [
+            {
+              ...mockRawEpic,
+              descendantWeightSum: {
+                closedIssues: 3,
+                openedIssues: 2,
+              },
+            },
+          ],
+          newEpic: true,
+          timeframeExtended: true,
+        },
         state,
         [
           { type: types.UPDATE_EPIC_IDS, payload: mockRawEpic.id },
@@ -608,6 +624,19 @@ describe('Roadmap Vuex Actions', () => {
         {},
         { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), milestones },
         [{ type: types.SET_MILESTONES, payload: milestones }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleExpandedEpic', () => {
+    it('should perform TOGGLE_EXPANDED_EPIC mutation with epic ID payload', done => {
+      testAction(
+        actions.toggleExpandedEpic,
+        10,
+        state,
+        [{ type: types.TOGGLE_EXPANDED_EPIC, payload: 10 }],
         [],
         done,
       );
