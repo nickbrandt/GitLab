@@ -16,6 +16,9 @@ describe('PipelineTourSuccessModal', () => {
     trackingSpy = mockTracking('_category_', undefined, jest.spyOn);
     wrapper = shallowMount(pipelineTourSuccess, {
       propsData: modalProps,
+      stubs: {
+        GlModal,
+      },
     });
 
     cookieSpy = jest.spyOn(Cookies, 'remove');
@@ -51,7 +54,6 @@ describe('PipelineTourSuccessModal', () => {
     it('send an event when go to pipelines is clicked', () => {
       trackingSpy = mockTracking('_category_', wrapper.element, jest.spyOn);
       const goToBtn = wrapper.find({ ref: 'goto' });
-
       triggerEvent(goToBtn.element);
 
       expect(trackingSpy).toHaveBeenCalledWith('_category_', 'click_button', {

@@ -95,7 +95,7 @@ export default {
         </gl-link>
       </template>
     </gl-sprintf>
-    <template slot="modal-footer">
+    <template #modal-footer>
       <a
         ref="goto"
         :href="goToPipelinesPath"
