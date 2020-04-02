@@ -11,7 +11,8 @@ module Gitlab
         def execute
           return error('Upload not found') unless recorded_file
           return file_not_found(recorded_file) unless recorded_file.exist?
-          return error('Upload not found') unless valid?
+          return error('Invalid request') unless valid?
+          return error('Checksum mismatch') unless matches_checksum?
 
           success(recorded_file.retrieve_uploader)
         end
@@ -25,10 +26,8 @@ module Gitlab
         end
 
         def valid?
-          matches_requested_model? && matches_checksum?
-        end
+          return false if message.nil?
 
-        def matches_requested_model?
           message[:id] == recorded_file.model_id &&
             message[:type] == recorded_file.model_type
         end

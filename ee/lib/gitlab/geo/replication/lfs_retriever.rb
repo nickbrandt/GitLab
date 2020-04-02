@@ -9,6 +9,7 @@ module Gitlab
       #
       class LfsRetriever < BaseRetriever
         def execute
+          return error('Invalid request') unless valid?
           return error('LFS object not found') unless lfs_object
           return error('LFS object not found') unless matches_checksum?
 
@@ -27,6 +28,10 @@ module Gitlab
           strong_memoize(:lfs_object) do
             LfsObject.find_by_id(object_db_id)
           end
+        end
+
+        def valid?
+          !message.nil?
         end
 
         def matches_checksum?
