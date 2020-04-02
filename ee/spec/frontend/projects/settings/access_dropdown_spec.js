@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { LEVEL_TYPES } from 'ee/projects/settings/constants';
 
