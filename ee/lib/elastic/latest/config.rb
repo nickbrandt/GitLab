@@ -117,7 +117,7 @@ module Elastic
         indexes :iid, type: :integer
 
         indexes :title, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :description, type: :text,
           index_options: 'positions'
         indexes :state, type: :text
@@ -163,11 +163,11 @@ module Elastic
 
         ### PROJECTS
         indexes :name, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :path, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :name_with_namespace, type: :text,
-          index_options: 'docs',
+          index_options: 'positions',
           analyzer: :my_ngram_analyzer
         indexes :path_with_namespace, type: :text,
           index_options: 'positions'
@@ -185,7 +185,7 @@ module Elastic
 
         ### SNIPPETS
         indexes :file_name, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :content, type: :text,
           index_options: 'positions'
 
@@ -227,14 +227,14 @@ module Elastic
             normalizer: :sha_normalizer
 
           indexes :author do
-            indexes :name, type: :text, index_options: 'docs'
-            indexes :email, type: :text, index_options: 'docs'
+            indexes :name, type: :text, index_options: 'positions'
+            indexes :email, type: :text, index_options: 'positions'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
           indexes :committer do
-            indexes :name, type: :text, index_options: 'docs'
-            indexes :email, type: :text, index_options: 'docs'
+            indexes :name, type: :text, index_options: 'positions'
+            indexes :email, type: :text, index_options: 'positions'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
