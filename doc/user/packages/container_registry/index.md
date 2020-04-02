@@ -85,7 +85,7 @@ Clicking on the name of any image repository will navigate to the details.
 
 NOTE: **Note:**
 The following page has the same functionalities both in the **Group level container registry**
-and in the **Project level container registry**
+and in the **Project level container registry**.
 
 This view will:
 
