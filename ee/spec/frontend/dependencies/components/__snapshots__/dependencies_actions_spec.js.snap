@@ -10,14 +10,14 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
     <gl-dropdown-stub
       class="flex-grow-1 text-center"
       right=""
-      text="Component name"
+      text="Severity"
     >
       <gl-dropdown-item-stub>
         <span
           class="d-flex"
         >
           <gl-icon-stub
-            class="flex-shrink-0 append-right-4"
+            class="flex-shrink-0 append-right-4 invisible"
             name="mobile-issue-close"
             size="16"
           />
@@ -45,7 +45,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           class="d-flex"
         >
           <gl-icon-stub
-            class="flex-shrink-0 append-right-4 invisible"
+            class="flex-shrink-0 append-right-4"
             name="mobile-issue-close"
             size="16"
           />
