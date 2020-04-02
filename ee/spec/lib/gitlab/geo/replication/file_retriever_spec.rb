@@ -28,7 +28,7 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
           let(:message) { { id: 10000, type: upload.model_type, checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' } }
 
           it 'returns an error hash' do
-            expect(subject).to include(code: :not_found, message: "Upload not found")
+            expect(subject).to include(code: :not_found, message: 'Invalid request')
           end
         end
 
@@ -36,7 +36,7 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
           let(:message) { { id: upload.model_id, type: 'bad_type', checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' } }
 
           it 'returns an error hash' do
-            expect(subject).to include(code: :not_found, message: "Upload not found")
+            expect(subject).to include(code: :not_found, message: 'Invalid request')
           end
         end
 
@@ -44,7 +44,7 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
           let(:message) { { id: upload.model_id, type: upload.model_type, checksum: 'doesnotmatch' } }
 
           it 'returns an error hash' do
-            expect(subject).to include(code: :not_found, message: "Upload not found")
+            expect(subject).to include(code: :not_found, message: 'Checksum mismatch')
           end
         end
       end
@@ -62,7 +62,7 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
       it 'returns an error hash' do
         result = described_class.new(10000, {}).execute
 
-        expect(result).to eq(code: :not_found, message: "Upload not found")
+        expect(result).to eq(code: :not_found, message: 'Upload not found')
       end
     end
   end

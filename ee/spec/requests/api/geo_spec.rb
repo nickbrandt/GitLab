@@ -42,14 +42,14 @@ describe API::Geo do
 
     describe 'allowed IPs' do
       let(:note) { create(:note, :with_attachment) }
-      let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
-      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, upload) }
+      let(:resource) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, resource) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       it 'responds with 401 when IP is not allowed' do
         stub_application_setting(geo_node_allowed_ips: '192.34.34.34')
 
-        get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+        get api("/geo/transfers/attachment/#{resource.id}"), headers: req_header
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
@@ -57,18 +57,13 @@ describe API::Geo do
       it 'responds with 200 when IP is allowed' do
         stub_application_setting(geo_node_allowed_ips: '127.0.0.1')
 
-        get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+        get api("/geo/transfers/attachment/#{resource.id}"), headers: req_header
 
         expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
-    describe 'GET /geo/transfers/attachment/:id' do
-      let(:note) { create(:note, :with_attachment) }
-      let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
-      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, upload) }
-      let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
-
+    shared_examples 'validate geo transfer requests' do |api_path|
       before do
         allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
           allow(instance).to receive(:requesting_node).and_return(secondary_node)
@@ -76,13 +71,43 @@ describe API::Geo do
       end
 
       it 'responds with 401 with invalid auth header' do
-        get api("/geo/transfers/attachment/#{upload.id}"), headers: { Authorization: 'Test' }
+        path = File.join(api_path, resource.id.to_s)
+        get api(path), headers: { Authorization: 'Test' }
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
+      context 'with mismatched params in auth headers' do
+        let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:wrong, resource) }
+
+        it 'responds with 401' do
+          path = File.join(api_path, resource.id.to_s)
+          get api(path), headers: { Authorization: 'Test' }
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
+        end
+      end
+
+      context 'resource does not exist' do
+        it 'responds with 404' do
+          path = File.join(api_path, '100000')
+          get api(path), headers: not_found_req_header
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+
+    describe 'GET /geo/transfers/attachment/:id' do
+      let(:note) { create(:note, :with_attachment) }
+      let(:resource) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, resource) }
+      let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
+
+      it_behaves_like 'validate geo transfer requests', '/geo/transfers/attachment/'
+
       context 'when attachment file exists' do
-        subject(:request) { get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header }
+        subject(:request) { get api("/geo/transfers/attachment/#{resource.id}"), headers: req_header }
 
         it 'responds with 200 with X-Sendfile' do
           request
@@ -95,19 +120,11 @@ describe API::Geo do
         it_behaves_like 'with terms enforced'
       end
 
-      context 'when attachment does not exist' do
-        it 'responds with 404' do
-          get api("/geo/transfers/attachment/100000"), headers: not_found_req_header
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
       context 'when attachment has mount_point nil' do
         it 'responds with 200 with X-Sendfile' do
-          upload.update(mount_point: nil)
+          resource.update(mount_point: nil)
 
-          get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+          get api("/geo/transfers/attachment/#{resource.id}"), headers: req_header
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers['Content-Type']).to eq('application/octet-stream')
@@ -118,24 +135,14 @@ describe API::Geo do
 
     describe 'GET /geo/transfers/avatar/1' do
       let(:user) { create(:user, avatar: fixture_file_upload('spec/fixtures/dk.png', 'image/png')) }
-      let(:upload) { Upload.find_by(model: user, uploader: 'AvatarUploader') }
-      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:avatar, upload) }
+      let(:resource) { Upload.find_by(model: user, uploader: 'AvatarUploader') }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:avatar, resource) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
-      before do
-        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
-          allow(instance).to receive(:requesting_node).and_return(secondary_node)
-        end
-      end
-
-      it 'responds with 401 with invalid auth header' do
-        get api("/geo/transfers/avatar/#{upload.id}"), headers: { Authorization: 'Test' }
-
-        expect(response).to have_gitlab_http_status(:unauthorized)
-      end
+      it_behaves_like 'validate geo transfer requests', '/geo/transfers/avatar/'
 
       context 'avatar file exists' do
-        subject(:request) { get api("/geo/transfers/avatar/#{upload.id}"), headers: req_header }
+        subject(:request) { get api("/geo/transfers/avatar/#{resource.id}"), headers: req_header }
 
         it 'responds with 200 with X-Sendfile' do
           request
@@ -148,19 +155,11 @@ describe API::Geo do
         it_behaves_like 'with terms enforced'
       end
 
-      context 'avatar does not exist' do
-        it 'responds with 404' do
-          get api("/geo/transfers/avatar/100000"), headers: not_found_req_header
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
       context 'avatar has mount_point nil' do
         it 'responds with 200 with X-Sendfile' do
-          upload.update(mount_point: nil)
+          resource.update(mount_point: nil)
 
-          get api("/geo/transfers/avatar/#{upload.id}"), headers: req_header
+          get api("/geo/transfers/avatar/#{resource.id}"), headers: req_header
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers['Content-Type']).to eq('application/octet-stream')
@@ -171,26 +170,19 @@ describe API::Geo do
 
     describe 'GET /geo/transfers/file/1' do
       let(:project) { create(:project) }
-      let(:upload) { Upload.find_by(model: project, uploader: 'FileUploader') }
-      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:file, upload) }
+      let(:resource) { Upload.find_by(model: project, uploader: 'FileUploader') }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:file, resource) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
+      it_behaves_like 'validate geo transfer requests', '/geo/transfers/file/'
+
       before do
-        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
-          allow(instance).to receive(:requesting_node).and_return(secondary_node)
-        end
         FileUploader.new(project).store!(fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
-      end
-
-      it 'responds with 401 with invalid auth header' do
-        get api("/geo/transfers/file/#{upload.id}"), headers: { Authorization: 'Test' }
-
-        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       context 'when the Upload record exists' do
         context 'when the file exists' do
-          subject(:request) { get api("/geo/transfers/file/#{upload.id}"), headers: req_header }
+          subject(:request) { get api("/geo/transfers/file/#{resource.id}"), headers: req_header }
 
           it 'responds with 200 with X-Sendfile' do
             request
@@ -205,52 +197,34 @@ describe API::Geo do
 
         context 'file does not exist' do
           it 'responds with 404 and a specific geo code' do
-            File.unlink(upload.absolute_path)
+            File.unlink(resource.absolute_path)
 
-            get api("/geo/transfers/file/#{upload.id}"), headers: req_header
+            get api("/geo/transfers/file/#{resource.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(:not_found)
             expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
       end
-
-      context 'when the Upload record does not exist' do
-        it 'responds with 404' do
-          get api("/geo/transfers/file/100000"), headers: not_found_req_header
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
     end
 
     describe 'GET /geo/transfers/lfs/1' do
-      let(:lfs_object) { create(:lfs_object, :with_file) }
-      let(:transfer) { Gitlab::Geo::Replication::LfsTransfer.new(lfs_object) }
+      let(:resource) { create(:lfs_object, :with_file) }
+      let(:transfer) { Gitlab::Geo::Replication::LfsTransfer.new(resource) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
-      before do
-        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
-          allow(instance).to receive(:requesting_node).and_return(secondary_node)
-        end
-      end
-
-      it 'responds with 401 with invalid auth header' do
-        get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: { Authorization: 'Test' }
-
-        expect(response).to have_gitlab_http_status(:unauthorized)
-      end
+      it_behaves_like 'validate geo transfer requests', '/geo/transfers/lfs/'
 
       context 'LFS object exists' do
         context 'file exists' do
-          subject(:request) { get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: req_header }
+          subject(:request) { get api("/geo/transfers/lfs/#{resource.id}"), headers: req_header }
 
           it 'responds with 200 with X-Sendfile' do
             request
 
             expect(response).to have_gitlab_http_status(:ok)
             expect(response.headers['Content-Type']).to eq('application/octet-stream')
-            expect(response.headers['X-Sendfile']).to eq(lfs_object.file.path)
+            expect(response.headers['X-Sendfile']).to eq(resource.file.path)
           end
 
           it_behaves_like 'with terms enforced'
@@ -258,21 +232,13 @@ describe API::Geo do
 
         context 'file does not exist' do
           it 'responds with 404 and a specific geo code' do
-            File.unlink(lfs_object.file.path)
+            File.unlink(resource.file.path)
 
-            get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: req_header
+            get api("/geo/transfers/lfs/#{resource.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(:not_found)
             expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
-        end
-      end
-
-      context 'LFS object does not exist' do
-        it 'responds with 404' do
-          get api("/geo/transfers/lfs/100000"), headers: not_found_req_header
-
-          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
