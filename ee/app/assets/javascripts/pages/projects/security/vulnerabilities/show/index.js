@@ -1,6 +1,30 @@
 import Vue from 'vue';
-import HeaderApp from 'ee/vulnerabilities/components/app.vue';
+import HeaderApp from 'ee/vulnerabilities/components/header.vue';
 import FooterApp from 'ee/vulnerabilities/components/footer.vue';
+
+function createHeaderApp() {
+  const el = document.getElementById('js-vulnerability-management-app');
+  const initialVulnerability = JSON.parse(el.dataset.vulnerabilityJson);
+  const pipeline = JSON.parse(el.dataset.pipelineJson);
+  const finding = JSON.parse(el.dataset.findingJson);
+
+  const { projectFingerprint, createIssueUrl } = el.dataset;
+
+  return new Vue({
+    el,
+
+    render: h =>
+      h(HeaderApp, {
+        props: {
+          initialVulnerability,
+          finding,
+          pipeline,
+          projectFingerprint,
+          createIssueUrl,
+        },
+      }),
+  });
+}
 
 function createFooterApp() {
   const el = document.getElementById('js-vulnerability-footer');
@@ -39,30 +63,6 @@ function createFooterApp() {
     render: h =>
       h(FooterApp, {
         props,
-      }),
-  });
-}
-
-function createHeaderApp() {
-  const el = document.getElementById('js-vulnerability-management-app');
-  const initialVulnerability = JSON.parse(el.dataset.vulnerabilityJson);
-  const pipeline = JSON.parse(el.dataset.pipelineJson);
-  const finding = JSON.parse(el.dataset.findingJson);
-
-  const { projectFingerprint, createIssueUrl } = el.dataset;
-
-  return new Vue({
-    el,
-
-    render: h =>
-      h(HeaderApp, {
-        props: {
-          initialVulnerability,
-          finding,
-          pipeline,
-          projectFingerprint,
-          createIssueUrl,
-        },
       }),
   });
 }

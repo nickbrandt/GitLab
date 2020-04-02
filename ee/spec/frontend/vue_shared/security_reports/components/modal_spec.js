@@ -2,6 +2,8 @@ import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/modal.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
+import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
+import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import { mount, shallowMount } from '@vue/test-utils';
 
 describe('Security Reports modal', () => {
@@ -202,8 +204,7 @@ describe('Security Reports modal', () => {
       });
 
       it('displays a link to the issue', () => {
-        const notes = wrapper.find('.notes');
-        expect(notes.exists()).toBe(true);
+        expect(wrapper.contains(IssueNote)).toBe(true);
       });
     });
 
@@ -220,8 +221,8 @@ describe('Security Reports modal', () => {
       });
 
       it('hides the link to the issue', () => {
-        const notes = wrapper.find('.notes');
-        expect(notes.exists()).toBe(false);
+        const note = wrapper.find(IssueNote);
+        expect(note.exists()).toBe(false);
       });
     });
   });
@@ -240,8 +241,7 @@ describe('Security Reports modal', () => {
       });
 
       it('displays a link to the merge request', () => {
-        const notes = wrapper.find('.notes');
-        expect(notes.exists()).toBe(true);
+        expect(wrapper.contains(MergeRequestNote)).toBe(true);
       });
     });
 
@@ -258,8 +258,8 @@ describe('Security Reports modal', () => {
       });
 
       it('hides the link to the merge request', () => {
-        const notes = wrapper.find('.notes');
-        expect(notes.exists()).toBe(false);
+        const note = wrapper.find(MergeRequestNote);
+        expect(note.exists()).toBe(false);
       });
     });
   });

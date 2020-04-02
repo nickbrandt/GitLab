@@ -209,51 +209,51 @@ export default {
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       />
 
-      <ul v-if="canReadIssueFeedback || canReadMergeRequestFeedback" class="notes card my-4">
-        <li v-if="issueFeedback" class="note">
-          <div class="card-body">
-            <issue-note :feedback="issueFeedback" :project="project" />
-          </div>
-        </li>
-        <li v-if="mergeRequestFeedback" class="note">
-          <div class="card-body">
-            <merge-request-note :feedback="mergeRequestFeedback" :project="project" />
-          </div>
-        </li>
-      </ul>
+      <div v-if="canReadIssueFeedback || canReadMergeRequestFeedback" class="card my-4">
+        <issue-note
+          v-if="issueFeedback"
+          :feedback="issueFeedback"
+          :project="project"
+          class="card-body"
+        />
+        <merge-request-note
+          v-if="mergeRequestFeedback"
+          :feedback="mergeRequestFeedback"
+          :project="project"
+          class="card-body"
+        />
+      </div>
 
-      <div v-if="dismissalFeedback || modal.isCommentingOnDismissal" class="card my-4">
-        <div class="card-body">
-          <dismissal-note
-            :feedback="dismissalFeedbackObject"
-            :is-commenting-on-dismissal="modal.isCommentingOnDismissal"
-            :is-showing-delete-buttons="modal.isShowingDeleteButtons"
-            :project="project"
-            :show-dismissal-comment-actions="
-              !dismissalFeedback || !dismissalFeedback.comment_details || !isEditingExistingFeedback
-            "
-            @editVulnerabilityDismissalComment="$emit('editVulnerabilityDismissalComment')"
-            @showDismissalDeleteButtons="$emit('showDismissalDeleteButtons')"
-            @hideDismissalDeleteButtons="$emit('hideDismissalDeleteButtons')"
-            @deleteDismissalComment="$emit('deleteDismissalComment')"
-          />
-          <dismissal-comment-box-toggle
-            v-if="
-              !dismissalFeedback || !dismissalFeedback.comment_details || isEditingExistingFeedback
-            "
-            v-model="localDismissalComment"
-            :dismissal-comment="
-              dismissalFeedback &&
-                dismissalFeedback.comment_details &&
-                dismissalFeedback.comment_details.comment
-            "
-            :is-active="modal.isCommentingOnDismissal"
-            :error-message="dismissalCommentErrorMessage"
-            @openDismissalCommentBox="$emit('openDismissalCommentBox')"
-            @submit="handleDismissalCommentSubmission"
-            @clearError="clearDismissalError"
-          />
-        </div>
+      <div v-if="dismissalFeedback || modal.isCommentingOnDismissal" class="card card-body my-4">
+        <dismissal-note
+          :feedback="dismissalFeedbackObject"
+          :is-commenting-on-dismissal="modal.isCommentingOnDismissal"
+          :is-showing-delete-buttons="modal.isShowingDeleteButtons"
+          :project="project"
+          :show-dismissal-comment-actions="
+            !dismissalFeedback || !dismissalFeedback.comment_details || !isEditingExistingFeedback
+          "
+          @editVulnerabilityDismissalComment="$emit('editVulnerabilityDismissalComment')"
+          @showDismissalDeleteButtons="$emit('showDismissalDeleteButtons')"
+          @hideDismissalDeleteButtons="$emit('hideDismissalDeleteButtons')"
+          @deleteDismissalComment="$emit('deleteDismissalComment')"
+        />
+        <dismissal-comment-box-toggle
+          v-if="
+            !dismissalFeedback || !dismissalFeedback.comment_details || isEditingExistingFeedback
+          "
+          v-model="localDismissalComment"
+          :dismissal-comment="
+            dismissalFeedback &&
+              dismissalFeedback.comment_details &&
+              dismissalFeedback.comment_details.comment
+          "
+          :is-active="modal.isCommentingOnDismissal"
+          :error-message="dismissalCommentErrorMessage"
+          @openDismissalCommentBox="$emit('openDismissalCommentBox')"
+          @submit="handleDismissalCommentSubmission"
+          @clearError="clearDismissalError"
+        />
       </div>
 
       <div v-if="modal.error" class="alert alert-danger">{{ modal.error }}</div>
