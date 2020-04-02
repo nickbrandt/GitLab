@@ -26,17 +26,17 @@ module Gitlab
         end
 
         def valid?
-          return false if message.nil?
+          return false if extra_params.nil?
 
-          message[:id] == recorded_file.model_id &&
-            message[:type] == recorded_file.model_type
+          extra_params[:id] == recorded_file.model_id &&
+            extra_params[:type] == recorded_file.model_type
         end
 
         def matches_checksum?
           # Remove this when we implement checksums for files on the Object Storage
           return true unless recorded_file.local?
 
-          message[:checksum] == Upload.hexdigest(recorded_file.absolute_path)
+          extra_params[:checksum] == Upload.hexdigest(recorded_file.absolute_path)
         end
       end
     end

@@ -31,11 +31,11 @@ module Gitlab
         end
 
         def valid?
-          !message.nil?
+          !extra_params.nil?
         end
 
         def matches_checksum?
-          message[:checksum] == lfs_object.oid
+          extra_params[:checksum] == lfs_object.oid
         end
       end
     end
