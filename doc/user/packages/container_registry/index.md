@@ -79,7 +79,7 @@ This view will:
 
 ### Image Repository details page
 
-Clicking on the name of any **Image Repository** will navigate to the details
+Clicking on the name of any image repository will navigate to the details.
 
 ![Container Registry project repository details](img/container_registry_repository_details_v12.10.png)
 
