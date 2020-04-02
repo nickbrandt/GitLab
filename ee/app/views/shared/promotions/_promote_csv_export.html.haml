@@ -9,10 +9,7 @@
             = custom_icon('icon_export_issues')
         .user-callout-copy
           %h4
-            - if Gitlab::CurrentSettings.should_check_namespace_plan?
-              Upgrade your plan to export issues.
-            - else
-              Export issues with GitLab Enterprise Edition.
+            Export issues with GitLab Enterprise Edition.
           %p
             Export Issues to CSV enables you and your team to export all the data collected from issues into a comma-separated values (CSV) file, which stores tabular data in plain text.
             = link_to 'Read more', help_page_path('user/project/issues/csv_export.html'), target: '_blank'
