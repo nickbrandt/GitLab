@@ -1696,7 +1696,7 @@ class User < ApplicationRecord
 
   def gitlab_employee?
     strong_memoize(:gitlab_employee) do
-      if Gitlab.com?
+      if Feature.enabled?(:gitlab_employee_badge) && Gitlab.com?
         Mail::Address.new(email).domain == "gitlab.com" && confirmed?
       else
         false
@@ -1711,6 +1711,10 @@ class User < ApplicationRecord
 
   def confirmation_required_on_sign_in?
     !confirmed? && !confirmation_period_valid?
+  end
+
+  def organization
+    gitlab_employee? ? 'GitLab' : super
   end
 
   protected
