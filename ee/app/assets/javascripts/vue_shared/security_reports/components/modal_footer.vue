@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import DismissButton from 'ee/vue_shared/security_reports/components/dismiss_button.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import { s__ } from '~/locale';
@@ -9,7 +9,7 @@ export default {
   name: 'ModalFooter',
   components: {
     DismissButton,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
     SplitButton,
   },
@@ -102,9 +102,9 @@ export default {
 
 <template>
   <div>
-    <gl-button data-dismiss="modal" :disabled="disabled">
+    <gl-deprecated-button data-dismiss="modal" :disabled="disabled">
       {{ __('Cancel') }}
-    </gl-button>
+    </gl-deprecated-button>
 
     <dismiss-button
       v-if="canDismissVulnerability"

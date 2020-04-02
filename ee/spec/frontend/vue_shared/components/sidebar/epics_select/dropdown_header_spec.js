@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import DropdownHeader from 'ee/vue_shared/components/sidebar/epics_select/dropdown_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -26,7 +26,7 @@ describe('EpicsSelect', () => {
       });
 
       it('should render close button', () => {
-        const buttonEl = wrapper.find(GlButton);
+        const buttonEl = wrapper.find(GlDeprecatedButton);
 
         expect(buttonEl.exists()).toBe(true);
         expect(buttonEl.attributes('aria-label')).toBe('Close');
@@ -36,7 +36,7 @@ describe('EpicsSelect', () => {
       });
 
       it('should render close button icon', () => {
-        const iconEl = wrapper.find(GlButton).find(Icon);
+        const iconEl = wrapper.find(GlDeprecatedButton).find(Icon);
 
         expect(iconEl.exists()).toBe(true);
         expect(iconEl.attributes('name')).toBe('close');

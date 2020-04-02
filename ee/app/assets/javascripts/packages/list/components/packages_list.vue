@@ -3,7 +3,7 @@ import { mapState, mapGetters } from 'vuex';
 import {
   GlTable,
   GlPagination,
-  GlButton,
+  GlDeprecatedButton,
   GlModal,
   GlLink,
   GlIcon,
@@ -23,7 +23,7 @@ export default {
   components: {
     GlTable,
     GlPagination,
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
     TimeAgoTooltip,
     GlModal,
@@ -181,7 +181,7 @@ export default {
         </template>
         <template #cell(actions)="{item}">
           <!-- _links contains the urls needed to navigate to the page details and to perform a package deletion and it comes straight from the API -->
-          <gl-button
+          <gl-deprecated-button
             ref="action-delete"
             variant="danger"
             :title="s__('PackageRegistry|Remove package')"
@@ -190,7 +190,7 @@ export default {
             @click="setItemToBeDeleted(item)"
           >
             <gl-icon name="remove" />
-          </gl-button>
+          </gl-deprecated-button>
         </template>
       </gl-table>
       <gl-pagination

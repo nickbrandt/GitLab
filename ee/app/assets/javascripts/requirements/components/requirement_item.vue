@@ -1,6 +1,13 @@
 <script>
 import { escape as esc } from 'lodash';
-import { GlPopover, GlLink, GlAvatar, GlButton, GlIcon, GlTooltipDirective } from '@gitlab/ui';
+import {
+  GlPopover,
+  GlLink,
+  GlAvatar,
+  GlDeprecatedButton,
+  GlIcon,
+  GlTooltipDirective,
+} from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -10,7 +17,7 @@ export default {
     GlPopover,
     GlLink,
     GlAvatar,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
   },
   directives: {
@@ -81,14 +88,14 @@ export default {
         <div class="issuable-meta">
           <ul v-if="canUpdate || canArchive" class="controls flex-column flex-sm-row">
             <li v-if="canUpdate" class="requirement-edit d-sm-block">
-              <gl-button v-gl-tooltip size="sm" class="border-0" :title="__('Edit')">
+              <gl-deprecated-button v-gl-tooltip size="sm" class="border-0" :title="__('Edit')">
                 <gl-icon name="pencil" />
-              </gl-button>
+              </gl-deprecated-button>
             </li>
             <li v-if="canArchive" class="requirement-archive d-sm-block">
-              <gl-button v-gl-tooltip size="sm" class="border-0" :title="__('Archive')">
+              <gl-deprecated-button v-gl-tooltip size="sm" class="border-0" :title="__('Archive')">
                 <gl-icon name="archive" />
-              </gl-button>
+              </gl-deprecated-button>
             </li>
           </ul>
           <div class="float-right issuable-updated-at d-none d-sm-inline-block">

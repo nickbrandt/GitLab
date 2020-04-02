@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 import App from 'ee/approvals/components/app.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
@@ -25,7 +25,7 @@ describe('EE Approvals App', () => {
       store: new Vuex.Store(store),
     });
   };
-  const findAddButton = () => wrapper.find(GlButton);
+  const findAddButton = () => wrapper.find(GlDeprecatedButton);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findRules = () => wrapper.find(`.${TEST_RULES_CLASS}`);
 

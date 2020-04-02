@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import Popover from '~/blob/suggest_gitlab_ci_yml/components/popover.vue';
 import { mockTracking, unmockTracking, triggerEvent } from 'helpers/tracking_helper';
 import * as utils from '~/lib/utils/common_utils';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 jest.mock('~/lib/utils/common_utils', () => ({
   ...jest.requireActual('~/lib/utils/common_utils'),
@@ -29,11 +29,11 @@ describe('Suggest gitlab-ci.yml Popover', () => {
         humanAccess,
       },
       stubs: {
-        GlButton,
+        GlDeprecatedButton,
         GlIcon
       }
       slots: {
-        title: '<gl-button><gl-icon /> </gl-button>',
+        title: '<gl-deprecated-button><gl-icon /> </gl-deprecated-button>',
       }
     });
   }
@@ -101,7 +101,7 @@ describe('Suggest gitlab-ci.yml Popover', () => {
       const expectedLabel = commitTrackLabel;
       const expectedProperty = 'owner';
       const expectedValue = '10';
-      const dismissButton = wrapper.find(GlButton);
+      const dismissButton = wrapper.find(GlDeprecatedButton);
 
 console.log(wrapper.html());
 

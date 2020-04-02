@@ -1,14 +1,14 @@
 <script>
 import { escape as esc } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
     EventItem,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
   },
   props: {
@@ -126,9 +126,9 @@ export default {
               @click="$emit('deleteDismissalComment')"
             />
 
-            <gl-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
+            <gl-deprecated-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
               {{ __('Cancel') }}
-            </gl-button>
+            </gl-deprecated-button>
           </div>
         </template>
       </event-item>

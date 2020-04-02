@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import { escape as esc } from 'lodash';
-import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton, GlAvatar } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { s__, __ } from '~/locale';
 import Api from '~/api';
@@ -12,7 +12,7 @@ export default {
   components: {
     Icon,
     GlLoadingIcon,
-    GlButton,
+    GlDeprecatedButton,
     GlAvatar,
   },
   props: {
@@ -117,7 +117,7 @@ export default {
 <template>
   <div>
     <div ref="groupsDropdown" class="dropdown dropdown-groups">
-      <gl-button
+      <gl-deprecated-button
         class="dropdown-menu-toggle wide shadow-none bg-white"
         type="button"
         data-toggle="dropdown"
@@ -136,7 +136,7 @@ export default {
         />
         {{ selectedGroupName }}
         <icon name="chevron-down" />
-      </gl-button>
+      </gl-deprecated-button>
       <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
         <div class="dropdown-title">{{ __('Groups') }}</div>
         <div class="dropdown-input">

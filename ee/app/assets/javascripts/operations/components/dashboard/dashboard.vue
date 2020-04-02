@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlModal, GlModalDirective, GlButton, GlDashboardSkeleton } from '@gitlab/ui';
+import { GlModal, GlModalDirective, GlDeprecatedButton, GlDashboardSkeleton } from '@gitlab/ui';
 import VueDraggable from 'vuedraggable';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import DashboardProject from './project.vue';
@@ -10,7 +10,7 @@ export default {
     DashboardProject,
     GlModal,
     GlDashboardSkeleton,
-    GlButton,
+    GlDeprecatedButton,
     ProjectSelector,
     VueDraggable,
   },
@@ -131,13 +131,13 @@ export default {
       <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
         {{ s__('OperationsDashboard|Operations Dashboard') }}
       </h1>
-      <gl-button
+      <gl-deprecated-button
         v-if="projects.length"
         v-gl-modal="$options.modalId"
         class="js-add-projects-button btn btn-success"
       >
         {{ s__('OperationsDashboard|Add projects') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
     <div class="prepend-top-default">
       <vue-draggable
@@ -169,12 +169,12 @@ export default {
           </span>
         </div>
         <div class="col-12">
-          <gl-button
+          <gl-deprecated-button
             v-gl-modal="$options.modalId"
             class="js-add-projects-button btn btn-success prepend-top-default append-bottom-default"
           >
             {{ s__('OperationsDashboard|Add projects') }}
-          </gl-button>
+          </gl-deprecated-button>
         </div>
       </div>
       <gl-dashboard-skeleton v-else />

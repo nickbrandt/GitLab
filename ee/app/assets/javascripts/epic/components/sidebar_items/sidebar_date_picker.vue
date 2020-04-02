@@ -1,6 +1,6 @@
 <script>
 import { uniqueId } from 'lodash';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 
 import { __, s__ } from '~/locale';
 import { dateInWords } from '~/lib/utils/datetime_utility';
@@ -26,7 +26,7 @@ export default {
     CollapsedCalendarIcon,
     ToggleSidebar,
     GlLoadingIcon,
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     sidebarCollapsed: {
@@ -206,7 +206,7 @@ export default {
           class="help-icon append-right-5"
           tabindex="0"
         />
-        <gl-button
+        <gl-deprecated-button
           v-show="canUpdate && !editing"
           ref="editButton"
           variant="link"
@@ -214,7 +214,7 @@ export default {
           @click="startEditing"
         >
           {{ __('Edit') }}
-        </gl-button>
+        </gl-deprecated-button>
         <toggle-sidebar
           v-if="showToggleSidebar"
           :collapsed="sidebarCollapsed"
@@ -254,14 +254,14 @@ export default {
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">
               &nbsp;&ndash;&nbsp;
-              <gl-button
+              <gl-deprecated-button
                 ref="removeButton"
                 variant="link"
                 class="btn-sidebar-date-remove"
                 @click="newDateSelected(null)"
               >
                 {{ __('remove') }}
-              </gl-button>
+              </gl-deprecated-button>
             </span>
           </template>
           <span v-else class="no-value"> {{ __('None') }} </span>

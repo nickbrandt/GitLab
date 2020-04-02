@@ -3,7 +3,7 @@ import { isEmpty, findKey } from 'lodash';
 import Vue from 'vue';
 import {
   GlLink,
-  GlButton,
+  GlDeprecatedButton,
   GlButtonGroup,
   GlFormGroup,
   GlFormInput,
@@ -36,7 +36,7 @@ const SUBMIT_BUTTON_CLASS = {
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlButtonGroup,
     GlFormGroup,
     GlFormInput,
@@ -247,30 +247,30 @@ export default {
         </gl-dropdown>
       </gl-form-group>
       <gl-button-group class="mb-2" :label="s__('PrometheusAlerts|Operator')">
-        <gl-button
+        <gl-deprecated-button
           :class="{ active: operator === operators.greaterThan }"
           :disabled="formDisabled"
           type="button"
           @click="operator = operators.greaterThan"
         >
           {{ operators.greaterThan }}
-        </gl-button>
-        <gl-button
+        </gl-deprecated-button>
+        <gl-deprecated-button
           :class="{ active: operator === operators.equalTo }"
           :disabled="formDisabled"
           type="button"
           @click="operator = operators.equalTo"
         >
           {{ operators.equalTo }}
-        </gl-button>
-        <gl-button
+        </gl-deprecated-button>
+        <gl-deprecated-button
           :class="{ active: operator === operators.lessThan }"
           :disabled="formDisabled"
           type="button"
           @click="operator = operators.lessThan"
         >
           {{ operators.lessThan }}
-        </gl-button>
+        </gl-deprecated-button>
       </gl-button-group>
       <gl-form-group :label="s__('PrometheusAlerts|Threshold')" label-for="alerts-threshold">
         <gl-form-input

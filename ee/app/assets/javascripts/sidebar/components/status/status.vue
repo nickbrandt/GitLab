@@ -1,6 +1,6 @@
 <script>
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlFormGroup,
   GlFormRadioGroup,
   GlIcon,
@@ -12,7 +12,7 @@ import { healthStatusColorMap, healthStatusTextMap } from '../../constants';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     GlLoadingIcon,
     GlFormGroup,
@@ -134,12 +134,12 @@ export default {
             />
           </gl-form-group>
           <gl-form-group class="mb-0">
-            <gl-button type="button" class="append-right-10" @click="hideForm">
+            <gl-deprecated-button type="button" class="append-right-10" @click="hideForm">
               {{ __('Cancel') }}
-            </gl-button>
-            <gl-button type="submit" variant="success">
+            </gl-deprecated-button>
+            <gl-deprecated-button type="submit" variant="success">
               {{ __('Save') }}
-            </gl-button>
+            </gl-deprecated-button>
           </gl-form-group>
         </form>
       </div>
@@ -156,9 +156,9 @@ export default {
         {{ statusText }}
         <template v-if="canRemoveStatus">
           <span class="text-secondary mx-1" aria-hidden="true">-</span>
-          <gl-button variant="link" class="text-secondary" @click="removeStatus">
+          <gl-deprecated-button variant="link" class="text-secondary" @click="removeStatus">
             {{ __('remove status') }}
-          </gl-button>
+          </gl-deprecated-button>
         </template>
       </p>
     </div>

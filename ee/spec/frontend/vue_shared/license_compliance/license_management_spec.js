@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
@@ -131,7 +131,7 @@ describe('License Management', () => {
           actionMocks: { setLicenseApproval: setLicenseApprovalMock },
           isAdmin: true,
         });
-        wrapper.find(GlButton).vm.$emit('click');
+        wrapper.find(GlDeprecatedButton).vm.$emit('click');
 
         return wrapper.vm.$nextTick().then(() => {
           wrapper.find(AddLicenseForm).vm.$emit('addLicense');
@@ -145,17 +145,17 @@ describe('License Management', () => {
         });
 
         it('should render the form if the form is open and disable the form button', () => {
-          wrapper.find(GlButton).vm.$emit('click');
+          wrapper.find(GlDeprecatedButton).vm.$emit('click');
 
           return wrapper.vm.$nextTick().then(() => {
             expect(wrapper.find(AddLicenseForm).exists()).toBe(true);
-            expect(wrapper.find(GlButton).attributes('disabled')).toBe('true');
+            expect(wrapper.find(GlDeprecatedButton).attributes('disabled')).toBe('true');
           });
         });
 
         it('should not render the form if the form is closed and have active button', () => {
           expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
-          expect(wrapper.find(GlButton).attributes('disabled')).not.toBe('true');
+          expect(wrapper.find(GlDeprecatedButton).attributes('disabled')).not.toBe('true');
         });
 
         it('should render delete confirmation modal', () => {
@@ -176,7 +176,7 @@ describe('License Management', () => {
           actionMocks: { setLicenseApproval: setLicenseApprovalMock },
           isAdmin: false,
         });
-        expect(wrapper.find(GlButton).exists()).toBe(false);
+        expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
         expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
         expect(setLicenseApprovalMock).not.toHaveBeenCalled();
       });
@@ -188,7 +188,7 @@ describe('License Management', () => {
 
         it('should not render the form', () => {
           expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
-          expect(wrapper.find(GlButton).exists()).toBe(false);
+          expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
         });
 
         it('should not render delete confirmation modal', () => {

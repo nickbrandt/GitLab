@@ -56,7 +56,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
       </gl-dropdown-item-stub>
     </gl-dropdown-stub>
      
-    <gl-button-stub
+    <gl-deprecated-button-stub
       class="flex-grow-0 js-sort-order"
       size="md"
       title="Sort direction"
@@ -66,10 +66,10 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
         name="sort-lowest"
         size="16"
       />
-    </gl-button-stub>
+    </gl-deprecated-button-stub>
   </div>
    
-  <gl-button-stub
+  <gl-deprecated-button-stub
     class="js-download"
     download="dependencies.json"
     href="http://test.host/dependencies.json"
@@ -81,6 +81,6 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
       name="export"
       size="16"
     />
-  </gl-button-stub>
+  </gl-deprecated-button-stub>
 </div>
 `;

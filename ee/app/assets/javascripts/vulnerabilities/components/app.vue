@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -14,7 +14,7 @@ import { VULNERABILITY_STATES } from '../constants';
 export default {
   name: 'VulnerabilityManagementApp',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
     ResolutionAlert,
     VulnerabilityStateDropdown,
@@ -171,7 +171,7 @@ export default {
           :initial-state="vulnerability.state"
           @change="changeVulnerabilityState"
         />
-        <gl-button
+        <gl-deprecated-button
           ref="create-issue-btn"
           class="ml-2"
           variant="success"
@@ -180,7 +180,7 @@ export default {
           @click="createIssue"
         >
           {{ s__('VulnerabilityManagement|Create issue') }}
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
   </div>

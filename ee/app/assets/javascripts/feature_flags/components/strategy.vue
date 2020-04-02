@@ -7,7 +7,7 @@ import {
   GlFormTextarea,
   GlFormGroup,
   GlToken,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
@@ -27,7 +27,7 @@ export default {
     GlFormTextarea,
     GlFormSelect,
     GlToken,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     NewEnvironmentsDropdown,
   },
@@ -224,12 +224,12 @@ export default {
       </div>
 
       <div class="align-self-end align-self-md-stretch order-first offset-md-0 order-md-0 ml-auto">
-        <gl-button v-if="canDelete" variant="danger" @click="$emit('delete')">
+        <gl-deprecated-button v-if="canDelete" variant="danger" @click="$emit('delete')">
           <span class="d-md-none">
             {{ $options.translations.removeLabel }}
           </span>
           <gl-icon class="d-none d-md-inline-flex" name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
     <div class="flex flex-column">

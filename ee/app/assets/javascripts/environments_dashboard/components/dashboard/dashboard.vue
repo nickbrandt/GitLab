@@ -4,7 +4,7 @@ import { mapState, mapActions } from 'vuex';
 import {
   GlModal,
   GlModalDirective,
-  GlButton,
+  GlDeprecatedButton,
   GlDashboardSkeleton,
   GlSprintf,
   GlLink,
@@ -33,7 +33,7 @@ export default {
   components: {
     GlModal,
     GlDashboardSkeleton,
-    GlButton,
+    GlDeprecatedButton,
     GlSprintf,
     GlLink,
     ProjectSelector,
@@ -153,9 +153,12 @@ export default {
       <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
         {{ $options.dashboardHeader }}
       </h1>
-      <gl-button v-gl-modal="$options.modalId" class="js-add-projects-button btn btn-success">
+      <gl-deprecated-button
+        v-gl-modal="$options.modalId"
+        class="js-add-projects-button btn btn-success"
+      >
         {{ $options.addProjectsButton }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
     <p class="mt-2 mb-4 js-page-limits-message">
       <gl-sprintf

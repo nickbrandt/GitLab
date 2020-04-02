@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { __ } from '~/locale';
@@ -8,7 +8,7 @@ export default {
   components: {
     Icon,
     ProjectAvatar,
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
   },
   directives: {
@@ -64,13 +64,13 @@ export default {
         <span class="js-project-name bold"> {{ project.name }}</span>
       </gl-link>
     </div>
-    <gl-button
+    <gl-deprecated-button
       v-gl-tooltip
       class="js-remove-button bg-transparent border-0 p-0 text-secondary"
       :title="title"
       @click="onRemove"
     >
       <icon name="remove" />
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

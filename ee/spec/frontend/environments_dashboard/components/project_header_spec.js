@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import component from 'ee/environments_dashboard/components/dashboard/project_header.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
@@ -79,7 +79,7 @@ describe('Project Header', () => {
         .filter(w => w.text() === 'Remove');
       removeLink
         .at(0)
-        .find(GlButton)
+        .find(GlDeprecatedButton)
         .vm.$emit('click');
 
       return wrapper.vm.$nextTick().then(() => {

@@ -1,5 +1,5 @@
 <script>
-import { GlModal, GlButton } from '@gitlab/ui';
+import { GlModal, GlDeprecatedButton } from '@gitlab/ui';
 import { escape as esc } from 'lodash';
 import { __, sprintf } from '~/locale';
 
@@ -7,7 +7,7 @@ export default {
   name: 'MergeImmediatelyConfirmationDialog',
   components: {
     GlModal,
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     docsUrl: {
@@ -61,12 +61,14 @@ export default {
     <p v-html="bodyText"></p>
     <p>{{ __('Are you sure you want to merge immediately?') }}</p>
     <template v-slot:modal-footer>
-      <gl-button ref="cancelButton" @click="cancel">{{ __('Cancel') }}</gl-button>
-      <gl-button
+      <gl-deprecated-button ref="cancelButton" @click="cancel">{{
+        __('Cancel')
+      }}</gl-deprecated-button>
+      <gl-deprecated-button
         variant="danger"
         data-qa-selector="merge_immediately_button"
         @click="mergeImmediately"
-        >{{ __('Merge immediately') }}</gl-button
+        >{{ __('Merge immediately') }}</gl-deprecated-button
       >
     </template>
   </gl-modal>

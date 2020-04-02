@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective, GlButton } from '@gitlab/ui';
+import { GlTooltipDirective, GlDeprecatedButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
@@ -8,7 +8,7 @@ export default {
   components: {
     Icon,
     TimeAgoTooltip,
-    GlButton,
+    GlDeprecatedButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -83,7 +83,7 @@ export default {
 
     <div v-else class="d-flex flex-grow-1 align-self-start flex-row-reverse">
       <div v-if="showActionButtons" class="action-buttons">
-        <gl-button
+        <gl-deprecated-button
           v-for="button in actionButtons"
           :key="button.title"
           ref="button"
@@ -94,7 +94,7 @@ export default {
           @click="$emit(button.emit)"
         >
           <icon :name="button.iconName" class="link-highlight" />
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
   </div>

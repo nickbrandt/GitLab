@@ -47,7 +47,7 @@ describe('PackagesApp', () => {
       store,
       stubs: {
         ...stubChildren(PackagesApp),
-        GlButton: false,
+        GlDeprecatedButton: false,
         GlLink: false,
         GlModal: false,
         GlTable: false,

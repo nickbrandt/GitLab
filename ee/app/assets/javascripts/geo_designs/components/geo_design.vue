@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlLink, GlButton } from '@gitlab/ui';
+import { GlLink, GlDeprecatedButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { ACTION_TYPES } from '../store/constants';
 import GeoDesignStatus from './geo_design_status.vue';
@@ -10,7 +10,7 @@ export default {
   name: 'GeoDesign',
   components: {
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     GeoDesignTimeAgo,
     GeoDesignStatus,
   },
@@ -77,9 +77,9 @@ export default {
     <div class="card-header d-flex align-center">
       <gl-link class="font-weight-bold" :href="`/${name}`" target="_blank">{{ name }}</gl-link>
       <div class="ml-auto">
-        <gl-button
+        <gl-deprecated-button
           @click="initiateReplicableSync({ projectId, name, action: $options.actionTypes.RESYNC })"
-          >{{ __('Resync') }}</gl-button
+          >{{ __('Resync') }}</gl-deprecated-button
         >
       </div>
     </div>

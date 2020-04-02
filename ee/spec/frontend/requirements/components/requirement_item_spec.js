@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlLink, GlButton, GlIcon } from '@gitlab/ui';
+import { GlLink, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
 
 import { requirement1, mockUserPermissions } from '../mock_data';
@@ -94,7 +94,7 @@ describe('RequirementItem', () => {
     });
 
     it('renders element containing requirement `Edit` button when `requirement.userPermissions.updateRequirement` is true', () => {
-      const editButtonEl = wrapper.find('.controls .requirement-edit').find(GlButton);
+      const editButtonEl = wrapper.find('.controls .requirement-edit').find(GlDeprecatedButton);
 
       expect(editButtonEl.exists()).toBe(true);
       expect(editButtonEl.attributes('title')).toBe('Edit');
@@ -117,7 +117,9 @@ describe('RequirementItem', () => {
     });
 
     it('renders element containing requirement `Archive` button when `requirement.userPermissions.adminRequirement` is true', () => {
-      const archiveButtonEl = wrapper.find('.controls .requirement-archive').find(GlButton);
+      const archiveButtonEl = wrapper
+        .find('.controls .requirement-archive')
+        .find(GlDeprecatedButton);
 
       expect(archiveButtonEl.exists()).toBe(true);
       expect(archiveButtonEl.attributes('title')).toBe('Archive');

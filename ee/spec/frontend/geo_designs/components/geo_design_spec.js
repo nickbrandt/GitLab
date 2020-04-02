@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlLink, GlButton } from '@gitlab/ui';
+import { GlLink, GlDeprecatedButton } from '@gitlab/ui';
 import GeoDesign from 'ee/geo_designs/components/geo_design.vue';
 import store from 'ee/geo_designs/store';
 import { ACTION_TYPES } from 'ee/geo_designs/store/constants';
@@ -43,7 +43,7 @@ describe('GeoDesignsApp', () => {
 
   const findCard = () => wrapper.find('.card');
   const findGlLink = () => findCard().find(GlLink);
-  const findGlButton = () => findCard().find(GlButton);
+  const findGlButton = () => findCard().find(GlDeprecatedButton);
   const findCardHeader = () => findCard().find('.card-header');
   const findCardBody = () => findCard().find('.card-body');
 

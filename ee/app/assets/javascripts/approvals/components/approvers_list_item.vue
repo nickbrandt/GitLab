@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Avatar from '~/vue_shared/components/project_avatar/default.vue';
 import HiddenGroupsItem from './hidden_groups_item.vue';
@@ -9,7 +9,7 @@ const types = [TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS];
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     Icon,
     Avatar,
     HiddenGroupsItem,
@@ -42,9 +42,9 @@ export default {
       <template v-else>
         <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
       </template>
-      <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
+      <gl-deprecated-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
         <icon name="remove" :aria-label="__('Remove')" />
-      </gl-button>
+      </gl-deprecated-button>
     </li>
   </transition>
 </template>

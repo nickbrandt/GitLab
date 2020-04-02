@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltipDirective } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import eventHub from '../event_hub';
 import { NODE_ACTIONS } from '../constants';
@@ -8,7 +8,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 export default {
   components: {
     Icon,
-    GlButton,
+    GlDeprecatedButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -106,14 +106,14 @@ export default {
       <icon v-if="!node.current" name="external-link" /> {{ __('Open projects') }}
     </a>
     <template v-if="nodeActionsAllowed">
-      <gl-button
+      <gl-deprecated-button
         v-if="nodeMissingOauth"
         class="btn btn-sm btn-default mx-1 sm-column-spacing"
         @click="onRepairNode"
       >
         {{ s__('Repair authentication') }}
-      </gl-button>
-      <gl-button
+      </gl-deprecated-button>
+      <gl-deprecated-button
         v-if="isToggleAllowed"
         :class="{
           'btn-warning': node.enabled,
@@ -124,32 +124,32 @@ export default {
       >
         <icon :name="nodeToggleIcon" />
         {{ nodeToggleLabel }}
-      </gl-button>
+      </gl-deprecated-button>
       <a v-if="nodeEditAllowed" :href="node.editPath" class="btn btn-sm mx-1 sm-column-spacing">
         {{ __('Edit') }}
       </a>
-      <gl-button
+      <gl-deprecated-button
         v-if="isSecondaryNode"
         class="btn btn-sm btn-danger mx-1 sm-column-spacing"
         :disabled="!nodeRemovalAllowed"
         @click="onRemoveSecondaryNode"
       >
         {{ __('Remove') }}
-      </gl-button>
+      </gl-deprecated-button>
       <div
         v-gl-tooltip.hover
         name="disabledRemovalTooltip"
         class="mx-1 sm-column-spacing"
         :title="disabledRemovalTooltip"
       >
-        <gl-button
+        <gl-deprecated-button
           v-if="!isSecondaryNode"
           class="btn btn-sm btn-danger w-100"
           :disabled="!nodeRemovalAllowed"
           @click="onRemovePrimaryNode"
         >
           {{ __('Remove') }}
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </template>
   </div>

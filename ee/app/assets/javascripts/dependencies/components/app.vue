@@ -1,6 +1,14 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlLink, GlButton } from '@gitlab/ui';
+import {
+  GlBadge,
+  GlEmptyState,
+  GlLoadingIcon,
+  GlTab,
+  GlTabs,
+  GlLink,
+  GlDeprecatedButton,
+} from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import DependenciesActions from './dependencies_actions.vue';
@@ -20,7 +28,7 @@ export default {
     GlTab,
     GlTabs,
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
     Icon,
@@ -141,9 +149,9 @@ export default {
     :svg-path="emptyStateSvgPath"
   >
     <template #actions>
-      <gl-button variant="info" :href="emptyStateOptions.link">
+      <gl-deprecated-button variant="info" :href="emptyStateOptions.link">
         {{ emptyStateOptions.buttonLabel }}
-      </gl-button>
+      </gl-deprecated-button>
     </template>
   </gl-empty-state>
 

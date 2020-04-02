@@ -1,10 +1,10 @@
 <script>
-import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
 import { VALID_DESIGN_FILE_MIMETYPE } from '../../constants';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
   },
   directives: {
@@ -30,7 +30,7 @@ export default {
 
 <template>
   <div>
-    <gl-button
+    <gl-deprecated-button
       v-gl-tooltip.hover
       :title="
         s__(
@@ -43,7 +43,7 @@ export default {
     >
       {{ s__('DesignManagement|Add designs') }}
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
-    </gl-button>
+    </gl-deprecated-button>
 
     <input
       ref="fileUpload"
