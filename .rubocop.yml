@@ -401,7 +401,6 @@ RSpec/RepeatedExample:
     - 'spec/frontend/fixtures/merge_requests.rb'
     - 'spec/graphql/gitlab_schema_spec.rb'
     - 'spec/helpers/users_helper_spec.rb'
-    - 'spec/lib/banzai/filter/autolink_filter_spec.rb'
     - 'spec/lib/gitlab/closing_issue_extractor_spec.rb'
     - 'spec/lib/gitlab/danger/changelog_spec.rb'
     - 'spec/lib/gitlab/git/blob_spec.rb'
