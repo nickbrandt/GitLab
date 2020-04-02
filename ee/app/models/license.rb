@@ -111,6 +111,7 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
+    enterprise_templates
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management

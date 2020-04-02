@@ -223,7 +223,7 @@ const bindEvents = () => {
       },
       hipaa_audit_protocol: {
         text: s__('ProjectTemplates|HIPAA Audit Protocol'),
-        icon: '.template-option .icon-serverless_framework',
+        icon: '.template-option .icon-hipaa_audit_protocol',
       },
     };
 
