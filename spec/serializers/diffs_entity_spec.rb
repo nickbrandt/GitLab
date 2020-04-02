@@ -54,7 +54,7 @@ describe DiffsEntity do
         let(:commit) { commits.first }
 
         it 'includes commit references for nil and next' do
-          expect(subject[:commit][:prev_commit_id]).to eq(nil)
+          expect(subject[:commit][:prev_commit_id]).to be_nil
           expect(subject[:commit][:next_commit_id]).to eq(commits.second.id)
         end
       end
@@ -64,7 +64,7 @@ describe DiffsEntity do
 
         it 'includes commit references for previous and nil' do
           expect(subject[:commit][:prev_commit_id]).to eq(commits[-2].id)
-          expect(subject[:commit][:next_commit_id]).to eq(nil)
+          expect(subject[:commit][:next_commit_id]).to be_nil
         end
       end
     end

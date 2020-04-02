@@ -16,7 +16,7 @@ class DiffsEntity < Grape::Entity
   end
 
   expose :commit do |diffs, options|
-    CommitEntity.represent options[:commit], commit_options(options)
+    CommitEntity.represent(options[:commit], commit_options(options))
   end
 
   expose :context_commits, using: API::Entities::Commit, if: -> (diffs, options) { merge_request&.project&.context_commits_enabled? } do |diffs|
@@ -79,7 +79,7 @@ class DiffsEntity < Grape::Entity
   private
 
   def commit_ids
-    @commit_ids ||= merge_request.commits.collect(&:id)
+    @commit_ids ||= merge_request.recent_commits.map(&:id)
   end
 
   def commit_neighbors(commit_id)
