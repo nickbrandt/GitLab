@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Item from 'ee/design_management/components/list/item.vue';
+import { GlIntersectionObserver } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -45,6 +46,19 @@ describe('Design management list item component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  it('renders an image when it appears in view', () => {
+    createComponent();
+    const image = wrapper.find('img');
+
+    expect(image.attributes('src')).toBe('');
+
+    wrapper.find(GlIntersectionObserver).vm.$emit('appear');
+
+    return wrapper.vm.$nextTick().then(() => {
+      expect(image.attributes('src')).toBe('http://via.placeholder.com/300');
+    });
   });
 
   describe('with notes', () => {

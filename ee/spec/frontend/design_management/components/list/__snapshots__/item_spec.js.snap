@@ -30,12 +30,16 @@ exports[`Design management list item component with no notes renders item with c
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -99,12 +103,16 @@ exports[`Design management list item component with no notes renders item with c
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -168,12 +176,16 @@ exports[`Design management list item component with no notes renders item with c
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -224,12 +236,16 @@ exports[`Design management list item component with no notes renders item with n
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -279,13 +295,17 @@ exports[`Design management list item component with no notes renders loading spi
       size="md"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-      style="display: none;"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+        style="display: none;"
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -336,12 +356,16 @@ exports[`Design management list item component with notes renders item with mult
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
@@ -409,12 +433,16 @@ exports[`Design management list item component with notes renders item with sing
       style="display: none;"
     />
      
-    <img
-      alt="test"
-      class="block ml-auto mr-auto mw-100 mh-100 design-img"
-      data-qa-selector="design_image"
-      src="http://via.placeholder.com/300"
-    />
+    <gl-intersection-observer-stub
+      options="[object Object]"
+    >
+      <img
+        alt="test"
+        class="block mx-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+        src=""
+      />
+    </gl-intersection-observer-stub>
   </div>
    
   <div
