@@ -7,6 +7,7 @@
 >   to pass a [personal access token](../../profile/personal_access_tokens.md) instead of your password in order to
 >   login to GitLab's Container Registry.
 > - Multiple level image names support was added in GitLab 9.1.
+> - The group level Container Registry was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/23315) in GitLab 12.10.
 
 NOTE: **Note:**
 This document is the user guide. To learn how to enable GitLab Container
