@@ -142,7 +142,7 @@ describe API::Todos do
 
         post api("/groups/#{group.id}/epics/#{non_existing_record_iid}/todo", user)
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns an error if the epic is not accessible' do
