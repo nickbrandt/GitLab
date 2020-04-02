@@ -106,7 +106,7 @@ describe ApprovalProjectRule do
 
   describe "validation" do
     let(:project_approval_rule) { create(:approval_project_rule) }
-    let(:license_compliance_rule) { create(:approval_project_rule, :license_management) }
+    let(:license_compliance_rule) { create(:approval_project_rule, :license_scanning) }
     let(:vulnerability_check_rule) { create(:approval_project_rule, :security) }
 
     context "when creating a new rule" do
