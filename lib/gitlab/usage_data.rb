@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# For hardening usage ping and make it easier to add measures there is in place alt_usage_data method
+# which handles StandardError and fallbacks into -1
+# this way not all measures fail if we encounter one exception
+#
+# Examples:
+#  alt_usage_data { Gitlab::VERSION }
+#  alt_usage_data { Gitlab::CurrentSettings.uuid }
 module Gitlab
   class UsageData
     BATCH_SIZE = 100
