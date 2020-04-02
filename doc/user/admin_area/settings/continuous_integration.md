@@ -126,8 +126,8 @@ a group in the **Usage Quotas** page available to the group page settings list.
 ---
 
 How minutes are accumulated:
-- Build minutes of [Public](https://docs.gitlab.com/ee/public_access/public_access.html#public-projects) projects are not counted towards the quota.
-- Builds minutes of [Internal](https://docs.gitlab.com/ee/public_access/public_access.html#internal-projects) and [Private](https://docs.gitlab.com/ee/public_access/public_access.html#internal-projects) projects are tracked.
+- Build minutes of [Public](../../../public_access/public_access.html#public-projects) projects are not counted towards the quota.
+- Builds minutes of [Internal](../../../public_access/public_access.html#internal-projects) and [Private](../../../public_access/public_access.html#internal-projects) projects are tracked.
 
 ## Archive jobs **(CORE ONLY)**
 
