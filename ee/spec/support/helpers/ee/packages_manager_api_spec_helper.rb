@@ -28,8 +28,8 @@ module EE
       end
     end
 
-    def temp_file(package_tmp)
-      upload_path = ::Packages::PackageFileUploader.workhorse_local_upload_path
+    def temp_file(package_tmp, upload_path_override = nil)
+      upload_path = upload_path_override || ::Packages::PackageFileUploader.workhorse_local_upload_path
       file_path = "#{upload_path}/#{package_tmp}"
 
       FileUtils.mkdir_p(upload_path)
