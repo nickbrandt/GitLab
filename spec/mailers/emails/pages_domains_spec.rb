@@ -104,7 +104,7 @@ describe Emails::PagesDomains do
   end
 
   describe '#pages_domain_auto_ssl_failed_email' do
-    let(:email_subject) { "#{project.path} | ACTION REQUIRED: Something went wrong while obtaining Let's Encrypt certificate for GitLab Pages domain '#{domain.domain}'" }
+    let(:email_subject) { "#{project.path} | ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '#{domain.domain}'" }
 
     subject { Notify.pages_domain_auto_ssl_failed_email(domain, user) }
 

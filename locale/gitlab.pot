@@ -886,7 +886,7 @@ msgstr ""
 msgid "A user with write access to the source branch selected this option"
 msgstr ""
 
-msgid "ACTION REQUIRED: Something went wrong while obtaining Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
+msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
 msgstr ""
 
 msgid "API Help"
