@@ -45,7 +45,6 @@ export default {
         :background-color="label.color"
         :target="labelFilterUrl(label)"
         :scoped="scopedLabel(label)"
-        :scoped-labels-documentation-link="scopedLabelsDocumentationPath"
         tooltip-placement="top"
       />
     </template>

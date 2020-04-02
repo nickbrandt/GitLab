@@ -57,7 +57,6 @@ describe LabelsHelper do
         show_any: "true",
         default_label: "Labels",
         scoped_labels: "false",
-        scoped_labels_documentation_link: "/help/user/project/labels.md#scoped-labels-premium"
       }
     end
 

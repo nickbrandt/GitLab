@@ -35,11 +35,6 @@ export default {
       type: String,
       required: true,
     },
-    scopedLabelsDocumentationLink: {
-      type: String,
-      required: false,
-      default: '#',
-    },
     enableScopedLabels: {
       type: Boolean,
       required: false,
@@ -119,7 +114,6 @@ export default {
         :context="board"
         :labels-path="labelsPath"
         :can-edit="canAdminBoard"
-        :scoped-labels-documentation-link="scopedLabelsDocumentationLink"
         :enable-scoped-labels="enableScopedLabels"
         ability-name="issue"
         @onLabelClick="handleLabelClick"
