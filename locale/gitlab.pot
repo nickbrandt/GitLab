@@ -3953,7 +3953,7 @@ msgstr ""
 msgid "Class"
 msgstr ""
 
-msgid "Class: "
+msgid "Class:"
 msgstr ""
 
 msgid "Classification Label (optional)"
