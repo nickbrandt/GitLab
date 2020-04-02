@@ -65,6 +65,7 @@ describe Geo::RepositoryVerificationPrimaryService do
       repository_state =
         create(:repository_state,
           :repository_outdated,
+          :wiki_outdated,
           project: project
         )
 
