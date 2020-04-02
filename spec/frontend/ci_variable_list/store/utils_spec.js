@@ -2,7 +2,6 @@ import {
   prepareDataForDisplay,
   prepareEnvironments,
   prepareDataForApi,
-  extractEnvironmentScopes,
 } from '~/ci_variable_list/store/utils';
 import mockData from '../services/mock_data';
 
@@ -46,13 +45,5 @@ describe('CI variables store utils', () => {
 
   it('prepares environments for display', () => {
     expect(prepareEnvironments(mockData.mockEnvironments)).toStrictEqual(['staging', 'production']);
-  });
-
-  it('returns variable environment scopes with no duplicates', () => {
-    expect(extractEnvironmentScopes(mockData.mockVariableScopes)).toStrictEqual([
-      'All (default)',
-      'staging',
-      'production',
-    ]);
   });
 });

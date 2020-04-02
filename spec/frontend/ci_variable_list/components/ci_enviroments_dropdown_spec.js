@@ -30,12 +30,9 @@ describe('Ci environments dropdown', () => {
   const findDropdownItemByIndex = index => wrapper.findAll(GlDropdownItem).at(index);
   const findActiveIconByIndex = index => wrapper.findAll(GlIcon).at(index);
 
-  beforeEach(() => {
-    createComponent('prod');
-  });
-
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('No enviroments found', () => {
@@ -53,13 +50,22 @@ describe('Ci environments dropdown', () => {
     });
   });
 
-  describe('Enviroments found', () => {
-    it('renders all enviroments when search term is empty', () => {
+  describe('Search term is empty', () => {
+    beforeEach(() => {
       createComponent('');
+    });
+
+    it('renders all enviroments when search term is empty', () => {
       expect(findAllDropdownItems()).toHaveLength(3);
       expect(findDropdownItemByIndex(0).text()).toBe('dev');
       expect(findDropdownItemByIndex(1).text()).toBe('prod');
       expect(findDropdownItemByIndex(2).text()).toBe('staging');
+    });
+  });
+
+  describe('Enviroments found', () => {
+    beforeEach(() => {
+      createComponent('prod');
     });
 
     it('renders only the enviroment searched for', () => {
@@ -78,21 +84,20 @@ describe('Ci environments dropdown', () => {
     });
 
     it('should display active checkmark if active', () => {
-      createComponent('dev');
       expect(findActiveIconByIndex(0).classes('invisible')).toBe(false);
     });
-  });
 
-  describe('Custom events', () => {
-    it('should emit selectEnvironment if an environment is clicked', () => {
-      findDropdownItemByIndex(0).vm.$emit('click');
-      expect(wrapper.emitted('selectEnvironment')).toEqual([['prod']]);
-    });
+    describe('Custom events', () => {
+      it('should emit selectEnvironment if an environment is clicked', () => {
+        findDropdownItemByIndex(0).vm.$emit('click');
+        expect(wrapper.emitted('selectEnvironment')).toEqual([['prod']]);
+      });
 
-    it('should emit createClicked if an environment is clicked', () => {
-      createComponent('newscope');
-      findDropdownItemByIndex(1).vm.$emit('click');
-      expect(wrapper.emitted('createClicked')).toEqual([['newscope']]);
+      it('should emit createClicked if an environment is clicked', () => {
+        createComponent('newscope');
+        findDropdownItemByIndex(1).vm.$emit('click');
+        expect(wrapper.emitted('createClicked')).toEqual([['newscope']]);
+      });
     });
   });
 });

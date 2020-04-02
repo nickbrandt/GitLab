@@ -1,12 +1,9 @@
-import { extractEnvironmentScopes } from './utils';
+/* eslint-disable import/prefer-default-export */
+// Disabling import/prefer-default-export can be
+// removed once a second getter is added to this file
+import { uniq } from 'lodash';
 
 export const joinedEnvironments = state => {
-  if (state.variables) {
-    const joined = state.environments.concat(extractEnvironmentScopes(state.variables));
-    return [...new Set(joined)].sort();
-  }
-  return null;
+  const scopesFromVariables = (state.variables || []).map(variable => variable.environment_scope);
+  return uniq(state.environments.concat(scopesFromVariables)).sort();
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
