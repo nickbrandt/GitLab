@@ -19,23 +19,15 @@ describe('Blob Embeddable', () => {
     id: 'gid://foo.bar/snippet',
     webUrl: 'https://foo.bar',
     visibilityLevel: SNIPPET_VISIBILITY_PUBLIC,
+    blob: BlobMock,
   };
   const dataMock = {
-    blob: BlobMock,
     activeViewerType: SimpleViewerMock.type,
   };
 
-  function createComponent(
-    props = {},
-    data = dataMock,
-    blobLoading = false,
-    contentLoading = false,
-  ) {
+  function createComponent(props = {}, data = dataMock, contentLoading = false) {
     const $apollo = {
       queries: {
-        blob: {
-          loading: blobLoading,
-        },
         blobContent: {
           loading: contentLoading,
         },
@@ -87,10 +79,10 @@ describe('Blob Embeddable', () => {
       expect(wrapper.find(BlobEmbeddable).exists()).toBe(true);
     });
 
-    it('shows loading icon while blob data is in flight', () => {
+    it('shows loading icon while blob content data is in flight', () => {
       createComponent({}, dataMock, true);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
-      expect(wrapper.find('.snippet-file-content').exists()).toBe(false);
+      expect(wrapper.find(BlobContent).exists()).toBe(false);
     });
 
     it('sets simple viewer correctly', () => {
@@ -133,14 +125,14 @@ describe('Blob Embeddable', () => {
       });
 
       it('renders simple viewer by default if URL contains hash', () => {
-        createComponent();
+        createComponent({}, {});
 
         expect(wrapper.vm.activeViewerType).toBe(SimpleViewerMock.type);
         expect(wrapper.find(SimpleViewer).exists()).toBe(true);
       });
 
       describe('switchViewer()', () => {
-        it('by default switches to the passed viewer', () => {
+        it('switches to the passed viewer', () => {
           createComponent();
 
           wrapper.vm.switchViewer(RichViewerMock.type);
@@ -156,22 +148,6 @@ describe('Blob Embeddable', () => {
               expect(wrapper.vm.activeViewerType).toBe(SimpleViewerMock.type);
               expect(wrapper.find(SimpleViewer).exists()).toBe(true);
             });
-        });
-
-        it('respects hash over richViewer in the blob when corresponding parameter is passed', () => {
-          createComponent(
-            {},
-            {
-              blob: BlobMock,
-            },
-          );
-          expect(wrapper.vm.blob.richViewer).toEqual(expect.any(Object));
-
-          wrapper.vm.switchViewer(RichViewerMock.type, true);
-          return wrapper.vm.$nextTick().then(() => {
-            expect(wrapper.vm.activeViewerType).toBe(SimpleViewerMock.type);
-            expect(wrapper.find(SimpleViewer).exists()).toBe(true);
-          });
         });
       });
     });
