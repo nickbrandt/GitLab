@@ -131,8 +131,21 @@ module Issuable
 
     strip_attributes :title
 
-    def self.locking_enabled?
-      false
+    class << self
+      def labels_hash
+        issue_labels = Hash.new { |h, k| h[k] = [] }
+
+        relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
+        relation.pluck(:id, 'labels.title').each do |issue_id, label|
+          issue_labels[issue_id] << label if label.present?
+        end
+
+        issue_labels
+      end
+
+      def locking_enabled?
+        false
+      end
     end
 
     # We want to use optimistic lock for cases when only title or description are involved
@@ -478,5 +491,4 @@ module Issuable
   end
 end
 
-Issuable.prepend_if_ee('EE::Issuable') # rubocop: disable Cop/InjectEnterpriseEditionModule
-Issuable::ClassMethods.prepend_if_ee('EE::Issuable::ClassMethods')
+Issuable.prepend_if_ee('EE::Issuable')
