@@ -126,8 +126,8 @@ a group in the **Usage Quotas** page available to the group page settings list.
 ---
 
 How minutes are accumulated:
-- Build minutes of [Public](../../../public_access/public_access.html#public-projects) projects are not counted towards the quota.
-- Builds minutes of [Internal](../../../public_access/public_access.html#internal-projects) and [Private](../../../public_access/public_access.html#private-projects) projects are tracked.
+- Build minutes of [Public](../../../public_access/public_access.md#public-projects) projects are not counted towards the quota.
+- Builds minutes of [Internal](../../../public_access/public_access.md#internal-projects) and [Private](../../../public_access/public_access.md#private-projects) projects are tracked.
 
 ## Archive jobs **(CORE ONLY)**
 
