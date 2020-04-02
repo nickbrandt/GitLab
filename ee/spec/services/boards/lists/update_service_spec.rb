@@ -52,13 +52,6 @@ describe 'EE::Boards::Lists::UpdateService' do
         update_list_and_test_result(list, { max_issue_weight: 42 }, { max_issue_weight: 42 })
       end
 
-      it 'does not update the list if max_issue_count is nil' do
-        update_list_and_test_result(list,
-                                    { max_issue_count: nil },
-                                    { max_issue_count: 0 },
-                                    expected_service_result: :error)
-      end
-
       it 'does not update the list if max_issue_weight is nil' do
         update_list_and_test_result(list,
                                     { max_issue_weight: nil },
