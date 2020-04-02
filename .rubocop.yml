@@ -404,7 +404,6 @@ RSpec/RepeatedExample:
     - 'spec/lib/banzai/filter/autolink_filter_spec.rb'
     - 'spec/lib/gitlab/closing_issue_extractor_spec.rb'
     - 'spec/lib/gitlab/danger/changelog_spec.rb'
-    - 'spec/lib/gitlab/git/blob_spec.rb'
     - 'spec/lib/gitlab/import_export/project/relation_factory_spec.rb'
     - 'spec/models/ability_spec.rb'
     - 'spec/models/ci/build_spec.rb'
