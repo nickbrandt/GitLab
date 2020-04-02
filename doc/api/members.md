@@ -282,13 +282,14 @@ Example response:
 }
 ```
 
-### Override LDAP permissions for a member from a group
+### Set override flag for a member of a group
 
-Allows access level to be overriden for a LDAP group member
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4875) in GitLab 12.10.
 
->**Note:** This API endpoint is only available on 11.x Starter and above.
+By default, the access level of LDAP group members is set to the value specified
+by LDAP through Group Sync. You can allow access level overrides by calling this endpoint.
 
-```
+```plaintext
 POST /groups/:id/members/:user_id/override
 ```
 
@@ -317,13 +318,14 @@ Example response:
 }
 ```
 
-### Un-override LDAP permissions for a member from a group
+### Remove override for a member of a group
 
-Resets access level for a LDAP group member back to be level determined by the LDAP group
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4875) in GitLab 12.10.
 
->**Note:** This API endpoint is only available on 11.x Starter and above.
+Sets the override flag to false and allows LDAP Group Sync to reset the access
+level to the LDAP-prescribed value.
 
-```
+```plaintext
 DELETE /groups/:id/members/:user_id/override
 ```
 

@@ -14,7 +14,7 @@ module EE
           expose :is_using_seat, if: -> (_, options) { options[:show_seat_info] }
 
           expose :override,
-                 if: ->(member, options) { member.source_type == 'Namespace' && member.ldap? }
+                 if: ->(member, _) { member.source_type == 'Namespace' && member.ldap? }
         end
       end
     end
