@@ -1,3 +1,4 @@
+import { GlDeprecatedButton } from '@gitlab/ui';
 import Component from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { shallowMount, mount } from '@vue/test-utils';
 
@@ -37,7 +38,7 @@ describe('Event Item', () => {
     });
 
     it('uses the fallback icon class', () => {
-      expect(wrapper.props().iconStyle).toBe('ci-status-icon-success');
+      expect(wrapper.props().iconClass).toBe('ci-status-icon-success');
     });
 
     it('renders the action buttons tontainer', () => {
@@ -53,12 +54,12 @@ describe('Event Item', () => {
       actionButtons: [
         {
           iconName: 'pencil',
-          emit: 'fooEvent',
+          onClick: jest.fn(),
           title: 'Foo Action',
         },
         {
           iconName: 'remove',
-          emit: 'barEvent',
+          onClick: jest.fn(),
           title: 'Bar Action',
         },
       ],
@@ -77,12 +78,12 @@ describe('Event Item', () => {
     });
 
     it('renders the action buttons', () => {
-      expect(wrapper.findAll('.action-buttons > button').length).toBe(2);
+      expect(wrapper.findAll(GlDeprecatedButton).length).toBe(2);
       expect(wrapper).toMatchSnapshot();
     });
 
     it('emits the button events when clicked', () => {
-      const buttons = wrapper.findAll('.action-buttons > button');
+      const buttons = wrapper.findAll(GlDeprecatedButton);
       buttons.at(0).trigger('click');
       return wrapper.vm
         .$nextTick()
@@ -91,8 +92,8 @@ describe('Event Item', () => {
           return wrapper.vm.$nextTick();
         })
         .then(() => {
-          expect(wrapper.emitted().fooEvent.length).toEqual(1);
-          expect(wrapper.emitted().barEvent.length).toEqual(1);
+          expect(propsData.actionButtons[0].onClick).toHaveBeenCalledTimes(1);
+          expect(propsData.actionButtons[1].onClick).toHaveBeenCalledTimes(1);
         });
     });
   });
