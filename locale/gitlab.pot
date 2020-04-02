@@ -8222,6 +8222,9 @@ msgstr ""
 msgid "Error fetching network graph."
 msgstr ""
 
+msgid "Error fetching payload data."
+msgstr ""
+
 msgid "Error fetching projects"
 msgstr ""
 
@@ -8229,9 +8232,6 @@ msgid "Error fetching refs"
 msgstr ""
 
 msgid "Error fetching the dependency list. Please check your network connection and try again."
-msgstr ""
-
-msgid "Error fetching usage ping data."
 msgstr ""
 
 msgid "Error loading branch data. Please try again."
