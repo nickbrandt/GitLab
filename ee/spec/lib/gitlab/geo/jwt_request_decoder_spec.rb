@@ -62,15 +62,15 @@ describe Gitlab::Geo::JwtRequestDecoder do
   end
 
   describe '#valid_attributes?' do
-    it 'returns true when all informed attributes and decoded data are all the same' do
+    it 'returns true when all given attributes and decoded data are all the same' do
       expect(subject.valid_attributes?(input: 123, other_input: 'string value')).to be_truthy
     end
 
-    it 'returns true when informed attributes is a slice of decoded data' do
+    it 'returns true when given attributes is a slice of decoded data' do
       expect(subject.valid_attributes?(input: 123)).to be_truthy
     end
 
-    it 'returns false when one informed data doesnt match its corresponding decoded one' do
+    it 'returns false when one given data doesnt match its corresponding decoded one' do
       expect(subject.valid_attributes?(input: 123, other_input: 'wrong value')).to be_falsey
     end
   end
