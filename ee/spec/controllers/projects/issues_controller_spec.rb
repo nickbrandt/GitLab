@@ -10,7 +10,6 @@ describe Projects::IssuesController do
   describe 'POST export_csv' do
     let(:viewer)            { user }
     let(:issue)             { create(:issue, project: project) }
-    let(:globally_licensed) { false }
 
     before do
       project.add_developer(user)
@@ -18,26 +17,13 @@ describe Projects::IssuesController do
       sign_in(viewer) if viewer
 
       allow(License).to receive(:feature_available?).and_call_original
-      allow(License).to receive(:feature_available?).with(:export_issues).and_return(globally_licensed)
     end
 
     def request_csv
       post :export_csv, params: { namespace_id: project.namespace.to_param, project_id: project.to_param }
     end
 
-    context 'unlicensed' do
-      it 'returns 404' do
-        expect(ExportCsvWorker).not_to receive(:perform_async)
-
-        request_csv
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'globally licensed' do
-      let(:globally_licensed) { true }
-
       it 'allows CSV export' do
         expect(ExportCsvWorker).to receive(:perform_async).with(viewer.id, project.id, anything)
 
@@ -61,7 +47,6 @@ describe Projects::IssuesController do
     end
 
     context 'licensed by namespace' do
-      let(:globally_licensed) { true }
       let(:namespace) { create(:group, :private) }
       let!(:gitlab_subscriptions) { create(:gitlab_subscription, :bronze, namespace: namespace) }
       let(:project) { create(:project, namespace: namespace) }
