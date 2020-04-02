@@ -1,106 +1,77 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import AxiosMockAdapter from 'axios-mock-adapter';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdownItem } from '@gitlab/ui';
+import { monitoringDashboard } from '~/monitoring/stores';
 import PanelType from 'ee/monitoring/components/panel_type.vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
-import { createStore } from '~/monitoring/stores';
-import axios from '~/lib/utils/axios_utils';
 import { graphDataPrometheusQueryRange } from 'jest/monitoring/mock_data';
+
+const localVue = createLocalVue();
+
+localVue.use(Vuex);
 
 global.URL.createObjectURL = jest.fn();
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
-
 describe('Panel Type', () => {
-  let axiosMock;
-  let panelType;
   let store;
-  const exampleText = 'example_text';
+  let wrapper;
+
+  const setMetricsSavedToDb = val =>
+    monitoringDashboard.getters.metricsSavedToDb.mockReturnValue(val);
+  const findAlertsWidget = () => wrapper.find(AlertWidget);
+  const findMenuItemAlert = () =>
+    wrapper.findAll(GlDropdownItem).filter(i => i.text() === 'Alerts');
+
+  const mockPropsData = {
+    graphData: graphDataPrometheusQueryRange,
+    clipboardText: 'example_text',
+    alertsEndpoint: '/endpoint',
+    prometheusAlertsAvailable: true,
+  };
 
   const createWrapper = propsData => {
-    store = createStore();
-    panelType = shallowMount(PanelType, {
-      propsData,
+    wrapper = shallowMount(PanelType, {
+      propsData: {
+        ...mockPropsData,
+        ...propsData,
+      },
       store,
       localVue,
     });
   };
 
   beforeEach(() => {
-    axiosMock = new AxiosMockAdapter(axios);
-    window.gon = {
-      ...window.gon,
-      ee: true,
-    };
-  });
+    jest.spyOn(monitoringDashboard.getters, 'metricsSavedToDb').mockReturnValue([]);
 
-  afterEach(() => {
-    axiosMock.reset();
-  });
-
-  describe('metrics with alert', () => {
-    describe('with license', () => {
-      beforeEach(() => {
-        createWrapper({
-          clipboardText: exampleText,
-          graphData: graphDataPrometheusQueryRange,
-          alertsEndpoint: '/endpoint',
-          prometheusAlertsAvailable: true,
-        });
-      });
-
-      afterEach(() => {
-        panelType.destroy();
-      });
-
-      it('shows alert widget and dropdown item', done => {
-        localVue.nextTick(() => {
-          expect(panelType.find(AlertWidget).exists()).toBe(true);
-          expect(
-            panelType
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
-
-      it('shows More actions dropdown on chart', done => {
-        localVue.nextTick(() => {
-          expect(
-            panelType
-              .findAll(GlDropdown)
-              .filter(d => d.attributes('title') === 'More actions')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
+    store = new Vuex.Store({
+      modules: {
+        monitoringDashboard,
+      },
     });
+  });
 
-    describe('without license', () => {
+  describe('panel type alerts', () => {
+    describe.each`
+      desc                                           | metricsSavedToDb                                       | propsData                               | isShown
+      ${'with license and no metrics in db'}         | ${[]}                                                  | ${{}}                                   | ${false}
+      ${'with license and related metrics in db'}    | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{}}                                   | ${true}
+      ${'without license and related metrics in db'} | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{ prometheusAlertsAvailable: false }} | ${false}
+      ${'with license and unrelated metrics in db'}  | ${['another_metric_id']}                               | ${{}}                                   | ${false}
+    `('$desc', ({ metricsSavedToDb, isShown, propsData }) => {
+      const showsDesc = isShown ? 'shows' : 'does not show';
+
       beforeEach(() => {
-        createWrapper({
-          clipboardText: exampleText,
-          graphData: graphDataPrometheusQueryRange,
-          alertsEndpoint: '/endpoint',
-          prometheusAlertsAvailable: false,
-        });
+        setMetricsSavedToDb(metricsSavedToDb);
+        createWrapper(propsData);
+        return wrapper.vm.$nextTick();
       });
 
-      it('does not show alert widget', () => {
-        expect(panelType.find(AlertWidget).exists()).toBe(false);
-        expect(
-          panelType
-            .findAll(GlDropdownItem)
-            .filter(i => i.text() === 'Alerts')
-            .exists(),
-        ).toBe(false);
+      it(`${showsDesc} alert widget`, () => {
+        expect(findAlertsWidget().exists()).toBe(isShown);
+      });
+
+      it(`${showsDesc} alert configuration`, () => {
+        expect(findMenuItemAlert().exists()).toBe(isShown);
       });
     });
   });
