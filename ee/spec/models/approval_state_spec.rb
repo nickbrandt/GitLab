@@ -1585,8 +1585,22 @@ describe ApprovalState do
             merge_request.update!(target_branch: 'stable-1')
             source_rule.update!(protected_branches: [protected_branch])
             another_source_rule.update!(protected_branches: [another_protected_branch])
-            mr_rule.update!(approval_project_rule: another_source_rule)
-            another_mr_rule.update!(approval_project_rule: source_rule)
+
+            mr_rule.update!(
+              approval_project_rule: another_source_rule,
+              name: another_source_rule.name,
+              approvals_required: another_source_rule.approvals_required,
+              users: another_source_rule.users,
+              groups: another_source_rule.groups
+            )
+
+            another_mr_rule.update!(
+              approval_project_rule: source_rule,
+              name: source_rule.name,
+              approvals_required: source_rule.approvals_required,
+              users: source_rule.users,
+              groups: source_rule.groups
+            )
           end
 
           context 'and scoped_approval_rules feature is enabled' do
