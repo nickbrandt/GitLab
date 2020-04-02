@@ -5,13 +5,15 @@ module Geo
     include ExclusiveLeaseGuard
     include ::Gitlab::Geo::LogHelpers
 
-    attr_reader :replicable_name, :blob_id, :decoded_params, :replicator
+    attr_reader :replicable_name, :blob_id, :checksum, :replicator
 
     def initialize(replicable_name:, blob_id:, decoded_params:)
       @replicable_name = replicable_name
       @blob_id = blob_id
-      @decoded_params = decoded_params
-      @replicator = Gitlab::Geo::Replicator.for_replicable_name(params[:replicable_name])
+      @checksum = decoded_params.delete(:checksum)
+
+      replicator_klass = Gitlab::Geo::Replicator.for_replicable_name(replicable_name)
+      @replicator = replicator_klass.new(model_record_id: blob_id)
 
       fail_unimplemented!(replicable_name) unless @replicator
     end
@@ -21,7 +23,7 @@ module Geo
     end
 
     def retriever
-      retriever = Gitlab::Geo::Replication::BlobRetriever.new(replicable_name, blob_id)
+      Gitlab::Geo::Replication::BlobRetriever.new(replicator: replicator, checksum: checksum)
     end
 
     private

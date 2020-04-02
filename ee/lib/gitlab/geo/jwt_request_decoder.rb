@@ -19,7 +19,7 @@ module Gitlab
         @auth_header = auth_header
       end
 
-      # Return decoded attributes from informed header
+      # Return decoded attributes from given header
       #
       # @return [Hash] decoded attributes
       def decode
