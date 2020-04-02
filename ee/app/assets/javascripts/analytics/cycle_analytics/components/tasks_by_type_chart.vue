@@ -20,10 +20,6 @@ export default {
       type: Object,
       required: true,
     },
-    labels: {
-      type: Array,
-      required: true,
-    },
   },
   computed: {
     hasData() {
@@ -69,7 +65,6 @@ export default {
       <div v-if="hasData">
         <p>{{ summaryDescription }}</p>
         <tasks-by-type-filters
-          :labels="labels"
           :selected-label-ids="filters.selectedLabelIds"
           :subject-filter="selectedSubjectFilter"
           @updateFilter="$emit('updateFilter', $event)"

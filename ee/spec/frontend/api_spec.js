@@ -537,7 +537,8 @@ describe('Api', () => {
     describe('cycleAnalyticsGroupLabels', () => {
       it('fetches group level labels', done => {
         const response = [];
-        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/labels`;
+        const expectedUrl = `${dummyUrlRoot}/groups/${groupId}/-/labels.json`;
+
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsGroupLabels(groupId)

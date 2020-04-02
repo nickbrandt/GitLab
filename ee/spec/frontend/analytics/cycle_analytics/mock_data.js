@@ -18,7 +18,7 @@ const fixtureEndpoints = {
 };
 
 export const endpoints = {
-  groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/labels/,
+  groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/-\/labels.json/,
   summaryData: /analytics\/value_stream_analytics\/summary/,
   durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
   stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,

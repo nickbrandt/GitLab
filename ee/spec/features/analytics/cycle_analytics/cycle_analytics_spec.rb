@@ -4,14 +4,16 @@ require 'spec_helper'
 describe 'Group Value Stream Analytics', :js do
   include DragTo
 
-  let!(:user) { create(:user) }
-  let!(:group) { create(:group, name: "CA-test-group") }
-  let!(:sub_group) { create(:group, name: "CA-sub-group", parent: group) }
-  let!(:group2) { create(:group, name: "CA-bad-test-group") }
-  let!(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
-  let!(:label) { create(:group_label, group: group) }
-  let!(:label2) { create(:group_label, group: group) }
-  let!(:label3) { create(:group_label, group: group2) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group, name: "CA-test-group") }
+  let_it_be(:sub_group) { create(:group, name: "CA-sub-group", parent: group) }
+  let_it_be(:group2) { create(:group, name: "CA-bad-test-group") }
+  let_it_be(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
+  let_it_be(:group_label1) { create(:group_label, group: group) }
+  let_it_be(:group_label2) { create(:group_label, group: group) }
+  let_it_be(:label) { create(:group_label, group: group2) }
+  let_it_be(:sub_group_label1) { create(:group_label, group: sub_group) }
+  let_it_be(:sub_group_label2) { create(:group_label, group: sub_group) }
 
   let(:milestone) { create(:milestone, project: project) }
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
@@ -20,7 +22,7 @@ describe 'Group Value Stream Analytics', :js do
   stage_nav_selector = '.stage-nav'
 
   3.times do |i|
-    let!("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
+    let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
 
   shared_examples 'empty state' do
@@ -268,7 +270,7 @@ describe 'Group Value Stream Analytics', :js do
   end
 
   context 'with lots of data', :js do
-    let!(:issue) { create(:issue, project: project, created_at: 5.days.ago) }
+    let_it_be(:issue) { create(:issue, project: project, created_at: 5.days.ago) }
 
     around do |example|
       Timecop.freeze { example.run }
@@ -350,8 +352,8 @@ describe 'Group Value Stream Analytics', :js do
       context 'with data available' do
         before do
           3.times do |i|
-            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label])
-            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label2])
+            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [group_label1])
+            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [group_label2])
           end
 
           visit analytics_cycle_analytics_path
@@ -436,8 +438,17 @@ describe 'Group Value Stream Analytics', :js do
       page.find("select[name='#{name}']").find("#{elem}[value=#{value}]").select_option
     end
 
+    def wait_for_labels(field)
+      page.within("[name=#{field}]") do
+        find('.dropdown-toggle').click
+
+        wait_for_requests
+
+        expect(find('.dropdown-menu')).to have_selector('.dropdown-item')
+      end
+    end
+
     def select_dropdown_label(field, index = 2)
-      page.find("[name=#{field}] .dropdown-toggle").click
       page.find("[name=#{field}] .dropdown-menu").all('.dropdown-item')[index].click
     end
 
@@ -626,24 +637,30 @@ describe 'Group Value Stream Analytics', :js do
               expect(page).to have_button('Add stage', disabled: true)
             end
 
-            it 'does not contain labels from outside the group' do
-              field = 'custom-stage-start-event-label'
-              page.find("[name=#{field}] .dropdown-toggle").click
+            context 'with labels available' do
+              start_field = "custom-stage-start-event-label"
+              end_field = "custom-stage-stop-event-label"
 
-              menu = page.find("[name=#{field}] .dropdown-menu")
+              it 'does not contain labels from outside the group' do
+                wait_for_labels(start_field)
+                menu = page.find("[name=#{start_field}] .dropdown-menu")
 
-              expect(menu).not_to have_content(label3.name)
-              expect(menu).to have_content(label.name)
-              expect(menu).to have_content(label2.name)
-            end
-
-            context 'with all required fields set' do
-              before do
-                select_dropdown_label 'custom-stage-start-event-label', 1
-                select_dropdown_label 'custom-stage-stop-event-label', 2
+                expect(menu).not_to have_content(other_label.name)
+                expect(menu).to have_content(first_label.name)
+                expect(menu).to have_content(second_label.name)
               end
 
-              it_behaves_like 'submits the form successfully', custom_stage_with_labels_name
+              context 'with all required fields set' do
+                before do
+                  wait_for_labels(start_field)
+                  select_dropdown_label start_field, 1
+
+                  wait_for_labels(end_field)
+                  select_dropdown_label end_field, 2
+                end
+
+                it_behaves_like 'submits the form successfully', custom_stage_with_labels_name
+              end
             end
           end
         end
@@ -725,7 +742,11 @@ describe 'Group Value Stream Analytics', :js do
             select_group
           end
 
-          it_behaves_like 'can create custom stages'
+          it_behaves_like 'can create custom stages' do
+            let(:first_label) { group_label1 }
+            let(:second_label) { group_label2 }
+            let(:other_label) { label }
+          end
         end
 
         context 'with a custom stage created' do
@@ -746,7 +767,11 @@ describe 'Group Value Stream Analytics', :js do
             select_group(sub_group.full_name)
           end
 
-          it_behaves_like 'can create custom stages'
+          it_behaves_like 'can create custom stages' do
+            let(:first_label) { sub_group_label1 }
+            let(:second_label) { sub_group_label2 }
+            let(:other_label) { label }
+          end
         end
 
         context 'with a custom stage created' do
