@@ -87,7 +87,7 @@ NOTE: **Note:**
 The following page has the same functionalities both in the **Group level container registry**
 and in the **Project level container registry**.
 
-This view will:
+This view:
 
 - Show all the **Image Repository** details
 - Show all the tags of the **Image Repository**
