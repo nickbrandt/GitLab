@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import createDiff from './create_diff';
 import { getWebSocketUrl, mergeUrlParams } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
@@ -9,6 +8,8 @@ export const MSG_CONNECTION_ERROR = __('Could not connect to Web IDE file mirror
 
 // Before actually connecting to the service, we must delay a bit
 // so that the service has sufficiently started.
+
+const noop = () => {};
 export const SERVICE_DELAY = 8000;
 
 const cancellableWait = time => {
@@ -62,12 +63,12 @@ export const canConnect = ({ services = [] }) => services.some(name => name === 
 
 export const createMirror = () => {
   let socket = null;
-  let cancelHandler = _.noop;
-  let nextMessageHandler = _.noop;
+  let cancelHandler = noop;
+  let nextMessageHandler = noop;
 
   const cancelConnect = () => {
     cancelHandler();
-    cancelHandler = _.noop;
+    cancelHandler = noop;
   };
 
   const onCancelConnect = fn => {
@@ -76,7 +77,7 @@ export const createMirror = () => {
 
   const receiveMessage = ev => {
     const handle = nextMessageHandler;
-    nextMessageHandler = _.noop;
+    nextMessageHandler = noop;
     handle(JSON.parse(ev.data));
   };
 
