@@ -19,7 +19,7 @@ describe('mediator', () => {
 
   beforeEach(() => {
     store = createStore();
-    spyOn(store, 'dispatch');
+    jest.spyOn(store, 'dispatch').mockImplementation(() => {});
   });
 
   it('triggers fetching vulnerabilities after one filter changes', () => {

@@ -1,13 +1,18 @@
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import createState from 'ee/security_dashboard/store/modules/filters/state';
 import * as types from 'ee/security_dashboard/store/modules/filters/mutation_types';
-import module, * as actions from 'ee/security_dashboard/store/modules/filters/actions';
+import * as actions from 'ee/security_dashboard/store/modules/filters/actions';
 import { ALL } from 'ee/security_dashboard/store/modules/filters/constants';
 import Tracking from '~/tracking';
+import { getParameterValues } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility', () => ({
+  getParameterValues: jest.fn().mockReturnValue([]),
+}));
 
 describe('filters actions', () => {
   beforeEach(() => {
-    spyOn(Tracking, 'event');
+    jest.spyOn(Tracking, 'event').mockImplementation(() => {});
   });
 
   describe('setFilter', () => {
@@ -85,7 +90,7 @@ describe('filters actions', () => {
           },
           {
             type: types.SET_FILTER,
-            payload: jasmine.objectContaining({
+            payload: expect.objectContaining({
               filterId: 'project_id',
               optionId: ALL,
             }),
@@ -164,7 +169,7 @@ describe('filters actions', () => {
       },
     ].forEach(testCase => {
       it(testCase.description, done => {
-        spyOnDependency(module, 'getParameterValues').and.returnValue(testCase.returnValue);
+        getParameterValues.mockReturnValue(testCase.returnValue);
         const state = createState();
         testAction(
           actions.setHideDismissedToggleInitialState,
