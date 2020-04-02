@@ -49,7 +49,7 @@ project:
 ## Control Container Registry from within GitLab
 
 GitLab offers a simple Container Registry management panel. This management panel is available
-both for projects and groups.
+for both projects and groups.
 
 ### Control Container Registry for your project
 
