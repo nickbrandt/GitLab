@@ -64,31 +64,31 @@ associated Pages domain. It also will be renewed automatically by GitLab.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/30146) in GitLab 13.0.
 
-If you get an error **Something went wrong while obtaining Let's Encrypt certificate** you can retry obtaining the certificate following these steps:
+If you get an error **Something went wrong while obtaining Let's Encrypt certificate**, you can try obtaining the certificate again by following these steps:
 
 1. Go to your project's **Settings > Pages**.
 1. Click **Edit** on your domain.
 1. Click **Retry**.
 1. If you're still seeing the same error:
     1. Make sure you have properly set only one `CNAME` or `A` DNS record for your domain.
-    1. Make sure your domain **doesn't have** `AAAA` DNS record.
-    1. If you have `CAA` DNS record for your domain or any higher level domains make sure [it includes `letsencrypt.org`](https://letsencrypt.org/docs/caa/).
+    1. Make sure your domain **doesn't have** an `AAAA` DNS record.
+    1. If you have a `CAA` DNS record for your domain or any higher level domains, make sure [it includes `letsencrypt.org`](https://letsencrypt.org/docs/caa/).
     1. Make sure [your domain is verified](index.md#1-add-a-custom-domain-to-pages).
-    1. Go to the step 1.
+    1. Go to step 1.
 
 ### Message "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later." hangs for more than an hour
 
-If you've enabled Let's Encrypt integration, but certificate is absent after an hour and you see message "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later.", try to remove and add domain for GitLab Pages again following these steps:
+If you've enabled Let's Encrypt integration, but a certificate is absent after an hour and you see the message, "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later.", try to remove and add the domain for GitLab Pages again by following these steps:
 
 1. Go to your project's **Settings > Pages**.
 1. Click **Remove** on your domain.
-1. [Add domain again and verify it](index.md#1-add-a-custom-domain-to-pages)
-1. [Enable Let's Encrypt integration for your domain](#enabling-lets-encrypt-integration-for-your-custom-domain)
+1. [Add the domain again and verify it](index.md#1-add-a-custom-domain-to-pages).
+1. [Enable Let's Encrypt integration for your domain](#enabling-lets-encrypt-integration-for-your-custom-domain).
 1. If you still see the same message after some time:
     1. Make sure you have properly set only one `CNAME` or `A` DNS record for your domain.
-    1. Make sure your domain **doesn't have** `AAAA` DNS record.
-    1. If you have `CAA` DNS record for your domain or any higher level domains make sure [it includes `letsencrypt.org`](https://letsencrypt.org/docs/caa/).
-    1. Go to the step 1.
+    1. Make sure your domain **doesn't have** an `AAAA` DNS record.
+    1. If you have a `CAA` DNS record for your domain or any higher level domains, make sure [it includes `letsencrypt.org`](https://letsencrypt.org/docs/caa/).
+    1. Go to step 1.
 
 <!-- Include any troubleshooting steps that you can foresee. If you know beforehand what issues
 one might have when setting this up, or when something is changed, or on upgrading, it's
