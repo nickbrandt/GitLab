@@ -23,6 +23,7 @@ describe API::Terraform::State do
   describe 'GET /projects/:id/terraform/state/:name' do
     it 'returns 401 if user is not authenticated' do
       headers = { 'HTTP_AUTHORIZATION' => 'failing_token' }
+
       get api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: headers
 
       expect(response).to have_gitlab_http_status(:unauthorized)
@@ -43,6 +44,7 @@ describe API::Terraform::State do
 
     it 'returns forbidden if the user cannot access the state' do
       project.add_developer(developer)
+
       get api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: auth_header_for(developer)
 
       expect(response).to have_gitlab_http_status(:forbidden)
@@ -62,7 +64,8 @@ describe API::Terraform::State do
 
       it 'returns forbidden if the user cannot access the state' do
         project.add_developer(developer)
-        get api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: auth_header_for(developer)
+
+        post api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: auth_header_for(developer)
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
@@ -89,7 +92,8 @@ describe API::Terraform::State do
 
     it 'returns forbidden if the user cannot access the state' do
       project.add_developer(developer)
-      get api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: auth_header_for(developer)
+
+      delete api("/projects/#{project.id}/terraform/state/#{state_name}"), headers: auth_header_for(developer)
 
       expect(response).to have_gitlab_http_status(:forbidden)
     end
