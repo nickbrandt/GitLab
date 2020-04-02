@@ -53,7 +53,7 @@ both for projects and groups.
 
 ### Control Container Registry for your project
 
-Go to your project and click **Packages > Container Registry** in the project menu.
+Navigate to your project's **{package}** **Packages > Container Registry**.
 
 ![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v12_10.png)
 
