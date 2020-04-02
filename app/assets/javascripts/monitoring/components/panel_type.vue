@@ -209,7 +209,6 @@ export default {
         data-qa-selector="prometheus_graph_widgets"
       >
         <div class="d-flex align-items-center">
-          <!--  -->
           <alert-widget
             v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"

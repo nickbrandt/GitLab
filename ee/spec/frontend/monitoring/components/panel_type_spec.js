@@ -1,6 +1,7 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
+import { monitoringDashboard } from '~/monitoring/stores';
 import PanelType from 'ee/monitoring/components/panel_type.vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import { graphDataPrometheusQueryRange } from 'jest/monitoring/mock_data';
@@ -12,9 +13,11 @@ localVue.use(Vuex);
 global.URL.createObjectURL = jest.fn();
 
 describe('Panel Type', () => {
+  let store;
   let wrapper;
-  let metricsSavedToDbValue;
 
+  const setMetricsSavedToDb = val =>
+    monitoringDashboard.getters.metricsSavedToDb.mockReturnValue(val);
   const findAlertsWidget = () => wrapper.find(AlertWidget);
   const findMenuItemAlert = () =>
     wrapper.findAll(GlDropdownItem).filter(i => i.text() === 'Alerts');
@@ -27,17 +30,6 @@ describe('Panel Type', () => {
   };
 
   const createWrapper = propsData => {
-    const store = new Vuex.Store({
-      modules: {
-        monitoringDashboard: {
-          namespaced: true,
-          getters: {
-            metricsSavedToDb: jest.fn().mockReturnValue(metricsSavedToDbValue),
-          },
-        },
-      },
-    });
-
     wrapper = shallowMount(PanelType, {
       propsData: {
         ...mockPropsData,
@@ -48,70 +40,38 @@ describe('Panel Type', () => {
     });
   };
 
+  beforeEach(() => {
+    jest.spyOn(monitoringDashboard.getters, 'metricsSavedToDb').mockReturnValue([]);
+
+    store = new Vuex.Store({
+      modules: {
+        monitoringDashboard,
+      },
+    });
+  });
+
   describe('panel type alerts', () => {
-    describe('with license and no metrics in db', () => {
+    describe.each`
+      desc                                           | metricsSavedToDb                                       | propsData                               | isShown
+      ${'with license and no metrics in db'}         | ${[]}                                                  | ${{}}                                   | ${false}
+      ${'with license and related metrics in db'}    | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{}}                                   | ${true}
+      ${'without license and related metrics in db'} | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{ prometheusAlertsAvailable: false }} | ${false}
+      ${'with license and unrelated metrics in db'}  | ${['another_metric_id']}                               | ${{}}                                   | ${false}
+    `('$desc', ({ metricsSavedToDb, isShown, propsData }) => {
+      const showsDesc = isShown ? 'shows' : 'does not show';
+
       beforeEach(() => {
-        metricsSavedToDbValue = [];
-        createWrapper();
+        setMetricsSavedToDb(metricsSavedToDb);
+        createWrapper(propsData);
         return wrapper.vm.$nextTick();
       });
 
-      it('does not show an alert widget', () => {
-        expect(findAlertsWidget().exists()).toBe(false);
+      it(`${showsDesc} alert widget`, () => {
+        expect(findAlertsWidget().exists()).toBe(isShown);
       });
 
-      it('does not show menu for alert configuration', () => {
-        expect(findMenuItemAlert().exists()).toBe(false);
-      });
-    });
-
-    describe('with license and related metrics in db', () => {
-      beforeEach(() => {
-        metricsSavedToDbValue = [graphDataPrometheusQueryRange.metrics[0].metricId];
-        createWrapper();
-        return wrapper.vm.$nextTick();
-      });
-
-      it('shows an alert widget', () => {
-        expect(findAlertsWidget().exists()).toBe(true);
-      });
-
-      it('shows menu for alert configuration', () => {
-        expect(findMenuItemAlert().exists()).toBe(true);
-      });
-    });
-
-    describe('with license and unrelated metrics in db', () => {
-      beforeEach(() => {
-        metricsSavedToDbValue = ['another_metric_id'];
-        createWrapper();
-        return wrapper.vm.$nextTick();
-      });
-
-      it('does not show an alert widget', () => {
-        expect(findAlertsWidget().exists()).toBe(false);
-      });
-
-      it('does not show menu for alert configuration', () => {
-        expect(findMenuItemAlert().exists()).toBe(false);
-      });
-    });
-
-    describe('without license and metrics in db', () => {
-      beforeEach(() => {
-        metricsSavedToDbValue = [graphDataPrometheusQueryRange.metrics[0].metricId];
-        createWrapper({
-          prometheusAlertsAvailable: false,
-        });
-        return wrapper.vm.$nextTick();
-      });
-
-      it('does not show an alert widget', () => {
-        expect(findAlertsWidget().exists()).toBe(false);
-      });
-
-      it('does not show menu for alert configuration', () => {
-        expect(findMenuItemAlert().exists()).toBe(false);
+      it(`${showsDesc} alert configuration`, () => {
+        expect(findMenuItemAlert().exists()).toBe(isShown);
       });
     });
   });
