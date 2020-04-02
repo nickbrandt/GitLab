@@ -20,7 +20,11 @@ import {
   designDeletionError,
 } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
-import { designUploadOptimisticResponse } from '../utils/design_management_utils';
+import {
+  designUploadOptimisticResponse,
+  isValidDesignFile,
+} from '../utils/design_management_utils';
+import { getFilename } from '~/lib/utils/file_upload';
 import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
@@ -92,6 +96,9 @@ export default {
         ? s__('DesignManagement|Deselect all')
         : s__('DesignManagement|Select all');
     },
+  },
+  mounted() {
+    this.toggleOnPasteListener(this.$route.name);
   },
   methods: {
     resetFilesToBeSaved() {
@@ -215,9 +222,34 @@ export default {
 
       this.onUploadDesign(files);
     },
+    onDesignPaste(event) {
+      const { clipboardData } = event;
+      const files = Array.from(clipboardData.files);
+      if (clipboardData && files.length > 0) {
+        if (!files.some(isValidDesignFile)) {
+          return;
+        }
+        event.preventDefault();
+        const filename = getFilename(event) || 'image.png';
+        const newFile = new File([files[0]], filename);
+        this.onUploadDesign([newFile]);
+      }
+    },
+    toggleOnPasteListener(route) {
+      if (route === DESIGNS_ROUTE_NAME) {
+        document.addEventListener('paste', this.onDesignPaste);
+      } else {
+        document.removeEventListener('paste', this.onDesignPaste);
+      }
+    },
   },
   beforeRouteUpdate(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     this.selectedDesigns = [];
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     next();
   },
 };
