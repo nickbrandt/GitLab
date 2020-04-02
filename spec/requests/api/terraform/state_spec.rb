@@ -98,4 +98,22 @@ describe API::Terraform::State do
       expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
+
+  describe 'PUT /projects/:id/terraform/state/:name/lock' do
+    it 'locks the terraform state' do
+      put api("/projects/#{project.id}/terraform/state/#{state_name}/lock?ID=123-456"), headers: auth_header_for(maintainer)
+
+      expect(response).to have_gitlab_http_status(:not_implemented)
+      expect(response.body).to include('LOCK not implemented')
+    end
+  end
+
+  describe 'DELETE /projects/:id/terraform/state/:name/lock' do
+    it 'remove the terraform state lock' do
+      delete api("/projects/#{project.id}/terraform/state/#{state_name}/lock?ID=123-456"), headers: auth_header_for(maintainer)
+
+      expect(response).to have_gitlab_http_status(:not_implemented)
+      expect(response.body).to include('LOCK not implemented')
+    end
+  end
 end

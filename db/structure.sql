@@ -6134,7 +6134,11 @@ CREATE TABLE public.terraform_states (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     file_store smallint,
-    file character varying(255)
+    file character varying(255),
+    lock_xid character varying(255),
+    locked_at timestamp with time zone,
+    locked_by_id bigint,
+    name character varying(255)
 );
 
 CREATE SEQUENCE public.terraform_states_id_seq
@@ -10232,7 +10236,11 @@ CREATE INDEX index_term_agreements_on_term_id ON public.term_agreements USING bt
 
 CREATE INDEX index_term_agreements_on_user_id ON public.term_agreements USING btree (user_id);
 
+CREATE INDEX index_terraform_states_on_locked_by_id ON public.terraform_states USING btree (locked_by_id);
+
 CREATE INDEX index_terraform_states_on_project_id ON public.terraform_states USING btree (project_id);
+
+CREATE UNIQUE INDEX index_terraform_states_on_project_id_and_name ON public.terraform_states USING btree (project_id, name);
 
 CREATE INDEX index_timelogs_on_issue_id ON public.timelogs USING btree (issue_id);
 
@@ -11792,6 +11800,9 @@ ALTER TABLE ONLY public.resource_label_events
 ALTER TABLE ONLY public.packages_build_infos
     ADD CONSTRAINT fk_rails_b18868292d FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT fk_rails_b1c810a8d8 FOREIGN KEY (locked_by_id) REFERENCES public.users(id);
+
 ALTER TABLE ONLY public.merge_trains
     ADD CONSTRAINT fk_rails_b29261ce31 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
@@ -13157,7 +13168,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200402123926
 20200402124802
 20200402135250
+20200402171949
 20200402185044
+20200403095403
 20200403184110
 20200403185127
 20200403185422

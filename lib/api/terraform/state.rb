@@ -30,12 +30,31 @@ module API
             body 'not implemented'
           end
 
-          desc 'Delete a terraform state of certain name'
+          desc 'Delete a terraform state of a certain name'
           route_setting :authentication, basic_auth_personal_access_token: true
           delete do
             status 501
             content_type 'text/plain'
             body 'not implemented'
+          end
+
+          desc 'Lock a terraform state of a certain name'
+          route_setting :authentication, basic_auth_personal_access_token: true
+          params do
+            optional :ID, type: String, desc: 'Terraform state lock ID'
+          end
+          put '/lock' do
+            status 501
+            content_type 'text/plain'
+            body 'LOCK not implemented'
+          end
+
+          desc 'Unlock a terraform state of a certain name'
+          route_setting :authentication, basic_auth_personal_access_token: true
+          delete '/lock' do
+            status 501
+            content_type 'text/plain'
+            body 'UNLOCK not implemented'
           end
         end
       end
