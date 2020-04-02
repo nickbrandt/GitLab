@@ -73,9 +73,9 @@ Navigate to your groups's **{package}** **Packages > Container Registry**.
 
 This view will:
 
-- Show all the **Image Repositories** that belong to all the project belonging to this group
-- Allow to [delete](#delete-images-from-within-gitlab) one or more **Image Repository**
-- Allow to navigate to the **Image repository** details page
+- Show all the image repositories of the projects that belong to this group.
+- Allow to [delete](#delete-images-from-within-gitlab) one or more image repositories.
+- Allow to navigate to a specific image repository details page.
 
 ### Image Repository details page
 
