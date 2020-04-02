@@ -5,8 +5,12 @@ module QA
     module Page
       module Admin
         module Menu
-          def self.prepended(page)
-            page.module_eval do
+          extend QA::Page::PageConcern
+
+          def self.prepended(base)
+            super
+
+            base.class_eval do
               view 'app/views/layouts/nav/sidebar/_admin.html.haml' do
                 element :admin_settings_template_item
               end
