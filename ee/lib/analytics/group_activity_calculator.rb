@@ -21,11 +21,11 @@ module Analytics
 
     def new_members_count
       @new_members_count ||=
-        GroupMembersFinder.new(@group, @current_user)
-          .execute(
-            include_relations: [:direct, :descendants],
-            params: { created_after: DURATION.ago }
-          ).count
+        GroupMembersFinder.new(
+          @group,
+          @current_user,
+          params: { created_after: DURATION.ago }
+        ).execute(include_relations: [:direct, :descendants]).count
     end
 
     private
