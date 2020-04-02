@@ -89,10 +89,10 @@ and in the **Project level container registry**.
 
 This view:
 
-- Show all the **Image Repository** details
-- Show all the tags of the **Image Repository**
-- Allow to quickly copy the tag path ( by clicking on the clipboard button near the tag name)
-- Allow to [delete one or more tags](#delete-images-from-within-gitlab)
+- Shows all the image repository details.
+- Shows all the tags of the image repository.
+- Allows you to quickly copy the tag path (by clicking on the clipboard button near the tag name).
+- Allows you to [delete one or more tags](#delete-images-from-within-gitlab).
 
 ## Use images from GitLab Container Registry
 
