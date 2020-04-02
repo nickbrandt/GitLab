@@ -38,6 +38,7 @@ const defaultStubs = {
   'stage-event-list': true,
   'stage-nav-item': true,
   'tasks-by-type-chart': true,
+  'labels-selector': true,
 };
 
 function createComponent({
@@ -383,7 +384,6 @@ describe('Cycle Analytics component', () => {
 
       describe('with tasksByTypeChart=true', () => {
         beforeEach(() => {
-          mock = new MockAdapter(axios);
           wrapper = createComponent({
             shallow: false,
             withStageSelected: true,
@@ -394,7 +394,6 @@ describe('Cycle Analytics component', () => {
 
         afterEach(() => {
           wrapper.destroy();
-          mock.restore();
         });
 
         it('displays the tasks by type chart', () => {
@@ -445,11 +444,6 @@ describe('Cycle Analytics component', () => {
           status: defaultStatus,
           endpoint: mockData.endpoints.baseStagesEndpoint,
           response: { ...mockData.customizableStagesAndEvents },
-        },
-        fetchGroupLabels: {
-          status: defaultStatus,
-          endpoint: mockData.endpoints.groupLabels,
-          response: [...mockData.groupLabels],
         },
         ...overrides,
       };
@@ -521,24 +515,6 @@ describe('Cycle Analytics component', () => {
 
       return selectGroupAndFindError(
         'There was an error while fetching value stream analytics summary data.',
-      );
-    });
-
-    it('will display an error if the fetchGroupLabels request fails', () => {
-      expect(findFlashError()).toBeNull();
-
-      mockRequestCycleAnalyticsData({
-        overrides: {
-          fetchGroupLabels: {
-            endpoint: mockData.endpoints.groupLabels,
-            status: httpStatusCodes.NOT_FOUND,
-            response: { response: { status: httpStatusCodes.NOT_FOUND } },
-          },
-        },
-      });
-
-      return selectGroupAndFindError(
-        'There was an error fetching label data for the selected group',
       );
     });
 

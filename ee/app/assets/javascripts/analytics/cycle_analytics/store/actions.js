@@ -132,7 +132,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
-    .then(() => dispatch('fetchGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
@@ -206,29 +205,6 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
-
-export const receiveGroupLabelsSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
-
-export const receiveGroupLabelsError = ({ commit }, error) => {
-  commit(types.RECEIVE_GROUP_LABELS_ERROR, error);
-  createFlash(__('There was an error fetching label data for the selected group'));
-};
-
-export const requestGroupLabels = ({ commit }) => commit(types.REQUEST_GROUP_LABELS);
-
-export const fetchGroupLabels = ({ dispatch, state }) => {
-  dispatch('requestGroupLabels');
-  const {
-    selectedGroup: { fullPath, parentId = null },
-  } = state;
-
-  return Api.cycleAnalyticsGroupLabels(parentId || fullPath)
-    .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
-    );
-};
 
 export const receiveTopRankedGroupLabelsSuccess = ({ commit, dispatch }, data) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);

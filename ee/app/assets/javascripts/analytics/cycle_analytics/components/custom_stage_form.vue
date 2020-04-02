@@ -72,10 +72,6 @@ export default {
       type: Array,
       required: true,
     },
-    labels: {
-      type: Array,
-      required: true,
-    },
     initialFields: {
       type: Object,
       required: false,
@@ -326,8 +322,7 @@ export default {
           :invalid-feedback="fieldErrorMessage('startEventLabelId')"
         >
           <labels-selector
-            :labels="labels"
-            :selected-label-id="fields.startEventLabelId"
+            :selected-label-id="[fields.startEventLabelId]"
             name="custom-stage-start-event-label"
             @selectLabel="handleSelectLabel('startEventLabelId', $event)"
             @clearLabel="handleClearLabel('startEventLabelId')"
@@ -363,8 +358,7 @@ export default {
           :invalid-feedback="fieldErrorMessage('endEventLabelId')"
         >
           <labels-selector
-            :labels="labels"
-            :selected-label-id="fields.endEventLabelId"
+            :selected-label-id="[fields.endEventLabelId]"
             name="custom-stage-stop-event-label"
             @selectLabel="handleSelectLabel('endEventLabelId', $event)"
             @clearLabel="handleClearLabel('endEventLabelId')"

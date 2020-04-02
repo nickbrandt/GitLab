@@ -22,7 +22,7 @@ export default {
   cycleAnalyticsStagePath: '/-/analytics/value_stream_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath:
     '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
-  cycleAnalyticsGroupLabelsPath: '/api/:version/groups/:namespace_path/labels',
+  cycleAnalyticsGroupLabelsPath: '/groups/:namespace_path/-/labels.json',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
   groupActivityIssuesPath: '/api/:version/analytics/group_activity/issues_count',
   groupActivityMergeRequestsPath: '/api/:version/analytics/group_activity/merge_requests_count',
@@ -200,7 +200,7 @@ export default {
     });
   },
 
-  cycleAnalyticsGroupLabels(groupId, params = {}) {
+  cycleAnalyticsGroupLabels(groupId, params = { search: null }) {
     // TODO: This can be removed when we resolve the labels endpoint
     // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25746
     const url = Api.buildUrl(this.cycleAnalyticsGroupLabelsPath).replace(

@@ -65,7 +65,6 @@ export default {
       'selectedStage',
       'stages',
       'summary',
-      'labels',
       'topRankedLabels',
       'currentStageEvents',
       'customStageFormEvents',
@@ -302,7 +301,6 @@ export default {
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :custom-stage-form-errors="customStageFormErrors"
-            :labels="labels"
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
@@ -350,7 +348,6 @@ export default {
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
-              :labels="labels"
               @updateFilter="setTasksByTypeFilters"
             />
           </div>
