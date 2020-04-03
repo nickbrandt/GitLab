@@ -1,4 +1,5 @@
 <script>
+import { escape } from 'lodash';
 import {
   GlDropdown,
   GlDropdownDivider,
@@ -74,7 +75,7 @@ export default {
       return sprintf(
         s__('ClusterIntegration|Use %{query}'),
         {
-          query: `<code>${this.searchQuery}</code>`,
+          query: `<code>${escape(this.searchQuery)}</code>`,
         },
         false,
       );
