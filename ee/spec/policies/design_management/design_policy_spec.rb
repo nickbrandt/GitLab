@@ -99,19 +99,9 @@ describe DesignManagement::DesignPolicy do
     it { is_expected.to be_disallowed(:create_design, :destroy_design) }
   end
 
-  context "when the license does not include the feature" do
+  context "when DesignManagement is not enabled" do
     before do
-      stub_licensed_features(design_management: false)
-      allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
-    end
-
-    it_behaves_like "design abilities not available"
-  end
-
-  context "when LFS is not enabled" do
-    before do
-      stub_licensed_features(design_management: true)
-      allow(Gitlab.config.lfs).to receive(:enabled).and_return(false)
+      enable_design_management(false)
     end
 
     it_behaves_like "design abilities not available"

@@ -63,7 +63,6 @@ class License < ApplicationRecord
     default_project_deletion_protection
     dependency_proxy
     deploy_board
-    design_management
     disable_name_update_for_users
     email_additional_text
     epics
