@@ -251,20 +251,6 @@ describe Gitlab::UsageData, :aggregate_failures do
           expect(described_class.distinct_count(relation, fallback: 15, batch: false)).to eq(15)
         end
       end
-
-      describe '#alt_usage_data' do
-        it 'returns the fallback when it gets an error' do
-          expect(described_class.alt_usage_data { raise StandardError } ).to eq(-1)
-        end
-
-        it 'returns the evaluated block when give' do
-          expect(described_class.alt_usage_data { Gitlab::CurrentSettings.uuid } ).to eq(Gitlab::CurrentSettings.uuid)
-        end
-
-        it 'returns the value when given' do
-          expect(described_class.alt_usage_data(1)).to eq 1
-        end
-      end
     end
   end
 
@@ -282,5 +268,19 @@ describe Gitlab::UsageData, :aggregate_failures do
     end
 
     it_behaves_like 'usage data execution'
+  end
+
+  describe '#alt_usage_data' do
+    it 'returns the fallback when it gets an error' do
+      expect(described_class.alt_usage_data { raise StandardError } ).to eq(-1)
+    end
+
+    it 'returns the evaluated block when give' do
+      expect(described_class.alt_usage_data { Gitlab::CurrentSettings.uuid } ).to eq(Gitlab::CurrentSettings.uuid)
+    end
+
+    it 'returns the value when given' do
+      expect(described_class.alt_usage_data(1)).to eq 1
+    end
   end
 end
