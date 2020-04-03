@@ -4,12 +4,13 @@ import {
   GlBadge,
   GlEmptyState,
   GlLoadingIcon,
+  GlSprintf,
   GlTab,
   GlTabs,
   GlLink,
   GlDeprecatedButton,
 } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
+import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import DependenciesActions from './dependencies_actions.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
@@ -25,6 +26,7 @@ export default {
     GlBadge,
     GlEmptyState,
     GlLoadingIcon,
+    GlSprintf,
     GlTab,
     GlTabs,
     GlLink,
@@ -79,18 +81,6 @@ export default {
         const { namespace } = this.listTypes[index] || {};
         this.setCurrentList(namespace);
       },
-    },
-    subHeadingText() {
-      const { jobPath } = this.reportInfo;
-
-      const body = __(
-        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest successful%{linkEnd} scan',
-      );
-
-      const linkStart = jobPath ? `<a href="${jobPath}">` : '';
-      const linkEnd = jobPath ? '</a>' : '';
-
-      return sprintf(body, { linkStart, linkEnd }, false);
     },
     showEmptyState() {
       return this.isJobNotSetUp || this.hasNoDependencies;
@@ -179,7 +169,16 @@ export default {
         </gl-link>
       </h2>
       <p class="mb-0">
-        <span v-html="subHeadingText"></span>
+        <gl-sprintf
+          :message="s__('Dependencies|Based on the %{linkStart}latest successful%{linkEnd} scan')"
+        >
+          <template #link="{ content }">
+            <gl-link v-if="reportInfo.jobPath" ref="jobLink" :href="reportInfo.jobPath">{{
+              content
+            }}</gl-link>
+            <template v-else>{{ content }}</template>
+          </template>
+        </gl-sprintf>
         <span v-if="generatedAtTimeAgo">
           <span aria-hidden="true">&bull;</span>
           <span class="text-secondary">{{ generatedAtTimeAgo }}</span>
