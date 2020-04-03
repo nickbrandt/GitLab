@@ -35,13 +35,11 @@ module LicenseHelper
   end
 
   def current_license
-    return @current_license if defined?(@current_license)
-
-    @current_license = License.current
+    License.current
   end
 
   def current_license_title
-    @current_license_title ||= License.current ? License.current.plan.titleize : 'Core'
+    License.current&.plan&.titleize || 'Core'
   end
 
   def new_trial_url
@@ -50,15 +48,6 @@ module LicenseHelper
     uri.path = '/trials/new'
     uri.query = "return_to=#{return_to_url}&id=#{Base64.strict_encode64(current_user.email)}"
     uri.to_s
-  end
-
-  def upgrade_plan_url
-    group = @project&.group || @group
-    if group
-      group_billings_path(group)
-    else
-      profile_billings_path
-    end
   end
 
   def show_promotions?(selected_user = current_user)

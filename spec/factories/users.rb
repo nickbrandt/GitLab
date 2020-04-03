@@ -23,6 +23,10 @@ FactoryBot.define do
       after(:build) { |user, _| user.block! }
     end
 
+    trait :inactive do
+      state_event { :deactivate }
+    end
+
     trait :bot do
       user_type { :alert_bot }
     end
@@ -83,11 +87,17 @@ FactoryBot.define do
 
     transient do
       developer_projects { [] }
+      non_guest { false }
     end
 
     after(:create) do |user, evaluator|
       evaluator.developer_projects.each do |project|
         project.add_developer(user)
+      end
+
+      if evaluator.non_guest
+        # default access_level for a group_member is owner
+        create(:group_member, user: user)
       end
     end
 
