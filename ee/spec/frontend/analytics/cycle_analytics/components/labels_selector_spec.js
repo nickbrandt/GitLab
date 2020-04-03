@@ -20,8 +20,6 @@ const findFlashError = () => document.querySelector('.flash-container .flash-tex
 const mockGroupLabelsRequest = (status = 200) =>
   new MockAdapter(axios).onGet().reply(status, groupLabels);
 
-jest.mock('lodash/debounce', () => jest.fn);
-
 describe('Value Stream Analytics LabelsSelector', () => {
   let store = null;
   const localVue = createLocalVue();
