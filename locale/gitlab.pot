@@ -10650,9 +10650,6 @@ msgstr ""
 msgid "IDE|Live Preview"
 msgstr ""
 
-msgid "IDE|Open in file view"
-msgstr ""
-
 msgid "IDE|Preview your web application using Web IDE client-side evaluation."
 msgstr ""
 
@@ -13904,9 +13901,6 @@ msgid "Open errors"
 msgstr ""
 
 msgid "Open in Xcode"
-msgstr ""
-
-msgid "Open in file view"
 msgstr ""
 
 msgid "Open issues"
