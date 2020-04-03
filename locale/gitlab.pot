@@ -12725,6 +12725,9 @@ msgstr ""
 msgid "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information."
 msgstr ""
 
+msgid "Message: "
+msgstr ""
+
 msgid "Messages"
 msgstr ""
 
