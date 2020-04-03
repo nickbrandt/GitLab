@@ -120,15 +120,17 @@ export default {
       data-qa-selector="license_report_widget"
     >
       <template #success>
-        {{ licenseSummaryText }}
-        <gl-link
-          v-if="reportContainsBlacklistedLicense && securityApprovalsHelpPagePath"
-          :href="securityApprovalsHelpPagePath"
-          class="js-security-approval-help-link"
-          target="_blank"
-        >
-          <icon :size="12" name="question" />
-        </gl-link>
+        <div class="pr-3">
+          {{ licenseSummaryText }}
+          <gl-link
+            v-if="reportContainsBlacklistedLicense && securityApprovalsHelpPagePath"
+            :href="securityApprovalsHelpPagePath"
+            class="js-security-approval-help-link"
+            target="_blank"
+          >
+            <icon :size="12" name="question" />
+          </gl-link>
+        </div>
       </template>
       <div v-if="showActionButtons" slot="actionButtons" class="append-right-default">
         <a
