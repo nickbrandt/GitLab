@@ -4406,6 +4406,16 @@ describe User, :do_not_mock_admin_mode do
 
       it { is_expected.to be false }
     end
+
+    context 'when `:gitlab_employee_badge` feature flag is disabled' do
+      let(:user) { build(:user, email: 'test@gitlab.com') }
+
+      before do
+        stub_feature_flags(gitlab_employee_badge: false)
+      end
+
+      it { is_expected.to be false }
+    end
   end
 
   describe '#current_highest_access_level' do
@@ -4425,6 +4435,27 @@ describe User, :do_not_mock_admin_mode do
 
         expect(user.current_highest_access_level).to eq(Gitlab::Access::REPORTER)
       end
+    end
+  end
+
+  describe '#organization' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:user) { build(:user, organization: 'ACME') }
+
+    subject { user.organization }
+
+    where(:gitlab_employee?, :expected_result) do
+      true  | 'GitLab'
+      false | 'ACME'
+    end
+
+    with_them do
+      before do
+        allow(user).to receive(:gitlab_employee?).and_return(gitlab_employee?)
+      end
+
+      it { is_expected.to eql(expected_result) }
     end
   end
 
