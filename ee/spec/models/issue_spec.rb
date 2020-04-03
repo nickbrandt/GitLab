@@ -105,9 +105,9 @@ describe Issue do
   end
 
   describe 'validations' do
-    subject { build(:issue) }
-
     describe 'weight' do
+      subject { build(:issue) }
+
       it 'is not valid when negative number' do
         subject.weight = -1
 
@@ -123,6 +123,26 @@ describe Issue do
         subject.weight = 1
 
         expect(subject).to be_valid
+      end
+    end
+
+    describe 'confidential' do
+      subject { build(:issue, :confidential) }
+
+      it 'is valid when changing to not-confidential and is associated with not-confidential epic' do
+        subject.epic = build(:epic)
+
+        subject.confidential = false
+
+        expect(subject).to be_valid
+      end
+
+      it 'is not valid when changing to not-confidential and is associated with confidential epic' do
+        subject.epic = build(:epic, :confidential)
+
+        subject.confidential = false
+
+        expect(subject).not_to be_valid
       end
     end
   end
