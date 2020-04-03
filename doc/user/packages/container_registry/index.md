@@ -59,10 +59,10 @@ Navigate to your project's **{package}** **Packages > Container Registry**.
 
 This view will:
 
- 	- Show all the image repositories that belong to the project.
-	- Allow you to [delete](#delete-images-from-within-gitlab) one or more image repository.
-	- Allow you to navigate to the image repository details page.
-	- Show a **Quick start** dropdown with the most common commands to log in, build and push docker images.
+- Show all the image repositories that belong to the project.
+- Allow you to [delete](#delete-images-from-within-gitlab) one or more image repository.
+- Allow you to navigate to the image repository details page.
+- Show a **Quick start** dropdown with the most common commands to log in, build and push
 - Optionally, a banner will be visible if the [expiration policy](#expiration-policy) is enabled for this project.
 
 ### Control Container Registry for your group
