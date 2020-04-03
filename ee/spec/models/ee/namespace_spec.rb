@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Namespace do
   shared_examples 'plan helper' do |namespace_plan|
-    let(:namespace) { create(:namespace, plan: "#{plan_name}_plan") }
+    let(:namespace) { create(:namespace_with_plan, plan: "#{plan_name}_plan") }
 
     subject { namespace.public_send("#{namespace_plan}_plan?") }
 
@@ -151,7 +151,7 @@ describe Namespace do
   end
 
   describe '#actual_plan_name' do
-    let(:namespace) { create(:namespace, plan: :gold_plan) }
+    let(:namespace) { create(:namespace) }
 
     subject { namespace.actual_plan_name }
 
@@ -170,7 +170,7 @@ describe Namespace do
     end
 
     context 'when namespace is not persisted' do
-      let(:namespace) { build(:namespace, plan: :gold_plan) }
+      let(:namespace) { build(:namespace) }
 
       it 'returns free plan' do
         is_expected.to eq('free')
@@ -182,8 +182,8 @@ describe Namespace do
     end
 
     context 'when DB is not read-only' do
-      it 'returns gold plan' do
-        is_expected.to eq('gold')
+      it 'returns free plan' do
+        is_expected.to eq('free')
       end
 
       it 'creates a gitlab_subscription' do

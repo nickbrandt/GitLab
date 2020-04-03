@@ -121,7 +121,6 @@ describe API::Namespaces do
 
         aggregate_failures do
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['plan']).to eq('silver')
           expect(json_response['shared_runners_minutes_limit']).to eq(9001)
         end
       end
@@ -130,7 +129,6 @@ describe API::Namespaces do
         put api("/namespaces/#{group1.id}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response['plan']).to eq('silver')
         expect(json_response['shared_runners_minutes_limit']).to eq(9001)
       end
     end

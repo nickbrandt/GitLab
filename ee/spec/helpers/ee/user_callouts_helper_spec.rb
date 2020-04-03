@@ -224,7 +224,6 @@ describe EE::UserCalloutsHelper do
     let_it_be(:silver_plan) { create(:silver_plan) }
     let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
-    let(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
     where(:never_had_trial?, :show_gold_trial?, :gold_plan?, :free_plan?, :should_render?) do
       true  | true  | false | false | true
@@ -248,12 +247,13 @@ describe EE::UserCalloutsHelper do
     with_them do
       before do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
-        namespace.update(plan: gold_plan) if gold_plan?
-        namespace.update(plan: silver_plan) if !gold_plan? && !free_plan?
 
-        unless never_had_trial?
-          namespace.update(plan: free_plan)
-          namespace.create_gitlab_subscription(trial_ends_on: Date.yesterday)
+        if !never_had_trial?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: free_plan, trial_ends_on: Date.yesterday)
+        elsif gold_plan?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+        elsif !free_plan?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: silver_plan)
         end
       end
 
