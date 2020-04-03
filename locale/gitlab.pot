@@ -4025,6 +4025,9 @@ msgstr ""
 msgid "Clone with %{http_label}"
 msgstr ""
 
+msgid "Clone with %{protocol}"
+msgstr ""
+
 msgid "Clone with KRB5"
 msgstr ""
 
