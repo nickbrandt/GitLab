@@ -1,15 +1,15 @@
 <script>
-import { escape } from 'lodash';
 import {
   GlDropdown,
   GlDropdownDivider,
   GlDropdownItem,
   GlLoadingIcon,
   GlSearchBoxByType,
+  GlSprintf,
 } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import ClipboardButton from '../../vue_shared/components/clipboard_button.vue';
-import { __, s__, sprintf } from '~/locale';
+import { __, s__ } from '~/locale';
 
 import { APPLICATION_STATUS } from '~/clusters/constants';
 
@@ -24,6 +24,7 @@ export default {
     GlDropdownDivider,
     GlDropdownItem,
     GlSearchBoxByType,
+    GlSprintf,
   },
   props: {
     knative: {
@@ -70,15 +71,6 @@ export default {
     },
     domainDropdownText() {
       return this.knativeHostname || s__('ClusterIntegration|Select existing domain or use new');
-    },
-    useQueryText() {
-      return sprintf(
-        s__('ClusterIntegration|Use %{query}'),
-        {
-          query: `<code>${escape(this.searchQuery)}</code>`,
-        },
-        false,
-      );
     },
     availableDomains() {
       return this.knative.availableDomains || [];
@@ -147,7 +139,13 @@ export default {
         <template v-if="searchQuery">
           <gl-dropdown-divider />
           <gl-dropdown-item key="custom-domain" @click="selectCustomDomain(searchQuery)">
-            <span class="ml-1" v-html="useQueryText"></span>
+            <span class="ml-1">
+              <gl-sprintf :message="s__('ClusterIntegration|Use %{query}')">
+                <template #query>
+                  <code>{{ searchQuery }}</code>
+                </template>
+              </gl-sprintf>
+            </span>
           </gl-dropdown-item>
         </template>
       </gl-dropdown>
