@@ -700,6 +700,8 @@ describe Projects::MergeRequestsController do
 
   describe 'GET #license_management_reports' do
     let(:merge_request) { create(:ee_merge_request, :with_license_scanning_reports, source_project: project, author: create(:user)) }
+    let(:comparison_status) { { status: :parsed, data: { new_licenses: [], existing_licenses: [], removed_licenses: [] } } }
+
     let(:params) do
       {
         namespace_id: project.namespace.to_param,
@@ -709,6 +711,32 @@ describe Projects::MergeRequestsController do
     end
 
     subject { get :license_management_reports, params: params, format: :json }
+
+    before do
+      allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
+                                                 .with(::Ci::CompareLicenseScanningReportsService, project.users.first).and_return(comparison_status)
+    end
+
+    it 'returns 200 HTTP status' do
+      subject
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response).to eq({ "new_licenses" => [], "existing_licenses" => [], "removed_licenses" => [] })
+    end
+  end
+
+  describe 'GET #license_scanning_reports' do
+    let(:merge_request) { create(:ee_merge_request, :with_license_scanning_reports, source_project: project, author: create(:user)) }
+
+    let(:params) do
+      {
+        namespace_id: project.namespace.to_param,
+        project_id: project,
+        id: merge_request.iid
+      }
+    end
+
+    subject { get :license_scanning_reports, params: params, format: :json }
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
