@@ -77,7 +77,7 @@ module Projects
         return [] unless latest_default_branch_pipeline
 
         ::Security::SecurityJobsFinder.new(pipeline: latest_default_branch_pipeline).execute +
-          ::Security::LicenseManagementJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
+          ::Security::LicenseComplianceJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
       end
 
       def latest_default_branch_pipeline
@@ -123,7 +123,7 @@ module Projects
       end
 
       def scan_types
-        ::Security::SecurityJobsFinder.allowed_job_types + ::Security::LicenseManagementJobsFinder.allowed_job_types
+        ::Security::SecurityJobsFinder.allowed_job_types + ::Security::LicenseComplianceJobsFinder.allowed_job_types
       end
     end
   end
