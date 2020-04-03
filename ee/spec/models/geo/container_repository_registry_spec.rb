@@ -73,4 +73,18 @@ describe Geo::ContainerRepositoryRegistry, :geo do
       end
     end
   end
+
+  describe '.replication_enabled?' do
+    it 'returns true when registry replication is enabled' do
+      stub_geo_setting(registry_replication: { enabled: true })
+
+      expect(Geo::ContainerRepositoryRegistry.replication_enabled?).to be_truthy
+    end
+
+    it 'returns false when registry replication is disabled' do
+      stub_geo_setting(registry_replication: { enabled: false })
+
+      expect(Geo::ContainerRepositoryRegistry.replication_enabled?).to be_falsey
+    end
+  end
 end
