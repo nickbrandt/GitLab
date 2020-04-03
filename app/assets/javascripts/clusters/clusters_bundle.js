@@ -521,15 +521,10 @@ export default class Clusters {
     });
   }
 
-  setKnativeDomain(data) {
-    const appId = data.id;
+  setKnativeDomain({ id: appId, domain, domainId }) {
     this.store.updateAppProperty(appId, 'isEditingDomain', true);
-    this.store.updateAppProperty(appId, 'hostname', data.domain);
-    this.store.updateAppProperty(
-      appId,
-      'pagesDomain',
-      data.domainId ? { id: data.domainId, domain: data.domain } : null,
-    );
+    this.store.updateAppProperty(appId, 'hostname', domain);
+    this.store.updateAppProperty(appId, 'pagesDomain', domainId ? { id: domainId, domain } : null);
   }
 
   setCrossplaneProviderStack(data) {
