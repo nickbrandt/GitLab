@@ -16,10 +16,20 @@ describe EE::API::Entities::Analytics::GroupActivity do
   end
 
   context 'issues count' do
-    it_behaves_like 'exposes count', 'issues_count', EE::API::Entities::Analytics::GroupActivity::IssuesCount
+    it_behaves_like 'exposes count',
+      'issues_count',
+      EE::API::Entities::Analytics::GroupActivity::IssuesCount
   end
 
   context 'merge requests count' do
-    it_behaves_like 'exposes count', 'merge_requests_count', EE::API::Entities::Analytics::GroupActivity::MergeRequestsCount
+    it_behaves_like 'exposes count',
+      'merge_requests_count',
+      EE::API::Entities::Analytics::GroupActivity::MergeRequestsCount
+  end
+
+  context 'new members count' do
+    it_behaves_like 'exposes count',
+      'new_members_count',
+      EE::API::Entities::Analytics::GroupActivity::NewMembersCount
   end
 end
