@@ -120,81 +120,49 @@ describe('getters', () => {
         );
       });
 
-      it('should be `License Compliance detected no new licenses`, if the report is empty', () => {
-        const mockGetters = { licenseReport: [] };
+      it.each`
+        givenLicenseReport                              | givenReportContainsBlacklistedLicense | expectedSummaryText
+        ${[]}                                           | ${false}                              | ${'License Compliance detected no new licenses'}
+        ${[licenseReportMock[0]]}                       | ${false}                              | ${'License Compliance detected 1 new license'}
+        ${[licenseReportMock[0], licenseReportMock[0]]} | ${false}                              | ${'License Compliance detected 2 new licenses'}
+        ${[licenseReportMock[0]]}                       | ${true}                               | ${'License Compliance detected 1 new license and policy violation; approval required'}
+        ${[licenseReportMock[0], licenseReportMock[0]]} | ${true}                               | ${'License Compliance detected 2 new licenses and policy violations; approval required'}
+      `(
+        `should show "$expectedSummaryText" if the report contains $givenLicenseReport.length license(s) and contains blacklisted licenses is: $givenReportContainsBlacklistedLicense`,
+        ({ givenLicenseReport, givenReportContainsBlacklistedLicense, expectedSummaryText }) => {
+          const mockGetters = {
+            licenseReport: givenLicenseReport,
+            reportContainsBlacklistedLicense: givenReportContainsBlacklistedLicense,
+          };
 
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected no new licenses',
-        );
-      });
-
-      it('should be `License Compliance detected 1 new license`, if the report has one element', () => {
-        const mockGetters = { licenseReport: [licenseReportMock[0]] };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 1 new license',
-        );
-      });
-
-      it('should be `License Compliance detected 2 new licenses`, if the report has two elements', () => {
-        const mockGetters = { licenseReport: [licenseReportMock[0], licenseReportMock[0]] };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 2 new licenses',
-        );
-      });
-
-      it('should be `License Compliance detected 2 new licenses; approval required`, if the report has two elements and including some blacklisted', () => {
-        const mockGetters = {
-          licenseReport: [licenseReportMock[0], licenseReportMock[0]],
-          reportContainsBlacklistedLicense: true,
-        };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 2 new licenses; approval required',
-        );
-      });
+          expect(getters.licenseSummaryText(state, mockGetters)).toBe(expectedSummaryText);
+        },
+      );
     });
 
-    describe('when there are no licences on the BASE', () => {
+    describe('when there are no licenses on the BASE', () => {
       beforeEach(() => {
         state = createState();
       });
 
-      it('should be `License Compliance detected no licenses for the source branch only` with no new licences', () => {
-        const mockGetters = { licenseReport: [] };
+      it.each`
+        givenLicenseReport                              | givenReportContainsBlacklistedLicense | expectedSummaryText
+        ${[]}                                           | ${false}                              | ${'License Compliance detected no licenses for the source branch only'}
+        ${[licenseReportMock[0]]}                       | ${false}                              | ${'License Compliance detected 1 license for the source branch only'}
+        ${[licenseReportMock[0], licenseReportMock[0]]} | ${false}                              | ${'License Compliance detected 2 licenses for the source branch only'}
+        ${[licenseReportMock[0]]}                       | ${true}                               | ${'License Compliance detected 1 license and policy violation for the source branch only; approval required'}
+        ${[licenseReportMock[0], licenseReportMock[0]]} | ${true}                               | ${'License Compliance detected 2 licenses and policy violations for the source branch only; approval required'}
+      `(
+        `should show "$expectedSummaryText" if the report contains $givenLicenseReport.length license(s) and contains blacklisted licenses is: $givenReportContainsBlacklistedLicense`,
+        ({ givenLicenseReport, givenReportContainsBlacklistedLicense, expectedSummaryText }) => {
+          const mockGetters = {
+            licenseReport: givenLicenseReport,
+            reportContainsBlacklistedLicense: givenReportContainsBlacklistedLicense,
+          };
 
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected no licenses for the source branch only',
-        );
-      });
-
-      it('should be `License Compliance detected 1 license for the source branch only` with one new licence', () => {
-        const mockGetters = { licenseReport: [licenseReportMock[0]] };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 1 license for the source branch only',
-        );
-      });
-
-      it('should be `License Compliance detected 2 licenses for the source branch only` with two new licences', () => {
-        const mockGetters = { licenseReport: [licenseReportMock[0], licenseReportMock[0]] };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 2 licenses for the source branch only',
-        );
-      });
-
-      it('should be `License Compliance detected 2 licenses for the source branch only; approval required` with two new licences including some blacklisted', () => {
-        const mockGetters = {
-          licenseReport: [licenseReportMock[0], licenseReportMock[0]],
-          reportContainsBlacklistedLicense: true,
-        };
-
-        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
-          'License Compliance detected 2 licenses for the source branch only; approval required',
-        );
-      });
+          expect(getters.licenseSummaryText(state, mockGetters)).toBe(expectedSummaryText);
+        },
+      );
     });
   });
 

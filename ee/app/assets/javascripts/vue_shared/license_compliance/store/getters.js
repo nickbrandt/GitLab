@@ -33,8 +33,8 @@ export const licenseSummaryText = (state, getters) => {
     if (!baseReportHasLicenses) {
       return getters.reportContainsBlacklistedLicense
         ? n__(
-            'LicenseCompliance|License Compliance detected %d license for the source branch only; approval required',
-            'LicenseCompliance|License Compliance detected %d licenses for the source branch only; approval required',
+            'LicenseCompliance|License Compliance detected %d license and policy violation for the source branch only; approval required',
+            'LicenseCompliance|License Compliance detected %d licenses and policy violations for the source branch only; approval required',
             licenseReportLength,
           )
         : n__(
@@ -46,8 +46,8 @@ export const licenseSummaryText = (state, getters) => {
 
     return getters.reportContainsBlacklistedLicense
       ? n__(
-          'LicenseCompliance|License Compliance detected %d new license; approval required',
-          'LicenseCompliance|License Compliance detected %d new licenses; approval required',
+          'LicenseCompliance|License Compliance detected %d new license and policy violation; approval required',
+          'LicenseCompliance|License Compliance detected %d new licenses and policy violations; approval required',
           licenseReportLength,
         )
       : n__(
