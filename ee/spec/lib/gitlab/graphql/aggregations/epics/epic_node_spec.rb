@@ -28,8 +28,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       end
     end
 
-    it_behaves_like 'setting attributes based on the first record', { epic_state_id: OPENED_EPIC_STATE, parent_id: nil }
-    it_behaves_like 'setting attributes based on the first record', { epic_state_id: CLOSED_EPIC_STATE, parent_id: 2 }
+    it_behaves_like 'setting attributes based on the first record', { epic_state_id: Gitlab::Graphql::Aggregations::Epics::Constants::OPENED_EPIC_STATE, parent_id: nil }
+    it_behaves_like 'setting attributes based on the first record', { epic_state_id: Gitlab::Graphql::Aggregations::Epics::Constants::CLOSED_EPIC_STATE, parent_id: 2 }
   end
 
   describe 'recursive totals' do

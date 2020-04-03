@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Security::VulnerableProjectPresenter do
-  SEVERITY_LEVELS = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys
-
   let(:project) { create(:project) }
 
   before do
@@ -17,7 +15,7 @@ describe Security::VulnerableProjectPresenter do
     expect(subject.id).to be(project.id)
   end
 
-  SEVERITY_LEVELS.each do |severity_level|
+  ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |severity_level|
     it "exposes a vulnerability count attribute for #{severity_level} vulnerabilities" do
       expect(subject.public_send("#{severity_level}_vulnerability_count")).to be(1)
     end
