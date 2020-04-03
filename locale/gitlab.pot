@@ -10815,9 +10815,6 @@ msgstr ""
 msgid "Import CSV"
 msgstr ""
 
-msgid "Import Jira issues"
-msgstr ""
-
 msgid "Import Projects from Gitea"
 msgstr ""
 
@@ -10831,6 +10828,9 @@ msgid "Import all repositories"
 msgstr ""
 
 msgid "Import an exported GitLab project"
+msgstr ""
+
+msgid "Import from Jira"
 msgstr ""
 
 msgid "Import in progress"
