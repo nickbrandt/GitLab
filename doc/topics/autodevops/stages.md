@@ -536,7 +536,7 @@ The metrics include:
 To make use of Auto Monitoring:
 
 1. [Install and configure the requirements](index.md#requirements).
-1. [Enable Auto DevOps](#enablingdisabling-auto-devops) if you haven't done already.
+1. [Enable Auto DevOps](index.md#enablingdisabling-auto-devops) if you haven't done already.
 1. Finally, go to your project's **CI/CD > Pipelines** and run a pipeline.
 1. Once the pipeline finishes successfully, open the
    [monitoring dashboard for a deployed environment](../../ci/environments.md#monitoring-environments)
