@@ -22604,6 +22604,9 @@ msgstr ""
 msgid "Vulnerability|Description"
 msgstr ""
 
+msgid "Vulnerability|Evidence"
+msgstr ""
+
 msgid "Vulnerability|File"
 msgstr ""
 
