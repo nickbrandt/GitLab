@@ -30,9 +30,25 @@ module Gitlab
       Loader.new(
         merge_request.target_project,
         merge_request.target_branch,
-        merge_request.modified_paths(past_merge_request_diff: merge_request_diff)
+        paths_for_merge_request(merge_request, merge_request_diff)
       )
     end
     private_class_method :loader_for_merge_request
+
+    def self.paths_for_merge_request(merge_request, merge_request_diff)
+      # Because MergeRequest#modified_paths is limited to only returning 1_000
+      #   records, if the diff_size is more than 1_000, we need to fall back to
+      #   the MUCH slower method of using Repository#diff_stats, which isn't
+      #   subject to the same limit.
+      #
+      if merge_request.diff_size == "1000+"
+        merge_request.project.repository.diff_stats(
+          merge_request.commits.last.sha,
+          merge_request.commits.first.sha
+        ).paths
+      else
+        merge_request.modified_paths(past_merge_request_diff: merge_request_diff)
+      end
+    end
   end
 end

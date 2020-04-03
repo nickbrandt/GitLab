@@ -47,7 +47,7 @@ describe Gitlab::CodeOwners do
   describe '.entries_for_merge_request' do
     let(:codeowner_lookup_ref) { merge_request.target_branch }
     let(:merge_request) do
-      build(
+      create(
         :merge_request,
         source_project: project,
         source_branch: 'feature',
@@ -71,14 +71,25 @@ describe Gitlab::CodeOwners do
       end
 
       context 'when merge_request_diff is specified' do
-        let(:merge_request_diff) { double(:merge_request_diff) }
-
         it 'returns owners at the specified ref' do
-          expect(merge_request).to receive(:modified_paths).with(past_merge_request_diff: merge_request_diff).and_return(['docs/CODEOWNERS'])
+          expect(merge_request).to receive(:modified_paths).with(past_merge_request_diff: merge_request.merge_request_diff).and_return(['docs/CODEOWNERS'])
 
-          entry = described_class.entries_for_merge_request(merge_request, merge_request_diff: merge_request_diff).first
+          entry = described_class.entries_for_merge_request(merge_request, merge_request_diff: merge_request.merge_request_diff).first
 
           expect(entry.users).to eq([code_owner])
+        end
+      end
+
+      context 'when the merge request is large (>1_000 files)' do
+        before do
+          expect(merge_request).to receive(:diff_size).and_return("1000+")
+        end
+
+        it 'generates paths via Repository#diff_stats' do
+          expect(merge_request).not_to receive(:modified_paths)
+          expect(merge_request.project.repository).to receive(:diff_stats).and_call_original
+
+          described_class.entries_for_merge_request(merge_request)
         end
       end
     end
