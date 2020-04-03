@@ -4,7 +4,7 @@ module EE
   module MirrorHelper
     def render_mirror_failed_message(raw_message:)
       mirror_last_update_at = @project.import_state.last_update_at
-      message = "The repository failed to update #{time_ago_with_tooltip(mirror_last_update_at)}.".html_safe
+      message = "Pull mirroring failed #{time_ago_with_tooltip(mirror_last_update_at)}.".html_safe
 
       return message if raw_message
 
