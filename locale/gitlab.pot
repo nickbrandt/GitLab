@@ -17817,6 +17817,9 @@ msgstr ""
 msgid "SecurityDashboard|Severity"
 msgstr ""
 
+msgid "SecurityDashboard|Status"
+msgstr ""
+
 msgid "SecurityDashboard|The security dashboard displays the latest security findings for projects you wish to monitor. Select \"Edit dashboard\" to add and remove projects."
 msgstr ""
 
@@ -22672,6 +22675,21 @@ msgstr ""
 msgid "VulnerabilityManagement|Will not fix or a false-positive"
 msgstr ""
 
+msgid "VulnerabilityStatusTypes|All"
+msgstr ""
+
+msgid "VulnerabilityStatusTypes|Confirmed"
+msgstr ""
+
+msgid "VulnerabilityStatusTypes|Detected"
+msgstr ""
+
+msgid "VulnerabilityStatusTypes|Dismissed"
+msgstr ""
+
+msgid "VulnerabilityStatusTypes|Resolved"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -24773,9 +24791,6 @@ msgid "severity|Medium"
 msgstr ""
 
 msgid "severity|None"
-msgstr ""
-
-msgid "severity|Undefined"
 msgstr ""
 
 msgid "severity|Unknown"

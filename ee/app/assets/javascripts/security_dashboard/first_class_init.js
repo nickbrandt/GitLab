@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
-import FirstClassProjectDashboard from './components/first_class_project_dashboard.vue';
+import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
 
 const isRequired = message => {
   throw new Error(message);
@@ -28,7 +28,7 @@ export default (
 
   // We'll add more of these for group and instance once we have the components
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
-    element = FirstClassProjectDashboard;
+    element = FirstClassProjectSecurityDashboard;
     props.projectFullPath = el.dataset.projectFullPath;
   }
 

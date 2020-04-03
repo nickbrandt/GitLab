@@ -10,9 +10,9 @@ import App from 'ee/vulnerabilities/components/app.vue';
 import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
-import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
+import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 
-const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATES);
+const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
 
