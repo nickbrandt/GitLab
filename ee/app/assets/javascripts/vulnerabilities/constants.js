@@ -1,6 +1,6 @@
 import { s__ } from '~/locale';
 
-export const VULNERABILITY_STATES = {
+export const VULNERABILITY_STATE_OBJECTS = {
   dismissed: {
     action: 'dismiss',
     statusBoxStyle: 'upcoming',
@@ -19,6 +19,13 @@ export const VULNERABILITY_STATES = {
     displayName: s__('VulnerabilityManagement|Resolved'),
     description: s__('VulnerabilityManagement|Verified as fixed or mitigated'),
   },
+};
+
+export const VULNERABILITY_STATES = {
+  detected: s__('VulnerabilityStatusTypes|Detected'),
+  confirmed: s__('VulnerabilityStatusTypes|Confirmed'),
+  dismissed: s__('VulnerabilityStatusTypes|Dismissed'),
+  resolved: s__('VulnerabilityStatusTypes|Resolved'),
 };
 
 export const VULNERABILITIES_PER_PAGE = 20;

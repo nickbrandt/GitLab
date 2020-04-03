@@ -1,9 +1,22 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 #import "./vulnerability.fragment.graphql"
 
-query project($fullPath: ID!, $after: String, $first: Int) {
+query project(
+  $fullPath: ID!
+  $after: String
+  $first: Int
+  $severity: [VulnerabilitySeverity!]
+  $reportType: [VulnerabilityReportType!]
+  $state: [VulnerabilityState!]
+) {
   project(fullPath: $fullPath) {
-    vulnerabilities(after:$after, first:$first){
+    vulnerabilities(
+      after:$after
+      first:$first
+      severity: $severity
+      reportType: $reportType
+      state: $state
+    ){
       nodes{
         ...Vulnerability
       }

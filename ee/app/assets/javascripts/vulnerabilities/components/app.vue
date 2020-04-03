@@ -9,7 +9,7 @@ import UsersCache from '~/lib/utils/users_cache';
 import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
-import { VULNERABILITY_STATES } from '../constants';
+import { VULNERABILITY_STATE_OBJECTS } from '../constants';
 
 export default {
   name: 'VulnerabilityManagementApp',
@@ -53,7 +53,7 @@ export default {
   computed: {
     statusBoxStyle() {
       // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
-      return VULNERABILITY_STATES[this.vulnerability.state]?.statusBoxStyle || 'expired';
+      return VULNERABILITY_STATE_OBJECTS[this.vulnerability.state]?.statusBoxStyle || 'expired';
     },
     showResolutionAlert() {
       return (

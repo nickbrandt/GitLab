@@ -5,9 +5,9 @@ import UsersMockHelper from 'helpers/user_mock_data_helper';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import StatusText from 'ee/vulnerabilities/components/status_description.vue';
-import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
+import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 
-const NON_DETECTED_STATES = Object.keys(VULNERABILITY_STATES);
+const NON_DETECTED_STATES = Object.keys(VULNERABILITY_STATE_OBJECTS);
 const ALL_STATES = ['detected', ...NON_DETECTED_STATES];
 
 describe('Vulnerability status description component', () => {
