@@ -43,10 +43,12 @@ type RedisConfig struct {
 type Config struct {
 	Redis                    *RedisConfig  `toml:"redis"`
 	Backend                  *url.URL      `toml:"-"`
+	CableBackend             *url.URL      `toml:"-"`
 	Version                  string        `toml:"-"`
 	DocumentRoot             string        `toml:"-"`
 	DevelopmentMode          bool          `toml:"-"`
 	Socket                   string        `toml:"-"`
+	CableSocket              string        `toml:"-"`
 	ProxyHeadersTimeout      time.Duration `toml:"-"`
 	APILimit                 uint          `toml:"-"`
 	APIQueueLimit            uint          `toml:"-"`
