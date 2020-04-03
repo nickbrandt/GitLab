@@ -1005,4 +1005,28 @@ describe User do
       it { is_expected.to eq [free_group_a, free_group_z] }
     end
   end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+
+    let(:user) { create(:user) }
+
+    context 'based on user type' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:user_type, :expected_result) do
+        'service_user'      | true
+        'support_bot'       | false
+        'visual_review_bot' | false
+      end
+
+      with_them do
+        before do
+          user.update(user_type: user_type)
+        end
+
+        it { is_expected.to be expected_result }
+      end
+    end
+  end
 end
