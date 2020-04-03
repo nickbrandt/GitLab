@@ -48,7 +48,7 @@ describe API::Analytics::GroupActivityAnalytics do
       end
     end
 
-    context 'when user has no authorization to view a private group' do
+    context 'when user does not have access to a group' do
       let(:current_user) { anonymous_user }
 
       it 'is returns `not_found`' do

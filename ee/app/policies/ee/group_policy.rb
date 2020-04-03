@@ -91,7 +91,7 @@ module EE
       rule { has_access & contribution_analytics_available }
         .enable :read_group_contribution_analytics
 
-      rule { can?(:read_group) & group_activity_analytics_available }
+      rule { has_access & group_activity_analytics_available }
         .enable :read_group_activity_analytics
 
       rule { reporter & cycle_analytics_available }.policy do

@@ -10,6 +10,7 @@ describe 'GroupAnalytics' do
   before do
     stub_licensed_features(group_activity_analytics: true)
 
+    group.add_developer(user)
     sign_in(user)
   end
 
