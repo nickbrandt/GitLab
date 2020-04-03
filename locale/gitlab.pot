@@ -5760,6 +5760,9 @@ msgstr ""
 msgid "Could not save prometheus manual configuration"
 msgstr ""
 
+msgid "Could not update the LDAP settings"
+msgstr ""
+
 msgid "Could not upload your designs as one or more files uploaded are not supported."
 msgstr ""
 
@@ -11583,6 +11586,9 @@ msgid "LDAP"
 msgstr ""
 
 msgid "LDAP settings"
+msgstr ""
+
+msgid "LDAP settings updated"
 msgstr ""
 
 msgid "LDAP sync in progress. This could take a few minutes. Refresh the page to see the changes."
