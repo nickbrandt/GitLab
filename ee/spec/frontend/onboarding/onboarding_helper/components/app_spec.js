@@ -1,11 +1,16 @@
 import Vue from 'vue';
 import OnboardingHelperApp from 'ee/onboarding/onboarding_helper/components/app.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import eventHub from 'ee/onboarding/onboarding_helper/event_hub';
 import createStore from 'ee/onboarding/onboarding_helper/store';
 import actionPopoverUtils from 'ee/onboarding/onboarding_helper/action_popover_utils';
 import Tracking from '~/tracking';
 import { mockTourData } from '../mock_data';
+import { redirectTo } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility', () => ({
+  redirectTo: jest.fn(),
+}));
 
 describe('User onboarding helper app', () => {
   let vm;
@@ -55,7 +60,7 @@ describe('User onboarding helper app', () => {
   beforeEach(() => {
     vm = createComponent();
 
-    spyOn(vm, 'init');
+    jest.spyOn(vm, 'init');
 
     vm.$mount();
   });
@@ -122,7 +127,7 @@ describe('User onboarding helper app', () => {
   describe('methods', () => {
     describe('initActionPopover', () => {
       it('calls renderPopover with the correct data', () => {
-        spyOn(actionPopoverUtils, 'renderPopover');
+        jest.spyOn(actionPopoverUtils, 'renderPopover');
 
         const expected = {
           selector: '.popup-trigger',
@@ -144,7 +149,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('calls renderPopover with showPopover=true if there is no helpContent data and no popover selector for the current url', () => {
-        spyOn(actionPopoverUtils, 'renderPopover');
+        jest.spyOn(actionPopoverUtils, 'renderPopover');
 
         vm.$store.state.url = 'http://gitlab-org/gitlab-test/xyz';
 
@@ -170,7 +175,7 @@ describe('User onboarding helper app', () => {
 
     describe('showActionPopover', () => {
       it('emits the "onboardingHelper.showActionPopover" event', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit');
 
         vm.showActionPopover();
 
@@ -180,7 +185,7 @@ describe('User onboarding helper app', () => {
 
     describe('hideActionPopover', () => {
       it('emits the "onboardingHelper.hideActionPopover" event', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit');
 
         vm.hideActionPopover();
 
@@ -190,8 +195,8 @@ describe('User onboarding helper app', () => {
 
     describe('handleRestartStep', () => {
       it('calls the "showExitTourContent" and "handleFeedbackTourContent" methods', () => {
-        spyOn(vm, 'showExitTourContent');
-        spyOn(vm, 'handleFeedbackTourContent');
+        jest.spyOn(vm, 'showExitTourContent');
+        jest.spyOn(vm, 'handleFeedbackTourContent');
 
         vm.handleRestartStep();
 
@@ -200,7 +205,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('emits the "onboardingHelper.hideActionPopover" event', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit');
 
         vm.handleRestartStep();
 
@@ -218,8 +223,8 @@ describe('User onboarding helper app', () => {
           click: () => {},
         };
 
-        spyOn(document, 'querySelector').and.returnValue(fakeLink);
-        spyOn(fakeLink, 'click');
+        jest.spyOn(document, 'querySelector').mockReturnValue(fakeLink);
+        jest.spyOn(fakeLink, 'click');
 
         vm.handleSkipStep();
 
@@ -230,7 +235,7 @@ describe('User onboarding helper app', () => {
 
     describe('handleStepContentButton', () => {
       it('shows the exitTour content', () => {
-        spyOn(vm, 'showExitTourContent');
+        jest.spyOn(vm, 'showExitTourContent');
 
         const button = {
           showExitTourContent: true,
@@ -268,19 +273,18 @@ describe('User onboarding helper app', () => {
       });
 
       it('redirects to the redirectPath', () => {
-        const redirectSpy = spyOnDependency(OnboardingHelperApp, 'redirectTo');
         const button = {
           redirectPath: 'my-redirect/path',
         };
 
         vm.handleStepContentButton(button);
 
-        expect(redirectSpy).toHaveBeenCalledWith(button.redirectPath);
+        expect(redirectTo).toHaveBeenCalledWith(button.redirectPath);
       });
 
       it('switches to the next tour part and calls initActionPopover', () => {
-        spyOn(vm.$store, 'dispatch');
-        spyOn(vm, 'initActionPopover');
+        jest.spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm, 'initActionPopover');
 
         const nextPart = 2;
         const button = {
@@ -294,7 +298,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('shows the next content item', () => {
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm.$store, 'dispatch');
 
         const button = {};
 
@@ -309,8 +313,8 @@ describe('User onboarding helper app', () => {
 
     describe('handleFeedbackButton', () => {
       beforeEach(() => {
-        spyOn(Tracking, 'event');
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(Tracking, 'event');
+        jest.spyOn(vm.$store, 'dispatch');
       });
 
       it('tracks feedback and shows the exit tour content', () => {
@@ -341,7 +345,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('calls the "setExitTour" method', () => {
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm.$store, 'dispatch');
 
         vm.showExitTourContent(true);
 
@@ -357,7 +361,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('calls the "setTourFeedback" method', () => {
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm.$store, 'dispatch');
 
         vm.handleFeedbackTourContent(true);
 
@@ -373,7 +377,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('calls the "setDntExitTour" method', () => {
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm.$store, 'dispatch');
 
         vm.handleDntExitTourContent(true);
 
@@ -383,7 +387,7 @@ describe('User onboarding helper app', () => {
 
     describe('handleExitTourButton', () => {
       it('emits the "onboardingHelper.hideActionPopover" event', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit');
 
         vm.handleExitTourButton();
 
@@ -391,7 +395,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('calls the "setDismissed" method with true', () => {
-        spyOn(vm.$store, 'dispatch');
+        jest.spyOn(vm.$store, 'dispatch');
 
         vm.handleExitTourButton();
 
@@ -399,7 +403,7 @@ describe('User onboarding helper app', () => {
       });
 
       it('emits the "onboardingHelper.destroyActionPopover" event', () => {
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit');
 
         vm.handleExitTourButton();
 

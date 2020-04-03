@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
 import {
   ONBOARDING_DISMISSED_COOKIE_NAME,
   STORAGE_KEY,
@@ -8,10 +9,12 @@ import onboardingUtils from 'ee/onboarding/utils';
 import AccessorUtilities from '~/lib/utils/accessor';
 
 describe('User onboarding utils', () => {
+  useLocalStorageSpy();
+
   beforeEach(() => {
     Cookies.remove(ONBOARDING_DISMISSED_COOKIE_NAME);
     onboardingUtils.resetOnboardingLocalStorage();
-    spyOn(AccessorUtilities, 'isLocalStorageAccessSafe').and.returnValue(true);
+    jest.spyOn(AccessorUtilities, 'isLocalStorageAccessSafe').mockReturnValue(true);
   });
 
   describe('isOnboardingDismissed', () => {
@@ -34,8 +37,6 @@ describe('User onboarding utils', () => {
     });
 
     it('removes onboarding related data from localStorage', () => {
-      spyOn(localStorage, 'removeItem');
-
       onboardingUtils.updateOnboardingDismissed(true);
 
       expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEY);
@@ -44,46 +45,33 @@ describe('User onboarding utils', () => {
 
   describe('resetOnboardingLocalStorage', () => {
     it('resets the onboarding props in the localStorage to the default', () => {
-      const modified = {
-        tourKey: 2,
-        lastStepIndex: 5,
-        createdProjectPath: 'foo',
-      };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(modified));
-
+      jest.spyOn(window.localStorage, 'setItem');
       onboardingUtils.resetOnboardingLocalStorage();
-
-      expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual(ONBOARDING_PROPS_DEFAULTS);
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEY,
+        JSON.stringify(ONBOARDING_PROPS_DEFAULTS),
+      );
     });
   });
 
   describe('getOnboardingLocalStorageState', () => {
     it('retrieves the proper values from localStorage', () => {
-      const modified = {
-        tourKey: 2,
-        lastStepIndex: 5,
-        createdProjectPath: 'foo',
-      };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(modified));
-
-      expect(onboardingUtils.getOnboardingLocalStorageState()).toEqual(modified);
+      jest.spyOn(window.localStorage, 'getItem').mockReturnValue('{}');
+      onboardingUtils.getOnboardingLocalStorageState();
+      expect(localStorage.getItem).toHaveBeenCalledWith(STORAGE_KEY);
     });
   });
 
   describe('updateLocalStorage', () => {
     it('updates the onboarding state on the localStorage', () => {
-      spyOn(localStorage, 'setItem');
-
+      jest.spyOn(window.localStorage, 'getItem').mockReturnValue('{}');
+      jest.spyOn(window.localStorage, 'setItem');
       const modified = {
         tourKey: 2,
         lastStepIndex: 5,
         createdProjectPath: 'foo',
       };
-
       onboardingUtils.updateLocalStorage(modified);
-
       expect(localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEY, JSON.stringify(modified));
     });
   });
