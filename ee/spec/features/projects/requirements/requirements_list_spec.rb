@@ -45,10 +45,42 @@ describe 'Requirements list', :js do
       end
     end
 
-    it 'shows button "New requirement"' do
-      page.within('.nav-controls') do
-        expect(page).to have_selector('button.js-new-requirement')
-        expect(find('button.js-new-requirement')).to have_content('New requirement')
+    context 'new requirement' do
+      it 'shows button "New requirement"' do
+        page.within('.nav-controls') do
+          expect(page).to have_selector('button.js-new-requirement')
+          expect(find('button.js-new-requirement')).to have_content('New requirement')
+        end
+      end
+
+      it 'shows requirement create form when "New requirement" button is clicked' do
+        page.within('.nav-controls') do
+          find('button.js-new-requirement').click
+        end
+
+        page.within('.requirements-list-container') do
+          expect(page).to have_selector('.requirement-form')
+        end
+      end
+
+      it 'creates new requirement' do
+        page.within('.nav-controls') do
+          find('button.js-new-requirement').click
+        end
+
+        page.within('.requirements-list-container') do
+          requirement_title = 'Foobar'
+
+          find('textarea#requirementTitle').native.send_keys requirement_title
+          find('button.js-requirement-save').click
+
+          wait_for_all_requests
+
+          expect(page).to have_selector('li.requirement', count: 4)
+          page.within('.requirements-list li.requirement', match: :first) do
+            expect(page.find('.issue-title-text')).to have_content(requirement_title)
+          end
+        end
       end
     end
 

@@ -9,7 +9,6 @@ import { FilterState } from './constants';
 Vue.use(VueApollo);
 
 export default () => {
-  const btnNewRequirement = document.querySelector('.js-new-requirement');
   const el = document.getElementById('js-requirements-app');
 
   if (!el) {
@@ -43,7 +42,6 @@ export default () => {
       const ARCHIVED = parseInt(archived, 10);
 
       return {
-        showCreateRequirement: false,
         filterBy: stateFilterBy,
         requirementsCount: {
           OPENED,
@@ -57,17 +55,6 @@ export default () => {
         projectPath,
       };
     },
-    mounted() {
-      btnNewRequirement.addEventListener('click', this.handleClickNewRequirement);
-    },
-    beforeDestroy() {
-      btnNewRequirement.removeEventListener('click', this.handleClickNewRequirement);
-    },
-    methods: {
-      handleClickNewRequirement() {
-        this.showCreateRequirement = !this.showCreateRequirement;
-      },
-    },
     render(createElement) {
       return createElement('requirements-root', {
         props: {
@@ -77,7 +64,6 @@ export default () => {
           page: parseInt(this.page, 10) || 1,
           prev: this.prev,
           next: this.next,
-          showCreateRequirement: this.showCreateRequirement,
           emptyStatePath: this.emptyStatePath,
         },
       });

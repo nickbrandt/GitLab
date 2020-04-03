@@ -1,10 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
 
 import { GlPagination } from '@gitlab/ui';
+import createFlash from '~/flash';
+
 import RequirementsRoot from 'ee/requirements/components/requirements_root.vue';
 import RequirementsLoading from 'ee/requirements/components/requirements_loading.vue';
 import RequirementsEmptyState from 'ee/requirements/components/requirements_empty_state.vue';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
+import RequirementForm from 'ee/requirements/components/requirement_form.vue';
+
+import createRequirement from 'ee/requirements/queries/createRequirement.mutation.graphql';
 
 import {
   FilterState,
@@ -16,6 +21,8 @@ import {
 jest.mock('ee/requirements/constants', () => ({
   DEFAULT_PAGE_SIZE: 2,
 }));
+
+jest.mock('~/flash');
 
 const createComponent = ({
   projectPath = 'gitlab-org/gitlab-shell',
@@ -41,8 +48,10 @@ const createComponent = ({
             list: [],
             pageInfo: {},
             count: {},
+            refetch: jest.fn(),
           },
         },
+        mutate: jest.fn(),
       },
     },
   });
@@ -51,6 +60,7 @@ describe('RequirementsRoot', () => {
   let wrapper;
 
   beforeEach(() => {
+    setFixtures('<button class="js-new-requirement">New requirement</button>');
     wrapper = createComponent();
   });
 
@@ -148,6 +158,92 @@ describe('RequirementsRoot', () => {
       });
     });
 
+    describe('handleNewRequirementClick', () => {
+      it('sets `showCreateForm` prop to `true`', () => {
+        wrapper.vm.handleNewRequirementClick();
+
+        expect(wrapper.vm.showCreateForm).toBe(true);
+      });
+    });
+
+    describe('handleNewRequirementSave', () => {
+      const mockMutationResult = {
+        data: {
+          createRequirement: {
+            errors: [],
+          },
+        },
+      };
+
+      it('sets `createRequirementRequestActive` prop to `true`', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+
+        wrapper.vm.handleNewRequirementSave('foo');
+
+        expect(wrapper.vm.createRequirementRequestActive).toBe(true);
+      });
+
+      it('calls `$apollo.mutate` with createRequirement mutation and `projectPath` & `title` as variables', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+
+        wrapper.vm.handleNewRequirementSave('foo');
+
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: createRequirement,
+            variables: {
+              createRequirementInput: {
+                projectPath: 'gitlab-org/gitlab-shell',
+                title: 'foo',
+              },
+            },
+          }),
+        );
+      });
+
+      it('sets `showCreateForm` and `createRequirementRequestActive` props to `false` and calls `$apollo.queries.requirements.refetch()` when request is successful', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+        jest
+          .spyOn(wrapper.vm.$apollo.queries.requirements, 'refetch')
+          .mockImplementation(jest.fn());
+
+        return wrapper.vm.handleNewRequirementSave('foo').then(() => {
+          expect(wrapper.vm.showCreateForm).toBe(false);
+          expect(wrapper.vm.$apollo.queries.requirements.refetch).toHaveBeenCalled();
+          expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+        });
+      });
+
+      it('sets `createRequirementRequestActive` prop to `false` and calls `createFlash` when `$apollo.mutate` request fails', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
+
+        return wrapper.vm.handleNewRequirementSave('foo').then(() => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Something went wrong while creating a requirement.',
+          );
+          expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+        });
+      });
+    });
+
+    describe('handleNewRequirementCancel', () => {
+      it('sets `showCreateForm` prop to `false`', () => {
+        wrapper.setData({
+          showCreateForm: true,
+        });
+
+        wrapper.vm.handleNewRequirementCancel();
+
+        expect(wrapper.vm.showCreateForm).toBe(false);
+      });
+    });
+
     describe('handlePageChange', () => {
       beforeEach(() => {
         jest.spyOn(wrapper.vm, 'updateUrl').mockImplementation(jest.fn());
@@ -206,6 +302,16 @@ describe('RequirementsRoot', () => {
       expect(wrapperLoading.find(RequirementsLoading).isVisible()).toBe(true);
 
       wrapperLoading.destroy();
+    });
+
+    it('renders requirement-form component when `showCreateForm` prop is `true`', () => {
+      wrapper.setData({
+        showCreateForm: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(RequirementForm).exists()).toBe(true);
+      });
     });
 
     it('renders requirement items for all the requirements', () => {

@@ -11,6 +11,15 @@
       }
     }
   }
+
+  .requirement-form {
+    .requirement-form-textarea {
+      line-height: $gl-line-height-24;
+      // We need `!important` here as GlFormTextarea (based on `BFormTextarea`)
+      // somehow applies inline styles ¯\_(ツ)_/¯.
+      overflow-y: auto !important;
+    }
+  }
 }
 
 .requirements-list-container {
