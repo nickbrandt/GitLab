@@ -35,7 +35,6 @@ const MERGE_REQUEST_CLOSED = 'merge_request_closed';
 let store = null;
 const localVue = createLocalVue();
 localVue.use(Vuex);
-jest.mock('lodash/debounce', () => jest.fn);
 
 describe('CustomStageForm', () => {
   function createComponent(props = {}, stubs = {}) {

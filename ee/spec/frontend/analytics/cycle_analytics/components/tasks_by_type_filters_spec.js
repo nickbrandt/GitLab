@@ -32,7 +32,6 @@ const selectLabelAtIndex = (ctx, index) => {
 
 const mockGroupLabelsRequest = () => new MockAdapter(axios).onGet().reply(200, groupLabels);
 
-jest.mock('lodash/debounce', () => jest.fn);
 let store = null;
 const localVue = createLocalVue();
 localVue.use(Vuex);

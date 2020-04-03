@@ -4,8 +4,6 @@ import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
 import MREditModule from 'ee/approvals/stores/modules/mr_edit';
 import { createStoreOptions } from 'ee/approvals/stores';
 
-jest.mock('lodash/debounce', () => jest.fn(fn => fn));
-
 const localVue = createLocalVue();
 localVue.use(Vuex);
 

@@ -6,7 +6,6 @@ import { createStore } from '~/ide/stores';
 import eventHub from '~/ide/eventhub';
 
 jest.mock('ee/ide/lib/mirror');
-jest.mock('lodash/debounce', () => jest.fn);
 
 const ACTION_START = 'terminalSync/start';
 const ACTION_STOP = 'terminalSync/stop';
