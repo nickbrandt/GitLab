@@ -91,8 +91,8 @@ RSpec.describe AuditEvent, type: :model do
     context 'when entity does not exist' do
       subject(:event) { described_class.new(entity_id: non_existing_record_id, entity_type: 'User') }
 
-      it 'returns nil' do
-        expect(event.entity).to be_blank
+      it 'returns a NullEntity' do
+        expect(event.entity).to be_a(Gitlab::Audit::NullEntity)
       end
     end
   end

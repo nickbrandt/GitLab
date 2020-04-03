@@ -1,0 +1,5 @@
+---
+title: Fix N+1 queries in Audit Events controllers
+merge_request: 28399
+author:
+type: performance

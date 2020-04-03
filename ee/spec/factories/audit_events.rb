@@ -4,33 +4,38 @@ FactoryBot.define do
   factory :audit_event, class: 'SecurityEvent', aliases: [:user_audit_event] do
     user
 
+    transient { target_user { create(:user) } }
+
     entity_type { 'User' }
-    entity_id   { user.id }
+    entity_id   { target_user.id }
     details do
       {
         change: 'email address',
         from: 'admin@gitlab.com',
         to: 'maintainer@gitlab.com',
         author_name: user.name,
-        target_id: user.id,
+        target_id: target_user.id,
         target_type: 'User',
-        target_details: user.name,
+        target_details: target_user.name,
         ip_address: '127.0.0.1',
-        entity_path: user.username
+        entity_path: target_user.username
       }
     end
 
     trait :project_event do
+      transient { target_project { create(:project) } }
+
       entity_type { 'Project' }
-      entity_id   { create(:project).id }
+      entity_id   { target_project.id }
       details do
         {
-          add: 'user_access',
-          as: 'Developer',
+          change: 'packges_enabled',
+          from: true,
+          to: false,
           author_name: user.name,
-          target_id: user.id,
-          target_type: 'User',
-          target_details: user.name,
+          target_id: target_project.id,
+          target_type: 'Project',
+          target_details: target_project.name,
           ip_address: '127.0.0.1',
           entity_path: 'gitlab.org/gitlab-ce'
         }
@@ -38,17 +43,19 @@ FactoryBot.define do
     end
 
     trait :group_event do
+      transient { target_group { create(:group) } }
+
       entity_type { 'Group' }
-      entity_id   { create(:group).id }
+      entity_id   { target_group.id }
       details do
         {
           change: 'project_creation_level',
           from: nil,
           to: 'Developers + Maintainers',
-          author_name: 'Administrator',
-          target_id: 1,
+          author_name: user.name,
+          target_id: target_group.id,
           target_type: 'Group',
-          target_details: "gitlab-org",
+          target_details: target_group.name,
           ip_address: '127.0.0.1',
           entity_path: "gitlab-org"
         }
