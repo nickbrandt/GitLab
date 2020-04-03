@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :epic do
+  factory :epic, traits: [:has_internal_id] do
     title { generate(:title) }
     group
     author

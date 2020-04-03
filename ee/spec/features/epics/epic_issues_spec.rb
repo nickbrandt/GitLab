@@ -27,9 +27,11 @@ describe 'Epic Issues', :js do
     ]
   end
 
-  def visit_epic
+  before do
     stub_licensed_features(epics: true, subepics: true)
+  end
 
+  def visit_epic
     sign_in(user)
     visit group_epic_path(group, epic)
 

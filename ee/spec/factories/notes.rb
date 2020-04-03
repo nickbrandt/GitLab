@@ -3,19 +3,19 @@
 FactoryBot.modify do
   factory :note do
     trait :on_epic do
-      noteable { create(:epic) }
+      noteable { association(:epic) }
       project { nil }
     end
 
     trait :on_vulnerability do
-      noteable { create(:vulnerability) }
+      noteable { association(:vulnerability, project: project) }
     end
 
     trait :on_design do
       transient do
-        issue { create(:issue, project: project) }
+        issue { association(:issue, project: project) }
       end
-      noteable { create(:design, :with_file, issue: issue) }
+      noteable { association(:design, :with_file, issue: issue) }
 
       after(:build) do |note|
         next if note.project == note.noteable.project
