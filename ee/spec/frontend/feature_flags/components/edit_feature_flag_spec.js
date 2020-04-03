@@ -2,6 +2,7 @@ import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlToggle } from '@gitlab/ui';
+import { LEGACY_FLAG, NEW_VERSION_FLAG } from 'ee/feature_flags/constants';
 import Form from 'ee/feature_flags/components/form.vue';
 import editModule from 'ee/feature_flags/store/modules/edit';
 import EditFeatureFlag from 'ee/feature_flags/components/edit_feature_flag.vue';
@@ -22,21 +23,30 @@ describe('Edit feature flag form', () => {
   });
 
   const factory = () => {
+    if (wrapper) {
+      wrapper.destroy();
+      wrapper = null;
+    }
     wrapper = shallowMount(EditFeatureFlag, {
       localVue,
       propsData: {
-        endpoint: `${TEST_HOST}/feature_flags.json'`,
+        endpoint: `${TEST_HOST}/feature_flags.json`,
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
       },
       store,
+      provide: {
+        glFeatures: {
+          featureFlagsNewVersion: true,
+        },
+      },
     });
   };
 
   beforeEach(done => {
     mock = new MockAdapter(axios);
 
-    mock.onGet(`${TEST_HOST}/feature_flags.json'`).replyOnce(200, {
+    mock.onGet(`${TEST_HOST}/feature_flags.json`).replyOnce(200, {
       id: 21,
       iid: 5,
       active: true,
@@ -44,6 +54,7 @@ describe('Edit feature flag form', () => {
       updated_at: '2019-01-17T17:27:39.778Z',
       name: 'feature_flag',
       description: '',
+      version: LEGACY_FLAG,
       edit_path: '/h5bp/html5-boilerplate/-/feature_flags/21/edit',
       destroy_path: '/h5bp/html5-boilerplate/-/feature_flags/21',
       scopes: [
@@ -97,6 +108,32 @@ describe('Edit feature flag form', () => {
 
     it('should render feature flag form', () => {
       expect(wrapper.find(Form).exists()).toEqual(true);
+    });
+
+    it('should set the version of the form from the feature flag', () => {
+      expect(wrapper.find(Form).props('version')).toBe(LEGACY_FLAG);
+
+      mock.resetHandlers();
+
+      mock.onGet(`${TEST_HOST}/feature_flags.json`).replyOnce(200, {
+        id: 21,
+        iid: 5,
+        active: true,
+        created_at: '2019-01-17T17:27:39.778Z',
+        updated_at: '2019-01-17T17:27:39.778Z',
+        name: 'feature_flag',
+        description: '',
+        version: NEW_VERSION_FLAG,
+        edit_path: '/h5bp/html5-boilerplate/-/feature_flags/21/edit',
+        destroy_path: '/h5bp/html5-boilerplate/-/feature_flags/21',
+        strategies: [],
+      });
+
+      factory();
+
+      return axios.waitForAll().then(() => {
+        expect(wrapper.find(Form).props('version')).toBe(NEW_VERSION_FLAG);
+      });
     });
   });
 });

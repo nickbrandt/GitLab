@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue';
-import { memoize, isString, cloneDeep } from 'lodash';
+import { memoize, isString, cloneDeep, isNumber } from 'lodash';
 import {
   GlDeprecatedButton,
   GlBadge,
@@ -147,7 +147,7 @@ export default {
     },
 
     deleteStrategy(s) {
-      if (s.id) {
+      if (isNumber(s.id)) {
         Vue.set(s, 'shouldBeDestroyed', true);
       } else {
         this.formStrategies = this.formStrategies.filter(strategy => strategy !== s);

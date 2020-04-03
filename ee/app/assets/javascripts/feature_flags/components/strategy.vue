@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue';
-import { isString } from 'lodash';
+import { isNumber } from 'lodash';
 import {
   GlFormSelect,
   GlFormInput,
@@ -122,18 +122,18 @@ export default {
       return (
         this.filteredEnvironments.length === 0 ||
         (this.filteredEnvironments.length === 1 &&
-          this.filteredEnvironments[0].environment_scope === '*')
+          this.filteredEnvironments[0].environmentScope === '*')
       );
     },
     filteredEnvironments() {
-      return this.environments.filter(e => !e.shouldDestroy);
+      return this.environments.filter(e => !e.shouldBeDestroyed);
     },
   },
   methods: {
     addEnvironment(environment) {
       const allEnvironmentsScope = this.environments.find(scope => scope.environmentScope === '*');
       if (allEnvironmentsScope) {
-        allEnvironmentsScope.shouldDestroy = true;
+        allEnvironmentsScope.shouldBeDestroyed = true;
       }
       this.environments.push({ environmentScope: environment });
       this.onStrategyChange();
@@ -158,7 +158,7 @@ export default {
       });
     },
     removeScope(environment) {
-      if (isString(environment.id)) {
+      if (isNumber(environment.id)) {
         Vue.set(environment, 'shouldBeDestroyed', true);
       } else {
         this.environments = this.environments.filter(e => e !== environment);

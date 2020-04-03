@@ -3,7 +3,8 @@ import axios from '~/lib/utils/axios_utils';
 import { visitUrl } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
-import { mapFromScopesViewModel } from '../helpers';
+import { NEW_VERSION_FLAG } from '../../../constants';
+import { mapFromScopesViewModel, mapStrategiesToRails } from '../helpers';
 
 /**
  * Commits mutation to set the main endpoint
@@ -32,7 +33,12 @@ export const updateFeatureFlag = ({ state, dispatch }, params) => {
   dispatch('requestUpdateFeatureFlag');
 
   axios
-    .put(state.endpoint, mapFromScopesViewModel(params))
+    .put(
+      state.endpoint,
+      params.version === NEW_VERSION_FLAG
+        ? mapStrategiesToRails(params)
+        : mapFromScopesViewModel(params),
+    )
     .then(() => {
       dispatch('receiveUpdateFeatureFlagSuccess');
       visitUrl(state.path);

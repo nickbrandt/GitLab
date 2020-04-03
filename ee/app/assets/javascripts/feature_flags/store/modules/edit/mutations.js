@@ -1,5 +1,6 @@
 import * as types from './mutation_types';
-import { mapToScopesViewModel } from '../helpers';
+import { mapToScopesViewModel, mapStrategiesToViewModel } from '../helpers';
+import { LEGACY_FLAG } from '../../../constants';
 
 export default {
   [types.SET_ENDPOINT](state, endpoint) {
@@ -20,8 +21,8 @@ export default {
     state.iid = response.iid;
     state.active = response.active;
     state.scopes = mapToScopesViewModel(response.scopes);
-    state.strategies = response.strategies || [];
-    state.version = response.version || 1;
+    state.strategies = mapStrategiesToViewModel(response.strategies);
+    state.version = response.version || LEGACY_FLAG;
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {
     state.isLoading = false;
