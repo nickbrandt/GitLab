@@ -1,15 +1,15 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlPagination } from '@gitlab/ui';
-import store from 'ee/geo_designs/store';
-import GeoDesigns from 'ee/geo_designs/components/geo_designs.vue';
-import GeoDesign from 'ee/geo_designs/components/geo_design.vue';
+import store from 'ee/geo_replicable/store';
+import GeoReplicable from 'ee/geo_replicable/components/geo_replicable.vue';
+import GeoReplicableItem from 'ee/geo_replicable/components/geo_replicable_item.vue';
 import { MOCK_BASIC_FETCH_DATA_MAP } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesigns', () => {
+describe('GeoReplicable', () => {
   let wrapper;
 
   const actionSpies = {
@@ -18,7 +18,7 @@ describe('GeoDesigns', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesigns, {
+    wrapper = mount(GeoReplicable, {
       localVue,
       store,
       methods: {
@@ -31,17 +31,17 @@ describe('GeoDesigns', () => {
     wrapper.destroy();
   });
 
-  const findGeoDesignsContainer = () => wrapper.find('section');
-  const findGlPagination = () => findGeoDesignsContainer().find(GlPagination);
-  const findGeoDesign = () => findGeoDesignsContainer().findAll(GeoDesign);
+  const findGeoReplicableContainer = () => wrapper.find('section');
+  const findGlPagination = () => findGeoReplicableContainer().find(GlPagination);
+  const findGeoReplicableItem = () => findGeoReplicableContainer().findAll(GeoReplicableItem);
 
   describe('template', () => {
     beforeEach(() => {
       createComponent();
     });
 
-    it('renders the designs container', () => {
-      expect(findGeoDesignsContainer().exists()).toBe(true);
+    it('renders the replicable container', () => {
+      expect(findGeoReplicableContainer().exists()).toBe(true);
     });
 
     describe('GlPagination', () => {
@@ -68,17 +68,17 @@ describe('GeoDesigns', () => {
       });
     });
 
-    describe('GeoDesign', () => {
+    describe('GeoReplicableItem', () => {
       beforeEach(() => {
         wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP.data;
       });
 
-      it('renders an instance for each design in the store', () => {
-        const designWrappers = findGeoDesign();
+      it('renders an instance for each replicableItem in the store', () => {
+        const replicableItemWrappers = findGeoReplicableItem();
         const replicableItems = [...wrapper.vm.$store.state.replicableItems];
 
-        for (let i = 0; i < designWrappers.length; i += 1) {
-          expect(designWrappers.at(i).props().projectId).toBe(replicableItems[i].projectId);
+        for (let i = 0; i < replicableItemWrappers.length; i += 1) {
+          expect(replicableItemWrappers.at(i).props().projectId).toBe(replicableItems[i].projectId);
         }
       });
     });

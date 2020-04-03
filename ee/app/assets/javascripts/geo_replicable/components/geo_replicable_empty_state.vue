@@ -4,7 +4,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
 export default {
-  name: 'GeoEmptyState',
+  name: 'GeoReplicableEmptyState',
   components: {
     GlEmptyState,
   },

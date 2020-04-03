@@ -7,7 +7,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import { DEFAULT_SEARCH_DELAY, ACTION_TYPES } from '../store/constants';
 
 export default {
-  name: 'GeoDesignsFilterBar',
+  name: 'GeoReplicableFilterBar',
   components: {
     GlTabs,
     GlTab,

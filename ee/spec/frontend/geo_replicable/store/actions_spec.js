@@ -2,10 +2,10 @@ import testAction from 'helpers/vuex_action_helper';
 import flash from '~/flash';
 import toast from '~/vue_shared/plugins/global_toast';
 import Api from 'ee/api';
-import * as actions from 'ee/geo_designs/store/actions';
-import * as types from 'ee/geo_designs/store/mutation_types';
-import createState from 'ee/geo_designs/store/state';
-import { ACTION_TYPES } from 'ee/geo_designs/store/constants';
+import * as actions from 'ee/geo_replicable/store/actions';
+import * as types from 'ee/geo_replicable/store/mutation_types';
+import createState from 'ee/geo_replicable/store/state';
+import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
 import {
   MOCK_BASIC_FETCH_DATA_MAP,
   MOCK_BASIC_FETCH_RESPONSE,
@@ -16,7 +16,7 @@ import {
 jest.mock('~/flash');
 jest.mock('~/vue_shared/plugins/global_toast');
 
-describe('GeoDesigns Store Actions', () => {
+describe('GeoReplicable Store Actions', () => {
   let state;
 
   beforeEach(() => {
