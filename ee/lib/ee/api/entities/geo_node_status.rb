@@ -9,6 +9,19 @@ module EE
 
         expose :geo_node_id
 
+        ::GeoNodeStatus::RESOURCE_STATUS_FIELDS.each do |field|
+          expose field
+        end
+
+        ::GeoNodeStatus.percentage_methods.each do |method_name|
+          expose method_name do |node|
+            number_to_percentage(node[method_name], precision: 2)
+          end
+        end
+
+        expose :replication_slots_count
+        expose :replication_slots_used_count
+
         expose :healthy?, as: :healthy
         expose :health do |node|
           node.healthy? ? 'Healthy' : node.health
@@ -16,109 +29,21 @@ module EE
         expose :health_status
         expose :missing_oauth_application
 
-        expose :attachments_replication_enabled
-        expose :attachments_count
-        expose :attachments_synced_count
-        expose :attachments_failed_count
-        expose :attachments_synced_missing_on_primary_count
-        expose :attachments_synced_in_percentage do |node|
-          number_to_percentage(node.attachments_synced_in_percentage, precision: 2)
-        end
-
         expose :db_replication_lag_seconds
 
+        expose :attachments_replication_enabled
         expose :lfs_objects_replication_enabled
-        expose :lfs_objects_count
-        expose :lfs_objects_synced_count
-        expose :lfs_objects_failed_count
-        expose :lfs_objects_synced_missing_on_primary_count
-        expose :lfs_objects_synced_in_percentage do |node|
-          number_to_percentage(node.lfs_objects_synced_in_percentage, precision: 2)
-        end
-
         expose :job_artifacts_replication_enabled
-        expose :job_artifacts_count
-        expose :job_artifacts_synced_count
-        expose :job_artifacts_failed_count
-        expose :job_artifacts_synced_missing_on_primary_count
-        expose :job_artifacts_synced_in_percentage do |node|
-          number_to_percentage(node.job_artifacts_synced_in_percentage, precision: 2)
-        end
-
         expose :container_repositories_replication_enabled
-        expose :container_repositories_count
-        expose :container_repositories_synced_count
-        expose :container_repositories_failed_count
-        expose :container_repositories_synced_in_percentage do |node|
-          number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
-        end
-
         expose :design_repositories_replication_enabled
-        expose :design_repositories_count
-        expose :design_repositories_synced_count
-        expose :design_repositories_failed_count
-        expose :design_repositories_synced_in_percentage do |node|
-          number_to_percentage(node.design_repositories_synced_in_percentage, precision: 2)
-        end
-
         expose :repositories_replication_enabled
-        expose :projects_count
-
-        expose :repositories_failed_count
-        expose :repositories_synced_count
-        expose :repositories_synced_in_percentage do |node|
-          number_to_percentage(node.repositories_synced_in_percentage, precision: 2)
-        end
-
-        expose :wikis_failed_count
-        expose :wikis_synced_count
-        expose :wikis_synced_in_percentage do |node|
-          number_to_percentage(node.wikis_synced_in_percentage, precision: 2)
-        end
 
         expose :repository_verification_enabled
 
-        expose :repositories_checksummed_count
-        expose :repositories_checksum_failed_count
-        expose :repositories_checksummed_in_percentage do |node|
-          number_to_percentage(node.repositories_checksummed_in_percentage, precision: 2)
-        end
-
-        expose :wikis_checksummed_count
-        expose :wikis_checksum_failed_count
-        expose :wikis_checksummed_in_percentage do |node|
-          number_to_percentage(node.wikis_checksummed_in_percentage, precision: 2)
-        end
-
-        expose :repositories_verification_failed_count
-        expose :repositories_verified_count
-        expose :repositories_verified_in_percentage do |node|
-          number_to_percentage(node.repositories_verified_in_percentage, precision: 2)
-        end
-        expose :repositories_checksum_mismatch_count
-
-        expose :wikis_verification_failed_count
-        expose :wikis_verified_count
-        expose :wikis_verified_in_percentage do |node|
-          number_to_percentage(node.wikis_verified_in_percentage, precision: 2)
-        end
-        expose :wikis_checksum_mismatch_count
-
-        expose :repositories_retrying_verification_count
-        expose :wikis_retrying_verification_count
-
-        expose :replication_slots_count
-        expose :replication_slots_used_count
-        expose :replication_slots_used_in_percentage do |node|
-          number_to_percentage(node.replication_slots_used_in_percentage, precision: 2)
-        end
         expose :replication_slots_max_retained_wal_bytes
 
         expose :repositories_checked_count
         expose :repositories_checked_failed_count
-        expose :repositories_checked_in_percentage do |node|
-          number_to_percentage(node.repositories_checked_in_percentage, precision: 2)
-        end
 
         expose :last_event_id
         expose :last_event_timestamp

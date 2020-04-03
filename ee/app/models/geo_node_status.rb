@@ -298,8 +298,16 @@ class GeoNodeStatus < ApplicationRecord
     self[attr] = Time.at(value)
   end
 
+  def self.percentage_methods
+    @percentage_methods || []
+  end
+
   def self.attr_in_percentage(attr_name, count, total)
-    define_method("#{attr_name}_in_percentage") do
+    method_name = "#{attr_name}_in_percentage"
+    @percentage_methods ||= []
+    @percentage_methods << method_name
+
+    define_method(method_name) do
       return 0 if self[total].to_i.zero?
 
       (self[count].to_f / self[total].to_f) * 100.0
