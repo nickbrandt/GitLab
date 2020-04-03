@@ -45,25 +45,6 @@ describe 'Getting designs related to an issue' do
     Gitlab::UrlBuilder.build(design, ref: ref, size: size)
   end
 
-  context 'when the feature is not available' do
-    before do
-      stub_licensed_features(design_management: false)
-      stub_feature_flags(design_managment: false)
-    end
-
-    it_behaves_like 'a working graphql query' do
-      before do
-        post_graphql(query, current_user: current_user)
-      end
-    end
-
-    it 'returns no designs' do
-      post_graphql(query, current_user: current_user)
-
-      expect(design_collection).to be_nil
-    end
-  end
-
   context 'when the feature is available' do
     before do
       enable_design_management
