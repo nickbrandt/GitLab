@@ -8,7 +8,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
-import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.vue';
+import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
 import '~/gl_dropdown';
@@ -34,7 +34,7 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 const defaultStubs = {
-  'summary-table': true,
+  'metric-card': true,
   'stage-event-list': true,
   'stage-nav-item': true,
   'tasks-by-type-chart': true,
@@ -119,8 +119,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(Daterange).exists()).toBe(flag);
   };
 
-  const displaysSummaryTable = flag => {
-    expect(wrapper.find(SummaryTable).exists()).toBe(flag);
+  const displaysMetricCard = flag => {
+    expect(wrapper.find(MetricCard).exists()).toBe(flag);
   };
 
   const displaysStageTable = flag => {
@@ -175,8 +175,8 @@ describe('Cycle Analytics component', () => {
         displaysDateRangePicker(false);
       });
 
-      it('does not display the summary table', () => {
-        displaysSummaryTable(false);
+      it('does not display the metric card', () => {
+        displaysMetricCard(false);
       });
 
       it('does not display the stage table', () => {
@@ -229,8 +229,8 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(true);
         });
 
-        it('displays the summary table', () => {
-          displaysSummaryTable(true);
+        it('displays the metric card', () => {
+          displaysMetricCard(true);
         });
 
         it('displays the stage table', () => {
@@ -282,7 +282,7 @@ describe('Cycle Analytics component', () => {
               opts: {
                 stubs: {
                   'stage-event-list': true,
-                  'summary-table': true,
+                  'metric-card': true,
                   'add-stage-button': true,
                   'stage-table-header': true,
                 },
@@ -340,8 +340,8 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(false);
         });
 
-        it('does not display the summary table', () => {
-          displaysSummaryTable(false);
+        it('does not display the metric card', () => {
+          displaysMetricCard(false);
         });
 
         it('does not display the stage table', () => {
@@ -594,6 +594,23 @@ describe('Cycle Analytics component', () => {
           'There was an error while fetching value stream analytics duration data.',
         );
       });
+    });
+  });
+
+  describe('Summary data', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        withStageSelected: true,
+      });
+
+      wrapper.vm.$store.dispatch('receiveSummaryDataSuccess', mockData.summaryData);
+    });
+
+    it('displays the summary data within the metric card', () => {
+      expect(wrapper.find(MetricCard).props('metrics')).toEqual([
+        { value: 3, label: 'New Issues' },
+        { value: '-', label: 'Deploys' },
+      ]);
     });
   });
 

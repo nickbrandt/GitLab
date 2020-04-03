@@ -123,7 +123,7 @@ export default {
   },
   [types.RECEIVE_SUMMARY_DATA_SUCCESS](state, data) {
     state.summary = data.map(item => ({
-      ...item,
+      label: item.title,
       value: item.value || '-',
     }));
   },

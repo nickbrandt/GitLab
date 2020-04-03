@@ -6,11 +6,11 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
+import MetricCard from '../../shared/components/metric_card.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
 import { LAST_ACTIVITY_AT, dateFormats, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
-import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
 import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
@@ -24,11 +24,11 @@ export default {
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
-    SummaryTable,
     StageTable,
     StageDropdownFilter,
     Scatterplot,
     TasksByTypeChart,
+    MetricCard,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -285,7 +285,12 @@ export default {
           <gl-loading-icon class="mt-4" size="md" />
         </div>
         <div v-else>
-          <summary-table class="js-summary-table" :items="summary" />
+          <metric-card
+            :title="__('Recent Activity')"
+            :metrics="summary"
+            :is-loading="isLoading"
+            class="js-metric-card mt-3"
+          />
           <stage-table
             v-if="selectedStage"
             :key="stageCount"
