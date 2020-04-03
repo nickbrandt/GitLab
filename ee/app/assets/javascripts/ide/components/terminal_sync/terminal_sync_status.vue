@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { throttle } from 'lodash';
 import { GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
 import { mapState } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -49,7 +49,7 @@ export default {
   watch: {
     // We want to throttle the `isLoading` updates so that
     // the user actually sees an indicator that changes are sent.
-    isLoadingState: _.throttle(function watchIsLoadingState(val) {
+    isLoadingState: throttle(function watchIsLoadingState(val) {
       this.isLoading = val;
     }, 150),
   },

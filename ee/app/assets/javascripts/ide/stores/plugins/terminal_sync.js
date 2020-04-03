@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { debounce } from 'lodash';
 import eventHub from '~/ide/eventhub';
 import terminalSyncModule from '../modules/terminal_sync';
 import { isEndingStatus, isRunningStatus } from '../../utils';
@@ -15,7 +15,7 @@ export default function createMirrorPlugin() {
   return store => {
     store.registerModule('terminalSync', terminalSyncModule());
 
-    const upload = _.debounce(() => {
+    const upload = debounce(() => {
       store.dispatch(`terminalSync/upload`);
     }, UPLOAD_DEBOUNCE);
 
