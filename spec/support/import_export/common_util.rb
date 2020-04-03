@@ -26,15 +26,13 @@ module ImportExport
       "tmp/tests/gitlab-test/import_export"
     end
 
-    def saved_relations(path, exportable_path, key, ndjson_enabled)
-      if ndjson_enabled == true
+    def get_json(path, exportable_path, key, ndjson_enabled)
+      if ndjson_enabled
         json = if key == :projects
                  consume_attributes(path, exportable_path)
                else
                  consume_relations(path, exportable_path, key)
                end
-
-        json = json.first if key == :project_feature
       else
         json = project_json(path)
         json = json[key.to_s] unless key == :projects
@@ -86,11 +84,11 @@ module ImportExport
         relations << json
       end
 
-      relations.flatten
+      key == :project_feature ? relations.first : relations.flatten
     end
 
     def project_json(filename)
-      ::JSON.parse(IO.read(filename))
+      ActiveSupport::JSON.decode(IO.read(filename))
     end
   end
 end
