@@ -8,7 +8,7 @@ import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_chart.vue';
-import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
+import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list_vuex.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 import LoadingError from 'ee/security_dashboard/components/loading_error.vue';
 
