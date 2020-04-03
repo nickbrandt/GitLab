@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import NoteHeader from '~/notes/components/note_header.vue';
-import GitLabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
+import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -150,7 +150,7 @@ describe('NoteHeader component', () => {
     ({ props, expected }) => {
       createComponent(props);
 
-      expect(wrapper.find(GitLabTeamMemberBadge).exists()).toBe(expected);
+      expect(wrapper.find(GitlabTeamMemberBadge).exists()).toBe(expected);
     },
   );
 });

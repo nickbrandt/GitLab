@@ -2,26 +2,24 @@
 import { GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 
-const GITLAB_TEAM_MEMBER = __('GitLab Team Member');
+const GITLAB_TEAM_MEMBER_LABEL = __('GitLab Team Member');
 
 export default {
-  name: 'GitLabTeamMemberBadge',
+  name: 'GitlabTeamMemberBadge',
   directives: {
     GlTooltip: GlTooltipDirective,
   },
   components: { GlIcon },
-  created() {
-    this.GITLAB_TEAM_MEMBER = GITLAB_TEAM_MEMBER;
-  },
+  gitlabTeamMemberLabel: GITLAB_TEAM_MEMBER_LABEL,
 };
 </script>
 
 <template>
   <span
     v-gl-tooltip.hover
-    :title="GITLAB_TEAM_MEMBER"
+    :title="$options.gitlabTeamMemberLabel"
     role="img"
-    :aria-label="GITLAB_TEAM_MEMBER"
+    :aria-label="$options.gitlabTeamMemberLabel"
     class="d-inline-block align-middle"
   >
     <gl-icon name="tanuki-verified" class="gl-text-purple d-block" />
