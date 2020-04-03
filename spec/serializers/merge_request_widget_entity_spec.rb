@@ -5,9 +5,9 @@ require 'spec_helper'
 describe MergeRequestWidgetEntity do
   include ProjectForksHelper
 
-  let(:project)  { create :project, :repository }
+  let(:project) { create :project, :repository }
   let(:resource) { create(:merge_request, source_project: project, target_project: project) }
-  let(:user)     { create(:user) }
+  let(:user) { create(:user) }
 
   let(:request) { double('request', current_user: user, project: project) }
 
@@ -54,6 +54,8 @@ describe MergeRequestWidgetEntity do
   end
 
   describe 'merge_request_add_ci_config_path' do
+    let!(:project_auto_devops) { create(:project_auto_devops, :disabled, project: project) }
+
     before do
       project.add_role(user, role)
     end
@@ -78,6 +80,16 @@ describe MergeRequestWidgetEntity do
           expected_path = "/#{resource.project.full_path}/-/new/#{resource.source_branch}?commit_message=Add+.gitlab-ci.yml&file_name=.gitlab-ci.yml&suggest_gitlab_ci_yml=true"
 
           expect(subject[:merge_request_add_ci_config_path]).to eq(expected_path)
+        end
+
+        context 'when auto devops is enabled' do
+          before do
+            project_auto_devops.enabled = true
+          end
+
+          it 'returns a blank ci config path' do
+            expect(subject[:merge_request_add_ci_config_path]).to be_nil
+          end
         end
 
         context 'when source project is missing' do
