@@ -81,7 +81,7 @@ describe('KnativeDomainEditor', () => {
     it('triggers save event and pass current knative hostname', () => {
       wrapper.find(LoadingButton).vm.$emit('click');
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('save')[0]).toEqual([]);
+        expect(wrapper.emitted('save').length).toEqual(1);
       });
     });
   });
