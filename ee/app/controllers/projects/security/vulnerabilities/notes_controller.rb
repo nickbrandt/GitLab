@@ -12,7 +12,7 @@ module Projects
         include ToggleAwardEmoji
 
         before_action :not_found, unless: -> { project.first_class_vulnerabilities_enabled? }
-        before_action :vulnerability
+        before_action :authorize_create_note!, only: [:create]
 
         private
 
