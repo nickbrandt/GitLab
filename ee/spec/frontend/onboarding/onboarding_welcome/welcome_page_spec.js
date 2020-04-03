@@ -5,6 +5,11 @@ import ActionPopover from 'ee/onboarding/onboarding_helper/components/action_pop
 import HelpContentPopover from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
 import onboardingUtils from 'ee/onboarding/utils';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
+import { redirectTo } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility', () => ({
+  redirectTo: jest.fn(),
+}));
 
 const localVue = createLocalVue();
 
@@ -38,8 +43,7 @@ describe('User onboarding welcome page', () => {
   describe('methods', () => {
     describe('startTour', () => {
       it('resets the localStorage', done => {
-        spyOnDependency(component, 'redirectTo');
-        spyOn(onboardingUtils, 'resetOnboardingLocalStorage').and.stub();
+        jest.spyOn(onboardingUtils, 'resetOnboardingLocalStorage');
 
         wrapper.vm
           .$nextTick()
@@ -53,8 +57,7 @@ describe('User onboarding welcome page', () => {
       });
 
       it('sets the dismissed property to false', done => {
-        spyOnDependency(component, 'redirectTo');
-        spyOn(onboardingUtils, 'updateOnboardingDismissed').and.stub();
+        jest.spyOn(onboardingUtils, 'updateOnboardingDismissed');
 
         wrapper.vm
           .$nextTick()
@@ -68,13 +71,12 @@ describe('User onboarding welcome page', () => {
       });
 
       it('redirects to the project path', done => {
-        const redirectSpy = spyOnDependency(component, 'redirectTo');
         wrapper.vm
           .$nextTick()
           .then(() => wrapper.vm.startTour())
           .then(wrapper.vm.$nextTick)
           .then(() => {
-            expect(redirectSpy).toHaveBeenCalledWith(props.projectFullPath);
+            expect(redirectTo).toHaveBeenCalledWith(props.projectFullPath);
           })
           .then(done)
           .catch(done.fail);
@@ -83,8 +85,7 @@ describe('User onboarding welcome page', () => {
 
     describe('skipTour', () => {
       it('sets the dismissed property to true', done => {
-        spyOnDependency(component, 'redirectTo');
-        spyOn(onboardingUtils, 'updateOnboardingDismissed').and.stub();
+        jest.spyOn(onboardingUtils, 'updateOnboardingDismissed');
 
         wrapper.vm
           .$nextTick()
@@ -98,13 +99,12 @@ describe('User onboarding welcome page', () => {
       });
 
       it('redirects to the skip url', done => {
-        const redirectSpy = spyOnDependency(component, 'redirectTo');
         wrapper.vm
           .$nextTick()
           .then(() => wrapper.vm.skipTour())
           .then(wrapper.vm.$nextTick)
           .then(() => {
-            expect(redirectSpy).toHaveBeenCalledWith(props.skipUrl);
+            expect(redirectTo).toHaveBeenCalledWith(props.skipUrl);
           })
           .then(done)
           .catch(done.fail);

@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import createState from 'ee/onboarding/onboarding_helper/store/state';
 import * as types from 'ee/onboarding/onboarding_helper/store/mutation_types';
 import {
@@ -41,7 +41,7 @@ describe('User onboarding helper store actions', () => {
 
   describe('setTourKey', () => {
     beforeEach(() => {
-      spyOn(onboardingUtils, 'updateLocalStorage').and.stub();
+      jest.spyOn(onboardingUtils, 'updateLocalStorage');
     });
 
     it(`commits ${types.SET_TOUR_KEY} mutation`, done => {
@@ -68,7 +68,7 @@ describe('User onboarding helper store actions', () => {
 
   describe('setLastStepIndex', () => {
     beforeEach(() => {
-      spyOn(onboardingUtils, 'updateLocalStorage').and.stub();
+      jest.spyOn(onboardingUtils, 'updateLocalStorage');
     });
 
     it(`commits ${types.SET_LAST_STEP_INDEX} mutation`, done => {
@@ -183,10 +183,10 @@ describe('User onboarding helper store actions', () => {
         [{ type: types.SET_DISMISSED, payload: dismissed }],
         [],
         () => {
-          setTimeout(() => {
+          setImmediate(() => {
             expect(Cookies.get(ONBOARDING_DISMISSED_COOKIE_NAME)).toEqual(`${dismissed}`);
             done();
-          }, 0);
+          });
         },
       );
     });

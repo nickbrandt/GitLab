@@ -32,23 +32,23 @@ describe('User onboarding action popover', () => {
 
   describe('when mounted', () => {
     it("binds 'onboardingHelper.showActionPopover', 'onboardingHelper.hideActionPopover' and 'onboardingHelper.destroyActionPopover' event listener on eventHub", () => {
-      spyOn(eventHub, '$on');
+      jest.spyOn(eventHub, '$on');
 
       createComponent();
 
       expect(eventHub.$on).toHaveBeenCalledWith(
         'onboardingHelper.showActionPopover',
-        jasmine.any(Function),
+        expect.any(Function),
       );
 
       expect(eventHub.$on).toHaveBeenCalledWith(
         'onboardingHelper.hideActionPopover',
-        jasmine.any(Function),
+        expect.any(Function),
       );
 
       expect(eventHub.$on).toHaveBeenCalledWith(
         'onboardingHelper.destroyActionPopover',
-        jasmine.any(Function),
+        expect.any(Function),
       );
     });
   });
@@ -60,7 +60,7 @@ describe('User onboarding action popover', () => {
 
     describe('beforeDestroy', () => {
       it("unbinds 'showActionPopover', 'hideActionPopover' and 'destroyActionPopover' event handler", () => {
-        spyOn(eventHub, '$off');
+        jest.spyOn(eventHub, '$off');
 
         wrapper.destroy();
 
