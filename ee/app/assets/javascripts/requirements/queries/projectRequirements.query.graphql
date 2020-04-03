@@ -1,6 +1,24 @@
-query projectRequirements($projectPath: ID!, $state: RequirementState) {
+query projectRequirements(
+  $projectPath: ID!
+  $state: RequirementState
+  $firstPageSize: Int
+  $lastPageSize: Int
+  $prevPageCursor: String = ""
+  $nextPageCursor: String = ""
+) {
   project(fullPath: $projectPath) {
-    requirements(sort: created_desc, state: $state) {
+    requirementStatesCount {
+      opened
+      archived
+    }
+    requirements(
+      first: $firstPageSize
+      last: $lastPageSize
+      after: $nextPageCursor
+      before: $prevPageCursor
+      sort: created_desc
+      state: $state
+    ) {
       nodes {
         iid
         title
@@ -17,6 +35,10 @@ query projectRequirements($projectPath: ID!, $state: RequirementState) {
           avatarUrl
           webUrl
         }
+      }
+      pageInfo {
+        startCursor
+        endCursor
       }
     }
   }

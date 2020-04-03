@@ -27,12 +27,32 @@ export default () => {
       RequirementsRoot,
     },
     data() {
-      const { filterBy, projectPath, emptyStatePath } = el.dataset;
+      const {
+        filterBy,
+        page,
+        next,
+        prev,
+        projectPath,
+        emptyStatePath,
+        opened,
+        archived,
+      } = el.dataset;
       const stateFilterBy = filterBy ? FilterState[filterBy] : FilterState.opened;
+
+      const OPENED = parseInt(opened, 10);
+      const ARCHIVED = parseInt(archived, 10);
 
       return {
         showCreateRequirement: false,
         filterBy: stateFilterBy,
+        requirementsCount: {
+          OPENED,
+          ARCHIVED,
+          ALL: OPENED + ARCHIVED,
+        },
+        page,
+        prev,
+        next,
         emptyStatePath,
         projectPath,
       };
@@ -53,6 +73,10 @@ export default () => {
         props: {
           projectPath: this.projectPath,
           filterBy: this.filterBy,
+          requirementsCount: this.requirementsCount,
+          page: parseInt(this.page, 10) || 1,
+          prev: this.prev,
+          next: this.next,
           showCreateRequirement: this.showCreateRequirement,
           emptyStatePath: this.emptyStatePath,
         },
