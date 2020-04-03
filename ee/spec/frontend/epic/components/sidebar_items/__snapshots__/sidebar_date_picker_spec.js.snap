@@ -30,7 +30,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
         tabindex="0"
       />
        
-      <gl-button-stub
+      <gl-deprecated-button-stub
         class="btn-sidebar-action"
         size="md"
         variant="link"
@@ -38,7 +38,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
         
         Edit
       
-      </gl-button-stub>
+      </gl-deprecated-button-stub>
        
       <!---->
     </div>

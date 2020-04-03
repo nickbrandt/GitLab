@@ -1,6 +1,6 @@
 <script>
 import { escape as esc } from 'lodash';
-import { GlButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -8,7 +8,7 @@ import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     Icon,
     GlModal,
     GlToggle,
@@ -180,17 +180,17 @@ export default {
         <div class="table-section section-20 table-button-footer" role="gridcell">
           <div class="table-action-buttons btn-group">
             <template v-if="featureFlag.edit_path">
-              <gl-button
+              <gl-deprecated-button
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
                 variant="outline-primary"
                 :href="featureFlag.edit_path"
               >
                 <icon name="pencil" :size="16" />
-              </gl-button>
+              </gl-deprecated-button>
             </template>
             <template v-if="featureFlag.destroy_path">
-              <gl-button
+              <gl-deprecated-button
                 v-gl-tooltip.hover.bottom="__('Delete')"
                 class="js-feature-flag-delete-button"
                 variant="danger"
@@ -198,7 +198,7 @@ export default {
                 @click="setDeleteModalData(featureFlag)"
               >
                 <icon name="remove" :size="16" />
-              </gl-button>
+              </gl-deprecated-button>
             </template>
           </div>
         </div>

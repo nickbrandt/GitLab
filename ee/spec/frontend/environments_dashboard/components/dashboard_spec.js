@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlDeprecatedButton, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import state from 'ee/vue_shared/dashboards/store/state';
 import component from 'ee/environments_dashboard/components/dashboard/dashboard.vue';
@@ -89,7 +89,7 @@ describe('dashboard', () => {
     let button;
 
     beforeEach(() => {
-      button = wrapper.find(GlButton);
+      button = wrapper.find(GlDeprecatedButton);
     });
 
     it('is labelled correctly', () => {
@@ -132,7 +132,7 @@ describe('dashboard', () => {
 
     describe('project selector modal', () => {
       beforeEach(() => {
-        wrapper.find(GlButton).trigger('click');
+        wrapper.find(GlDeprecatedButton).trigger('click');
         return wrapper.vm.$nextTick();
       });
 

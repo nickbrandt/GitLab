@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import createFlash, { hideFlash } from '~/flash';
 import { s__ } from '~/locale';
 import eventHub from '~/vue_merge_request_widget/event_hub';
@@ -20,7 +20,7 @@ export default {
     ApprovalsSummaryOptional,
     ApprovalsFooter,
     ApprovalsAuth,
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
   },
   props: {
@@ -207,7 +207,7 @@ export default {
           @approve="approveWithAuth"
           @hide="clearError"
         />
-        <gl-button
+        <gl-deprecated-button
           v-if="action"
           :variant="action.variant"
           :class="{ 'btn-inverted': action.inverted }"
@@ -218,7 +218,7 @@ export default {
         >
           <gl-loading-icon v-if="isApproving" inline />
           {{ action.text }}
-        </gl-button>
+        </gl-deprecated-button>
         <approvals-summary-optional
           v-if="isOptional"
           :can-approve="hasAction"

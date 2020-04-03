@@ -1,5 +1,5 @@
 <script>
-import { GlIcon, GlDropdown, GlButton } from '@gitlab/ui';
+import { GlIcon, GlDropdown, GlDeprecatedButton } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
 import { SELECTIVE_SYNC_SHARDS } from '../constants';
 
@@ -8,7 +8,7 @@ export default {
   components: {
     GlIcon,
     GlDropdown,
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     syncShardsOptions: {
@@ -51,10 +51,10 @@ export default {
 <template>
   <gl-dropdown :text="dropdownTitle">
     <li v-for="shard in syncShardsOptions" :key="shard.value">
-      <gl-button class="d-flex align-items-center" @click="toggleShard(shard)">
+      <gl-deprecated-button class="d-flex align-items-center" @click="toggleShard(shard)">
         <gl-icon :class="[{ invisible: !isSelected(shard) }]" name="mobile-issue-close" />
         <span class="ml-1">{{ shard.label }}</span>
-      </gl-button>
+      </gl-deprecated-button>
     </li>
     <div v-if="noSyncShards" class="text-secondary p-2">{{ __('Nothing found…') }}</div>
   </gl-dropdown>

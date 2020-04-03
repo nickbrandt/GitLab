@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -19,7 +19,7 @@ export default {
   },
   components: {
     Icon,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
     UserAvatarLink,
     TimeagoTooltip,
@@ -109,7 +109,7 @@ export default {
         @click="toggleEpicStatus(isEpicOpen)"
       />
     </div>
-    <gl-button
+    <gl-deprecated-button
       :aria-label="__('Toggle sidebar')"
       variant="secondary"
       class="float-right d-block d-sm-none
@@ -118,6 +118,6 @@ gutter-toggle issuable-gutter-toggle js-sidebar-toggle"
       @click="toggleSidebar({ sidebarCollapsed })"
     >
       <i class="fa fa-angle-double-left"></i>
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

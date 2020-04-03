@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import { shallowMount } from '@vue/test-utils';
-import { GlFormTextarea, GlFormCheckbox, GlButton } from '@gitlab/ui';
+import { GlFormTextarea, GlFormCheckbox, GlDeprecatedButton } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import Strategy from 'ee/feature_flags/components/strategy.vue';
@@ -424,7 +424,7 @@ describe('feature flag form', () => {
     });
 
     it('should add a strategy when clicking the Add button', () => {
-      wrapper.find(GlButton).vm.$emit('click');
+      wrapper.find(GlDeprecatedButton).vm.$emit('click');
       return wrapper.vm.$nextTick().then(() => expect(wrapper.findAll(Strategy)).toHaveLength(3));
     });
 

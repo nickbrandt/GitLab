@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 import CreateEpicForm from 'ee/related_items_tree/components/create_epic_form.vue';
 
@@ -90,7 +90,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders form action buttons', () => {
-        const actionButtons = wrapper.findAll(GlButton);
+        const actionButtons = wrapper.findAll(GlDeprecatedButton);
 
         expect(actionButtons.at(0).text()).toBe('Create epic');
         expect(actionButtons.at(1).text()).toBe('Cancel');

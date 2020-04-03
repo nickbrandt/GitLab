@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { memoize, isString, cloneDeep } from 'lodash';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlBadge,
   GlTooltip,
   GlTooltipDirective,
@@ -29,7 +29,7 @@ import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlBadge,
     GlFormTextarea,
     GlFormCheckbox,
@@ -299,9 +299,9 @@ export default {
             <h4>{{ s__('FeatureFlags|Strategies') }}</h4>
             <div class="flex align-items-baseline justify-content-between">
               <p class="mr-3">{{ $options.translations.newHelpText }}</p>
-              <gl-button variant="success" category="secondary" @click="addStrategy">
+              <gl-deprecated-button variant="success" category="secondary" @click="addStrategy">
                 {{ s__('FeatureFlags|Add strategy') }}
-              </gl-button>
+              </gl-deprecated-button>
             </div>
           </div>
         </div>
@@ -482,7 +482,7 @@ export default {
                   {{ s__('FeatureFlags|Remove') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-delete">
-                  <gl-button
+                  <gl-deprecated-button
                     v-if="!isAllEnvironment(scope.environmentScope) && canUpdateScope(scope)"
                     v-gl-tooltip
                     :title="s__('FeatureFlags|Remove')"
@@ -490,7 +490,7 @@ export default {
                     @click="removeScope(scope)"
                   >
                     <icon name="clear" />
-                  </gl-button>
+                  </gl-deprecated-button>
                 </div>
               </div>
             </div>
@@ -551,7 +551,7 @@ export default {
     </fieldset>
 
     <div class="form-actions">
-      <gl-button
+      <gl-deprecated-button
         ref="submitButton"
         type="button"
         variant="success"
@@ -559,10 +559,14 @@ export default {
         @click="handleSubmit"
       >
         {{ submitText }}
-      </gl-button>
-      <gl-button :href="cancelPath" variant="secondary" class="js-ff-cancel col-xs-12 float-right">
+      </gl-deprecated-button>
+      <gl-deprecated-button
+        :href="cancelPath"
+        variant="secondary"
+        class="js-ff-cancel col-xs-12 float-right"
+      >
         {{ __('Cancel') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
   </form>
 </template>

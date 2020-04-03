@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlFormGroup, GlFormInput, GlFormCheckbox, GlButton } from '@gitlab/ui';
+import { GlFormGroup, GlFormInput, GlFormCheckbox, GlDeprecatedButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import GeoNodeFormCore from './geo_node_form_core.vue';
@@ -13,7 +13,7 @@ export default {
     GlFormGroup,
     GlFormInput,
     GlFormCheckbox,
-    GlButton,
+    GlDeprecatedButton,
     GeoNodeFormCore,
     GeoNodeFormSelectiveSync,
     GeoNodeFormCapacities,
@@ -123,12 +123,15 @@ export default {
       </gl-form-group>
     </section>
     <section class="d-flex align-items-center mt-4">
-      <gl-button id="node-save-button" variant="success" @click="saveGeoNode(nodeData)">{{
-        saveButtonTitle
-      }}</gl-button>
-      <gl-button id="node-cancel-button" class="ml-auto" @click="redirect">{{
+      <gl-deprecated-button
+        id="node-save-button"
+        variant="success"
+        @click="saveGeoNode(nodeData)"
+        >{{ saveButtonTitle }}</gl-deprecated-button
+      >
+      <gl-deprecated-button id="node-cancel-button" class="ml-auto" @click="redirect">{{
         __('Cancel')
-      }}</gl-button>
+      }}</gl-deprecated-button>
     </section>
   </form>
 </template>

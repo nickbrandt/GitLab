@@ -1,10 +1,10 @@
 <script>
-import { GlTooltipDirective, GlButton } from '@gitlab/ui';
+import { GlTooltipDirective, GlDeprecatedButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     Icon,
   },
   directives: {
@@ -19,13 +19,13 @@ export default {
       <icon name="folder-o" :size="16" />
     </div>
     <span>{{ __('Private group(s)') }}</span>
-    <gl-button
+    <gl-deprecated-button
       v-gl-tooltip
       :title="__('One or more groups that you don\'t have access to.')"
       variant="blank"
       class="ml-1 text-secondary"
     >
       <icon name="question-o" :size="16" />
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

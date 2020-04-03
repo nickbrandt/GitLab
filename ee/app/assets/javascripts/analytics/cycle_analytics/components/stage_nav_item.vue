@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { approximateDuration } from '~/lib/utils/datetime_utility';
 import StageCardListItem from './stage_card_list_item.vue';
 
@@ -8,7 +8,7 @@ export default {
   components: {
     StageCardListItem,
     GlIcon,
-    GlButton,
+    GlDeprecatedButton,
     GlTooltip,
   },
   props: {
@@ -121,31 +121,31 @@ export default {
           <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
         </div>
         <div v-show="menuOpen" ref="dropdown" :class="[openMenuClasses]" class="dropdown w-25">
-          <gl-button
+          <gl-deprecated-button
             :title="__('More actions')"
             class="more-actions-toggle btn btn-transparent p-0"
             data-toggle="dropdown"
           >
             <gl-icon class="icon" name="ellipsis_v" />
-          </gl-button>
+          </gl-deprecated-button>
           <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
             <template v-if="isDefaultStage">
               <li>
-                <gl-button @click="handleDropdownAction('hide', $event)">
+                <gl-deprecated-button @click="handleDropdownAction('hide', $event)">
                   {{ __('Hide stage') }}
-                </gl-button>
+                </gl-deprecated-button>
               </li>
             </template>
             <template v-else>
               <li>
-                <gl-button @click="handleDropdownAction('edit', $event)">
+                <gl-deprecated-button @click="handleDropdownAction('edit', $event)">
                   {{ __('Edit stage') }}
-                </gl-button>
+                </gl-deprecated-button>
               </li>
               <li>
-                <gl-button @click="handleDropdownAction('remove', $event)">
+                <gl-deprecated-button @click="handleDropdownAction('remove', $event)">
                   {{ __('Remove stage') }}
-                </gl-button>
+                </gl-deprecated-button>
               </li>
             </template>
           </ul>

@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlButtonGroup } from '@gitlab/ui';
+import { GlDeprecatedButton, GlButtonGroup } from '@gitlab/ui';
 import { GlLineChart } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
@@ -7,7 +7,7 @@ import { s__, __, sprintf } from '~/locale';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlButtonGroup,
     GlLineChart,
     ResizableChartContainer,
@@ -135,15 +135,15 @@ export default {
     <div class="burndown-header d-flex align-items-center">
       <h3>{{ __('Burndown chart') }}</h3>
       <gl-button-group class="ml-3 js-burndown-data-selector">
-        <gl-button
+        <gl-deprecated-button
           ref="totalIssuesButton"
           :variant="issuesSelected ? 'primary' : 'inverted-primary'"
           size="sm"
           @click="showIssueCount"
         >
           {{ __('Issues') }}
-        </gl-button>
-        <gl-button
+        </gl-deprecated-button>
+        <gl-deprecated-button
           ref="totalWeightButton"
           :variant="issuesSelected ? 'inverted-primary' : 'primary'"
           size="sm"
@@ -151,7 +151,7 @@ export default {
           @click="showIssueWeight"
         >
           {{ __('Issue weight') }}
-        </gl-button>
+        </gl-deprecated-button>
       </gl-button-group>
     </div>
     <resizable-chart-container class="burndown-chart">

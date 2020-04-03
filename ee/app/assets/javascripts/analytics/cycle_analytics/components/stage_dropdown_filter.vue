@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import { escape as esc } from 'lodash';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -9,7 +9,7 @@ export default {
   name: 'StageDropdownFilter',
   components: {
     Icon,
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     stages: {
@@ -86,7 +86,7 @@ export default {
 <template>
   <div>
     <div ref="stagesDropdown" class="dropdown dropdown-stages">
-      <gl-button
+      <gl-deprecated-button
         class="dropdown-menu-toggle wide shadow-none bg-white"
         type="button"
         data-toggle="dropdown"
@@ -95,7 +95,7 @@ export default {
       >
         {{ selectedStagesLabel }}
         <icon name="chevron-down" />
-      </gl-button>
+      </gl-deprecated-button>
       <div
         class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width dropdown-menu-right"
       >

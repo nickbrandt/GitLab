@@ -1,6 +1,6 @@
 <script>
 import { uniqueId } from 'lodash';
-import { GlLink, GlIntersperse, GlModal, GlButton, GlModalDirective } from '@gitlab/ui';
+import { GlLink, GlIntersperse, GlModal, GlDeprecatedButton, GlModalDirective } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 
 const MODAL_ID_PREFIX = 'license-component-link-modal-';
@@ -10,7 +10,7 @@ export default {
   components: {
     GlIntersperse,
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     GlModal,
   },
   directives: {
@@ -68,14 +68,14 @@ export default {
         }}</gl-link>
         <template v-else>{{ component.name }}</template>
       </span>
-      <gl-button
+      <gl-deprecated-button
         v-if="hasComponentsInModal"
         v-gl-modal-directive="modalId"
         variant="link"
         class="align-baseline js-component-links-modal-trigger"
       >
         {{ modalButtonText }}
-      </gl-button>
+      </gl-deprecated-button>
     </gl-intersperse>
     <gl-modal
       v-if="hasComponentsInModal"

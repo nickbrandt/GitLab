@@ -3,7 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 
 import createDefaultState from 'ee/security_dashboard/store/modules/project_selector/state';
 
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
@@ -60,7 +60,7 @@ describe('Project Manager component', () => {
   const getMockAction = actionName => storeOptions.modules.projectSelector.actions[actionName];
   const getMockActionDispatchedPayload = actionName => getMockAction(actionName).mock.calls[0][1];
 
-  const getAddProjectsButton = () => wrapper.find(GlButton);
+  const getAddProjectsButton = () => wrapper.find(GlDeprecatedButton);
   const getProjectList = () => wrapper.find(ProjectList);
   const getProjectSelector = () => wrapper.find(ProjectSelector);
 

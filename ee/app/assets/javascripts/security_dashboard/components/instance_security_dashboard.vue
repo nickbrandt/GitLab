@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlButton, GlEmptyState, GlLink, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlEmptyState, GlLink, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectManager from './project_manager.vue';
 import SecurityDashboard from './security_dashboard_vuex.vue';
@@ -8,7 +8,7 @@ import SecurityDashboard from './security_dashboard_vuex.vue';
 export default {
   name: 'InstanceSecurityDashboard',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlEmptyState,
     GlLink,
     GlLoadingIcon,
@@ -102,7 +102,7 @@ export default {
   <article>
     <header class="page-title-holder flex-fill d-flex align-items-center">
       <h2 class="page-title">{{ s__('SecurityDashboard|Security Dashboard') }}</h2>
-      <gl-button
+      <gl-deprecated-button
         v-if="isInitialized"
         class="page-title-controls js-project-selector-toggle"
         :variant="toggleButtonProps.variant"
@@ -132,9 +132,9 @@ export default {
             >.
           </template>
           <template #actions>
-            <gl-button variant="success" @click="toggleProjectSelector">
+            <gl-deprecated-button variant="success" @click="toggleProjectSelector">
               {{ s__('SecurityDashboard|Add projects') }}
-            </gl-button>
+            </gl-deprecated-button>
           </template>
         </gl-empty-state>
 

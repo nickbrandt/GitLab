@@ -1,13 +1,13 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import { GlFormGroup, GlButton } from '@gitlab/ui';
+import { GlFormGroup, GlDeprecatedButton } from '@gitlab/ui';
 import StepHeader from './step_header.vue';
 import StepSummary from './step_summary.vue';
 
 export default {
   components: {
     GlFormGroup,
-    GlButton,
+    GlDeprecatedButton,
     StepHeader,
     StepSummary,
   },
@@ -62,9 +62,9 @@ export default {
       <div v-show="isActive" @keyup.enter="nextStep">
         <slot name="body" :active="isActive"></slot>
         <gl-form-group v-if="nextStepButtonText" class="prepend-top-8 append-bottom-0">
-          <gl-button variant="success" :disabled="!isValid" @click="nextStep">
+          <gl-deprecated-button variant="success" :disabled="!isValid" @click="nextStep">
             {{ nextStepButtonText }}
-          </gl-button>
+          </gl-deprecated-button>
         </gl-form-group>
       </div>
       <step-summary v-if="isFinished" :is-editable="isEditable" :edit="edit">

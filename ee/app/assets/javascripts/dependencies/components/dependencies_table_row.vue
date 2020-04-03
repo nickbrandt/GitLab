@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
+import { GlDeprecatedButton, GlSkeletonLoading } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import DependencyLicenseLinks from './dependency_license_links.vue';
 import DependencyVulnerability from './dependency_vulnerability.vue';
@@ -10,7 +10,7 @@ export default {
   components: {
     DependencyLicenseLinks,
     DependencyVulnerability,
-    GlButton,
+    GlDeprecatedButton,
     GlSkeletonLoading,
     Icon,
   },
@@ -79,7 +79,7 @@ export default {
       <div class="table-section section-20 section-wrap pr-md-3">
         <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Status') }}</div>
         <div class="table-mobile-content">
-          <gl-button
+          <gl-deprecated-button
             v-if="isVulnerable"
             class="bold text-warning-700 text-1 text-decoration-none js-vulnerabilities-toggle"
             variant="link"
@@ -93,7 +93,7 @@ export default {
                 vulnerabilities.length,
               )
             }}
-          </gl-button>
+          </gl-deprecated-button>
           <span v-else class="text-success-500 text-1">
             <icon name="check-circle" class="align-middle mr-1" />{{ s__('Dependencies|Safe') }}
           </span>

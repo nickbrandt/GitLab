@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltip } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
@@ -42,7 +42,7 @@ describe('RelatedItemsTree', () => {
   describe('RelatedItemsTreeHeader', () => {
     let wrapper;
 
-    const findAddIssuesButton = () => wrapper.find(GlButton);
+    const findAddIssuesButton = () => wrapper.find(GlDeprecatedButton);
     const findEpicsSplitButton = () => wrapper.find(EpicActionsSplitButton);
 
     afterEach(() => {

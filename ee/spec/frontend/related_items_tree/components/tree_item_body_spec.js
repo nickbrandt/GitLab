@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlLink } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink } from '@gitlab/ui';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 
@@ -347,7 +347,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders item remove button when `item.userPermissions.adminEpic` is true', () => {
-        const removeButton = wrapper.find(GlButton);
+        const removeButton = wrapper.find(GlDeprecatedButton);
 
         expect(removeButton.isVisible()).toBe(true);
         expect(removeButton.attributes('title')).toBe('Remove');

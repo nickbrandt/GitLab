@@ -1,7 +1,7 @@
 <script>
 import { __, n__ } from '~/locale';
 import { mapActions, mapGetters } from 'vuex';
-import { GlButton, GlFormSelect } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormSelect } from '@gitlab/ui';
 
 const REASON_NONE = __('[No reason]');
 const REASON_WONT_FIX = __("Won't fix / Accept risk");
@@ -10,7 +10,7 @@ const REASON_FALSE_POSITIVE = __('False positive');
 export default {
   name: 'SelectionSummary',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlFormSelect,
   },
   data: () => ({
@@ -61,9 +61,9 @@ export default {
         class="mx-3 w-auto"
         :options="$options.dismissalReasons"
       />
-      <gl-button type="submit" variant="close" :disabled="!canDismissVulnerability">{{
+      <gl-deprecated-button type="submit" variant="close" :disabled="!canDismissVulnerability">{{
         __('Dismiss Selected')
-      }}</gl-button>
+      }}</gl-deprecated-button>
     </form>
   </div>
 </template>

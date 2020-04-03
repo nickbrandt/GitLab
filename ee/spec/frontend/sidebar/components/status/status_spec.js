@@ -1,4 +1,4 @@
-import { GlButton, GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Status from 'ee/sidebar/components/status/status.vue';
@@ -12,7 +12,7 @@ const getStatusIconCssClasses = wrapper => wrapper.find('[name="severity-low"]')
 
 const getEditButton = wrapper => wrapper.find({ ref: 'editButton' });
 
-const getRemoveStatusButton = wrapper => wrapper.find(GlButton);
+const getRemoveStatusButton = wrapper => wrapper.find(GlDeprecatedButton);
 
 const getEditForm = wrapper => wrapper.find('form');
 

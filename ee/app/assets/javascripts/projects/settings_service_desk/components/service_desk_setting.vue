@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlFormSelect, GlToggle, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormSelect, GlToggle, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
@@ -12,7 +12,7 @@ export default {
   },
   components: {
     ClipboardButton,
-    GlButton,
+    GlDeprecatedButton,
     GlFormSelect,
     GlToggle,
     GlLoadingIcon,
@@ -132,9 +132,12 @@ export default {
         <span class="form-text text-muted mb-3">{{
           __('Emails sent from Service Desk will have this name')
         }}</span>
-        <gl-button variant="success" :disabled="isTemplateSaving" @click="onSaveTemplate">{{
-          __('Save template')
-        }}</gl-button>
+        <gl-deprecated-button
+          variant="success"
+          :disabled="isTemplateSaving"
+          @click="onSaveTemplate"
+          >{{ __('Save template') }}</gl-deprecated-button
+        >
       </div>
     </div>
   </div>

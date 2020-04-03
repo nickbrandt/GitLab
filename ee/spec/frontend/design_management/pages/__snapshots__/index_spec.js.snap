@@ -85,13 +85,13 @@ exports[`Design management index page designs renders designs list and header wi
       <div
         class="qa-selector-toolbar d-flex"
       >
-        <gl-button-stub
+        <gl-deprecated-button-stub
           class="mr-2 js-select-all"
           size="md"
           variant="link"
         >
           Select all
-        </gl-button-stub>
+        </gl-deprecated-button-stub>
          
         <div>
           <delete-button-stub

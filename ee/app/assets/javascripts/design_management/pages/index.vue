@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -33,7 +33,7 @@ export default {
   components: {
     GlLoadingIcon,
     GlAlert,
-    GlButton,
+    GlDeprecatedButton,
     UploadButton,
     Design,
     DesignDestroyer,
@@ -261,12 +261,12 @@ export default {
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
         <div :class="['qa-selector-toolbar', { 'd-flex': hasDesigns, 'd-none': !hasDesigns }]">
-          <gl-button
+          <gl-deprecated-button
             v-if="isLatestVersion"
             variant="link"
             class="mr-2 js-select-all"
             @click="toggleDesignsSelection"
-            >{{ selectAllButtonText }}</gl-button
+            >{{ selectAllButtonText }}</gl-deprecated-button
           >
           <design-destroyer
             v-slot="{ mutate, loading }"

@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { GlButton, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltip } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
@@ -12,7 +12,7 @@ import EpicActionsSplitButton from './epic_actions_split_button.vue';
 export default {
   components: {
     Icon,
-    GlButton,
+    GlDeprecatedButton,
     GlTooltip,
     EpicActionsSplitButton,
   },
@@ -95,11 +95,11 @@ export default {
         />
 
         <slot name="issueActions">
-          <gl-button
+          <gl-deprecated-button
             class="ml-1 js-add-issues-button qa-add-issues-button"
             size="sm"
             @click="showAddIssueForm"
-            >{{ __('Add an issue') }}</gl-button
+            >{{ __('Add an issue') }}</gl-deprecated-button
           >
         </slot>
       </template>

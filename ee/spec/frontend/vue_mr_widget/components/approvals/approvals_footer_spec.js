@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import { shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/approvals_list.vue';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -25,8 +25,8 @@ describe('EE MRWidget approvals footer', () => {
   const findToggle = () => wrapper.find('button');
   const findToggleIcon = () => findToggle().find(Icon);
   const findToggleLoadingIcon = () => findToggle().find(GlLoadingIcon);
-  const findExpandButton = () => wrapper.find(GlButton);
-  const findCollapseButton = () => wrapper.find(GlButton);
+  const findExpandButton = () => wrapper.find(GlDeprecatedButton);
+  const findCollapseButton = () => wrapper.find(GlDeprecatedButton);
   const findList = () => wrapper.find(ApprovalsList);
   const findAvatars = () => wrapper.find(UserAvatarList);
 
