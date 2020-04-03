@@ -128,33 +128,4 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
       expect(occurrence.old_location).to eq(old_location)
     end
   end
-
-  describe '#== and eql?' do
-    using RSpec::Parameterized::TableSyntax
-
-    let(:identifier) { create(:ci_reports_security_identifier) }
-    let(:other_identifier) { create(:ci_reports_security_identifier, external_type: 'other_identifier') }
-    let(:location) { create(:ci_reports_security_locations_sast) }
-    let(:other_location) { create(:ci_reports_security_locations_sast, file_path: 'other/file.rb') }
-
-    where(:report_type_1, :location_1, :identifier_1, :report_type_2, :location_2, :identifier_2, :equal, :case_name) do
-      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { location }       | -> { identifier }       | true  | 'when report_type, location and primary identifier are equal'
-      'sast' | -> { location } | -> { identifier } | 'dependency_scanning' | -> { location }       | -> { identifier }       | false | 'when report_type is different'
-      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { other_location } | -> { identifier }       | false | 'when location is different'
-      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { location }       | -> { other_identifier } | false | 'when primary identifier is different'
-    end
-
-    with_them do
-      let(:occurrence_1) { create(:ci_reports_security_occurrence, report_type: report_type_1, location: location_1.call, identifiers: [identifier_1.call]) }
-      let(:occurrence_2) { create(:ci_reports_security_occurrence, report_type: report_type_2, location: location_2.call, identifiers: [identifier_2.call]) }
-
-      it "returns #{params[:equal]} for ==" do
-        expect(occurrence_1 == occurrence_2).to eq(equal)
-      end
-
-      it "returns #{params[:equal]} for eq?" do
-        expect(occurrence_1.eql?(occurrence_2)).to eq(equal)
-      end
-    end
-  end
 end
