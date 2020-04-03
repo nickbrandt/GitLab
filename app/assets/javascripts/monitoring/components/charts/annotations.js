@@ -1,7 +1,23 @@
 import { graphTypes, symbolSizes } from '../../constants';
 
 /**
- * A "virtual" coordinates system for the annotation series.
+ * Annotations and deployments are decoration layers on
+ * top of the actual chart data. We use a scatter plot to
+ * display this information. Each chart has its coordinate
+ * system based on data and irresptive of the data, these
+ * decorations have to be placed in specific locations.
+ * For this reason, annotations have their own coordinate system,
+ *
+ * As of %12.9, only deployment icons, a type of annotations, need
+ * to be displayed on the chart.
+ *
+ * After https://gitlab.com/gitlab-org/gitlab/-/issues/211418,
+ * annotations and deployments will co-exist in the same
+ * series as they logically belong together. Annotations will be
+ * passed as markLine objects.
+ */
+
+/**
  * Deployment icons, a type of annotation, are displayed
  * along the [min, max] range at height `pos`.
  */
@@ -35,12 +51,6 @@ export const annotationsYAxis = {
 export const isAnnotation = type => type === graphTypes.annotationsData;
 
 /**
- * Annotations are scatter plot series that are passed
- * to eCharts along with the actual data series. As of %12.9
- * deployment icons, a type of annotations, need to be displayed on
- * the chart and a scatter plot is the most convenient way.
- *
- *
  * This method currently supports only deployments. After
  * https://gitlab.com/gitlab-org/gitlab/-/issues/211418 annotations
  * support will be added in this method.
