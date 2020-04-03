@@ -30,9 +30,9 @@ module API
       def authenticate_with_webhook_token!
         return not_found! unless project
 
-        unless valid_github_signature?
-          render_invalid_github_signature!
-        end
+        return if valid_github_signature?
+
+        render_invalid_github_signature!
       end
 
       def try_authenticate_with_webhook_token!
