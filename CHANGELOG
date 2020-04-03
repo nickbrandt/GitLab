@@ -9,6 +9,7 @@ v 8.29.0
 v 8.28.0
 
 - Reject parameters that override upload fields
+- PyPi - Object storage upload route for package files !474
 
 v 8.27.0
 
