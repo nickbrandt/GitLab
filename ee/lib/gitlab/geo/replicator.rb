@@ -135,7 +135,7 @@ module Gitlab
 
         # Only works with the new geo_events at the moment because we need to
         # know which foreign key to use
-        ::Geo::EventLog.create!(geo_event_id: event)
+        ::Geo::EventLog.create!(geo_event: event)
 
         event
       rescue ActiveRecord::RecordInvalid, NoMethodError => e
