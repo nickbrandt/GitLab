@@ -16,7 +16,7 @@ const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
 
-describe('Vulnerability management app', () => {
+describe('Vulnerability Header', () => {
   let wrapper;
 
   const defaultVulnerability = {

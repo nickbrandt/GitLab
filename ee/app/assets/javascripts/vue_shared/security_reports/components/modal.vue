@@ -75,11 +75,9 @@ export default {
       return Boolean(!this.isResolved && this.canDismissVulnerability);
     },
     canDownloadPatchForThisVulnerability() {
-      const remediationDiff = this.remediation && this.remediation.diff;
       return Boolean(
         !this.isResolved &&
-          remediationDiff &&
-          remediationDiff.length > 0 &&
+          this.remediation?.diff?.length > 0 &&
           (!this.vulnerability.hasMergeRequest && this.remediation),
       );
     },
@@ -89,47 +87,34 @@ export default {
     hasRemediation() {
       return Boolean(this.remediation);
     },
-    hasDismissedBy() {
-      return (
-        this.vulnerability &&
-        this.vulnerability.dismissalFeedback &&
-        this.vulnerability.dismissalFeedback.pipeline &&
-        this.vulnerability.dismissalFeedback.author
-      );
-    },
     project() {
       return this.modal.project;
     },
     solution() {
-      return this.vulnerability && this.vulnerability.solution;
+      return this.vulnerability?.solution;
     },
     remediation() {
-      return (
-        this.vulnerability && this.vulnerability.remediations && this.vulnerability.remediations[0]
-      );
+      return this.vulnerability?.remediations?.[0];
     },
     vulnerability() {
       return this.modal.vulnerability;
     },
     issueFeedback() {
-      return this.vulnerability && this.vulnerability.issue_feedback;
+      return this.vulnerability?.issue_feedback;
     },
     canReadIssueFeedback() {
-      return this.issueFeedback && this.issueFeedback.issue_url;
+      return this.issueFeedback?.issue_url;
     },
     mergeRequestFeedback() {
-      return this.vulnerability && this.vulnerability.merge_request_feedback;
+      return this.vulnerability?.merge_request_feedback;
     },
     canReadMergeRequestFeedback() {
-      return this.mergeRequestFeedback && this.mergeRequestFeedback.merge_request_path;
+      return this.mergeRequestFeedback?.merge_request_path;
     },
     dismissalFeedback() {
-      return (
-        this.vulnerability &&
-        // grouped security reports are populating `dismissalFeedback` and the dashboards `dismissal_feedback`
-        // https://gitlab.com/gitlab-org/gitlab/issues/207489 aims to use the same property in all cases
-        (this.vulnerability.dismissalFeedback || this.vulnerability.dismissal_feedback)
-      );
+      // grouped security reports are populating `dismissalFeedback` and the dashboards `dismissal_feedback`
+      // https://gitlab.com/gitlab-org/gitlab/issues/207489 aims to use the same property in all cases
+      return this.vulnerability?.dismissalFeedback || this.vulnerability?.dismissal_feedback;
     },
     isEditingExistingFeedback() {
       return this.dismissalFeedback && this.modal.isCommentingOnDismissal;
@@ -157,6 +142,24 @@ export default {
           avatar_url: current_user_avatar_url,
         },
       };
+    },
+    dismissalFeedbackComment() {
+      return this.dismissalFeedback?.comment_details?.comment;
+    },
+    showFeedbackNotes() {
+      return (
+        (this.canReadIssueFeedback || this.canReadMergeRequestFeedback) &&
+        (this.issueFeedback || this.mergeRequestFeedback)
+      );
+    },
+    showDismissalCard() {
+      return this.dismissalFeedback || this.modal.isCommentingOnDismissal;
+    },
+    showDismissalCommentActions() {
+      return !this.dismissalFeedbackComment || !this.isEditingExistingFeedback;
+    },
+    showDismissalCommentTextbox() {
+      return !this.dismissalFeedbackComment || this.isEditingExistingFeedback;
     },
   },
   methods: {
@@ -209,7 +212,7 @@ export default {
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       />
 
-      <div v-if="canReadIssueFeedback || canReadMergeRequestFeedback" class="card my-4">
+      <div v-if="showFeedbackNotes" class="card my-4">
         <issue-note
           v-if="issueFeedback"
           :feedback="issueFeedback"
@@ -224,30 +227,22 @@ export default {
         />
       </div>
 
-      <div v-if="dismissalFeedback || modal.isCommentingOnDismissal" class="card card-body my-4">
+      <div v-if="showDismissalCard" class="card card-body my-4">
         <dismissal-note
           :feedback="dismissalFeedbackObject"
           :is-commenting-on-dismissal="modal.isCommentingOnDismissal"
           :is-showing-delete-buttons="modal.isShowingDeleteButtons"
           :project="project"
-          :show-dismissal-comment-actions="
-            !dismissalFeedback || !dismissalFeedback.comment_details || !isEditingExistingFeedback
-          "
+          :show-dismissal-comment-actions="showDismissalCommentActions"
           @editVulnerabilityDismissalComment="$emit('editVulnerabilityDismissalComment')"
           @showDismissalDeleteButtons="$emit('showDismissalDeleteButtons')"
           @hideDismissalDeleteButtons="$emit('hideDismissalDeleteButtons')"
           @deleteDismissalComment="$emit('deleteDismissalComment')"
         />
         <dismissal-comment-box-toggle
-          v-if="
-            !dismissalFeedback || !dismissalFeedback.comment_details || isEditingExistingFeedback
-          "
+          v-if="showDismissalCommentTextbox"
           v-model="localDismissalComment"
-          :dismissal-comment="
-            dismissalFeedback &&
-              dismissalFeedback.comment_details &&
-              dismissalFeedback.comment_details.comment
-          "
+          :dismissal-comment="dismissalFeedbackComment"
           :is-active="modal.isCommentingOnDismissal"
           :error-message="dismissalCommentErrorMessage"
           @openDismissalCommentBox="$emit('openDismissalCommentBox')"
