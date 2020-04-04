@@ -72,10 +72,10 @@ module Geo
       class_name: 'Geo::ContainerRepositoryUpdatedEvent',
       foreign_key: :container_repository_updated_event_id
 
-    belongs_to :event,
+    belongs_to :geo_event,
       class_name: 'Geo::Event',
-      foreign_key: :geo_event_id
-
+      foreign_key: :geo_event_id,
+      inverse_of: :geo_event_log
     def self.latest_event
       order(id: :desc).first
     end
@@ -95,6 +95,7 @@ module Geo
       includes(reflections.keys)
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
     def event
       repository_created_event ||
         repository_updated_event ||
@@ -108,8 +109,10 @@ module Geo
         upload_deleted_event ||
         reset_checksum_event ||
         cache_invalidation_event ||
-        container_repository_updated_event
+        container_repository_updated_event ||
+        geo_event
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def project_id
       event.try(:project_id)
