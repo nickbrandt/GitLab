@@ -1,18 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'group permission check on the controller level' do
-  context 'when `group_id` is not provided' do
-    before do
-      params[:group_id] = nil
-    end
-
-    it 'renders `not_found` when group_id is not provided' do
-      subject
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
-  end
-
   context 'when `group_id` is not found' do
     before do
       params[:group_id] = 'missing_group'
