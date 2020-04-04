@@ -1,8 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLink, GlSkeletonLoading } from '@gitlab/ui';
+import { GlLink, GlSkeletonLoading, GlBadge } from '@gitlab/ui';
 import LicenseComponentLinks from 'ee/license_compliance/components/license_component_links.vue';
 import LicensesTableRow from 'ee/license_compliance/components/licenses_table_row.vue';
 import { makeLicense } from './utils';
+import { LICENSE_APPROVAL_CLASSIFICATION } from 'ee/vue_shared/license_compliance/constants';
 
 describe('LicensesTableRow component', () => {
   let wrapper;
@@ -95,6 +96,37 @@ describe('LicensesTableRow component', () => {
 
       expect(nameSection.text()).toContain(license.name);
       expect(nameSection.find(GlLink).exists()).toBe(false);
+    });
+  });
+
+  describe('when a license has a denied policy violation', () => {
+    beforeEach(() => {
+      license = makeLicense({ classification: LICENSE_APPROVAL_CLASSIFICATION.DENIED });
+
+      factory({
+        isLoading: false,
+        license,
+      });
+    });
+
+    it('shows the policy violation badge', () => {
+      expect(wrapper.find(GlBadge).exists()).toBe(true);
+      expect(wrapper.find(GlBadge).text()).toContain('Policy violation: denied');
+    });
+  });
+
+  describe('when a license is allowed', () => {
+    beforeEach(() => {
+      license = makeLicense({ classification: LICENSE_APPROVAL_CLASSIFICATION.ALLOWED });
+
+      factory({
+        isLoading: false,
+        license,
+      });
+    });
+
+    it('does not show the policy violation badge', () => {
+      expect(wrapper.find(GlBadge).exists()).toBe(false);
     });
   });
 });

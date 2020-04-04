@@ -3,12 +3,20 @@ import { __, s__ } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 /*
- * Endpoint still returns 'approved' & 'blacklisted'
+ * Legacy endpoint still returns 'approved' & 'blacklisted'
  * even though we adopted 'allowed' & 'denied' in the UI
  */
 export const LICENSE_APPROVAL_STATUS = {
   ALLOWED: 'approved',
   DENIED: 'blacklisted',
+};
+
+/*
+ * New project licenses endpoint returns 'allowed' & 'denied'
+ */
+export const LICENSE_APPROVAL_CLASSIFICATION = {
+  ALLOWED: 'allowed',
+  DENIED: 'denied',
 };
 
 export const LICENSE_APPROVAL_ACTION = {
