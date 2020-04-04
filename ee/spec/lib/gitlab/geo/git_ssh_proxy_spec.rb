@@ -17,7 +17,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
   let(:base_request) { double(Gitlab::Geo::BaseRequest.new.authorization) }
 
   let(:info_refs_body_short) do
-    "008f43ba78b7912f7bf7ef1d7c3b8a0e5ae14a759dfa refs/heads/masterreport-status delete-refs side-band-64k quiet atomic ofs-delta agent=git/2.18.0\n0000"
+    "008f43ba78b7912f7bf7ef1d7c3b8a0e5ae14a759dfa refs/heads/masterreport-status delete-refs side-band-64k quiet atomic ofs-delta agent=git/2.26.0\n0000"
   end
 
   let(:base_headers) do
@@ -36,6 +36,8 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
       'primary_repo' => primary_repo_http
     }
   end
+
+  let(:irrelevant_encoded_message) { Base64.encode64('irrelevant')}
 
   context 'instance methods' do
     subject { described_class.new(data) }
@@ -292,8 +294,8 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
       context 'against secondary node' do
         let(:current_node) { secondary_node }
 
-        let(:full_info_refs_url) { "#{primary_repo_http}/info/refs?service=git-receive-pack" }
-        let(:info_refs_http_body_full) { "001f# service=git-receive-pack\n0000#{info_refs_body_short}" }
+        let(:full_info_refs_receive_pack_url) { "#{primary_repo_http}/info/refs?service=git-receive-pack" }
+        let(:info_refs_receive_pack_http_body_full) { "001f# service=git-receive-pack\n0000#{info_refs_body_short}" }
 
         context 'authorization header is scoped' do
           it 'passes the scope when .info_refs_receive_pack is called' do
@@ -313,7 +315,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
           let(:error_msg) { 'execution expired' }
 
           before do
-            stub_request(:get, full_info_refs_url).to_timeout
+            stub_request(:get, full_info_refs_receive_pack_url).to_timeout
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
@@ -341,7 +343,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
           let(:error_msg) { 'dial unix /Users/ash/src/gdk/gdk-ee/gitlab.socket: connect: connection refused' }
 
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg)
+            stub_request(:get, full_info_refs_receive_pack_url).to_return(status: 502, body: error_msg)
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
@@ -367,7 +369,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
 
         context 'with a valid response' do
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full)
+            stub_request(:get, full_info_refs_receive_pack_url).to_return(status: 200, body: info_refs_receive_pack_http_body_full)
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
@@ -419,15 +421,15 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
-            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
+            expect(subject.receive_pack(irrelevant_encoded_message)).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
           end
 
           it 'has a messsage' do
-            expect(subject.receive_pack(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.receive_pack(irrelevant_encoded_message).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.receive_pack(info_refs_body_short).body[:result]).to be_nil
+            expect(subject.receive_pack(irrelevant_encoded_message).body[:result]).to be_nil
           end
         end
 
@@ -439,40 +441,42 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
-            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
+            expect(subject.receive_pack(irrelevant_encoded_message)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a messsage' do
-            expect(subject.receive_pack(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.receive_pack(irrelevant_encoded_message).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.receive_pack(info_refs_body_short).body[:result]).to be_nil
+            expect(subject.receive_pack(irrelevant_encoded_message).body[:result]).to be_nil
           end
         end
 
         context 'with a valid response' do
-          let(:body) { '<binary content>' }
-          let(:base64_encoded_body) { Base64.encode64(body) }
+          let(:decoded_response) { "0095bc3b8ba91de3ecd161440326eda0b89a3c91d339 fc02c3ed8ef0b2dc7cc6e3e3bcf6b13465fea91b refs/heads/master report-status side-band-64k agent=git/2.26.00000PACK<binary>" }
+          let(:base64_encoded_response) { decoded_response }
+
+          let(:base64_encoded_expected_body) { Base64.encode64(decoded_response) }
 
           before do
-            stub_request(:post, full_git_receive_pack_url).to_return(status: 201, body: body, headers: receive_pack_headers)
+            stub_request(:post, full_git_receive_pack_url).to_return(status: 201, body: decoded_response, headers: receive_pack_headers)
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
-            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
+            expect(subject.receive_pack(base64_encoded_response)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 201' do
-            expect(subject.receive_pack(info_refs_body_short).code).to be(201)
+            expect(subject.receive_pack(base64_encoded_response).code).to be(201)
           end
 
           it 'has no messsage' do
-            expect(subject.receive_pack(info_refs_body_short).body[:message]).to be_nil
+            expect(subject.receive_pack(base64_encoded_response).body[:message]).to be_nil
           end
 
           it 'has a result' do
-            expect(subject.receive_pack(info_refs_body_short).body[:result]).to eql(base64_encoded_body)
+            expect(subject.receive_pack(base64_encoded_response).body[:result]).to eql(base64_encoded_expected_body)
           end
         end
       end

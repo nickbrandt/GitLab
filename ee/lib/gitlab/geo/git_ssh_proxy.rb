@@ -97,13 +97,14 @@ module Gitlab
         handle_exception(e)
       end
 
-      def receive_pack(encoded_info_refs_response)
+      def receive_pack(encoded_response)
         ensure_secondary!
 
         url = "#{primary_repo}/git-receive-pack"
         headers = { 'Content-Type' => RECEIVE_PACK_REQUEST_CONTENT_TYPE, 'Accept' => RECEIVE_PACK_RESULT_CONTENT_TYPE }
-        info_refs_response = Base64.decode64(encoded_info_refs_response)
-        resp = post(url, info_refs_response, headers)
+        decoded_response = Base64.decode64(encoded_response)
+
+        resp = post(url, decoded_response, headers)
 
         APIResponse.from_http_response(resp, primary_repo)
       rescue => e
