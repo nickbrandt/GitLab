@@ -397,6 +397,5 @@ RSpec/RepeatedExample:
     - 'spec/helpers/users_helper_spec.rb'
     - 'spec/lib/gitlab/closing_issue_extractor_spec.rb'
     - 'spec/lib/gitlab/import_export/project/relation_factory_spec.rb'
-    - 'spec/rubocop/cop/migration/update_large_table_spec.rb'
     - 'spec/services/notification_service_spec.rb'
     - 'spec/services/web_hook_service_spec.rb'
