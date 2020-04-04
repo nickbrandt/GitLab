@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.30.0
+
+- Proxy ActionCable websocket connection !454
+
 v 8.29.0
 
 - Bump Labkit version to support Profiler sample versioning !479
