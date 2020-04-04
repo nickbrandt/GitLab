@@ -286,11 +286,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
       context 'against primary node' do
         let(:current_node) { primary_node }
 
-        it 'raises an exception' do
-          expect do
-            subject.info_refs_receive_pack
-          end.to raise_error(described_class::MustBeASecondaryNode, 'Node is not a secondary or there is no primary Geo node')
-        end
+        it_behaves_like 'must be a secondary'
       end
 
       context 'against secondary node' do
@@ -401,11 +397,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
       context 'against primary node' do
         let(:current_node) { primary_node }
 
-        it 'raises an exception' do
-          expect do
-            subject.receive_pack(info_refs_body_short)
-          end.to raise_error(described_class::MustBeASecondaryNode)
-        end
+        it_behaves_like 'must be a secondary'
       end
 
       context 'against secondary node' do
