@@ -35,7 +35,7 @@ describe 'Group navbar' do
     before do
       stub_licensed_features(cycle_analytics_for_groups: true)
 
-      insert_before_sub_nav_item(
+      insert_after_sub_nav_item(
         _('Contribution'),
         within: _('Analytics'),
         new_sub_nav_item_name: _('Value Stream')
