@@ -41,8 +41,10 @@ export default {
         {{ __('New') }}
       </div>
       {{ issue.name }}
-      <a ref="accessibility-issue-learn-more" :href="learnMoreUrl">{{ __('Learn More') }}</a>
-      {{ __('Message: ') }}
+      <a ref="accessibility-issue-learn-more" :href="learnMoreUrl">{{
+        s__('AccessibilityReport|Learn More')
+      }}</a>
+      {{ s__('AccessibilityReport|Message: ') }}
       {{ issue.message }}
     </div>
   </div>

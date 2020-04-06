@@ -1024,6 +1024,12 @@ msgstr ""
 msgid "AccessTokens|reset it"
 msgstr ""
 
+msgid "AccessibilityReport|Learn More"
+msgstr ""
+
+msgid "AccessibilityReport|Message: "
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -12723,9 +12729,6 @@ msgid "Merges this merge request when the pipeline succeeds."
 msgstr ""
 
 msgid "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information."
-msgstr ""
-
-msgid "Message: "
 msgstr ""
 
 msgid "Messages"
