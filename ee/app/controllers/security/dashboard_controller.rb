@@ -2,5 +2,8 @@
 
 module Security
   class DashboardController < ::Security::ApplicationController
+    before_action only: [:show] do
+      push_frontend_feature_flag(:first_class_vulnerabilities)
+    end
   end
 end

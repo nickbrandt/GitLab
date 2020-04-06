@@ -1,0 +1,13 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "ee/vulnerabilities/graphql/vulnerability.fragment.graphql"
+
+query instance($after: String, $first: Int) {
+  vulnerabilities(after:$after, first:$first) {
+    nodes {
+      ...Vulnerability
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+}
