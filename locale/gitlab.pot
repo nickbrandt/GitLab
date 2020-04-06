@@ -373,6 +373,9 @@ msgstr ""
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
+msgid "%{namespace_name} is now read-only. You cannot: %{base_message}"
+msgstr ""
+
 msgid "%{name} contained %{resultsString}"
 msgstr ""
 
@@ -10924,6 +10927,9 @@ msgid "If you believe this may be an error, please refer to the %{linkStart}Geo 
 msgstr ""
 
 msgid "If you lose your recovery codes you can generate new ones, invalidating all previous codes."
+msgstr ""
+
+msgid "If you reach 100%% storage capacity, you will not be able to: %{base_message}"
 msgstr ""
 
 msgid "If your HTTP repository is not publicly accessible, add your credentials."
@@ -23952,6 +23958,9 @@ msgstr ""
 msgid "You need to upload a Google Takeout archive."
 msgstr ""
 
+msgid "You reached %{usage_in_percent} of %{namespace_name}'s capacity (%{used_storage} of %{storage_limit})"
+msgstr ""
+
 msgid "You tried to fork %{link_to_the_project} but it failed for the following reason:"
 msgstr ""
 
@@ -25275,6 +25284,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "project avatar"
+msgstr ""
+
+msgid "push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines."
 msgstr ""
 
 msgid "quick actions"
