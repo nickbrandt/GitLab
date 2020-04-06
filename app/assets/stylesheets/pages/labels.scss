@@ -460,7 +460,8 @@
 // Label inside title of Delete Label Modal
 .modal-header .page-title {
   .scoped-label-wrapper {
-    .scoped-label {
+    .scoped-label,
+    .gl-label-icon {
       line-height: 20px;
     }
 

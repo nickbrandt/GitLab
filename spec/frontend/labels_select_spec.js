@@ -100,10 +100,6 @@ describe('LabelsSelect', () => {
         expect($labelEl.find('a').attr('data-html')).toBe('true');
       });
 
-      it('generated label item template has question icon', () => {
-        expect($labelEl.find('i.fa-question-circle')).toHaveLength(1);
-      });
-
       it('generated label item template has correct label styles', () => {
         expect($labelEl.find('span.gl-label-text').attr('style')).toBe(
           `background-color: ${label.color}; color: ${label.text_color};`,

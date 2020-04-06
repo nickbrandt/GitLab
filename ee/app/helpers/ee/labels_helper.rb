@@ -44,7 +44,7 @@ module EE
 
     def label_dropdown_data(edit_context, opts = {})
       scoped_labels_fields = {
-        scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s,
+        scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s
       }
 
       return super.merge(scoped_labels_fields) unless edit_context.is_a?(Group)

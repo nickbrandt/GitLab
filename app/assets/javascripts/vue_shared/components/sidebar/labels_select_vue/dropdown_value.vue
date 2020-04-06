@@ -9,12 +9,7 @@ export default {
     GlLabel,
   },
   computed: {
-    ...mapState([
-      'selectedLabels',
-      'allowScopedLabels',
-      'labelsFilterBasePath',
-      'scopedLabelsDocumentationPath',
-    ]),
+    ...mapState(['selectedLabels', 'allowScopedLabels', 'labelsFilterBasePath']),
   },
   methods: {
     labelFilterUrl(label) {
