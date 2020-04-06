@@ -182,7 +182,7 @@ describe 'Pipeline', :js do
       context 'with code quality artifact' do
         before do
           create(:ee_ci_build, :codequality, pipeline: pipeline)
-          visit codequality_report_namespace_project_pipeline_path(project.namespace, project, pipeline)
+          visit codequality_report_project_pipeline_path(project, pipeline)
         end
 
         it 'shows code quality tab pane as active' do
