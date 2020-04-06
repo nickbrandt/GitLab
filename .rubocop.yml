@@ -388,5 +388,4 @@ RSpec/RepeatedExample:
   Exclude:
     - 'spec/features/merge_request/user_posts_diff_notes_spec.rb'
     - 'spec/features/projects/files/template_type_dropdown_spec.rb'
-    - 'spec/helpers/users_helper_spec.rb'
     - 'spec/services/notification_service_spec.rb'
