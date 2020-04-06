@@ -56,7 +56,7 @@ module Gitlab
     end
 
     def self.slow_path_lookup(merge_request, merge_request_diff)
-      merge_request_diff = merge_request_diff || merge_request.merge_request_diff
+      merge_request_diff ||= merge_request.merge_request_diff
 
       merge_request.project.repository.diff_stats(
         merge_request_diff.base_commit_sha,
