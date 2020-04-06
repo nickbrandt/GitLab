@@ -30,25 +30,25 @@
           %h3= _('Location')
           %ul
             %li
-              = _("File:")
+              = _('File:')
               = vulnerability_file_link(@vulnerability)
             - if location['class']
               %li
-                = _("Class:")
+                = _('Class:')
                 = location['class']
             - if location['method']
               %li
-                = _("Method:")
+                = _('Method:')
                 %code= location['method']
 
         - if finding.links.any?
-          %h3= _("Links")
+          %h3= _('Links')
           %ul
             - finding.links.each do |link|
-              %li= link_to link["url"], target: '_blank', rel: 'noopener noreferrer'
+              %li= link_to link['url'], target: '_blank', rel: 'noopener noreferrer'
 
         - if finding.identifiers.any?
-          %h3= _("Identifiers")
+          %h3= _('Identifiers')
           %ul
             - finding.identifiers.each do |identifier|
               %li= link_to identifier.name, identifier.url, target: '_blank', rel: 'noopener noreferrer'
