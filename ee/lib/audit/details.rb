@@ -29,9 +29,9 @@ module Audit
     end
 
     def action_text
-      action = @details.slice(*ACTIONS)
+      action_name, action_info = @details.slice(*ACTIONS).first
 
-      case action.each_key.first
+      case action_name
       when :add
         "Added #{target_name}#{@details[:as] ? " as #{@details[:as]}" : ''}"
       when :remove
@@ -45,7 +45,7 @@ module Audit
 
         "Updated ref #{target_ref} from #{from_sha} to #{to_sha}"
       when :custom_message
-        detail_value
+        action_info
       else
         text_for_change(target_name)
       end
