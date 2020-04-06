@@ -128,7 +128,7 @@ Example response:
 Resolves a given vulnerability. Returns status code `304` if the vulnerability is already resolved.
 
 If an authenticated user does not have permission to
-[resolve vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[resolve vulnerabilities](../user/permissions.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```plaintext
@@ -178,7 +178,7 @@ Example response:
 Dismisses a given vulnerability. Returns status code `304` if the vulnerability is already dismissed.
 
 If an authenticated user does not have permission to
-[dismiss vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[dismiss vulnerabilities](../user/permissions.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```plaintext
