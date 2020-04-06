@@ -26,6 +26,10 @@ export default {
       type: Object,
       required: true,
     },
+    finding: {
+      type: Object,
+      required: true,
+    },
     pipeline: {
       type: Object,
       required: true,
@@ -51,6 +55,9 @@ export default {
   },
 
   computed: {
+    hasIssue() {
+      return Boolean(this.finding.issue_feedback?.issue_iid);
+    },
     statusBoxStyle() {
       // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
       return VULNERABILITY_STATE_OBJECTS[this.vulnerability.state]?.statusBoxStyle || 'expired';
@@ -172,6 +179,7 @@ export default {
           @change="changeVulnerabilityState"
         />
         <gl-deprecated-button
+          v-if="!hasIssue"
           ref="create-issue-btn"
           class="ml-2"
           variant="success"

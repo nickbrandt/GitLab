@@ -26,6 +26,17 @@ describe('Vulnerability management app', () => {
     state: 'detected',
   };
 
+  const defaultFinding = {
+    description: 'description',
+    identifiers: 'identifiers',
+    links: 'links',
+    location: 'location',
+    name: 'name',
+    issue_feedback: {
+      issue_iid: 12,
+    },
+  };
+
   const dataset = {
     createIssueUrl: 'create_issue_url',
     projectFingerprint: 'abc123',
@@ -49,11 +60,12 @@ describe('Vulnerability management app', () => {
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
-  const createWrapper = (vulnerability = {}) => {
+  const createWrapper = (vulnerability = {}, finding = {}) => {
     wrapper = shallowMount(App, {
       propsData: {
         ...dataset,
         initialVulnerability: { ...defaultVulnerability, ...vulnerability },
+        finding,
       },
     });
   };
@@ -98,8 +110,13 @@ describe('Vulnerability management app', () => {
   describe('create issue button', () => {
     beforeEach(createWrapper);
 
-    it('renders properly', () => {
+    it('does display if there is not an issue already created', () => {
       expect(findCreateIssueButton().exists()).toBe(true);
+    });
+
+    it('does not display if there is an issue already created', () => {
+      createWrapper({}, defaultFinding);
+      expect(findCreateIssueButton().exists()).toBe(false);
     });
 
     it('calls create issue endpoint on click and redirects to new issue', () => {
