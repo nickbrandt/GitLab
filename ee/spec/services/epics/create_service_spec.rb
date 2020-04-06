@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Epics::CreateService do
-  let(:group) { create(:group, :internal)}
-  let(:user) { create(:user) }
-  let!(:parent_epic) { create(:epic, group: group) }
+  let_it_be(:group) { create(:group, :internal)}
+  let_it_be(:user) { create(:user) }
+  let_it_be(:parent_epic) { create(:epic, group: group) }
   let(:params) { { title: 'new epic', description: 'epic description', parent_id: parent_epic.id } }
 
   subject { described_class.new(group, user, params).execute }
