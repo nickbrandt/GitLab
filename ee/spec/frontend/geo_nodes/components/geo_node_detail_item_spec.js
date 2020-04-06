@@ -1,11 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlPopover, GlLink } from '@gitlab/ui';
 
 import GeoNodeDetailItemComponent from 'ee/geo_nodes/components/geo_node_detail_item.vue';
 import GeoNodeSyncSettings from 'ee/geo_nodes/components/geo_node_sync_settings.vue';
 import GeoNodeEventStatus from 'ee/geo_nodes/components/geo_node_event_status.vue';
 import GeoNodeSyncProgress from 'ee/geo_nodes/components/geo_node_sync_progress.vue';
 
-import { VALUE_TYPE, CUSTOM_TYPE } from 'ee/geo_nodes/constants';
+import { VALUE_TYPE, CUSTOM_TYPE, REPLICATION_HELP_URL } from 'ee/geo_nodes/constants';
 import { rawMockNodeDetails } from '../mock_data';
 
 describe('GeoNodeDetailItemComponent', () => {
@@ -127,16 +128,51 @@ describe('GeoNodeDetailItemComponent', () => {
         expect(wrapper.find(GeoNodeSyncProgress).exists()).toBeFalsy();
       });
     });
+  });
 
-    describe('when featureDisabled is true', () => {
+  describe('itemEnabled', () => {
+    describe('when false', () => {
       beforeEach(() => {
         createComponent({
-          featureDisabled: true,
+          itemEnabled: false,
         });
       });
 
-      it('does not render', () => {
-        expect(wrapper.vm.$el.innerHTML).toBeUndefined();
+      it('renders synchronization disabled text', () => {
+        expect(
+          wrapper
+            .find({ ref: 'disabledText' })
+            .text()
+            .trim(),
+        ).toBe('Synchronization disabled');
+      });
+
+      it('renders GlPopover', () => {
+        expect(wrapper.find(GlPopover).exists()).toBeTruthy();
+      });
+
+      it('renders link to replication help documentation in popover', () => {
+        const popoverLink = wrapper.find(GlPopover).find(GlLink);
+
+        expect(popoverLink.exists()).toBeTruthy();
+        expect(popoverLink.text()).toBe('Learn how to enable synchronization');
+        expect(popoverLink.attributes('href')).toBe(REPLICATION_HELP_URL);
+      });
+    });
+
+    describe('when true', () => {
+      beforeEach(() => {
+        createComponent({
+          itemEnabled: true,
+        });
+      });
+
+      it('does not render synchronization disabled text', () => {
+        expect(wrapper.find('.node-detail-item').text()).not.toContain('Synchronization disabled');
+      });
+
+      it('does not render GlPopover', () => {
+        expect(wrapper.find(GlPopover).exists()).toBeFalsy();
       });
     });
   });

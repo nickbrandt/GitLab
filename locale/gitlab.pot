@@ -11879,6 +11879,9 @@ msgstr ""
 msgid "Learn how to %{no_packages_link_start}publish and share your packages%{no_packages_link_end} with GitLab."
 msgstr ""
 
+msgid "Learn how to enable synchronization"
+msgstr ""
+
 msgid "Learn more"
 msgstr ""
 
@@ -13813,6 +13816,9 @@ msgid "Nothing found…"
 msgstr ""
 
 msgid "Nothing to preview."
+msgstr ""
+
+msgid "Nothing to synchronize"
 msgstr ""
 
 msgid "Notification events"
@@ -19843,6 +19849,12 @@ msgid "Sync information"
 msgstr ""
 
 msgid "Synced"
+msgstr ""
+
+msgid "Synchronization disabled"
+msgstr ""
+
+msgid "Synchronization of container repositories is disabled."
 msgstr ""
 
 msgid "System"
