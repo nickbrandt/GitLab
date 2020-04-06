@@ -44,6 +44,7 @@ module EE
 
     def upgrade_plan_path(group)
       return profile_billings_path if group.blank?
+
       group_billings_path(group)
     end
 

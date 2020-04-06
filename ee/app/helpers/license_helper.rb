@@ -26,16 +26,12 @@ module LicenseHelper
     ).message
   end
 
-  def seats_calculation_message
-    if current_license&.exclude_guests_from_active_count?
+  def seats_calculation_message(license:)
+    if license&.exclude_guests_from_active_count?
       content_tag :p do
         "Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license."
       end
     end
-  end
-
-  def current_license
-    License.current
   end
 
   def current_license_title
