@@ -392,7 +392,6 @@ RSpec/RepeatedExample:
     - 'spec/features/merge_request/user_posts_diff_notes_spec.rb'
     - 'spec/features/projects/files/template_type_dropdown_spec.rb'
     - 'spec/finders/environments_finder_spec.rb'
-    - 'spec/frontend/fixtures/merge_requests.rb'
     - 'spec/helpers/users_helper_spec.rb'
     - 'spec/lib/gitlab/import_export/project/relation_factory_spec.rb'
     - 'spec/services/notification_service_spec.rb'
