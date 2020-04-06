@@ -4,6 +4,7 @@ module Epics
   class CreateService < Epics::BaseService
     def execute
       set_date_params
+      params.extract!(:confidential) unless ::Feature.enabled?(:confidential_epics, group)
 
       epic = group.epics.new
       create(epic)
