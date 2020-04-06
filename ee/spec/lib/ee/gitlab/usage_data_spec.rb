@@ -38,6 +38,10 @@ describe Gitlab::UsageData do
       create(:project_tracing_setting, project: projects[0])
       create(:operations_feature_flag, project: projects[0])
 
+      create(:issue, project: projects[1])
+      create(:issue, health_status: :on_track, project: projects[1])
+      create(:issue, health_status: :at_risk, project: projects[1])
+
       # for group_view testing
       create(:user) # user with group_view = NULL (should be counted as having default value 'details')
       create(:user, group_view: :details)
@@ -83,6 +87,7 @@ describe Gitlab::UsageData do
         epics_deepest_relationship_level
         feature_flags
         geo_nodes
+        issues_with_health_status
         ldap_group_links
         ldap_keys
         ldap_users
@@ -116,6 +121,7 @@ describe Gitlab::UsageData do
       expect(count_data[:feature_flags]).to eq(1)
       expect(count_data[:status_page_projects]).to eq(1)
       expect(count_data[:status_page_issues]).to eq(1)
+      expect(count_data[:issues_with_health_status]).to eq(2)
     end
 
     it 'has integer value for epic relationship level' do

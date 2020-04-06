@@ -147,6 +147,7 @@ module EE
                 feature_flags: count(Operations::FeatureFlag),
                 geo_nodes: count(::GeoNode),
                 ldap_group_links: count(::LdapGroupLink),
+                issues_with_health_status: count(::Issue.with_health_status),
                 ldap_keys: count(::LDAPKey),
                 ldap_users: count(::User.ldap, 'users.id'),
                 pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
