@@ -301,7 +301,7 @@ Example:
 
 ```ruby
 field :token, GraphQL::STRING_TYPE, null: true,
-      deprecated: { reason: 'Login via token has been removed', milestone: 10.0 },
+      deprecated: { reason: 'Login via token has been removed', milestone: '10.0' },
       description: 'Token for login'
 ```
 
@@ -321,7 +321,7 @@ Example:
 
 ```ruby
 field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
-      deprecated: { reason: 'Use `designCollection`', milestone: 10.0 },
+      deprecated: { reason: 'Use `designCollection`', milestone: '10.0' },
       description: 'The designs associated with this issue',
 ```
 
