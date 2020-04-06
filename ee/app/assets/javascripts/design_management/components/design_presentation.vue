@@ -46,6 +46,7 @@ export default {
         height: 0,
       },
       initialLoad: true,
+      lastDragPosition: null,
     };
   },
   computed: {
@@ -54,6 +55,14 @@ export default {
     },
     currentCommentForm() {
       return (this.isAnnotating && this.currentAnnotationPosition) || null;
+    },
+    presentationStyle() {
+      return {
+        cursor: this.isDraggingDesign ? 'grabbing' : undefined,
+      };
+    },
+    isDraggingDesign() {
+      return Boolean(this.lastDragPosition);
     },
   },
   beforeDestroy() {
@@ -206,12 +215,60 @@ export default {
       const position = this.getAnnotationPositon(coordinates);
       this.$emit('moveNote', { noteId, discussionId, position });
     },
+    onPresentationMousedown({ clientX, clientY }) {
+      if (!this.isDesignOverflowing()) return;
+
+      this.lastDragPosition = {
+        x: clientX,
+        y: clientY,
+      };
+    },
+    onPresentationMousemove({ clientX, clientY }) {
+      if (!this.lastDragPosition) return;
+
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport) return;
+
+      const { scrollLeft, scrollTop } = presentationViewport;
+      const deltaX = this.lastDragPosition.x - clientX;
+      const deltaY = this.lastDragPosition.y - clientY;
+      presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
+
+      this.lastDragPosition = {
+        x: clientX,
+        y: clientY,
+      };
+    },
+    onPresentationMouseup() {
+      this.lastDragPosition = null;
+    },
+    isDesignOverflowing() {
+      const { presentationContainer } = this.$refs;
+      if (!presentationContainer) return false;
+
+      return (
+        presentationContainer.scrollWidth > presentationContainer.offsetWidth ||
+        presentationContainer.scrollHeight > presentationContainer.offsetHeight
+      );
+    },
   },
 };
 </script>
 
 <template>
-  <div ref="presentationViewport" class="h-100 w-100 p-3 overflow-auto position-relative">
+  <div
+    ref="presentationViewport"
+    class="h-100 w-100 p-3 overflow-auto position-relative"
+    :style="presentationStyle"
+    @mousedown="onPresentationMousedown"
+    @mousemove="onPresentationMousemove"
+    @mouseup="onPresentationMouseup"
+    @mouseleave="onPresentationMouseup"
+    @touchstart="onPresentationMousedown"
+    @touchmove="onPresentationMousemove"
+    @touchend="onPresentationMouseup"
+    @touchcancel="onPresentationMouseup"
+  >
     <div
       ref="presentationContainer"
       class="h-100 w-100 d-flex align-items-center position-relative"
@@ -229,6 +286,7 @@ export default {
         :position="overlayPosition"
         :notes="discussionStartingNotes"
         :current-comment-form="currentCommentForm"
+        :disable-commenting="isDraggingDesign"
         @openCommentForm="openCommentForm"
         @moveNote="moveNote"
       />
