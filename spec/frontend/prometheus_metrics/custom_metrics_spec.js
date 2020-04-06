@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
-import PrometheusMetrics from 'ee/prometheus_metrics/prometheus_metrics';
+import PrometheusMetrics from '~/prometheus_metrics/custom_metrics';
 import axios from '~/lib/utils/axios_utils';
 import PANEL_STATE from '~/prometheus_metrics/constants';
 import metrics from './mock_data';
 
-describe('PrometheusMetrics EE', () => {
+describe('PrometheusMetrics', () => {
   const FIXTURE = 'services/prometheus/prometheus_service.html';
   const customMetricsEndpoint =
     'http://test.host/frontend-fixtures/services-project/prometheus/metrics';
@@ -23,7 +23,7 @@ describe('PrometheusMetrics EE', () => {
     mock.restore();
   });
 
-  describe('Custom Metrics EE', () => {
+  describe('Custom Metrics', () => {
     let prometheusMetrics;
 
     beforeEach(() => {
