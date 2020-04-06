@@ -96,9 +96,8 @@ class MergeRequestWidgetEntity < Grape::Entity
 
   def can_add_ci_config_path?(merge_request)
     merge_request.source_project&.uses_default_ci_config? &&
-      !merge_request.target_project.auto_devops_enabled? &&
+      !merge_request.source_project.has_ci? &&
       merge_request.commits_count.positive? &&
-      !merge_request.source_project.repository.blob_at(merge_request.source_branch, Gitlab::FileDetector::PATTERNS[:gitlab_ci]) &&
       can?(current_user, :read_build, merge_request.source_project) &&
       can?(current_user, :create_pipeline, merge_request.source_project)
   end
