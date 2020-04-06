@@ -180,6 +180,7 @@ export default {
             :model="children"
             :can-read-environment="canReadEnvironment"
             :table-data="tableData"
+            :should-show-auto-stop-date="shouldShowAutoStopDate"
           />
 
           <div :key="`sub-div-${i}`">
