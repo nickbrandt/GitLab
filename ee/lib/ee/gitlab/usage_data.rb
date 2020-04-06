@@ -140,28 +140,31 @@ module EE
         override :system_usage_data
         def system_usage_data
           super.tap do |usage_data|
-            usage_data[:counts].merge!({
-                                         dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
-                                         epics: count(::Epic),
-                                         feature_flags: count(Operations::FeatureFlag),
-                                         geo_nodes: count(::GeoNode),
-                                         ldap_group_links: count(::LdapGroupLink),
-                                         ldap_keys: count(::LDAPKey),
-                                         ldap_users: count(::User.ldap, 'users.id'),
-                                         pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
-                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-                                         merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
-                                         merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
-                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
-                                         projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-                                         projects_with_packages: distinct_count(::Packages::Package, :project_id),
-                                         projects_with_tracing_enabled: count(ProjectTracingSetting),
-                                         template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
-                                       },
-                                       service_desk_counts,
-                                       security_products_usage,
-                                       epics_deepest_relationship_level,
-                                       operations_dashboard_usage)
+            usage_data[:counts].merge!(
+              {
+                dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
+                epics: count(::Epic),
+                feature_flags: count(Operations::FeatureFlag),
+                geo_nodes: count(::GeoNode),
+                ldap_group_links: count(::LdapGroupLink),
+                ldap_keys: count(::LDAPKey),
+                ldap_users: count(::User.ldap, 'users.id'),
+                pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
+                projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
+                merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
+                merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
+                projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
+                projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+                projects_with_packages: distinct_count(::Packages::Package, :project_id),
+                projects_with_tracing_enabled: count(ProjectTracingSetting),
+                status_page_projects: count(::StatusPageSetting.enabled),
+                status_page_issues: count(::Issue.on_status_page),
+                template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
+              },
+              service_desk_counts,
+              security_products_usage,
+              epics_deepest_relationship_level,
+              operations_dashboard_usage)
           end
         end
 
