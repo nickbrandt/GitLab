@@ -65,40 +65,8 @@ describe LicenseHelper do
   end
 
   describe '#guest_user_count' do
-    let!(:inactive_owner) { create(:user, :inactive, non_guest: true) }
-    let!(:inactive_guest) { create(:user, :inactive) }
-
-    context 'when there are no active users' do
-      it 'returns 0' do
-        expect(guest_user_count).to eq(0)
-      end
-    end
-
-    context 'when there are active users and none is a guest user' do
-      let!(:owner1) { create(:user, non_guest: true) }
-      let!(:owner2) { create(:user, non_guest: true) }
-
-      it 'returns 0' do
-        expect(guest_user_count).to eq(0)
-      end
-    end
-
-    context 'when there are active users and some are guest users' do
-      let!(:owner) { create(:user, non_guest: true) }
-      let!(:guest) { create(:user) }
-
-      it 'returns the count of all active guest users' do
-        expect(guest_user_count).to eq(1)
-      end
-    end
-
-    context 'when there are active users and all are guest users' do
-      let!(:guest1) { create(:user) }
-      let!(:guest2) { create(:user) }
-
-      it 'returns the count of all active guest users' do
-        expect(guest_user_count).to eq(2)
-      end
+    it 'returns the number of active guest users' do
+      expect(guest_user_count).to eq(User.active.count - User.active.excluding_guests.count)
     end
   end
 
@@ -124,39 +92,40 @@ describe LicenseHelper do
   end
 
   describe '#current_license' do
-    let(:license) { create(:license) }
-
     it 'returns the current license' do
-      expect(license).to eq(license)
+      license = double
+      allow(License).to receive(:current).and_return(license)
+
+      expect(current_license).to eq(license)
     end
   end
 
   describe '#current_license_title' do
     context 'when there is a current license' do
-      let!(:license) { create(:license, more_attrs) }
-      let(:more_attrs) { {} }
+      context 'and it has a plan associated to it' do
+        it 'returns the plan titleized' do
+          custom_plan = 'custom plan'
+          license = double('License', plan: custom_plan)
+          allow(License).to receive(:current).and_return(license)
 
-      context 'and it has a custom plan associated to it' do
-        let(:more_attrs) { { plan: License::ULTIMATE_PLAN } }
-
-        it 'returns the plans title' do
-          expect(current_license_title).to eq('Ultimate')
+          expect(current_license_title).to eq(custom_plan.titleize)
         end
       end
 
-      context 'and it has the default plan associated to it' do
-        it 'returns the plans title' do
-          expect(current_license_title).to eq('Starter')
+      context 'and it does not have a plan associated to it' do
+        it 'returns the default title' do
+          license = double('License', plan: nil)
+          allow(License).to receive(:current).and_return(license)
+
+          expect(current_license_title).to eq('Core')
         end
       end
     end
 
     context 'when there is NOT a current license' do
-      before do
+      it 'returns the default title' do
         allow(License).to receive(:current).and_return(nil)
-      end
 
-      it 'returns default title' do
         expect(current_license_title).to eq('Core')
       end
     end

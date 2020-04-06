@@ -43,11 +43,8 @@ module EE
     end
 
     def upgrade_plan_path(group)
-      if group.present?
-        group_billings_path(group)
-      else
-        profile_billings_path
-      end
+      return profile_billings_path if group.blank?
+      group_billings_path(group)
     end
 
     def self.url_helper(route_name)
