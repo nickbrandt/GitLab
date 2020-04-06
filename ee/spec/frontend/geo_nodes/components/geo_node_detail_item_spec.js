@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 
-import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 import GeoNodeDetailItemComponent from 'ee/geo_nodes/components/geo_node_detail_item.vue';
 import GeoNodeSyncSettings from 'ee/geo_nodes/components/geo_node_sync_settings.vue';
 import GeoNodeEventStatus from 'ee/geo_nodes/components/geo_node_event_status.vue';
+import GeoNodeSyncProgress from 'ee/geo_nodes/components/geo_node_sync_progress.vue';
 
 import { VALUE_TYPE, CUSTOM_TYPE } from 'ee/geo_nodes/constants';
 import { rawMockNodeDetails } from '../mock_data';
@@ -40,18 +40,30 @@ describe('GeoNodeDetailItemComponent', () => {
     });
 
     it('renders container elements correctly', () => {
-      expect(wrapper.vm.$el.classList.contains('node-detail-item')).toBeTruthy();
-      expect(wrapper.vm.$el.querySelectorAll('.node-detail-title').length).not.toBe(0);
-      expect(wrapper.vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe(
-        'GitLab version',
-      );
+      expect(wrapper.find('.node-detail-item').exists()).toBeTruthy();
+      expect(wrapper.findAll('.node-detail-title')).not.toHaveLength(0);
+      expect(
+        wrapper
+          .find('.node-detail-title')
+          .text()
+          .trim(),
+      ).toBe('GitLab version');
     });
 
-    it('renders plain item value', () => {
-      expect(wrapper.vm.$el.querySelectorAll('.node-detail-value').length).not.toBe(0);
-      expect(wrapper.vm.$el.querySelector('.node-detail-value').innerText.trim()).toBe(
-        '10.4.0-pre',
-      );
+    describe('when plain text value', () => {
+      it('renders plain item value', () => {
+        expect(wrapper.findAll('.node-detail-value')).not.toHaveLength(0);
+        expect(
+          wrapper
+            .find('.node-detail-value')
+            .text()
+            .trim(),
+        ).toBe('10.4.0-pre');
+      });
+
+      it('does not render graph item', () => {
+        expect(wrapper.find(GeoNodeSyncProgress).exists()).toBeFalsy();
+      });
     });
 
     describe('when graph item value', () => {
@@ -62,29 +74,8 @@ describe('GeoNodeDetailItemComponent', () => {
         });
       });
 
-      it('renders progress bar', () => {
-        expect(wrapper.find(StackedProgressBar).exists()).toBeTruthy();
-      });
-
-      describe('with itemValueStale prop', () => {
-        const itemValueStaleTooltip = 'Data is out of date from 8 hours ago';
-
-        beforeEach(() => {
-          createComponent({
-            itemValueType: VALUE_TYPE.GRAPH,
-            itemValue: { successCount: 5, failureCount: 3, totalCount: 10 },
-            itemValueStale: true,
-            itemValueStaleTooltip,
-          });
-        });
-
-        it('renders stale information icon', () => {
-          const iconEl = wrapper.find('.text-warning-500');
-
-          expect(iconEl).not.toBeNull();
-          expect(iconEl.attributes('data-original-title')).toBe(itemValueStaleTooltip);
-          expect(iconEl.attributes('name')).toBe('time-out');
-        });
+      it('renders graph item', () => {
+        expect(wrapper.find(GeoNodeSyncProgress).exists()).toBeTruthy();
       });
     });
 
@@ -110,6 +101,10 @@ describe('GeoNodeDetailItemComponent', () => {
       it('renders sync settings item value', () => {
         expect(wrapper.find(GeoNodeSyncSettings).exists()).toBeTruthy();
       });
+
+      it('does not render graph item', () => {
+        expect(wrapper.find(GeoNodeSyncProgress).exists()).toBeFalsy();
+      });
     });
 
     describe('when custom type is event', () => {
@@ -126,6 +121,10 @@ describe('GeoNodeDetailItemComponent', () => {
 
       it('renders event status item value', () => {
         expect(wrapper.find(GeoNodeEventStatus).exists()).toBeTruthy();
+      });
+
+      it('does not render graph item', () => {
+        expect(wrapper.find(GeoNodeSyncProgress).exists()).toBeFalsy();
       });
     });
 
