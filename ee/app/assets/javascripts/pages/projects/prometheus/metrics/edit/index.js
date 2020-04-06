@@ -1,3 +1,3 @@
-import customMetrics from 'ee/custom_metrics';
+import customMetrics from '~/custom_metrics';
 
 document.addEventListener('DOMContentLoaded', customMetrics);

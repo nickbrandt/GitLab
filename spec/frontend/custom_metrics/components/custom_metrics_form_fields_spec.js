@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
-import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import axios from '~/lib/utils/axios_utils';
 
 const { CancelToken } = axios;
