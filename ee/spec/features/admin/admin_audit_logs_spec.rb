@@ -36,6 +36,21 @@ describe 'Admin::AuditLogs', :js do
       expect(page).to have_link('Audit Log', href: admin_audit_logs_path)
     end
 
+    describe 'release created events' do
+      let(:project) { create(:project) }
+      let(:release) { create(:release, project: project, tag: 'v0.1', author: user) }
+
+      before do
+        EE::AuditEvents::ReleaseCreatedAuditEventService.new(user, project, '127.0.0.1', release).security_event
+      end
+
+      it 'shows the related audit event' do
+        visit admin_audit_logs_path
+
+        expect(page).to have_content('Created Release')
+      end
+    end
+
     describe 'user events' do
       before do
         AuditEventService.new(user, user, with: :ldap)
