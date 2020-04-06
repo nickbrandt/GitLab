@@ -32,7 +32,7 @@ Read more on [pagination](README.md#pagination).
 List all of a project's vulnerabilities.
 
 If an authenticated user does not have permission to
-[use the Project Security Dashboard](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[use the Project Security Dashboard](../user/permissions.md#project-members-permissions),
 `GET` requests for vulnerabilities of this project will result in a `403` status code.
 
 ```plaintext
@@ -109,7 +109,7 @@ Example response:
 Creates a new vulnerability.
 
 If an authenticated user does not have a permission to
-[create a new vulnerability](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[create a new vulnerability](../user/permissions.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```plaintext
