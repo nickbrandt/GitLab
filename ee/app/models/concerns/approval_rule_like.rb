@@ -7,7 +7,7 @@ module ApprovalRuleLike
   DEFAULT_NAME_FOR_LICENSE_REPORT = 'License-Check'
   DEFAULT_NAME_FOR_SECURITY_REPORT = 'Vulnerability-Check'
   REPORT_TYPES_BY_DEFAULT_NAME = {
-    DEFAULT_NAME_FOR_LICENSE_REPORT => :license_management,
+    DEFAULT_NAME_FOR_LICENSE_REPORT => :license_scanning,
     DEFAULT_NAME_FOR_SECURITY_REPORT => :security
   }.freeze
   APPROVALS_REQUIRED_MAX = 100

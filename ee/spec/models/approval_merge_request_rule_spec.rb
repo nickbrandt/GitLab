@@ -373,10 +373,10 @@ describe ApprovalMergeRequestRule do
     end
 
     context "when the rule is a `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` rule" do
-      subject { create(:report_approver_rule, :requires_approval, :license_management, merge_request: open_merge_request) }
+      subject { create(:report_approver_rule, :requires_approval, :license_scanning, merge_request: open_merge_request) }
 
       let(:open_merge_request) { create(:merge_request, :opened, target_project: project, source_project: project) }
-      let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
+      let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_scanning, project: project) }
       let(:project) { create(:project) }
       let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
       let!(:denied_policy) { create(:software_license_policy, project: project, software_license: license, classification: :denied) }
