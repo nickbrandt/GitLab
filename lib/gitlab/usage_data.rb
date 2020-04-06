@@ -277,11 +277,11 @@ module Gitlab
 
       def alt_usage_data(value = nil, fallback: -1, &block)
         if block_given?
-          instance_eval(&block)
+          yield
         else
           value
         end
-      rescue StandardError
+      rescue
         fallback
       end
 
