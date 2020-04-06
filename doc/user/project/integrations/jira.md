@@ -55,7 +55,7 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 
 > **Notes:**
 >
-> - The currently supported Jira versions are `v6.x` and `v7.x.`. GitLab 7.8 or
+> - The currently supported Jira versions are `v6.x, v7.x, v8.x` . GitLab 7.8 or
 >   higher is required.
 > - GitLab 8.14 introduced a new way to integrate with Jira which greatly simplified
 >   the configuration options you have to enter. If you are using an older version,
