@@ -150,7 +150,7 @@ function ensure_namespace() {
 
 function install_external_dns() {
   local namespace="${KUBE_NAMESPACE}"
-  local release="dns-gitlab-review-app"
+  local release="dns-gitlab-review-app-helm3"
   local domain
   domain=$(echo "${REVIEW_APPS_DOMAIN}" | awk -F. '{printf "%s.%s", $(NF-1), $NF}')
   echoinfo "Installing external DNS for domain ${domain}..." true
