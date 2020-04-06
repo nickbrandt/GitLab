@@ -171,23 +171,21 @@ export default {
       documentation-anchor="web-application-firewall"
     />
 
-    <template v-if="glFeatures.networkPolicyUi">
-      <hr />
+    <hr />
 
-      <threat-monitoring-section
-        ref="networkPolicySection"
-        store-namespace="threatMonitoringNetworkPolicy"
-        :title="s__('ThreatMonitoring|Container Network Policy')"
-        :subtitle="s__('ThreatMonitoring|Packet Activity')"
-        :anomalous-title="s__('ThreatMonitoring|Dropped Packets')"
-        :nominal-title="s__('ThreatMonitoring|Total Packets')"
-        :y-legend="s__('ThreatMonitoring|Operations Per Second')"
-        :chart-empty-state-title="s__('ThreatMonitoring|Container NetworkPolicies not detected')"
-        :chart-empty-state-text="$options.networkPolicyChartEmptyStateDescription"
-        :chart-empty-state-svg-path="networkPolicyNoDataSvgPath"
-        :documentation-path="documentationPath"
-        documentation-anchor="container-network-policy"
-      />
-    </template>
+    <threat-monitoring-section
+      ref="networkPolicySection"
+      store-namespace="threatMonitoringNetworkPolicy"
+      :title="s__('ThreatMonitoring|Container Network Policy')"
+      :subtitle="s__('ThreatMonitoring|Packet Activity')"
+      :anomalous-title="s__('ThreatMonitoring|Dropped Packets')"
+      :nominal-title="s__('ThreatMonitoring|Total Packets')"
+      :y-legend="s__('ThreatMonitoring|Operations Per Second')"
+      :chart-empty-state-title="s__('ThreatMonitoring|Container NetworkPolicies not detected')"
+      :chart-empty-state-text="$options.networkPolicyChartEmptyStateDescription"
+      :chart-empty-state-svg-path="networkPolicyNoDataSvgPath"
+      :documentation-path="documentationPath"
+      documentation-anchor="container-network-policy"
+    />
   </section>
 </template>
