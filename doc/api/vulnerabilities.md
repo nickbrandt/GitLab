@@ -78,7 +78,7 @@ Example response:
 Confirms a given vulnerability. Returns status code `304` if the vulnerability is already confirmed.
 
 If an authenticated user does not have permission to
-[confirm vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[confirm vulnerabilities](../user/permissions.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```plaintext
