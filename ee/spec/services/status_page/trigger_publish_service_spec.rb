@@ -235,14 +235,6 @@ describe StatusPage::TriggerPublishService do
         end
       end
 
-      context 'when feature is disabled' do
-        include_examples 'no trigger status page publish' do
-          before do
-            stub_feature_flags(status_page: false)
-          end
-        end
-      end
-
       context 'when user cannot publish status page' do
         include_examples 'no trigger status page publish' do
           before do
