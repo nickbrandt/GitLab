@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import CustomMetricsForm from 'ee/custom_metrics/components/custom_metrics_form.vue';
+import CustomMetricsForm from '~/custom_metrics/components/custom_metrics_form.vue';
 
 describe('CustomMetricsForm', () => {
   let wrapper;
