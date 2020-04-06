@@ -6,12 +6,6 @@ export const healthStatus = {
   AT_RISK: 'atRisk',
 };
 
-export const healthStatusColorMap = {
-  [healthStatus.ON_TRACK]: 'text-success',
-  [healthStatus.NEEDS_ATTENTION]: 'text-warning',
-  [healthStatus.AT_RISK]: 'text-danger',
-};
-
 export const healthStatusTextMap = {
   [healthStatus.ON_TRACK]: __('On track'),
   [healthStatus.NEEDS_ATTENTION]: __('Needs attention'),
