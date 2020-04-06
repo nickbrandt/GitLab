@@ -12,6 +12,8 @@ import { __, sprintf } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 
+import RequirementForm from './requirement_form.vue';
+
 export default {
   components: {
     GlPopover,
@@ -19,6 +21,7 @@ export default {
     GlAvatar,
     GlDeprecatedButton,
     GlIcon,
+    RequirementForm,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -32,6 +35,16 @@ export default {
         ['iid', 'state', 'userPermissions', 'title', 'createdAt', 'updatedAt', 'author'].every(
           prop => value[prop],
         ),
+    },
+    showUpdateForm: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    updateRequirementRequestActive: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -70,13 +83,23 @@ export default {
       }
       return '';
     },
+    handleUpdateRequirementSave(params) {
+      this.$emit('updateSave', params);
+    },
   },
 };
 </script>
 
 <template>
   <li class="issue requirement">
-    <div class="issue-box">
+    <requirement-form
+      v-if="showUpdateForm"
+      :requirement="requirement"
+      :requirement-request-active="updateRequirementRequestActive"
+      @save="handleUpdateRequirementSave"
+      @cancel="$emit('updateCancel')"
+    />
+    <div v-else class="issue-box">
       <div class="issuable-info-container">
         <span class="issuable-reference text-muted d-none d-sm-block mr-2">{{ reference }}</span>
         <div class="issuable-main-info">
@@ -101,7 +124,13 @@ export default {
         <div class="issuable-meta">
           <ul v-if="canUpdate || canArchive" class="controls flex-column flex-sm-row">
             <li v-if="canUpdate" class="requirement-edit d-sm-block">
-              <gl-deprecated-button v-gl-tooltip size="sm" class="border-0" :title="__('Edit')">
+              <gl-deprecated-button
+                v-gl-tooltip
+                size="sm"
+                class="border-0"
+                :title="__('Edit')"
+                @click="$emit('editClick', requirement.iid)"
+              >
                 <gl-icon name="pencil" />
               </gl-deprecated-button>
             </li>

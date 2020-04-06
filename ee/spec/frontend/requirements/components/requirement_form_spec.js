@@ -49,6 +49,12 @@ describe('RequirementForm', () => {
         expect(wrapperWithRequirement.vm.saveButtonLabel).toBe('Save changes');
       });
     });
+
+    describe('reference', () => {
+      it('returns string containing `requirement.iid` prefixed with `REQ-`', () => {
+        expect(wrapperWithRequirement.vm.reference).toBe(`REQ-${mockRequirementsOpen[0].iid}`);
+      });
+    });
   });
 
   describe('methods', () => {
@@ -90,11 +96,15 @@ describe('RequirementForm', () => {
       expect(wrapperClasses).toContain('border-bottom');
     });
 
-    it('renders component container element without classes `p-3 border-bottom` when form is in edit mode', () => {
+    it('renders component container element with classes `d-block d-sm-flex` when form is in edit mode', () => {
       const wrapperClasses = wrapperWithRequirement.classes();
 
-      expect(wrapperClasses).not.toContain('p-3');
-      expect(wrapperClasses).not.toContain('border-bottom');
+      expect(wrapperClasses).toContain('d-block');
+      expect(wrapperClasses).toContain('d-sm-flex');
+    });
+
+    it('renders element containing requirement reference when form is in edit mode', () => {
+      expect(wrapperWithRequirement.find('span').text()).toBe(`REQ-${mockRequirementsOpen[0].iid}`);
     });
 
     it('renders gl-form-group component', () => {

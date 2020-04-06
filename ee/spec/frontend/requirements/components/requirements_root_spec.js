@@ -10,6 +10,7 @@ import RequirementItem from 'ee/requirements/components/requirement_item.vue';
 import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 
 import createRequirement from 'ee/requirements/queries/createRequirement.mutation.graphql';
+import updateRequirement from 'ee/requirements/queries/updateRequirement.mutation.graphql';
 
 import {
   FilterState,
@@ -166,6 +167,14 @@ describe('RequirementsRoot', () => {
       });
     });
 
+    describe('handleEditRequirementClick', () => {
+      it('sets `showUpdateFormForRequirement` prop to value of passed param', () => {
+        wrapper.vm.handleEditRequirementClick('10');
+
+        expect(wrapper.vm.showUpdateFormForRequirement).toBe('10');
+      });
+    });
+
     describe('handleNewRequirementSave', () => {
       const mockMutationResult = {
         data: {
@@ -232,6 +241,81 @@ describe('RequirementsRoot', () => {
       });
     });
 
+    describe('handleUpdateRequirementSave', () => {
+      const mockMutationResult = {
+        data: {
+          createRequirement: {
+            errors: [],
+            requirement: {
+              iid: '1',
+              title: 'foo',
+            },
+          },
+        },
+      };
+
+      it('sets `createRequirementRequestActive` prop to `true`', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+
+        wrapper.vm.handleUpdateRequirementSave('foo');
+
+        expect(wrapper.vm.createRequirementRequestActive).toBe(true);
+      });
+
+      it('calls `$apollo.mutate` with updateRequirement mutation and `projectPath`, `iid` & `title` as variables', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+
+        wrapper.vm.handleUpdateRequirementSave({
+          iid: '1',
+          title: 'foo',
+        });
+
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: updateRequirement,
+            variables: {
+              updateRequirementInput: {
+                projectPath: 'gitlab-org/gitlab-shell',
+                iid: '1',
+                title: 'foo',
+              },
+            },
+          }),
+        );
+      });
+
+      it('sets `showUpdateFormForRequirement` to `0` and `createRequirementRequestActive` prop to `false` when request is successful', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockReturnValue(Promise.resolve(mockMutationResult));
+
+        return wrapper.vm
+          .handleUpdateRequirementSave({
+            iid: '1',
+            title: 'foo',
+          })
+          .then(() => {
+            expect(wrapper.vm.showUpdateFormForRequirement).toBe(0);
+            expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+          });
+      });
+
+      it('sets `createRequirementRequestActive` prop to `false` and calls `createFlash` when `$apollo.mutate` request fails', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
+
+        return wrapper.vm.handleUpdateRequirementSave('foo').then(() => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Something went wrong while updating a requirement.',
+          );
+          expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+        });
+      });
+    });
+
     describe('handleNewRequirementCancel', () => {
       it('sets `showCreateForm` prop to `false`', () => {
         wrapper.setData({
@@ -241,6 +325,14 @@ describe('RequirementsRoot', () => {
         wrapper.vm.handleNewRequirementCancel();
 
         expect(wrapper.vm.showCreateForm).toBe(false);
+      });
+    });
+
+    describe('handleUpdateRequirementCancel', () => {
+      it('sets `showUpdateFormForRequirement` prop to `0`', () => {
+        wrapper.vm.handleUpdateRequirementCancel();
+
+        expect(wrapper.vm.showUpdateFormForRequirement).toBe(0);
       });
     });
 

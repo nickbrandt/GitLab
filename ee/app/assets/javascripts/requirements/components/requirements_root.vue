@@ -13,6 +13,7 @@ import RequirementForm from './requirement_form.vue';
 
 import projectRequirements from '../queries/projectRequirements.query.graphql';
 import createRequirement from '../queries/createRequirement.mutation.graphql';
+import updateRequirement from '../queries/updateRequirement.mutation.graphql';
 
 import { FilterState, DEFAULT_PAGE_SIZE } from '../constants';
 
@@ -106,6 +107,7 @@ export default {
   data() {
     return {
       showCreateForm: false,
+      showUpdateFormForRequirement: 0,
       createRequirementRequestActive: false,
       currentPage: this.page,
       prevPageCursor: this.prev,
@@ -181,6 +183,9 @@ export default {
     handleNewRequirementClick() {
       this.showCreateForm = true;
     },
+    handleEditRequirementClick(iid) {
+      this.showUpdateFormForRequirement = iid;
+    },
     handleNewRequirementSave(title) {
       this.createRequirementRequestActive = true;
       return this.$apollo
@@ -211,6 +216,37 @@ export default {
     },
     handleNewRequirementCancel() {
       this.showCreateForm = false;
+    },
+    handleUpdateRequirementSave({ iid, title }) {
+      this.createRequirementRequestActive = true;
+      return this.$apollo
+        .mutate({
+          mutation: updateRequirement,
+          variables: {
+            updateRequirementInput: {
+              projectPath: this.projectPath,
+              iid,
+              title,
+            },
+          },
+        })
+        .then(({ data }) => {
+          if (!data.updateRequirement.errors.length) {
+            this.showUpdateFormForRequirement = 0;
+          } else {
+            throw new Error(`Error updating a requirement`);
+          }
+        })
+        .catch(e => {
+          createFlash(__('Something went wrong while updating a requirement.'));
+          Sentry.captureException(e);
+        })
+        .finally(() => {
+          this.createRequirementRequestActive = false;
+        });
+    },
+    handleUpdateRequirementCancel() {
+      this.showUpdateFormForRequirement = 0;
     },
     handlePageChange(page) {
       const { startCursor, endCursor } = this.requirements.pageInfo;
@@ -262,6 +298,11 @@ export default {
         v-for="requirement in requirements.list"
         :key="requirement.iid"
         :requirement="requirement"
+        :show-update-form="showUpdateFormForRequirement === requirement.iid"
+        :update-requirement-request-active="createRequirementRequestActive"
+        @updateSave="handleUpdateRequirementSave"
+        @updateCancel="handleUpdateRequirementCancel"
+        @editClick="handleEditRequirementClick"
       />
     </ul>
     <gl-pagination
