@@ -41,13 +41,19 @@ module Gitlab
       #   the MUCH slower method of using Repository#diff_stats, which isn't
       #   subject to the same limit.
       #
-      if merge_request.diff_size == "1000+"
+      if oversized_merge_request?(merge_request, merge_request_diff)
         slow_path_lookup(merge_request, merge_request_diff)
       else
         fast_path_lookup(merge_request, merge_request_diff)
       end
     end
     private_class_method :paths_for_merge_request
+
+    def self.oversized_merge_request?(merge_request, merge_request_diff)
+      mrd_to_check_for_overflow = merge_request_diff || merge_request.merge_request_diff
+
+      mrd_to_check_for_overflow.overflow?
+    end
 
     def self.slow_path_lookup(merge_request, merge_request_diff)
       merge_request_diff = merge_request_diff || merge_request.merge_request_diff

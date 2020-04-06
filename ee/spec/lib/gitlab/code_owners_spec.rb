@@ -64,7 +64,7 @@ describe Gitlab::CodeOwners do
     it "return equivalent results" do
       fast_results = described_class.entries_for_merge_request(merge_request).first
 
-      expect(merge_request).to receive(:diff_size).and_return("1000+")
+      expect(merge_request.merge_request_diff).to receive(:overflow?).and_return(true)
 
       slow_results = described_class.entries_for_merge_request(merge_request).first
 
@@ -113,7 +113,7 @@ describe Gitlab::CodeOwners do
 
       context 'when the merge request is large (>1_000 files)' do
         before do
-          expect(merge_request).to receive(:diff_size).and_return("1000+")
+          expect(merge_request.merge_request_diff).to receive(:overflow?).and_return(true)
         end
 
         it 'generates paths via .slow_path_lookup' do
