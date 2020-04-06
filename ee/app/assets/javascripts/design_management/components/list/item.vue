@@ -43,6 +43,11 @@ export default {
       required: false,
       default: true,
     },
+    imageV432x230: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -80,7 +85,7 @@ export default {
       return this.imageLoading || this.isUploading;
     },
     imageLink() {
-      return this.isInView ? this.image : '';
+      return this.isInView ? this.imageV432x230 || this.image : '';
     },
   },
   methods: {

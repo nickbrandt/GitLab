@@ -197,6 +197,7 @@ describe('Design management index page', () => {
                 __typename: 'Design',
                 id: expect.anything(),
                 image: '',
+                imageV432x230: '',
                 filename: 'test',
                 fullPath: '',
                 event: 'NONE',
