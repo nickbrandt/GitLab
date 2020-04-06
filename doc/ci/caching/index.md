@@ -337,8 +337,6 @@ all jobs inherit it. Go modules are installed in `${GOPATH}/pkg/mod/` and
 are cached for all of all the `go` projects:
 
 ```yaml
-image: golang:1.13
-
 .go-cache:
   variables:
     GOPATH: $CI_PROJECT_DIR/.go
@@ -349,6 +347,7 @@ image: golang:1.13
       - .go/pkg/mod/
 
 test:
+  image: golang:1.13
   extends: .go-cache
   script:
   - go test ./... -v -short
