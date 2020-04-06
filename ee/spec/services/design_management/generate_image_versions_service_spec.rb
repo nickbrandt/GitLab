@@ -15,6 +15,14 @@ describe DesignManagement::GenerateImageVersionsService do
         .from(nil).to(CarrierWave::SanitizedFile)
     end
 
+    it 'skips generating image versions if the mime type is not whitelisted' do
+      stub_const('DesignManagement::DesignV432x230Uploader::MIME_TYPE_WHITELIST', [])
+
+      described_class.new(version).execute
+
+      expect(action.reload.image_v432x230.file).to eq(nil)
+    end
+
     it 'skips generating image versions if the design file size is too large' do
       stub_const("#{described_class.name}::MAX_DESIGN_SIZE", 1.byte)
 
