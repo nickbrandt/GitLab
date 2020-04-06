@@ -286,14 +286,3 @@ To re-import the metrics you can run:
 ```shell
 sudo gitlab-rake metrics:setup_common_metrics
 ```
-
-## Import additional development metrics
-
-A lot of different types of metrics are supported, like multi line metrics, heatmaps,
-anomaly, etc.
-
-To import these custom metrics, you can run:
-
-```shell
-sudo gitlab-rake 'metrics:setup_development_metrics[your_project_id]'
-```
