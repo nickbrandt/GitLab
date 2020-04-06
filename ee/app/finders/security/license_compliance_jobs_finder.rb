@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Security::LicenseManagementJobsFinder
+# Security::LicenseScanningJobsFinder
 #
 # Used to find jobs (builds) that are related to the License Management.
 #
@@ -10,7 +10,7 @@
 #     job_types:             required, array of job types that should be returned, defaults to all job types
 
 module Security
-  class LicenseManagementJobsFinder < JobsFinder
+  class LicenseComplianceJobsFinder < JobsFinder
     def self.allowed_job_types
       [:license_management, :license_scanning]
     end
