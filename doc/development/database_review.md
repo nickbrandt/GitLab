@@ -77,7 +77,7 @@ the following preparations into account.
 - Ensure `db/structure.sql` is updated.
 - Make migrations reversible by using the `change` method or include a `down` method when using `up`.
   - Include either a rollback procedure or describe how to rollback changes.
-- Add the output of the both up & down methods for all migrations into the MR description
+- Add the output of both migrating and rolling back for all migrations into the MR description
   - Ensure the down method reverts the changes in `db/structure.sql`
   - Update the migration output whenever you modify the migrations during the review process
 - Add tests for the migration in `spec/migrations` if necessary. See [Testing Rails migrations at GitLab](testing_guide/testing_migrations_guide.md) for more details.
