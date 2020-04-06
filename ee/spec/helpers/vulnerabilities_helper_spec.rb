@@ -3,17 +3,34 @@
 require 'spec_helper'
 
 describe VulnerabilitiesHelper do
-  RSpec.shared_examples 'vulnerability properties' do
-    it 'has expected vulnerability properties' do
-      expect(subject).to include(
-        vulnerability_json: vulnerability.to_json,
-        project_fingerprint: vulnerability.finding.project_fingerprint,
-        create_issue_url: anything,
-        has_mr: anything,
-        vulnerability_feedback_help_path: anything,
-        finding_json: anything
-      )
-    end
+  let_it_be(:user) { build(:user) }
+  let_it_be(:vulnerability) { create(:vulnerability, :with_findings, title: "My vulnerability") }
+  let_it_be(:finding) { vulnerability.finding }
+  let(:vulnerability_serializer_hash) do
+    vulnerability.slice(
+      :id,
+      :title,
+      :state,
+      :severity,
+      :confidence,
+      :report_type,
+      :resolved_on_default_branch,
+      :project_default_branch,
+      :resolved_by_id,
+      :dismissed_by_id,
+      :confirmed_by_id
+    )
+  end
+  let(:occurrence_serializer_hash) do
+    finding.slice(:description,
+      :identifiers,
+      :links,
+      :location,
+      :name,
+      :issue_feedback,
+      :project,
+      :solution
+    )
   end
 
   before do
@@ -21,11 +38,30 @@ describe VulnerabilitiesHelper do
     allow(helper).to receive(:current_user).and_return(user)
   end
 
-  let(:user) { build(:user) }
+  RSpec.shared_examples 'vulnerability properties' do
+    before do
+      vulnerability_serializer_stub = instance_double("VulnerabilitySerializer")
+      expect(VulnerabilitySerializer).to receive(:new).and_return(vulnerability_serializer_stub)
+      expect(vulnerability_serializer_stub).to receive(:represent).with(vulnerability).and_return(vulnerability_serializer_hash)
+
+      occurrence_serializer_stub = instance_double("Vulnerabilities::OccurrenceSerializer")
+      expect(Vulnerabilities::OccurrenceSerializer).to receive(:new).and_return(occurrence_serializer_stub)
+      expect(occurrence_serializer_stub).to receive(:represent).with(finding).and_return(occurrence_serializer_hash)
+    end
+
+    it 'has expected vulnerability properties' do
+      expect(subject).to include(
+        vulnerability_json: kind_of(String),
+        project_fingerprint: vulnerability.finding.project_fingerprint,
+        create_issue_url: kind_of(String),
+        has_mr: anything,
+        vulnerability_feedback_help_path: kind_of(String),
+        finding_json: kind_of(String)
+      )
+    end
+  end
 
   describe '#vulnerability_data' do
-    let(:vulnerability) { create(:vulnerability, :with_findings) }
-
     subject { helper.vulnerability_data(vulnerability, pipeline) }
 
     describe 'when pipeline exists' do
@@ -55,9 +91,6 @@ describe VulnerabilitiesHelper do
   end
 
   describe '#vulnerability_finding_data' do
-    let(:vulnerability) { create(:vulnerability, :with_findings) }
-    let(:finding) { vulnerability.finding }
-
     subject { helper.vulnerability_finding_data(finding) }
 
     it "returns finding information" do

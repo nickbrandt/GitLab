@@ -5,7 +5,7 @@ module VulnerabilitiesHelper
     return unless vulnerability
 
     {
-      vulnerability_json: vulnerability.to_json,
+      vulnerability_json: VulnerabilitySerializer.new.represent(vulnerability).to_json,
       project_fingerprint: vulnerability.finding.project_fingerprint,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       pipeline_json: vulnerability_pipeline_data(pipeline).to_json,
