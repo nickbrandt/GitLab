@@ -110,7 +110,7 @@ To make full use of Auto DevOps, you will need:
 
   1. A [Kubernetes 1.12+ cluster](../../user/project/clusters/index.md) for the project. The easiest
      way is to create a [new cluster using the GitLab UI](../../user/project/clusters/add_remove_clusters.md#create-new-cluster).
-     For Kubernetes 1.16+ clusters, there is some additional configuration for [Auto Deploy for Kubernetes 1.16+](#kubernetes-116).
+     For Kubernetes 1.16+ clusters, there is some additional configuration for [Auto Deploy for Kubernetes 1.16+](stages.md#kubernetes-116).
   1. NGINX Ingress. You can deploy it to your Kubernetes cluster by installing
      the [GitLab-managed app for Ingress](../../user/clusters/applications.md#ingress),
      once you have configured GitLab's Kubernetes integration in the previous step.
@@ -642,7 +642,7 @@ applications.
 |-----------------------------------------|------------------------------------|
 | `ADDITIONAL_HOSTS`                      | Fully qualified domain names specified as a comma-separated list that are added to the Ingress hosts. |
 | `<ENVIRONMENT>_ADDITIONAL_HOSTS`        | For a specific environment, the fully qualified domain names specified as a comma-separated list that are added to the Ingress hosts. This takes precedence over `ADDITIONAL_HOSTS`. |
-| `AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED`   | When set to a non-empty value and no `Dockerfile` is present, Auto Build builds your application using Cloud Native Buildpacks instead of Herokuish. [More details](#auto-build-using-cloud-native-buildpacks-beta). |
+| `AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED`   | When set to a non-empty value and no `Dockerfile` is present, Auto Build builds your application using Cloud Native Buildpacks instead of Herokuish. [More details](stages.md#auto-build-using-cloud-native-buildpacks-beta). |
 | `AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS`    | Extra arguments to be passed to the `docker build` command. Note that using quotes will not prevent word splitting. [More details](#passing-arguments-to-docker-build). |
 | `AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES` | A [comma-separated list of CI variable names](#passing-secrets-to-docker-build) to be passed to the `docker build` command as secrets. |
 | `AUTO_DEVOPS_CHART`                     | Helm Chart used to deploy your apps. Defaults to the one [provided by GitLab](https://gitlab.com/gitlab-org/charts/auto-deploy-app). |
