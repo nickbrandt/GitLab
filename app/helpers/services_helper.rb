@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 module ServicesHelper
-  def service_form_url(service, project: nil)
-    if project.present?
-      project_service_path(project, service.to_param)
-    else
-      admin_application_settings_integration_path(service.to_param)
-    end
-  end
-
   def service_event_description(event)
     case event
     when "push", "push_events"
@@ -82,7 +74,7 @@ module ServicesHelper
 
   def scoped_integration_path(integration)
     if @project.present?
-      project_settings_integration_path(@project, integration)
+      project_service_path(@project, integration)
     elsif @group.present?
       group_settings_integration_path(@group, integration)
     else
