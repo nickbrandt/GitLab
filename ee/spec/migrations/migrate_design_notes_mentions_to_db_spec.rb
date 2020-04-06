@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200124110831_migrate_design_notes_mentions_to_db')
 
-describe MigrateDesignNotesMentionsToDb, :migration, :sidekiq do
+describe MigrateDesignNotesMentionsToDb, :sidekiq do
   let(:users) { table(:users) }
   let(:projects) { table(:projects) }
   let(:namespaces) { table(:namespaces) }
@@ -25,7 +25,11 @@ describe MigrateDesignNotesMentionsToDb, :migration, :sidekiq do
   let!(:resource4) { notes.create!(note: 'note3 for @root to check', noteable_id: design.id, noteable_type: 'DesignManagement::Design') }
   let!(:user_mention) { design_user_mentions.create!(design_id: design.id, note_id: resource4.id, mentioned_users_ids: [1]) }
   # this note points to an innexistent noteable record
-  let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: designs.maximum(:id) + 10, noteable_type: 'DesignManagement::Design') }
+  let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: non_existing_record_id, noteable_type: 'DesignManagement::Design') }
+
+  before do
+    stub_const("#{described_class.name}::BATCH_SIZE", 1)
+  end
 
   it_behaves_like 'schedules resource mentions migration', DesignManagement::Design, true
 end

@@ -37,14 +37,18 @@ export default {
     };
   },
   computed: {
-    id() {
+    htmlId() {
+      if (!this.release.tagName) {
+        return null;
+      }
+
       return slugify(this.release.tagName);
     },
     assets() {
       return this.release.assets || {};
     },
     hasEvidence() {
-      return Boolean(this.release.evidenceSha);
+      return Boolean(this.release.evidences && this.release.evidences.length);
     },
     milestones() {
       return this.release.milestones || [];
@@ -72,7 +76,7 @@ export default {
     this.renderGFM();
 
     const hash = getLocationHash();
-    if (hash && slugify(hash) === this.id) {
+    if (hash && slugify(hash) === this.htmlId) {
       this.isHighlighted = true;
       setTimeout(() => {
         this.isHighlighted = false;
@@ -89,11 +93,14 @@ export default {
 };
 </script>
 <template>
-  <div :id="id" :class="{ 'bg-line-target-blue': isHighlighted }" class="card release-block">
+  <div :id="htmlId" :class="{ 'bg-line-target-blue': isHighlighted }" class="card release-block">
     <release-block-header :release="release" />
     <div class="card-body">
       <div v-if="shouldRenderMilestoneInfo">
-        <release-block-milestone-info :milestones="milestones" />
+        <release-block-milestone-info
+          :milestones="milestones"
+          :open-issues-path="release._links.issuesUrl"
+        />
         <hr class="mb-3 mt-0" />
       </div>
 

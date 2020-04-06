@@ -33,6 +33,7 @@ describe('GeoNodeForm', () => {
   const findGeoNodeInternalUrlField = () => wrapper.find('#node-internal-url-field');
   const findGeoNodeFormCapacitiesField = () => wrapper.find(GeoNodeFormCapacities);
   const findGeoNodeObjectStorageField = () => wrapper.find('#node-object-storage-field');
+  const findGeoNodeSaveButton = () => wrapper.find('#node-save-button');
   const findGeoNodeCancelButton = () => wrapper.find('#node-cancel-button');
 
   describe('template', () => {
@@ -84,6 +85,18 @@ describe('GeoNodeForm', () => {
   });
 
   describe('methods', () => {
+    describe('saveGeoNode', () => {
+      beforeEach(() => {
+        createComponent();
+        wrapper.vm.saveGeoNode = jest.fn();
+      });
+
+      it('calls saveGeoNode when save is clicked', () => {
+        findGeoNodeSaveButton().vm.$emit('click');
+        expect(wrapper.vm.saveGeoNode).toHaveBeenCalledWith(MOCK_NODE);
+      });
+    });
+
     describe('redirect', () => {
       beforeEach(() => {
         createComponent();
@@ -91,7 +104,7 @@ describe('GeoNodeForm', () => {
 
       it('calls visitUrl when cancel is clicked', () => {
         findGeoNodeCancelButton().vm.$emit('click');
-        expect(visitUrl).toHaveBeenCalled();
+        expect(visitUrl).toHaveBeenCalledWith('/admin/geo/nodes');
       });
     });
 

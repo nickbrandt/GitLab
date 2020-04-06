@@ -172,6 +172,7 @@ export default () => {
         props: {
           emptyStateSvgPath,
           noAccessSvgPath,
+          hideGroupDropDown,
         },
       });
     },

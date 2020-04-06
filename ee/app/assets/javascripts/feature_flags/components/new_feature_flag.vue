@@ -2,6 +2,7 @@
 import { createNamespacedHelpers } from 'vuex';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
+import { LEGACY_FLAG, NEW_VERSION_FLAG } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -41,6 +42,12 @@ export default {
         ),
       ];
     },
+    version() {
+      return this.glFeatures.featureFlagsNewVersion ? NEW_VERSION_FLAG : LEGACY_FLAG;
+    },
+    strategies() {
+      return [{ name: '', parameters: {}, scopes: [] }];
+    },
   },
   created() {
     this.setEndpoint(this.endpoint);
@@ -63,7 +70,9 @@ export default {
       :cancel-path="path"
       :submit-text="s__('FeatureFlags|Create feature flag')"
       :scopes="scopes"
+      :strategies="strategies"
       :environments-endpoint="environmentsEndpoint"
+      :version="version"
       @handleSubmit="data => createFeatureFlag(data)"
     />
   </div>

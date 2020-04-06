@@ -31,7 +31,7 @@
   }
 
   &.sortable-chosen .draggable-panel {
-    background: $white-light;
+    background: $white;
     box-shadow: 0 0 4px $gray-500;
   }
 
@@ -41,7 +41,7 @@
     .draggable-remove-link {
       cursor: pointer;
       color: $gray-600;
-      background-color: $white-light;
+      background-color: $white;
     }
   }
 }
@@ -93,6 +93,11 @@
 
 .alert-current-setting {
   max-width: 240px;
+
+  .badge.badge-danger {
+    color: $red-500;
+    background-color: $red-100;
+  }
 }
 
 .prometheus-graph-cursor {

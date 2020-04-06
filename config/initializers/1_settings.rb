@@ -74,14 +74,6 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 end
 
-Gitlab.ee do
-  Settings['smartcard'] ||= Settingslogic.new({})
-  Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
-  Settings.smartcard['client_certificate_required_port'] = 3444 if Settings.smartcard['client_certificate_required_port'].nil?
-  Settings.smartcard['required_for_git_access'] = false if Settings.smartcard['required_for_git_access'].nil?
-  Settings.smartcard['san_extensions'] = false if Settings.smartcard['san_extensions'].nil?
-end
-
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled'] = true if Settings.omniauth['enabled'].nil?
 Settings.omniauth['auto_sign_in_with_provider'] = false if Settings.omniauth['auto_sign_in_with_provider'].nil?
@@ -179,6 +171,8 @@ Settings.gitlab['email_smime'] = SmimeSignatureSettings.parse(Settings.gitlab['e
 Settings.gitlab['base_url'] ||= Settings.__send__(:build_base_gitlab_url)
 Settings.gitlab['url'] ||= Settings.__send__(:build_gitlab_url)
 Settings.gitlab['user'] ||= 'git'
+# External configuration may cause the ssh user to differ from the GitLab user
+Settings.gitlab['ssh_user'] ||= Settings.gitlab.user
 Settings.gitlab['user_home'] ||= begin
   Etc.getpwnam(Settings.gitlab['user']).dir
 rescue ArgumentError # no user configured
@@ -216,6 +210,7 @@ Gitlab.ee do
   Settings.gitlab['mirror_max_delay'] ||= 300
   Settings.gitlab['mirror_max_capacity'] ||= 30
   Settings.gitlab['mirror_capacity_threshold'] ||= 15
+  Settings.gitlab['seat_link_enabled'] = true if Settings.gitlab['seat_link_enabled'].nil?
 end
 
 #
@@ -376,6 +371,14 @@ Gitlab.ee do
 end
 
 #
+# Terraform state
+#
+Settings['terraform_state'] ||= Settingslogic.new({})
+Settings.terraform_state['enabled']      = true if Settings.terraform_state['enabled'].nil?
+Settings.terraform_state['storage_path'] = Settings.absolute(Settings.terraform_state['storage_path'] || File.join(Settings.shared['path'], "terraform_state"))
+Settings.terraform_state['object_store'] = ObjectStoreSettings.parse(Settings.terraform_state['object_store'])
+
+#
 # Mattermost
 #
 Settings['mattermost'] ||= Settingslogic.new({})
@@ -451,6 +454,9 @@ Settings.cron_jobs['remove_unreferenced_lfs_objects_worker']['job_class'] = 'Rem
 Settings.cron_jobs['stuck_import_jobs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['stuck_import_jobs_worker']['cron'] ||= '15 * * * *'
 Settings.cron_jobs['stuck_import_jobs_worker']['job_class'] = 'StuckImportJobsWorker'
+Settings.cron_jobs['stuck_export_jobs_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['stuck_export_jobs_worker']['cron'] ||= '30 * * * *'
+Settings.cron_jobs['stuck_export_jobs_worker']['job_class'] = 'StuckExportJobsWorker'
 Settings.cron_jobs['gitlab_usage_ping_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['gitlab_usage_ping_worker']['cron'] ||= nil # This is dynamically loaded in the sidekiq initializer
 Settings.cron_jobs['gitlab_usage_ping_worker']['job_class'] = 'GitlabUsagePingWorker'
@@ -540,6 +546,12 @@ Gitlab.ee do
   Settings.cron_jobs['elastic_index_bulk_cron_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['elastic_index_bulk_cron_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['elastic_index_bulk_cron_worker']['job_class'] ||= 'ElasticIndexBulkCronWorker'
+  Settings.cron_jobs['elastic_metrics_update_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['elastic_metrics_update_worker']['cron'] ||= '*/1 * * * *'
+  Settings.cron_jobs['elastic_metrics_update_worker']['job_class'] ||= 'ElasticMetricsUpdateWorker'
+  Settings.cron_jobs['sync_seat_link_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['sync_seat_link_worker']['cron'] ||= "#{rand(60)} 0 * * *"
+  Settings.cron_jobs['sync_seat_link_worker']['job_class'] = 'SyncSeatLinkWorker'
 end
 
 #
@@ -560,7 +572,7 @@ Settings.gitlab_shell['receive_pack']   = true if Settings.gitlab_shell['receive
 Settings.gitlab_shell['upload_pack']    = true if Settings.gitlab_shell['upload_pack'].nil?
 Settings.gitlab_shell['ssh_host']     ||= Settings.gitlab.ssh_host
 Settings.gitlab_shell['ssh_port']     ||= 22
-Settings.gitlab_shell['ssh_user']     ||= Settings.gitlab.user
+Settings.gitlab_shell['ssh_user']       = Settings.gitlab.ssh_user
 Settings.gitlab_shell['owner_group']  ||= Settings.gitlab.user
 Settings.gitlab_shell['ssh_path_prefix'] ||= Settings.__send__(:build_gitlab_shell_ssh_path_prefix)
 Settings.gitlab_shell['git_timeout'] ||= 10800
@@ -657,6 +669,18 @@ Gitlab.ee do
   if Settings.kerberos['enabled'] && !Settings.omniauth.providers.map(&:name).include?('kerberos_spnego')
     Settings.omniauth.providers << Settingslogic.new({ 'name' => 'kerberos_spnego' })
   end
+end
+
+#
+# Smartcard
+#
+Gitlab.ee do
+  Settings['smartcard'] ||= Settingslogic.new({})
+  Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
+  Settings.smartcard['client_certificate_required_host'] = Settings.gitlab.host if Settings.smartcard['client_certificate_required_host'].nil?
+  Settings.smartcard['client_certificate_required_port'] = 3444 if Settings.smartcard['client_certificate_required_port'].nil?
+  Settings.smartcard['required_for_git_access'] = false if Settings.smartcard['required_for_git_access'].nil?
+  Settings.smartcard['san_extensions'] = false if Settings.smartcard['san_extensions'].nil?
 end
 
 #

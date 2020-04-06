@@ -19,7 +19,6 @@ describe EE::NotificationService, :mailer do
     let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
-         project: project,
          note: "Hello #{dev.to_reference}, G'day #{stranger.to_reference}")
     end
 
@@ -378,39 +377,6 @@ describe EE::NotificationService, :mailer do
     end
   end
 
-  describe '#prometheus_alerts_fired' do
-    let!(:project) { create(:project) }
-    let!(:prometheus_alert) { create(:prometheus_alert, project: project) }
-    let!(:master) { create(:user) }
-    let!(:developer) { create(:user) }
-
-    before do
-      project.add_master(master)
-    end
-
-    it 'sends the email to owners and masters' do
-      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, master.id, prometheus_alert).and_call_original
-      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, project.owner.id, prometheus_alert).and_call_original
-      expect(Notify).not_to receive(:prometheus_alert_fired_email).with(project.id, developer.id, prometheus_alert)
-
-      subject.prometheus_alerts_fired(prometheus_alert.project, [prometheus_alert])
-    end
-
-    it_behaves_like 'project emails are disabled' do
-      before do
-        allow_any_instance_of(::Gitlab::Alerting::Alert).to receive(:valid?).and_return(true)
-      end
-
-      let(:alert_params) { { 'labels' => { 'gitlab_alert_id' => 'unknown' } } }
-      let(:notification_target)  { prometheus_alert.project }
-      let(:notification_trigger) { subject.prometheus_alerts_fired(prometheus_alert.project, [alert_params]) }
-
-      around do |example|
-        perform_enqueued_jobs { example.run }
-      end
-    end
-  end
-
   describe 'epics' do
     let_it_be(:group) { create(:group, :private) }
     let_it_be(:epic) { create(:epic, group: group) }
@@ -640,10 +606,10 @@ describe EE::NotificationService, :mailer do
           reset_delivered_emails!
         end
 
-        it 'emails the approvers' do
+        it 'does not email the approvers' do
           notification.new_merge_request(merge_request, @u_disabled)
 
-          project_approvers.each { |approver| should_email(approver) }
+          project_approvers.each { |approver| should_not_email(approver) }
         end
 
         it 'does not email the approvers when approval is not necessary' do
@@ -666,10 +632,10 @@ describe EE::NotificationService, :mailer do
             reset_delivered_emails!
           end
 
-          it 'emails the MR approvers' do
+          it 'does not email the MR approvers' do
             notification.new_merge_request(merge_request, @u_disabled)
 
-            mr_approvers.each { |approver| should_email(approver) }
+            mr_approvers.each { |approver| should_not_email(approver) }
           end
 
           it 'does not email approvers set on the project who are not approvers of this MR' do

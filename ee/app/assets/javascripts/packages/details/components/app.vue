@@ -1,6 +1,6 @@
 <script>
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
   GlModal,
   GlModalDirective,
@@ -29,7 +29,7 @@ import { mapState } from 'vuex';
 export default {
   name: 'PackagesApp',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlEmptyState,
     GlLink,
     GlModal,
@@ -180,13 +180,13 @@ export default {
       <package-title />
 
       <div class="mt-sm-2">
-        <gl-button
+        <gl-deprecated-button
           v-if="canDeletePackage"
           v-gl-modal="'delete-modal'"
           class="js-delete-button"
           variant="danger"
           data-qa-selector="delete_button"
-          >{{ __('Delete') }}</gl-button
+          >{{ __('Delete') }}</gl-deprecated-button
         >
       </div>
     </div>
@@ -247,15 +247,15 @@ export default {
 
       <div slot="modal-footer" class="w-100">
         <div class="float-right">
-          <gl-button @click="cancelDelete()">{{ __('Cancel') }}</gl-button>
-          <gl-button
+          <gl-deprecated-button @click="cancelDelete()">{{ __('Cancel') }}</gl-deprecated-button>
+          <gl-deprecated-button
             ref="modal-delete-button"
             data-method="delete"
             :to="destroyPath"
             variant="danger"
             data-qa-selector="delete_modal_button"
             @click="track($options.trackingActions.DELETE_PACKAGE)"
-            >{{ __('Delete') }}</gl-button
+            >{{ __('Delete') }}</gl-deprecated-button
           >
         </div>
       </div>

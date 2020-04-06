@@ -41,12 +41,6 @@ export const setCreateVulnerabilityFeedbackDismissalPath = ({ commit }, path) =>
 
 export const setPipelineId = ({ commit }, id) => commit(types.SET_PIPELINE_ID, id);
 
-export const setCanCreateIssuePermission = ({ commit }, permission) =>
-  commit(types.SET_CAN_CREATE_ISSUE_PERMISSION, permission);
-
-export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
-  commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
-
 /**
  * CONTAINER SCANNING
  */

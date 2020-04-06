@@ -22,11 +22,12 @@ describe Project do
 
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
-    it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
+    it { is_expected.to have_one(:status_page_setting).class_name('StatusPageSetting') }
 
     it { is_expected.to have_many(:reviews).inverse_of(:project) }
     it { is_expected.to have_many(:path_locks) }
     it { is_expected.to have_many(:vulnerability_feedback) }
+    it { is_expected.to have_many(:vulnerability_exports) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
     it { is_expected.to have_many(:approvers).dependent(:destroy) }
@@ -432,24 +433,6 @@ describe Project do
     end
   end
 
-  describe '#environments_for_scope' do
-    let_it_be(:project, reload: true) { create(:project) }
-
-    before do
-      create_list(:environment, 2, project: project)
-    end
-
-    it 'retrieves all project environments when using the * wildcard' do
-      expect(project.environments_for_scope("*")).to eq(project.environments)
-    end
-
-    it 'retrieves a specific project environment when using the name of that environment' do
-      environment = project.environments.first
-
-      expect(project.environments_for_scope(environment.name)).to eq([environment])
-    end
-  end
-
   describe '#ensure_external_webhook_token' do
     let(:project) { create(:project, :repository) }
 
@@ -630,14 +613,6 @@ describe Project do
         it_behaves_like 'returns nil when the feature is not available'
 
         it { is_expected.to eq(true) }
-
-        context 'when sub_group_webhooks feature flag is disabled' do
-          before do
-            stub_feature_flags(sub_group_webhooks: false)
-          end
-
-          it { is_expected.to eq(false) }
-        end
       end
     end
   end
@@ -676,32 +651,12 @@ describe Project do
 
         it_behaves_like 'triggering group webhook'
 
-        context 'when sub_group_webhooks feature flag is disabled' do
-          before do
-            stub_feature_flags(sub_group_webhooks: false)
-          end
-
-          it_behaves_like 'triggering group webhook'
-        end
-
         context 'in sub group' do
           let(:sub_group) { create :group, parent: group }
           let(:sub_sub_group) { create :group, parent: sub_group }
           let(:project) { create(:project, namespace: sub_sub_group) }
 
           it_behaves_like 'triggering group webhook'
-
-          context 'when sub_group_webhooks feature flag is disabled' do
-            before do
-              stub_feature_flags(sub_group_webhooks: false)
-            end
-
-            it 'does not execute the hook' do
-              expect(WebHookService).not_to receive(:new).with(group_hook, { some: 'info' }, 'push_hooks')
-
-              project.execute_hooks(some: 'info')
-            end
-          end
         end
       end
     end
@@ -1014,48 +969,6 @@ describe Project do
     end
   end
 
-  describe '#size_limit_enabled?' do
-    let(:project) { create(:project) }
-
-    context 'when repository_size_limit is not configured' do
-      it 'is disabled' do
-        expect(project.size_limit_enabled?).to be_falsey
-      end
-    end
-
-    context 'when repository_size_limit is configured' do
-      before do
-        project.update(repository_size_limit: 1024)
-      end
-
-      context 'with an EES license' do
-        let!(:license) { create(:license, plan: License::STARTER_PLAN) }
-
-        it 'is enabled' do
-          expect(project.size_limit_enabled?).to be_truthy
-        end
-      end
-
-      context 'with an EEP license' do
-        let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
-
-        it 'is enabled' do
-          expect(project.size_limit_enabled?).to be_truthy
-        end
-      end
-
-      context 'without a License' do
-        before do
-          License.destroy_all # rubocop: disable DestroyAll
-        end
-
-        it 'is disabled' do
-          expect(project.size_limit_enabled?).to be_falsey
-        end
-      end
-    end
-  end
-
   describe '#service_desk_enabled?' do
     let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
     let(:namespace) { create(:namespace) }
@@ -1191,6 +1104,49 @@ describe Project do
 
       it 'returns the first approval rule' do
         expect(project.visible_user_defined_rules).to eq([any_approver_rule])
+      end
+    end
+  end
+
+  describe '#visible_user_defined_inapplicable_rules' do
+    let_it_be(:project) { create(:project) }
+    let!(:rule) { create(:approval_project_rule, project: project) }
+    let!(:another_rule) { create(:approval_project_rule, project: project) }
+
+    context 'when multiple approval rules is available' do
+      before do
+        stub_licensed_features(multiple_approval_rules: true)
+      end
+
+      let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+      let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test-*') }
+
+      context 'when rules are scoped' do
+        before do
+          rule.update!(protected_branches: [protected_branch])
+          another_rule.update!(protected_branches: [another_protected_branch])
+        end
+
+        it 'returns rules that are not applicable to target_branch' do
+          expect(project.visible_user_defined_inapplicable_rules('stable-1'))
+            .to match_array([another_rule])
+        end
+      end
+
+      context 'when rules are not scoped' do
+        it 'returns empty array' do
+          expect(project.visible_user_defined_inapplicable_rules('stable-1')).to be_empty
+        end
+      end
+    end
+
+    context 'when multiple approval rules is not available' do
+      before do
+        stub_licensed_features(multiple_approval_rules: false)
+      end
+
+      it 'returns empty array' do
+        expect(project.visible_user_defined_inapplicable_rules('stable-1')).to be_empty
       end
     end
   end
@@ -1790,11 +1746,52 @@ describe Project do
   describe '#add_import_job' do
     let(:project) { create(:project) }
 
-    context 'when import_type is gitlab_custom_project_template_import' do
-      it 'does not create import job' do
-        project.import_type = 'gitlab_custom_project_template_import'
+    before do
+      stub_licensed_features(custom_project_templates: true)
+    end
 
+    context 'when import_type is gitlab_custom_project_template' do
+      it 'does not create import job' do
+        project.import_type = 'gitlab_custom_project_template'
+
+        expect(project.gitlab_custom_project_template_import?).to be true
         expect(project.add_import_job).to be_nil
+      end
+    end
+
+    context 'when mirror true on a jira imported project' do
+      let(:user) { create(:user) }
+      let(:symbol_keys_project) do
+        { key: 'AA', scheduled_at: 2.days.ago.strftime('%Y-%m-%d %H:%M:%S'), scheduled_by: { 'user_id' => 1, 'name' => 'tester1' } }
+      end
+      let(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+
+      context 'when jira import is forced' do
+        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project], JiraImportData::FORCE_IMPORT_KEY => true } }) }
+
+        it 'does not trigger mirror update' do
+          expect(RepositoryUpdateMirrorWorker).not_to receive(:perform_async)
+          expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async)
+          expect(project.mirror).to be true
+          expect(project.jira_import?).to be true
+          expect(project.jira_force_import?).to be true
+
+          project.add_import_job
+        end
+      end
+
+      context 'when jira import is not forced' do
+        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project] } }) }
+
+        it 'does trigger mirror update' do
+          expect(RepositoryUpdateMirrorWorker).to receive(:perform_async)
+          expect(Gitlab::JiraImport::Stage::StartImportWorker).not_to receive(:perform_async)
+          expect(project.mirror).to be true
+          expect(project.jira_import?).to be true
+          expect(project.jira_force_import?).to be false
+
+          project.add_import_job
+        end
       end
     end
   end
@@ -2051,18 +2048,19 @@ describe Project do
   describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(:license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
-      false | false | false | false | false
-      true  | false | false | false | false
-      true  | true  | false | false | true
-      true  | true  | false | true  | false
-      true  | true  | true  | false | true
-      true  | true  | true  | true  | true
+    where(:lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false
+      false | true  | true  | false
+      false | true  | false | false
+      false | false | true  | false
+      true  | false | false | true
+      true  | true  | true  | true
+      true  | true  | false | true
+      true  | false | true  | false
     end
 
     with_them do
       before do
-        stub_licensed_features(design_management: license_enabled)
         stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
         allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
@@ -2082,77 +2080,71 @@ describe Project do
     end
   end
 
-  describe 'repository size restrictions' do
+  describe '#repository_size_checker' do
     let(:project) { build(:project) }
+    let(:checker) { project.repository_size_checker }
 
-    before do
-      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
-    end
+    describe '#current_size' do
+      let(:project) { create(:project) }
 
-    describe '#changes_will_exceed_size_limit?' do
-      before do
-        allow(project).to receive(:repository_and_lfs_size).and_return(49)
-      end
-      it 'returns true when changes go over' do
-        expect(project.changes_will_exceed_size_limit?(5)).to be_truthy
+      it 'returns the total repository and lfs size' do
+        allow(project.statistics).to receive(:total_repository_size).and_return(80)
+
+        expect(checker.current_size).to eq(80)
       end
     end
 
-    describe '#actual_size_limit' do
-      it 'returns the limit set in the application settings' do
-        expect(project.actual_size_limit).to eq(50)
+    describe '#limit' do
+      it 'returns the value set in the namespace when available' do
+        allow(project.namespace).to receive(:actual_size_limit).and_return(100)
+
+        expect(checker.limit).to eq(100)
       end
 
-      it 'returns the value set in the group' do
-        group = create(:group, repository_size_limit: 100)
-        project.update_attribute(:namespace_id, group.id)
+      it 'returns the value set locally when available' do
+        project.repository_size_limit = 200
 
-        expect(project.actual_size_limit).to eq(100)
-      end
-
-      it 'returns the value set locally' do
-        project.update_attribute(:repository_size_limit, 75)
-
-        expect(project.actual_size_limit).to eq(75)
+        expect(checker.limit).to eq(200)
       end
     end
 
-    describe '#size_limit_enabled?' do
-      it 'returns false when disabled' do
-        project.update_attribute(:repository_size_limit, 0)
+    describe '#enabled?' do
+      it 'returns true when not equal to zero' do
+        project.repository_size_limit = 1
 
-        expect(project.size_limit_enabled?).to be_falsey
+        expect(checker.enabled?).to be_truthy
       end
 
-      it 'returns true when a limit is set' do
-        project.update_attribute(:repository_size_limit, 75)
+      it 'returns false when equals to zero' do
+        project.repository_size_limit = 0
 
-        expect(project.size_limit_enabled?).to be_truthy
-      end
-    end
-
-    describe '#above_size_limit?' do
-      let(:project) do
-        create(:project,
-               statistics: build(:project_statistics))
+        expect(checker.enabled?).to be_falsey
       end
 
-      it 'returns true when above the limit' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+      context 'when repository_size_limit is configured' do
+        before do
+          project.repository_size_limit = 1
+        end
 
-        expect(project.above_size_limit?).to be_truthy
-      end
+        context 'when license feature enabled' do
+          before do
+            stub_licensed_features(repository_size_limit: true)
+          end
 
-      it 'returns false when not over the limit' do
-        expect(project.above_size_limit?).to be_falsey
-      end
-    end
+          it 'is enabled' do
+            expect(checker.enabled?).to be_truthy
+          end
+        end
 
-    describe '#size_to_remove' do
-      it 'returns the correct value' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+        context 'when license feature disabled' do
+          before do
+            stub_licensed_features(repository_size_limit: false)
+          end
 
-        expect(project.size_to_remove).to eq(50)
+          it 'is disabled' do
+            expect(checker.enabled?).to be_falsey
+          end
+        end
       end
     end
   end
@@ -2240,19 +2232,6 @@ describe Project do
 
         expect(projects).to contain_exactly(project1, project2)
       end
-    end
-  end
-
-  describe '#repository_and_lfs_size' do
-    let(:project) { create(:project, :repository) }
-    let(:size) { 50 }
-
-    before do
-      allow(project.statistics).to receive(:total_repository_size).and_return(size)
-    end
-
-    it 'returns the total repository and lfs size' do
-      expect(project.repository_and_lfs_size).to eq(size)
     end
   end
 
@@ -2612,6 +2591,21 @@ describe Project do
         end
 
         it { is_expected.to eq(true) }
+      end
+    end
+  end
+
+  describe '#remove_import_data' do
+    let(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
+
+    context 'when mirror' do
+      let(:user) { create(:user) }
+      let!(:project) { create(:project, mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+
+      it 'does not remove import data' do
+        expect(project.mirror?).to be true
+        expect(project.jira_import?).to be false
+        expect { project.remove_import_data }.not_to change { ProjectImportData.count }
       end
     end
   end

@@ -27,13 +27,13 @@ describe 'Dropdown epic', :js do
 
   describe 'behavior' do
     it 'loads all the epics when opened' do
-      input_filtered_search('epic=', submit: false, extra_space: false)
+      input_filtered_search('epic:=', submit: false, extra_space: false)
 
       expect_filtered_search_dropdown_results(filter_dropdown, 2)
     end
 
     it 'selects epic and correct title is loaded' do
-      input_filtered_search('epic=', submit: false, extra_space: false)
+      input_filtered_search('epic:=', submit: false, extra_space: false)
       wait_for_requests
 
       find('li', text: epic.title).click
@@ -42,7 +42,7 @@ describe 'Dropdown epic', :js do
     end
 
     it 'filters issues by epic' do
-      input_filtered_search('epic=', submit: false, extra_space: false)
+      input_filtered_search('epic:=', submit: false, extra_space: false)
       wait_for_requests
 
       find('li', text: epic2.title).click

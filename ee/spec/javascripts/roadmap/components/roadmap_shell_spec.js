@@ -8,13 +8,14 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate, mockGroupId } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate, mockGroupId, mockMilestone } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = (
   {
     epics = [mockEpic],
+    milestones = [mockMilestone],
     timeframe = mockTimeframeMonths,
     currentGroupId = mockGroupId,
     defaultInnerHeight = 0,
@@ -34,6 +35,7 @@ const createComponent = (
     props: {
       presetType: PRESET_TYPES.MONTHS,
       epics,
+      milestones,
       timeframe,
       currentGroupId,
     },

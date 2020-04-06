@@ -4,8 +4,7 @@ type: reference, howto
 
 # Dynamic Application Security Testing (DAST) **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4348)
-in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4348) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
 
 NOTE: **4 of the top 6 attacks were application based.**
 Download our whitepaper,
@@ -31,12 +30,16 @@ that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 GitLab checks the DAST report, compares the found vulnerabilities between the source and target
 branches, and shows the information right on the merge request.
 
-![DAST Widget](img/dast_all.png)
+NOTE: **Note:**
+This comparison logic uses only the latest pipeline executed for the target branch's base commit.
+Running the pipeline on any other commit has no effect on the merge request.
+
+![DAST Widget](img/dast_all_v12_9.png)
 
 By clicking on one of the detected linked vulnerabilities, you will be able to
 see the details and the URL(s) affected.
 
-![DAST Widget Clicked](img/dast_single.png)
+![DAST Widget Clicked](img/dast_single_v12_9.png)
 
 [Dynamic Application Security Testing (DAST)](https://en.wikipedia.org/wiki/Dynamic_Application_Security_Testing)
 is using the popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
@@ -83,7 +86,7 @@ There are two ways to define the URL to be scanned by DAST:
 
 1. Add it in an `environment_url.txt` file at the root of your project.
     This is great for testing in dynamic environments. In order to run DAST against
-    an app that is dynamically created during a GitLab CI pipeline, have the app
+    an app that is dynamically created during a GitLab CI/CD pipeline, have the app
     persist its domain in an `environment_url.txt` file, and DAST will
     automatically parse that file to find its scan target.
     You can see an [example](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml)
@@ -104,6 +107,23 @@ is used to run the tests on the specified URL and scan it for possible vulnerabi
 By default, the DAST template will use the latest major version of the DAST Docker image. Using the `DAST_VERSION` variable,
 you can choose to automatically update DAST with new features and fixes by pinning to a major version (e.g. 1), only update fixes by pinning to a minor version (e.g. 1.6) or prevent all updates by pinning to a specific version (e.g. 1.6.4).
 Find the latest DAST versions on the [Releases](https://gitlab.com/gitlab-org/security-products/dast/-/releases) page.
+
+### When DAST scans run
+
+When using `DAST.gitlab-ci.yml` template, the `dast` job is run last as shown in the example below. To ensure DAST is scanning the latest code, your CI pipeline should deploy changes to the web server in one of the jobs preceeding the `dast` job.
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+  - dast
+```
+
+Be aware that if your pipeline is configured to deploy to the same webserver in each run, running a pipeline while another is still running, could cause a race condition
+where one pipeline overwrites the code from another pipeline. The site to be scanned should be excluded from changes for the duration of a DAST scan.
+The only changes to the site should be from the DAST scanner. Be aware that any changes that users, scheduled tasks, database or code changes, other pipelines, or other scanners make to
+the site during a scan could lead to inaccurate results.
 
 ### Authenticated scan
 
@@ -214,7 +234,7 @@ It's also possible to add the `Gitlab-DAST-Permission` header via a proxy.
 
 The following config allows NGINX to act as a reverse proxy and add the `Gitlab-DAST-Permission` [header](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header):
 
-```
+```nginx
 # default.conf
 server {
     listen 80;
@@ -234,7 +254,7 @@ to add the `Gitlab-DAST-Permission` [header](https://httpd.apache.org/docs/curre
 
 To do so, add the following lines to `httpd.conf`:
 
-```
+```plaintext
 # httpd.conf
 LoadModule proxy_module modules/mod_proxy.so
 LoadModule proxy_connect_module modules/mod_proxy_connect.so
@@ -249,6 +269,87 @@ LoadModule proxy_http_module modules/mod_proxy_http.so
 
 [This snippet](https://gitlab.com/gitlab-org/security-products/dast/snippets/1894732) contains a complete `httpd.conf` file
 configured to act as a remote proxy and add the `Gitlab-DAST-Permission` header.
+
+### API scan
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/10928) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
+
+Using an API specification as a scan's target is a useful way to seed URLs for scanning an API.
+Vulnerability rules in an API scan are different than those in a normal website scan.
+
+#### Specification format
+
+API scans support OpenAPI V2 and OpenAPI V3 specifications. You can define these specifications using `JSON` or `YAML`.
+
+#### Import API specification from a URL
+
+If your API specification is accessible at a URL, you can pass that URL in directly as the target.
+The specification doesn't have to be hosted on the same host as the API being tested.
+
+```yml
+include:
+  - template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_API_SPECIFICATION: http://my.api/api-specification.yml
+```
+
+#### Import API specification from a file
+
+If your API specification is in your repository, you can provide the specification's filename directly as the target. The specification file is expected to be in the `/zap/wrk` directory.
+
+```yml
+dast:
+  script:
+    - mkdir -p /zap/wrk
+    - cp api-specification.yml /zap/wrk/api-specification.yml
+    - /analyze -t $DAST_WEBSITE
+  variables:
+    GIT_STRATEGY: fetch
+    DAST_API_SPECIFICATION: api-specification.yml
+```
+
+#### Full scan
+
+API scans support full scanning, which can be enabled by using the `DAST_FULL_SCAN_ENABLED` environment variable. Domain validation isn't supported for full API scans.
+
+#### Host override
+
+Specifications often define a host, which contains a domain name and a port. The host referenced may be different than the host of the API's review instance.
+This can cause incorrect URLs to be imported, or a scan on an incorrect host. Use the `DAST_API_HOST_OVERRIDE` environment variable to override these values.
+
+For example, with a OpenAPI V3 specification containing:
+
+```yml
+servers:
+  - url: https://api.host.com
+```
+
+If the test version of the API is running at `https://api-test.host.com`, then the following DAST configuration can be used:
+
+```yml
+include:
+  - template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_API_SPECIFICATION: http://api-test.host.com/api-specification.yml
+  DAST_API_HOST_OVERRIDE: api-test.host.com
+```
+
+Note that `DAST_API_HOST_OVERRIDE` is only applied to specifications imported by URL.
+
+#### Authentication using headers
+
+Tokens in request headers are often used as a way to authenticate API requests. You can achieve this by using the `DAST_REQUEST_HEADERS` environment variable. Headers are applied to every request DAST makes.
+
+```yml
+include:
+  - template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_API_SPECIFICATION: http://api-test.api.com/api-specification.yml
+  DAST_REQUEST_HEADERS: "Authorization: Bearer my.token"
+```
 
 ### Customizing the DAST settings
 
@@ -297,17 +398,21 @@ DAST can be [configured](#customizing-the-dast-settings) using environment varia
 
 | Environment variable        | Required   | Description                                                                    |
 |-----------------------------| ----------|--------------------------------------------------------------------------------|
-| `DAST_WEBSITE`  | yes | The URL of the website to scan. |
-| `DAST_AUTH_URL` | no | The authentication URL of the website to scan. |
+| `DAST_WEBSITE`  | no| The URL of the website to scan. `DAST_API_SPECIFICATION` must be specified if this is omitted. |
+| `DAST_API_SPECIFICATION`  | no | The API specification to import. `DAST_WEBSITE` must be specified if this is omitted. |
+| `DAST_AUTH_URL` | no | The authentication URL of the website to scan. Not supported for API scans. |
 | `DAST_USERNAME` | no | The username to authenticate to in the website. |
 | `DAST_PASSWORD` | no | The password to authenticate to in the website. |
 | `DAST_USERNAME_FIELD` | no | The name of username field at the sign-in HTML form. |
 | `DAST_PASSWORD_FIELD` | no | The name of password field at the sign-in HTML form. |
-| `DAST_AUTH_EXCLUDE_URLS` | no | The URLs to skip during the authenticated scan; comma-separated, no spaces in between. |
+| `DAST_AUTH_EXCLUDE_URLS` | no | The URLs to skip during the authenticated scan; comma-separated, no spaces in between. Not supported for API scans. |
 | `DAST_TARGET_AVAILABILITY_TIMEOUT` | no | Time limit in seconds to wait for target availability. Scan is attempted nevertheless if it runs out. Integer. Defaults to `60`. |
 | `DAST_FULL_SCAN_ENABLED` | no | Switches the tool to execute [ZAP Full Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan) instead of [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan). Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
-| `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` | no | Requires [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
+| `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` | no | Requires [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. Not supported for API scans. |
 | `DAST_AUTO_UPDATE_ADDONS` | no | Set to `false` to pin the versions of ZAProxy add-ons to those provided with the DAST image. Defaults to `true`. |
+| `DAST_API_HOST_OVERRIDE` | no | Used to override domains defined in API specification files. |
+| `DAST_EXCLUDE_RULES` | no | Set to a comma-separated list of Vulnerability Rule IDs to exclude them from scans. Rule IDs are numbers and can be found from the DAST log or on the [ZAP project](https://github.com/zaproxy/zaproxy/blob/master/docs/scanners.md). For example, `HTTP Parameter Override` has a rule ID of `10026`. |
+| `DAST_REQUEST_HEADERS` | no | Set to a comma-separated list of request header names and values. For example, `Cache-control: no-cache,User-Agent: DAST/1.0` |
 
 ### DAST command-line options
 
@@ -355,6 +460,31 @@ dast:
 
 The DAST job does not require the project's repository to be present when running, so by default
 [`GIT_STRATEGY`](../../../ci/yaml/README.md#git-strategy) is set to `none`.
+
+## Running DAST in an offline environment
+
+DAST can be executed on an offline GitLab Ultimate installation by using the following process:
+
+1. Host the DAST image `registry.gitlab.com/gitlab-org/security-products/dast:latest` in your local
+   Docker container registry.
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+   to the DAST Docker image hosted on your local Docker container registry:
+
+   ```yaml
+   include:
+     - template: DAST.gitlab-ci.yml
+
+   dast:
+     image: registry.example.com/namespace/dast:latest
+     script:
+        - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+        - /analyze -t $DAST_WEBSITE --auto-update-addons false -z"-silent"
+   ```
+
+The option `--auto-update-addons false` instructs ZAP not to update add-ons.
+
+The option `-z` passes the quoted `-silent` parameter to ZAP. The `-silent` parameter ensures ZAP
+does not make any unsolicited requests including checking for updates.
 
 ## Reports
 
@@ -444,7 +574,7 @@ Since it keeps most of its information in memory during a scan,
 it is possible for DAST to run out of memory while scanning large applications.
 This results in the following error:
 
-```
+```plaintext
 [zap.out] java.lang.OutOfMemoryError: Java heap space
 ```
 

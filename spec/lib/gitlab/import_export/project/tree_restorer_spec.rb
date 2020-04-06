@@ -2,13 +2,17 @@
 
 require 'spec_helper'
 
+def match_mr1_note(content_regex)
+  MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{content_regex}/)}.first
+end
+
 describe Gitlab::ImportExport::Project::TreeRestorer do
   include ImportExport::CommonUtil
 
   let(:shared) { project.import_export_shared }
 
   describe 'restore project tree' do
-    before(:context) do
+    before_all do
       # Using an admin for import, so we can check assignment of existing members
       @user = create(:admin)
       @existing_members = [
@@ -74,9 +78,29 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         context 'for a Merge Request' do
           it 'does not import note_html' do
             note_content = 'Sit voluptatibus eveniet architecto quidem'
-            merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+            merge_request_note = match_mr1_note(note_content)
 
             expect(merge_request_note.note_html).to match(/#{note_content}/)
+          end
+
+          context 'merge request system note metadata' do
+            it 'restores title action for unmark wip' do
+              merge_request_note = match_mr1_note('unmarked as a \\*\\*Work In Progress\\*\\*')
+
+              expect(merge_request_note.noteable_type).to eq('MergeRequest')
+              expect(merge_request_note.system).to eq(true)
+              expect(merge_request_note.system_note_metadata.action).to eq('title')
+              expect(merge_request_note.system_note_metadata.commit_count).to be_nil
+            end
+
+            it 'restores commit action and commit count for pushing 3 commits' do
+              merge_request_note = match_mr1_note('added 3 commits')
+
+              expect(merge_request_note.noteable_type).to eq('MergeRequest')
+              expect(merge_request_note.system).to eq(true)
+              expect(merge_request_note.system_note_metadata.action).to eq('commit')
+              expect(merge_request_note.system_note_metadata.commit_count).to eq(3)
+            end
           end
         end
       end
@@ -104,8 +128,26 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         expect(pipeline.merge_request.source_branch).to eq('feature_conflict')
       end
 
+      it 'restores pipelines based on ascending id order' do
+        expected_ordered_shas = %w[
+          2ea1f3dec713d940208fb5ce4a38765ecb5d3f73
+          ce84140e8b878ce6e7c4d298c7202ff38170e3ac
+          048721d90c449b244b7b4c53a9186b04330174ec
+          sha-notes
+          5f923865dde3436854e9ceb9cdb7815618d4e849
+          d2d430676773caa88cdaf7c55944073b2fd5561a
+          2ea1f3dec713d940208fb5ce4a38765ecb5d3f73
+        ]
+
+        project = Project.find_by_path('project')
+
+        project.ci_pipelines.order(:id).each_with_index do |pipeline, i|
+          expect(pipeline['sha']).to eq expected_ordered_shas[i]
+        end
+      end
+
       it 'preserves updated_at on issues' do
-        issue = Issue.where(description: 'Aliquam enim illo et possimus.').first
+        issue = Issue.find_by(description: 'Aliquam enim illo et possimus.')
 
         expect(issue.reload.updated_at.to_s).to eq('2016-06-14 15:02:47 UTC')
       end
@@ -152,7 +194,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
       end
 
       context 'event at forth level of the tree' do
-        let(:event) { Event.where(action: 6).first }
+        let(:event) { Event.find_by(action: 6) }
 
         it 'restores the event' do
           expect(event).not_to be_nil
@@ -355,7 +397,8 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
         context 'notes' do
           it 'has award emoji' do
-            award_emoji = MergeRequest.find_by_title('MR1').notes.first.award_emoji.first
+            merge_request_note = match_mr1_note('Sit voluptatibus eveniet architecto quidem')
+            award_emoji = merge_request_note.award_emoji.first
 
             expect(award_emoji.name).to eq('tada')
           end
@@ -385,7 +428,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         it 'has the correct number of pipelines and statuses' do
           expect(@project.ci_pipelines.size).to eq(7)
 
-          @project.ci_pipelines.order(:id).zip([2, 2, 2, 2, 2, 0, 0])
+          @project.ci_pipelines.order(:id).zip([2, 0, 2, 2, 2, 2, 0])
             .each do |(pipeline, expected_status_size)|
             expect(pipeline.statuses.size).to eq(expected_status_size)
           end
@@ -422,7 +465,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         end
 
         it 'restores external pull request for the restored pipeline' do
-          pipeline_with_external_pr = @project.ci_pipelines.order(:id).last
+          pipeline_with_external_pr = @project.ci_pipelines.find_by(source: 'external_pull_request_event')
 
           expect(pipeline_with_external_pr.external_pull_request).to be_persisted
         end
@@ -488,6 +531,16 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
                       milestones: 1,
                       first_issue_labels: 1,
                       services: 1
+
+      it 'issue system note metadata restored successfully' do
+        note_content = 'created merge request !1 to address this issue'
+        note = project.issues.first.notes.select { |n| n.note.match(/#{note_content}/)}.first
+
+        expect(note.noteable_type).to eq('Issue')
+        expect(note.system).to eq(true)
+        expect(note.system_note_metadata.action).to eq('merge')
+        expect(note.system_note_metadata.commit_count).to be_nil
+      end
 
       context 'when there is an existing build with build token' do
         before do
@@ -685,6 +738,12 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         expect(project.services.where(template: true).count).to eq(0)
       end
 
+      it 'does not import any instance services' do
+        expect(restored_project_json).to eq(true)
+
+        expect(project.services.where(instance: true).count).to eq(0)
+      end
+
       it 'imports labels' do
         create(:group_label, name: 'Another label', group: project.group)
 
@@ -759,7 +818,8 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
     end
 
     before do
-      expect(restorer).to receive(:read_tree_hash) { tree_hash }
+      allow_any_instance_of(Gitlab::ImportExport::JSON::LegacyReader::File).to receive(:valid?).and_return(true)
+      allow_any_instance_of(Gitlab::ImportExport::JSON::LegacyReader::File).to receive(:tree_hash) { tree_hash }
     end
 
     context 'no group visibility' do

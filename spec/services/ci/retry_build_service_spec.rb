@@ -34,9 +34,11 @@ describe Ci::RetryBuildService do
        job_artifacts_container_scanning job_artifacts_dast
        job_artifacts_license_management job_artifacts_license_scanning
        job_artifacts_performance job_artifacts_lsif
+       job_artifacts_terraform
        job_artifacts_codequality job_artifacts_metrics scheduled_at
        job_variables waiting_for_resource_at job_artifacts_metrics_referee
-       job_artifacts_network_referee needs].freeze
+       job_artifacts_network_referee job_artifacts_dotenv
+       job_artifacts_cobertura needs].freeze
 
   IGNORE_ACCESSORS =
     %i[type lock_version target_url base_tags trace_sections
@@ -237,6 +239,10 @@ describe Ci::RetryBuildService do
 
         it 'creates a new deployment' do
           expect { new_build }.to change { Deployment.count }.by(1)
+        end
+
+        it 'persists expanded environment name' do
+          expect(new_build.metadata.expanded_environment_name).to eq('production')
         end
       end
 

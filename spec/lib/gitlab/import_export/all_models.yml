@@ -38,6 +38,7 @@ issues:
 - vulnerability_links
 - related_vulnerabilities
 - user_mentions
+- system_note_metadata
 events:
 - author
 - project
@@ -94,7 +95,7 @@ releases:
 - links
 - milestone_releases
 - milestones
-- evidence
+- evidences
 links:
 - release
 project_members:
@@ -152,6 +153,7 @@ merge_requests:
 - deployment_merge_requests
 - deployments
 - user_mentions
+- system_note_metadata
 external_pull_requests:
 - project
 merge_request_diff:
@@ -197,6 +199,7 @@ ci_pipelines:
 - source_bridge
 - source_job
 - sourced_pipelines
+- source_project
 - triggered_by_pipeline
 - triggered_pipelines
 - child_pipelines
@@ -207,6 +210,7 @@ ci_pipelines:
 - vulnerability_findings
 - pipeline_config
 - security_scans
+- daily_report_results
 pipeline_variables:
 - pipeline
 stages:
@@ -250,6 +254,7 @@ services:
 - service_hook
 - jira_tracker_data
 - issue_tracker_data
+- open_project_tracker_data
 hooks:
 - project
 - web_hook_logs
@@ -429,6 +434,7 @@ project:
 - sourced_pipelines
 - prometheus_metrics
 - vulnerabilities
+- vulnerability_exports
 - vulnerability_findings
 - vulnerability_feedback
 - vulnerability_identifiers
@@ -466,6 +472,11 @@ project:
 - container_expiration_policy
 - resource_groups
 - autoclose_referenced_issues
+- status_page_setting
+- requirements
+- export_jobs
+- daily_report_results
+- jira_imports
 award_emoji:
 - awardable
 - user
@@ -612,3 +623,6 @@ epic:
 epic_issue:
 - epic
 - issue
+system_note_metadata:
+- note
+- description_version

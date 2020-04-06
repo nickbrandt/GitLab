@@ -67,16 +67,16 @@ class Issue < ApplicationRecord
   scope :order_due_date_desc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'DESC')) }
   scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
+  scope :order_closed_date_desc, -> { reorder(closed_at: :desc) }
+  scope :order_created_at_desc, -> { reorder(created_at: :desc) }
 
-  scope :preload_associated_models, -> { preload(:labels, project: :namespace) }
+  scope :preload_associated_models, -> { preload(:assignees, :labels, project: :namespace) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
 
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
 
   scope :counts_by_state, -> { reorder(nil).group(:state_id).count }
-
-  ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
 
   after_commit :expire_etag_cache, unless: :importing?
   after_save :ensure_metrics, unless: :importing?
@@ -305,6 +305,10 @@ class Issue < ApplicationRecord
     labels.map(&:hook_attrs)
   end
 
+  def previous_updated_at
+    previous_changes['updated_at']&.first || updated_at
+  end
+
   private
 
   def ensure_metrics
@@ -322,10 +326,8 @@ class Issue < ApplicationRecord
       true
     elsif project.owner == user
       true
-    elsif confidential?
-      author == user ||
-        assignees.include?(user) ||
-        project.team.member?(user, Gitlab::Access::REPORTER)
+    elsif confidential? && !assignee_or_author?(user)
+      project.team.member?(user, Gitlab::Access::REPORTER)
     else
       project.public? ||
         project.internal? && !user.external? ||

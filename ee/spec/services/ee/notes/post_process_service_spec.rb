@@ -11,7 +11,7 @@ describe Notes::PostProcessService do
       subject { described_class.new(note).execute }
 
       def create_note(in_reply_to: nil)
-        create(:diff_note_on_design, noteable: noteable, project: noteable.project, in_reply_to: in_reply_to)
+        create(:diff_note_on_design, noteable: noteable, in_reply_to: in_reply_to)
       end
 
       context 'when the note is the start of a new discussion' do

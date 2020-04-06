@@ -67,6 +67,7 @@ RSpec.shared_examples 'valid dashboard cloning process' do |dashboard_template, 
 
     it 'delegates commit creation to Files::CreateService', :aggregate_failures do
       service_instance = instance_double(::Files::CreateService)
+      allow(::Gitlab::Metrics::Dashboard::Processor).to receive(:new).and_return(double(process: file_content_hash))
       expect(::Files::CreateService).to receive(:new).with(project, user, dashboard_attrs).and_return(service_instance)
       expect(service_instance).to receive(:execute).and_return(status: :success)
 
@@ -104,5 +105,26 @@ RSpec.shared_examples 'valid dashboard update process' do
     expect(service_instance).to receive(:execute).and_return(status: :success)
 
     service_call
+  end
+end
+
+RSpec.shared_examples 'misconfigured dashboard service response with stepable' do |status_code, message = nil|
+  it 'returns an appropriate message and status code', :aggregate_failures do
+    result = service_call
+
+    expect(result.keys).to contain_exactly(:message, :http_status, :status, :last_step)
+    expect(result[:status]).to eq(:error)
+    expect(result[:http_status]).to eq(status_code)
+    expect(result[:message]).to eq(message) if message
+  end
+end
+
+RSpec.shared_examples 'updates gitlab_metrics_dashboard_processing_time_ms metric' do
+  specify :prometheus do
+    service_call
+    metric = subject.send(:processing_time_metric)
+    labels = subject.send(:processing_time_metric_labels)
+
+    expect(metric.get(labels)).to be > 0
   end
 end

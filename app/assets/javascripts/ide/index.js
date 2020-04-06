@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { mapActions } from 'vuex';
-import _ from 'underscore';
 import Translate from '~/vue_shared/translate';
+import { identity } from 'lodash';
 import ide from './components/ide.vue';
 import store from './stores';
 import router from './ide_router';
@@ -31,7 +31,7 @@ Vue.use(Translate);
 export function initIde(el, options = {}) {
   if (!el) return null;
 
-  const { rootComponent = ide, extendStore = _.identity } = options;
+  const { rootComponent = ide, extendStore = identity } = options;
 
   return new Vue({
     el,
@@ -53,6 +53,7 @@ export function initIde(el, options = {}) {
         clientsidePreviewEnabled: parseBoolean(el.dataset.clientsidePreviewEnabled),
         renderWhitespaceInCode: parseBoolean(el.dataset.renderWhitespaceInCode),
         editorTheme: window.gon?.user_color_scheme || DEFAULT_THEME,
+        codesandboxBundlerUrl: el.dataset.codesandboxBundlerUrl,
       });
     },
     methods: {

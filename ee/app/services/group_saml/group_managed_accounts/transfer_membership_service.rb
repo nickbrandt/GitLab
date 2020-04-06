@@ -51,9 +51,11 @@ module GroupSaml
       end
 
       def leave_non_gma_memberships
+        return true unless ::Feature.enabled?(:remove_non_gma_memberships)
+
         current_user.members.all? do |member|
           next true if member.source == group
-          next true if member.source.owner == current_user
+          next true if member.source.owned_by?(current_user)
 
           Members::DestroyService.new(current_user).execute(member)
           member.destroyed?

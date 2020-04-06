@@ -7,6 +7,10 @@ require:
   - ./rubocop/rubocop
   - rubocop-rspec
 
+inherit_mode:
+  merge:
+    - Include
+
 AllCops:
   TargetRubyVersion: 2.6
   TargetRailsVersion: 5.0
@@ -161,6 +165,14 @@ Rails/ApplicationRecord:
     - ee/db/**/*.rb
     - ee/spec/**/*.rb
 
+Rails/FindBy:
+  Enabled: true
+  Include:
+    - 'ee/app/**/*.rb'
+    - 'ee/lib/**/*.rb'
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+
 # GitLab ###################################################################
 
 Gitlab/ModuleWithInstanceVariables:
@@ -199,6 +211,14 @@ GitlabSecurity/PublicSend:
     - 'ee/db/**/*'
     - 'ee/lib/**/*.rake'
     - 'ee/spec/**/*'
+
+Gitlab/DuplicateSpecLocation:
+  Exclude:
+    - ee/spec/helpers/auth_helper_spec.rb
+    - ee/spec/lib/gitlab/gl_repository_spec.rb
+    - ee/spec/services/merge_requests/refresh_service_spec.rb
+    - ee/spec/helpers/ee/auth_helper_spec.rb
+    - ee/spec/services/ee/merge_requests/refresh_service_spec.rb
 
 Cop/InjectEnterpriseEditionModule:
   Enabled: true
@@ -299,7 +319,10 @@ RSpec/ImplicitSubject:
   Enabled: false
 
 RSpec/LeakyConstantDeclaration:
-  Enabled: false
+  Enabled: true
+  Exclude:
+    - 'spec/**/*.rb'
+    - 'qa/spec/**/*.rb'
 
 RSpec/EmptyLineAfterHook:
   Enabled: false
@@ -344,3 +367,21 @@ Style/MultilineWhenThen:
 
 Style/FloatDivision:
   Enabled: false
+
+Cop/BanCatchThrow:
+  Enabled: true
+
+Performance/ReadlinesEach:
+  Enabled: true
+
+Performance/ChainArrayAllocation:
+  Enabled: true
+  Include:
+    - 'lib/gitlab/import_export/**/*'
+    - 'ee/lib/gitlab/import_export/**/*'
+    - 'ee/lib/ee/gitlab/import_export/**/*'
+
+# https://gitlab.com/gitlab-org/gitlab/-/issues/212541
+RSpec/RepeatedExample:
+  Exclude:
+    - 'spec/features/merge_request/user_posts_diff_notes_spec.rb'

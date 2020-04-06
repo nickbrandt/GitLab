@@ -8,8 +8,8 @@ module EE
           extend ActiveSupport::Concern
 
           EE_SERVICES = [
-            ::Metrics::Dashboard::ClusterDashboardService,
-            ::Metrics::Dashboard::GitlabAlertEmbedService
+            ::Metrics::Dashboard::ClusterMetricsEmbedService,
+            ::Metrics::Dashboard::ClusterDashboardService
           ].freeze
 
           class_methods do

@@ -19,6 +19,28 @@ will fail.
 
 - **Max limit:** 5.000 comments
 
+## Size of comments and descriptions of issues, merge requests, and epics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61974) in GitLab 12.2.
+
+There is a limit to the size of comments and descriptions of issues, merge requests, and epics.
+Attempting to add a body of text larger than the limit will result in an error, and the
+item will not be created.
+
+It's possible that this limit will be changed to a lower number in the future.
+
+- **Max size:** ~1 million characters / ~1 MB
+
+## Number of issues in the milestone overview
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39453) in GitLab 12.10.
+
+The maximum number of issues loaded on the milestone overview page is 3000.
+When the number exceeds the limit the page displays an alert and links to a paginated
+[issue list](../user/project/issues/index.md#issues-list) of all issues in the milestone.
+
+- **Limit:** 3000 issues
+
 ## Number of pipelines per Git push
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/51401) in GitLab 11.10.
@@ -35,12 +57,20 @@ Read more in the [CI documentation](../ci/yaml/README.md#processing-git-pushes).
 
 Activity history for projects and individuals' profiles was limited to one year until [GitLab 11.4](https://gitlab.com/gitlab-org/gitlab-foss/issues/52246) when it was extended to two years, and in [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/33840) to three years.
 
+## Number of embedded metrics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14939) in GitLab 12.7.
+
+There is a limit when embedding metrics in GFM for performance reasons.
+
+- **Max limit:** 100 embeds
+
 ## Number of webhooks
 
 On GitLab.com, the [maximum number of webhooks](../user/gitlab_com/index.md#maximum-number-of-webhooks) per project, and per group, is limited.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 # If limits don't exist for the default plan, you can create one with:
@@ -54,6 +84,20 @@ Plan.default.limits.update!(group_hooks: 100)
 ```
 
 NOTE: **Note:** Set the limit to `0` to disable it.
+
+## Incoming emails from auto-responders
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/30327) in GitLab 12.4.
+
+GitLab ignores all incoming emails sent from auto-responders by looking for the `X-Autoreply`
+header. Such emails don't create comments on issues or merge requests.
+
+## Amount of data sent from Sentry via Error Tracking
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14926) in GitLab 12.6.
+
+Sentry payloads sent to GitLab have a 1 MB maximum limit, both for security reasons
+and to limit memory consumption.
 
 ## CI/CD limits
 
@@ -76,7 +120,7 @@ will fail with a `job_activity_limit_exceeded` error.
   This limit is disabled by default.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 # If limits don't exist for the default plan, you can create one with:
@@ -86,6 +130,51 @@ Plan.default.limits.update!(ci_active_jobs: 500)
 ```
 
 NOTE: **Note:** Set the limit to `0` to disable it.
+
+### Number of CI/CD subscriptions to a project
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9045) in GitLab 12.9.
+
+The total number of subscriptions can be limited per project. This limit is
+checked each time a new subscription is created.
+
+If a new subscription would cause the total number of subscription to exceed the
+limit, the subscription will be considered invalid.
+
+- On GitLab.com different [limits are defined per plan](../user/gitlab_com/index.md#gitlab-cicd) and they affect all projects under that plan.
+- On [GitLab Starter](https://about.gitlab.com/pricing/#self-managed) tier or higher self-managed installations, this limit is defined for the `default` plan that affects all projects.
+
+To set this limit on a self-managed installation, run the following in the
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
+
+```ruby
+Plan.default.limits.update!(ci_project_subscriptions: 500)
+```
+
+NOTE: **Note:** Set the limit to `0` to disable it.
+
+### Number of pipeline schedules
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/29566) in GitLab 12.10.
+
+The total number of pipeline schedules can be limited per project. This limit is
+checked each time a new pipeline schedule is created. If a new pipeline schedule
+would cause the total number of pipeline schedules to exceed the limit, the
+pipeline schedule will not be created.
+
+On GitLab.com, different limits are [defined per plan](../user/gitlab_com/index.md#gitlab-cicd),
+and they affect all projects under that plan.
+
+On self-managed instances ([GitLab Starter](https://about.gitlab.com/pricing/#self-managed)
+or higher tiers), this limit is defined for the `default` plan that affects all
+projects. By default, there is no limit.
+
+To set this limit on a self-managed installation, run the following in the
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
+
+```ruby
+Plan.default.limits.update!(ci_pipeline_schedules: 100)
+```
 
 ## Environment data on Deploy Boards
 
@@ -123,3 +212,26 @@ NOTE: **Note:** Set the limit to `0` to disable it.
 ## Wiki limits
 
 - [Length restrictions for file and directory names](../user/project/wiki/index.md#length-restrictions-for-file-and-directory-names).
+
+## Push Event Limits
+
+### Webhooks and Project Services
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31009) in GitLab 12.4.
+
+Total number of changes (branches or tags) in a single push. If changes are more
+than the specified limit, hooks won't be executed.
+
+More information can be found in these docs:
+
+- [Webhooks push events](../user/project/integrations/webhooks.md#push-events)
+- [Project services push hooks limit](../user/project/integrations/overview.md#push-hooks-limit)
+
+### Activities
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31007) in GitLab 12.4.
+
+Total number of changes (branches or tags) in a single push to determine whether
+individual push events or bulk push event will be created.
+
+More information can be found in the [Push event activities limit and bulk push events documentation](../user/admin_area/settings/push_event_activities_limit.md).

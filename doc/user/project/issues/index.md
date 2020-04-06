@@ -4,7 +4,8 @@ Issues are the fundamental medium for collaborating on ideas and planning work i
 
 ## Overview
 
-The GitLab issue tracker is an advanced tool for collaboratively developing ideas, solving problems, and planning work.
+The GitLab issue tracker is an advanced tool for collaboratively developing ideas, solving problems,
+and planning work.
 
 Issues can allow sharing and discussion of proposals before, and during,
 their implementation between:
@@ -50,7 +51,8 @@ must be set.
             </ul>
             <li>State</li>
             <ul>
-                <li>Status (open/closed)</li>
+                <li>State (open or closed)</li>
+                <li>Status (On track, Needs attention, or At risk)</li>
                 <li>Confidentiality</li>
                 <li>Tasks (completed vs. outstanding)</li>
             </ul>
@@ -109,15 +111,14 @@ view, you can also make certain changes [in bulk](../bulk_editing.md) to the dis
 For more information, see the [Issue Data and Actions](issue_data_and_actions.md) page
 for a rundown of all the fields and information in an issue.
 
-You can sort a list of issues several ways, including by issue creation date, milestone due date,
-etc. For more information, see the [Sorting and Ordering Issue Lists](sorting_issue_lists.md) page.
+You can sort a list of issues in several ways, for example by issue creation date, milestone due date. For more information, see the [Sorting and Ordering Issue Lists](sorting_issue_lists.md) page.
 
 ### Issue boards
 
 ![Issue board](img/issue_board.png)
 
-[Issue boards](../issue_board.md) are Kanban boards with columns that display issues based on their labels
-or their assignees**(PREMIUM)**. They offer the flexibility to manage issues using
+[Issue boards](../issue_board.md) are Kanban boards with columns that display issues based on their
+labels or their assignees**(PREMIUM)**. They offer the flexibility to manage issues using
 highly customizable workflows.
 
 You can reorder issues within a column. If you drag an issue card to another column, its
@@ -125,7 +126,7 @@ associated label or assignee will change to match that of the new column. The en
 board can also be filtered to only include issues from a certain milestone or an overarching
 label.
 
-### Design Management **(PREMIUM)**
+### Design Management
 
 With [Design Management](design_management.md), you can upload design
 assets to issues and view them all together to easily share and
@@ -157,11 +158,37 @@ To prevent duplication of issues for the same topic, GitLab searches for similar
 when new issues are being created.
 
 When typing in the title in the **New Issue** page, GitLab searches titles and descriptions
-across all issues the user has access to in the current project. Up 5 similar issues,
+across all issues the user has access to in the current project. Up to five similar issues,
 sorted by most recently updated, are displayed below the title box. Note that this feature
 requires [GraphQL](../../../api/graphql/index.md) to be enabled.
 
 ![Similar issues](img/similar_issues.png)
+
+---
+
+### Status **(ULTIMATE)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/36427) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
+
+To help you track the status of your issues, you can assign a status to each issue to flag work that's progressing as planned or needs attention to keep on schedule:
+
+- **On track** (green)
+- **Needs attention** (amber)
+- **At risk** (red)
+
+!["On track" health status on an issue](img/issue_health_status_v12_10.png)
+
+---
+
+#### Enable issue health status
+
+This feature comes with the `:save_issuable_health_status` feature flag enabled by default. However, in some cases
+this feature is incompatible with old configuration. To turn off the feature while configuration is
+migrated, ask a GitLab administrator with Rails console access to run the following command:
+
+```ruby
+Feature.disable(:save_issuable_health_status)
+```
 
 ## Other Issue actions
 

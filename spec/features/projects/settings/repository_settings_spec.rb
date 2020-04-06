@@ -26,11 +26,7 @@ describe 'Projects > Settings > Repository settings' do
     let(:role) { :maintainer }
 
     context 'remote mirror settings' do
-      let(:user2) { create(:user) }
-
       before do
-        project.add_maintainer(user2)
-
         visit project_settings_repository_path(project)
       end
 
@@ -76,6 +72,21 @@ describe 'Projects > Settings > Repository settings' do
         expect(project.remote_mirrors.first.only_protected_branches).to eq(true)
       end
 
+      it 'creates a push mirror that keeps divergent refs', :js do
+        select_direction
+
+        fill_in 'url', with: 'ssh://user@localhost/project.git'
+        fill_in 'Password', with: 'password'
+        check 'Keep divergent refs'
+
+        Sidekiq::Testing.fake! do
+          click_button 'Mirror repository'
+        end
+
+        expect(page).to have_content('Mirroring settings were successfully updated')
+        expect(project.reload.remote_mirrors.first.keep_divergent_refs).to eq(true)
+      end
+
       it 'generates an SSH public key on submission', :js do
         fill_in 'url', with: 'ssh://user@localhost/project.git'
         select 'SSH public key', from: 'Authentication method'
@@ -90,6 +101,18 @@ describe 'Projects > Settings > Repository settings' do
         expect(page).to have_selector('[title="Copy SSH public key"]')
       end
 
+      context 'when project mirroring is disabled' do
+        before do
+          stub_application_setting(mirror_available: false)
+          visit project_settings_repository_path(project)
+        end
+
+        it 'hides remote mirror settings' do
+          expect(page.find('.project-mirror-settings')).not_to have_selector('form')
+          expect(page).to have_content('Mirror settings are only available to GitLab administrators.')
+        end
+      end
+
       def select_direction(direction = 'push')
         direction_select = find('#mirror_direction')
 
@@ -99,6 +122,20 @@ describe 'Projects > Settings > Repository settings' do
         else
           direction_select.select(direction.capitalize)
         end
+      end
+    end
+
+    # Removal: https://gitlab.com/gitlab-org/gitlab/-/issues/208828
+    context 'with the `keep_divergent_refs` feature flag disabled' do
+      before do
+        stub_feature_flags(keep_divergent_refs: { enabled: false, thing: project })
+      end
+
+      it 'hides the "Keep divergent refs" option' do
+        visit project_settings_repository_path(project)
+
+        expect(page).not_to have_selector('#keep_divergent_refs')
+        expect(page).not_to have_text('Keep divergent refs')
       end
     end
 
@@ -152,6 +189,33 @@ describe 'Projects > Settings > Repository settings' do
       expect(mirror).to have_selector('.rspec-delete-mirror')
       expect(mirror).to have_selector('.rspec-disabled-mirror-badge')
       expect(mirror).not_to have_selector('.rspec-update-now-button')
+    end
+  end
+
+  context 'for admin' do
+    shared_examples_for 'shows mirror settings' do
+      it 'shows mirror settings' do
+        expect(page.find('.project-mirror-settings')).to have_selector('form')
+        expect(page).not_to have_content('Changing mirroring setting is disabled for non-admin users.')
+      end
+    end
+
+    before do
+      stub_application_setting(mirror_available: mirror_available)
+      user.update!(admin: true)
+      visit project_settings_repository_path(project)
+    end
+
+    context 'when project mirroring is enabled' do
+      let(:mirror_available) { true }
+
+      include_examples 'shows mirror settings'
+    end
+
+    context 'when project mirroring is disabled' do
+      let(:mirror_available) { false }
+
+      include_examples 'shows mirror settings'
     end
   end
 end

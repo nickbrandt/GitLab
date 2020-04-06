@@ -44,10 +44,18 @@ module QA
         new.visit(address, page_class, &block)
       end
 
+      # rubocop: disable Metrics/AbcSize
       def self.configure!
         RSpec.configure do |config|
           config.define_derived_metadata(file_path: %r{/qa/specs/features/}) do |metadata|
             metadata[:type] = :feature
+          end
+
+          config.append_after(:each) do |example|
+            if example.metadata[:screenshot]
+              screenshot = example.metadata[:screenshot][:image] || example.metadata[:screenshot][:html]
+              example.metadata[:stdout] = %{[[ATTACHMENT|#{screenshot}]]}
+            end
           end
         end
 
@@ -122,8 +130,10 @@ module QA
           driver.browser.save_screenshot(path)
         end
 
+        Capybara::Screenshot.append_timestamp = false
+
         Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
-          ::File.join(QA::Runtime::Namespace.name, example.file_path.sub('./qa/specs/features/', ''))
+          ::File.join(QA::Runtime::Namespace.name, example.full_description.downcase.parameterize(separator: "_")[0..99])
         end
 
         Capybara.configure do |config|
@@ -138,6 +148,7 @@ module QA
           config.default_normalize_ws = true
         end
       end
+      # rubocop: enable Metrics/AbcSize
 
       class Session
         include Capybara::DSL

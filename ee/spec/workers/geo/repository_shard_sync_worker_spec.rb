@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cache do
+describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cache, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -155,7 +155,9 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
         unsynced_project.destroy
         unsynced_project_in_restricted_group.destroy
 
-        allow_any_instance_of(described_class).to receive(:db_retrieve_batch_size).and_return(2) # Must be >1 because of the Geo::BaseSchedulerWorker#interleave
+        allow_next_instance_of(described_class) do |instance|
+          allow(instance).to receive(:db_retrieve_batch_size).and_return(2) # Must be >1 because of the Geo::BaseSchedulerWorker#interleave
+        end
         secondary.update!(repos_max_capacity: 3) # Must be more than db_retrieve_batch_size
 
         project_list.each do |project|
@@ -165,8 +167,12 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
               .and_call_original
         end
 
-        allow_any_instance_of(Geo::ProjectRegistry).to receive(:wiki_sync_due?).and_return(false)
-        allow_any_instance_of(Geo::RepositorySyncService).to receive(:expire_repository_caches)
+        allow_next_instance_of(Geo::ProjectRegistry) do |instance|
+          allow(instance).to receive(:wiki_sync_due?).and_return(false)
+        end
+        allow_next_instance_of(Geo::RepositorySyncService) do |instance|
+          allow(instance).to receive(:expire_repository_caches)
+        end
       end
 
       it 'tries to sync project where last attempt to sync failed' do
@@ -216,12 +222,22 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
         unsynced_project.destroy
         unsynced_project_in_restricted_group.destroy
 
-        allow_any_instance_of(described_class).to receive(:db_retrieve_batch_size).and_return(2) # Must be >1 because of the Geo::BaseSchedulerWorker#interleave
+        allow_next_instance_of(described_class) do |instance|
+          allow(instance).to receive(:db_retrieve_batch_size).and_return(2) # Must be >1 because of the Geo::BaseSchedulerWorker#interleave
+        end
         secondary.update!(repos_max_capacity: 3) # Must be more than db_retrieve_batch_size
-        allow_any_instance_of(Project).to receive(:ensure_repository).and_raise(Gitlab::Shell::Error.new('foo'))
-        allow_any_instance_of(Geo::ProjectRegistry).to receive(:wiki_sync_due?).and_return(false)
-        allow_any_instance_of(Geo::RepositorySyncService).to receive(:expire_repository_caches)
-        allow_any_instance_of(Geo::ProjectHousekeepingService).to receive(:do_housekeeping)
+        allow_next_instance_of(Project) do |instance|
+          allow(instance).to receive(:ensure_repository).and_raise(Gitlab::Shell::Error.new('foo'))
+        end
+        allow_next_instance_of(Geo::ProjectRegistry) do |instance|
+          allow(instance).to receive(:wiki_sync_due?).and_return(false)
+        end
+        allow_next_instance_of(Geo::RepositorySyncService) do |instance|
+          allow(instance).to receive(:expire_repository_caches)
+        end
+        allow_next_instance_of(Geo::ProjectHousekeepingService) do |instance|
+          allow(instance).to receive(:do_housekeeping)
+        end
       end
 
       it 'tries to sync every project' do

@@ -21,12 +21,10 @@ export default () => ({
   modal: {
     vulnerability: {},
     project: {},
-    isCreatingNewIssue: false,
-    isCreatingMergeRequest: false,
-    isDismissingVulnerability: false,
     isCommentingOnDismissal: false,
     isShowingDeleteButtons: false,
   },
+  isDismissingVulnerability: false,
   isDismissingVulnerabilities: false,
   selectedVulnerabilities: {},
   isCreatingIssue: false,

@@ -16,9 +16,9 @@ module Analytics
       end
     end
 
-    def execute_async(*args)
+    def execute_async(**kwargs)
       merge_requests.each do |mr|
-        CodeReviewMetricsWorker.perform_async(self.class.name, mr.id, *args)
+        CodeReviewMetricsWorker.perform_async(self.class.name, mr.id, **kwargs)
       end
     end
 

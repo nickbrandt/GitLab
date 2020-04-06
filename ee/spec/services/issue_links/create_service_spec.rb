@@ -32,7 +32,7 @@ describe IssueLinks::CreateService do
 
     context 'when Issue not found' do
       let(:params) do
-        { issuable_references: ['#999'] }
+        { issuable_references: ["##{non_existing_record_iid}"] }
       end
 
       it 'returns error' do

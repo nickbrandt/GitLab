@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTooltipDirective, GlModalDirective, GlLink, GlButton } from '@gitlab/ui';
+import { GlTooltipDirective, GlModalDirective, GlLink, GlDeprecatedButton } from '@gitlab/ui';
 import _ from 'underscore';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
@@ -20,7 +20,7 @@ export default {
   components: {
     Icon,
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     StateTooltip,
     ItemMilestone,
     ItemAssignees,
@@ -79,6 +79,9 @@ export default {
     itemId() {
       return this.itemReference.split(this.item.pathIdSeparator).pop();
     },
+    itemHierarchy() {
+      return this.itemPath + this.item.pathIdSeparator + this.itemId;
+    },
     computedPath() {
       return this.itemWebPath.length ? this.itemWebPath : null;
     },
@@ -127,6 +130,7 @@ export default {
           />
           <state-tooltip
             :get-target-ref="() => $refs.stateIconLg"
+            :path="itemHierarchy"
             :is-open="isOpen"
             :state="item.state"
             :created-at="item.createdAt"
@@ -157,15 +161,12 @@ export default {
             />
             <state-tooltip
               :get-target-ref="() => $refs.stateIconMd"
+              :path="itemHierarchy"
               :is-open="isOpen"
               :state="item.state"
               :created-at="item.createdAt"
               :closed-at="item.closedAt || ''"
             />
-            <span v-gl-tooltip :title="itemPath" class="path-id-text d-inline-block">{{
-              itemPath
-            }}</span
-            >{{ item.pathIdSeparator }}{{ itemId }}
           </div>
           <div
             class="item-meta-child d-flex align-items-center order-0 flex-wrap mr-md-1 ml-md-auto ml-xl-2 mt-2 mt-md-0 flex-xl-nowrap"
@@ -194,7 +195,7 @@ export default {
             class="item-assignees d-inline-flex align-items-center align-self-end ml-0 ml-md-2 mt-2 mt-md-0 mt-xl-0 mr-xl-1 mb-md-0 order-2 flex-xl-grow-0"
           />
         </div>
-        <gl-button
+        <gl-deprecated-button
           v-if="parentItem.userPermissions.adminEpic"
           v-gl-tooltip.hover
           v-gl-modal-directive="$options.itemRemoveModalId"
@@ -204,7 +205,7 @@ export default {
           @click="handleRemoveClick"
         >
           <icon :size="16" name="close" class="btn-item-remove-icon" />
-        </gl-button>
+        </gl-deprecated-button>
         <span v-if="showEmptySpacer" class="p-3"></span>
       </div>
     </div>

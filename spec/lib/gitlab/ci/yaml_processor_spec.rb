@@ -509,28 +509,48 @@ module Gitlab
 
         describe "before_script" do
           context "in global context" do
-            let(:config) do
-              {
-                before_script: ["global script"],
-                test: { script: ["script"] }
-              }
+            using RSpec::Parameterized::TableSyntax
+
+            where(:inherit, :result) do
+              nil | ["global script"]
+              { default: false } | nil
+              { default: true } | ["global script"]
+              { default: %w[before_script] } | ["global script"]
+              { default: %w[image] } | nil
             end
 
-            it "return commands with scripts concatenated" do
-              expect(subject[:options][:before_script]).to eq(["global script"])
-            end
-          end
+            with_them do
+              let(:config) do
+                {
+                  before_script: ["global script"],
+                  test: { script: ["script"], inherit: inherit }
+                }
+              end
 
-          context "in default context" do
-            let(:config) do
-              {
-                default: { before_script: ["global script"] },
-                test: { script: ["script"] }
-              }
+              it { expect(subject[:options][:before_script]).to eq(result) }
             end
 
-            it "return commands with scripts concatenated" do
-              expect(subject[:options][:before_script]).to eq(["global script"])
+            context "in default context" do
+              using RSpec::Parameterized::TableSyntax
+
+              where(:inherit, :result) do
+                nil | ["global script"]
+                { default: false } | nil
+                { default: true } | ["global script"]
+                { default: %w[before_script] } | ["global script"]
+                { default: %w[image] } | nil
+              end
+
+              with_them do
+                let(:config) do
+                  {
+                    default: { before_script: ["global script"] },
+                    test: { script: ["script"], inherit: inherit }
+                  }
+                end
+
+                it { expect(subject[:options][:before_script]).to eq(result) }
+              end
             end
           end
 
@@ -645,7 +665,7 @@ module Gitlab
       describe "Image and service handling" do
         context "when extended docker configuration is used" do
           it "returns image and service when defined" do
-            config = YAML.dump({ image: { name: "ruby:2.1", entrypoint: ["/usr/local/bin/init", "run"] },
+            config = YAML.dump({ image: { name: "ruby:2.7", entrypoint: ["/usr/local/bin/init", "run"] },
                                  services: ["mysql", { name: "docker:dind", alias: "docker",
                                                        entrypoint: ["/usr/local/bin/init", "run"],
                                                        command: ["/usr/local/bin/init", "run"] }],
@@ -663,7 +683,7 @@ module Gitlab
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
-                image: { name: "ruby:2.1", entrypoint: ["/usr/local/bin/init", "run"] },
+                image: { name: "ruby:2.7", entrypoint: ["/usr/local/bin/init", "run"] },
                 services: [{ name: "mysql" },
                            { name: "docker:dind", alias: "docker", entrypoint: ["/usr/local/bin/init", "run"],
                              command: ["/usr/local/bin/init", "run"] }]
@@ -676,7 +696,7 @@ module Gitlab
           end
 
           it "returns image and service when overridden for job" do
-            config = YAML.dump({ image: "ruby:2.1",
+            config = YAML.dump({ image: "ruby:2.7",
                                  services: ["mysql"],
                                  before_script: ["pwd"],
                                  rspec: { image: { name: "ruby:2.5", entrypoint: ["/usr/local/bin/init", "run"] },
@@ -711,7 +731,7 @@ module Gitlab
 
         context "when etended docker configuration is not used" do
           it "returns image and service when defined" do
-            config = YAML.dump({ image: "ruby:2.1",
+            config = YAML.dump({ image: "ruby:2.7",
                                  services: ["mysql", "docker:dind"],
                                  before_script: ["pwd"],
                                  rspec: { script: "rspec" } })
@@ -727,7 +747,7 @@ module Gitlab
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
-                image: { name: "ruby:2.1" },
+                image: { name: "ruby:2.7" },
                 services: [{ name: "mysql" }, { name: "docker:dind" }]
               },
               allow_failure: false,
@@ -738,7 +758,7 @@ module Gitlab
           end
 
           it "returns image and service when overridden for job" do
-            config = YAML.dump({ image: "ruby:2.1",
+            config = YAML.dump({ image: "ruby:2.7",
                                  services: ["mysql"],
                                  before_script: ["pwd"],
                                  rspec: { image: "ruby:2.5", services: ["postgresql", "docker:dind"], script: "rspec" } })
@@ -793,7 +813,7 @@ module Gitlab
 
         context 'when job and global variables are defined' do
           let(:global_variables) do
-            { 'VAR1' => 'global1', 'VAR3' => 'global3' }
+            { 'VAR1' => 'global1', 'VAR3' => 'global3', 'VAR4' => 'global4' }
           end
           let(:job_variables) do
             { 'VAR1' => 'value1', 'VAR2' => 'value2' }
@@ -802,16 +822,44 @@ module Gitlab
             {
               before_script: ['pwd'],
               variables: global_variables,
-              rspec: { script: 'rspec', variables: job_variables }
+              rspec: { script: 'rspec', variables: job_variables, inherit: inherit }
             }
           end
 
-          it 'returns all unique variables' do
-            expect(subject).to contain_exactly(
-              { key: 'VAR3', value: 'global3', public: true },
-              { key: 'VAR1', value: 'value1', public: true },
-              { key: 'VAR2', value: 'value2', public: true }
-            )
+          context 'when no inheritance is specified' do
+            let(:inherit) { }
+
+            it 'returns all unique variables' do
+              expect(subject).to contain_exactly(
+                { key: 'VAR4', value: 'global4', public: true },
+                { key: 'VAR3', value: 'global3', public: true },
+                { key: 'VAR1', value: 'value1', public: true },
+                { key: 'VAR2', value: 'value2', public: true }
+              )
+            end
+          end
+
+          context 'when inheritance is disabled' do
+            let(:inherit) { { variables: false } }
+
+            it 'does not inherit variables' do
+              expect(subject).to contain_exactly(
+                { key: 'VAR1', value: 'value1', public: true },
+                { key: 'VAR2', value: 'value2', public: true }
+              )
+            end
+          end
+
+          context 'when specific variables are to inherited' do
+            let(:inherit) { { variables: %w[VAR1 VAR4] } }
+
+            it 'returns all unique variables and inherits only specified variables' do
+              expect(subject).to contain_exactly(
+                { key: 'VAR4', value: 'global4', public: true },
+                { key: 'VAR1', value: 'value1', public: true },
+                { key: 'VAR2', value: 'value2', public: true }
+              )
+            end
           end
         end
 
@@ -1244,7 +1292,7 @@ module Gitlab
       describe "Artifacts" do
         it "returns artifacts when defined" do
           config = YAML.dump({
-                               image:         "ruby:2.1",
+                               image:         "ruby:2.7",
                                services:      ["mysql"],
                                before_script: ["pwd"],
                                rspec:         {
@@ -1270,7 +1318,7 @@ module Gitlab
             options: {
               before_script: ["pwd"],
               script: ["rspec"],
-              image: { name: "ruby:2.1" },
+              image: { name: "ruby:2.7" },
               services: [{ name: "mysql" }],
               artifacts: {
                 name: "custom_name",
@@ -1897,7 +1945,7 @@ module Gitlab
         context 'when hidden job have a script definition' do
           let(:config) do
             YAML.dump({
-                        '.hidden_job' => { image: 'ruby:2.1', script: 'test' },
+                        '.hidden_job' => { image: 'ruby:2.7', script: 'test' },
                         'normal_job' => { script: 'test' }
                       })
           end
@@ -1908,7 +1956,7 @@ module Gitlab
         context "when hidden job doesn't have a script definition" do
           let(:config) do
             YAML.dump({
-                        '.hidden_job' => { image: 'ruby:2.1' },
+                        '.hidden_job' => { image: 'ruby:2.7' },
                         'normal_job' => { script: 'test' }
                       })
           end

@@ -29,12 +29,12 @@ to protect trigger tokens.
 
 ### CI job token
 
-You can use the `CI_JOB_TOKEN` [variable][predef] (used to authenticate
-with the [GitLab Container Registry][registry]) in the following cases.
+You can use the `CI_JOB_TOKEN` [variable](../variables/README.md#predefined-environment-variables) (used to authenticate
+with the [GitLab Container Registry](../../user/packages/container_registry/index.md)) in the following cases.
 
 #### When used with multi-project pipelines
 
-> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced][ee-2017] in [GitLab Premium][ee] 9.3.
+> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.3.
 > - Use of `CI_JOB_TOKEN` for multi-project pipelines was [made available](https://gitlab.com/gitlab-org/gitlab/issues/31573) in all tiers in GitLab 12.4.
 
 This way of triggering can only be used when invoked inside `.gitlab-ci.yml`,
@@ -53,11 +53,11 @@ build_docs:
 Pipelines triggered that way also expose a special variable:
 `CI_PIPELINE_SOURCE=pipeline`.
 
-Read more about the [pipelines trigger API][trigapi].
+Read more about the [pipelines trigger API](../../api/pipeline_triggers.md).
 
 #### When a pipeline depends on the artifacts of another pipeline **(PREMIUM)**
 
-> The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346] in [GitLab Premium][ee] 9.5.
+> The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.5.
 
 With the introduction of dependencies between different projects, one of
 them may need to access artifacts created by a previous one. This process
@@ -78,7 +78,7 @@ build_submodule:
 
 This allows you to use that for multi-project pipelines and download artifacts
 from any project to which you have access as this follows the same principles
-with the [permission model][permissions].
+with the [permission model](../../user/permissions.md#job-permissions).
 
 Read more about the [jobs API](../../api/jobs.md#download-the-artifacts-archive).
 
@@ -123,7 +123,7 @@ settings page which provides self-explanatory examples.
 When a rerun of a pipeline is triggered, the information is exposed in GitLab's
 UI under the **Jobs** page and the jobs are marked as triggered 'by API'.
 
-![Marked rebuilds as  on jobs page](img/builds_page.png)
+![Marked rebuilds as on jobs page](img/builds_page.png)
 
 ---
 
@@ -192,7 +192,7 @@ https://gitlab.example.com/api/v4/projects/9/ref/master/trigger/pipeline?token=T
 ## Making use of trigger variables
 
 You can pass any number of arbitrary variables in the trigger API call and they
-will be available in GitLab CI so that they can be used in your `.gitlab-ci.yml`
+will be available in GitLab CI/CD so that they can be used in your `.gitlab-ci.yml`
 file. The parameter is of the form:
 
 ```plaintext
@@ -256,7 +256,7 @@ of all types of variables.
 
 >**Note:**
 The following behavior can also be achieved through GitLab's UI with
-[pipeline schedules](../../user/project/pipelines/schedules.md).
+[pipeline schedules](../pipelines/schedules.md).
 
 Whether you craft a script or just run cURL directly, you can trigger jobs
 in conjunction with cron. The example below triggers a job on the `master`
@@ -273,12 +273,3 @@ Old triggers, created before GitLab 9.0 will be marked as legacy.
 Triggers with the legacy label do not have an associated user and only have
 access to the current project. They are considered deprecated and will be
 removed with one of the future versions of GitLab.
-
-[ee-2017]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017
-[ee-2346]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346
-[ee]: https://about.gitlab.com/pricing/
-[variables]: ../variables/README.md
-[predef]: ../variables/README.md#predefined-environment-variables
-[registry]: ../../user/packages/container_registry/index.md
-[permissions]: ../../user/permissions.md#job-permissions
-[trigapi]: ../../api/pipeline_triggers.md

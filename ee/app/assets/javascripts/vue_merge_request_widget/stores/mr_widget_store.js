@@ -24,16 +24,12 @@ export default class MergeRequestStore extends CEMergeRequestStore {
       data.create_vulnerability_feedback_merge_request_path;
     this.createVulnerabilityFeedbackDismissalPath =
       data.create_vulnerability_feedback_dismissal_path;
-    this.canCreateIssue = Boolean(this.createVulnerabilityFeedbackIssuePath);
-    this.canCreateMergeRequest = Boolean(this.createVulnerabilityFeedbackMergeRequestPath);
-    this.canDismissVulnerability = Boolean(this.createVulnerabilityFeedbackDismissalPath);
-    this.canCreateFeedback = data.can_create_feedback || false;
     this.visualReviewAppAvailable = Boolean(data.visual_review_app_available);
     this.appUrl = gon && gon.gitlab_url;
 
     this.initCodeclimate(data);
     this.initPerformanceReport(data);
-    this.licenseManagement = data.license_management;
+    this.licenseScanning = data.license_scanning;
     this.metricsReportsPath = data.metrics_reports_path;
 
     this.enabledReports = convertObjectPropsToCamelCase(data.enabled_reports);

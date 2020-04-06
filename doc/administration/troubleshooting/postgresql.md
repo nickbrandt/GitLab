@@ -99,13 +99,13 @@ References:
 - [Customer ticket (internal) GitLab 12.1.6](https://gitlab.zendesk.com/agent/tickets/134307) and [Google doc (internal)](https://docs.google.com/document/d/19xw2d_D1ChLiU-MO1QzWab-4-QXgsIUcN5e_04WTKy4)
 - [Issue #2 deadlocks can occur if an instance is flooded with pushes](https://gitlab.com/gitlab-org/gitlab/issues/33650). Provided for context about how GitLab code can have this sort of unanticipated effect in unusual situations.
 
-```
+```plaintext
 ERROR: deadlock detected
 ```
 
 Three applicable timeouts are identified in the issue [#1](https://gitlab.com/gitlab-org/gitlab/issues/30528); our recommended settings are as follows:
 
-```
+```ini
 deadlock_timeout = 5s
 statement_timeout = 15s
 idle_in_transaction_session_timeout = 60s
@@ -121,14 +121,14 @@ In this case, the guidance we had from development was to drop deadlock_timeout 
 
 PostgresSQL defaults:
 
-- statement_timeout = 0 (never)
-- idle_in_transaction_session_timeout = 0 (never)
+- `statement_timeout = 0` (never)
+- `idle_in_transaction_session_timeout = 0` (never)
 
 Comments in issue [#1](https://gitlab.com/gitlab-org/gitlab/issues/30528) indicate that these should both be set to at least a number of minutes for all Omnibus installations (so they don't hang indefinitely). However, 15s for statement_timeout is very short, and will only be effective if the underlying infrastructure is very performant.
 
 See current settings with:
 
-```
+```shell
 sudo gitlab-rails runner "c = ApplicationRecord.connection ; puts c.execute('SHOW statement_timeout').to_a ;
 puts c.execute('SHOW lock_timeout').to_a ;
 puts c.execute('SHOW idle_in_transaction_session_timeout').to_a ;"
@@ -136,7 +136,7 @@ puts c.execute('SHOW idle_in_transaction_session_timeout').to_a ;"
 
 It may take a little while to respond.
 
-```
+```ruby
 {"statement_timeout"=>"1min"}
 {"lock_timeout"=>"0"}
 {"idle_in_transaction_session_timeout"=>"1min"}

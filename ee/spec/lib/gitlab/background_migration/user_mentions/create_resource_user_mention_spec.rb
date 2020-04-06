@@ -3,11 +3,9 @@
 require 'spec_helper'
 require './db/post_migrate/20191115115043_migrate_epic_mentions_to_db'
 require './db/post_migrate/20191115115522_migrate_epic_notes_mentions_to_db'
-require './db/post_migrate/20200214174519_remigrate_epic_mentions_to_db'
-require './db/post_migrate/20200214174607_remigrate_epic_notes_mentions_to_db'
 require './db/post_migrate/20200124110831_migrate_design_notes_mentions_to_db'
 
-describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200214174607 do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
   include MigrationsHelpers
 
   context 'when migrating data' do
@@ -15,6 +13,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
     let(:namespaces) { table(:namespaces) }
     let(:projects) { table(:projects) }
     let(:notes) { table(:notes) }
+    let(:routes) { table(:routes) }
 
     let(:author) { users.create!(email: 'author@example.com', notification_email: 'author@example.com', name: 'author', username: 'author', projects_limit: 10, state: 'active') }
     let(:member) { users.create!(email: 'member@example.com', notification_email: 'member@example.com', name: 'member', username: 'member', projects_limit: 10, state: 'active') }
@@ -35,13 +34,14 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
 
     before do
       # build personal namespaces and routes for users
-      mentioned_users.each { |u| u.becomes(User).save! }
+      mentioned_users.each do |u|
+        namespace = namespaces.create!(path: u.username, name: u.name, runners_token: "my-token-u#{u.id}", owner_id: u.id, type: nil)
+        routes.create!(path: namespace.path, source_type: 'Namespace', source_id: namespace.id)
+      end
 
       # build namespaces and routes for groups
       mentioned_groups.each do |gr|
-        gr.name += '-org'
-        gr.path += '-org'
-        gr.becomes(Namespace).save!
+        routes.create!(path: gr.path, source_type: 'Namespace', source_id: gr.id)
       end
     end
 
@@ -59,7 +59,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
                         title_html: "epic title", description: 'simple description')
         end
         let!(:epic3) do
-          epics.create!(iid: 2, group_id: group.id, author_id: author.id, title: "epic title}",
+          epics.create!(iid: 3, group_id: group.id, author_id: author.id, title: "epic title}",
                         title_html: "epic title", description: 'description with an email@example.com and some other @ char here.')
         end
 
@@ -67,7 +67,6 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
         let(:resource) { epic }
 
         it_behaves_like 'resource mentions migration', MigrateEpicMentionsToDb, Epic
-        it_behaves_like 'resource mentions migration', RemigrateEpicMentionsToDb, Epic
 
         context 'mentions in epic notes' do
           let!(:note1) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions) }
@@ -76,10 +75,9 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
           # this not does not have actual mentions
           let!(:note4) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
           # this not points to an innexistent noteable record in desigs table
-          let!(:note5) { notes.create!(noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
+          let!(:note5) { notes.create!(noteable_id: non_existing_record_id, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
 
           it_behaves_like 'resource notes mentions migration', MigrateEpicNotesMentionsToDb, Epic
-          it_behaves_like 'resource notes mentions migration', RemigrateEpicNotesMentionsToDb, Epic
         end
       end
     end
@@ -98,7 +96,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
       # this not does not have actual mentions
       let!(:note4) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
       # this not points to an innexistent noteable record in desigs table
-      let!(:note5) { notes.create!(noteable_id: designs.maximum(:id) + 10, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
+      let!(:note5) { notes.create!(noteable_id: non_existing_record_id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
 
       let(:user_mentions) { design_user_mentions }
       let(:resource) { design }

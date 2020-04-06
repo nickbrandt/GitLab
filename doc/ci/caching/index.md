@@ -202,7 +202,7 @@ so they don't have to be re-fetched from the public internet.
 
 NOTE: **Note:**
 For more examples, check out our [GitLab CI/CD
-templates](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates).
+templates](https://gitlab.com/gitlab-org/gitlab/tree/master/lib/gitlab/ci/templates).
 
 ### Caching Node.js dependencies
 
@@ -214,7 +214,7 @@ we tell npm to use `./.npm` instead, and it is cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab/tree/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
 #
 image: node:latest
 
@@ -241,7 +241,7 @@ are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/PHP.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab/tree/master/lib/gitlab/ci/templates/PHP.gitlab-ci.yml
 #
 image: php:7.2
 
@@ -265,12 +265,12 @@ test:
 
 Assuming your project is using [pip](https://pip.pypa.io/en/stable/) to install
 the Python dependencies, the following example defines `cache` globally so that
-all jobs inherit it. Python libraries are installed in a virtualenv under `venv/`,
+all jobs inherit it. Python libraries are installed in a virtual environment under `venv/`,
 pip's cache is defined under `.cache/pip/` and both are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab/tree/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 #
 image: python:latest
 
@@ -310,7 +310,7 @@ jobs inherit it. Gems are installed in `vendor/ruby/` and are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Ruby.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab/tree/master/lib/gitlab/ci/templates/Ruby.gitlab-ci.yml
 #
 image: ruby:2.6
 

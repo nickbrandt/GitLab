@@ -4,15 +4,15 @@ You can find more about the organization of the frontend team in the [handbook](
 
 ## Development Checklist
 
-The idea is to remind us about specific topics during the time we build a new feature or start something. This is a common practice in other industries (like pilots) that also use  standardised checklists to reduce problems early on.
+The idea is to remind us about specific topics during the time we build a new feature or start something. This is a common practice in other industries (like pilots) that also use standardised checklists to reduce problems early on.
 
 Copy the content over to your issue or merge request and if something doesn't apply simply remove it from your current list.
 
 This checklist is intended to help us during development of bigger features/refactorings, it's not a "use it always and every point always matches" list.
 
-Please use your best judgement when to use it and please contribute new points through merge requests if something comes to your mind.
+Please use your best judgment when to use it and please contribute new points through merge requests if something comes to your mind.
 
-```
+```markdown
 ### Frontend development
 
 #### Planning development

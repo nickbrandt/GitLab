@@ -5,9 +5,10 @@ module Banzai
     class InlineClusterMetricsFilter < ::Banzai::Filter::InlineEmbedsFilter
       def embed_params(node)
         url = node['href']
+        @query_params = query_params(url)
 
         return unless [:group, :title, :y_label].all? do |param|
-          query_params(url).include?(param)
+          @query_params.include?(param)
         end
 
         link_pattern.match(url) { |m| m.named_captures }.symbolize_keys
@@ -32,7 +33,7 @@ module Banzai
           cluster_type: :project,
           embedded: true,
           format: :json,
-          **query_params(params['url'])
+          **@query_params
         )
       end
     end

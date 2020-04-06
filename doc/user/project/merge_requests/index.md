@@ -10,18 +10,18 @@ to source code that exist as commits on a given Git branch.
 ![Merge request view](img/merge_request.png)
 
 A Merge Request (**MR**) is the basis of GitLab as a code collaboration and version
-control platform. It is as simple as the name implies: a _request_ to _merge_ one
+control platform. It's exactly as the name implies: a _request_ to _merge_ one
 branch into another.
 
 ## Use cases
 
-A. Consider you are a software developer working in a team:
+A. Consider you're a software developer working in a team:
 
 1. You checkout a new branch, and submit your changes through a merge request
 1. You gather feedback from your team
 1. You work on the implementation optimizing code with [Code Quality reports](code_quality.md) **(STARTER)**
 1. You verify your changes with [JUnit test reports](../../../ci/junit_test_reports.md) in GitLab CI/CD
-1. You avoid using dependencies whose license is not compatible with your project with [License Compliance reports](../../application_security/license_compliance/index.md) **(ULTIMATE)**
+1. You avoid using dependencies whose license is not compatible with your project with [License Compliance reports](../../compliance/license_compliance/index.md) **(ULTIMATE)**
 1. You request the [approval](merge_request_approvals.md) from your manager **(STARTER)**
 1. Your manager:
    1. Pushes a commit with their final review
@@ -61,7 +61,7 @@ So far, the navigation tabs present in merge requests to display **Discussion**,
 widget.
 
 To facilitate this navigation without having to scroll up and down through the page
-to find these tabs, based on user feedback, we are experimenting with a new positioning
+to find these tabs, based on user feedback, we're experimenting with a new positioning
 of these tabs. They are now located at the top of the merge request, with a new
 **Overview** tab, containing the description of the merge request followed by the
 widget. Next to **Overview**, you can find **Pipelines**, **Commits**, and **Changes**.
@@ -94,13 +94,15 @@ or link to useful information directly in the merge request page:
 | [Accessibility Testing](accessibility_testing.md)                                                      | Automatically report A11y violations for changed pages in merge requests                                                                                                                                  |
 | [Browser Performance Testing](browser_performance_testing.md) **(PREMIUM)**                            | Quickly determine the performance impact of pending code changes.                                                                                                                                         |
 | [Code Quality](code_quality.md) **(STARTER)**                                                          | Analyze your source code quality using the [Code Climate](https://codeclimate.com/) analyzer and show the Code Climate report right in the merge request widget area.                                     |
-| [Display arbitrary job artifacts](../../../ci/yaml/README.md#artifactsexpose_as)                       | Configure CI pipelines with the `artifacts:expose_as` parameter to directly link to selected [artifacts](../pipelines/job_artifacts.md) in merge requests.                                                |
+| [Display arbitrary job artifacts](../../../ci/yaml/README.md#artifactsexpose_as)                       | Configure CI pipelines with the `artifacts:expose_as` parameter to directly link to selected [artifacts](../../../ci/pipelines/job_artifacts.md) in merge requests.                                                |
 | [GitLab CI/CD](../../../ci/README.md)                                                                  | Build, test, and deploy your code in a per-branch basis with built-in CI/CD.                                                                                                                              |
 | [JUnit test reports](../../../ci/junit_test_reports.md)                                                | Configure your CI jobs to use JUnit test reports, and let GitLab display a report on the merge request so that it’s easier and faster to identify the failure without having to check the entire job log. |
+| [License Compliance](../../compliance/license_compliance/index.md) **(ULTIMATE)**                      | Manage the licenses of your dependencies. |
 | [Metrics Reports](../../../ci/metrics_reports.md) **(PREMIUM)**                                        | Display the Metrics Report on the merge request so that it's fast and easy to identify changes to important metrics.                                                                                      |
 | [Multi-Project pipelines](../../../ci/multi_project_pipelines.md) **(PREMIUM)**                        | When you set up GitLab CI/CD across multiple projects, you can visualize the entire pipeline, including all cross-project interdependencies.                                                              |
 | [Pipelines for merge requests](../../../ci/merge_request_pipelines/index.md)                           | Customize a specific pipeline structure for merge requests in order to speed the cycle up by running only important jobs.                                                                                 |
-| [Pipeline Graphs](../../../ci/pipelines.md#visualizing-pipelines)                                      | View the status of pipelines within the merge request, including the deployment process.                                                                                                                  |
+| [Pipeline Graphs](../../../ci/pipelines/index.md#visualizing-pipelines)                                      | View the status of pipelines within the merge request, including the deployment process.                                                                                                                  |
+| [Test Coverage visualization](test_coverage_visualization.md)                                          | See test coverage results for merge requests, within the file diff.                                                                                                                                       |
 
 ### Security Reports **(ULTIMATE)**
 
@@ -112,7 +114,6 @@ generated by scanning and reporting any vulnerabilities found in your project:
 | [Container Scanning](../../application_security/container_scanning/index.md)            | Analyze your Docker images for known vulnerabilities.            |
 | [Dynamic Application Security Testing (DAST)](../../application_security/dast/index.md) | Analyze your running web applications for known vulnerabilities. |
 | [Dependency Scanning](../../application_security/dependency_scanning/index.md)          | Analyze your dependencies for known vulnerabilities.             |
-| [License Compliance](../../application_security/license_compliance/index.md)            | Manage the licenses of your dependencies.                        |
 | [Static Application Security Testing (SAST)](../../application_security/sast/index.md)  | Analyze your source code for known vulnerabilities.              |
 
 ## Authorization for merge requests

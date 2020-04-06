@@ -14,7 +14,7 @@ and upgrade your GitLab instance.
 
 Admin privileges for [GitLab.com](https://gitlab.com/) are restricted to the GitLab team.
 
-For more information on configuring GitLab self-managed instances, see [Administrator documentation](../administration/index.md).
+For more information on configuring GitLab self-managed instances, see the [Administrator documentation](../administration/index.md).
 
 ## Overview
 
@@ -66,7 +66,7 @@ With GitLab Enterprise Edition, you can also:
 - Leverage continuous delivery method with [Canary Deployments](project/canary_deployments.md).
 - Scan your code for vulnerabilities and [display them in merge requests](application_security/sast/index.md).
 
-You can also [integrate](project/integrations/project_services.md) GitLab with numerous third-party applications, such as Mattermost, Microsoft Teams, HipChat, Trello, Slack, Bamboo CI, Jira, and a lot more.
+You can also [integrate](project/integrations/overview.md) GitLab with numerous third-party applications, such as Mattermost, Microsoft Teams, HipChat, Trello, Slack, Bamboo CI, Jira, and a lot more.
 
 ## Projects
 

@@ -38,9 +38,6 @@ describe('Grouped security reports app', () => {
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
-    canCreateIssue: true,
-    canCreateMergeRequest: true,
-    canDismissVulnerability: true,
   };
 
   const createWrapper = (propsData, provide = {}) => {
@@ -235,9 +232,6 @@ describe('Grouped security reports app', () => {
     beforeEach(() => {
       createWrapper({
         headBlobPath: 'path',
-        canCreateIssue: false,
-        canCreateMergeRequest: false,
-        canDismissVulnerability: false,
         pipelinePath,
       });
     });
@@ -395,7 +389,7 @@ describe('Grouped security reports app', () => {
 
       it('should display out of date message', () => {
         expect(wrapper.vm.$el.textContent).toContain(
-          'Security report is out of date. Retry the pipeline for the target branch',
+          'Security report is out of date. Run a new pipeline for the target branch (master)',
         );
       });
     });
@@ -407,7 +401,7 @@ describe('Grouped security reports app', () => {
 
       it('should display out of date message', () => {
         expect(wrapper.vm.$el.textContent).toContain(
-          'Security report is out of date. Please incorporate latest changes from master',
+          'Security report is out of date. Please update your branch with the latest changes from the target branch (master)',
         );
       });
     });

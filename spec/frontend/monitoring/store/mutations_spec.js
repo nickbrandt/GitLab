@@ -5,7 +5,13 @@ import * as types from '~/monitoring/stores/mutation_types';
 import state from '~/monitoring/stores/state';
 import { metricStates } from '~/monitoring/constants';
 
-import { metricsDashboardPayload, deploymentData, dashboardGitResponse } from '../mock_data';
+import { deploymentData, dashboardGitResponse } from '../mock_data';
+import { getJSONFixture } from '../../helpers/fixtures';
+
+const metricsDashboardFixture = getJSONFixture(
+  'metrics_dashboard/environment_metrics_dashboard.json',
+);
+const metricsDashboardPayload = metricsDashboardFixture.dashboard;
 
 describe('Monitoring mutations', () => {
   let stateCopy;
@@ -28,30 +34,30 @@ describe('Monitoring mutations', () => {
 
       expect(groups[0].key).toBe('system-metrics-kubernetes-0');
       expect(groups[1].key).toBe('response-metrics-nginx-ingress-vts-1');
+      expect(groups[2].key).toBe('response-metrics-nginx-ingress-2');
     });
     it('normalizes values', () => {
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
-      const expectedLabel = 'Pod average';
+      const expectedLabel = 'Pod average (MB)';
 
       const { label, queryRange } = getGroups()[0].panels[2].metrics[0];
       expect(label).toEqual(expectedLabel);
       expect(queryRange.length).toBeGreaterThan(0);
     });
-    it('contains two groups, with panels with a metric each', () => {
+    it('contains six groups, with panels with a metric each', () => {
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
 
       const groups = getGroups();
 
       expect(groups).toBeDefined();
-      expect(groups).toHaveLength(2);
+      expect(groups).toHaveLength(6);
 
-      expect(groups[0].panels).toHaveLength(4);
+      expect(groups[0].panels).toHaveLength(7);
       expect(groups[0].panels[0].metrics).toHaveLength(1);
       expect(groups[0].panels[1].metrics).toHaveLength(1);
       expect(groups[0].panels[2].metrics).toHaveLength(1);
-      expect(groups[0].panels[3].metrics).toHaveLength(5);
 
-      expect(groups[1].panels).toHaveLength(1);
+      expect(groups[1].panels).toHaveLength(3);
       expect(groups[1].panels[0].metrics).toHaveLength(1);
     });
     it('assigns metrics a metric id', () => {
@@ -60,10 +66,13 @@ describe('Monitoring mutations', () => {
       const groups = getGroups();
 
       expect(groups[0].panels[0].metrics[0].metricId).toEqual(
-        '12_system_metrics_kubernetes_container_memory_total',
+        'NO_DB_system_metrics_kubernetes_container_memory_total',
       );
       expect(groups[1].panels[0].metrics[0].metricId).toEqual(
-        '1_response_metrics_nginx_ingress_throughput_status_code',
+        'NO_DB_response_metrics_nginx_ingress_throughput_status_code',
+      );
+      expect(groups[2].panels[0].metrics[0].metricId).toEqual(
+        'NO_DB_response_metrics_nginx_ingress_16_throughput_status_code',
       );
     });
   });
@@ -77,6 +86,58 @@ describe('Monitoring mutations', () => {
       expect(typeof stateCopy.deploymentData[0]).toEqual('object');
     });
   });
+
+  describe('SET_INITIAL_STATE', () => {
+    it('should set all the endpoints', () => {
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        metricsEndpoint: 'additional_metrics.json',
+        deploymentsEndpoint: 'deployments.json',
+        dashboardEndpoint: 'dashboard.json',
+        projectPath: '/gitlab-org/gitlab-foss',
+        currentEnvironmentName: 'production',
+      });
+      expect(stateCopy.metricsEndpoint).toEqual('additional_metrics.json');
+      expect(stateCopy.deploymentsEndpoint).toEqual('deployments.json');
+      expect(stateCopy.dashboardEndpoint).toEqual('dashboard.json');
+      expect(stateCopy.projectPath).toEqual('/gitlab-org/gitlab-foss');
+      expect(stateCopy.currentEnvironmentName).toEqual('production');
+    });
+
+    it('should not remove previously set properties', () => {
+      const defaultLogsPath = stateCopy.logsPath;
+
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        logsPath: defaultLogsPath,
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        dashboardEndpoint: 'dashboard.json',
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        projectPath: '/gitlab-org/gitlab-foss',
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        currentEnvironmentName: 'canary',
+      });
+
+      expect(stateCopy).toMatchObject({
+        logsPath: defaultLogsPath,
+        dashboardEndpoint: 'dashboard.json',
+        projectPath: '/gitlab-org/gitlab-foss',
+        currentEnvironmentName: 'canary',
+      });
+    });
+
+    it('should not update unknown properties', () => {
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        dashboardEndpoint: 'dashboard.json',
+        someOtherProperty: 'some invalid value', // someOtherProperty is not allowed
+      });
+
+      expect(stateCopy.dashboardEndpoint).toBe('dashboard.json');
+      expect(stateCopy.someOtherProperty).toBeUndefined();
+    });
+  });
+
   describe('SET_ENDPOINTS', () => {
     it('should set all the endpoints', () => {
       mutations[types.SET_ENDPOINTS](stateCopy, {
@@ -123,14 +184,14 @@ describe('Monitoring mutations', () => {
   });
 
   describe('Individual panel/metric results', () => {
-    const metricId = '12_system_metrics_kubernetes_container_memory_total';
+    const metricId = 'NO_DB_response_metrics_nginx_ingress_throughput_status_code';
     const result = [
       {
         values: [[0, 1], [1, 1], [1, 3]],
       },
     ];
     const dashboard = metricsDashboardPayload;
-    const getMetric = () => stateCopy.dashboard.panelGroups[0].panels[0].metrics[0];
+    const getMetric = () => stateCopy.dashboard.panelGroups[1].panels[0].metrics[0];
 
     describe('REQUEST_METRIC_RESULT', () => {
       beforeEach(() => {

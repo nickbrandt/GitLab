@@ -14,7 +14,7 @@ GitLab supports several ways deploy Serverless applications in both Kubernetes E
 Currently we support:
 
 - [Knative](#knative): Build Knative applications with Knative and `gitlabktl` on GKE and EKS.
-- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI.
+- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI/CD.
 
 ## Knative
 
@@ -245,7 +245,7 @@ project):
 
    ```yaml
    include:
-     template: Serverless.gitlab-ci.yml
+     - template: Serverless.gitlab-ci.yml
 
    functions:build:
      extends: .serverless:build:functions
@@ -311,7 +311,7 @@ Explanation of the fields used above:
 | Parameter | Description |
 |-----------|-------------|
 | `name` | Indicates which provider is used to execute the `serverless.yml` file. In this case, the TriggerMesh middleware. |
-| `envs` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are he variable contents. You may replace this with you own variables. |
+| `envs` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are the variable contents. You may replace this with your own variables. |
 | `secrets` | Includes the contents of the Kubernetes secret as environment variables accessible to be passed as part of function execution for **all** functions in the file. The secrets are expected in ini format. |
 
 ### `functions`
@@ -384,7 +384,8 @@ The sample function can now be triggered from any HTTP client using a simple `PO
 
 ### Secrets
 
-To access your Kubernetes secrets from within your function, the secrets should be created under the namespace of your serverless deployment.
+To access your Kubernetes secrets from within your function, the secrets should be created under the namespace of your serverless deployment and specified in your `serverless.yml` file as above.
+You can create secrets in several ways. The following sections show some examples.
 
 #### CLI example
 
@@ -461,7 +462,7 @@ Add the following `.gitlab-ci.yml` to the root of your repository
 
 ```yaml
 include:
-  template: Serverless.gitlab-ci.yml
+  - template: Serverless.gitlab-ci.yml
 
 build:
   extends: .serverless:build:image

@@ -4,7 +4,12 @@ type: index, reference
 
 # GitLab subscription
 
-Access to GitLab features is provided on a subscription basis. A subscription entitles users to the features of a specific GitLab tier. Each tier provides a set of features. A subscription is valid for 12 months.
+GitLab offers tiers of features. Your subscription determines which tier you have access to. Subscriptions are valid for 12 months.
+
+GitLab provides special subscriptions to participants in the [GitLab Education Program](https://about.gitlab.com/solutions/education/) and [GitLab Open Source Program](https://about.gitlab.com/solutions/open-source/). For details on obtaining and renewing these subscriptions, see:
+
+- [GitLab Education Program subscriptions](#gitlab-education-program-subscriptions)
+- [GitLab Open Source Program subscriptions](#gitlab-open-source-program-subscriptions)
 
 ## Choosing a GitLab subscription
 
@@ -59,13 +64,16 @@ source projects, GitLab grants access to **Gold** features for all GitLab.com
 
 #### Self-managed
 
-A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. At the end of the subscription period, the maximum number of simultaneous users in the self-managed installation is checked. If the number of users is higher than your subscription, you are billed for the extra users. The maximum number of simultaneous users is also used to calculate the cost of subscription renewal.
+A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. For instances that aren't offline or on a closed network, the maximum number of simultaneous users in the self-managed installation is checked each quarter, using [Seat Link](#seat-link).
 
 Every occupied seat, whether by person, job, or bot is counted in the subscription, with the following exceptions:
 
-- Blocked users who are blocked prior to the renewal of a subscription won't be counted as active users for the renewal subscription. They may count as active users in the subscription period in which they were originally added.
+- [Deactivated](../user/admin_area/activating_deactivating_users.md#deactivating-a-user) and
+[blocked](../user/admin_area/blocking_unblocking_users.md) users who are restricted prior to the
+renewal of a subscription won't be counted as active users for the renewal subscription. They may
+count as active users in the subscription period in which they were originally added.
 - Members with Guest permissions on an Ultimate subscription.
-- Special internal GitLab accounts: `Ghost User` and `Support Bot`.
+- GitLab-created service accounts: `Ghost User` and `Support Bot`.
 
 NOTE: **Note:**
 If you have LDAP integration enabled, anyone in the configured domain can sign up for a GitLab account. This can result in an unexpected bill at time of renewal. Consider [disabling new signups](../user/admin_area/settings/sign_up_restrictions.md) and managing new users manually instead.
@@ -165,7 +173,7 @@ To see the status of your GitLab.com subscription, log into GitLab.com and go to
   1. Go to **User Avatar > Settings**.
   1. Click **Billing**.
 - For groups:
-  1. From the group page (*not* from a project within the group), go to **Settings > Billing**.
+  1. From the group page (*not* from a project within the group), go to **Administration > Billing**.
 
 The following table describes details of your subscription for groups:
 
@@ -180,12 +188,12 @@ The following table describes details of your subscription for groups:
 
 ## Renew your subscription
 
-To renew your subscription, [prepare for the renewal](#prepare-for-renewal), then do one of the following:
+To renew your subscription, [prepare for renewal by reviewing your account](#prepare-for-renewal-by-reviewing-your-account), then do one of the following:
 
 - [Renew a GitLab.com subscription](#renew-or-change-a-gitlabcom-subscription).
 - [Renew a self-managed subscription](#renew-a-self-managed-subscription).
 
-### Prepare for renewal
+### Prepare for renewal by reviewing your account
 
 The [Customers Portal](https://customers.gitlab.com/customers/sign_in) is your tool for renewing and modifying your subscription. Before going ahead with renewal, log in and verify or update:
 
@@ -232,17 +240,107 @@ The following will be emailed to you:
 - A payment receipt. You can also access this information in the Customers Portal under **Payment History**.
 - A new license. [Upload this license](../user/admin_area/license.md#uploading-your-license) to your instance to use it.
 
+### Seat Link
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/208832) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.9.
+
+Seat Link allows us to provide our self-managed customers with prorated charges for user growth throughout the year using a quarterly reconciliation process.
+
+Seat Link sends to GitLab daily a count of all users in connected self-managed instances. That information is used to automate prorated reconciliations. The data is sent securely through an encrypted HTTPS connection.
+
+Seat Link provides **only** the following information to GitLab:
+
+- Date
+- License key
+- Historical maximum user count
+- Active users count
+
+For offline or closed network customers, the existing [true-up model](#users-over-license) will be used. Prorated charges are not possible without user count data.
+
+<details>
+<summary>Click here to view example content of a Seat Link POST request.</summary>
+
+<pre><code>
+{
+  date: '2020-01-29',
+  license_key: 'ZXlKa1lYUmhJam9pWm5WNmVsTjVZekZ2YTJoV2NucDBh
+RXRxTTA5amQxcG1VMVZqDQpXR3RwZEc5SGIyMVhibmxuZDJ0NWFrNXJTVzVH
+UzFCT1hHNVRiVFIyT0ZaUFlVSm1OV1ZGV0VObE1uVk4NCk4xY3ZkM1F4Y2to
+MFFuVklXSFJvUWpSM01VdE9SVE5rYkVjclZrdDJORkpOTlhka01qaE5aalpj
+YmxSMg0KWVd3MFNFTldTRmRtV1ZGSGRDOUhPR05oUVZvNUsxVnRXRUZIZFU1
+U1VqUm5aVFZGZUdwTWIxbDFZV1EyDQphV1JTY1V4c1ZYSjNPVGhrYVZ4dVlu
+TkpWMHRJZUU5dmF6ZEJRVVkxTlVWdFUwMTNSMGRHWm5SNlJFcFYNClQyVkJl
+VXc0UzA0NWFFb3ZlSFJrZW0xbVRqUlZabkZ4U1hWcWNXRnZYRzVaTm5GSmVW
+UnJVR1JQYTJKdA0KU0ZZclRHTmFPRTVhZEVKMUt6UjRkSE15WkRCT1UyNWlS
+MGRJZDFCdmRFWk5Za2h4Tm5sT1VsSktlVlYyDQpXRmhjYmxSeU4wRnRNMU5q
+THpCVWFGTmpTMnh3UWpOWVkyc3pkbXBST1dnelZHY3hUV3hxVDIwdlZYRlQN
+Ck9EWTJSVWx4WlVOT01EQXhVRlZ3ZGs1Rk0xeHVSVEJTTDFkMWJUQTVhV1ZK
+WjBORFdWUktaRXNyVnpsTw0KTldkWWQwWTNZa05VWlZBMmRUVk9kVUpxT1hV
+Mk5VdDFTUzk0TUU5V05XbFJhWGh0WEc1cVkyWnhaeTlXDQpTMEpyZWt0cmVY
+bzBOVGhFVG1oU1oxSm5WRFprY0Uwck0wZEdhVUpEV1d4a1RXZFRjVU5tYTB0
+a2RteEQNCmNWTlFSbFpuWlZWY2JpdFVVbXhIV0d4MFRuUnRWbkJKTkhwSFJt
+TnRaMGsyV0U1MFFUUXJWMUJVTWtOSA0KTVhKUWVGTkxPVTkzV1VsMlVUUldk
+R3hNTWswNU1USlNjRnh1U1UxTGJTdHRRM1l5YTFWaWJtSlBTMkUxDQplRkpL
+SzJSckszaG1hVXB1ZVRWT1UwdHZXV0ZOVG1WamMyVjRPV0pSUlZkUU9UUnpU
+VWh2Wlc5cFhHNUgNClNtRkdVMDUyY1RGMWNGTnhVbU5JUkZkeGVWcHVRMnBh
+VTBSUGR6VnRNVGhvWTFBM00zVkZlVzFOU0djMA0KY1ZFM1FWSlplSFZ5UzFS
+aGIxTmNia3BSUFQxY2JpSXNJbxRsZVNJNkltZFhiVzFGVkRZNWNFWndiV2Rt
+DQpNWEIyY21SbFFrdFNZamxaYURCdVVHcHhiRlV3Tm1WQ2JGSlFaSFJ3Y0Rs
+cFMybGhSMnRPTkZOMWNVNU0NClVGeHVTa3N6TUUxcldVOTVWREl6WVVWdk5U
+ZGhWM1ZvVjJkSFRtZFBZVXRJTkVGcE55dE1NRE5dWnpWeQ0KWlV0aWJsVk9T
+RmRzVVROUGRHVXdWR3hEWEc1MWjWaEtRMGQ2YTAxWFpUZHJURTVET0doV00w
+ODRWM0V2DQphV2M1YWs5cWFFWk9aR3BYTm1aVmJXNUNaazlXVUVRMWRrMXpj
+bTFDV0V4dldtRmNibFpTTWpWU05VeFMNClEwTjRNMWxWCUtSVGEzTTJaV2xE
+V0hKTFRGQmpURXRsZFVaQlNtRnJTbkpPZGtKdlUyUmlNVWxNWWpKaQ0KT0dw
+c05YbE1kVnh1YzFWbk5VZDFhbU56ZUM5Tk16TXZUakZOVW05cVpsVTNObEo0
+TjJ4eVlVUkdkWEJtDQpkSHByYWpreVJrcG9UVlo0Y0hKSU9URndiV2RzVFdO
+VlhHNXRhVmszTkV0SVEzcEpNMWRyZEVoRU4ydHINCmRIRnFRVTlCVUVVM1pV
+SlRORE4xUjFaYVJGb3JlWGM5UFZ4dUlpd2lhWFlpt2lKV00yRnNVbk5RTjJk
+Sg0KU1hNMGExaE9SVGR2V2pKQlBUMWNiaUo5DQo=',
+  max_historical_user_count: 10,
+  active_users: 6
+}
+</code></pre>
+
+</details>
+
+#### Disable Seat Link
+
+Seat Link is enabled by default. To disable this feature, go to
+**{admin}** **Admin Area > Settings > Metrics and profiling** and
+clear the Seat Link checkbox.
+
+To disable Seat Link in an Omnibus GitLab installation, and prevent it from
+being configured in the future through the administration panel, set the following in
+[`gitlab.rb`](https://docs.gitlab.com/omnibus/settings/configuration.html#configuration-options):
+
+```ruby
+gitlab_rails['seat_link_enabled'] = false
+```
+
+To disable Seat Link in a GitLab source installation, and prevent it from
+being configured in the future through the administration panel,
+set the following in `gitlab.yml`:
+
+```yaml
+production: &base
+  # ...
+  gitlab:
+    # ...
+    seat_link_enabled: false
+```
+
 ### Renew or change a GitLab.com subscription
 
 To renew for more users than are currently active in your GitLab.com system, contact our sales team via `renewals@gitlab.com` for assistance as this can't be done in the Customers Portal.
 
-To change the [GitLab tier](https://about.gitlab.com/pricing/), select **Upgrade** under your subscription on the [My Account](https://customers.gitlab.com/subscriptions) page.
+For details on upgrading your subscription tier, see [Upgrade your GitLab.com subscription tier](#upgrade-your-gitlabcom-subscription-tier).
 
 #### Automatic renewal
 
 To view or change automatic subscription renewal (at the same tier as the previous period), log in to the [Customers Portal](https://customers.gitlab.com/customers/sign_in), and:
 
-- If you see a **Resume subscription** button, your subscription was cancelled previously. Click it to resume automatic renewal.
+- If you see a **Resume subscription** button, your subscription was canceled previously. Click it to resume automatic renewal.
 - If you see **Cancel subscription**, your subscription is set to automatically renew at the end of the subscription period. Click it to cancel automatic renewal.
 
 With automatic renewal enabled, the subscription will automatically renew on the expiration date and there will be no gap in available service.
@@ -273,6 +371,41 @@ We recommend following these steps during renewal:
 
 An invoice will be generated for the renewal and available for viewing or download in the [Payment History](https://customers.gitlab.com/receipts) page. If you have difficulty during the renewal process, contact our [support team](https://support.gitlab.com/hc/en-us/requests/new?ticket_form_id=360000071293) for assistance.
 
+## Upgrade your subscription tier
+
+The process for upgrading differs depending on whether you're a GitLab.com or self-managed customer.
+
+### Upgrade your GitLab.com subscription tier
+
+To upgrade your [GitLab tier](https://about.gitlab.com/pricing/):
+
+1. Log in to the [Customers Portal](https://customers.gitlab.com/customers/sign_in).
+1. Select **Upgrade** under your subscription on the [My Account](https://customers.gitlab.com/subscriptions) page.
+1. Select the desired upgrade.
+1. Confirm the active form of payment, or add a new form of payment.
+1. Check the **I accept the Privacy Policy and Terms of Service** checkbox.
+1. Select **Confirm purchase**.
+
+When the purchase has been processed, you receive confirmation of your new subscription tier.
+
+### Upgrade your self-managed subscription tier
+
+To upgrade your [GitLab tier](https://about.gitlab.com/pricing/), contact our sales team as this
+can't be done in the Customers Portal. You can either send an email to `renewals@gitlab.com`, or
+complete the [**Contact Sales**](https://about.gitlab.com/sales/) form. Include in your message
+details of which subscription you want to upgrade, and the desired tier.
+
+After messaging the sales team, the workflow is as follows:
+
+1. Receive a reply from the sales team, asking for confirmation of the upgrade.
+1. Reply to the sales team, confirming details of the upgrade.
+1. Receive a quote from the sales team.
+1. Sign and return the quote.
+1. Receive the new license.
+1. Upload the new license. For details, see [Uploading your license](../user/admin_area/license.md#uploading-your-license).
+
+The new subscription tier is active when the license file is uploaded.
+
 ## Subscription expiry
 
 When your subscription or trial expires, GitLab does not delete your data, but it may become inaccessible, depending on the tier at expiry. Some features may not behave as expected if you're not prepared for the expiry. For example, [environment specific variables not being passed](https://gitlab.com/gitlab-org/gitlab/issues/24759).
@@ -290,11 +423,11 @@ features, and the instance will be read / write again.
 
 ## CI pipeline minutes
 
-CI pipeline minutes are the execution time for your [pipelines](../ci/pipelines.md) on GitLab's shared runners. Each [GitLab.com tier](https://about.gitlab.com/pricing/) includes a monthly quota of CI pipeline minutes.
+CI pipeline minutes are the execution time for your [pipelines](../ci/pipelines/index.md) on GitLab's shared runners. Each [GitLab.com tier](https://about.gitlab.com/pricing/) includes a monthly quota of CI pipeline minutes.
 
 Quotas apply to:
 
-- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Settings > Usage Quotas**.
+- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Administration > Usage Quotas**.
 - Your personal account, where the minutes are available for your personal projects. To view and buy personal minutes, click your avatar, then **{settings}** **Settings > Pipeline quota**.
 
 Only pipeline minutes for GitLab shared runners are restricted. If you have a specific runner set up for your projects, there is no limit to your build time on GitLab.com.
@@ -315,17 +448,17 @@ main quota. Additional minutes:
 
 To purchase additional minutes for your group on GitLab.com:
 
-1. From your group, go to **{settings}** **Settings > Usage Quotas**.
+1. From your group, go to **{settings}** **Administration > Usage Quotas**.
 1. Locate the subscription card that's linked to your group on GitLab.com, click **Buy more CI minutes**, and complete the details about the transaction.
 1. Once we have processed your payment, the extra CI minutes will be synced to your group.
-1. To confirm the available CI minutes, go to your group, then **{settings}** **Settings > Usage Quotas**.
+1. To confirm the available CI minutes, go to your group, then **{settings}** **Administration > Usage Quotas**.
    The **Additional minutes** displayed now includes the purchased additional CI minutes, plus any minutes rolled over from last month.
 
 To purchase additional minutes for your personal namespace:
 
 1. Click your avatar, then go to **Settings > Pipeline quota**.
 1. Locate the subscription card that's linked to your personal namespace on GitLab.com, click **Buy more CI minutes**, and complete the details about the transaction. Once we have processed your payment, the extra CI minutes will be synced to your Group.
-1. To confirm the available CI minutes for your personal projects, click your avatar, then go to **Settings > Pipeline quota**.  
+1. To confirm the available CI minutes for your personal projects, click your avatar, then go to **Settings > Pipeline quota**.
    The **Additional minutes** displayed now includes the purchased additional CI minutes, plus any minutes rolled over from last month.
 
 Be aware that:
@@ -334,7 +467,7 @@ Be aware that:
   we will calculate a pro-rated charge for your paid plan. That means you may
   be charged for less than one year since your subscription was previously
   created with the extra CI minutes.
-- Once the extra CI minutes has been assigned to a Group they can't be transferred
+- Once the extra CI minutes have been assigned to a Group, they can't be transferred
   to a different Group.
 - If you have used more minutes than your default quota, these minutes will
   be deducted from your Additional Minutes quota immediately after your purchase of additional
@@ -352,6 +485,20 @@ Learn more about:
 
 - The tiers of [GitLab Support](https://about.gitlab.com/support/).
 - [Submit a request via the Support Portal](https://support.gitlab.com/hc/en-us/requests/new).
+
+## GitLab Education Program subscriptions
+
+To renew a [GitLab Education Program](https://about.gitlab.com/solutions/education/) subscription, send an email to `education@gitlab.com` with the following information:
+
+1. The number of seats for the renewal. You can add seats if needed.
+1. The use case for the license. Specifically, we need verification that the use meets the conditions of the [End User License Agreement](https://about.gitlab.com/terms/#edu-oss). Note that university infrastructure operations and information technology operations don't fall within the stated terms of the Education Program. For details, see the [Education FAQ](https://about.gitlab.com/solutions/education/#FAQ).
+1. The full name, email address, and phone number of the primary contact who will be signing the renewal quote. Only signatures by faculty or staff with proper signing authority on the behalf of the university will be accepted.
+
+After we receive the above information, we will process the request and return a renewal quote for signature. Please allow a minimum of 2 business days for return. Email us at `education@gitlab.com` with any questions.
+
+## GitLab Open Source Program subscriptions
+
+All requests for our GitLab Open Source program, including subscription renewals, must be made by using the [Open Source Program](https://about.gitlab.com/solutions/open-source/program/) application process. If you have any questions, send an email to `opensource@gitlab.com` for assistance.
 
 <!-- ## Troubleshooting
 

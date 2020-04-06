@@ -19,6 +19,7 @@
         },
         "additionalProperties": false
       },
+      "commands_changes": { "type": "object", "additionalProperties": true },
       "created_at": { "type": "date" },
       "updated_at": { "type": "date" },
       "system": { "type": "boolean" },
@@ -27,7 +28,8 @@
       "noteable_type": { "type": "string" },
       "resolved": { "type": "boolean" },
       "resolvable": { "type": "boolean" },
-      "resolved_by": { "type": ["string", "null"] }
+      "resolved_by": { "type": ["string", "null"] },
+      "confidential": { "type": ["boolean", "null"] }
     },
     "required": [
       "id", "body", "attachment", "author", "created_at", "updated_at",

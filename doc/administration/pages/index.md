@@ -4,14 +4,14 @@ description: 'Learn how to administer GitLab Pages.'
 
 # GitLab Pages administration
 
-> - [Introduced][ee-80] in GitLab EE 8.3.
-> - Custom CNAMEs with TLS support were [introduced][ee-173] in GitLab EE 8.5.
-> - GitLab Pages [was ported][ce-14605] to Community Edition in GitLab 8.17.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/80) in GitLab EE 8.3.
+> - Custom CNAMEs with TLS support were [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173) in GitLab EE 8.5.
+> - GitLab Pages [was ported](https://gitlab.com/gitlab-org/gitlab-foss/issues/14605) to Community Edition in GitLab 8.17.
 > - Support for subgroup project's websites was
 >   [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/30548) in GitLab 11.8.
 
 GitLab Pages allows for hosting of static sites. It must be configured by an
-administrator. Separate [user documentation][pages-userguide] is available.
+administrator. Separate [user documentation](../../user/project/pages/index.md) is available.
 
 NOTE: **Note:**
 This guide is for Omnibus GitLab installations. If you have installed
@@ -20,11 +20,11 @@ GitLab from source, see
 
 ## Overview
 
-GitLab Pages makes use of the [GitLab Pages daemon], a simple HTTP server
+GitLab Pages makes use of the [GitLab Pages daemon](https://gitlab.com/gitlab-org/gitlab-pages), a simple HTTP server
 written in Go that can listen on an external IP address and provide support for
 custom domains and custom certificates. It supports dynamic certificates through
 SNI and exposes pages using HTTP2 by default.
-You are encouraged to read its [README][pages-readme] to fully understand how
+You are encouraged to read its [README](https://gitlab.com/gitlab-org/gitlab-pages/blob/master/README.md) to fully understand how
 it works.
 
 In the case of [custom domains](#custom-domains) (but not
@@ -38,7 +38,7 @@ which you can set it up:
    the Pages daemon is installed, so you will have to share it via network.
 - Run the Pages daemon in the same server as GitLab, listening on the same IP
    but on different ports. In that case, you will have to proxy the traffic with
-   a loadbalancer. If you choose that route note that you should use TCP load
+   a load balancer. If you choose that route note that you should use TCP load
    balancing for HTTPS. If you use TLS-termination (HTTPS-load balancing) the
    pages will not be able to be served with user provided certificates. For
    HTTP it's OK to use HTTP or TCP load balancing.
@@ -124,9 +124,9 @@ The Pages daemon doesn't listen to the outside world.
    pages_external_url 'http://example.io'
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
-Watch the [video tutorial][video-admin] for this configuration.
+Watch the [video tutorial](https://youtu.be/dD8c7WNcc6s) for this configuration.
 
 ### Wildcard domains with TLS support
 
@@ -156,7 +156,7 @@ outside world.
    where `pages-nginx.crt` and `pages-nginx.key` are the SSL cert and key,
    respectively.
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ### Additional configuration for Docker container
 
@@ -171,7 +171,7 @@ behavior:
    gitlab_pages['inplace_chroot'] = true
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 NOTE: **Note:**
 `inplace_chroot` option might not work with the other features, such as [Pages Access Control](#access-control).
@@ -213,7 +213,7 @@ world. Custom domains are supported, but no TLS.
    `192.0.2.2` and `2001::2` are the secondary IPs the GitLab Pages daemon
    listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ### Custom domains with TLS support
 
@@ -247,7 +247,7 @@ world. Custom domains and TLS are supported.
    `192.0.2.2` and `2001::2` are the secondary IPs where the GitLab Pages daemon
    listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ### Custom domain verification
 
@@ -256,7 +256,7 @@ GitLab supports [custom domain verification](../../user/project/pages/custom_dom
 When adding a custom domain, users will be required to prove they own it by
 adding a GitLab-controlled verification code to the DNS records for that domain.
 
-If your userbase is private or otherwise trusted, you can disable the
+If your user base is private or otherwise trusted, you can disable the
 verification requirement. Navigate to **Admin Area > Settings > Preferences** and
 uncheck **Require users to prove ownership of custom domains** in the **Pages** section.
 This setting is enabled by default.
@@ -304,7 +304,7 @@ Pages access control is disabled by default. To enable it:
    gitlab_pages['access_control'] = true
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Users can now configure it in their [projects' settings](../../user/project/pages/pages_access_control.md).
 
 #### Disabling public access to all Pages websites
@@ -340,12 +340,12 @@ pages:
    gitlab_pages['http_proxy'] = 'http://example:8080'
    ```
 
-1. [Reconfigure GitLab][reconfigure] for the changes to take effect.
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ### Using a custom Certificate Authority (CA)
 
 When using certificates issued by a custom CA, [Access Control](../../user/project/pages/pages_access_control.md#gitlab-pages-access-control) and
-the [online view of HTML job artifacts](../../user/project/pipelines/job_artifacts.md#browsing-artifacts)
+the [online view of HTML job artifacts](../../ci/pipelines/job_artifacts.md#browsing-artifacts)
 will fail to work if the custom CA is not recognized.
 
 This usually results in this error:
@@ -358,18 +358,18 @@ For Omnibus, normally this would be fixed by [installing a custom CA in GitLab O
 but a [bug](https://gitlab.com/gitlab-org/gitlab/issues/25411) is currently preventing
 that method from working. Use the following workaround:
 
-1. Append your GitLab server TLS/SSL certficate to `/opt/gitlab/embedded/ssl/certs/cacert.pem` where `gitlab-domain-example.com` is your GitLab application URL
+1. Append your GitLab server TLS/SSL certificate to `/opt/gitlab/embedded/ssl/certs/cacert.pem` where `gitlab-domain-example.com` is your GitLab application URL
 
-    ```shell
-    printf "\ngitlab-domain-example.com\n===========================\n" | sudo tee --append /opt/gitlab/embedded/ssl/certs/cacert.pem
-    echo -n | openssl s_client -connect gitlab-domain-example.com:443  | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee --append /opt/gitlab/embedded/ssl/certs/cacert.pem
-    ```
+   ```shell
+   printf "\ngitlab-domain-example.com\n===========================\n" | sudo tee --append /opt/gitlab/embedded/ssl/certs/cacert.pem
+   echo -n | openssl s_client -connect gitlab-domain-example.com:443  | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee --append /opt/gitlab/embedded/ssl/certs/cacert.pem
+   ```
 
 1. [Restart](../restart_gitlab.md) the GitLab Pages Daemon. For GitLab Omnibus instances:
 
-    ```shell
-    sudo gitlab-ctl restart gitlab-pages
-    ```
+   ```shell
+   sudo gitlab-ctl restart gitlab-pages
+   ```
 
 CAUTION: **Caution:**
 Some GitLab Omnibus upgrades will revert this workaround and you'll need to apply it again.
@@ -389,7 +389,7 @@ Follow the steps below to configure verbose logging of GitLab Pages daemon.
    gitlab_pages['log_verbose'] = true
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ## Change storage path
 
@@ -404,7 +404,7 @@ are stored.
    gitlab_rails['pages_path'] = "/mnt/storage/pages"
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ## Configure listener for reverse proxy requests
 
@@ -427,7 +427,7 @@ Omnibus GitLab 11.1.
    gitlab_pages['listen_proxy'] = "localhost:10080"
    ```
 
-1. [Reconfigure GitLab][reconfigure].
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ## Set maximum pages size
 
@@ -559,22 +559,54 @@ then you must use the following procedure to configure [access control](#access-
 
 ## Backup
 
-GitLab Pages are part of the [regular backup][backup], so there is no separate backup to configure.
+GitLab Pages are part of the [regular backup](../../raketasks/backup_restore.md), so there is no separate backup to configure.
 
 ## Security
 
 You should strongly consider running GitLab Pages under a different hostname
 than GitLab to prevent XSS attacks.
 
-[backup]: ../../raketasks/backup_restore.md
-[ce-14605]: https://gitlab.com/gitlab-org/gitlab-foss/issues/14605
-[ee-80]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/80
-[ee-173]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173
-[gitlab pages daemon]: https://gitlab.com/gitlab-org/gitlab-pages
-[NGINX configs]: https://gitlab.com/gitlab-org/gitlab/tree/8-5-stable-ee/lib/support/nginx
-[pages-readme]: https://gitlab.com/gitlab-org/gitlab-pages/blob/master/README.md
-[pages-userguide]: ../../user/project/pages/index.md
-[reconfigure]: ../restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart]: ../restart_gitlab.md#installations-from-source
-[gitlab-pages]: https://gitlab.com/gitlab-org/gitlab-pages/tree/v0.2.4
-[video-admin]: https://youtu.be/dD8c7WNcc6s
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->
+
+## Troubleshooting
+
+### `open /etc/ssl/ca-bundle.pem: permission denied`
+
+GitLab Pages runs inside a chroot jail, usually in a uniquely numbered directory like
+`/tmp/gitlab-pages-*`.
+
+Within the jail, a bundle of trusted certificates is
+provided at `/etc/ssl/ca-bundle.pem`. It's
+[copied there](https://gitlab.com/gitlab-org/gitlab-pages/-/merge_requests/51)
+from `/opt/gitlab/embedded/ssl/certs/cacert.pem`
+as part of starting up Pages.
+
+If the permissions on the source file are incorrect (they should be `0644`) then
+the file inside the chroot jail will also be wrong.
+
+Pages will log errors in `/var/log/gitlab/gitlab-pages/current` like:
+
+```plaintext
+x509: failed to load system roots and no roots provided
+open /etc/ssl/ca-bundle.pem: permission denied
+```
+
+The use of a chroot jail makes this error misleading, as it is not
+referring to `/etc/ssl` on the root filesystem.
+
+The fix is to correct the source file permissions and restart Pages:
+
+```shell
+sudo chmod 644 /opt/gitlab/embedded/ssl/certs/cacert.pem
+sudo gitlab-ctl restart gitlab-pages
+```

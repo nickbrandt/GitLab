@@ -41,6 +41,10 @@ export default () => ({
    */
   sorting: {
     sort: 'desc',
-    orderBy: 'version',
+    orderBy: 'created_at',
   },
+  /**
+   * The search query that is used to filter packages by name
+   */
+  filterQuery: '',
 });

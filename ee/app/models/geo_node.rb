@@ -102,7 +102,7 @@ class GeoNode < ApplicationRecord
 
     # Tries to find a GeoNode by oauth_application_id, returning nil if none could be found.
     def find_by_oauth_application_id(oauth_application_id)
-      where(oauth_application_id: oauth_application_id).take
+      find_by(oauth_application_id: oauth_application_id)
     end
 
     private

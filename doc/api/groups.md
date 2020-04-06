@@ -49,7 +49,8 @@ GET /groups
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
     "file_template_project_id": 1,
-    "parent_id": null
+    "parent_id": null,
+    "created_at": "2020-01-15T12:36:29.590Z"
   }
 ]
 ```
@@ -85,6 +86,7 @@ GET /groups?statistics=true
     "full_path": "foo-bar",
     "file_template_project_id": 1,
     "parent_id": null,
+    "created_at": "2020-01-15T12:36:29.590Z",
     "statistics": {
       "storage_size" : 212,
       "repository_size" : 33,
@@ -157,7 +159,8 @@ GET /groups/:id/subgroups
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
     "file_template_project_id": 1,
-    "parent_id": 123
+    "parent_id": 123,
+    "created_at": "2020-01-15T12:36:29.590Z"
   }
 ]
 ```
@@ -282,6 +285,7 @@ Example response:
   "runners_token": "ba324ca7b1c77fc20bb9",
   "file_template_project_id": 1,
   "parent_id": null,
+  "created_at": "2020-01-15T12:36:29.590Z",
   "projects": [
     {
       "id": 7,
@@ -484,6 +488,7 @@ Parameters:
 | `name`                               | string  | yes      | The name of the group. |
 | `path`                               | string  | yes      | The path of the group. |
 | `description`                        | string  | no       | The group's description. |
+| `membership_lock`                    | boolean | no       | **(STARTER)** Prevent adding new members to project membership within this group. |
 | `visibility`                         | string  | no       | The group's visibility. Can be `private`, `internal`, or `public`. |
 | `share_with_group_lock`              | boolean | no       | Prevent sharing a project with another group within this group. |
 | `require_two_factor_authentication`  | boolean | no       | Require all users in this group to setup Two-factor authentication. |
@@ -547,7 +552,6 @@ PUT /groups/:id
 | `membership_lock`                    | boolean | no       | **(STARTER)** Prevent adding new members to project membership within this group. |
 | `share_with_group_lock`              | boolean | no       | Prevent sharing a project with another group within this group. |
 | `visibility`                         | string  | no       | The visibility level of the group. Can be `private`, `internal`, or `public`. |
-| `share_with_group_lock`              | boolean | no       | Prevent sharing a project with another group within this group. |
 | `require_two_factor_authentication`  | boolean | no       | Require all users in this group to setup Two-factor authentication. |
 | `two_factor_grace_period`            | integer | no       | Time before Two-factor authentication is enforced (in hours). |
 | `project_creation_level`             | string  | no       | Determine if developers can create projects in the group. Can be `noone` (No one), `maintainer` (Maintainers), or `developer` (Developers + Maintainers). |
@@ -590,6 +594,7 @@ Example response:
   "full_path": "foo-bar",
   "file_template_project_id": 1,
   "parent_id": null,
+  "created_at": "2020-01-15T12:36:29.590Z",
   "projects": [
     {
       "id": 9,
@@ -743,6 +748,7 @@ GET /groups/:id/hooks/:hook_id
   "merge_requests_events": true,
   "tag_push_events": true,
   "note_events": true,
+  "confidential_note_events": true,
   "job_events": true,
   "pipeline_events": true,
   "wiki_page_events": true,
@@ -769,6 +775,7 @@ POST /groups/:id/hooks
 | `merge_requests_events`      | boolean        | no       | Trigger hook on merge requests events |
 | `tag_push_events`            | boolean        | no       | Trigger hook on tag push events |
 | `note_events`                | boolean        | no       | Trigger hook on note events |
+| `confidential_note_events`   | boolean        | no       | Trigger hook on confidential note events |
 | `job_events`                 | boolean        | no       | Trigger hook on job events |
 | `pipeline_events`            | boolean        | no       | Trigger hook on pipeline events |
 | `wiki_page_events`           | boolean        | no       | Trigger hook on wiki events |
@@ -794,6 +801,7 @@ PUT /groups/:id/hooks/:hook_id
 | `merge_requests_events`      | boolean        | no       | Trigger hook on merge requests events |
 | `tag_push_events`            | boolean        | no       | Trigger hook on tag push events |
 | `note_events`                | boolean        | no       | Trigger hook on note events |
+| `confidential_note_events`   | boolean        | no       | Trigger hook on confidential note events |
 | `job_events`                 | boolean        | no       | Trigger hook on job events |
 | `pipeline_events`            | boolean        | no       | Trigger hook on pipeline events |
 | `wiki_events`                | boolean        | no       | Trigger hook on wiki events |

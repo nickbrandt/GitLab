@@ -1,5 +1,13 @@
 # Style guides
 
+## Editor/IDE styling standardization
+
+We use [EditorConfig](https://editorconfig.org/) to automatically apply certain styling
+standards before files are saved locally. Most editors/IDEs will honor the `.editorconfig`
+settings automatically by default. If your editor/IDE does not automatically support `.editorconfig`,
+we suggest investigating to see if a plugin exists. For instance here is the
+[plugin for vim](https://github.com/editorconfig/editorconfig-vim).
+
 ## Pre-commit static analysis
 
 You're strongly advised to install
@@ -9,7 +17,7 @@ static analysis offenses before committing locally.
 In your GitLab source directory run:
 
 ```shell
-cd tooling/overcommit && make && cd -
+make -C tooling/overcommit
 ```
 
 Then before a commit is created, Overcommit will automatically check for

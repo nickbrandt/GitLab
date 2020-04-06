@@ -6,9 +6,13 @@ import { GlEmptyState } from '@gitlab/ui';
 import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
-import UploadButton from 'ee/design_management/components/upload/button.vue';
+import DesignDropzone from 'ee/design_management/components/upload/design_dropzone.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
 import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
+import {
+  EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
+  EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
+} from 'ee/design_management/utils/error_messages';
 import createFlash from '~/flash';
 
 const localVue = createLocalVue();
@@ -63,7 +67,8 @@ describe('Design management index page', () => {
   const findSelectAllButton = () => wrapper.find('.js-select-all');
   const findToolbar = () => wrapper.find('.qa-selector-toolbar');
   const findDeleteButton = () => wrapper.find(DeleteButton);
-  const findUploadButton = () => wrapper.find(UploadButton);
+  const findDropzone = () => wrapper.findAll(DesignDropzone).at(0);
+  const findFirstDropzoneWithDesign = () => wrapper.findAll(DesignDropzone).at(1);
 
   function createComponent({
     loading = false,
@@ -91,6 +96,7 @@ describe('Design management index page', () => {
       localVue,
       router,
       stubs: { DesignDestroyer, ApolloMutation, ...stubs },
+      attachToDocument: true,
     });
 
     wrapper.setData({
@@ -191,6 +197,7 @@ describe('Design management index page', () => {
                 __typename: 'Design',
                 id: expect.anything(),
                 image: '',
+                imageV432x230: '',
                 filename: 'test',
                 fullPath: '',
                 event: 'NONE',
@@ -225,7 +232,7 @@ describe('Design management index page', () => {
       };
 
       return wrapper.vm.$nextTick().then(() => {
-        findUploadButton().vm.$emit('upload', [{ name: 'test' }]);
+        findDropzone().vm.$emit('change', [{ name: 'test' }]);
         expect(mutate).toHaveBeenCalledWith(mutationVariables);
         expect(wrapper.vm.filesToBeSaved).toEqual([{ name: 'test' }]);
         expect(wrapper.vm.isSaving).toBeTruthy();
@@ -328,6 +335,42 @@ describe('Design management index page', () => {
         );
       });
     });
+
+    describe('dragging onto an existing design', () => {
+      beforeEach(() => {
+        createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
+      });
+
+      it('calls onUploadDesign with valid upload', () => {
+        wrapper.setMethods({
+          onUploadDesign: jest.fn(),
+        });
+
+        const mockUploadPayload = [
+          {
+            name: mockDesigns[0].filename,
+          },
+        ];
+
+        const designDropzone = findFirstDropzoneWithDesign();
+        designDropzone.vm.$emit('change', mockUploadPayload);
+
+        expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
+        expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith(mockUploadPayload);
+      });
+
+      it.each`
+        description             | eventPayload                              | message
+        ${'> 1 file'}           | ${[{ name: 'test' }, { name: 'test-2' }]} | ${EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE}
+        ${'different filename'} | ${[{ name: 'wrong-name' }]}               | ${EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE}
+      `('calls createFlash when upload has $description', ({ eventPayload, message }) => {
+        const designDropzone = findFirstDropzoneWithDesign();
+        designDropzone.vm.$emit('change', eventPayload);
+
+        expect(createFlash).toHaveBeenCalledTimes(1);
+        expect(createFlash).toHaveBeenCalledWith(message);
+      });
+    });
   });
 
   describe('on latest version when has designs', () => {
@@ -426,6 +469,51 @@ describe('Design management index page', () => {
 
     it('does not render Select All button', () => {
       expect(findSelectAllButton().exists()).toBe(false);
+    });
+  });
+
+  describe('pasting a design', () => {
+    let event;
+    beforeEach(() => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
+
+      wrapper.setMethods({
+        onUploadDesign: jest.fn(),
+      });
+
+      event = new Event('paste');
+
+      router.replace({
+        name: DESIGNS_ROUTE_NAME,
+        query: {
+          version: '2',
+        },
+      });
+    });
+
+    it('calls onUploadDesign with valid paste', () => {
+      event.clipboardData = {
+        files: [{ name: 'image.png', type: 'image/png' }],
+        getData: () => 'test.png',
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith([
+        new File([{ name: 'image.png' }], 'test.png'),
+      ]);
+    });
+
+    it('does not call onUploadDesign with invalid paste', () => {
+      event.clipboardData = {
+        items: [{ type: 'text/plain' }, { type: 'text' }],
+        files: [],
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).not.toHaveBeenCalled();
     });
   });
 });

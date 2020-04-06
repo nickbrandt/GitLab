@@ -2,9 +2,8 @@
 
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191115115043_migrate_epic_mentions_to_db')
-require Rails.root.join('db', 'post_migrate', '20200214174519_remigrate_epic_mentions_to_db')
 
-describe 'epic mentions migration' do
+describe MigrateEpicMentionsToDb, :migration do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }
@@ -20,16 +19,10 @@ describe 'epic mentions migration' do
 
   # non-migrateable resources
   # this epic is already migrated, as it has a record in the epic_user_mentions table
-  let!(:resource4) { epics.create!(iid: 4, title: "title3", title_html: 'title3', description: 'epic description with @root mention', group_id: group.id, author_id: user.id) }
+  let!(:resource4) { epics.create!(iid: 4, title: "title4", title_html: 'title4', description: 'epic description with @root mention', group_id: group.id, author_id: user.id) }
   let!(:user_mention) { epic_user_mentions.create!(epic_id: resource4.id, mentioned_users_ids: [1]) }
   # this epic has no mentions so should be filtered out
   let!(:resource5) { epics.create!(iid: 5, title: "title5", title_html: 'title5', description: 'epic description with no mention', group_id: group.id, author_id: user.id) }
 
-  describe MigrateEpicMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, false
-  end
-
-  describe RemigrateEpicMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, false
-  end
+  it_behaves_like 'schedules resource mentions migration', Epic, false
 end

@@ -136,5 +136,26 @@ module Gitlab
 
       Gitlab::CIDR.new(allowed_ips).match?(ip)
     end
+
+    def self.interacting_with_primary_message(url)
+      return unless url
+
+      # This is formatted like this to fit into the console 'box', e.g.
+      #
+      # remote:
+      # remote: This request to a Geo secondary node will be forwarded to the
+      # remote: Geo primary node:
+      # remote:
+      # remote:   <url>
+      # remote:
+      template = <<~STR
+        This request to a Geo secondary node will be forwarded to the
+        Geo primary node:
+
+          %{url}
+      STR
+
+      _(template) % { url: url }
+    end
   end
 end

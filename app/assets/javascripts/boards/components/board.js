@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import Sortable from 'sortablejs';
 import Vue from 'vue';
-import { GlButtonGroup, GlButton, GlLabel, GlTooltip } from '@gitlab/ui';
+import { GlButtonGroup, GlDeprecatedButton, GlLabel, GlTooltip } from '@gitlab/ui';
 import isWipLimitsOn from 'ee_else_ce/boards/mixins/is_wip_limits';
 import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -16,6 +16,14 @@ import { getBoardSortableDefaultOptions, sortableEnd } from '../mixins/sortable_
 import { ListType } from '../constants';
 import { isScopedLabel } from '~/lib/utils/common_utils';
 
+/**
+ * Please don't edit this file, have a look at:
+ * ./board_column.vue
+ * https://gitlab.com/gitlab-org/gitlab/-/issues/212300
+ *
+ * This file here will be deleted soon
+ * @deprecated
+ */
 export default Vue.extend({
   components: {
     BoardBlankState,
@@ -24,7 +32,7 @@ export default Vue.extend({
     Icon,
     GlButtonGroup,
     IssueCount,
-    GlButton,
+    GlDeprecatedButton,
     GlLabel,
     GlTooltip,
   },
@@ -36,6 +44,7 @@ export default Vue.extend({
     list: {
       type: Object,
       default: () => ({}),
+      required: false,
     },
     disabled: {
       type: Boolean,
@@ -52,6 +61,13 @@ export default Vue.extend({
     boardId: {
       type: String,
       required: true,
+    },
+    // Does not do anything but is used
+    // to support the API of the new board_column.vue
+    canAdminList: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -94,7 +110,7 @@ export default Vue.extend({
       return this.list.type !== ListType.blank && this.list.type !== ListType.promotion;
     },
     uniqueKey() {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       return `boards.${this.boardId}.${this.list.type}.${this.list.id}`;
     },
     helpLink() {

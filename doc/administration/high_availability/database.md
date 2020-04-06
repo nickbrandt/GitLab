@@ -83,7 +83,7 @@ deploy the bundled PostgreSQL.
 
    NOTE: **Note:** The role `postgres_role` was introduced with GitLab 10.3
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Note the PostgreSQL node's IP address or hostname, port, and
    plain text password. These will be necessary when configuring the GitLab
    application servers later.
@@ -146,7 +146,7 @@ Each service in the package comes with a set of [default ports](https://docs.git
 - Application servers connect to either PgBouncer directly via its [default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#pgbouncer) or via a configured Internal Load Balancer (TCP) that serves multiple PgBouncers.
 - PgBouncer connects to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
 - Repmgr connects to the database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
-- Postgres secondaries connect to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
+- PostgreSQL secondaries connect to the primary database servers [PostgreSQL default port](https://docs.gitlab.com/omnibus/package-information/defaults.html#postgresql)
 - Consul servers and agents connect to each others [Consul default ports](https://docs.gitlab.com/omnibus/package-information/defaults.html#consul)
 
 #### Required information
@@ -163,7 +163,7 @@ Similarly, PostgreSQL access is controlled based on the network source.
 This is why you will need:
 
 - IP address of each nodes network interface. This can be set to `0.0.0.0` to
-  listen on all interfaces. It cannot be set to the loopack address `127.0.0.1`.
+  listen on all interfaces. It cannot be set to the loopback address `127.0.0.1`.
 - Network Address. This can be in subnet (i.e. `192.168.0.0/255.255.255.0`)
   or CIDR (i.e. `192.168.0.0/24`) form.
 
@@ -338,7 +338,7 @@ When installing the GitLab package, do not supply `EXTERNAL_URL` value.
    repmgr['master_on_initialization'] = false
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. [Enable Monitoring](#enable-monitoring)
 
 > Please note:
@@ -383,7 +383,7 @@ Select one node as a primary node.
    * master  | HOSTNAME |          | host=HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
    ```
 
-1. Note down the hostname/ip in the connection string: `host=HOSTNAME`. We will
+1. Note down the hostname or IP address in the connection string: `host=HOSTNAME`. We will
    refer to the hostname in the next section as `MASTER_NODE_NAME`. If the value
    is not an IP address, it will need to be a resolvable name (via DNS or
    `/etc/hosts`)
@@ -487,7 +487,7 @@ attributes set, but the following need to be set.
    gitlab_rails['auto_migrate'] = false
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Application node post-configuration
 
@@ -535,7 +535,7 @@ Here is a list and description of each machine and the assigned IP:
 - `10.6.0.33`: PostgreSQL secondary
 - `10.6.0.41`: GitLab application
 
-All passwords are set to `toomanysecrets`, please do not use this password or derived hashes and the external_url for GitLab is `http://gitlab.example.com`.
+All passwords are set to `toomanysecrets`, please do not use this password or derived hashes and the `external_url` for GitLab is `http://gitlab.example.com`.
 
 Please note that after the initial configuration, if a failover occurs, the PostgresSQL master will change to one of the available secondaries until it is failed back.
 
@@ -554,7 +554,7 @@ consul['configuration'] = {
 consul['monitoring_service_discovery'] =  true
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Example recommended setup for PgBouncer servers
 
@@ -584,7 +584,7 @@ consul['configuration'] = {
 consul['monitoring_service_discovery'] =  true
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Internal load balancer setup
 
@@ -625,7 +625,7 @@ consul['configuration'] = {
 consul['monitoring_service_discovery'] =  true
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ###### Secondary nodes
 
@@ -638,7 +638,7 @@ configuration:
 repmgr['master_on_initialization'] = false
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Example recommended setup for application server
 
@@ -673,7 +673,7 @@ consul['configuration'] = {
 }
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Example recommended setup manual steps
 
@@ -739,7 +739,7 @@ Here is a list and description of each machine and the assigned IP:
 
 All passwords are set to `toomanysecrets`, please do not use this password or derived hashes.
 
-The external_url for GitLab is `http://gitlab.example.com`
+The `external_url` for GitLab is `http://gitlab.example.com`
 
 Please note that after the initial configuration, if a failover occurs, the PostgresSQL master will change to one of the available secondaries until it is failed back.
 
@@ -778,7 +778,7 @@ consul['configuration'] = {
 }
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ###### Secondary nodes
 
@@ -826,7 +826,7 @@ consul['configuration'] = {
 }
 ```
 
-[Reconfigure Omnibus GitLab][reconfigure GitLab] for the changes to take effect.
+[Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ##### Example minimal setup manual steps
 
@@ -872,8 +872,9 @@ standby nodes.
 If a node fails, it can be removed from the cluster, or added back as a standby
 after it has been restored to service.
 
-- If you want to remove the node from the cluster, on any other node in the
-  cluster, run:
+##### Remove a standby from the cluster
+
+  From any other node in the cluster, run:
 
   ```shell
   gitlab-ctl repmgr standby unregister --node=X
@@ -893,13 +894,15 @@ after it has been restored to service.
   959789412
   ```
 
-  Then you will use this id to unregister the node:
+  Then you will use this ID to unregister the node:
 
   ```shell
   gitlab-ctl repmgr standby unregister --node=959789412
   ```
 
-- To add the node as a standby server:
+##### Add a node as a standby server
+
+  From the stnadby node, run:
 
   ```shell
   gitlab-ctl repmgr standby follow NEW_MASTER
@@ -911,6 +914,28 @@ after it has been restored to service.
   If there are any clients that are still attempting to write to the old master,
   this will cause a split, and the old master will need to be resynced from
   scratch by performing a `gitlab-ctl repmgr standby setup NEW_MASTER`.
+
+##### Add a failed master back into the cluster as a standby node
+
+  Once `repmgrd` and PostgreSQL are runnning, the node will need to follow the new
+  as a standby node.
+
+  ```shell
+  gitlab-ctl repmgr standby follow NEW_MASTER
+  ```
+
+  Once the node is following the new master as a standby, the node needs to be
+  [unregistered from the cluster on the new master node](#remove-a-standby-from-the-cluster).
+
+  Once the old master node has been unregistered from the cluster, it will need
+  to be setup as a new standby:
+
+  ```shell
+  gitlab-ctl repmgr standby setup NEW_MASTER
+  ```
+
+  Failure to unregister and readd the old master node can lead to subsequent failovers
+  not working.
 
 #### Alternate configurations
 
@@ -944,7 +969,7 @@ repmgr['trust_auth_cidr_addresses'] = %w(192.168.1.44/32 db2.example.com)
 ##### MD5 Authentication
 
 If you are running on an untrusted network, repmgr can use md5 authentication
-with a [.pgpass file](https://www.postgresql.org/docs/9.6/libpq-pgpass.html)
+with a [`.pgpass` file](https://www.postgresql.org/docs/9.6/libpq-pgpass.html)
 to authenticate.
 
 You can specify by IP address, FQDN, or by subnet, using the same format as in
@@ -980,7 +1005,7 @@ the previous section:
 1. On each PgBouncer node, edit `/etc/gitlab/gitlab.rb`:
    1. Ensure `gitlab_rails['db_password']` is set to the plaintext password for
       the `gitlab` database user
-   1. [Reconfigure GitLab] for the changes to take effect
+   1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect
 
 ## Enable Monitoring
 
@@ -1022,7 +1047,7 @@ steps to fix the problem:
 1. On the master database node, connect to the database prompt - `gitlab-psql -d template1`
 1. Delete the `gitlab-consul` user - `DROP USER "gitlab-consul";`
 1. Exit the database prompt - `\q`
-1. [Reconfigure GitLab] and the user will be re-added with the proper permissions.
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) and the user will be re-added with the proper permissions.
 1. Change to the `gitlab-consul` user - `su - gitlab-consul`
 1. Try the check command again - `gitlab-ctl repmgr-check-master`.
 
@@ -1054,7 +1079,7 @@ To fix the problem, add the IP address to `/etc/gitlab/gitlab.rb`.
 postgresql['trust_auth_cidr_addresses'] = %w(123.123.123.123/32 <other_cidrs>)
 ```
 
-[Reconfigure GitLab] for the changes to take effect.
+[Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 ### Issues with other components
 
@@ -1076,5 +1101,3 @@ Read more on high-availability configuration:
 1. [Configure the GitLab application servers](gitlab.md)
 1. [Configure the load balancers](load_balancer.md)
 1. [Manage the bundled Consul cluster](consul.md)
-
-[reconfigure GitLab]: ../restart_gitlab.md#omnibus-gitlab-reconfigure

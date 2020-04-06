@@ -11,17 +11,18 @@ module API
       expose :tag, as: :tag_name, if: ->(_, _) { can_download_code? }
       expose :description
       expose :description_html do |entity|
-        MarkupHelper.markdown_field(entity, :description)
+        MarkupHelper.markdown_field(entity, :description, current_user: options[:current_user])
       end
       expose :created_at
       expose :released_at
       expose :author, using: Entities::UserBasic, if: -> (release, _) { release.author.present? }
       expose :commit, using: Entities::Commit, if: ->(_, _) { can_download_code? }
       expose :upcoming_release?, as: :upcoming_release
-      expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? && can_read_milestone? }
+      expose :milestones, using: Entities::MilestoneWithStats, if: -> (release, _) { release.milestones.present? && can_read_milestone? }
       expose :commit_path, expose_nil: false
       expose :tag_path, expose_nil: false
       expose :evidence_sha, expose_nil: false, if: ->(_, _) { can_download_code? }
+
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]
@@ -33,6 +34,7 @@ module API
         end
         expose :evidence_file_path, expose_nil: false, if: ->(_, _) { can_download_code? }
       end
+      expose :evidences, using: Entities::Releases::Evidence, expose_nil: false, if: ->(_, _) { can_download_code? }
       expose :_links do
         expose :self_url, as: :self, expose_nil: false
         expose :merge_requests_url, expose_nil: false

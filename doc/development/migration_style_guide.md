@@ -171,38 +171,138 @@ lock allow the database to process other statements.
 
 ### Examples
 
-Removing a column:
+**Removing a column:**
 
 ```ruby
 include Gitlab::Database::MigrationHelpers
 
-def change
+def up
   with_lock_retries do
-    remove_column :users, :full_name, :string
+    remove_column :users, :full_name
+  end
+end
+
+def down
+  with_lock_retries do
+    add_column :users, :full_name, :string
   end
 end
 ```
 
-Removing a foreign key:
+**Removing a foreign key:**
 
 ```ruby
 include Gitlab::Database::MigrationHelpers
 
-def change
+def up
   with_lock_retries do
     remove_foreign_key :issues, :projects
   end
 end
+
+def down
+  with_lock_retries do
+    add_foreign_key :issues, :projects
+  end
+end
 ```
 
-Changing default value for a column:
+**Changing default value for a column:**
 
 ```ruby
 include Gitlab::Database::MigrationHelpers
 
-def change
+def up
   with_lock_retries do
     change_column_default :merge_requests, :lock_version, from: nil, to: 0
+  end
+end
+
+def down
+  with_lock_retries do
+    change_column_default :merge_requests, :lock_version, from: 0, to: nil
+  end
+end
+```
+
+**Creating a new table with a foreign key:**
+
+We can simply wrap the `create_table` method with `with_lock_retries`:
+
+```ruby
+def up
+  with_lock_retries do
+    create_table :issues do |t|
+      t.references :project, index: true, null: false, foreign_key: { on_delete: :cascade }
+      t.string :title, limit: 255
+    end
+  end
+end
+
+def down
+  drop_table :issues
+end
+```
+
+**Creating a new table when we have two foreign keys:**
+
+For this, we'll need three migrations:
+
+1. Creating the table without foreign keys (with the indices).
+1. Add foreign key to the first table.
+1. Add foreign key to the second table.
+
+Creating the table:
+
+```ruby
+def up
+  create_table :imports do |t|
+    t.bigint :project_id, null: false
+    t.bigint :user_id, null: false
+    t.string :jid, limit: 255
+  end
+
+  add_index :imports, :project_id
+  add_index :imports, :user_id
+end
+
+def down
+  drop_table :imports
+end
+```
+
+Adding foreign key to `projects`:
+
+```ruby
+include Gitlab::Database::MigrationHelpers
+
+def up
+  with_lock_retries do
+    add_foreign_key :imports, :projects, column: :project_id, on_delete: :cascade
+  end
+end
+
+def down
+  with_lock_retries do
+    remove_foreign_key :imports, column: :project_id
+  end
+end
+```
+
+Adding foreign key to `users`:
+
+```ruby
+include Gitlab::Database::MigrationHelpers
+
+def up
+  with_lock_retries do
+    add_foreign_key :imports, :users, column: :user_id, on_delete: :cascade
+  end
+end
+
+def down
+  with_lock_retries do
+    remove_foreign_key :imports, column: :user_id
   end
 end
 ```
@@ -228,8 +328,11 @@ Example changes:
 - `add_foreign_key` / `remove_foreign_key`
 - `add_column` / `remove_column`
 - `change_column_default`
+- `create_table` / `drop_table`
 
 **Note:** `with_lock_retries` method **cannot** be used with `disable_ddl_transaction!`.
+
+**Note:** `with_lock_retries` method **cannot** be used within the `change` method, you must manually define the `up` and `down` methods to make the migration reversible.
 
 ### How the helper method works
 

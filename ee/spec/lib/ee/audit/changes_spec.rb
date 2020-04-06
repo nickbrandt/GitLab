@@ -63,11 +63,11 @@ describe EE::Audit::Changes do
         end
       end
 
-      context 'when target_model is provided' do
+      context 'when entity is provided' do
         let(:project) { Project.new }
-        let(:options) { { model: user, target_model: project } }
+        let(:options) { { model: user, entity: project } }
 
-        it 'instantiates audit event service with the given target_model' do
+        it 'instantiates audit event service with the given entity' do
           user.update!(name: 'Scrooge McDuck')
 
           audit!

@@ -70,6 +70,9 @@ class Group < Namespace
   validates :variables, variable_duplicates: true
 
   validates :two_factor_grace_period, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :name,
+    format: { with: Gitlab::Regex.group_name_regex,
+              message: Gitlab::Regex.group_name_regex_message }
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:groups_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -169,8 +172,8 @@ class Group < Namespace
     "#{self.class.reference_prefix}#{full_path}"
   end
 
-  def web_url
-    Gitlab::Routing.url_helpers.group_canonical_url(self)
+  def web_url(only_path: nil)
+    Gitlab::UrlBuilder.build(self, only_path: only_path)
   end
 
   def human_name
@@ -245,9 +248,6 @@ class Group < Namespace
     add_user(user, :maintainer, current_user: current_user)
   end
 
-  # @deprecated
-  alias_method :add_master, :add_maintainer
-
   def add_owner(user, current_user = nil)
     add_user(user, :owner, current_user: current_user)
   end
@@ -273,9 +273,6 @@ class Group < Namespace
   def has_container_repository_including_subgroups?
     ::ContainerRepository.for_group_and_its_subgroups(self).exists?
   end
-
-  # @deprecated
-  alias_method :has_master?, :has_maintainer?
 
   # Check if user is a last owner of the group.
   def last_owner?(user)
@@ -516,16 +513,27 @@ class Group < Namespace
 
     group_group_links_query = GroupGroupLink.where(shared_group_id: self_and_ancestors_ids)
     cte = Gitlab::SQL::CTE.new(:group_group_links_cte, group_group_links_query)
+    cte_alias = cte.table.alias(GroupGroupLink.table_name)
 
     link = GroupGroupLink
              .with(cte.to_arel)
+             .select(smallest_value_arel([cte_alias[:group_access], group_member_table[:access_level]],
+                                         'group_access'))
              .from([group_member_table, cte.alias_to(group_group_link_table)])
              .where(group_member_table[:user_id].eq(user.id))
+             .where(group_member_table[:requested_at].eq(nil))
              .where(group_member_table[:source_id].eq(group_group_link_table[:shared_with_group_id]))
+             .where(group_member_table[:source_type].eq('Namespace'))
              .reorder(Arel::Nodes::Descending.new(group_group_link_table[:group_access]))
              .first
 
     link&.group_access
+  end
+
+  def smallest_value_arel(args, column_alias)
+    Arel::Nodes::As.new(
+      Arel::Nodes::NamedFunction.new('LEAST', args),
+      Arel::Nodes::SqlLiteral.new(column_alias))
   end
 
   def self.groups_including_descendants_by(group_ids)

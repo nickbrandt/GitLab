@@ -8,7 +8,7 @@ Troubleshooting Elasticsearch requires:
 ## Common terminology
 
 - **Lucene**: A full-text search library written in Java.
-- **Near Realtime (NRT)**: Refers to the slight latency from the time to index a
+- **Near real time (NRT)**: Refers to the slight latency from the time to index a
   document to the time when it becomes searchable.
 - **Cluster**: A collection of one or more nodes that work together to hold all
   the data, providing indexing and search capabilities.
@@ -204,7 +204,7 @@ If it is, check on the Elasticsearch side to determine if the `gitlab-production
 name for the GitLab index) exists. If it exists, manually delete it on the Elasticsearch
 side and attempt to recreate it from the
 [`create_empty_index`](../../integration/elasticsearch.md#gitlab-elasticsearch-rake-tasks)
-rake task.
+Rake task.
 
 If you still encounter issues, try creating an index manually on the Elasticsearch
 instance. The details of the index aren't important here, as we want to test if indices
@@ -220,7 +220,7 @@ during the indexing of projects. If errors do occur, they will either stem from 
   something you are familiar with, contact GitLab support for guidance.
 - Within the Elasticsearch instance itself. See if the error is [documented and has a fix](../../integration/elasticsearch.md#troubleshooting). If not, speak with your Elasticsearch admin.
 
-If the indexing process does not present errors, you will want to check the status of the indexed projects. You can do this via the following rake tasks:
+If the indexing process does not present errors, you will want to check the status of the indexed projects. You can do this via the following Rake tasks:
 
 - [`sudo gitlab-rake gitlab:elastic:index_projects_status`](../../integration/elasticsearch.md#gitlab-elasticsearch-rake-tasks) (shows the overall status)
 - [`sudo gitlab-rake gitlab:elastic:projects_not_indexed`](../../integration/elasticsearch.md#gitlab-elasticsearch-rake-tasks) (shows specific projects that are not indexed)
@@ -271,7 +271,7 @@ Generally speaking, ensure:
 - The Elasticsearch server have enough RAM and CPU cores.
 - That sharding **is** being used.
 
-Going into some more detail here, if Elasticsearch is running on the same server as GitLab, resource contention is **very** likely to occur. Ideally, Elasticsearch, which requires ample resources, should be running on its own server (maybe coupled with logstash and kibana).
+Going into some more detail here, if Elasticsearch is running on the same server as GitLab, resource contention is **very** likely to occur. Ideally, Elasticsearch, which requires ample resources, should be running on its own server (maybe coupled with Logstash and Kibana).
 
 When it comes to Elasticsearch, RAM is the key resource. Elasticsearch themselves recommend:
 

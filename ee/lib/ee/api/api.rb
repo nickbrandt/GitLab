@@ -21,7 +21,6 @@ module EE
         mount ::API::ElasticsearchIndexedNamespaces
         mount ::API::FeatureFlags
         mount ::API::FeatureFlagScopes
-        mount ::API::ContainerRegistryEvent
         mount ::API::Geo
         mount ::API::GeoReplication
         mount ::API::GeoNodes
@@ -32,6 +31,7 @@ module EE
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
         mount ::API::NugetPackages
+        mount ::API::PypiPackages
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
@@ -46,12 +46,14 @@ module EE
         mount ::API::Vulnerabilities
         mount ::API::VulnerabilityFindings
         mount ::API::VulnerabilityIssueLinks
+        mount ::API::VulnerabilityExports
         mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases
         mount ::API::Dependencies
         mount ::API::VisualReviewDiscussions
         mount ::API::Analytics::CodeReviewAnalytics
+        mount ::API::Analytics::GroupActivityAnalytics
         mount ::API::ProtectedEnvironments
 
         version 'v3', using: :path do

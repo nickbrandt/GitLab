@@ -1,6 +1,5 @@
 import * as types from 'ee/threat_monitoring/store/modules/threat_monitoring/mutation_types';
 import mutations from 'ee/threat_monitoring/store/modules/threat_monitoring/mutations';
-import { mockWafStatisticsResponse } from '../../../mock_data';
 
 describe('Threat Monitoring mutations', () => {
   let state;
@@ -9,13 +8,10 @@ describe('Threat Monitoring mutations', () => {
     state = {};
   });
 
-  describe(types.SET_ENDPOINTS, () => {
+  describe(types.SET_ENDPOINT, () => {
     it('sets the endpoints', () => {
-      const endpoints = { wafStatisticsEndpoint: 'waf', environmentsEndpoint: 'envs' };
-
-      mutations[types.SET_ENDPOINTS](state, endpoints);
-
-      expect(state).toEqual(expect.objectContaining(endpoints));
+      mutations[types.SET_ENDPOINT](state, 'envs');
+      expect(state.environmentsEndpoint).toEqual('envs');
     });
   });
 
@@ -89,56 +85,6 @@ describe('Threat Monitoring mutations', () => {
 
     it('sets currentTimeWindow', () => {
       expect(state.currentTimeWindow).toBe(timeWindow);
-    });
-  });
-
-  describe(types.REQUEST_WAF_STATISTICS, () => {
-    beforeEach(() => {
-      mutations[types.REQUEST_WAF_STATISTICS](state);
-    });
-
-    it('sets isLoadingWafStatistics to true', () => {
-      expect(state.isLoadingWafStatistics).toBe(true);
-    });
-
-    it('sets errorLoadingWafStatistics to false', () => {
-      expect(state.errorLoadingWafStatistics).toBe(false);
-    });
-  });
-
-  describe(types.RECEIVE_WAF_STATISTICS_SUCCESS, () => {
-    beforeEach(() => {
-      mutations[types.RECEIVE_WAF_STATISTICS_SUCCESS](state, mockWafStatisticsResponse);
-    });
-
-    it('sets wafStatistics according to the payload', () => {
-      expect(state.wafStatistics).toEqual({
-        totalTraffic: mockWafStatisticsResponse.total_traffic,
-        anomalousTraffic: mockWafStatisticsResponse.anomalous_traffic,
-        history: mockWafStatisticsResponse.history,
-      });
-    });
-
-    it('sets isLoadingWafStatistics to false', () => {
-      expect(state.isLoadingWafStatistics).toBe(false);
-    });
-
-    it('sets errorLoadingWafStatistics to false', () => {
-      expect(state.errorLoadingWafStatistics).toBe(false);
-    });
-  });
-
-  describe(types.RECEIVE_WAF_STATISTICS_ERROR, () => {
-    beforeEach(() => {
-      mutations[types.RECEIVE_WAF_STATISTICS_ERROR](state);
-    });
-
-    it('sets isLoadingWafStatistics to false', () => {
-      expect(state.isLoadingWafStatistics).toBe(false);
-    });
-
-    it('sets errorLoadingWafStatistics to true', () => {
-      expect(state.errorLoadingWafStatistics).toBe(true);
     });
   });
 });

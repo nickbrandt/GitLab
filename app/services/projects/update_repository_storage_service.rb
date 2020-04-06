@@ -4,59 +4,69 @@ module Projects
   class UpdateRepositoryStorageService < BaseService
     include Gitlab::ShellAdapter
 
-    RepositoryAlreadyMoved = Class.new(StandardError)
+    Error = Class.new(StandardError)
 
     def initialize(project)
       @project = project
     end
 
     def execute(new_repository_storage_key)
-      # Raising an exception is a little heavy handed but this behavior (doing
-      # nothing if the repo is already on the right storage) prevents data
-      # loss, so it is valuable for us to be able to observe it via the
-      # exception.
-      raise RepositoryAlreadyMoved if project.repository_storage == new_repository_storage_key
+      mirror_repositories(new_repository_storage_key)
 
-      if mirror_repositories(new_repository_storage_key)
-        mark_old_paths_for_archive
+      mark_old_paths_for_archive
 
-        project.update(repository_storage: new_repository_storage_key, repository_read_only: false)
-        project.leave_pool_repository
-        project.track_project_repository
+      project.update(repository_storage: new_repository_storage_key, repository_read_only: false)
+      project.leave_pool_repository
+      project.track_project_repository
 
-        enqueue_housekeeping
-      else
-        project.update(repository_read_only: false)
-      end
+      enqueue_housekeeping
+
+      success
+
+    rescue Error, ArgumentError, Gitlab::Git::BaseError => e
+      project.update(repository_read_only: false)
+
+      Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path)
+
+      error(s_("UpdateRepositoryStorage|Error moving repository storage for %{project_full_path} - %{message}") % { project_full_path: project.full_path, message: e.message })
     end
 
     private
 
     def mirror_repositories(new_repository_storage_key)
-      result = mirror_repository(new_repository_storage_key)
+      mirror_repository(new_repository_storage_key)
 
       if project.wiki.repository_exists?
-        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
+        mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
       end
-
-      result
     end
 
     def mirror_repository(new_storage_key, type: Gitlab::GlRepository::PROJECT)
-      return false unless wait_for_pushes(type)
+      unless wait_for_pushes(type)
+        raise Error, s_('UpdateRepositoryStorage|Timeout waiting for %{type} repository pushes') % { type: type.name }
+      end
 
       repository = type.repository_for(project)
       full_path = repository.full_path
       raw_repository = repository.raw
+      checksum = repository.checksum
 
       # Initialize a git repository on the target path
-      gitlab_shell.create_repository(new_storage_key, raw_repository.relative_path, full_path)
-      new_repository = Gitlab::Git::Repository.new(new_storage_key,
-                                                   raw_repository.relative_path,
-                                                   raw_repository.gl_repository,
-                                                   full_path)
+      new_repository = Gitlab::Git::Repository.new(
+        new_storage_key,
+        raw_repository.relative_path,
+        raw_repository.gl_repository,
+        full_path
+      )
 
-      new_repository.fetch_repository_as_mirror(raw_repository)
+      new_repository.create_repository
+
+      new_repository.replicate(raw_repository)
+      new_checksum = new_repository.checksum
+
+      if checksum != new_checksum
+        raise Error, s_('UpdateRepositoryStorage|Failed to verify %{type} repository checksum from %{old} to %{new}') % { type: type.name, old: checksum, new: new_checksum }
+      end
     end
 
     def mark_old_paths_for_archive

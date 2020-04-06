@@ -32,6 +32,8 @@ shared_examples_for 'snippet editor' do
 
       visit project_snippets_path(project)
 
+      # Wait for the SVG to ensure the button location doesn't shift
+      within('.empty-state') { find('img.js-lazy-loaded') }
       click_on('New snippet')
       wait_for_requests
     end
@@ -94,6 +96,29 @@ shared_examples_for 'snippet editor' do
       end
       link = find('a.no-attachment-icon img[alt="banana_sample"]')['src']
       expect(link).to match(%r{/#{Regexp.escape(project.full_path)}/uploads/\h{32}/banana_sample\.gif\z})
+    end
+
+    context 'when the git operation fails' do
+      let(:error) { 'This is a git error' }
+
+      before do
+        allow_next_instance_of(Snippets::CreateService) do |instance|
+          allow(instance).to receive(:create_commit).and_raise(StandardError, error)
+        end
+
+        fill_form
+
+        click_button('Create snippet')
+        wait_for_requests
+      end
+
+      it 'displays the error' do
+        expect(page).to have_content(error)
+      end
+
+      it 'renders new page' do
+        expect(page).to have_content('New Snippet')
+      end
     end
   end
 

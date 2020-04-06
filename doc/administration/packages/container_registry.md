@@ -353,10 +353,6 @@ configuring a different storage driver. By default the GitLab Container Registry
 is configured to use the filesystem driver, which makes use of [storage path](#container-registry-storage-path)
 configuration.
 
-NOTE: **Note:** Enabling a storage driver other than `filesystem` would mean
-that your Docker client needs to be able to access the storage backend directly.
-In that case, you must use an address that resolves and is accessible outside GitLab server. The Docker client will continue to authenticate via GitLab but data transfer will be direct to and from the storage backend.
-
 The different supported drivers are:
 
 | Driver     | Description                         |
@@ -424,6 +420,55 @@ storage:
 
 NOTE: **Note:**
 `your-s3-bucket` should only be the name of a bucket that exists, and can't include subdirectories.
+
+### Disable redirect for storage driver
+
+By default, users accessing a registry configured with a remote backend are redirected to the default backend for the storage driver. For example, registries can be configured using the `s3` storage driver, which redirects requests to a remote S3 bucket to alleviate load on the GitLab server.
+
+However, this behaviour is undesirable for registries used by internal hosts that usually can't access public servers. To disable redirects, set the `disable` flag to true as follows. This makes all traffic to always go through the Registry service. This results in improved security (less surface attack as the storage backend is not publicly accessible), but worse performance (all traffic is redirected via the service).
+
+**Omnibus GitLab installations**
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+
+    ```ruby
+    registry['storage'] = {
+      's3' => {
+        'accesskey' => 's3-access-key',
+        'secretkey' => 's3-secret-key-for-access-key',
+        'bucket' => 'your-s3-bucket',
+        'region' => 'your-s3-region',
+        'regionendpoint' => 'your-s3-regionendpoint'
+      },
+      'redirect' => {
+        'disable' => true
+      }
+    }
+    ```
+
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+**Installations from source**
+
+1. Add the `redirect` flag to your registry configuration YML file:
+
+    ```yml
+    storage:
+      s3:
+        accesskey: 'AKIAKIAKI'
+        secretkey: 'secret123'
+        bucket: 'gitlab-registry-bucket-AKIAKIAKI'
+        region: 'your-s3-region'
+        regionendpoint: 'your-s3-regionendpoint'
+      redirect:
+        disable: true
+      cache:
+        blobdescriptor: inmemory
+      delete:
+        enabled: true
+    ```
+
+1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ### Storage limitations
 
@@ -601,6 +646,13 @@ NOTE: **Note:**
 The garbage collection tools are only available when you've installed GitLab
 via an Omnibus package or the cloud native chart.
 
+DANGER: **Danger:**
+By running the built-in garbage collection command, it will cause downtime to
+the Container Registry. Running this command on an instance in an HA environment
+while one of your other instances is still writing to the Registry storage,
+will remove referenced manifests. To avoid that, make sure Registry is set to
+[read-only mode](#performing-garbage-collection-without-downtime) before proceeding.
+
 Container Registry can use considerable amounts of disk space. To clear up
 some unused layers, the registry includes a garbage collect command.
 
@@ -649,13 +701,6 @@ built-in command:
 - If you changed the location of registry configuration file, you will need to
   specify its path.
 - After the garbage collection is done, the registry should start up automatically.
-
-DANGER: **Danger:**
-By running the built-in garbage collection command, it will cause downtime to
-the Container Registry. Running this command on an instance in an HA environment
-while one of your other instances is still writing to the Registry storage,
-will remove referenced manifests. To avoid that, make sure Registry is set to
-[read-only mode](#performing-garbage-collection-without-downtime) before proceeding.
 
 If you did not change the default location of the configuration file, run:
 
@@ -736,10 +781,14 @@ To enable the read-only mode:
 
    This will set the Container Registry into the read only mode.
 
-1. Next, trigger the garbage collect command:
+1. Next, trigger one of the garbage collect commands:
 
    ```sh
+   # Recycling unused tags
    sudo /opt/gitlab/embedded/bin/registry garbage-collect /var/opt/gitlab/registry/config.yml
+
+   # Removing unused layers not referenced by manifests
+   sudo /opt/gitlab/embedded/bin/registry garbage-collect -m /var/opt/gitlab/registry/config.yml
    ```
 
    This will start the garbage collection, which might take some time to complete.

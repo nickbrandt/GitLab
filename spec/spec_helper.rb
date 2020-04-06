@@ -76,11 +76,21 @@ RSpec.configure do |config|
     metadata[:level] = quality_level.level_for(location)
     metadata[:api] = true if location =~ %r{/spec/requests/api/}
 
-    # do not overwrite type if it's already set
-    next if metadata.key?(:type)
+    # Do not overwrite migration if it's already set
+    unless metadata.key?(:migration)
+      metadata[:migration] = true if metadata[:level] == :migration
+    end
 
-    match = location.match(%r{/spec/([^/]+)/})
-    metadata[:type] = match[1].singularize.to_sym if match
+    # Do not overwrite schema if it's already set
+    unless metadata.key?(:schema)
+      metadata[:schema] = :latest if quality_level.background_migration?(location)
+    end
+
+    # Do not overwrite type if it's already set
+    unless metadata.key?(:type)
+      match = location.match(%r{/spec/([^/]+)/})
+      metadata[:type] = match[1].singularize.to_sym if match
+    end
   end
 
   config.include LicenseHelpers
@@ -90,6 +100,7 @@ RSpec.configure do |config|
   config.include ExpectOffense
   config.include FactoryBot::Syntax::Methods
   config.include FixtureHelpers
+  config.include NonExistingRecordsHelpers
   config.include GitlabRoutingHelper
   config.include StubFeatureFlags
   config.include StubExperiments
@@ -193,8 +204,10 @@ RSpec.configure do |config|
     # expect(Gitlab::Git::KeepAround).to receive(:execute).and_call_original
     allow(Gitlab::Git::KeepAround).to receive(:execute)
 
-    # Clear thread cache and Sidekiq queues
-    Gitlab::ThreadMemoryCache.cache_backend.clear
+    [Gitlab::ThreadMemoryCache, Gitlab::ProcessMemoryCache].each do |cache|
+      cache.cache_backend.clear
+    end
+
     Sidekiq::Worker.clear_all
 
     # Temporary patch to force admin mode to be active by default in tests when
@@ -202,15 +215,62 @@ RSpec.configure do |config|
     # modifying a significant number of specs to test both states for admin
     # mode enabled / disabled.
     #
-    # See https://gitlab.com/gitlab-org/gitlab/issues/31511
-    # See gitlab/spec/support/helpers/admin_mode_helpers.rb
+    # This will only be applied to specs below dirs in `admin_mode_mock_dirs`
     #
-    # If it is required to have the real behaviour that an admin is signed in
+    # See ongoing migration: https://gitlab.com/gitlab-org/gitlab/-/issues/31511
+    #
+    # Until the migration is finished, if it is required to have the real
+    # behaviour in any of the mocked dirs specs that an admin is signed in
     # with normal user mode and needs to switch to admin mode, it is possible to
     # mark such tests with the `do_not_mock_admin_mode` metadata tag, e.g:
     #
-    # context 'some test with normal user mode', :do_not_mock_admin_mode do ... end
-    unless example.metadata[:do_not_mock_admin_mode]
+    # context 'some test in mocked dir', :do_not_mock_admin_mode do ... end
+    admin_mode_mock_dirs = %w(
+      ./ee/spec/controllers
+      ./ee/spec/elastic_integration
+      ./ee/spec/features
+      ./ee/spec/finders
+      ./ee/spec/lib
+      ./ee/spec/models
+      ./ee/spec/policies
+      ./ee/spec/requests/admin
+      ./ee/spec/serializers
+      ./ee/spec/services
+      ./ee/spec/support/protected_tags
+      ./ee/spec/support/shared_examples
+      ./spec/controllers
+      ./spec/features
+      ./spec/finders
+      ./spec/frontend
+      ./spec/helpers
+      ./spec/lib
+      ./spec/models
+      ./spec/policies
+      ./spec/requests
+      ./spec/serializers
+      ./spec/services
+      ./spec/support/cycle_analytics_helpers
+      ./spec/support/protected_tags
+      ./spec/support/shared_examples
+      ./spec/views
+      ./spec/workers
+    )
+
+    if !example.metadata[:do_not_mock_admin_mode] && example.metadata[:file_path].start_with?(*admin_mode_mock_dirs)
+      allow_any_instance_of(Gitlab::Auth::CurrentUserMode).to receive(:admin_mode?) do |current_user_mode|
+        current_user_mode.send(:user)&.admin?
+      end
+    end
+
+    # Administrators have to re-authenticate in order to access administrative
+    # functionality when feature flag :user_mode_in_session is active. Any spec
+    # that requires administrative access can use the tag :enable_admin_mode
+    # to avoid the second auth step (provided the user is already an admin):
+    #
+    # context 'some test that requires admin mode', :enable_admin_mode do ... end
+    #
+    # See also spec/support/helpers/admin_mode_helpers.rb
+    if example.metadata[:enable_admin_mode]
       allow_any_instance_of(Gitlab::Auth::CurrentUserMode).to receive(:admin_mode?) do |current_user_mode|
         current_user_mode.send(:user)&.admin?
       end

@@ -5,9 +5,6 @@ module API
     include PaginationParams
 
     before do
-      # TODO: Remove flag: https://gitlab.com/gitlab-org/gitlab/issues/38121
-      not_found! unless Feature.enabled?(:remote_mirrors_api, user_project)
-
       unauthorized! unless can?(current_user, :admin_remote_mirror, user_project)
     end
 
@@ -33,9 +30,11 @@ module API
         requires :url, type: String, desc: 'The URL for a remote mirror'
         optional :enabled, type: Boolean, desc: 'Determines if the mirror is enabled'
         optional :only_protected_branches, type: Boolean, desc: 'Determines if only protected branches are mirrored'
+        optional :keep_divergent_refs, type: Boolean, desc: 'Determines if divergent refs are kept on the target'
       end
       post ':id/remote_mirrors' do
         create_params = declared_params(include_missing: false)
+        create_params.delete(:keep_divergent_refs) unless ::Feature.enabled?(:keep_divergent_refs, user_project)
 
         new_mirror = user_project.remote_mirrors.create(create_params)
 
@@ -53,12 +52,15 @@ module API
         requires :mirror_id, type: String, desc: 'The ID of a remote mirror'
         optional :enabled, type: Boolean, desc: 'Determines if the mirror is enabled'
         optional :only_protected_branches, type: Boolean, desc: 'Determines if only protected branches are mirrored'
+        optional :keep_divergent_refs, type: Boolean, desc: 'Determines if divergent refs are kept on the target'
       end
       put ':id/remote_mirrors/:mirror_id' do
         mirror = user_project.remote_mirrors.find(params[:mirror_id])
 
         mirror_params = declared_params(include_missing: false)
         mirror_params[:id] = mirror_params.delete(:mirror_id)
+        mirror_params.delete(:keep_divergent_refs) unless ::Feature.enabled?(:keep_divergent_refs, user_project)
+
         update_params = { remote_mirrors_attributes: mirror_params }
 
         result = ::Projects::UpdateService

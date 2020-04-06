@@ -14,10 +14,14 @@ import {
   anyReportHasError,
   summaryCounts,
   isBaseSecurityReportOutOfDate,
+  canCreateIssue,
+  canCreateMergeRequest,
+  canDismissVulnerability,
 } from 'ee/vue_shared/security_reports/store/getters';
 
 const BASE_PATH = 'fake/base/path.json';
 const HEAD_PATH = 'fake/head/path.json';
+const MOCK_PATH = 'fake/path.json';
 
 describe('Security reports getters', () => {
   function removeBreakLine(data) {
@@ -540,6 +544,42 @@ describe('Security reports getters', () => {
     it('returns true when any of the reports is out of date', () => {
       state.dast.baseReportOutofDate = true;
       expect(isBaseSecurityReportOutOfDate(state)).toEqual(true);
+    });
+  });
+
+  describe('canCreateIssue', () => {
+    it('returns false if no feedback path is defined', () => {
+      expect(canCreateIssue(state)).toEqual(false);
+    });
+
+    it('returns true if a feedback path is defined', () => {
+      state.createVulnerabilityFeedbackIssuePath = MOCK_PATH;
+
+      expect(canCreateIssue(state)).toEqual(true);
+    });
+  });
+
+  describe('canCreateMergeRequest', () => {
+    it('returns false if no feedback path is defined', () => {
+      expect(canCreateMergeRequest(state)).toEqual(false);
+    });
+
+    it('returns true if a feedback path is defined', () => {
+      state.createVulnerabilityFeedbackMergeRequestPath = MOCK_PATH;
+
+      expect(canCreateMergeRequest(state)).toEqual(true);
+    });
+  });
+
+  describe('canDismissVulnerability', () => {
+    it('returns false if no feedback path is defined', () => {
+      expect(canDismissVulnerability(state)).toEqual(false);
+    });
+
+    it('returns true if a feedback path is defined', () => {
+      state.createVulnerabilityFeedbackDismissalPath = MOCK_PATH;
+
+      expect(canDismissVulnerability(state)).toEqual(true);
     });
   });
 });

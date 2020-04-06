@@ -7,10 +7,11 @@ exports[`Dast Issue Body matches the snaphot 1`] = `
   <div
     class="report-block-list-issue-description-text"
   >
-    
-    Low:
-
-    
+    <severity-badge-stub
+      class="d-inline-block"
+      severity="Low"
+    />
+     
     <modal-open-name-stub
       class="js-modal-dast"
       issue="[object Object]"

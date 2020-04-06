@@ -2,15 +2,12 @@
 # rubygems.org in the future.
 cache gems:
   extends:
-    - .default-tags
     - .default-retry
     - .default-cache
     - .default-before_script
     - .setup:rules:cache-gems
   stage: test
-  needs:
-    - job: setup-test-env
-      artifacts: true
+  needs: ["setup-test-env pg10"]
   variables:
     SETUP_DB: "false"
   script:
@@ -21,9 +18,19 @@ cache gems:
 
 .minimal-job:
   extends:
-    - .default-tags
     - .default-retry
   needs: []
+
+dont-interrupt-me:
+  extends: .setup:rules:dont-interrupt-me
+  stage: sync
+  image: alpine:edge
+  interruptible: false
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "This jobs makes sure this pipeline won't be interrupted! See https://docs.gitlab.com/ee/ci/yaml/#interruptible."
 
 gitlab_git_test:
   extends:

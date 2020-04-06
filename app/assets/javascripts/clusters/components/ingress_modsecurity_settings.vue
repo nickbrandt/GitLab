@@ -1,19 +1,34 @@
 <script>
-import _ from 'lodash';
-import { __ } from '../../locale';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import { APPLICATION_STATUS, INGRESS } from '~/clusters/constants';
-import { GlAlert, GlSprintf, GlLink } from '@gitlab/ui';
+import { escape as esc } from 'lodash';
+import { s__, __ } from '../../locale';
+import { APPLICATION_STATUS, INGRESS, LOGGING_MODE, BLOCKING_MODE } from '~/clusters/constants';
+import {
+  GlAlert,
+  GlSprintf,
+  GlLink,
+  GlToggle,
+  GlDeprecatedButton,
+  GlDropdown,
+  GlDropdownItem,
+  GlIcon,
+} from '@gitlab/ui';
 import eventHub from '~/clusters/event_hub';
+import modSecurityLogo from 'images/cluster_app_logos/modsecurity.png';
 
-const { UPDATING, UNINSTALLING } = APPLICATION_STATUS;
+const { UPDATING, UNINSTALLING, INSTALLING, INSTALLED, UPDATED } = APPLICATION_STATUS;
 
 export default {
+  title: 'ModSecurity Web Application Firewall',
+  modsecurityUrl: 'https://modsecurity.org/about.html',
   components: {
-    LoadingButton,
     GlAlert,
     GlSprintf,
     GlLink,
+    GlToggle,
+    GlDeprecatedButton,
+    GlDropdown,
+    GlDropdownItem,
+    GlIcon,
   },
   props: {
     ingress: {
@@ -25,40 +40,112 @@ export default {
       required: false,
       default: '',
     },
+    modes: {
+      type: Object,
+      required: false,
+      default: () => ({
+        [LOGGING_MODE]: {
+          name: s__('ClusterIntegration|Logging mode'),
+        },
+        [BLOCKING_MODE]: {
+          name: s__('ClusterIntegration|Blocking mode'),
+        },
+      }),
+    },
   },
+  data: () => ({
+    modSecurityLogo,
+    initialValue: null,
+    initialMode: null,
+  }),
   computed: {
     modSecurityEnabled: {
       get() {
         return this.ingress.modsecurity_enabled;
       },
       set(isEnabled) {
+        if (this.initialValue === null) {
+          this.initialValue = this.ingress.modsecurity_enabled;
+        }
         eventHub.$emit('setIngressModSecurityEnabled', {
           id: INGRESS,
           modSecurityEnabled: isEnabled,
         });
       },
     },
+    hasValueChanged() {
+      return this.modSecurityEnabledChanged || this.modSecurityModeChanged;
+    },
+    modSecurityEnabledChanged() {
+      return this.initialValue !== null && this.initialValue !== this.ingress.modsecurity_enabled;
+    },
+    modSecurityModeChanged() {
+      return (
+        this.ingress.modsecurity_enabled &&
+        this.initialMode !== null &&
+        this.initialMode !== this.ingress.modsecurity_mode
+      );
+    },
     ingressModSecurityDescription() {
-      return _.escape(this.ingressModSecurityHelpPath);
+      return esc(this.ingressModSecurityHelpPath);
     },
     saving() {
       return [UPDATING].includes(this.ingress.status);
     },
     saveButtonDisabled() {
-      return [UNINSTALLING, UPDATING].includes(this.ingress.status);
+      return (
+        [UNINSTALLING, UPDATING, INSTALLING].includes(this.ingress.status) ||
+        this.ingress.updateAvailable
+      );
     },
     saveButtonLabel() {
       return this.saving ? __('Saving') : __('Save changes');
     },
-    ingressInstalled() {
-      return this.ingress.installed;
+    /**
+     * Returns true either when:
+     *   - The application is getting updated.
+     *   - The user has changed some of the settings for an application which is
+     *     neither getting installed nor updated.
+     */
+    showButtons() {
+      return this.saving || this.valuesChangedByUser;
+    },
+    modSecurityModeName() {
+      return this.modes[this.ingress.modsecurity_mode].name;
+    },
+    valuesChangedByUser() {
+      return this.hasValueChanged && [INSTALLED, UPDATED].includes(this.ingress.status);
     },
   },
   methods: {
     updateApplication() {
       eventHub.$emit('updateApplication', {
         id: INGRESS,
-        params: { modsecurity_enabled: this.ingress.modsecurity_enabled },
+        params: {
+          modsecurity_enabled: this.ingress.modsecurity_enabled,
+          modsecurity_mode: this.ingress.modsecurity_mode,
+        },
+      });
+      this.resetStatus();
+    },
+    resetStatus() {
+      if (this.initialMode !== null) {
+        this.ingress.modsecurity_mode = this.initialMode;
+      }
+      if (this.initialValue !== null) {
+        this.ingress.modsecurity_enabled = this.initialValue;
+      }
+      this.initialValue = null;
+      this.initialMode = null;
+      eventHub.$emit('resetIngressModSecurityChanges', INGRESS);
+    },
+    selectMode(modeKey) {
+      if (this.initialMode === null) {
+        this.initialMode = this.ingress.modsecurity_mode;
+      }
+      eventHub.$emit('setIngressModSecurityMode', {
+        id: INGRESS,
+        modSecurityMode: modeKey,
       });
     },
   },
@@ -75,42 +162,93 @@ export default {
       @dismiss="alert = null"
     >
       {{
-        s__('ClusterIntegration|Something went wrong while updating the Web Application Firewall.')
+        s__(
+          'ClusterIntegration|Something went wrong while trying to save your settings. Please try again.',
+        )
       }}
     </gl-alert>
-    <div class="form-group">
-      <div class="form-check form-check-inline">
-        <input
-          v-model="modSecurityEnabled"
-          type="checkbox"
-          autocomplete="off"
-          class="form-check-input"
+    <div class="gl-responsive-table-row-layout" role="row">
+      <div class="table-section append-right-8 section-align-top" role="gridcell">
+        <img
+          :src="modSecurityLogo"
+          :alt="`${$options.title} logo`"
+          class="cluster-application-logo avatar s40"
         />
-        <label class="form-check-label label-bold" for="ingress-enable-modsecurity">
-          {{ s__('ClusterIntegration|Enable Web Application Firewall') }}
-        </label>
       </div>
-      <p class="form-text text-muted">
+      <div class="table-section section-wrap" role="gridcell">
         <strong>
-          <gl-sprintf
-            :message="s__('ClusterIntegration|Learn more about %{linkStart}ModSecurity%{linkEnd}')"
-          >
-            <template #link="{ content }">
-              <gl-link :href="ingressModSecurityDescription" target="_blank"
-                >{{ content }}
-              </gl-link>
-            </template>
-          </gl-sprintf>
+          <gl-link :href="$options.modsecurityUrl" target="_blank">{{ $options.title }} </gl-link>
         </strong>
-      </p>
-      <loading-button
-        v-if="ingressInstalled"
-        class="btn-success mt-1"
-        :loading="saving"
-        :disabled="saveButtonDisabled"
-        :label="saveButtonLabel"
-        @click="updateApplication"
-      />
+        <div class="form-group">
+          <p class="form-text text-muted">
+            <strong>
+              <gl-sprintf
+                :message="
+                  s__(
+                    'ClusterIntegration|Real-time web application monitoring, logging and access control. %{linkStart}More information%{linkEnd}',
+                  )
+                "
+              >
+                <template #link="{ content }">
+                  <gl-link :href="ingressModSecurityDescription" target="_blank"
+                    >{{ content }}
+                  </gl-link>
+                </template>
+              </gl-sprintf>
+            </strong>
+          </p>
+          <div class="form-check form-check-inline mt-3">
+            <gl-toggle
+              v-model="modSecurityEnabled"
+              :label-on="__('Enabled')"
+              :label-off="__('Disabled')"
+              :disabled="saveButtonDisabled"
+              label-position="right"
+            />
+          </div>
+          <div
+            v-if="ingress.modsecurity_enabled"
+            class="gl-responsive-table-row-layout mt-3"
+            role="row"
+          >
+            <div class="table-section section-wrap" role="gridcell">
+              <strong>
+                {{ s__('ClusterIntegration|Global default') }}
+                <gl-icon name="earth" class="align-text-bottom" />
+              </strong>
+              <div class="form-group">
+                <p class="form-text text-muted">
+                  <strong>
+                    {{
+                      s__(
+                        'ClusterIntegration|Set the global mode for the WAF in this cluster. This can be overridden at the environmental level.',
+                      )
+                    }}
+                  </strong>
+                </p>
+              </div>
+              <gl-dropdown :text="modSecurityModeName" :disabled="saveButtonDisabled">
+                <gl-dropdown-item v-for="(mode, key) in modes" :key="key" @click="selectMode(key)">
+                  {{ mode.name }}
+                </gl-dropdown-item>
+              </gl-dropdown>
+            </div>
+          </div>
+          <div v-if="showButtons" class="mt-3">
+            <gl-deprecated-button
+              class="btn-success inline mr-1"
+              :loading="saving"
+              :disabled="saveButtonDisabled"
+              @click="updateApplication"
+            >
+              {{ saveButtonLabel }}
+            </gl-deprecated-button>
+            <gl-deprecated-button :disabled="saveButtonDisabled" @click="resetStatus">
+              {{ __('Cancel') }}
+            </gl-deprecated-button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

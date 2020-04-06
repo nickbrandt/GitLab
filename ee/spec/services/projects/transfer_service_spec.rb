@@ -30,8 +30,9 @@ describe Projects::TransferService do
     include_examples 'audit event logging' do
       let(:operation) { subject.execute(group) }
       let(:fail_condition!) do
-        expect_any_instance_of(Project)
-          .to receive(:has_container_registry_tags?).and_return(true)
+        expect_next_instance_of(Project) do |instance|
+          expect(instance).to receive(:has_container_registry_tags?).and_return(true)
+        end
       end
       let(:attributes) do
         {

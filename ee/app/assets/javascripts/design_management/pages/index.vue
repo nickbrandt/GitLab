@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlEmptyState, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -7,17 +7,24 @@ import DeleteButton from '../components/delete_button.vue';
 import Design from '../components/list/item.vue';
 import DesignDestroyer from '../components/design_destroyer.vue';
 import DesignVersionDropdown from '../components/upload/design_version_dropdown.vue';
+import DesignDropzone from '../components/upload/design_dropzone.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
 import {
   UPLOAD_DESIGN_ERROR,
+  EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
+  EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
   designUploadSkippedWarning,
   designDeletionError,
 } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
-import { designUploadOptimisticResponse } from '../utils/design_management_utils';
+import {
+  designUploadOptimisticResponse,
+  isValidDesignFile,
+} from '../utils/design_management_utils';
+import { getFilename } from '~/lib/utils/file_upload';
 import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
@@ -25,13 +32,14 @@ const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 export default {
   components: {
     GlLoadingIcon,
+    GlAlert,
+    GlDeprecatedButton,
     UploadButton,
-    GlEmptyState,
-    GlButton,
     Design,
     DesignDestroyer,
     DesignVersionDropdown,
     DeleteButton,
+    DesignDropzone,
   },
   mixins: [allDesignsMixin],
   apollo: {
@@ -88,6 +96,9 @@ export default {
         ? s__('DesignManagement|Deselect all')
         : s__('DesignManagement|Select all');
     },
+  },
+  mounted() {
+    this.toggleOnPasteListener(this.$route.name);
   },
   methods: {
     resetFilesToBeSaved() {
@@ -196,9 +207,49 @@ export default {
       const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });
       createFlash(errorMessage);
     },
+    onExistingDesignDropzoneChange(files, existingDesignFilename) {
+      const filesArr = Array.from(files);
+
+      if (filesArr.length > 1) {
+        createFlash(EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE);
+        return;
+      }
+
+      if (!filesArr.some(({ name }) => existingDesignFilename === name)) {
+        createFlash(EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE);
+        return;
+      }
+
+      this.onUploadDesign(files);
+    },
+    onDesignPaste(event) {
+      const { clipboardData } = event;
+      const files = Array.from(clipboardData.files);
+      if (clipboardData && files.length > 0) {
+        if (!files.some(isValidDesignFile)) {
+          return;
+        }
+        event.preventDefault();
+        const filename = getFilename(event) || 'image.png';
+        const newFile = new File([files[0]], filename);
+        this.onUploadDesign([newFile]);
+      }
+    },
+    toggleOnPasteListener(route) {
+      if (route === DESIGNS_ROUTE_NAME) {
+        document.addEventListener('paste', this.onDesignPaste);
+      } else {
+        document.removeEventListener('paste', this.onDesignPaste);
+      }
+    },
   },
   beforeRouteUpdate(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     this.selectedDesigns = [];
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     next();
   },
 };
@@ -210,12 +261,12 @@ export default {
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
         <div :class="['qa-selector-toolbar', { 'd-flex': hasDesigns, 'd-none': !hasDesigns }]">
-          <gl-button
+          <gl-deprecated-button
             v-if="isLatestVersion"
             variant="link"
             class="mr-2 js-select-all"
             @click="toggleDesignsSelection"
-            >{{ selectAllButtonText }}</gl-button
+            >{{ selectAllButtonText }}</gl-deprecated-button
           >
           <design-destroyer
             v-slot="{ mutate, loading }"
@@ -242,12 +293,18 @@ export default {
     </header>
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
-      <div v-else-if="error" class="alert alert-danger">
+      <gl-alert v-else-if="error" variant="danger" :dismissible="false">
         {{ __('An error occurred while loading designs. Please try again.') }}
-      </div>
-      <ol v-else-if="hasDesigns" class="list-unstyled row">
+      </gl-alert>
+      <ol v-else class="list-unstyled row">
+        <li class="col-md-6 col-lg-4 mb-3">
+          <design-dropzone class="design-list-item" @change="onUploadDesign" />
+        </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)" />
+          <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
+            ><design v-bind="design" :is-uploading="isDesignToBeSaved(design.filename)"
+          /></design-dropzone>
+
           <input
             v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"
@@ -257,20 +314,6 @@ export default {
           />
         </li>
       </ol>
-      <gl-empty-state
-        v-else
-        :title="s__('DesignManagement|The one place for your designs')"
-        :description="
-          s__(`DesignManagement|Upload and view the latest designs for this issue.
-            Consistent and easy to find, so everyone is up to date.`)
-        "
-      >
-        <template #actions>
-          <div v-if="canCreateDesign" class="center">
-            <upload-button :is-saving="isSaving" @upload="onUploadDesign" />
-          </div>
-        </template>
-      </gl-empty-state>
     </div>
     <router-view />
   </div>

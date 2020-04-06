@@ -92,29 +92,18 @@ describe MergeRequest do
     end
   end
 
-  describe '#participant_approvers' do
-    let(:approvers) { create_list(:user, 2) }
-    let(:code_owners) { create_list(:user, 2) }
+  describe '#participants' do
+    context 'with approval rule' do
+      before do
+        approver = create(:approver, target: project)
+        second_approver = create(:approver, target: project)
 
-    let!(:regular_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: approvers) }
-    let!(:code_owner_rule) { create(:code_owner_rule, merge_request: merge_request, users: code_owners) }
+        create(:approval_merge_request_rule, merge_request: merge_request, users: [approver.user, second_approver.user])
+      end
 
-    let!(:approval) { create(:approval, merge_request: merge_request, user: approvers.last) }
-
-    before do
-      allow(subject).to receive(:code_owners).and_return(code_owners)
-    end
-
-    it 'returns empty array if approval not needed' do
-      allow(subject).to receive(:approval_needed?).and_return(false)
-
-      expect(subject.participant_approvers).to be_empty
-    end
-
-    it 'returns approvers if approval is needed, excluding code owners' do
-      allow(subject).to receive(:approval_needed?).and_return(true)
-
-      expect(subject.participant_approvers).to contain_exactly(approvers.first)
+      it 'returns only the author as a participant' do
+        expect(subject.participants).to contain_exactly(subject.author)
+      end
     end
   end
 
@@ -149,27 +138,6 @@ describe MergeRequest do
 
         it { is_expected.to be_falsy }
       end
-    end
-  end
-
-  describe '#participant_approvers with approval_rules disabled' do
-    let!(:approver) { create(:approver, target: project) }
-    let(:code_owners) { [double(:code_owner)] }
-
-    before do
-      allow(subject).to receive(:code_owners).and_return(code_owners)
-    end
-
-    it 'returns empty array if approval not needed' do
-      allow(subject).to receive(:approval_needed?).and_return(false)
-
-      expect(subject.participant_approvers).to eq([])
-    end
-
-    it 'returns approvers if approval is needed, excluding code owners' do
-      allow(subject).to receive(:approval_needed?).and_return(true)
-
-      expect(subject.participant_approvers).to eq([approver.user])
     end
   end
 
@@ -743,13 +711,19 @@ describe MergeRequest do
   end
 
   describe 'review time sorting' do
-    it 'orders by first_comment_at' do
-      merge_request_1 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 1.day.ago })
-      merge_request_2 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 3.days.ago })
-      merge_request_3 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: nil })
+    def create_mr(metrics_data = {})
+      create(:merge_request, :with_productivity_metrics, metrics_data: metrics_data)
+    end
 
-      expect(described_class.order_review_time_desc).to match([merge_request_2, merge_request_1, merge_request_3])
-      expect(described_class.sort_by_attribute('review_time_desc')).to match([merge_request_2, merge_request_1, merge_request_3])
+    it 'orders by first_comment_at or first_approved_at whatever is earlier' do
+      mr1 = create_mr(first_comment_at: 1.day.ago)
+      mr2 = create_mr(first_comment_at: 3.days.ago)
+      mr3 = create_mr(first_approved_at: 5.days.ago)
+      mr4 = create_mr(first_comment_at: 1.day.ago, first_approved_at: 4.days.ago)
+      mr5 = create_mr(first_comment_at: nil, first_approved_at: nil)
+
+      expect(described_class.order_review_time_desc).to match([mr3, mr4, mr2, mr1, mr5])
+      expect(described_class.sort_by_attribute('review_time_desc')).to match([mr3, mr4, mr2, mr1, mr5])
     end
   end
 end

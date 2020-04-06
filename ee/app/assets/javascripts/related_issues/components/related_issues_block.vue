@@ -1,4 +1,5 @@
 <script>
+import { GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import AddIssuableForm from './add_issuable_form.vue';
 import RelatedIssuesList from './related_issues_list.vue';
@@ -13,6 +14,7 @@ export default {
   name: 'RelatedIssuesBlock',
   components: {
     Icon,
+    GlLink,
     AddIssuableForm,
     RelatedIssuesList,
   },
@@ -114,10 +116,16 @@ export default {
 </script>
 
 <template>
-  <div class="related-issues-block">
+  <div id="related-issues" class="related-issues-block">
     <div class="card card-slim">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
-        <h3 class="card-title mt-0 mb-0 h5">
+        <h3 class="card-title mt-0 mb-0 h5 position-relative">
+          <gl-link
+            id="user-content-related-issues"
+            class="anchor position-absolute text-decoration-none"
+            href="#related-issues"
+            aria-hidden="true"
+          />
           {{ __('Linked issues') }}
           <a v-if="hasHelpPath" :href="helpPath">
             <i

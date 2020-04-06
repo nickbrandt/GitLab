@@ -22,7 +22,7 @@ describe Projects::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_scanning: true, license_management: true, security_dashboard: true)
+          stub_licensed_features(dependency_scanning: true, license_scanning: true, security_dashboard: true)
         end
 
         context 'when requesting HTML' do
@@ -163,7 +163,7 @@ describe Projects::DependenciesController do
         context 'with found license report' do
           let(:user) { developer }
           let(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
-          let(:license_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline) }
+          let(:license_build) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline) }
 
           before do
             pipeline.builds << license_build

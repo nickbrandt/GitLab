@@ -15,10 +15,18 @@ module API
           detail 'Private API subject to change'
           success EE::API::Entities::ProjectApprovalSettings
         end
+        params do
+          optional :target_branch, type: String, desc: 'Branch that scoped approval rules apply to'
+        end
         get do
           authorize_create_merge_request_in_project
 
-          present user_project, with: EE::API::Entities::ProjectApprovalSettings, current_user: current_user
+          present(
+            user_project,
+            with: EE::API::Entities::ProjectApprovalSettings,
+            current_user: current_user,
+            target_branch: declared_params[:target_branch]
+          )
         end
 
         segment 'rules' do

@@ -1,10 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton, GlFormGroup, GlFormInput, GlLink } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormGroup, GlFormInput, GlLink } from '@gitlab/ui';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlFormGroup,
     GlFormInput,
     GlLink,
@@ -36,7 +36,7 @@ export default {
       <h3 class="js-section-header h4">
         {{ s__('ExternalMetrics|External Dashboard') }}
       </h3>
-      <gl-button class="js-settings-toggle">{{ __('Expand') }}</gl-button>
+      <gl-deprecated-button class="js-settings-toggle">{{ __('Expand') }}</gl-deprecated-button>
       <p class="js-section-sub-header">
         {{
           s__(
@@ -54,18 +54,18 @@ export default {
           :description="s__('ExternalMetrics|Enter the URL of the dashboard you want to link to')"
         >
           <!-- placeholder with a url is a false positive  -->
-          <!-- eslint-disable @gitlab/vue-i18n/no-bare-attribute-strings -->
+          <!-- eslint-disable @gitlab/vue-require-i18n-attribute-strings -->
           <gl-form-input
             id="full-dashboard-url"
             v-model="userDashboardUrl"
             placeholder="https://my-org.gitlab.io/my-dashboards"
             @keydown.enter.native.prevent="updateExternalDashboardUrl"
           />
-          <!-- eslint-enable @gitlab/vue-i18n/no-bare-attribute-strings -->
+          <!-- eslint-enable @gitlab/vue-require-i18n-attribute-strings -->
         </gl-form-group>
-        <gl-button variant="success" @click="updateExternalDashboardUrl">
+        <gl-deprecated-button variant="success" @click="updateExternalDashboardUrl">
           {{ __('Save Changes') }}
-        </gl-button>
+        </gl-deprecated-button>
       </form>
     </div>
   </section>

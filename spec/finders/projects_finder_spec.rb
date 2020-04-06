@@ -6,22 +6,22 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
   include AdminModeHelper
 
   describe '#execute' do
-    let(:user) { create(:user) }
-    let(:group) { create(:group, :public) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:group) { create(:group, :public) }
 
-    let!(:private_project) do
+    let_it_be(:private_project) do
       create(:project, :private, name: 'A', path: 'A')
     end
 
-    let!(:internal_project) do
+    let_it_be(:internal_project) do
       create(:project, :internal, group: group, name: 'B', path: 'B')
     end
 
-    let!(:public_project) do
+    let_it_be(:public_project) do
       create(:project, :public, group: group, name: 'C', path: 'C')
     end
 
-    let!(:shared_project) do
+    let_it_be(:shared_project) do
       create(:project, :private, name: 'D', path: 'D')
     end
 
@@ -139,6 +139,12 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
         it { is_expected.to eq([public_project]) }
       end
 
+      describe 'filter by group name' do
+        let(:params) { { name: group.name, search_namespaces: true } }
+
+        it { is_expected.to eq([public_project, internal_project]) }
+      end
+
       describe 'filter by archived' do
         let!(:archived_project) { create(:project, :public, :archived, name: 'E', path: 'E') }
 
@@ -214,6 +220,28 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
         let!(:pending_delete_project) { create(:project, :public, pending_delete: true) }
 
         it { is_expected.to match_array([public_project, internal_project]) }
+      end
+
+      describe 'filter by last_activity_after' do
+        let(:params) { { last_activity_after: 60.minutes.ago } }
+
+        before do
+          internal_project.update(last_activity_at: Time.now)
+          public_project.update(last_activity_at: 61.minutes.ago)
+        end
+
+        it { is_expected.to match_array([internal_project]) }
+      end
+
+      describe 'filter by last_activity_before' do
+        let(:params) { { last_activity_before: 60.minutes.ago } }
+
+        before do
+          internal_project.update(last_activity_at: Time.now)
+          public_project.update(last_activity_at: 61.minutes.ago)
+        end
+
+        it { is_expected.to match_array([public_project]) }
       end
 
       describe 'sorting' do

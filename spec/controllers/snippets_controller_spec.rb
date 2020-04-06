@@ -260,8 +260,10 @@ describe SnippetsController do
     context 'when the snippet description contains a file' do
       include FileMoverHelpers
 
-      let(:picture_file) { "/-/system/user/#{user.id}/secret56/picture.jpg" }
-      let(:text_file) { "/-/system/user/#{user.id}/secret78/text.txt" }
+      let(:picture_secret) { SecureRandom.hex }
+      let(:text_secret) { SecureRandom.hex }
+      let(:picture_file) { "/-/system/user/#{user.id}/#{picture_secret}/picture.jpg" }
+      let(:text_file) { "/-/system/user/#{user.id}/#{text_secret}/text.txt" }
       let(:description) do
         "Description with picture: ![picture](/uploads#{picture_file}) and "\
         "text: [text.txt](/uploads#{text_file})"
@@ -284,8 +286,8 @@ describe SnippetsController do
         snippet = subject
 
         expected_description = "Description with picture: "\
-          "![picture](/uploads/-/system/personal_snippet/#{snippet.id}/secret56/picture.jpg) and "\
-          "text: [text.txt](/uploads/-/system/personal_snippet/#{snippet.id}/secret78/text.txt)"
+          "![picture](/uploads/-/system/personal_snippet/#{snippet.id}/#{picture_secret}/picture.jpg) and "\
+          "text: [text.txt](/uploads/-/system/personal_snippet/#{snippet.id}/#{text_secret}/text.txt)"
 
         expect(snippet.description).to eq(expected_description)
       end
@@ -306,7 +308,7 @@ describe SnippetsController do
       end
 
       context 'when the snippet is public' do
-        it 'rejects the shippet' do
+        it 'rejects the snippet' do
           expect { create_snippet(visibility_level: Snippet::PUBLIC) }
             .not_to change { Snippet.count }
         end
@@ -352,6 +354,7 @@ describe SnippetsController do
 
   describe 'PUT #update' do
     let(:project) { create :project }
+    let(:visibility_level) { Snippet::PUBLIC }
     let(:snippet) { create :personal_snippet, author: user, project: project, visibility_level: visibility_level }
 
     def update_snippet(snippet_params = {}, additional_params = {})
@@ -363,6 +366,12 @@ describe SnippetsController do
       }.merge(additional_params)
 
       snippet.reload
+    end
+
+    it_behaves_like 'updating snippet checks blob is binary' do
+      let_it_be(:title) { 'Foo' }
+
+      subject { put :update, params: { id: snippet, personal_snippet: { title: title } } }
     end
 
     context 'when the snippet is spam' do
@@ -427,9 +436,7 @@ describe SnippetsController do
       end
 
       context 'when the snippet is public' do
-        let(:visibility_level) { Snippet::PUBLIC }
-
-        it 'rejects the shippet' do
+        it 'rejects the snippet' do
           expect { update_snippet(title: 'Foo') }
             .not_to change { snippet.reload.title }
         end
@@ -499,6 +506,11 @@ describe SnippetsController do
   end
 
   describe "GET #raw" do
+    let(:inline) { nil }
+    let(:params) { { id: snippet.to_param, inline: inline } }
+
+    subject { get :raw, params: params }
+
     shared_examples '200 status' do
       before do
         subject
@@ -507,11 +519,6 @@ describe SnippetsController do
       it 'responds with status 200' do
         expect(assigns(:snippet)).to eq(snippet)
         expect(response).to have_gitlab_http_status(:ok)
-      end
-
-      it 'has expected headers' do
-        expect(response.header['Content-Type']).to eq('text/plain; charset=utf-8')
-        expect(response.header['Content-Disposition']).to match(/inline/)
       end
 
       it "sets #{Gitlab::Workhorse::DETECT_HEADER} header" do
@@ -549,12 +556,20 @@ describe SnippetsController do
 
     shared_examples 'successful response' do
       it_behaves_like '200 status'
-      it_behaves_like 'CRLF line ending'
 
-      it 'returns snippet first blob data' do
+      it 'has expected blob headers' do
         subject
 
-        expect(response.body).to eq snippet.blobs.first.data
+        expect(response.header[Gitlab::Workhorse::SEND_DATA_HEADER]).to start_with('git-blob:')
+        expect(response.header[Gitlab::Workhorse::DETECT_HEADER]).to eq 'true'
+      end
+
+      it_behaves_like 'content disposition headers'
+
+      it 'sets cache_control public header based on snippet visibility' do
+        subject
+
+        expect(response.cache_control[:public]).to eq snippet.public?
       end
 
       context 'when feature flag version_snippets is disabled' do
@@ -569,12 +584,33 @@ describe SnippetsController do
           subject
 
           expect(response.body).to eq snippet.content
+          expect(response.header['Content-Type']).to eq('text/plain; charset=utf-8')
         end
+
+        it_behaves_like 'content disposition headers'
+      end
+
+      context 'when snippet repository is empty' do
+        before do
+          allow_any_instance_of(Repository).to receive(:empty?).and_return(true)
+        end
+
+        it_behaves_like '200 status'
+        it_behaves_like 'CRLF line ending'
+
+        it 'returns snippet database content' do
+          subject
+
+          expect(response.body).to eq snippet.content
+          expect(response.header['Content-Type']).to eq('text/plain; charset=utf-8')
+        end
+
+        it_behaves_like 'content disposition headers'
       end
     end
 
     context 'when the personal snippet is private' do
-      let_it_be(:personal_snippet) { create(:personal_snippet, :private, :repository, author: user) }
+      let_it_be(:snippet) { create(:personal_snippet, :private, :repository, author: user) }
 
       context 'when signed in' do
         before do
@@ -593,18 +629,13 @@ describe SnippetsController do
         end
 
         context 'when signed in user is the author' do
-          it_behaves_like 'successful response' do
-            let(:snippet) { personal_snippet }
-            let(:params) { { id: snippet.to_param } }
-
-            subject { get :raw, params: params }
-          end
+          it_behaves_like 'successful response'
         end
       end
 
       context 'when not signed in' do
         it 'redirects to the sign in page' do
-          get :raw, params: { id: personal_snippet.to_param }
+          subject
 
           expect(response).to redirect_to(new_user_session_path)
         end
@@ -612,24 +643,19 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is internal' do
-      let_it_be(:personal_snippet) { create(:personal_snippet, :internal, :repository, author: user) }
+      let_it_be(:snippet) { create(:personal_snippet, :internal, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it_behaves_like 'successful response' do
-          let(:snippet) { personal_snippet }
-          let(:params) { { id: snippet.to_param } }
-
-          subject { get :raw, params: params }
-        end
+        it_behaves_like 'successful response'
       end
 
       context 'when not signed in' do
         it 'redirects to the sign in page' do
-          get :raw, params: { id: personal_snippet.to_param }
+          subject
 
           expect(response).to redirect_to(new_user_session_path)
         end
@@ -637,26 +663,21 @@ describe SnippetsController do
     end
 
     context 'when the personal snippet is public' do
-      let_it_be(:personal_snippet) { create(:personal_snippet, :public, :repository, author: user) }
+      let_it_be(:snippet) { create(:personal_snippet, :public, :repository, author: user) }
 
       context 'when signed in' do
         before do
           sign_in(user)
         end
 
-        it_behaves_like 'successful response' do
-          let(:snippet) { personal_snippet }
-          let(:params) { { id: snippet.to_param } }
-
-          subject { get :raw, params: params }
-        end
+        it_behaves_like 'successful response'
       end
 
       context 'when not signed in' do
         it 'responds with status 200' do
-          get :raw, params: { id: personal_snippet.to_param }
+          subject
 
-          expect(assigns(:snippet)).to eq(personal_snippet)
+          expect(assigns(:snippet)).to eq(snippet)
           expect(response).to have_gitlab_http_status(:ok)
         end
       end
@@ -699,7 +720,7 @@ describe SnippetsController do
           post(:toggle_award_emoji, params: { id: personal_snippet.to_param, name: "thumbsup" })
         end.to change { personal_snippet.award_emoji.count }.from(0).to(1)
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it "removes the already awarded emoji" do
@@ -709,7 +730,7 @@ describe SnippetsController do
           post(:toggle_award_emoji, params: { id: personal_snippet.to_param, name: "thumbsup" })
         end.to change { personal_snippet.award_emoji.count }.from(1).to(0)
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end
@@ -775,6 +796,14 @@ describe SnippetsController do
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
+    end
+  end
+
+  describe 'GET #edit' do
+    it_behaves_like 'editing snippet checks blob is binary' do
+      let_it_be(:snippet) { create(:personal_snippet, :public, :repository, author: user) }
+
+      subject { get :edit, params: { id: snippet } }
     end
   end
 end

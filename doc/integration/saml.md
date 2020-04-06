@@ -67,6 +67,8 @@ in your SAML IdP:
    auto_link_saml_user: true
    ```
 
+1. Ensure that the SAML [`NameID`](../user/group/saml_sso/index.md#nameid) and email address are fixed for each user, as described in the section on [Security](#security). Otherwise, your users will be able to sign in as other authorized users.
+
 1. Add the provider configuration:
 
    For Omnibus package:
@@ -118,7 +120,7 @@ in your SAML IdP:
 1. Change the value of `issuer` to a unique name, which will identify the application
    to the IdP.
 
-1. For the changes to take effect, you must [reconfigure][] GitLab if you installed via Omnibus or [restart GitLab][] if you installed from source.
+1. For the changes to take effect, you must [reconfigure](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) GitLab if you installed via Omnibus or [restart GitLab](../administration/restart_gitlab.md#installations-from-source) if you installed from source.
 
 1. Register the GitLab SP in your SAML 2.0 IdP, using the application name specified
    in `issuer`.
@@ -127,7 +129,7 @@ To ease configuration, most IdP accept a metadata URL for the application to pro
 configuration information to the IdP. To build the metadata URL for GitLab, append
 `users/auth/saml/metadata` to the HTTPS URL of your GitLab installation, for instance:
 
-```
+```plaintext
 https://gitlab.example.com/users/auth/saml/metadata
 ```
 
@@ -292,7 +294,7 @@ If you want some SAML authentication methods to count as 2FA on a per session ba
    ]
    ```
 
-1. Save the file and [reconfigure][] GitLab for the changes to take effect.
+1. Save the file and [reconfigure](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) GitLab for the changes to take effect.
 
 ---
 
@@ -322,7 +324,7 @@ If you want some SAML authentication methods to count as 2FA on a per session ba
          }
    ```
 
-1. Save the file and [restart GitLab][] for the changes ot take effect
+1. Save the file and [restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes ot take effect
 
 In addition to the changes in GitLab, make sure that your Idp is returning the
 `AuthnContext`. For example:
@@ -429,6 +431,8 @@ args: {
         uid_attribute: 'uid'
 }
 ```
+
+Make sure you read the [Security](#security) section before changing this value.
 
 ## Response signature validation (required)
 
@@ -544,6 +548,17 @@ args: {
 
 GitLab will sign the request with the provided private key. GitLab will include the configured public x500 certificate in the metadata for your Identity Provider to validate the signature of the received request with. For more information on this option, see the [Ruby SAML gem documentation](https://github.com/onelogin/ruby-saml/tree/v1.7.0). The Ruby SAML gem is used by the [OmniAuth SAML gem](https://github.com/omniauth/omniauth-saml) to implement the client side of the SAML authentication.
 
+## Security
+
+Avoid user control of the following attributes:
+
+- [`*NameID*`](../user/group/saml_sso/index.md#nameid)
+- *Email* when used with `omniauth_auto_link_saml_user`
+
+These attributes define the SAML user. If users can change these attributes, they can impersonate others.
+
+Refer to the documentation for your [SAML Identity Provider](../user/group/saml_sso/index.md#providers) for information on how to fix these attributes.
+
 ## Troubleshooting
 
 ### GitLab+SAML Testing Environments
@@ -615,6 +630,3 @@ For this you need take the following into account:
 
 Make sure that one of the above described scenarios is valid, or the requests will
 fail with one of the mentioned errors.
-
-[reconfigure]: ../administration/restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart GitLab]: ../administration/restart_gitlab.md#installations-from-source

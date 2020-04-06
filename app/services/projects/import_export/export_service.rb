@@ -5,9 +5,7 @@ module Projects
     class ExportService < BaseService
       def execute(after_export_strategy = nil, options = {})
         unless project.template_source? || can?(current_user, :admin_project, project)
-          raise ::Gitlab::ImportExport::Error.new(
-            "User with ID: %s does not have permission to Project %s with ID: %s." %
-              [current_user.id, project.name, project.id])
+          raise ::Gitlab::ImportExport::Error.permission_error(current_user, project)
         end
 
         @shared = project.import_export_shared
@@ -44,7 +42,7 @@ module Projects
       end
 
       def exporters
-        [version_saver, avatar_saver, project_tree_saver, uploads_saver, repo_saver, wiki_repo_saver, lfs_saver]
+        [version_saver, avatar_saver, project_tree_saver, uploads_saver, repo_saver, wiki_repo_saver, lfs_saver, snippets_repo_saver]
       end
 
       def version_saver
@@ -56,7 +54,16 @@ module Projects
       end
 
       def project_tree_saver
-        Gitlab::ImportExport::Project::TreeSaver.new(project: project, current_user: current_user, shared: shared, params: params)
+        tree_saver_class.new(project: project, current_user: current_user, shared: shared, params: params)
+      end
+
+      def tree_saver_class
+        if ::Feature.enabled?(:streaming_serializer, project, default_enabled: true)
+          Gitlab::ImportExport::Project::TreeSaver
+        else
+          # Once we remove :streaming_serializer feature flag, Project::LegacyTreeSaver should be removed as well
+          Gitlab::ImportExport::Project::LegacyTreeSaver
+        end
       end
 
       def uploads_saver
@@ -73,6 +80,10 @@ module Projects
 
       def lfs_saver
         Gitlab::ImportExport::LfsSaver.new(project: project, shared: shared)
+      end
+
+      def snippets_repo_saver
+        Gitlab::ImportExport::SnippetsRepoSaver.new(current_user: current_user, project: project, shared: shared)
       end
 
       def cleanup

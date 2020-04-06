@@ -12,6 +12,7 @@ import {
   INSTALL_EVENT,
   UPDATE_EVENT,
   UNINSTALL_EVENT,
+  ELASTIC_STACK,
 } from '../constants';
 import transitionApplicationState from '../services/application_state_machine';
 
@@ -52,10 +53,13 @@ export default class ClusterStore {
           ...applicationInitialState,
           title: s__('ClusterIntegration|Ingress'),
           modsecurity_enabled: false,
+          modsecurity_mode: null,
           externalIp: null,
           externalHostname: null,
           isEditingModSecurityEnabled: false,
+          isEditingModSecurityMode: false,
           updateFailed: false,
+          updateAvailable: false,
         },
         cert_manager: {
           ...applicationInitialState,
@@ -89,7 +93,7 @@ export default class ClusterStore {
           ...applicationInitialState,
           title: s__('ClusterIntegration|Knative'),
           hostname: null,
-          isEditingHostName: false,
+          isEditingDomain: false,
           externalIp: null,
           externalHostname: null,
           updateSuccessful: false,
@@ -210,10 +214,12 @@ export default class ClusterStore {
       if (appId === INGRESS) {
         this.state.applications.ingress.externalIp = serverAppEntry.external_ip;
         this.state.applications.ingress.externalHostname = serverAppEntry.external_hostname;
+        this.state.applications.ingress.updateAvailable = updateAvailable;
         if (!this.state.applications.ingress.isEditingModSecurityEnabled) {
-          this.state.applications.ingress.modsecurity_enabled =
-            serverAppEntry.modsecurity_enabled ||
-            this.state.applications.ingress.modsecurity_enabled;
+          this.state.applications.ingress.modsecurity_enabled = serverAppEntry.modsecurity_enabled;
+        }
+        if (!this.state.applications.ingress.isEditingModSecurityMode) {
+          this.state.applications.ingress.modsecurity_mode = serverAppEntry.modsecurity_mode;
         }
       } else if (appId === CERT_MANAGER) {
         this.state.applications.cert_manager.email =
@@ -228,7 +234,12 @@ export default class ClusterStore {
           'jupyter',
         );
       } else if (appId === KNATIVE) {
-        if (!this.state.applications.knative.isEditingHostName) {
+        if (serverAppEntry.available_domains) {
+          this.state.applications.knative.availableDomains = serverAppEntry.available_domains;
+        }
+        if (!this.state.applications.knative.isEditingDomain) {
+          this.state.applications.knative.pagesDomain =
+            serverAppEntry.pages_domain || this.state.applications.knative.pagesDomain;
           this.state.applications.knative.hostname =
             serverAppEntry.hostname || this.state.applications.knative.hostname;
         }
@@ -239,6 +250,9 @@ export default class ClusterStore {
       } else if (appId === RUNNER) {
         this.state.applications.runner.version = version;
         this.state.applications.runner.updateAvailable = updateAvailable;
+      } else if (appId === ELASTIC_STACK) {
+        this.state.applications.elastic_stack.version = version;
+        this.state.applications.elastic_stack.updateAvailable = updateAvailable;
       }
     });
   }

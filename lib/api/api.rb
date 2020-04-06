@@ -45,7 +45,7 @@ module API
 
     before do
       Gitlab::ApplicationContext.push(
-        user: -> { current_user },
+        user: -> { @current_user },
         project: -> { @project },
         namespace: -> { @group },
         caller_id: route.origin
@@ -121,6 +121,7 @@ module API
       mount ::API::BroadcastMessages
       mount ::API::Commits
       mount ::API::CommitStatuses
+      mount ::API::ContainerRegistryEvent
       mount ::API::DeployKeys
       mount ::API::DeployTokens
       mount ::API::Deployments
@@ -171,6 +172,7 @@ module API
       mount ::API::ProjectSnippets
       mount ::API::ProjectStatistics
       mount ::API::ProjectTemplates
+      mount ::API::Terraform::State
       mount ::API::ProtectedBranches
       mount ::API::ProtectedTags
       mount ::API::Releases

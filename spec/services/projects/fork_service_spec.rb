@@ -4,7 +4,6 @@ require 'spec_helper'
 
 describe Projects::ForkService do
   include ProjectForksHelper
-  include Gitlab::ShellAdapter
 
   shared_examples 'forks count cache refresh' do
     it 'flushes the forks count cache of the source project', :clean_gitlab_redis_cache do
@@ -135,17 +134,16 @@ describe Projects::ForkService do
       end
 
       context 'repository in legacy storage already exists' do
-        let(:repository_storage) { 'default' }
-        let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage].legacy_disk_path }
+        let(:fake_repo_path) { File.join(TestEnv.repos_path, @to_user.namespace.full_path, "#{@from_project.path}.git") }
         let(:params) { { namespace: @to_user.namespace } }
 
         before do
           stub_application_setting(hashed_storage_enabled: false)
-          gitlab_shell.create_repository(repository_storage, "#{@to_user.namespace.full_path}/#{@from_project.path}", "#{@to_user.namespace.full_path}/#{@from_project.path}")
+          TestEnv.create_bare_repository(fake_repo_path)
         end
 
         after do
-          gitlab_shell.remove_repository(repository_storage, "#{@to_user.namespace.full_path}/#{@from_project.path}")
+          FileUtils.rm_rf(fake_repo_path)
         end
 
         subject { fork_project(@from_project, @to_user, params) }
@@ -313,15 +311,19 @@ describe Projects::ForkService do
       fork_before_move = fork_project(project)
 
       # Stub everything required to move a project to a Gitaly shard that does not exist
-      stub_storage_settings('test_second_storage' => { 'path' => 'tmp/tests/second_storage' })
-      allow_any_instance_of(Gitlab::Git::Repository).to receive(:fetch_repository_as_mirror).and_return(true)
+      stub_storage_settings('test_second_storage' => { 'path' => TestEnv::SECOND_STORAGE_PATH })
+      allow_any_instance_of(Gitlab::Git::Repository).to receive(:create_repository)
+        .and_return(true)
+      allow_any_instance_of(Gitlab::Git::Repository).to receive(:replicate)
+      allow_any_instance_of(Gitlab::Git::Repository).to receive(:checksum)
+        .and_return(::Gitlab::Git::BLANK_SHA)
 
       Projects::UpdateRepositoryStorageService.new(project).execute('test_second_storage')
       fork_after_move = fork_project(project)
       pool_repository_before_move = PoolRepository.joins(:shard)
-                                      .where(source_project: project, shards: { name: 'default' }).first
+                                      .find_by(source_project: project, shards: { name: 'default' })
       pool_repository_after_move = PoolRepository.joins(:shard)
-                                     .where(source_project: project, shards: { name: 'test_second_storage' }).first
+                                     .find_by(source_project: project, shards: { name: 'test_second_storage' })
 
       expect(fork_before_move.pool_repository).to eq(pool_repository_before_move)
       expect(fork_after_move.pool_repository).to eq(pool_repository_after_move)

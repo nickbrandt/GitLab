@@ -1,24 +1,33 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { setTestTimeout } from 'helpers/timeout';
 import { GlLink } from '@gitlab/ui';
-import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
+import {
+  GlAreaChart,
+  GlLineChart,
+  GlChartSeriesLabel,
+  GlChartLegend,
+} from '@gitlab/ui/dist/charts';
 import { cloneDeep } from 'lodash';
 import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
-import { chartColorValues } from '~/monitoring/constants';
 import { createStore } from '~/monitoring/stores';
 import TimeSeries from '~/monitoring/components/charts/time_series.vue';
 import * as types from '~/monitoring/stores/mutation_types';
 import {
   deploymentData,
-  metricsDashboardPayload,
-  mockedQueryResultPayload,
+  mockedQueryResultFixture,
   metricsDashboardViewModel,
   mockProjectDir,
   mockHost,
 } from '../../mock_data';
 import * as iconUtils from '~/lib/utils/icon_utils';
+import { getJSONFixture } from '../../../helpers/fixtures';
 
 const mockSvgPathContent = 'mockSvgPathContent';
+
+const metricsDashboardFixture = getJSONFixture(
+  'metrics_dashboard/environment_metrics_dashboard.json',
+);
+const metricsDashboardPayload = metricsDashboardFixture.dashboard;
 
 jest.mock('lodash/throttle', () =>
   // this throttle mock executes immediately
@@ -37,13 +46,16 @@ describe('Time series component', () => {
   let store;
 
   const makeTimeSeriesChart = (graphData, type) =>
-    shallowMount(TimeSeries, {
+    mount(TimeSeries, {
       propsData: {
         graphData: { ...graphData, type },
         deploymentData: store.state.monitoringDashboard.deploymentData,
         projectPath: `${mockHost}${mockProjectDir}`,
       },
       store,
+      stubs: {
+        GlPopover: true,
+      },
     });
 
   describe('With a single time series', () => {
@@ -59,14 +71,12 @@ describe('Time series component', () => {
 
       store.commit(`monitoringDashboard/${types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS}`, deploymentData);
 
-      // Mock data contains 2 panel groups, with 1 and 2 panels respectively
       store.commit(
         `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
-        mockedQueryResultPayload,
+        mockedQueryResultFixture,
       );
-
-      // Pick the second panel group and the first panel in it
-      [mockGraphData] = store.state.monitoringDashboard.dashboard.panelGroups[0].panels;
+      // dashboard is a dynamically generated fixture and stored at environment_metrics_dashboard.json
+      [mockGraphData] = store.state.monitoringDashboard.dashboard.panelGroups[1].panels;
     });
 
     describe('general functions', () => {
@@ -189,9 +199,8 @@ describe('Time series component', () => {
             });
 
             it('formats tooltip content', () => {
-              const name = 'Total';
-              const value = '5.556MB';
-
+              const name = 'Status Code';
+              const value = '5.556';
               const dataIndex = 0;
               const seriesLabel = timeSeriesChart.find(GlChartSeriesLabel);
 
@@ -306,10 +315,6 @@ describe('Time series component', () => {
           it('formats line width correctly', () => {
             expect(chartData[0].lineStyle.width).toBe(2);
           });
-
-          it('formats line color correctly', () => {
-            expect(chartData[0].lineStyle.color).toBe(chartColorValues[0]);
-          });
         });
 
         describe('chartOptions', () => {
@@ -399,7 +404,7 @@ describe('Time series component', () => {
             });
 
             it('formats and rounds to 2 decimal places', () => {
-              expect(dataFormatter(0.88888)).toBe('0.89MB');
+              expect(dataFormatter(0.88888)).toBe('0.89');
             });
 
             it('deployment formatter is set as is required to display a tooltip', () => {
@@ -408,16 +413,24 @@ describe('Time series component', () => {
           });
         });
 
-        describe('deploymentSeries', () => {
+        describe('annotationSeries', () => {
           it('utilizes deployment data', () => {
-            expect(timeSeriesChart.vm.deploymentSeries.yAxisIndex).toBe(1); // same as deployment y axis
-            expect(timeSeriesChart.vm.deploymentSeries.data).toEqual([
-              ['2019-07-16T10:14:25.589Z', expect.any(Number)],
-              ['2019-07-16T11:14:25.589Z', expect.any(Number)],
-              ['2019-07-16T12:14:25.589Z', expect.any(Number)],
+            const annotationSeries = timeSeriesChart.vm.chartOptionSeries[0];
+            expect(annotationSeries.yAxisIndex).toBe(1); // same as annotations y axis
+            expect(annotationSeries.data).toEqual([
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T10:14:25.589Z', expect.any(Number)],
+              }),
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T11:14:25.589Z', expect.any(Number)],
+              }),
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T12:14:25.589Z', expect.any(Number)],
+              }),
             ]);
-
-            expect(timeSeriesChart.vm.deploymentSeries.symbolSize).toBe(14);
           });
         });
 
@@ -441,7 +454,7 @@ describe('Time series component', () => {
           it('constructs a label for the chart y-axis', () => {
             const { yAxis } = getChartOptions();
 
-            expect(yAxis[0].name).toBe('Total Memory Used');
+            expect(yAxis[0].name).toBe('Requests / Sec');
           });
         });
       });
@@ -544,7 +557,7 @@ describe('Time series component', () => {
         store = createStore();
         const graphData = cloneDeep(metricsDashboardViewModel.panelGroups[0].panels[3]);
         graphData.metrics.forEach(metric =>
-          Object.assign(metric, { result: mockedQueryResultPayload.result }),
+          Object.assign(metric, { result: mockedQueryResultFixture.result }),
         );
 
         timeSeriesChart = makeTimeSeriesChart(graphData, 'area-chart');
@@ -555,19 +568,39 @@ describe('Time series component', () => {
         timeSeriesChart.destroy();
       });
 
-      describe('computed', () => {
-        let chartData;
+      describe('Color match', () => {
+        let lineColors;
 
         beforeEach(() => {
-          ({ chartData } = timeSeriesChart.vm);
+          lineColors = timeSeriesChart
+            .find(GlAreaChart)
+            .vm.series.map(item => item.lineStyle.color);
         });
 
-        it('should contain different colors for each time series', () => {
-          expect(chartData[0].lineStyle.color).toBe('#1f78d1');
-          expect(chartData[1].lineStyle.color).toBe('#1aaa55');
-          expect(chartData[2].lineStyle.color).toBe('#fc9403');
-          expect(chartData[3].lineStyle.color).toBe('#6d49cb');
-          expect(chartData[4].lineStyle.color).toBe('#1f78d1');
+        it('should contain different colors for contiguous time series', () => {
+          lineColors.forEach((color, index) => {
+            expect(color).not.toBe(lineColors[index + 1]);
+          });
+        });
+
+        it('should match series color with tooltip label color', () => {
+          const labels = timeSeriesChart.findAll(GlChartSeriesLabel);
+
+          lineColors.forEach((color, index) => {
+            const labelColor = labels.at(index).props('color');
+            expect(color).toBe(labelColor);
+          });
+        });
+
+        it('should match series color with legend color', () => {
+          const legendColors = timeSeriesChart
+            .find(GlChartLegend)
+            .props('seriesInfo')
+            .map(item => item.color);
+
+          lineColors.forEach((color, index) => {
+            expect(color).toBe(legendColors[index]);
+          });
         });
       });
     });

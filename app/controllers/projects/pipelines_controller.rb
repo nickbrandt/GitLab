@@ -13,6 +13,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   before_action do
     push_frontend_feature_flag(:junit_pipeline_view)
   end
+  before_action :ensure_pipeline, only: [:show]
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
 
@@ -22,7 +23,7 @@ class Projects::PipelinesController < Projects::ApplicationController
 
   def index
     @scope = params[:scope]
-    @pipelines = PipelinesFinder
+    @pipelines = Ci::PipelinesFinder
       .new(project, current_user, scope: @scope)
       .execute
       .page(params[:page])
@@ -60,10 +61,10 @@ class Projects::PipelinesController < Projects::ApplicationController
       .new(project, current_user, create_params)
       .execute(:web, ignore_skip_ci: true, save_on_errors: false)
 
-    if @pipeline.persisted?
+    if @pipeline.created_successfully?
       redirect_to project_pipeline_path(project, @pipeline)
     else
-      render 'new'
+      render 'new', status: :bad_request
     end
   end
 
@@ -171,9 +172,15 @@ class Projects::PipelinesController < Projects::ApplicationController
         if pipeline_test_report == :error
           render json: { status: :error_parsing_report }
         else
+          test_reports = if params[:scope] == "with_attachment"
+                           pipeline_test_report.with_attachment!
+                         else
+                           pipeline_test_report
+                         end
+
           render json: TestReportSerializer
             .new(current_user: @current_user)
-            .represent(pipeline_test_report)
+            .represent(test_reports)
         end
       end
     end
@@ -214,6 +221,10 @@ class Projects::PipelinesController < Projects::ApplicationController
     params.require(:pipeline).permit(:ref, variables_attributes: %i[key variable_type secret_value])
   end
 
+  def ensure_pipeline
+    render_404 unless pipeline
+  end
+
   # rubocop: disable CodeReuse/ActiveRecord
   def pipeline
     @pipeline ||= if params[:id].blank? && params[:latest]
@@ -251,7 +262,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def limited_pipelines_count(project, scope = nil)
-    finder = PipelinesFinder.new(project, current_user, scope: scope)
+    finder = Ci::PipelinesFinder.new(project, current_user, scope: scope)
 
     view_context.limited_counter_with_delimiter(finder.execute)
   end

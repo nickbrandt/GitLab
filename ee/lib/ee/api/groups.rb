@@ -74,7 +74,7 @@ module EE
         resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           desc 'Sync a group with LDAP.'
           post ":id/ldap_sync" do
-            not_found! unless ::Gitlab::Auth::LDAP::Config.group_sync_enabled?
+            not_found! unless ::Gitlab::Auth::Ldap::Config.group_sync_enabled?
 
             group = find_group!(params[:id])
             authorize! :admin_group, group
@@ -110,11 +110,15 @@ module EE
             desc 'Get a specific audit event in this group.' do
               success EE::API::Entities::AuditEvent
             end
+            params do
+              requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
+            end
             get '/:audit_event_id' do
-              audit_log_finder_params = audit_log_finder_params(user_group)
-              audit_event = AuditLogFinder.new(audit_log_finder_params.merge(id: params[:audit_event_id])).execute
-
-              not_found!('Audit Event') unless audit_event
+              # rubocop: disable CodeReuse/ActiveRecord
+              # This is not `find_by!` from ActiveRecord
+              audit_event = AuditLogFinder.new(audit_log_finder_params(user_group))
+                .find_by!(id: params[:audit_event_id])
+              # rubocop: enable CodeReuse/ActiveRecord
 
               present audit_event, with: EE::API::Entities::AuditEvent
             end

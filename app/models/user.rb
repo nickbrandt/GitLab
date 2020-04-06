@@ -21,6 +21,8 @@ class User < ApplicationRecord
   include OptionallySearch
   include FromUnion
   include BatchDestroyDependentAssociations
+  include HasUniqueInternalUsers
+  include IgnorableColumns
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -56,10 +58,14 @@ class User < ApplicationRecord
 
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
                     "administrator if you think this is an error."
+  LOGIN_FORBIDDEN = "Your account does not have the required permission to login. Please contact your GitLab " \
+                    "administrator if you think this is an error."
 
   MINIMUM_INACTIVE_DAYS = 180
 
-  enum bot_type: ::UserBotTypeEnums.bots
+  enum user_type: ::UserTypeEnums.types
+
+  ignore_column :bot_type, remove_with: '12.11', remove_after: '2020-04-22'
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -103,7 +109,6 @@ class User < ApplicationRecord
 
   # Groups
   has_many :members
-  has_one  :max_access_level_membership, -> { select(:id, :user_id, :access_level).order(access_level: :desc).readonly }, class_name: 'Member'
   has_many :group_members, -> { where(requested_at: nil) }, source: 'GroupMember'
   has_many :groups, through: :group_members
   has_many :owned_groups, -> { where(members: { access_level: Gitlab::Access::OWNER }) }, through: :group_members, source: :group
@@ -163,6 +168,8 @@ class User < ApplicationRecord
   has_one :status, class_name: 'UserStatus'
   has_one :user_preference
   has_one :user_detail
+  has_one :user_highest_role
+  has_one :user_canonical_email
 
   #
   # Validations
@@ -211,6 +218,7 @@ class User < ApplicationRecord
   before_save :check_for_verified_email, if: ->(user) { user.email_changed? && !user.new_record? }
   before_validation :ensure_namespace_correct
   before_save :ensure_namespace_correct # in case validation is skipped
+  before_save :ensure_bio_is_assigned_to_user_details, if: :bio_changed?
   after_validation :set_username_errors
   after_update :username_changed_hook, if: :saved_change_to_username?
   after_destroy :post_destroy_hook
@@ -230,6 +238,7 @@ class User < ApplicationRecord
       end
     end
   end
+  after_commit :update_highest_role, on: [:create, :update]
 
   after_initialize :set_projects_limit
 
@@ -291,14 +300,6 @@ class User < ApplicationRecord
       def blocked?
         true
       end
-
-      def active_for_authentication?
-        false
-      end
-
-      def inactive_message
-        BLOCKED_MESSAGE
-      end
     end
 
     before_transition do
@@ -335,14 +336,29 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
-  scope :bots, -> { where.not(bot_type: nil) }
-  scope :humans, -> { where(bot_type: nil) }
+  scope :bots, -> { where(user_type: UserTypeEnums.bots.values) }
+  scope :not_bots, -> { humans.or(where.not(user_type: UserTypeEnums.bots.values)) }
+  scope :humans, -> { where(user_type: nil) }
 
   scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
     where('EXISTS (?)',
           ::PersonalAccessToken
             .where('personal_access_tokens.user_id = users.id')
             .expiring_and_not_notified(at).select(1))
+  end
+
+  def active_for_authentication?
+    super && can?(:log_in)
+  end
+
+  def inactive_message
+    if blocked?
+      BLOCKED_MESSAGE
+    elsif internal?
+      LOGIN_FORBIDDEN
+    else
+      super
+    end
   end
 
   def self.with_visible_profile(user)
@@ -504,7 +520,7 @@ class User < ApplicationRecord
     # query - The search query as a String
     #
     # Returns an ActiveRecord::Relation.
-    def search(query)
+    def search(query, **options)
       query = query&.delete_prefix('@')
       return none if query.blank?
 
@@ -607,7 +623,7 @@ class User < ApplicationRecord
     # owns records previously belonging to deleted users.
     def ghost
       email = 'ghost%s@example.com'
-      unique_internal(where(ghost: true), 'ghost', email) do |u|
+      unique_internal(where(ghost: true, user_type: :ghost), 'ghost', email) do |u|
         u.bio = _('This is a "Ghost User", created to hold all issues authored by users that have since been deleted. This user cannot be removed.')
         u.name = 'Ghost User'
       end
@@ -616,7 +632,7 @@ class User < ApplicationRecord
     def alert_bot
       email_pattern = "alert%s@#{Settings.gitlab.host}"
 
-      unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+      unique_internal(where(user_type: :alert_bot), 'alert-bot', email_pattern) do |u|
         u.bio = 'The GitLab alert bot'
         u.name = 'GitLab Alert Bot'
       end
@@ -638,11 +654,18 @@ class User < ApplicationRecord
   end
 
   def bot?
-    bot_type.present?
+    UserTypeEnums.bots.has_key?(user_type)
   end
 
   def internal?
     ghost? || bot?
+  end
+
+  # We are transitioning from ghost boolean column to user_type
+  # so we need to read from old column for now
+  # @see https://gitlab.com/gitlab-org/gitlab/-/issues/210025
+  def ghost?
+    ghost
   end
 
   def self.internal
@@ -650,7 +673,7 @@ class User < ApplicationRecord
   end
 
   def self.non_internal
-    without_ghosts.humans
+    without_ghosts.not_bots
   end
 
   #
@@ -1056,7 +1079,7 @@ class User < ApplicationRecord
   end
 
   def highest_role
-    max_access_level_membership&.access_level || Gitlab::Access::NO_ACCESS
+    user_highest_role&.highest_access_level || Gitlab::Access::NO_ACCESS
   end
 
   def accessible_deploy_keys
@@ -1248,6 +1271,13 @@ class User < ApplicationRecord
     end
   end
 
+  # Temporary, will be removed when bio is fully migrated
+  def ensure_bio_is_assigned_to_user_details
+    return if Feature.disabled?(:migrate_bio_to_user_details, default_enabled: true)
+
+    user_detail.bio = bio.to_s[0...255] # bio can be NULL in users, but cannot be NULL in user_details
+  end
+
   def set_username_errors
     namespace_path_errors = self.errors.delete(:"namespace.path")
     self.errors[:username].concat(namespace_path_errors) if namespace_path_errors
@@ -1374,7 +1404,7 @@ class User < ApplicationRecord
         .select('ci_runners.*')
 
       group_runners = Ci::RunnerNamespace
-        .where(namespace_id: owned_groups.select(:id))
+        .where(namespace_id: Gitlab::ObjectHierarchy.new(owned_groups).base_and_descendants.select(:id))
         .joins(:runner)
         .select('ci_runners.*')
 
@@ -1560,13 +1590,6 @@ class User < ApplicationRecord
   end
 
   def read_only_attribute?(attribute)
-    if Feature.enabled?(:ldap_readonly_attributes, default_enabled: true)
-      enabled = Gitlab::Auth::LDAP::Config.enabled?
-      read_only = attribute.to_sym.in?(UserSyncedAttributesMetadata::SYNCABLE_ATTRIBUTES)
-
-      return true if enabled && read_only
-    end
-
     user_synced_attributes_metadata&.read_only?(attribute)
   end
 
@@ -1670,8 +1693,28 @@ class User < ApplicationRecord
     callouts.any?
   end
 
-  # @deprecated
-  alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
+  def gitlab_employee?
+    strong_memoize(:gitlab_employee) do
+      if Feature.enabled?(:gitlab_employee_badge) && Gitlab.com?
+        Mail::Address.new(email).domain == "gitlab.com" && confirmed?
+      else
+        false
+      end
+    end
+  end
+
+  # Load the current highest access by looking directly at the user's memberships
+  def current_highest_access_level
+    members.non_request.maximum(:access_level)
+  end
+
+  def confirmation_required_on_sign_in?
+    !confirmed? && !confirmation_period_valid?
+  end
+
+  def organization
+    gitlab_employee? ? 'GitLab' : super
+  end
 
   protected
 
@@ -1680,6 +1723,30 @@ class User < ApplicationRecord
     return false if internal?
 
     super
+  end
+
+  # override from Devise::Confirmable
+  def confirmation_period_valid?
+    return false if Feature.disabled?(:soft_email_confirmation)
+
+    super
+  end
+
+  # This is copied from Devise::Models::TwoFactorAuthenticatable#consume_otp!
+  #
+  # An OTP cannot be used more than once in a given timestep
+  # Storing timestep of last valid OTP is sufficient to satisfy this requirement
+  #
+  # See:
+  #   <https://github.com/tinfoil/devise-two-factor/blob/master/lib/devise_two_factor/models/two_factor_authenticatable.rb#L66>
+  #
+  def consume_otp!
+    if self.consumed_timestep != current_otp_timestep
+      self.consumed_timestep = current_otp_timestep
+      return Gitlab::Database.read_only? ? true : save(validate: false)
+    end
+
+    false
   end
 
   private
@@ -1767,50 +1834,8 @@ class User < ApplicationRecord
     return if restrictions.blank?
 
     if Gitlab::UntrustedRegexp.new(restrictions).match?(email)
-      errors.add(:email, _('is not allowed for sign-up'))
+      errors.add(:email, _('is not allowed. Try again with a different email address, or contact your GitLab admin.'))
     end
-  end
-
-  def self.unique_internal(scope, username, email_pattern, &block)
-    scope.first || create_unique_internal(scope, username, email_pattern, &block)
-  end
-
-  def self.create_unique_internal(scope, username, email_pattern, &creation_block)
-    # Since we only want a single one of these in an instance, we use an
-    # exclusive lease to ensure than this block is never run concurrently.
-    lease_key = "user:unique_internal:#{username}"
-    lease = Gitlab::ExclusiveLease.new(lease_key, timeout: 1.minute.to_i)
-
-    until uuid = lease.try_obtain
-      # Keep trying until we obtain the lease. To prevent hammering Redis too
-      # much we'll wait for a bit between retries.
-      sleep(1)
-    end
-
-    # Recheck if the user is already present. One might have been
-    # added between the time we last checked (first line of this method)
-    # and the time we acquired the lock.
-    existing_user = uncached { scope.first }
-    return existing_user if existing_user.present?
-
-    uniquify = Uniquify.new
-
-    username = uniquify.string(username) { |s| User.find_by_username(s) }
-
-    email = uniquify.string(-> (n) { Kernel.sprintf(email_pattern, n) }) do |s|
-      User.find_by_email(s)
-    end
-
-    user = scope.build(
-      username: username,
-      email: email,
-      &creation_block
-    )
-
-    Users::UpdateService.new(user, user: user).execute(validate: false) # rubocop: disable CodeReuse/ServiceClass
-    user
-  ensure
-    Gitlab::ExclusiveLease.cancel(lease_key, uuid)
   end
 
   def groups_with_developer_maintainer_project_access
@@ -1828,6 +1853,21 @@ class User < ApplicationRecord
   def no_recent_activity?
     last_active_at.to_i <= MINIMUM_INACTIVE_DAYS.days.ago.to_i
   end
+
+  # Triggers the service to schedule a Sidekiq job to update the highest role
+  # for a User
+  #
+  # The job will be called outside of a transaction in order to ensure the changes
+  # for a Member to be commited before attempting to update the highest role.
+  # rubocop: disable CodeReuse/ServiceClass
+  def update_highest_role
+    return unless (previous_changes.keys & %w(state user_type ghost)).any?
+
+    run_after_commit_or_now do
+      Members::UpdateHighestRoleService.new(id).execute
+    end
+  end
+  # rubocop: enable CodeReuse/ServiceClass
 end
 
 User.prepend_if_ee('EE::User')

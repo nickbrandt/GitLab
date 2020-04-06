@@ -1,9 +1,9 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     position: {
@@ -12,6 +12,10 @@ export default {
     },
     data: {
       type: Object,
+      required: true,
+    },
+    definitionPathPrefix: {
+      type: String,
       required: true,
     },
   },
@@ -26,6 +30,11 @@ export default {
         left: `${this.position.x - this.offsetLeft}px`,
         top: `${this.position.y + this.position.height}px`,
       };
+    },
+    definitionPath() {
+      return (
+        this.data.definition_path && `${this.definitionPathPrefix}/${this.data.definition_path}`
+      );
     },
   },
   watch: {
@@ -67,10 +76,10 @@ export default {
         {{ hover.value }}
       </p>
     </div>
-    <div v-if="data.definition_url" class="popover-body">
-      <gl-button :href="data.definition_url" target="_blank" class="w-100" variant="default">
+    <div v-if="definitionPath" class="popover-body">
+      <gl-deprecated-button :href="definitionPath" target="_blank" class="w-100" variant="default">
         {{ __('Go to definition') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
   </div>
 </template>

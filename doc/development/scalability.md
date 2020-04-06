@@ -18,7 +18,7 @@ users. We will discuss each component below.
 
 The PostgreSQL database holds all metadata for projects, issues, merge
 requests, users, etc. The schema is managed by the Rails application
-[db/schema.rb](https://gitlab.com/gitlab-org/gitlab/blob/master/db/schema.rb).
+[db/structure.sql](https://gitlab.com/gitlab-org/gitlab/blob/master/db/structure.sql).
 
 GitLab Web/API servers and Sidekiq nodes talk directly to the database via a
 Rails object relational model (ORM). Most SQL queries are accessed via this
@@ -67,7 +67,7 @@ kind of partitioning.
 Sharding is likely more difficult and will require significant changes
 to the schema and application. For example, if we have to store projects
 in many different databases, we immediately run into the question, "How
-can we retrieve data across different projects?"  One answer to this is
+can we retrieve data across different projects?" One answer to this is
 to abstract data access into API calls that abstract the database from
 the application, but this is a significant amount of work.
 
@@ -128,7 +128,7 @@ replica if its replication lag is low (e.g. WAL data behind by < 100
 megabytes).
 
 More [details are in a blog
-post](https://about.gitlab.com/2017/10/02/scaling-the-gitlab-database/).
+post](https://about.gitlab.com/blog/2017/10/02/scaling-the-gitlab-database/).
 
 ### PgBouncer
 

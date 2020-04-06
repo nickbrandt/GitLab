@@ -9,6 +9,8 @@ module CiVariablesHelper
     if entity.is_a?(Group)
       create_deploy_token_group_settings_ci_cd_path(entity, opts)
     else
+      # TODO: change this path to 'create_deploy_token_project_settings_ci_cd_path'
+      # See MR comment for more detail: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27059#note_311585356
       create_deploy_token_project_settings_repository_path(entity, opts)
     end
   end
@@ -45,6 +47,6 @@ module CiVariablesHelper
   end
 
   def ci_variable_maskable_regex
-    Maskable::REGEX.inspect.sub('\\A', '^').sub('\\z', '$').sub(/^\//, '').sub(/\/[a-z]*$/, '').gsub('\/', '/')
+    Ci::Maskable::REGEX.inspect.sub('\\A', '^').sub('\\z', '$').sub(/^\//, '').sub(/\/[a-z]*$/, '').gsub('\/', '/')
   end
 end

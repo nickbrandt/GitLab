@@ -12,7 +12,7 @@ RSpec.shared_examples 'rejects nuget packages access' do |user_type, status, add
       it 'has the correct response header' do
         subject
 
-        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Nuget Package Registry'
+        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Packages Registry'
       end
     end
   end
@@ -35,6 +35,8 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
     end
 
     it_behaves_like 'returning response status', status
+
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'nuget_service_index'
 
     it 'returns a valid json response' do
       subject
@@ -164,6 +166,10 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
     end
 
     context 'with object storage disabled' do
+      before do
+        stub_package_file_object_storage(enabled: false)
+      end
+
       context 'without a file from workhorse' do
         let(:params) { { package: nil } }
 
@@ -178,18 +184,19 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
     end
 
     context 'with object storage enabled' do
+      let(:tmp_object) do
+        fog_connection.directories.new(key: 'packages').files.create(
+          key: "tmp/uploads/#{file_name}",
+          body: 'content'
+        )
+      end
+      let(:fog_file) { fog_to_uploaded_file(tmp_object) }
+      let(:params) { { package: fog_file, 'package.remote_id' => file_name } }
+
       context 'and direct upload enabled' do
-        let!(:fog_connection) do
+        let(:fog_connection) do
           stub_package_file_object_storage(direct_upload: true)
         end
-        let(:tmp_object) do
-          fog_connection.directories.new(key: 'packages').files.create(
-            key: "tmp/uploads/#{file_name}",
-            body: 'content'
-          )
-        end
-        let(:fog_file) { fog_to_uploaded_file(tmp_object) }
-        let(:params) { { package: fog_file, 'package.remote_id' => file_name } }
 
         it_behaves_like 'creates nuget package files'
 
@@ -207,8 +214,26 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
         end
       end
 
-      it_behaves_like 'background upload schedules a file migration'
+      context 'and direct upload disabled' do
+        context 'and background upload disabled' do
+          let(:fog_connection) do
+            stub_package_file_object_storage(direct_upload: false, background_upload: false)
+          end
+
+          it_behaves_like 'creates nuget package files'
+        end
+
+        context 'and background upload enabled' do
+          let(:fog_connection) do
+            stub_package_file_object_storage(direct_upload: false, background_upload: true)
+          end
+
+          it_behaves_like 'creates nuget package files'
+        end
+      end
     end
+
+    it_behaves_like 'background upload schedules a file migration'
   end
 end
 
@@ -257,6 +282,8 @@ RSpec.shared_examples 'process nuget download content request' do |user_type, st
 
     it_behaves_like 'returning response status', status
 
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
+
     it 'returns a valid package archive' do
       subject
 
@@ -304,6 +331,8 @@ RSpec.shared_examples 'process nuget search request' do |user_type, status, add_
     end
 
     it_behaves_like 'returns a valid json search response', status, 4, [1, 5, 5, 1]
+
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'search_package'
 
     context 'with skip set to 2' do
       let(:skip) { 2 }

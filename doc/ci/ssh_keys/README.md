@@ -37,7 +37,7 @@ with any type of [executor](https://docs.gitlab.com/runner/executors/)
 NOTE: **Note:**
 The private key will not be displayed in the job log, unless you enable
 [debug logging](../variables/README.md#debug-logging). You might also want to
-check the [visibility of your pipelines](../../user/project/pipelines/settings.md#visibility-of-pipelines).
+check the [visibility of your pipelines](../pipelines/settings.md#visibility-of-pipelines).
 
 ## SSH keys when using the Docker executor
 
@@ -204,11 +204,9 @@ before_script:
 
 ## Example project
 
-We have set up an [Example SSH Project][ssh-example-repo] for your convenience
+We have set up an [Example SSH Project](https://gitlab.com/gitlab-examples/ssh-private-key/) for your convenience
 that runs on [GitLab.com](https://gitlab.com) using our publicly available
 [shared runners](../runners/README.md).
 
 Want to hack on it? Simply fork it, commit and push your changes. Within a few
 moments the changes will be picked by a public runner and the job will begin.
-
-[ssh-example-repo]: https://gitlab.com/gitlab-examples/ssh-private-key/

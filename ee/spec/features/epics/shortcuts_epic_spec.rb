@@ -30,7 +30,7 @@ describe 'Epic shortcuts', :js do
     it "opens labels dropdown for editing" do
       find('body').native.send_key('l')
 
-      expect(find('.js-labels-block')).to have_selector('.dropdown-menu-labels.show')
+      expect(find('.js-labels-block')).to have_selector('.labels-select-dropdown-contents')
     end
   end
 

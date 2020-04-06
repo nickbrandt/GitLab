@@ -6,7 +6,7 @@
   - if show_feed_buttons
     = render 'shared/issuable/feed_buttons'
 
-  .btn-group.append-right-10<
+  .btn-group
     - if show_export_button
       = render_if_exists 'projects/issues/export_csv/button'
 
@@ -20,7 +20,6 @@
                                                   issue: { assignee_id: finder.assignee.try(:id),
                                                            milestone_id: finder.milestones.first.try(:id) }),
                                                   class: "btn btn-success",
-                                                  title: _("New issue"),
                                                   id: "new_issue_link"
 
 - if show_export_button

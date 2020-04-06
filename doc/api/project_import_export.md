@@ -5,7 +5,7 @@
 See also:
 
 - [Project import/export documentation](../user/project/settings/import_export.md).
-- [Project import/export administration rake tasks](../administration/raketasks/project_import_export.md). **(CORE ONLY)**
+- [Project import/export administration Rake tasks](../administration/raketasks/project_import_export.md). **(CORE ONLY)**
 
 ## Schedule an export
 
@@ -61,14 +61,20 @@ curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/ap
 Status can be one of:
 
 - `none`
+- `queued`
 - `started`
-- `after_export_action`
 - `finished`
+- `regeneration_in_progress`
 
-The `after_export_action` state represents that the export process has been completed successfully and
-the platform is performing some actions on the resulted file. For example, sending
-an email notifying the user to download the file, uploading the exported file
-to a web server, etc.
+`queued` state represents the request for export is received, and is currently in the queue to be processed.
+
+The `started` state represents that the export process has started and is currently in progress.
+It includes the process of exporting, actions performed on the resultant file such as sending
+an email notifying the user to download the file, uploading the exported file to a web server, etc.
+
+`finished` state is after the export process has completed and the user has been notified.
+
+`regeneration_in_progress` is when an export file is available to download, and a request to generate a new export is in process.
 
 `_links` are only present when export has finished.
 
@@ -125,7 +131,7 @@ POST /projects/import
 | `overwrite` | boolean | no | If there is a project with the same path the import will overwrite it. Default to false |
 | `override_params` | Hash | no | Supports all fields defined in the [Project API](projects.md) |
 
-The override params passed will take precedence over all values defined inside the export file.
+The override parameters passed will take precedence over all values defined inside the export file.
 
 To upload a file from your file system, use the `--form` argument. This causes
 cURL to post data using the header `Content-Type: multipart/form-data`.

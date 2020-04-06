@@ -2,7 +2,7 @@
 
 ## List project pipelines
 
-> [Introduced][ce-5837] in GitLab 8.11
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5837) in GitLab 8.11
 
 ```plaintext
 GET /projects/:id/pipelines
@@ -12,9 +12,9 @@ GET /projects/:id/pipelines
 |-----------|---------|----------|---------------------|
 | `id`      | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `scope`   | string  | no       | The scope of pipelines, one of: `running`, `pending`, `finished`, `branches`, `tags` |
-| `status`  | string  | no       | The status of pipelines, one of: `running`, `pending`, `success`, `failed`, `canceled`, `skipped` |
+| `status`  | string  | no       | The status of pipelines, one of: `running`, `pending`, `success`, `failed`, `canceled`, `skipped`, `created` |
 | `ref`     | string  | no       | The ref of pipelines |
-| `sha`     | string  | no       | The sha of pipelines |
+| `sha`     | string  | no       | The SHA of pipelines |
 | `yaml_errors`| boolean  | no       | Returns pipelines with invalid configurations |
 | `name`| string  | no       | The name of the user who triggered pipelines |
 | `username`| string  | no       | The username of the user who triggered pipelines |
@@ -54,7 +54,7 @@ Example of response
 
 ## Get a single pipeline
 
-> [Introduced][ce-5837] in GitLab 8.11
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5837) in GitLab 8.11
 
 ```plaintext
 GET /projects/:id/pipelines/:pipeline_id
@@ -132,7 +132,7 @@ Example of response
 
 ## Create a new pipeline
 
-> [Introduced][ce-7209] in GitLab 8.14
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7209) in GitLab 8.14
 
 ```plaintext
 POST /projects/:id/pipeline
@@ -180,7 +180,7 @@ Example of response
 
 ## Retry jobs in a pipeline
 
-> [Introduced][ce-5837] in GitLab 8.11
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5837) in GitLab 8.11
 
 ```plaintext
 POST /projects/:id/pipelines/:pipeline_id/retry
@@ -227,7 +227,7 @@ Response:
 
 ## Cancel a pipelines jobs
 
-> [Introduced][ce-5837] in GitLab 8.11
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5837) in GitLab 8.11
 
 ```plaintext
 POST /projects/:id/pipelines/:pipeline_id/cancel
@@ -288,6 +288,3 @@ DELETE /projects/:id/pipelines/:pipeline_id
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" --request "DELETE" "https://gitlab.example.com/api/v4/projects/1/pipelines/46"
 ```
-
-[ce-5837]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5837
-[ce-7209]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7209

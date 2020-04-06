@@ -1,7 +1,8 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlFormGroup, GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import { TIME_WINDOWS } from '../constants';
+import { timeRanges, defaultTimeRange } from '~/vue_shared/constants';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 
 export default {
   name: 'ThreatMonitoringFilters',
@@ -9,6 +10,13 @@ export default {
     GlFormGroup,
     GlDropdown,
     GlDropdownItem,
+    DateTimePicker,
+  },
+  data() {
+    return {
+      selectedTimeRange: defaultTimeRange,
+      timeRanges,
+    };
   },
   computed: {
     ...mapState('threatMonitoring', [
@@ -17,7 +25,7 @@ export default {
       'isLoadingEnvironments',
       'isLoadingWafStatistics',
     ]),
-    ...mapGetters('threatMonitoring', ['currentEnvironmentName', 'currentTimeWindowName']),
+    ...mapGetters('threatMonitoring', ['currentEnvironmentName']),
     isDisabled() {
       return (
         this.isLoadingEnvironments || this.isLoadingWafStatistics || this.environments.length === 0
@@ -26,10 +34,12 @@ export default {
   },
   methods: {
     ...mapActions('threatMonitoring', ['setCurrentEnvironmentId', 'setCurrentTimeWindow']),
+    onDateTimePickerInput(timeRange) {
+      this.selectedTimeRange = timeRange;
+      this.setCurrentTimeWindow(timeRange);
+    },
   },
   environmentFilterId: 'threat-monitoring-environment-filter',
-  showLastFilterId: 'threat-monitoring-show-last-filter',
-  timeWindows: TIME_WINDOWS,
 };
 </script>
 
@@ -63,25 +73,17 @@ export default {
       <gl-form-group
         :label="s__('ThreatMonitoring|Show last')"
         label-size="sm"
-        :label-for="$options.showLastFilterId"
-        class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
+        label-for="threat-monitoring-time-window-dropdown"
+        class="col-sm-6 col-md-6 col-lg-4"
       >
-        <gl-dropdown
-          :id="$options.showLastFilterId"
-          ref="showLastDropdown"
-          class="mb-0 d-flex"
-          toggle-class="d-flex justify-content-between"
-          :text="currentTimeWindowName"
+        <date-time-picker
+          ref="dateTimePicker"
+          :custom-enabled="false"
+          :value="selectedTimeRange"
+          :options="timeRanges"
           :disabled="isDisabled"
-        >
-          <gl-dropdown-item
-            v-for="(timeWindowConfig, timeWindow) in $options.timeWindows"
-            :key="timeWindow"
-            ref="showLastDropdownItem"
-            @click="setCurrentTimeWindow(timeWindow)"
-            >{{ timeWindowConfig.name }}</gl-dropdown-item
-          >
-        </gl-dropdown>
+          @input="onDateTimePickerInput"
+        />
       </gl-form-group>
     </div>
   </div>

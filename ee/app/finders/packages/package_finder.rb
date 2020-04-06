@@ -7,7 +7,10 @@ module Packages
     end
 
     def execute
-      @project.packages.find(@package_id)
+      @project
+        .packages
+        .processed
+        .find(@package_id)
     end
   end
 end

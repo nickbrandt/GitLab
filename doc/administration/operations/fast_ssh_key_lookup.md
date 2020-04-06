@@ -1,15 +1,12 @@
 # Fast lookup of authorized SSH keys in the database
 
-NOTE: **Note:** This document describes a drop-in replacement for the
-`authorized_keys` file for normal (non-deploy key) users. Consider
-using [SSH certificates](ssh_certificates.md), they are even faster,
-but are not a drop-in replacement.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1631) in [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
+> - [Available in](https://gitlab.com/gitlab-org/gitlab/issues/3953) GitLab Community Edition 10.4.
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1631) in
-> [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
->
-> [Available in](https://gitlab.com/gitlab-org/gitlab/issues/3953) GitLab
-> Community Edition 10.4.
+NOTE: **Note:** This document describes a drop-in replacement for the
+`authorized_keys` file. For normal (non-deploy key) users, consider using
+[SSH certificates](ssh_certificates.md). They are even faster, but are not a
+drop-in replacement.
 
 Regular SSH operations become slow as the number of users grows because OpenSSH
 searches for a key to authorize a user via a linear search. In the worst case,
@@ -54,8 +51,10 @@ Add the following to your `sshd_config` file. This is usually located at
 Omnibus Docker:
 
 ```plaintext
-AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
-AuthorizedKeysCommandUser git
+Match User git    # Apply the AuthorizedKeysCommands to the git user only
+  AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
+  AuthorizedKeysCommandUser git
+Match all    # End match, settings apply to all users again
 ```
 
 Reload OpenSSH:
@@ -99,7 +98,7 @@ This is a brief overview. Please refer to the above instructions for more contex
 1. [Rebuild the `authorized_keys` file](../raketasks/maintenance.md#rebuild-authorized_keys-file)
 1. Enable writes to the `authorized_keys` file in Application Settings
 1. Remove the `AuthorizedKeysCommand` lines from `/etc/ssh/sshd_config` or from `/assets/sshd_config` if you are using Omnibus Docker.
-1. Reload sshd: `sudo service sshd reload`
+1. Reload `sshd`: `sudo service sshd reload`
 1. Remove the `/opt/gitlab-shell/authorized_keys` file
 
 ## Compiling a custom version of OpenSSH for CentOS 6
@@ -185,7 +184,7 @@ the database. The following instructions can be used to build OpenSSH 7.5:
 
    You should see a line that reads: "debug1: Remote protocol version 2.0, remote software version OpenSSH_7.5"
 
-   If not, you may need to restart sshd (e.g. `systemctl restart sshd.service`).
+   If not, you may need to restart `sshd` (e.g. `systemctl restart sshd.service`).
 
 1. *IMPORTANT!* Open a new SSH session to your server before exiting to make
    sure everything is working! If you need to downgrade, simple install the

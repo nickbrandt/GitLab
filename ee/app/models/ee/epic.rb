@@ -55,6 +55,8 @@ module EE
 
       validates :group, presence: true
       validate :validate_parent, on: :create
+      validate :validate_confidential_issues_and_subepics
+      validate :validate_confidential_parent
 
       alias_attribute :parent_ids, :parent_id
       alias_method :issuing_parent, :group
@@ -66,6 +68,8 @@ module EE
       scope :in_milestone, -> (milestone_id) { joins(:issues).where(issues: { milestone_id: milestone_id }) }
       scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
       scope :has_parent, -> { where.not(parent_id: nil) }
+      scope :iid_starts_with, -> (query) { where("CAST(iid AS VARCHAR) LIKE ?", "#{sanitize_sql_like(query)}%") }
+      scope :public_only, -> { where(confidential: false) }
 
       scope :within_timeframe, -> (start_date, end_date) do
         where('start_date is not NULL or end_date is not NULL')
@@ -185,6 +189,11 @@ module EE
 
       def parent_class
         ::Group
+      end
+
+      def nullify_lost_group_parents(groups, lost_groups)
+        epics_to_update = in_selected_groups(groups).where(parent: in_selected_groups(lost_groups))
+        epics_to_update.update_all(parent_id: nil)
       end
 
       # Return the deepest relation level for an epic.
@@ -378,6 +387,26 @@ module EE
       return self.class.none unless parent_id
 
       hierarchy.base_and_ancestors(hierarchy_order: :asc)
+    end
+
+    def validate_confidential_issues_and_subepics
+      return unless confidential?
+
+      if issues.public_only.any?
+        errors.add :confidential, _('Cannot make epic confidential if it contains not-confidential issues')
+      end
+
+      if children.public_only.any?
+        errors.add :confidential, _('Cannot make epic confidential if it contains not-confidential sub-epics')
+      end
+    end
+
+    def validate_confidential_parent
+      return unless parent
+
+      if !confidential? && parent.confidential?
+        errors.add :confidential, _('Not-confidential epic cannot be assigned to a confidential parent epic')
+      end
     end
   end
 end

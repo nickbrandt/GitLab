@@ -8,7 +8,7 @@ GitLab's documentation is [intended as the single source of truth (SSOT)](https:
 
 In addition to this page, the following resources can help you craft and contribute documentation:
 
-- [Style Guide](styleguide.md) - What belongs in the docs, language guidelines, Markdown standards to follow, and more.
+- [Style Guide](styleguide.md) - What belongs in the docs, language guidelines, Markdown standards to follow, links, and more.
 - [Structure and template](structure.md) - Learn the typical parts of a doc page and how to write each one.
 - [Documentation process](workflow.md).
 - [Markdown Guide](../../user/markdown.md) - A reference for all Markdown syntax supported by GitLab.
@@ -58,7 +58,7 @@ However, anyone can contribute [documentation improvements](improvement-workflow
 ## Markdown and styles
 
 [GitLab docs](https://gitlab.com/gitlab-org/gitlab-docs) uses [GitLab Kramdown](https://gitlab.com/gitlab-org/gitlab_kramdown)
-as its Markdown rendering engine. See the [GitLab Markdown Guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/) for a complete Kramdown reference.
+as its Markdown rendering engine. See the [GitLab Markdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/) for a complete Kramdown reference.
 
 Adhere to the [Documentation Style Guide](styleguide.md). If a style standard is missing, you are welcome to suggest one via a merge request.
 
@@ -116,8 +116,9 @@ Things to note:
 - The above `git grep` command will search recursively in the directory you run
   it in for `workflow/lfs/lfs_administration` and `lfs/lfs_administration`
   and will print the file and the line where this file is mentioned.
-  You may ask why the two greps. Since we use relative paths to link to
-  documentation, sometimes it might be useful to search a path deeper.
+  You may ask why the two greps. Since [we use relative paths to link to
+  documentation](styleguide.md#links)
+  , sometimes it might be useful to search a path deeper.
 - The `*.md` extension is not used when a document is linked to GitLab's
   built-in help page, that's why we omit it in `git grep`.
 - Use the checklist on the "Change documentation location" MR description template.
@@ -393,15 +394,14 @@ merge request with new or changed docs is submitted, are:
 - [`docs lint`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/docs.gitlab-ci.yml#L48):
   Runs several tests on the content of the docs themselves:
   - [`lint-doc.sh` script](https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/lint-doc.sh)
-    checks that:
+    runs the following checks and linters:
     - All cURL examples use the long flags (ex: `--header`, not `-H`).
     - The `CHANGELOG.md` does not contain duplicate versions.
     - No files in `doc/` are executable.
     - No new `README.md` was added.
-  - [markdownlint](#markdownlint).
-  - Nanoc tests, which you can [run locally](#previewing-the-changes-live) before
-    pushing to GitLab by executing the command `bundle exec nanoc check internal_links`
-    (or `internal_anchors`) on your local [`gitlab-docs`](https://gitlab.com/gitlab-org/gitlab-docs) directory:
+    - [markdownlint](#markdownlint).
+    - [Vale](#vale).
+  - Nanoc tests:
     - [`internal_links`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/docs.gitlab-ci.yml#L67)
       checks that all internal links (ex: `[link](../index.md)`) are valid.
     - [`internal_anchors`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/docs.gitlab-ci.yml#L69)
@@ -410,66 +410,78 @@ merge request with new or changed docs is submitted, are:
 - If any code or the `doc/README.md` file is changed, a full pipeline will run, which
   runs tests for [`/help`](#gitlab-help-tests).
 
-### Linting
+### Running tests
+
+Apart from [previewing your changes locally](#previewing-the-changes-live), you can also run all lint checks
+and Nanoc tests locally.
+
+#### Nanoc tests
+
+To execute Nanoc tests locally:
+
+1. Navigate to the [`gitlab-docs`](https://gitlab.com/gitlab-org/gitlab-docs) directory.
+1. Run:
+
+   ```shell
+   # Check for broken internal links
+   bundle exec nanoc check internal_links
+
+   # Check for broken external links (might take a lot of time to complete).
+   # This test is set to be allowed to fail and is run only in the gitlab-docs project CI
+   bundle exec nanoc check internal_anchors
+   ```
+
+#### Lint checks
+
+Lint checks are performed by the [`lint-doc.sh`](https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/lint-doc.sh)
+script and can be executed as follows:
+
+1. Navigate to the `gitlab` directory.
+1. Run:
+
+   ```shell
+   MD_DOC_PATH=path/to/my_doc.md scripts/lint-doc.sh
+   ```
+
+Where `MD_DOC_PATH` points to the file or directory you would like to run lint checks for.
+If you omit it completely, it will default to the `doc/` directory.
+The output should be similar to:
+
+```plaintext
+=> Linting documents at path /path/to/gitlab as <user>...
+=> Checking for cURL short options...
+=> Checking for CHANGELOG.md duplicate entries...
+=> Checking /path/to/gitlab/doc for executable permissions...
+=> Checking for new README.md files...
+=> Linting markdown style...
+=> Linting prose...
+✔ 0 errors, 0 warnings and 0 suggestions in 1 file.
+✔ Linting passed
+```
+
+Note that this requires you to either have the required lint tools installed on your machine,
+or a working Docker installation, in which case an image with these tools pre-installed will be used.
+
+### Local linting
 
 To help adhere to the [documentation style guidelines](styleguide.md), and improve the content
 added to documentation, consider locally installing and running documentation linters. This will
 help you catch common issues before raising merge requests for review of documentation.
 
-The following are some suggested linters you can install locally and sample configuration:
+Running the following locally allows you to match the checks in the build pipeline:
 
-- [`proselint`](#proselint)
-- [markdownlint](#markdownlint), which is the same as the test run in [`docs-lint`](#testing)
-- [Vale](#vale), for English language grammar and syntax suggestions
+- [markdownlint](#markdownlint).
+- [Vale](#vale).
 
 NOTE: **Note:**
 This list does not limit what other linters you can add to your local documentation writing toolchain.
-
-#### `proselint`
-
-`proselint` checks for common problems with English prose. It provides a
- [plethora of checks](http://proselint.com/checks/) that are helpful for technical writing.
-
-`proselint` can be used [on the command line](http://proselint.com/utility/), either on a single
- Markdown file or on all Markdown files in a project. For example, to run `proselint` on all
- documentation in the [`gitlab` project](https://gitlab.com/gitlab-org/gitlab), run the
- following commands from within the `gitlab` project:
-
-```shell
-cd doc
-proselint **/*.md
-```
-
-`proselint` can also be run from within editors using plugins. For example, the following plugins
- are available:
-
-- [Sublime Text](https://packagecontrol.io/packages/SublimeLinter-contrib-proselint)
-- [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=PatrykPeszko.vscode-proselint)
-- [Others](https://github.com/amperser/proselint#plugins-for-other-software)
-
-##### Sample `proselint` configuration
-
-All of the checks are good to use. However, excluding the `typography.symbols` and `misc.phrasal_adjectives` checks will reduce
-noise. The following sample `proselint` configuration disables these checks:
-
-```json
-{
-  "checks": {
-    "typography.symbols": false,
-    "misc.phrasal_adjectives": false
-  }
-}
-```
-
-A file with `proselint` configuration must be placed in a
-[valid location](https://github.com/amperser/proselint#checks). For example, `~/.config/proselint/config`.
 
 #### markdownlint
 
 [markdownlint](https://github.com/DavidAnson/markdownlint) checks that Markdown
 syntax follows [certain rules](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#rules),
 and is used by the [`docs-lint` test](#testing) with a [configuration file](#markdownlint-configuration).
-Our [Documentation Style Guide](styleguide.md#markdown) and [Markdown Guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/)
+Our [Documentation Style Guide](styleguide.md#markdown) and [Markdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/)
 elaborate on which choices must be made when selecting Markdown syntax for GitLab
 documentation. This tool helps catch deviations from those guidelines.
 
@@ -541,8 +553,6 @@ vale --glob='*.{md}' doc
 You can also
 [configure the text editor of your choice](https://errata-ai.github.io/vale/#local-use-by-a-single-writer)
 to display the results.
-
-Vale's test results are not currently displayed in CI, but may be displayed in the future.
 
 ## Danger Bot
 

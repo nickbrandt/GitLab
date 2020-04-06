@@ -40,7 +40,7 @@ they are still not 100% standardized. You can see them below:
 | Issues/MR/Notes Legacy Markdown attachments | no | uploads/-/system/note/attachment/:id/:filename            | `AttachmentUploader`   | Note       |
 | Design Management design thumbnails (EE) | yes | uploads/-/system/design_management/action/image_v432x230/:id/:filename | `DesignManagement::DesignV432x230Uploader` | DesignManagement::Action |
 | CI Artifacts (CE)                     | yes    | `shared/artifacts/:disk_hash[0..1]/:disk_hash[2..3]/:disk_hash/:year_:month_:date/:job_id/:job_artifact_id` (:disk_hash is SHA256 digest of project_id) | `JobArtifactUploader`  | Ci::JobArtifact  |
-| LFS Objects  (CE)                     | yes    | shared/lfs-objects/:hex/:hex/:object_hash                   | `LfsObjectUploader`    | LfsObject  |
+| LFS Objects (CE)                      | yes    | shared/lfs-objects/:hex/:hex/:object_hash                   | `LfsObjectUploader`    | LfsObject  |
 | External merge request diffs          | yes    | shared/external-diffs/merge_request_diffs/mr-:parent_id/diff-:id | `ExternalDiffUploader` | MergeRequestDiff |
 
 CI Artifacts and LFS Objects behave differently in CE and EE. In CE they inherit the `GitlabUploader`
@@ -50,9 +50,9 @@ In the case of Issues/MR/Notes Markdown attachments, there is a different approa
 instead of basing the path into a mutable variable `:project_path_with_namespace`, it's possible to use the
 hash of the project ID instead, if project migrates to the new approach (introduced in 10.2).
 
-> Note: We provide an [all-in-one rake task] to migrate all uploads to object
+> Note: We provide an [all-in-one Rake task] to migrate all uploads to object
 > storage in one go. If a new Uploader class or model type is introduced, make
-> sure you add a rake task invocation corresponding to it to the [category
+> sure you add a Rake task invocation corresponding to it to the [category
 > list].
 
 ### Path segments
@@ -60,7 +60,7 @@ hash of the project ID instead, if project migrates to the new approach (introdu
 Files are stored at multiple locations and use different path schemes.
 All the `GitlabUploader` derived classes should comply with this path segment schema:
 
-```
+```plaintext
 |   GitlabUploader
 | ----------------------- + ------------------------- + --------------------------------- + -------------------------------- |
 | `<gitlab_root>/public/` | `uploads/-/system/`       | `user/avatar/:id/`                | `:filename`                      |

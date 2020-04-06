@@ -15,7 +15,7 @@ describe Projects::Licenses::UpdatePolicyService do
     context "when the user is authorized" do
       before do
         allow(RefreshLicenseComplianceChecksWorker).to receive(:perform_async)
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
         project.add_maintainer(user)
       end
 

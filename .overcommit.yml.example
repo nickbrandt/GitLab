@@ -15,8 +15,8 @@
 #
 # Uncomment the following lines to make the configuration take effect.
 
-# Make sure to run `cd tooling/overcommit && make && cd -`
-gemfile: 'tooling/overcommit/gems.rb'
+# Make sure to run `make -C tooling/overcommit`
+gemfile: 'tooling/overcommit/Gemfile'
 
 PostCheckout:
   BundleInstall:
@@ -28,7 +28,9 @@ PreCommit:
   EsLint:
     enabled: true
     # https://github.com/sds/overcommit/issues/338
-    command: './node_modules/eslint/bin/eslint.js'
+    required_executable: 'yarn'
+    command: ['yarn', 'eslint']
+    flags: []
   HamlLint:
     enabled: true
   MergeConflicts:

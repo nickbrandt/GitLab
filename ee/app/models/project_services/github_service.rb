@@ -60,7 +60,7 @@ class GithubService < Service
   end
 
   def can_test?
-    project.ci_pipelines.any?
+    project&.ci_pipelines&.any?
   end
 
   def disabled_title

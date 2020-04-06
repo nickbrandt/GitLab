@@ -10,7 +10,7 @@ RSpec.describe SCA::LicenseCompliance do
   let(:other_license) { create(:software_license, spdx_identifier: "Other-Id") }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   describe "#policies" do
@@ -43,13 +43,13 @@ RSpec.describe SCA::LicenseCompliance do
 
       context "when the license scan job has not finished" do
         let(:builds) { [create(:ci_build, :running, job_artifacts: [artifact])] }
-        let(:artifact) { create(:ci_job_artifact, file_type: :license_management, file_format: :raw) }
+        let(:artifact) { create(:ci_job_artifact, file_type: :license_scanning, file_format: :raw) }
 
         it { expect(subject.policies).to be_empty }
       end
 
       context "when the license scan produces a poorly formatted report" do
-        let(:builds) { [create(:ee_ci_build, :running, :corrupted_license_management_report)] }
+        let(:builds) { [create(:ee_ci_build, :running, :corrupted_license_scanning_report)] }
 
         it { expect(subject.policies).to be_empty }
       end

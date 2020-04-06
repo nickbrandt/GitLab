@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlIntersectionObserver } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 import { n__, __ } from '~/locale';
@@ -8,6 +8,7 @@ import { DESIGN_ROUTE_NAME } from '../../router/constants';
 export default {
   components: {
     GlLoadingIcon,
+    GlIntersectionObserver,
     Icon,
     Timeago,
   },
@@ -37,11 +38,22 @@ export default {
       required: false,
       default: null,
     },
-    isLoading: {
+    isUploading: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
+    imageV432x230: {
+      type: String,
+      required: false,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      imageLoading: true,
+      isInView: false,
+    };
   },
   computed: {
     icon() {
@@ -69,6 +81,17 @@ export default {
     notesLabel() {
       return n__('%d comment', '%d comments', this.notesCount);
     },
+    showLoadingSpinner() {
+      return this.imageLoading || this.isUploading;
+    },
+    imageLink() {
+      return this.isInView ? this.imageV432x230 || this.image : '';
+    },
+  },
+  methods: {
+    onImageLoad() {
+      this.imageLoading = false;
+    },
   },
   DESIGN_ROUTE_NAME,
 };
@@ -89,14 +112,17 @@ export default {
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
-      <gl-loading-icon v-if="isLoading" size="md" />
-      <img
-        v-else
-        :src="image"
-        :alt="filename"
-        class="block ml-auto mr-auto mw-100 mh-100 design-img"
-        data-qa-selector="design_image"
-      />
+      <gl-loading-icon v-show="showLoadingSpinner" size="md" />
+      <gl-intersection-observer @appear="isInView = true">
+        <img
+          v-show="!showLoadingSpinner"
+          :src="imageLink"
+          :alt="filename"
+          class="block mx-auto mw-100 mh-100 design-img"
+          data-qa-selector="design_image"
+          @load="onImageLoad"
+        />
+      </gl-intersection-observer>
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">

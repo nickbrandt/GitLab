@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::Auth::LDAP::Sync::Group do
+describe EE::Gitlab::Auth::Ldap::Sync::Group do
   include LdapHelpers
 
   let(:adapter) { ldap_adapter }
@@ -91,7 +91,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
 
       adapter = ldap_adapter('ldapmain')
       proxy = proxy(adapter, 'ldapmain')
-      allow(EE::Gitlab::Auth::LDAP::Sync::Proxy).to receive(:open).and_yield(proxy)
+      allow(EE::Gitlab::Auth::Ldap::Sync::Proxy).to receive(:open).and_yield(proxy)
     end
 
     let(:group) do
@@ -497,7 +497,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
         it 'does not update permissions when group base is missing' do
           stub_ldap_config(group_base: nil)
 
-          expect_any_instance_of(EE::Gitlab::Auth::LDAP::Sync::Proxy).not_to receive(:dns_for_group_cn)
+          expect_any_instance_of(EE::Gitlab::Auth::Ldap::Sync::Proxy).not_to receive(:dns_for_group_cn)
 
           sync_group.update_permissions
         end

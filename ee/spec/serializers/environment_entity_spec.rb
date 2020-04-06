@@ -4,17 +4,13 @@ require 'spec_helper'
 
 describe EnvironmentEntity do
   include KubernetesHelpers
-  include Gitlab::Routing.url_helpers
 
   let(:user) { create(:user) }
   let(:environment) { create(:environment) }
-
-  before do
-    environment.project.add_maintainer(user)
-  end
+  let(:project) { create(:project) }
 
   let(:entity) do
-    described_class.new(environment, request: double(current_user: user))
+    described_class.new(environment, request: double(current_user: user, project: project))
   end
 
   describe '#as_json' do
@@ -29,6 +25,7 @@ describe EnvironmentEntity do
         before do
           allow(environment).to receive(:has_terminals?).and_return(true)
           allow(environment).to receive(:rollout_status).and_return(kube_deployment_rollout_status)
+          environment.project.add_maintainer(user)
         end
 
         it 'exposes rollout_status' do
@@ -47,37 +44,29 @@ describe EnvironmentEntity do
       end
     end
 
-    context 'when pod_logs are available' do
+    context 'when environment has a review app' do
+      let(:project) { create(:project, :repository) }
+      let(:environment) { create(:environment, :with_review_app, ref: 'development', project: project) }
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
       before do
-        stub_licensed_features(pod_logs: true)
+        project.repository.add_branch(user, 'development', project.commit.id)
       end
 
-      it 'exposes logs keys' do
-        expect(subject).to include(:logs_path)
-        expect(subject).to include(:logs_api_path)
-        expect(subject).to include(:enable_advanced_logs_querying)
+      describe '#can_stop' do
+        subject { entity.as_json[:can_stop] }
+
+        it_behaves_like 'protected environments access'
       end
 
-      it 'uses k8s api when ES is not available' do
-        expect(subject[:logs_api_path]).to eq(k8s_project_logs_path(environment.project, environment_name: environment.name, format: :json))
-      end
+      describe '#terminal_path' do
+        before do
+          allow(environment).to receive(:has_terminals?).and_return(true)
+        end
 
-      it 'uses ES api when ES is available' do
-        allow(environment).to receive(:elastic_stack_available?).and_return(true)
+        subject { entity.as_json.include?(:terminal_path) }
 
-        expect(subject[:logs_api_path]).to eq(elasticsearch_project_logs_path(environment.project, environment_name: environment.name, format: :json))
-      end
-    end
-
-    context 'when pod_logs are not available' do
-      before do
-        stub_licensed_features(pod_logs: false)
-      end
-
-      it 'does not expose logs keys' do
-        expect(subject).not_to include(:logs_path)
-        expect(subject).not_to include(:logs_api_path)
-        expect(subject).not_to include(:enable_advanced_logs_querying)
+        it_behaves_like 'protected environments access', false
       end
     end
   end

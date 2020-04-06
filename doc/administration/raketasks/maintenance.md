@@ -50,7 +50,7 @@ Git:              /usr/bin/git
 
 ## Check GitLab configuration
 
-Runs the following rake tasks:
+Runs the following Rake tasks:
 
 - `gitlab:gitlab_shell:check`
 - `gitlab:gitaly:check`
@@ -58,6 +58,7 @@ Runs the following rake tasks:
 - `gitlab:app:check`
 
 It will check that each component was set up according to the installation guide and suggest fixes for issues found.
+This command must be run from your app server and will not work correctly on component servers like [Gitaly](../gitaly/index.md#running-gitaly-on-its-own-server).
 
 You may also have a look at our Troubleshooting Guides:
 
@@ -208,7 +209,7 @@ sudo -u git -H bundle exec rake gitlab:track_deployment RAILS_ENV=production
 ## Check TCP connectivity to a remote site
 
 Sometimes you need to know if your GitLab installation can connect to a TCP
-service on another machine - perhaps a PostgreSQL or HTTPS server. A rake task
+service on another machine - perhaps a PostgreSQL or HTTPS server. A Rake task
 is included to help you with this:
 
 **Omnibus Installation**
@@ -254,7 +255,10 @@ sudo gitlab-rake gitlab:exclusive_lease:clear[project_housekeeping:4]
 
 ## Display status of database migrations
 
-To check the status of migrations, you can use the following rake task:
+See the [upgrade documentation](../../update/README.md#checking-for-background-migrations-before-upgrading)
+for how to check that migrations are complete when upgrading GitLab.
+
+To check the status of specific migrations, you can use the following Rake task:
 
 ```shell
 sudo gitlab-rake db:migrate:status

@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import _ from 'underscore';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import ResizablePanel from '../resizable_panel.vue';
@@ -48,14 +47,14 @@ export default {
       },
     }),
     namespace() {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       return `${this.side}Pane`;
     },
     tabs() {
       return this.extensionTabs.filter(tab => tab.show);
     },
     tabViews() {
-      return _.flatten(this.tabs.map(tab => tab.views));
+      return this.tabs.map(tab => tab.views).flat();
     },
     aliveTabViews() {
       return this.tabViews.filter(view => this.isAliveView(view.name));

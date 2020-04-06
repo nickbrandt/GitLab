@@ -18,7 +18,7 @@ describe DependencyEntity do
 
     context 'when all required features available' do
       before do
-        stub_licensed_features(security_dashboard: true, license_management: true)
+        stub_licensed_features(security_dashboard: true, license_scanning: true)
         allow(request).to receive(:project).and_return(project)
         allow(request).to receive(:user).and_return(user)
       end

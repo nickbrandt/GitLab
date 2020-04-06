@@ -55,4 +55,14 @@ describe Analytics::MergeRequestMetricsCalculator do
       expect(subject.first_approved_at).to be_like_time(1.day.ago)
     end
   end
+
+  describe '#first_reassigned_at' do
+    it 'returns earliest non-author assignee creation timestamp' do
+      merge_request.merge_request_assignees.create(assignee: merge_request.author, created_at: 5.days.ago)
+      merge_request.merge_request_assignees.create(assignee: create(:user), created_at: 3.days.ago)
+      merge_request.merge_request_assignees.create(assignee: create(:user), created_at: 1.day.ago)
+
+      expect(subject.first_reassigned_at).to be_like_time(3.days.ago)
+    end
+  end
 end

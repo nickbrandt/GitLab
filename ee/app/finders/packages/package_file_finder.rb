@@ -22,7 +22,6 @@ class Packages::PackageFileFinder
     files = package.package_files
 
     files = by_file_name(files)
-    files = by_conan_file_type(files)
 
     files
   end
@@ -33,11 +32,5 @@ class Packages::PackageFileFinder
     else
       files.with_file_name(file_name)
     end
-  end
-
-  def by_conan_file_type(files)
-    return files unless params[:conan_file_type]
-
-    files.with_conan_file_type(params[:conan_file_type])
   end
 end

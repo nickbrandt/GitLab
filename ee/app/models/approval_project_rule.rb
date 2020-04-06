@@ -23,6 +23,10 @@ class ApprovalProjectRule < ApplicationRecord
     includes(:protected_branches).select { |rule| rule.applies_to_branch?(branch) }
   end
 
+  def self.inapplicable_to_branch(branch)
+    includes(:protected_branches).reject { |rule| rule.applies_to_branch?(branch) }
+  end
+
   def applies_to_branch?(branch)
     return true if protected_branches.empty?
 

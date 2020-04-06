@@ -19,13 +19,13 @@ module EE
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
-      scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
       scope :no_epic, -> { left_outer_joins(:epic_issue).where(epic_issues: { epic_id: nil }) }
       scope :in_epics, ->(epics) do
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
@@ -45,6 +45,7 @@ module EE
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+      validate :validate_confidential_epic
 
       after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
     end
@@ -63,6 +64,20 @@ module EE
     # override
     def allows_multiple_assignees?
       project.feature_available?(:multiple_issue_assignees)
+    end
+
+    def blocked?
+      blocking_issues_ids.any?
+    end
+
+    # Used on EE::IssueEntity to expose blocking issues URLs
+    def blocked_by_issues(user)
+      return ::Issue.none unless blocked?
+
+      issues =
+        ::IssuesFinder.new(user).execute.where(id: blocking_issues_ids)
+
+      issues.preload(project: [:route, { namespace: [:route] }])
     end
 
     # override
@@ -196,6 +211,10 @@ module EE
 
     private
 
+    def blocking_issues_ids
+      @blocking_issues_ids ||= ::IssueLink.blocking_issue_ids_for(self)
+    end
+
     def update_generic_alert_title
       update(title: "#{title} #{iid}")
     end
@@ -204,6 +223,14 @@ module EE
       title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE &&
         project.alerts_service_activated? &&
         author == ::User.alert_bot
+    end
+
+    def validate_confidential_epic
+      return unless epic
+
+      if !confidential? && epic.confidential?
+        errors.add :issue, _('Cannot set confidential epic for not-confidential issue')
+      end
     end
   end
 end

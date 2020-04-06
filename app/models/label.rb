@@ -138,7 +138,7 @@ class Label < ApplicationRecord
   # query - The search query as a String.
   #
   # Returns an ActiveRecord::Relation.
-  def self.search(query)
+  def self.search(query, **options)
     fuzzy_search(query, [:title, :description])
   end
 
@@ -157,6 +157,11 @@ class Label < ApplicationRecord
     return false if label_id.blank?
 
     on_project_boards(project_id).where(id: label_id).exists?
+  end
+
+  # Generate a hex color based on hex-encoded value
+  def self.color_for(value)
+    "##{Digest::MD5.hexdigest(value)[0..5]}"
   end
 
   def open_issues_count(user = nil)

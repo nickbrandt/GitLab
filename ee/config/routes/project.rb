@@ -11,6 +11,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
+        resources :requirements, only: [:index]
         resources :packages, only: [:index, :show, :destroy], module: :packages
         resources :package_files, only: [], module: :packages do
           member do
@@ -37,33 +38,35 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :settings do
-          resource :operations, only: [] do
-            member do
-              post :reset_alerting_token
-            end
-          end
-
           resource :slack, only: [:destroy, :edit, :update] do
             get :slack_auth
           end
         end
 
-        resources :designs, only: [], constraints: { id: /\d+/ } do
-          member do
-            get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
+        # DEPRECATED: Remove this redirection in GitLab 13.0.
+        # This redirection supports old (pre-12.9) routes to Design Management raw images.
+        # https://gitlab.com/gitlab-org/gitlab/issues/208256
+        get '/designs/:id(/*ref)',
+          as: :design,
+          contraints: { id: /\d+/, ref: Gitlab::PathRegex.git_reference_regex },
+          to: redirect { |params|
+            namespace_id, project_id, id, ref = params.values_at(:namespace_id, :project_id, :id, :ref)
+            # The :ref route segment is optional in both this route, and the route
+            # we redirect to (where it is called :sha).
+            ref_path = "/#{ref}" if ref
+            "#{namespace_id}/#{project_id}/-/design_management/designs/#{id}#{ref_path}/raw_image"
+          }
+
+        namespace :design_management do
+          namespace :designs, path: 'designs/:design_id(/:sha)', constraints: -> (params) { params[:sha].nil? || Gitlab::Git.commit_id?(params[:sha]) } do
+            resource :raw_image, only: :show
+            resources :resized_image, only: :show, constraints: -> (params) { DesignManagement::DESIGN_IMAGE_SIZES.include?(params[:id]) }
           end
         end
 
         resources :subscriptions, only: [:create, :destroy]
 
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring
-
-        resources :logs, only: [:index] do
-          collection do
-            get :k8s
-            get :elasticsearch
-          end
-        end
 
         resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
           collection do
@@ -92,7 +95,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
 
-          resources :vulnerabilities, only: [:show, :index]
+          resources :vulnerabilities, only: [:show, :index] do
+            member do
+              get :discussions, format: :json
+            end
+
+            scope module: :vulnerabilities do
+              resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
+            end
+          end
         end
 
         namespace :analytics do
@@ -120,13 +131,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       namespace :prometheus do
-        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
-          post :notify, on: :collection
-          member do
-            get :metrics_dashboard
-          end
-        end
-
         resources :metrics, constraints: { id: %r{[^\/]+} }, only: [] do
           post :validate_query, on: :collection
         end
@@ -154,6 +158,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           get :security
           get :licenses
+          get :codequality_report
         end
       end
 

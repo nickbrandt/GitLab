@@ -87,7 +87,7 @@ gem 'grape-entity', '~> 0.7.1'
 gem 'rack-cors', '~> 1.0.6', require: 'rack/cors'
 
 # GraphQL API
-gem 'graphql', '~> 1.9.12'
+gem 'graphql', '~> 1.10.5'
 # NOTE: graphiql-rails v1.5+ doesn't work: https://gitlab.com/gitlab-org/gitlab/issues/31771
 # TODO: remove app/views/graphiql/rails/editors/show.html.erb when https://github.com/rmosolgo/graphiql-rails/pull/71 is released:
 # https://gitlab.com/gitlab-org/gitlab/issues/31747
@@ -149,7 +149,7 @@ gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '0.0.10'
-gem 'rouge', '~> 3.16.0'
+gem 'rouge', '~> 3.17.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
 gem 'nokogiri', '~> 1.10.5'
@@ -171,7 +171,7 @@ group :unicorn do
 end
 
 group :puma do
-  gem 'gitlab-puma', '~> 4.3.1.gitlab.2', require: false
+  gem 'gitlab-puma', '~> 4.3.3.gitlab.2', require: false
   gem 'gitlab-puma_worker_killer', '~> 0.1.1.gitlab.1', require: false
   gem 'rack-timeout', require: false
 end
@@ -301,7 +301,7 @@ gem 'sentry-raven', '~> 2.9'
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '0.10.0'
+gem 'gitlab-labkit', '0.12.0'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false
@@ -366,7 +366,7 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 3.1.0', require: false
+  gem 'gitlab-styles', '~> 3.2.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
   gem 'rubocop', '~> 0.74.0'
   gem 'rubocop-performance', '~> 1.4.1'
@@ -399,7 +399,6 @@ group :test do
   gem 'fuubar', '~> 2.2.0'
   gem 'rspec-retry', '~> 0.6.1'
   gem 'rspec_profiling', '~> 0.0.5'
-  gem 'rspec-set', '~> 0.1.3'
   gem 'rspec-parameterized', require: false
 
   gem 'capybara', '~> 3.22.0'
@@ -425,7 +424,7 @@ gem 'gitlab-mail_room', '~> 0.0.3', require: 'mail_room'
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
 
-gem 'ruby-prof', '~> 1.0.0'
+gem 'ruby-prof', '~> 1.3.0'
 gem 'stackprof', '~> 0.2.15', require: false
 gem 'rbtrace', '~> 0.4', require: false
 gem 'memory_profiler', '~> 0.9', require: false
@@ -456,7 +455,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 1.86.0'
+gem 'gitaly', '~> 12.9.0.pre.rc4'
 
 gem 'grpc', '~> 1.24.0'
 
@@ -493,3 +492,6 @@ gem 'erubi', '~> 1.9.0'
 # Monkey-patched in `config/initializers/mail_encoding_patch.rb`
 # See https://gitlab.com/gitlab-org/gitlab/issues/197386
 gem 'mail', '= 2.7.1'
+
+# File encryption
+gem 'lockbox', '~> 0.3.3'

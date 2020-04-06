@@ -14,9 +14,9 @@ module EE
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }
 
         field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
-              description: "Deprecated. Use `designCollection`",
               method: :design_collection,
-              deprecation_reason: 'Use designCollection'
+              deprecated: { reason: 'Use `designCollection`', milestone: '12.2' },
+              description: 'The designs associated with this issue'
 
         field :design_collection, ::Types::DesignManagement::DesignCollectionType, null: true,
               description: 'Collection of design images associated with this issue'
@@ -24,8 +24,8 @@ module EE
         field :health_status,
           ::Types::HealthStatusEnum,
           null: true,
-          description: 'Current health status',
-          feature_flag: :save_issuable_health_status
+          description: 'Current health status. Returns null if `save_issuable_health_status` feature flag is disabled.',
+          resolve: -> (obj, _, _) { obj.supports_health_status? ? obj.health_status : nil }
       end
     end
   end

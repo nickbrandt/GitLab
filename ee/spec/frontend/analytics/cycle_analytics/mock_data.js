@@ -18,13 +18,14 @@ const fixtureEndpoints = {
 };
 
 export const endpoints = {
-  groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/labels/,
+  groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/-\/labels.json/,
   summaryData: /analytics\/value_stream_analytics\/summary/,
   durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
   stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
   stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
   baseStagesEndpoint: /analytics\/value_stream_analytics\/stages$/,
   tasksByTypeData: /analytics\/type_of_work\/tasks_by_type/,
+  tasksByTypeTopLabelsData: /analytics\/type_of_work\/tasks_by_type\/top_labels/,
 };
 
 export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(

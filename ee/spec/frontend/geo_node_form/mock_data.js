@@ -43,6 +43,9 @@ export const MOCK_SYNC_NAMESPACES = [
   },
 ];
 
+export const STRING_OVER_255 =
+  'ynzF7m5XjQQAlHfzPpDLhiaFZH84Zds47cHLWpRqRGTKjmXCe4frDWjIrjzfchpoOOX2jmK4wLRbyw9oTuzFmMPZhTK14mVoZTfaLXOBeH9F0S1XT3v7kszTC4cMLJvNsto7iSQ2PGxTGpZXFSQTL2UuMTTQ5GiARLVLS7CEEW75orbJh5kbKM6CRXpu4EliGRKKSwHMtXQ2ZDi01yvWOXc7ymNHeEooT4aDC7xq7g1uslbq1aVEWylVixSDARob';
+
 export const MOCK_NODE = {
   id: 1,
   name: 'Mock Node',

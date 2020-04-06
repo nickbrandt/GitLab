@@ -32,7 +32,7 @@ CAUTION: **Important:**
 OAuth specification advises sending the `state` parameter with each request to
 `/oauth/authorize`. We highly recommended sending a unique value with each request
 and validate it against the one in the redirect request. This is important in
-order to prevent [CSRF attacks](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)).
+order to prevent [CSRF attacks](https://wiki.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)).
 The `state` parameter really should have been a requirement in the standard!
 
 In the following sections you will find detailed instructions on how to obtain
@@ -49,7 +49,7 @@ The web application flow is:
 1. Request authorization code. To do that, you should redirect the user to the
    `/oauth/authorize` endpoint with the following GET parameters:
 
-   ```
+   ```plaintext
    https://gitlab.example.com/oauth/authorize?client_id=APP_ID&redirect_uri=REDIRECT_URI&response_type=code&state=YOUR_UNIQUE_STATE_HASH&scope=REQUESTED_SCOPES
    ```
 
@@ -60,7 +60,7 @@ The web application flow is:
    would request `read_user` and `profile` scopes). The redirect will
    include the GET `code` parameter, for example:
 
-   ```
+   ```plaintext
    http://myapp.com/oauth/redirect?code=1234567890&state=YOUR_UNIQUE_STATE_HASH
    ```
 

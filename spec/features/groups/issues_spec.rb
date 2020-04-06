@@ -48,7 +48,7 @@ describe 'Group issues page' do
       let(:user2) { user_outside_group }
 
       it 'filters by only group users' do
-        filtered_search.set('assignee=')
+        filtered_search.set('assignee:=')
 
         expect(find('#js-dropdown-assignee .filter-dropdown')).to have_content(user.name)
         expect(find('#js-dropdown-assignee .filter-dropdown')).not_to have_content(user2.name)
@@ -99,6 +99,8 @@ describe 'Group issues page' do
       it 'shows projects only with issues feature enabled', :js do
         find('.empty-state .js-lazy-loaded')
         find('.new-project-item-link').click
+
+        find('.select2-input').set(group.name)
 
         page.within('.select2-results') do
           expect(page).to have_content(project.full_name)

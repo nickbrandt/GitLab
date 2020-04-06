@@ -11,6 +11,7 @@ const createComponent = ({
   nodeDetails = Object.assign({}, mockNodeDetails),
   nodeActionsAllowed = true,
   nodeEditAllowed = true,
+  nodeRemovalAllowed = true,
   versionMismatch = false,
 }) => {
   const Component = Vue.extend(NodeDetailsSectionMainComponent);
@@ -20,6 +21,7 @@ const createComponent = ({
     nodeDetails,
     nodeActionsAllowed,
     nodeEditAllowed,
+    nodeRemovalAllowed,
     versionMismatch,
   });
 };

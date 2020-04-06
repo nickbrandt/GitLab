@@ -26,10 +26,28 @@ describe Projects::ImportExport::ExportService do
       service.execute
     end
 
-    it 'saves the models' do
-      expect(Gitlab::ImportExport::Project::TreeSaver).to receive(:new).and_call_original
+    context 'when :streaming_serializer feature is enabled' do
+      before do
+        stub_feature_flags(streaming_serializer: true)
+      end
 
-      service.execute
+      it 'saves the models' do
+        expect(Gitlab::ImportExport::Project::TreeSaver).to receive(:new).and_call_original
+
+        service.execute
+      end
+    end
+
+    context 'when :streaming_serializer feature is disabled' do
+      before do
+        stub_feature_flags(streaming_serializer: false)
+      end
+
+      it 'saves the models' do
+        expect(Gitlab::ImportExport::Project::LegacyTreeSaver).to receive(:new).and_call_original
+
+        service.execute
+      end
     end
 
     it 'saves the uploads' do
@@ -60,6 +78,14 @@ describe Projects::ImportExport::ExportService do
 
     it 'saves the lfs objects' do
       expect(Gitlab::ImportExport::LfsSaver).to receive(:new).and_call_original
+
+      service.execute
+    end
+
+    it 'saves the snippets' do
+      expect_next_instance_of(Gitlab::ImportExport::SnippetsRepoSaver) do |instance|
+        expect(instance).to receive(:save).and_call_original
+      end
 
       service.execute
     end
@@ -164,7 +190,7 @@ describe Projects::ImportExport::ExportService do
 
       it 'fails' do
         expected_message =
-          "User with ID: %s does not have permission to Project %s with ID: %s." %
+          "User with ID: %s does not have required permissions for Project: %s with ID: %s" %
             [another_user.id, project.name, project.id]
         expect { service.execute }.to raise_error(Gitlab::ImportExport::Error).with_message(expected_message)
       end

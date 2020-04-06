@@ -190,7 +190,7 @@ describe API::Projects do
       it 'includes the project labels as the tag_list' do
         get api('/projects', user)
 
-        expect(response.status).to eq 200
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
         expect(json_response.first.keys).to include('tag_list')
@@ -199,7 +199,7 @@ describe API::Projects do
       it 'includes open_issues_count' do
         get api('/projects', user)
 
-        expect(response.status).to eq 200
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
         expect(json_response.first.keys).to include('open_issues_count')
@@ -220,7 +220,7 @@ describe API::Projects do
 
         get api('/projects', user)
 
-        expect(response.status).to eq 200
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
         expect(json_response.find { |hash| hash['id'] == project.id }.keys).not_to include('open_issues_count')
@@ -232,7 +232,7 @@ describe API::Projects do
 
           get api('/projects?with_issues_enabled=true', user)
 
-          expect(response.status).to eq 200
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to include_pagination_headers
           expect(json_response).to be_an Array
           expect(json_response.map { |p| p['id'] }).not_to include(project.id)
@@ -281,7 +281,7 @@ describe API::Projects do
         it 'includes open_issues_count' do
           get api('/projects', user)
 
-          expect(response.status).to eq 200
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to include_pagination_headers
           expect(json_response).to be_an Array
           expect(json_response.first.keys).to include('open_issues_count')
@@ -293,7 +293,7 @@ describe API::Projects do
 
           get api('/projects', user)
 
-          expect(response.status).to eq 200
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to include_pagination_headers
           expect(json_response).to be_an Array
           expect(json_response.find { |hash| hash['id'] == project.id }.keys).not_to include('open_issues_count')
@@ -359,6 +359,21 @@ describe API::Projects do
           let(:filter) { { search: project.name } }
           let(:current_user) { user }
           let(:projects) { [project] }
+        end
+      end
+
+      context 'and using search and search_namespaces is true' do
+        let(:group) { create(:group) }
+        let!(:project_in_group) { create(:project, group: group) }
+
+        before do
+          group.add_guest(user)
+        end
+
+        it_behaves_like 'projects response' do
+          let(:filter) { { search: group.name, search_namespaces: true } }
+          let(:current_user) { user }
+          let(:projects) { [project_in_group] }
         end
       end
 
@@ -553,7 +568,7 @@ describe API::Projects do
 
           get api('/projects?with_issues_enabled=true', user2)
 
-          expect(response.status).to eq 200
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to include_pagination_headers
           expect(json_response).to be_an Array
           expect(json_response.map { |p| p['id'] }).not_to include(project.id)
@@ -726,6 +741,7 @@ describe API::Projects do
         issues_enabled: false,
         jobs_enabled: false,
         merge_requests_enabled: false,
+        forking_access_level: 'disabled',
         wiki_enabled: false,
         resolve_outdated_diff_discussions: false,
         remove_source_branch_after_merge: true,
@@ -1085,7 +1101,7 @@ describe API::Projects do
     end
 
     it 'returns error when user not found' do
-      get api('/users/9999/starred_projects/')
+      get api("/users/#{non_existing_record_id}/starred_projects/")
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 User Not Found')
@@ -1400,6 +1416,7 @@ describe API::Projects do
         expect(json_response['repository_access_level']).to be_present
         expect(json_response['issues_access_level']).to be_present
         expect(json_response['merge_requests_access_level']).to be_present
+        expect(json_response['forking_access_level']).to be_present
         expect(json_response['wiki_access_level']).to be_present
         expect(json_response['builds_access_level']).to be_present
         expect(json_response).to have_key('emails_disabled')
@@ -2071,13 +2088,13 @@ describe API::Projects do
     end
 
     it 'returns a 404 error when group does not exist' do
-      post api("/projects/#{project.id}/share", user), params: { group_id: 1234, group_access: Gitlab::Access::DEVELOPER }
+      post api("/projects/#{project.id}/share", user), params: { group_id: non_existing_record_id, group_access: Gitlab::Access::DEVELOPER }
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it "returns a 400 error when wrong params passed" do
-      post api("/projects/#{project.id}/share", user), params: { group_id: group.id, group_access: 1234 }
+      post api("/projects/#{project.id}/share", user), params: { group_id: group.id, group_access: non_existing_record_access_level }
 
       expect(response).to have_gitlab_http_status(:bad_request)
       expect(json_response['error']).to eq 'group_access does not have a valid value'
@@ -2120,13 +2137,13 @@ describe API::Projects do
     end
 
     it 'returns a 404 error when group link does not exist' do
-      delete api("/projects/#{project.id}/share/1234", user)
+      delete api("/projects/#{project.id}/share/#{non_existing_record_id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'returns a 404 error when project does not exist' do
-      delete api("/projects/123/share/1234", user)
+      delete api("/projects/123/share/#{non_existing_record_id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -2455,7 +2472,7 @@ describe API::Projects do
         end
 
         it 'returns 200 when repository storage has changed' do
-          stub_storage_settings('test_second_storage' => { 'path' => 'tmp/tests/second_storage' })
+          stub_storage_settings('test_second_storage' => { 'path' => TestEnv::SECOND_STORAGE_PATH })
 
           expect do
             Sidekiq::Testing.fake! do
@@ -2617,7 +2634,7 @@ describe API::Projects do
     end
 
     it 'returns not_found(404) for not existing project' do
-      get api("/projects/9999999999/starrers", user)
+      get api("/projects/#{non_existing_record_id}/starrers", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -2869,6 +2886,66 @@ describe API::Projects do
 
         expect(response).to have_gitlab_http_status(:created)
         expect(json_response['namespace']['name']).to eq(group2.name)
+      end
+
+      context 'when namespace_id is specified' do
+        shared_examples_for 'forking to specified namespace_id' do
+          it 'forks to specified namespace_id' do
+            expect(response).to have_gitlab_http_status(:created)
+            expect(json_response['owner']['id']).to eq(user2.id)
+            expect(json_response['namespace']['id']).to eq(user2.namespace.id)
+          end
+        end
+
+        context 'and namespace_id is specified alone' do
+          before do
+            post api("/projects/#{project.id}/fork", user2), params: { namespace_id: user2.namespace.id }
+          end
+
+          it_behaves_like 'forking to specified namespace_id'
+        end
+
+        context 'and namespace_id and namespace are both specified' do
+          before do
+            post api("/projects/#{project.id}/fork", user2), params: { namespace_id: user2.namespace.id, namespace: admin.namespace.id }
+          end
+
+          it_behaves_like 'forking to specified namespace_id'
+        end
+
+        context 'and namespace_id and namespace_path are both specified' do
+          before do
+            post api("/projects/#{project.id}/fork", user2), params: { namespace_id: user2.namespace.id, namespace_path: admin.namespace.path }
+          end
+
+          it_behaves_like 'forking to specified namespace_id'
+        end
+      end
+
+      context 'when namespace_path is specified' do
+        shared_examples_for 'forking to specified namespace_path' do
+          it 'forks to specified namespace_path' do
+            expect(response).to have_gitlab_http_status(:created)
+            expect(json_response['owner']['id']).to eq(user2.id)
+            expect(json_response['namespace']['path']).to eq(user2.namespace.path)
+          end
+        end
+
+        context 'and namespace_path is specified alone' do
+          before do
+            post api("/projects/#{project.id}/fork", user2), params: { namespace_path: user2.namespace.path }
+          end
+
+          it_behaves_like 'forking to specified namespace_path'
+        end
+
+        context 'and namespace_path and namespace are both specified' do
+          before do
+            post api("/projects/#{project.id}/fork", user2), params: { namespace_path: user2.namespace.path, namespace: admin.namespace.path }
+          end
+
+          it_behaves_like 'forking to specified namespace_path'
+        end
       end
 
       it 'forks to owned subgroup' do

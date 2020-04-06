@@ -31,12 +31,15 @@ describe Gitlab::GitAccessSnippet do
   end
 
   describe 'when feature flag :version_snippets is disabled' do
+    let(:user) { snippet.author }
+
     before do
       stub_feature_flags(version_snippets: false)
     end
 
-    it 'does not allow push and pull access' do
-      expect { pull_access_check }.to raise_project_not_found
+    it 'allows push and pull access' do
+      expect { pull_access_check }.not_to raise_error
+      expect { push_access_check }.not_to raise_error
     end
   end
 
@@ -185,12 +188,15 @@ describe Gitlab::GitAccessSnippet do
   end
 
   context 'when changes are specific' do
-    let(:changes) { 'oldrev newrev ref' }
+    let(:changes) { "2d1db523e11e777e49377cfb22d368deec3f0793 ddd0f15ae83993f5cb66a927a28673882e99100b master" }
     let(:user) { snippet.author }
 
     it 'does not raise error if SnippetCheck does not raise error' do
       expect_next_instance_of(Gitlab::Checks::SnippetCheck) do |check|
-        expect(check).to receive(:exec).and_call_original
+        expect(check).to receive(:validate!).and_call_original
+      end
+      expect_next_instance_of(Gitlab::Checks::PushFileCountCheck) do |check|
+        expect(check).to receive(:validate!)
       end
 
       expect { push_access_check }.not_to raise_error
@@ -198,7 +204,7 @@ describe Gitlab::GitAccessSnippet do
 
     it 'raises error if SnippetCheck raises error' do
       expect_next_instance_of(Gitlab::Checks::SnippetCheck) do |check|
-        allow(check).to receive(:exec).and_raise(Gitlab::GitAccess::ForbiddenError, 'foo')
+        allow(check).to receive(:validate!).and_raise(Gitlab::GitAccess::ForbiddenError, 'foo')
       end
 
       expect { push_access_check }.to raise_forbidden('foo')

@@ -28,7 +28,6 @@ module Gitlab
       apple-touch-icon.png
       assets
       autocomplete
-      ci
       dashboard
       deploy.html
       explore
@@ -42,7 +41,6 @@ module Gitlab
       invites
       jwt
       login
-      notification_settings
       oauth
       profile
       projects
@@ -100,6 +98,7 @@ module Gitlab
       preview
       raw
       refs
+      sse
       tree
       update
       wikis
@@ -237,7 +236,31 @@ module Gitlab
       }x
     end
 
+    def full_snippets_repository_path_regex
+      %r{\A(#{personal_snippet_repository_path_regex}|#{project_snippet_repository_path_regex})\z}
+    end
+
+    def personal_and_project_snippets_path_regex
+      %r{#{personal_snippet_path_regex}|#{project_snippet_path_regex}}
+    end
+
     private
+
+    def personal_snippet_path_regex
+      /snippets/
+    end
+
+    def personal_snippet_repository_path_regex
+      %r{#{personal_snippet_path_regex}/\d+}
+    end
+
+    def project_snippet_path_regex
+      %r{#{full_namespace_route_regex}/#{project_route_regex}/snippets}
+    end
+
+    def project_snippet_repository_path_regex
+      %r{#{project_snippet_path_regex}/\d+}
+    end
 
     def single_line_regexp(regex)
       # Turns a multiline extended regexp into a single line one,

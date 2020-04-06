@@ -13,7 +13,7 @@ RSpec.shared_examples 'handle uploads' do
     context 'when a user is not authorized to upload a file' do
       it 'returns 404 status' do
         post :create, params: params.merge(file: jpg), format: :json
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -69,13 +69,39 @@ RSpec.shared_examples 'handle uploads' do
   end
 
   describe "GET #show" do
+    let(:filename) { "rails_sample.jpg" }
+
+    let(:upload_service) do
+      UploadService.new(model, jpg, uploader_class).execute
+    end
+
     let(:show_upload) do
-      get :show, params: params.merge(secret: secret, filename: "rails_sample.jpg")
+      get :show, params: params.merge(secret: secret, filename: filename)
     end
 
     before do
       allow(FileUploader).to receive(:generate_secret).and_return(secret)
-      UploadService.new(model, jpg, uploader_class).execute
+      upload_service
+    end
+
+    context 'when the secret is invalid' do
+      let(:secret) { "../../../../../../../../" }
+      let(:filename) { "Gemfile.lock" }
+      let(:upload_service) { nil }
+
+      it 'responds with status 404' do
+        show_upload
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'is a working exploit without the validation' do
+        allow_any_instance_of(FileUploader).to receive(:secret) { secret }
+
+        show_upload
+
+        expect(response).to have_gitlab_http_status(:ok)
+      end
     end
 
     context 'when accessing a specific upload via different model' do
@@ -293,7 +319,7 @@ RSpec.shared_examples 'handle uploads authorize' do
       it 'returns 404 status' do
         post_authorize
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 

@@ -20,7 +20,7 @@ describe Admin::ApplicationSettingsController do
       settings = {
           help_text: 'help_text',
           elasticsearch_url: 'http://my-elastic.search:9200',
-          elasticsearch_indexing: true,
+          elasticsearch_indexing: false,
           elasticsearch_aws: true,
           elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
           elasticsearch_aws_secret_access_key: 'elasticsearch_aws_secret_access_key',
@@ -151,6 +151,35 @@ describe Admin::ApplicationSettingsController do
       let(:feature) { :admin_merge_request_approvers_rules }
 
       it_behaves_like 'settings for licensed features'
+    end
+
+    context 'required instance ci template' do
+      let(:settings) { { required_instance_ci_template: 'Auto-DevOps' } }
+      let(:feature) { :required_ci_templates }
+
+      it_behaves_like 'settings for licensed features'
+
+      context 'when ApplicationSetting already has a required_instance_ci_template value' do
+        before do
+          ApplicationSetting.current.update!(required_instance_ci_template: 'Auto-DevOps')
+        end
+
+        context 'with a valid value' do
+          let(:settings) { { required_instance_ci_template: 'Code-Quality' } }
+
+          it_behaves_like 'settings for licensed features'
+        end
+
+        context 'with an empty value' do
+          it 'sets required_instance_ci_template as nil' do
+            stub_licensed_features(required_ci_templates: true)
+
+            put :update, params: { application_setting: { required_instance_ci_template: '' } }
+
+            expect(ApplicationSetting.current.required_instance_ci_template).to be_nil
+          end
+        end
+      end
     end
 
     it 'updates repository_size_limit' do

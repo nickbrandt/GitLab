@@ -55,20 +55,37 @@ describe Users::UpdateService do
       expect(result[:message]).to eq("Emoji is not included in the list")
     end
 
-    it 'ignores read-only attributes' do
-      allow(user).to receive(:read_only_attribute?).with(:name).and_return(true)
-
-      expect do
-        update_user(user, name: 'changed' + user.name)
-        user.reload
-      end.not_to change { user.name }
-    end
-
     it 'updates user detail with provided attributes' do
       result = update_user(user, job_title: 'Backend Engineer')
 
       expect(result).to eq(status: :success)
       expect(user.job_title).to eq('Backend Engineer')
+    end
+
+    context 'updating canonical email' do
+      context 'if email was changed' do
+        subject do
+          update_user(user, email: 'user+extrastuff@example.com')
+        end
+
+        it 'calls canonicalize_email' do
+          expect_next_instance_of(Users::UpdateCanonicalEmailService) do |service|
+            expect(service).to receive(:execute)
+          end
+
+          subject
+        end
+      end
+
+      context 'if email was NOT changed' do
+        subject do
+          update_user(user, job_title: 'supreme leader of the universe')
+        end
+
+        it 'skips update canonicalize email service call' do
+          expect { subject }.not_to change { user.user_canonical_email }
+        end
+      end
     end
 
     def update_user(user, opts)

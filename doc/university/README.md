@@ -99,7 +99,7 @@ The GitLab University curriculum is composed of GitLab videos, screencasts, pres
 1. [Due Dates and Milestones for GitLab Issues](https://about.gitlab.com/blog/2016/08/05/feature-highlight-set-dates-for-issues/)
 1. [How to Use GitLab Labels](https://about.gitlab.com/blog/2016/08/17/using-gitlab-labels/)
 1. [Applying GitLab Labels Automatically](https://about.gitlab.com/blog/2016/08/19/applying-gitlab-labels-automatically/)
-1. [GitLab Issue Board - Product Page](https://about.gitlab.com/product/issueboard/)
+1. [GitLab Issue Board - Product Page](https://about.gitlab.com/stages-devops-lifecycle/issueboard/)
 1. [An Overview of GitLab Issue Board](https://about.gitlab.com/blog/2016/08/22/announcing-the-gitlab-issue-board/)
 1. [Designing GitLab Issue Board](https://about.gitlab.com/blog/2016/08/31/designing-issue-boards/)
 1. [From Idea to Production with GitLab - Video](https://www.youtube.com/watch?v=25pHyknRgEo&index=14&list=PLFGfElNsQthbQu_IWlNOxul0TbS_2JH-e)
@@ -107,7 +107,7 @@ The GitLab University curriculum is composed of GitLab videos, screencasts, pres
 ### 2.3. Continuous Integration
 
 1. [Operating Systems, Servers, VMs, Containers and Unix - Video](https://www.youtube.com/watch?v=V61kL6IC-zY&index=8&list=PLFGfElNsQthbQu_IWlNOxul0TbS_2JH-e)
-1. [GitLab CI - Product Page](https://about.gitlab.com/product/continuous-integration/)
+1. [GitLab CI/CD - Product Page](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/)
 1. [Getting started with GitLab and GitLab CI](https://about.gitlab.com/blog/2015/12/14/getting-started-with-gitlab-and-gitlab-ci/)
 1. [GitLab Container Registry](https://about.gitlab.com/blog/2016/05/23/gitlab-container-registry/)
 1. [GitLab and Docker - Video](https://www.youtube.com/watch?v=ugOrCcbdHko&index=12&list=PLFGfElNsQthbQu_IWlNOxul0TbS_2JH-e)
@@ -145,7 +145,7 @@ The GitLab University curriculum is composed of GitLab videos, screencasts, pres
 
 1. [Xebia Labs: Dev Ops Terminology](https://xebialabs.com/glossary/)
 1. [Xebia Labs: Periodic Table of DevOps Tools](https://xebialabs.com/periodic-table-of-devops-tools/)
-1. [Puppet Labs: State of Dev Ops 2016 - Book](https://puppet.com/resources/whitepaper/2016-state-of-devops-report)
+1. [Puppet Labs: State of Dev Ops 2016 - Book](https://puppet.com/resources/report/2016-state-devops-report/)
 
 ### 3.2. Installing GitLab with Omnibus
 
@@ -181,7 +181,7 @@ The GitLab University curriculum is composed of GitLab videos, screencasts, pres
 ### 3.8 Cycle Analytics
 
 1. [GitLab Cycle Analytics Overview](https://about.gitlab.com/blog/2016/09/21/cycle-analytics-feature-highlight/)
-1. [GitLab Cycle Analytics - Product Page](https://about.gitlab.com/product/cycle-analytics/)
+1. [GitLab Cycle Analytics - Product Page](https://about.gitlab.com/stages-devops-lifecycle/value-stream-analytics/)
 
 ### 3.9. Integrations
 
@@ -196,7 +196,7 @@ The GitLab University curriculum is composed of GitLab videos, screencasts, pres
 ## 4. External Articles
 
 1. [2011 WSJ article by Marc Andreessen - Software is Eating the World](https://www.wsj.com/articles/SB10001424053111903480904576512250915629460)
-1. [2014 Blog post by Chris Dixon - Software eats software development](https://cdixon.org/2014/04/13/software-eats-software-development)
+1. [2014 Blog post by Chris Dixon - Software eats software development](https://cdixon.org/2014/04/13/software-eats-software-development/)
 1. [2015 Venture Beat article - Actually, Open Source is Eating the World](https://venturebeat.com/2015/12/06/its-actually-open-source-software-thats-eating-the-world/)
 
 ## 5. Resources for GitLab Team Members

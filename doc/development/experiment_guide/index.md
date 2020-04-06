@@ -2,7 +2,7 @@
 
 Experiments will be conducted by teams from the [Growth Section](https://about.gitlab.com/handbook/engineering/development/growth/) and are not tied to releases, because they will primarily target GitLab.com.
 
-Experiments will be run as an A/B test and will be behind a feature flag to turn the test on or off. Based on the data the experiment generates, the team decides if the experiment had a positive impact and will be the new default or rolled back.
+Experiments will be run as an A/B test and will be behind a feature flag to turn the test on or off. Based on the data the experiment generates, the team will decide if the experiment had a positive impact and will be the new default or rolled back.
 
 ## Follow-up issue
 
@@ -55,10 +55,12 @@ The author then adds a comment to this piece of code and adds a link to the issu
   end
   ```
 
-- Track necessary events. See the [event tracking guide](../event_tracking/index.md) for details.
-- After the merge request is merged, use [`chatops`](../../ci/chatops/README.md) to enable the feature flag and start the experiment. For visibility, please run the command in the `#s_growth` channel:
+- Track necessary events. See the [telemetry guide](../../telemetry/index.md) for details.
+- After the merge request is merged, use [`chatops`](../../ci/chatops/README.md) in the
+[appropriate channel](../feature_flags/controls.md#where-to-run-commands) to enable the feature flag and start the experiment.
+For visibility, please also share any commands run against production in the `#s_growth` channel:
 
-  ```
+  ```shell
   /chatops run feature set --project=gitlab-org/gitlab experimental_sign_up_flow true
   ```
 

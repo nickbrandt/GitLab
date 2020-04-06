@@ -15,39 +15,43 @@ describe Emails::ServiceDesk do
   let_it_be(:issue) { create(:issue, project: project) }
   let(:template) { double(content: template_content) }
 
-  class ServiceEmailClass < ApplicationMailer
-    include GitlabRoutingHelper
-    include EmailsHelper
-    include Emails::ServiceDesk
+  before do
+    stub_const('ServiceEmailClass', Class.new(ApplicationMailer))
 
-    helper GitlabRoutingHelper
-    helper EmailsHelper
+    ServiceEmailClass.class_eval do
+      include GitlabRoutingHelper
+      include EmailsHelper
+      include Emails::ServiceDesk
 
-    append_view_path Rails.root.join('ee', 'app', 'views', 'notify')
+      helper GitlabRoutingHelper
+      helper EmailsHelper
 
-    # this method is implemented in Notify class, we don't need to test it
-    def reply_key
-      'test-key'
+      append_view_path Rails.root.join('ee', 'app', 'views', 'notify')
+
+      # this method is implemented in Notify class, we don't need to test it
+      def reply_key
+        'test-key'
+      end
+
+      # this method is implemented in Notify class, we don't need to test it
+      def sender(author_id, params = {})
+        author_id
+      end
+
+      # this method is implemented in Notify class
+      #
+      # We do not need to test the Notify method, it is already tested in notify_spec
+      def mail_new_thread(issue, options)
+        # we need to rewrite this in order to look up templates in the correct directory
+        self.class.mailer_name = 'notify'
+
+        # this is needed for default layout
+        @unsubscribe_url = 'http://unsubscribe.example.com'
+
+        mail(options)
+      end
+      alias_method :mail_answer_thread, :mail_new_thread
     end
-
-    # this method is implemented in Notify class, we don't need to test it
-    def sender(author_id, params = {})
-      author_id
-    end
-
-    # this method is implemented in Notify class
-    #
-    # We do not need to test the Notify method, it is already tested in notify_spec
-    def mail_new_thread(issue, options)
-      # we need to rewrite this in order to look up templates in the correct directory
-      self.class.mailer_name = 'notify'
-
-      # this is needed for default layout
-      @unsubscribe_url = 'http://unsubscribe.example.com'
-
-      mail(options)
-    end
-    alias_method :mail_answer_thread, :mail_new_thread
   end
 
   shared_examples 'handle template content' do |template_key|

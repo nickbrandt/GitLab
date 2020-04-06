@@ -36,15 +36,6 @@ use_sidekiq_legacy_memory_killer = !use_sidekiq_daemon_memory_killer
 use_request_store = ENV.fetch('SIDEKIQ_REQUEST_STORE', 1).to_i.nonzero?
 
 Sidekiq.configure_server do |config|
-  config.redis = queues_config_hash
-
-  config.server_middleware(&Gitlab::SidekiqMiddleware.server_configurator({
-    metrics: Settings.monitoring.sidekiq_exporter,
-    arguments_logger: ENV['SIDEKIQ_LOG_ARGUMENTS'] && !enable_json_logs,
-    memory_killer: enable_sidekiq_memory_killer && use_sidekiq_legacy_memory_killer,
-    request_store: use_request_store
-  }))
-
   if enable_json_logs
     Sidekiq.logger.formatter = Gitlab::SidekiqLogging::JSONFormatter.new
     config.options[:job_logger] = Gitlab::SidekiqLogging::StructuredLogger
@@ -53,6 +44,15 @@ Sidekiq.configure_server do |config|
     config.error_handlers.reject! { |handler| handler.is_a?(Sidekiq::ExceptionHandler::Logger) }
     config.error_handlers << Gitlab::SidekiqLogging::ExceptionHandler.new
   end
+
+  config.redis = queues_config_hash
+
+  config.server_middleware(&Gitlab::SidekiqMiddleware.server_configurator({
+    metrics: Settings.monitoring.sidekiq_exporter,
+    arguments_logger: ENV['SIDEKIQ_LOG_ARGUMENTS'] && !enable_json_logs,
+    memory_killer: enable_sidekiq_memory_killer && use_sidekiq_legacy_memory_killer,
+    request_store: use_request_store
+  }))
 
   config.client_middleware(&Gitlab::SidekiqMiddleware.client_configurator)
 
@@ -108,6 +108,11 @@ end
 
 Sidekiq.configure_client do |config|
   config.redis = queues_config_hash
+  # We only need to do this for other clients. If Sidekiq-server is the
+  # client scheduling jobs, we have access to the regular sidekiq logger that
+  # writes to STDOUT
+  Sidekiq.logger = Gitlab::SidekiqLogging::ClientLogger.build
+  Sidekiq.logger.formatter = Gitlab::SidekiqLogging::JSONFormatter.new if enable_json_logs
 
   config.client_middleware(&Gitlab::SidekiqMiddleware.client_configurator)
 end

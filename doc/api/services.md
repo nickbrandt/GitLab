@@ -67,7 +67,7 @@ Asana - Teamwork without email
 
 Set Asana service for a project.
 
-> This service adds commit messages as comments to Asana tasks. Once enabled, commit messages are checked for Asana task URLs (for example, `https://app.asana.com/0/123456/987654`) or task IDs starting with # (for example, `#987654`). Every task ID found will get the commit comment added to it. You can also close a task with a message containing: `fix #123456`. You can find your API Keys here: <https://asana.com/developers/documentation/getting-started/auth#api-key>.
+> This service adds commit messages as comments to Asana tasks. Once enabled, commit messages are checked for Asana task URLs (for example, `https://app.asana.com/0/123456/987654`) or task IDs starting with # (for example, `#987654`). Every task ID found will get the commit comment added to it. You can also close a task with a message containing: `fix #123456`. You can find your API Keys here: <https://developers.asana.com/docs/#authentication-basics>.
 
 ```plaintext
 PUT /projects/:id/services/asana
@@ -658,7 +658,7 @@ Send IRC messages, on update, to a list of recipients through an Irker gateway.
 
 Set Irker (IRC gateway) service for a project.
 
-> NOTE: Irker does NOT have built-in authentication, which makes it vulnerable to spamming IRC channels if it is hosted outside of a  firewall. Please make sure you run the daemon within a secured network  to prevent abuse. For more details, read: <http://www.catb.org/~esr/irker/security.html>.
+> NOTE: Irker does NOT have built-in authentication, which makes it vulnerable to spamming IRC channels if it is hosted outside of a firewall. Please make sure you run the daemon within a secured network to prevent abuse. For more details, read: <http://www.catb.org/~esr/irker/security.html>.
 
 ```plaintext
 PUT /projects/:id/services/irker
@@ -872,7 +872,7 @@ GET /projects/:id/services/packagist
 
 ## Pipeline-Emails
 
-Get emails for GitLab CI pipelines.
+Get emails for GitLab CI/CD pipelines.
 
 ### Create/Edit Pipeline-Emails service
 

@@ -86,6 +86,7 @@ describe Gitlab::Danger::CommitLinter do
       "A commit message" | false
       "A commit message\n" | false
       "A commit message\n\n" | false
+      "A commit message\n\nSigned-off-by: User Name <user@name.me>" | false
       "A commit message\n\nWith details" | true
     end
 
@@ -192,6 +193,39 @@ describe Gitlab::Danger::CommitLinter do
           expect(commit_linter).to receive(:add_problem).with(:subject_starts_with_lowercase, described_class::DEFAULT_SUBJECT_DESCRIPTION)
 
           commit_linter.lint
+        end
+      end
+
+      [
+        '[ci skip] A commit message',
+        '[Ci skip] A commit message',
+        '[API] A commit message'
+      ].each do |message|
+        context "when subject is '#{message}'" do
+          let(:commit_message) { message }
+
+          it 'does not add a problem' do
+            expect(commit_linter).not_to receive(:add_problem)
+
+            commit_linter.lint
+          end
+        end
+      end
+
+      [
+        '[ci skip]A commit message',
+        '[Ci skip]  A commit message',
+        '[ci skip] a commit message',
+        '! A commit message'
+      ].each do |message|
+        context "when subject is '#{message}'" do
+          let(:commit_message) { message }
+
+          it 'adds a problem' do
+            expect(commit_linter).to receive(:add_problem).with(:subject_starts_with_lowercase, described_class::DEFAULT_SUBJECT_DESCRIPTION)
+
+            commit_linter.lint
+          end
         end
       end
 

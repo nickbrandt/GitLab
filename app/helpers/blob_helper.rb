@@ -344,13 +344,17 @@ module BlobHelper
 
   def show_suggest_pipeline_creation_celebration?
     experiment_enabled?(:suggest_pipeline) &&
-      @blob.auxiliary_viewer.valid?(project: @project, sha: @commit.sha, user: current_user) &&
       @blob.path == Gitlab::FileDetector::PATTERNS[:gitlab_ci] &&
+      @blob.auxiliary_viewer.valid?(project: @project, sha: @commit.sha, user: current_user) &&
       @project.uses_default_ci_config? &&
       cookies[suggest_pipeline_commit_cookie_name].present?
   end
 
   def suggest_pipeline_commit_cookie_name
     "suggest_gitlab_ci_yml_commit_#{@project.id}"
+  end
+
+  def human_access
+    @project.team.human_max_access(current_user&.id).try(:downcase)
   end
 end

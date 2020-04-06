@@ -81,7 +81,7 @@ Complementary reads:
 - [Working with Merge Request diffs](diffs.md)
 - [Kubernetes integration guidelines](kubernetes.md)
 - [Permissions](permissions.md)
-- [Prometheus metrics](prometheus_metrics.md)
+- [Prometheus](prometheus.md)
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
 - [How Git object deduplication works in GitLab](git_object_deduplication.md)
@@ -98,6 +98,8 @@ Complementary reads:
 - [Application limits](application_limits.md)
 - [Redis guidelines](redis.md)
 - [Rails initializers](rails_initializers.md)
+- [Code comments](code_comments.md)
+- [Renaming features](renaming_features.md)
 
 ## Performance guides
 
@@ -145,13 +147,12 @@ Complementary reads:
 - [Hash indexes](hash_indexes.md)
 - [Storing SHA1 hashes as binary](sha1_as_binary.md)
 - [Iterating tables in batches](iterating_tables_in_batches.md)
+- [Insert into tables in batches](insert_into_tables_in_batches.md)
 - [Ordering table columns](ordering_table_columns.md)
 - [Verifying database capabilities](verifying_database_capabilities.md)
 - [Database Debugging and Troubleshooting](database_debugging.md)
 - [Query Count Limits](query_count_limits.md)
-- [Code comments](code_comments.md)
 - [Creating enums](creating_enums.md)
-- [Renaming features](renaming_features.md)
 
 ### Case studies
 
@@ -162,6 +163,8 @@ Complementary reads:
 
 - [Jira Connect app](integrations/jira_connect.md)
 - [Security Scanners](integrations/secure.md)
+- [Secure Partner Integration](integrations/secure_partner_integration.md)
+- [How to run Jenkins in development environment](integrations/jenkins.md)
 
 ## Testing guides
 
@@ -180,11 +183,11 @@ Complementary reads:
 - [Externalization](i18n/externalization.md)
 - [Translation](i18n/translation.md)
 
-## Event tracking guides
+## Telemetry guides
 
-- [Introduction](event_tracking/index.md)
-- [Frontend tracking guide](event_tracking/frontend.md)
-- [Backend tracking guide](event_tracking/backend.md)
+- [Introduction](../telemetry/index.md)
+- [Frontend tracking guide](../telemetry/frontend.md)
+- [Backend tracking guide](../telemetry/backend.md)
 
 ## Experiment Guide
 

@@ -1,5 +1,3 @@
-import { __ } from '~/locale';
-
 export const PROMETHEUS_TIMEOUT = 120000; // TWO_MINUTES
 
 /**
@@ -48,11 +46,10 @@ export const metricStates = {
 };
 
 export const sidebarAnimationDuration = 300; // milliseconds.
-
 export const chartHeight = 300;
 
 export const graphTypes = {
-  deploymentData: 'scatter',
+  annotationsData: 'scatter',
 };
 
 export const symbolSizes = {
@@ -70,13 +67,6 @@ export const colorValues = {
   anomalyAreaColor: '#1f78d1',
 };
 
-export const chartColorValues = [
-  '#1f78d1', // $blue-500 (see variables.scss)
-  '#1aaa55', // $green-500
-  '#fc9403', // $orange-500
-  '#6d49cb', // $purple
-];
-
 export const lineTypes = {
   default: 'solid',
 };
@@ -90,36 +80,32 @@ export const dateFormats = {
   default: 'dd mmm yyyy, h:MMTT',
 };
 
-export const timeRanges = [
-  {
-    label: __('30 minutes'),
-    duration: { seconds: 60 * 30 },
-  },
-  {
-    label: __('3 hours'),
-    duration: { seconds: 60 * 60 * 3 },
-  },
-  {
-    label: __('8 hours'),
-    duration: { seconds: 60 * 60 * 8 },
-    default: true,
-  },
-  {
-    label: __('1 day'),
-    duration: { seconds: 60 * 60 * 24 * 1 },
-  },
-  {
-    label: __('3 days'),
-    duration: { seconds: 60 * 60 * 24 * 3 },
-  },
-  {
-    label: __('1 week'),
-    duration: { seconds: 60 * 60 * 24 * 7 * 1 },
-  },
-  {
-    label: __('1 month'),
-    duration: { seconds: 60 * 60 * 24 * 30 },
-  },
+/**
+ * These Vuex store properties are allowed to be
+ * replaced dynamically after component has been created
+ * and initial state has been set.
+ *
+ * Currently used in `receiveMetricsDashboardSuccess` action.
+ */
+export const endpointKeys = [
+  'metricsEndpoint',
+  'deploymentsEndpoint',
+  'dashboardEndpoint',
+  'dashboardsEndpoint',
+  'currentDashboard',
+  'projectPath',
+  'logsPath',
 ];
 
-export const defaultTimeRange = timeRanges.find(tr => tr.default);
+/**
+ * These Vuex store properties are set as soon as the
+ * dashboard component has been created. The values are
+ * passed as data-* attributes and received by dashboard
+ * as Vue props.
+ */
+export const initialStateKeys = [...endpointKeys, 'currentEnvironmentName'];
+
+/**
+ * Constant to indicate if a metric exists in the database
+ */
+export const NOT_IN_DB_PREFIX = 'NO_DB';

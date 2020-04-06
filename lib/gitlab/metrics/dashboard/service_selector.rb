@@ -3,7 +3,8 @@
 # Responsible for determining which dashboard service should
 # be used to fetch or generate a dashboard hash.
 # The services can be considered in two categories - embeds
-# and dashboards. Embeds are all portions of dashboards.
+# and dashboards. Embed hashes are identical to dashboard hashes except
+# that they contain a subset of panels.
 module Gitlab
   module Metrics
     module Dashboard
@@ -12,6 +13,7 @@ module Gitlab
           include Gitlab::Utils::StrongMemoize
 
           SERVICES = [
+            ::Metrics::Dashboard::GitlabAlertEmbedService,
             ::Metrics::Dashboard::CustomMetricEmbedService,
             ::Metrics::Dashboard::GrafanaMetricEmbedService,
             ::Metrics::Dashboard::DynamicEmbedService,
@@ -19,7 +21,7 @@ module Gitlab
             ::Metrics::Dashboard::SystemDashboardService,
             ::Metrics::Dashboard::PodDashboardService,
             ::Metrics::Dashboard::SelfMonitoringDashboardService,
-            ::Metrics::Dashboard::ProjectDashboardService
+            ::Metrics::Dashboard::CustomDashboardService
           ].freeze
 
           # Returns a class which inherits from the BaseService

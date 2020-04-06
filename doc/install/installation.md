@@ -47,7 +47,7 @@ If the highest number stable branch is unclear, check the [GitLab blog](https://
 This is the main directory structure you will end up with following the instructions
 of this page:
 
-```
+```plaintext
 |-- home
 |   |-- git
 |       |-- .ssh
@@ -134,7 +134,7 @@ Make sure you have the right version of Git installed:
 # Install Git
 sudo apt-get install -y git-core
 
-# Make sure Git is version 2.24.1 or higher (minimal supported version is 2.22.0)
+# Make sure Git is version 2.26.0 or higher (minimal supported version is 2.22.0)
 git --version
 ```
 
@@ -147,7 +147,7 @@ ldd /usr/local/bin/git | grep pcre2
 
 The output should be similar to:
 
-```
+```plaintext
 libpcre2-8.so.0 => /usr/lib/libpcre2-8.so.0 (0x00007f08461c3000)
 ```
 
@@ -171,9 +171,9 @@ sudo make install
 
 # Download and compile from source
 cd /tmp
-curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.24.1.tar.gz
-echo 'ad5334956301c86841eb1e5b1bb20884a6bad89a10a6762c958220c7cf64da02  git-2.24.1.tar.gz' | shasum -a256 -c - && tar -xzf git-2.24.1.tar.gz
-cd git-2.24.1/
+curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.26.0.tar.gz
+echo 'aa168c2318e7187cd295a645f7370cc6d71a324aafc932f80f00c780b6a26bed  git-2.26.0.tar.gz' | shasum -a256 -c - && tar -xzf git-2.26.0.tar.gz
+cd git-2.26.0/
 ./configure --with-libpcre
 make prefix=/usr/local all
 
@@ -263,7 +263,7 @@ Since GitLab 8.17, GitLab requires the use of Node to compile JavaScript
 assets, and Yarn to manage JavaScript dependencies. The current minimum
 requirements for these are:
 
-- `node` >= v8.10.0. (We recommend node 12.x as it is faster)
+- `node` >= v10.13.0. (We recommend node 12.x as it is faster)
 - `yarn` >= v1.10.0.
 
 In many distros,
@@ -281,7 +281,7 @@ sudo apt-get update
 sudo apt-get install yarn
 ```
 
-Visit the official websites for [node](https://nodejs.org/en/download/package-manager/) and [yarn](https://yarnpkg.com/en/docs/install/) if you have any trouble with these steps.
+Visit the official websites for [node](https://nodejs.org/en/download/package-manager/) and [yarn](https://classic.yarnpkg.com/en/docs/install/) if you have any trouble with these steps.
 
 ## 5. System users
 
@@ -301,6 +301,13 @@ use of extensions and concurrent index removal, you need at least PostgreSQL 9.2
 
    ```shell
    sudo apt-get install -y postgresql postgresql-client libpq-dev postgresql-contrib
+   ```
+
+1. Start the PostgreSQL service and confirm that the service is running:
+
+   ```shell
+   sudo service postgresql start
+   sudo service postgresql status
    ```
 
 1. Create a database user for GitLab:
@@ -329,7 +336,7 @@ use of extensions and concurrent index removal, you need at least PostgreSQL 9.2
 
 1. Check if the `pg_trgm` extension is enabled:
 
-   ```shell
+   ```sql
    SELECT true AS enabled
    FROM pg_available_extensions
    WHERE name = 'pg_trgm'
@@ -338,7 +345,7 @@ use of extensions and concurrent index removal, you need at least PostgreSQL 9.2
 
    If the extension is enabled this will produce the following output:
 
-   ```
+   ```plaintext
    enabled
    ---------
     t
@@ -457,16 +464,13 @@ sudo chmod -R u+rwX shared/artifacts/
 # Change the permissions of the directory where GitLab Pages are stored
 sudo chmod -R ug+rwX shared/pages/
 
-# Copy the example Unicorn config
-sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
+# Copy the example Puma config
+sudo -u git -H cp config/puma.rb.example config/puma.rb
 
-# Find number of cores
-nproc
-
-# Enable cluster mode if you expect to have a high load instance
-# Set the number of workers to at least the number of cores
-# Ex. change the amount of workers to 3 for 2GB RAM server
-sudo -u git -H editor config/unicorn.rb
+# Refer to https://github.com/puma/puma#configuration for more information.
+# You should scale Puma workers and threads based on the number of CPU
+# cores you have available. You can get that number via the `nproc` command.
+sudo -u git -H editor config/puma.rb
 
 # Copy the example Rack attack config
 sudo -u git -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
@@ -495,8 +499,8 @@ sudo -u git -H editor config/resque.yml
 ```
 
 CAUTION: **Caution:**
-Make sure to edit both `gitlab.yml` and `unicorn.rb` to match your setup.
-If you want to use Puma web server, see [Using Puma](#using-puma) for the additional steps.
+Make sure to edit both `gitlab.yml` and `puma.rb` to match your setup.
+If you want to use the Unicorn web server, see [Using Unicorn](#using-unicorn) for the additional steps.
 
 NOTE: **Note:**
 If you want to use HTTPS, see [Using HTTPS](#using-https) for the additional steps.
@@ -536,7 +540,7 @@ As of Bundler 1.5.2, you can invoke `bundle install -jN` (where `N` is the numbe
 
 Make sure you have `bundle` (run `bundle -v`):
 
-- `>= 1.5.2`, because some [issues](https://devcenter.heroku.com/changelog-items/411) were [fixed](https://github.com/bundler/bundler/pull/2817) in 1.5.2.
+- `>= 1.5.2`, because some [issues](https://devcenter.heroku.com/changelog-items/411) were [fixed](https://github.com/rubygems/bundler/pull/2817) in 1.5.2.
 - `< 2.x`.
 
 ```shell
@@ -563,7 +567,7 @@ NOTE: **Note:**
 If you want to use HTTPS, see [Using HTTPS](#using-https) for the additional steps.
 
 NOTE: **Note:**
-Make sure your hostname can be resolved on the machine itself by either a proper DNS record or an additional line in `/etc/hosts` ("127.0.0.1  hostname"). This might be necessary, for example, if you set up GitLab behind a reverse proxy. If the hostname cannot be resolved, the final installation check will fail with `Check GitLab API access: FAILED. code: 401` and pushing commits will be rejected with `[remote rejected] master -> master (hook declined)`.
+Make sure your hostname can be resolved on the machine itself by either a proper DNS record or an additional line in `/etc/hosts` ("127.0.0.1 hostname"). This might be necessary, for example, if you set up GitLab behind a reverse proxy. If the hostname cannot be resolved, the final installation check will fail with `Check GitLab API access: FAILED. code: 401` and pushing commits will be rejected with `[remote rejected] master -> master (hook declined)`.
 
 NOTE: **Note:**
 GitLab Shell application startup time can be greatly reduced by disabling RubyGems. This can be done in several ways:
@@ -891,7 +895,7 @@ See the [OmniAuth integration documentation](../integration/omniauth.md).
 ### Build your projects
 
 GitLab can build your projects. To enable that feature, you need GitLab Runners to do that for you.
-See the [GitLab Runner section](https://about.gitlab.com/product/continuous-integration/#gitlab-runner) to install it.
+See the [GitLab Runner section](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/#gitlab-runner) to install it.
 
 ### Adding your Trusted Proxies
 
@@ -907,7 +911,7 @@ for the changes to take effect.
 
 If you'd like to connect to a Redis server on a non-standard port or a different host, you can configure its connection string via the `config/resque.yml` file.
 
-```
+```yaml
 # example
 production:
   url: redis://redis.example.tld:6379
@@ -915,7 +919,7 @@ production:
 
 If you want to connect the Redis server via socket, use the "unix:" URL scheme and the path to the Redis socket file in the `config/resque.yml` file.
 
-```
+```yaml
 # example
 production:
   url: unix:/path/to/redis/socket
@@ -923,7 +927,7 @@ production:
 
 Also, you can use environment variables in the `config/resque.yml` file:
 
-```
+```yaml
 # example
 production:
   url: <%= ENV.fetch('GITLAB_REDIS_URL') %>
@@ -933,7 +937,7 @@ production:
 
 If you are running SSH on a non-standard port, you must change the GitLab user's SSH config.
 
-```
+```plaintext
 # Add to /home/git/.ssh/config
 host localhost          # Give your setup a name (here: override localhost)
     user git            # Your remote git user
@@ -947,24 +951,32 @@ You also need to change the corresponding options (e.g. `ssh_user`, `ssh_host`, 
 
 Apart from the always supported Markdown style, there are other rich text files that GitLab can display. But you might have to install a dependency to do so. See the [`github-markup` gem README](https://github.com/gitlabhq/markup#markups) for more information.
 
-### Using Puma
+### Using Unicorn
 
-Puma is a multi-threaded HTTP 1.1 server for Ruby applications.
+As of GitLab 12.9, [Puma](https://github.com/puma/puma) has replaced Unicorn as the default web server for installations from source.
+If you want to switch back to Unicorn, follow these steps:
 
-To use GitLab with Puma:
-
-1. Finish GitLab setup so you have it up and running.
-1. Copy the supplied example Puma config file into place:
+1. Finish the GitLab setup so you have it up and running.
+1. Copy the supplied example Unicorn config file into place:
 
    ```shell
    cd /home/git/gitlab
 
    # Copy config file for the web server
-   sudo -u git -H cp config/puma.rb.example config/puma.rb
+   sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
    ```
 
-1. Edit the system `init.d` script to use `EXPERIMENTAL_PUMA=1` flag. If you have `/etc/default/gitlab`, then you should edit it instead.
+1. Edit the system `init.d` script to set the `USE_UNICORN=1` flag. If you have `/etc/default/gitlab`, then you should edit it instead.
 1. Restart GitLab.
+
+### Using Sidekiq instead of Sidekiq Cluster
+
+As of GitLab 12.10, Source installations are using `bin/sidekiq-cluster` for managing Sidekiq processes.
+Using Sidekiq directly will still be supported until 14.0. So if you're experiencing issues, please:
+
+1. Edit the system `init.d` script to remove the `SIDEKIQ_WORKERS` flag. If you have `/etc/default/gitlab`, then you should edit it instead.
+1. Restart GitLab.
+1. [Create an issue](https://gitlab.com/gitlab-org/gitlab/issues/-/new) describing the problem.
 
 ## Troubleshooting
 

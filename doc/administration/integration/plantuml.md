@@ -2,7 +2,7 @@
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8537) in GitLab 8.16.
 
-When [PlantUML](http://plantuml.com) integration is enabled and configured in
+When [PlantUML](https://plantuml.com) integration is enabled and configured in
 GitLab we are able to create simple diagrams in AsciiDoc and Markdown documents
 created in snippets, wikis, and repos.
 
@@ -122,12 +122,12 @@ our AsciiDoc snippets, wikis and repos using delimited blocks:
 
 - **Markdown**
 
-  ~~~markdown
+  ````markdown
   ```plantuml
   Bob -> Alice : hello
   Alice -> Bob : hi
   ```
-  ~~~
+  ````
 
 - **AsciiDoc**
 
@@ -149,9 +149,9 @@ our AsciiDoc snippets, wikis and repos using delimited blocks:
      Alice -> Bob: hi
   ```
 
-   You can also use the `uml::` directive for compatibility with [sphinxcontrib-plantuml](https://pypi.org/project/sphinxcontrib-plantuml/), but please note that we currently only support the `caption` option.
+   You can also use the `uml::` directive for compatibility with [`sphinxcontrib-plantuml`](https://pypi.org/project/sphinxcontrib-plantuml/), but please note that we currently only support the `caption` option.
 
-The above blocks will be converted to an HTML img tag with source pointing to the
+The above blocks will be converted to an HTML image tag with source pointing to the
 PlantUML instance. If the PlantUML server is correctly configured, this should
 render a nice diagram instead of the block:
 
@@ -161,10 +161,10 @@ Alice -> Bob : hi
 ```
 
 Inside the block you can add any of the supported diagrams by PlantUML such as
-[Sequence](http://plantuml.com/sequence-diagram), [Use Case](http://plantuml.com/use-case-diagram),
-[Class](http://plantuml.com/class-diagram), [Activity](http://plantuml.com/activity-diagram-legacy),
-[Component](http://plantuml.com/component-diagram), [State](http://plantuml.com/state-diagram),
-and [Object](http://plantuml.com/object-diagram) diagrams. You do not need to use the PlantUML
+[Sequence](https://plantuml.com/sequence-diagram), [Use Case](https://plantuml.com/use-case-diagram),
+[Class](https://plantuml.com/class-diagram), [Activity](https://plantuml.com/activity-diagram-legacy),
+[Component](https://plantuml.com/component-diagram), [State](https://plantuml.com/state-diagram),
+and [Object](https://plantuml.com/object-diagram) diagrams. You do not need to use the PlantUML
 diagram delimiters `@startuml`/`@enduml` as these are replaced by the AsciiDoc `plantuml` block.
 
 Some parameters can be added to the AsciiDoc block definition:
@@ -172,7 +172,7 @@ Some parameters can be added to the AsciiDoc block definition:
 - *format*: Can be either `png` or `svg`. Note that `svg` is not supported by
   all browsers so use with care. The default is `png`.
 - *id*: A CSS id added to the diagram HTML tag.
-- *width*: Width attribute added to the img tag.
-- *height*: Height attribute added to the img tag.
+- *width*: Width attribute added to the image tag.
+- *height*: Height attribute added to the image tag.
 
 Markdown does not support any parameters and will always use PNG format.

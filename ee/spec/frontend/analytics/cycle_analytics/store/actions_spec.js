@@ -1,15 +1,15 @@
-import * as commonUtils from '~/lib/utils/common_utils';
-import * as urlUtils from '~/lib/utils/url_utility';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
+import {
+  TASKS_BY_TYPE_FILTERS,
+  TASKS_BY_TYPE_SUBJECT_ISSUE,
+} from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
-import { toYmd } from 'ee/analytics/shared/utils';
 import {
   group,
   summaryData,
@@ -24,6 +24,7 @@ import {
   transformedDurationMedianData,
   endpoints,
 } from '../mock_data';
+import { shouldFlashAMessage } from '../helpers';
 
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
@@ -32,34 +33,14 @@ const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
 
-const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stages/${stageId}`;
+const stageEndpoint = ({ stageId }) =>
+  `/groups/${group.full_path}/-/analytics/value_stream_analytics/stages/${stageId}`;
 
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAMessage(msg = flashErrorMessage) {
-    expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
-  }
-
-  function shouldSetUrlParams({ action, payload, result }) {
-    const store = {
-      state,
-      getters,
-      commit: jest.fn(),
-      dispatch: jest.fn(() => Promise.resolve()),
-    };
-
-    return actions[action](store, payload).then(() => {
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(result, window.location.href, true);
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  }
-
   beforeEach(() => {
-    commonUtils.historyPushState = jest.fn();
-    urlUtils.setUrlParams = jest.fn();
-
     state = {
       startDate,
       endDate,
@@ -99,61 +80,10 @@ describe('Cycle analytics actions', () => {
     );
   });
 
-  describe('setSelectedGroup', () => {
-    const payload = { full_path: 'someNewGroup' };
-    it('calls setUrlParams with the group params', () => {
-      actions.setSelectedGroup(
-        {
-          state,
-          getters: {
-            currentGroupPath: 'someNewGroup',
-            selectedProjectIds: [],
-          },
-          commit: jest.fn(),
-        },
-        payload,
-      );
-
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(
-        {
-          group_id: 'someNewGroup',
-          'project_ids[]': [],
-        },
-        window.location.href,
-        true,
-      );
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  });
-
-  describe('setSelectedProjects', () => {
-    const payload = [1, 2];
-    it('calls setUrlParams with the date params', () => {
-      actions.setSelectedProjects(
-        {
-          state,
-          getters: {
-            currentGroupPath: 'test-group',
-            selectedProjectIds: payload,
-          },
-          commit: jest.fn(),
-        },
-        payload,
-      );
-
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(
-        { 'project_ids[]': payload, group_id: 'test-group' },
-        window.location.href,
-        true,
-      );
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  });
-
   describe('setDateRange', () => {
     const payload = { startDate, endDate };
 
-    it('sets the dates as expected and dispatches fetchCycleAnalyticsData', done => {
+    it('dispatches the fetchCycleAnalyticsData action', done => {
       testAction(
         actions.setDateRange,
         payload,
@@ -162,19 +92,6 @@ describe('Cycle analytics actions', () => {
         [{ type: 'fetchCycleAnalyticsData' }],
         done,
       );
-    });
-
-    it('calls setUrlParams with the date params', () => {
-      shouldSetUrlParams({
-        action: 'setDateRange',
-        payload,
-        result: {
-          group_id: getters.currentGroupPath,
-          'project_ids[]': getters.selectedProjectIds,
-          created_after: toYmd(payload.startDate),
-          created_before: toYmd(payload.endDate),
-        },
-      });
     });
   });
 
@@ -269,65 +186,83 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('fetchGroupLabels', () => {
+  describe('fetchTopRankedGroupLabels', () => {
+    beforeEach(() => {
+      gon.api_version = 'v4';
+      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE }, ...getters };
+    });
+
     describe('succeeds', () => {
       beforeEach(() => {
-        gon.api_version = 'v4';
-        state = { selectedGroup };
-        mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
+        mock.onGet(endpoints.tasksByTypeTopLabelsData).replyOnce(200, groupLabels);
       });
 
-      it('dispatches receiveGroupLabels if the request succeeds', () => {
+      it('dispatches receiveTopRankedGroupLabelsSuccess if the request succeeds', () => {
         return testAction(
-          actions.fetchGroupLabels,
+          actions.fetchTopRankedGroupLabels,
           null,
           state,
           [],
           [
-            { type: 'requestGroupLabels' },
-            {
-              type: 'receiveGroupLabelsSuccess',
-              payload: groupLabels,
-            },
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsSuccess', payload: groupLabels },
           ],
         );
+      });
+
+      describe('receiveTopRankedGroupLabelsSuccess', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it(`commits the ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS} mutation and dispatches the 'fetchTasksByTypeData' action`, done => {
+          testAction(
+            actions.receiveTopRankedGroupLabelsSuccess,
+            null,
+            state,
+            [
+              {
+                type: types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS,
+                payload: null,
+              },
+            ],
+            [{ type: 'fetchTasksByTypeData' }],
+            done,
+          );
+        });
       });
     });
 
     describe('with an error', () => {
       beforeEach(() => {
-        state = { selectedGroup };
-        mock.onGet(endpoints.groupLabels).replyOnce(404);
+        mock.onGet(endpoints.fetchTopRankedGroupLabels).replyOnce(404);
       });
 
-      it('dispatches receiveGroupLabelsError if the request fails', () => {
+      it('dispatches receiveTopRankedGroupLabelsError if the request fails', () => {
         return testAction(
-          actions.fetchGroupLabels,
+          actions.fetchTopRankedGroupLabels,
           null,
           state,
           [],
           [
-            { type: 'requestGroupLabels' },
-            {
-              type: 'receiveGroupLabelsError',
-              payload: error,
-            },
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsError', payload: error },
           ],
         );
       });
     });
 
-    describe('receiveGroupLabelsError', () => {
+    describe('receiveTopRankedGroupLabelsError', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
       });
 
       it('flashes an error message if the request fails', () => {
-        actions.receiveGroupLabelsError({
+        actions.receiveTopRankedGroupLabelsError({
           commit: () => {},
         });
 
-        shouldFlashAMessage('There was an error fetching label data for the selected group');
+        shouldFlashAMessage('There was an error fetching the top labels for the selected group');
       });
     });
   });
@@ -337,7 +272,6 @@ describe('Cycle analytics actions', () => {
       const mocks = {
         requestCycleAnalyticsData:
           overrides.requestCycleAnalyticsData || jest.fn().mockResolvedValue(),
-        fetchGroupLabels: overrides.fetchGroupLabels || jest.fn().mockResolvedValue(),
         fetchStageMedianValues: overrides.fetchStageMedianValues || jest.fn().mockResolvedValue(),
         fetchGroupStagesAndEvents:
           overrides.fetchGroupStagesAndEvents || jest.fn().mockResolvedValue(),
@@ -350,7 +284,6 @@ describe('Cycle analytics actions', () => {
         mockDispatchContext: jest
           .fn()
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
-          .mockImplementationOnce(mocks.fetchGroupLabels)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchStageMedianValues)
           .mockImplementationOnce(mocks.fetchSummaryData)
@@ -372,7 +305,6 @@ describe('Cycle analytics actions', () => {
         [],
         [
           { type: 'requestCycleAnalyticsData' },
-          { type: 'fetchGroupLabels' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'fetchSummaryData' },
@@ -380,34 +312,6 @@ describe('Cycle analytics actions', () => {
         ],
         done,
       );
-    });
-
-    // TOOD: parameterize?
-    it(`displays an error if fetchGroupLabels fails`, done => {
-      const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
-        fetchGroupLabels: actions.fetchGroupLabels({
-          dispatch: jest
-            .fn()
-            .mockResolvedValueOnce()
-            .mockImplementation(actions.receiveGroupLabelsError({ commit: () => {} })),
-          commit: () => {},
-          state: { ...state },
-          getters,
-        }),
-      });
-
-      actions
-        .fetchCycleAnalyticsData({
-          dispatch: mockDispatchContext,
-          state: {},
-          commit: () => {},
-        })
-
-        .then(() => {
-          shouldFlashAMessage('There was an error fetching label data for the selected group');
-          done();
-        })
-        .catch(done.fail);
     });
 
     it(`displays an error if fetchStageMedianValues fails`, done => {
@@ -558,7 +462,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAMessage();
+        shouldFlashAMessage(flashErrorMessage);
       });
     });
   });
@@ -611,7 +515,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 
@@ -671,7 +575,7 @@ describe('Cycle analytics actions', () => {
         );
       });
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 
@@ -1191,6 +1095,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: stateWithStages,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenNthCalledWith(1, 'requestDurationMedianData');
@@ -1211,6 +1116,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: stateWithStages,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith(
@@ -1238,6 +1144,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: brokenState,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith('receiveDurationMedianDataError');
@@ -1540,8 +1447,6 @@ describe('Cycle analytics actions', () => {
     };
 
     beforeEach(() => {
-      commonUtils.historyPushState = jest.fn();
-      urlUtils.setUrlParams = jest.fn();
       mockDispatch = jest.fn(() => Promise.resolve());
       mockCommit = jest.fn();
       store = {
@@ -1623,6 +1528,88 @@ describe('Cycle analytics actions', () => {
           .then(() => {
             shouldFlashAMessage('There was a problem refreshing the data, please try again');
           }));
+    });
+  });
+
+  describe('reorderStage', () => {
+    const stageId = 'cool-stage';
+    const payload = { id: stageId, move_after_id: '2', move_before_id: '8' };
+
+    beforeEach(() => {
+      state = { selectedGroup };
+    });
+
+    describe('with no errors', () => {
+      beforeEach(() => {
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
+      });
+
+      it(`dispatches the ${types.REQUEST_REORDER_STAGE} and ${types.RECEIVE_REORDER_STAGE_SUCCESS} actions`, done => {
+        testAction(
+          actions.reorderStage,
+          payload,
+          state,
+          [],
+          [{ type: 'requestReorderStage' }, { type: 'receiveReorderStageSuccess' }],
+          done,
+        );
+      });
+    });
+
+    describe('with errors', () => {
+      beforeEach(() => {
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.NOT_FOUND);
+      });
+
+      it(`dispatches the ${types.REQUEST_REORDER_STAGE} and ${types.RECEIVE_REORDER_STAGE_ERROR} actions `, done => {
+        testAction(
+          actions.reorderStage,
+          payload,
+          state,
+          [],
+          [
+            { type: 'requestReorderStage' },
+            { type: 'receiveReorderStageError', payload: { status: httpStatusCodes.NOT_FOUND } },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveReorderStageError', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+    it(`commits the ${types.RECEIVE_REORDER_STAGE_ERROR} mutation and flashes an error`, () => {
+      testAction(
+        actions.receiveReorderStageError,
+        null,
+        state,
+        [
+          {
+            type: types.RECEIVE_REORDER_STAGE_ERROR,
+          },
+        ],
+        [],
+      );
+
+      shouldFlashAMessage(
+        'There was an error updating the stage order. Please try reloading the page.',
+      );
+    });
+  });
+
+  describe('receiveReorderStageSuccess', () => {
+    it(`commits the ${types.RECEIVE_REORDER_STAGE_SUCCESS} mutation`, done => {
+      testAction(
+        actions.receiveReorderStageSuccess,
+        null,
+        state,
+        [{ type: types.RECEIVE_REORDER_STAGE_SUCCESS }],
+        [],
+        done,
+      );
     });
   });
 });

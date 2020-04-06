@@ -1,5 +1,3 @@
-$gray-border: 1px solid $border-color;
-
 .error-list {
   .sort-control {
     .btn {
@@ -13,54 +11,21 @@ $gray-border: 1px solid $border-color;
     }
   }
 
-  @include media-breakpoint-up(sm) {
-    .row-top {
-      border: $gray-border;
-      background-color: $gray-50;
-    }
-  }
+  @include media-breakpoint-down(sm) {
+    .error-list-table {
+      .table-col {
+        min-height: 68px;
 
-  @include media-breakpoint-down(xs) {
-    .table-row {
-      border: $gray-border;
-      border-radius: 4px;
-    }
+        &:last-child {
+          background-color: $gray-normal;
 
-    .search-box {
-      border-top: $gray-border;
-      border-bottom: $gray-border;
-      background-color: $gray-50;
-    }
+          &::before {
+            content: none !important;
+          }
 
-    .table-col {
-      min-height: 68px;
-
-      &::before {
-        text-align: left !important;
-      }
-
-      &:first-child {
-        div {
-          padding: 0 !important;
-          align-items: flex-end;
-        }
-      }
-
-      &:last-child {
-        height: 64px;
-        background-color: $gray-normal;
-
-        &::before {
-          content: none !important;
-        }
-
-        div {
-          width: 100% !important;
-          padding: 0 !important;
-
-          a {
-            color: $blue-500;
-            border-color: $blue-500;
+          div {
+            width: 100% !important;
+            padding: 0 !important;
           }
         }
       }

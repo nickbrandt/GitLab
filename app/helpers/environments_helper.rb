@@ -38,7 +38,21 @@ module EnvironmentsHelper
       "tags-path" => project_tags_path(project),
       "has-metrics" => "#{environment.has_metrics?}",
       "prometheus-status" => "#{environment.prometheus_status}",
-      "external-dashboard-url" => project.metrics_setting_external_dashboard_url
+      "external-dashboard-url" => project.metrics_setting_external_dashboard_url,
+      "environment-state" => "#{environment.state}"
     }
+  end
+
+  def environment_logs_data(project, environment)
+    {
+      "environment-name": environment.name,
+      "environments-path": project_environments_path(project, format: :json),
+      "environment-id": environment.id,
+      "cluster-applications-documentation-path" => help_page_path('user/clusters/applications.md', anchor: 'elastic-stack')
+    }
+  end
+
+  def can_destroy_environment?(environment)
+    can?(current_user, :destroy_environment, environment)
   end
 end

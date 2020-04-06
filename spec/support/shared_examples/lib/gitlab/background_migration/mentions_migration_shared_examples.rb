@@ -22,14 +22,6 @@ shared_examples 'resource mentions migration' do |migration_class, resource_clas
 end
 
 shared_examples 'resource notes mentions migration' do |migration_class, resource_class|
-  before do
-    note1.becomes(Note).save!
-    note2.becomes(Note).save!
-    note3.becomes(Note).save!
-    note4.becomes(Note).save!
-    note5.becomes(Note).save(validate: false)
-  end
-
   it 'migrates mentions from note' do
     join = migration_class::JOIN
     conditions = migration_class::QUERY_CONDITIONS
@@ -72,7 +64,7 @@ shared_examples 'schedules resource mentions migration' do |resource_class, is_f
   it 'schedules background migrations' do
     Sidekiq::Testing.fake! do
       Timecop.freeze do
-        resource_count = is_for_notes ? Note.where(noteable_type: resource_class.to_s).count : resource_class.count
+        resource_count = is_for_notes ? Note.count : resource_class.count
         expect(resource_count).to eq 5
 
         migrate!
@@ -80,10 +72,11 @@ shared_examples 'schedules resource mentions migration' do |resource_class, is_f
         migration = described_class::MIGRATION
         join = described_class::JOIN
         conditions = described_class::QUERY_CONDITIONS
+        delay = described_class::DELAY
 
-        expect(migration).to be_scheduled_delayed_migration(2.minutes, resource_class.name, join, conditions, is_for_notes, resource1.id, resource1.id)
-        expect(migration).to be_scheduled_delayed_migration(4.minutes, resource_class.name, join, conditions, is_for_notes, resource2.id, resource2.id)
-        expect(migration).to be_scheduled_delayed_migration(6.minutes, resource_class.name, join, conditions, is_for_notes, resource3.id, resource3.id)
+        expect(migration).to be_scheduled_delayed_migration(1 * delay, resource_class.name, join, conditions, is_for_notes, resource1.id, resource1.id)
+        expect(migration).to be_scheduled_delayed_migration(2 * delay, resource_class.name, join, conditions, is_for_notes, resource2.id, resource2.id)
+        expect(migration).to be_scheduled_delayed_migration(3 * delay, resource_class.name, join, conditions, is_for_notes, resource3.id, resource3.id)
         expect(BackgroundMigrationWorker.jobs.size).to eq 3
       end
     end

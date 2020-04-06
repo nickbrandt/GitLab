@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -19,7 +19,7 @@ export default {
   },
   components: {
     Icon,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
     UserAvatarLink,
     TimeagoTooltip,
@@ -43,7 +43,7 @@ export default {
     actionButtonClass() {
       // False positive css classes
       // https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       return `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button ${
         this.isEpicOpen ? 'btn-close' : 'btn-open'
       }`;
@@ -109,7 +109,7 @@ export default {
         @click="toggleEpicStatus(isEpicOpen)"
       />
     </div>
-    <gl-button
+    <gl-deprecated-button
       :aria-label="__('Toggle sidebar')"
       variant="secondary"
       class="float-right d-block d-sm-none
@@ -118,6 +118,6 @@ gutter-toggle issuable-gutter-toggle js-sidebar-toggle"
       @click="toggleSidebar({ sidebarCollapsed })"
     >
       <i class="fa fa-angle-double-left"></i>
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

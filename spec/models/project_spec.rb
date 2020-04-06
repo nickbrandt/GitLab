@@ -70,6 +70,7 @@ describe Project do
     it { is_expected.to have_one(:auto_devops).class_name('ProjectAutoDevops') }
     it { is_expected.to have_one(:error_tracking_setting).class_name('ErrorTracking::ProjectErrorTrackingSetting') }
     it { is_expected.to have_one(:project_setting) }
+    it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
     it { is_expected.to have_many(:commit_statuses) }
     it { is_expected.to have_many(:ci_pipelines) }
     it { is_expected.to have_many(:ci_refs) }
@@ -107,14 +108,14 @@ describe Project do
     it { is_expected.to have_many(:external_pull_requests) }
     it { is_expected.to have_many(:sourced_pipelines) }
     it { is_expected.to have_many(:source_pipelines) }
+    it { is_expected.to have_many(:prometheus_alert_events) }
+    it { is_expected.to have_many(:self_managed_prometheus_alert_events) }
+    it { is_expected.to have_many(:jira_imports) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
       let(:stubbed_container) { build_stubbed(:project) }
       let(:expected_full_path) { "#{container.namespace.full_path}/somewhere" }
-      let(:expected_repository_klass) { Repository }
-      let(:expected_storage_klass) { Storage::Hashed }
-      let(:expected_web_url_path) { "#{container.namespace.full_path}/somewhere" }
     end
 
     it 'has an inverse relationship with merge requests' do
@@ -824,7 +825,7 @@ describe Project do
       end
 
       it 'returns nil when no issue found' do
-        expect(project.get_issue(999, user)).to be_nil
+        expect(project.get_issue(non_existing_record_id, user)).to be_nil
       end
 
       it "returns nil when user doesn't have access" do
@@ -1388,16 +1389,11 @@ describe Project do
   context 'repository storage by default' do
     let(:project) { build(:project) }
 
-    before do
-      storages = {
-        'default' => Gitlab::GitalyClient::StorageSettings.new('path' => 'tmp/tests/repositories'),
-        'picked'  => Gitlab::GitalyClient::StorageSettings.new('path' => 'tmp/tests/repositories')
-      }
-      allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
-    end
-
     it 'picks storage from ApplicationSetting' do
-      expect_any_instance_of(ApplicationSetting).to receive(:pick_repository_storage).and_return('picked')
+      expect_next_instance_of(ApplicationSetting) do |instance|
+        expect(instance).to receive(:pick_repository_storage).and_return('picked')
+      end
+      expect(described_class).to receive(:pick_repository_storage).and_call_original
 
       expect(project.repository_storage).to eq('picked')
     end
@@ -1740,7 +1736,7 @@ describe Project do
       expect(described_class.search(project.path.upcase)).to eq([project])
     end
 
-    context 'by full path' do
+    context 'when include_namespace is true' do
       let_it_be(:group) { create(:group) }
       let_it_be(:project) { create(:project, group: group) }
 
@@ -1750,11 +1746,11 @@ describe Project do
         end
 
         it 'returns projects that match the group path' do
-          expect(described_class.search(group.path)).to eq([project])
+          expect(described_class.search(group.path, include_namespace: true)).to eq([project])
         end
 
         it 'returns projects that match the full path' do
-          expect(described_class.search(project.full_path)).to eq([project])
+          expect(described_class.search(project.full_path, include_namespace: true)).to eq([project])
         end
       end
 
@@ -1764,11 +1760,11 @@ describe Project do
         end
 
         it 'returns no results when searching by group path' do
-          expect(described_class.search(group.path)).to be_empty
+          expect(described_class.search(group.path, include_namespace: true)).to be_empty
         end
 
         it 'returns no results when searching by full path' do
-          expect(described_class.search(project.full_path)).to be_empty
+          expect(described_class.search(project.full_path, include_namespace: true)).to be_empty
         end
       end
     end
@@ -1921,30 +1917,15 @@ describe Project do
 
   describe '#create_repository' do
     let(:project) { create(:project, :repository) }
-    let(:shell) { Gitlab::Shell.new }
-
-    before do
-      allow(project).to receive(:gitlab_shell).and_return(shell)
-    end
 
     context 'using a regular repository' do
       it 'creates the repository' do
-        expect(shell).to receive(:create_repository)
-          .with(project.repository_storage, project.disk_path, project.full_path)
-          .and_return(true)
-
-        expect(project.repository).to receive(:after_create)
-
+        expect(project.repository).to receive(:create_repository)
         expect(project.create_repository).to eq(true)
       end
 
       it 'adds an error if the repository could not be created' do
-        expect(shell).to receive(:create_repository)
-          .with(project.repository_storage, project.disk_path, project.full_path)
-          .and_return(false)
-
-        expect(project.repository).not_to receive(:after_create)
-
+        expect(project.repository).to receive(:create_repository) { raise 'Fail in test' }
         expect(project.create_repository).to eq(false)
         expect(project.errors).not_to be_empty
       end
@@ -1953,7 +1934,7 @@ describe Project do
     context 'using a forked repository' do
       it 'does nothing' do
         expect(project).to receive(:forked?).and_return(true)
-        expect(shell).not_to receive(:create_repository)
+        expect(project.repository).not_to receive(:create_repository)
 
         project.create_repository
       end
@@ -1962,28 +1943,16 @@ describe Project do
 
   describe '#ensure_repository' do
     let(:project) { create(:project, :repository) }
-    let(:shell) { Gitlab::Shell.new }
-
-    before do
-      allow(project).to receive(:gitlab_shell).and_return(shell)
-    end
 
     it 'creates the repository if it not exist' do
-      allow(project).to receive(:repository_exists?)
-        .and_return(false)
-
-      allow(shell).to receive(:create_repository)
-        .with(project.repository_storage, project.disk_path, project.full_path)
-        .and_return(true)
-
+      allow(project).to receive(:repository_exists?).and_return(false)
       expect(project).to receive(:create_repository).with(force: true)
 
       project.ensure_repository
     end
 
     it 'does not create the repository if it exists' do
-      allow(project).to receive(:repository_exists?)
-        .and_return(true)
+      allow(project).to receive(:repository_exists?).and_return(true)
 
       expect(project).not_to receive(:create_repository)
 
@@ -1992,13 +1961,8 @@ describe Project do
 
     it 'creates the repository if it is a fork' do
       expect(project).to receive(:forked?).and_return(true)
-
-      allow(project).to receive(:repository_exists?)
-        .and_return(false)
-
-      expect(shell).to receive(:create_repository)
-        .with(project.repository_storage, project.disk_path, project.full_path)
-        .and_return(true)
+      expect(project).to receive(:repository_exists?).and_return(false)
+      expect(project.repository).to receive(:create_repository) { true }
 
       project.ensure_repository
     end
@@ -2316,6 +2280,44 @@ describe Project do
     end
   end
 
+  describe '#jira_import_status' do
+    let(:project) { create(:project, :import_started, import_type: 'jira') }
+
+    context 'when import_data is nil' do
+      it 'returns none' do
+        expect(project.import_data).to be nil
+        expect(project.jira_import_status).to eq('none')
+      end
+    end
+
+    context 'when import_data is set' do
+      let(:jira_import_data) { JiraImportData.new }
+      let(:project) { create(:project, :import_started, import_data: jira_import_data, import_type: 'jira') }
+
+      it 'returns none' do
+        expect(project.import_data.becomes(JiraImportData).force_import?).to be false
+        expect(project.jira_import_status).to eq('none')
+      end
+
+      context 'when jira_force_import is true' do
+        let(:imported_jira_project) do
+          JiraImportData::JiraProjectDetails.new('xx', Time.now.strftime('%Y-%m-%d %H:%M:%S'), { user_id: 1, name: 'root' })
+        end
+
+        before do
+          jira_import_data = project.import_data.becomes(JiraImportData)
+          jira_import_data << imported_jira_project
+          jira_import_data.force_import!
+        end
+
+        it 'returns started' do
+          expect(project.import_data.becomes(JiraImportData).force_import?).to be true
+          expect(project.jira_import_status).to eq('started')
+        end
+      end
+    end
+  end
+
   describe '#human_import_status_name' do
     context 'with import_state' do
       it 'returns the right human import status' do
@@ -2367,6 +2369,63 @@ describe Project do
 
         expect(RepositoryImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
         expect(project.add_import_job).to eq(import_jid)
+      end
+    end
+
+    context 'jira import' do
+      it 'schedules a jira import job' do
+        project = create(:project, import_type: 'jira')
+
+        expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
+        expect(project.add_import_job).to eq(import_jid)
+      end
+    end
+  end
+
+  describe '#jira_import?' do
+    subject(:project) { build(:project, import_type: 'jira') }
+
+    it { expect(project.jira_import?).to be true }
+    it { expect(project.import?).to be true }
+  end
+
+  describe '#jira_force_import?' do
+    let(:imported_jira_project) do
+      JiraImportData::JiraProjectDetails.new('xx', Time.now.strftime('%Y-%m-%d %H:%M:%S'), { user_id: 1, name: 'root' })
+    end
+    let(:jira_import_data) do
+      data = JiraImportData.new
+      data << imported_jira_project
+      data.force_import!
+      data
+    end
+
+    subject(:project) { build(:project, import_type: 'jira', import_data: jira_import_data) }
+
+    it { expect(project.jira_force_import?).to be true }
+  end
+
+  describe '#remove_import_data' do
+    let(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
+
+    context 'when jira import' do
+      let!(:project) { create(:project, import_type: 'jira', import_data: import_data) }
+
+      it 'does not remove import data' do
+        expect(project.mirror?).to be false
+        expect(project.jira_import?).to be true
+        expect { project.remove_import_data }.not_to change { ProjectImportData.count }
+      end
+    end
+
+    context 'when not mirror neither jira import' do
+      let(:user) { create(:user) }
+      let!(:project) { create(:project, import_type: 'github', import_data: import_data) }
+
+      it 'removes import data' do
+        expect(project.mirror?).to be false
+        expect(project.jira_import?).to be false
+        expect { project.remove_import_data }.to change { ProjectImportData.count }.by(-1)
       end
     end
   end
@@ -3957,6 +4016,12 @@ describe Project do
   describe '#remove_export' do
     let(:project) { create(:project, :with_export) }
 
+    before do
+      allow_next_instance_of(ProjectExportWorker) do |job|
+        allow(job).to receive(:jid).and_return(SecureRandom.hex(8))
+      end
+    end
+
     it 'removes the export' do
       project.remove_exports
 
@@ -4618,13 +4683,14 @@ describe Project do
     let(:import_state) { create(:import_state, project: project) }
 
     it 'runs the correct hooks' do
-      expect(project.repository).to receive(:after_import)
-      expect(project.wiki.repository).to receive(:after_import)
+      expect(project.repository).to receive(:expire_content_cache)
+      expect(project.wiki.repository).to receive(:expire_content_cache)
       expect(import_state).to receive(:finish)
       expect(project).to receive(:update_project_counter_caches)
       expect(project).to receive(:after_create_default_branch)
       expect(project).to receive(:refresh_markdown_cache!)
       expect(InternalId).to receive(:flush_records!).with(project: project)
+      expect(DetectRepositoryLanguagesWorker).to receive(:perform_async).with(project.id)
 
       project.after_import
     end
@@ -4863,6 +4929,38 @@ describe Project do
       it 'returns the project and the project nested groups badges' do
         expect(project.badges.count).to eq 5
       end
+    end
+  end
+
+  context 'with cross internal project merge requests' do
+    let(:project) { create(:project, :repository, :internal) }
+    let(:forked_project) { fork_project(project, nil, repository: true) }
+    let(:user) { double(:user) }
+
+    it "does not endlessly loop for internal projects with MRs to each other", :sidekiq_inline do
+      allow(user).to receive(:can?).and_return(true, false, true)
+      allow(user).to receive(:id).and_return(1)
+
+      create(
+        :merge_request,
+        target_project: project,
+        target_branch: 'merge-test',
+        source_project: forked_project,
+        source_branch: 'merge-test',
+        allow_collaboration: true
+      )
+
+      create(
+        :merge_request,
+        target_project: forked_project,
+        target_branch: 'merge-test',
+        source_project: project,
+        source_branch: 'merge-test',
+        allow_collaboration: true
+      )
+
+      expect(user).to receive(:can?).at_most(5).times
+      project.branch_allows_collaboration?(user, "merge-test")
     end
   end
 
@@ -5629,6 +5727,20 @@ describe Project do
     end
   end
 
+  describe 'with services and chat names' do
+    subject { create(:project) }
+
+    let(:service) { create(:service, project: subject) }
+
+    before do
+      create_list(:chat_name, 5, service: service)
+    end
+
+    it 'removes chat names on removal' do
+      expect { subject.destroy }.to change { ChatName.count }.by(-5)
+    end
+  end
+
   describe 'with_issues_or_mrs_available_for_user' do
     before do
       Project.delete_all
@@ -5656,7 +5768,54 @@ describe Project do
     subject { project.limited_protected_branches(1) }
 
     it 'returns limited number of protected branches based on specified limit' do
-      expect(subject).to eq([another_protected_branch])
+      expect(subject.count).to eq(1)
+    end
+  end
+
+  describe '#all_lfs_objects_oids' do
+    let(:project) { create(:project) }
+    let(:lfs_object) { create(:lfs_object) }
+    let(:another_lfs_object) { create(:lfs_object) }
+
+    subject { project.all_lfs_objects_oids }
+
+    context 'when project has associated LFS objects' do
+      before do
+        create(:lfs_objects_project, lfs_object: lfs_object, project: project)
+        create(:lfs_objects_project, lfs_object: another_lfs_object, project: project)
+      end
+
+      it 'returns OIDs of LFS objects' do
+        expect(subject).to match_array([lfs_object.oid, another_lfs_object.oid])
+      end
+
+      context 'and there are specified oids' do
+        subject { project.all_lfs_objects_oids(oids: [lfs_object.oid]) }
+
+        it 'returns OIDs of LFS objects that match specified oids' do
+          expect(subject).to eq([lfs_object.oid])
+        end
+      end
+    end
+
+    context 'when fork has associated LFS objects to itself and source' do
+      let(:source) { create(:project) }
+      let(:project) { fork_project(source) }
+
+      before do
+        create(:lfs_objects_project, lfs_object: lfs_object, project: source)
+        create(:lfs_objects_project, lfs_object: another_lfs_object, project: project)
+      end
+
+      it 'returns OIDs of LFS objects' do
+        expect(subject).to match_array([lfs_object.oid, another_lfs_object.oid])
+      end
+    end
+
+    context 'when project has no associated LFS objects' do
+      it 'returns empty array' do
+        expect(subject).to be_empty
+      end
     end
   end
 
@@ -5675,6 +5834,14 @@ describe Project do
 
       it 'returns OIDs of LFS objects' do
         expect(subject).to match_array([lfs_object.oid, another_lfs_object.oid])
+      end
+
+      context 'and there are specified oids' do
+        subject { project.lfs_objects_oids(oids: [lfs_object.oid]) }
+
+        it 'returns OIDs of LFS objects that match specified oids' do
+          expect(subject).to eq([lfs_object.oid])
+        end
       end
     end
 
@@ -5723,6 +5890,132 @@ describe Project do
     context 'when the project is not self monitoring' do
       it { is_expected.to be false }
     end
+  end
+
+  describe '#add_export_job' do
+    context 'if not already present' do
+      it 'starts project export job' do
+        user = create(:user)
+        project = build(:project)
+
+        expect(ProjectExportWorker).to receive(:perform_async).with(user.id, project.id, nil, {})
+
+        project.add_export_job(current_user: user)
+      end
+    end
+  end
+
+  describe '#export_in_progress?' do
+    let(:project) { build(:project) }
+    let!(:project_export_job ) { create(:project_export_job, project: project) }
+
+    context 'when project export is enqueued' do
+      it { expect(project.export_in_progress?).to be false }
+    end
+
+    context 'when project export is in progress' do
+      before do
+        project_export_job.start!
+      end
+
+      it { expect(project.export_in_progress?).to be true }
+    end
+
+    context 'when project export is completed' do
+      before do
+        finish_job(project_export_job)
+      end
+
+      it { expect(project.export_in_progress?).to be false }
+    end
+  end
+
+  describe '#export_status' do
+    let(:project) { build(:project) }
+    let!(:project_export_job ) { create(:project_export_job, project: project) }
+
+    context 'when project export is enqueued' do
+      it { expect(project.export_status).to eq :queued }
+    end
+
+    context 'when project export is in progress' do
+      before do
+        project_export_job.start!
+      end
+
+      it { expect(project.export_status).to eq :started }
+    end
+
+    context 'when project export is completed' do
+      before do
+        finish_job(project_export_job)
+        allow(project).to receive(:export_file).and_return(double(ImportExportUploader, file: 'exists.zip'))
+      end
+
+      it { expect(project.export_status).to eq :finished }
+    end
+
+    context 'when project export is being regenerated' do
+      let!(:new_project_export_job ) { create(:project_export_job, project: project) }
+
+      before do
+        finish_job(project_export_job)
+        allow(project).to receive(:export_file).and_return(double(ImportExportUploader, file: 'exists.zip'))
+      end
+
+      it { expect(project.export_status).to eq :regeneration_in_progress }
+    end
+  end
+
+  describe '#environments_for_scope' do
+    let_it_be(:project, reload: true) { create(:project) }
+
+    before do
+      create_list(:environment, 2, project: project)
+    end
+
+    it 'retrieves all project environments when using the * wildcard' do
+      expect(project.environments_for_scope("*")).to eq(project.environments)
+    end
+
+    it 'retrieves a specific project environment when using the name of that environment' do
+      environment = project.environments.first
+
+      expect(project.environments_for_scope(environment.name)).to eq([environment])
+    end
+  end
+
+  describe '#latest_jira_import' do
+    let_it_be(:project) { create(:project) }
+    context 'when no jira imports' do
+      it 'returns nil' do
+        expect(project.latest_jira_import).to be nil
+      end
+    end
+
+    context 'when single jira import' do
+      let!(:jira_import1) { create(:jira_import_state, project: project) }
+
+      it 'returns the jira import' do
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
+    end
+
+    context 'when multiple jira imports' do
+      let!(:jira_import1) { create(:jira_import_state, :finished, created_at: 1.day.ago, project: project) }
+      let!(:jira_import2) { create(:jira_import_state, :failed, created_at: 2.days.ago, project: project) }
+      let!(:jira_import3) { create(:jira_import_state, :started, created_at: 3.days.ago, project: project) }
+
+      it 'returns latest jira import by created_at' do
+        expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
+    end
+  end
+
+  def finish_job(export_job)
+    export_job.start
+    export_job.finish
   end
 
   def rugged_config

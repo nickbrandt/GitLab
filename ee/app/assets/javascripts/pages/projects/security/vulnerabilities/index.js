@@ -1,6 +1,9 @@
 import Vue from 'vue';
-import VulnerabilitiesApp from 'ee/vulnerabilities/components/vulnerabilities_app.vue';
-import createStore from 'ee/security_dashboard/store';
+import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
+import createDefaultClient from '~/lib/graphql';
+import VueApollo from 'vue-apollo';
+
+Vue.use(VueApollo);
 
 function render() {
   const el = document.getElementById('app');
@@ -9,17 +12,21 @@ function render() {
     return false;
   }
 
-  const { dashboardDocumentation, emptyStateSvgPath, vulnerabilitiesEndpoint } = el.dataset;
+  const { dashboardDocumentation, emptyStateSvgPath, projectFullPath } = el.dataset;
+
+  const apolloProvider = new VueApollo({
+    defaultClient: createDefaultClient(),
+  });
 
   return new Vue({
     el,
-    store: createStore(),
+    apolloProvider,
     render(createElement) {
-      return createElement(VulnerabilitiesApp, {
+      return createElement(ProjectVulnerabilitiesApp, {
         props: {
           emptyStateSvgPath,
           dashboardDocumentation,
-          vulnerabilitiesEndpoint,
+          projectFullPath,
         },
       });
     },

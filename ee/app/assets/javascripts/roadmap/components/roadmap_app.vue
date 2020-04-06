@@ -30,22 +30,11 @@ export default {
       required: true,
     },
   },
-  data() {
-    const roadmapGraphQL = gon.features && gon.features.roadmapGraphql;
-    return {
-      // TODO
-      // Remove these method alias and call actual
-      // method once feature flag is removed.
-      fetchEpicsFn: roadmapGraphQL ? this.fetchEpicsGQL : this.fetchEpics,
-      fetchEpicsForTimeframeFn: roadmapGraphQL
-        ? this.fetchEpicsForTimeframeGQL
-        : this.fetchEpicsForTimeframe,
-    };
-  },
   computed: {
     ...mapState([
       'currentGroupId',
       'epics',
+      'milestones',
       'timeframe',
       'extendedTimeframe',
       'windowResizeInProgress',
@@ -54,6 +43,7 @@ export default {
       'epicsFetchResultEmpty',
       'epicsFetchFailure',
       'isChildEpics',
+      'milestonesFetchFailure',
     ]),
     timeframeStart() {
       return this.timeframe[0];
@@ -72,17 +62,18 @@ export default {
     },
   },
   mounted() {
-    this.fetchEpicsFn();
+    this.fetchEpics();
+    this.fetchMilestones();
   },
   methods: {
     ...mapActions([
       'setWindowResizeInProgress',
       'fetchEpics',
-      'fetchEpicsGQL',
       'fetchEpicsForTimeframe',
-      'fetchEpicsForTimeframeGQL',
       'extendTimeframe',
       'refreshEpicDates',
+      'fetchMilestones',
+      'refreshMilestoneDates',
     ]),
     /**
      * Once timeline is expanded (either with prepend or append)
@@ -113,9 +104,10 @@ export default {
     handleScrollToExtend(roadmapTimelineEl, extendType = EXTEND_AS.PREPEND) {
       this.extendTimeframe({ extendAs: extendType });
       this.refreshEpicDates();
+      this.refreshMilestoneDates();
 
       this.$nextTick(() => {
-        this.fetchEpicsForTimeframeFn({
+        this.fetchEpicsForTimeframe({
           timeframe: this.extendedTimeframe,
         })
           .then(() => {
@@ -141,6 +133,7 @@ export default {
       v-if="showRoadmap"
       :preset-type="presetType"
       :epics="epics"
+      :milestones="milestones"
       :timeframe="timeframe"
       :current-group-id="currentGroupId"
       @onScrollToStart="handleScrollToExtend"

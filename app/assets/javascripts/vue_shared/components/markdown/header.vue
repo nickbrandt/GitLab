@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { GlPopover, GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlPopover, GlDeprecatedButton, GlTooltipDirective } from '@gitlab/ui';
 import ToolbarButton from './toolbar_button.vue';
 import Icon from '../icon.vue';
 
@@ -9,7 +9,7 @@ export default {
     ToolbarButton,
     Icon,
     GlPopover,
-    GlButton,
+    GlDeprecatedButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -39,10 +39,10 @@ export default {
     mdTable() {
       return [
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-        '| header | header |', // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
+        '| header | header |', // eslint-disable-line @gitlab/require-i18n-strings
         '| ------ | ------ |',
-        '| cell | cell |', // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
-        '| cell | cell |', // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
+        '| cell | cell |', // eslint-disable-line @gitlab/require-i18n-strings
+        '| cell | cell |', // eslint-disable-line @gitlab/require-i18n-strings
       ].join('\n');
     },
     mdSuggestion() {
@@ -142,9 +142,9 @@ export default {
                   )
                 }}
               </p>
-              <gl-button variant="primary" size="sm" @click="handleSuggestDismissed">
+              <gl-deprecated-button variant="primary" size="sm" @click="handleSuggestDismissed">
                 {{ __('Got it') }}
-              </gl-button>
+              </gl-deprecated-button>
             </gl-popover>
           </template>
           <toolbar-button tag="`" tag-block="```" :button-title="__('Insert code')" icon="code" />

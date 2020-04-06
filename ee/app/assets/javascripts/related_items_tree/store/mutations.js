@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import * as types from './mutation_types';
+import { issuableTypesMap } from 'ee/related_issues/constants';
 
 export default {
   [types.SET_INITIAL_CONFIG](
@@ -142,6 +143,12 @@ export default {
   [types.TOGGLE_CREATE_EPIC_FORM](state, { toggleState }) {
     state.showCreateEpicForm = toggleState;
     state.showAddItemForm = false;
+    state.issuableType = issuableTypesMap.EPIC;
+  },
+
+  [types.TOGGLE_CREATE_ISSUE_FORM](state, { toggleState }) {
+    state.showCreateIssueForm = toggleState;
+    state.showAddItemForm = false;
   },
 
   [types.SET_PENDING_REFERENCES](state, references) {
@@ -203,7 +210,14 @@ export default {
     state.children[parentItem.reference].splice(newIndex, 0, targetItem);
   },
 
-  [types.SET_PROJECTS](state, projects) {
+  [types.REQUEST_PROJECTS](state) {
+    state.projectsFetchInProgress = true;
+  },
+  [types.RECIEVE_PROJECTS_SUCCESS](state, projects) {
     state.projects = projects;
+    state.projectsFetchInProgress = false;
+  },
+  [types.RECIEVE_PROJECTS_FAILURE](state) {
+    state.projectsFetchInProgress = false;
   },
 };

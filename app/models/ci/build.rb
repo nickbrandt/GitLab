@@ -10,7 +10,7 @@ module Ci
     include ObjectStorage::BackgroundMove
     include Presentable
     include Importable
-    include HasRef
+    include Ci::HasRef
     include IgnorableColumns
 
     BuildArchivedError = Class.new(StandardError)
@@ -59,15 +59,11 @@ module Ci
     ##
     # Since Gitlab 11.5, deployments records started being created right after
     # `ci_builds` creation. We can look up a relevant `environment` through
-    # `deployment` relation today. This is much more efficient than expanding
-    # environment name with variables.
+    # `deployment` relation today.
     # (See more https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22380)
     #
-    # However, we have to still expand environment name if it's a stop action,
-    # because `deployment` persists information for start action only.
-    #
-    # We will follow up this by persisting expanded name in build metadata or
-    # persisting stop action in database.
+    # Since Gitlab 12.9, we started persisting the expanded environment name to
+    # avoid repeated variables expansion in `action: stop` builds as well.
     def persisted_environment
       return unless has_environment?
 
@@ -177,6 +173,8 @@ module Ci
       preload(Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE,
               pipeline: Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE)
     end
+
+    scope :with_coverage, -> { where.not(coverage: nil) }
 
     acts_as_taggable
 
@@ -465,7 +463,14 @@ module Ci
       return unless has_environment?
 
       strong_memoize(:expanded_environment_name) do
-        ExpandVariables.expand(environment, -> { simple_variables })
+        # We're using a persisted expanded environment name in order to avoid
+        # variable expansion per request.
+        if Feature.enabled?(:ci_persisted_expanded_environment_name, project, default_enabled: true) &&
+          metadata&.expanded_environment_name.present?
+          metadata.expanded_environment_name
+        else
+          ExpandVariables.expand(environment, -> { simple_variables })
+        end
       end
     end
 
@@ -504,14 +509,6 @@ module Ci
 
     def outdated_deployment?
       success? && !deployment.try(:last?)
-    end
-
-    def depends_on_builds
-      # Get builds of the same type
-      latest_builds = self.pipeline.builds.latest
-
-      # Return builds from previous stages
-      latest_builds.where('stage_idx < ?', stage_idx)
     end
 
     def triggered_by?(current_user)
@@ -593,19 +590,15 @@ module Ci
     end
 
     def merge_request
-      return @merge_request if defined?(@merge_request)
+      strong_memoize(:merge_request) do
+        merge_requests = MergeRequest.includes(:latest_merge_request_diff)
+          .where(source_branch: ref, source_project: pipeline.project)
+          .reorder(iid: :desc)
 
-      @merge_request ||=
-        begin
-          merge_requests = MergeRequest.includes(:latest_merge_request_diff)
-            .where(source_branch: ref,
-                   source_project: pipeline.project)
-            .reorder(iid: :desc)
-
-          merge_requests.find do |merge_request|
-            merge_request.commit_shas.include?(pipeline.sha)
-          end
+        merge_requests.find do |merge_request|
+          merge_request.commit_shas.include?(pipeline.sha)
         end
+      end
     end
 
     def repo_url
@@ -822,41 +815,15 @@ module Ci
     end
 
     def all_dependencies
-      (dependencies + cross_dependencies).uniq
-    end
-
-    def dependencies
-      return [] if empty_dependencies?
-
-      depended_jobs = depends_on_builds
-
-      # find all jobs that are needed
-      if Feature.enabled?(:ci_dag_support, project, default_enabled: true) && scheduling_type_dag?
-        depended_jobs = depended_jobs.where(name: needs.artifacts.select(:name))
-      end
-
-      # find all jobs that are dependent on
-      if options[:dependencies].present?
-        depended_jobs = depended_jobs.where(name: options[:dependencies])
-      end
-
-      # if both needs and dependencies are used,
-      # the end result will be an intersection between them
-      depended_jobs
-    end
-
-    def cross_dependencies
-      []
-    end
-
-    def empty_dependencies?
-      options[:dependencies]&.empty?
+      dependencies.all
     end
 
     def has_valid_build_dependencies?
-      return true if Feature.enabled?('ci_disable_validates_dependencies')
+      dependencies.valid?
+    end
 
-      dependencies.all?(&:valid_dependency?)
+    def invalid_dependencies
+      dependencies.invalid_local
     end
 
     def valid_dependency?
@@ -864,10 +831,6 @@ module Ci
       return false if erased?
 
       true
-    end
-
-    def invalid_dependencies
-      dependencies.reject(&:valid_dependency?)
     end
 
     def runner_required_feature_names
@@ -908,9 +871,17 @@ module Ci
     def collect_test_reports!(test_reports)
       test_reports.get_suite(group_name).tap do |test_suite|
         each_report(Ci::JobArtifact::TEST_REPORT_FILE_TYPES) do |file_type, blob|
-          Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite)
+          Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite, job: self)
         end
       end
+    end
+
+    def collect_coverage_reports!(coverage_report)
+      each_report(Ci::JobArtifact::COVERAGE_REPORT_FILE_TYPES) do |file_type, blob|
+        Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, coverage_report)
+      end
+
+      coverage_report
     end
 
     def report_artifacts
@@ -938,6 +909,12 @@ module Ci
     end
 
     private
+
+    def dependencies
+      strong_memoize(:dependencies) do
+        Ci::BuildDependencies.new(self)
+      end
+    end
 
     def build_data
       @build_data ||= Gitlab::DataBuilder::Build.build(self)

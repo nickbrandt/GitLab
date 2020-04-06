@@ -1,6 +1,7 @@
-# Kubernetes Pod Logs **(ULTIMATE)**
+# Kubernetes Logs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4752) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4752) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.0.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25455) to [GitLab Core](https://about.gitlab.com/pricing/) 12.9.
 
 GitLab makes it easy to view the logs of running pods in [connected Kubernetes clusters](index.md).
 By displaying the logs directly in GitLab, developers can avoid having to manage console tools or jump to a different interface.
@@ -11,17 +12,17 @@ Everything you need to build, test, deploy, and run your app at scale.
 
 ## Overview
 
-[Kubernetes](https://kubernetes.io) pod logs can be viewed directly within GitLab.
+[Kubernetes](https://kubernetes.io) logs can be viewed directly within GitLab.
 
-![Pod logs](img/kubernetes_pod_logs_v12_8.png)
+![Pod logs](img/kubernetes_pod_logs_v12_9.png)
 
 ## Requirements
 
-[Deploying to a Kubernetes environment](../deploy_boards.md#enabling-deploy-boards) is required in order to be able to use Pod Logs.
+[Deploying to a Kubernetes environment](../deploy_boards.md#enabling-deploy-boards) is required in order to be able to use Logs.
 
 ## Usage
 
-To access pod logs, you must have the right [permissions](../../permissions.md#project-members-permissions).
+To access logs, you must have the right [permissions](../../permissions.md#project-members-permissions).
 
 You can access them in two ways.
 
@@ -29,7 +30,7 @@ You can access them in two ways.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22011) in GitLab 12.5.
 
-Go to **{cloud-gear}** **Operations > Pod logs** on the sidebar menu.
+Go to **{cloud-gear}** **Operations > Logs** on the sidebar menu.
 
 ![Sidebar menu](img/sidebar_menu_pod_logs_v12_5.png)
 
@@ -45,12 +46,14 @@ Logs can be displayed by clicking on a specific pod from [Deploy Boards](../depl
 
 ### Logs view
 
-The logs view will contain the last 500 lines for a pod, and has control to filter through:
+The logs view lets you filter the logs by:
 
 - Pods.
 - [From GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/5769), environments.
 - [From GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21656), [full text search](#full-text-search).
 - [From GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/197879), dates.
+
+Loading more than 500 log lines is possible from [GitLab 12.9](https://gitlab.com/gitlab-org/gitlab/-/issues/198050) onwards.
 
 Support for pods with multiple containers is coming [in a future release](https://gitlab.com/gitlab-org/gitlab/issues/13404).
 

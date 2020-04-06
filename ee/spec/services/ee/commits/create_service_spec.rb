@@ -18,7 +18,7 @@ describe Commits::CreateService do
     before do
       stub_licensed_features(repository_size_limit: true)
       project.update!(repository_size_limit: 1)
-      allow(project).to receive(:repository_and_lfs_size).and_return(2)
+      allow(project.repository_size_checker).to receive(:current_size).and_return(2)
     end
 
     subject(:result) { service.execute }

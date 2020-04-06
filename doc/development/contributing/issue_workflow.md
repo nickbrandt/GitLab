@@ -14,7 +14,7 @@ see fit.
 
 ## Issue triaging
 
-Our issue triage policies are [described in our handbook](https://about.gitlab.com/handbook/engineering/issue-triage/).
+Our issue triage policies are [described in our handbook](https://about.gitlab.com/handbook/engineering/quality/issue-triage/).
 You are very welcome to help the GitLab team triage issues.
 We also organize [issue bash events](https://gitlab.com/gitlab-org/gitlab-foss/issues/17815)
 once every quarter.
@@ -40,7 +40,7 @@ scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: `~feature`, `~bug`, `~backstage`, etc.
+- Type: `~feature`, `~bug`, `~backstage`, `~documentation`, etc.
 - Stage: `~"devops::plan"`, `~"devops::create"`, etc.
 - Group: `~"group::source code"`, `~"group::knowledge"`, `~"group::editor"`, etc.
 - Category: `~"Category:Code Analytics"`, `~"Category:DevOps Score"`, `~"Category:Templates"`, etc.
@@ -56,7 +56,7 @@ All labels, their meaning and priority are defined on the
 [labels page](https://gitlab.com/gitlab-org/gitlab/-/labels).
 
 If you come across an issue that has none of these, and you're allowed to set
-labels, you can _always_ add the team and type, and often also the subject.
+labels, you can _always_ add the type, stage, group, and often the category/feature labels.
 
 ### Type labels
 
@@ -70,15 +70,18 @@ The current type labels are:
 - ~backstage
 - ~"support request"
 - ~meta
+- ~documentation
 
 A number of type labels have a priority assigned to them, which automatically
 makes them float to the top, depending on their importance.
 
 Type labels are always lowercase, and can have any color, besides blue (which is
-already reserved for subject labels).
+already reserved for category labels).
 
 The descriptions on the [labels page](https://gitlab.com/groups/gitlab-org/-/labels)
 explain what falls under each type label.
+
+The GitLab handbook documents [when something is a bug and when it is a feature request](https://about.gitlab.com/handbook/product/product-management/process/feature-or-bug.html).
 
 ### Facet labels
 
@@ -137,7 +140,7 @@ their color is `#A8D695`.
 with `_` replaced with a space.
 
 For instance, the "Continuous Integration" group is represented by the
-~"group::continuous integration"  label in the `gitlab-org` group since its key
+~"group::continuous integration" label in the `gitlab-org` group since its key
 under `stages.manage.groups` is `continuous_integration`.
 
 The current group labels can be found by [searching the labels list for `group::`](https://gitlab.com/groups/gitlab-org/-/labels?search=group::).
@@ -270,45 +273,25 @@ or ~"Stretch". Any open issue for a previous milestone should be labeled
 
 ### Priority labels
 
-Priority labels help us define the time a ~bug fix should be completed. Priority determines how quickly the defect turnaround time must be.
-If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.
-This label documents the planned timeline & urgency which is used to measure against our target SLO on delivering ~bug fixes.
+We have the following priority labels:
 
-| Label | Meaning         | Target SLO (applies only to ~bug and ~security defects)                                                    |
-|-------|-----------------|----------------------------------------------------------------------------|
-| ~P1   | Urgent Priority | The current release + potentially immediate hotfix to GitLab.com (30 days) |
-| ~P2   | High Priority   | The next release (60 days)                                                 |
-| ~P3   | Medium Priority | Within the next 3 releases (approx one quarter or 90 days)                 |
-| ~P4   | Low Priority    | Anything outside the next 3 releases (more than one quarter or 120 days)   |
+- ~P1
+- ~P2
+- ~P3
+- ~P4
+
+Please refer to the issue triage [priority label](https://about.gitlab.com/handbook/engineering/quality/issue-triage/#priority) section in our handbook to see how it's used.
 
 ### Severity labels
 
-Severity labels help us clearly communicate the impact of a ~bug on users.
-There can be multiple facets of the impact. The below is a guideline.
+We have the following severity labels:
 
-| Label | Meaning           | Functionality                                         | Affected Users                   | GitLab.com Availability                            | Performance Degradation      |
-|-------|-------------------|-------------------------------------------------------|----------------------------------|----------------------------------------------------|------------------------------|
-| ~S1   | Blocker           | Unusable feature with no workaround, user is blocked  | Impacts 50% or more of users     | Outage, Significant impact on all of GitLab.com    |                                                       |
-| ~S2   | Critical Severity | Broken Feature, workaround too complex & unacceptable | Impacts between 25%-50% of users | Significant impact on large portions of GitLab.com | Degradation is guaranteed to occur in the near future |
-| ~S3   | Major Severity    | Broken feature with an acceptable workaround          | Impacts up to 25% of users       | Limited impact on important portions of GitLab.com | Degradation is likely to occur in the near future     |
-| ~S4   | Low Severity      | Functionality inconvenience or cosmetic issue         | Impacts less than 5% of users    | Minor impact on GitLab.com                         | Degradation _may_ occur but it's not likely           |
+- ~S1
+- ~S2
+- ~S3
+- ~S4
 
-If a bug seems to fall between two severity labels, assign it to the higher-severity label.
-
-- Example(s) of ~S1
-  - Data corruption/loss.
-  - Security breach.
-  - Unable to create an issue or merge request.
-  - Unable to add a comment or thread to the issue or merge request.
-- Example(s) of ~S2
-  - Cannot submit changes through the web IDE but the commandline works.
-  - A status widget on the merge request page is not working but information can be seen in the test pipeline page.
-- Example(s) of ~S3
-  - Can create merge requests only from the Merge Requests list view, not from an Issue page.
-  - Status is not updated in real time and needs a page refresh.
-- Example(s) of ~S4
-  - Label colors are incorrect.
-  - UI elements are not fully aligned.
+Please refer to the issue triage [severity label](https://about.gitlab.com/handbook/engineering/quality/issue-triage/#severity) section in our handbook to see how it's used.
 
 ### Label for community contributors
 

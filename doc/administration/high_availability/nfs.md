@@ -52,7 +52,39 @@ management between systems:
 - [NetApp instructions](https://library.netapp.com/ecmdocs/ECMP1401220/html/GUID-24367A9F-E17B-4725-ADC1-02D86F56F78E.html)
 - For non-NetApp devices, disable NFSv4 `idmapping` by performing opposite of [enable NFSv4 idmapper](https://wiki.archlinux.org/index.php/NFS#Enabling_NFSv4_idmapping)
 
+### Disable NFS server delegation
+
+We recommend that all NFS users disable the NFS server delegation feature. This
+is to avoid a [Linux kernel bug](https://bugzilla.redhat.com/show_bug.cgi?id=1552203)
+which causes NFS clients to slow precipitously due to
+[excessive network traffic from numerous `TEST_STATEID` NFS messages](https://gitlab.com/gitlab-org/gitlab-foss/issues/52017).
+
+To disable NFS server delegation, do the following:
+
+1. On the NFS server, run:
+
+   ```shell
+   echo 0 > /proc/sys/fs/leases-enable
+   sysctl -w fs.leases-enable=0
+   ```
+
+1. Restart the NFS server process. For example, on CentOS run `service nfs restart`.
+
+#### Important notes
+
+The kernel bug may be fixed in
+[more recent kernels with this commit](https://github.om/torvalds/linux/commit/95da1b3a5aded124dd1bda1e3cdb876184813140).
+
+Red Hat Enterprise 7 [shipped a kernel update](https://access.redhat.com/errata/RHSA-2019:2029)
+on August 6, 2019 that may also have resolved this problem.
+
+You may not need to disable NFS server delegation if you know you are using a version of
+the Linux kernel that has been fixed. That said, GitLab still encourages instance
+administrators to keep NFS server delegation disabled.
+
 ### Improving NFS performance with GitLab
+
+#### Improving NFS performance with Unicorn
 
 NOTE: **Note:** From GitLab 12.1, it will automatically be detected if Rugged can and should be used per storage.
 
@@ -64,35 +96,19 @@ sudo gitlab-rake gitlab:features:unset_rugged
 
 If the Rugged feature flag is explicitly set to either true or false, GitLab will use the value explicitly set.
 
+#### Improving NFS performance with Puma
+
+NOTE: **Note:** From GitLab 12.7, Rugged auto-detection is disabled if Puma thread count is greater than 1.
+
+If you want to use Rugged with Puma, it is recommended to [set Puma thread count to 1](https://docs.gitlab.com/omnibus/settings/puma.html#puma-settings).
+
+If you want to use Rugged with Puma thread count more than 1, Rugged can be enabled using the [feature flag](../../development/gitaly.md#legacy-rugged-code)
+
+If the Rugged feature flag is explicitly set to either true or false, GitLab will use the value explicitly set.
+
 ### Known issues
 
-On some customer systems, we have seen NFS clients slow precipitously due to
-[excessive network traffic from numerous `TEST_STATEID` NFS
-messages](https://gitlab.com/gitlab-org/gitlab-foss/issues/52017). This is
-likely due to a [Linux kernel
-bug](https://bugzilla.redhat.com/show_bug.cgi?id=1552203) that may be fixed in
-[more recent kernels with this
-commit](https://github.com/torvalds/linux/commit/95da1b3a5aded124dd1bda1e3cdb876184813140).
-
-NOTE: **Note** Red Hat Enterprise 7 [shipped a kernel
-update](https://access.redhat.com/errata/RHSA-2019:2029) on August 6,
-2019 that may have resolved this problem. The following instructions may
-not be needed if the latest kernel is updated properly.
-
-GitLab recommends all NFS users disable the NFS server
-delegation feature. To disable NFS server delegations
-on an Linux NFS server, do the following:
-
-1. On the NFS server, run:
-
-   ```shell
-   echo 0 > /proc/sys/fs/leases-enable
-   sysctl -w fs.leases-enable=0
-   ```
-
-1. Restart the NFS server process. For example, on CentOS run `service nfs restart`.
-
-## Avoid using AWS's Elastic File System (EFS)
+#### Avoid using AWS's Elastic File System (EFS)
 
 GitLab strongly recommends against using AWS Elastic File System (EFS).
 Our support team will not be able to assist on performance issues related to
@@ -108,19 +124,19 @@ stored on a local volume.
 
 For more details on another person's experience with EFS, see this [Commit Brooklyn 2019 video](https://youtu.be/K6OS8WodRBQ?t=313).
 
-## Avoid using CephFS and GlusterFS
+#### Avoid using CephFS and GlusterFS
 
 GitLab strongly recommends against using CephFS and GlusterFS.
 These distributed file systems are not well-suited for GitLab's input/output access patterns because Git uses many small files and access times and file locking times to propagate will make Git activity very slow.
 
-## Avoid using PostgreSQL with NFS
+#### Avoid using PostgreSQL with NFS
 
 GitLab strongly recommends against running your PostgreSQL database
 across NFS. The GitLab support team will not be able to assist on performance issues related to
 this configuration.
 
 Additionally, this configuration is specifically warned against in the
-[Postgres Documentation](https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-NFS):
+[PostgreSQL Documentation](https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-NFS):
 
 >PostgreSQL does nothing special for NFS file systems, meaning it assumes NFS behaves exactly like
 >locally-connected drives. If the client or server NFS implementation does not provide standard file
@@ -149,7 +165,7 @@ Note there are several options that you should consider using:
 
 ## A single NFS mount
 
-It's recommended to nest all GitLab data dirs within a mount, that allows automatic
+It's recommended to nest all GitLab data directories within a mount, that allows automatic
 restore of backups without manually moving existing data.
 
 ```plaintext
@@ -212,12 +228,12 @@ following are the 4 locations need to be shared:
 | `/var/opt/gitlab/git-data` | Git repository data. This will account for a large portion of your data | `git_data_dirs({"default" => { "path" => "/var/opt/gitlab/git-data"} })`
 | `/var/opt/gitlab/gitlab-rails/uploads` | User uploaded attachments | `gitlab_rails['uploads_directory'] = '/var/opt/gitlab/gitlab-rails/uploads'`
 | `/var/opt/gitlab/gitlab-rails/shared` | Build artifacts, GitLab Pages, LFS objects, temp files, etc. If you're using LFS this may also account for a large portion of your data | `gitlab_rails['shared_path'] = '/var/opt/gitlab/gitlab-rails/shared'`
-| `/var/opt/gitlab/gitlab-ci/builds` | GitLab CI build traces | `gitlab_ci['builds_directory'] = '/var/opt/gitlab/gitlab-ci/builds'`
+| `/var/opt/gitlab/gitlab-ci/builds` | GitLab CI/CD build traces | `gitlab_ci['builds_directory'] = '/var/opt/gitlab/gitlab-ci/builds'`
 
 Other GitLab directories should not be shared between nodes. They contain
 node-specific files and GitLab code that does not need to be shared. To ship
 logs to a central location consider using remote syslog. GitLab Omnibus packages
-provide configuration for [UDP log shipping][udp-log-shipping].
+provide configuration for [UDP log shipping](https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only).
 
 Having multiple NFS mounts will require manually making sure the data directories
 are empty before attempting a restore. Read more about the
@@ -231,8 +247,6 @@ Read more on high-availability configuration:
 1. [Configure Redis](redis.md)
 1. [Configure the GitLab application servers](gitlab.md)
 1. [Configure the load balancers](load_balancer.md)
-
-[udp-log-shipping]: https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only "UDP log shipping"
 
 <!-- ## Troubleshooting
 

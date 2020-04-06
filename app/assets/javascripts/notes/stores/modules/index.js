@@ -1,10 +1,12 @@
 import * as actions from '../actions';
 import * as getters from '../getters';
 import mutations from '../mutations';
+import { ASC } from '../../constants';
 
 export default () => ({
   state: {
     discussions: [],
+    discussionSortOrder: ASC,
     convertedDisscussionIds: [],
     targetNoteHash: null,
     lastFetchedAt: null,
@@ -28,7 +30,7 @@ export default () => ({
     commentsDisabled: false,
     resolvableDiscussionsCount: 0,
     unresolvedDiscussionsCount: 0,
-    descriptionVersion: null,
+    descriptionVersions: {},
   },
   actions,
   getters,

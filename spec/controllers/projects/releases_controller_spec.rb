@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Projects::ReleasesController do
-  let!(:project)         { create(:project, :repository, :public) }
-  let!(:private_project) { create(:project, :repository, :private) }
-  let(:user)             { developer }
-  let(:developer)        { create(:user) }
-  let(:reporter)         { create(:user) }
+  let!(:project) { create(:project, :repository, :public) }
+  let_it_be(:private_project) { create(:project, :repository, :private) }
+  let_it_be(:developer)  { create(:user) }
+  let_it_be(:reporter)   { create(:user) }
+  let_it_be(:user)       { developer }
   let!(:release_1)       { create(:release, project: project, released_at: Time.zone.parse('2018-10-18')) }
   let!(:release_2)       { create(:release, project: project, released_at: Time.zone.parse('2019-10-19')) }
 
@@ -36,7 +36,7 @@ describe Projects::ReleasesController do
     it 'renders a 200' do
       get_index
 
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     context 'when the project is private' do
@@ -54,7 +54,7 @@ describe Projects::ReleasesController do
 
           get_index
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -66,7 +66,7 @@ describe Projects::ReleasesController do
 
           get_index
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -198,137 +198,99 @@ describe Projects::ReleasesController do
     end
   end
 
-  describe 'GET #evidence' do
-    let_it_be(:tag_name) { "v1.1.0-evidence" }
-    let!(:release) { create(:release, :with_evidence, project: project, tag: tag_name) }
-    let(:tag) { CGI.escape(release.tag) }
-    let(:format) { :json }
-
+  context 'GET #downloads' do
     subject do
-      get :evidence, params: {
-        namespace_id: project.namespace,
-        project_id: project,
-        tag: tag,
-        format: format
-      }
+      get :downloads, params: { namespace_id: project.namespace, project_id: project, tag: tag, filepath: filepath }
     end
 
     before do
       sign_in(user)
     end
 
-    context 'when the user is a developer' do
-      it 'returns the correct evidence summary as a json' do
+    let(:release) { create(:release, project: project, tag: tag ) }
+    let!(:link) { create(:release_link, release: release, name: 'linux-amd64 binaries', filepath: '/binaries/linux-amd64', url: 'https://downloads.example.com/bin/gitlab-linux-amd64') }
+    let(:tag) { 'v11.9.0-rc2' }
+
+    context 'valid filepath' do
+      let(:filepath) { CGI.escape('/binaries/linux-amd64') }
+
+      it 'redirects to the asset direct link' do
         subject
 
-        expect(json_response).to eq(release.evidence.summary)
+        expect(response).to redirect_to('https://downloads.example.com/bin/gitlab-linux-amd64')
       end
 
-      context 'when the release was created before evidence existed' do
-        before do
-          release.evidence.destroy
-        end
+      it 'redirects with a status of 302' do
+        subject
 
-        it 'returns an empty json' do
-          subject
-
-          expect(json_response).to eq({})
-        end
+        expect(response).to have_gitlab_http_status(:redirect)
       end
     end
 
-    context 'when the user is a guest for the project' do
-      before do
-        project.add_guest(user)
+    context 'invalid filepath' do
+      let(:filepath) { CGI.escape('/binaries/win32') }
+
+      it 'is not found' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
+    end
+  end
 
-      context 'when the project is private' do
-        let(:project) { private_project }
+  context 'GET #downloads' do
+    subject do
+      get :downloads, params: {
+        namespace_id: project.namespace,
+        project_id: project,
+        tag: tag,
+        filepath: filepath
+       }
+    end
 
-        it_behaves_like 'not found'
-      end
+    before do
+      sign_in(user)
+    end
 
-      context 'when the project is public' do
-        it_behaves_like 'successful request'
+    let(:release) { create(:release, project: project, tag: tag ) }
+    let(:tag) { 'v11.9.0-rc2' }
+    let(:db_filepath) { '/binaries/linux-amd64' }
+    let!(:link) do
+      create :release_link,
+        release: release,
+        name: 'linux-amd64 binaries',
+        filepath: db_filepath,
+        url: 'https://downloads.example.com/bin/gitlab-linux-amd64'
+    end
+
+    context 'valid filepath' do
+      let(:filepath) { CGI.escape('/binaries/linux-amd64') }
+
+      it 'redirects to the asset direct link' do
+        subject
+
+        expect(response).to redirect_to(link.url)
       end
     end
 
-    context 'when release is associated to a milestone which includes an issue' do
-      let_it_be(:project) { create(:project, :repository, :public) }
-      let_it_be(:issue) { create(:issue, project: project) }
-      let_it_be(:milestone) { create(:milestone, project: project, issues: [issue]) }
-      let_it_be(:release) { create(:release, project: project, tag: tag_name, milestones: [milestone]) }
+    context 'invalid filepath' do
+      let(:filepath) { CGI.escape('/binaries/win32') }
 
-      before do
-        create(:evidence, release: release)
+      it 'is not found' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
+    end
 
-      shared_examples_for 'does not show the issue in evidence' do
-        it do
-          subject
+    context 'ignores filepath extension' do
+      let(:db_filepath) { '/binaries/linux-amd64.json' }
+      let(:filepath) { CGI.escape(db_filepath) }
 
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['release']['milestones']
-            .all? { |milestone| milestone['issues'].nil? }).to eq(true)
-        end
-      end
+      it 'redirects to the asset direct link' do
+        subject
 
-      shared_examples_for 'evidence not found' do
-        it do
-          subject
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      shared_examples_for 'safely expose evidence' do
-        it_behaves_like 'does not show the issue in evidence'
-
-        context 'when the issue is confidential' do
-          let(:issue) { create(:issue, :confidential, project: project) }
-
-          it_behaves_like 'does not show the issue in evidence'
-        end
-
-        context 'when the user is the author of the confidential issue' do
-          let(:issue) { create(:issue, :confidential, project: project, author: user) }
-
-          it_behaves_like 'does not show the issue in evidence'
-        end
-
-        context 'when project is private' do
-          let!(:project) { create(:project, :repository, :private) }
-
-          it_behaves_like 'evidence not found'
-        end
-
-        context 'when project restricts the visibility of issues to project members only' do
-          let!(:project) { create(:project, :repository, :issues_private) }
-
-          it_behaves_like 'evidence not found'
-        end
-      end
-
-      context 'when user is non-project member' do
-        let(:user) { create(:user) }
-
-        it_behaves_like 'safely expose evidence'
-      end
-
-      context 'when user is auditor', if: Gitlab.ee? do
-        let(:user) { create(:user, :auditor) }
-
-        it_behaves_like 'safely expose evidence'
-      end
-
-      context 'when external authorization control is enabled' do
-        let(:user) { create(:user) }
-
-        before do
-          stub_application_setting(external_authorization_service_enabled: true)
-        end
-
-        it_behaves_like 'evidence not found'
+        expect(response).to redirect_to(link.url)
       end
     end
   end

@@ -75,15 +75,33 @@ describe ::SystemNotes::IssuablesService do
     end
   end
 
-  describe '#auto_resolve_prometheus_alert' do
-    subject { service.auto_resolve_prometheus_alert }
+  describe '#change_health_status_note' do
+    context 'when health_status changed' do
+      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', health_status: 'at_risk') }
 
-    it_behaves_like 'a system note' do
-      let(:action) { 'closed' }
+      subject { service.change_health_status_note }
+
+      it_behaves_like 'a system note' do
+        let(:action) { 'health_status' }
+      end
+
+      it 'sets the note text' do
+        expect(subject.note).to eq "changed health status to **at risk**"
+      end
     end
 
-    it 'creates the expected system note' do
-      expect(subject.note).to eq('automatically closed this issue because the alert resolved.')
+    context 'when health_status removed' do
+      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', health_status: nil) }
+
+      subject { service.change_health_status_note }
+
+      it_behaves_like 'a system note' do
+        let(:action) { 'health_status' }
+      end
+
+      it 'sets the note text' do
+        expect(subject.note).to eq 'removed the health status'
+      end
     end
   end
 end

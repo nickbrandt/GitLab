@@ -52,7 +52,8 @@ describe ProjectPolicy do
       admin_snippet admin_project_member admin_note admin_wiki admin_project
       admin_commit_status admin_build admin_container_image
       admin_pipeline admin_environment admin_deployment destroy_release add_cluster
-      daily_statistics read_deploy_token
+      daily_statistics read_deploy_token create_deploy_token destroy_deploy_token
+      admin_terraform_state
     ]
   end
 
@@ -571,6 +572,52 @@ describe ProjectPolicy do
       let(:project) { create(:project, :private) }
 
       it { is_expected.to be_allowed(:admin_issue) }
+    end
+  end
+
+  describe 'read_prometheus_alerts' do
+    subject { described_class.new(current_user, project) }
+
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_prometheus_alerts) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_prometheus_alerts) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:read_prometheus_alerts) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
     end
   end
 end

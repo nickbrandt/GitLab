@@ -65,6 +65,16 @@ module Types
           calls_gitaly: true,
           null: false
 
+    field :ssh_url_to_repo, type: GraphQL::STRING_TYPE,
+          description: 'SSH URL to the snippet repository',
+          calls_gitaly: true,
+          null: true
+
+    field :http_url_to_repo, type: GraphQL::STRING_TYPE,
+          description: 'HTTP URL to the snippet repository',
+          calls_gitaly: true,
+          null: true
+
     markdown_field :description_html, null: true, method: :description
   end
 end

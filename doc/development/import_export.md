@@ -1,6 +1,6 @@
 # Import/Export development documentation
 
-Troubleshooing and general development guidelines and tips for the [Import/Export feature](../user/project/settings/import_export.md).
+Troubleshooting and general development guidelines and tips for the [Import/Export feature](../user/project/settings/import_export.md).
 
 <i class="fa fa-youtube-play youtube" aria-hidden="true"></i> This document is originally based on the [Import/Export 201 presentation available on YouTube](https://www.youtube.com/watch?v=V3i1OfExotE).
 
@@ -63,7 +63,7 @@ class StuckImportJobsWorker
 Marked stuck import jobs as failed. JIDs: xyz
 ```
 
-```
+```plaintext
   +-----------+    +-----------------------------------+
   |Export Job |--->| Calls ActiveRecord `as_json` and  |
   +-----------+    | `to_json` on all project models   |
@@ -79,11 +79,11 @@ Marked stuck import jobs as failed. JIDs: xyz
 
 | Problem | Possible solutions |
 | -------- | -------- |
-| [Slow JSON](https://gitlab.com/gitlab-org/gitlab-foss/issues/54084) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab-foss/issues/54085) |
+| [Slow JSON](https://gitlab.com/gitlab-org/gitlab/-/issues/25251) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab/-/issues/25252) |
 | | Batch export
 | | Optimize SQL
 | | Move away from `ActiveRecord` callbacks (difficult)
-| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab-foss/issues/35389) | DB Commit sweet spot that uses less memory |
+| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab/-/issues/18857) | DB Commit sweet spot that uses less memory |
 | | [Netflix Fast JSON API](https://github.com/Netflix/fast_jsonapi) may help |
 | | Batch reading/writing to disk and any SQL
 
@@ -195,17 +195,17 @@ module Gitlab
 The [current version history](../user/project/settings/import_export.md) also displays the equivalent GitLab version
 and it is useful for knowing which versions won't be compatible between them.
 
-| Exporting GitLab version   | Importing GitLab version   |  
-| -------------------------- | -------------------------- |  
-| 11.7 to current            | 11.7 to current            |  
-| 11.1 to 11.6               | 11.1 to 11.6               |  
-| 10.8 to 11.0               | 10.8 to 11.0               |  
-| 10.4 to 10.7               | 10.4 to 10.7               |  
-| ...                        | ...                        |  
-| 8.10.3 to 8.11             | 8.10.3 to 8.11             |  
-| 8.10.0 to 8.10.2           | 8.10.0 to 8.10.2           |  
-| 8.9.5 to 8.9.11            | 8.9.5 to 8.9.11            |  
-| 8.9.0 to 8.9.4             | 8.9.0 to 8.9.4             |  
+| Exporting GitLab version   | Importing GitLab version   |
+| -------------------------- | -------------------------- |
+| 11.7 to current            | 11.7 to current            |
+| 11.1 to 11.6               | 11.1 to 11.6               |
+| 10.8 to 11.0               | 10.8 to 11.0               |
+| 10.4 to 10.7               | 10.4 to 10.7               |
+| ...                        | ...                        |
+| 8.10.3 to 8.11             | 8.10.3 to 8.11             |
+| 8.10.0 to 8.10.2           | 8.10.0 to 8.10.2           |
+| 8.9.5 to 8.9.11            | 8.9.5 to 8.9.11            |
+| 8.9.0 to 8.9.4             | 8.9.0 to 8.9.4             |
 
 ### When to bump the version up
 

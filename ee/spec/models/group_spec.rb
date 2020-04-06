@@ -257,6 +257,24 @@ describe Group do
     end
   end
 
+  describe '#vulnerabilities' do
+    subject { group.vulnerabilities }
+
+    let(:subgroup) { create(:group, parent: group) }
+    let(:group_project) { create(:project, namespace: group) }
+    let(:subgroup_project) { create(:project, namespace: subgroup) }
+    let(:archived_project) { create(:project, :archived, namespace: group) }
+    let(:deleted_project) { create(:project, pending_delete: true, namespace: group) }
+    let!(:group_vulnerability) { create(:vulnerability, project: group_project) }
+    let!(:subgroup_vulnerability) { create(:vulnerability, project: subgroup_project) }
+    let!(:archived_vulnerability) { create(:vulnerability, project: archived_project) }
+    let!(:deleted_vulnerability) { create(:vulnerability, project: deleted_project) }
+
+    it 'returns vulnerabilities for all non-archived, non-deleted projects in the group and its subgroups' do
+      is_expected.to contain_exactly(group_vulnerability, subgroup_vulnerability)
+    end
+  end
+
   describe '#mark_ldap_sync_as_failed' do
     it 'sets the state to failed' do
       group.start_ldap_sync
@@ -310,8 +328,6 @@ describe Group do
   end
 
   describe '#file_template_project' do
-    it { expect(group.private_methods).to include(:file_template_project) }
-
     before do
       stub_licensed_features(custom_file_templates_for_namespace: true)
     end

@@ -15,6 +15,7 @@ module Elastic
           :title,
           :file_name,
           :content,
+          :description,
           :created_at,
           :updated_at,
           :project_id,

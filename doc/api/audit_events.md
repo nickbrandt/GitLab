@@ -4,7 +4,7 @@
 
 The Audit Events API allows you to retrieve [instance audit events](../administration/audit_events.md#instance-events-premium-only).
 
-To retrieve audit events using the API, you must [authenticate yourself](README.html#authentication) as an Administrator.
+To retrieve audit events using the API, you must [authenticate yourself](README.md#authentication) as an Administrator.
 
 ### Retrieve all instance audit events
 
@@ -91,6 +91,10 @@ Example response:
 GET /audit_events/:id
 ```
 
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer | yes | The ID of the audit event |
+
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/audit_events/1
 ```
@@ -122,7 +126,7 @@ Example response:
 
 The Group Audit Events API allows you to retrieve [group audit events](../administration/audit_events.md#group-events-starter).
 
-To retrieve group audit events using the API, you must [authenticate yourself](README.html#authentication) as an Administrator or an owner of the group.
+To retrieve group audit events using the API, you must [authenticate yourself](README.md#authentication) as an Administrator or an owner of the group.
 
 ### Retrieve all group audit events
 
@@ -195,7 +199,7 @@ GET /groups/:id/audit_events/:audit_event_id
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
-| `audit_event_id` | integer | yes | ID of the audit event |
+| `audit_event_id` | integer | yes | The ID of the audit event |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/groups/60/audit_events/2

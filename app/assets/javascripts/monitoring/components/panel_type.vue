@@ -11,22 +11,28 @@ import {
   GlTooltip,
   GlTooltipDirective,
 } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, n__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorAnomalyChart from './charts/anomaly.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import MonitorHeatmapChart from './charts/heatmap.vue';
 import MonitorColumnChart from './charts/column.vue';
+import MonitorBarChart from './charts/bar.vue';
 import MonitorStackedColumnChart from './charts/stacked_column.vue';
 import MonitorEmptyChart from './charts/empty_chart.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
+const events = {
+  timeRangeZoom: 'timerangezoom',
+};
+
 export default {
   components: {
     MonitorSingleStatChart,
     MonitorColumnChart,
+    MonitorBarChart,
     MonitorHeatmapChart,
     MonitorStackedColumnChart,
     MonitorEmptyChart,
@@ -62,6 +68,11 @@ export default {
       required: false,
       default: 'panel-type-chart',
     },
+    namespace: {
+      type: String,
+      required: false,
+      default: 'monitoringDashboard',
+    },
   },
   data() {
     return {
@@ -70,12 +81,28 @@ export default {
     };
   },
   computed: {
-    ...mapState('monitoringDashboard', ['deploymentData', 'projectPath', 'logsPath', 'timeRange']),
+    // Use functions to support dynamic namespaces in mapXXX helpers. Pattern described
+    // in https://github.com/vuejs/vuex/issues/863#issuecomment-329510765
+    ...mapState({
+      deploymentData(state) {
+        return state[this.namespace].deploymentData;
+      },
+      projectPath(state) {
+        return state[this.namespace].projectPath;
+      },
+      logsPath(state) {
+        return state[this.namespace].logsPath;
+      },
+      timeRange(state) {
+        return state[this.namespace].timeRange;
+      },
+    }),
     title() {
       return this.graphData.title || '';
     },
     alertWidgetAvailable() {
-      return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint && this.graphData;
+      // This method is extended by ee functionality
+      return false;
     },
     graphDataHasMetrics() {
       return (
@@ -95,7 +122,7 @@ export default {
     csvText() {
       const chartData = this.graphData.metrics[0].result[0].values;
       const yLabel = this.graphData.y_label;
-      const header = `timestamp,${yLabel}\r\n`; // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
+      const header = `timestamp,${yLabel}\r\n`; // eslint-disable-line @gitlab/require-i18n-strings
       return chartData.reduce((csv, data) => {
         const row = data.join(',');
         return `${csv}${row}\r\n`;
@@ -119,6 +146,12 @@ export default {
         !this.isPanelType('column') &&
         !this.isPanelType('stacked-column')
       );
+    },
+    editCustomMetricLink() {
+      return this.graphData?.metrics[0].edit_path;
+    },
+    editCustomMetricLinkText() {
+      return n__('Metrics|Edit metric', 'Metrics|Edit metrics', this.graphData.metrics.length);
     },
   },
   mounted() {
@@ -153,6 +186,7 @@ export default {
     },
     onDatazoom({ start, end }) {
       this.zoomedTimeRange = { start, end };
+      this.$emit(events.timeRangeZoom, { start, end });
     },
   },
 };
@@ -176,7 +210,7 @@ export default {
       >
         <div class="d-flex align-items-center">
           <alert-widget
-            v-if="alertWidgetAvailable && graphData"
+            v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"
             :alerts-endpoint="alertsEndpoint"
             :relevant-queries="graphData.metrics"
@@ -195,7 +229,13 @@ export default {
             <template slot="button-content">
               <icon name="ellipsis_v" class="text-secondary" />
             </template>
-
+            <gl-dropdown-item
+              v-if="editCustomMetricLink"
+              ref="editMetricLink"
+              :href="editCustomMetricLink"
+            >
+              {{ editCustomMetricLinkText }}
+            </gl-dropdown-item>
             <gl-dropdown-item
               v-if="logsPathWithTimeRange"
               ref="viewLogsLink"
@@ -220,7 +260,7 @@ export default {
               :data-clipboard-text="clipboardText"
               @click="showToast(clipboardText)"
             >
-              {{ __('Generate link to chart') }}
+              {{ __('Copy link to chart') }}
             </gl-dropdown-item>
             <gl-dropdown-item
               v-if="alertWidgetAvailable"
@@ -240,6 +280,10 @@ export default {
     />
     <monitor-heatmap-chart
       v-else-if="isPanelType('heatmap') && graphDataHasMetrics"
+      :graph-data="graphData"
+    />
+    <monitor-bar-chart
+      v-else-if="isPanelType('bar') && graphDataHasMetrics"
       :graph-data="graphData"
     />
     <monitor-column-chart

@@ -3,7 +3,6 @@ import Vue from 'vue';
 
 import 'ee_else_ce/boards/models/issue';
 import 'ee_else_ce/boards/models/list';
-import Board from 'ee_else_ce/boards/components/board';
 import BoardSidebar from 'ee_else_ce/boards/components/board_sidebar';
 import initNewListDropdown from 'ee_else_ce/boards/components/new_list_dropdown';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
@@ -65,7 +64,15 @@ export default () => {
   issueBoardsApp = new Vue({
     el: $boardApp,
     components: {
-      Board,
+      Board: () =>
+        window?.gon?.features?.sfcIssueBoards
+          ? import('ee_else_ce/boards/components/board_column.vue')
+          : /**
+             * Please have a look at, we are moving to the SFC soon:
+             * https://gitlab.com/gitlab-org/gitlab/-/issues/212300
+             * @deprecated
+             */
+            import('ee_else_ce/boards/components/board'),
       BoardSidebar,
       BoardAddIssuesModal,
       BoardSettingsSidebar: () =>
@@ -84,7 +91,6 @@ export default () => {
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
       detailIssue: boardsStore.detail,
-      defaultAvatar: $boardApp.dataset.defaultAvatar,
     },
     computed: {
       detailIssueVisible() {
@@ -98,6 +104,7 @@ export default () => {
         listsEndpoint: this.listsEndpoint,
         bulkUpdatePath: this.bulkUpdatePath,
         boardId: this.boardId,
+        fullPath: $boardApp.dataset.fullPath,
       });
       boardsStore.rootPath = this.boardsEndpoint;
 
@@ -129,13 +136,10 @@ export default () => {
               position = -1;
             }
 
-            boardsStore.addList(
-              {
-                ...listObj,
-                position,
-              },
-              this.defaultAvatar,
-            );
+            boardsStore.addList({
+              ...listObj,
+              position,
+            });
           });
 
           boardsStore.addBlankState();

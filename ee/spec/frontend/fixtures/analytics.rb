@@ -125,51 +125,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     clean_frontend_fixtures('cycle_analytics/')
   end
 
-  default_stages = %w[issue plan review code test staging production]
-
-  describe Groups::CycleAnalytics::EventsController, type: :controller do
-    render_views
-
-    before do
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
-      prepare_cycle_analytics_data
-      create_deployment
-
-      sign_in(user)
-    end
-
-    default_stages.each do |endpoint|
-      it "value_stream_analytics/events/#{endpoint}.json" do
-        get endpoint, params: { group_id: group, format: :json }
-
-        expect(response).to be_successful
-      end
-    end
-  end
-
-  describe Groups::CycleAnalyticsController, type: :controller do
-    render_views
-
-    before do
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
-      prepare_cycle_analytics_data
-      create_deployment
-
-      sign_in(user)
-    end
-
-    it 'value_stream_analytics/mock_data.json' do
-      get(:show, params: {
-        group_id: group.name,
-        cycle_analytics: { start_date: 30 }
-      }, format: :json)
-
-      expect(response).to be_successful
-    end
-  end
-
   describe Analytics::CycleAnalytics::StagesController, type: :controller do
     render_views
 

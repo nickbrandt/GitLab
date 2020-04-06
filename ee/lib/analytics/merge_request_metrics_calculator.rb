@@ -31,6 +31,15 @@ module Analytics
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    # rubocop: disable CodeReuse/ActiveRecord
+    def first_reassigned_at
+      merge_request.merge_request_assignees
+        .where.not(assignee: merge_request.author)
+        .order(id: :asc).limit(1)
+        .pluck(:created_at).first
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
     private
 
     attr_reader :merge_request

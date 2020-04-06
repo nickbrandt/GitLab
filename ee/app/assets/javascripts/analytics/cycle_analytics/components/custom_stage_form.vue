@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { isEqual } from 'underscore';
+import { isEqual } from 'lodash';
 import {
   GlFormGroup,
   GlFormInput,
@@ -9,6 +9,7 @@ import {
   GlDropdown,
   GlDropdownHeader,
   GlDropdownItem,
+  GlSprintf,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
@@ -64,13 +65,10 @@ export default {
     GlDropdown,
     GlDropdownHeader,
     GlDropdownItem,
+    GlSprintf,
   },
   props: {
     events: {
-      type: Array,
-      required: true,
-    },
-    labels: {
       type: Array,
       required: true,
     },
@@ -280,10 +278,10 @@ export default {
         <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
       </gl-dropdown>
     </div>
-
     <gl-form-group
       ref="name"
       :label="s__('CustomCycleAnalytics|Name')"
+      label-for="custom-stage-name"
       :state="!hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
     >
@@ -302,6 +300,7 @@ export default {
         <gl-form-group
           ref="startEventIdentifier"
           :label="s__('CustomCycleAnalytics|Start event')"
+          label-for="custom-stage-start-event"
           :state="!hasFieldErrors('startEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('startEventIdentifier')"
         >
@@ -318,12 +317,12 @@ export default {
         <gl-form-group
           ref="startEventLabelId"
           :label="s__('CustomCycleAnalytics|Start event label')"
+          label-for="custom-stage-start-event-label"
           :state="!hasFieldErrors('startEventLabelId')"
           :invalid-feedback="fieldErrorMessage('startEventLabelId')"
         >
           <labels-selector
-            :labels="labels"
-            :selected-label-id="fields.startEventLabelId"
+            :selected-label-id="[fields.startEventLabelId]"
             name="custom-stage-start-event-label"
             @selectLabel="handleSelectLabel('startEventLabelId', $event)"
             @clearLabel="handleClearLabel('startEventLabelId')"
@@ -336,6 +335,7 @@ export default {
         <gl-form-group
           ref="endEventIdentifier"
           :label="s__('CustomCycleAnalytics|Stop event')"
+          label-for="custom-stage-stop-event"
           :state="!hasFieldErrors('endEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
         >
@@ -353,12 +353,12 @@ export default {
         <gl-form-group
           ref="endEventLabelId"
           :label="s__('CustomCycleAnalytics|Stop event label')"
+          label-for="custom-stage-stop-event-label"
           :state="!hasFieldErrors('endEventLabelId')"
           :invalid-feedback="fieldErrorMessage('endEventLabelId')"
         >
           <labels-selector
-            :labels="labels"
-            :selected-label-id="fields.endEventLabelId"
+            :selected-label-id="[fields.endEventLabelId]"
             name="custom-stage-stop-event-label"
             @selectLabel="handleSelectLabel('endEventLabelId', $event)"
             @clearLabel="handleClearLabel('endEventLabelId')"
@@ -385,6 +385,20 @@ export default {
         <gl-loading-icon v-if="isSavingCustomStage" size="sm" inline />
         {{ saveStageText }}
       </button>
+    </div>
+
+    <div class="mt-2">
+      <gl-sprintf
+        :message="
+          __(
+            '%{strongStart}Note:%{strongEnd} Once a custom stage has been added you can re-order stages by dragging them into the desired position.',
+          )
+        "
+      >
+        <template #strong="{ content }">
+          <strong>{{ content }}</strong>
+        </template>
+      </gl-sprintf>
     </div>
   </form>
 </template>

@@ -7,13 +7,11 @@ module EE
 
       override :mirror_repositories
       def mirror_repositories(new_repository_storage_key)
-        result = super
+        super
 
         if project.design_repository.exists?
-          result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
+          mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
         end
-
-        result
       end
 
       override :mark_old_paths_for_archive

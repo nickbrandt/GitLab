@@ -83,6 +83,8 @@ class JenkinsDeprecatedService < CiService
 
   def calculate_reactive_cache(sha, ref)
     { commit_status: read_commit_status(sha, ref) }
+  rescue Gitlab::HTTP::BlockedUrlError => ex
+    Gitlab::ErrorTracking.track_exception(ex)
   end
 
   private
@@ -91,14 +93,14 @@ class JenkinsDeprecatedService < CiService
     parsed_url = URI.parse(build_page(sha, ref))
 
     if parsed_url.userinfo.blank?
-      response = Gitlab::HTTP.get(build_page(sha, ref), verify: false, allow_local_requests: true)
+      response = Gitlab::HTTP.get(build_page(sha, ref), verify: false)
     else
       get_url = build_page(sha, ref).gsub("#{parsed_url.userinfo}@", "")
       auth = {
         username: CGI.unescape(parsed_url.user),
         password: CGI.unescape(parsed_url.password)
       }
-      response = Gitlab::HTTP.get(get_url, verify: false, basic_auth: auth, allow_local_requests: true)
+      response = Gitlab::HTTP.get(get_url, verify: false, basic_auth: auth)
     end
 
     if response.code == 200

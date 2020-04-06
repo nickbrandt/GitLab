@@ -16,6 +16,9 @@
 .if-master-refs: &if-master-refs
   if: '$CI_COMMIT_REF_NAME == "master"'
 
+.if-auto-deploy-branches: &if-auto-deploy-branches
+  if: '$CI_COMMIT_BRANCH =~ /^\d+-\d+-auto-deploy-\d+$/'
+
 .if-master-or-tag: &if-master-or-tag
   if: '$CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG'
 
@@ -57,6 +60,17 @@
   - "doc/**/*"
   - ".markdownlint.json"
 
+.frontend-dependency-patterns: &frontend-dependency-patterns
+  - "{package.json,yarn.lock}"
+
+.frontend-patterns: &frontend-patterns
+  - "{package.json,yarn.lock}"
+  - "{babel.config,jest.config}.js"
+  - ".csscomb.json"
+  - "Dockerfile.assets"
+  - "vendor/assets/**/*"
+  - "{,ee/}{app/assets,app/helpers,app/presenters,app/views,locale,public,symbol}/**/*"
+
 .backstage-patterns: &backstage-patterns
   - "Dangerfile"
   - "danger/**/*"
@@ -66,17 +80,18 @@
   - "doc/README.md"  # Some RSpec test rely on this file
 
 .code-patterns: &code-patterns
+  - "{package.json,yarn.lock}"
+  - "{babel.config,jest.config}.js"
+  - ".csscomb.json"
+  - "Dockerfile.assets"
+  - "vendor/assets/**/*"
   - ".gitlab/ci/**/*"
   - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
   - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
   - "*_VERSION"
   - "Gemfile{,.lock}"
   - "Rakefile"
-  - "{babel.config,jest.config}.js"
   - "config.ru"
-  - "{package.json,yarn.lock}"
   - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
   - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
 
@@ -85,17 +100,18 @@
   - "qa/**/*"
 
 .code-backstage-patterns: &code-backstage-patterns
+  - "{package.json,yarn.lock}"
+  - "{babel.config,jest.config}.js"
+  - ".csscomb.json"
+  - "Dockerfile.assets"
+  - "vendor/assets/**/*"
   - ".gitlab/ci/**/*"
   - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
   - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
   - "*_VERSION"
   - "Gemfile{,.lock}"
   - "Rakefile"
-  - "{babel.config,jest.config}.js"
   - "config.ru"
-  - "{package.json,yarn.lock}"
   - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
   - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
   # Backstage changes
@@ -107,17 +123,18 @@
   - "doc/README.md"  # Some RSpec test rely on this file
 
 .code-qa-patterns: &code-qa-patterns
+  - "{package.json,yarn.lock}"
+  - "{babel.config,jest.config}.js"
+  - ".csscomb.json"
+  - "Dockerfile.assets"
+  - "vendor/assets/**/*"
   - ".gitlab/ci/**/*"
   - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
   - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
   - "*_VERSION"
   - "Gemfile{,.lock}"
   - "Rakefile"
-  - "{babel.config,jest.config}.js"
   - "config.ru"
-  - "{package.json,yarn.lock}"
   - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
   - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
   # QA changes
@@ -125,17 +142,18 @@
   - "qa/**/*"
 
 .code-backstage-qa-patterns: &code-backstage-qa-patterns
+  - "{package.json,yarn.lock}"
+  - "{babel.config,jest.config}.js"
+  - ".csscomb.json"
+  - "Dockerfile.assets"
+  - "vendor/assets/**/*"
   - ".gitlab/ci/**/*"
   - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
   - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
   - "*_VERSION"
   - "Gemfile{,.lock}"
   - "Rakefile"
-  - "{babel.config,jest.config}.js"
   - "config.ru"
-  - "{package.json,yarn.lock}"
   - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
   - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
   # Backstage changes
@@ -258,7 +276,7 @@
       changes: *code-backstage-patterns
       when: on_success
 
-.frontend:rules:default-frontend-jobs-as-if-foss:
+.frontend:rules:default-frontend-jobs-no-foss:
   rules:
     - <<: *if-not-ee
       when: never
@@ -269,6 +287,10 @@
 .frontend:rules:qa-frontend-node:
   rules:
     - <<: *if-master-refs
+      changes: *frontend-dependency-patterns
+      when: on_success
+    - <<: *if-merge-request
+      changes: *frontend-dependency-patterns
       when: on_success
 
 ################
@@ -285,6 +307,8 @@
 ###############
 .pages:rules:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-master
       changes: *code-backstage-qa-patterns
       when: on_success
@@ -337,6 +361,7 @@
     - <<: *if-master-refs
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:master-refs-code-backstage-ee-only:
   rules:
@@ -345,12 +370,23 @@
     - <<: *if-master-refs
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:nightly-master-refs-code-backstage:
   rules:
     - <<: *if-nightly-master-schedule
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:nightly-master-refs-code-backstage-ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-nightly-master-schedule
+      changes: *code-backstage-patterns
+      when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:ee-only:
   rules:
@@ -409,7 +445,11 @@
     - if: '$DAST_DISABLED || $GITLAB_FEATURES !~ /\bdast\b/'
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *frontend-patterns
+      when: on_success
+    - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
+      when: manual
 
 .reports:schedule-dast:
   rules:
@@ -420,11 +460,23 @@
 ################
 # Review rules #
 ################
-.review:rules:mr-and-schedule:
+.review:rules:mr-and-schedule-auto:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: on_success
+    - <<: *if-dot-com-gitlab-org-schedule
+      when: on_success
+
+.review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *frontend-patterns
+      when: on_success
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+      when: manual
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-schedule
       when: on_success
 
@@ -434,6 +486,15 @@
       changes: *code-qa-patterns
       when: on_success
 
+.review:rules:mr-only-auto-if-frontend-manual-otherwise:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *frontend-patterns
+      when: on_success
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+      when: manual
+
 .review:rules:mr-only-manual:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
@@ -441,6 +502,14 @@
       when: manual
 
 .review:rules:review-cleanup:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+      when: manual
+    - <<: *if-dot-com-gitlab-org-schedule
+      when: on_success
+
+.review:rules:review-gcp-cleanup:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
@@ -463,6 +532,14 @@
     - <<: *if-master-or-tag
       changes: *code-backstage-qa-patterns
       when: on_success
+
+.setup:rules:dont-interrupt-me:
+  rules:
+    - <<: *if-master-or-tag
+      when: on_success
+    - <<: *if-auto-deploy-branches
+      when: on_success
+    - when: manual
 
 .setup:rules:gitlab_git_test:
   rules:

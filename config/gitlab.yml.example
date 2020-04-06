@@ -320,6 +320,24 @@ production: &base
         # aws_signature_version: 4 # For creation of signed URLs. Set to 2 if provider does not support v4.
         # path_style: true # Use 'host/bucket_name/object' instead of 'bucket_name.host/object'
 
+  ## Terraform state
+  terraform_state:
+    enabled: true
+    # The location where Terraform state files are stored (default: shared/terraform_state).
+    # storage_path: shared/terraform_state
+    object_store:
+      enabled: false
+      remote_directory: terraform_state # The bucket name
+      connection:
+        provider: AWS
+        aws_access_key_id: AWS_ACCESS_KEY_ID
+        aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+        region: us-east-1
+        # host: 'localhost' # default: s3.amazonaws.com
+        # endpoint: 'http://127.0.0.1:9000' # default: nil
+        # aws_signature_version: 4 # For creation of signed URLs. Set to 2 if provider does not support v4.
+        # path_style: true # Use 'host/bucket_name/object' instead of 'bucket_name.host/object'
+
   ## GitLab Pages
   pages:
     enabled: false
@@ -457,6 +475,11 @@ production: &base
     # Elasticsearch bulk updater for incremental updates.
     # NOTE: This will only take effect if elasticsearch is enabled.
     elastic_index_bulk_cron_worker:
+      cron: "*/1 * * * *"
+
+    # Elasticsearch metrics
+    # NOTE: This will only take effect if Elasticsearch is enabled.
+    elastic_metrics_update_worker:
       cron: "*/1 * * * *"
 
   registry:
@@ -752,7 +775,9 @@ production: &base
     # Path to a file containing a CA certificate
     ca_file: '/etc/ssl/certs/CA.pem'
 
-    # Port where the client side certificate is requested by the webserver (NGINX/Apache)
+    # Host and port where the client side certificate is requested by the
+    # webserver (NGINX/Apache)
+    # client_certificate_required_host: smartcard.gitlab.example.com
     # client_certificate_required_port: 3444
 
     # Browser session with smartcard sign-in is required for Git access
@@ -1186,6 +1211,19 @@ test:
         aws_access_key_id: AWS_ACCESS_KEY_ID
         aws_secret_access_key: AWS_SECRET_ACCESS_KEY
         region: us-east-1
+
+  terraform_state:
+    enabled: true
+    storage_path: tmp/tests/terraform_state
+    object_store:
+      enabled: false
+      remote_directory: terraform_state
+      connection:
+        provider: AWS # Only AWS supported at the moment
+        aws_access_key_id: AWS_ACCESS_KEY_ID
+        aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+        region: us-east-1
+
   gitlab:
     host: localhost
     port: 80
@@ -1226,6 +1264,8 @@ test:
   gitaly:
     client_path: tmp/tests/gitaly
     token: secret
+  workhorse:
+    secret_file: tmp/gitlab_workhorse_test_secret
   backup:
     path: tmp/tests/backups
   pseudonymizer:

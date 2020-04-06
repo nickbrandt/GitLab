@@ -7,7 +7,7 @@ type: reference
 This page contains a list of common SSL-related errors and scenarios that you may face while working with GitLab.
 It should serve as an addition to the main SSL docs available here:
 
-- [Omniibus SSL Configuration](https://docs.gitlab.com/omnibus/settings/ssl.html)
+- [Omnibus SSL Configuration](https://docs.gitlab.com/omnibus/settings/ssl.html)
 - [Self-signed certificates or custom Certification Authorities for GitLab Runner](https://docs.gitlab.com/runner/configuration/tls-self-signed.html)
 - [Manually configuring HTTPS](https://docs.gitlab.com/omnibus/settings/nginx.html#manually-configuring-https)
 
@@ -23,7 +23,7 @@ After configuring a GitLab instance with an internal CA certificate, you might n
   More details here: https://curl.haxx.se/docs/sslcerts.html
   ```
 
-- Testing via the [rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session) also fails:
+- Testing via the [rails console](debug.md#starting-a-rails-console-session) also fails:
 
   ```ruby
   uri = URI.parse("https://gitlab.domain.tld")

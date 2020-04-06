@@ -9,12 +9,21 @@
 # needs any special behavior.
 module HasRepository
   extend ActiveSupport::Concern
-  include Gitlab::ShellAdapter
   include AfterCommitQueue
   include Referable
+  include Gitlab::ShellAdapter
   include Gitlab::Utils::StrongMemoize
 
   delegate :base_dir, :disk_path, to: :storage
+
+  class_methods do
+    def pick_repository_storage
+      # We need to ensure application settings are fresh when we pick
+      # a repository storage to use.
+      Gitlab::CurrentSettings.expire_current_application_settings
+      Gitlab::CurrentSettings.pick_repository_storage
+    end
+  end
 
   def valid_repo?
     repository.exists?
@@ -78,7 +87,7 @@ module HasRepository
   end
 
   def url_to_repo
-    gitlab_shell.url_to_repo(full_path)
+    Gitlab::Shell.url_to_repo(full_path)
   end
 
   def ssh_url_to_repo
@@ -101,6 +110,10 @@ module HasRepository
   end
 
   def web_url(only_path: nil)
+    Gitlab::UrlBuilder.build(self, only_path: only_path)
+  end
+
+  def repository_size_checker
     raise NotImplementedError
   end
 end

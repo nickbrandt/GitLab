@@ -38,11 +38,9 @@ The current stages are:
 
 ## Default image
 
-The default image is currently
-`registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.5-golang-1.12-git-2.24-lfs-2.9-chrome-73.0-node-12.x-yarn-1.21-postgresql-9.6-graphicsmagick-1.3.34`.
+The default image is defined in <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml>.
 
-It includes Ruby 2.6.5, Go 1.12, Git 2.24, Git LFS 2.9, Chrome 73, Node 12, Yarn 1.21,
-PostgreSQL 9.6, and Graphics Magick 1.3.33.
+It includes Ruby, Go, Git, Git LFS, Chrome, Node, Yarn, PostgreSQL, and Graphics Magick.
 
 The images used in our pipelines are configured in the
 [`gitlab-org/gitlab-build-images`](https://gitlab.com/gitlab-org/gitlab-build-images)
@@ -61,8 +59,8 @@ each pipeline includes default variables defined in
 ## Common job definitions
 
 Most of the jobs [extend from a few CI definitions](../ci/yaml/README.md#extends)
-that are scoped to a single
-[configuration parameter](../ci/yaml/README.md#configuration-parameters).
+defined in [`.gitlab/ci/global.gitlab-ci.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/global.gitlab-ci.yml)
+that are scoped to a single [configuration parameter](../ci/yaml/README.md#configuration-parameters).
 
 | Job definitions  | Description |
 |------------------|-------------|
@@ -72,9 +70,27 @@ that are scoped to a single
 | `.default-cache` | Allows a job to use a default `cache` definition suitable for Ruby/Rails and frontend tasks. |
 | `.use-pg9` | Allows a job to use the `postgres:9.6.17` and `redis:alpine` services. |
 | `.use-pg10` | Allows a job to use the `postgres:10.12` and `redis:alpine` services. |
+| `.use-pg11` | Allows a job to use the `postgres:11.6` and `redis:alpine` services. |
 | `.use-pg9-ee` | Same as `.use-pg9` but also use the `docker.elastic.co/elasticsearch/elasticsearch:6.4.2` services. |
 | `.use-pg10-ee` | Same as `.use-pg10` but also use the `docker.elastic.co/elasticsearch/elasticsearch:6.4.2` services. |
+| `.use-pg11-ee` | Same as `.use-pg11` but also use the `docker.elastic.co/elasticsearch/elasticsearch:6.4.2` services. |
 | `.as-if-foss` | Simulate the FOSS project by setting the `FOSS_ONLY='1'` environment variable. |
+
+## `workflow:rules`
+
+We're using the [`workflow:rules` keyword](../ci/yaml/README.md#workflowrules) to
+define default rules to determine whether or not a pipeline is created.
+
+These rules are defined in <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml>
+and are as follows:
+
+1. If `$FORCE_GITLAB_CI` is set, create a pipeline.
+1. For merge requests, create a pipeline.
+1. For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
+1. For tags, create a pipeline.
+1. If `$GITLAB_INTERNAL` isn't set, don't create a pipeline.
+1. For stable, auto-deploy, and security branches, create a pipeline.
+1. For any other cases (e.g. when pushing a branch with no MR for it), no pipeline is created.
 
 ## `rules`, `if:` conditions and `changes:` patterns
 
@@ -115,12 +131,23 @@ and included in `rules` definitions via [YAML anchors](../ci/yaml/README.md#anch
 |------------------------------|--------------------------------------------------------------------------|
 | `yaml-patterns`              | Only create job for YAML-related changes.                                |
 | `docs-patterns`              | Only create job for docs-related changes.                                |
-| `backstage-patterns`         | Only create job for backstage-related changes.                           |
+| `frontend-dependency-patterns` | Only create job when frontend dependencies are updated (i.e. `package.json`, and `yarn.lock`). changes.                                |
+| `frontend-patterns`          | Only create job for frontend-related changes.                           |
+| `backstage-patterns`         | Only create job for backstage-related changes (i.e. Danger, fixtures, RuboCop, specs).                           |
 | `code-patterns`              | Only create job for code-related changes.                                |
 | `qa-patterns`                | Only create job for QA-related changes.                                  |
 | `code-backstage-patterns`    | Combination of `code-patterns` and `backstage-patterns`.                 |
 | `code-qa-patterns`           | Combination of `code-patterns` and `qa-patterns`.                        |
 | `code-backstage-qa-patterns` | Combination of `code-patterns`, `backstage-patterns`, and `qa-patterns`. |
+
+## Interruptible jobs pipelines
+
+By default, all jobs are [interruptible](../ci/yaml/README.md#interruptible), except the
+`dont-interrupt-me` job which runs automatically on `master`, and is `manual`
+otherwise.
+
+If you want a running pipeline to finish even if you push new commits to a merge
+request, be sure to start the `dont-interrupt-me` job before pushing.
 
 ## Directed acyclic graph
 
@@ -149,7 +176,7 @@ graph RL;
   O[coverage-frontend];
   N["pages (master only)"];
   Q[package-and-qa];
-  S["RSpec<br/>(e.g. rspec unit pg9)"]
+  S["RSpec<br/>(e.g. rspec unit pg10)"]
   T[retrieve-tests-metadata];
   QA["qa:internal, qa:selectors"];
   QA2["qa:internal-as-if-foss, qa:selectors-as-if-foss<br/>(EE default refs only)"];

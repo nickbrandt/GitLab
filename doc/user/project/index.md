@@ -65,16 +65,16 @@ When you create a project in GitLab, you'll have access to a large number of
   images out-of-the-box
   - [Auto Deploy](../../topics/autodevops/index.md#auto-deploy): Configure GitLab CI/CD
   to automatically set up your app's deployment
-  - [Enable and disable GitLab CI](../../ci/enable_or_disable_ci.md)
-  - [Pipelines](../../ci/pipelines.md): Configure and visualize
+  - [Enable and disable GitLab CI/CD](../../ci/enable_or_disable_ci.md)
+  - [Pipelines](../../ci/pipelines/index.md): Configure and visualize
     your GitLab CI/CD pipelines from the UI
-    - [Scheduled Pipelines](pipelines/schedules.md): Schedule a pipeline
+    - [Scheduled Pipelines](../../ci/pipelines/schedules.md): Schedule a pipeline
       to start at a chosen time
-    - [Pipeline Graphs](../../ci/pipelines.md#visualizing-pipelines): View your
+    - [Pipeline Graphs](../../ci/pipelines/index.md#visualizing-pipelines): View your
       entire pipeline from the UI
-    - [Job artifacts](pipelines/job_artifacts.md): Define,
+    - [Job artifacts](../../ci/pipelines/job_artifacts.md): Define,
       browse, and download job artifacts
-    - [Pipeline settings](pipelines/settings.md): Set up Git strategy (choose the default way your repository is fetched from GitLab in a job),
+    - [Pipeline settings](../../ci/pipelines/settings.md): Set up Git strategy (choose the default way your repository is fetched from GitLab in a job),
       timeout (defines the maximum amount of time in minutes that a job is able run), custom path for `.gitlab-ci.yml`, test coverage parsing, pipeline's visibility, and much more
   - [Kubernetes cluster integration](clusters/index.md): Connecting your GitLab project
     with a Kubernetes cluster
@@ -100,7 +100,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Maven packages](../packages/maven_repository/index.md): your private Maven repository in GitLab. **(PREMIUM)**
 - [NPM packages](../packages/npm_registry/index.md): your private NPM package registry in GitLab. **(PREMIUM)**
 - [Code owners](code_owners.md): specify code owners for certain files **(STARTER)**
-- [License Compliance](../application_security/license_compliance/index.md): approve and blacklist licenses for projects. **(ULTIMATE)**
+- [License Compliance](../compliance/license_compliance/index.md): approve and blacklist licenses for projects. **(ULTIMATE)**
 - [Dependency List](../application_security/dependency_list/index.md): view project dependencies. **(ULTIMATE)**
 
 ### Project integrations

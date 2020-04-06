@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { sortBy } from 'lodash';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
@@ -132,8 +132,9 @@ describe('Dependencies actions', () => {
   describe('fetchDependencies', () => {
     const dependenciesPackagerDescending = {
       ...mockDependenciesResponse,
-      dependencies: _.sortBy(mockDependenciesResponse.dependencies, 'packager').reverse(),
+      dependencies: sortBy(mockDependenciesResponse.dependencies, 'packager').reverse(),
     };
+
     let state;
     let mock;
 

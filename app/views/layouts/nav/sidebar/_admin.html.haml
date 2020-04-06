@@ -83,7 +83,7 @@
                 = _('Requests Profiles')
           - if Gitlab::CurrentSettings.current_application_settings.grafana_enabled?
             = nav_link do
-              = link_to Gitlab::CurrentSettings.current_application_settings.grafana_url, target: '_blank', title: _('Metrics Dashboard') do
+              = link_to Gitlab::CurrentSettings.current_application_settings.grafana_url, target: '_blank', title: _('Metrics Dashboard'), rel: 'noopener noreferrer' do
                 %span
                   = _('Metrics Dashboard')
           = render_if_exists 'layouts/nav/ee/admin/new_monitoring_sidebar'
@@ -245,7 +245,7 @@
               = link_to repository_admin_application_settings_path, title: _('Repository'), class: 'qa-admin-settings-repository-item' do
                 %span
                   = _('Repository')
-            - if template_exists?('admin/application_settings/templates')
+            - if Gitlab.ee? && License.feature_available?(:custom_file_templates)
               = nav_link(path: 'application_settings#templates') do
                 = link_to templates_admin_application_settings_path, title: _('Templates'), class: 'qa-admin-settings-template-item' do
                   %span

@@ -121,6 +121,7 @@
     }
 
     > .btn,
+    > .btn-group,
     > .btn-container,
     > .dropdown,
     > input,
@@ -161,7 +162,8 @@
       .dropdown,
       .dropdown-toggle,
       .dropdown-menu-toggle,
-      .form-control {
+      .form-control,
+      > .btn-group {
         margin: 0 0 $gl-padding-8;
         display: block;
         width: 100%;
@@ -305,7 +307,7 @@
 
 .inner-page-scroll-tabs {
   .fade-right {
-    @include fade(left, $white-light);
+    @include fade(left, $white);
     right: 0;
     text-align: right;
 
@@ -315,7 +317,7 @@
   }
 
   .fade-left {
-    @include fade(right, $white-light);
+    @include fade(right, $white);
     left: 0;
     text-align: left;
 
@@ -345,7 +347,7 @@
     @include scrolling-links();
 
     .fade-right {
-      @include fade(left, $white-light);
+      @include fade(left, $white);
       right: -5px;
 
       .fa {
@@ -354,7 +356,7 @@
     }
 
     .fade-left {
-      @include fade(right, $white-light);
+      @include fade(right, $white);
       left: -5px;
 
       .fa {

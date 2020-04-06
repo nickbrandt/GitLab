@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import helmInstallIllustration from '@gitlab/svgs/dist/illustrations/kubernetes-installation.svg';
 import { GlLoadingIcon } from '@gitlab/ui';
 import elasticsearchLogo from 'images/cluster_app_logos/elasticsearch.png';
@@ -107,8 +107,12 @@ export default {
     isProjectCluster() {
       return this.type === CLUSTER_TYPE.PROJECT;
     },
+    managedAppsLocalTillerEnabled() {
+      return Boolean(gon.features?.managedAppsLocalTiller);
+    },
     helmInstalled() {
       return (
+        this.managedAppsLocalTillerEnabled ||
         this.applications.helm.status === APPLICATION_STATUS.INSTALLED ||
         this.applications.helm.status === APPLICATION_STATUS.UPDATED
       );
@@ -118,9 +122,6 @@ export default {
     },
     ingressInstalled() {
       return this.applications.ingress.status === APPLICATION_STATUS.INSTALLED;
-    },
-    ingressEnableModsecurity() {
-      return this.applications.ingress.modsecurity_enabled;
     },
     ingressExternalEndpoint() {
       return this.applications.ingress.externalIp || this.applications.ingress.externalHostname;
@@ -133,7 +134,7 @@ export default {
     },
     ingressDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Installing Ingress may incur additional costs. Learn more about %{pricingLink}.`,
           ),
@@ -141,14 +142,14 @@ export default {
         {
           pricingLink: `<a href="https://cloud.google.com/compute/pricing#lb"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__('ClusterIntegration|pricing'))}</a>`,
+              ${esc(s__('ClusterIntegration|pricing'))}</a>`,
         },
         false,
       );
     },
     certManagerDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Cert-Manager is a native Kubernetes certificate management controller that helps with issuing certificates.
             Installing Cert-Manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates
@@ -158,14 +159,14 @@ export default {
         {
           letsEncrypt: `<a href="https://letsencrypt.org/"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__("ClusterIntegration|Let's Encrypt"))}</a>`,
+              ${esc(s__("ClusterIntegration|Let's Encrypt"))}</a>`,
         },
         false,
       );
     },
     crossplaneDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Crossplane enables declarative provisioning of managed services from your cloud of choice using %{kubectl} or %{gitlabIntegrationLink}.
 Crossplane runs inside your Kubernetes cluster and supports secure connectivity and secrets management between app containers and the cloud services they depend on.`,
@@ -174,7 +175,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         {
           gitlabIntegrationLink: `<a href="https://docs.gitlab.com/ee/user/clusters/applications.html#crossplane"
           target="_blank" rel="noopener noreferrer">
-          ${_.escape(s__('ClusterIntegration|Gitlab Integration'))}</a>`,
+          ${esc(s__('ClusterIntegration|Gitlab Integration'))}</a>`,
           kubectl: `<code>kubectl</code>`,
         },
         false,
@@ -183,7 +184,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
     prometheusDescription() {
       return sprintf(
-        _.escape(
+        esc(
           s__(
             `ClusterIntegration|Prometheus is an open-source monitoring system
             with %{gitlabIntegrationLink} to monitor deployed applications.`,
@@ -192,7 +193,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         {
           gitlabIntegrationLink: `<a href="https://docs.gitlab.com/ce/user/project/integrations/prometheus.html"
               target="_blank" rel="noopener noreferrer">
-              ${_.escape(s__('ClusterIntegration|GitLab Integration'))}</a>`,
+              ${esc(s__('ClusterIntegration|GitLab Integration'))}</a>`,
         },
         false,
       );
@@ -218,11 +219,11 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
     installedVia() {
       if (this.cloudRun) {
         return sprintf(
-          _.escape(s__(`ClusterIntegration|installed via %{installed_via}`)),
+          esc(s__(`ClusterIntegration|installed via %{installed_via}`)),
           {
             installed_via: `<a href="${
               this.cloudRunHelpPath
-            }" target="_blank" rel="noopener noreferrer">${_.escape(
+            }" target="_blank" rel="noopener noreferrer">${esc(
               s__('ClusterIntegration|Cloud Run'),
             )}</a>`,
           },
@@ -239,16 +240,20 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
     this.helmInstallIllustration = helmInstallIllustration;
   },
   methods: {
-    saveKnativeDomain(hostname) {
+    saveKnativeDomain() {
       eventHub.$emit('saveKnativeDomain', {
         id: 'knative',
-        params: { hostname },
+        params: {
+          hostname: this.applications.knative.hostname,
+          pages_domain_id: this.applications.knative.pagesDomain?.id,
+        },
       });
     },
-    setKnativeHostname(hostname) {
-      eventHub.$emit('setKnativeHostname', {
+    setKnativeDomain({ domainId, domain }) {
+      eventHub.$emit('setKnativeDomain', {
         id: 'knative',
-        hostname,
+        domainId,
+        domain,
       });
     },
     setCrossplaneProviderStack(stack) {
@@ -263,7 +268,6 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
 <template>
   <section id="cluster-applications">
-    <h4>{{ s__('ClusterIntegration|Applications') }}</h4>
     <p class="append-bottom-0">
       {{
         s__(`ClusterIntegration|Choose which applications to install on your Kubernetes cluster.
@@ -274,6 +278,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
 
     <div class="cluster-application-list prepend-top-10">
       <application-row
+        v-if="!managedAppsLocalTillerEnabled"
         id="helm"
         :logo-url="helmLogo"
         :title="applications.helm.title"
@@ -317,6 +322,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :install-failed="applications.ingress.installFailed"
         :install-application-request-params="{
           modsecurity_enabled: applications.ingress.modsecurity_enabled,
+          modsecurity_mode: applications.ingress.modsecurity_mode,
         }"
         :uninstallable="applications.ingress.uninstallable"
         :uninstall-successful="applications.ingress.uninstallSuccessful"
@@ -589,7 +595,10 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :request-reason="applications.knative.requestReason"
         :installed="applications.knative.installed"
         :install-failed="applications.knative.installFailed"
-        :install-application-request-params="{ hostname: applications.knative.hostname }"
+        :install-application-request-params="{
+          hostname: applications.knative.hostname,
+          pages_domain_id: applications.knative.pagesDomain && applications.knative.pagesDomain.id,
+        }"
         :installed-via="installedVia"
         :uninstallable="applications.knative.uninstallable"
         :uninstall-successful="applications.knative.uninstallSuccessful"
@@ -626,7 +635,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
             :knative="knative"
             :ingress-dns-help-path="ingressDnsHelpPath"
             @save="saveKnativeDomain"
-            @set="setKnativeHostname"
+            @set="setKnativeDomain"
           />
         </div>
       </application-row>
@@ -638,8 +647,13 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :status-reason="applications.elastic_stack.statusReason"
         :request-status="applications.elastic_stack.requestStatus"
         :request-reason="applications.elastic_stack.requestReason"
+        :version="applications.elastic_stack.version"
+        :chart-repo="applications.elastic_stack.chartRepo"
+        :update-available="applications.elastic_stack.updateAvailable"
         :installed="applications.elastic_stack.installed"
         :install-failed="applications.elastic_stack.installFailed"
+        :update-successful="applications.elastic_stack.updateSuccessful"
+        :update-failed="applications.elastic_stack.updateFailed"
         :uninstallable="applications.elastic_stack.uninstallable"
         :uninstall-successful="applications.elastic_stack.uninstallSuccessful"
         :uninstall-failed="applications.elastic_stack.uninstallFailed"

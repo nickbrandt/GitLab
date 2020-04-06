@@ -151,13 +151,13 @@ describe Gitlab::Auth::CurrentUserMode, :do_not_mock_admin_mode, :request_store 
               allow(ActiveSession).to receive(:list_sessions).with(user).and_return([session, another_session])
             end
 
-            it 'can be enabled in one and seen in the other' do
+            it 'cannot be enabled in one and seen in the other' do
               Gitlab::Session.with_session(another_session) do
                 another_subject.request_admin_mode!
                 another_subject.enable_admin_mode!(password: user.password)
               end
 
-              expect(subject.admin_mode?).to be(true)
+              expect(subject.admin_mode?).to be(false)
             end
           end
         end
@@ -196,7 +196,7 @@ describe Gitlab::Auth::CurrentUserMode, :do_not_mock_admin_mode, :request_store 
         subject.request_admin_mode!
         subject.enable_admin_mode!(password: user.password)
 
-        expect(session).to include(expected_session_entry(be_within(1.second).of Time.now))
+        expect(session).to include(expected_session_entry(be_within(1.second).of(Time.now)))
       end
     end
 

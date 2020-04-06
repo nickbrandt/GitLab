@@ -35,7 +35,7 @@ for an overview of how this is accomplished in GitLab!**
 To create an executable runbook, you will need:
 
 1. **Kubernetes** - A Kubernetes cluster is required to deploy the rest of the applications.
-    The simplest way to get started is to add a cluster using one of [GitLab's integrations](../add_remove_clusters.md#add-new-cluster).
+    The simplest way to get started is to add a cluster using one of [GitLab's integrations](../add_remove_clusters.md#create-new-cluster).
 1. **Helm Tiller** - Helm is a package manager for Kubernetes and is required to install
     all the other applications. It is installed in its own pod inside the cluster which
     can run the Helm CLI in a safe environment.
@@ -60,7 +60,7 @@ the components outlined above and the preloaded demo runbook.
 
 ### 1. Add a Kubernetes cluster
 
-Follow the steps outlined in [Add new cluster](../add_remove_clusters.md#add-new-cluster)
+Follow the steps outlined in [Create new cluster](../add_remove_clusters.md#create-new-cluster)
 to add a Kubernetes cluster to your project.
 
 ### 2. Install Helm Tiller, Ingress, and JupyterHub
@@ -120,7 +120,7 @@ VARIABLE_VALUE = project.variables.get('PRIVATE_TOKEN').value
 ### 5. Configure an operation
 
 For this example we'll use the "**Run SQL queries in Notebook**" section in the sample runbook to query
-a postgres database. The first 4 lines of the section define the variables that are required for this query to function.
+a PostgreSQL database. The first 4 lines of the section define the variables that are required for this query to function.
 
 ```sql
 %env DB_USER={project.variables.get('DB_USER').value}
@@ -136,7 +136,7 @@ Create the matching variables in your project's **Settings >> CI/CD >> Variables
 Back in Jupyter, click the "Run SQL queries in Notebook" heading and the click *Run*. The results will be
 displayed in-line as follows:
 
-![postgres query](img/postgres-query.png)
+![PostgreSQL query](img/postgres-query.png)
 
 You can try other operations such as running shell scripts or interacting with a Kubernetes cluster. Visit the
 [Nurtch Documentation](http://docs.nurtch.com/) for more information.

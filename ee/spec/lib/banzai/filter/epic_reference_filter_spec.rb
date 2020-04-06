@@ -65,8 +65,8 @@ describe Banzai::Filter::EpicReferenceFilter do
       expect(link.attr('data-original')).to eq(reference)
     end
 
-    it 'ignores invalid epic IDs' do
-      text = "Check &9999"
+    it 'ignores invalid epic IIDs' do
+      text = "Check &#{non_existing_record_iid}"
 
       expect(doc(text).to_s).to eq(ERB::Util.html_escape_once(text))
     end
@@ -100,8 +100,8 @@ describe Banzai::Filter::EpicReferenceFilter do
       expect(doc.css('a').first.attr('class')).to eq('gfm gfm-epic has-tooltip')
     end
 
-    it 'ignores invalid epic IDs' do
-      text = "Check &amp;9999"
+    it 'ignores invalid epic IIDs' do
+      text = "Check &amp;#{non_existing_record_iid}"
 
       expect(doc(text).to_s).to eq(ERB::Util.html_escape_once(text))
     end

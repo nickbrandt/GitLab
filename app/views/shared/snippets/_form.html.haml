@@ -3,7 +3,8 @@
 
 .snippet-form-holder
   = form_for @snippet, url: url,
-             html: { class: "snippet-form js-requires-input js-quick-submit common-note-form" } do |f|
+             html: { class: "snippet-form js-requires-input js-quick-submit common-note-form" },
+             data: { "snippet-type": @snippet.project_id ? 'project' : 'personal'} do |f|
     = form_errors(@snippet)
 
     .form-group
@@ -26,7 +27,7 @@
       = f.label :file_name, s_('Snippets|File')
       .file-holder.snippet
         .js-file-title.file-title-flex-parent
-          = f.text_field :file_name, placeholder: s_("Snippets|Give your file a name to add code highlighting, e.g. example.rb for Ruby"), class: 'form-control snippet-file-name qa-snippet-file-name'
+          = f.text_field :file_name, placeholder: s_("Snippets|Give your file a name to add code highlighting, e.g. example.rb for Ruby"), class: 'form-control js-snippet-file-name qa-snippet-file-name'
         .file-content.code
           %pre#editor{ data: { 'editor-loading': true } }= @snippet.content
           = f.hidden_field :content, class: 'snippet-file-content'

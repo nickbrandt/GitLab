@@ -119,7 +119,7 @@ describe 'Gcp Cluster', :js, :do_not_mock_admin_mode do
       context 'when user disables the cluster' do
         before do
           page.find(:css, '.js-cluster-enable-toggle-area .js-project-feature-toggle').click
-          page.within('#cluster-integration') { click_button 'Save changes' }
+          page.within('.js-cluster-integration-form') { click_button 'Save changes' }
         end
 
         it 'user sees the successful message' do
@@ -130,7 +130,7 @@ describe 'Gcp Cluster', :js, :do_not_mock_admin_mode do
       context 'when user changes cluster parameters' do
         before do
           fill_in 'cluster_platform_kubernetes_attributes_namespace', with: 'my-namespace'
-          page.within('#js-cluster-details') { click_button 'Save changes' }
+          page.within('.js-provider-details') { click_button 'Save changes' }
         end
 
         it 'user sees the successful message' do
@@ -141,6 +141,7 @@ describe 'Gcp Cluster', :js, :do_not_mock_admin_mode do
 
       context 'when user destroys the cluster' do
         before do
+          click_link 'Advanced Settings'
           click_button 'Remove integration and resources'
           fill_in 'confirm_cluster_name_input', with: cluster.name
           click_button 'Remove integration'
@@ -204,6 +205,7 @@ describe 'Gcp Cluster', :js, :do_not_mock_admin_mode do
     let(:admin) { create(:admin) }
 
     before do
+      stub_feature_flags(instance_level_integrations: false)
       stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
       sign_in(admin)
       gitlab_enable_admin_mode_sign_in(admin)

@@ -3,17 +3,11 @@
 require 'spec_helper'
 
 describe 'User activates GitHub Service' do
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
-
-  before do
-    project.add_maintainer(user)
-    sign_in(user)
-  end
+  include_context 'project service activation'
 
   context 'without a license' do
     it "is excluded from the integrations index" do
-      visit project_settings_integrations_path(project)
+      visit_project_integrations
 
       expect(page).not_to have_link('GitHub')
     end
@@ -25,18 +19,16 @@ describe 'User activates GitHub Service' do
     end
   end
 
-  context 'with valid license' do
+  context 'with valid license', :js do
     before do
       stub_licensed_features(github_project_service_integration: true)
 
-      visit project_settings_integrations_path(project)
+      visit_project_integration('GitHub')
 
-      click_link('GitHub')
       fill_in_details
     end
 
     def fill_in_details
-      check('Active')
       fill_in "Token", with: "aaaaaaaaaa"
       fill_in "Repository URL", with: 'https://github.com/h5bp/html5-boilerplate'
     end

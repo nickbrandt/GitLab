@@ -11,6 +11,7 @@ describe 'EE Clusters', :js do
   before do
     project.add_maintainer(user)
     gitlab_sign_in(user)
+    stub_feature_flags(clusters_list_redesign: false)
   end
 
   context 'when user has a cluster' do
@@ -51,7 +52,7 @@ describe 'EE Clusters', :js do
           before do
             click_link 'default-cluster'
             fill_in 'cluster_environment_scope', with: 'production/*'
-            within '.cluster_integration_form' do
+            within '.js-cluster-integration-form' do
               click_button 'Save changes'
             end
           end
@@ -134,7 +135,7 @@ describe 'EE Clusters', :js do
           end
 
           it 'user sees a cluster details page' do
-            expect(page).to have_content('Enable or disable GitLab\'s connection to your Kubernetes cluster.')
+            expect(page).to have_content('GitLab Integration')
             expect(page.find_field('cluster[environment_scope]').value).to eq('staging/*')
           end
         end
@@ -143,7 +144,7 @@ describe 'EE Clusters', :js do
           before do
             click_link 'default-cluster'
             fill_in 'cluster_environment_scope', with: 'production/*'
-            within ".cluster_integration_form" do
+            within ".js-cluster-integration-form" do
               click_button 'Save changes'
             end
           end

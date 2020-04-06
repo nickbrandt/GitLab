@@ -28,6 +28,10 @@ describe ProcessGithubPullRequestEventService do
   subject { described_class.new(project, user) }
 
   describe '#execute' do
+    before do
+      stub_licensed_features(ci_cd_projects: true, github_project_service_integration: true)
+    end
+
     context 'when project is not a mirror' do
       let(:source_branch) { double }
       let(:source_sha) { double }
@@ -153,6 +157,21 @@ describe ProcessGithubPullRequestEventService do
             expect(subject.execute(params).errors).not_to be_empty
           end
         end
+      end
+    end
+
+    context 'without license' do
+      let(:source_branch) { double }
+      let(:source_sha) { double }
+
+      before do
+        project.clear_memoization(:licensed_feature_available)
+        allow(project).to receive(:mirror?).and_return(true)
+        stub_licensed_features(ci_cd_projects: false, github_project_service_integration: false)
+      end
+
+      it 'does nothing' do
+        expect(subject.execute(params)).to be_nil
       end
     end
   end

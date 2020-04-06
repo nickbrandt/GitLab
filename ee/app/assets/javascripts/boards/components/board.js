@@ -5,6 +5,12 @@ import Board from '~/boards/components/board';
 import { __, sprintf, s__ } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
 
+/**
+ * Please have a look at:
+ * ./board_column.vue
+ * https://gitlab.com/gitlab-org/gitlab/-/issues/212300
+ * @deprecated
+ */
 export default Board.extend({
   data() {
     return {

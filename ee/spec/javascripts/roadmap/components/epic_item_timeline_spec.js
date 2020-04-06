@@ -1,139 +1,91 @@
-import Vue from 'vue';
-
-import epicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
-import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
-
+import { GlPopover, GlProgressBar } from '@gitlab/ui';
+import { shallowMount } from '@vue/test-utils';
+import CurrentDayIndicator from 'ee/roadmap/components/current_day_indicator.vue';
+import EpicItemTimeline from 'ee/roadmap/components/epic_item_timeline.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
-
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic } from '../mock_data';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+import { mockTimeframeInitialDate, mockFormattedEpic } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
+  epic = mockFormattedEpic,
   presetType = PRESET_TYPES.MONTHS,
   timeframe = mockTimeframeMonths,
   timeframeItem = mockTimeframeMonths[0],
-  epic = mockEpic,
-}) => {
-  const Component = Vue.extend(epicItemTimelineComponent);
-
-  return mountComponent(Component, {
-    presetType,
-    timeframe,
-    timeframeItem,
-    epic,
+  timeframeString = '',
+} = {}) => {
+  return shallowMount(EpicItemTimeline, {
+    propsData: {
+      epic,
+      presetType,
+      timeframe,
+      timeframeItem,
+      timeframeString,
+    },
   });
 };
 
+const getEpicBar = wrapper => wrapper.find('.epic-bar');
+
 describe('EpicItemTimelineComponent', () => {
-  let vm;
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('computed', () => {
+  describe('epic bar', () => {
     beforeEach(() => {
-      vm = createComponent({});
+      wrapper = createComponent();
     });
 
-    describe('startDateValues', () => {
-      it('returns object containing date parts from epic.startDate', () => {
-        expect(vm.startDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockEpic.startDate.getDay(),
-            date: mockEpic.startDate.getDate(),
-            month: mockEpic.startDate.getMonth(),
-            year: mockEpic.startDate.getFullYear(),
-            time: mockEpic.startDate.getTime(),
-          }),
-        );
-      });
+    it('shows the title', () => {
+      expect(getEpicBar(wrapper).text()).toContain(mockFormattedEpic.title);
     });
 
-    describe('endDateValues', () => {
-      it('returns object containing date parts from epic.endDate', () => {
-        expect(vm.endDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockEpic.endDate.getDay(),
-            date: mockEpic.endDate.getDate(),
-            month: mockEpic.endDate.getMonth(),
-            year: mockEpic.endDate.getFullYear(),
-            time: mockEpic.endDate.getTime(),
-          }),
-        );
-      });
+    it('shows the progress bar with correct value', () => {
+      expect(wrapper.find(GlProgressBar).attributes('value')).toBe('60');
+    });
+
+    it('shows the percentage', () => {
+      expect(getEpicBar(wrapper).text()).toContain('60%');
+    });
+
+    it('contains a link to the epic', () => {
+      expect(getEpicBar(wrapper).attributes('href')).toBe(mockFormattedEpic.webUrl);
     });
   });
 
-  describe('template', () => {
-    it('renders component container element with class `epic-timeline-cell`', () => {
-      vm = createComponent({});
+  describe('popover', () => {
+    it('shows the start and end dates', () => {
+      wrapper = createComponent();
 
-      expect(vm.$el.classList.contains('epic-timeline-cell')).toBe(true);
+      expect(wrapper.find(GlPopover).text()).toContain('Jun 26, 2017 – Mar 10, 2018');
     });
 
-    it('renders current day indicator element', () => {
-      const currentDate = new Date();
-      vm = createComponent({
-        timeframeItem: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
-      });
+    it('shows the weight completed', () => {
+      wrapper = createComponent();
 
-      expect(vm.$el.querySelector('span.current-day-indicator')).not.toBeNull();
+      expect(wrapper.find(GlPopover).text()).toContain('3 of 5 weight completed');
     });
 
-    it('renders timeline bar element with class `timeline-bar` and class `timeline-bar-wrapper` as container element', () => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, { startDate: mockTimeframeMonths[1] }),
-        timeframeItem: mockTimeframeMonths[1],
+    it('shows the weight completed with no numbers when there is no weights information', () => {
+      wrapper = createComponent({
+        epic: {
+          ...mockFormattedEpic,
+          descendantWeightSum: undefined,
+        },
       });
 
-      expect(vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar')).not.toBeNull();
+      expect(wrapper.find(GlPopover).text()).toContain('- of - weight completed');
     });
+  });
 
-    it('renders timeline bar with calculated `width` and `left` properties applied via style attribute', () => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDate: mockTimeframeMonths[0],
-          endDate: new Date(2018, 1, 15),
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar');
+  it('shows current day indicator element', () => {
+    wrapper = createComponent();
 
-      expect(timelineBarEl.getAttribute('style')).toContain('width');
-      expect(timelineBarEl.getAttribute('style')).toContain('left: 0px;');
-    });
-
-    it('renders timeline bar with `start-date-undefined` class when Epic startDate is undefined', done => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDateUndefined: true,
-          startDate: mockTimeframeMonths[0],
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar');
-
-      vm.$nextTick(() => {
-        expect(timelineBarEl.classList.contains('start-date-undefined')).toBe(true);
-        done();
-      });
-    });
-
-    it('renders timeline bar with `end-date-undefined` class when Epic endDate is undefined', done => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDate: mockTimeframeMonths[0],
-          endDateUndefined: true,
-          endDate: mockTimeframeMonths[mockTimeframeMonths.length - 1],
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar');
-
-      vm.$nextTick(() => {
-        expect(timelineBarEl.classList.contains('end-date-undefined')).toBe(true);
-        done();
-      });
-    });
+    expect(wrapper.find(CurrentDayIndicator).exists()).toBe(true);
   });
 });

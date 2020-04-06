@@ -51,6 +51,13 @@ module EE
         super.push(:saml_provider_id)
       end
 
+      override :build_identity
+      def build_identity(user)
+        return build_scim_identity(user) if params[:provider] == 'group_scim'
+
+        super
+      end
+
       override :identity_params
       def identity_params
         if group_id_for_saml.present?
@@ -58,6 +65,10 @@ module EE
         else
           super
         end
+      end
+
+      def scim_identity_attributes
+        [:group_id, :extern_uid]
       end
 
       def saml_provider_id
@@ -70,10 +81,16 @@ module EE
       def build_smartcard_identity(user, params)
         smartcard_identity_attrs = params.slice(:certificate_subject, :certificate_issuer)
 
-        if smartcard_identity_attrs.any?
+        unless smartcard_identity_attrs.empty?
           user.smartcard_identities.build(subject: params[:certificate_subject],
                                           issuer: params[:certificate_issuer])
         end
+      end
+
+      def build_scim_identity(user)
+        scim_identity_params = params.slice(*scim_identity_attributes)
+
+        user.scim_identities.build(scim_identity_params.merge(active: true))
       end
     end
   end

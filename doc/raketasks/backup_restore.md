@@ -109,7 +109,7 @@ kubectl exec -it <gitlab task-runner pod> backup-utility
 Similarly to the Kubernetes case, if you have scaled out your GitLab
 cluster to use multiple application servers, you should pick a
 designated node (that won't be auto-scaled away) for running the
-backup rake task. Because the backup rake task is tightly coupled to
+backup Rake task. Because the backup Rake task is tightly coupled to
 the main Rails application, this is typically a node on which you're
 also running Unicorn/Puma and/or Sidekiq.
 
@@ -169,6 +169,9 @@ For [Docker installations](https://docs.gitlab.com/omnibus/docker/), you must
 back up the volume where the configuration files are stored. If you have created
 the GitLab container according to the documentation, it should be under
 `/srv/gitlab/config`.
+
+For [GitLab Helm chart Installations](https://gitlab.com/gitlab-org/charts/gitlab) on a
+Kubernetes cluster, you must follow the [Backup the secrets](https://docs.gitlab.com/charts/backup-restore/backup.html#backup-the-secrets) instructions.
 
 You may also want to back up any TLS keys and certificates, and your
 [SSH host keys](https://superuser.com/questions/532040/copy-ssh-keys-from-one-server-to-another-server/532079#532079).
@@ -269,6 +272,31 @@ For installations from source:
 
 ```shell
 sudo -u git -H bundle exec rake gitlab:backup:create SKIP=db,uploads RAILS_ENV=production
+```
+
+### Skipping tar creation
+
+The last part of creating a backup is generation of a `.tar` file containing
+all the parts. In some cases (for example, if the backup is picked up by other
+backup software) creating a `.tar` file might be wasted effort or even directly
+harmful, so you can skip this step by adding `tar` to the `SKIP` environment
+variable.
+
+Adding `tar` to the `SKIP` variable leaves the files and directories containing the
+backup in the directory used for the intermediate files. These files will be
+overwritten when a new backup is created, so you should make sure they are copied
+elsewhere, because you can only have one backup on the system.
+
+For Omnibus GitLab packages:
+
+```shell
+sudo gitlab-backup create SKIP=tar
+```
+
+For installations from source:
+
+```shell
+sudo -u git -H bundle exec rake gitlab:backup:create SKIP=tar RAILS_ENV=production
 ```
 
 ### Uploading backups to a remote (cloud) storage
@@ -658,6 +686,10 @@ lose access to your GitLab server.
 
 You may also want to restore any TLS keys, certificates, or [SSH host keys](https://superuser.com/questions/532040/copy-ssh-keys-from-one-server-to-another-server/532079#532079).
 
+Starting with GitLab 12.9 if an untarred backup (like the ones made with
+`SKIP=tar`) is found, and no backup is chosen with `BACKUP=<timestamp>`, the
+untarred backup is used.
+
 Depending on your case, you might want to run the restore command with one or
 more of the following options:
 
@@ -787,7 +819,7 @@ a Kubernetes cluster, the restore task expects the restore directories to be emp
 However, with docker and Kubernetes volume mounts, some system level directories
 may be created at the volume roots, like `lost+found` directory found in Linux
 operating systems. These directories are usually owned by `root`, which can
-cause access permission errors since the restore rake task runs as `git` user.
+cause access permission errors since the restore Rake task runs as `git` user.
 So, to restore a GitLab installation, users have to confirm the restore target
 directories are empty.
 
@@ -821,7 +853,7 @@ Example: Amazon EBS
 > A GitLab server using Omnibus GitLab hosted on Amazon AWS.
 > An EBS drive containing an ext4 filesystem is mounted at `/var/opt/gitlab`.
 > In this case you could make an application backup by taking an EBS snapshot.
-> The backup includes all repositories, uploads and Postgres data.
+> The backup includes all repositories, uploads and PostgreSQL data.
 
 Example: LVM snapshots + rsync
 
@@ -829,7 +861,7 @@ Example: LVM snapshots + rsync
 > Replicating the `/var/opt/gitlab` directory using rsync would not be reliable because too many files would change while rsync is running.
 > Instead of rsync-ing `/var/opt/gitlab`, we create a temporary LVM snapshot, which we mount as a read-only filesystem at `/mnt/gitlab_backup`.
 > Now we can have a longer running rsync job which will create a consistent replica on the remote server.
-> The replica includes all repositories, uploads and Postgres data.
+> The replica includes all repositories, uploads and PostgreSQL data.
 
 If you are running GitLab on a virtualized server you can possibly also create VM snapshots of the entire GitLab server.
 It is not uncommon however for a VM snapshot to require you to power down the server, so this approach is probably of limited practical use.
@@ -843,8 +875,8 @@ to export / backup your data yourself from GitLab.com.
 Issues are stored in the database. They can't be stored in Git itself.
 
 To migrate your repositories from one server to another with an up-to-date version of
-GitLab, you can use the [import rake task](import.md) to do a mass import of the
-repository. Note that if you do an import rake task, rather than a backup restore, you
+GitLab, you can use the [import Rake task](import.md) to do a mass import of the
+repository. Note that if you do an import Rake task, rather than a backup restore, you
 will have all your repositories, but not any other data.
 
 ## Troubleshooting
@@ -861,7 +893,7 @@ psql:/var/opt/gitlab/backups/db/database.sql:2933: WARNING:  no privileges were 
 
 Be advised that, backup is successfully restored in spite of these warnings.
 
-The rake task runs this as the `gitlab` user which does not have the superuser access to the database. When restore is initiated it will also run as `gitlab` user but it will also try to alter the objects it does not have access to.
+The Rake task runs this as the `gitlab` user which does not have the superuser access to the database. When restore is initiated it will also run as `gitlab` user but it will also try to alter the objects it does not have access to.
 Those objects have no influence on the database backup/restore but they give this annoying warning.
 
 For more information see similar questions on PostgreSQL issue tracker[here](https://www.postgresql.org/message-id/201110220712.30886.adrian.klaver@gmail.com) and [here](https://www.postgresql.org/message-id/2039.1177339749@sss.pgh.pa.us) as well as [stack overflow](https://stackoverflow.com/questions/4368789/error-must-be-owner-of-language-plpgsql).

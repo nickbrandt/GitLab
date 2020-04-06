@@ -1,0 +1,5 @@
+---
+title: Fix passing project_ids to Value Stream Analytics
+merge_request: 27895
+author:
+type: fixed

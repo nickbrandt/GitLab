@@ -1,12 +1,11 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions } from 'vuex';
 import { GlAlert, GlEmptyState, GlIcon, GlLink, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ThreatMonitoringFilters from './threat_monitoring_filters.vue';
-import WafLoadingSkeleton from './waf_loading_skeleton.vue';
-import WafStatisticsSummary from './waf_statistics_summary.vue';
-import WafStatisticsHistory from './waf_statistics_history.vue';
+import ThreatMonitoringSection from './threat_monitoring_section.vue';
 
 export default {
   name: 'ThreatMonitoring',
@@ -17,10 +16,9 @@ export default {
     GlLink,
     GlPopover,
     ThreatMonitoringFilters,
-    WafLoadingSkeleton,
-    WafStatisticsSummary,
-    WafStatisticsHistory,
+    ThreatMonitoringSection,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     defaultEnvironmentId: {
       type: Number,
@@ -31,6 +29,14 @@ export default {
       required: true,
     },
     emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    wafNoDataSvgPath: {
+      type: String,
+      required: true,
+    },
+    networkPolicyNoDataSvgPath: {
       type: String,
       required: true,
     },
@@ -55,19 +61,15 @@ export default {
     return {
       showAlert: this.showUserCallout,
 
-      // WAF requires the project to have at least one available environment.
+      // We require the project to have at least one available environment.
       // An invalid default environment id means there there are no available
-      // environments, therefore the WAF cannot be set up. A valid default
-      // environment id only means that WAF *might* be set up.
-      isWafMaybeSetUp: this.isValidEnvironmentId(this.defaultEnvironmentId),
+      // environments, therefore infrastructure cannot be set up. A valid default
+      // environment id only means that infrastructure *might* be set up.
+      isSetUpMaybe: this.isValidEnvironmentId(this.defaultEnvironmentId),
     };
   },
-  computed: {
-    ...mapState('threatMonitoring', ['isLoadingWafStatistics']),
-    ...mapGetters('threatMonitoring', ['hasHistory']),
-  },
   created() {
-    if (this.isWafMaybeSetUp) {
+    if (this.isSetUpMaybe) {
       this.setCurrentEnvironmentId(this.defaultEnvironmentId);
       this.fetchEnvironments();
     }
@@ -90,10 +92,17 @@ export default {
     application, it can happen. In any event, we ask that you double check your
     settings to make sure you've set up the WAF correctly.`,
   ),
+  wafChartEmptyStateDescription: s__(
+    `ThreatMonitoring|The firewall is not installed or has been disabled. To view
+     this data, ensure you firewall is installed and enabled for your cluster.`,
+  ),
+  networkPolicyChartEmptyStateDescription: s__(
+    `ThreatMonitoring|Container NetworkPolicies are not installed or has been disabled. To view
+     this data, ensure you NetworkPolicies are installed and enabled for your cluster.`,
+  ),
   emptyStateDescription: s__(
-    `ThreatMonitoring|A Web Application Firewall (WAF) provides monitoring and
-    rules to protect production applications. GitLab adds the modsecurity WAF
-    plug-in when you install the Ingress app in your Kubernetes cluster.`,
+    `ThreatMonitoring|To view this data, ensure you have configured an environment
+    for this project and that at least one threat monitoring feature is enabled.`,
   ),
   alertText: s__(
     `ThreatMonitoring|The graph below is an overview of traffic coming to your
@@ -102,19 +111,19 @@ export default {
     malicious traffic is trying to access your app. The docs link is also
     accessible by clicking the "?" icon next to the title below.`,
   ),
-  helpPopoverText: s__('ThreatMonitoring|At this time, threat monitoring only supports WAF data.'),
+  helpPopoverText: s__('ThreatMonitoring|View documentation'),
 };
 </script>
 
 <template>
   <gl-empty-state
-    v-if="!isWafMaybeSetUp"
+    v-if="!isSetUpMaybe"
     ref="emptyState"
-    :title="s__('ThreatMonitoring|Web Application Firewall not enabled')"
+    :title="s__('ThreatMonitoring|No environments detected')"
     :description="$options.emptyStateDescription"
     :svg-path="emptyStateSvgPath"
     :primary-button-link="documentationPath"
-    :primary-button-text="__('Learn More')"
+    :primary-button-text="__('More information')"
   />
 
   <section v-else>
@@ -129,7 +138,7 @@ export default {
       {{ $options.alertText }}
     </gl-alert>
     <header class="my-3">
-      <h2 class="h4 mb-1">
+      <h2 class="h3 mb-1">
         {{ s__('ThreatMonitoring|Threat Monitoring') }}
         <gl-link
           ref="helpLink"
@@ -147,21 +156,36 @@ export default {
 
     <threat-monitoring-filters />
 
-    <waf-loading-skeleton v-if="isLoadingWafStatistics" class="mt-3" />
+    <threat-monitoring-section
+      ref="wafSection"
+      store-namespace="threatMonitoringWaf"
+      :title="s__('ThreatMonitoring|Web Application Firewall')"
+      :subtitle="s__('ThreatMonitoring|Requests')"
+      :anomalous-title="s__('ThreatMonitoring|Anomalous Requests')"
+      :nominal-title="s__('ThreatMonitoring|Total Requests')"
+      :y-legend="s__('ThreatMonitoring|Requests')"
+      :chart-empty-state-title="s__('ThreatMonitoring|Application firewall not detected')"
+      :chart-empty-state-text="$options.wafChartEmptyStateDescription"
+      :chart-empty-state-svg-path="wafNoDataSvgPath"
+      :documentation-path="documentationPath"
+      documentation-anchor="web-application-firewall"
+    />
 
-    <template v-else-if="hasHistory">
-      <waf-statistics-summary class="mt-3" />
-      <waf-statistics-history class="mt-3" />
-    </template>
+    <hr />
 
-    <gl-empty-state
-      v-else
-      ref="chartEmptyState"
-      :title="s__('ThreatMonitoring|No traffic to display')"
-      :description="$options.chartEmptyStateDescription"
-      :svg-path="chartEmptyStateSvgPath"
-      :primary-button-link="documentationPath"
-      :primary-button-text="__('Learn More')"
+    <threat-monitoring-section
+      ref="networkPolicySection"
+      store-namespace="threatMonitoringNetworkPolicy"
+      :title="s__('ThreatMonitoring|Container Network Policy')"
+      :subtitle="s__('ThreatMonitoring|Packet Activity')"
+      :anomalous-title="s__('ThreatMonitoring|Dropped Packets')"
+      :nominal-title="s__('ThreatMonitoring|Total Packets')"
+      :y-legend="s__('ThreatMonitoring|Operations Per Second')"
+      :chart-empty-state-title="s__('ThreatMonitoring|Container NetworkPolicies not detected')"
+      :chart-empty-state-text="$options.networkPolicyChartEmptyStateDescription"
+      :chart-empty-state-svg-path="networkPolicyNoDataSvgPath"
+      :documentation-path="documentationPath"
+      documentation-anchor="container-network-policy"
     />
   </section>
 </template>

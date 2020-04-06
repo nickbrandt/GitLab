@@ -3,11 +3,15 @@
 module Gitlab
   module Geo
     module ReplicableModel
-      def self.included(klass)
-        klass.extend(ClassMethods)
+      extend ActiveSupport::Concern
+      include Checksummable
+
+      included do
+        # If this hook turns out not to apply to all Models, perhaps we should extract a `ReplicableBlobModel`
+        after_create_commit -> { replicator.handle_after_create_commit if replicator.respond_to?(:handle_after_create_commit) }
       end
 
-      module ClassMethods
+      class_methods do
         def with_replicator(klass)
           raise ArgumentError, 'Must be a class inheriting from Gitlab::Geo::Replicator' unless klass < ::Gitlab::Geo::Replicator
 
@@ -24,6 +28,33 @@ module Gitlab
       # @return [Gitlab::Geo::Replicator]
       def replicator
         raise NotImplementedError, 'There is no Replicator defined for this model'
+      end
+
+      def calculate_checksum!
+        self.verification_checksum = nil
+
+        return unless needs_checksum?
+
+        self.verification_checksum = self.class.hexdigest(file.path)
+      end
+
+      def needs_checksum?
+        verification_checksum.nil? && checksummable?
+      end
+
+      def checksummable?
+        local? && file_exist?
+      end
+
+      # This checks for existence of the file on storage
+      #
+      # @return [Boolean] whether the file exists on storage
+      def file_exist?
+        if local?
+          File.exist?(file.path)
+        else
+          file.exists?
+        end
       end
     end
   end

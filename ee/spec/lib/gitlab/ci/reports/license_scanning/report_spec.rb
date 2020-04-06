@@ -279,7 +279,7 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context 'when parsing a v2 report' do
       subject { described_class.parse_from(v2_json) }
 
-      let(:v2_json) { fixture_file('security_reports/gl-license-management-report-v2.json', dir: 'ee') }
+      let(:v2_json) { fixture_file('security_reports/gl-license-scanning-report-v2.json', dir: 'ee') }
 
       it { expect(subject.version).to eql('2.0') }
       it { expect(subject.licenses.count).to eq(3) }

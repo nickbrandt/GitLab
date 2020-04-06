@@ -2,7 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/project_selector/st
 import mutations from 'ee/security_dashboard/store/modules/project_selector/mutations';
 import * as types from 'ee/security_dashboard/store/modules/project_selector/mutation_types';
 
-describe('projectsSelector mutations', () => {
+describe('EE projectsSelector mutations', () => {
   let state;
 
   beforeEach(() => {
@@ -332,6 +332,14 @@ describe('projectsSelector mutations', () => {
       expect(state.projectSearchResults).toHaveLength(0);
     });
 
+    it('sets "pageInfo.total" to be 0', () => {
+      state.pageInfo.total = 1;
+
+      mutations[types.SET_MINIMUM_QUERY_MESSAGE](state);
+
+      expect(state.pageInfo.total).toBe(0);
+    });
+
     it('sets "messages.noResults" to be false', () => {
       state.messages.noResults = true;
 
@@ -362,6 +370,26 @@ describe('projectsSelector mutations', () => {
       mutations[types.RECEIVE_SEARCH_RESULTS_ERROR](state);
 
       expect(state.searchCount).toBe(0);
+    });
+  });
+
+  describe('RECEIVE_NEXT_PAGE_SUCCESS', () => {
+    it('appends the data from the payload to "projectsSearchResults"', () => {
+      state.projectSearchResults = ['foo'];
+
+      const payload = { data: ['bar'] };
+
+      mutations[types.RECEIVE_NEXT_PAGE_SUCCESS](state, payload);
+
+      expect(state.projectSearchResults).toEqual(['foo', 'bar']);
+    });
+
+    it('sets "pageInfo" to be the given payload', () => {
+      const payload = { pageInfo: { foo: 'foo', bar: 'bar' } };
+
+      mutations[types.RECEIVE_NEXT_PAGE_SUCCESS](state, payload);
+
+      expect(state.pageInfo).toEqual(payload.pageInfo);
     });
   });
 });

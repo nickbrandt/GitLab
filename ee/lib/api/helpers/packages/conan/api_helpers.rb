@@ -8,7 +8,12 @@ module API
           def present_download_urls(entity)
             authorize!(:read_package, project)
 
-            presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
+            presenter = ::Packages::Conan::PackagePresenter.new(
+              recipe,
+              current_user,
+              project,
+              conan_package_reference: params[:conan_package_reference]
+            )
 
             render_api_error!("No recipe manifest found", 404) if yield(presenter).empty?
 
@@ -92,8 +97,13 @@ module API
           def download_package_file(file_type)
             authorize!(:read_package, project)
 
-            package_file = ::Packages::PackageFileFinder
-              .new(package, "#{params[:file_name]}", conan_file_type: file_type).execute!
+            package_file = ::Packages::Conan::PackageFileFinder
+              .new(
+                package,
+                params[:file_name].to_s,
+                conan_file_type: file_type,
+                conan_package_reference: params[:conan_package_reference]
+              ).execute!
 
             track_event('pull_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY
 

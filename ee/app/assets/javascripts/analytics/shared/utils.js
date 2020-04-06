@@ -17,7 +17,7 @@ export const formattedDate = d => dateFormat(d, dateFormats.defaultDate);
  * @returns {Object} - A group object
  */
 export const buildGroupFromDataset = dataset => {
-  const { groupId, groupName, groupFullPath, groupAvatarUrl } = dataset;
+  const { groupId, groupName, groupFullPath, groupAvatarUrl, groupParentId } = dataset;
 
   if (groupId) {
     return {
@@ -25,6 +25,7 @@ export const buildGroupFromDataset = dataset => {
       name: groupName,
       full_path: groupFullPath,
       avatar_url: groupAvatarUrl,
+      parent_id: groupParentId,
     };
   }
 
@@ -76,11 +77,18 @@ export const buildCycleAnalyticsInitialData = ({
   projects = null,
   groupName = null,
   groupFullPath = null,
+  groupParentId = null,
   groupAvatarUrl = null,
 } = {}) => ({
   group: groupId
     ? convertObjectPropsToCamelCase(
-        buildGroupFromDataset({ groupId, groupName, groupFullPath, groupAvatarUrl }),
+        buildGroupFromDataset({
+          groupId,
+          groupName,
+          groupFullPath,
+          groupAvatarUrl,
+          groupParentId,
+        }),
       )
     : null,
   createdBefore: createdBefore ? new Date(createdBefore) : null,

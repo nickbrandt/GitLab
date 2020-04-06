@@ -163,17 +163,21 @@ Git operations in GitLab will result in an API error.
    unicorn['enable'] = false
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
+   grafana['enable'] = false
+
+   # If you run a seperate monitoring node you can disable these services
+   alertmanager['enable'] = false
+   prometheus['enable'] = false
+
+   # If you don't run a seperate monitoring node you can
+   # Enable Prometheus access & disable these extra services
+   # This makes Prometheus listen on all interfaces. You must use firewalls to restrict access to this address/port.
+   # prometheus['listen_address'] = '0.0.0.0:9090'
+   # prometheus['monitor_kubernetes'] = false
 
    # If you don't want to run monitoring services uncomment the following (not recommended)
-   # alertmanager['enable'] = false
    # gitlab_exporter['enable'] = false
-   # grafana['enable'] = false
    # node_exporter['enable'] = false
-   # prometheus['enable'] = false
-
-   # Enable prometheus monitoring - comment out if you disable monitoring services above.
-   # This makes Prometheus listen on all interfaces. You must use firewalls to restrict access to this address/port.
-   prometheus['listen_address'] = '0.0.0.0:9090'
 
    # Prevent database connections during 'gitlab-ctl reconfigure'
    gitlab_rails['rake_cache_clear'] = false
@@ -727,7 +731,7 @@ use a Ruby gem (library) called
 the form of a C library.
 
 Over time it has become clear to use that Rugged, and particularly
-Rugged in combination with the [Unicorn](https://bogomips.org/unicorn/)
+Rugged in combination with the [Unicorn](https://yhbt.net/unicorn/)
 web server, is extremely efficient. Because libgit2 is a *library* and
 not an external process, there was very little overhead between GitLab
 application code that tried to look up data in Git repositories, and the
@@ -777,7 +781,7 @@ two checks. The result of both of these checks is cached.
     see if we can access filesystem underneath the Gitaly server
     directly. If so, use the Rugged patch.
 
-To see if GitLab  Rails can access the repo filesystem directly, we use
+To see if GitLab Rails can access the repo filesystem directly, we use
 the following heuristic:
 
 - Gitaly ensures that the filesystem has a metadata file in its root
@@ -861,7 +865,7 @@ default level is `WARN`.
 You can run a gRPC trace with:
 
 ```shell
-GRPC_TRACE=all GRPC_VERBOSITY=DEBUG sudo gitlab-rake gitlab:gitaly:check
+sudo GRPC_TRACE=all GRPC_VERBOSITY=DEBUG gitlab-rake gitlab:gitaly:check
 ```
 
 ### Observing `gitaly-ruby` traffic
@@ -1005,6 +1009,21 @@ To remove the proxy setting, run the following commands (depending on which vari
 unset http_proxy
 unset https_proxy
 ```
+
+### Gitaly not listening on new address after reconfiguring
+
+When updating the `gitaly['listen_addr']` or `gitaly['prometheus_listen_addr']` values, Gitaly may continue to listen on the old address after a `sudo gitlab-ctl reconfigure`.
+
+When this occurs, performing a `sudo gitlab-ctl restart` will resolve the issue. This will no longer be necessary after [this issue](https://gitlab.com/gitlab-org/gitaly/issues/2521) is resolved.
+
+### Permission denied errors appearing in Gitaly logs when accessing repositories from a standalone Gitaly node
+
+If this error occurs even though file permissions are correct, it's likely that
+the Gitaly node is experiencing
+[clock drift](https://en.wikipedia.org/wiki/Clock_drift).
+
+Please ensure that the GitLab and Gitaly nodes are synchronized and use an NTP time
+server to keep them synchronized if possible.
 
 ### Praefect
 

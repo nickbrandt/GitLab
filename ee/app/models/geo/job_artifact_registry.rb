@@ -30,4 +30,8 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
   def self.has_create_events?
     false
   end
+
+  def self.replication_enabled?
+    JobArtifactUploader.object_store_enabled? ? Gitlab::Geo.current_node.sync_object_storage? : true
+  end
 end

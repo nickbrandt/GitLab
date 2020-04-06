@@ -15,10 +15,22 @@ If you choose a size larger than what is currently configured for the web server
 you will likely get errors. See the [troubleshooting section](#troubleshooting) for more
 details.
 
+## Maximum namespace storage size
+
+This sets a maximum size limit on each namespace. The following are included in the namespace size:
+
+- repository
+- wiki
+- LFS objects
+- build artifacts
+- packages
+
+NOTE: **Note:**
+This limit is not currently enforced but will be in a future release.
+
 ## Repository size limit **(STARTER ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/blog/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
-> Available in [GitLab Starter](https://about.gitlab.com/pricing/).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/releases/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
 
 Repositories within your GitLab instance can grow quickly, especially if you are
 using LFS. Their size can grow exponentially, rapidly consuming available storage.
@@ -32,7 +44,7 @@ For instance, consider the following workflow:
 
 1. Your team develops apps which require large files to be stored in
    the application repository.
-1. Although you have enabled [Git LFS](../../../administration/lfs/manage_large_binaries_with_git_lfs.md#git-lfs)
+1. Although you have enabled [Git LFS](../../../topics/git/lfs/index.md#git-lfs)
    to your project, your storage has grown significantly.
 1. Before you exceed available storage, you set up a limit of 10 GB
    per repository.

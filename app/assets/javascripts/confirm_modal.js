@@ -1,26 +1,14 @@
 import Vue from 'vue';
 import ConfirmModal from '~/vue_shared/components/confirm_modal.vue';
 
-const mountConfirmModal = button => {
-  const props = {
-    path: button.dataset.path,
-    method: button.dataset.method,
-    modalAttributes: JSON.parse(button.dataset.modalAttributes),
-  };
-
+const mountConfirmModal = () => {
   return new Vue({
     render(h) {
-      return h(ConfirmModal, { props });
+      return h(ConfirmModal, {
+        props: { selector: '.js-confirm-modal-button' },
+      });
     },
   }).$mount();
 };
 
-export default () => {
-  document.getElementsByClassName('js-confirm-modal-button').forEach(button => {
-    button.addEventListener('click', e => {
-      e.preventDefault();
-
-      mountConfirmModal(button);
-    });
-  });
-};
+export default () => mountConfirmModal();

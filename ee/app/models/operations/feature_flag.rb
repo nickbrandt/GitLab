@@ -34,7 +34,7 @@ module Operations
     before_create :build_default_scope, if: -> { legacy_flag? && scopes.none? }
 
     accepts_nested_attributes_for :scopes, allow_destroy: true
-    accepts_nested_attributes_for :strategies
+    accepts_nested_attributes_for :strategies, allow_destroy: true
 
     scope :ordered, -> { order(:name) }
 
@@ -48,7 +48,15 @@ module Operations
 
     class << self
       def preload_relations
-        preload(:scopes)
+        preload(:scopes, strategies: :scopes)
+      end
+
+      def for_unleash_client(project, environment)
+        includes(strategies: :scopes)
+          .where(project: project)
+          .merge(Operations::FeatureFlags::Scope.on_environment(environment))
+          .reorder(:id)
+          .references(:operations_scopes)
       end
     end
 

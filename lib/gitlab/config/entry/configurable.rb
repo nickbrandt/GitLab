@@ -75,7 +75,8 @@ module Gitlab
 
           # rubocop: disable CodeReuse/ActiveRecord
           def entry(key, entry, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
-            raise ArgumentError, "Entry #{key} already defined" if @nodes.to_h[key.to_sym]
+            entry_name = key.to_sym
+            raise ArgumentError, "Entry '#{key}' already defined in '#{name}'" if @nodes.to_h[entry_name]
 
             factory = ::Gitlab::Config::Entry::Factory.new(entry)
               .with(description: description)
@@ -84,14 +85,21 @@ module Gitlab
               .with(reserved: reserved)
               .metadata(metadata)
 
-            (@nodes ||= {}).merge!(key.to_sym => factory)
+            @nodes ||= {}
+            @nodes[entry_name] = factory
+
+            helpers(entry_name)
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
+          def dynamic_helpers(*nodes)
+            helpers(*nodes, dynamic: true)
+          end
+
           def helpers(*nodes, dynamic: false)
             nodes.each do |symbol|
-              if method_defined?("#{symbol}_defined?") || method_defined?("#{symbol}_value")
-                raise ArgumentError, "Method #{symbol}_defined? or #{symbol}_value already defined"
+              if method_defined?("#{symbol}_defined?") || method_defined?("#{symbol}_entry") || method_defined?("#{symbol}_value")
+                raise ArgumentError, "Method '#{symbol}_defined?', '#{symbol}_entry' or '#{symbol}_value' already defined in '#{name}'"
               end
 
               unless @nodes.to_h[symbol]
@@ -102,10 +110,13 @@ module Gitlab
                 entries[symbol]&.specified?
               end
 
-              define_method("#{symbol}_value") do
-                return unless entries[symbol] && entries[symbol].valid?
+              define_method("#{symbol}_entry") do
+                entries[symbol]
+              end
 
-                entries[symbol].value
+              define_method("#{symbol}_value") do
+                entry = entries[symbol]
+                entry.value if entry&.valid?
               end
             end
           end

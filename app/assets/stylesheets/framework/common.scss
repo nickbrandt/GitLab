@@ -5,7 +5,7 @@
 .cgreen { color: $green-600; }
 .cdark { color: $common-gray-dark; }
 
-.fwhite { fill: $white-light; }
+.fwhite { fill: $white; }
 .fgray { fill: $gray-700; }
 
 .text-plain,
@@ -207,10 +207,10 @@ li.note {
   padding: 10px;
   background: $red-400;
   margin: 0;
-  color: $white-light;
+  color: $white;
 
   a {
-    color: $white-light;
+    color: $white;
     text-decoration: underline;
   }
 }
@@ -413,6 +413,7 @@ img.emoji {
 .prepend-left-20 { margin-left: 20px; }
 .prepend-left-32 { margin-left: 32px; }
 .prepend-left-64 { margin-left: 64px; }
+.append-right-2 { margin-right: 2px; }
 .append-right-4 { margin-right: 4px; }
 .append-right-5 { margin-right: 5px; }
 .append-right-8 { margin-right: 8px; }
@@ -424,6 +425,7 @@ img.emoji {
 .append-right-48 { margin-right: 48px; }
 .prepend-right-32 { margin-right: 32px; }
 .append-bottom-0 { margin-bottom: 0; }
+.append-bottom-2 { margin-bottom: 2px; }
 .append-bottom-4 { margin-bottom: $gl-padding-4; }
 .append-bottom-5 { margin-bottom: 5px; }
 .append-bottom-8 { margin-bottom: $grid-size; }
@@ -481,6 +483,34 @@ img.emoji {
 }
 
 /** COMMON SPACING CLASSES **/
+/**
+  🚨 Do not use these classes — they are deprecated and being removed. 🚨
+  See https://gitlab.com/gitlab-org/gitlab/issues/36857 for more details.
+
+  Instead, if you need a spacing class, add it below using the following values.
+    $gl-spacing-scale-0: 0;
+    $gl-spacing-scale-1: 2px;
+    $gl-spacing-scale-2: 4px;
+    $gl-spacing-scale-3: 8px;
+    $gl-spacing-scale-4: 12px;
+    $gl-spacing-scale-5: 16px;
+    $gl-spacing-scale-6: 24px;
+    $gl-spacing-scale-7: 32px;
+    $gl-spacing-scale-8: 40px;
+    $gl-spacing-scale-9: 48px;
+    $gl-spacing-scale-10: 56px;
+    $gl-spacing-scale-11: 64px;
+    $gl-spacing-scale-12: 80px;
+    $gl-spacing-scale-13: 96px;
+
+  E.g., a padding top of 96px can be added using:
+  .gl-shim-pt-13 {
+    padding-top: 96px;
+  }
+
+  Please use -shim- so it can be differentiated from the old scale classes.
+  These will be replaced when the Gitlab UI utilities are included.
+**/
 @each $index, $padding in $spacing-scale {
   #{'.gl-p-#{$index}'} { padding: $padding; }
   #{'.gl-pl-#{$index}'} { padding-left: $padding; }
@@ -521,6 +551,8 @@ img.emoji {
 .cursor-pointer {
   cursor: pointer;
 }
+
+.cursor-not-allowed { cursor: not-allowed; }
 
 // this needs to use "!important" due to some very specific styles
 // around buttons
@@ -579,13 +611,11 @@ img.emoji {
 .gl-font-size-large { font-size: $gl-font-size-large; }
 
 .gl-line-height-24 { line-height: $gl-line-height-24; }
-.gl-line-height-14 { line-height: $gl-line-height-14; }
 
 .gl-font-size-0 { font-size: 0; }
 .gl-font-size-12 { font-size: $gl-font-size-12; }
 .gl-font-size-14 { font-size: $gl-font-size-14; }
 .gl-font-size-16 { font-size: $gl-font-size-16; }
-.gl-font-size-20 { font-size: $gl-font-size-20; }
 .gl-font-size-28 { font-size: $gl-font-size-28; }
 .gl-font-size-42 { font-size: $gl-font-size-42; }
 
@@ -595,3 +625,10 @@ img.emoji {
 
   border-top: 1px solid $border-color;
 }
+
+/**
+🚨 Do not use these classes — they clash with the Gitlab UI design system and will be removed. 🚨
+See https://gitlab.com/gitlab-org/gitlab/issues/36857 for more details.
+**/
+.gl-line-height-14 { line-height: $gl-line-height-14; }
+.gl-font-size-20 { font-size: $gl-font-size-20; }

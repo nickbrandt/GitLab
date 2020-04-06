@@ -5,7 +5,7 @@ describe Mutations::Issues::SetWeight do
   let(:issue) { create(:issue) }
   let(:user) { create(:user) }
 
-  subject(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
+  subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
   describe '#resolve' do
     let(:weight) { 2 }

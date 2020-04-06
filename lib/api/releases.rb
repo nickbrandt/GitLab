@@ -46,7 +46,7 @@ module API
       params do
         requires :tag_name,    type: String, desc: 'The name of the tag', as: :tag
         optional :name,        type: String, desc: 'The name of the release'
-        requires :description, type: String, desc: 'The release notes'
+        optional :description, type: String, desc: 'The release notes'
         optional :ref,         type: String, desc: 'The commit sha or branch name'
         optional :assets, type: Hash do
           optional :links, type: Array do
@@ -148,6 +148,10 @@ module API
 
       def authorize_download_code!
         authorize! :download_code, release
+      end
+
+      def authorize_create_evidence!
+        # This is a separate method so that EE can extend its behaviour
       end
 
       def release

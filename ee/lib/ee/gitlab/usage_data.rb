@@ -5,6 +5,28 @@ module EE
     module UsageData
       extend ActiveSupport::Concern
 
+      SECURE_PRODUCT_TYPES = {
+        container_scanning: {
+          name: :container_scanning_jobs
+        },
+        dast: {
+          name: :dast_jobs
+        },
+        dependency_scanning: {
+          name: :dependency_scanning_jobs
+        },
+        license_management: {
+          name: :license_management_jobs
+        },
+        license_scanning: {
+          name: :license_scanning_jobs,
+          fallback: 0
+        },
+        sast: {
+          name: :sast_jobs
+        }
+      }.freeze
+
       class_methods do
         extend ::Gitlab::Utils::Override
 
@@ -15,20 +37,11 @@ module EE
 
         override :uncached_data
         def uncached_data
-          # The `usage_activity_by_stage` queries are likely to time out on large instances, and are sure
-          # to time out on GitLab.com. Since we are mostly interested in gathering these statistics for
-          # self hosted instances, prevent them from running on GitLab.com and allow instance maintainers
-          # to disable them via a feature flag.
-          return super if (::Feature.disabled?(:usage_ping_batch_counter) && ::Gitlab.com?) ||
-                          ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
+          return super if ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
 
-          if ::Feature.disabled?(:usage_activity_by_stage_monthly)
-            super.merge(usage_activity_by_stage)
-          else
-            time_period = { created_at: 28.days.ago..Time.current }
-            usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
-            super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)
-          end
+          time_period = { created_at: 28.days.ago..Time.current }
+          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
+          super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)
         end
 
         override :features_usage_data
@@ -90,27 +103,17 @@ module EE
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def security_products_usage
-          types = {
-            container_scanning: :container_scanning_jobs,
-            dast: :dast_jobs,
-            dependency_scanning: :dependency_scanning_jobs,
-            license_management: :license_management_jobs,
-            license_scanning: :license_scanning_jobs,
-            sast: :sast_jobs
-          }
-
-          results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1), batch: false)
-
-          license_scan_count = results.delete("license_scanning")
-          if license_scan_count && results["license_management"]
-            results["license_management"] += license_scan_count
+          results = SECURE_PRODUCT_TYPES.each_with_object({}) do |(secure_type, attribs), response|
+            response[attribs[:name]] = count(::Ci::Build.where(name: secure_type), fallback: attribs.fetch(:fallback, -1)) # rubocop:disable CodeReuse/ActiveRecord
           end
 
-          results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
+          # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
+          license_scan_count = results.delete(:license_scanning_jobs)
+          results[:license_management_jobs] += license_scan_count
+
+          results
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         # Note: when adding a preference, check if it's mapped to an attribute of a User model. If so, name
         # the base key part after a corresponding User model attribute, use its possible values as suffix values.
@@ -126,7 +129,7 @@ module EE
 
         def operations_dashboard_usage
           users_with_ops_dashboard_as_default = count(::User.active.with_dashboard('operations'))
-          users_with_projects_added = count(UsersOpsDashboardProject.distinct_users(::User.active), batch: false)
+          users_with_projects_added = distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active), :user_id) # rubocop:disable CodeReuse/ActiveRecord
 
           {
             operations_dashboard_default_dashboard: users_with_ops_dashboard_as_default,
@@ -146,15 +149,14 @@ module EE
                                          ldap_keys: count(::LDAPKey),
                                          ldap_users: count(::User.ldap, 'users.id'),
                                          pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
-                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval, batch: false),
+                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
                                          merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                                          merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
-                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines, batch: false),
-                                         projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active, batch: false),
-                                         projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
-                                         projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects, batch: false),
-                                         projects_with_tracing_enabled: count(ProjectTracingSetting, batch: false),
-                                         template_repositories:  count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
+                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
+                                         projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+                                         projects_with_packages: distinct_count(::Packages::Package, :project_id),
+                                         projects_with_tracing_enabled: count(ProjectTracingSetting),
+                                         template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
                                        },
                                        service_desk_counts,
                                        security_products_usage,
@@ -194,7 +196,7 @@ module EE
 
         # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
         # Omitted because not in use anymore: `gcp_clusters`, `gcp_clusters_disabled`, `gcp_clusters_enabled`
-        # rubocop: disable CodeReuse/ActiveRecord
+        # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
             clusters_applications_cert_managers: ::Clusters::Applications::CertManager.where(time_period).distinct_by_user,
@@ -230,7 +232,10 @@ module EE
             protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id),
             remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
             snippets: distinct_count(::Snippet.where(time_period), :author_id),
-            suggestions: distinct_count(::Note.with_suggestions.where(time_period), :author_id)
+            suggestions: distinct_count(::Note.with_suggestions.where(time_period),
+                                        :author_id,
+                                        start: ::User.minimum(:id),
+                                        finish: ::User.maximum(:id))
           }
         end
 
@@ -240,7 +245,9 @@ module EE
             events: distinct_count(::Event.where(time_period), :author_id),
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
-            ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id)
+            ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
+            users_created: count(::User.where(time_period)),
+            value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true))
           }
         end
 
@@ -249,7 +256,7 @@ module EE
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
             clusters_applications_prometheus: ::Clusters::Applications::Prometheus.where(time_period).distinct_by_user,
             operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
-            operations_dashboard_users_with_projects_added: count(UsersOpsDashboardProject.distinct_users(::User.active).where(time_period), batch: false),
+            operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
             projects_with_error_tracking_enabled: distinct_count(::Project.with_enabled_error_tracking.where(time_period), :creator_id),
             projects_with_tracing_enabled: distinct_count(::Project.with_tracing_enabled.where(time_period), :creator_id)
@@ -277,8 +284,8 @@ module EE
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
-            service_desk_enabled_projects: distinct_count(::Project.with_active_services.service_desk_enabled.where(time_period), :creator_id),
-            service_desk_issues: distinct_count(::Issue.service_desk.where(time_period)),
+            service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
+            service_desk_issues: count(::Issue.service_desk.where(time_period)),
             todos: distinct_count(::Todo.where(time_period), :author_id)
           }
         end
@@ -314,10 +321,34 @@ module EE
         # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
         # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
         def usage_activity_by_stage_secure(time_period)
-          {
+          prefix = 'user_'
+
+          results = {
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
+
+          SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id, fallback: attribs.fetch(:fallback, -1))
+          end
+
+          # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
+          combined_license_key = "#{prefix}license_management_jobs".to_sym
+          license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
+          results[combined_license_key] += license_scan_count
+
+          results
         end
+
+        private
+
+        def distinct_count_service_desk_enabled_projects(time_period)
+          project_creator_id_start = ::User.minimum(:id)
+          project_creator_id_finish = ::User.maximum(:id)
+
+          distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
+        end
+
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end

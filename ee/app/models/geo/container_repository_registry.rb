@@ -38,6 +38,10 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     where(nil).pluck(:container_repository_id)
   end
 
+  def self.replication_enabled?
+    Gitlab.config.geo.registry_replication.enabled
+  end
+
   def fail_sync!(message, error)
     new_retry_count = retry_count + 1
 

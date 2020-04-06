@@ -1,6 +1,6 @@
 # Search API
 
-[Introduced][ce-41763] in GitLab 10.5
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/41763) in GitLab 10.5.
 
 Every API call to search must be authenticated.
 
@@ -255,6 +255,8 @@ Example response:
 
 ### Scope: snippet_blobs
 
+This scope will be disabled after GitLab 13.0.
+
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/search?scope=snippet_blobs&search=test
 ```
@@ -310,7 +312,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: commits **(STARTER)**
 
@@ -381,7 +383,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: users
 
@@ -651,7 +653,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: commits **(STARTER)**
 
@@ -722,7 +724,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: users
 
@@ -1007,7 +1009,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: commits
 
@@ -1080,7 +1082,7 @@ Example response:
 ]
 ```
 
-**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/issues/34521).
 
 ### Scope: users
 
@@ -1102,6 +1104,3 @@ Example response:
   }
 ]
 ```
-
-[ce-41763]: https://gitlab.com/gitlab-org/gitlab-foss/issues/41763
-[gitlab-34521]: https://gitlab.com/gitlab-org/gitlab/issues/34521

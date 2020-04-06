@@ -21,7 +21,6 @@ module Gitlab
 
       def cached_vulnerability_summary
         summary = {
-          undefined: 0,
           info:      0,
           unknown:   0,
           low:       0,

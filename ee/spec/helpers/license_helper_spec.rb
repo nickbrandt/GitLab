@@ -9,66 +9,110 @@ describe LicenseHelper do
   end
 
   describe '#license_message' do
-    context 'license installed' do
-      subject { license_message(signed_in: true, is_admin: false) }
+    subject { license_message(signed_in: signed_in, is_admin: is_admin) }
 
-      let(:license) { double('License') }
-      let(:faq_link_regex) { /For renewal instructions <a href.*>view our Licensing FAQ\.<\/a>/ }
+    context 'license installed' do
+      let(:license) { double(:license) }
+      let(:expired_date) { Time.utc(2020, 3, 9, 10) }
+      let(:today) { Time.utc(2020, 3, 7, 10) }
 
       before do
         allow(License).to receive(:current).and_return(license)
-        allow(license).to receive(:notify_users?).and_return(true)
-        allow(license).to receive(:expired?).and_return(false)
-        allow(license).to receive(:remaining_days).and_return(4)
+        allow(license).to receive(:plan).and_return('ultimate')
+        allow(license).to receive(:expires_at).and_return(expired_date)
       end
 
-      it 'does NOT have a license faq link if license is a trial' do
-        allow(license).to receive(:trial?).and_return(true)
+      context 'license is notify admins' do
+        before do
+          allow(license).to receive(:notify_admins?).and_return(true)
+        end
 
-        expect(subject).not_to match(faq_link_regex)
-      end
+        context 'admin signed in' do
+          let(:signed_in) { true }
+          let(:is_admin) { true }
 
-      it 'has license faq link if license is not a trial' do
-        allow(license).to receive(:trial?).and_return(false)
+          context 'license expired' do
+            let(:expired_date) { Time.utc(2020, 3, 9).to_date }
 
-        expect(subject).to match(faq_link_regex)
+            before do
+              allow(license).to receive(:expired?).and_return(true)
+              allow(license).to receive(:expires_at).and_return(expired_date)
+            end
+
+            context 'and it will block changes when it expires' do
+              before do
+                allow(license).to receive(:will_block_changes?).and_return(true)
+              end
+
+              context 'and its currently blocking changes' do
+                before do
+                  allow(license).to receive(:block_changes?).and_return(true)
+                  allow(license).to receive(:block_changes_at).and_return(expired_date)
+                end
+
+                it 'has a nice subject' do
+                  allow(license).to receive(:will_block_changes?).and_return(false)
+
+                  expect(subject).to have_text('Your subscription has been downgraded')
+                end
+
+                it 'has an expiration blocking message' do
+                  Timecop.freeze(today) do
+                    expect(subject).to have_text("You didn't renew your Ultimate subscription so it was downgraded to the GitLab Core Plan")
+                  end
+                end
+              end
+
+              context 'and its NOT currently blocking changes' do
+                before do
+                  allow(license).to receive(:block_changes?).and_return(false)
+                end
+
+                it 'has a nice subject' do
+                  allow(license).to receive(:will_block_changes?).and_return(false)
+
+                  expect(subject).to have_text('Your subscription expired!')
+                end
+
+                it 'has an expiration blocking message' do
+                  allow(license).to receive(:block_changes_at).and_return(expired_date)
+
+                  Timecop.freeze(today) do
+                    expect(subject).to have_text('No worries, you can still use all the Ultimate features for now. You have 2 days to renew your subscription.')
+                  end
+                end
+              end
+            end
+          end
+
+          context 'license NOT expired' do
+            before do
+              allow(license).to receive(:expired?).and_return(false)
+              allow(license).to receive(:remaining_days).and_return(4)
+              allow(license).to receive(:will_block_changes?).and_return(true)
+              allow(license).to receive(:block_changes_at).and_return(expired_date)
+            end
+
+            it 'has a nice subject' do
+              expect(subject).to have_text('Your subscription will expire in 4 days')
+            end
+
+            it 'has an expiration blocking message' do
+              Timecop.freeze(today) do
+                expect(subject).to have_text('Your Ultimate subscription will expire on 2020-03-09. After that, you will not to be able to create issues or merge requests as well as many other features.')
+              end
+            end
+          end
+        end
       end
     end
 
     context 'no license installed' do
-      before do
-        allow(License).to receive(:current).and_return(nil)
-      end
+      let(:license) { nil }
+      let(:signed_in) { true }
+      let(:is_admin) { true }
 
-      context 'admin user' do
-        let(:is_admin) { true }
-
-        it 'displays correct error message for admin user' do
-          expect(license_message(signed_in: true, is_admin: is_admin)).to be_blank
-        end
-      end
-
-      context 'normal user' do
-        let(:is_admin) { false }
-
-        it 'displays correct error message for normal user' do
-          expect(license_message(signed_in: true, is_admin: is_admin)).to be_blank
-        end
-      end
-    end
-  end
-
-  describe '#api_licenses_url' do
-    it 'returns licenses API url' do
-      stub_default_url_options
-
-      expect(api_licenses_url).to eq('http://localhost/api/v4/licenses')
-    end
-
-    it 'returns licenses API url with relative url' do
-      stub_default_url_options(script_name: '/gitlab')
-
-      expect(api_licenses_url).to eq('http://localhost/gitlab/api/v4/licenses')
+      it { is_expected.to be_blank }
     end
   end
 

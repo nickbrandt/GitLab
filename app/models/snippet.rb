@@ -17,7 +17,7 @@ class Snippet < ApplicationRecord
   include HasRepository
   extend ::Gitlab::Utils::Override
 
-  ignore_column :repository_storage, remove_with: '12.10', remove_after: '2020-03-22'
+  MAX_FILE_COUNT = 1
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
@@ -160,6 +160,10 @@ class Snippet < ApplicationRecord
     @link_reference_pattern ||= super("snippets", /(?<snippet>\d+)/)
   end
 
+  def self.find_by_id_and_project(id:, project:)
+    Snippet.find_by(id: id, project: project)
+  end
+
   def initialize(attributes = {})
     # We can't use default_value_for because the database has a default
     # value of 0 for visibility_level. If someone attempts to create a
@@ -193,6 +197,8 @@ class Snippet < ApplicationRecord
   end
 
   def blobs
+    return [] unless repository_exists?
+
     repository.ls_files(repository.root_ref).map { |file| Blob.lazy(self, repository.root_ref, file) }
   end
 
@@ -275,30 +281,40 @@ class Snippet < ApplicationRecord
     end
   end
 
+  def url_to_repo
+    Gitlab::Shell.url_to_repo(full_path.delete('@'))
+  end
+
   def repository_storage
-    snippet_repository&.shard_name ||
-      Gitlab::CurrentSettings.pick_repository_storage
+    snippet_repository&.shard_name || self.class.pick_repository_storage
   end
 
   def create_repository
-    return if repository_exists?
+    return if repository_exists? && snippet_repository
 
     repository.create_if_not_exists
-
-    track_snippet_repository if repository_exists?
+    track_snippet_repository(repository.storage)
   end
 
-  def track_snippet_repository
-    repository = snippet_repository || build_snippet_repository
-    repository.update!(shard_name: repository_storage, disk_path: disk_path)
+  def track_snippet_repository(shard)
+    snippet_repo = snippet_repository || build_snippet_repository
+    snippet_repo.update!(shard_name: shard, disk_path: disk_path)
   end
 
   def can_cache_field?(field)
     field != :content || MarkupHelper.gitlab_markdown?(file_name)
   end
 
+  def hexdigest
+    Digest::SHA256.hexdigest("#{title}#{description}#{created_at}#{updated_at}")
+  end
+
+  def versioned_enabled_for?(user)
+    ::Feature.enabled?(:version_snippets, user) && repository_exists?
+  end
+
   class << self
-    # Searches for snippets with a matching title or file name.
+    # Searches for snippets with a matching title, description or file name.
     #
     # This method uses ILIKE on PostgreSQL and LIKE on MySQL.
     #
@@ -306,7 +322,7 @@ class Snippet < ApplicationRecord
     #
     # Returns an ActiveRecord::Relation.
     def search(query)
-      fuzzy_search(query, [:title, :file_name])
+      fuzzy_search(query, [:title, :description, :file_name])
     end
 
     # Searches for snippets with matching content.

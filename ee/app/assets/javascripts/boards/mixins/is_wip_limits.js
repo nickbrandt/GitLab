@@ -1,7 +1,7 @@
 export default {
   computed: {
     isWipLimitsOn() {
-      return gon.features.wipLimits;
+      return Boolean(gon?.features?.wipLimits);
     },
   },
 };

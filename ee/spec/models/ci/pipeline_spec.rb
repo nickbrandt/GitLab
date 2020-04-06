@@ -91,7 +91,7 @@ describe Ci::Pipeline do
 
     context 'with license compliance artifact' do
       before do
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
       end
 
       [:license_management, :license_scanning].each do |artifact_type|
@@ -120,7 +120,7 @@ describe Ci::Pipeline do
     subject { pipeline.expose_license_scanning_data? }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     [:license_scanning, :license_management].each do |artifact_type|
@@ -247,17 +247,12 @@ describe Ci::Pipeline do
     subject { pipeline.license_scanning_report }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
-    context 'when pipeline has multiple builds with license management reports' do
-      let!(:build_1) { create(:ci_build, :success, name: 'license_management', pipeline: pipeline, project: project) }
-      let!(:build_2) { create(:ci_build, :success, name: 'license_management2', pipeline: pipeline, project: project) }
-
-      before do
-        create(:ee_ci_job_artifact, :license_management, job: build_1, project: project)
-        create(:ee_ci_job_artifact, :license_management_feature_branch, job: build_2, project: project)
-      end
+    context 'when pipeline has multiple builds with license scanning reports' do
+      let!(:build_1) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline, project: project) }
+      let!(:build_2) { create(:ee_ci_build, :success, :license_scanning_feature_branch, pipeline: pipeline, project: project) }
 
       it 'returns a license scanning report with collected data' do
         expect(subject.licenses.count).to eq(5)
@@ -265,8 +260,10 @@ describe Ci::Pipeline do
       end
 
       context 'when builds are retried' do
-        let!(:build_1) { create(:ci_build, :retried, :success, name: 'license_management', pipeline: pipeline, project: project) }
-        let!(:build_2) { create(:ci_build, :retried, :success, name: 'license_management2', pipeline: pipeline, project: project) }
+        before do
+          build_1.update(retried: true)
+          build_2.update(retried: true)
+        end
 
         it 'does not take retried builds into account' do
           expect(subject.licenses).to be_empty
@@ -274,7 +271,7 @@ describe Ci::Pipeline do
       end
     end
 
-    context 'when pipeline does not have any builds with license management reports' do
+    context 'when pipeline does not have any builds with license scanning reports' do
       it 'returns an empty license scanning report' do
         expect(subject.licenses).to be_empty
       end
@@ -289,10 +286,8 @@ describe Ci::Pipeline do
     end
 
     context 'when pipeline has a build with dependency list reports' do
-      let!(:build) { create(:ci_build, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
-      let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: build, project: project) }
-      let!(:build2) { create(:ci_build, :success, name: 'license_management', pipeline: pipeline, project: project) }
-      let!(:artifact2) { create(:ee_ci_job_artifact, :license_management, job: build, project: project) }
+      let!(:build) { create(:ee_ci_build, :success, :dependency_list, pipeline: pipeline, project: project) }
+      let!(:build2) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline, project: project) }
 
       it 'returns a dependency list report with collected data' do
         expect(subject.dependencies.count).to eq(21)
@@ -301,8 +296,9 @@ describe Ci::Pipeline do
       end
 
       context 'when builds are retried' do
-        let!(:build) { create(:ci_build, :retried, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
-        let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: build, project: project) }
+        before do
+          build.update(retried: true)
+        end
 
         it 'does not take retried builds into account' do
           expect(subject.dependencies).to be_empty
@@ -383,6 +379,44 @@ describe Ci::Pipeline do
         expect(ExpirePipelineCacheWorker).not_to receive(:perform_async)
 
         pipeline.cancel!
+      end
+    end
+
+    context 'when pipeline project has downstream subscriptions' do
+      let(:pipeline) { create(:ci_empty_pipeline, project: create(:project, :public)) }
+
+      before do
+        pipeline.project.downstream_projects << create(:project)
+      end
+
+      context 'when pipeline runs on a tag' do
+        before do
+          pipeline.update(tag: true)
+        end
+
+        context 'when feature is not available' do
+          before do
+            stub_feature_flags(ci_project_subscriptions: false)
+          end
+
+          it 'does not schedule the trigger downstream subscriptions worker' do
+            expect(::Ci::TriggerDownstreamSubscriptionsWorker).not_to receive(:perform_async)
+
+            pipeline.succeed!
+          end
+        end
+
+        context 'when feature is available' do
+          before do
+            stub_feature_flags(ci_project_subscriptions: true)
+          end
+
+          it 'schedules the trigger downstream subscriptions worker' do
+            expect(::Ci::TriggerDownstreamSubscriptionsWorker).to receive(:perform_async)
+
+            pipeline.succeed!
+          end
+        end
       end
     end
   end

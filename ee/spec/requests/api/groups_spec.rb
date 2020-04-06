@@ -201,7 +201,7 @@ describe API::Groups do
 
   describe 'POST /groups/:id/ldap_sync' do
     before do
-      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
+      allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
     end
 
     context 'when the ldap_group_sync feature is available' do
@@ -248,8 +248,7 @@ describe API::Groups do
         end
 
         it 'returns 404 for a non existing group' do
-          non_existent_group_id = Group.maximum(:id).to_i + 1
-          ldap_sync(non_existent_group_id, user, :disable!)
+          ldap_sync(non_existing_record_id, user, :disable!)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -465,9 +464,17 @@ describe API::Groups do
             end
           end
 
+          context 'invalid audit_event_id' do
+            let(:path) { "/groups/#{group.id}/audit_events/an-invalid-id" }
+
+            it_behaves_like '400 response' do
+              let(:request) { get api(path, user) }
+            end
+          end
+
           context 'non existent audit event' do
             context 'non existent audit event of a group' do
-              let(:path) { "/groups/#{group.id}/audit_events/non-existent-id" }
+              let(:path) { "/groups/#{group.id}/audit_events/666777" }
 
               it_behaves_like '404 response' do
                 let(:request) { get api(path, user) }

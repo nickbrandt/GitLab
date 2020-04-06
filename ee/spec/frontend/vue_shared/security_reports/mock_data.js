@@ -5,7 +5,7 @@ export const sastParsedIssues = [
     title: 'Arbitrary file existence disclosure in Action Pack',
     path: 'Gemfile.lock',
     line: 12,
-    priority: 'High',
+    severity: 'High',
     urlPath: 'foo/Gemfile.lock',
   },
 ];
@@ -297,6 +297,7 @@ export const mockFindings = [
     solution: 'Upgrade to version 2.1.1 or above.',
     state: 'opened',
     blob_path: '/gitlab-org/gitlab-ui/blob/ad137f0a8ac59af961afe47d04e5cc062c6864a9/yarn.lock',
+    evidence: 'Credit Card Detected: Diners Card',
   },
   {
     id: null,

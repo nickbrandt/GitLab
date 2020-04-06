@@ -35,54 +35,50 @@ export REGION=us-central1 # the GCP region where the GKE cluster is provisioned.
 
 ## Configure RBAC permissions
 
-- For a non-GitLab managed cluster(s), ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group.
-Manually grant GitLab's service account the ability to manage resources in the
-`database.crossplane.io` API group. The Aggregated ClusterRole allows us to do that.
-​
-NOTE: **Note:**
-For a non-GitLab managed cluster, ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group.
-​1. Save the following YAML as `crossplane-database-role.yaml`:
+- For GitLab-managed clusters, RBAC is configured automatically.
 
-```shell
-cat > crossplane-database-role.yaml <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: crossplane-database-role
-  labels:
-    rbac.authorization.k8s.io/aggregate-to-edit: "true"
-rules:
-- apiGroups:
-  - database.crossplane.io
-  resources:
-  - postgresqlinstances
-  verbs:
-  - get
-  - list
-  - create
-  - update
-  - delete
-  - patch
-  - watch
-EOF
-```
+- For non-GitLab managed clusters, ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group:
 
-Once the file is created, apply it with the following command in order to create the necessary role:
+  1. Save the following YAML as `crossplane-database-role.yaml`:
 
-```shell
-kubectl apply -f crossplane-database-role.yaml
-```
+      ```yaml
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: crossplane-database-role
+        labels:
+          rbac.authorization.k8s.io/aggregate-to-edit: "true"
+      rules:
+      - apiGroups:
+        - database.crossplane.io
+        resources:
+        - postgresqlinstances
+        verbs:
+        - get
+        - list
+        - create
+        - update
+        - delete
+        - patch
+        - watch
+      ```
+
+  1. Apply the cluster role to the cluster:
+
+      ```shell
+      kubectl apply -f crossplane-database-role.yaml
+      ```
 
 ## Configure Crossplane with a cloud provider
 
-See [Configure Your Cloud Provider Account](https://crossplane.io/docs/v0.4/cloud-providers.html)
+See [Configure Your Cloud Provider Account](https://crossplane.github.io/docs/v0.4/cloud-providers.html)
 to configure the installed cloud provider stack with a user account.
 
 Note that the Secret and the Provider resource referencing the Secret needs to be
 applied to the `gitlab-managed-apps` namespace in the guide. Make sure you change that
 while following the process.
 
-[Configure Providers](https://crossplane.io/docs/v0.4/cloud-providers.html)
+[Configure Providers](https://crossplane.github.io/docs/v0.4/cloud-providers.html)
 
 ## Configure Managed Service Access
 
@@ -147,9 +143,9 @@ kubectl describe globaladdress.compute.gcp.crossplane.io gitlab-ad-globaladdress
 
 ## Setting up Resource classes
 
-Resource classes are a way of defining a configuration for the required managed service. We will define the Postgres Resource class
+Resource classes are a way of defining a configuration for the required managed service. We will define the PostgreSQL Resource class
 
-- Define a gcp-postgres-standard.yaml resourceclass which contains
+- Define a `gcp-postgres-standard.yaml` resourceclass which contains
 
 1. A default CloudSQLInstanceClass.
 1. A CloudSQLInstanceClass with labels.
@@ -289,4 +285,4 @@ serverCACertificateSha1Fingerprint:   40 bytes
 ## Connect to the PostgreSQL instance
 
 Follow this [GCP guide](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine) if you
-would like to connect to the newly provisioned Postgres database instance on CloudSQL.
+would like to connect to the newly provisioned PostgreSQL database instance on CloudSQL.

@@ -6,7 +6,6 @@ module EE
       class ProvisioningService
         include ::Gitlab::Utils::StrongMemoize
 
-        IDENTITY_PROVIDER = 'group_saml'
         PASSWORD_AUTOMATICALLY_SET = true
         SKIP_EMAIL_CONFIRMATION = false
         DEFAULT_ACCESS = :guest
@@ -39,9 +38,27 @@ module EE
           ProvisioningResponse.new(status: :success, identity: identity)
         end
 
+        def scim_identities_enabled?
+          strong_memoize(:scim_identities_enabled) do
+            ::EE::Gitlab::Scim::Feature.scim_identities_enabled?(@group)
+          end
+        end
+
+        def identity_provider
+          strong_memoize(:identity_provider) do
+            next 'group_scim' if scim_identities_enabled?
+
+            'group_saml'
+          end
+        end
+
         def identity
           strong_memoize(:identity) do
-            ::Identity.with_extern_uid(IDENTITY_PROVIDER, @parsed_hash[:extern_uid]).first
+            if scim_identities_enabled?
+              @group.scim_identities.with_extern_uid(@parsed_hash[:extern_uid]).first
+            else
+              ::Identity.with_extern_uid(identity_provider, @parsed_hash[:extern_uid]).first
+            end
           end
         end
 
@@ -67,8 +84,9 @@ module EE
         def user_params
           @parsed_hash.tap do |hash|
             hash[:skip_confirmation] = SKIP_EMAIL_CONFIRMATION
-            hash[:saml_provider_id] = @group.saml_provider.id
-            hash[:provider] = IDENTITY_PROVIDER
+            hash[:saml_provider_id] = @group.saml_provider&.id
+            hash[:group_id] = @group.id
+            hash[:provider] = identity_provider
             hash[:email_confirmation] = hash[:email]
             hash[:username] = valid_username
             hash[:password] = hash[:password_confirmation] = random_password

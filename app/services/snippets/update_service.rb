@@ -4,6 +4,9 @@ module Snippets
   class UpdateService < Snippets::BaseService
     include SpamCheckMethods
 
+    UpdateError = Class.new(StandardError)
+    CreateRepositoryError = Class.new(StandardError)
+
     def execute(snippet)
       # check that user is allowed to set specified visibility_level
       new_visibility = visibility_level
@@ -20,17 +23,86 @@ module Snippets
       snippet.assign_attributes(params)
       spam_check(snippet, current_user)
 
-      snippet_saved = snippet.with_transaction_returning_status do
-        snippet.save
-      end
-
-      if snippet_saved
+      if save_and_commit(snippet)
         Gitlab::UsageDataCounters::SnippetCounter.count(:update)
 
         ServiceResponse.success(payload: { snippet: snippet } )
       else
         snippet_error_response(snippet, 400)
       end
+    end
+
+    private
+
+    def save_and_commit(snippet)
+      return false unless snippet.save
+
+      # In order to avoid non migrated snippets scenarios,
+      # if the snippet does not have a repository we created it
+      # We don't need to check if the repository exists
+      # because `create_repository` already handles it
+      if Feature.enabled?(:version_snippets, current_user)
+        create_repository_for(snippet)
+      end
+
+      # If the snippet repository exists we commit always
+      # the changes
+      create_commit(snippet) if snippet.repository_exists?
+
+      true
+    rescue => e
+      # Restore old attributes
+      unless snippet.previous_changes.empty?
+        snippet.previous_changes.each { |attr, value| snippet[attr] = value[0] }
+        snippet.save
+      end
+
+      snippet.errors.add(:repository, 'Error updating the snippet')
+      log_error(e.message)
+
+      # If the commit action failed we remove it because
+      # we don't want to leave empty repositories
+      # around, to allow cloning them.
+      if repository_empty?(snippet)
+        snippet.repository.remove
+        snippet.snippet_repository&.delete
+      end
+
+      # Purge any existing value for repository_exists?
+      snippet.repository.expire_exists_cache
+
+      false
+    end
+
+    def create_repository_for(snippet)
+      snippet.create_repository
+
+      raise CreateRepositoryError, 'Repository could not be created' unless snippet.repository_exists?
+    end
+
+    def create_commit(snippet)
+      raise UpdateError unless snippet.snippet_repository
+
+      commit_attrs = {
+        branch_name: 'master',
+        message: 'Update snippet'
+      }
+
+      snippet.snippet_repository.multi_files_action(current_user, snippet_files(snippet), commit_attrs)
+    end
+
+    def snippet_files(snippet)
+      [{ previous_path: snippet.blobs.first&.path,
+         file_path: params[:file_name],
+         content: params[:content] }]
+    end
+
+    # Because we are removing repositories we don't want to remove
+    # any existing repository with data. Therefore, we cannot
+    # rely on cached methods for that check in order to avoid losing
+    # data.
+    def repository_empty?(snippet)
+      snippet.repository._uncached_exists? && !snippet.repository._uncached_has_visible_content?
     end
   end
 end

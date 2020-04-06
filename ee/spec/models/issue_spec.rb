@@ -67,6 +67,16 @@ describe Issue do
       end
     end
 
+    describe '.counts_by_health_status' do
+      it 'returns counts grouped by health_status' do
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :at_risk)
+
+        expect(Issue.counts_by_health_status).to eq({ 'on_track' => 2, 'at_risk' => 1 } )
+      end
+    end
+
     context 'epics' do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }
@@ -95,9 +105,9 @@ describe Issue do
   end
 
   describe 'validations' do
-    subject { build(:issue) }
-
     describe 'weight' do
+      subject { build(:issue) }
+
       it 'is not valid when negative number' do
         subject.weight = -1
 
@@ -113,6 +123,26 @@ describe Issue do
         subject.weight = 1
 
         expect(subject).to be_valid
+      end
+    end
+
+    describe 'confidential' do
+      subject { build(:issue, :confidential) }
+
+      it 'is valid when changing to not-confidential and is associated with not-confidential epic' do
+        subject.epic = build(:epic)
+
+        subject.confidential = false
+
+        expect(subject).to be_valid
+      end
+
+      it 'is not valid when changing to not-confidential and is associated with confidential epic' do
+        subject.epic = build(:epic, :confidential)
+
+        subject.confidential = false
+
+        expect(subject).not_to be_valid
       end
     end
   end
@@ -611,6 +641,51 @@ describe Issue do
       end
 
       it { is_expected.to eq(expected) }
+    end
+  end
+
+  describe "#blocked_by_issues" do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:issue) { create(:issue, project: project) }
+    let_it_be(:blocking_issue) { create(:issue, project: project) }
+    let_it_be(:other_project_blocking_issue) { create(:issue) }
+    let_it_be(:blocked_by_issue) { create(:issue, project: project) }
+    let_it_be(:confidential_blocked_by_issue) { create(:issue, :confidential, project: project) }
+    let_it_be(:related_issue) { create(:issue, project: project) }
+    let_it_be(:closed_blocking_issue) { create(:issue, project: project, state: :closed) }
+
+    before_all do
+      create(:issue_link, source: blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: other_project_blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: issue, target: blocked_by_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: issue, target: confidential_blocked_by_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: issue, target: related_issue, link_type: IssueLink::TYPE_RELATES_TO)
+      create(:issue_link, source: closed_blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+    end
+
+    context 'when user can read issues' do
+      it 'returns blocked issues' do
+        project.add_developer(user)
+        other_project_blocking_issue.project.add_developer(user)
+
+        expect(issue.blocked_by_issues(user)).to match_array([blocking_issue, blocked_by_issue, other_project_blocking_issue, confidential_blocked_by_issue])
+      end
+    end
+
+    context 'when user cannot read issues' do
+      it 'returns empty array' do
+        expect(issue.blocked_by_issues(user)).to be_empty
+      end
+    end
+
+    context 'when user can read some issues' do
+      it 'returns issues that user can read' do
+        guest = create(:user)
+        project.add_guest(guest)
+
+        expect(issue.blocked_by_issues(guest)).to match_array([blocking_issue, blocked_by_issue])
+      end
     end
   end
 

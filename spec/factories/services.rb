@@ -64,6 +64,7 @@ FactoryBot.define do
   factory :jira_service do
     project
     active { true }
+    type { 'JiraService' }
 
     transient do
       create_data { true }
@@ -125,6 +126,26 @@ FactoryBot.define do
     end
   end
 
+  factory :open_project_service do
+    project
+    active { true }
+
+    transient do
+      url { 'http://openproject.example.com' }
+      api_url { 'http://openproject.example.com/issues/:id' }
+      token { 'supersecret' }
+      closed_status_id { '15' }
+      project_identifier_code { 'PRJ-1' }
+    end
+
+    after(:build) do |service, evaluator|
+      create(:open_project_tracker_data, service: service,
+        url: evaluator.url, api_url: evaluator.api_url, token: evaluator.token,
+        closed_status_id: evaluator.closed_status_id, project_identifier_code: evaluator.project_identifier_code
+      )
+    end
+  end
+
   trait :jira_cloud_service do
     url { 'https://mysite.atlassian.net' }
     username { 'jira_user' }
@@ -153,5 +174,15 @@ FactoryBot.define do
     after(:create) do
       IssueTrackerService.set_callback(:validation, :before, :handle_properties)
     end
+  end
+
+  trait :template do
+    project { nil }
+    template { true }
+  end
+
+  trait :instance do
+    project { nil }
+    instance { true }
   end
 end

@@ -19,7 +19,7 @@ module EE
       def weight_change_events
         return [] unless resource.respond_to?(:resource_weight_events)
 
-        events = resource.resource_weight_events.includes(user: :status) # rubocop: disable CodeReuse/ActiveRecord
+        events = resource.resource_weight_events.includes(user: :status).order(:id) # rubocop: disable CodeReuse/ActiveRecord
         since_fetch_at(events)
       end
     end

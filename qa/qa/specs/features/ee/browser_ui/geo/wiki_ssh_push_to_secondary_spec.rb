@@ -14,7 +14,7 @@ module QA
       before do
         QA::Flow::Login.while_signed_in(address: :geo_primary) do
           # Create a new SSH key
-          key = Resource::SSHKey.fabricate! do |resource|
+          key = Resource::SSHKey.fabricate_via_api! do |resource|
             resource.title = key_title
           end
 
@@ -86,7 +86,7 @@ module QA
           # as ssh:// can appear depending on how GitLab is configured.
           ssh_uri = wiki.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
 
-          expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
+          expect(push.output).to match(%r{This request to a Geo secondary node will be forwarded to the.*Geo primary node:.*#{ssh_uri}}m)
 
           # Validate git push worked and new content is visible
           Page::Project::Menu.perform(&:click_wiki)

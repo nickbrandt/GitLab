@@ -1,5 +1,8 @@
 <script>
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlPopover, GlProgressBar } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
+import Icon from '~/vue_shared/components/icon.vue';
+import { generateKey } from '../utils/epic_utils';
 
 import CommonMixin from '../mixins/common_mixin';
 import QuartersPresetMixin from '../mixins/quarters_preset_mixin';
@@ -8,15 +11,21 @@ import WeeksPresetMixin from '../mixins/weeks_preset_mixin';
 
 import CurrentDayIndicator from './current_day_indicator.vue';
 
-import { TIMELINE_CELL_MIN_WIDTH } from '../constants';
+import {
+  EPIC_DETAILS_CELL_WIDTH,
+  PERCENTAGE,
+  PRESET_TYPES,
+  SMALL_TIMELINE_BAR,
+  TIMELINE_CELL_MIN_WIDTH,
+} from '../constants';
 
 export default {
   cellWidth: TIMELINE_CELL_MIN_WIDTH,
-  directives: {
-    tooltip,
-  },
   components: {
     CurrentDayIndicator,
+    Icon,
+    GlPopover,
+    GlProgressBar,
   },
   mixins: [CommonMixin, QuartersPresetMixin, MonthsPresetMixin, WeeksPresetMixin],
   props: {
@@ -35,6 +44,11 @@ export default {
     epic: {
       type: Object,
       required: true,
+    },
+    clientWidth: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   computed: {
@@ -60,6 +74,27 @@ export default {
         time: endDate.getTime(),
       };
     },
+    /**
+     * In case Epic start date is out of range
+     * we need to use original date instead of proxy date
+     */
+    startDate() {
+      if (this.epic.startDateOutOfRange) {
+        return this.epic.originalStartDate;
+      }
+
+      return this.epic.startDate;
+    },
+    /**
+     * In case Epic end date is out of range
+     * we need to use original date instead of proxy date
+     */
+    endDate() {
+      if (this.epic.endDateOutOfRange) {
+        return this.epic.originalEndDate;
+      }
+      return this.epic.endDate;
+    },
     hasStartDate() {
       if (this.presetTypeQuarters) {
         return this.hasStartDateForQuarter();
@@ -70,30 +105,60 @@ export default {
       }
       return false;
     },
-    timelineBarStyles() {
-      let barStyles = {};
-
+    timelineBarInnerStyle() {
+      return {
+        maxWidth: `${this.clientWidth - EPIC_DETAILS_CELL_WIDTH}px`,
+      };
+    },
+    timelineBarWidth() {
       if (this.hasStartDate) {
-        if (this.presetTypeQuarters) {
-          // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForQuarters(
-            this.epic,
-          )}px; ${this.getTimelineBarStartOffsetForQuarters(this.epic)}`;
-        } else if (this.presetTypeMonths) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths(
-            this.epic,
-          )}`;
-        } else if (this.presetTypeWeeks) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks(
-            this.epic,
-          )}`;
+        if (this.presetType === PRESET_TYPES.QUARTERS) {
+          return this.getTimelineBarWidthForQuarters(this.epic);
+        } else if (this.presetType === PRESET_TYPES.MONTHS) {
+          return this.getTimelineBarWidthForMonths();
+        } else if (this.presetType === PRESET_TYPES.WEEKS) {
+          return this.getTimelineBarWidthForWeeks();
         }
       }
-      return barStyles;
+      return Infinity;
     },
+    isTimelineBarSmall() {
+      return this.timelineBarWidth < SMALL_TIMELINE_BAR;
+    },
+    timelineBarTitle() {
+      return this.isTimelineBarSmall ? '...' : this.epic.title;
+    },
+    epicTotalWeight() {
+      if (this.epic.descendantWeightSum) {
+        const { openedIssues, closedIssues } = this.epic.descendantWeightSum;
+        return openedIssues + closedIssues;
+      }
+      return undefined;
+    },
+    epicWeightPercentage() {
+      return this.epicTotalWeight
+        ? Math.round(
+            (this.epic.descendantWeightSum.closedIssues / this.epicTotalWeight) * PERCENTAGE,
+          )
+        : 0;
+    },
+    epicWeightPercentageText() {
+      return sprintf(__(`%{percentage}%% weight completed`), {
+        percentage: this.epicWeightPercentage,
+      });
+    },
+    popoverWeightText() {
+      if (this.epic.descendantWeightSum) {
+        return sprintf(__('%{completedWeight} of %{totalWeight} weight completed'), {
+          completedWeight: this.epic.descendantWeightSum.closedIssues,
+          totalWeight: this.epicTotalWeight,
+        });
+      }
+      return __('- of - weight completed');
+    },
+  },
+  methods: {
+    generateKey,
   },
 };
 </script>
@@ -101,17 +166,40 @@ export default {
 <template>
   <span class="epic-timeline-cell" data-qa-selector="epic_timeline_cell">
     <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
-    <div class="timeline-bar-wrapper">
+    <div class="epic-bar-wrapper">
       <a
         v-if="hasStartDate"
+        :id="generateKey(epic)"
         :href="epic.webUrl"
-        :class="{
-          'start-date-undefined': epic.startDateUndefined,
-          'end-date-undefined': epic.endDateUndefined,
-        }"
-        :style="timelineBarStyles"
-        class="timeline-bar"
-      ></a>
+        :style="timelineBarStyles(epic)"
+        :class="{ 'epic-bar-child-epic': epic.isChildEpic }"
+        class="epic-bar rounded"
+      >
+        <div class="epic-bar-inner px-2 py-1" :style="timelineBarInnerStyle">
+          <p class="epic-bar-title text-nowrap text-truncate m-0">{{ timelineBarTitle }}</p>
+
+          <div v-if="!isTimelineBarSmall" class="d-flex align-items-center">
+            <gl-progress-bar
+              class="epic-bar-progress flex-grow-1 mr-1"
+              :value="epicWeightPercentage"
+              aria-hidden="true"
+            />
+            <div class="gl-font-size-small d-flex align-items-center text-nowrap">
+              <icon class="append-right-2" :size="12" name="weight" />
+              <p class="m-0" :aria-label="epicWeightPercentageText">{{ epicWeightPercentage }}%</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <gl-popover
+        :target="generateKey(epic)"
+        :title="epic.title"
+        triggers="hover"
+        placement="lefttop"
+      >
+        <p class="text-secondary m-0">{{ timeframeString(epic) }}</p>
+        <p class="m-0">{{ popoverWeightText }}</p>
+      </gl-popover>
     </div>
   </span>
 </template>

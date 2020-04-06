@@ -28,9 +28,9 @@ module Users
         end
       end
 
-      unless identity_params.empty?
-        user.identities.build(identity_params)
-      end
+      build_identity(user)
+
+      Users::UpdateCanonicalEmailService.new(user: user).execute
 
       user
     end
@@ -39,6 +39,12 @@ module Users
 
     def identity_attributes
       [:extern_uid, :provider]
+    end
+
+    def build_identity(user)
+      return if identity_params.empty?
+
+      user.identities.build(identity_params)
     end
 
     def can_create_user?

@@ -4,8 +4,7 @@ type: reference, howto
 
 # Static Application Security Testing (SAST) **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3775)
-in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3775) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.3.
 
 NOTE: **4 of the top 6 attacks were application based.**
 Download our whitepaper,
@@ -17,15 +16,16 @@ to learn how to protect your organization.
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your source code for known
 vulnerabilities using Static Application Security Testing (SAST).
 
-You can take advantage of SAST by either [including the CI job](#configuration) in
-your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
-that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
+You can take advantage of SAST by doing one of the following:
+
+- [Including the CI job](#configuration) in your existing `.gitlab-ci.yml` file.
+- Implicitly using [Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate) provided by
+  [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the SAST report, compares the found vulnerabilities between the
 source and target branches, and shows the information right on the merge request.
 
-![SAST Widget](img/sast.png)
+![SAST Widget](img/sast_v12_9.png)
 
 The results are sorted by the priority of the vulnerability:
 
@@ -89,14 +89,20 @@ The Java analyzers can also be used for variants like the
 [Gradle wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html),
 [Grails](https://grails.org/) and the [Maven wrapper](https://github.com/takari/maven-wrapper).
 
+## Contribute your scanner
+
+The [Security Scanner Integration](../../../development/integrations/secure.md) documentation explains how to integrate other security scanners into GitLab.
+
 ## Configuration
 
-For GitLab 11.9 and later, to enable SAST, you must
-[include](../../../ci/yaml/README.md#includetemplate) the
-[`SAST.gitlab-ci.yml` template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml)
-that's provided as a part of your GitLab installation.
-For GitLab versions earlier than 11.9, you can copy and use the job as defined
-that template.
+NOTE: **Note:**
+You don't have to configure SAST manually as shown in this section if you're using [Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
+provided by [Auto DevOps](../../../topics/autodevops/index.md).
+
+For GitLab 11.9 and later, to enable SAST you must [include](../../../ci/yaml/README.md#includetemplate)
+the [`SAST.gitlab-ci.yml` template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml)
+that is provided as a part of your GitLab installation. For GitLab versions earlier than 11.9, you
+can copy and use the job as defined that template.
 
 Add the following to your `.gitlab-ci.yml` file:
 
@@ -160,18 +166,10 @@ it via [custom environment variables](#custom-environment-variables).
 
 #### Using a variable to pass username and password to a private Maven repository
 
-If you have a private Apache Maven repository that requires login credentials,
-you can use the `MAVEN_CLI_OPTS` [environment variable](#available-variables)
-to pass a username and password. You can set it under your project's settings
-so that your credentials aren't exposed in `.gitlab-ci.yml`.
+If you have a private Maven repository which requires login credentials,
+you can use the `MAVEN_CLI_OPTS` environment variable.
 
-If the username is `myuser` and the password is `verysecret` then you would
-[set the following variable](../../../ci/variables/README.md#via-the-ui)
-under your project's settings:
-
-| Type | Key | Value |
-| ---- | --- | ----- |
-| Variable | `MAVEN_CLI_OPTS` | `-Drepository.password=verysecret -Drepository.user=myuser` |
+Read more on [how to use private Maven repos](../index.md#using-private-maven-repos).
 
 ### Disabling Docker in Docker for SAST
 
@@ -187,6 +185,15 @@ variables:
 ```
 
 This will create individual `<analyzer-name>-sast` jobs for each analyzer that runs in your CI/CD pipeline.
+
+By removing Docker-in-Docker (DIND), GitLab relies on [Linguist](https://github.com/github/linguist)
+to start relevant analyzers depending on the detected repository language(s) instead of the
+[orchestrator](https://gitlab.com/gitlab-org/security-products/dependency-scanning/). However, there
+are some differences in the way repository languages are detected between DIND and non-DIND. You can
+observe these differences by checking both Linguist and the common library. For instance, Linguist
+looks for `*.java` files to spin up the [spotbugs](https://gitlab.com/gitlab-org/security-products/analyzers/spotbugs)
+image, while orchestrator only looks for the existence of `pom.xml`, `build.xml`, `gradlew`,
+`grailsw`, or `mvnw`.
 
 #### Enabling kubesec analyzer
 
@@ -260,6 +267,11 @@ See [Analyzer settings](#analyzer-settings) for the complete list of available o
 ### Available variables
 
 SAST can be [configured](#customizing-the-sast-settings) using environment variables.
+
+#### Custom Certificate Authority
+
+To trust a custom Certificate Authority, set the `ADDITIONAL_CA_CERT_BUNDLE` variable to the bundle
+of CA certs that you want to trust within the SAST environment.
 
 #### Docker images
 
@@ -413,6 +425,9 @@ it highlighted:
 }
 ```
 
+CAUTION: **Deprecation:**
+Beginning with GitLab 12.9, SAST no longer reports `undefined` severity and confidence levels.
+
 Here is the description of the report file structure nodes and their meaning. All fields are mandatory in
 the report JSON unless stated otherwise. Presence of optional fields depends on the underlying analyzers being used.
 
@@ -445,8 +460,9 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 
 ## Secret detection
 
-GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the repository.
-For example, an API key that allows write access to third-party deployment environments.
+GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the
+repository (for example, an API key that allows write access to third-party deployment
+environments).
 
 This check is performed by a specific analyzer during the `sast` job. It runs regardless of the programming
 language of your app, and you don't need to change anything to your
@@ -475,6 +491,79 @@ Once a vulnerability is found, you can interact with it. Read more on how to
 
 For more information about the vulnerabilities database update, check the
 [maintenance table](../index.md#maintenance-and-update-of-the-vulnerabilities-database).
+
+## GitLab SAST in an offline environment
+
+For self-managed GitLab instances in an environment with limited, restricted, or intermittent access
+to external resources through the internet, some adjustments are required for the SAST job to
+successfully run.
+
+### Requirements for offline SAST
+
+To use SAST in an offline environment, you need:
+
+- GitLab Runner with the [`docker` or `kubernetes` executor](#requirements).
+- Docker Container Registry with locally available copies of SAST [analyzer](https://gitlab.com/gitlab-org/security-products/analyzers) images.
+
+NOTE: **Note:**
+GitLab Runner has a [default `pull policy` of `always`](https://docs.gitlab.com/runner/executors/docker.html#using-the-always-pull-policy),
+meaning the runner will try to pull Docker images from the GitLab container registry even if a local
+copy is available. GitLab Runner's [`pull_policy` can be set to `if-not-present`](https://docs.gitlab.com/runner/executors/docker.html#using-the-if-not-present-pull-policy)
+in an offline environment if you prefer using only locally available Docker images. However, we
+recommend keeping the pull policy setting to `always` as it will better enable updated scanners to
+be utilized within your CI/CD pipelines.
+
+### Make GitLab SAST analyzer images available inside your Docker registry
+
+For SAST with all [supported languages and frameworks](#supported-languages-and-frameworks),
+import the following default SAST analyzer images from `registry.gitlab.com` to your local "offline"
+registry:
+
+```plaintext
+registry.gitlab.com/gitlab-org/security-products/analyzers/bandit:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/brakeman:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/eslint:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/flawfinder:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/go-ast-scanner:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/gosec:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/kubesec:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/nodejs-scan:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/phpcs-security-audit:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/pmd-apex:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/security-code-scan:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/sobelow:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/spotbugs:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/tslint:2
+```
+
+The process for importing Docker images into a local offline Docker registry depends on
+**your network security policy**. Please consult your IT staff to find an accepted and approved
+process by which external resources can be imported or temporarily accessed. Note that these scanners are [updated periodically](../index.md#maintenance-and-update-of-the-vulnerabilities-database)
+with new definitions, so consider if you are able to make periodic updates yourself.
+
+For details on saving and transporting Docker images as a file, see Docker's documentation on
+[`docker save`](https://docs.docker.com/engine/reference/commandline/save/), [`docker load`](https://docs.docker.com/engine/reference/commandline/load/),
+[`docker export`](https://docs.docker.com/engine/reference/commandline/export/), and [`docker import`](https://docs.docker.com/engine/reference/commandline/import/).
+
+### Set SAST CI job variables to use local SAST analyzers
+
+[Override SAST environment variables](#customizing-the-sast-settings) to use to your [local container registry](./analyzers.md#using-a-custom-docker-mirror)
+as the source for SAST analyzer images.
+
+For example, assuming a local Docker registry repository of `localhost:5000/analyzers`:
+
+  ```yaml
+include:
+  - template: SAST.gitlab-ci.yml
+
+variables:
+  SAST_ANALYZER_IMAGE_PREFIX: "localhost:5000/analyzers"
+  SAST_DISABLE_DIND: "true"
+  ```
+
+The SAST job should now use local copies of the SAST analyzers to scan your code and generate
+security reports without requiring internet access.
 
 ## Troubleshooting
 

@@ -1,7 +1,6 @@
 # Group badges API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17082)
-in GitLab 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17082) in GitLab 10.6.
 
 ## Placeholder tokens
 
@@ -10,7 +9,7 @@ Badges support placeholders that will be replaced in real time in both the link 
 - **%{project_path}**: will be replaced by the project path.
 - **%{project_id}**: will be replaced by the project id.
 - **%{default_branch}**: will be replaced by the project default branch.
-- **%{commit_sha}**: will be replaced by the last project's commit sha.
+- **%{commit_sha}**: will be replaced by the last project's commit SHA.
 
 Because these endpoints aren't inside a project's context, the information used to replace the placeholders will be
 from the first group's project by creation date. If the group hasn't got any project the original URL with the placeholders will be returned.

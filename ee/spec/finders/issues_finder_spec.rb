@@ -87,7 +87,7 @@ describe IssuesFinder do
         let_it_be(:issue_subepic) { create(:issue, project: project1, epic: sub_epic) }
 
         context 'filter issues with no epic' do
-          let(:params) { { epic_id: ::IssuesFinder::FILTER_NONE } }
+          let(:params) { { epic_id: ::IssuableFinder::Params::FILTER_NONE } }
 
           it 'returns filtered issues' do
             expect(issues).to contain_exactly(issue1, issue2, issue3, issue4)

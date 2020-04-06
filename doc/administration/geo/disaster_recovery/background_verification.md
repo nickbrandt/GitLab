@@ -17,8 +17,8 @@ You can restore it from backup or remove it from the **primary** node to resolve
 If verification succeeds on the **primary** node but fails on the **secondary** node,
 this indicates that the object was corrupted during the replication process.
 Geo actively try to correct verification failures marking the repository to
-be resynced with a backoff period. If you want to reset the verification for
-these failures, so you should follow [these instructions][reset-verification].
+be resynced with a back-off period. If you want to reset the verification for
+these failures, so you should follow [these instructions](background_verification.md#reset-verification-for-projects-where-verification-has-failed).
 
 If verification is lagging significantly behind replication, consider giving
 the node more time before scheduling a planned failover.
@@ -114,9 +114,9 @@ Feature.enable('geo_repository_reverification')
 ## Reset verification for projects where verification has failed
 
 Geo actively try to correct verification failures marking the repository to
-be resynced with a backoff period. If you want to reset them manually, this
-rake task marks projects where verification has failed or the checksum mismatch
-to be resynced without the backoff period:
+be resynced with a back-off period. If you want to reset them manually, this
+Rake task marks projects where verification has failed or the checksum mismatch
+to be resynced without the back-off period:
 
 For repositories:
 
@@ -172,8 +172,10 @@ If the **primary** and **secondary** nodes have a checksum verification mismatch
 
 Automatic background verification doesn't cover attachments, LFS objects,
 job artifacts, and user uploads in file storage. You can keep track of the
-progress to include them in [ee-1430]. For now, you can verify their integrity
-manually by following [these instructions][foreground-verification] on both
+progress to include them in [Geo: Verify all replicated data](https://gitlab.com/groups/gitlab-org/-/epics/1430).
+
+For now, you can verify their integrity
+manually by following [these instructions](../../raketasks/check.md) on both
 nodes, and comparing the output between them.
 
 In GitLab EE 12.1, Geo calculates checksums for attachments, LFS objects, and
@@ -184,7 +186,3 @@ been synced before GitLab EE 12.1.
 
 Data in object storage is **not verified**, as the object store is responsible
 for ensuring the integrity of the data.
-
-[reset-verification]: background_verification.md#reset-verification-for-projects-where-verification-has-failed
-[foreground-verification]: ../../raketasks/check.md
-[ee-1430]: https://gitlab.com/groups/gitlab-org/-/epics/1430

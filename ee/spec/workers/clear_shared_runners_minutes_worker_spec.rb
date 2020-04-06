@@ -9,8 +9,9 @@ describe ClearSharedRunnersMinutesWorker do
     let(:namespace) { create(:namespace) }
 
     before do
-      expect_any_instance_of(described_class)
-        .to receive(:try_obtain_lease).and_return(true)
+      expect_next_instance_of(described_class) do |instance|
+        expect(instance).to receive(:try_obtain_lease).and_return(true)
+      end
     end
 
     subject { worker.perform }

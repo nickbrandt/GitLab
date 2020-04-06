@@ -1,8 +1,9 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { __ } from '~/locale';
+import createFlash from '~/flash';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlLoadingIcon,
   GlLink,
   GlBadge,
@@ -17,6 +18,8 @@ import {
   severityLevelVariant,
   errorStatus,
 } from '~/error_tracking/components/constants';
+
+jest.mock('~/flash');
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -35,7 +38,7 @@ describe('ErrorDetails', () => {
 
   function mountComponent() {
     wrapper = shallowMount(ErrorDetails, {
-      stubs: { GlButton, GlSprintf },
+      stubs: { GlDeprecatedButton, GlSprintf },
       localVue,
       store,
       mocks,
@@ -47,18 +50,6 @@ describe('ErrorDetails', () => {
         issueStackTracePath: '/stacktrace',
         projectIssuesPath: '/test-project/issues/',
         csrfToken: 'fakeToken',
-      },
-    });
-    wrapper.setData({
-      error: {
-        id: 'gid://gitlab/Gitlab::ErrorTracking::DetailedError/129381',
-        sentryId: 129381,
-        title: 'Issue title',
-        externalUrl: 'http://sentry.gitlab.net/gitlab',
-        firstSeen: '2017-05-26T13:32:48Z',
-        lastSeen: '2018-05-26T13:32:48Z',
-        count: 12,
-        userCount: 2,
       },
     });
   }
@@ -78,6 +69,7 @@ describe('ErrorDetails', () => {
     const state = {
       stacktraceData: {},
       loadingStacktrace: true,
+      errorStatus: '',
     };
 
     store = new Vuex.Store({
@@ -99,6 +91,7 @@ describe('ErrorDetails', () => {
           error: {
             loading: true,
             stopPolling: jest.fn(),
+            setOptions: jest.fn(),
           },
         },
       },
@@ -123,10 +116,61 @@ describe('ErrorDetails', () => {
     });
   });
 
+  describe('sentry response timeout', () => {
+    const initTime = 300000;
+    const endTime = initTime + 10000;
+
+    beforeEach(() => {
+      mocks.$apollo.queries.error.loading = false;
+      jest.spyOn(Date, 'now').mockReturnValue(initTime);
+      mountComponent();
+    });
+
+    it('when before timeout, still shows loading', () => {
+      Date.now.mockReturnValue(endTime - 1);
+
+      wrapper.vm.onNoApolloResult();
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+        expect(createFlash).not.toHaveBeenCalled();
+        expect(mocks.$apollo.queries.error.stopPolling).not.toHaveBeenCalled();
+      });
+    });
+
+    it('when timeout is hit and no apollo result, stops loading and shows flash', () => {
+      Date.now.mockReturnValue(endTime + 1);
+
+      wrapper.vm.onNoApolloResult();
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
+        expect(wrapper.find(GlLink).exists()).toBe(false);
+        expect(createFlash).toHaveBeenCalledWith(
+          'Could not connect to Sentry. Refresh the page to try again.',
+          'warning',
+        );
+        expect(mocks.$apollo.queries.error.stopPolling).toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('Error details', () => {
     beforeEach(() => {
       mocks.$apollo.queries.error.loading = false;
       mountComponent();
+      wrapper.setData({
+        error: {
+          id: 'gid://gitlab/Gitlab::ErrorTracking::DetailedError/129381',
+          sentryId: 129381,
+          title: 'Issue title',
+          externalUrl: 'http://sentry.gitlab.net/gitlab',
+          firstSeen: '2017-05-26T13:32:48Z',
+          lastSeen: '2018-05-26T13:32:48Z',
+          count: 12,
+          userCount: 2,
+        },
+      });
     });
 
     it('should show Sentry error details without stacktrace', () => {
@@ -134,7 +178,29 @@ describe('ErrorDetails', () => {
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
       expect(wrapper.find(Stacktrace).exists()).toBe(false);
       expect(wrapper.find(GlBadge).exists()).toBe(false);
-      expect(wrapper.findAll(GlButton).length).toBe(3);
+      expect(wrapper.findAll(GlDeprecatedButton).length).toBe(3);
+    });
+
+    describe('unsafe chars for culprit field', () => {
+      const findReportedText = () => wrapper.find('[data-qa-selector="reported_text"]');
+      const culprit = '<script>console.log("surprise!")</script>';
+      beforeEach(() => {
+        store.state.details.loadingStacktrace = false;
+        wrapper.setData({
+          error: {
+            culprit,
+          },
+        });
+      });
+
+      it('should not convert interpolated text to html entities', () => {
+        expect(findReportedText().findAll('script').length).toEqual(0);
+        expect(findReportedText().findAll('strong').length).toEqual(1);
+      });
+
+      it('should render text instead of converting to html entities', () => {
+        expect(findReportedText().text()).toContain(culprit);
+      });
     });
 
     describe('Badges', () => {
@@ -210,10 +276,6 @@ describe('ErrorDetails', () => {
     });
 
     describe('When a user clicks the create issue button', () => {
-      beforeEach(() => {
-        mountComponent();
-      });
-
       it('should send sentry_issue_identifier', () => {
         const sentryErrorIdInput = findInput(
           'issue[sentry_issue_attributes][sentry_issue_identifier]',
@@ -253,7 +315,8 @@ describe('ErrorDetails', () => {
       describe('when error is unresolved', () => {
         beforeEach(() => {
           store.state.details.errorStatus = errorStatus.UNRESOLVED;
-          mountComponent();
+
+          return wrapper.vm.$nextTick();
         });
 
         it('displays Ignore and Resolve buttons', () => {
@@ -279,7 +342,8 @@ describe('ErrorDetails', () => {
       describe('when error is ignored', () => {
         beforeEach(() => {
           store.state.details.errorStatus = errorStatus.IGNORED;
-          mountComponent();
+
+          return wrapper.vm.$nextTick();
         });
 
         it('displays Undo Ignore and Resolve buttons', () => {
@@ -305,7 +369,8 @@ describe('ErrorDetails', () => {
       describe('when error is resolved', () => {
         beforeEach(() => {
           store.state.details.errorStatus = errorStatus.RESOLVED;
-          mountComponent();
+
+          return wrapper.vm.$nextTick();
         });
 
         it('displays Ignore and Unresolve buttons', () => {

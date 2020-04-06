@@ -21,6 +21,12 @@ and in [PDF](https://gitlab.com/gitlab-org/create-stage/uploads/8e78ea7f326b2ef6
 Everything covered in this deep dive was accurate as of GitLab 11.9, and while specific
 details may have changed since then, it should still serve as a good introduction.
 
+## GraphiQL
+
+GraphiQL is an interactive GraphQL API explorer where you can play around with existing queries.
+You can access it in any GitLab environment on `https://<your-gitlab-site.com>/-/graphql-explorer`.
+For example, the one for [GitLab.com](https://gitlab.com/-/graphql-explorer).
+
 ## Authentication
 
 Authentication happens through the `GraphqlController`, right now this
@@ -39,8 +45,8 @@ For example, `app/graphql/types/issue_type.rb`:
 ```ruby
 graphql_name 'Issue'
 
-field :iid, GraphQL::ID_TYPE, null: false
-field :title, GraphQL::STRING_TYPE, null: false
+field :iid, GraphQL::ID_TYPE, null: true
+field :title, GraphQL::STRING_TYPE, null: true
 
 # we also have a method here that we've defined, that extends `field`
 markdown_field :title_html, null: true
@@ -123,7 +129,7 @@ pagination models.
 
 To expose a collection of resources we can use a connection type. This wraps the array with default pagination fields. For example a query for project-pipelines could look like this:
 
-```
+```graphql
 query($project_path: ID!) {
   project(fullPath: $project_path) {
     pipelines(first: 2) {
@@ -181,7 +187,7 @@ look like this:
 To get the next page, the cursor of the last known element could be
 passed:
 
-```
+```graphql
 query($project_path: ID!) {
   project(fullPath: $project_path) {
     pipelines(first: 2, after: "Njc=") {
@@ -252,30 +258,123 @@ end
 
 ## Feature flags
 
-Features controlled by feature flags often provide GraphQL functionality. When a feature
-is enabled or disabled by a feature flag, the related GraphQL functionality should also
-be enabled or disabled.
+Developers can add [feature flags](../development/feature_flags/index.md) to GraphQL
+fields in the following ways:
 
-Fields can be put behind a feature flag so they can conditionally return the value for
-the field depending on if the feature has been enabled or not.
+- Add the `feature_flag` property to a field. This will allow the field to be _hidden_
+  from the GraphQL schema when the flag is disabled.
+- Toggle the return value when resolving the field.
 
-GraphQL feature flags use the common
-[GitLab feature flag](../development/feature_flags.md) system, and can be added to a
-field using the `feature_flag` property.
+You can refer to these guidelines to decide which approach to use:
 
-For example:
+- If your field is experimental, and its name or type is subject to
+  change, use the `feature_flag` property.
+- If your field is stable and its definition will not change, even after the flag is
+  removed, toggle the return value of the field instead. Note that
+  [all fields should be nullable](#nullable-fields) anyway.
+
+### `feature_flag` property
+
+The `feature_flag` property allows you to toggle the field's
+[visibility](https://graphql-ruby.org/authorization/visibility.html)
+within the GraphQL schema. This will remove the field from the schema
+when the flag is disabled.
+
+A description is [appended](https://gitlab.com/gitlab-org/gitlab/-/blob/497b556/app/graphql/types/base_field.rb#L44-53)
+to the field indicating that it is behind a feature flag.
+
+CAUTION: **Caution:**
+If a client queries for the field when the feature flag is disabled, the query will
+fail. Consider this when toggling the visibility of the feature on or off on
+production.
+
+The `feature_flag` property does not allow the use of
+[feature gates based on actors](../development/feature_flags/development.md).
+This means that the feature flag cannot be toggled only for particular
+projects, groups, or users, but instead can only be toggled globally for
+everyone.
+
+Example:
 
 ```ruby
 field :test_field, type: GraphQL::STRING_TYPE,
-      null: false,
+      null: true,
       description: 'Some test field',
-      feature_flag: :some_feature_flag
+      feature_flag: :my_feature_flag
 ```
 
-In the above example, the `test_field` field will only be returned if
-the `some_feature_flag` feature flag is enabled.
+### Toggle the value of a field
 
-If the feature flag is not enabled, an error will be returned saying the field does not exist.
+This method of using feature flags for fields is to toggle the
+return value of the field. This can be done in the resolver, in the
+type, or even in a model method, depending on your preference and
+situation.
+
+When applying a feature flag to toggle the value of a field, the
+`description` of the field must:
+
+- State that the value of the field can be toggled by a feature flag.
+- Name the feature flag.
+- State what the field will return when the feature flag is disabled (or
+  enabled, if more appropriate).
+
+Example:
+
+```ruby
+field :foo, GraphQL::STRING_TYPE,
+      null: true,
+      description: 'Some test field. Will always return `null`' \
+                   'if `my_feature_flag` feature flag is disabled'
+
+def foo
+  object.foo unless Feature.enabled?(:my_feature_flag, object)
+end
+```
+
+## Deprecating fields
+
+GitLab's GraphQL API is versionless, which means we maintain backwards
+compatibility with older versions of the API with every change. Rather
+than removing a field, we need to _deprecate_ the field instead. In
+future, GitLab
+[may remove deprecated fields](https://gitlab.com/gitlab-org/gitlab/issues/32292).
+
+Fields are deprecated using the `deprecated` property. The value
+of the property is a `Hash` of:
+
+- `reason` - Reason for the deprecation.
+- `milestone` - Milestone that the field was deprecated.
+
+Example:
+
+```ruby
+field :token, GraphQL::STRING_TYPE, null: true,
+      deprecated: { reason: 'Login via token has been removed', milestone: '10.0' },
+      description: 'Token for login'
+```
+
+The original `description:` of the field should be maintained, and should
+_not_ be updated to mention the deprecation.
+
+### Deprecation reason styleguide
+
+Where the reason for deprecation is due to the field being replaced
+with another field, the `reason` must be:
+
+```plaintext
+Use `otherFieldName`
+```
+
+Example:
+
+```ruby
+field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
+      deprecated: { reason: 'Use `designCollection`', milestone: '10.0' },
+      description: 'The designs associated with this issue',
+```
+
+If the field is not being replaced by another field, a descriptive
+deprecation `reason` should be given.
 
 ## Enums
 
@@ -319,7 +418,6 @@ module Types
     value 'CLOSED', value: 'closed', description: 'An closed Epic'
   end
 end
-
 ```
 
 ## Descriptions
@@ -336,7 +434,7 @@ field :id, GraphQL::ID_TYPE, description: 'ID of the resource'
 
 Descriptions of fields and arguments are viewable to users through:
 
-- The [GraphiQL explorer](../api/graphql/#graphiql).
+- The [GraphiQL explorer](#graphiql).
 - The [static GraphQL API reference](../api/graphql/#reference).
 
 ### Description styleguide
@@ -487,7 +585,7 @@ Arguments can be defined within the resolver, those arguments will be
 made available to the fields using the resolver. When exposing a model
 that had an internal ID (`iid`), prefer using that in combination with
 the namespace path as arguments in a resolver over a database
-ID. Othewise use a [globally unique ID](#exposing-global-ids).
+ID. Otherwise use a [globally unique ID](#exposing-global-ids).
 
 We already have a `FullPathLoader` that can be included in other
 resolvers to quickly find Projects and Namespaces which will have a
@@ -637,6 +735,37 @@ found, we should raise a
 `Gitlab::Graphql::Errors::ResourceNotAvailable` error. Which will be
 correctly rendered to the clients.
 
+## Validating arguments
+
+For validations of single arguments, use the
+[`prepare` option](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/fields/arguments.md)
+as normal.
+
+Sometimes a mutation or resolver may accept a number of optional
+arguments, but still want to validate that at least one of the optional
+arguments were given. In this situation, consider using the `#ready?`
+method within your mutation or resolver to provide the validation. The
+`#ready?` method will be called before any work is done within the
+`#resolve` method.
+
+Example:
+
+```ruby
+def ready?(**args)
+  if args.values_at(:body, :position).compact.blank?
+    raise Gitlab::Graphql::Errors::ArgumentError,
+          'body or position arguments are required'
+  end
+
+  # Always remember to call `#super`
+  super(args)
+end
+```
+
+In the future this may be able to be done using `InputUnions` if
+[this RFC](https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md)
+is merged.
+
 ## GitLab's custom scalars
 
 ### `Types::TimeType`
@@ -660,7 +789,7 @@ and handles time inputs.
 Example:
 
 ```ruby
-field :created_at, Types::TimeType, null: false, description: 'Timestamp of when the issue was created'
+field :created_at, Types::TimeType, null: true, description: 'Timestamp of when the issue was created'
 ```
 
 ## Testing
@@ -681,7 +810,7 @@ a hash with the input for the mutation. This will return a struct with
 a mutation query, and prepared variables.
 
 This struct can then be passed to the `post_graphql_mutation` helper,
-that will post the request with the correct params, like a GraphQL
+that will post the request with the correct parameters, like a GraphQL
 client would do.
 
 To access the response of a mutation, the `graphql_mutation_response`
@@ -717,16 +846,20 @@ that wraps around a query being executed. It is implemented as a module that use
 Example: `Present`
 
 ```ruby
-module Present
-  #... some code above...
+module Gitlab
+  module Graphql
+    module Present
+      #... some code above...
 
-  def self.use(schema_definition)
-    schema_definition.instrument(:field, Instrumentation.new)
+      def self.use(schema_definition)
+        schema_definition.instrument(:field, ::Gitlab::Graphql::Present::Instrumentation.new)
+      end
+    end
   end
 end
 ```
 
-A [Query Analyzer](https://graphql-ruby.org/queries/analysis.html#analyzer-api) contains a series
+A [Query Analyzer](https://graphql-ruby.org/queries/ast_analysis.html#analyzer-api) contains a series
 of callbacks to validate queries before they are executed. Each field can pass through
 the analyzer, and the final value is also available to you.
 

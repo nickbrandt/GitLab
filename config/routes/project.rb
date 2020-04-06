@@ -68,19 +68,25 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :settings do
-          get :members, to: redirect("%{namespace_id}/%{project_id}/project_members")
+          get :members, to: redirect("%{namespace_id}/%{project_id}/-/project_members")
 
           resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
             post :reset_cache
             put :reset_registration_token
+            post :create_deploy_token, path: 'deploy_token/create'
           end
 
-          resource :operations, only: [:show, :update]
+          resource :operations, only: [:show, :update] do
+            member do
+              post :reset_alerting_token
+            end
+          end
+
           resource :integrations, only: [:show]
 
           resource :repository, only: [:show], controller: :repository do
-            # TODO: Move 'create_deploy_token' here to the ':ci_cd' resource above during 12.9.
-            # More details here: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24102#note_287572556
+            # TODO: Removed this "create_deploy_token" route after change was made in app/helpers/ci_variables_helper.rb:14
+            # See MR comment for more detail: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27059#note_311585356
             post :create_deploy_token, path: 'deploy_token/create', to: 'ci_cd#create_deploy_token'
             post :cleanup
           end
@@ -170,7 +176,17 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :releases, only: [:index, :show, :edit], param: :tag, constraints: { tag: %r{[^/]+} } do
           member do
-            get :evidence
+            get :downloads, path: 'downloads/*filepath', format: false
+            scope module: :releases do
+              resources :evidences, only: [:show]
+            end
+          end
+        end
+
+        resources :logs, only: [:index] do
+          collection do
+            get :k8s
+            get :elasticsearch
           end
         end
 
@@ -287,6 +303,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         draw :repository_scoped
         draw :repository
         draw :wiki
+
+        namespace :import do
+          resource :jira, only: [:show], controller: :jira do
+            post :import
+          end
+        end
       end
       # End of the /-/ scope.
 
@@ -325,6 +347,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       namespace :prometheus do
+        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
+          post :notify, on: :collection
+          member do
+            get :metrics_dashboard
+          end
+        end
+
         resources :metrics, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy] do
           get :active_common, on: :collection
         end

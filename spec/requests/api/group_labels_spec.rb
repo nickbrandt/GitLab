@@ -98,7 +98,7 @@ describe API::GroupLabels do
              color: '#FFAABB'
            }
 
-      expect(response.status).to eq(201)
+      expect(response).to have_gitlab_http_status(:created)
       expect(json_response['name']).to eq('Foo & Bar')
       expect(json_response['color']).to eq('#FFAABB')
       expect(json_response['description']).to be_nil
@@ -334,7 +334,7 @@ describe API::GroupLabels do
 
     context 'when label ID is not found' do
       it 'returns 404 error' do
-        post api("/groups/#{group.id}/labels/1234/subscribe", user)
+        post api("/groups/#{group.id}/labels/#{non_existing_record_id}/subscribe", user)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -380,7 +380,7 @@ describe API::GroupLabels do
 
     context 'when label ID is not found' do
       it 'returns 404 error' do
-        post api("/groups/#{group.id}/labels/1234/unsubscribe", user)
+        post api("/groups/#{group.id}/labels/#{non_existing_record_id}/unsubscribe", user)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end

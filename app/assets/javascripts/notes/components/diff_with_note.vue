@@ -1,5 +1,5 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
+/* eslint-disable @gitlab/vue-require-i18n-strings */
 import { mapState, mapActions } from 'vuex';
 import { GlSkeletonLoading } from '@gitlab/ui';
 import DiffFileHeader from '~/diffs/components/diff_file_header.vue';
@@ -48,7 +48,7 @@ export default {
     },
   },
   mounted() {
-    if (!this.hasTruncatedDiffLines) {
+    if (this.isTextFile && !this.hasTruncatedDiffLines) {
       this.fetchDiff();
     }
   },

@@ -5,7 +5,7 @@ blocks of Ruby code. Method instrumentation is the primary form of
 instrumentation with block-based instrumentation only being used when we want to
 drill down to specific regions of code within a method.
 
-Please refer to [Event tracking](event_tracking/index.md) if you are tracking product usage patterns.
+Please refer to [Telemetry](../telemetry/index.md) if you are tracking product usage patterns.
 
 ## Instrumenting Methods
 
@@ -87,7 +87,7 @@ Ruby code. In case of the above snippet you'd run the following:
 
 This will print out something along the lines of:
 
-```
+```plaintext
 From: /path/to/your/gitlab/lib/gitlab/metrics/instrumentation.rb @ line 148:
 Owner: #<Module:0x0055f0865c6d50>
 Visibility: public

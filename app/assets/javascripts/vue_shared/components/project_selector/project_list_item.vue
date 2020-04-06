@@ -1,6 +1,6 @@
 <script>
-import { GlButton } from '@gitlab/ui';
-import _ from 'underscore';
+import { GlDeprecatedButton } from '@gitlab/ui';
+import { isString } from 'lodash';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import highlight from '~/lib/utils/highlight';
@@ -11,13 +11,13 @@ export default {
   components: {
     Icon,
     ProjectAvatar,
-    GlButton,
+    GlDeprecatedButton,
   },
   props: {
     project: {
       type: Object,
       required: true,
-      validator: p => _.isFinite(p.id) && _.isString(p.name) && _.isString(p.name_with_namespace),
+      validator: p => Number.isFinite(p.id) && isString(p.name) && isString(p.name_with_namespace),
     },
     selected: {
       type: Boolean,
@@ -45,7 +45,7 @@ export default {
 };
 </script>
 <template>
-  <gl-button
+  <gl-deprecated-button
     class="d-flex align-items-center btn pt-1 pb-1 border-0 project-list-item"
     @click="onClick"
   >
@@ -70,5 +70,5 @@ export default {
         v-html="highlightedProjectName"
       ></div>
     </div>
-  </gl-button>
+  </gl-deprecated-button>
 </template>

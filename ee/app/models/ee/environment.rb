@@ -7,8 +7,6 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
-      has_many :self_managed_prometheus_alert_events, inverse_of: :environment
-
       # Returns environments where its latest deployment is to a cluster
       scope :deployed_to_cluster, -> (cluster) do
         environments = model.arel_table
@@ -75,10 +73,6 @@ module EE
       result = rollout_status_with_reactive_cache
 
       result || ::Gitlab::Kubernetes::RolloutStatus.loading
-    end
-
-    def elastic_stack_available?
-      !!deployment_platform&.cluster&.application_elastic_stack&.available?
     end
 
     private

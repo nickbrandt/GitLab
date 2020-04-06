@@ -30,6 +30,25 @@ describe('Cycle analytics getters', () => {
     });
   });
 
+  describe('selectedProjectIds', () => {
+    describe('with selectedProjects set', () => {
+      it('returns the ids of each project', () => {
+        state = {
+          selectedProjects,
+        };
+
+        expect(getters.selectedProjectIds(state)).toEqual([1, 2]);
+      });
+    });
+
+    describe('without selectedProjects set', () => {
+      it('will return an empty array', () => {
+        state = { selectedProjects: [] };
+        expect(getters.selectedProjectIds(state)).toEqual([]);
+      });
+    });
+  });
+
   describe('currentGroupPath', () => {
     describe('with selectedGroup set', () => {
       it('returns the `fullPath` value of the group', () => {
@@ -140,6 +159,44 @@ describe('Cycle analytics getters', () => {
 
     it(`'${func}' returns an empty array if there are no stages`, () => {
       expect(getters[func]({ stages: [] })).toEqual([]);
+    });
+  });
+
+  describe('enableCustomOrdering', () => {
+    describe('with no errors saving the stage order', () => {
+      beforeEach(() => {
+        state = {
+          errorSavingStageOrder: false,
+        };
+      });
+
+      it('returns true when stages have numeric IDs', () => {
+        state.stages = [{ id: 1 }, { id: 2 }];
+        expect(getters.enableCustomOrdering(state)).toEqual(true);
+      });
+
+      it('returns false when stages have string based IDs', () => {
+        state.stages = [{ id: 'one' }, { id: 'two' }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
+    });
+
+    describe('with errors saving the stage order', () => {
+      beforeEach(() => {
+        state = {
+          errorSavingStageOrder: true,
+        };
+      });
+
+      it('returns false when stages have numeric IDs', () => {
+        state.stages = [{ id: 1 }, { id: 2 }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
+
+      it('returns false when stages have string based IDs', () => {
+        state.stages = [{ id: 'one' }, { id: 'two' }];
+        expect(getters.enableCustomOrdering(state)).toEqual(false);
+      });
     });
   });
 });

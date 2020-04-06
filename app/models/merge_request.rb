@@ -257,7 +257,9 @@ class MergeRequest < ApplicationRecord
     with_state(:opened).where(auto_merge_enabled: true)
   end
 
-  ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
+  scope :including_metrics, -> do
+    includes(:metrics)
+  end
 
   after_save :keep_around_commit, unless: :importing?
 
@@ -406,8 +408,16 @@ class MergeRequest < ApplicationRecord
     "#{project.to_reference_base(from, full: full)}#{reference}"
   end
 
-  def context_commits
-    @context_commits ||= merge_request_context_commits.map(&:to_commit)
+  def context_commits(limit: nil)
+    @context_commits ||= merge_request_context_commits.limit(limit).map(&:to_commit)
+  end
+
+  def recent_context_commits
+    context_commits(limit: MergeRequestDiff::COMMITS_SAFE_SIZE)
+  end
+
+  def context_commits_count
+    context_commits.count
   end
 
   def commits(limit: nil)
@@ -561,6 +571,10 @@ class MergeRequest < ApplicationRecord
             end
 
     diffs.modified_paths
+  end
+
+  def new_paths
+    diffs.diff_files.map(&:new_path)
   end
 
   def diff_base_commit
@@ -1251,7 +1265,7 @@ class MergeRequest < ApplicationRecord
 
   def all_pipelines
     strong_memoize(:all_pipelines) do
-      MergeRequest::Pipelines.new(self).all
+      Ci::PipelinesForMergeRequestFinder.new(self).all
     end
   end
 
@@ -1276,7 +1290,7 @@ class MergeRequest < ApplicationRecord
       variables.append(key: 'CI_MERGE_REQUEST_PROJECT_URL', value: project.web_url)
       variables.append(key: 'CI_MERGE_REQUEST_TARGET_BRANCH_NAME', value: target_branch.to_s)
       variables.append(key: 'CI_MERGE_REQUEST_TITLE', value: title)
-      variables.append(key: 'CI_MERGE_REQUEST_ASSIGNEES', value: assignee_username_list) if assignees.any?
+      variables.append(key: 'CI_MERGE_REQUEST_ASSIGNEES', value: assignee_username_list) if assignees.present?
       variables.append(key: 'CI_MERGE_REQUEST_MILESTONE', value: milestone.title) if milestone
       variables.append(key: 'CI_MERGE_REQUEST_LABELS', value: label_names.join(',')) if labels.present?
       variables.concat(source_project_variables)
@@ -1289,6 +1303,24 @@ class MergeRequest < ApplicationRecord
     end
 
     compare_reports(Ci::CompareTestReportsService)
+  end
+
+  def has_coverage_reports?
+    return false unless Feature.enabled?(:coverage_report_view, project)
+
+    actual_head_pipeline&.has_reports?(Ci::JobArtifact.coverage_reports)
+  end
+
+  # TODO: this method and compare_test_reports use the same
+  # result type, which is handled by the controller's #reports_response.
+  # we should minimize mistakes by isolating the common parts.
+  # issue: https://gitlab.com/gitlab-org/gitlab/issues/34224
+  def find_coverage_reports
+    unless has_coverage_reports?
+      return { status: :error, status_reason: 'This merge request does not have coverage reports' }
+    end
+
+    compare_reports(Ci::GenerateCoverageReportsService)
   end
 
   def has_exposed_artifacts?
@@ -1314,7 +1346,7 @@ class MergeRequest < ApplicationRecord
   # issue: https://gitlab.com/gitlab-org/gitlab/issues/34224
   def compare_reports(service_class, current_user = nil)
     with_reactive_cache(service_class.name, current_user&.id) do |data|
-      unless service_class.new(project, current_user)
+      unless service_class.new(project, current_user, id: id)
         .latest?(base_pipeline, actual_head_pipeline, data)
         raise InvalidateReactiveCache
       end
@@ -1331,7 +1363,7 @@ class MergeRequest < ApplicationRecord
     raise NameError, service_class unless service_class < Ci::CompareReportsBaseService
 
     current_user = User.find_by(id: current_user_id)
-    service_class.new(project, current_user).execute(base_pipeline, actual_head_pipeline)
+    service_class.new(project, current_user, id: id).execute(base_pipeline, actual_head_pipeline)
   end
 
   def all_commits

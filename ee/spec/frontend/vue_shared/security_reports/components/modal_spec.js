@@ -7,8 +7,15 @@ import { mount, shallowMount } from '@vue/test-utils';
 describe('Security Reports modal', () => {
   let wrapper;
 
-  const mountComponent = (options, mountFn = shallowMount) => {
-    wrapper = mountFn(component, options);
+  const mountComponent = (propsData, mountFn = shallowMount) => {
+    wrapper = mountFn(component, {
+      propsData: {
+        isCreatingIssue: false,
+        isDismissingVulnerability: false,
+        isCreatingMergeRequest: false,
+        ...propsData,
+      },
+    });
   };
 
   describe('with permissions', () => {
@@ -24,7 +31,7 @@ describe('Security Reports modal', () => {
           pipeline: { id: '123', path: '#' },
           created_at: new Date().toString(),
         };
-        mountComponent({ propsData }, mount);
+        mountComponent(propsData, mount);
       });
 
       it('renders dismissal author and associated pipeline', () => {
@@ -48,7 +55,7 @@ describe('Security Reports modal', () => {
           author: { username: 'jsmith', name: 'John Smith' },
           pipeline: { id: '123', path: '#' },
         };
-        mountComponent({ propsData }, mount);
+        mountComponent(propsData, mount);
       });
 
       it('renders dismissal author and hides associated pipeline', () => {
@@ -64,7 +71,7 @@ describe('Security Reports modal', () => {
           modal: createState().modal,
           canDismissVulnerability: true,
         };
-        mountComponent({ propsData }, mount);
+        mountComponent(propsData, mount);
       });
 
       it('allows the vulnerability to be dismissed', () => {
@@ -82,7 +89,7 @@ describe('Security Reports modal', () => {
         const summary = 'Upgrade to 123';
         const diff = 'abc123';
         propsData.modal.vulnerability.remediations = [{ summary, diff }];
-        mountComponent({ propsData }, mount);
+        mountComponent(propsData, mount);
       });
 
       it('renders create merge request and issue button as a split button', () => {
@@ -125,7 +132,7 @@ describe('Security Reports modal', () => {
           vulnerabilityFeedbackHelpPath: 'feedbacksHelpPath',
         };
         propsData.modal.title = 'Arbitrary file existence disclosure in Action Pack';
-        mountComponent({ propsData }, mount);
+        mountComponent(propsData, mount);
       });
 
       it('renders title', () => {
@@ -149,7 +156,7 @@ describe('Security Reports modal', () => {
         };
         propsData.modal.vulnerability.remediations = [{ diff: '123' }];
         propsData.modal.isResolved = true;
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('disallows any actions in the footer', () => {
@@ -168,7 +175,7 @@ describe('Security Reports modal', () => {
       const propsData = {
         modal: createState().modal,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('disallows any actions in the footer', () => {
@@ -191,7 +198,7 @@ describe('Security Reports modal', () => {
         propsData.modal.vulnerability.issue_feedback = {
           issue_url: 'http://issue.url',
         };
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('displays a link to the issue', () => {
@@ -209,7 +216,7 @@ describe('Security Reports modal', () => {
         propsData.modal.vulnerability.issue_feedback = {
           issue_url: null,
         };
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('hides the link to the issue', () => {
@@ -229,7 +236,7 @@ describe('Security Reports modal', () => {
         propsData.modal.vulnerability.merge_request_feedback = {
           merge_request_path: 'http://mr.url',
         };
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('displays a link to the merge request', () => {
@@ -247,7 +254,7 @@ describe('Security Reports modal', () => {
         propsData.modal.vulnerability.merge_request_feedback = {
           merge_request_path: null,
         };
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('hides the link to the merge request', () => {
@@ -263,7 +270,7 @@ describe('Security Reports modal', () => {
         modal: createState().modal,
       };
       propsData.modal.isResolved = true;
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('disallows any actions in the footer', () => {
@@ -290,7 +297,7 @@ describe('Security Reports modal', () => {
         file: fileValue,
         operating_system: namespaceValue,
       };
-      mountComponent({ propsData }, mount);
+      mountComponent(propsData, mount);
     });
 
     it('is rendered', () => {
@@ -310,7 +317,7 @@ describe('Security Reports modal', () => {
 
       const solution = 'Upgrade to XYZ';
       propsData.modal.vulnerability.solution = solution;
-      mountComponent({ propsData }, mount);
+      mountComponent(propsData, mount);
 
       const solutionCard = wrapper.find(SolutionCard);
 
@@ -326,7 +333,7 @@ describe('Security Reports modal', () => {
       const summary = 'Upgrade to 123';
       const diff = 'foo';
       propsData.modal.vulnerability.remediations = [{ summary, diff }];
-      mountComponent({ propsData }, mount);
+      mountComponent(propsData, mount);
 
       const solutionCard = wrapper.find(SolutionCard);
 
@@ -340,7 +347,7 @@ describe('Security Reports modal', () => {
       const propsData = {
         modal: createState().modal,
       };
-      mountComponent({ propsData }, mount);
+      mountComponent(propsData, mount);
 
       const solutionCard = wrapper.find(SolutionCard);
 
@@ -372,7 +379,7 @@ describe('Security Reports modal', () => {
 
     describe('with a non-dismissed vulnerability', () => {
       beforeEach(() => {
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('creates an error when an empty comment is submitted', () => {
@@ -396,7 +403,7 @@ describe('Security Reports modal', () => {
     describe('with a dismissed vulnerability', () => {
       beforeEach(() => {
         propsData.modal.vulnerability.dismissal_feedback = { author: {} };
-        mountComponent({ propsData });
+        mountComponent(propsData);
       });
 
       it('creates an error when an empty comment is submitted', () => {

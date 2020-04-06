@@ -28,7 +28,7 @@ export const graphDataValidatorForValues = (isValues, graphData) => {
   );
 };
 
-/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+/* eslint-disable @gitlab/require-i18n-strings */
 /**
  * Checks that element that triggered event is located on cluster health check dashboard
  * @param {HTMLElement}  element to check against
@@ -131,5 +131,64 @@ export const timeRangeToUrl = (timeRange, url = window.location.href) => {
   const params = timeRangeToParams(timeRange);
   return mergeUrlParams(params, toUrl);
 };
+
+/**
+ * Get the metric value from first data point.
+ * Currently only used for bar charts
+ *
+ * @param {Array} values data points
+ * @returns {Number}
+ */
+const metricValueMapper = values => values[0]?.[1];
+
+/**
+ * Get the metric name from metric object
+ * Currently only used for bar charts
+ * e.g. { handler: '/query' }
+ * { method: 'get' }
+ *
+ * @param {Object} metric metric object
+ * @returns {String}
+ */
+const metricNameMapper = metric => Object.values(metric)?.[0];
+
+/**
+ * Parse metric object to extract metric value and name in
+ * [<metric-value>, <metric-name>] format.
+ * Currently only used for bar charts
+ *
+ * @param {Object} param0 metric object
+ * @returns {Array}
+ */
+const resultMapper = ({ metric, values = [] }) => [
+  metricValueMapper(values),
+  metricNameMapper(metric),
+];
+
+/**
+ * Bar charts graph data parser to massage data from
+ * backend to a format acceptable by bar charts component
+ * in GitLab UI
+ *
+ * e.g.
+ * {
+ *   SLO: [
+ *      [98, 'api'],
+ *      [99, 'web'],
+ *      [99, 'database']
+ *   ]
+ * }
+ *
+ * @param {Array} data series information
+ * @returns {Object}
+ */
+export const barChartsDataParser = (data = []) =>
+  data?.reduce(
+    (acc, { result = [], label }) => ({
+      ...acc,
+      [label]: result.map(resultMapper),
+    }),
+    {},
+  );
 
 export default {};

@@ -54,8 +54,8 @@ module Audit
     def text_for_change(value)
       changed = ["Changed #{value}"]
 
-      changed << "from #{@details[:from]}" if @details[:from]
-      changed << "to #{@details[:to]}" if @details[:to]
+      changed << "from #{@details[:from]}" if @details[:from].to_s.present?
+      changed << "to #{@details[:to]}" if @details[:to].to_s.present?
 
       if access_level_changed?(value) && expiry_details_available?
         changed << text_for_expiry_change

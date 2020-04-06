@@ -1,10 +1,10 @@
 <script>
-import _ from 'underscore';
+import { isNumber, isString } from 'lodash';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
-import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
+import MrWidgetLicenses from 'ee/vue_shared/license_compliance/mr_widget_license_report.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 
@@ -154,14 +154,14 @@ export default {
     shouldRenderMergeTrainHelperText() {
       return (
         this.mr.pipeline &&
-        _.isNumber(this.mr.pipeline.id) &&
-        _.isString(this.mr.pipeline.path) &&
+        isNumber(this.mr.pipeline.id) &&
+        isString(this.mr.pipeline.path) &&
         this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY &&
         !this.mr.autoMergeEnabled
       );
     },
     licensesApiPath() {
-      return (gl && gl.mrWidgetData && gl.mrWidgetData.license_management_comparison_path) || null;
+      return gl?.mrWidgetData?.license_scanning_comparison_path || null;
     },
   },
   watch: {
@@ -323,21 +323,20 @@ export default {
         :create-vulnerability-feedback-dismissal-path="mr.createVulnerabilityFeedbackDismissalPath"
         :pipeline-path="mr.pipeline.path"
         :pipeline-id="mr.securityReportsPipelineId"
-        :can-create-issue="mr.canCreateIssue"
-        :can-create-merge-request="mr.canCreateMergeRequest"
-        :can-dismiss-vulnerability="mr.canDismissVulnerability"
         :diverged-commits-count="mr.divergedCommitsCount"
         :mr-state="mr.state"
+        :target-branch-tree-path="mr.targetBranchTreePath"
+        :new-pipeline-path="mr.newPipelinePath"
         class="js-security-widget"
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
-        :api-url="mr.licenseManagement.managed_licenses_path"
+        :api-url="mr.licenseScanning.managed_licenses_path"
         :licenses-api-path="licensesApiPath"
         :pipeline-path="mr.pipeline.path"
-        :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
-        :full-report-path="mr.licenseManagement.license_management_full_report_path"
-        :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
+        :can-manage-licenses="mr.licenseScanning.can_manage_licenses"
+        :full-report-path="mr.licenseScanning.full_report_path"
+        :license-management-settings-path="mr.licenseScanning.settings_path"
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />

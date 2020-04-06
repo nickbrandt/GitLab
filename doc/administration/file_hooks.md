@@ -1,7 +1,7 @@
 # File hooks
 
-> Introduced in GitLab 10.6.
-> Until 12.8 the feature name was Plugins.
+> - Introduced in GitLab 10.6.
+> - Until GitLab 12.8, the feature name was Plugins.
 
 With custom file hooks, GitLab administrators can introduce custom integrations
 without modifying GitLab's source code.
@@ -88,9 +88,9 @@ end
 ## Validation
 
 Writing your own file hook can be tricky and it's easier if you can check it
-without altering the system. A rake task is provided so that you can use it
+without altering the system. A Rake task is provided so that you can use it
 in a staging environment to test your file hook before using it in production.
-The rake task will use a sample data and execute each of file hook. The output
+The Rake task will use a sample data and execute each of file hook. The output
 should be enough to determine if the system sees your file hook and if it was
 executed without errors.
 

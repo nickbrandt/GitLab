@@ -24,7 +24,7 @@ module Gitlab
 
         attrs = {
           GL_ID: Gitlab::GlId.gl_id(user),
-          GL_REPOSITORY: repo_type.identifier_for_container(repository.project),
+          GL_REPOSITORY: repo_type.identifier_for_container(repository.container),
           GL_USERNAME: user&.username,
           ShowAllRefs: show_all_refs,
           Repository: repository.gitaly_repository.to_h,
@@ -225,8 +225,8 @@ module Gitlab
 
       def gitaly_server_hash(repository)
         {
-          address: Gitlab::GitalyClient.address(repository.project.repository_storage),
-          token: Gitlab::GitalyClient.token(repository.project.repository_storage),
+          address: Gitlab::GitalyClient.address(repository.container.repository_storage),
+          token: Gitlab::GitalyClient.token(repository.container.repository_storage),
           features: Feature::Gitaly.server_feature_flags
         }
       end

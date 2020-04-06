@@ -48,7 +48,34 @@ describe GroupPolicy do
       stub_licensed_features(contribution_analytics: true)
     end
 
-    it { is_expected.to be_allowed(:read_group_contribution_analytics) }
+    context 'when signed in user is a member of the group' do
+      it { is_expected.to be_allowed(:read_group_contribution_analytics) }
+    end
+
+    describe 'when user is not a member of the group' do
+      let(:current_user) { non_group_member }
+      let(:private_group) { create(:group, :private) }
+
+      subject { described_class.new(non_group_member, private_group) }
+
+      context 'when user is not invited to any of the group projects' do
+        it do
+          is_expected.not_to be_allowed(:read_group_contribution_analytics)
+        end
+      end
+
+      context 'when user is invited to a group project, but not to the group' do
+        let(:private_project) { create(:project, :private, group: private_group) }
+
+        before do
+          private_project.add_guest(non_group_member)
+        end
+
+        it do
+          is_expected.not_to be_allowed(:read_group_contribution_analytics)
+        end
+      end
+    end
   end
 
   context 'when contribution analytics is not available' do
@@ -59,6 +86,26 @@ describe GroupPolicy do
     end
 
     it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
+  end
+
+  context 'when group activity analytics is available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: true)
+    end
+
+    it { is_expected.to be_allowed(:read_group_activity_analytics) }
+  end
+
+  context 'when group activity analytics is not available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: false)
+    end
+
+    it { is_expected.not_to be_allowed(:read_group_activity_analytics) }
   end
 
   context 'when timelogs report feature is enabled' do
@@ -226,6 +273,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
 
       context 'does not allow group owners to manage ldap' do
         before do
@@ -233,6 +281,7 @@ describe GroupPolicy do
         end
 
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -241,6 +290,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
   end
 
@@ -254,6 +304,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'guests' do
@@ -261,6 +312,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'reporter' do
@@ -268,6 +320,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'developer' do
@@ -275,6 +328,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'maintainer' do
@@ -282,6 +336,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'owner' do
@@ -298,6 +353,7 @@ describe GroupPolicy do
 
         it { is_expected.to be_disallowed(:override_group_member) }
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -306,6 +362,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_allowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
 
     context 'when memberships locked to LDAP' do
@@ -322,6 +379,53 @@ describe GroupPolicy do
       end
 
       context 'owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.not_to be_allowed(:admin_group_member) }
+        it { is_expected.not_to be_allowed(:override_group_member) }
+        it { is_expected.not_to be_allowed(:update_group_member) }
+      end
+
+      context 'when LDAP sync is enabled' do
+        let(:current_user) { owner }
+
+        before do
+          allow(group).to receive(:ldap_synced?).and_return(true)
+        end
+
+        context 'Group Owner disable membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: true)
+            stub_feature_flags(ldap_settings_unlock_groups_by_owners: true)
+          end
+
+          it { is_expected.to be_allowed(:admin_group_member) }
+          it { is_expected.to be_allowed(:override_group_member) }
+          it { is_expected.to be_allowed(:update_group_member) }
+
+          context 'ldap_settings_unlock_groups_by_owners is disabled' do
+            before do
+              stub_feature_flags(ldap_settings_unlock_groups_by_owners: false)
+            end
+
+            it { is_expected.to be_disallowed(:admin_group_member) }
+            it { is_expected.to be_disallowed(:override_group_member) }
+            it { is_expected.to be_disallowed(:update_group_member) }
+          end
+        end
+
+        context 'Group Owner keeps the membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: false)
+          end
+
+          it { is_expected.not_to be_allowed(:admin_group_member) }
+          it { is_expected.not_to be_allowed(:override_group_member) }
+          it { is_expected.not_to be_allowed(:update_group_member) }
+        end
+      end
+
+      context 'when LDAP sync is disable' do
         let(:current_user) { owner }
 
         it { is_expected.not_to be_allowed(:admin_group_member) }
@@ -585,6 +689,48 @@ describe GroupPolicy do
         let(:current_user) { public_send(role) }
 
         it { is_expected.to be_disallowed(:read_group_saml_identity) }
+      end
+    end
+  end
+
+  describe 'read_cluster_health' do
+    let(:current_user) { owner }
+
+    context 'when cluster is readable' do
+      context 'and cluster health is available' do
+        before do
+          stub_licensed_features(cluster_health: true)
+        end
+
+        it { is_expected.to be_allowed(:read_cluster_health) }
+      end
+
+      context 'and cluster health is unavailable' do
+        before do
+          stub_licensed_features(cluster_health: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
+      end
+    end
+
+    context 'when cluster is not readable to user' do
+      let(:current_user) { build(:user) }
+
+      context 'when cluster health is available' do
+        before do
+          stub_licensed_features(cluster_health: true)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
+      end
+
+      context 'when cluster health is unavailable' do
+        before do
+          stub_licensed_features(cluster_health: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_cluster_health) }
       end
     end
   end

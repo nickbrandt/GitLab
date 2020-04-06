@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require './db/post_migrate/20200127131953_migrate_snippet_mentions_to_db'
-require './db/post_migrate/20200127151953_migrate_snippet_notes_mentions_to_db'
+require './db/post_migrate/20200128134110_migrate_commit_notes_mentions_to_db'
+require './db/post_migrate/20200211155539_migrate_merge_request_mentions_to_db'
 
-describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200127151953 do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200211155539 do
   include MigrationsHelpers
 
   context 'when migrating data' do
@@ -12,6 +12,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
     let(:namespaces) { table(:namespaces) }
     let(:projects) { table(:projects) }
     let(:notes) { table(:notes) }
+    let(:routes) { table(:routes) }
 
     let(:author) { users.create!(email: 'author@example.com', notification_email: 'author@example.com', name: 'author', username: 'author', projects_limit: 10, state: 'active') }
     let(:member) { users.create!(email: 'member@example.com', notification_email: 'member@example.com', name: 'member', username: 'member', projects_limit: 10, state: 'active') }
@@ -32,46 +33,79 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
 
     before do
       # build personal namespaces and routes for users
-      mentioned_users.each { |u| u.becomes(User).save! }
+      mentioned_users.each do |u|
+        namespace = namespaces.create!(path: u.username, name: u.name, runners_token: "my-token-u#{u.id}", owner_id: u.id, type: nil)
+        routes.create!(path: namespace.path, source_type: 'Namespace', source_id: namespace.id)
+      end
 
       # build namespaces and routes for groups
       mentioned_groups.each do |gr|
-        gr.name += '-org'
-        gr.path += '-org'
-        gr.becomes(Namespace).save!
+        routes.create!(path: gr.path, source_type: 'Namespace', source_id: gr.id)
       end
     end
 
-    context 'migrate snippet mentions' do
-      let(:snippets) { table(:snippets) }
-      let(:snippet_user_mentions) { table(:snippet_user_mentions) }
+    context 'migrate merge request mentions' do
+      let(:merge_requests) { table(:merge_requests) }
+      let(:merge_request_user_mentions) { table(:merge_request_user_mentions) }
 
-      let!(:snippet1) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title1', description: description_mentions) }
-      let!(:snippet2) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title2', description: 'some description') }
-      let!(:snippet3) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title3', description: 'description with an email@example.com and some other @ char here.') }
-
-      let(:user_mentions) { snippet_user_mentions }
-      let(:resource) { snippet1 }
-
-      it_behaves_like 'resource mentions migration', MigrateSnippetMentionsToDb, Snippet
-
-      context 'mentions in note' do
-        let!(:note1) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions) }
-        let!(:note2) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: 'sample note') }
-        let!(:note3) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
-        # this not does not have actual mentions
-        let!(:note4) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
-        # this note points to an innexistent noteable record in snippets table
-        let!(:note5) { notes.create!(noteable_id: snippets.maximum(:id) + 10, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions) }
-
-        it_behaves_like 'resource notes mentions migration', MigrateSnippetNotesMentionsToDb, Snippet
+      let!(:mr1) do
+        merge_requests.create!(
+          title: "title 1", state_id: 1, target_branch: 'feature1', source_branch: 'master',
+          source_project_id: project.id, target_project_id: project.id, author_id: author.id,
+          description: description_mentions
+        )
       end
+
+      let!(:mr2) do
+        merge_requests.create!(
+          title: "title 2", state_id: 1, target_branch: 'feature2', source_branch: 'master',
+          source_project_id: project.id, target_project_id: project.id, author_id: author.id,
+          description: 'some description'
+        )
+      end
+
+      let!(:mr3) do
+        merge_requests.create!(
+          title: "title 3", state_id: 1, target_branch: 'feature3', source_branch: 'master',
+          source_project_id: project.id, target_project_id: project.id, author_id: author.id,
+          description: 'description with an email@example.com and some other @ char here.')
+      end
+
+      let(:user_mentions) { merge_request_user_mentions }
+      let(:resource) { merge_request }
+
+      it_behaves_like 'resource mentions migration', MigrateMergeRequestMentionsToDb, MergeRequest
+    end
+
+    context 'migrate commit mentions' do
+      let(:repository) { Gitlab::Git::Repository.new('default', TEST_REPO_PATH, '', 'group/project') }
+      let(:commit) { Commit.new(RepoHelpers.sample_commit, project.becomes(Project)) }
+      let(:commit_user_mentions) { table(:commit_user_mentions) }
+
+      let!(:note1) { notes.create!(commit_id: commit.id, noteable_type: 'Commit', project_id: project.id, author_id: author.id, note: description_mentions) }
+      let!(:note2) { notes.create!(commit_id: commit.id, noteable_type: 'Commit', project_id: project.id, author_id: author.id, note: 'sample note') }
+      let!(:note3) { notes.create!(commit_id: commit.id, noteable_type: 'Commit', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
+
+      # this not does not have actual mentions
+      let!(:note4) { notes.create!(commit_id: commit.id, noteable_type: 'Commit', project_id: project.id, author_id: author.id, note: 'note for an email@somesite.com and some other random @ ref' ) }
+      # this should have pointed to an innexisted commit record in a commits table
+      # but because commit is not an AR we'll just make it so that it does not have mentions
+      let!(:note5) { notes.create!(commit_id: 'abc', noteable_type: 'Commit', project_id: project.id, author_id: author.id, note: 'note for an email@somesite.com and some other random @ ref') }
+
+      let(:user_mentions) { commit_user_mentions }
+      let(:resource) { commit }
+
+      it_behaves_like 'resource notes mentions migration', MigrateCommitNotesMentionsToDb, Commit
     end
   end
 
   context 'checks no_quote_columns' do
     it 'has correct no_quote_columns' do
-      expect(Gitlab::BackgroundMigration::UserMentions::Models::Snippet.no_quote_columns).to match([:note_id, :snippet_id])
+      expect(Gitlab::BackgroundMigration::UserMentions::Models::MergeRequest.no_quote_columns).to match([:note_id, :merge_request_id])
+    end
+
+    it 'commit has correct no_quote_columns' do
+      expect(Gitlab::BackgroundMigration::UserMentions::Models::Commit.no_quote_columns).to match([:note_id])
     end
   end
 end

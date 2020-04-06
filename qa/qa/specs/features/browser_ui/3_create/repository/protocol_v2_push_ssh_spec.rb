@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Git protocol v2 is temporarily disabled
-  context 'Create', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/27828', type: :bug } do
+  context 'Create' do
     describe 'Push over SSH using Git protocol version 2', :requires_git_protocol_v2 do
       # Note: If you run this test against GDK make sure you've enabled sshd and
       # enabled setting the Git protocol by adding `AcceptEnv GIT_PROTOCOL` to
@@ -11,29 +10,24 @@ module QA
 
       let(:key_title) { "key for ssh tests #{Time.now.to_f}" }
       let(:ssh_key) do
-        Resource::SSHKey.fabricate! do |resource|
+        Resource::SSHKey.fabricate_via_api! do |resource|
           resource.title = key_title
         end
       end
 
       around do |example|
-        # Create an SSH key to be used with Git
+        # Create an SSH key to be used with Git, then remove it after the test
         Flow::Login.sign_in
         ssh_key
 
         example.run
 
-        # Remove the SSH key
-        Flow::Login.sign_in
-        Page::Main::Menu.perform(&:click_settings_link)
-        Page::Profile::Menu.perform(&:click_ssh_keys)
-        Page::Profile::SSHKeys.perform do |ssh_keys|
-          ssh_keys.remove_key(key_title)
-        end
+        ssh_key.remove_via_api!
+
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       it 'user pushes to the repository' do
-        # Create a project to push to
         project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'git-protocol-project'
         end
@@ -65,15 +59,15 @@ module QA
           end
         end
 
-        project.visit!
         project.wait_for_push_new_branch
+        project.visit!
 
-        # Check that the push worked
-        expect(page).to have_content(file_name)
-        expect(page).to have_content(file_content)
-
-        # And check that the correct Git protocol was used
         expect(git_protocol_reported).to eq(git_protocol)
+
+        Page::Project::Show.perform do |show|
+          expect(show).to have_file(file_name)
+          expect(show).to have_readme_content(file_content)
+        end
       end
     end
   end

@@ -13,6 +13,8 @@ import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
+import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
+import { toYmd } from '../../shared/utils';
 
 export default {
   name: 'CycleAnalytics',
@@ -28,7 +30,7 @@ export default {
     Scatterplot,
     TasksByTypeChart,
   },
-  mixins: [glFeatureFlagsMixin()],
+  mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -63,7 +65,7 @@ export default {
       'selectedStage',
       'stages',
       'summary',
-      'labels',
+      'topRankedLabels',
       'currentStageEvents',
       'customStageFormEvents',
       'errorCode',
@@ -81,6 +83,7 @@ export default {
       'durationChartMedianData',
       'activeStages',
       'selectedProjectIds',
+      'enableCustomOrdering',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -112,7 +115,7 @@ export default {
         startDate,
         endDate,
         selectedProjectIds,
-        tasksByType: { subject, labelIds: selectedLabelIds },
+        tasksByType: { subject, selectedLabelIds },
       } = this;
       return {
         selectedGroup,
@@ -122,6 +125,17 @@ export default {
         subject,
         selectedLabelIds,
       };
+    },
+    query() {
+      return {
+        group_id: !this.hideGroupDropDown ? this.currentGroupPath : null,
+        'project_ids[]': this.selectedProjectIds,
+        created_after: toYmd(this.startDate),
+        created_before: toYmd(this.endDate),
+      };
+    },
+    stageCount() {
+      return this.activeStages.length;
     },
   },
   mounted() {
@@ -151,6 +165,7 @@ export default {
       'clearCustomStageFormErrors',
       'updateStage',
       'setTasksByTypeFilters',
+      'reorderStage',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -183,6 +198,9 @@ export default {
     onDurationStageSelect(stages) {
       this.updateSelectedDurationChartStages(stages);
     },
+    onStageReorder(data) {
+      this.reorderStage(data);
+    },
   },
   multiProjectSelect: true,
   dateOptions: [7, 30, 90],
@@ -199,7 +217,6 @@ export default {
   maxDateRange: DATE_RANGE_LIMIT,
 };
 </script>
-
 <template>
   <div class="js-cycle-analytics">
     <div class="page-title-holder d-flex align-items-center">
@@ -271,6 +288,7 @@ export default {
           <summary-table class="js-summary-table" :items="summary" />
           <stage-table
             v-if="selectedStage"
+            :key="stageCount"
             class="js-stage-table"
             :current-stage="selectedStage"
             :stages="activeStages"
@@ -283,10 +301,10 @@ export default {
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :custom-stage-form-errors="customStageFormErrors"
-            :labels="labels"
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
+            :custom-ordering="enableCustomOrdering"
             @clearCustomStageFormErrors="clearCustomStageFormErrors"
             @selectStage="onStageSelect"
             @editStage="onShowEditStageForm"
@@ -295,6 +313,7 @@ export default {
             @removeStage="onRemoveStage"
             @createStage="onCreateCustomStage"
             @updateStage="onUpdateCustomStage"
+            @reorderStage="onStageReorder"
           />
         </div>
       </div>
@@ -303,9 +322,9 @@ export default {
           <div class="mt-3 d-flex">
             <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
             <stage-dropdown-filter
-              v-if="stages.length"
+              v-if="activeStages.length"
               class="ml-auto"
-              :stages="stages"
+              :stages="activeStages"
               @selected="onDurationStageSelect"
             />
           </div>
@@ -329,7 +348,6 @@ export default {
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
-              :labels="labels"
               @updateFilter="setTasksByTypeFilters"
             />
           </div>

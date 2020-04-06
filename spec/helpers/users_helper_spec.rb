@@ -95,9 +95,9 @@ describe UsersHelper do
     end
 
     it 'includes the settings tab if the user can update themself' do
-      expect(helper).to receive(:can?).with(user, :read_user, user) { true }
+      expect(helper).to receive(:can?).with(user, :update_user, user) { true }
 
-      expect(items).to include(:profile)
+      expect(items).to include(:settings)
     end
 
     context 'when terms are enforced' do
@@ -176,6 +176,44 @@ describe UsersHelper do
 
         expect(filter_ee_badges(badges)).to be_empty
       end
+    end
+  end
+
+  describe '#work_information' do
+    subject { helper.work_information(user) }
+
+    context 'when both job_title and organization are present' do
+      let(:user) { build(:user, organization: 'GitLab', job_title: 'Frontend Engineer') }
+
+      it 'returns job title concatenated with organization' do
+        is_expected.to eq('Frontend Engineer at GitLab')
+      end
+    end
+
+    context 'when only organization is present' do
+      let(:user) { build(:user, organization: 'GitLab') }
+
+      it "returns organization" do
+        is_expected.to eq('GitLab')
+      end
+    end
+
+    context 'when only job_title is present' do
+      let(:user) { build(:user, job_title: 'Frontend Engineer') }
+
+      it 'returns job title' do
+        is_expected.to eq('Frontend Engineer')
+      end
+    end
+
+    context 'when neither organization nor job_title are present' do
+      it { is_expected.to be_nil }
+    end
+
+    context 'when user parameter is nil' do
+      let(:user) { nil }
+
+      it { is_expected.to be_nil }
     end
   end
 end

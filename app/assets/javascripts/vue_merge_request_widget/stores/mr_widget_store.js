@@ -1,5 +1,4 @@
 import { format } from 'timeago.js';
-import _ from 'underscore';
 import getStateKey from 'ee_else_ce/vue_merge_request_widget/stores/get_state_key';
 import { stateKey } from './state_maps';
 import { formatDate } from '../../lib/utils/datetime_utility';
@@ -180,6 +179,7 @@ export default class MergeRequestStore {
     this.mergeRequestAddCiConfigPath = data.merge_request_add_ci_config_path;
     this.pipelinesEmptySvgPath = data.pipelines_empty_svg_path;
     this.humanAccess = data.human_access;
+    this.newPipelinePath = data.new_project_pipeline_path;
   }
 
   get isNothingToMergeState() {
@@ -227,11 +227,13 @@ export default class MergeRequestStore {
   }
 
   static getPreferredAutoMergeStrategy(availableAutoMergeStrategies) {
-    if (_.includes(availableAutoMergeStrategies, MTWPS_MERGE_STRATEGY)) {
+    if (availableAutoMergeStrategies === undefined) return undefined;
+
+    if (availableAutoMergeStrategies.includes(MTWPS_MERGE_STRATEGY)) {
       return MTWPS_MERGE_STRATEGY;
-    } else if (_.includes(availableAutoMergeStrategies, MT_MERGE_STRATEGY)) {
+    } else if (availableAutoMergeStrategies.includes(MT_MERGE_STRATEGY)) {
       return MT_MERGE_STRATEGY;
-    } else if (_.includes(availableAutoMergeStrategies, MWPS_MERGE_STRATEGY)) {
+    } else if (availableAutoMergeStrategies.includes(MWPS_MERGE_STRATEGY)) {
       return MWPS_MERGE_STRATEGY;
     }
 

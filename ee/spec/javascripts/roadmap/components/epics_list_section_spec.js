@@ -10,6 +10,8 @@ import {
   TIMELINE_CELL_MIN_WIDTH,
 } from 'ee/roadmap/constants';
 import {
+  mockFormattedChildEpic1,
+  mockFormattedChildEpic2,
   mockTimeframeInitialDate,
   mockGroupId,
   rawEpics,
@@ -33,6 +35,10 @@ store.dispatch('setInitialData', {
 store.dispatch('receiveEpicsSuccess', { rawEpics });
 
 const mockEpics = store.state.epics;
+
+store.state.epics[0].children = {
+  edges: [mockFormattedChildEpic1, mockFormattedChildEpic2],
+};
 
 const createComponent = ({
   epics = mockEpics,
@@ -71,6 +77,7 @@ describe('EpicsListSectionComponent', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('data', () => {
@@ -225,6 +232,9 @@ describe('EpicsListSectionComponent', () => {
     });
 
     it('renders epic-item when roadmapBufferedRendering is `false`', () => {
+      // Destroy the wrapper created in the beforeEach above
+      wrapper.destroy();
+
       const wrapperFlagOff = createComponent({
         roadmapBufferedRendering: false,
       });
@@ -251,7 +261,26 @@ describe('EpicsListSectionComponent', () => {
         showBottomShadow: true,
       });
 
-      expect(wrapper.find('.scroll-bottom-shadow').exists()).toBe(true);
+      expect(wrapper.find('.epic-scroll-bottom-shadow').exists()).toBe(true);
     });
+  });
+
+  it('expands to show child epics when epic is toggled', done => {
+    const epic = mockEpics[0];
+    wrapper = createComponent();
+
+    expect(wrapper.findAll(EpicItem).length).toBe(mockEpics.length);
+
+    wrapper.vm.toggleIsEpicExpanded(epic.id);
+
+    wrapper.vm
+      .$nextTick()
+      .then(() => {
+        const expected = mockEpics.length + epic.children.edges.length;
+
+        expect(wrapper.findAll(EpicItem).length).toBe(expected);
+      })
+      .then(done)
+      .catch(done.fail);
   });
 });

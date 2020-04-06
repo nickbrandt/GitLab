@@ -74,7 +74,7 @@ module EE
     private
 
     def scoped_labels_doc_link
-      help_url = ::Gitlab::Routing.url_helpers.help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
+      help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels-premium')
 
       %(<a href="#{help_url}" class="gl-link gl-label-icon" target="_blank" rel="noopener"><i class="fa fa-question-circle"></i></a>).html_safe
     end

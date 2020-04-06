@@ -51,6 +51,8 @@ module Gitlab
         const_get(replicator_class_name, false)
       end
 
+      attr_reader :model_record_id
+
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
         @model_record_id = model_record_id
@@ -133,7 +135,7 @@ module Gitlab
 
         # Only works with the new geo_events at the moment because we need to
         # know which foreign key to use
-        ::Geo::EventLog.create!(geo_event_id: event)
+        ::Geo::EventLog.create!(geo_event: event)
 
         event
       rescue ActiveRecord::RecordInvalid, NoMethodError => e

@@ -3,11 +3,15 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::LogHelpers do
-  class FakeLogHelpersConsumer
-    include Gitlab::Geo::LogHelpers
+  before do
+    stub_const('FakeLogHelpersConsumer', Class.new)
 
-    def execute
-      log_error('Test message')
+    FakeLogHelpersConsumer.class_eval do
+      include Gitlab::Geo::LogHelpers
+
+      def execute
+        log_error('Test message')
+      end
     end
   end
 

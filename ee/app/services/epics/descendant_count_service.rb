@@ -31,6 +31,18 @@ module Epics
       issues_count.fetch(closed_state_id, 0)
     end
 
+    def issues_on_track
+      issue_health_statuses.fetch('on_track', 0)
+    end
+
+    def issues_needing_attention
+      issue_health_statuses.fetch('needs_attention', 0)
+    end
+
+    def issues_at_risk
+      issue_health_statuses.fetch('at_risk', 0)
+    end
+
     private
 
     def epics_count
@@ -42,6 +54,12 @@ module Epics
     def issues_count
       strong_memoize(:issue_counts) do
         Issue.in_epics(accessible_epics).counts_by_state
+      end
+    end
+
+    def issue_health_statuses
+      strong_memoize(:issue_health_statuses) do
+        Issue.in_epics(accessible_epics).counts_by_health_status
       end
     end
 

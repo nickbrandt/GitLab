@@ -11,6 +11,7 @@ module Ci
     NotSupportedAdapterError = Class.new(StandardError)
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
+    COVERAGE_REPORT_FILE_TYPES = %w[cobertura].freeze
     NON_ERASABLE_FILE_TYPES = %w[trace].freeze
     DEFAULT_FILE_NAMES = {
       archive: nil,
@@ -28,7 +29,10 @@ module Ci
       license_scanning: 'gl-license-scanning-report.json',
       performance: 'performance.json',
       metrics: 'metrics.txt',
-      lsif: 'lsif.json'
+      lsif: 'lsif.json',
+      dotenv: '.env',
+      cobertura: 'cobertura-coverage.xml',
+      terraform: 'tfplan.json'
     }.freeze
 
     INTERNAL_TYPES = {
@@ -43,6 +47,8 @@ module Ci
       metrics_referee: :gzip,
       network_referee: :gzip,
       lsif: :gzip,
+      dotenv: :gzip,
+      cobertura: :gzip,
 
       # All these file formats use `raw` as we need to store them uncompressed
       # for Frontend to fetch the files and do analysis
@@ -54,7 +60,8 @@ module Ci
       dast: :raw,
       license_management: :raw,
       license_scanning: :raw,
-      performance: :raw
+      performance: :raw,
+      terraform: :raw
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
@@ -75,6 +82,7 @@ module Ci
     scope :with_files_stored_locally, -> { where(file_store: [nil, ::JobArtifactUploader::Store::LOCAL]) }
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
     scope :for_sha, ->(sha, project_id) { joins(job: :pipeline).where(ci_pipelines: { sha: sha, project_id: project_id }) }
+    scope :for_job_name, ->(name) { joins(:job).where(ci_builds: { name: name }) }
 
     scope :with_file_types, -> (file_types) do
       types = self.file_types.select { |file_type| file_types.include?(file_type) }.values
@@ -88,6 +96,10 @@ module Ci
 
     scope :test_reports, -> do
       with_file_types(TEST_REPORT_FILE_TYPES)
+    end
+
+    scope :coverage_reports, -> do
+      with_file_types(COVERAGE_REPORT_FILE_TYPES)
     end
 
     scope :erasable, -> do
@@ -118,7 +130,10 @@ module Ci
       metrics: 12, ## EE-specific
       metrics_referee: 13, ## runner referees
       network_referee: 14, ## runner referees
-      lsif: 15 # LSIF data for code navigation
+      lsif: 15, # LSIF data for code navigation
+      dotenv: 16,
+      cobertura: 17,
+      terraform: 18 # Transformed json
     }
 
     enum file_format: {

@@ -58,12 +58,11 @@ module EE
           .having("COUNT(users.id) = ?", usernames.size)
       end
 
-      participant :participant_approvers
-
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
 
       scope :order_review_time_desc, -> do
-        joins(:metrics).reorder(::Gitlab::Database.nulls_last_order('merge_request_metrics.first_comment_at'))
+        joins(:metrics)
+          .reorder(::Gitlab::Database.nulls_last_order(::MergeRequest::Metrics.review_time_field))
       end
 
       scope :with_code_review_api_entity_associations, -> do
@@ -97,7 +96,7 @@ module EE
       # Returns an array of arel columns
       def grouping_columns(sort)
         grouping_columns = super
-        grouping_columns << ::MergeRequest::Metrics.arel_table[:first_comment_at] if sort.to_s == 'review_time_desc'
+        grouping_columns << ::MergeRequest::Metrics.review_time_field if sort.to_s == 'review_time_desc'
         grouping_columns
       end
     end
@@ -161,14 +160,6 @@ module EE
         .select { |pos| file_paths.include?(pos.file_path) }
 
       super.concat(positions)
-    end
-
-    def participant_approvers
-      strong_memoize(:participant_approvers) do
-        next [] unless approval_needed?
-
-        approval_state.filtered_approvers(code_owner: false, unactioned: true)
-      end
     end
 
     def enabled_reports

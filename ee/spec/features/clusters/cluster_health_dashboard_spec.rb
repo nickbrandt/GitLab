@@ -22,15 +22,20 @@ describe 'Cluster Health board', :js, :use_clean_rails_memory_store_caching, :si
   it 'shows cluster board section within the page' do
     visit cluster_path
 
-    expect(page).to have_text('Cluster health')
-    expect(page).to have_css('#cluster-health')
+    expect(page).to have_text('Health')
+
+    click_link 'Health'
+
+    expect(page).to have_css('.cluster-health-graphs')
   end
 
   context 'no prometheus installed' do
     it 'shows install prometheus message' do
       visit cluster_path
 
-      expect(page).to have_text('you must first install Prometheus below')
+      click_link 'Health'
+
+      expect(page).to have_text('you must first install Prometheus in the Applications tab')
     end
   end
 
@@ -47,6 +52,9 @@ describe 'Cluster Health board', :js, :use_clean_rails_memory_store_caching, :si
 
       it 'shows container and waiting for data message' do
         visit cluster_path
+
+        click_link 'Health'
+
         wait_for_requests
 
         expect(page).to have_css('.prometheus-graphs')
@@ -61,6 +69,9 @@ describe 'Cluster Health board', :js, :use_clean_rails_memory_store_caching, :si
 
       it 'renders charts' do
         visit cluster_path
+
+        click_link 'Health'
+
         wait_for_requests
 
         expect(page).to have_css('.prometheus-graphs')

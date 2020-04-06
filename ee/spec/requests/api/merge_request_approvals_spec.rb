@@ -165,6 +165,50 @@ describe API::MergeRequestApprovals do
       expect(rule_response['approved_by'][0]['username']).to eq(approver.username)
       expect(rule_response['source_rule']).to eq(nil)
     end
+
+    context 'when target_branch is specified' do
+      let(:protected_branch) { create(:protected_branch, project: project, name: 'master') }
+      let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test') }
+
+      let(:project_rule) do
+        create(
+          :approval_project_rule,
+          project: project,
+          protected_branches: [protected_branch]
+        )
+      end
+
+      let(:another_project_rule) do
+        create(
+          :approval_project_rule,
+          project: project,
+          protected_branches: [another_protected_branch]
+        )
+      end
+
+      let!(:another_rule) do
+        create(
+          :approval_merge_request_rule,
+          approval_project_rule: another_project_rule,
+          merge_request: merge_request
+        )
+      end
+
+      before do
+        rule.update!(approval_project_rule: project_rule)
+      end
+
+      it 'filters the rules returned by target branch' do
+        get api("#{url}?target_branch=master", user)
+
+        expect(json_response['rules'].size).to eq(1)
+
+        rule_response = json_response['rules'].first
+
+        expect(rule_response['id']).to eq(rule.id)
+        expect(rule_response['name']).to eq('foo')
+      end
+    end
   end
 
   describe 'GET :id/merge_requests/:merge_request_iid/approval_state' do
@@ -437,28 +481,23 @@ describe API::MergeRequestApprovals do
           approver.update(password: 'password')
         end
 
-        it 'returns a 401 with no password' do
-          approve
-          expect(response).to have_gitlab_http_status(:unauthorized)
-        end
-
         it 'does not approve the merge request with no password' do
           approve
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
           expect(merge_request.reload.approvals_left).to eq(2)
         end
 
-        it 'returns a 401 with incorrect password' do
-          approve
-          expect(response).to have_gitlab_http_status(:unauthorized)
-        end
-
         it 'does not approve the merge request with incorrect password' do
-          approve
+          approve(approval_password: 'incorrect')
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
           expect(merge_request.reload.approvals_left).to eq(2)
         end
 
         it 'approves the merge request with correct password' do
           approve(approval_password: 'password')
+
           expect(response).to have_gitlab_http_status(:created)
           expect(merge_request.reload.approvals_left).to eq(1)
         end

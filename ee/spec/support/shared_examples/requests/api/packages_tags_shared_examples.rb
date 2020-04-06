@@ -14,7 +14,7 @@ RSpec.shared_examples 'returns package tags' do |user_type|
   using RSpec::Parameterized::TableSyntax
 
   before do
-    stub_feature_flags(forward_npm_package_registry_requests: { enabled: false })
+    stub_application_setting(npm_package_requests_forwarding: false)
     project.send("add_#{user_type}", user) unless user_type == :no_type
   end
 
@@ -73,8 +73,8 @@ RSpec.shared_examples 'create package tag' do |user_type|
   end
 
   context 'with already existing tag' do
-    let(:package2) { create(:npm_package, project: project, name: package.name, version: '5.5.55') }
-    let!(:tag) { create(:packages_tag, package: package2, name: tag_name) }
+    let_it_be(:package2) { create(:npm_package, project: project, name: package.name, version: '5.5.55') }
+    let_it_be(:tag) { create(:packages_tag, package: package2, name: tag_name) }
 
     it_behaves_like 'returning response status', :no_content
 

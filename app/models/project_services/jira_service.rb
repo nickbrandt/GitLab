@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class JiraService < IssueTrackerService
+  extend ::Gitlab::Utils::Override
   include Gitlab::Routing
   include ApplicationHelper
   include ActionView::Helpers::AssetUrlHelper
@@ -200,9 +201,18 @@ class JiraService < IssueTrackerService
   end
 
   # Jira does not need test data.
-  # We are requesting the project that belongs to the project key.
-  def test_data(user = nil, project = nil)
+  def test_data(_, _)
     nil
+  end
+
+  override :support_close_issue?
+  def support_close_issue?
+    true
+  end
+
+  override :support_cross_reference?
+  def support_cross_reference?
+    true
   end
 
   private
@@ -210,7 +220,6 @@ class JiraService < IssueTrackerService
   def test_settings
     return unless client_url.present?
 
-    # Test settings by getting the project
     jira_request { client.ServerInfo.all.attrs }
   end
 
@@ -280,19 +289,15 @@ class JiraService < IssueTrackerService
     return unless client_url.present?
 
     jira_request do
-      create_issue_link(issue, remote_link_props)
-      create_issue_comment(issue, message)
+      remote_link = find_remote_link(issue, remote_link_props[:object][:url])
+
+      create_issue_comment(issue, message) unless remote_link
+      remote_link ||= issue.remotelink.build
+      remote_link.save!(remote_link_props)
 
       log_info("Successfully posted", client_url: client_url)
       "SUCCESS: Successfully posted to #{client_url}."
     end
-  end
-
-  def create_issue_link(issue, remote_link_props)
-    remote_link = find_remote_link(issue, remote_link_props[:object][:url])
-    remote_link ||= issue.remotelink.build
-
-    remote_link.save!(remote_link_props)
   end
 
   def create_issue_comment(issue, message)

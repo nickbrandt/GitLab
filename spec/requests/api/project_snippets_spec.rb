@@ -85,7 +85,7 @@ describe API::ProjectSnippets do
 
   describe 'GET /projects/:project_id/snippets/:id' do
     let(:user) { create(:user) }
-    let(:snippet) { create(:project_snippet, :public, project: project) }
+    let(:snippet) { create(:project_snippet, :public, :repository, project: project) }
 
     it 'returns snippet json' do
       get api("/projects/#{project.id}/snippets/#{snippet.id}", user)
@@ -95,10 +95,22 @@ describe API::ProjectSnippets do
       expect(json_response['title']).to eq(snippet.title)
       expect(json_response['description']).to eq(snippet.description)
       expect(json_response['file_name']).to eq(snippet.file_name)
+      expect(json_response['ssh_url_to_repo']).to eq(snippet.ssh_url_to_repo)
+      expect(json_response['http_url_to_repo']).to eq(snippet.http_url_to_repo)
+    end
+
+    context 'when feature flag :version_snippets is disabled' do
+      before do
+        stub_feature_flags(version_snippets: false)
+
+        get api("/projects/#{project.id}/snippets/#{snippet.id}", user)
+      end
+
+      it_behaves_like 'snippet response without repository URLs'
     end
 
     it 'returns 404 for invalid snippet id' do
-      get api("/projects/#{project.id}/snippets/1234", user)
+      get api("/projects/#{project.id}/snippets/#{non_existing_record_id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Not found')
@@ -148,6 +160,30 @@ describe API::ProjectSnippets do
           end.to change { ProjectSnippet.count }.by(1)
 
           expect(snippet.repository_exists?).to be_falsey
+        end
+      end
+    end
+
+    context 'with an external user' do
+      let(:user) { create(:user, :external) }
+
+      context 'that belongs to the project' do
+        before do
+          project.add_developer(user)
+        end
+
+        it 'creates a new snippet' do
+          post api("/projects/#{project.id}/snippets/", user), params: params
+
+          expect(response).to have_gitlab_http_status(:created)
+        end
+      end
+
+      context 'that does not belong to the project' do
+        it 'does not create a new snippet' do
+          post api("/projects/#{project.id}/snippets/", user), params: params
+
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -278,13 +314,13 @@ describe API::ProjectSnippets do
 
   describe 'PUT /projects/:project_id/snippets/:id/' do
     let(:visibility_level) { Snippet::PUBLIC }
-    let(:snippet) { create(:project_snippet, author: admin, visibility_level: visibility_level, project: project) }
+    let(:snippet) { create(:project_snippet, :repository, author: admin, visibility_level: visibility_level, project: project) }
 
     it 'updates snippet' do
       new_content = 'New content'
       new_description = 'New description'
 
-      put api("/projects/#{snippet.project.id}/snippets/#{snippet.id}/", admin), params: { code: new_content, description: new_description, visibility: 'private' }
+      update_snippet(params: { code: new_content, description: new_description, visibility: 'private' })
 
       expect(response).to have_gitlab_http_status(:ok)
       snippet.reload
@@ -297,7 +333,7 @@ describe API::ProjectSnippets do
       new_content = 'New content'
       new_description = 'New description'
 
-      put api("/projects/#{snippet.project.id}/snippets/#{snippet.id}/", admin), params: { content: new_content, description: new_description }
+      update_snippet(params: { content: new_content, description: new_description })
 
       expect(response).to have_gitlab_http_status(:ok)
       snippet.reload
@@ -306,21 +342,21 @@ describe API::ProjectSnippets do
     end
 
     it 'returns 400 when both code and content parameters specified' do
-      put api("/projects/#{snippet.project.id}/snippets/1234", admin), params: { code: 'some content', content: 'other content' }
+      update_snippet(params: { code: 'some content', content: 'other content' })
 
       expect(response).to have_gitlab_http_status(:bad_request)
       expect(json_response['error']).to eq('code, content are mutually exclusive')
     end
 
     it 'returns 404 for invalid snippet id' do
-      put api("/projects/#{snippet.project.id}/snippets/1234", admin), params: { title: 'foo' }
+      update_snippet(snippet_id: non_existing_record_id, params: { title: 'foo' })
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Snippet Not Found')
     end
 
     it 'returns 400 for missing parameters' do
-      put api("/projects/#{project.id}/snippets/1234", admin)
+      update_snippet
 
       expect(response).to have_gitlab_http_status(:bad_request)
     end
@@ -328,16 +364,16 @@ describe API::ProjectSnippets do
     it 'returns 400 for empty code field' do
       new_content = ''
 
-      put api("/projects/#{snippet.project.id}/snippets/#{snippet.id}/", admin), params: { code: new_content }
+      update_snippet(params: { code: new_content })
 
       expect(response).to have_gitlab_http_status(:bad_request)
     end
 
-    context 'when the snippet is spam' do
-      def update_snippet(snippet_params = {})
-        put api("/projects/#{snippet.project.id}/snippets/#{snippet.id}", admin), params: snippet_params
-      end
+    it_behaves_like 'update with repository actions' do
+      let(:snippet_without_repo) { create(:project_snippet, author: admin, project: project, visibility_level: visibility_level) }
+    end
 
+    context 'when the snippet is spam' do
       before do
         allow_next_instance_of(Spam::AkismetService) do |instance|
           allow(instance).to receive(:spam?).and_return(true)
@@ -348,7 +384,7 @@ describe API::ProjectSnippets do
         let(:visibility_level) { Snippet::PRIVATE }
 
         it 'creates the snippet' do
-          expect { update_snippet(title: 'Foo') }
+          expect { update_snippet(params: { title: 'Foo' }) }
             .to change { snippet.reload.title }.to('Foo')
         end
       end
@@ -357,12 +393,12 @@ describe API::ProjectSnippets do
         let(:visibility_level) { Snippet::PUBLIC }
 
         it 'rejects the snippet' do
-          expect { update_snippet(title: 'Foo') }
+          expect { update_snippet(params: { title: 'Foo' }) }
             .not_to change { snippet.reload.title }
         end
 
         it 'creates a spam log' do
-          expect { update_snippet(title: 'Foo') }
+          expect { update_snippet(params: { title: 'Foo' }) }
             .to log_spam(title: 'Foo', user_id: admin.id, noteable_type: 'ProjectSnippet')
         end
       end
@@ -371,7 +407,7 @@ describe API::ProjectSnippets do
         let(:visibility_level) { Snippet::PRIVATE }
 
         it 'rejects the snippet' do
-          expect { update_snippet(title: 'Foo', visibility: 'public') }
+          expect { update_snippet(params: { title: 'Foo', visibility: 'public' }) }
             .not_to change { snippet.reload.title }
 
           expect(response).to have_gitlab_http_status(:bad_request)
@@ -379,7 +415,7 @@ describe API::ProjectSnippets do
         end
 
         it 'creates a spam log' do
-          expect { update_snippet(title: 'Foo', visibility: 'public') }
+          expect { update_snippet(params: { title: 'Foo', visibility: 'public' }) }
             .to log_spam(title: 'Foo', user_id: admin.id, noteable_type: 'ProjectSnippet')
         end
       end
@@ -389,6 +425,10 @@ describe API::ProjectSnippets do
       it_behaves_like '403 response' do
         let(:request) { put api("/projects/#{project_no_snippets.id}/snippets/123", admin), params: { description: 'foo' } }
       end
+    end
+
+    def update_snippet(snippet_id: snippet.id, params: {})
+      put api("/projects/#{snippet.project.id}/snippets/#{snippet_id}", admin), params: params
     end
   end
 
@@ -402,7 +442,7 @@ describe API::ProjectSnippets do
     end
 
     it 'returns 404 for invalid snippet id' do
-      delete api("/projects/#{snippet.project.id}/snippets/1234", admin)
+      delete api("/projects/#{snippet.project.id}/snippets/#{non_existing_record_id}", admin)
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Snippet Not Found')
@@ -431,7 +471,7 @@ describe API::ProjectSnippets do
     end
 
     it 'returns 404 for invalid snippet id' do
-      get api("/projects/#{snippet.project.id}/snippets/1234/raw", admin)
+      get api("/projects/#{snippet.project.id}/snippets/#{non_existing_record_id}/raw", admin)
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Snippet Not Found')

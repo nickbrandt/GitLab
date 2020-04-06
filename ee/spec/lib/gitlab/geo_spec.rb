@@ -307,4 +307,32 @@ describe Gitlab::Geo, :geo, :request_store do
       end
     end
   end
+
+  describe '.proxying_to_primary_message' do
+    it 'returns a message as a string' do
+      url = 'ssh://git@primary.com/namespace/repo.git'
+      message = <<~STR
+      This request to a Geo secondary node will be forwarded to the
+      Geo primary node:
+
+        #{url}
+      STR
+
+      expect(described_class.interacting_with_primary_message(url)).to eq(message)
+    end
+  end
+
+  describe '.redirecting_to_primary_message' do
+    it 'returns a message as a string' do
+      url = 'http://primary.com/namespace/repo.git'
+      message = <<~STR
+      This request to a Geo secondary node will be forwarded to the
+      Geo primary node:
+
+        #{url}
+      STR
+
+      expect(described_class.interacting_with_primary_message(url)).to eq(message)
+    end
+  end
 end

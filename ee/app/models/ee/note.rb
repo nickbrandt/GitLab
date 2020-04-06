@@ -29,6 +29,10 @@ module EE
       noteable.is_a?(Epic)
     end
 
+    def for_vulnerability?
+      noteable.is_a?(Vulnerability)
+    end
+
     override :for_project_noteable?
     def for_project_noteable?
       !for_epic? && super

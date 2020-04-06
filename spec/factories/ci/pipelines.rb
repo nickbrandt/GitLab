@@ -67,6 +67,22 @@ FactoryBot.define do
         end
       end
 
+      trait :with_test_reports_attachment do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :test_reports_with_attachment, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
+      trait :with_coverage_reports do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :coverage_reports, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
       trait :with_exposed_artifacts do
         status { :success }
 
@@ -90,6 +106,30 @@ FactoryBot.define do
 
       trait :repository_source do
         config_source { Ci::Pipeline.config_sources[:repository_source] }
+      end
+
+      trait :detached_merge_request_pipeline do
+        merge_request
+
+        source { :merge_request_event }
+        project { merge_request.source_project }
+        sha { merge_request.source_branch_sha }
+        ref { merge_request.ref_path }
+      end
+
+      trait :legacy_detached_merge_request_pipeline do
+        detached_merge_request_pipeline
+
+        ref { merge_request.source_branch }
+      end
+
+      trait :merged_result_pipeline do
+        detached_merge_request_pipeline
+
+        sha { 'test-merge-sha'}
+        ref { merge_request.merge_ref_path }
+        source_sha { merge_request.source_branch_sha }
+        target_sha { merge_request.target_branch_sha }
       end
     end
   end

@@ -14,7 +14,7 @@ describe SoftwareLicensePolicies::UpdateService do
   let(:software_license_policy) { create(:software_license_policy, :denied) }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   describe '#execute' do
@@ -29,7 +29,7 @@ describe SoftwareLicensePolicies::UpdateService do
 
       context 'with license management unavailable' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
         end
 
         it 'does not update the software license policy' do

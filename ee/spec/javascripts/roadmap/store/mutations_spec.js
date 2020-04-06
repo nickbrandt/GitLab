@@ -5,6 +5,8 @@ import defaultState from 'ee/roadmap/store/state';
 
 import { mockGroupId, basePath, epicsPath, mockSortedBy } from '../mock_data';
 
+const getEpic = (epicId, epics) => epics.find(e => e.id === epicId);
+
 describe('Roadmap Store Mutations', () => {
   let state;
 
@@ -138,6 +140,54 @@ describe('Roadmap Store Mutations', () => {
     });
   });
 
+  describe('SET_MILESTONES', () => {
+    it('Should provided milestones array in state', () => {
+      const milestones = [{ id: 1 }, { id: 2 }];
+
+      mutations[types.SET_MILESTONES](state, milestones);
+
+      expect(state.milestones).toEqual(milestones);
+    });
+  });
+
+  describe('UPDATE_MILESTONE_IDS', () => {
+    it('Should update milestoneIds array', () => {
+      mutations[types.UPDATE_MILESTONE_IDS](state, [22]);
+
+      expect(state.milestoneIds.length).toBe(1);
+      expect(state.milestoneIds[0]).toBe(22);
+    });
+  });
+
+  describe('REQUEST_MILESTONES', () => {
+    it('Should set state.milestonesFetchInProgress to `true`', () => {
+      mutations[types.REQUEST_MILESTONES](state);
+
+      expect(state.milestonesFetchInProgress).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_MILESTONES_SUCCESS', () => {
+    it('Should set milestonesFetchResultEmpty, milestones in state based on provided milestones array and set milestonesFetchInProgress to `false`', () => {
+      const milestones = [{ id: 1 }, { id: 2 }];
+
+      mutations[types.RECEIVE_MILESTONES_SUCCESS](state, milestones);
+
+      expect(state.milestonesFetchResultEmpty).toBe(false);
+      expect(state.milestones).toEqual(milestones);
+      expect(state.milestonesFetchInProgress).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_MILESTONES_FAILURE', () => {
+    it('Should set milestonesFetchInProgress to false and milestonesFetchFailure to true', () => {
+      mutations[types.RECEIVE_MILESTONES_FAILURE](state);
+
+      expect(state.milestonesFetchInProgress).toBe(false);
+      expect(state.milestonesFetchFailure).toBe(true);
+    });
+  });
+
   describe('SET_BUFFER_SIZE', () => {
     it('Should set `bufferSize` in state', () => {
       const bufferSize = 10;
@@ -145,6 +195,32 @@ describe('Roadmap Store Mutations', () => {
       mutations[types.SET_BUFFER_SIZE](state, bufferSize);
 
       expect(state.bufferSize).toBe(bufferSize);
+    });
+  });
+
+  describe('TOGGLE_EXPANDED_EPIC', () => {
+    it('should toggle collapsed epic to an expanded epic', () => {
+      const epicId = 1;
+      const epics = [
+        { id: 1, title: 'Collapsed epic', isChildEpicShowing: false },
+        { id: 2, title: 'Expanded epic', isChildEpicShowing: true },
+      ];
+
+      mutations[types.TOGGLE_EXPANDED_EPIC]({ ...state, epics }, epicId);
+
+      expect(getEpic(epicId, epics).isChildEpicShowing).toBe(true);
+    });
+
+    it('should toggle expanded epic to a collapsed epic', () => {
+      const epicId = 2;
+      const epics = [
+        { id: 1, title: 'Collapsed epic', isChildEpicShowing: false },
+        { id: 2, title: 'Expanded epic', isChildEpicShowing: true },
+      ];
+
+      mutations[types.TOGGLE_EXPANDED_EPIC]({ ...state, epics }, epicId);
+
+      expect(getEpic(epicId, epics).isChildEpicShowing).toBe(false);
     });
   });
 });

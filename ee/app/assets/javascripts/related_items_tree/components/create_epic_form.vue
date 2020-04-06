@@ -1,11 +1,11 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
   },
   props: {
@@ -53,7 +53,7 @@ export default {
       @keyup.escape.exact="onFormCancel"
     />
     <div class="add-issuable-form-actions clearfix">
-      <gl-button
+      <gl-deprecated-button
         :disabled="isSubmitButtonDisabled"
         variant="success"
         type="submit"
@@ -61,8 +61,10 @@ export default {
       >
         {{ buttonLabel }}
         <gl-loading-icon v-if="isSubmitting" :inline="true" />
-      </gl-button>
-      <gl-button class="float-right" @click="onFormCancel">{{ __('Cancel') }}</gl-button>
+      </gl-deprecated-button>
+      <gl-deprecated-button class="float-right" @click="onFormCancel">{{
+        __('Cancel')
+      }}</gl-deprecated-button>
     </div>
   </form>
 </template>

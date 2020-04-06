@@ -1,5 +1,6 @@
 <script>
 import { mapState } from 'vuex';
+import Sortable from 'sortablejs';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import StageNavItem from './stage_nav_item.vue';
@@ -8,6 +9,8 @@ import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
 import CustomStageForm from './custom_stage_form.vue';
 import { STAGE_ACTIONS } from '../constants';
+import { NO_DRAG_CLASS } from '../../shared/constants';
+import sortableDefaultOptions from '../../shared/mixins/sortable_default_options';
 
 export default {
   name: 'StageTable',
@@ -69,10 +72,6 @@ export default {
       required: false,
       default: () => {},
     },
-    labels: {
-      type: Array,
-      required: true,
-    },
     noDataSvgPath: {
       type: String,
       required: true,
@@ -84,6 +83,16 @@ export default {
     canEditStages: {
       type: Boolean,
       required: true,
+    },
+    customOrdering: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    errorSavingStageOrder: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -105,6 +114,12 @@ export default {
     },
     customStageFormActive() {
       return this.isCreatingCustomStage;
+    },
+    allowCustomOrdering() {
+      return this.customOrdering && !this.errorSavingStageOrder;
+    },
+    manualOrderingClass() {
+      return this.allowCustomOrdering ? 'js-manual-ordering' : '';
     },
     stageHeaders() {
       return [
@@ -137,6 +152,23 @@ export default {
   },
   mounted() {
     this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
+
+    if (this.allowCustomOrdering) {
+      const options = Object.assign({}, sortableDefaultOptions(), {
+        onUpdate: event => {
+          const el = event.item;
+
+          const { previousElementSibling, nextElementSibling } = el;
+
+          const { id } = el.dataset;
+          const moveAfterId = previousElementSibling?.dataset?.id || null;
+          const moveBeforeId = nextElementSibling?.dataset?.id || null;
+
+          this.$emit('reorderStage', { id, moveAfterId, moveBeforeId });
+        },
+      });
+      this.sortable = Sortable.create(this.$refs.list, options);
+    }
   },
   methods: {
     medianValue(id) {
@@ -144,6 +176,7 @@ export default {
     },
   },
   STAGE_ACTIONS,
+  noDragClass: NO_DRAG_CLASS,
 };
 </script>
 <template>
@@ -164,10 +197,11 @@ export default {
         </nav>
       </div>
       <div class="stage-panel-body">
-        <nav ref="stageNav" class="stage-nav">
-          <ul>
+        <nav ref="stageNav" class="stage-nav pl-2">
+          <ul ref="list" :class="manualOrderingClass">
             <stage-nav-item
               v-for="stage in stages"
+              :id="stage.id"
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
               :value="medianValue(stage.id)"
@@ -181,6 +215,7 @@ export default {
             />
             <add-stage-button
               v-if="canEditStages"
+              :class="$options.noDragClass"
               :active="customStageFormActive"
               @showform="$emit('showAddStageForm')"
             />
@@ -191,7 +226,6 @@ export default {
           <custom-stage-form
             v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
-            :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
             :initial-fields="customStageFormInitialData"
             :is-editing-custom-stage="isEditingCustomStage"

@@ -9,13 +9,12 @@ describe Banzai::Filter::InlineClusterMetricsFilter do
   let!(:project) { create(:project) }
   let(:params) { [project.namespace.path, project.path, cluster.id] }
   let(:query_params) { { group: 'Food metrics', title: 'Pizza Consumption', y_label: 'Slice Count' } }
-
   let(:trigger_url) { urls.metrics_namespace_project_cluster_url(*params, **query_params) }
   let(:dashboard_url) do
     urls.metrics_dashboard_namespace_project_cluster_url(
       *params,
       **{
-        embedded: true,
+        embedded: 'true',
         cluster_type: 'project',
         format: :json
       }.merge(query_params)

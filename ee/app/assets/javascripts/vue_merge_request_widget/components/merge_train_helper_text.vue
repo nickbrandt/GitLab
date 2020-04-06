@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { GlLink } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
@@ -37,7 +37,7 @@ export default {
               'mrWidget|This merge request will be added to the merge train when pipeline %{linkStart}#%{pipelineId}%{linkEnd} succeeds.',
             );
 
-      const sanitizedPipelineLink = _.escape(this.pipelineLink);
+      const sanitizedPipelineLink = esc(this.pipelineLink);
 
       return sprintf(
         text,

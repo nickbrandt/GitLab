@@ -34,19 +34,6 @@ describe Gitlab::GitalyClient::RemoteService do
     end
   end
 
-  describe '#fetch_internal_remote' do
-    let(:remote_repository) { Gitlab::Git::Repository.new('default', TEST_MUTABLE_REPO_PATH, '', 'group/project') }
-
-    it 'sends an fetch_internal_remote message and returns the result value' do
-      expect_any_instance_of(Gitaly::RemoteService::Stub)
-        .to receive(:fetch_internal_remote)
-        .with(gitaly_request_with_path(storage_name, relative_path), kind_of(Hash))
-        .and_return(double(result: true))
-
-      expect(client.fetch_internal_remote(remote_repository)).to be(true)
-    end
-  end
-
   describe '#find_remote_root_ref' do
     it 'sends an find_remote_root_ref message and returns the root ref' do
       expect_any_instance_of(Gitaly::RemoteService::Stub)
@@ -79,7 +66,7 @@ describe Gitlab::GitalyClient::RemoteService do
         .with(kind_of(Enumerator), kind_of(Hash))
         .and_return(double(:update_remote_mirror_response))
 
-      client.update_remote_mirror(ref_name, only_branches_matching, ssh_key: ssh_key, known_hosts: known_hosts)
+      client.update_remote_mirror(ref_name, only_branches_matching, ssh_key: ssh_key, known_hosts: known_hosts, keep_divergent_refs: true)
     end
   end
 

@@ -523,7 +523,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
             expect(json_response['token']).to eq(job.token)
             expect(json_response['job_info']).to eq(expected_job_info)
             expect(json_response['git_info']).to eq(expected_git_info)
-            expect(json_response['image']).to eq({ 'name' => 'ruby:2.1', 'entrypoint' => '/bin/sh', 'ports' => [] })
+            expect(json_response['image']).to eq({ 'name' => 'ruby:2.7', 'entrypoint' => '/bin/sh', 'ports' => [] })
             expect(json_response['services']).to eq([{ 'name' => 'postgres', 'entrypoint' => nil,
                                                        'alias' => nil, 'command' => nil, 'ports' => [] },
                                                      { 'name' => 'docker:stable-dind', 'entrypoint' => '/bin/sh',
@@ -756,7 +756,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
               expect(json_response['dependencies'].count).to eq(1)
               expect(json_response['dependencies']).to include(
                 { 'id' => job.id, 'name' => job.name, 'token' => job.token,
-                  'artifacts_file' => { 'filename' => 'ci_build_artifacts.zip', 'size' => 106365 } })
+                  'artifacts_file' => { 'filename' => 'ci_build_artifacts.zip', 'size' => 107464 } })
             end
           end
 
@@ -1102,7 +1102,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           end
 
           it 'returns that operation conflicts' do
-            expect(response.status).to eq(409)
+            expect(response).to have_gitlab_http_status(:conflict)
           end
         end
       end
@@ -1185,7 +1185,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
 
       context 'when request is valid' do
         it 'gets correct response' do
-          expect(response.status).to eq 202
+          expect(response).to have_gitlab_http_status(:accepted)
           expect(job.reload.trace.raw).to eq 'BUILD TRACE appended'
           expect(response.header).to have_key 'Range'
           expect(response.header).to have_key 'Job-Status'
@@ -1242,7 +1242,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           end
 
           it 'responds with forbidden' do
-            expect(response.status).to eq(403)
+            expect(response).to have_gitlab_http_status(:forbidden)
           end
         end
 
@@ -1252,7 +1252,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           end
 
           it 'has valid trace' do
-            expect(response.status).to eq(202)
+            expect(response).to have_gitlab_http_status(:accepted)
             expect(job.reload.trace.raw).to eq 'BUILD TRACE appended appended'
           end
 
@@ -1267,7 +1267,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
               end
 
               it 'returns Forbidden ' do
-                expect(response.status).to eq(403)
+                expect(response).to have_gitlab_http_status(:forbidden)
               end
             end
           end
@@ -1287,7 +1287,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
               end
 
               it 'returns an error' do
-                expect(response.status).to eq(416)
+                expect(response).to have_gitlab_http_status(:range_not_satisfiable)
                 expect(response.header['Range']).to eq('0-0')
               end
             end
@@ -1298,7 +1298,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
               end
 
               it 'succeeds with updating trace' do
-                expect(response.status).to eq(202)
+                expect(response).to have_gitlab_http_status(:accepted)
                 expect(job.reload.trace.raw).to eq 'BUILD TRACE appended appended hello'
               end
             end
@@ -1313,7 +1313,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           end
 
           it 'returns that operation conflicts' do
-            expect(response.status).to eq(409)
+            expect(response).to have_gitlab_http_status(:conflict)
           end
         end
 
@@ -1336,7 +1336,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           it 'returns X-GitLab-Trace-Update-Interval as 3' do
             patch_the_trace
 
-            expect(response.status).to eq 202
+            expect(response).to have_gitlab_http_status(:accepted)
             expect(response.header['X-GitLab-Trace-Update-Interval']).to eq('3')
           end
         end
@@ -1345,21 +1345,8 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           it 'returns X-GitLab-Trace-Update-Interval as 30' do
             patch_the_trace
 
-            expect(response.status).to eq 202
+            expect(response).to have_gitlab_http_status(:accepted)
             expect(response.header['X-GitLab-Trace-Update-Interval']).to eq('30')
-          end
-        end
-
-        context 'when feature flag runner_job_trace_update_interval_header is disabled' do
-          before do
-            stub_feature_flags(runner_job_trace_update_interval_header: { enabled: false })
-          end
-
-          it 'does not return X-GitLab-Trace-Update-Interval header' do
-            patch_the_trace
-
-            expect(response.status).to eq 202
-            expect(response.header).not_to have_key 'X-GitLab-Trace-Update-Interval'
           end
         end
       end
@@ -1370,7 +1357,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
         end
 
         it 'gets correct response' do
-          expect(response.status).to eq 202
+          expect(response).to have_gitlab_http_status(:accepted)
           expect(job.reload.trace.raw).to eq 'BUILD TRACE appended'
           expect(response.header).to have_key 'Range'
           expect(response.header).to have_key 'Job-Status'
@@ -1381,7 +1368,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
         let(:headers_with_range) { headers.merge({ 'Content-Range' => '15-20/6' }) }
 
         it 'gets 416 error response with range headers' do
-          expect(response.status).to eq 416
+          expect(response).to have_gitlab_http_status(:range_not_satisfiable)
           expect(response.header).to have_key 'Range'
           expect(response.header['Range']).to eq '0-11'
         end
@@ -1391,7 +1378,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
         let(:headers_with_range) { headers.merge({ 'Content-Range' => '8-20/13' }) }
 
         it 'gets 416 error response with range headers' do
-          expect(response.status).to eq 416
+          expect(response).to have_gitlab_http_status(:range_not_satisfiable)
           expect(response.header).to have_key 'Range'
           expect(response.header['Range']).to eq '0-11'
         end
@@ -1400,13 +1387,13 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
       context 'when Content-Range header is missing' do
         let(:headers_with_range) { headers }
 
-        it { expect(response.status).to eq 400 }
+        it { expect(response).to have_gitlab_http_status(:bad_request) }
       end
 
       context 'when job has been errased' do
         let(:job) { create(:ci_build, runner_id: runner.id, erased_at: Time.now) }
 
-        it { expect(response.status).to eq 403 }
+        it { expect(response).to have_gitlab_http_status(:forbidden) }
       end
 
       def patch_the_trace(content = ' appended', request_headers = nil)
@@ -1934,6 +1921,49 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
 
                 expect(response).to have_gitlab_http_status(:bad_request)
                 expect(job.reload.job_artifacts_network_referee).to be_nil
+              end
+            end
+          end
+
+          context 'when artifact_type is dotenv' do
+            context 'when artifact_format is gzip' do
+              let(:file_upload) { fixture_file_upload('spec/fixtures/build.env.gz') }
+              let(:params) { { artifact_type: :dotenv, artifact_format: :gzip } }
+
+              it 'stores dotenv file' do
+                upload_artifacts(file_upload, headers_with_token, params)
+
+                expect(response).to have_gitlab_http_status(:created)
+                expect(job.reload.job_artifacts_dotenv).not_to be_nil
+              end
+
+              it 'parses dotenv file' do
+                expect do
+                  upload_artifacts(file_upload, headers_with_token, params)
+                end.to change { job.job_variables.count }.from(0).to(2)
+              end
+
+              context 'when parse error happens' do
+                let(:file_upload) { fixture_file_upload('spec/fixtures/ci_build_artifacts_metadata.gz') }
+
+                it 'returns an error' do
+                  upload_artifacts(file_upload, headers_with_token, params)
+
+                  expect(response).to have_gitlab_http_status(:bad_request)
+                  expect(json_response['message']).to eq('Invalid Format')
+                end
+              end
+            end
+
+            context 'when artifact_format is raw' do
+              let(:file_upload) { fixture_file_upload('spec/fixtures/build.env.gz') }
+              let(:params) { { artifact_type: :dotenv, artifact_format: :raw } }
+
+              it 'returns an error' do
+                upload_artifacts(file_upload, headers_with_token, params)
+
+                expect(response).to have_gitlab_http_status(:bad_request)
+                expect(job.reload.job_artifacts_dotenv).to be_nil
               end
             end
           end

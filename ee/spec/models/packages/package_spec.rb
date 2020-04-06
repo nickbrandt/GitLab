@@ -13,6 +13,61 @@ RSpec.describe Packages::Package, type: :model do
     it { is_expected.to have_one(:maven_metadatum).inverse_of(:package) }
   end
 
+  describe '.sort_by_attribute' do
+    let_it_be(:group) { create(:group, :public) }
+    let_it_be(:project) { create(:project, :public, namespace: group, name: 'project A') }
+    let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
+    let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
+    let(:package3) { create(:maven_package, project: project, version: '1.1.1', name: 'zzz') }
+
+    before do
+      travel_to(1.day.ago) do
+        package3
+      end
+    end
+
+    RSpec.shared_examples 'package sorting by attribute' do |order_by|
+      subject { described_class.where(id: packages.map(&:id)).sort_by_attribute("#{order_by}_#{sort}").to_a }
+
+      context "sorting by #{order_by}" do
+        context 'ascending order' do
+          let(:sort) { 'asc' }
+
+          it { is_expected.to eq packages }
+        end
+
+        context 'descending order' do
+          let(:sort) { 'desc' }
+
+          it { is_expected.to eq packages.reverse }
+        end
+      end
+    end
+
+    it_behaves_like 'package sorting by attribute', 'name' do
+      let(:packages) { [package1, package2, package3] }
+    end
+
+    it_behaves_like 'package sorting by attribute', 'created_at' do
+      let(:packages) { [package3, package1, package2] }
+    end
+
+    it_behaves_like 'package sorting by attribute', 'version' do
+      let(:packages) { [package3, package2, package1] }
+    end
+
+    it_behaves_like 'package sorting by attribute', 'type' do
+      let(:packages) { [package3, package1, package2] }
+    end
+
+    it_behaves_like 'package sorting by attribute', 'project_path' do
+      let(:another_project) { create(:project, :public, namespace: group, name: 'project B') }
+      let!(:package4) { create(:npm_package, project: another_project, version: '3.1.0', name: "@#{project.root_namespace.path}/bar") }
+
+      let(:packages) { [package1, package2, package3, package4] }
+    end
+  end
+
   describe 'validations' do
     subject { create(:package) }
 
@@ -23,6 +78,21 @@ RSpec.describe Packages::Package, type: :model do
       it { is_expected.to allow_value("my/domain/com/my-app").for(:name) }
       it { is_expected.to allow_value("my.app-11.07.2018").for(:name) }
       it { is_expected.not_to allow_value("my(dom$$$ain)com.my-app").for(:name) }
+    end
+
+    describe '#version' do
+      context 'npm package' do
+        subject { create(:npm_package) }
+
+        it { is_expected.to allow_value('1.2.3').for(:version) }
+        it { is_expected.to allow_value('1.2.3-beta').for(:version) }
+        it { is_expected.to allow_value('1.2.3-alpha.3').for(:version) }
+        it { is_expected.not_to allow_value('1').for(:version) }
+        it { is_expected.not_to allow_value('1.2').for(:version) }
+        it { is_expected.not_to allow_value('1./2.3').for(:version) }
+        it { is_expected.not_to allow_value('../../../../../1.2.3').for(:version) }
+        it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
+      end
     end
 
     describe '#package_already_taken' do
@@ -118,7 +188,7 @@ RSpec.describe Packages::Package, type: :model do
     end
 
     describe '.has_version' do
-      let!(:package4) { create(:npm_package, version: nil) }
+      let!(:package4) { create(:nuget_package, version: nil) }
 
       subject { described_class.has_version }
 

@@ -1,6 +1,40 @@
 {
     "@generated": "Fri, 13 Apr 2018 09:22:01", 
     "@version": "2.7.0", 
+    "scan": {
+        "scanned_resources": [
+            {
+                "method": "GET",
+                "type": "url",
+                "url": "http://api-server/"
+            },
+            {
+                "method": "GET",
+                "type": "url",
+                "url": "http://api-server/v1"
+            },
+            {
+                "method": "DELETE",
+                "type": "url",
+                "url": "http://api-server/v1/tree/10"
+            },
+            {
+                "method": "GET",
+                "type": "url",
+                "url": "http://api-server/v1/tree/10"
+            },
+            {
+                "method": "GET",
+                "type": "url",
+                "url": "http://api-server/v1/trees"
+            },
+            {
+                "method": "POST",
+                "type": "url",
+                "url": "http://api-server/v1/trees"
+            }
+        ]
+    },
     "site": [
         {
             "@host": "goat", 

@@ -7,7 +7,7 @@ We will use GitLab's native Kubernetes integration, so you will not need
 to create a Kubernetes cluster manually using the Google Cloud Platform console.
 We will create and deploy a simple application that we create from a GitLab template.
 
-These instructions will also work for a self-hosted GitLab instance; you'll just
+These instructions will also work for a self-managed GitLab instance; you'll just
 need to ensure your own [Runners are configured](../../ci/runners/README.md) and
 [Google OAuth is enabled](../../integration/google.md).
 
@@ -239,7 +239,7 @@ After a few minutes you'll notice that there was a failure in a test.
 This means there's a test that was 'broken' by our change.
 Navigating into the `test` job that failed, you can see what the broken test is:
 
-```
+```plaintext
 Failure:
 WelcomeControllerTest#test_should_get_index [/app/test/controllers/welcome_controller_test.rb:7]:
 <You're on Rails!> expected but was

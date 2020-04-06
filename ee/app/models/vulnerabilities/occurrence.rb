@@ -39,7 +39,7 @@ module Vulnerabilities
     }.with_indifferent_access.freeze
 
     SEVERITY_LEVELS = {
-      undefined: 0,
+      # undefined: 0, no longer applicable
       info: 1,
       unknown: 2,
       # experimental: 3, formerly used by confidence, no longer applicable
@@ -77,6 +77,8 @@ module Vulnerabilities
 
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
+
+    delegate :name, to: :scanner, prefix: true, allow_nil: true
 
     scope :report_type, -> (type) { where(report_type: report_types[type]) }
     scope :ordered, -> { order(severity: :desc, confidence: :desc, id: :asc) }

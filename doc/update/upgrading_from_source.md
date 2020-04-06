@@ -98,7 +98,7 @@ sudo apt-get update
 sudo apt-get install yarn
 ```
 
-More information can be found on the [Yarn website](https://yarnpkg.com/en/docs/install).
+More information can be found on the [Yarn website](https://classic.yarnpkg.com/en/docs/install).
 
 ### 5. Update Go
 
@@ -165,7 +165,7 @@ sudo make prefix=/usr/local install
 cd /home/git/gitlab
 
 sudo -u git -H git fetch --all --prune
-sudo -u git -H git checkout -- db/schema.rb # local changes will be restored automatically
+sudo -u git -H git checkout -- db/structure.sql # local changes will be restored automatically
 sudo -u git -H git checkout -- locale
 ```
 

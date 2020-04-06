@@ -42,8 +42,6 @@ module Gitlab
           entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
             description: 'Environment variables available for this job.'
 
-          helpers :before_script, :script, :image, :variables, :services
-
           attributes :tags
 
           def value

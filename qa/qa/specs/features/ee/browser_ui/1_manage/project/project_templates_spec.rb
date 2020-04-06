@@ -64,7 +64,7 @@ module QA
         end
       end
 
-      context 'instance level', :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/36815', type: :bug } do
+      context 'instance level', :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/13418', type: :bug } do
         before do
           Flow::Login.sign_in_as_admin
 
@@ -105,7 +105,7 @@ module QA
         end
       end
 
-      context 'group level' do
+      context 'group level', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/211528', type: :bug } do
         before do
           Flow::Login.sign_in
 

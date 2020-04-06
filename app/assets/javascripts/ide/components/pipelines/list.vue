@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { sprintf, __ } from '../../../locale';
 import Icon from '../../../vue_shared/components/icon.vue';
@@ -35,7 +35,7 @@ export default {
       return sprintf(
         __('You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}.'),
         {
-          linkStart: `<a href="${_.escape(this.currentProject.web_url)}/-/ci/lint">`,
+          linkStart: `<a href="${esc(this.currentProject.web_url)}/-/ci/lint">`,
           linkEnd: '</a>',
         },
         false,
@@ -59,7 +59,7 @@ export default {
     <gl-loading-icon v-if="showLoadingIcon" :size="2" class="prepend-top-default" />
     <template v-else-if="hasLoadedPipeline">
       <header v-if="latestPipeline" class="ide-tree-header ide-pipeline-header">
-        <ci-icon :status="latestPipeline.details.status" :size="24" />
+        <ci-icon :status="latestPipeline.details.status" :size="24" class="d-flex" />
         <span class="prepend-left-8">
           <strong> {{ __('Pipeline') }} </strong>
           <a
@@ -76,6 +76,7 @@ export default {
         :help-page-path="links.ciHelpPagePath"
         :empty-state-svg-path="pipelinesEmptyStateSvgPath"
         :can-set-ci="true"
+        class="mb-auto mt-auto"
       />
       <div v-else-if="latestPipeline.yamlError" class="bs-callout bs-callout-danger">
         <p class="append-bottom-0">{{ __('Found errors in your .gitlab-ci.yml:') }}</p>

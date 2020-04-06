@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import mutations from '~/notes/stores/mutations';
-import { DISCUSSION_NOTE } from '~/notes/constants';
+import { DISCUSSION_NOTE, ASC, DESC } from '~/notes/constants';
 import {
   note,
   discussionMock,
@@ -8,6 +8,7 @@ import {
   userDataMock,
   noteableDataMock,
   individualNote,
+  notesWithDescriptionChanges,
 } from '../mock_data';
 
 const RESOLVED_NOTE = { resolvable: true, resolved: true };
@@ -21,7 +22,10 @@ describe('Notes Store mutations', () => {
     let noteData;
 
     beforeEach(() => {
-      state = { discussions: [] };
+      state = {
+        discussions: [],
+        discussionSortOrder: ASC,
+      };
       noteData = {
         expanded: true,
         id: note.discussion_id,
@@ -33,9 +37,7 @@ describe('Notes Store mutations', () => {
     });
 
     it('should add a new note to an array of notes', () => {
-      expect(state).toEqual({
-        discussions: [noteData],
-      });
+      expect(state).toEqual(expect.objectContaining({ discussions: [noteData] }));
 
       expect(state.discussions.length).toBe(1);
     });
@@ -328,6 +330,52 @@ describe('Notes Store mutations', () => {
     });
   });
 
+  describe('SET_EXPAND_DISCUSSIONS', () => {
+    it('should succeed when discussions are null', () => {
+      const state = {};
+
+      mutations.SET_EXPAND_DISCUSSIONS(state, { discussionIds: null, expanded: true });
+
+      expect(state).toEqual({});
+    });
+
+    it('should succeed when discussions are empty', () => {
+      const state = {};
+
+      mutations.SET_EXPAND_DISCUSSIONS(state, { discussionIds: [], expanded: true });
+
+      expect(state).toEqual({});
+    });
+
+    it('should open all closed discussions', () => {
+      const discussion1 = Object.assign({}, discussionMock, { id: 0, expanded: false });
+      const discussion2 = Object.assign({}, discussionMock, { id: 1, expanded: true });
+      const discussionIds = [discussion1.id, discussion2.id];
+
+      const state = { discussions: [discussion1, discussion2] };
+
+      mutations.SET_EXPAND_DISCUSSIONS(state, { discussionIds, expanded: true });
+
+      state.discussions.forEach(discussion => {
+        expect(discussion.expanded).toEqual(true);
+      });
+    });
+
+    it('should close all opened discussions', () => {
+      const discussion1 = Object.assign({}, discussionMock, { id: 0, expanded: false });
+      const discussion2 = Object.assign({}, discussionMock, { id: 1, expanded: true });
+      const discussionIds = [discussion1.id, discussion2.id];
+
+      const state = { discussions: [discussion1, discussion2] };
+
+      mutations.SET_EXPAND_DISCUSSIONS(state, { discussionIds, expanded: false });
+
+      state.discussions.forEach(discussion => {
+        expect(discussion.expanded).toEqual(false);
+      });
+    });
+  });
+
   describe('UPDATE_NOTE', () => {
     it('should update a note', () => {
       const state = {
@@ -577,6 +625,43 @@ describe('Notes Store mutations', () => {
       mutations.REMOVE_CONVERTED_DISCUSSION(state, discussion.id);
 
       expect(state.convertedDisscussionIds).not.toContain(discussion.id);
+    });
+  });
+
+  describe('RECEIVE_DESCRIPTION_VERSION', () => {
+    const descriptionVersion = notesWithDescriptionChanges[0].notes[0].note;
+    const versionId = notesWithDescriptionChanges[0].notes[0].id;
+    const state = {};
+
+    it('adds a descriptionVersion', () => {
+      mutations.RECEIVE_DESCRIPTION_VERSION(state, { descriptionVersion, versionId });
+      expect(state.descriptionVersions[versionId]).toBe(descriptionVersion);
+    });
+  });
+
+  describe('RECEIVE_DELETE_DESCRIPTION_VERSION', () => {
+    const descriptionVersion = notesWithDescriptionChanges[0].notes[0].note;
+    const versionId = notesWithDescriptionChanges[0].notes[0].id;
+    const state = { descriptionVersions: { [versionId]: descriptionVersion } };
+    const deleted = 'Deleted';
+
+    it('updates descriptionVersion to "Deleted"', () => {
+      mutations.RECEIVE_DELETE_DESCRIPTION_VERSION(state, { [versionId]: deleted });
+      expect(state.descriptionVersions[versionId]).toBe(deleted);
+    });
+  });
+
+  describe('SET_DISCUSSIONS_SORT', () => {
+    let state;
+
+    beforeEach(() => {
+      state = { discussionSortOrder: ASC };
+    });
+
+    it('sets sort order', () => {
+      mutations.SET_DISCUSSIONS_SORT(state, DESC);
+
+      expect(state.discussionSortOrder).toBe(DESC);
     });
   });
 });

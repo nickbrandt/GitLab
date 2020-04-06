@@ -1,10 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import ContainerScanningIssueBody from 'ee/vue_shared/security_reports/components/container_scanning_issue_body.vue';
+import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 
 describe('Container Scanning Issue Body', () => {
   let wrapper;
 
-  const createComponent = severity => {
+  const createComponent = (severity = undefined) => {
     wrapper = shallowMount(ContainerScanningIssueBody, {
       propsData: {
         issue: {
@@ -30,13 +31,13 @@ describe('Container Scanning Issue Body', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('renders severity if present on issue', () => {
+  it('does show SeverityBadge if severity is present', () => {
     createComponent('Low');
-    expect(wrapper.find('.report-block-list-issue-description-text').text()).toBe('Low:');
+    expect(wrapper.find(SeverityBadge).props('severity')).toBe('Low');
   });
 
-  it('does not render  severity if not present on issue', () => {
+  it('does not show SeverityBadge if severity is not present', () => {
     createComponent();
-    expect(wrapper.find('.report-block-list-issue-description-text').text()).toBe('');
+    expect(wrapper.contains(SeverityBadge)).toBe(false);
   });
 });

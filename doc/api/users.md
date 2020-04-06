@@ -304,9 +304,13 @@ Example Responses:
   "external": false,
   "private_profile": false,
   "current_sign_in_ip": "196.165.1.102",
-  "last_sign_in_ip": "172.127.2.22"
+  "last_sign_in_ip": "172.127.2.22",
+  "plan": "gold",
+  "trial": true
 }
 ```
+
+NOTE: **Note:** The `plan` and `trial` parameters are only available on GitLab Enterprise Edition.
 
 Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) will also see
 the `shared_runners_minutes_limit`, `extra_shared_runners_minutes_limit`, and `note` parameters.
@@ -383,7 +387,7 @@ Parameters:
 | `group_id_for_saml`                  | No       | ID of group where SAML has been configured                                                                                                              |
 | `linkedin`                           | No       | LinkedIn                                                                                                                                                |
 | `location`                           | No       | User's location                                                                                                                                         |
-| `name`                               | No       | Name                                                                                                                                                    |
+| `name`                               | Yes      | Name                                                                                                                                                    |
 | `organization`                       | No       | Organization name                                                                                                                                       |
 | `password`                           | No       | Password                                                                                                                                                |
 | `private_profile`                    | No       | User's profile is private - true, false (default), or null (will be converted to false)                                                                 |
@@ -750,7 +754,7 @@ POST /user/keys
 Parameters:
 
 - `title` (required) - new SSH Key's title
-- `key` (required)   - new SSH key
+- `key` (required) - new SSH key
 
 ```json
 {
@@ -787,9 +791,9 @@ POST /users/:id/keys
 
 Parameters:
 
-- `id` (required)    - id of specified user
+- `id` (required) - id of specified user
 - `title` (required) - new SSH Key's title
-- `key` (required)   - new SSH key
+- `key` (required) - new SSH key
 
 ## Delete SSH key for current user
 
@@ -815,7 +819,7 @@ DELETE /users/:id/keys/:key_id
 Parameters:
 
 - `id` (required) - id of specified user
-- `key_id` (required)  - SSH key ID
+- `key_id` (required) - SSH key ID
 
 ## List all GPG keys
 
@@ -1126,7 +1130,7 @@ POST /users/:id/emails
 
 Parameters:
 
-- `id` (required)    - id of specified user
+- `id` (required) - id of specified user
 - `email` (required) - email address
 - `skip_confirmation` (optional) - Skip confirmation and assume e-mail is verified - true or false (default)
 
@@ -1154,7 +1158,7 @@ DELETE /users/:id/emails/:email_id
 Parameters:
 
 - `id` (required) - id of specified user
-- `email_id` (required)  - email ID
+- `email_id` (required) - email ID
 
 ## Block user
 
@@ -1168,8 +1172,11 @@ Parameters:
 
 - `id` (required) - id of specified user
 
-Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
-`403 Forbidden` when trying to block an already blocked user by LDAP synchronization.
+Returns:
+
+- `201 OK` on success.
+- `404 User Not Found` if user cannot be found.
+- `403 Forbidden` when trying to block an already blocked user by LDAP synchronization.
 
 ## Unblock user
 

@@ -1,6 +1,6 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
-import { transformRawStages, transformRawTasksByTypeData } from '../utils';
+import { transformRawStages, transformRawTasksByTypeData, toggleSelectedLabel } from '../utils';
 import { TASKS_BY_TYPE_FILTERS } from '../constants';
 
 export default {
@@ -56,11 +56,27 @@ export default {
     state.isEmptyStage = true;
     state.isLoadingStage = false;
   },
-  [types.REQUEST_GROUP_LABELS](state) {
-    state.labels = [];
+  [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
+    state.topRankedLabels = [];
     state.tasksByType = {
       ...state.tasksByType,
-      labelIds: [],
+      selectedLabelIds: [],
+    };
+  },
+  [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
+    const { tasksByType } = state;
+    state.topRankedLabels = data.map(convertObjectPropsToCamelCase);
+    state.tasksByType = {
+      ...tasksByType,
+      selectedLabelIds: data.map(({ id }) => id),
+    };
+  },
+  [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
+    const { tasksByType } = state;
+    state.topRankedLabels = [];
+    state.tasksByType = {
+      ...tasksByType,
+      selectedLabelIds: [],
     };
   },
   [types.REQUEST_STAGE_MEDIANS](state) {
@@ -77,22 +93,6 @@ export default {
   },
   [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
     state.medians = {};
-  },
-  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
-    const { tasksByType } = state;
-    state.labels = data.map(convertObjectPropsToCamelCase);
-    state.tasksByType = {
-      ...tasksByType,
-      labelIds: data.map(({ id }) => id),
-    };
-  },
-  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
-    const { tasksByType } = state;
-    state.labels = [];
-    state.tasksByType = {
-      ...tasksByType,
-      labelIds: [],
-    };
   },
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
     state.isCreatingCustomStage = true;
@@ -217,15 +217,13 @@ export default {
   },
   [types.SET_TASKS_BY_TYPE_FILTERS](state, { filter, value }) {
     const {
-      tasksByType: { labelIds, ...tasksByTypeRest },
+      tasksByType: { selectedLabelIds, ...tasksByTypeRest },
     } = state;
     let updatedFilter = {};
     switch (filter) {
       case TASKS_BY_TYPE_FILTERS.LABEL:
         updatedFilter = {
-          labelIds: labelIds.includes(value)
-            ? labelIds.filter(v => v !== value)
-            : [...labelIds, value],
+          selectedLabelIds: toggleSelectedLabel({ selectedLabelIds, value }),
         };
         break;
       case TASKS_BY_TYPE_FILTERS.SUBJECT:
@@ -234,7 +232,7 @@ export default {
       default:
         break;
     }
-    state.tasksByType = { ...tasksByTypeRest, labelIds, ...updatedFilter };
+    state.tasksByType = { ...tasksByTypeRest, selectedLabelIds, ...updatedFilter };
   },
   [types.INITIALIZE_CYCLE_ANALYTICS](
     state,
@@ -253,5 +251,17 @@ export default {
   },
   [types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS](state) {
     state.isLoading = false;
+  },
+  [types.REQUEST_REORDER_STAGE](state) {
+    state.isSavingStageOrder = true;
+    state.errorSavingStageOrder = false;
+  },
+  [types.RECEIVE_REORDER_STAGE_SUCCESS](state) {
+    state.isSavingStageOrder = false;
+    state.errorSavingStageOrder = false;
+  },
+  [types.RECEIVE_REORDER_STAGE_ERROR](state) {
+    state.isSavingStageOrder = false;
+    state.errorSavingStageOrder = true;
   },
 };

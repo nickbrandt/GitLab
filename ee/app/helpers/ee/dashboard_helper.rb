@@ -32,15 +32,11 @@ module EE
     end
 
     def analytics_nav_url
-      if ::Feature.disabled?(:group_level_cycle_analytics) && ::Gitlab::Analytics.any_features_enabled?
-        return analytics_root_path
-      end
-
       if can?(current_user, :read_instance_statistics)
-        return instance_statistics_root_path
+        instance_statistics_root_path
+      else
+        'errors/not_found'
       end
-
-      'errors/not_found'
     end
 
     private
@@ -48,8 +44,6 @@ module EE
     override :get_dashboard_nav_links
     def get_dashboard_nav_links
       super.tap do |links|
-        links << :analytics if ::Feature.disabled?(:group_level_cycle_analytics) && ::Gitlab::Analytics.any_features_enabled?
-
         if can?(current_user, :read_operations_dashboard)
           links << :environments if ::Feature.enabled?(:environments_dashboard, current_user, default_enabled: true)
           links << :operations

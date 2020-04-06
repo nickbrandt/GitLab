@@ -4,7 +4,6 @@ require 'carrierwave/orm/activerecord'
 
 class Project < ApplicationRecord
   include Gitlab::ConfigHelper
-  include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
   include AccessRequestable
   include Avatarable
@@ -66,7 +65,10 @@ class Project < ApplicationRecord
   default_value_for :archived, false
   default_value_for :resolve_outdated_diff_discussions, false
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
-  default_value_for(:repository_storage) { Gitlab::CurrentSettings.pick_repository_storage }
+  default_value_for(:repository_storage) do
+    pick_repository_storage
+  end
+
   default_value_for(:shared_runners_enabled) { Gitlab::CurrentSettings.shared_runners_enabled }
   default_value_for :issues_enabled, gitlab_config_features.issues
   default_value_for :merge_requests_enabled, gitlab_config_features.merge_requests
@@ -104,6 +106,7 @@ class Project < ApplicationRecord
   after_update :update_forks_visibility_level
 
   before_destroy :remove_private_deploy_keys
+  before_destroy :cleanup_chat_names
 
   use_fast_destroy :build_trace_chunks
 
@@ -186,12 +189,14 @@ class Project < ApplicationRecord
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_many :export_jobs, class_name: 'ProjectExportJob'
   has_one :project_repository, inverse_of: :project
   has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
   has_one :error_tracking_setting, inverse_of: :project, class_name: 'ErrorTracking::ProjectErrorTrackingSetting'
   has_one :metrics_setting, inverse_of: :project, class_name: 'ProjectMetricsSetting'
   has_one :grafana_integration, inverse_of: :project
   has_one :project_setting, ->(project) { where_or_create_by(project: project) }, inverse_of: :project
+  has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -247,6 +252,8 @@ class Project < ApplicationRecord
 
   has_many :prometheus_metrics
   has_many :prometheus_alerts, inverse_of: :project
+  has_many :prometheus_alert_events, inverse_of: :project
+  has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
   # Container repositories need to remove data from the container registry,
   # which is not managed by the DB. Hence we're still using dependent: :destroy
@@ -306,6 +313,9 @@ class Project < ApplicationRecord
   has_one :pages_metadatum, class_name: 'ProjectPagesMetadatum', inverse_of: :project
 
   has_many :import_failures, inverse_of: :project
+  has_many :jira_imports, -> { order 'jira_imports.created_at' }, class_name: 'JiraImportState', inverse_of: :project
+
+  has_many :daily_report_results, class_name: 'Ci::DailyReportResult'
 
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
@@ -323,6 +333,7 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
   accepts_nested_attributes_for :grafana_integration, update_only: true, allow_destroy: true
   accepts_nested_attributes_for :prometheus_service, update_only: true
+  accepts_nested_attributes_for :alerting_setting, update_only: true
 
   delegate :feature_available?, :builds_enabled?, :wiki_enabled?,
     :merge_requests_enabled?, :forking_enabled?, :issues_enabled?,
@@ -338,7 +349,6 @@ class Project < ApplicationRecord
   delegate :members, to: :team, prefix: true
   delegate :add_user, :add_users, to: :team
   delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
-  delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
   delegate :root_ancestor, to: :namespace, allow_nil: true
   delegate :last_pipeline, to: :commit, allow_nil: true
@@ -580,9 +590,9 @@ class Project < ApplicationRecord
     # case-insensitive.
     #
     # query - The search query as a String.
-    def search(query)
-      if Feature.enabled?(:project_search_by_full_path, default_enabled: true)
-        joins(:route).fuzzy_search(query, [Route.arel_table[:path], :name, :description])
+    def search(query, include_namespace: false)
+      if include_namespace && Feature.enabled?(:project_search_by_full_path, default_enabled: true)
+        joins(:route).fuzzy_search(query, [Route.arel_table[:path], Route.arel_table[:name], :description])
       else
         fuzzy_search(query, [:path, :name, :description])
       end
@@ -848,6 +858,12 @@ class Project < ApplicationRecord
     import_state&.status || 'none'
   end
 
+  def jira_import_status
+    return import_status if jira_force_import?
+
+    import_data&.becomes(JiraImportData)&.projects.blank? ? 'none' : 'finished'
+  end
+
   def human_import_status_name
     import_state&.human_status_name || 'none'
   end
@@ -859,6 +875,8 @@ class Project < ApplicationRecord
       elsif gitlab_project_import?
         # Do not retry on Import/Export until https://gitlab.com/gitlab-org/gitlab-foss/issues/26189 is solved.
         RepositoryImportWorker.set(retry: false).perform_async(self.id)
+      elsif jira_import?
+        Gitlab::JiraImport::Stage::StartImportWorker.perform_async(self.id)
       else
         RepositoryImportWorker.perform_async(self.id)
       end
@@ -891,7 +909,7 @@ class Project < ApplicationRecord
 
   # This method is overridden in EE::Project model
   def remove_import_data
-    import_data&.destroy
+    import_data&.destroy unless jira_import?
   end
 
   def ci_config_path=(value)
@@ -938,7 +956,7 @@ class Project < ApplicationRecord
   end
 
   def import?
-    external_import? || forked? || gitlab_project_import? || bare_repository_import?
+    external_import? || forked? || gitlab_project_import? || jira_import? || bare_repository_import?
   end
 
   def external_import?
@@ -951,6 +969,14 @@ class Project < ApplicationRecord
 
   def bare_repository_import?
     import_type == 'bare_repository'
+  end
+
+  def jira_import?
+    import_type == 'jira' && Feature.enabled?(:jira_issue_import, self)
+  end
+
+  def jira_force_import?
+    jira_import? && import_data&.becomes(JiraImportData)&.force_import?
   end
 
   def gitlab_project_import?
@@ -1095,10 +1121,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def web_url(only_path: nil)
-    Gitlab::Routing.url_helpers.project_url(self, only_path: only_path)
-  end
-
   def readme_url
     readme_path = repository.readme_path
     if readme_path
@@ -1189,6 +1211,10 @@ class Project < ApplicationRecord
     update_column(:has_external_issue_tracker, services.external_issue_trackers.any?) if Gitlab::Database.read_write?
   end
 
+  def external_references_supported?
+    external_issue_tracker&.support_cross_reference?
+  end
+
   def has_wiki?
     wiki_enabled? || has_external_wiki?
   end
@@ -1209,14 +1235,12 @@ class Project < ApplicationRecord
     update_column(:has_external_wiki, services.external_wikis.any?) if Gitlab::Database.read_write?
   end
 
-  def find_or_initialize_services(exceptions: [])
-    available_services_names = Service.available_services_names - exceptions
+  def find_or_initialize_services
+    available_services_names = Service.available_services_names - disabled_services
 
-    available_services = available_services_names.map do |service_name|
+    available_services_names.map do |service_name|
       find_or_initialize_service(service_name)
     end
-
-    available_services.compact
   end
 
   def disabled_services
@@ -1229,13 +1253,11 @@ class Project < ApplicationRecord
     service = find_service(services, name)
     return service if service
 
-    # We should check if template for the service exists
     template = find_service(services_templates, name)
 
     if template
       Service.build_from_template(id, template)
     else
-      # If no template, we should create an instance. Ex `build_gitlab_ci_service`
       public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
     end
   end
@@ -1248,10 +1270,6 @@ class Project < ApplicationRecord
     end
   end
   # rubocop: enable CodeReuse/ServiceClass
-
-  def find_service(list, name)
-    list.find { |service| service.to_param == name }
-  end
 
   def ci_services
     services.where(category: :ci)
@@ -1267,10 +1285,6 @@ class Project < ApplicationRecord
 
   def monitoring_service
     @monitoring_service ||= monitoring_services.reorder(nil).find_by(active: true)
-  end
-
-  def jira_tracker?
-    issues_tracker.to_param == 'jira'
   end
 
   def avatar_in_git
@@ -1398,12 +1412,17 @@ class Project < ApplicationRecord
       .where(lfs_objects_projects: { project_id: [self, lfs_storage_project] })
   end
 
-  # TODO: Call `#lfs_objects` instead once all LfsObjectsProject records are
-  # backfilled. At that point, projects can look at their own `lfs_objects`.
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks. At that point, projects can look at their own `lfs_objects` so
+  # `lfs_objects_oids` can be used instead.
   #
   # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
-  def lfs_objects_oids
-    all_lfs_objects.pluck(:oid)
+  def all_lfs_objects_oids(oids: [])
+    oids(all_lfs_objects, oids: oids)
+  end
+
+  def lfs_objects_oids(oids: [])
+    oids(lfs_objects, oids: oids)
   end
 
   def personal?
@@ -1450,13 +1469,14 @@ class Project < ApplicationRecord
     # Forked import is handled asynchronously
     return if forked? && !force
 
-    if gitlab_shell.create_project_repository(self)
-      repository.after_create
-      true
-    else
-      errors.add(:base, _('Failed to create repository via gitlab-shell'))
-      false
-    end
+    repository.create_repository
+    repository.after_create
+
+    true
+  rescue => err
+    Gitlab::ErrorTracking.track_exception(err, project: { id: id, full_path: full_path, disk_path: disk_path })
+    errors.add(:base, _('Failed to create repository'))
+    false
   end
 
   def hook_attrs(backward: true)
@@ -1573,10 +1593,6 @@ class Project < ApplicationRecord
     strong_memoize(:wiki) do
       ProjectWiki.new(self, self.owner)
     end
-  end
-
-  def jira_tracker_active?
-    jira_tracker? && jira_service.active
   end
 
   def allowed_to_share_with_group?
@@ -1782,8 +1798,10 @@ class Project < ApplicationRecord
   # rubocop:enable Gitlab/RailsLogger
 
   def after_import
-    repository.after_import
-    wiki.repository.after_import
+    repository.expire_content_cache
+    wiki.repository.expire_content_cache
+
+    DetectRepositoryLanguagesWorker.perform_async(id)
 
     # The import assigns iid values on its own, e.g. by re-using GitHub ids.
     # Flush existing InternalId records for this project for consistency reasons.
@@ -1843,10 +1861,12 @@ class Project < ApplicationRecord
   end
 
   def export_status
-    if export_in_progress?
+    if regeneration_in_progress?
+      :regeneration_in_progress
+    elsif export_enqueued?
+      :queued
+    elsif export_in_progress?
       :started
-    elsif after_export_in_progress?
-      :after_export_action
     elsif export_file_exists?
       :finished
     else
@@ -1855,11 +1875,19 @@ class Project < ApplicationRecord
   end
 
   def export_in_progress?
-    import_export_shared.active_export_count > 0
+    strong_memoize(:export_in_progress) do
+      ::Projects::ExportJobFinder.new(self, { status: :started }).execute.present?
+    end
   end
 
-  def after_export_in_progress?
-    import_export_shared.after_export_in_progress?
+  def export_enqueued?
+    strong_memoize(:export_enqueued) do
+      ::Projects::ExportJobFinder.new(self, { status: :queued }).execute.present?
+    end
+  end
+
+  def regeneration_in_progress?
+    (export_enqueued? || export_in_progress?) && export_file_exists?
   end
 
   def remove_exports
@@ -1875,6 +1903,17 @@ class Project < ApplicationRecord
 
   def export_file
     import_export_upload&.export_file
+  end
+
+  # Before 12.9 we did not correctly clean up chat names and this causes issues.
+  # In 12.9, we add a foreign key relationship, but this code is used ensure the chat names are cleaned up while a post
+  # migration enables the foreign key relationship.
+  #
+  # This should be removed in 13.0.
+  #
+  # https://gitlab.com/gitlab-org/gitlab/issues/204787
+  def cleanup_chat_names
+    ChatName.where(service: services.select(:id)).delete_all
   end
 
   def full_path_slug
@@ -2375,7 +2414,21 @@ class Project < ApplicationRecord
     branch_protection.fully_protected? || branch_protection.developer_can_merge?
   end
 
+  def environments_for_scope(scope)
+    quoted_scope = ::Gitlab::SQL::Glob.q(scope)
+
+    environments.where("name LIKE (#{::Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
+  end
+
+  def latest_jira_import
+    jira_imports.last
+  end
+
   private
+
+  def find_service(services, name)
+    services.find { |service| service.to_param == name }
+  end
 
   def closest_namespace_setting(name)
     namespace.closest_setting(name)
@@ -2425,7 +2478,7 @@ class Project < ApplicationRecord
 
     if repository_storage.blank? || repository_with_same_path_already_exists?
       errors.add(:base, _('There is already a repository with that name on disk'))
-      throw :abort
+      throw :abort # rubocop:disable Cop/BanCatchThrow
     end
   end
 
@@ -2514,6 +2567,12 @@ class Project < ApplicationRecord
   rescue ActiveRecord::RecordNotUnique
     reset
     retry
+  end
+
+  def oids(objects, oids: [])
+    collection = oids.any? ? objects.where(oid: oids) : objects
+
+    collection.pluck(:oid)
   end
 end
 

@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import LicenseManagement from 'ee/vue_shared/license_management/license_management.vue';
-import createStore from 'ee/vue_shared/license_management/store/index';
+import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
+import createStore from 'ee/vue_shared/license_compliance/store/index';
 import ProtectedEnvironmentCreate from 'ee/protected_environments/protected_environment_create';
 import ProtectedEnvironmentEditList from 'ee/protected_environments/protected_environment_edit_list';
 import showToast from '~/vue_shared/plugins/global_toast';
@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (el && el.dataset && el.dataset.apiUrl) {
     const store = createStore();
     store.dispatch('licenseManagement/setIsAdmin', Boolean(el.dataset.apiUrl));
+    store.dispatch('licenseManagement/setAPISettings', { apiUrlManageLicenses: el.dataset.apiUrl });
     // eslint-disable-next-line no-new
     new Vue({
       el,

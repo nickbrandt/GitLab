@@ -1,18 +1,21 @@
 <script>
-import { GlBadge, GlLoadingIcon, GlModalDirective } from '@gitlab/ui';
-import { s__, sprintf } from '~/locale';
+import { GlBadge, GlLoadingIcon, GlModalDirective, GlIcon, GlTooltip, GlSprintf } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import createFlash from '~/flash';
-import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
+import { OPERATORS } from '../constants';
+import { values, get } from 'lodash';
 
 export default {
   components: {
     AlertWidgetForm,
     GlBadge,
     GlLoadingIcon,
-    Icon,
+    GlIcon,
+    GlTooltip,
+    GlSprintf,
   },
   directives: {
     GlModal: GlModalDirective,
@@ -21,6 +24,11 @@ export default {
     alertsEndpoint: {
       type: String,
       required: true,
+    },
+    showLoadingState: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     // { [alertPath]: { alert_attributes } }. Populated from subsequent API calls.
     // Includes only the metrics/alerts to be managed by this widget.
@@ -50,16 +58,51 @@ export default {
       apiAction: 'create',
     };
   },
+  i18n: {
+    alertsCountMsg: s__('PrometheusAlerts|%{count} alerts applied'),
+    singleFiringMsg: s__('PrometheusAlerts|Firing: %{alert}'),
+    multipleFiringMsg: s__('PrometheusAlerts|%{firingCount} firing'),
+    firingAlertsTooltip: s__('PrometheusAlerts|Firing: %{alerts}'),
+  },
   computed: {
-    alertSummary() {
+    singleAlertSummary() {
+      return {
+        message: this.isFiring ? this.$options.i18n.singleFiringMsg : this.thresholds[0],
+        alert: this.thresholds[0],
+      };
+    },
+    multipleAlertsSummary() {
+      return {
+        message: this.isFiring
+          ? `${this.$options.i18n.alertsCountMsg}, ${this.$options.i18n.multipleFiringMsg}`
+          : this.$options.i18n.alertsCountMsg,
+        count: this.thresholds.length,
+        firingCount: this.firingAlerts.length,
+      };
+    },
+    shouldShowLoadingIcon() {
+      return this.showLoadingState && this.isLoading;
+    },
+    thresholds() {
       const alertsToManage = Object.keys(this.alertsToManage);
-      const alertCountMsg = sprintf(s__('PrometheusAlerts|%{count} alerts applied'), {
-        count: alertsToManage.length,
-      });
-
-      return alertsToManage.length > 1
-        ? alertCountMsg
-        : alertsToManage.map(this.formatAlertSummary)[0];
+      return alertsToManage.map(this.formatAlertSummary);
+    },
+    hasAlerts() {
+      return Boolean(Object.keys(this.alertsToManage).length);
+    },
+    hasMultipleAlerts() {
+      return this.thresholds.length > 1;
+    },
+    isFiring() {
+      return Boolean(this.firingAlerts.length);
+    },
+    firingAlerts() {
+      return values(this.alertsToManage).filter(alert =>
+        this.passedAlertThreshold(this.getQueryData(alert), alert),
+      );
+    },
+    formattedFiringAlerts() {
+      return this.firingAlerts.map(alert => this.formatAlertSummary(alert.alert_path));
     },
   },
   created() {
@@ -98,6 +141,25 @@ export default {
       const alertQuery = this.relevantQueries.find(query => query.metricId === alert.metricId);
 
       return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
+    },
+    passedAlertThreshold(data, alert) {
+      const { threshold, operator } = alert;
+
+      switch (operator) {
+        case OPERATORS.greaterThan:
+          return data.some(value => value > threshold);
+        case OPERATORS.lessThan:
+          return data.some(value => value < threshold);
+        case OPERATORS.equalTo:
+          return data.some(value => value === threshold);
+        default:
+          return false;
+      }
+    },
+    getQueryData(alert) {
+      const alertQuery = this.relevantQueries.find(query => query.metricId === alert.metricId);
+
+      return get(alertQuery, 'result[0].values', []).map(value => get(value, '[1]', null));
     },
     showModal() {
       this.$root.$emit('bv::show::modal', this.modalId);
@@ -159,21 +221,49 @@ export default {
 
 <template>
   <div class="prometheus-alert-widget dropdown flex-grow-2 overflow-hidden">
-    <span v-if="errorMessage" class="alert-error-message">{{ errorMessage }}</span>
+    <gl-loading-icon v-if="shouldShowLoadingIcon" :inline="true" />
+    <span v-else-if="errorMessage" ref="alertErrorMessage" class="alert-error-message">{{
+      errorMessage
+    }}</span>
     <span
-      v-else
-      class="alert-current-setting text-secondary cursor-pointer d-flex align-items-end"
+      v-else-if="hasAlerts"
+      ref="alertCurrentSetting"
+      class="alert-current-setting cursor-pointer d-flex"
       @click="showModal"
     >
       <gl-badge
-        v-if="alertSummary"
-        variant="secondary"
-        class="d-flex-center text-secondary text-truncate"
+        :variant="isFiring ? 'danger' : 'secondary'"
+        pill
+        class="d-flex-center text-truncate"
       >
-        <icon name="notifications" class="s18 append-right-4" :size="16" />
-        <span class="text-truncate">{{ alertSummary }}</span>
+        <gl-icon name="warning" :size="16" class="flex-shrink-0" />
+        <span class="text-truncate gl-pl-1">
+          <gl-sprintf
+            :message="
+              hasMultipleAlerts ? multipleAlertsSummary.message : singleAlertSummary.message
+            "
+          >
+            <template #alert>
+              {{ singleAlertSummary.alert }}
+            </template>
+            <template #count>
+              {{ multipleAlertsSummary.count }}
+            </template>
+            <template #firingCount>
+              {{ multipleAlertsSummary.firingCount }}
+            </template>
+          </gl-sprintf>
+        </span>
       </gl-badge>
-      <gl-loading-icon v-show="isLoading" :inline="true" />
+      <gl-tooltip v-if="hasMultipleAlerts && isFiring" :target="() => $refs.alertCurrentSetting">
+        <gl-sprintf :message="$options.i18n.firingAlertsTooltip">
+          <template #alerts>
+            <div v-for="alert in formattedFiringAlerts" :key="alert.alert_path">
+              {{ alert }}
+            </div>
+          </template>
+        </gl-sprintf>
+      </gl-tooltip>
     </span>
     <alert-widget-form
       ref="widgetForm"

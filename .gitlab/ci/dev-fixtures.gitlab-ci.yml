@@ -1,18 +1,17 @@
 .run-dev-fixtures:
   extends:
-    - .default-tags
     - .default-retry
     - .default-cache
     - .default-before_script
-    - .use-pg9
+    - .use-pg10
   stage: test
-  needs: ["setup-test-env"]
+  needs: ["setup-test-env pg10"]
   variables:
     FIXTURE_PATH: "db/fixtures/development"
     SEED_CYCLE_ANALYTICS: "true"
     SEED_PRODUCTIVITY_ANALYTICS: "true"
     CYCLE_ANALYTICS_ISSUE_COUNT: 1
-    SIZE: 0 # number of external projects to fork, requires network connection
+    SIZE: 0  # number of external projects to fork, requires network connection
     # SEED_NESTED_GROUPS: "false" # requires network connection
 
 run-dev-fixtures:
@@ -27,7 +26,7 @@ run-dev-fixtures-ee:
   extends:
     - .run-dev-fixtures
     - .dev-fixtures:rules:ee-only
-    - .use-pg9-ee
+    - .use-pg10-ee
   script:
     - scripts/gitaly-test-spawn
     - cp ee/db/fixtures/development/* $FIXTURE_PATH

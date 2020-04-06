@@ -13,39 +13,53 @@ exports[`Design management index page designs does not render toolbar when there
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-1-name"
-          id="design-1"
-          image="design-1-image"
-          notescount="0"
+        <design-dropzone-stub
+          class="design-list-item"
         />
+      </li>
+       
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-1-name"
+            id="design-1"
+            image="design-1-image"
+            notescount="0"
+          />
+        </design-dropzone-stub>
          
         <!---->
       </li>
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-2-name"
-          id="design-2"
-          image="design-2-image"
-          notescount="1"
-        />
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-2-name"
+            id="design-2"
+            image="design-2-image"
+            notescount="1"
+          />
+        </design-dropzone-stub>
          
         <!---->
       </li>
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-3-name"
-          id="design-3"
-          image="design-3-image"
-          notescount="0"
-        />
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-3-name"
+            id="design-3"
+            image="design-3-image"
+            notescount="0"
+          />
+        </design-dropzone-stub>
          
         <!---->
       </li>
@@ -71,13 +85,13 @@ exports[`Design management index page designs renders designs list and header wi
       <div
         class="qa-selector-toolbar d-flex"
       >
-        <gl-button-stub
+        <gl-deprecated-button-stub
           class="mr-2 js-select-all"
           size="md"
           variant="link"
         >
           Select all
-        </gl-button-stub>
+        </gl-deprecated-button-stub>
          
         <div>
           <delete-button-stub
@@ -105,13 +119,23 @@ exports[`Design management index page designs renders designs list and header wi
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-1-name"
-          id="design-1"
-          image="design-1-image"
-          notescount="0"
+        <design-dropzone-stub
+          class="design-list-item"
         />
+      </li>
+       
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-1-name"
+            id="design-1"
+            image="design-1-image"
+            notescount="0"
+          />
+        </design-dropzone-stub>
          
         <input
           class="design-checkbox"
@@ -121,13 +145,15 @@ exports[`Design management index page designs renders designs list and header wi
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-2-name"
-          id="design-2"
-          image="design-2-image"
-          notescount="1"
-        />
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-2-name"
+            id="design-2"
+            image="design-2-image"
+            notescount="1"
+          />
+        </design-dropzone-stub>
          
         <input
           class="design-checkbox"
@@ -137,13 +163,15 @@ exports[`Design management index page designs renders designs list and header wi
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
-        <design-stub
-          event="NONE"
-          filename="design-3-name"
-          id="design-3"
-          image="design-3-image"
-          notescount="0"
-        />
+        <design-dropzone-stub>
+          <design-stub
+            event="NONE"
+            filename="design-3-name"
+            id="design-3"
+            image="design-3-image"
+            notescount="0"
+          />
+        </design-dropzone-stub>
          
         <input
           class="design-checkbox"
@@ -166,13 +194,19 @@ exports[`Design management index page designs renders error 1`] = `
   <div
     class="mt-4"
   >
-    <div
-      class="alert alert-danger"
+    <gl-alert-stub
+      dismisslabel="Dismiss"
+      primarybuttonlink=""
+      primarybuttontext=""
+      secondarybuttonlink=""
+      secondarybuttontext=""
+      title=""
+      variant="danger"
     >
       
       An error occurred while loading designs. Please try again.
     
-    </div>
+    </gl-alert-stub>
   </div>
    
   <router-view-stub
@@ -208,10 +242,18 @@ exports[`Design management index page when has no designs renders empty text 1`]
   <div
     class="mt-4"
   >
-    <gl-empty-state-stub
-      description="Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
-      title="The one place for your designs"
-    />
+    <ol
+      class="list-unstyled row"
+    >
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
+        <design-dropzone-stub
+          class="design-list-item"
+        />
+      </li>
+       
+    </ol>
   </div>
    
   <router-view-stub

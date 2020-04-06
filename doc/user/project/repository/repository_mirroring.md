@@ -28,6 +28,10 @@ immediate update, unless:
 - The mirror is already being updated.
 - 5 minutes haven't elapsed since its last update.
 
+For security reasons, from [GitLab 12.10 onwards](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27166),
+the URL to the original repository is only displayed to users with
+Maintainer or Owner permissions to the mirrored project.
+
 ## Use cases
 
 The following are some possible use cases for repository mirroring:
@@ -69,6 +73,11 @@ Changes pushed to files in the repository are automatically pushed to the remote
 In the case of a diverged branch, you will see an error indicated at the **Mirroring repositories**
 section.
 
+### Configuring push mirrors through the API
+
+You can also create and modify project push mirrors through the
+[remote mirrors API](../../../api/remote_mirrors.md).
+
 ### Push only protected branches **(CORE)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3350) in [GitLab Starter](https://about.gitlab.com/pricing/) 10.3.
@@ -104,9 +113,6 @@ The repository will push soon. To force a push, click the appropriate button.
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/51) in GitLab Enterprise Edition 8.2.
 > - [Added Git LFS support](https://gitlab.com/gitlab-org/gitlab/issues/10871) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.11.
-
-NOTE: **Note:** This feature [is available for free](https://gitlab.com/gitlab-org/gitlab/issues/10361) to
-GitLab.com users until March 22nd, 2020.
 
 You can set up a repository to automatically have its branches, tags, and commits updated from an
 upstream repository.

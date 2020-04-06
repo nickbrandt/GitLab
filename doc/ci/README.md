@@ -80,13 +80,13 @@ GitLab CI/CD supports numerous configuration options:
 
 | Configuration | Description  |
 |:--------------|:-------------|
-| [Pipelines](pipelines.md) | Structure your CI/CD process through pipelines. |
+| [Pipelines](pipelines/index.md) | Structure your CI/CD process through pipelines. |
 | [Environment variables](variables/README.md) | Reuse values based on a variable/value key pair. |
 | [Environments](environments.md) | Deploy your application to different environments (e.g., staging, production). |
-| [Job artifacts](../user/project/pipelines/job_artifacts.md) | Output, use, and reuse job artifacts. |
+| [Job artifacts](pipelines/job_artifacts.md) | Output, use, and reuse job artifacts. |
 | [Cache dependencies](caching/index.md) | Cache your dependencies for a faster execution. |
-| [Schedule pipelines](../user/project/pipelines/schedules.md) | Schedule pipelines to run as often as you need. |
-| [Custom path for `.gitlab-ci.yml`](../user/project/pipelines/settings.md#custom-ci-configuration-path) | Define a custom path for the CI/CD configuration file. |
+| [Schedule pipelines](pipelines/schedules.md) | Schedule pipelines to run as often as you need. |
+| [Custom path for `.gitlab-ci.yml`](pipelines/settings.md#custom-ci-configuration-path) | Define a custom path for the CI/CD configuration file. |
 | [Git submodules for CI/CD](git_submodules.md) | Configure jobs for using Git submodules.|
 | [SSH keys for CI/CD](ssh_keys/README.md) | Using SSH keys in your CI pipelines. |
 | [Pipelines triggers](triggers/README.md) | Trigger pipelines through the API. |
@@ -133,7 +133,7 @@ Its feature set is listed on the table below according to DevOps stages.
 | **Secure** ||
 | [Container Scanning](../user/application_security/container_scanning/index.md) **(ULTIMATE)** | Check your Docker containers for known vulnerabilities.|
 | [Dependency Scanning](../user/application_security/dependency_scanning/index.md) **(ULTIMATE)** | Analyze your dependencies for known vulnerabilities. |
-| [License Compliance](../user/application_security/license_compliance/index.md) **(ULTIMATE)** | Search your project dependencies for their licenses. |
+| [License Compliance](../user/compliance/license_compliance/index.md) **(ULTIMATE)** | Search your project dependencies for their licenses. |
 | [Security Test reports](../user/application_security/index.md) **(ULTIMATE)** | Check for app vulnerabilities. |
 
 ## Examples
@@ -149,7 +149,7 @@ As a GitLab administrator, you can change the default behavior
 of GitLab CI/CD for:
 
 - An [entire GitLab instance](../user/admin_area/settings/continuous_integration.md).
-- Specific projects, using [pipelines settings](../user/project/pipelines/settings.md).
+- Specific projects, using [pipelines settings](pipelines/settings.md).
 
 See also:
 
@@ -160,11 +160,10 @@ See also:
 
 ### Why GitLab CI/CD?
 
-The following articles explain reasons to use GitLab CI/CD
-for your CI/CD infrastructure:
+Learn more about:
 
-- [Why we chose GitLab CI for our CI/CD solution](https://about.gitlab.com/blog/2016/10/17/gitlab-ci-oohlala/)
-- [Building our web-app on GitLab CI](https://about.gitlab.com/blog/2016/07/22/building-our-web-app-on-gitlab-ci/)
+- [Why you might chose GitLab CI/CD](https://about.gitlab.com/blog/2016/10/17/gitlab-ci-oohlala/).
+- [Reasons you might migrate from another platform](https://about.gitlab.com/blog/2016/07/22/building-our-web-app-on-gitlab-ci/).
 - [5 Teams that made the switch to GitLab CI/CD](https://about.gitlab.com/blog/2019/04/25/5-teams-that-made-the-switch-to-gitlab-ci-cd/)
 
 See also the [Why CI/CD?](https://docs.google.com/presentation/d/1OGgk2Tcxbpl7DJaIOzCX4Vqg3dlwfELC3u2jEeCBbDk) presentation.

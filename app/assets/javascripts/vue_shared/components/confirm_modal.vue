@@ -1,42 +1,47 @@
 <script>
 import { GlModal } from '@gitlab/ui';
 import csrf from '~/lib/utils/csrf';
+import { uniqueId } from 'lodash';
 
 export default {
   components: {
     GlModal,
   },
   props: {
-    modalAttributes: {
-      type: Object,
-      required: true,
-    },
-    path: {
-      type: String,
-      required: true,
-    },
-    method: {
+    selector: {
       type: String,
       required: true,
     },
   },
   data() {
     return {
-      isDismissed: false,
+      modalId: uniqueId('confirm-modal-'),
+      path: '',
+      method: '',
+      modalAttributes: {},
     };
   },
   mounted() {
-    this.openModal();
+    document.querySelectorAll(this.selector).forEach(button => {
+      button.addEventListener('click', e => {
+        e.preventDefault();
+
+        this.path = button.dataset.path;
+        this.method = button.dataset.method;
+        this.modalAttributes = JSON.parse(button.dataset.modalAttributes);
+        this.openModal();
+      });
+    });
   },
   methods: {
     openModal() {
       this.$refs.modal.show();
     },
-    submitModal() {
-      this.$refs.form.requestSubmit();
+    closeModal() {
+      this.$refs.modal.hide();
     },
-    dismiss() {
-      this.isDismissed = true;
+    submitModal() {
+      this.$refs.form.submit();
     },
   },
   csrf,
@@ -45,11 +50,11 @@ export default {
 
 <template>
   <gl-modal
-    v-if="!isDismissed"
     ref="modal"
+    :modal-id="modalId"
     v-bind="modalAttributes"
     @primary="submitModal"
-    @canceled="dismiss"
+    @cancel="closeModal"
   >
     <form ref="form" :action="path" method="post">
       <!-- Rails workaround for <form method="delete" />

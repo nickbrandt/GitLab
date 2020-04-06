@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import { uniqueId } from 'underscore';
 
 import { AccordionItem } from 'ee/vue_shared/components/accordion';
 import accordionEventBus from 'ee/vue_shared/components/accordion/accordion_event_bus';
+import { uniqueId } from 'lodash';
 
 jest.mock('ee/vue_shared/components/accordion/accordion_event_bus', () => ({
   $on: jest.fn(),
@@ -10,7 +10,7 @@ jest.mock('ee/vue_shared/components/accordion/accordion_event_bus', () => ({
   $off: jest.fn(),
 }));
 
-jest.mock('underscore');
+jest.mock('lodash/uniqueId', () => jest.fn().mockReturnValue('mockUniqueId'));
 
 describe('AccordionItem component', () => {
   const mockUniqueId = 'mockUniqueId';
@@ -42,10 +42,6 @@ describe('AccordionItem component', () => {
   const contentContainer = () => wrapper.find({ ref: 'contentContainer' });
   const content = () => wrapper.find({ ref: 'content' });
   const namespacedCloseOtherAccordionItemsEvent = `${accordionId}.closeOtherAccordionItems`;
-
-  beforeEach(() => {
-    uniqueId.mockReturnValue(mockUniqueId);
-  });
 
   afterEach(() => {
     wrapper.destroy();
@@ -171,8 +167,7 @@ describe('AccordionItem component', () => {
 
     it('contains a expansion trigger element with a unique, namespaced id', () => {
       expect(uniqueId).toHaveBeenCalledWith('gl-accordion-item-trigger-');
-
-      expect(expansionTrigger().attributes('id')).toBe('mockUniqueId');
+      expect(expansionTrigger().attributes('id')).toBe(mockUniqueId);
     });
 
     it('contains a content-container element with a unique, namespaced id', () => {

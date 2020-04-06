@@ -7,9 +7,10 @@ module Ci
     include Ci::Metadatable
     include Importable
     include AfterCommitQueue
-    include HasRef
+    include Ci::HasRef
 
     InvalidBridgeTypeError = Class.new(StandardError)
+    InvalidTransitionError = Class.new(StandardError)
 
     belongs_to :project
     belongs_to :trigger_request
@@ -87,6 +88,10 @@ module Ci
       strong_memoize(:downstream_project_path) do
         options&.dig(:trigger, :project)
       end
+    end
+
+    def parent_pipeline
+      pipeline if triggers_child_pipeline?
     end
 
     def triggers_child_pipeline?

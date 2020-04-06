@@ -17,12 +17,18 @@ import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
+import * as commonUtils from '~/lib/utils/common_utils';
+import * as urlUtils from '~/lib/utils/url_utility';
+import { toYmd } from 'ee/analytics/shared/utils';
 import * as mockData from '../mock_data';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
 const hideGroupDropDown = false;
+const selectedGroup = convertObjectPropsToCamelCase(mockData.group);
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -32,10 +38,13 @@ const defaultStubs = {
   'stage-event-list': true,
   'stage-nav-item': true,
   'tasks-by-type-chart': true,
+  'labels-selector': true,
 };
 
 function createComponent({
-  opts = {},
+  opts = {
+    stubs: defaultStubs,
+  },
   shallow = true,
   withStageSelected = false,
   scatterplotEnabled = true,
@@ -47,6 +56,7 @@ function createComponent({
   const comp = func(Component, {
     localVue,
     store,
+    mixins: [UrlSyncMixin],
     propsData: {
       emptyStateSvgPath,
       noDataSvgPath,
@@ -66,14 +76,13 @@ function createComponent({
   });
 
   comp.vm.$store.dispatch('initializeCycleAnalytics', {
-    group: mockData.group,
     createdAfter: mockData.startDate,
     createdBefore: mockData.endDate,
   });
 
   if (withStageSelected) {
     comp.vm.$store.dispatch('setSelectedGroup', {
-      ...mockData.group,
+      ...selectedGroup,
     });
 
     comp.vm.$store.dispatch('receiveGroupStagesAndEventsSuccess', {
@@ -94,6 +103,13 @@ describe('Cycle Analytics component', () => {
       .find(StageTable)
       .findAll('.stage-nav-item')
       .at(index);
+
+  const shouldSetUrlParams = result => {
+    return wrapper.vm.$nextTick().then(() => {
+      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(result, window.location.href, true);
+      expect(commonUtils.historyPushState).toHaveBeenCalled();
+    });
+  };
 
   const displaysProjectsDropdownFilter = flag => {
     expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
@@ -132,6 +148,7 @@ describe('Cycle Analytics component', () => {
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
+    wrapper = null;
   });
 
   describe('displays the components as required', () => {
@@ -348,9 +365,6 @@ describe('Cycle Analytics component', () => {
         beforeEach(() => {
           mock = new MockAdapter(axios);
           wrapper = createComponent({
-            opts: {
-              stubs: defaultStubs,
-            },
             shallow: false,
             withStageSelected: true,
             customizableCycleAnalyticsEnabled: true,
@@ -370,11 +384,7 @@ describe('Cycle Analytics component', () => {
 
       describe('with tasksByTypeChart=true', () => {
         beforeEach(() => {
-          mock = new MockAdapter(axios);
           wrapper = createComponent({
-            opts: {
-              stubs: defaultStubs,
-            },
             shallow: false,
             withStageSelected: true,
             customizableCycleAnalyticsEnabled: false,
@@ -384,7 +394,6 @@ describe('Cycle Analytics component', () => {
 
         afterEach(() => {
           wrapper.destroy();
-          mock.restore();
         });
 
         it('displays the tasks by type chart', () => {
@@ -396,9 +405,6 @@ describe('Cycle Analytics component', () => {
         beforeEach(() => {
           mock = new MockAdapter(axios);
           wrapper = createComponent({
-            opts: {
-              stubs: defaultStubs,
-            },
             shallow: false,
             withStageSelected: true,
             customizableCycleAnalyticsEnabled: false,
@@ -419,13 +425,14 @@ describe('Cycle Analytics component', () => {
   });
 
   describe('with failed requests while loading', () => {
-    function mockRequestCycleAnalyticsData({
+    const mockRequestCycleAnalyticsData = ({
       overrides = {},
       mockFetchStageData = true,
       mockFetchStageMedian = true,
       mockFetchDurationData = true,
       mockFetchTasksByTypeData = true,
-    }) {
+      mockFetchTopRankedGroupLabels = true,
+    }) => {
       const defaultStatus = 200;
       const defaultRequests = {
         fetchSummaryData: {
@@ -438,13 +445,14 @@ describe('Cycle Analytics component', () => {
           endpoint: mockData.endpoints.baseStagesEndpoint,
           response: { ...mockData.customizableStagesAndEvents },
         },
-        fetchGroupLabels: {
-          status: defaultStatus,
-          endpoint: mockData.endpoints.groupLabels,
-          response: [...mockData.groupLabels],
-        },
         ...overrides,
       };
+
+      if (mockFetchTopRankedGroupLabels) {
+        mock
+          .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
+          .reply(defaultStatus, mockData.groupLabels);
+      }
 
       if (mockFetchTasksByTypeData) {
         mock
@@ -469,7 +477,7 @@ describe('Cycle Analytics component', () => {
       Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
         mock.onGet(endpoint).replyOnce(status, response);
       });
-    }
+    };
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
@@ -510,24 +518,6 @@ describe('Cycle Analytics component', () => {
       );
     });
 
-    it('will display an error if the fetchGroupLabels request fails', () => {
-      expect(findFlashError()).toBeNull();
-
-      mockRequestCycleAnalyticsData({
-        overrides: {
-          fetchGroupLabels: {
-            endpoint: mockData.endpoints.groupLabels,
-            status: httpStatusCodes.NOT_FOUND,
-            response: { response: { status: httpStatusCodes.NOT_FOUND } },
-          },
-        },
-      });
-
-      return selectGroupAndFindError(
-        'There was an error fetching label data for the selected group',
-      );
-    });
-
     it('will display an error if the fetchGroupStagesAndEvents request fails', () => {
       expect(findFlashError()).toBeNull();
 
@@ -552,6 +542,16 @@ describe('Cycle Analytics component', () => {
       });
 
       return selectGroupAndFindError('There was an error fetching data for the selected stage');
+    });
+
+    it('will display an error if the fetchTopRankedGroupLabels request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({ mockFetchTopRankedGroupLabels: false });
+
+      return selectGroupAndFindError(
+        'There was an error fetching the top labels for the selected group',
+      );
     });
 
     it('will display an error if the fetchTasksByTypeData request fails', () => {
@@ -593,6 +593,121 @@ describe('Cycle Analytics component', () => {
         expect(findFlashError().innerText.trim()).toEqual(
           'There was an error while fetching value stream analytics duration data.',
         );
+      });
+    });
+  });
+
+  describe('Url parameters', () => {
+    const fakeGroup = {
+      id: 2,
+      path: 'new-test',
+      fullPath: 'new-test-group',
+      name: 'New test group',
+    };
+
+    beforeEach(() => {
+      commonUtils.historyPushState = jest.fn();
+      urlUtils.setUrlParams = jest.fn();
+
+      mock = new MockAdapter(axios);
+
+      wrapper = createComponent({
+        shallow: false,
+        scatterplotEnabled: false,
+        tasksByTypeChartEnabled: false,
+        stubs: {
+          ...defaultStubs,
+        },
+      });
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('sets the created_after and created_before url parameters', () => {
+      return shouldSetUrlParams({
+        created_after: toYmd(mockData.startDate),
+        created_before: toYmd(mockData.endDate),
+        group_id: null,
+        'project_ids[]': [],
+      });
+    });
+
+    describe('with hideGroupDropDown=true', () => {
+      beforeEach(() => {
+        commonUtils.historyPushState = jest.fn();
+        urlUtils.setUrlParams = jest.fn();
+
+        mock = new MockAdapter(axios);
+
+        wrapper = createComponent({
+          shallow: false,
+          scatterplotEnabled: false,
+          tasksByTypeChartEnabled: false,
+          stubs: {
+            ...defaultStubs,
+          },
+          props: {
+            hideGroupDropDown: true,
+          },
+        });
+
+        wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
+          createdAfter: mockData.startDate,
+          createdBefore: mockData.endDate,
+          group: fakeGroup,
+        });
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the group_id url parameter', () => {
+        return shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: null,
+          'project_ids[]': [],
+        });
+      });
+    });
+
+    describe('with a group selected', () => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('setSelectedGroup', {
+          ...fakeGroup,
+        });
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the group_id url parameter', () => {
+        return shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: fakeGroup.fullPath,
+          'project_ids[]': [],
+        });
+      });
+    });
+
+    describe('with a group and selectedProjectIds set', () => {
+      const selectedProjectIds = mockData.selectedProjects.map(({ id }) => id);
+
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('setSelectedGroup', {
+          ...selectedGroup,
+        });
+
+        wrapper.vm.$store.dispatch('setSelectedProjects', mockData.selectedProjects);
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the project_ids url parameter', () => {
+        return shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: selectedGroup.fullPath,
+          'project_ids[]': selectedProjectIds,
+        });
       });
     });
   });

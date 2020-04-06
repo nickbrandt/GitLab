@@ -13,6 +13,7 @@ describe Elastic::Latest::SnippetInstanceProxy do
         id: snippet.id,
         title: snippet.title,
         file_name: snippet.file_name,
+        description: snippet.description,
         content: snippet.content,
         created_at: snippet.created_at,
         updated_at: snippet.updated_at,

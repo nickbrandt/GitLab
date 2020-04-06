@@ -338,13 +338,13 @@ describe Projects::IssuesController do
 
       context 'with invalid params' do
         it 'returns a unprocessable entity 422 response for invalid move ids' do
-          reorder_issue(issue1, move_after_id: 99, move_before_id: 999)
+          reorder_issue(issue1, move_after_id: 99, move_before_id: non_existing_record_id)
 
           expect(response).to have_gitlab_http_status(:unprocessable_entity)
         end
 
         it 'returns a not found 404 response for invalid issue id' do
-          reorder_issue(object_double(issue1, iid: 999),
+          reorder_issue(object_double(issue1, iid: non_existing_record_iid),
             move_after_id: issue2.id,
             move_before_id: issue3.id)
 
@@ -1249,6 +1249,26 @@ describe Projects::IssuesController do
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
+    context 'invalid branch name' do
+      it 'is unprocessable' do
+        post(
+          :create_merge_request,
+          params: {
+            target_project_id: nil,
+            branch_name: 'master',
+            ref: 'master',
+            namespace_id: project.namespace.to_param,
+            project_id: project.to_param,
+            id: issue.to_param
+          },
+          format: :json
+        )
+
+        expect(response.body).to eq('Branch already exists')
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
+      end
+    end
+
     context 'target_project_id is set' do
       let(:target_project) { fork_project(project, user, repository: true) }
       let(:target_project_id) { target_project.id }
@@ -1377,7 +1397,7 @@ describe Projects::IssuesController do
       it 'returns discussion json' do
         get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid }
 
-        expect(json_response.first.keys).to match_array(%w[id reply_id expanded notes diff_discussion discussion_path individual_note resolvable resolved resolved_at resolved_by resolved_by_push commit_id for_commit project_id])
+        expect(json_response.first.keys).to match_array(%w[id reply_id expanded notes diff_discussion discussion_path individual_note resolvable resolved resolved_at resolved_by resolved_by_push commit_id for_commit project_id confidential])
       end
 
       it 'renders the author status html if there is a status' do
@@ -1388,6 +1408,61 @@ describe Projects::IssuesController do
         note_json = json_response.first['notes'].first
 
         expect(note_json['author']['status_tooltip_html']).to be_present
+      end
+
+      context 'is_gitlab_employee attribute' do
+        subject { get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid } }
+
+        before do
+          allow(Gitlab).to receive(:com?).and_return(true)
+          note_user = discussion.author
+          note_user.update(email: email)
+          note_user.confirm
+        end
+
+        shared_examples 'non inclusion of gitlab employee badge' do
+          it 'does not render the is_gitlab_employee attribute' do
+            subject
+
+            note_json = json_response.first['notes'].first
+
+            expect(note_json['author']['is_gitlab_employee']).to be nil
+          end
+        end
+
+        context 'when user is a gitlab employee' do
+          let(:email) { 'test@gitlab.com' }
+
+          it 'renders the is_gitlab_employee attribute' do
+            subject
+
+            note_json = json_response.first['notes'].first
+
+            expect(note_json['author']['is_gitlab_employee']).to be true
+          end
+
+          context 'when feature flag is disabled' do
+            before do
+              stub_feature_flags(gitlab_employee_badge: false)
+            end
+
+            it_behaves_like 'non inclusion of gitlab employee badge'
+          end
+        end
+
+        context 'when user is not a gitlab employee' do
+          let(:email) { 'test@example.com' }
+
+          it_behaves_like 'non inclusion of gitlab employee badge'
+
+          context 'when feature flag is disabled' do
+            before do
+              stub_feature_flags(gitlab_employee_badge: false)
+            end
+
+            it_behaves_like 'non inclusion of gitlab employee badge'
+          end
+        end
       end
 
       it 'does not cause an extra query for the status' do

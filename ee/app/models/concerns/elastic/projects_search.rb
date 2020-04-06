@@ -19,12 +19,20 @@ module Elastic
         ::Gitlab::CurrentSettings.elasticsearch_indexes_project?(self)
       end
 
-      def maintain_elasticsearch_incremental_bulk
-        # TODO: ElasticIndexerWorker does extra work for project hooks, so we
-        # can't use the incremental-bulk indexer for projects yet.
-        #
-        # https://gitlab.com/gitlab-org/gitlab/issues/207494
-        false
+      # TODO: ElasticIndexerWorker does extra work for project hooks, so we
+      # can't use the incremental-bulk indexer for projects yet.
+      #
+      # https://gitlab.com/gitlab-org/gitlab/issues/207494
+      def maintain_elasticsearch_create
+        ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
+      end
+
+      def maintain_elasticsearch_update
+        ElasticIndexerWorker.perform_async(:update, self.class.to_s, self.id, self.es_id)
+      end
+
+      def maintain_elasticsearch_destroy
+        ElasticIndexerWorker.perform_async(:delete, self.class.to_s, self.id, self.es_id, es_parent: self.es_parent)
       end
 
       def each_indexed_association

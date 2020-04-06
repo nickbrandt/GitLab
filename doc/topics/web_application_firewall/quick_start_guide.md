@@ -7,22 +7,12 @@ We will use GitLab's native Kubernetes integration, so you will not need
 to create a Kubernetes cluster manually using the Google Cloud Platform console.
 We will create and deploy a simple application that we create from a GitLab template.
 
-These instructions will also work for a self-hosted GitLab instance. However, you will
+These instructions will also work for a self-managed GitLab instance. However, you will
 need to ensure your own [Runners are configured](../../ci/runners/README.md) and
 [Google OAuth is enabled](../../integration/google.md).
 
 **Note**: GitLab's Web Application Firewall is deployed with [Ingress](../../user/clusters/applications.md#Ingress),
 so it will be available to your applications no matter how you deploy them to Kubernetes.
-
-## Enable or disable ModSecurity
-
-ModSecurity is enabled by default on GitLab.com. You can toggle the feature flag to false by running the following command in the Rails console:
-
-```ruby
-Feature.disable(:ingress_modsecurity)
-```
-
-Once disabled, you must uninstall and reinstall your Ingress application for the changes to take effect. See the [Feature Flag](../../user/project/operations/feature_flags.md) documentation for more information.
 
 ## Configuring your Google account
 
@@ -112,10 +102,9 @@ Once it is installed, the other applications that rely on it will each have thei
 
 For this guide, we need to install Ingress. Ingress provides load balancing,
 SSL termination, and name-based virtual hosting, using NGINX behind
-the scenes. Make sure that the **Enable Web Application Firewall** button is checked
-before installing.
+the scenes. Make sure to switch the toogle to the enabled position before installing.
 
-![Cluster applications](./img/guide_waf_ingress_installation.png)
+![Cluster applications](./img/guide_waf_ingress_installation_v12_9.png)
 
 After Ingress is installed, wait a few seconds and copy the IP address that
 is displayed in order to add in your base **Domain** at the top of the page. For
@@ -249,7 +238,7 @@ $ kubectl -n gitlab-managed-apps exec -it $(kubectl get pods -n gitlab-managed-a
 }
 ```
 
-You can see that ModSecurity logs the suspicous behavior. By sending a request
+You can see that ModSecurity logs the suspicious behavior. By sending a request
 with the `User Agent: absinthe` header, which [absinthe](https://github.com/cameronhotchkies/Absinthe), a tool for testing for SQL injections uses, we can detect that someone was
 searching for vulnerabilities on our system. Detecting scanners is useful, because we
 can learn if someone is trying to exploit our system.

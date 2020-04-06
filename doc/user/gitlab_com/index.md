@@ -52,7 +52,7 @@ Host gitlab.com
 
 ## GitLab Pages
 
-Below are the settings for [GitLab Pages](https://about.gitlab.com/product/pages/).
+Below are the settings for [GitLab Pages](https://about.gitlab.com/stages-devops-lifecycle/pages/).
 
 | Setting                     | GitLab.com        | Default       |
 | --------------------------- | ----------------  | ------------- |
@@ -74,8 +74,9 @@ Below are the current settings regarding [GitLab CI/CD](../../ci/README.md).
 | -----------             | ----------------- | ------------- |
 | Artifacts maximum size (uncompressed) | 1G                | 100M          |
 | Artifacts [expiry time](../../ci/yaml/README.md#artifactsexpire_in)   | kept forever           | deleted after 30 days unless otherwise specified    |
-| Scheduled Pipeline Cron | `*/5 * * * *` | `*/19 * * * *` |
+| Scheduled Pipeline Cron | `*/5 * * * *` | `19 * * * *` |
 | [Max jobs in active pipelines](../../administration/instance_limits.md#number-of-jobs-in-active-pipelines) | `500` for Free tier, unlimited otherwise | Unlimited
+| [Max pipeline schedules in projects](../../administration/instance_limits.md#number-of-pipeline-schedules) | `10` for Free tier, `50` for all paid tiers | Unlimited |
 
 ## Repository size limit
 
@@ -86,13 +87,21 @@ or over the size limit, you can [reduce your repository size with Git](../projec
 | -----------             | ----------------- | ------------- |
 | Repository size including LFS | 10G         | Unlimited     |
 
+NOTE: **Note:**
+A single `git push` is limited to 5GB. LFS is not affected by this limit.
+
 ## IP range
 
-GitLab.com, CI/CD, and related services are deployed into Google Cloud Platform (GCP). Any
-IP based firewall can be configured by looking up all
-[IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).
+GitLab.com is using the IP range `34.74.90.64/28` for traffic from its Web/API
+fleet. This whole range is solely allocated to GitLab. You can expect connections from webhooks or repository mirroring to come
+from those IPs and whitelist them.
 
-[Static endpoints](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/97) are being considered.
+GitLab.com is fronted by Cloudflare. For incoming connections to GitLab.com you might need to whitelist CIDR blocks of Cloudflare ([IPv4](https://www.cloudflare.com/ips-v4) and [IPv6](https://www.cloudflare.com/ips-v6))
+
+For outgoing connections from CI/CD runners we are not providing static IP addresses.
+All our runners are deployed into Google Cloud Platform (GCP) - any IP based
+firewall can be configured by looking up all
+[IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).
 
 ## Maximum number of webhooks
 
@@ -372,15 +381,6 @@ NOTE: **Note:**
 The `SIDEKIQ_MEMORY_KILLER_MAX_RSS` setting is `16000000` on Sidekiq import
 nodes and Sidekiq export nodes.
 
-## Cron jobs
-
-Periodically executed jobs by Sidekiq, to self-heal GitLab, do external
-synchronizations, run scheduled pipelines, etc.:
-
-| Setting                     | GitLab.com   | Default      |
-|--------                     |------------- |------------- |
-| `pipeline_schedule_worker`  | `19 * * * *` | `19 * * * *` |
-
 ## PostgreSQL
 
 GitLab.com being a fairly large installation of GitLab means we have changed
@@ -530,6 +530,14 @@ On GitLab.com, projects, groups, and snippets created
 As of GitLab 12.2 (July 2019), projects, groups, and snippets have the
 [**Internal** visibility](../../public_access/public_access.md#internal-projects) setting [disabled on GitLab.com](https://gitlab.com/gitlab-org/gitlab/issues/12388).
 
+### SSH maximum number of connections
+
+GitLab.com defines the maximum number of concurrent, unauthenticated SSH connections by
+using the [MaxStartups setting](http://man.openbsd.org/sshd_config.5#MaxStartups).
+If more than the maximum number of allowed connections occur concurrently, they are
+dropped and users get
+[an `ssh_exchange_identification` error](../../topics/git/troubleshooting_git.md#ssh_exchange_identification-error).
+
 ## GitLab.com Logging
 
 We use [Fluentd](https://gitlab.com/gitlab-com/runbooks/tree/master/logging/doc#fluentd) to parse our logs. Fluentd sends our logs to
@@ -586,7 +594,7 @@ Service discovery:
 
 - [`gitlab-cookbooks` / `gitlab_consul` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_consul)
 
-### Haproxy
+### HAProxy
 
 High Performance TCP/HTTP Load Balancer:
 

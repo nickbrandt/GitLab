@@ -1,14 +1,15 @@
-/* global ace */
-import Editor from '~/editor/editor_lite';
+import { initEditorLite } from '~/blob/utils';
 import setupCollapsibleInputs from './collapsible_input';
 
 let editor;
 
 const initAce = () => {
-  editor = ace.edit('editor');
-
+  const editorEl = document.getElementById('editor');
   const form = document.querySelector('.snippet-form-holder form');
   const content = document.querySelector('.snippet-file-content');
+
+  editor = initEditorLite({ el: editorEl });
+
   form.addEventListener('submit', () => {
     content.value = editor.getValue();
   });
@@ -17,11 +18,10 @@ const initAce = () => {
 const initMonaco = () => {
   const editorEl = document.getElementById('editor');
   const contentEl = document.querySelector('.snippet-file-content');
-  const fileNameEl = document.querySelector('.snippet-file-name');
+  const fileNameEl = document.querySelector('.js-snippet-file-name');
   const form = document.querySelector('.snippet-form-holder form');
 
-  editor = new Editor();
-  editor.createInstance({
+  editor = initEditorLite({
     el: editorEl,
     blobPath: fileNameEl.value,
     blobContent: contentEl.value,

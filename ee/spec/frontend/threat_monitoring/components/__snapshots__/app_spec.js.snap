@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ThreatMonitoringApp component given there is a default environment with data renders the network policy section 1`] = `
+<threat-monitoring-section-stub
+  anomaloustitle="Dropped Packets"
+  chartemptystatesvgpath="/network-policy-no-data-svg"
+  chartemptystatetext="Container NetworkPolicies are not installed or has been disabled. To view this data, ensure you NetworkPolicies are installed and enabled for your cluster."
+  chartemptystatetitle="Container NetworkPolicies not detected"
+  documentationanchor="container-network-policy"
+  documentationpath="/docs"
+  nominaltitle="Total Packets"
+  storenamespace="threatMonitoringNetworkPolicy"
+  subtitle="Packet Activity"
+  title="Container Network Policy"
+  ylegend="Operations Per Second"
+/>
+`;
+
+exports[`ThreatMonitoringApp component given there is a default environment with data renders the waf section 1`] = `
+<threat-monitoring-section-stub
+  anomaloustitle="Anomalous Requests"
+  chartemptystatesvgpath="/waf-no-data-svg"
+  chartemptystatetext="The firewall is not installed or has been disabled. To view this data, ensure you firewall is installed and enabled for your cluster."
+  chartemptystatetitle="Application firewall not detected"
+  documentationanchor="web-application-firewall"
+  documentationpath="/docs"
+  nominaltitle="Total Requests"
+  storenamespace="threatMonitoringWaf"
+  subtitle="Requests"
+  title="Web Application Firewall"
+  ylegend="Requests"
+/>
+`;
+
 exports[`ThreatMonitoringApp component given there is a default environment with data shows the alert 1`] = `
 <gl-alert-stub
   class="my-3"

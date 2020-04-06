@@ -18,3 +18,23 @@ p.details {
 pre.commit-message {
   white-space: pre-wrap;
 }
+
+.gl-label-scoped {
+  border: 2px solid currentColor;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 17px;
+  line-height: 14px;
+}
+
+.gl-label-text {
+  padding: 0 5px;
+}
+
+.gl-label-text-light {
+  color: $white;
+}
+
+.gl-label-text-dark {
+  color: $gl-gray-800;
+}

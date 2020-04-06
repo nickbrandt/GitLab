@@ -11,56 +11,57 @@ module Gitlab
           @project      = project
           @current_user = current_user
           @shared       = shared
-          @full_path    = File.join(@shared.export_path, ImportExport.project_filename)
         end
 
         def save
-          project_tree = tree_saver.serialize(@project, reader.project_tree)
-          fix_project_tree(project_tree)
-          tree_saver.save(project_tree, @shared.export_path, ImportExport.project_filename)
+          ImportExport::JSON::StreamingSerializer.new(
+            exportable,
+            reader.project_tree,
+            json_writer,
+            exportable_path: "project"
+          ).execute
 
           true
         rescue => e
           @shared.error(e)
           false
+        ensure
+          json_writer&.close
         end
 
         private
-
-        # Aware that the resulting hash needs to be pure-hash and
-        # does not include any AR objects anymore, only objects that run `.to_json`
-        def fix_project_tree(project_tree)
-          if @params[:description].present?
-            project_tree['description'] = @params[:description]
-          end
-
-          project_tree['project_members'] += group_members_array
-        end
 
         def reader
           @reader ||= Gitlab::ImportExport::Reader.new(shared: @shared)
         end
 
-        def group_members_array
-          group_members.as_json(reader.group_members_tree).each do |group_member|
-            group_member['source_type'] = 'Project' # Make group members project members of the future import
+        def exportable
+          @project.present(exportable_params)
+        end
+
+        def exportable_params
+          params = {
+            presenter_class: presenter_class,
+            current_user: @current_user
+          }
+          params[:override_description] = @params[:description] if @params[:description].present?
+          params
+        end
+
+        def presenter_class
+          Projects::ImportExport::ProjectExportPresenter
+        end
+
+        def json_writer
+          @json_writer ||= begin
+            if ::Feature.enabled?(:project_export_as_ndjson, @project.namespace)
+              full_path = File.join(@shared.export_path, 'tree')
+              Gitlab::ImportExport::JSON::NdjsonWriter.new(full_path)
+            else
+              full_path = File.join(@shared.export_path, ImportExport.project_filename)
+              Gitlab::ImportExport::JSON::LegacyWriter.new(full_path, allowed_path: 'project')
+            end
           end
-        end
-
-        def group_members
-          return [] unless @current_user.can?(:admin_group, @project.group)
-
-          # We need `.where.not(user_id: nil)` here otherwise when a group has an
-          # invitee, it would make the following query return 0 rows since a NULL
-          # user_id would be present in the subquery
-          # See http://stackoverflow.com/questions/129077/not-in-clause-and-null-values
-          non_null_user_ids = @project.project_members.where.not(user_id: nil).select(:user_id)
-
-          GroupMembersFinder.new(@project.group).execute.where.not(user_id: non_null_user_ids)
-        end
-
-        def tree_saver
-          @tree_saver ||= RelationTreeSaver.new
         end
       end
     end

@@ -17,20 +17,10 @@ describe 'issue boards', :js do
       login_as(user)
     end
 
-    it 'shows the button when the feature is enabled' do
-      stub_licensed_features(issue_board_focus_mode: true)
-
+    it 'shows the button' do
       visit_board_page
 
       expect(page).to have_link('Toggle focus mode')
-    end
-
-    it 'hides the button when the feature is enabled' do
-      stub_licensed_features(issue_board_focus_mode: false)
-
-      visit_board_page
-
-      expect(page).not_to have_link('Toggle focus mode')
     end
   end
 

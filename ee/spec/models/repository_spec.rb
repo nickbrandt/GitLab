@@ -7,7 +7,9 @@ describe Repository do
   include ::EE::GeoHelpers
   include GitHelpers
 
-  TestBlob = Struct.new(:path)
+  before do
+    stub_const('TestBlob', Struct.new(:path))
+  end
 
   let_it_be(:primary_node)   { create(:geo_node, :primary) }
   let_it_be(:secondary_node) { create(:geo_node) }

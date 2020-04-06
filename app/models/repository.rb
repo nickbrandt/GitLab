@@ -437,15 +437,6 @@ class Repository
     expire_all_method_caches
   end
 
-  # Runs code after a repository has been forked/imported.
-  def after_import
-    expire_content_cache
-
-    return unless repo_type.project?
-
-    DetectRepositoryLanguagesWorker.perform_async(project.id)
-  end
-
   # Runs code after a new commit has been pushed.
   def after_push_commit(branch_name)
     expire_statistics_caches
@@ -911,10 +902,8 @@ class Repository
   def merged_branch_names(branch_names = [])
     # Currently we should skip caching if requesting all branch names
     # This is only used in a few places, notably app/services/branches/delete_merged_service.rb,
-    # and it could potentially result in a very large cache/performance issues with the current
-    # implementation.
-    skip_cache = branch_names.empty? || Feature.disabled?(:merged_branch_names_redis_caching, default_enabled: true)
-    return raw_repository.merged_branch_names(branch_names) if skip_cache
+    # and it could potentially result in a very large cache.
+    return raw_repository.merged_branch_names(branch_names) if branch_names.empty?
 
     cache = redis_hash_cache
 
@@ -1072,8 +1061,7 @@ class Repository
   end
 
   def squash(user, merge_request, message)
-    raw.squash(user, merge_request.id, branch: merge_request.target_branch,
-                                       start_sha: merge_request.diff_start_sha,
+    raw.squash(user, merge_request.id, start_sha: merge_request.diff_start_sha,
                                        end_sha: merge_request.diff_head_sha,
                                        author: merge_request.author,
                                        message: message)

@@ -106,7 +106,7 @@ describe ApprovalProjectRule do
 
   describe "validation" do
     let(:project_approval_rule) { create(:approval_project_rule) }
-    let(:license_compliance_rule) { create(:approval_project_rule, :license_management) }
+    let(:license_compliance_rule) { create(:approval_project_rule, :license_scanning) }
     let(:vulnerability_check_rule) { create(:approval_project_rule, :security) }
 
     context "when creating a new rule" do
@@ -175,6 +175,35 @@ describe ApprovalProjectRule do
 
       context 'but branch does not match anything' do
         let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
+
+        it { is_expected.to be_empty }
+      end
+    end
+  end
+
+  describe '.inapplicable_to_branch' do
+    let!(:rule) { create(:approval_project_rule) }
+    let(:branch) { 'stable' }
+
+    subject { described_class.inapplicable_to_branch(branch) }
+
+    context 'when there are no associated protected branches' do
+      it { is_expected.to be_empty }
+    end
+
+    context 'when there are associated protected branches' do
+      before do
+        rule.update!(protected_branches: protected_branches)
+      end
+
+      context 'and branch does not match anything' do
+        let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
+
+        it { is_expected.to eq([rule]) }
+      end
+
+      context 'but branch matches' do
+        let(:protected_branches) { [create(:protected_branch, name: branch)] }
 
         it { is_expected.to be_empty }
       end

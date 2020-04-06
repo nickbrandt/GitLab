@@ -104,6 +104,35 @@ describe ProjectsHelper do
     context 'project with pipeline' do
       subject { helper.project_security_dashboard_config(project, pipeline) }
 
+      it 'checks if first vulnerability class is enabled' do
+        expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project)
+
+        subject
+      end
+
+      context 'when first first class vulnerabilities is enabled for project' do
+        before do
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(true)
+        end
+
+        it 'checks if first vulnerability class is enabled' do
+          expect(subject[:vulnerabilities_export_endpoint]).to(
+            eq(
+              api_v4_projects_vulnerability_exports_path(id: project.id)
+            ))
+        end
+      end
+
+      context 'when first first class vulnerabilities is disabled for project' do
+        before do
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(false)
+        end
+
+        it 'checks if first vulnerability class is enabled' do
+          expect(subject).not_to have_key(:vulnerabilities_export_endpoint)
+        end
+      end
+
       it 'returns config containing pipeline details' do
         expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'true'

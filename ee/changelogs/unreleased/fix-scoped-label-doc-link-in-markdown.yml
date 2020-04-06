@@ -1,0 +1,5 @@
+---
+title: Fix invalid scoped label documentation URL when rendered in Markdown
+merge_request: 28268
+author:
+type: fixed

@@ -20,6 +20,8 @@ FactoryBot.define do
     raw_metadata do
       {
         description: "The cipher does not provide data integrity update 1",
+        message: "The cipher does not provide data integrity",
+        cve: "818bf5dacb291e15d9e6dc3c5ac32178:CIPHER",
         solution: "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
         location: {
           file: "maven/src/main/java/com/gitlab/security_products/tests/App.java",
@@ -64,6 +66,19 @@ FactoryBot.define do
                :issue,
                project: finding.project,
                project_fingerprint: finding.project_fingerprint)
+      end
+    end
+
+    trait :with_remediation do
+      after(:build) do |finding|
+        raw_metadata = JSON.parse(finding.raw_metadata)
+        raw_metadata.delete(:solution)
+        raw_metadata[:remediations] = [
+          {
+            summary: "Use GCM mode which includes HMAC in the resulting encrypted data, providing integrity of the result."
+          }
+        ]
+        finding.raw_metadata = raw_metadata.to_json
       end
     end
 

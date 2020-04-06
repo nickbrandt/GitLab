@@ -99,7 +99,7 @@ describe 'Login' do
       stub_licensed_features(smartcard_auth: true)
       stub_ldap_setting(enabled: true)
       allow(Gitlab.config.smartcard).to receive(:enabled).and_return(true)
-      allow(::Gitlab::Auth::LDAP::Config).to receive_messages(enabled: true, servers: [ldap_server_config])
+      allow(::Gitlab::Auth::Ldap::Config).to receive_messages(enabled: true, servers: [ldap_server_config])
       allow_any_instance_of(ActionDispatch::Routing::RoutesProxy)
         .to receive(:user_ldapmain_omniauth_callback_path)
               .and_return('/users/auth/ldapmain/callback')

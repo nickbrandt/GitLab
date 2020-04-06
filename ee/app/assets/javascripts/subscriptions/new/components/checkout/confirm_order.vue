@@ -1,11 +1,11 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
   },
   computed: {
@@ -26,9 +26,9 @@ export default {
 </script>
 <template>
   <div v-if="isActive" class="full-width prepend-bottom-32">
-    <gl-button :disabled="isConfirmingOrder" variant="success" @click="confirmOrder">
+    <gl-deprecated-button :disabled="isConfirmingOrder" variant="success" @click="confirmOrder">
       <gl-loading-icon v-if="isConfirmingOrder" inline size="sm" />
       {{ isConfirmingOrder ? $options.i18n.confirming : $options.i18n.confirm }}
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

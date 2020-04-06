@@ -364,7 +364,7 @@ $note-form-margin-left: 72px;
             left: $gl-padding-24;
             right: 0;
             bottom: 0;
-            background: linear-gradient(rgba($white-light, 0.1) -100px, $white-light 100%);
+            background: linear-gradient(rgba($white, 0.1) -100px, $white 100%);
           }
         }
       }
@@ -380,7 +380,7 @@ $note-form-margin-left: 72px;
     .timeline-icon {
       display: flex;
       align-items: center;
-      background-color: $white-light;
+      background-color: $white;
       width: $system-note-icon-size;
       height: $system-note-icon-size;
       border: 1px solid $border-color;
@@ -470,7 +470,7 @@ $note-form-margin-left: 72px;
     }
 
     .system-note {
-      background-color: $white-light;
+      background-color: $white;
       padding: $gl-padding;
     }
   }
@@ -506,7 +506,7 @@ $note-form-margin-left: 72px;
         // Fixes subpixel rounding issue https://gitlab.com/gitlab-org/gitlab-foss/issues/53973
         // background-color is needed for dark code preference
         padding-bottom: 1px;
-        background-color: $white-light;
+        background-color: $white;
 
         &.parallel {
           border-width: 1px;
@@ -517,7 +517,7 @@ $note-form-margin-left: 72px;
         }
 
         .notes {
-          background-color: $white-light;
+          background-color: $white;
         }
 
         a code {
@@ -561,7 +561,7 @@ $note-form-margin-left: 72px;
 
 .code-commit .notes-content,
 .diff-viewer > .image ~ .note-container {
-  background-color: $white-light;
+  background-color: $white;
 
   .avatar-note-form-holder {
     .user-avatar-link img {
@@ -827,7 +827,7 @@ $note-form-margin-left: 72px;
 
   &.discussion-locked {
     border: 0;
-    background-color: $white-light;
+    background-color: $white;
   }
 
   a:not(.learn-more) {
@@ -842,11 +842,11 @@ $note-form-margin-left: 72px;
     white-space: nowrap;
   }
 
-  .btn-group {
-    margin-left: -4px;
+  .discussion-next-btn {
+    border-radius: 0;
   }
 
-  .discussion-next-btn {
+  .toggle-all-discussions-btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -855,11 +855,10 @@ $note-form-margin-left: 72px;
     line-height: $gl-line-height;
 
     svg {
-      fill: $gray-darkest;
+      fill: $gray-700;
     }
 
     &.discussion-create-issue-btn {
-      margin-left: -4px;
       border-radius: 0;
       border-right: 0;
 
@@ -873,6 +872,10 @@ $note-form-margin-left: 72px;
         }
       }
     }
+
+    &.discussion-next-btn {
+      border-right: 0;
+    }
   }
 }
 
@@ -884,16 +887,13 @@ $note-form-margin-left: 72px;
   border: 1px solid $border-color;
   border-radius: $border-radius-default;
   font-size: $gl-btn-small-font-size;
-
-  &.has-next-btn {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: 0;
-  }
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 0;
 
   .line-resolve-btn {
     margin-right: 5px;
-    color: $gray-darkest;
+    color: $gray-700;
 
     svg {
       vertical-align: middle;

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mapActions } from 'vuex';
+import Vuex from 'vuex';
 
 import { parseBoolean } from '~/lib/utils/common_utils';
 
@@ -8,6 +8,8 @@ import createStore from './store';
 import RelatedItemsTreeApp from './components/related_items_tree_app.vue';
 import TreeRoot from './components/tree_root.vue';
 import TreeItem from './components/tree_item.vue';
+
+Vue.use(Vuex);
 
 export default () => {
   const el = document.getElementById('js-tree');
@@ -58,7 +60,7 @@ export default () => {
       });
     },
     methods: {
-      ...mapActions(['setInitialParentItem', 'setInitialConfig']),
+      ...Vuex.mapActions(['setInitialParentItem', 'setInitialConfig']),
     },
     render: createElement => createElement('related-items-tree-app'),
   });

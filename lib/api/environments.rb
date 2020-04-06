@@ -3,7 +3,6 @@
 module API
   # Environments RESTfull API endpoints
   class Environments < Grape::API
-    include ::API::Helpers::CustomValidators
     include PaginationParams
 
     before { authenticate! }
@@ -82,9 +81,10 @@ module API
         requires :environment_id, type: Integer, desc: 'The environment ID'
       end
       delete ':id/environments/:environment_id' do
-        authorize! :update_environment, user_project
+        authorize! :read_environment, user_project
 
         environment = user_project.environments.find(params[:environment_id])
+        authorize! :destroy_environment, environment
 
         destroy_conditionally!(environment)
       end

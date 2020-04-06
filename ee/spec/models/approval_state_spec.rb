@@ -1519,6 +1519,16 @@ describe ApprovalState do
                 another_project_rule
               ])
             end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  project_rule
+                ])
+              end
+            end
           end
 
           context 'but scoped_approval_rules feature is disabled' do
@@ -1575,8 +1585,22 @@ describe ApprovalState do
             merge_request.update!(target_branch: 'stable-1')
             source_rule.update!(protected_branches: [protected_branch])
             another_source_rule.update!(protected_branches: [another_protected_branch])
-            mr_rule.update!(approval_project_rule: another_source_rule)
-            another_mr_rule.update!(approval_project_rule: source_rule)
+
+            mr_rule.update!(
+              approval_project_rule: another_source_rule,
+              name: another_source_rule.name,
+              approvals_required: another_source_rule.approvals_required,
+              users: another_source_rule.users,
+              groups: another_source_rule.groups
+            )
+
+            another_mr_rule.update!(
+              approval_project_rule: source_rule,
+              name: source_rule.name,
+              approvals_required: source_rule.approvals_required,
+              users: source_rule.users,
+              groups: source_rule.groups
+            )
           end
 
           context 'and scoped_approval_rules feature is enabled' do
@@ -1584,6 +1608,16 @@ describe ApprovalState do
               expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
                 another_mr_rule
               ])
+            end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  mr_rule
+                ])
+              end
             end
           end
 

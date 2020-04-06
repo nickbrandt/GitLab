@@ -1,5 +1,3 @@
-import $ from 'jquery';
-import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { joinPaths } from './lib/utils/url_utility';
 import flash from '~/flash';
@@ -43,11 +41,13 @@ const Api = {
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   releasesPath: '/api/:version/projects/:id/releases',
   releasePath: '/api/:version/projects/:id/releases/:tag_name',
+  releaseLinksPath: '/api/:version/projects/:id/releases/:tag_name/assets/links',
+  releaseLinkPath: '/api/:version/projects/:id/releases/:tag_name/assets/links/:link_id',
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
   adminStatisticsPath: '/api/:version/application/statistics',
   pipelineSinglePath: '/api/:version/projects/:id/pipelines/:pipeline_id',
-  lsifPath: '/api/:version/projects/:id/commits/:commit_id/lsif/info',
   environmentsPath: '/api/:version/projects/:id/environments',
+  rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -70,7 +70,7 @@ const Api = {
   },
 
   // Return groups list. Filtered by query
-  groups(query, options, callback = $.noop) {
+  groups(query, options, callback = () => {}) {
     const url = Api.buildUrl(Api.groupsPath);
     return axios
       .get(url, {
@@ -108,7 +108,7 @@ const Api = {
   },
 
   // Return projects list. Filtered by query
-  projects(query, options, callback = _.noop) {
+  projects(query, options, callback = () => {}) {
     const url = Api.buildUrl(Api.projectsPath);
     const defaults = {
       search: query,
@@ -463,6 +463,23 @@ const Api = {
     return axios.put(url, release);
   },
 
+  createReleaseLink(projectPath, tagName, link) {
+    const url = Api.buildUrl(this.releaseLinksPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName));
+
+    return axios.post(url, link);
+  },
+
+  deleteReleaseLink(projectPath, tagName, linkId) {
+    const url = Api.buildUrl(this.releaseLinkPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName))
+      .replace(':link_id', encodeURIComponent(linkId));
+
+    return axios.delete(url);
+  },
+
   adminStatistics() {
     const url = Api.buildUrl(this.adminStatisticsPath);
     return axios.get(url);
@@ -476,17 +493,17 @@ const Api = {
     return axios.get(url);
   },
 
-  lsifData(projectPath, commitId, paths) {
-    const url = Api.buildUrl(this.lsifPath)
-      .replace(':id', encodeURIComponent(projectPath))
-      .replace(':commit_id', commitId);
-
-    return axios.get(url, { params: { paths } });
-  },
-
   environments(id) {
     const url = Api.buildUrl(this.environmentsPath).replace(':id', encodeURIComponent(id));
     return axios.get(url);
+  },
+
+  getRawFile(id, path, params = { ref: 'master' }) {
+    const url = Api.buildUrl(this.rawFilePath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':path', encodeURIComponent(path));
+
+    return axios.get(url, { params });
   },
 
   buildUrl(url) {

@@ -8,8 +8,15 @@ import LoadingButton from '~/vue_shared/components/loading_button.vue';
 describe('Security Reports modal footer', () => {
   let wrapper;
 
-  const mountComponent = options => {
-    wrapper = mount(component, options);
+  const mountComponent = propsData => {
+    wrapper = mount(component, {
+      propsData: {
+        isCreatingIssue: false,
+        isDismissingVulnerability: false,
+        isCreatingMergeRequest: false,
+        ...propsData,
+      },
+    });
   };
 
   describe('can only create issue', () => {
@@ -18,7 +25,7 @@ describe('Security Reports modal footer', () => {
         modal: createState().modal,
         canCreateIssue: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('does not render dismiss button', () => {
@@ -45,7 +52,7 @@ describe('Security Reports modal footer', () => {
         modal: createState().modal,
         canCreateMergeRequest: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('only renders the create merge request button', () => {
@@ -68,7 +75,7 @@ describe('Security Reports modal footer', () => {
         modal: createState().modal,
         canDownloadPatch: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('renders the download patch button', () => {
@@ -92,7 +99,7 @@ describe('Security Reports modal footer', () => {
         canCreateIssue: true,
         canCreateMergeRequest: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('renders create merge request and issue button as a split button', () => {
@@ -112,7 +119,7 @@ describe('Security Reports modal footer', () => {
         canCreateMergeRequest: true,
         canDownloadPatch: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('renders the split button', () => {
@@ -130,7 +137,7 @@ describe('Security Reports modal footer', () => {
         modal: createState().modal,
         canDismissVulnerability: true,
       };
-      mountComponent({ propsData });
+      mountComponent(propsData);
     });
 
     it('should render the dismiss button', () => {

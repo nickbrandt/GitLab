@@ -63,6 +63,20 @@ describe IssueLink do
     end
   end
 
+  describe '.blocking_issue_ids_for' do
+    it 'returns blocking issue ids' do
+      issue = create(:issue)
+      blocking_issue = create(:issue, project: issue.project)
+      blocked_by_issue = create(:issue, project: issue.project)
+      create(:issue_link, source: blocking_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: issue, target: blocked_by_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+
+      blocking_ids = described_class.blocking_issue_ids_for(issue)
+
+      expect(blocking_ids).to match_array([blocking_issue.id, blocked_by_issue.id])
+    end
+  end
+
   describe '.inverse_link_type' do
     it 'returns reverse type of link' do
       expect(described_class.inverse_link_type('relates_to')).to eq 'relates_to'

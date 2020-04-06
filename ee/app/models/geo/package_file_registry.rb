@@ -12,7 +12,6 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
 
   belongs_to :package_file, class_name: 'Packages::PackageFile'
 
-  scope :package_file_id_not_in, -> (ids) { where.not(package_file_id: ids) }
   scope :never, -> { where(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }

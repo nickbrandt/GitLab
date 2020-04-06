@@ -38,7 +38,7 @@ describe API::Todos do
 
     shared_examples 'an endpoint that responds with success' do
       it do
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -75,39 +75,24 @@ describe API::Todos do
         get api('/todos', personal_access_token: pat)
       end
 
-      context 'when the feature is enabled' do
-        before do
-          api_request
-        end
-
-        it_behaves_like 'an endpoint that responds with success'
-
-        it 'avoids N+1 queries', :request_store do
-          control = ActiveRecord::QueryRecorder.new { api_request }
-
-          create_todo_for_mentioned_in_design
-
-          expect { api_request }.not_to exceed_query_limit(control)
-        end
-
-        it 'includes the Design Todo in the response' do
-          expect(json_response).to include(
-            a_hash_including('id' => design_todo.id)
-          )
-        end
+      before do
+        api_request
       end
 
-      context 'when the feature is disabled' do
-        before do
-          stub_feature_flags(design_management_todos_api: false)
-          api_request
-        end
+      it_behaves_like 'an endpoint that responds with success'
 
-        it_behaves_like 'an endpoint that responds with success'
+      it 'avoids N+1 queries', :request_store do
+        control = ActiveRecord::QueryRecorder.new { api_request }
 
-        it 'does not include the Design Todo in the response' do
-          expect(json_response).to be_empty
-        end
+        create_todo_for_mentioned_in_design
+
+        expect { api_request }.not_to exceed_query_limit(control)
+      end
+
+      it 'includes the Design Todo in the response' do
+        expect(json_response).to include(
+          a_hash_including('id' => design_todo.id)
+        )
       end
     end
   end
@@ -131,7 +116,7 @@ describe API::Todos do
       it 'creates a todo on an epic' do
         expect { subject }.to change { Todo.count }.by(1)
 
-        expect(response.status).to eq(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['project']).to be_nil
         expect(json_response['group']).to be_a(Hash)
         expect(json_response['author']).to be_a(Hash)
@@ -149,13 +134,15 @@ describe API::Todos do
 
         subject
 
-        expect(response.status).to eq(304)
+        expect(response).to have_gitlab_http_status(:not_modified)
       end
 
       it 'returns 404 if the epic is not found' do
-        post api("/groups/#{group.id}/epics/9999/todo", user)
+        group.add_developer(user)
 
-        expect(response.status).to eq(403)
+        post api("/groups/#{group.id}/epics/#{non_existing_record_iid}/todo", user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns an error if the epic is not accessible' do

@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlBadge, GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlBadge, GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
@@ -87,7 +87,7 @@ describe('Project List component', () => {
     const mockProjects = generateMockProjects(1);
     const [projectData] = mockProjects;
 
-    factory({ projects: mockProjects, stubs: { GlButton } });
+    factory({ projects: mockProjects, stubs: { GlDeprecatedButton } });
 
     getFirstRemoveButton().vm.$emit('click');
 

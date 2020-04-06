@@ -4,17 +4,6 @@ module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
 
-    override :sidebar_projects_paths
-    def sidebar_projects_paths
-      if ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, @project, default_enabled: true)
-        super
-      else
-        super + %w[
-          projects/insights#show
-        ]
-      end
-    end
-
     override :sidebar_settings_paths
     def sidebar_settings_paths
       super + %w[
@@ -158,6 +147,10 @@ module EE
       ::License.feature_available?(:ci_cd_projects) && import_sources_enabled?
     end
 
+    def first_class_vulnerabilities_available?(project)
+      ::Feature.enabled?(:first_class_vulnerabilities, project)
+    end
+
     def merge_pipelines_available?
       return false unless @project.builds_enabled?
 
@@ -187,10 +180,6 @@ module EE
       "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
     end
 
-    def project_above_size_limit_message
-      ::Gitlab::RepositorySizeError.new(@project).above_size_limit_message
-    end
-
     override :membership_locked?
     def membership_locked?
       group = @project.group
@@ -216,6 +205,7 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
+          project_full_path: project.full_path,
           vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
           vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
@@ -233,8 +223,14 @@ module EE
           pipeline_path: pipeline_url(pipeline),
           pipeline_created: pipeline.created_at.to_s(:iso8601),
           has_pipeline_data: "true"
-        }
+        }.merge(project_vulnerabilities_config(project))
       end
+    end
+
+    def project_vulnerabilities_config(project)
+      return {} unless first_class_vulnerabilities_available?(project)
+
+      { vulnerabilities_export_endpoint: api_v4_projects_vulnerability_exports_path(id: project.id) }
     end
 
     def can_create_feedback?(project, feedback_type)

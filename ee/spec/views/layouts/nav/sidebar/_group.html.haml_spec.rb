@@ -11,23 +11,50 @@ describe 'layouts/nav/sidebar/_group' do
   let(:user) { create(:user) }
 
   describe 'contribution analytics tab' do
-    it 'is not visible when there is no valid license and we dont show promotions' do
-      stub_licensed_features(contribution_analytics: false)
+    let!(:current_user) { create(:user) }
 
-      render
+    before do
+      group.add_guest(current_user)
 
-      expect(rendered).not_to have_text 'Contribution Analytics'
+      allow(view).to receive(:current_user).and_return(current_user)
+    end
+
+    context 'contribution analytics feature is available' do
+      before do
+        stub_licensed_features(contribution_analytics: true)
+      end
+
+      it 'is visible' do
+        render
+
+        expect(rendered).to have_text 'Contribution'
+      end
+    end
+
+    context 'contribution analytics feature is not available' do
+      before do
+        stub_licensed_features(contribution_analytics: false)
+      end
+
+      context 'we do not show promotions' do
+        before do
+          allow(LicenseHelper).to receive(:show_promotions?).and_return(false)
+        end
+
+        it 'is not visible' do
+          render
+
+          expect(rendered).not_to have_text 'Contribution'
+        end
+      end
     end
 
     context 'no license installed' do
-      let!(:cuser) { create(:admin) }
-
       before do
         allow(License).to receive(:current).and_return(nil)
         stub_application_setting(check_namespace_plan: false)
 
         allow(view).to receive(:can?) { |*args| Ability.allowed?(*args) }
-        allow(view).to receive(:current_user).and_return(cuser)
       end
 
       it 'is visible when there is no valid license but we show promotions' do
@@ -35,7 +62,7 @@ describe 'layouts/nav/sidebar/_group' do
 
         render
 
-        expect(rendered).to have_text 'Contribution Analytics'
+        expect(rendered).to have_text 'Contribution'
       end
     end
 
@@ -44,7 +71,7 @@ describe 'layouts/nav/sidebar/_group' do
 
       render
 
-      expect(rendered).to have_text 'Contribution Analytics'
+      expect(rendered).to have_text 'Contribution'
     end
 
     describe 'group issue boards link' do

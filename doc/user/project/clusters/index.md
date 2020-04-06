@@ -20,14 +20,14 @@ NOTE: **Scalable app deployment with GitLab and Google Cloud Platform**
 Using the GitLab project Kubernetes integration, you can:
 
 - Use [Review Apps](../../../ci/review_apps/index.md).
-- Run [pipelines](../../../ci/pipelines.md).
+- Run [pipelines](../../../ci/pipelines/index.md).
 - [Deploy](#deploying-to-a-kubernetes-cluster) your applications.
 - Detect and [monitor Kubernetes](#kubernetes-monitoring).
 - Use it with [Auto DevOps](#auto-devops).
 - Use [Web terminals](#web-terminals).
 - Use [Deploy Boards](#deploy-boards-premium). **(PREMIUM)**
 - Use [Canary Deployments](#canary-deployments-premium). **(PREMIUM)**
-- View [Pod logs](#pod-logs-ultimate). **(ULTIMATE)**
+- View [Logs](#logs).
 - Run serverless workloads on [Kubernetes with Knative](serverless/index.md).
 
 ### Deploy Boards **(PREMIUM)**
@@ -48,11 +48,11 @@ the need to leave GitLab.
 
 [Read more about Canary Deployments](../canary_deployments.md)
 
-### Pod logs **(ULTIMATE)**
+### Logs
 
 GitLab makes it easy to view the logs of running pods in connected Kubernetes clusters. By displaying the logs directly in GitLab, developers can avoid having to manage console tools or jump to a different interface.
 
-[Read more about Kubernetes pod logs](kubernetes_pod_logs.md)
+[Read more about Kubernetes logs](kubernetes_pod_logs.md)
 
 ### Kubernetes monitoring
 
@@ -78,7 +78,7 @@ Kubernetes clusters can be used without Auto DevOps.
 
 > Introduced in GitLab 8.15.
 
-When enabled, the Kubernetes service adds [web terminal](../../../ci/environments.md#web-terminals)
+When enabled, the Kubernetes integration adds [web terminal](../../../ci/environments.md#web-terminals)
 support to your [environments](../../../ci/environments.md). This is based on the `exec` functionality found in
 Docker and Kubernetes, so you get a new shell session within your existing
 containers. To use this integration, you should deploy to Kubernetes using
@@ -238,7 +238,7 @@ The result will then be:
 
 With GitLab Premium, you can associate more than one Kubernetes cluster to your
 project. That way you can have different clusters for different environments,
-like dev, staging, production, etc.
+like dev, staging, production, and so on.
 
 Simply add another cluster, like you did the first time, and make sure to
 [set an environment scope](#setting-the-environment-scope-premium) that will
@@ -247,7 +247,7 @@ differentiate the new cluster with the rest.
 ## Installing applications
 
 GitLab can install and manage some applications like Helm, GitLab Runner, Ingress,
-Prometheus, etc., in your project-level cluster. For more information on
+Prometheus, and so on, in your project-level cluster. For more information on
 installing, upgrading, uninstalling, and troubleshooting applications for
 your project cluster, see
 [GitLab Managed Apps](../../clusters/applications.md).

@@ -30,8 +30,8 @@ export const setGettingStartedEmptyState = ({ commit }) => {
   commit(types.SET_GETTING_STARTED_EMPTY_STATE);
 };
 
-export const setEndpoints = ({ commit }, endpoints) => {
-  commit(types.SET_ENDPOINTS, endpoints);
+export const setInitialState = ({ commit }, initialState) => {
+  commit(types.SET_INITIAL_STATE, initialState);
 };
 
 export const setTimeRange = ({ commit }, timeRange) => {
@@ -79,15 +79,15 @@ export const fetchData = ({ dispatch }) => {
   dispatch('fetchEnvironmentsData');
 };
 
-export const fetchDashboard = ({ state, dispatch }) => {
+export const fetchDashboard = ({ state, commit, dispatch }) => {
   dispatch('requestMetricsDashboard');
 
   const params = {};
 
   if (state.timeRange) {
     const { start, end } = convertToFixedRange(state.timeRange);
-    params.start = start;
-    params.end = end;
+    params.start_time = start;
+    params.end_time = end;
   }
 
   if (state.currentDashboard) {
@@ -100,6 +100,7 @@ export const fetchDashboard = ({ state, dispatch }) => {
     .catch(error => {
       Sentry.captureException(error);
 
+      commit(types.SET_ALL_DASHBOARDS, error.response?.data?.all_dashboards ?? []);
       dispatch('receiveMetricsDashboardFailure', error);
 
       if (state.showErrorBanner) {
@@ -138,16 +139,16 @@ function fetchPrometheusResult(prometheusEndpoint, params) {
  * @param {metric} metric
  */
 export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
-  const { start, end } = params;
-  const timeDiff = (new Date(end) - new Date(start)) / 1000;
+  const { start_time, end_time } = params;
+  const timeDiff = (new Date(end_time) - new Date(start_time)) / 1000;
 
   const minStep = 60;
   const queryDataPoints = 600;
-  const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
+  const step = metric.step ? metric.step : Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
 
   const queryParams = {
-    start,
-    end,
+    start_time,
+    end_time,
     step,
   };
 

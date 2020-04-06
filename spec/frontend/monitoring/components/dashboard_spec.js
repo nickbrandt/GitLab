@@ -1,11 +1,12 @@
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
-import { GlDropdownItem, GlButton } from '@gitlab/ui';
+import { GlDropdownItem, GlDeprecatedButton } from '@gitlab/ui';
 import VueDraggable from 'vuedraggable';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import statusCodes from '~/lib/utils/http_status';
 import { metricStates } from '~/monitoring/constants';
 import Dashboard from '~/monitoring/components/dashboard.vue';
+import { getJSONFixture } from '../../../../spec/frontend/helpers/fixtures';
 
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
@@ -15,15 +16,19 @@ import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import { setupComponentStore, propsData } from '../init_utils';
 import {
-  metricsDashboardPayload,
-  mockedQueryResultPayload,
   metricsDashboardViewModel,
   environmentData,
   dashboardGitResponse,
+  mockedQueryResultFixture,
 } from '../mock_data';
 
 const localVue = createLocalVue();
 const expectedPanelCount = 4;
+
+const metricsDashboardFixture = getJSONFixture(
+  'metrics_dashboard/environment_metrics_dashboard.json',
+);
+const metricsDashboardPayload = metricsDashboardFixture.dashboard;
 
 describe('Dashboard', () => {
   let store;
@@ -83,11 +88,17 @@ describe('Dashboard', () => {
       expect(findEnvironmentsDropdown().exists()).toBe(true);
     });
 
-    it('sets endpoints: logs path', () => {
-      expect(store.dispatch).toHaveBeenCalledWith(
-        'monitoringDashboard/setEndpoints',
-        expect.objectContaining({ logsPath: propsData.logsPath }),
-      );
+    it('sets initial state', () => {
+      expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/setInitialState', {
+        currentDashboard: '',
+        currentEnvironmentName: 'production',
+        dashboardEndpoint: 'https://invalid',
+        dashboardsEndpoint: 'https://invalid',
+        deploymentsEndpoint: null,
+        logsPath: '/path/to/logs',
+        metricsEndpoint: 'http://test.host/monitoring/mock',
+        projectPath: '/path/to/project',
+      });
     });
   });
 
@@ -196,7 +207,7 @@ describe('Dashboard', () => {
     );
     wrapper.vm.$store.commit(
       `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
-      mockedQueryResultPayload,
+      mockedQueryResultFixture,
     );
 
     return wrapper.vm.$nextTick().then(() => {
@@ -223,7 +234,7 @@ describe('Dashboard', () => {
       const refreshBtn = wrapper.findAll({ ref: 'refreshDashboardBtn' });
 
       expect(refreshBtn).toHaveLength(1);
-      expect(refreshBtn.is(GlButton)).toBe(true);
+      expect(refreshBtn.is(GlDeprecatedButton)).toBe(true);
     });
   });
 
@@ -506,7 +517,7 @@ describe('Dashboard', () => {
       const externalDashboardButton = wrapper.find('.js-external-dashboard-link');
 
       expect(externalDashboardButton.exists()).toBe(true);
-      expect(externalDashboardButton.is(GlButton)).toBe(true);
+      expect(externalDashboardButton.is(GlDeprecatedButton)).toBe(true);
       expect(externalDashboardButton.text()).toContain('View full dashboard');
     });
   });

@@ -1,4 +1,5 @@
 import dateFormat from 'dateformat';
+import { isNumber } from 'lodash';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
 import { getDurationChartData, getDurationChartMedianData, getTasksByTypeData } from '../utils';
@@ -53,3 +54,6 @@ const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
 
 export const hiddenStages = ({ stages }) => filterStagesByHiddenStatus(stages);
 export const activeStages = ({ stages }) => filterStagesByHiddenStatus(stages, false);
+
+export const enableCustomOrdering = ({ stages, errorSavingStageOrder }) =>
+  stages.some(stage => isNumber(stage.id)) && !errorSavingStageOrder;

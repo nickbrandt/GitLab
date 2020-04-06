@@ -106,21 +106,7 @@ describe Note, :elastic do
     expect(note.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
-  it "does not create ElasticIndexerWorker job for system messages" do
-    stub_feature_flags(elastic_bulk_incremental_updates: false)
-
-    project = create :project, :repository
-    # We have to set one minute delay because of https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15682
-    issue = create :issue, project: project, updated_at: 1.minute.ago
-
-    # Only issue should be updated
-    expect(ElasticIndexerWorker).to receive(:perform_async).with(:update, 'Issue', anything, anything)
-    create :note, :system, project: project, noteable: issue
-  end
-
-  it 'does not track system note updates via the bulk updater' do
-    stub_feature_flags(elastic_bulk_incremental_updates: true)
-
+  it 'does not track system note updates' do
     note = create(:note, :system)
 
     expect(Elastic::ProcessBookkeepingService).not_to receive(:track!)

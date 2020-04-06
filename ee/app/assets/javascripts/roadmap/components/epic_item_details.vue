@@ -1,8 +1,14 @@
 <script>
-import { s__, sprintf } from '~/locale';
-import { dateInWords } from '~/lib/utils/datetime_utility';
+import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { __, n__ } from '~/locale';
+import eventHub from '../event_hub';
 
 export default {
+  components: {
+    GlNewButton,
+    GlIcon,
+    GlTooltip,
+  },
   props: {
     epic: {
       type: Object,
@@ -12,75 +18,73 @@ export default {
       type: Number,
       required: true,
     },
+    timeframeString: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     isEpicGroupDifferent() {
       return this.currentGroupId !== this.epic.groupId;
     },
-    /**
-     * In case Epic start date is out of range
-     * we need to use original date instead of proxy date
-     */
-    startDate() {
-      if (this.epic.startDateOutOfRange) {
-        return this.epic.originalStartDate;
-      }
-
-      return this.epic.startDate;
+    isExpandIconHidden() {
+      return this.epic.isChildEpic || !this.epic.children?.edges?.length;
     },
-    /**
-     * In case Epic end date is out of range
-     * we need to use original date instead of proxy date
-     */
-    endDate() {
-      if (this.epic.endDateOutOfRange) {
-        return this.epic.originalEndDate;
-      }
-      return this.epic.endDate;
+    expandIconName() {
+      return this.epic.isChildEpicShowing ? 'chevron-down' : 'chevron-right';
     },
-    /**
-     * Compose timeframe string to show on UI
-     * based on start and end date availability
-     */
-    timeframeString() {
-      if (this.epic.startDateUndefined) {
-        return sprintf(s__('GroupRoadmap|Until %{dateWord}'), {
-          dateWord: dateInWords(this.endDate, true),
-        });
-      } else if (this.epic.endDateUndefined) {
-        return sprintf(s__('GroupRoadmap|From %{dateWord}'), {
-          dateWord: dateInWords(this.startDate, true),
-        });
-      }
-
-      // In case both start and end date fall in same year
-      // We should hide year from start date
-      const startDateInWords = dateInWords(
-        this.startDate,
-        true,
-        this.startDate.getFullYear() === this.endDate.getFullYear(),
-      );
-
-      const endDateInWords = dateInWords(this.endDate, true);
-      return sprintf(s__('GroupRoadmap|%{startDateInWords} &ndash; %{endDateInWords}'), {
-        startDateInWords,
-        endDateInWords,
-      });
+    expandIconLabel() {
+      return this.epic.isChildEpicShowing ? __('Collapse child epics') : __('Expand child epics');
+    },
+    childEpicsCount() {
+      return this.epic.isChildEpic ? '-' : this.epic.children?.edges?.length || 0;
+    },
+    childEpicsCountText() {
+      return Number.isInteger(this.childEpicsCount)
+        ? n__(`%d child epic`, `%d child epics`, this.childEpicsCount)
+        : '';
+    },
+  },
+  methods: {
+    toggleIsEpicExpanded() {
+      eventHub.$emit('toggleIsEpicExpanded', this.epic.id);
     },
   },
 };
 </script>
 
 <template>
-  <span class="epic-details-cell" data-qa-selector="epic_details_cell">
-    <div class="epic-title">
-      <a :href="epic.webUrl" :title="epic.title" class="epic-url">{{ epic.title }}</a>
+  <div class="epic-details-cell d-flex align-items-start p-2" data-qa-selector="epic_details_cell">
+    <gl-new-button
+      :class="{ invisible: isExpandIconHidden }"
+      variant="link"
+      :aria-label="expandIconLabel"
+      @click="toggleIsEpicExpanded"
+    >
+      <gl-icon :name="expandIconName" class="text-secondary" aria-hidden="true" />
+    </gl-new-button>
+    <div class="overflow-hidden flex-grow-1" :class="[epic.isChildEpic ? 'ml-4 mr-2' : 'mx-2']">
+      <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
+        {{ epic.title }}
+      </a>
+      <div class="epic-group-timeframe d-flex text-secondary">
+        <p v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group">
+          {{ epic.groupName }}
+        </p>
+        <span class="mx-1" aria-hidden="true">&middot;</span>
+        <p class="epic-timeframe" :title="timeframeString">{{ timeframeString }}</p>
+      </div>
     </div>
-    <div class="epic-group-timeframe">
-      <span v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group"
-        >{{ epic.groupName }} &middot;</span
-      >
-      <span class="epic-timeframe" v-html="timeframeString"></span>
+    <div
+      ref="childEpicsCount"
+      :class="{ invisible: epic.isChildEpic }"
+      class="d-flex text-secondary text-nowrap"
+    >
+      <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
+      <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
     </div>
-  </span>
+    <gl-tooltip v-if="!epic.isChildEpic" :target="() => $refs.childEpicsCount">
+      {{ childEpicsCountText }}
+    </gl-tooltip>
+  </div>
 </template>

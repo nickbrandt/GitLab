@@ -13,7 +13,7 @@ This guide talks about how to read and use these system log files.
 This file lives in `/var/log/gitlab/gitlab-rails/production_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/production_json.log` for
 installations from source. When GitLab is running in an environment
-other than production, the corresponding logfile is shown here.
+other than production, the corresponding log file is shown here.
 
 It contains a structured log for Rails controller requests received from
 GitLab, thanks to [Lograge](https://github.com/roidrage/lograge/). Note that
@@ -105,7 +105,7 @@ NOTE: **Note:** Starting with GitLab 12.5, if an error occurs, an
 This file lives in `/var/log/gitlab/gitlab-rails/production.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/production.log` for
 installations from source. (When GitLab is running in an environment
-other than production, the corresponding logfile is shown here.)
+other than production, the corresponding log file is shown here.)
 
 It contains information about all performed requests. You can see the
 URL and type of request, IP address, and what parts of code were
@@ -228,7 +228,7 @@ This file lives in `/var/log/gitlab/gitlab-rails/integrations_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/integrations_json.log` for
 installations from source.
 
-It contains information about [integrations](../user/project/integrations/project_services.md) activities such as Jira, Asana, and Irker services. It uses JSON format like the example below:
+It contains information about [integrations](../user/project/integrations/overview.md) activities such as Jira, Asana, and Irker services. It uses JSON format like the example below:
 
 ```json
 {
@@ -353,7 +353,7 @@ GitLab uses background jobs for processing tasks which can take a long
 time. All information about processing these jobs are written down to
 this file. For example:
 
-```
+```plaintext
 2014-06-10T07:55:20Z 2037 TID-tm504 ERROR: /opt/bitnami/apps/discourse/htdocs/vendor/bundle/ruby/1.9.1/gems/redis-3.0.7/lib/redis/client.rb:228:in `read'
 2014-06-10T18:18:26Z 14299 TID-55uqo INFO: Booting Sidekiq 3.0.0 with redis options {:url=>"redis://localhost:6379/0", :namespace=>"sidekiq"}
 ```
@@ -400,6 +400,21 @@ For source installations, edit the `gitlab.yml` and set the Sidekiq
     log_format: json
 ```
 
+## `sidekiq_client.log`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/26586) in GitLab 12.9.
+
+This file lives in `/var/log/gitlab/gitlab-rails/sidekiq_client.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/sidekiq_client.log` for
+installations from source.
+
+This file contains logging information about jobs before they are start
+being processed by Sidekiq, for example before being enqueued.
+
+This logfile follows the same structure as
+[`sidekiq.log`](#sidekiqlog), so it will be structured as JSON if
+you've configured this for Sidekiq as mentioned above.
+
 ## `gitlab-shell.log`
 
 This file lives in `/var/log/gitlab/gitaly/gitlab-shell.log` for
@@ -418,6 +433,10 @@ I, [2015-02-13T06:17:00.679433 #9291]  INFO -- : Moving existing hooks directory
 ```
 
 User clone/fetch activity using SSH transport appears in this log as `executing git command <gitaly-upload-pack...`.
+
+## `current`
+
+This file lives in `/var/log/gitlab/gitaly/current` and is produced by [runit](http://smarden.org/runit/). `runit` is packaged with Omnibus and a brief explanation of its purpose is available [in the omnibus documentation](https://docs.gitlab.com/omnibus/architecture/#runit). [Log files are rotated](http://smarden.org/runit/svlogd.8.html), renamed in unix timestamp format and `gzip`-compressed (e.g. `@1584057562.s`).
 
 ## `unicorn_stderr.log`
 

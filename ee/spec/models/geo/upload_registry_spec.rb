@@ -3,8 +3,15 @@
 require 'spec_helper'
 
 describe Geo::UploadRegistry, :geo, :geo_fdw do
+  include EE::GeoHelpers
+
   let!(:failed) { create(:geo_upload_registry, :failed) }
   let!(:synced) { create(:geo_upload_registry) }
+
+  it_behaves_like 'a BulkInsertSafe model', Geo::UploadRegistry do
+    let(:valid_items_for_bulk_insertion) { build_list(:geo_upload_registry, 10, created_at: Time.zone.now) }
+    let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
+  end
 
   it 'finds associated Upload record' do
     registry = create(:geo_upload_registry, :attachment, :with_file)
@@ -97,6 +104,30 @@ describe Geo::UploadRegistry, :geo, :geo_fdw do
 
     it 'returns :failed for a failed registry' do
       expect(failed.synchronization_state).to eq(:failed)
+    end
+  end
+
+  describe '.replication_enabled?' do
+    context 'when Object Storage is enabled' do
+      before do
+        allow(FileUploader).to receive(:object_store_enabled?).and_return(true)
+      end
+
+      it 'returns true when Geo Object Storage replication is enabled' do
+        stub_current_geo_node(double(sync_object_storage?: true))
+
+        expect(Geo::UploadRegistry.replication_enabled?).to be_truthy
+      end
+
+      it 'returns false when Geo Object Storage replication is disabled' do
+        stub_current_geo_node(double(sync_object_storage?: false))
+
+        expect(Geo::UploadRegistry.replication_enabled?).to be_falsey
+      end
+    end
+
+    it 'returns true when Object Storage is disabled' do
+      expect(Geo::UploadRegistry.replication_enabled?).to be_truthy
     end
   end
 end

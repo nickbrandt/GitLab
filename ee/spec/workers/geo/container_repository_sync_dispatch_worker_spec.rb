@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::ContainerRepositorySyncDispatchWorker, :geo, :geo_fdw do
+describe Geo::ContainerRepositorySyncDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -12,7 +12,9 @@ describe Geo::ContainerRepositorySyncDispatchWorker, :geo, :geo_fdw do
   before do
     stub_current_geo_node(secondary)
     stub_exclusive_lease(renew: true)
-    allow_any_instance_of(described_class).to receive(:over_time?).and_return(false)
+    allow_next_instance_of(described_class) do |instance|
+      allow(instance).to receive(:over_time?).and_return(false)
+    end
     stub_registry_replication_config(enabled: true)
   end
 

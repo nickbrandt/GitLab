@@ -15,13 +15,13 @@ module QA
                 element :icon_status, ':data-qa-selector="`status_${status}_icon`" ' # rubocop:disable QA/ElementWithPattern
               end
 
-              view 'ee/app/assets/javascripts/vue_shared/license_management/components/set_approval_status_modal.vue' do
+              view 'ee/app/assets/javascripts/vue_shared/license_compliance/components/set_approval_status_modal.vue' do
                 element :license_management_modal
                 element :approve_license_button
                 element :blacklist_license_button
               end
 
-              view 'ee/app/assets/javascripts/vue_shared/license_management/mr_widget_license_report.vue' do
+              view 'ee/app/assets/javascripts/vue_shared/license_compliance/mr_widget_license_report.vue' do
                 element :license_report_widget
               end
             end

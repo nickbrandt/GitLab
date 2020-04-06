@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import * as jqueryMatchers from 'custom-jquery-matchers';
-import $ from 'jquery';
 import { config as testUtilsConfig } from '@vue/test-utils';
 import Translate from '~/vue_shared/translate';
 import { initializeTestTimeout } from './helpers/timeout';
@@ -9,11 +8,9 @@ import { setupManualMocks } from './mocks/mocks_helper';
 import customMatchers from './matchers';
 
 import './helpers/dom_shims';
-
-// Expose jQuery so specs using jQuery plugins can be imported nicely.
-// Here is an issue to explore better alternatives:
-// https://gitlab.com/gitlab-org/gitlab/issues/12448
-window.jQuery = $;
+import './helpers/jquery';
+import '~/commons/jquery';
+import '~/commons/bootstrap';
 
 process.on('unhandledRejection', global.promiseRejectionHandler);
 
@@ -23,7 +20,7 @@ afterEach(() =>
   // give Promises a bit more time so they fail the right test
   new Promise(setImmediate).then(() => {
     // wait for pending setTimeout()s
-    jest.runAllTimers();
+    jest.runOnlyPendingTimers();
   }),
 );
 

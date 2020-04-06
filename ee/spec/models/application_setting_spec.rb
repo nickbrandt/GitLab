@@ -102,6 +102,33 @@ describe ApplicationSetting do
         end
       end
     end
+
+    context 'when validating elasticsearch_url' do
+      where(:elasticsearch_url, :is_valid) do
+        "http://es.localdomain" | true
+        "https://es.localdomain" | true
+        "http://es.localdomain, https://es.localdomain " | true
+        "http://10.0.0.1" | true
+        "https://10.0.0.1" | true
+        "http://10.0.0.1, https://10.0.0.1" | true
+        "http://localhost" | true
+        "http://127.0.0.1" | true
+
+        "es.localdomain" | false
+        "10.0.0.1" | false
+        "http://es.localdomain, es.localdomain" | false
+        "http://es.localdomain, 10.0.0.1" | false
+        "this_isnt_a_url" | false
+      end
+
+      with_them do
+        it do
+          setting.elasticsearch_url = elasticsearch_url
+
+          expect(setting.valid?).to eq(is_valid)
+        end
+      end
+    end
   end
 
   describe '#should_check_namespace_plan?' do
@@ -259,7 +286,7 @@ describe ApplicationSetting do
 
           expect(setting.elasticsearch_limited_namespaces).to match_array(
             [namespaces.last, child_namespace, child_namespace_indexed_through_parent])
-          expect(setting.elasticsearch_limited_namespaces(true)).to match_array(
+          expect(setting.elasticsearch_limited_namespaces(ignore_descendants: true)).to match_array(
             [namespaces.last, child_namespace])
         end
       end
@@ -506,6 +533,71 @@ describe ApplicationSetting do
 
         setting.save
       end
+    end
+  end
+
+  describe '#seat_link_available?' do
+    subject { setting.seat_link_available? }
+
+    before do
+      allow(License).to receive(:feature_available?).and_call_original
+      allow(License).to receive(:feature_available?).with(:seat_link).and_return(seat_link)
+    end
+
+    context 'when the seat_link feature is available' do
+      let(:seat_link) { true }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when the seat_link feature is not available' do
+      let(:seat_link) { false }
+
+      it { is_expected.to eq(false) }
+    end
+  end
+
+  describe '#seat_link_can_be_configured?' do
+    subject { setting.seat_link_can_be_configured? }
+
+    before do
+      allow(Settings.gitlab).to receive(:seat_link_enabled).and_return(seat_link_enabled)
+    end
+
+    context 'when the seat_link_enabled configuration is enabled' do
+      let(:seat_link_enabled) { true }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when the seat_link_enabled configuration is disabled' do
+      let(:seat_link_enabled) { false }
+
+      it { is_expected.to eq(false) }
+    end
+  end
+
+  describe '#seat_link_enabled?' do
+    subject { setting.seat_link_enabled? }
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:seat_link_available, :seat_link_can_be_configured, :seat_link_enabled, :result) do
+      true  | true  | true  | true
+      false | true  | true  | false
+      true  | false | true  | false
+      true  | true  | false | false
+      false | false | false | false
+    end
+
+    with_them do
+      before do
+        allow(setting).to receive(:seat_link_available?).and_return(seat_link_available)
+        allow(setting).to receive(:seat_link_can_be_configured?).and_return(seat_link_can_be_configured)
+        setting.seat_link_enabled = seat_link_enabled
+      end
+
+      it { is_expected.to eq(result) }
     end
   end
 end

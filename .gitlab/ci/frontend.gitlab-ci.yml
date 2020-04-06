@@ -2,6 +2,8 @@
   cache:
     paths:
       - vendor/ruby/
+      - public/assets/webpack/
+      - assets-hash.txt
       - .yarn-cache/
       - tmp/cache/assets/sprockets
       - tmp/cache/babel-loader
@@ -10,11 +12,10 @@
 
 .gitlab:assets:compile-metadata:
   extends:
-    - .default-tags
     - .default-retry
     - .default-before_script
     - .assets-compile-cache
-  image: registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.5-git-2.24-lfs-2.9-chrome-73.0-node-12.x-yarn-1.21-graphicsmagick-1.3.34-docker-19.03.1
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.5-git-2.26-lfs-2.9-chrome-73.0-node-12.x-yarn-1.21-graphicsmagick-1.3.34-docker-19.03.1
   stage: prepare
   services:
     - docker:19.03.0-dind
@@ -29,18 +30,26 @@
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
   cache:
-    key: "assets-compile:production:vendor_ruby:.yarn-cache:tmp_cache_assets_sprockets:tmp_cache_webpack:v9"
+    key: "assets-compile:production:v1"
   artifacts:
     name: webpack-report
     expire_in: 31d
     paths:
       - webpack-report/
-      - public/assets/
+      - assets-compile.log
+      # We consume these files in GitLab UI for integration tests:
+      # https://gitlab.com/gitlab-org/gitlab-ui/-/blob/e88493b3c855aea30bf60baee692a64606b0eb1e/.storybook/preview-head.pug#L1
+      - public/assets/application-*.css
+      - public/assets/application-*.css.gz
+    when: always
   script:
     - node --version
     - retry yarn install --frozen-lockfile --production --cache-folder .yarn-cache --prefer-offline
     - free -m
-    - retry bundle exec rake gitlab:assets:compile
+    - time bin/rake gitlab:assets:compile > assets-compile.log 2>&1
+    # TODO: Change the image tag to be the MD5 of assets files and skip image building if the image exists
+    # We'll also need to pass GITLAB_ASSETS_TAG to the trigerred omnibus-gitlab pipeline similarly to how we do it for trigerred CNG pipelines
+    # https://gitlab.com/gitlab-org/gitlab/issues/208389
     - time scripts/build_assets_image
     - scripts/clean-old-cached-assets
     - rm -f /etc/apt/sources.list.d/google*.list  # We don't need to update Chrome here
@@ -64,7 +73,6 @@ gitlab:assets:compile pull-cache:
 
 .compile-assets-metadata:
   extends:
-    - .default-tags
     - .default-retry
     - .default-before_script
     - .assets-compile-cache
@@ -73,7 +81,7 @@ gitlab:assets:compile pull-cache:
     - node --version
     - retry yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
     - free -m
-    - retry bundle exec rake gitlab:assets:compile
+    - time bin/rake gitlab:assets:compile > assets-compile.log 2>&1
     - scripts/clean-old-cached-assets
   variables:
     SETUP_DB: "false"
@@ -81,12 +89,14 @@ gitlab:assets:compile pull-cache:
     NODE_OPTIONS: --max_old_space_size=3584
     WEBPACK_VENDOR_DLL: "true"
   cache:
-    key: "assets-compile:v9"
+    key: "assets-compile:test:v1"
   artifacts:
     expire_in: 7d
     paths:
       - node_modules
       - public/assets
+      - assets-compile.log
+    when: always
 
 compile-assets pull-push-cache:
   extends:
@@ -102,7 +112,7 @@ compile-assets pull-push-cache as-if-foss:
     - .as-if-foss
   cache:
     policy: pull-push
-    key: "assets-compile:v9:foss"
+    key: "assets-compile:test:as-if-foss:v1"
 
 compile-assets pull-cache:
   extends:
@@ -118,21 +128,16 @@ compile-assets pull-cache as-if-foss:
     - .as-if-foss
   cache:
     policy: pull
-    key: "assets-compile:v9:foss"
+    key: "assets-compile:test:as-if-foss:v1"
 
 .frontend-fixtures-base:
   extends:
-    - .default-tags
     - .default-retry
     - .default-cache
     - .default-before_script
-    - .use-pg9
+    - .use-pg10
   stage: fixtures
-  needs:
-    - job: "setup-test-env"
-      artifacts: true
-    - job: "compile-assets pull-cache"
-      artifacts: true
+  needs: ["setup-test-env pg10", "compile-assets pull-cache"]
   script:
     - date
     - scripts/gitaly-test-spawn
@@ -155,12 +160,11 @@ frontend-fixtures:
 frontend-fixtures-as-if-foss:
   extends:
     - .frontend-fixtures-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .frontend:rules:default-frontend-jobs-no-foss
     - .as-if-foss
 
 .frontend-job-base:
   extends:
-    - .default-tags
     - .default-retry
     - .default-cache
     - .default-before_script
@@ -199,7 +203,7 @@ karma:
 karma-as-if-foss:
   extends:
     - .karma-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .frontend:rules:default-frontend-jobs-no-foss
     - .as-if-foss
   needs: ["frontend-fixtures-as-if-foss"]
 
@@ -234,7 +238,7 @@ jest:
 jest-as-if-foss:
   extends:
     - .jest-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .frontend:rules:default-frontend-jobs-no-foss
     - .as-if-foss
   needs: ["frontend-fixtures-as-if-foss"]
   cache:
@@ -242,9 +246,8 @@ jest-as-if-foss:
 
 coverage-frontend:
   extends:
-    - .default-tags
     - .default-retry
-    - .frontend:rules:default-frontend-jobs
+    - .frontend:rules:default-frontend-jobs-no-foss
   needs: ["jest"]
   stage: post-test
   before_script:
@@ -262,9 +265,7 @@ coverage-frontend:
 
 .qa-frontend-node:
   extends:
-    - .default-tags
     - .default-retry
-    - .default-cache
     - .frontend:rules:qa-frontend-node
   stage: test
   dependencies: []
@@ -279,10 +280,6 @@ coverage-frontend:
     - date
     - yarn run webpack-prod
 
-qa-frontend-node:8:
-  extends: .qa-frontend-node
-  image: node:carbon
-
 qa-frontend-node:10:
   extends: .qa-frontend-node
   image: node:dubnium
@@ -294,12 +291,11 @@ qa-frontend-node:latest:
 
 webpack-dev-server:
   extends:
-    - .default-tags
     - .default-retry
     - .default-cache
     - .frontend:rules:default-frontend-jobs
   stage: test
-  needs: ["setup-test-env", "compile-assets pull-cache"]
+  needs: ["setup-test-env pg10", "compile-assets pull-cache"]
   variables:
     WEBPACK_MEMORY_TEST: "true"
     WEBPACK_VENDOR_DLL: "true"

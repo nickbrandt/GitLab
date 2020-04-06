@@ -39,6 +39,7 @@ module QA
     autoload :MailHog, 'qa/runtime/mail_hog'
     autoload :IPAddress, 'qa/runtime/ip_address'
     autoload :Search, 'qa/runtime/search'
+    autoload :Project, 'qa/runtime/project'
     autoload :ApplicationSettings, 'qa/runtime/application_settings'
 
     module API
@@ -133,7 +134,6 @@ module QA
         autoload :LDAPNoServer, 'qa/scenario/test/integration/ldap_no_server'
         autoload :LDAPTLS, 'qa/scenario/test/integration/ldap_tls'
         autoload :InstanceSAML, 'qa/scenario/test/integration/instance_saml'
-        autoload :OAuth, 'qa/scenario/test/integration/oauth'
         autoload :Kubernetes, 'qa/scenario/test/integration/kubernetes'
         autoload :Mattermost, 'qa/scenario/test/integration/mattermost'
         autoload :ObjectStorage, 'qa/scenario/test/integration/object_storage'
@@ -385,6 +385,7 @@ module QA
     # Classes describing components that are used by several pages.
     #
     module Component
+      autoload :Breadcrumbs, 'qa/page/component/breadcrumbs'
       autoload :CiBadgeLink, 'qa/page/component/ci_badge_link'
       autoload :ClonePanel, 'qa/page/component/clone_panel'
       autoload :LazyLoader, 'qa/page/component/lazy_loader'
@@ -429,6 +430,7 @@ module QA
       autoload :Gcloud, 'qa/service/cluster_provider/gcloud'
       autoload :Minikube, 'qa/service/cluster_provider/minikube'
       autoload :K3d, 'qa/service/cluster_provider/k3d'
+      autoload :K3s, 'qa/service/cluster_provider/k3s'
     end
 
     module DockerRun
@@ -440,6 +442,7 @@ module QA
       autoload :GitlabRunner, 'qa/service/docker_run/gitlab_runner'
       autoload :MailHog, 'qa/service/docker_run/mail_hog'
       autoload :SamlIdp, 'qa/service/docker_run/saml_idp'
+      autoload :K3s, 'qa/service/docker_run/k3s'
     end
   end
 
@@ -475,20 +478,9 @@ module QA
         autoload :Configure, 'qa/vendor/jenkins/page/configure'
         autoload :NewCredentials, 'qa/vendor/jenkins/page/new_credentials'
         autoload :NewJob, 'qa/vendor/jenkins/page/new_job'
-        autoload :Job, 'qa/vendor/jenkins/page/job'
+        autoload :LastJobConsole, 'qa/vendor/jenkins/page/last_job_console'
         autoload :ConfigureJob, 'qa/vendor/jenkins/page/configure_job'
       end
-    end
-
-    module Github
-      module Page
-        autoload :Base, 'qa/vendor/github/page/base'
-        autoload :Login, 'qa/vendor/github/page/login'
-      end
-    end
-
-    module OnePassword
-      autoload :CLI, 'qa/vendor/one_password/cli'
     end
   end
 

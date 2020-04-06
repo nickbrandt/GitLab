@@ -49,7 +49,7 @@ The Web Application Firewall requires:
 If you are using GitLab.com, see the [quick start guide](quick_start_guide.md) for
 how to use the WAF with GitLab.com and a Kubernetes cluster on Google Kubernetes Engine (GKE).
 
-If you are using a self-hosted instance of GitLab, you need to configure the
+If you are using a self-managed instance of GitLab, you need to configure the
 [Google OAuth2 OmniAuth Provider](../../integration/google.md) before
 you can configure a cluster on GKE. Once this is set up, you can follow the steps on the [quick start guide](quick_start_guide.md) to get started.
 
@@ -73,14 +73,14 @@ more advanced rules around threat detection.
 ModSecurity is enabled with the [OWASP Core Rule Set (CRS)](https://modsecurity.org/crs/) by
 default. The OWASP CRS logs attempts to the following attacks:
 
-- [SQL Injection](https://www.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_SQL_Injection)
-- [Cross-Site Scripting](https://www.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_Cross-Site_Scripting_(XSS))
-- [Local File Inclusion](https://www.owasp.org/index.php/Testing_for_Local_File_Inclusion)
-- [Remote File Inclusion](https://www.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_Remote_File_Inclusion)
-- [Code Injection](https://www.owasp.org/index.php/Code_Injection)
-- [Session Fixation](https://www.owasp.org/index.php/Session_fixation)
-- [Scanner Detection](https://www.owasp.org/index.php/Category:Vulnerability_Scanning_Tools)
-- [Metadata/Error Leakages](https://www.owasp.org/index.php/Improper_Error_Handling)
+- [SQL Injection](https://wiki.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_SQL_Injection)
+- [Cross-Site Scripting](https://wiki.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_Cross-Site_Scripting_(XSS))
+- [Local File Inclusion](https://wiki.owasp.org/index.php/Testing_for_Local_File_Inclusion)
+- [Remote File Inclusion](https://wiki.owasp.org/index.php/OWASP_Periodic_Table_of_Vulnerabilities_-_Remote_File_Inclusion)
+- [Code Injection](https://wiki.owasp.org/index.php/Code_Injection)
+- [Session Fixation](https://wiki.owasp.org/index.php/Session_fixation)
+- [Scanner Detection](https://wiki.owasp.org/index.php/Category:Vulnerability_Scanning_Tools)
+- [Metadata/Error Leakages](https://wiki.owasp.org/index.php/Improper_Error_Handling)
 
 It is good to have a basic knowledge of the following:
 

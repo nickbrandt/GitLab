@@ -730,147 +730,6 @@ describe Ci::Build do
     end
   end
 
-  describe '#depends_on_builds' do
-    let!(:build) { create(:ci_build, pipeline: pipeline, name: 'build', stage_idx: 0, stage: 'build') }
-    let!(:rspec_test) { create(:ci_build, pipeline: pipeline, name: 'rspec', stage_idx: 1, stage: 'test') }
-    let!(:rubocop_test) { create(:ci_build, pipeline: pipeline, name: 'rubocop', stage_idx: 1, stage: 'test') }
-    let!(:staging) { create(:ci_build, pipeline: pipeline, name: 'staging', stage_idx: 2, stage: 'deploy') }
-
-    it 'expects to have no dependents if this is first build' do
-      expect(build.depends_on_builds).to be_empty
-    end
-
-    it 'expects to have one dependent if this is test' do
-      expect(rspec_test.depends_on_builds.map(&:id)).to contain_exactly(build.id)
-    end
-
-    it 'expects to have all builds from build and test stage if this is last' do
-      expect(staging.depends_on_builds.map(&:id)).to contain_exactly(build.id, rspec_test.id, rubocop_test.id)
-    end
-
-    it 'expects to have retried builds instead the original ones' do
-      project.add_developer(user)
-
-      retried_rspec = described_class.retry(rspec_test, user)
-
-      expect(staging.depends_on_builds.map(&:id))
-        .to contain_exactly(build.id, retried_rspec.id, rubocop_test.id)
-    end
-
-    describe '#dependencies' do
-      let(:dependencies) { }
-      let(:needs) { }
-
-      let!(:final) do
-        scheduling_type = needs.present? ? :dag : :stage
-
-        create(:ci_build,
-          pipeline: pipeline, name: 'final', scheduling_type: scheduling_type,
-          stage_idx: 3, stage: 'deploy', options: {
-            dependencies: dependencies
-          }
-        )
-      end
-
-      before do
-        needs.to_a.each do |need|
-          create(:ci_build_need, build: final, **need)
-        end
-      end
-
-      subject { final.dependencies }
-
-      context 'when dependencies are defined' do
-        let(:dependencies) { %w(rspec staging) }
-
-        it { is_expected.to contain_exactly(rspec_test, staging) }
-      end
-
-      context 'when needs are defined' do
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: true },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(build, rspec_test, staging) }
-
-        context 'when ci_dag_support is disabled' do
-          before do
-            stub_feature_flags(ci_dag_support: false)
-          end
-
-          it { is_expected.to contain_exactly(build, rspec_test, rubocop_test, staging) }
-        end
-      end
-
-      context 'when need artifacts are defined' do
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: false },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(build, staging) }
-      end
-
-      context 'when needs and dependencies are defined' do
-        let(:dependencies) { %w(rspec staging) }
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: true },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(rspec_test, staging) }
-      end
-
-      context 'when needs and dependencies contradict' do
-        let(:dependencies) { %w(rspec staging) }
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: false },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(staging) }
-      end
-
-      context 'when nor dependencies or needs are defined' do
-        it { is_expected.to contain_exactly(build, rspec_test, rubocop_test, staging) }
-      end
-    end
-
-    describe '#all_dependencies' do
-      let!(:final_build) do
-        create(:ci_build,
-          pipeline: pipeline, name: 'deploy',
-          stage_idx: 3, stage: 'deploy'
-        )
-      end
-
-      subject { final_build.all_dependencies }
-
-      it 'returns dependencies and cross_dependencies' do
-        dependencies = [1, 2, 3]
-        cross_dependencies = [3, 4]
-
-        allow(final_build).to receive(:dependencies).and_return(dependencies)
-        allow(final_build).to receive(:cross_dependencies).and_return(cross_dependencies)
-
-        is_expected.to match(a_collection_containing_exactly(1, 2, 3, 4))
-      end
-    end
-  end
-
   describe '#triggered_by?' do
     subject { build.triggered_by?(user) }
 
@@ -1293,7 +1152,35 @@ describe Ci::Build do
                  environment: 'review/$APP_HOST')
         end
 
-        it { is_expected.to eq('review/host') }
+        it 'returns an expanded environment name with a list of variables' do
+          expect(build).to receive(:simple_variables).once.and_call_original
+
+          is_expected.to eq('review/host')
+        end
+
+        context 'when build metadata has already persisted the expanded environment name' do
+          before do
+            build.metadata.expanded_environment_name = 'review/host'
+          end
+
+          it 'returns a persisted expanded environment name without a list of variables' do
+            expect(build).not_to receive(:simple_variables)
+
+            is_expected.to eq('review/host')
+          end
+
+          context 'when ci_persisted_expanded_environment_name feature flag is disabled' do
+            before do
+              stub_feature_flags(ci_persisted_expanded_environment_name: false)
+            end
+
+            it 'returns an expanded environment name with a list of variables' do
+              expect(build).to receive(:simple_variables).once.and_call_original
+
+              is_expected.to eq('review/host')
+            end
+          end
+        end
       end
 
       context 'when using persisted variables' do
@@ -1995,7 +1882,7 @@ describe Ci::Build do
   describe '#options' do
     let(:options) do
       {
-        image: "ruby:2.1",
+        image: "ruby:2.7",
         services: ["postgres"],
         script: ["ls -a"]
       }
@@ -2006,11 +1893,11 @@ describe Ci::Build do
     end
 
     it 'allows to access with keys' do
-      expect(build.options[:image]).to eq('ruby:2.1')
+      expect(build.options[:image]).to eq('ruby:2.7')
     end
 
     it 'allows to access with strings' do
-      expect(build.options['image']).to eq('ruby:2.1')
+      expect(build.options['image']).to eq('ruby:2.7')
     end
 
     context 'when ci_build_metadata_config is set' do
@@ -2514,6 +2401,8 @@ describe Ci::Build do
         <<~ROUTEMAP
         - source: 'bar/branch-test.txt'
           public: '/bar/branches'
+        - source: 'with space/README.md'
+          public: '/README'
         ROUTEMAP
       end
 
@@ -2528,10 +2417,27 @@ describe Ci::Build do
         let(:environment)   { create(:environment, project: merge_request.project, name: "foo-#{project.default_branch}") }
         let(:build)         { create(:ci_build, pipeline: pipeline, environment: environment.name) }
 
+        let(:full_urls) do
+          [
+            File.join(environment.external_url, '/bar/branches'),
+            File.join(environment.external_url, '/README')
+          ]
+        end
+
         it 'populates CI_MERGE_REQUEST_CHANGED_PAGES_* variables' do
           expect(subject).to include(
-            { key: 'CI_MERGE_REQUEST_CHANGED_PAGE_PATHS', value: '/bar/branches', public: true, masked: false },
-            { key: 'CI_MERGE_REQUEST_CHANGED_PAGE_URLS', value: File.join(environment.external_url, '/bar/branches'), public: true, masked: false }
+            {
+              key: 'CI_MERGE_REQUEST_CHANGED_PAGE_PATHS',
+              value: '/bar/branches,/README',
+              public: true,
+              masked: false
+            },
+            {
+              key: 'CI_MERGE_REQUEST_CHANGED_PAGE_URLS',
+              value: full_urls.join(','),
+              public: true,
+              masked: false
+            }
           )
         end
 
@@ -3431,7 +3337,7 @@ describe Ci::Build do
         end
 
         it "doesn't save timeout" do
-          expect { run_job_without_exception }.not_to change { job.reload.ensure_metadata.timeout_source }
+          expect { run_job_without_exception }.not_to change { job.reload.ensure_metadata.timeout }
         end
 
         it "doesn't save timeout_source" do
@@ -3894,6 +3800,53 @@ describe Ci::Build do
 
         it 'raises an error' do
           expect { subject }.to raise_error(Gitlab::Ci::Parsers::Test::Junit::JunitParserError)
+        end
+      end
+    end
+  end
+
+  describe '#collect_coverage_reports!' do
+    subject { build.collect_coverage_reports!(coverage_report) }
+
+    let(:coverage_report) { Gitlab::Ci::Reports::CoverageReports.new }
+
+    it { expect(coverage_report.files).to eq({}) }
+
+    context 'when build has a coverage report' do
+      context 'when there is a Cobertura coverage report from simplecov-cobertura' do
+        before do
+          create(:ci_job_artifact, :cobertura, job: build, project: build.project)
+        end
+
+        it 'parses blobs and add the results to the coverage report' do
+          expect { subject }.not_to raise_error
+
+          expect(coverage_report.files.keys).to match_array(['app/controllers/abuse_reports_controller.rb'])
+          expect(coverage_report.files['app/controllers/abuse_reports_controller.rb'].count).to eq(23)
+        end
+      end
+
+      context 'when there is a Cobertura coverage report from gocov-xml' do
+        before do
+          create(:ci_job_artifact, :coverage_gocov_xml, job: build, project: build.project)
+        end
+
+        it 'parses blobs and add the results to the coverage report' do
+          expect { subject }.not_to raise_error
+
+          expect(coverage_report.files.keys).to match_array(['auth/token.go', 'auth/rpccredentials.go'])
+          expect(coverage_report.files['auth/token.go'].count).to eq(49)
+          expect(coverage_report.files['auth/rpccredentials.go'].count).to eq(10)
+        end
+      end
+
+      context 'when there is a corrupted Cobertura coverage report' do
+        before do
+          create(:ci_job_artifact, :coverage_with_corrupted_data, job: build, project: build.project)
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(Gitlab::Ci::Parsers::Coverage::Cobertura::CoberturaParserError)
         end
       end
     end

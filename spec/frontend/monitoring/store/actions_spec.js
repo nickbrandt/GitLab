@@ -16,7 +16,7 @@ import {
   fetchEnvironmentsData,
   fetchPrometheusMetrics,
   fetchPrometheusMetric,
-  setEndpoints,
+  setInitialState,
   filterEnvironments,
   setGettingStartedEmptyState,
   duplicateSystemDashboard,
@@ -30,6 +30,7 @@ import {
   metricsDashboardResponse,
   metricsDashboardViewModel,
   dashboardGitResponse,
+  mockDashboardsErrorResponse,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -207,14 +208,14 @@ describe('Monitoring store actions', () => {
     });
   });
 
-  describe('Set endpoints', () => {
+  describe('Set initial state', () => {
     let mockedState;
     beforeEach(() => {
       mockedState = storeState();
     });
-    it('should commit SET_ENDPOINTS mutation', done => {
+    it('should commit SET_INITIAL_STATE mutation', done => {
       testAction(
-        setEndpoints,
+        setInitialState,
         {
           metricsEndpoint: 'additional_metrics.json',
           deploymentsEndpoint: 'deployments.json',
@@ -222,7 +223,7 @@ describe('Monitoring store actions', () => {
         mockedState,
         [
           {
-            type: types.SET_ENDPOINTS,
+            type: types.SET_INITIAL_STATE,
             payload: {
               metricsEndpoint: 'additional_metrics.json',
               deploymentsEndpoint: 'deployments.json',
@@ -257,9 +258,11 @@ describe('Monitoring store actions', () => {
   describe('fetchDashboard', () => {
     let dispatch;
     let state;
+    let commit;
     const response = metricsDashboardResponse;
     beforeEach(() => {
       dispatch = jest.fn();
+      commit = jest.fn();
       state = storeState();
       state.dashboardEndpoint = '/dashboard';
     });
@@ -270,6 +273,7 @@ describe('Monitoring store actions', () => {
       fetchDashboard(
         {
           state,
+          commit,
           dispatch,
         },
         params,
@@ -287,19 +291,21 @@ describe('Monitoring store actions', () => {
 
     describe('on failure', () => {
       let result;
-      let errorResponse;
       beforeEach(() => {
         const params = {};
         result = () => {
-          mock.onGet(state.dashboardEndpoint).replyOnce(500, errorResponse);
-          return fetchDashboard({ state, dispatch }, params);
+          mock.onGet(state.dashboardEndpoint).replyOnce(500, mockDashboardsErrorResponse);
+          return fetchDashboard({ state, commit, dispatch }, params);
         };
       });
 
       it('dispatches a failure action', done => {
-        errorResponse = {};
         result()
           .then(() => {
+            expect(commit).toHaveBeenCalledWith(
+              types.SET_ALL_DASHBOARDS,
+              mockDashboardsErrorResponse.all_dashboards,
+            );
             expect(dispatch).toHaveBeenCalledWith(
               'receiveMetricsDashboardFailure',
               new Error('Request failed with status code 500'),
@@ -311,15 +317,15 @@ describe('Monitoring store actions', () => {
       });
 
       it('dispatches a failure action when a message is returned', done => {
-        const message = 'Something went wrong with Prometheus!';
-        errorResponse = { message };
         result()
           .then(() => {
             expect(dispatch).toHaveBeenCalledWith(
               'receiveMetricsDashboardFailure',
               new Error('Request failed with status code 500'),
             );
-            expect(createFlash).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(createFlash).toHaveBeenCalledWith(
+              expect.stringContaining(mockDashboardsErrorResponse.message),
+            );
             done();
           })
           .catch(done.fail);
@@ -503,8 +509,8 @@ describe('Monitoring store actions', () => {
   });
   describe('fetchPrometheusMetric', () => {
     const params = {
-      start: '2019-08-06T12:40:02.184Z',
-      end: '2019-08-06T20:40:02.184Z',
+      start_time: '2019-08-06T12:40:02.184Z',
+      end_time: '2019-08-06T20:40:02.184Z',
     };
     let metric;
     let state;
@@ -549,6 +555,86 @@ describe('Monitoring store actions', () => {
           done();
         },
       ).catch(done.fail);
+    });
+
+    describe('without metric defined step', () => {
+      const expectedParams = {
+        start_time: '2019-08-06T12:40:02.184Z',
+        end_time: '2019-08-06T20:40:02.184Z',
+        step: 60,
+      };
+
+      it('uses calculated step', done => {
+        mock.onGet('http://test').reply(200, { data }); // One attempt
+
+        testAction(
+          fetchPrometheusMetric,
+          { metric, params },
+          state,
+          [
+            {
+              type: types.REQUEST_METRIC_RESULT,
+              payload: {
+                metricId: metric.metricId,
+              },
+            },
+            {
+              type: types.RECEIVE_METRIC_RESULT_SUCCESS,
+              payload: {
+                metricId: metric.metricId,
+                result: data.result,
+              },
+            },
+          ],
+          [],
+          () => {
+            expect(mock.history.get[0].params).toEqual(expectedParams);
+            done();
+          },
+        ).catch(done.fail);
+      });
+    });
+
+    describe('with metric defined step', () => {
+      beforeEach(() => {
+        metric.step = 7;
+      });
+
+      const expectedParams = {
+        start_time: '2019-08-06T12:40:02.184Z',
+        end_time: '2019-08-06T20:40:02.184Z',
+        step: 7,
+      };
+
+      it('uses metric step', done => {
+        mock.onGet('http://test').reply(200, { data }); // One attempt
+
+        testAction(
+          fetchPrometheusMetric,
+          { metric, params },
+          state,
+          [
+            {
+              type: types.REQUEST_METRIC_RESULT,
+              payload: {
+                metricId: metric.metricId,
+              },
+            },
+            {
+              type: types.RECEIVE_METRIC_RESULT_SUCCESS,
+              payload: {
+                metricId: metric.metricId,
+                result: data.result,
+              },
+            },
+          ],
+          [],
+          () => {
+            expect(mock.history.get[0].params).toEqual(expectedParams);
+            done();
+          },
+        ).catch(done.fail);
+      });
     });
 
     it('commits result, when waiting for results', done => {

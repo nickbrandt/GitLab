@@ -60,6 +60,35 @@ ICON_STATUS_HTML
           expect(@service.calculate_reactive_cache('2ab7834c', 'master')).to eq(commit_status: :error)
         end
       end
+
+      describe 'respects outbound network setting' do
+        let(:url) { 'http://127.0.0.1:8080/job/test' }
+
+        before do
+          stub_application_setting(allow_local_requests_from_web_hooks_and_services: setting)
+          allow(@service).to receive(:project_url).and_return(url)
+        end
+
+        context 'when local requests are allowed' do
+          let(:setting) { true }
+
+          it "makes an outbound request" do
+            stub_request(:get, 'http://127.0.0.1:8080/job/test/scm/bySHA1/2ab7834c').to_return(status: 200, body: status_body_for_icon('blue.png'), headers: {})
+
+            expect(@service.calculate_reactive_cache('2ab7834c', 'master')).to eq(commit_status: 'success')
+          end
+        end
+
+        context 'when local requests are not allowed' do
+          let(:setting) { false }
+
+          it 'raises an exception' do
+            expect(Gitlab::ErrorTracking).to receive(:track_exception).with(an_instance_of(Gitlab::HTTP::BlockedUrlError)).and_call_original
+
+            expect { @service.calculate_reactive_cache('2ab7834c', 'master') }.not_to raise_error
+          end
+        end
+      end
     end
 
     describe '#commit_status' do

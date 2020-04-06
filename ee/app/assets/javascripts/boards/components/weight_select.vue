@@ -1,12 +1,12 @@
 <script>
-import { GlButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDeprecatedButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 
 const ANY_WEIGHT = 'Any Weight';
 const NO_WEIGHT = 'No Weight';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlDropdown,
     GlDropdownItem,
   },
@@ -70,9 +70,14 @@ export default {
   <div class="block weight">
     <div class="title append-bottom-10">
       {{ __('Weight') }}
-      <gl-button v-if="canEdit" variant="blank" class="float-right" @click="showDropdown">
+      <gl-deprecated-button
+        v-if="canEdit"
+        variant="blank"
+        class="float-right"
+        @click="showDropdown"
+      >
         {{ __('Edit') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
     <div :class="valueClass" :hidden="!dropdownHidden" class="value">{{ valueText }}</div>
 

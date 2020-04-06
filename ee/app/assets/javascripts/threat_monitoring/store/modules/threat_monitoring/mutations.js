@@ -1,10 +1,8 @@
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
 
 export default {
-  [types.SET_ENDPOINTS](state, { wafStatisticsEndpoint, environmentsEndpoint }) {
-    state.wafStatisticsEndpoint = wafStatisticsEndpoint;
-    state.environmentsEndpoint = environmentsEndpoint;
+  [types.SET_ENDPOINT](state, endpoint) {
+    state.environmentsEndpoint = endpoint;
   },
   [types.REQUEST_ENVIRONMENTS](state) {
     state.isLoadingEnvironments = true;
@@ -24,18 +22,5 @@ export default {
   },
   [types.SET_CURRENT_TIME_WINDOW](state, payload) {
     state.currentTimeWindow = payload;
-  },
-  [types.REQUEST_WAF_STATISTICS](state) {
-    state.isLoadingWafStatistics = true;
-    state.errorLoadingWafStatistics = false;
-  },
-  [types.RECEIVE_WAF_STATISTICS_SUCCESS](state, payload) {
-    state.wafStatistics = convertObjectPropsToCamelCase(payload);
-    state.isLoadingWafStatistics = false;
-    state.errorLoadingWafStatistics = false;
-  },
-  [types.RECEIVE_WAF_STATISTICS_ERROR](state) {
-    state.isLoadingWafStatistics = false;
-    state.errorLoadingWafStatistics = true;
   },
 };

@@ -6,6 +6,7 @@ describe 'Admin updates EE-only settings' do
   include StubENV
 
   before do
+    stub_feature_flags(instance_level_integrations: false)
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     sign_in(create(:admin))
     allow(License).to receive(:feature_available?).and_return(true)
@@ -166,7 +167,6 @@ describe 'Admin updates EE-only settings' do
   end
 
   it 'Enable Slack application' do
-    visit integrations_admin_application_settings_path
     allow(Gitlab).to receive(:com?).and_return(true)
     visit integrations_admin_application_settings_path
 
@@ -198,7 +198,7 @@ describe 'Admin updates EE-only settings' do
 
   describe 'LDAP settings' do
     before do
-      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(ldap_setting)
+      allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(ldap_setting)
 
       visit general_admin_application_settings_path
     end

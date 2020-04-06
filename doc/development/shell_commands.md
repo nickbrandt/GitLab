@@ -6,7 +6,7 @@ These guidelines are meant to make your code more reliable _and_ secure.
 ## References
 
 - [Google Ruby Security Reviewer's Guide](https://code.google.com/archive/p/ruby-security/wikis/Guide.wiki)
-- [OWASP Command Injection](https://www.owasp.org/index.php/Command_Injection)
+- [OWASP Command Injection](https://wiki.owasp.org/index.php/Command_Injection)
 - [Ruby on Rails Security Guide Command Line Injection](https://guides.rubyonrails.org/security.html#command-line-injection)
 
 ## Use File and FileUtils instead of shell commands
@@ -71,19 +71,21 @@ Make the difference between options and arguments clear to the argument parsers 
 
 To understand what `--` does, consider the problem below.
 
-```
+```shell
 # Example
 $ echo hello > -l
 $ cat -l
+
 cat: illegal option -- l
 usage: cat [-benstuv] [file ...]
 ```
 
 In the example above, the argument parser of `cat` assumes that `-l` is an option. The solution in the example above is to make it clear to `cat` that `-l` is really an argument, not an option. Many Unix command line tools follow the convention of separating options from arguments with `--`.
 
-```
+```shell
 # Example (continued)
 $ cat -- -l
+
 hello
 ```
 
@@ -203,7 +205,7 @@ validates :import_url, format: { with: URI.regexp(%w(ssh git http https)) }
 
 Suppose the user submits the following as their import URL:
 
-```
+```plaintext
 file://git:/tmp/lol
 ```
 

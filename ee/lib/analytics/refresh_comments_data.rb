@@ -4,19 +4,13 @@ module Analytics
   class RefreshCommentsData
     include MergeRequestMetricsRefresh
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    def self.for_note(note)
-      if note.for_commit?
-        merge_requests = note.noteable.merge_requests.includes(:metrics)
-      elsif note.for_merge_request?
-        merge_requests = [note.noteable]
-      else
-        return
-      end
+    class << self
+      def for_note(note)
+        merge_requests = note.merge_requests&.including_metrics
 
-      new(*merge_requests)
+        new(*merge_requests) unless merge_requests.nil?
+      end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     private
 

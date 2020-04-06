@@ -65,7 +65,7 @@ in a safe place.
 
 ### Enable 2FA via U2F device
 
-GitLab officially only supports [YubiKey](https://www.yubico.com/products/yubikey-hardware/)
+GitLab officially only supports [YubiKey](https://www.yubico.com/products/)
 U2F devices, but users have successfully used [SoloKeys](https://solokeys.com/).
 
 The U2F workflow is [supported by](https://caniuse.com/#search=U2F) the
@@ -110,6 +110,7 @@ the **Download codes** button for storage in a safe place. If you choose to
 download them, the file will be called `gitlab-recovery-codes.txt`.
 
 If you lose the recovery codes or just want to generate new ones, you can do so
+from the [two-factor authentication account settings page](#regenerate-2fa-recovery-codes) or
 [using SSH](#generate-new-recovery-codes-using-ssh).
 
 ## Logging in with 2FA Enabled
@@ -258,6 +259,8 @@ Sign in and re-enable two-factor authentication as soon as possible.
   - The user logs out and attempts to log in via `first.host.xyz` - U2F authentication succeeds.
   - The user logs out and attempts to log in via `second.host.xyz` - U2F authentication fails, because
     the U2F key has only been registered on `first.host.xyz`.
+
+- To enforce 2FA at the system or group levels see [Enforce Two-factor Authentication](../../../security/two_factor_authentication.md).
 
 ## Troubleshooting
 

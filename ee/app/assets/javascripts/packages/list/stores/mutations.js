@@ -26,4 +26,12 @@ export default {
   [types.SET_SORTING](state, sorting) {
     state.sorting = { ...state.sorting, ...sorting };
   },
+
+  [types.SET_SELECTED_TYPE](state, type) {
+    state.selectedType = type;
+  },
+
+  [types.SET_FILTER](state, query) {
+    state.filterQuery = query;
+  },
 };

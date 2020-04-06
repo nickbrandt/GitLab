@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
-import _ from 'underscore';
-import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import { escape as esc } from 'lodash';
+import { GlLoadingIcon, GlDeprecatedButton, GlAvatar } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { n__, s__, __ } from '~/locale';
 import Api from '~/api';
@@ -12,7 +12,7 @@ export default {
   components: {
     Icon,
     GlLoadingIcon,
-    GlButton,
+    GlDeprecatedButton,
     GlAvatar,
   },
   props: {
@@ -120,7 +120,7 @@ export default {
           <li>
             <a href='#' class='dropdown-menu-link ${isActiveClass}'>
               ${this.avatarTemplate(project)}
-              <div class="align-middle">${_.escape(project.name)}</div>
+              <div class="align-middle">${esc(project.name)}</div>
             </a>
           </li>
         `;
@@ -140,7 +140,7 @@ export default {
 <template>
   <div>
     <div ref="projectsDropdown" class="dropdown dropdown-projects">
-      <gl-button
+      <gl-deprecated-button
         class="dropdown-menu-toggle wide shadow-none bg-white"
         type="button"
         data-toggle="dropdown"
@@ -159,15 +159,17 @@ export default {
         />
         {{ selectedProjectsLabel }}
         <icon name="chevron-down" />
-      </gl-button>
+      </gl-deprecated-button>
       <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
         <div class="dropdown-title">{{ __('Projects') }}</div>
         <div class="dropdown-input">
           <input class="dropdown-input-field" type="search" :placeholder="__('Search projects')" />
           <icon name="search" class="dropdown-input-search" data-hidden="true" />
         </div>
+        <div class="dropdown-loading pt-8">
+          <gl-loading-icon size="lg" class="pt-8" />
+        </div>
         <div class="dropdown-content"></div>
-        <gl-loading-icon class="dropdown-loading" />
       </div>
     </div>
   </div>

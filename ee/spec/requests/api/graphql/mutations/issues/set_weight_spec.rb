@@ -55,7 +55,7 @@ describe 'Setting weight of an issue' do
     let(:input) { { weight: "2" } }
 
     it 'raises invalid value error' do
-      error = "Variable issueSetWeightInput of type IssueSetWeightInput! was provided "\
+      error = "Variable $issueSetWeightInput of type IssueSetWeightInput! was provided "\
               "invalid value for weight (Could not coerce value \"#{input[:weight]}\" to Int)"
 
       post_graphql_mutation(mutation, current_user: current_user)

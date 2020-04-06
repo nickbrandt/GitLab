@@ -480,29 +480,39 @@ describe WikiPage do
 
     let(:untitled_page) { described_class.new(wiki) }
     let(:directory_page) do
-      create_page('parent/child', 'test content')
-      wiki.find_page('parent/child')
+      create_page('parent directory/child page', 'test content')
+      wiki.find_page('parent directory/child page')
     end
 
     where(:page, :title, :changed) do
-      :untitled_page  | nil            | false
-      :untitled_page  | 'new title'    | true
+      :untitled_page  | nil                             | false
+      :untitled_page  | 'new title'                     | true
 
-      :new_page       | nil            | true
-      :new_page       | 'test page'    | true
-      :new_page       | 'new title'    | true
+      :new_page       | nil                             | true
+      :new_page       | 'test page'                     | true
+      :new_page       | 'new title'                     | true
 
-      :existing_page  | nil            | false
-      :existing_page  | 'test page'    | false
-      :existing_page  | '/test page'   | false
-      :existing_page  | 'new title'    | true
+      :existing_page  | nil                             | false
+      :existing_page  | 'test page'                     | false
+      :existing_page  | 'test-page'                     | false
+      :existing_page  | '/test page'                    | false
+      :existing_page  | '/test-page'                    | false
+      :existing_page  | ' test page '                   | true
+      :existing_page  | 'new title'                     | true
+      :existing_page  | 'new-title'                     | true
 
-      :directory_page | nil            | false
-      :directory_page | 'parent/child' | false
-      :directory_page | 'child'        | false
-      :directory_page | '/child'       | true
-      :directory_page | 'parent/other' | true
-      :directory_page | 'other/child'  | true
+      :directory_page | nil                             | false
+      :directory_page | 'parent directory/child page'   | false
+      :directory_page | 'parent-directory/child page'   | false
+      :directory_page | 'parent-directory/child-page'   | false
+      :directory_page | 'child page'                    | false
+      :directory_page | 'child-page'                    | false
+      :directory_page | '/child page'                   | true
+      :directory_page | 'parent directory/other'        | true
+      :directory_page | 'parent-directory/other'        | true
+      :directory_page | 'parent-directory / child-page' | true
+      :directory_page | 'other directory/child page'    | true
+      :directory_page | 'other-directory/child page'    | true
     end
 
     with_them do
@@ -567,6 +577,8 @@ describe WikiPage do
     end
 
     it 'returns false when version is nil' do
+      expect(latest_page).to receive(:version) { nil }
+
       expect(latest_page.historical?).to be_falsy
     end
 
@@ -596,12 +608,36 @@ describe WikiPage do
       expect(subject).to eq(subject)
     end
 
-    it 'returns false for updated wiki page' do
+    it 'returns true for updated wiki page' do
       subject.update(content: "Updated content")
-      updated_page = wiki.find_page('test page')
+      updated_page = wiki.find_page(existing_page.slug)
 
       expect(updated_page).not_to be_nil
-      expect(updated_page).not_to eq(subject)
+      expect(updated_page).to eq(subject)
+    end
+
+    it 'returns false for a completely different wiki page' do
+      other_page = create(:wiki_page)
+
+      expect(subject.slug).not_to eq(other_page.slug)
+      expect(subject.project).not_to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
+    end
+
+    it 'returns false for page with different slug on same project' do
+      other_page = create(:wiki_page, project: subject.project)
+
+      expect(subject.slug).not_to eq(other_page.slug)
+      expect(subject.project).to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
+    end
+
+    it 'returns false for page with the same slug on a different project' do
+      other_page = create(:wiki_page, title: existing_page.slug)
+
+      expect(subject.slug).to eq(other_page.slug)
+      expect(subject.project).not_to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
     end
   end
 

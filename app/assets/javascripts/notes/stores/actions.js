@@ -46,6 +46,10 @@ export const setNotesFetchedState = ({ commit }, state) =>
 
 export const toggleDiscussion = ({ commit }, data) => commit(types.TOGGLE_DISCUSSION, data);
 
+export const setExpandDiscussions = ({ commit }, { discussionIds, expanded }) => {
+  commit(types.SET_EXPAND_DISCUSSIONS, { discussionIds, expanded });
+};
+
 export const fetchDiscussions = ({ commit, dispatch }, { path, filter, persistFilter }) => {
   const config =
     filter !== undefined
@@ -54,6 +58,7 @@ export const fetchDiscussions = ({ commit, dispatch }, { path, filter, persistFi
 
   return axios.get(path, config).then(({ data }) => {
     commit(types.SET_INITIAL_DISCUSSIONS, data);
+
     dispatch('updateResolvableDiscussionsCounts');
   });
 };
@@ -62,6 +67,10 @@ export const updateDiscussion = ({ commit, state }, discussion) => {
   commit(types.UPDATE_DISCUSSION, discussion);
 
   return utils.findNoteObjectById(state.discussions, discussion.id);
+};
+
+export const setDiscussionSortDirection = ({ commit }, direction) => {
+  commit(types.SET_DISCUSSIONS_SORT, direction);
 };
 
 export const removeNote = ({ commit, dispatch, state }, note) => {
@@ -515,7 +524,7 @@ export const removeConvertedDiscussion = ({ commit }, noteId) =>
 export const setCurrentDiscussionId = ({ commit }, discussionId) =>
   commit(types.SET_CURRENT_DISCUSSION_ID, discussionId);
 
-export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersion }) => {
+export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersion, versionId }) => {
   let requestUrl = endpoint;
 
   if (startingVersion) {
@@ -526,7 +535,7 @@ export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersio
   return axios
     .get(requestUrl)
     .then(res => {
-      dispatch('receiveDescriptionVersion', res.data);
+      dispatch('receiveDescriptionVersion', { descriptionVersion: res.data, versionId });
     })
     .catch(error => {
       dispatch('receiveDescriptionVersionError', error);
@@ -544,7 +553,10 @@ export const receiveDescriptionVersionError = ({ commit }, error) => {
   commit(types.RECEIVE_DESCRIPTION_VERSION_ERROR, error);
 };
 
-export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingVersion }) => {
+export const softDeleteDescriptionVersion = (
+  { dispatch },
+  { endpoint, startingVersion, versionId },
+) => {
   let requestUrl = endpoint;
 
   if (startingVersion) {
@@ -555,7 +567,7 @@ export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingV
   return axios
     .delete(requestUrl)
     .then(() => {
-      dispatch('receiveDeleteDescriptionVersion');
+      dispatch('receiveDeleteDescriptionVersion', versionId);
     })
     .catch(error => {
       dispatch('receiveDeleteDescriptionVersionError', error);
@@ -566,8 +578,8 @@ export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingV
 export const requestDeleteDescriptionVersion = ({ commit }) => {
   commit(types.REQUEST_DELETE_DESCRIPTION_VERSION);
 };
-export const receiveDeleteDescriptionVersion = ({ commit }) => {
-  commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION, __('Deleted'));
+export const receiveDeleteDescriptionVersion = ({ commit }, versionId) => {
+  commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION, { [versionId]: __('Deleted') });
 };
 export const receiveDeleteDescriptionVersionError = ({ commit }, error) => {
   commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION_ERROR, error);

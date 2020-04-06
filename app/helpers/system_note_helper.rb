@@ -23,10 +23,11 @@ module SystemNoteHelper
     'moved' => 'arrow-right',
     'outdated' => 'pencil-square',
     'pinned_embed' => 'thumbtack',
-    'duplicate' => 'issue-duplicate',
+    'duplicate' => 'duplicate',
     'locked' => 'lock',
     'unlocked' => 'lock-open',
-    'due_date' => 'calendar'
+    'due_date' => 'calendar',
+    'health_status' => 'status-health'
   }.freeze
 
   def system_note_icon_name(note)

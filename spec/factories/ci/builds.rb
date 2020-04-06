@@ -16,7 +16,7 @@ FactoryBot.define do
 
     options do
       {
-        image: 'ruby:2.1',
+        image: 'ruby:2.7',
         services: ['postgres'],
         script: ['ls -a']
       }
@@ -29,6 +29,7 @@ FactoryBot.define do
     end
 
     pipeline factory: :ci_pipeline
+    project { pipeline.project }
 
     trait :degenerated do
       options { nil }
@@ -220,18 +221,15 @@ FactoryBot.define do
       end
     end
 
-    after(:build) do |build, evaluator|
-      build.project ||= build.pipeline.project
-    end
-
     trait :with_deployment do
       after(:build) do |build, evaluator|
         ##
         # Build deployment/environment relations if environment name is set
         # to the job. If `build.deployment` has already been set, it doesn't
         # build a new instance.
+        environment = Gitlab::Ci::Pipeline::Seed::Environment.new(build).to_resource
         build.deployment =
-          Gitlab::Ci::Pipeline::Seed::Deployment.new(build).to_resource
+          Gitlab::Ci::Pipeline::Seed::Deployment.new(build, environment).to_resource
       end
     end
 
@@ -310,6 +308,18 @@ FactoryBot.define do
       end
     end
 
+    trait :test_reports_with_attachment do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :junit_with_attachment, job: build)
+      end
+    end
+
+    trait :coverage_reports do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :cobertura, job: build)
+      end
+    end
+
     trait :expired do
       artifacts_expire_at { 1.minute.ago }
     end
@@ -329,7 +339,7 @@ FactoryBot.define do
     trait :extended_options do
       options do
         {
-          image: { name: 'ruby:2.1', entrypoint: '/bin/sh' },
+          image: { name: 'ruby:2.7', entrypoint: '/bin/sh' },
           services: ['postgres', { name: 'docker:stable-dind', entrypoint: '/bin/sh', command: 'sleep 30', alias: 'docker' }],
           script: %w(echo),
           after_script: %w(ls date),
@@ -354,6 +364,8 @@ FactoryBot.define do
       options { {} }
     end
 
+    # TODO: move Security traits to ee_ci_build
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/210486
     trait :dast do
       options do
         {
@@ -390,6 +402,14 @@ FactoryBot.define do
       options do
         {
             artifacts: { reports: { license_management: 'gl-license-management-report.json' } }
+        }
+      end
+    end
+
+    trait :license_scanning do
+      options do
+        {
+          artifacts: { reports: { license_management: 'gl-license-scanning-report.json' } }
         }
       end
     end

@@ -43,6 +43,78 @@ describe Gitlab::ProjectAuthorizations do
     end
   end
 
+  context 'unapproved access request' do
+    let_it_be(:group) { create(:group) }
+    let_it_be(:user) { create(:user) }
+
+    subject(:mapping) { map_access_levels(authorizations) }
+
+    context 'group membership' do
+      let!(:group_project) { create(:project, namespace: group) }
+
+      before do
+        create(:group_member, :developer, :access_request, user: user, group: group)
+      end
+
+      it 'does not create authorization' do
+        expect(mapping[group_project.id]).to be_nil
+      end
+    end
+
+    context 'inherited group membership' do
+      let!(:sub_group) { create(:group, parent: group) }
+      let!(:sub_group_project) { create(:project, namespace: sub_group) }
+
+      before do
+        create(:group_member, :developer, :access_request, user: user, group: group)
+      end
+
+      it 'does not create authorization' do
+        expect(mapping[sub_group_project.id]).to be_nil
+      end
+    end
+
+    context 'project membership' do
+      let!(:group_project) { create(:project, namespace: group) }
+
+      before do
+        create(:project_member, :developer, :access_request, user: user, project: group_project)
+      end
+
+      it 'does not create authorization' do
+        expect(mapping[group_project.id]).to be_nil
+      end
+    end
+
+    context 'shared group' do
+      let!(:shared_group) { create(:group) }
+      let!(:shared_group_project) { create(:project, namespace: shared_group) }
+
+      before do
+        create(:group_group_link, shared_group: shared_group, shared_with_group: group)
+        create(:group_member, :developer, :access_request, user: user, group: group)
+      end
+
+      it 'does not create authorization' do
+        expect(mapping[shared_group_project.id]).to be_nil
+      end
+    end
+
+    context 'shared project' do
+      let!(:another_group) { create(:group) }
+      let!(:shared_project) { create(:project, namespace: another_group) }
+
+      before do
+        create(:project_group_link, group: group, project: shared_project)
+        create(:group_member, :developer, :access_request, user: user, group: group)
+      end
+
+      it 'does not create authorization' do
+        expect(mapping[shared_project.id]).to be_nil
+      end
+    end
+  end
+
   context 'with nested groups' do
     let(:group) { create(:group) }
     let!(:nested_group) { create(:group, parent: group) }
@@ -109,6 +181,20 @@ describe Gitlab::ProjectAuthorizations do
       end
     end
 
+    context 'with lower group access level than max access level for share' do
+      let(:user) { create(:user) }
+
+      it 'creates proper authorizations' do
+        group.add_reporter(user)
+
+        mapping = map_access_levels(authorizations)
+
+        expect(mapping[project_parent.id]).to be_nil
+        expect(mapping[project.id]).to eq(Gitlab::Access::REPORTER)
+        expect(mapping[project_child.id]).to eq(Gitlab::Access::REPORTER)
+      end
+    end
+
     context 'parent group user' do
       let(:user) { parent_group_user }
 
@@ -148,7 +234,7 @@ describe Gitlab::ProjectAuthorizations do
     end
 
     context 'unrelated project owner' do
-      let(:common_id) { [Project.maximum(:id).to_i, Namespace.maximum(:id).to_i].max + 999 }
+      let(:common_id) { non_existing_record_id }
       let!(:group) { create(:group, id: common_id) }
       let!(:unrelated_project) { create(:project, id: common_id) }
       let(:user) { unrelated_project.owner }

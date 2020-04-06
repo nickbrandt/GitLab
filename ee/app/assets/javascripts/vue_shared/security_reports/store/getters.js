@@ -140,5 +140,13 @@ export const isBaseSecurityReportOutOfDate = state =>
   state.containerScanning.baseReportOutofDate ||
   state.dependencyScanning.baseReportOutofDate;
 
+export const canCreateIssue = state => Boolean(state.createVulnerabilityFeedbackIssuePath);
+
+export const canCreateMergeRequest = state =>
+  Boolean(state.createVulnerabilityFeedbackMergeRequestPath);
+
+export const canDismissVulnerability = state =>
+  Boolean(state.createVulnerabilityFeedbackDismissalPath);
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

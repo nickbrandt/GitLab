@@ -42,7 +42,7 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: true),
           security_scan(:dependency_scanning, configured: true),
-          security_scan(:license_management, configured: true)
+          security_scan(:license_scanning, configured: true)
         )
       end
     end
@@ -62,7 +62,7 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: false),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_management, configured: false)
+          security_scan(:license_scanning, configured: false)
         )
       end
     end
@@ -88,7 +88,7 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_management, configured: false)
+          security_scan(:license_scanning, configured: false)
         )
       end
 
@@ -102,7 +102,7 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_management, configured: false)
+          security_scan(:license_scanning, configured: false)
         )
       end
 
@@ -122,7 +122,19 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_management, configured: false)
+          security_scan(:license_scanning, configured: false)
+        )
+      end
+
+      it 'detect new license compliance job' do
+        create(:ci_build, :license_scanning, pipeline: pipeline)
+
+        expect(JSON.parse(subject[:features])).to contain_exactly(
+          security_scan(:dast, configured: true),
+          security_scan(:sast, configured: true),
+          security_scan(:container_scanning, configured: false),
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: true)
         )
       end
 

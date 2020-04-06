@@ -1,17 +1,18 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import ProjectList from './project_list.vue';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     ProjectList,
     ProjectSelector,
   },
   computed: {
     ...mapState('projectSelector', [
+      'pageInfo',
       'projects',
       'selectedProjects',
       'projectSearchResults',
@@ -26,6 +27,7 @@ export default {
   methods: {
     ...mapActions('projectSelector', [
       'fetchSearchResults',
+      'fetchSearchResultsNextPage',
       'addProjects',
       'clearSearchResults',
       'toggleSelectedProject',
@@ -62,13 +64,19 @@ export default {
             :show-loading-indicator="isSearchingProjects"
             :show-minimum-search-query-message="messages.minimumQuery"
             :show-search-error-message="messages.searchError"
+            :total-results="pageInfo.total"
             @searched="searched"
             @projectClicked="projectClicked"
+            @bottomReached="fetchSearchResultsNextPage"
           />
           <div class="mb-3">
-            <gl-button :disabled="!canAddProjects" variant="success" @click="addProjects">
+            <gl-deprecated-button
+              :disabled="!canAddProjects"
+              variant="success"
+              @click="addProjects"
+            >
               {{ s__('SecurityDashboard|Add projects') }}
-            </gl-button>
+            </gl-deprecated-button>
           </div>
         </div>
       </div>

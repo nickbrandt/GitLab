@@ -120,7 +120,7 @@ be disabled. If the pipeline fails to deploy, the deployment info will be hidden
 
 ![Merge request pipeline](img/merge_request_pipeline.png)
 
-For more information, [read about pipelines](../../../ci/pipelines.md).
+For more information, [read about pipelines](../../../ci/pipelines/index.md).
 
 ### Merge when pipeline succeeds (MWPS)
 
@@ -128,7 +128,7 @@ Set a merge request that looks ready to merge to [merge automatically when CI pi
 
 ### Live preview with Review Apps
 
-If you configured [Review Apps](https://about.gitlab.com/product/review-apps/) for your project,
+If you configured [Review Apps](https://about.gitlab.com/stages-devops-lifecycle/review-apps/) for your project,
 you can preview the changes submitted to a feature-branch through a merge request
 in a per-branch basis. No need to checkout the branch, install and preview locally;
 all your changes will be available to preview by anyone with the Review Apps link.

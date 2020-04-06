@@ -30,7 +30,7 @@ describe API::Issues, :mailer do
 
   let_it_be(:milestone) { create(:milestone, title: '1.0.0', project: project) }
 
-  before(:all) do
+  before_all do
     project.add_reporter(user)
   end
 

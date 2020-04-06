@@ -56,7 +56,7 @@ You should see the NPM version printed in the output:
 ### Installing Yarn
 
 You may want to install and use Yarn as an alternative to NPM. Follow the
-instructions at [yarnpkg.com](https://yarnpkg.com/en/docs/install) to install on
+instructions at [yarnpkg.com](https://classic.yarnpkg.com/en/docs/install) to install on
 your development environment.
 
 Once installed, you can verify that Yarn is available with the following command:
@@ -117,23 +117,23 @@ npm config set @foo:registry https://gitlab.com/api/v4/packages/npm/
 
 # Add the token for the scoped packages URL. This will allow you to download
 # `@foo/` packages from private projects.
-npm config set '//gitlab.com/api/v4/projects/<your_project_id>/packages/npm/:_authToken' "<your_token>"
+npm config set '//gitlab.com/api/v4/packages/npm/:_authToken' "<your_token>"
 
 # Add token for uploading to the registry. Replace <your_project_id>
 # with the project you want your package to be uploaded to.
-npm config set '//gitlab.com/api/v4/packages/npm/:_authToken' "<your_token>"
+npm config set '//gitlab.com/api/v4/projects/<your_project_id>/packages/npm/:_authToken' "<your_token>"
 ```
 
 Replace `<your_project_id>` with your project ID which can be found on the home page
 of your project and `<your_token>` with your personal access token.
 
-If you have a self-hosted GitLab installation, replace `gitlab.com` with your
+If you have a self-managed GitLab installation, replace `gitlab.com` with your
 domain name.
 
 You should now be able to download and upload NPM packages to your project.
 
 NOTE: **Note:**
-If you encounter an error message with [Yarn](https://yarnpkg.com/en/), see the
+If you encounter an error message with [Yarn](https://classic.yarnpkg.com/en/), see the
 [troubleshooting section](#troubleshooting).
 
 ### Using variables to avoid hard-coding auth token values
@@ -185,7 +185,7 @@ for NPM. To do this, add the following section to the bottom of `package.json`:
 Replace `<your_project_id>` with your project ID, which can be found on the home
 page of your project, and replace `@foo` with your own scope.
 
-If you have a self-hosted GitLab installation, replace `gitlab.com` with your
+If you have a self-managed GitLab installation, replace `gitlab.com` with your
 domain name.
 
 Once you have enabled it and set up [authentication](#authenticating-to-the-gitlab-npm-registry),
@@ -224,7 +224,7 @@ it is not possible due to a naming collision. For example:
 
 The regex that is used for naming is validating all package names from all package managers:
 
-```
+```plaintext
 /\A\@?(([\w\-\.\+]*)\/)*([\w\-\.]+)@?(([\w\-\.\+]*)\/)*([\w\-\.]*)\z/
 ```
 
@@ -269,6 +269,14 @@ Or if you're using Yarn:
 yarn add @my-project-scope/my-package
 ```
 
+### Forwarding requests to npmjs.org
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/55344) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9.
+
+By default, when an NPM package is not found in the GitLab NPM Registry, the request will be forwarded to [npmjs.com](https://www.npmjs.com/).
+
+Administrators can disable this behavior in the [Continuous Integration settings](../../admin_area/settings/continuous_integration.md).
+
 ## Removing a package
 
 In the packages view of your project page, you can delete packages by clicking
@@ -277,7 +285,7 @@ page.
 
 ## Publishing a package with CI/CD
 
-To work with NPM commands within [GitLab CI](./../../../ci/README.md), you can use
+To work with NPM commands within [GitLab CI/CD](./../../../ci/README.md), you can use
 `CI_JOB_TOKEN` in place of the personal access token in your commands.
 
 A simple example `.gitlab-ci.yml` file for publishing NPM packages:
@@ -299,7 +307,7 @@ deploy:
 
 ### Error running yarn with NPM registry
 
-If you are using [yarn](https://yarnpkg.com/en/) with the NPM registry, you may get
+If you are using [yarn](https://classic.yarnpkg.com/en/) with the NPM registry, you may get
 an error message like:
 
 ```shell
@@ -311,7 +319,7 @@ warning XXX: No license field
 [2/4] 🚚  Fetching packages...
 error An unexpected error occurred: "https://gitlab.com/api/v4/projects/XXX/packages/npm/XXX/XXX/-/XXX/XXX-X.X.X.tgz: Request failed \"404 Not Found\"".
 info If you think this is a bug, please open a bug report with the information provided in "/Users/XXX/gitlab-migration/module-util/yarn-error.log".
-info Visit https://yarnpkg.com/en/docs/cli/install for documentation about this command
+info Visit https://classic.yarnpkg.com/en/docs/cli/install for documentation about this command
 ```
 
 In this case, try adding this to your `.npmrc` file (and replace `<your_token>`

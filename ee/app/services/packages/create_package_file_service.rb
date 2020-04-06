@@ -10,11 +10,12 @@ module Packages
 
     def execute
       package.package_files.create!(
-        file:      params[:file],
-        size:      params[:size],
-        file_name: params[:file_name],
-        file_sha1: params[:file_sha1],
-        file_md5:  params[:file_md5]
+        file:        params[:file],
+        size:        params[:size],
+        file_name:   params[:file_name],
+        file_sha1:   params[:file_sha1],
+        file_sha256: params[:file_sha256],
+        file_md5:    params[:file_md5]
       )
     end
   end

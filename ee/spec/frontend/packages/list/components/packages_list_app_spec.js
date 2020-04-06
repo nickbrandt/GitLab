@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
 const localVue = createLocalVue();
@@ -17,8 +17,24 @@ describe('packages_list_app', () => {
   const GlLoadingIcon = { name: 'gl-loading-icon', template: '<div>loading</div>' };
 
   const emptyListHelpUrl = 'helpUrl';
+  const findEmptyState = () => wrapper.find(GlEmptyState);
   const findListComponent = () => wrapper.find(PackageList);
-  const findLoadingComponent = () => wrapper.find(GlLoadingIcon);
+  const findTabComponent = (index = 0) => wrapper.findAll(GlTab).at(index);
+
+  const createStore = (filterQuery = '') => {
+    store = new Vuex.Store({
+      state: {
+        isLoading: false,
+        config: {
+          resourceId: 'project_id',
+          emptyListIllustration: 'helpSvg',
+          emptyListHelpUrl,
+        },
+        filterQuery,
+      },
+    });
+    store.dispatch = jest.fn();
+  };
 
   const mountComponent = () => {
     wrapper = shallowMount(PackageListApp, {
@@ -28,22 +44,15 @@ describe('packages_list_app', () => {
         GlEmptyState,
         GlLoadingIcon,
         PackageList,
+        GlTab,
+        GlTabs,
       },
     });
   };
 
   beforeEach(() => {
-    store = new Vuex.Store({
-      state: {
-        isLoading: false,
-        config: {
-          resourceId: 'project_id',
-          emptyListIllustration: 'helpSvg',
-          emptyListHelpUrl: 'helpUrl',
-        },
-      },
-    });
-    store.dispatch = jest.fn();
+    createStore();
+    mountComponent();
   });
 
   afterEach(() => {
@@ -55,48 +64,70 @@ describe('packages_list_app', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('when isLoading is true', () => {
-    beforeEach(() => {
-      store.state.isLoading = true;
-      mountComponent();
+  describe('empty state', () => {
+    it('generate the correct empty list link', () => {
+      const link = findListComponent().find('a');
+
+      expect(link.element).toMatchInlineSnapshot(`
+        <a
+          href="${emptyListHelpUrl}"
+          target="_blank"
+        >
+          publish and share your packages
+        </a>
+      `);
     });
 
-    it('shows the loading component', () => {
-      const loader = findLoadingComponent();
-      expect(loader.exists()).toBe(true);
+    it('includes the right content on the default tab', () => {
+      const heading = findEmptyState().find('h4');
+
+      expect(heading.text()).toBe('There are no packages yet');
     });
   });
 
-  describe('when isLoading is false', () => {
+  it('call requestPackagesList on page:changed', () => {
+    const list = findListComponent();
+    list.vm.$emit('page:changed', 1);
+    expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList', { page: 1 });
+  });
+
+  it('call requestDeletePackage on package:delete', () => {
+    const list = findListComponent();
+    list.vm.$emit('package:delete', 'foo');
+    expect(store.dispatch).toHaveBeenCalledWith('requestDeletePackage', 'foo');
+  });
+
+  it('calls requestPackagesList on sort:changed', () => {
+    const list = findListComponent();
+    list.vm.$emit('sort:changed');
+    expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+  });
+
+  describe('tab change', () => {
+    it('calls requestPackagesList when all tab is clicked', () => {
+      findTabComponent().trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
+
+    it('calls requestPackagesList when a package type tab is clicked', () => {
+      findTabComponent(1).trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
+  });
+
+  describe('filter without results', () => {
     beforeEach(() => {
+      createStore('foo');
       mountComponent();
     });
 
-    it('generate the correct empty list link', () => {
-      const emptyState = findListComponent();
-      const link = emptyState.find('a');
-
-      expect(link.html()).toMatchInlineSnapshot(
-        `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
+    it('should show specific empty message', () => {
+      expect(findEmptyState().text()).toContain('Sorry, your filter produced no results');
+      expect(findEmptyState().text()).toContain(
+        'To widen your search, change or remove the filters above',
       );
-    });
-
-    it('call requestPackagesList on page:changed', () => {
-      const list = findListComponent();
-      list.vm.$emit('page:changed', 1);
-      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList', { page: 1 });
-    });
-
-    it('call requestDeletePackage on package:delete', () => {
-      const list = findListComponent();
-      list.vm.$emit('package:delete', 'foo');
-      expect(store.dispatch).toHaveBeenCalledWith('requestDeletePackage', 'foo');
-    });
-
-    it('calls requestPackagesList on sort:changed', () => {
-      const list = findListComponent();
-      list.vm.$emit('sort:changed');
-      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
     });
   });
 });

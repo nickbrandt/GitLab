@@ -55,11 +55,11 @@ export default {
       ) {
         return '';
       } else if (startDay === 1) {
-        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+        /* eslint-disable-next-line @gitlab/require-i18n-strings */
         return 'left: 0;';
       }
 
-      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      /* eslint-disable-next-line @gitlab/require-i18n-strings */
       return `left: ${(startDay / daysInQuarter) * 100}%;`;
     },
     /**

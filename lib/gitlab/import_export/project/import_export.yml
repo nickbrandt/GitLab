@@ -17,6 +17,7 @@ tree:
       - notes:
         - :author
         - :award_emoji
+        - :system_note_metadata
         - events:
           - :push_event_payload
       - label_links:
@@ -47,6 +48,7 @@ tree:
       - notes:
         - :author
         - :award_emoji
+        - :system_note_metadata
         - events:
           - :push_event_payload
         - :suggestions
@@ -248,6 +250,7 @@ excluded_attributes:
     - :token_encrypted
   services:
     - :template
+    - :instance
   error_tracking_setting:
     - :encrypted_token
     - :encrypted_token_iv
@@ -322,6 +325,9 @@ excluded_attributes:
   epic_issue:
     - :epic_id
     - :issue_id
+  system_note_metadata:
+    - :description_version_id
+    - :note_id
 methods:
   notes:
     - :type
@@ -339,6 +345,7 @@ methods:
     - :diff_head_sha
     - :source_branch_sha
     - :target_branch_sha
+    - :state
   events:
     - :action
   push_event_payload:
@@ -349,6 +356,8 @@ methods:
     - :list_type
   ci_pipelines:
     - :notes
+  issues:
+    - :state
 
 preloads:
   statuses:

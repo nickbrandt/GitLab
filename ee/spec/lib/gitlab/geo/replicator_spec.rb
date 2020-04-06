@@ -3,15 +3,24 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::Replicator do
+  include ::EE::GeoHelpers
+
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
+
   context 'with defined events' do
-    class DummyReplicator < Gitlab::Geo::Replicator
-      event :test
-      event :another_test
+    before do
+      stub_const('DummyReplicator', Class.new(Gitlab::Geo::Replicator))
 
-      protected
+      DummyReplicator.class_eval do
+        event :test
+        event :another_test
 
-      def publish_test(other:)
-        true
+        protected
+
+        def publish_test(other:)
+          true
+        end
       end
     end
 
@@ -36,17 +45,25 @@ describe Gitlab::Geo::Replicator do
     end
 
     context 'model DSL' do
-      class DummyModel
-        include ActiveModel::Model
-        include Gitlab::Geo::ReplicableModel
+      before do
+        stub_const('DummyModel', Class.new)
 
-        with_replicator DummyReplicator
+        DummyModel.class_eval do
+          include ActiveModel::Model
+
+          def self.after_create_commit(*args)
+          end
+
+          include Gitlab::Geo::ReplicableModel
+
+          with_replicator DummyReplicator
+        end
       end
 
       subject { DummyModel.new }
 
       it 'adds replicator method to the model' do
-        expect(subject).respond_to? :replicator
+        expect(subject).to respond_to(:replicator)
       end
 
       it 'instantiates a replicator into the model' do
@@ -74,8 +91,12 @@ describe Gitlab::Geo::Replicator do
       end
 
       context 'when publishing a supported events with required params' do
-        it 'does not raise errors' do
-          expect { subject.publish(:test, other: true) }.not_to raise_error
+        it 'creates event with associated event log record' do
+          stub_current_geo_node(primary_node)
+
+          expect { subject.publish(:test, other: true) }.to change { ::Geo::EventLog.count }.from(0).to(1)
+
+          expect(::Geo::EventLog.last.event).to be_a(::Geo::Event)
         end
       end
 

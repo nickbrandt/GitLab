@@ -1,10 +1,11 @@
 import Vuex from 'vuex';
 import { last } from 'lodash';
-import { GlTable, GlSorting, GlPagination, GlModal } from '@gitlab/ui';
+import { GlTable, GlPagination, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
 import PackageTags from 'ee/packages/shared/components/package_tags.vue';
+import PackagesListLoader from 'ee/packages/list/components/packages_list_loader.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import stubChildren from 'helpers/stub_children';
@@ -16,23 +17,53 @@ localVue.use(Vuex);
 describe('packages_list', () => {
   let wrapper;
   let store;
-  let state;
-  let getListSpy;
 
   const GlSortingItem = { name: 'sorting-item-stub', template: '<div><slot></slot></div>' };
   const EmptySlotStub = { name: 'empty-slot-stub', template: '<div>bar</div>' };
 
+  const findPackagesListLoader = () => wrapper.find(PackagesListLoader);
   const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
   const findPackageListTable = () => wrapper.find(GlTable);
-  const findPackageListSorting = () => wrapper.find(GlSorting);
   const findPackageListPagination = () => wrapper.find(GlPagination);
   const findPackageListDeleteModal = () => wrapper.find(GlModal);
-  const findSortingItems = () => wrapper.findAll(GlSortingItem);
   const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
   const findPackageTags = () => wrapper.findAll(PackageTags);
   const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
-  const mountComponent = options => {
+  const createStore = (isGroupPage, packages, isLoading) => {
+    const state = {
+      isLoading,
+      packages,
+      pagination: {
+        perPage: 1,
+        total: 1,
+        page: 1,
+      },
+      config: {
+        isGroupPage,
+      },
+      sorting: {
+        orderBy: 'version',
+        sort: 'desc',
+      },
+    };
+    store = new Vuex.Store({
+      state,
+      getters: {
+        getList: () => packages,
+      },
+    });
+    store.dispatch = jest.fn();
+  };
+
+  const mountComponent = ({
+    isGroupPage = false,
+    packages = packageList,
+    isLoading = false,
+    ...options
+  } = {}) => {
+    createStore(isGroupPage, packages, isLoading);
+
     wrapper = mount(PackagesList, {
       localVue,
       store,
@@ -45,41 +76,37 @@ describe('packages_list', () => {
     });
   };
 
-  beforeEach(() => {
-    getListSpy = jest.fn();
-    getListSpy.mockReturnValue(packageList);
-    state = {
-      packages: [...packageList],
-      pagination: {
-        perPage: 1,
-        total: 1,
-        page: 1,
-      },
-      config: {
-        isGroupPage: false,
-      },
-      sorting: {
-        orderBy: 'version',
-        sort: 'desc',
-      },
-    };
-    store = new Vuex.Store({
-      state,
-      getters: {
-        getList: getListSpy,
-      },
-    });
-    store.dispatch = jest.fn();
-  });
-
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
+  });
+
+  describe('when is loading', () => {
+    beforeEach(() => {
+      mountComponent({
+        packages: [],
+        isLoading: true,
+      });
+    });
+
+    it('shows skeleton loader when loading', () => {
+      expect(findPackagesListLoader().exists()).toBe(true);
+    });
+  });
+
+  describe('when is not loading', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
+
+    it('does not show skeleton loader when not loading', () => {
+      expect(findPackagesListLoader().exists()).toBe(false);
+    });
   });
 
   describe('when is isGroupPage', () => {
     beforeEach(() => {
-      state.config.isGroupPage = true;
-      mountComponent();
+      mountComponent({ isGroupPage: true });
     });
 
     it('has project field', () => {
@@ -96,11 +123,6 @@ describe('packages_list', () => {
   describe('layout', () => {
     beforeEach(() => {
       mountComponent();
-    });
-
-    it('contains a sorting component', () => {
-      const sorting = findPackageListSorting();
-      expect(sorting.exists()).toBe(true);
     });
 
     it('contains a table component', () => {
@@ -177,8 +199,8 @@ describe('packages_list', () => {
 
   describe('when the list is empty', () => {
     beforeEach(() => {
-      getListSpy.mockReturnValue([]);
       mountComponent({
+        packages: [],
         slots: {
           'empty-state': EmptySlotStub,
         },
@@ -190,35 +212,6 @@ describe('packages_list', () => {
       const emptySlot = findEmptySlot();
       expect(table.exists()).toBe(false);
       expect(emptySlot.exists()).toBe(true);
-    });
-  });
-
-  describe('sorting component', () => {
-    let sorting;
-    let sortingItems;
-
-    beforeEach(() => {
-      mountComponent();
-      sorting = findPackageListSorting();
-      sortingItems = findSortingItems();
-    });
-
-    it('has all the sortable items', () => {
-      expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
-    });
-
-    it('on sort change set sorting in vuex and emit event', () => {
-      sorting.vm.$emit('sortDirectionChange');
-      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { sort: 'asc' });
-      expect(wrapper.emitted('sort:changed')).toBeTruthy();
-    });
-
-    it('on sort item click set sorting and emit event', () => {
-      const item = sortingItems.at(0);
-      const { orderBy } = wrapper.vm.sortableFields[0];
-      item.vm.$emit('click');
-      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { orderBy });
-      expect(wrapper.emitted('sort:changed')).toBeTruthy();
     });
   });
 

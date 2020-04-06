@@ -3,7 +3,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import dateFormat from 'dateformat';
 import createFlash from '~/flash';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlFormInput,
   GlLink,
   GlLoadingIcon,
@@ -25,9 +25,11 @@ import { severityLevel, severityLevelVariant, errorStatus } from './constants';
 
 import query from '../queries/details.query.graphql';
 
+const SENTRY_TIMEOUT = 10000;
+
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlFormInput,
     GlLink,
     GlLoadingIcon,
@@ -87,6 +89,8 @@ export default {
         if (res.data.project?.sentryErrors?.detailedError) {
           this.$apollo.queries.error.stopPolling();
           this.setStatus(this.error.status);
+        } else {
+          this.onNoApolloResult();
         }
       },
     },
@@ -94,6 +98,8 @@ export default {
   data() {
     return {
       error: null,
+      errorLoading: true,
+      errorPollTimeout: 0,
       issueCreationInProgress: false,
       isAlertVisible: false,
       closedIssueId: null,
@@ -108,16 +114,6 @@ export default {
       'errorStatus',
     ]),
     ...mapGetters('details', ['stacktrace']),
-    reported() {
-      return sprintf(
-        __('Reported %{timeAgo} by %{reportedBy}'),
-        {
-          reportedBy: `<strong class="error-details-meta-culprit">${this.error.culprit}</strong>`,
-          timeAgo: this.timeFormatted(this.stacktraceData.date_received),
-        },
-        false,
-      );
-    },
     firstReleaseLink() {
       return `${this.error.externalBaseUrl}/releases/${this.error.firstReleaseShortVersion}`;
     },
@@ -168,8 +164,19 @@ export default {
       return this.errorStatus !== errorStatus.RESOLVED ? __('Resolve') : __('Unresolve');
     },
   },
+  watch: {
+    error(val) {
+      if (val) {
+        this.errorLoading = false;
+      }
+    },
+  },
   mounted() {
     this.startPollingStacktrace(this.issueStackTracePath);
+    this.errorPollTimeout = Date.now() + SENTRY_TIMEOUT;
+    this.$apollo.queries.error.setOptions({
+      fetchPolicy: 'cache-and-network',
+    });
   },
   methods: {
     ...mapActions('details', [
@@ -201,6 +208,13 @@ export default {
         }
       });
     },
+    onNoApolloResult() {
+      if (Date.now() > this.errorPollTimeout) {
+        this.$apollo.queries.error.stopPolling();
+        this.errorLoading = false;
+        createFlash(__('Could not connect to Sentry. Refresh the page to try again.'), 'warning');
+      }
+    },
     formatDate(date) {
       return `${this.timeFormatted(date)} (${dateFormat(date, 'UTC:yyyy-mm-dd h:MM:ssTT Z')})`;
     },
@@ -210,7 +224,7 @@ export default {
 
 <template>
   <div>
-    <div v-if="$apollo.queries.error.loading" class="py-3">
+    <div v-if="errorLoading" class="py-3">
       <gl-loading-icon :size="3" />
     </div>
     <div v-else-if="error" class="error-details">
@@ -227,27 +241,38 @@ export default {
       </gl-alert>
 
       <div class="error-details-header d-flex py-2 justify-content-between">
-        <div class="error-details-meta my-auto">
-          <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
+        <div
+          v-if="!loadingStacktrace && stacktrace"
+          class="error-details-meta my-auto"
+          data-qa-selector="reported_text"
+        >
+          <gl-sprintf :message="__('Reported %{timeAgo} by %{reportedBy}')">
+            <template #reportedBy>
+              <strong class="error-details-meta-culprit">{{ error.culprit }}</strong>
+            </template>
+            <template #timeAgo>
+              {{ timeFormatted(stacktraceData.date_received) }}
+            </template>
+          </gl-sprintf>
         </div>
         <div class="error-details-actions">
           <div class="d-inline-flex bv-d-sm-down-none">
-            <gl-button
+            <gl-deprecated-button
               :loading="updatingIgnoreStatus"
               data-qa-selector="update_ignore_status_button"
               @click="onIgnoreStatusUpdate"
             >
               {{ ignoreBtnLabel }}
-            </gl-button>
-            <gl-button
+            </gl-deprecated-button>
+            <gl-deprecated-button
               class="btn-outline-info ml-2"
               :loading="updatingResolveStatus"
               data-qa-selector="update_resolve_status_button"
               @click="onResolveStatusUpdate"
             >
               {{ resolveBtnLabel }}
-            </gl-button>
-            <gl-button
+            </gl-deprecated-button>
+            <gl-deprecated-button
               v-if="error.gitlabIssuePath"
               class="ml-2"
               data-qa-selector="view_issue_button"
@@ -255,7 +280,7 @@ export default {
               variant="success"
             >
               {{ __('View issue') }}
-            </gl-button>
+            </gl-deprecated-button>
             <form
               ref="sentryIssueForm"
               :action="projectIssuesPath"
@@ -270,7 +295,7 @@ export default {
                 name="issue[sentry_issue_attributes][sentry_issue_identifier]"
               />
               <gl-form-input :value="csrfToken" class="hidden" name="authenticity_token" />
-              <gl-button
+              <gl-deprecated-button
                 v-if="!error.gitlabIssuePath"
                 class="btn-success"
                 :loading="issueCreationInProgress"
@@ -278,7 +303,7 @@ export default {
                 @click="createIssue"
               >
                 {{ __('Create issue') }}
-              </gl-button>
+              </gl-deprecated-button>
             </form>
           </div>
           <gl-dropdown

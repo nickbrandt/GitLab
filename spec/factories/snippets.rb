@@ -28,13 +28,13 @@ FactoryBot.define do
           bare_repo: TestEnv.factory_repo_path_bare,
           refs: TestEnv::BRANCH_SHA)
 
-        snippet.track_snippet_repository
+        snippet.track_snippet_repository(snippet.repository.storage)
       end
     end
 
     trait :empty_repo do
       after(:create) do |snippet|
-        raise "Failed to create repository!" unless snippet.repository.create_if_not_exists
+        raise "Failed to create repository!" unless snippet.create_repository
       end
     end
   end
@@ -48,6 +48,7 @@ FactoryBot.define do
     trait :secret do
       visibility_level { Snippet::PUBLIC }
       secret { true }
+      project { nil }
     end
   end
 end

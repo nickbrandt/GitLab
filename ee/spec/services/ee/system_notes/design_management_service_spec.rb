@@ -132,7 +132,7 @@ describe EE::SystemNotes::DesignManagementService do
     let(:design) { create(:design, :with_file, issue: issue) }
     let(:author) { create(:user) }
     let(:discussion_note) do
-      create(:diff_note_on_design, noteable: design, author: author, project: project)
+      create(:diff_note_on_design, noteable: design, author: author)
     end
     let(:action) { 'designs_discussion_added' }
 

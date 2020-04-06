@@ -318,7 +318,7 @@ module ObjectStorage
     def cache!(new_file = sanitized_file)
       # We intercept ::UploadedFile which might be stored on remote storage
       # We use that for "accelerated" uploads, where we store result on remote storage
-      if new_file.is_a?(::UploadedFile) && new_file.remote_id
+      if new_file.is_a?(::UploadedFile) && new_file.remote_id.present?
         return cache_remote_file!(new_file.remote_id, new_file.original_filename)
       end
 
@@ -394,7 +394,7 @@ module ObjectStorage
     def storage_for(store)
       case store
       when Store::REMOTE
-        raise 'Object Storage is not enabled' unless self.class.object_store_enabled?
+        raise "Object Storage is not enabled for #{self.class}" unless self.class.object_store_enabled?
 
         CarrierWave::Storage::Fog.new(self)
       when Store::LOCAL

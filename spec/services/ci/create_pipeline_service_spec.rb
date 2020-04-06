@@ -555,7 +555,7 @@ describe Ci::CreatePipelineService do
           let(:ci_yaml) do
             <<-EOS
               image:
-                name: ruby:2.2
+                name: ruby:2.7
                 ports:
                   - 80
             EOS
@@ -567,12 +567,12 @@ describe Ci::CreatePipelineService do
         context 'in the job image' do
           let(:ci_yaml) do
             <<-EOS
-              image: ruby:2.2
+              image: ruby:2.7
 
               test:
                 script: rspec
                 image:
-                  name: ruby:2.2
+                  name: ruby:2.7
                   ports:
                     - 80
             EOS
@@ -584,11 +584,11 @@ describe Ci::CreatePipelineService do
         context 'in the service' do
           let(:ci_yaml) do
             <<-EOS
-              image: ruby:2.2
+              image: ruby:2.7
 
               test:
                 script: rspec
-                image: ruby:2.2
+                image: ruby:2.7
                 services:
                   - name: test
                     ports:
@@ -985,6 +985,7 @@ describe Ci::CreatePipelineService do
           expect(pipeline).to be_persisted
           expect(build).to be_kind_of(Ci::Build)
           expect(build.options).to eq(config[:release].except(:stage, :only).with_indifferent_access)
+          expect(build).to be_persisted
         end
       end
 

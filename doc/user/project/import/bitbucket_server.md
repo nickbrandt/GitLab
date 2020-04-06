@@ -1,7 +1,6 @@
 # Import your project from Bitbucket Server to GitLab
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20164)
-in GitLab 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20164) in GitLab 11.2.
 
 NOTE: **Note:**
 The Bitbucket Server importer does not work with [Bitbucket Cloud](https://bitbucket.org).
@@ -39,7 +38,7 @@ Import your projects from Bitbucket Server to GitLab with minimal effort.
 
 The Bitbucket Server importer works as follows:
 
-1. The user will be prompted to enter the URl, username, and password or personal access token to login to Bitbucket.
+1. The user will be prompted to enter the URL, username, and password (or personal access token) to log in to Bitbucket.
    These credentials are preserved only as long as the importer is running.
 1. The importer will attempt to list all the current repositories on the Bitbucket Server.
 1. Upon selection, the importer will clone the repository and import pull requests and comments.

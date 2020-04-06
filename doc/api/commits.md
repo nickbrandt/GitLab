@@ -32,8 +32,8 @@ Example response:
     "id": "ed899a2f4b50b4370feeea94676502b42383c746",
     "short_id": "ed899a2f4b5",
     "title": "Replace sanitize with escape once",
-    "author_name": "Dmitriy Zaporozhets",
-    "author_email": "dzaporozhets@sphereconsultinginc.com",
+    "author_name": "Example User",
+    "author_email": "user@example.com",
     "authored_date": "2012-09-20T11:50:22+03:00",
     "committer_name": "Administrator",
     "committer_email": "admin@example.com",
@@ -50,9 +50,9 @@ Example response:
     "short_id": "6104942438c",
     "title": "Sanitize for network graph",
     "author_name": "randx",
-    "author_email": "dmitriy.zaporozhets@gmail.com",
-    "committer_name": "Dmitriy",
-    "committer_email": "dmitriy.zaporozhets@gmail.com",
+    "author_email": "user@example.com",
+    "committer_name": "ExampleName",
+    "committer_email": "user@example.com",
     "created_at": "2012-09-20T09:06:12+03:00",
     "message": "Sanitize for network graph",
     "parent_ids": [
@@ -142,10 +142,10 @@ Example response:
   "id": "ed899a2f4b50b4370feeea94676502b42383c746",
   "short_id": "ed899a2f4b5",
   "title": "some commit message",
-  "author_name": "Dmitriy Zaporozhets",
-  "author_email": "dzaporozhets@sphereconsultinginc.com",
-  "committer_name": "Dmitriy Zaporozhets",
-  "committer_email": "dzaporozhets@sphereconsultinginc.com",
+  "author_name": "Example User",
+  "author_email": "user@example.com",
+  "committer_name": "Example User",
+  "committer_email": "user@example.com",
   "created_at": "2016-09-20T09:26:24.000-07:00",
   "message": "some commit message",
   "parent_ids": [
@@ -217,9 +217,9 @@ Example response:
   "short_id": "6104942438c",
   "title": "Sanitize for network graph",
   "author_name": "randx",
-  "author_email": "dmitriy.zaporozhets@gmail.com",
+  "author_email": "user@example.com",
   "committer_name": "Dmitriy",
-  "committer_email": "dmitriy.zaporozhets@gmail.com",
+  "committer_email": "user@example.com",
   "created_at": "2012-09-20T09:06:12+03:00",
   "message": "Sanitize for network graph",
   "committed_date": "2012-09-20T09:06:12+03:00",
@@ -307,15 +307,15 @@ Example response:
   "id": "8b090c1b79a14f2bd9e8a738f717824ff53aebad",
   "short_id": "8b090c1b",
   "title": "Feature added",
-  "author_name": "Dmitriy Zaporozhets",
-  "author_email": "dmitriy.zaporozhets@gmail.com",
+  "author_name": "Example User",
+  "author_email": "user@example.com",
   "authored_date": "2016-12-12T20:10:39.000+01:00",
   "created_at": "2016-12-12T20:10:39.000+01:00",
   "committer_name": "Administrator",
   "committer_email": "admin@example.com",
   "committed_date": "2016-12-12T20:10:39.000+01:00",
   "title": "Feature added",
-  "message": "Feature added\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n",
+  "message": "Feature added\n\nSigned-off-by: Example User <user@example.com>\n",
   "parent_ids": [
     "a738f717824ff53aebad8b090c1b79a14f2bd9e8"
   ],
@@ -741,16 +741,40 @@ Parameters:
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/repository/commits/da738facbc19eb2fc2cef57c49be0e6038570352/signature"
 ```
 
-Example response if commit is signed:
+Example response if commit is GPG signed:
 
 ```json
 {
+  "signature_type": "PGP",
+  "verification_status": "verified",
   "gpg_key_id": 1,
   "gpg_key_primary_keyid": "8254AAB3FBD54AC9",
   "gpg_key_user_name": "John Doe",
   "gpg_key_user_email": "johndoe@example.com",
-  "verification_status": "verified",
   "gpg_key_subkey_id": null
+}
+```
+
+Example response if commit is x509 signed:
+
+```json
+{
+  "signature_type": "X509",
+  "verification_status": "unverified",
+  "x509_certificate": {
+    "id": 1,
+    "subject": "CN=gitlab@example.org,OU=Example,O=World",
+    "subject_key_identifier": "BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC:BC",
+    "email": "gitlab@example.org",
+    "serial_number": 278969561018901340486471282831158785578,
+    "certificate_status": "good",
+    "x509_issuer": {
+      "id": 1,
+      "subject": "CN=PKI,OU=Example,O=World",
+      "subject_key_identifier": "AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB:AB",
+      "crl_url": "http://example.com/pki.crl"
+    }
+  }
 }
 ```
 

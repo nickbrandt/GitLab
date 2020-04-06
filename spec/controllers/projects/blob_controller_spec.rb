@@ -8,18 +8,17 @@ describe Projects::BlobController do
   let(:project) { create(:project, :public, :repository) }
 
   describe "GET show" do
+    def request
+      get(:show, params: { namespace_id: project.namespace, project_id: project, id: id })
+    end
+
     render_views
 
     context 'with file path' do
       before do
         expect(::Gitlab::GitalyClient).to receive(:allow_ref_name_caching).and_call_original
 
-        get(:show,
-            params: {
-              namespace_id: project.namespace,
-              project_id: project,
-              id: id
-            })
+        request
       end
 
       context "valid branch, valid file" do

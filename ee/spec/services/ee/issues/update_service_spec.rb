@@ -164,5 +164,56 @@ describe Issues::UpdateService do
       let(:execute) { described_class.new(project, user, params).execute(issue) }
       let(:epic) { create(:epic, group: group) }
     end
+
+    context 'promoting to epic' do
+      before do
+        stub_licensed_features(epics: true)
+        group.add_developer(user)
+      end
+
+      context 'when promote_to_epic param is present' do
+        it 'promotes issue to epic' do
+          expect { update_issue(promote_to_epic: true) }.to change { Epic.count }.by(1)
+          expect(issue.promoted_to_epic_id).not_to be_nil
+        end
+      end
+
+      context 'when promote_to_epic param is not present' do
+        it 'does not promote issue to epic' do
+          expect { update_issue(promote_to_epic: false) }.not_to change { Epic.count }
+          expect(issue.promoted_to_epic_id).to be_nil
+        end
+      end
+    end
+
+    describe 'publish to status page' do
+      let(:execute) { update_issue(params) }
+      let(:issue_id) { execute&.id }
+
+      context 'when update succeeds' do
+        let(:params) { { title: 'New title' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when closing' do
+        let(:params) { { state_event: 'close' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when reopening' do
+        let(:issue) { create(:issue, :closed, project: project) }
+        let(:params) { { state_event: 'reopen' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when update fails' do
+        let(:params) { { title: nil } }
+
+        include_examples 'no trigger status page publish'
+      end
+    end
   end
 end

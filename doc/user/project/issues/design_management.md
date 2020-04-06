@@ -1,4 +1,4 @@
-# Design Management **(PREMIUM)**
+# Design Management
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/660) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
 
@@ -22,7 +22,7 @@ For an overview, see the video [Design Management (GitLab 12.2)](https://www.you
 ## Requirements
 
 Design Management requires
-[Large File Storage (LFS)](../../../administration/lfs/manage_large_binaries_with_git_lfs.md)
+[Large File Storage (LFS)](../../../topics/git/lfs/index.md)
 to be enabled:
 
 - For GitLab.com, LFS is already enabled.
@@ -39,17 +39,16 @@ Design Management requires that projects are using
 
 If the requirements are not met, the **Designs** tab displays a message to the user.
 
-### Feature Flags
+## Supported files
 
-- Reference Parsing
+Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`,
+`gif`, `bmp`, `tiff` or `ico`.
 
-  Designs support short references in Markdown, but this needs to be enabled by setting
-  the `:design_management_reference_filter_gfm_pipeline` feature flag.
+Support for [SVG files](https://gitlab.com/gitlab-org/gitlab/issues/12771)
+and [PDFs](https://gitlab.com/gitlab-org/gitlab/issues/32811) is planned for a future release.
 
 ## Limitations
 
-- Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`, `gif`, `bmp`, `tiff` or `ico`.
-  The [`svg` extension is not yet supported](https://gitlab.com/gitlab-org/gitlab/issues/12771).
 - Design uploads are limited to 10 files at a time.
 - Design Management data
   [isn't deleted when a project is destroyed](https://gitlab.com/gitlab-org/gitlab/issues/13429) yet.
@@ -71,8 +70,27 @@ Navigate to the **Design Management** page from any issue by clicking the **Desi
 
 To upload design images, click the **Upload Designs** button and select images to upload.
 
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9,
+you can drag and drop designs onto the dedicated dropzone to upload them.
+
+![Drag and drop design uploads](img/design_drag_and_drop_uploads_v12_9.png)
+
+[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/202634)
+in GitLab 12.10, you can also copy images from your file system and
+paste them directly on GitLab's Design page as a new design.
+
+On macOS you can also take a screenshot and immediately copy it to
+the clipboard by simultaneously clicking <kbd>Control</kbd> + <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>3</kbd>, and then paste it as a design.
+
+Copy-and-pasting has some limitations:
+
+- You can paste only one image at a time. When copy/pasting multiple files, only the first one will be uploaded.
+- All images will be converted to `png` format under the hood, so when you want to copy/paste `gif` file, it will result in broken animation.
+- Copy/pasting designs is not supported on Internet Explorer.
+
 Designs with the same filename as an existing uploaded design will create a new version
-of the design, and will replace the previous version.
+of the design, and will replace the previous version. [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9, dropping a design on an existing uploaded design will also create a new version,
+provided the filenames are the same.
 
 Designs cannot be added if the issue has been moved, or its
 [discussion is locked](../../discussions/#lock-discussions).
@@ -89,7 +107,7 @@ Images on the Design Management page can be enlarged by clicking on them.
 You can navigate through designs by clicking on the navigation buttons on the
 top-right corner or with <kbd>Left</kbd>/<kbd>Right</kbd> keyboard buttons.
 
-The number of comments on a design — if any — is listed to the right
+The number of discussions on a design — if any — is listed to the right
 of the design filename. Clicking on this number enlarges the design
 just like clicking anywhere else on the design.
 When a design is added or modified, an icon is displayed on the item
@@ -97,7 +115,7 @@ to help summarize changes between versions.
 
 | Indicator | Example |
 | --------- | ------- |
-| Comments | ![Comments Icon](img/design_comments_v12_3.png) |
+| Discussions | ![Discussions Icon](img/design_comments_v12_3.png) |
 | Modified (in the selected version) | ![Design Modified](img/design_modified_v12_3.png) |
 | Added (in the selected version) | ![Design Added](img/design_added_v12_3.png) |
 
@@ -105,7 +123,11 @@ to help summarize changes between versions.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/13217) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
 
-Designs can be explored in greater detail by zooming in and out of the image. Control the amount of zoom with the `+` and `-` buttons at the bottom of the image. While zoomed, you can still [add new annotations](#adding-annotations-to-designs) to the image, and see any existing ones.
+Designs can be explored in greater detail by zooming in and out of the image.
+Control the amount of zoom with the `+` and `-` buttons at the bottom of the image.
+While zoomed, you can still [start new discussions](#starting-discussions-on-designs) on the image, and see any existing ones.
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/197324) in GitLab 12.10, while zoomed in,
+you can click-and-drag on the image to move around it.
 
 ![Design zooming](img/design_zooming_v12_7.png)
 
@@ -137,52 +159,22 @@ Only the latest version of the designs can be deleted.
 Deleted designs are not permanently lost; they can be
 viewed by browsing previous versions.
 
-## Adding annotations to designs
+## Starting discussions on designs
 
-When a design is uploaded, you can add annotations by clicking on
-the image on the exact location you'd like to add the note to.
-A badge is added to the image identifying the annotation, from
-which you can start a new discussion:
+When a design is uploaded, you can start a discussion by clicking on
+the image on the exact location you would like the discussion to be focused on.
+A pin is added to the image, identifying the discussion's location.
 
 ![Starting a new discussion on design](img/adding_note_to_design_1.png)
 
 [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.8,
-you can adjust the badge's position by dragging it around the image. This is useful
+you can adjust a pin's position by dragging it around the image. This is useful
 for when your design layout has changed between revisions, or if you need to move an
-existing badge to add a new one in its place.
+existing pin to add a new one in its place.
 
-Different discussions have different badge numbers:
+Different discussions have different pin numbers:
 
-![Discussions on design annotations](img/adding_note_to_design_2.png)
+![Discussions on designs](img/adding_note_to_design_2.png)
 
-From GitLab 12.5 on, new annotations will be outputted to the issue activity,
+From GitLab 12.5 on, new discussions will be outputted to the issue activity,
 so that everyone involved can participate in the discussion.
-
-## References
-
-GitLab Flavored Markdown supports references to designs. The syntax for this is:
-
-  `#123[file.jpg]` - the issue reference, with the filename in square braces
-
-File names may contain a variety of odd characters, so two escaping mechanisms are supported:
-
-### Quoting
-
-File names may be quoted with double quotation marks, eg:
-
-  `#123["file.jpg"]`
-
-This is useful if, for instance, your filename has square braces in its name. In this scheme, all
-double quotation marks in the file name need to be escaped with backslashes, and backslashes need
-to be escaped likewise:
-
-  `#123["with with \"quote\" marks and a backslash \\.png"]`
-
-### Base64 Encoding
-
-In the case of file names that include HTML elements, you will need to escape these names to avoid
-them being processed as HTML literals. To do this, we support base64 encoding, eg.
-
-  The file `<a>.jpg` can be referenced as `#123[base64:PGE+LmpwZwo=]`
-
-Obviously we would advise against using such filenames.

@@ -3,7 +3,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import {
   GlTable,
   GlFormCheckbox,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
   GlTooltipDirective,
   GlPagination,
@@ -31,13 +31,17 @@ import {
   LIST_LABEL_IMAGE_ID,
   LIST_LABEL_SIZE,
   LIST_LABEL_LAST_UPDATED,
+  DELETE_TAG_SUCCESS_MESSAGE,
+  DELETE_TAG_ERROR_MESSAGE,
+  DELETE_TAGS_SUCCESS_MESSAGE,
+  DELETE_TAGS_ERROR_MESSAGE,
 } from '../constants';
 
 export default {
   components: {
     GlTable,
     GlFormCheckbox,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     ClipboardButton,
     GlPagination,
@@ -73,9 +77,10 @@ export default {
       return name;
     },
     fields() {
+      const tagClass = this.isDesktop ? 'w-25' : '';
       return [
         { key: LIST_KEY_CHECKBOX, label: '', class: 'gl-w-16' },
-        { key: LIST_KEY_TAG, label: LIST_LABEL_TAG, class: 'w-25' },
+        { key: LIST_KEY_TAG, label: LIST_LABEL_TAG, class: `${tagClass} js-tag-column` },
         { key: LIST_KEY_IMAGE_ID, label: LIST_LABEL_IMAGE_ID },
         { key: LIST_KEY_SIZE, label: LIST_LABEL_SIZE },
         { key: LIST_KEY_LAST_UPDATED, label: LIST_LABEL_LAST_UPDATED },
@@ -102,7 +107,7 @@ export default {
         return this.tagsPagination.page;
       },
       set(page) {
-        this.requestTagsList({ pagination: { page }, id: this.$route.params.id });
+        this.requestTagsList({ pagination: { page }, params: this.$route.params.id });
       },
     },
   },
@@ -176,17 +181,37 @@ export default {
     },
     handleSingleDelete(itemToDelete) {
       this.itemsToBeDeleted = [];
-      this.requestDeleteTag({ tag: itemToDelete, params: this.$route.params.id });
+      return this.requestDeleteTag({ tag: itemToDelete, params: this.$route.params.id })
+        .then(() =>
+          this.$toast.show(DELETE_TAG_SUCCESS_MESSAGE, {
+            type: 'success',
+          }),
+        )
+        .catch(() =>
+          this.$toast.show(DELETE_TAG_ERROR_MESSAGE, {
+            type: 'error',
+          }),
+        );
     },
     handleMultipleDelete() {
       const { itemsToBeDeleted } = this;
       this.itemsToBeDeleted = [];
       this.selectedItems = [];
 
-      this.requestDeleteTags({
+      return this.requestDeleteTags({
         ids: itemsToBeDeleted.map(x => this.tags[x].name),
         params: this.$route.params.id,
-      });
+      })
+        .then(() =>
+          this.$toast.show(DELETE_TAGS_SUCCESS_MESSAGE, {
+            type: 'success',
+          }),
+        )
+        .catch(() =>
+          this.$toast.show(DELETE_TAGS_ERROR_MESSAGE, {
+            type: 'error',
+          }),
+        );
     },
     onDeletionConfirmed() {
       this.track('confirm_delete');
@@ -225,7 +250,7 @@ export default {
         />
       </template>
       <template #head(actions)>
-        <gl-button
+        <gl-deprecated-button
           ref="bulkDeleteButton"
           v-gl-tooltip
           :disabled="!selectedItems || selectedItems.length === 0"
@@ -236,7 +261,7 @@ export default {
           @click="deleteMultipleItems()"
         >
           <gl-icon name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </template>
 
       <template #cell(checkbox)="{index}">
@@ -279,7 +304,7 @@ export default {
         </span>
       </template>
       <template #cell(actions)="{index, item}">
-        <gl-button
+        <gl-deprecated-button
           ref="singleDeleteButton"
           :title="s__('ContainerRegistry|Remove tag')"
           :aria-label="s__('ContainerRegistry|Remove tag')"
@@ -289,7 +314,7 @@ export default {
           @click="deleteSingleItem(index)"
         >
           <gl-icon name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </template>
 
       <template #empty>
@@ -327,6 +352,7 @@ export default {
     </gl-table>
 
     <gl-pagination
+      v-if="!isLoading"
       ref="pagination"
       v-model="currentPage"
       :per-page="tagsPagination.perPage"

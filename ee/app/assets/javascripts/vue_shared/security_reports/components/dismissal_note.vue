@@ -1,14 +1,14 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
     EventItem,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
   },
   props: {
@@ -54,7 +54,7 @@ export default {
 
       const projectLink =
         project && project.url && project.value
-          ? `<a href="${_.escape(project.url)}">${_.escape(project.value)}</a>`
+          ? `<a href="${esc(project.url)}">${esc(project.value)}</a>`
           : null;
 
       if (pipelineLink && projectLink) {
@@ -126,9 +126,9 @@ export default {
               @click="$emit('deleteDismissalComment')"
             />
 
-            <gl-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
+            <gl-deprecated-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
               {{ __('Cancel') }}
-            </gl-button>
+            </gl-deprecated-button>
           </div>
         </template>
       </event-item>

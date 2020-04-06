@@ -241,7 +241,9 @@ describe DraftNotes::PublishService do
     end
 
     it 'sends notifications if all threads are resolved' do
-      expect_any_instance_of(MergeRequests::ResolvedDiscussionNotificationService).to receive(:execute).with(merge_request)
+      expect_next_instance_of(MergeRequests::ResolvedDiscussionNotificationService) do |instance|
+        expect(instance).to receive(:execute).with(merge_request)
+      end
 
       publish
     end

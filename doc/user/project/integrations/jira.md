@@ -37,7 +37,7 @@ configured. Therefore, you will not have to explicitly associate
 a GitLab project with any single Jira project.
 
 If you have one Jira instance, you can pre-fill the settings page with a default
-template. See the [Services Templates][services-templates] docs.
+template. See the [Services Templates](services_templates.md) docs.
 
 In order to enable the Jira service in GitLab, you need to first configure the project in Jira and then enter the correct values in GitLab.
 
@@ -55,7 +55,7 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 
 > **Notes:**
 >
-> - The currently supported Jira versions are `v6.x` and `v7.x.`. GitLab 7.8 or
+> - The currently supported Jira versions are `v6.x, v7.x, v8.x` . GitLab 7.8 or
 >   higher is required.
 > - GitLab 8.14 introduced a new way to integrate with Jira which greatly simplified
 >   the configuration options you have to enter. If you are using an older version,
@@ -65,7 +65,7 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 >   a value of `fromDialog`.
 
 To enable the Jira integration in a project, navigate to the
-[Integrations page](project_services.md#accessing-the-project-services), click
+[Integrations page](overview.md#accessing-integrations), click
 the **Jira** service, and fill in the required details on the page as described
 in the table below.
 
@@ -101,7 +101,7 @@ When you reference a Jira issue, it will always link back to the source commit/M
 
 To disable the automated commenting on Jira issues:
 
-1. Open the [Integrations page](project_services.md#accessing-the-project-services) and select **Jira**.
+1. Open the [Integrations page](overview.md#accessing-integrations) and select **Jira**.
 1. In the **Event Action** section, uncheck **Comment**.
 
 ## Jira issues
@@ -212,5 +212,3 @@ which may lead to a `401 unauthorized` error when testing your Jira integration.
 If CAPTCHA has been triggered, you will not be able to use Jira's REST API to
 authenticate with the Jira site. You will need to log in to your Jira instance
 and complete the CAPTCHA.
-
-[services-templates]: services_templates.md

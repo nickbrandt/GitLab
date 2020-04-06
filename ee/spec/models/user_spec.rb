@@ -91,11 +91,24 @@ describe User do
       let_it_be(:user1) { create(:user, :external) }
       let_it_be(:user2) { create(:user, state: 'blocked') }
       let_it_be(:user3) { create(:user, ghost: true) }
-      let_it_be(:user4) { create(:user, bot_type: 'support_bot') }
-      let_it_be(:user5) { create(:user, state: 'blocked', bot_type: 'support_bot') }
+      let_it_be(:user4) { create(:user, user_type: :support_bot) }
+      let_it_be(:user5) { create(:user, state: 'blocked', user_type: :support_bot) }
 
       it 'returns all active users including active bots but ghost users' do
         expect(described_class.active_without_ghosts).to match_array([user1, user4])
+      end
+    end
+
+    describe '.non_internal' do
+      let!(:user) { create(:user) }
+      let!(:service_user) { create(:user, user_type: :service_user) }
+      let!(:ghost) { described_class.ghost }
+      let!(:alert_bot) { described_class.alert_bot }
+      let!(:non_internal) { [user, service_user] }
+
+      it 'returns users without ghosts and bots' do
+        expect(described_class.non_internal).to match_array(non_internal)
+        expect(non_internal.all?(&:internal?)).to eq(false)
       end
     end
   end
@@ -152,7 +165,7 @@ describe User do
       end
 
       it "returns false for an auditor user if a license is not present" do
-        stub_licensed_features(auditor_user: false)
+        allow(License).to receive(:current).and_return nil
 
         expect(build(:user, :auditor)).not_to be_auditor
       end
@@ -600,13 +613,13 @@ describe User do
       context 'when user is internal' do
         using RSpec::Parameterized::TableSyntax
 
-        where(:bot_type) do
-          User.bot_types.keys
+        where(:bot_user_type) do
+          UserTypeEnums.bots.keys
         end
 
         with_them do
           context 'when user is a bot' do
-            let(:user) { create(:user, bot_type: bot_type) }
+            let(:user) { create(:user, user_type: bot_user_type) }
 
             it 'returns false' do
               expect(user.using_license_seat?).to eq false
@@ -941,9 +954,9 @@ describe User do
 
   describe '#managed_free_namespaces' do
     let_it_be(:user) { create(:user) }
-    let_it_be(:licensed_group) { create(:group, plan: :bronze_plan) }
-    let_it_be(:free_group_z) { create(:group, plan: :default_plan, name: 'Z') }
-    let_it_be(:free_group_a) { create(:group, plan: :default_plan, name: 'A') }
+    let_it_be(:licensed_group) { create(:group, gitlab_subscription: create(:gitlab_subscription, :bronze)) }
+    let_it_be(:free_group_z) { create(:group, name: 'Z', gitlab_subscription: create(:gitlab_subscription, :free)) }
+    let_it_be(:free_group_a) { create(:group, name: 'A', gitlab_subscription: create(:gitlab_subscription, :free)) }
 
     subject { user.managed_free_namespaces }
 
@@ -990,6 +1003,30 @@ describe User do
       end
 
       it { is_expected.to eq [free_group_a, free_group_z] }
+    end
+  end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+
+    let(:user) { create(:user) }
+
+    context 'based on user type' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:user_type, :expected_result) do
+        'service_user'      | true
+        'support_bot'       | false
+        'visual_review_bot' | false
+      end
+
+      with_them do
+        before do
+          user.update(user_type: user_type)
+        end
+
+        it { is_expected.to be expected_result }
+      end
     end
   end
 end

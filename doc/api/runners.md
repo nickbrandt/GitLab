@@ -1,8 +1,6 @@
 # Runners API
 
-> [Introduced][ce-2640] in GitLab 8.5
-
-[ce-2640]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/2640
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/2640) in GitLab 8.5
 
 ## Registration and authentication tokens
 
@@ -469,6 +467,66 @@ DELETE /projects/:id/runners/:runner_id
 
 ```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/9/runners/9"
+```
+
+## List group's runners
+
+List all runners (specific and shared) available in the group as well it's ancestor groups.
+Shared runners are listed if at least one shared runner is defined.
+
+```plaintext
+GET /groups/:id/runners
+GET /groups/:id/runners?type=group_type
+GET /groups/:id/runners?status=active
+GET /groups/:id/runners?tag_list=tag1,tag2
+```
+
+| Attribute  | Type           | Required | Description         |
+|------------|----------------|----------|---------------------|
+| `id`       | integer        | yes      | The ID of the group owned by the authenticated user |
+| `type`     | string         | no       | The type of runners to show, one of: `instance_type`, `group_type`, `project_type` |
+| `status`   | string         | no       | The status of runners to show, one of: `active`, `paused`, `online`, `offline` |
+| `tag_list` | string array   | no       | List of of the runner's tags |
+
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/9/runners"
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 3,
+    "description": "Shared",
+    "ip_address": "127.0.0.1",
+    "active": true,
+    "is_shared": true,
+    "name": "gitlab-runner",
+    "online": null,
+    "status": "not_connected"
+  },
+  {
+    "id": 6,
+    "description": "Test",
+    "ip_address": "127.0.0.1",
+    "active": true,
+    "is_shared": true,
+    "name": "gitlab-runner",
+    "online": false,
+    "status": "offline"
+  },
+  {
+    "id": 8,
+    "description": "Test 2",
+    "ip_address": "127.0.0.1",
+    "active": true,
+    "is_shared": false,
+    "name": "gitlab-runner",
+    "online": null,
+    "status": "not_connected"
+  }
+]
 ```
 
 ## Register a new Runner

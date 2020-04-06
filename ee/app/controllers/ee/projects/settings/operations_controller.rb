@@ -8,30 +8,9 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          before_action :authorize_read_prometheus_alerts!,
-            only: [:reset_alerting_token]
-
-          respond_to :json, only: [:reset_alerting_token]
-
-          def reset_alerting_token
-            result = ::Projects::Operations::UpdateService
-              .new(project, current_user, alerting_params)
-              .execute
-
-            if result[:status] == :success
-              render json: { token: project.alerting_setting.token }
-            else
-              render json: {}, status: :unprocessable_entity
-            end
-          end
-
           helper_method :tracing_setting
 
           private
-
-          def alerting_params
-            { alerting_setting_attributes: { regenerate_token: true } }
-          end
 
           def tracing_setting
             @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
@@ -39,6 +18,11 @@ module EE
 
           def has_tracing_license?
             project.feature_available?(:tracing, current_user)
+          end
+
+          def has_status_page_license?
+            project.feature_available?(:status_page, current_user) &&
+            project.beta_feature_available?(:status_page)
           end
 
           def track_tracing_external_url
@@ -58,7 +42,15 @@ module EE
             permitted_params[:tracing_setting_attributes] = [:external_url]
           end
 
+          if has_status_page_license?
+            permitted_params.merge!(status_page_setting_params)
+          end
+
           permitted_params
+        end
+
+        def status_page_setting_params
+          { status_page_setting_attributes: [:aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
         end
 
         override :track_events

@@ -18,7 +18,6 @@ module EE
           def reference_filters
             [
               ::Banzai::Filter::EpicReferenceFilter,
-              ::Banzai::Filter::DesignReferenceFilter,
               *super
             ]
           end

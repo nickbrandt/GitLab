@@ -31,13 +31,20 @@ module Gitlab
           def collate_remediations(report_data)
             return report_data["vulnerabilities"] || [] unless report_data["remediations"]
 
+            fixes = fixes_from(report_data)
             report_data["vulnerabilities"].map do |vulnerability|
-              # Grab the first available remediation.
-              remediation = report_data["remediations"].find do |remediation|
-                remediation["fixes"].any? { |fix| fix["cve"] == vulnerability["cve"] }
-              end
-
+              remediation = fixes[vulnerability['id']] || fixes[vulnerability['cve']]
               vulnerability.merge("remediations" => [remediation])
+            end
+          end
+
+          def fixes_from(report_data)
+            report_data['remediations'].each_with_object({}) do |item, memo|
+              item['fixes'].each do |fix|
+                id = fix['id'] || fix['cve']
+                memo[id] = item if id
+              end
+              memo
             end
           end
 

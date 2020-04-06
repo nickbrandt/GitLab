@@ -38,7 +38,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
   - [Installing GitLab HA on Amazon Web Services (AWS)](../install/aws/index.md): Set up GitLab High Availability on Amazon AWS.
 - [Geo](geo/replication/index.md): Replicate your GitLab instance to other geographic locations as a read-only fully operational version. **(PREMIUM ONLY)**
 - [Disaster Recovery](geo/disaster_recovery/index.md): Quickly fail-over to a different site with minimal effort in a disaster situation. **(PREMIUM ONLY)**
-- [Pivotal Tile](../install/pivotal/index.md): Deploy GitLab as a pre-configured appliance using Ops Manager (BOSH) for Pivotal Cloud Foundry. **(PREMIUM ONLY)**
+- [Pivotal Tile](../install/pivotal/index.md): Deploy GitLab as a preconfigured appliance using Ops Manager (BOSH) for Pivotal Cloud Foundry. **(PREMIUM ONLY)**
 - [Add License](../user/admin_area/license.md): Upload a license at install time to unlock features that are in paid tiers of GitLab. **(STARTER ONLY)**
 
 ### Configuring GitLab
@@ -86,7 +86,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 - [GitLab versions and maintenance policy](../policy/maintenance.md): Understand GitLab versions and releases (Major, Minor, Patch, Security), as well as update recommendations.
 - [Update GitLab](../update/README.md): Update guides to upgrade your installation to a new version.
-- [Downtimeless updates](../update/README.md#upgrading-without-downtime): Upgrade to a newer major, minor, or patch version of GitLab without taking your GitLab instance offline.
+- [Upgrading without downtime](../update/README.md#upgrading-without-downtime): Upgrade to a newer major, minor, or patch version of GitLab without taking your GitLab instance offline.
 - [Migrate your GitLab CI/CD data to another version of GitLab](../migrate_ci_to_ce/README.md): If you have an old GitLab installation (older than 8.0), follow this guide to migrate your existing GitLab CI/CD data to another version of GitLab.
 
 ### Upgrading or downgrading GitLab
@@ -145,7 +145,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Repository checks](repository_checks.md): Periodic Git repository checks.
 - [Repository storage paths](repository_storage_paths.md): Manage the paths used to store repositories.
 - [Repository storage types](repository_storage_types.md): Information about the different repository storage types.
-- [Repository storage rake tasks](raketasks/storage.md): A collection of rake tasks to list and migrate existing projects and attachments associated with it from Legacy storage to Hashed storage.
+- [Repository storage Rake tasks](raketasks/storage.md): A collection of Rake tasks to list and migrate existing projects and attachments associated with it from Legacy storage to Hashed storage.
 - [Limit repository size](../user/admin_area/settings/account_and_limit_settings.md): Set a hard limit for your repositories' size. **(STARTER ONLY)**
 - [Static objects external storage](static_objects_external_storage.md): Set external storage for static objects in a repository.
 
@@ -200,6 +200,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Log system](logs.md): Where to look for logs.
 - [Sidekiq Troubleshooting](troubleshooting/sidekiq.md): Debug when Sidekiq appears hung and is not processing jobs.
 - [Troubleshooting Elasticsearch](troubleshooting/elasticsearch.md)
+- [Navigating GitLab via Rails console](troubleshooting/navigating_gitlab_via_rails_console.md)
 - [GitLab application limits](instance_limits.md)
 
 ### Support Team Docs
@@ -227,6 +228,6 @@ who are aware of the risks.
   - [GitLab Developer Docs](../development/README.md)
   - [Repairing and recovering broken Git repositories](https://git.seveas.net/repairing-and-recovering-broken-git-repositories.html)
   - [Testing with OpenSSL](https://www.feistyduck.com/library/openssl-cookbook/online/ch-testing-with-openssl.html)
-  - [Strace zine](https://wizardzines.com/zines/strace/)
+  - [`Strace` zine](https://wizardzines.com/zines/strace/)
 - GitLab.com-specific resources:
   - [Group SAML/SCIM setup](troubleshooting/group_saml_scim.md)

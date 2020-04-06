@@ -15,6 +15,7 @@ import {
   getTasksByTypeData,
   flattenTaskByTypeSeries,
   orderByDate,
+  toggleSelectedLabel,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
@@ -300,6 +301,21 @@ describe('Cycle analytics utils', () => {
           });
         });
       });
+    });
+  });
+
+  describe('toggleSelectedLabel', () => {
+    const selectedLabelIds = [1, 2, 3];
+
+    it('will return the array if theres no value given', () => {
+      expect(toggleSelectedLabel({ selectedLabelIds })).toEqual([1, 2, 3]);
+    });
+
+    it('will remove an id that exists', () => {
+      expect(toggleSelectedLabel({ selectedLabelIds, value: 2 })).toEqual([1, 3]);
+    });
+    it('will add an id that does not exist', () => {
+      expect(toggleSelectedLabel({ selectedLabelIds, value: 4 })).toEqual([1, 2, 3, 4]);
     });
   });
 });

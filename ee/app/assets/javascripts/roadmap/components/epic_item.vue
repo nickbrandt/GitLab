@@ -4,6 +4,8 @@ import _ from 'underscore';
 import epicItemDetails from './epic_item_details.vue';
 import epicItemTimeline from './epic_item_timeline.vue';
 
+import CommonMixin from '../mixins/common_mixin';
+
 import { EPIC_HIGHLIGHT_REMOVE_AFTER } from '../constants';
 
 export default {
@@ -11,6 +13,7 @@ export default {
     epicItemDetails,
     epicItemTimeline,
   },
+  mixins: [CommonMixin],
   props: {
     presetType: {
       type: String,
@@ -27,6 +30,34 @@ export default {
     currentGroupId: {
       type: Number,
       required: true,
+    },
+    clientWidth: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+  },
+  computed: {
+    /**
+     * In case Epic start date is out of range
+     * we need to use original date instead of proxy date
+     */
+    startDate() {
+      if (this.epic.startDateOutOfRange) {
+        return this.epic.originalStartDate;
+      }
+
+      return this.epic.startDate;
+    },
+    /**
+     * In case Epic end date is out of range
+     * we need to use original date instead of proxy date
+     */
+    endDate() {
+      if (this.epic.endDateOutOfRange) {
+        return this.epic.originalEndDate;
+      }
+      return this.epic.endDate;
     },
   },
   updated() {
@@ -59,7 +90,11 @@ export default {
 
 <template>
   <div :class="{ 'newly-added-epic': epic.newEpic }" class="epics-list-item clearfix">
-    <epic-item-details :epic="epic" :current-group-id="currentGroupId" />
+    <epic-item-details
+      :epic="epic"
+      :current-group-id="currentGroupId"
+      :timeframe-string="timeframeString(epic)"
+    />
     <epic-item-timeline
       v-for="(timeframeItem, index) in timeframe"
       :key="index"
@@ -67,6 +102,7 @@ export default {
       :timeframe="timeframe"
       :timeframe-item="timeframeItem"
       :epic="epic"
+      :client-width="clientWidth"
     />
   </div>
 </template>

@@ -2,7 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import {
   GlEmptyState,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
   GlLink,
   GlLoadingIcon,
@@ -13,30 +13,25 @@ import {
   GlDropdownDivider,
   GlTooltipDirective,
   GlPagination,
-  GlButtonGroup,
 } from '@gitlab/ui';
 import AccessorUtils from '~/lib/utils/accessor';
-import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import { __ } from '~/locale';
 import { isEmpty } from 'lodash';
+import ErrorTrackingActions from './error_tracking_actions.vue';
 
-export const tableDataClass = 'table-col d-flex d-sm-table-cell align-items-center';
+export const tableDataClass = 'table-col d-flex d-md-table-cell align-items-center';
 
 export default {
   FIRST_PAGE: 1,
   PREV_PAGE: 1,
   NEXT_PAGE: 2,
-  statusButtons: [
-    { status: 'ignored', icon: 'eye-slash', title: __('Ignore') },
-    { status: 'resolved', icon: 'check-circle', title: __('Resolve') },
-  ],
   fields: [
     {
       key: 'error',
       label: __('Error'),
       thClass: 'w-60p',
-      tdClass: `${tableDataClass} px-3`,
+      tdClass: `${tableDataClass} px-3 rounded-top`,
     },
     {
       key: 'events',
@@ -59,14 +54,14 @@ export default {
     {
       key: 'status',
       label: '',
-      tdClass: `${tableDataClass} text-right`,
-    },
-    {
-      key: 'details',
-      tdClass: 'table-col d-sm-none d-flex align-items-center',
-      thClass: 'invisible w-0',
+      tdClass: `${tableDataClass}`,
     },
   ],
+  statusFilters: {
+    unresolved: __('Unresolved'),
+    ignored: __('Ignored'),
+    resolved: __('Resolved'),
+  },
   sortFields: {
     last_seen: __('Last Seen'),
     first_seen: __('First Seen'),
@@ -74,7 +69,7 @@ export default {
   },
   components: {
     GlEmptyState,
-    GlButton,
+    GlDeprecatedButton,
     GlDropdown,
     GlDropdownItem,
     GlDropdownDivider,
@@ -83,10 +78,9 @@ export default {
     GlLoadingIcon,
     GlTable,
     GlFormInput,
-    Icon,
     GlPagination,
     TimeAgo,
-    GlButtonGroup,
+    ErrorTrackingActions,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -136,6 +130,7 @@ export default {
       'sortField',
       'recentSearches',
       'pagination',
+      'statusFilter',
       'cursor',
     ]),
     paginationRequired() {
@@ -169,6 +164,7 @@ export default {
       'fetchPaginatedResults',
       'updateStatus',
       'removeIgnoredResolvedErrors',
+      'filterByStatus',
     ]),
     setSearchText(text) {
       this.errorSearchQuery = text;
@@ -191,10 +187,17 @@ export default {
     isCurrentSortField(field) {
       return field === this.sortField;
     },
+    isCurrentStatusFilter(filter) {
+      return filter === this.statusFilter;
+    },
     getIssueUpdatePath(errorId) {
       return `/${this.projectPath}/-/error_tracking/${errorId}.json`;
     },
-    updateIssueStatus(errorId, status) {
+    filterErrors(status, label) {
+      this.filterValue = label;
+      return this.filterByStatus(status);
+    },
+    updateIssueStatus({ errorId, status }) {
       this.updateStatus({
         endpoint: this.getIssueUpdatePath(errorId),
         status,
@@ -208,8 +211,10 @@ export default {
 <template>
   <div class="error-list">
     <div v-if="errorTrackingEnabled">
-      <div class="row flex-column flex-sm-row align-items-sm-center row-top m-0 mt-sm-2 p-0 p-sm-3">
-        <div class="search-box flex-fill mr-sm-2 my-3 m-sm-0 p-3 p-sm-0">
+      <div
+        class="row flex-column flex-md-row align-items-md-center m-0 mt-sm-2 p-3 p-sm-3 bg-secondary border"
+      >
+        <div class="search-box flex-fill mb-1 mb-md-0">
           <div class="filtered-search-box mb-0">
             <gl-dropdown
               :text="__('Recent searches')"
@@ -245,7 +250,7 @@ export default {
               />
             </div>
             <div class="gl-search-box-by-type-right-icons">
-              <gl-button
+              <gl-deprecated-button
                 v-if="errorSearchQuery.length > 0"
                 v-gl-tooltip.hover
                 :title="__('Clear')"
@@ -254,17 +259,38 @@ export default {
                 @click="errorSearchQuery = ''"
               >
                 <gl-icon name="close" :size="12" />
-              </gl-button>
+              </gl-deprecated-button>
             </div>
           </div>
         </div>
 
         <gl-dropdown
-          class="sort-control"
+          :text="$options.statusFilters[statusFilter]"
+          class="status-dropdown mx-md-1 mb-1 mb-md-0"
+          menu-class="dropdown"
+          :disabled="loading"
+        >
+          <gl-dropdown-item
+            v-for="(label, status) in $options.statusFilters"
+            :key="status"
+            @click="filterErrors(status, label)"
+          >
+            <span class="d-flex">
+              <gl-icon
+                class="flex-shrink-0 append-right-4"
+                :class="{ invisible: !isCurrentStatusFilter(status) }"
+                name="mobile-issue-close"
+              />
+              {{ label }}
+            </span>
+          </gl-dropdown-item>
+        </gl-dropdown>
+
+        <gl-dropdown
           :text="$options.sortFields[sortField]"
           left
           :disabled="loading"
-          menu-class="sort-dropdown"
+          menu-class="dropdown"
         >
           <gl-dropdown-item
             v-for="(label, field) in $options.sortFields"
@@ -272,7 +298,7 @@ export default {
             @click="sortByField(field)"
           >
             <span class="d-flex">
-              <icon
+              <gl-icon
                 class="flex-shrink-0 append-right-4"
                 :class="{ invisible: !isCurrentSortField(field) }"
                 name="mobile-issue-close"
@@ -288,25 +314,25 @@ export default {
       </div>
 
       <template v-else>
-        <h4 class="d-block d-sm-none my-3">{{ __('Open errors') }}</h4>
+        <h4 class="d-block d-md-none my-3">{{ __('Open errors') }}</h4>
 
         <gl-table
-          class="mt-3"
+          class="error-list-table mt-3"
           :items="errors"
           :fields="$options.fields"
           :show-empty="true"
           fixed
-          stacked="sm"
+          stacked="md"
           tbody-tr-class="table-row mb-4"
         >
           <template #head(error)>
-            <div class="d-none d-sm-block">{{ __('Open errors') }}</div>
+            <div class="d-none d-md-block">{{ __('Open errors') }}</div>
           </template>
           <template #head(events)="data">
-            <div class="text-sm-right">{{ data.label }}</div>
+            <div class="text-md-right">{{ data.label }}</div>
           </template>
           <template #head(users)="data">
-            <div class="text-sm-right">{{ data.label }}</div>
+            <div class="text-md-right">{{ data.label }}</div>
           </template>
 
           <template #cell(error)="errors">
@@ -328,32 +354,12 @@ export default {
           </template>
 
           <template #cell(lastSeen)="errors">
-            <div class="text-md-left text-right">
+            <div class="text-lg-left text-right">
               <time-ago :time="errors.item.lastSeen" class="text-secondary" />
             </div>
           </template>
           <template #cell(status)="errors">
-            <gl-button-group>
-              <gl-button
-                v-for="button in $options.statusButtons"
-                :key="button.status"
-                :ref="button.title.toLowerCase() + 'Error'"
-                v-gl-tooltip.hover
-                :title="button.title"
-                @click="updateIssueStatus(errors.item.id, button.status)"
-              >
-                <gl-icon :name="button.icon" :size="12" />
-              </gl-button>
-            </gl-button-group>
-          </template>
-          <template #cell(details)="errors">
-            <gl-button
-              :href="getDetailsLink(errors.item.id)"
-              variant="outline-info"
-              class="d-block"
-            >
-              {{ __('More details') }}
-            </gl-button>
+            <error-tracking-actions :error="errors.item" @update-issue-status="updateIssueStatus" />
           </template>
           <template #empty>
             {{ __('No errors to display.') }}

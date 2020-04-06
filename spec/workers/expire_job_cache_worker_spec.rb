@@ -21,12 +21,12 @@ describe ExpireJobCacheWorker do
           allow(Gitlab::EtagCaching::Store).to receive(:new) { spy_store }
 
           expect(spy_store).to receive(:touch)
-            .exactly(IdempotentWorkerHelper::WORKER_EXEC_TIMES).times
+            .exactly(worker_exec_times).times
             .with(pipeline_path)
             .and_call_original
 
           expect(spy_store).to receive(:touch)
-            .exactly(IdempotentWorkerHelper::WORKER_EXEC_TIMES).times
+            .exactly(worker_exec_times).times
             .with(job_path)
             .and_call_original
 
@@ -39,7 +39,7 @@ describe ExpireJobCacheWorker do
       it 'does not change the etag store' do
         expect(Gitlab::EtagCaching::Store).not_to receive(:new)
 
-        perform_multiple(9999)
+        perform_multiple(non_existing_record_id)
       end
     end
   end

@@ -6,11 +6,6 @@ module EE
       module MetricsController
         extend ActiveSupport::Concern
 
-        prepended do
-          before_action :check_custom_metrics_license!,
-            only: [:validate_query, :index, :create, :update, :edit, :destroy]
-        end
-
         def validate_query
           respond_to do |format|
             format.json do
@@ -91,10 +86,6 @@ module EE
         end
 
         private
-
-        def check_custom_metrics_license!
-          render_404 unless project.feature_available?(:custom_prometheus_metrics)
-        end
 
         def prometheus_metric
           @prometheus_metric ||= ::PrometheusMetricsFinder.new(id: params[:id]).execute.first

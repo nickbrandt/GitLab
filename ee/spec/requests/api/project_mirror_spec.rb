@@ -76,6 +76,10 @@ describe API::ProjectMirror do
             }
           end
 
+          before do
+            stub_licensed_features(ci_cd_projects: true, github_project_service_integration: true)
+          end
+
           it 'triggers a pipeline for pull request' do
             expect(Ci::CreatePipelineService)
               .to receive(:new)
@@ -131,6 +135,30 @@ describe API::ProjectMirror do
               do_post(params: params, user: user, headers: {})
 
               expect(response).to have_gitlab_http_status(:ok)
+            end
+          end
+
+          context 'when ci_cd_projects is not available' do
+            before do
+              stub_licensed_features(ci_cd_projects: false, github_project_service_integration: true)
+            end
+
+            it 'returns the error message' do
+              do_post(params: params)
+
+              expect(response).to have_gitlab_http_status(:unprocessable_entity)
+            end
+          end
+
+          context 'when github_project_service_integration is not available' do
+            before do
+              stub_licensed_features(github_project_service_integration: false, ci_cd_projects: true)
+            end
+
+            it 'returns the error message' do
+              do_post(params: params)
+
+              expect(response).to have_gitlab_http_status(:unprocessable_entity)
             end
           end
         end
@@ -262,6 +290,24 @@ describe API::ProjectMirror do
                 expect(response).to have_gitlab_http_status(:ok)
               end
             end
+          end
+
+          context 'when repository_mirrors feature is not available' do
+            before do
+              stub_licensed_features(repository_mirrors: false)
+              project_mirrored.clear_memoization(:licensed_feature_available)
+            end
+
+            it_behaves_like 'an API endpoint that does not trigger pull mirroring operation', :bad_request
+          end
+
+          context 'when repository_mirrors feature is available' do
+            before do
+              stub_licensed_features(repository_mirrors: true)
+              project_mirrored.clear_memoization(:licensed_feature_available)
+            end
+
+            it_behaves_like 'an API endpoint that triggers pull mirroring operation'
           end
         end
 

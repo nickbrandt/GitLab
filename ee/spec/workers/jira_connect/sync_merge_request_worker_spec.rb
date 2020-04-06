@@ -18,7 +18,7 @@ describe JiraConnect::SyncMergeRequestWorker do
     end
 
     context 'when MR no longer exists' do
-      let(:merge_request_id) { MergeRequest.maximum(:id).to_i + 1 }
+      let(:merge_request_id) { non_existing_record_id }
 
       it 'does not call JiraConnect::SyncService' do
         expect(JiraConnect::SyncService).not_to receive(:new)

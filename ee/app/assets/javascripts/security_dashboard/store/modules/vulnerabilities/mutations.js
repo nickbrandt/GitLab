@@ -101,7 +101,6 @@ export default {
   },
   [types.REQUEST_CREATE_ISSUE](state) {
     state.isCreatingIssue = true;
-    Vue.set(state.modal, 'isCreatingNewIssue', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_CREATE_ISSUE_SUCCESS](state, payload) {
@@ -110,12 +109,10 @@ export default {
   },
   [types.RECEIVE_CREATE_ISSUE_ERROR](state) {
     state.isCreatingIssue = false;
-    Vue.set(state.modal, 'isCreatingNewIssue', false);
     Vue.set(state.modal, 'error', __('There was an error creating the issue'));
   },
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state, payload) {
@@ -124,12 +121,10 @@ export default {
     );
     vulnerability.dismissal_feedback = payload.data;
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', true);
   },
   [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(
       state.modal,
       'error',
@@ -167,7 +162,6 @@ export default {
   },
   [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
@@ -177,18 +171,15 @@ export default {
     if (vulnerability) {
       vulnerability.dismissal_feedback = payload.data;
       state.isDismissingVulnerability = false;
-      Vue.set(state.modal, 'isDismissingVulnerability', false);
       Vue.set(state.modal.vulnerability, 'isDismissed', true);
     }
   },
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', s__('Security Reports|There was an error adding the comment.'));
   },
   [types.REQUEST_DELETE_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](state, payload) {
@@ -196,18 +187,15 @@ export default {
     if (vulnerability) {
       vulnerability.dismissal_feedback = payload.data;
       state.isDismissingVulnerability = false;
-      Vue.set(state.modal, 'isDismissingVulnerability', false);
       Vue.set(state.modal.vulnerability, 'isDismissed', true);
     }
   },
   [types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](state) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', s__('Security Reports|There was an error deleting the comment.'));
   },
   [types.REQUEST_REVERT_DISMISSAL](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload) {
@@ -216,12 +204,10 @@ export default {
     );
     vulnerability.dismissal_feedback = null;
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', false);
   },
   [types.RECEIVE_REVERT_DISMISSAL_ERROR](state) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(
       state.modal,
       'error',
@@ -236,7 +222,6 @@ export default {
   },
   [types.REQUEST_CREATE_MERGE_REQUEST](state) {
     state.isCreatingMergeRequest = true;
-    Vue.set(state.modal, 'isCreatingMergeRequest', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
@@ -245,7 +230,7 @@ export default {
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state) {
     state.isCreatingIssue = false;
-    Vue.set(state.modal, 'isCreatingMergeRequest', false);
+    state.isCreatingMergeRequest = false;
     Vue.set(
       state.modal,
       'error',

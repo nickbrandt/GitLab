@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::LDAP::Config do
+describe Gitlab::Auth::Ldap::Config do
   include LdapHelpers
 
   let(:config) { described_class.new('ldapmain') }
@@ -499,6 +499,20 @@ AtlErSqafbECNDSwS5BX8yDpu5yRBJ4xegO/rNlmb8ICRYkuJapD1xXicFOsmfUK
         'email'    => %w(userPrincipalName),
         'name'     => 'cn'
       })
+    end
+  end
+
+  describe '#default_attributes' do
+    it 'includes the configured uid attribute in the username attributes' do
+      stub_ldap_config(options: { 'uid' => 'my_uid_attr' })
+
+      expect(config.default_attributes['username']).to include('my_uid_attr')
+    end
+
+    it 'only includes unique values for username attributes' do
+      stub_ldap_config(options: { 'uid' => 'uid' })
+
+      expect(config.default_attributes['username']).to contain_exactly('uid', 'sAMAccountName', 'userid')
     end
   end
 

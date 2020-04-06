@@ -11,7 +11,7 @@ describe DesignManagement::DesignUserNotesCountService, :use_clean_rails_memory_
 
   describe '#count' do
     it 'returns the count of notes' do
-      create_list(:diff_note_on_design, 3, noteable: design, project: design.project)
+      create_list(:diff_note_on_design, 3, noteable: design)
 
       expect(subject.count).to eq(3)
     end
@@ -33,7 +33,7 @@ describe DesignManagement::DesignUserNotesCountService, :use_clean_rails_memory_
     end
 
     it 'changes when a note is destroyed' do
-      note = create(:diff_note_on_design, noteable: design, project: design.project)
+      note = create(:diff_note_on_design, noteable: design)
 
       expect do
         Notes::DestroyService.new(note.project, note.author).execute(note)

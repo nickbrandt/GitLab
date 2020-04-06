@@ -69,7 +69,7 @@ FactoryBot.define do
       status { :success }
 
       after(:build) do |pipeline, evaluator|
-        pipeline.builds << build(:ee_ci_build, :license_management_feature_branch, pipeline: pipeline, project: pipeline.project)
+        pipeline.builds << build(:ee_ci_build, :license_scanning_feature_branch, pipeline: pipeline, project: pipeline.project)
       end
     end
 
@@ -77,7 +77,7 @@ FactoryBot.define do
       status { :success }
 
       after(:build) do |pipeline, evaluator|
-        pipeline.builds << build(:ee_ci_build, :corrupted_license_management_report, pipeline: pipeline, project: pipeline.project)
+        pipeline.builds << build(:ee_ci_build, :corrupted_license_scanning_report, pipeline: pipeline, project: pipeline.project)
       end
     end
 

@@ -56,8 +56,6 @@ describe Issuable do
   end
 
   describe "Scope" do
-    subject { build(:issue) }
-
     it { expect(issuable_class).to respond_to(:opened) }
     it { expect(issuable_class).to respond_to(:closed) }
     it { expect(issuable_class).to respond_to(:assigned) }
@@ -161,8 +159,7 @@ describe Issuable do
     end
 
     it 'returns issues with a partially matching description' do
-      expect(issuable_class.full_search(searchable_issue.description))
-        .to eq([searchable_issue])
+      expect(issuable_class.full_search('cut')).to eq([searchable_issue])
     end
 
     it 'returns issues with a matching description regardless of the casing' do

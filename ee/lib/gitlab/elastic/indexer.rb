@@ -83,10 +83,13 @@ module Gitlab
           'ELASTIC_CONNECTION_INFO' => elasticsearch_config(target),
           'GITALY_CONNECTION_INFO'  => gitaly_connection_info,
           'FROM_SHA'                => from_sha,
-          'TO_SHA'                  => to_sha
+          'TO_SHA'                  => to_sha,
+          'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
+          'SSL_CERT_FILE'           => OpenSSL::X509::DEFAULT_CERT_FILE,
+          'SSL_CERT_DIR'            => OpenSSL::X509::DEFAULT_CERT_DIR
         }
 
-        # SSL certificates related env will be sent to child process if configured
+        # Users can override default SSL certificate path via these envs
         %w(SSL_CERT_FILE SSL_CERT_DIR).each_with_object(vars) do |key, hash|
           hash[key] = ENV[key] if ENV.key?(key)
         end

@@ -88,7 +88,7 @@ module Gitlab
           else
             # If no user is provided, try LDAP.
             #   LDAP users are only authenticated via LDAP
-            authenticators << Gitlab::Auth::LDAP::Authentication
+            authenticators << Gitlab::Auth::Ldap::Authentication
           end
 
           authenticators.compact!
@@ -134,7 +134,7 @@ module Gitlab
       end
 
       def authenticate_using_internal_or_ldap_password?
-        Gitlab::CurrentSettings.password_authentication_enabled_for_git? || Gitlab::Auth::LDAP::Config.enabled?
+        Gitlab::CurrentSettings.password_authentication_enabled_for_git? || Gitlab::Auth::Ldap::Config.enabled?
       end
 
       def service_request_check(login, password, project)
@@ -164,25 +164,25 @@ module Gitlab
         Gitlab::Auth::Result.new(user, nil, :gitlab_or_ldap, full_authentication_abilities)
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def oauth_access_token_check(login, password)
         if login == "oauth2" && password.present?
           token = Doorkeeper::AccessToken.by_token(password)
 
           if valid_oauth_token?(token)
-            user = User.find_by(id: token.resource_owner_id)
+            user = User.id_in(token.resource_owner_id).first
+            return unless user&.can?(:log_in)
+
             Gitlab::Auth::Result.new(user, nil, :oauth, full_authentication_abilities)
           end
         end
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       def personal_access_token_check(password)
         return unless password.present?
 
         token = PersonalAccessTokensFinder.new(state: 'active').find_by_token(password)
 
-        if token && valid_scoped_token?(token, all_available_scopes)
+        if token && valid_scoped_token?(token, all_available_scopes) && token.user.can?(:log_in)
           Gitlab::Auth::Result.new(token.user, nil, :personal_access_token, abilities_for_scopes(token.scopes))
         end
       end
@@ -260,6 +260,8 @@ module Gitlab
         return unless build.project.builds_enabled?
 
         if build.user
+          return unless build.user.can?(:log_in)
+
           # If user is assigned to build, use restricted credentials of user
           Gitlab::Auth::Result.new(build.user, build.project, :build, build_authentication_abilities)
         else

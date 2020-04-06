@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import DismissButton from 'ee/vue_shared/security_reports/components/dismiss_button.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import { s__ } from '~/locale';
@@ -9,7 +9,7 @@ export default {
   name: 'ModalFooter',
   components: {
     DismissButton,
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
     SplitButton,
   },
@@ -48,6 +48,18 @@ export default {
       required: false,
       default: false,
     },
+    isCreatingIssue: {
+      type: Boolean,
+      required: true,
+    },
+    isDismissingVulnerability: {
+      type: Boolean,
+      required: true,
+    },
+    isCreatingMergeRequest: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     actionButtons() {
@@ -55,13 +67,13 @@ export default {
       const issueButton = {
         name: s__('ciReport|Create issue'),
         tagline: s__('ciReport|Investigate this vulnerability by creating an issue'),
-        isLoading: this.modal.isCreatingNewIssue,
+        isLoading: this.isCreatingIssue,
         action: 'createNewIssue',
       };
       const MRButton = {
         name: s__('ciReport|Resolve with merge request'),
         tagline: s__('ciReport|Automatically apply the patch in a new branch'),
-        isLoading: this.modal.isCreatingMergeRequest,
+        isLoading: this.isCreatingMergeRequest,
         action: 'createMergeRequest',
       };
       const DownloadButton = {
@@ -90,13 +102,13 @@ export default {
 
 <template>
   <div>
-    <gl-button data-dismiss="modal" :disabled="disabled">
+    <gl-deprecated-button data-dismiss="modal" :disabled="disabled">
       {{ __('Cancel') }}
-    </gl-button>
+    </gl-deprecated-button>
 
     <dismiss-button
       v-if="canDismissVulnerability"
-      :is-dismissing="modal.isDismissingVulnerability"
+      :is-dismissing="isDismissingVulnerability"
       :is-dismissed="isDismissed"
       :disabled="disabled"
       @dismissVulnerability="$emit('dismissVulnerability')"

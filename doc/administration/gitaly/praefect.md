@@ -28,7 +28,7 @@ reference architecture additionally requires:
 - 1 PostgreSQL server (PostgreSQL 9.6 or newer)
 - 3 Gitaly nodes (1 primary, 2 secondary)
 
-![Alpha architecture diagram](img/praefect_architecture_v12_9.png)
+![Alpha architecture diagram](img/praefect_architecture_v12_10.png)
 
 See the [design
 document](https://gitlab.com/gitlab-org/gitaly/-/blob/master/doc/design_ha.md)
@@ -44,6 +44,7 @@ package (highly recommended), follow the steps below:
 1. [Configuring the Praefect proxy/router](#praefect)
 1. [Configuring each Gitaly node](#gitaly) (once for each Gitaly node)
 1. [Updating the GitLab server configuration](#gitlab)
+1. [Configure Grafana](#grafana)
 
 ### Preparation
 
@@ -84,6 +85,8 @@ with secure tokens as you complete the setup process.
    Praefect cluster directly; that could lead to data loss.
 1. `PRAEFECT_SQL_PASSWORD`: this password is used by Praefect to connect to
    PostgreSQL.
+1. `GRAFANA_PASSWORD`: this password is used to access the `admin`
+   account in the Grafana dashboards.
 
 We will note in the instructions below where these secrets are required.
 
@@ -121,7 +124,7 @@ node, using `psql` which is installed by GitLab Omnibus.
 
    ```sql
    CREATE ROLE praefect WITH LOGIN CREATEDB PASSWORD 'PRAEFECT_SQL_PASSWORD';
-    ```
+   ```
 
 1. Reconnect to the PostgreSQL server, this time as the `praefect` user:
 
@@ -184,6 +187,10 @@ application server, or a Gitaly node.
    # Make Praefect accept connections on all network interfaces.
    # Use firewalls to restrict access to this address/port.
    praefect['listen_addr'] = '0.0.0.0:2305'
+
+   # Enable Prometheus metrics access to Praefect. You must use firewalls
+   # to restrict access to this address/port.
+   praefect['prometheus_listen_addr'] = '0.0.0.0:9652'
    ```
 
 1. Configure a strong `auth_token` for **Praefect** by editing
@@ -272,7 +279,7 @@ application server, or a Gitaly node.
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell
-   sudo gitlab-ctl reconfigure
+   gitlab-ctl reconfigure
    ```
 
 1. Verify that Praefect can reach PostgreSQL:
@@ -354,6 +361,10 @@ documentation](index.md#3-gitaly-server-configuration).
    # Make Gitaly accept connections on all network interfaces.
    # Use firewalls to restrict access to this address/port.
    gitaly['listen_addr'] = '0.0.0.0:8075'
+
+   # Enable Prometheus metrics access to Gitaly. You must use firewalls
+   # to restrict access to this address/port.
+   gitaly['prometheus_listen_addr'] = '0.0.0.0:9236'
    ```
 
 1. Configure a strong `auth_token` for **Gitaly** by editing
@@ -410,10 +421,16 @@ documentation](index.md#3-gitaly-server-configuration).
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure Gitaly](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell
-   sudo gitlab-ctl reconfigure
+   gitlab-ctl reconfigure
    ```
 
-**Complete these steps for each Gitaly node!**
+1. To ensure that Gitaly [has updated its Prometheus listen address](https://gitlab.com/gitlab-org/gitaly/-/issues/2521), [restart Gitaly](../restart_gitlab.md#omnibus-gitlab-restart):
+
+   ```shell
+   gitlab-ctl restart gitaly
+   ```
+
+**The steps above must be completed for each Gitaly node!**
 
 After all Gitaly nodes are configured, you can run the Praefect connection
 checker to verify Praefect can connect to all Gitaly servers in the Praefect
@@ -423,6 +440,34 @@ config.
 
    ```shell
    sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dial-nodes
+   ```
+
+1. Enable automatic failover by editing `/etc/gitlab/gitlab.rb`:
+
+   ```ruby
+   praefect['failover_enabled'] = true
+   ```
+
+   When automatic failover is enabled, Praefect checks the health of internal
+   Gitaly nodes. If the primary has a certain amount of health checks fail, it
+   will promote one of the secondaries to be primary, and demote the primary to
+   be a secondary.
+
+   Manual failover is possible by updating `praefect['virtual_storages']` and
+   nominating a new primary node.
+
+   NOTE: **Note:**: Automatic failover is not yet supported for setups with
+   multiple Praefect nodes. There is currently no coordination between Praefect
+   nodes, which could result in two Praefect instances thinking two different
+   Gitaly nodes are the primary. Follow issue
+   [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for
+   updates.
+
+1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
+   Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
+
+   ```shell
+   gitlab-ctl reconfigure
    ```
 
 ### GitLab
@@ -453,7 +498,7 @@ Particular attention should be shown to:
 
    You will need to replace:
 
-   - `PRAEFECT_URL_OR_IP` with the IP/host address of the Praefect node
+   - `PRAEFECT_HOST` with the IP address or hostname of the Praefect node
    - `PRAEFECT_EXTERNAL_TOKEN` with the real secret
 
    ```ruby
@@ -462,7 +507,7 @@ Particular attention should be shown to:
        "path" => "/var/opt/gitlab/git-data"
      },
      "praefect" => {
-       "gitaly_address" => "tcp://PRAEFECT_URL_OR_IP:2305",
+       "gitaly_address" => "tcp://PRAEFECT_HOST:2305",
        "gitaly_token" => 'PRAEFECT_EXTERNAL_TOKEN'
      }
    })
@@ -478,16 +523,62 @@ Particular attention should be shown to:
    gitlab_shell['secret_token'] = 'GITLAB_SHELL_SECRET_TOKEN'
    ```
 
+1. Configure the `external_url` so that files could be served by GitLab
+   by proper endpoint access by editing `/etc/gitlab/gitlab.rb`:
+
+   You will need to replace `GITLAB_SERVER_URL` with the real URL on which
+   current GitLab instance is serving:
+
+   ```ruby
+   external_url 'GITLAB_SERVER_URL'
+   ```
+
+1. Add Prometheus monitoring settings by editing `/etc/gitlab/gitlab.rb`.
+
+   You will need to replace:
+
+   - `PRAEFECT_HOST` with the IP address or hostname of the Praefect node
+   - `GITALY_HOST` with the IP address or hostname of each Gitaly node
+
+   ```ruby
+   prometheus['scrape_configs'] = [
+     {
+       'job_name' => 'praefect',
+       'static_configs' => [
+         'targets' => [
+           'PRAEFECT_HOST:9652' # praefect
+         ]
+       ]
+     },
+     {
+       'job_name' => 'praefect-gitaly',
+       'static_configs' => [
+         'targets' => [
+           'GITALY_HOST:9236', # gitaly-1
+           'GITALY_HOST:9236', # gitaly-2
+           'GITALY_HOST:9236', # gitaly-3
+         ]
+       ]
+     }
+   ]
+   ```
+
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell
-   sudo gitlab-ctl reconfigure
+   gitlab-ctl reconfigure
+   ```
+
+1. Verify each `gitlab-shell` on each Gitaly instance can reach GitLab. On each Gitaly instance run:
+
+   ```shell
+   /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
    ```
 
 1. Verify that GitLab can reach Praefect:
 
    ```shell
-   sudo gitlab-rake gitlab:gitaly:check
+   gitlab-rake gitlab:gitaly:check
    ```
 
 1. Update the **Repository storage** settings from **Admin Area > Settings >
@@ -497,12 +588,103 @@ Particular attention should be shown to:
    - Deselect the **default** storage location
    - Select the **praefect** storage location
 
+   ![Update repository storage](img/praefect_storage_v12_10.png)
+
 1. Verify everything is still working by creating a new project. Check the
    "Initialize repository with a README" box so that there is content in the
    repository that viewed. If the project is created, and you can see the
    README file, it works!
 
-Congratulations! You have configured a highly available Praefect cluster, and
+### Grafana
+
+Grafana is included with GitLab, and can be used to monitor your Praefect
+cluster. See [Grafana Dashboard
+Service](https://docs.gitlab.com/omnibus/settings/grafana.html)
+for detailed documentation.
+
+To get started quickly:
+
+1. SSH into the **GitLab** node and login as root:
+
+   ```shell
+   sudo -i
+   ```
+
+1. Enable the Grafana login form by editing `/etc/gitlab/gitlab.rb`.
+
+   ```ruby
+   grafana['disable_login_form'] = false
+   ```
+
+1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
+   GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure):
+
+   ```shell
+   gitlab-ctl reconfigure
+   ```
+
+1. Set the Grafana admin password. This command will prompt you to enter a new
+   password:
+
+   ```shell
+   gitlab-ctl set-grafana-password
+   ```
+
+1. In your web browser, open `/-/grafana` (e.g.
+   `https://gitlab.example.com/-/grafana`) on your GitLab server.
+
+   Login using the password you set, and the username `admin`.
+
+1. Go to **Explore** and query `gitlab_build_info` to verify that you are
+   getting metrics from all your machines.
+
+Congratulations! You've configured an observable highly available Praefect
+cluster.
+
+## Automatic failover and leader election
+
+Praefect regularly checks the health of each backend Gitaly node. This
+information can be used to automatically failover to a new primary node if the
+current primary node is found to be unhealthy.
+
+- **Manual:** Automatic failover is disabled. The primary node can be
+  reconfigured in `/etc/gitlab/gitlab.rb` on the Praefect node. Modify the
+  `praefect['virtual_storages']` field by moving the `primary = true` to promote
+  a different Gitaly node to primary. In the steps above, `gitaly-1` was set to
+  the primary.
+- **Memory:** Enabled by setting `praefect['failover_enabled'] = true` in
+  `/etc/gitlab/gitlab.rb` on the Praefect node. If a sufficient number of health
+  checks fail for the current primary backend Gitaly node, and new primary will
+  be elected. **Do not use with multiple Praefect nodes!** Using with multiple
+  Praefect nodes is likely to result in a split brain.
+- **PostgreSQL:** Coming soon. See isse
+  [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for updates.
+
+It is likely that we will implement support for Consul, and a cloud native
+strategy in the future.
+
+## Backend Node Recovery
+
+When a Praefect backend node fails and is no longer able to
+replicate changes, the backend node will start to drift from the primary. If
+that node eventually recovers, it will need to be reconciled with the current
+primary. The primary node is considered the single source of truth for the
+state of a shard. The Praefect `reconcile` subcommand allows for the manual
+reconciliation between a backend node and the current primary.
+
+Run the following command on the Praefect server after all placeholders
+(`<virtual-storage>` and `<target-storage>`) have been replaced:
+
+```shell
+sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml reconcile -virtual <virtual-storage> -target <target-storage>
+```
+
+- Replace the placeholder `<virtual-storage>` with the virtual storage containing the backend node storage to be checked.
+- Replace the placeholder `<target-storage>` with the backend storage name.
+
+The command will return a list of repositories that were found to be
+inconsistent against the current primary. Each of these inconsistencies will
+also be logged with an accompanying replication job ID.
 
 ## Migrating existing repositories to Praefect
 
@@ -513,10 +695,7 @@ Repositories may be moved from one storage location using the [Repository
 API](../../api/projects.html#edit-project):
 
 ```shell
-curl --request PUT \
-  --header "PRIVATE-TOKEN: <your_access_token>" \
-  --data "repository_storage=praefect" \
-  https://example.gitlab.com/api/v4/projects/123
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "repository_storage=praefect" https://example.gitlab.com/api/v4/projects/123
 ```
 
 ## Debugging Praefect

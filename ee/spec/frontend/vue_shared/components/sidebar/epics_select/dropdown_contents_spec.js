@@ -111,6 +111,16 @@ describe('EpicsSelect', () => {
             .classes(),
         ).toContain('is-active');
       });
+
+      it('should render string "No matches found" when `epics` array is empty', () => {
+        wrapper.setProps({
+          epics: [],
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.text()).toContain('No matches found');
+        });
+      });
     });
   });
 });

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, :migration, schema: 20200204113223 do
+describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, schema: 20200204113223 do
   let(:users_table) { table(:users) }
   let(:namespaces_table) { table(:namespaces) }
   let(:projects_table) { table(:projects) }
@@ -234,10 +234,8 @@ describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, :migrati
   end
 
   context 'deleted user' do
-    let(:nonexistent_user_id) { User.maximum(:id).to_i + 999 }
-
     it 'does not fail' do
-      expect { described_class.new.perform([nonexistent_user_id]) }.not_to raise_error
+      expect { described_class.new.perform([non_existing_record_id]) }.not_to raise_error
     end
   end
 end

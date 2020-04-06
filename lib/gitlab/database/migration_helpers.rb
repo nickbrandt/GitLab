@@ -375,8 +375,11 @@ module Gitlab
       # less "complex" without introducing extra methods (which actually will
       # make things _more_ complex).
       #
+      # `batch_column_name` option is for tables without primary key, in this
+      # case an other unique integer column can be used. Example: :user_id
+      #
       # rubocop: disable Metrics/AbcSize
-      def update_column_in_batches(table, column, value, batch_size: nil)
+      def update_column_in_batches(table, column, value, batch_size: nil, batch_column_name: :id)
         if transaction_open?
           raise 'update_column_in_batches can not be run inside a transaction, ' \
             'you can disable transactions by calling disable_ddl_transaction! ' \
@@ -403,14 +406,14 @@ module Gitlab
           batch_size = max_size if batch_size > max_size
         end
 
-        start_arel = table.project(table[:id]).order(table[:id].asc).take(1)
+        start_arel = table.project(table[batch_column_name]).order(table[batch_column_name].asc).take(1)
         start_arel = yield table, start_arel if block_given?
-        start_id = exec_query(start_arel.to_sql).to_a.first['id'].to_i
+        start_id = exec_query(start_arel.to_sql).to_a.first[batch_column_name.to_s].to_i
 
         loop do
-          stop_arel = table.project(table[:id])
-            .where(table[:id].gteq(start_id))
-            .order(table[:id].asc)
+          stop_arel = table.project(table[batch_column_name])
+            .where(table[batch_column_name].gteq(start_id))
+            .order(table[batch_column_name].asc)
             .take(1)
             .skip(batch_size)
 
@@ -420,12 +423,12 @@ module Gitlab
           update_arel = Arel::UpdateManager.new
             .table(table)
             .set([[table[column], value]])
-            .where(table[:id].gteq(start_id))
+            .where(table[batch_column_name].gteq(start_id))
 
           if stop_row
-            stop_id = stop_row['id'].to_i
+            stop_id = stop_row[batch_column_name.to_s].to_i
             start_id = stop_id
-            update_arel = update_arel.where(table[:id].lt(stop_id))
+            update_arel = update_arel.where(table[batch_column_name].lt(stop_id))
           end
 
           update_arel = yield table, update_arel if block_given?
@@ -461,7 +464,7 @@ module Gitlab
       #
       # This method can also take a block which is passed directly to the
       # `update_column_in_batches` method.
-      def add_column_with_default(table, column, type, default:, limit: nil, allow_null: false, &block)
+      def add_column_with_default(table, column, type, default:, limit: nil, allow_null: false, update_column_in_batches_args: {}, &block)
         if transaction_open?
           raise 'add_column_with_default can not be run inside a transaction, ' \
             'you can disable transactions by calling disable_ddl_transaction! ' \
@@ -483,7 +486,12 @@ module Gitlab
 
           begin
             default_after_type_cast = connection.type_cast(default, column_for(table, column))
-            update_column_in_batches(table, column, default_after_type_cast, &block)
+
+            if update_column_in_batches_args.any?
+              update_column_in_batches(table, column, default_after_type_cast, **update_column_in_batches_args, &block)
+            else
+              update_column_in_batches(table, column, default_after_type_cast, &block)
+            end
 
             change_column_null(table, column, false) unless allow_null
           # We want to rescue _all_ exceptions here, even those that don't inherit
@@ -1121,11 +1129,14 @@ into similar problems in the future (e.g. when new tables are created).
       end
 
       def create_or_update_plan_limit(limit_name, plan_name, limit_value)
+        limit_name_quoted = quote_column_name(limit_name)
+        plan_name_quoted = quote(plan_name)
+        limit_value_quoted = quote(limit_value)
+
         execute <<~SQL
-          INSERT INTO plan_limits (plan_id, #{quote_column_name(limit_name)})
-          VALUES
-            ((SELECT id FROM plans WHERE name = #{quote(plan_name)} LIMIT 1), #{quote(limit_value)})
-          ON CONFLICT (plan_id) DO UPDATE SET #{quote_column_name(limit_name)} = EXCLUDED.#{quote_column_name(limit_name)};
+          INSERT INTO plan_limits (plan_id, #{limit_name_quoted})
+          SELECT id, #{limit_value_quoted} FROM plans WHERE name = #{plan_name_quoted} LIMIT 1
+          ON CONFLICT (plan_id) DO UPDATE SET #{limit_name_quoted} = EXCLUDED.#{limit_name_quoted};
         SQL
       end
 

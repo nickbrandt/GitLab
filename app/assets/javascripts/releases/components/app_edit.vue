@@ -1,22 +1,29 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton, GlFormInput, GlFormGroup } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink, GlFormInput, GlFormGroup } from '@gitlab/ui';
 import { escape as esc } from 'lodash';
 import { __, sprintf } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
+import { BACK_URL_PARAM } from '~/releases/constants';
+import { getParameterByName } from '~/lib/utils/common_utils';
+import AssetLinksForm from './asset_links_form.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'ReleaseEditApp',
   components: {
     GlFormInput,
     GlFormGroup,
-    GlButton,
+    GlDeprecatedButton,
+    GlLink,
     MarkdownField,
+    AssetLinksForm,
   },
   directives: {
     autofocusonshow,
   },
+  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState('detail', [
       'isFetchingRelease',
@@ -74,6 +81,12 @@ export default {
         this.updateReleaseNotes(notes);
       },
     },
+    cancelPath() {
+      return getParameterByName(BACK_URL_PARAM) || this.releasesPagePath;
+    },
+    showAssetLinksForm() {
+      return this.glFeatures.releaseAssetLinkEditing;
+    },
   },
   created() {
     this.fetchRelease();
@@ -84,7 +97,6 @@ export default {
       'updateRelease',
       'updateReleaseTitle',
       'updateReleaseNotes',
-      'navigateToReleasesPage',
     ]),
   },
 };
@@ -148,24 +160,20 @@ export default {
         </div>
       </gl-form-group>
 
+      <asset-links-form v-if="showAssetLinksForm" />
+
       <div class="d-flex pt-3">
-        <gl-button
+        <gl-deprecated-button
           class="mr-auto js-submit-button"
           variant="success"
           type="submit"
           :aria-label="__('Save changes')"
         >
           {{ __('Save changes') }}
-        </gl-button>
-        <gl-button
-          class="js-cancel-button"
-          variant="default"
-          type="button"
-          :aria-label="__('Cancel')"
-          @click="navigateToReleasesPage()"
-        >
+        </gl-deprecated-button>
+        <gl-link :href="cancelPath" class="js-cancel-button btn btn-default">
           {{ __('Cancel') }}
-        </gl-button>
+        </gl-link>
       </div>
     </form>
   </div>

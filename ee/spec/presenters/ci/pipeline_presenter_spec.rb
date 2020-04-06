@@ -30,7 +30,7 @@ describe Ci::PipelinePresenter do
 
     context 'when features are available' do
       before do
-        stub_licensed_features(dependency_scanning: true, license_management: true)
+        stub_licensed_features(dependency_scanning: true, license_scanning: true)
       end
 
       context 'when there is an artifact of a right type' do

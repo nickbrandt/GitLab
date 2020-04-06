@@ -18,12 +18,20 @@ module EE
         @subject.feature_available?(:cycle_analytics_for_groups)
       end
 
+      condition(:group_activity_analytics_available) do
+        @subject.feature_available?(:group_activity_analytics)
+      end
+
       condition(:can_owners_manage_ldap, scope: :global) do
         ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
       end
 
       condition(:memberships_locked_to_ldap, scope: :global) do
         ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
+      end
+
+      condition(:owners_bypass_ldap_lock) do
+        ldap_lock_bypassable?
       end
 
       condition(:security_dashboard_enabled) do
@@ -54,6 +62,11 @@ module EE
         @subject.feature_available?(:group_timelogs)
       end
 
+      with_scope :global
+      condition(:cluster_health_available) do
+        License.feature_available?(:cluster_health)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -75,8 +88,11 @@ module EE
       rule { can?(:read_cluster) & cluster_deployments_available }
         .enable :read_cluster_environments
 
-      rule { can?(:read_group) & contribution_analytics_available }
+      rule { has_access & contribution_analytics_available }
         .enable :read_group_contribution_analytics
+
+      rule { has_access & group_activity_analytics_available }
+        .enable :read_group_activity_analytics
 
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
@@ -118,15 +134,18 @@ module EE
 
       rule { admin | owner }.enable :admin_group_saml
 
-      rule { admin | (can_owners_manage_ldap & owner) }.enable :admin_ldap_group_links
+      rule { admin | (can_owners_manage_ldap & owner) }.policy do
+        enable :admin_ldap_group_links
+        enable :admin_ldap_group_settings
+      end
 
-      rule { ldap_synced }.prevent :admin_group_member
+      rule { ldap_synced & ~owners_bypass_ldap_lock }.prevent :admin_group_member
 
       rule { ldap_synced & (admin | owner) }.enable :update_group_member
 
       rule { ldap_synced & (admin | (can_owners_manage_ldap & owner)) }.enable :override_group_member
 
-      rule { memberships_locked_to_ldap & ~admin }.policy do
+      rule { memberships_locked_to_ldap & ~admin & ~owners_bypass_ldap_lock }.policy do
         prevent :admin_group_member
         prevent :update_group_member
         prevent :override_group_member
@@ -156,6 +175,8 @@ module EE
       end
 
       rule { ~group_timelogs_available }.prevent :read_group_timelogs
+
+      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
     end
 
     override :lookup_access_level!
@@ -163,6 +184,13 @@ module EE
       return ::GroupMember::NO_ACCESS if needs_new_sso_session?
 
       super
+    end
+
+    def ldap_lock_bypassable?
+      return false unless ::Feature.enabled?(:ldap_settings_unlock_groups_by_owners)
+      return false unless ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
+
+      !!subject.unlock_membership_to_ldap? && subject.owned_by?(user)
     end
 
     def sso_enforcement_prevents_access?

@@ -315,25 +315,25 @@ describe API::Epics do
       end
 
       it 'returns an array of epics with any label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_ANY }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_ANY }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with any label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_ANY] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_ANY] }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with no label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_NONE }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_NONE }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_NONE] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_NONE] }
 
         expect_paginated_array_response(epic.id)
       end
@@ -594,7 +594,7 @@ describe API::Epics do
 
         post api(url, user), params: params
 
-        expect(response.status).to eq(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['title']).to include 'new epic'
         expect(json_response['description']).to include 'epic description'
         expect(json_response['labels']).to include 'label1'
@@ -683,7 +683,7 @@ describe API::Epics do
 
           put api(url, user), params: params
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['title']).to include 'new title'
           expect(json_response['description']).to include 'new description'
           expect(json_response['labels']).to include 'label1'

@@ -10,15 +10,6 @@ describe Packages::PackageFileFinder do
   RSpec.shared_examples 'package file finder examples' do
     it { is_expected.to eq(package_file) }
 
-    context 'with conan_file_type' do
-      let_it_be(:package) { create(:conan_package) }
-      # conan packages contain a conanmanifest.txt file for both conan_file_types
-      let(:package_file_name) { 'conanmanifest.txt' }
-      let(:params) { { conan_file_type: :recipe_file } }
-
-      it { expect(subject.conan_file_type).to eq('recipe_file') }
-    end
-
     context 'with file_name_like' do
       let(:package_file_name) { package_file.file_name.upcase }
       let(:params) { { with_file_name_like: true } }

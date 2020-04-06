@@ -12,34 +12,30 @@ describe 'Project active tab' do
     end
   end
 
-  context 'when `analytics_pages_under_project_analytics_sidebar` feature flag is enabled' do
+  before do
+    project.add_maintainer(user)
+    sign_in(user)
+  end
+
+  context 'on project Analytics/Insights' do
     before do
-      stub_feature_flags(analytics_pages_under_project_analytics_sidebar: { enabled: true, thing: project })
+      stub_licensed_features(insights: true)
 
-      project.add_maintainer(user)
-      sign_in(user)
+      visit project_insights_path(project)
     end
 
-    context 'on project Analytics/Insights' do
-      before do
-        stub_licensed_features(insights: true)
+    it_behaves_like 'page has active tab', _('Analytics')
+    it_behaves_like 'page has active sub tab', _('Insights')
+  end
 
-        visit project_insights_path(project)
-      end
+  context 'on project Analytics/Code Review' do
+    before do
+      stub_licensed_features(code_review_analytics: true)
 
-      it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('Insights')
+      visit project_analytics_code_reviews_path(project)
     end
 
-    context 'on project Analytics/Code Review' do
-      before do
-        stub_licensed_features(code_review_analytics: true)
-
-        visit project_analytics_code_reviews_path(project)
-      end
-
-      it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('Code Review')
-    end
+    it_behaves_like 'page has active tab', _('Analytics')
+    it_behaves_like 'page has active sub tab', _('Code Review')
   end
 end

@@ -80,20 +80,14 @@ describe Gitlab::BitbucketImport::Importer do
   end
 
   let(:importer) { described_class.new(project) }
-  let(:gitlab_shell) { double }
-
+  let(:sample) { RepoHelpers.sample_compare }
   let(:issues_statuses_sample_data) do
     {
       count: sample_issues_statuses.count,
       values: sample_issues_statuses
     }
   end
-
-  let(:sample) { RepoHelpers.sample_compare }
-
-  before do
-    allow(importer).to receive(:gitlab_shell) { gitlab_shell }
-  end
+  let(:counter) { double('counter', increment: true) }
 
   subject { described_class.new(project) }
 
@@ -220,6 +214,24 @@ describe Gitlab::BitbucketImport::Importer do
         expect(merge_request_diff.start_commit_sha).to eq target_branch_sha
       end
     end
+
+    context 'metrics' do
+      before do
+        allow(Gitlab::Metrics).to receive(:counter) { counter }
+        allow(pull_request).to receive(:raw).and_return('hello world')
+      end
+
+      it 'counts imported pull requests' do
+        expect(Gitlab::Metrics).to receive(:counter).with(
+          :bitbucket_importer_imported_pull_requests,
+          'The number of imported Bitbucket pull requests'
+        )
+
+        expect(counter).to receive(:increment)
+
+        subject.execute
+      end
+    end
   end
 
   context 'issues statuses' do
@@ -316,7 +328,7 @@ describe Gitlab::BitbucketImport::Importer do
     describe 'wiki import' do
       it 'is skipped when the wiki exists' do
         expect(project.wiki).to receive(:repository_exists?) { true }
-        expect(importer.gitlab_shell).not_to receive(:import_wiki_repository)
+        expect(project.wiki.repository).not_to receive(:import_repository)
 
         importer.execute
 
@@ -325,7 +337,7 @@ describe Gitlab::BitbucketImport::Importer do
 
       it 'imports to the project disk_path' do
         expect(project.wiki).to receive(:repository_exists?) { false }
-        expect(importer.gitlab_shell).to receive(:import_wiki_repository)
+        expect(project.wiki.repository).to receive(:import_repository)
 
         importer.execute
 
@@ -344,6 +356,55 @@ describe Gitlab::BitbucketImport::Importer do
         expect(project.issues.where("description LIKE ?", '%reporter2%').size).to eq(1)
         expect(project.issues.where("description LIKE ?", '%reporter3%').size).to eq(1)
         expect(importer.errors).to be_empty
+      end
+    end
+
+    context 'metrics' do
+      before do
+        allow(Gitlab::Metrics).to receive(:counter) { counter }
+      end
+
+      it 'counts imported issues' do
+        expect(Gitlab::Metrics).to receive(:counter).with(
+          :bitbucket_importer_imported_issues,
+          'The number of imported Bitbucket issues'
+        )
+
+        expect(counter).to receive(:increment)
+
+        subject.execute
+      end
+    end
+  end
+
+  describe '#execute' do
+    context 'metrics' do
+      let(:histogram) { double(:histogram) }
+
+      before do
+        allow(subject).to receive(:import_wiki)
+        allow(subject).to receive(:import_issues)
+        allow(subject).to receive(:import_pull_requests)
+
+        allow(Gitlab::Metrics).to receive(:counter) { counter }
+        allow(Gitlab::Metrics).to receive(:histogram) { histogram }
+      end
+
+      it 'counts and measures duration of imported projects' do
+        expect(Gitlab::Metrics).to receive(:counter).with(
+          :bitbucket_importer_imported_projects,
+          'The number of imported Bitbucket projects'
+        )
+
+        expect(Gitlab::Metrics).to receive(:histogram).with(
+          :bitbucket_importer_total_duration_seconds,
+          'Total time spent importing Bitbucket projects, in seconds'
+        )
+
+        expect(counter).to receive(:increment)
+        expect(histogram).to receive(:observe).with({ importer: described_class::IMPORTER }, anything)
+
+        subject.execute
       end
     end
   end

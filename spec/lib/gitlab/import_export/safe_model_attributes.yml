@@ -31,6 +31,7 @@ Issue:
 - last_edited_by_id
 - discussion_locked
 - health_status
+- external_key
 Event:
 - id
 - target_type
@@ -40,6 +41,14 @@ Event:
 - updated_at
 - action
 - author_id
+WikiPage::Meta:
+- id
+- title
+- project_id
+WikiPage::Slug:
+- id
+- wiki_page_meta_id
+- slug
 PushEventPayload:
 - commit_count
 - action
@@ -125,7 +134,7 @@ Release:
 - created_at
 - updated_at
 - released_at
-Evidence:
+Releases::Evidence:
 - id
 - summary
 - created_at
@@ -273,6 +282,7 @@ MergeRequest::Metrics:
 - modified_paths_size
 - commits_count
 - first_approved_at
+- first_reassigned_at
 Ci::Pipeline:
 - id
 - project_id
@@ -458,6 +468,7 @@ Service:
 - active
 - properties
 - template
+- instance
 - push_events
 - issues_events
 - commit_events
@@ -754,6 +765,7 @@ List:
 - user_id
 - max_issue_count
 - max_issue_weight
+- limit_metric
 ExternalPullRequest:
 - id
 - created_at
@@ -832,6 +844,14 @@ Epic:
   - start_date_sourcing_epic_id
   - due_date_sourcing_epic_id
   - health_status
+  - external_key
+  - confidential
 EpicIssue:
   - id
   - relative_position
+SystemNoteMetadata:
+  - id
+  - commit_count
+  - action
+  - created_at
+  - updated_at

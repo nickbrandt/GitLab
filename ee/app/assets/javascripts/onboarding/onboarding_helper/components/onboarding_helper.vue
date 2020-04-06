@@ -1,5 +1,5 @@
 <script>
-import { GlLink, GlProgressBar, GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlLink, GlProgressBar, GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import { __, s__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import HelpContentPopover from './help_content_popover.vue';
@@ -12,7 +12,7 @@ export default {
     Icon,
     GlLink,
     GlProgressBar,
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
     HelpContentPopover,
     TourPartsList,
@@ -186,13 +186,13 @@ export default {
           <strong v-if="activeTour">{{ tourInfo }}</strong>
           <gl-progress-bar class="mt-1" :value="percentageCompleted" variant="info" />
         </div>
-        <gl-button
+        <gl-deprecated-button
           class="qa-toggle-btn btn btn-transparent mr-1"
           type="button"
           :aria-label="toggleButtonLabel"
         >
           <icon :size="14" :name="toggleButtonIcon" />
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
     <div class="collapsible overflow-hidden">

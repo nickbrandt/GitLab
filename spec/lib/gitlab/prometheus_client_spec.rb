@@ -16,6 +16,26 @@ describe Gitlab::PrometheusClient do
     end
   end
 
+  describe '#healthy?' do
+    it 'returns true when status code is 200 and healthy response body' do
+      stub_request(:get, subject.health_url).to_return(status: 200, body: described_class::HEALTHY_RESPONSE)
+
+      expect(subject.healthy?).to eq(true)
+    end
+
+    it 'returns false when status code is 200 and unhealthy response body' do
+      stub_request(:get, subject.health_url).to_return(status: 200, body: '')
+
+      expect(subject.healthy?).to eq(false)
+    end
+
+    it 'raises error when status code not 200' do
+      stub_request(:get, subject.health_url).to_return(status: 500, body: '')
+
+      expect { subject.healthy? }.to raise_error(Gitlab::PrometheusClient::Error)
+    end
+  end
+
   # This shared examples expect:
   # - query_url: A query URL
   # - execute_query: A query call
@@ -193,23 +213,23 @@ describe Gitlab::PrometheusClient do
       let(:time_stop) { Time.now.in_time_zone("Warsaw") }
       let(:time_start) { time_stop - 8.hours }
 
-      let(:query_url) { prometheus_query_range_url(prometheus_query, start: time_start.utc.to_f, stop: time_stop.utc.to_f) }
+      let(:query_url) { prometheus_query_range_url(prometheus_query, start_time: time_start.utc.to_f, end_time: time_stop.utc.to_f) }
 
       it 'passed dates are properly converted to utc' do
         req_stub = stub_prometheus_request(query_url, body: prometheus_values_body('vector'))
 
-        subject.query_range(prometheus_query, start: time_start, stop: time_stop)
+        subject.query_range(prometheus_query, start_time: time_start, end_time: time_stop)
         expect(req_stub).to have_been_requested
       end
     end
 
     context 'when a start time is passed' do
-      let(:query_url) { prometheus_query_range_url(prometheus_query, start: 2.hours.ago) }
+      let(:query_url) { prometheus_query_range_url(prometheus_query, start_time: 2.hours.ago) }
 
       it 'passed it in the requested URL' do
         req_stub = stub_prometheus_request(query_url, body: prometheus_values_body('vector'))
 
-        subject.query_range(prometheus_query, start: 2.hours.ago)
+        subject.query_range(prometheus_query, start_time: 2.hours.ago)
         expect(req_stub).to have_been_requested
       end
     end

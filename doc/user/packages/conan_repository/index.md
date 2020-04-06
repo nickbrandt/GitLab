@@ -198,7 +198,7 @@ Add the Conan recipe to the `[requires]` section of the file:
  cmake
 ```
 
-Next, from the root of your project, create a build directory and navigate to it:
+Next, create a build directory from the root of your project and navigate to it:
 
 ```shell
 mkdir build && cd build
@@ -268,7 +268,7 @@ The GitLab Conan repository supports the following Conan CLI commands:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11678) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
 
-To work with Conan commands within [GitLab CI](./../../../ci/README.md), you can use
+To work with Conan commands within [GitLab CI/CD](./../../../ci/README.md), you can use
 `CI_JOB_TOKEN` in place of the personal access token in your commands.
 
 It is easiest to provide the `CONAN_LOGIN_USERNAME` and `CONAN_PASSWORD` with each

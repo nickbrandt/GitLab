@@ -78,7 +78,7 @@ describe API::Issues do
            description: "closes #{issue.to_reference(private_mrs_project)}")
   end
 
-  before(:all) do
+  before_all do
     project.add_reporter(user)
     project.add_guest(guest)
     private_mrs_project.add_reporter(user)
@@ -350,25 +350,25 @@ describe API::Issues do
     end
 
     it 'returns an array of project issues with any label' do
-      get api("#{base_url}/issues", user), params: { labels: IssuesFinder::FILTER_ANY }
+      get api("#{base_url}/issues", user), params: { labels: IssuableFinder::Params::FILTER_ANY }
 
       expect_paginated_array_response(issue.id)
     end
 
     it 'returns an array of project issues with any label with labels param as array' do
-      get api("#{base_url}/issues", user), params: { labels: [IssuesFinder::FILTER_ANY] }
+      get api("#{base_url}/issues", user), params: { labels: [IssuableFinder::Params::FILTER_ANY] }
 
       expect_paginated_array_response(issue.id)
     end
 
     it 'returns an array of project issues with no label' do
-      get api("#{base_url}/issues", user), params: { labels: IssuesFinder::FILTER_NONE }
+      get api("#{base_url}/issues", user), params: { labels: IssuableFinder::Params::FILTER_NONE }
 
       expect_paginated_array_response([confidential_issue.id, closed_issue.id])
     end
 
     it 'returns an array of project issues with no label with labels param as array' do
-      get api("#{base_url}/issues", user), params: { labels: [IssuesFinder::FILTER_NONE] }
+      get api("#{base_url}/issues", user), params: { labels: [IssuableFinder::Params::FILTER_NONE] }
 
       expect_paginated_array_response([confidential_issue.id, closed_issue.id])
     end

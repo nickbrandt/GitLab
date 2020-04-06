@@ -64,6 +64,10 @@ describe('BoardSettingsSideBar', () => {
       findList: bs.findList,
       addList: bs.addList,
       removeList: bs.removeList,
+      scopedLabels: {
+        enabled: false,
+        scopedLabelsDocumentationLink: '',
+      },
     };
 
     boardsStore.initEESpecific(storeMock);
@@ -499,6 +503,20 @@ describe('BoardSettingsSideBar', () => {
             expect(flash).toHaveBeenCalledTimes(1);
           });
         });
+      });
+    });
+
+    describe('passing of props to gl-form-input', () => {
+      beforeEach(() => {
+        createComponent({ activeListId: listId }, { updateListWipLimit: () => {} }, { edit: true });
+      });
+
+      it('passes `trim`', () => {
+        expect(wrapper.find(GlFormInput).attributes().trim).toBeDefined();
+      });
+
+      it('passes `number`', () => {
+        expect(wrapper.find(GlFormInput).attributes().number).toBeDefined();
       });
     });
   });

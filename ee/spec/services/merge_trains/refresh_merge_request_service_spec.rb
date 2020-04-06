@@ -148,7 +148,9 @@ describe MergeTrains::RefreshMergeRequestService do
 
         context 'when it failed to create a pipeline' do
           before do
-            allow_any_instance_of(MergeTrains::CreatePipelineService).to receive(:execute) { { result: :error, message: 'failed to create pipeline' } }
+            allow_next_instance_of(MergeTrains::CreatePipelineService) do |instance|
+              allow(instance).to receive(:execute) { { result: :error, message: 'failed to create pipeline' } }
+            end
           end
 
           it_behaves_like 'drops the merge request from the merge train' do
@@ -212,7 +214,9 @@ describe MergeTrains::RefreshMergeRequestService do
           before do
             allow(merge_request).to receive(:mergeable_state?) { true }
             merge_request.update(merge_error: 'Branch has been updated since the merge was requested.')
-            allow_any_instance_of(MergeRequests::MergeService).to receive(:execute) { { result: :error } }
+            allow_next_instance_of(MergeRequests::MergeService) do |instance|
+              allow(instance).to receive(:execute) { { result: :error } }
+            end
           end
 
           it 'does not finish merge and drops the merge request from train' do

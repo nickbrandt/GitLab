@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::Fdw::Project, :geo, type: :model do
+RSpec.describe Geo::Fdw::Project, :geo_fdw, type: :model do
   context 'relationships' do
     it { is_expected.to have_many(:job_artifacts).class_name('Geo::Fdw::Ci::JobArtifact') }
     it { is_expected.to have_many(:lfs_objects_projects).class_name('Geo::Fdw::LfsObjectsProject') }
@@ -11,8 +11,8 @@ RSpec.describe Geo::Fdw::Project, :geo, type: :model do
   end
 
   describe '.search' do
-    set(:test_project) { create(:project, description: 'kitten mittens') }
-    set(:project) { described_class.find(test_project.id) }
+    let(:test_project) { create(:project, description: 'kitten mittens') }
+    let(:project) { described_class.find(test_project.id) }
 
     it 'returns projects with a matching name' do
       expect(described_class.search(project.name)).to eq([project])

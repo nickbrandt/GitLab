@@ -77,11 +77,11 @@ and they will assist you with any issues you are having.
   ```shell
   kubectl get cronjobs
   ```
-  
+
   When one configures [cron-based backups](https://docs.gitlab.com/charts/backup-restore/backup.html#cron-based-backup),
   you will be able to see the new schedule here. Some details about the schedules can be found
   in [Running Automated Tasks with a CronJob](https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/#creating-a-cron-job)
-  
+
 ## GitLab-specific Kubernetes information
 
 - Minimal config that can be used to test a Kubernetes Helm chart can be found
@@ -117,7 +117,7 @@ and they will assist you with any issues you are having.
   kubectl get events -w --namespace=gitlab
   ```
 
-- Most of the useful GitLab tools (console, rake tasks, etc) are found in the task-runner
+- Most of the useful GitLab tools (console, Rake tasks, etc) are found in the task-runner
   pod. You may enter it and run commands inside or run them from the outside:
 
   ```shell
@@ -162,12 +162,12 @@ and they will assist you with any issues you are having.
   kubectl get secret <secret-name> -ojsonpath={.data.password} | base64 --decode ; echo
   ```
 
-- How to connect to a GitLab Postgres database:
+- How to connect to a GitLab PostgreSQL database:
 
   ```shell
   kubectl exec -it <task-runner-pod-name> -- /srv/gitlab/bin/rails dbconsole -p
   ```
-  
+
 - How to get info about Helm installation status:
 
   ```shell
@@ -202,9 +202,9 @@ and they will assist you with any issues you are having.
 - How to get the manifest for a release. It can be useful because it contains the info about
 all Kubernetes resources and dependent charts:
 
-    ```shell
-    helm get manifest <release name>
-    ```
+  ```shell
+  helm get manifest <release name>
+  ```
 
 ## Installation of minimal GitLab config via Minukube on macOS
 

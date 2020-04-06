@@ -19,6 +19,7 @@ module EE
       has_many :epics
 
       has_one :saml_provider
+      has_many :scim_identities
       has_many :ip_restrictions, autosave: true
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
@@ -44,7 +45,7 @@ module EE
 
       has_one :deletion_schedule, class_name: 'GroupDeletionSchedule'
       delegate :deleting_user, :marked_for_deletion_on, to: :deletion_schedule, allow_nil: true
-      delegate :enforced_group_managed_accounts?, to: :saml_provider, allow_nil: true
+      delegate :enforced_group_managed_accounts?, :enforced_sso?, to: :saml_provider, allow_nil: true
 
       belongs_to :file_template_project, class_name: "Project"
 
@@ -302,6 +303,12 @@ module EE
     def adjourned_deletion?
       feature_available?(:adjourned_deletion_for_projects_and_groups) &&
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def vulnerabilities
+      ::Vulnerability.where(
+        project: ::Project.for_group_and_its_subgroups(self).non_archived.without_deleted
+      )
     end
 
     private

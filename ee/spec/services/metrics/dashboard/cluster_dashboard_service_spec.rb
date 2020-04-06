@@ -15,13 +15,19 @@ describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_st
   end
 
   describe '.valid_params?' do
-    let(:params) { { cluster: cluster } }
+    let(:params) { { cluster: cluster, embedded: 'false' } }
 
     subject { described_class.valid_params?(params) }
 
     it { is_expected.to be_truthy }
 
-    context 'missing cluster' do
+    context 'with matching dashboard_path' do
+      let(:params) { { dashboard_path: ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH } }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'missing cluster without dashboard_path' do
       let(:params) { {} }
 
       it { is_expected.to be_falsey }

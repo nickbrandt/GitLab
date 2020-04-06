@@ -43,6 +43,7 @@
 .border-color-blue-300 { border-color: $blue-300; }
 .border-color-default { border-color: $border-color; }
 .border-bottom-color-default { border-bottom-color: $border-color; }
+.border-radius-default { border-radius: $border-radius-default; }
 .box-shadow-default { box-shadow: 0 2px 4px 0 $black-transparent; }
 
 .gl-children-ml-sm-3 > * {
@@ -54,8 +55,10 @@
 .mh-50vh { max-height: 50vh; }
 
 .font-size-inherit { font-size: inherit; }
+.gl-w-8 { width: px-to-rem($grid-size); }
 .gl-w-16 { width: px-to-rem($grid-size * 2); }
 .gl-w-64 { width: px-to-rem($grid-size * 8); }
+.gl-h-8 { height: px-to-rem($grid-size); }
 .gl-h-32 { height: px-to-rem($grid-size * 4); }
 .gl-h-64 { height: px-to-rem($grid-size * 8); }
 
@@ -64,7 +67,8 @@
 .gl-bg-purple-light { background-color: $purple-light; }
 
 // Classes using mixins coming from @gitlab-ui
-// can be removed once https://gitlab.com/gitlab-org/gitlab/merge_requests/19021 has been merged
+// can be removed once the mixins are added.
+// See https://gitlab.com/gitlab-org/gitlab/issues/36857 for more details.
 .gl-bg-blue-50 { @include gl-bg-blue-50; }
 .gl-bg-red-100 { @include gl-bg-red-100; }
 .gl-bg-orange-100 { @include gl-bg-orange-100; }
@@ -72,8 +76,21 @@
 .gl-bg-green-100 { @include gl-bg-green-100;}
 
 .gl-text-blue-500 { @include gl-text-blue-500; }
+.gl-text-gray-500 { @include gl-text-gray-500; }
 .gl-text-gray-700 { @include gl-text-gray-700; }
 .gl-text-gray-900 { @include gl-text-gray-900; }
 .gl-text-red-700 { @include gl-text-red-700; }
+.gl-text-red-900 { @include gl-text-red-900; }
+.gl-text-orange-400 { @include gl-text-orange-400; }
+.gl-text-orange-500 { @include gl-text-orange-500; }
+.gl-text-orange-600 { @include gl-text-orange-600; }
 .gl-text-orange-700 { @include gl-text-orange-700; }
+.gl-text-green-500 { @include gl-text-green-500; }
 .gl-text-green-700 { @include gl-text-green-700; }
+
+.gl-align-items-center { @include gl-align-items-center; }
+.d-sm-table-column {
+  @include media-breakpoint-up(sm) {
+    display: table-column !important;
+  }
+}

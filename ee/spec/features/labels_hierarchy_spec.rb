@@ -51,7 +51,7 @@ describe 'Labels Hierarchy', :js do
           expect(page).to have_selector('a', text: issue.title)
         end
 
-        expect(page).to have_selector('.badge', text: label.title)
+        expect(page).to have_selector('.gl-label', text: label.title)
       end
     end
   end

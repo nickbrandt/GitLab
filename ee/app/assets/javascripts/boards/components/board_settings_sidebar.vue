@@ -2,7 +2,7 @@
 import {
   GlDrawer,
   GlLabel,
-  GlButton,
+  GlDeprecatedButton,
   GlFormInput,
   GlAvatarLink,
   GlAvatarLabeled,
@@ -13,6 +13,7 @@ import { __, n__ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import boardsStoreEE from '../stores/boards_store_ee';
 import flash from '~/flash';
+import { isScopedLabel } from '~/lib/utils/common_utils';
 
 // NOTE: need to revisit how we handle headerHeight, because we have so many different header and footer options.
 export default {
@@ -32,7 +33,7 @@ export default {
   components: {
     GlDrawer,
     GlLabel,
-    GlButton,
+    GlDeprecatedButton,
     GlFormInput,
     GlAvatarLink,
     GlAvatarLabeled,
@@ -157,6 +158,12 @@ export default {
     onEnter() {
       this.offFocus();
     },
+    showScopedLabels(label) {
+      return boardsStoreEE.store.scopedLabels.enabled && isScopedLabel(label);
+    },
+    helpLink() {
+      return boardsStoreEE.store.scopedLabels.helpLink;
+    },
   },
 };
 </script>
@@ -176,7 +183,7 @@ export default {
           <gl-label
             :title="activeListLabel.title"
             :background-color="activeListLabel.color"
-            color="light"
+            :scoped="showScopedLabels(activeListLabel)"
           />
         </template>
         <template v-else-if="boardListType === $options.assignee">
@@ -198,11 +205,11 @@ export default {
       <div class="d-flex justify-content-between flex-column">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <label class="m-0">{{ $options.wipLimitText }}</label>
-          <gl-button
+          <gl-deprecated-button
             class="js-edit-button h-100 border-0 gl-line-height-14 text-dark"
             variant="link"
             @click="showInput"
-            >{{ $options.editLinkText }}</gl-button
+            >{{ $options.editLinkText }}</gl-deprecated-button
           >
         </div>
         <gl-form-input
@@ -212,6 +219,9 @@ export default {
           :disabled="updating"
           :placeholder="$options.inputPlaceholderText"
           trim
+          number
+          type="number"
+          min="0"
           @input="handleWipLimitChange"
           @keydown.enter.native="onEnter"
           @blur="offFocus"
@@ -220,11 +230,11 @@ export default {
           <p class="js-wip-limit bold m-0 text-secondary">{{ activeListWipLimit }}</p>
           <template v-if="wipLimitIsSet">
             <span class="m-1">-</span>
-            <gl-button
+            <gl-deprecated-button
               class="js-remove-limit h-100 border-0 gl-line-height-14 text-secondary"
               variant="link"
               @click="clearWipLimit"
-              >{{ $options.removeLimitText }}</gl-button
+              >{{ $options.removeLimitText }}</gl-deprecated-button
             >
           </template>
         </div>

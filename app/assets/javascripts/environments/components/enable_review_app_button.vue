@@ -1,11 +1,11 @@
 <script>
-import { GlButton, GlModal, GlModalDirective, GlLink, GlSprintf } from '@gitlab/ui';
+import { GlDeprecatedButton, GlModal, GlModalDirective, GlLink, GlSprintf } from '@gitlab/ui';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 import { s__ } from '~/locale';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
     GlModal,
     GlSprintf,
@@ -26,15 +26,17 @@ export default {
   modalInfo: {
     closeText: s__('EnableReviewApp|Close'),
     copyToClipboardText: s__('EnableReviewApp|Copy snippet text'),
-    copyString: `deploy_review
+    copyString: `deploy_review:
   stage: deploy
   script:
     - echo "Deploy a review app"
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.example.com
-  only: branches
-  except: master`,
+  only:
+    - branches
+  except:
+    - master`,
     id: 'enable-review-app-info',
     title: s__('ReviewApp|Enable Review App'),
   },
@@ -42,7 +44,7 @@ export default {
 </script>
 <template>
   <div>
-    <gl-button
+    <gl-deprecated-button
       v-gl-modal="$options.modalInfo.id"
       variant="info"
       category="secondary"
@@ -50,7 +52,7 @@ export default {
       class="js-enable-review-app-button"
     >
       {{ s__('Environments|Enable review app') }}
-    </gl-button>
+    </gl-deprecated-button>
     <gl-modal
       :modal-id="$options.modalInfo.id"
       :title="$options.modalInfo.title"

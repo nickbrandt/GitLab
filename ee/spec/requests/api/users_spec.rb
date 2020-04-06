@@ -57,6 +57,16 @@ describe API::Users do
         expect(AuditEvent.count).to eq(1)
       end
     end
+
+    describe 'POST /users/:id/block' do
+      it 'creates audit event when blocking user' do
+        stub_licensed_features(extended_audit_events: true)
+
+        expect do
+          post api("/users/#{user.id}/block", admin)
+        end.to change { AuditEvent.count }.by(1)
+      end
+    end
   end
 
   context 'shared_runners_minutes_limit' do
@@ -263,6 +273,62 @@ describe API::Users do
             expect(json_response).not_to have_key('note')
           end
         end
+      end
+    end
+  end
+
+  describe 'GET /user/:id' do
+    context 'when authenticated' do
+      context 'as an admin' do
+        context 'and user has a plan' do
+          let!(:subscription) { create(:gitlab_subscription, :gold, namespace: user.namespace) }
+
+          context 'and user is not a trial user' do
+            it 'contains plan and trial' do
+              get api("/users/#{user.id}", admin)
+
+              expect(json_response).to include('plan' => 'gold', 'trial' => false)
+            end
+          end
+
+          context 'and user is a trial user' do
+            before do
+              subscription.update!(trial: true)
+            end
+
+            it 'contains plan and trial' do
+              get api("/users/#{user.id}", admin)
+
+              expect(json_response).to include('plan' => 'gold', 'trial' => true)
+            end
+          end
+        end
+
+        context 'and user has no plan' do
+          it 'returns `nil` for both plan and trial' do
+            get api("/users/#{user.id}", admin)
+
+            expect(json_response).to include('plan' => nil, 'trial' => nil)
+          end
+        end
+      end
+
+      context 'as a user' do
+        it 'does not contain plan and trial info' do
+          get api("/users/#{user.id}", user)
+
+          expect(json_response).not_to have_key('plan')
+          expect(json_response).not_to have_key('trial')
+        end
+      end
+    end
+
+    context 'when not authenticated' do
+      it 'does not contain plan and trial info' do
+        get api("/users/#{user.id}")
+
+        expect(json_response).not_to have_key('plan')
+        expect(json_response).not_to have_key('trial')
       end
     end
   end

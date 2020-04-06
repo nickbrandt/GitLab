@@ -81,6 +81,7 @@ From there, you can see the following actions:
 - Release milestone associations changed
 - Permission to approve merge requests by committers was updated ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/7531) in GitLab 12.9)
 - Permission to approve merge requests by authors was updated ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/7531) in GitLab 12.9)
+- Number of required approvals was updated ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/7531) in GitLab 12.9)
 
 ### Instance events **(PREMIUM ONLY)**
 
@@ -107,6 +108,7 @@ recorded:
 - User was deleted ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
 - User was added ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
 - User was blocked via Admin Area ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
+- User was blocked via API ([introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25872) in GitLab 12.9)
 
 It's possible to filter particular actions by choosing an audit data type from
 the filter dropdown box. You can further filter by specific group, project, or user
@@ -132,7 +134,7 @@ on adding these events into GitLab:
 
 The current architecture of audit events is not prepared to receive a very high amount of records.
 It may make the user interface for your project or audit logs very busy, and the disk space consumed by the
-`audit_events` Postgres table will increase considerably. It's disabled by default
+`audit_events` PostgreSQL table will increase considerably. It's disabled by default
 to prevent performance degradations on GitLab instances with very high Git write traffic.
 
 In an upcoming release, Audit Logs for Git push events will be enabled

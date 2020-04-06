@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { groupBy } from 'lodash';
 import {
   RULE_TYPE_REGULAR,
   RULE_TYPE_FALLBACK,
@@ -31,7 +31,7 @@ function getApprovalRuleNamesLeft(data) {
     return [];
   }
 
-  const rulesLeft = _.groupBy(data.approval_rules_left, x => x.rule_type);
+  const rulesLeft = groupBy(data.approval_rules_left, x => x.rule_type);
 
   // Filter out empty names (fallback rule has no name) because the empties would look weird.
   const regularRules = (rulesLeft[RULE_TYPE_REGULAR] || []).map(x => x.name).filter(x => x);

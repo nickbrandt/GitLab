@@ -1,6 +1,6 @@
 <script>
-import _ from 'underscore';
-import { GlIcon, GlButton } from '@gitlab/ui';
+import { isEmpty } from 'lodash';
+import { GlIcon, GlDeprecatedButton } from '@gitlab/ui';
 import successSvg from 'icons/_icon_status_success.svg';
 import warningSvg from 'icons/_icon_status_warning.svg';
 import readyToMergeMixin from 'ee_else_ce/vue_merge_request_widget/mixins/ready_to_merge';
@@ -26,7 +26,7 @@ export default {
     CommitEdit,
     CommitMessageDropdown,
     GlIcon,
-    GlButton,
+    GlDeprecatedButton,
     MergeImmediatelyConfirmationDialog: () =>
       import(
         'ee_component/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue'
@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     isAutoMergeAvailable() {
-      return !_.isEmpty(this.mr.availableAutoMergeStrategies);
+      return !isEmpty(this.mr.availableAutoMergeStrategies);
     },
     status() {
       const { pipeline, isPipelineFailed, hasCI, ciStatus } = this.mr;
@@ -158,7 +158,7 @@ export default {
         .then(data => {
           const hasError = data.status === 'failed' || data.status === 'hook_validation_error';
 
-          if (_.includes(AUTO_MERGE_STRATEGIES, data.status)) {
+          if (AUTO_MERGE_STRATEGIES.includes(data.status)) {
             eventHub.$emit('MRWidgetUpdateRequested');
           } else if (data.status === 'success') {
             this.initiateMergePolling();
@@ -263,7 +263,7 @@ export default {
       <div class="media-body">
         <div class="mr-widget-body-controls media space-children">
           <span class="btn-group">
-            <gl-button
+            <gl-deprecated-button
               size="sm"
               class="qa-merge-button accept-merge-request"
               :variant="mergeButtonVariant"
@@ -272,7 +272,7 @@ export default {
               @click="handleMergeButtonClick(isAutoMergeAvailable)"
             >
               {{ mergeButtonText }}
-            </gl-button>
+            </gl-deprecated-button>
             <button
               v-if="shouldShowMergeImmediatelyDropdown"
               :disabled="isMergeButtonDisabled"

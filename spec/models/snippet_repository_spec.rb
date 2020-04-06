@@ -16,7 +16,7 @@ describe SnippetRepository do
   describe '.find_snippet' do
     it 'finds snippet by disk path' do
       snippet = create(:snippet, author: user)
-      snippet.track_snippet_repository
+      snippet.track_snippet_repository(snippet.repository.storage)
 
       expect(described_class.find_snippet(snippet.disk_path)).to eq(snippet)
     end
@@ -130,34 +130,77 @@ describe SnippetRepository do
       end
     end
 
-    context 'when files are not named' do
-      let(:data) do
-        [
-          {
-            file_path: '',
-            content: 'foo',
-            action: :create
-          },
-          {
-            file_path: '',
-            content: 'bar',
-            action: :create
-          },
-          {
-            file_path: 'foo.txt',
-            content: 'bar',
-            action: :create
-          }
-        ]
+    shared_examples 'snippet repository with file names' do |*filenames|
+      it 'sets a name for unnamed files' do
+        ls_files = snippet.repository.ls_files(nil)
+        expect(ls_files).to include(*filenames)
+      end
+    end
+
+    let_it_be(:named_snippet) { { file_path: 'fee.txt', content: 'bar', action: :create } }
+    let_it_be(:unnamed_snippet) { { file_path: '', content: 'dummy', action: :create } }
+
+    context 'when existing file has a default name' do
+      let(:default_name) { 'snippetfile1.txt' }
+      let(:new_file) { { file_path: '', content: 'bar' } }
+      let(:existing_file) { { previous_path: default_name, file_path: '', content: 'new_content' } }
+
+      before do
+        expect(blob_at(snippet, default_name)).to be_nil
+
+        snippet_repository.multi_files_action(user, [new_file], commit_opts)
+
+        expect(blob_at(snippet, default_name)).to be
       end
 
-      it 'sets a name for non named files' do
+      it 'reuses the existing file name' do
+        snippet_repository.multi_files_action(user, [existing_file], commit_opts)
+
+        blob = blob_at(snippet, default_name)
+        expect(blob.data).to eq existing_file[:content]
+      end
+    end
+
+    context 'when file name consists of one or several whitespaces' do
+      let(:default_name) { 'snippetfile1.txt' }
+      let(:new_file) { { file_path: ' ', content: 'bar' } }
+
+      it 'assigns a new name to the file' do
+        expect(blob_at(snippet, default_name)).to be_nil
+
+        snippet_repository.multi_files_action(user, [new_file], commit_opts)
+
+        blob = blob_at(snippet, default_name)
+        expect(blob.data).to eq new_file[:content]
+      end
+    end
+
+    context 'when some files are not named' do
+      let(:data) { [named_snippet] + Array.new(2) { unnamed_snippet.clone } }
+
+      before do
         expect do
           snippet_repository.multi_files_action(user, data, commit_opts)
         end.not_to raise_error
-
-        expect(snippet.repository.ls_files(nil)).to include('snippetfile1.txt', 'snippetfile2.txt', 'foo.txt')
       end
+
+      it_behaves_like 'snippet repository with file names', 'snippetfile1.txt', 'snippetfile2.txt'
+    end
+
+    context 'repository already has 10 unnamed snippets' do
+      let(:pre_populate_data) { Array.new(10) { unnamed_snippet.clone } }
+      let(:data) { [named_snippet] + Array.new(2) { unnamed_snippet.clone } }
+
+      before do
+        # Pre-populate repository with 9 unnamed snippets.
+        snippet_repository.multi_files_action(user, pre_populate_data, commit_opts)
+
+        expect do
+          snippet_repository.multi_files_action(user, data, commit_opts)
+        end.not_to raise_error
+      end
+
+      it_behaves_like 'snippet repository with file names', 'snippetfile10.txt', 'snippetfile11.txt'
     end
   end
 

@@ -8,7 +8,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   # ApplicationSetting model uses Gitlab::ThreadMemoryCache for caching and the
   # cache might be stale immediately after an update.
   # https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/30233
-  before_action :set_application_setting
+  before_action :set_application_setting, except: :integrations
 
   before_action :whitelist_query_limiting, only: [:usage_data]
 
@@ -25,6 +25,15 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   VALID_SETTING_PANELS.each do |action|
     define_method(action) { perform_update if submitted? }
+  end
+
+  def integrations
+    if Feature.enabled?(:instance_level_integrations)
+      @integrations = Service.find_or_initialize_instances.sort_by(&:title)
+    else
+      set_application_setting
+      perform_update if submitted?
+    end
   end
 
   def update
@@ -183,6 +192,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     params[:application_setting][:import_sources]&.delete("")
     params[:application_setting][:restricted_visibility_levels]&.delete("")
     params[:application_setting].delete(:elasticsearch_aws_secret_access_key) if params[:application_setting][:elasticsearch_aws_secret_access_key].blank?
+    params[:application_setting][:required_instance_ci_template] = nil if params[:application_setting][:required_instance_ci_template].blank?
     # TODO Remove domain_blacklist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-foss/issues/67204)
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist_file]
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist]
@@ -208,6 +218,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       :lets_encrypt_terms_of_service_accepted,
       :domain_blacklist_file,
       :raw_blob_request_limit,
+      :namespace_storage_size_limit,
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],

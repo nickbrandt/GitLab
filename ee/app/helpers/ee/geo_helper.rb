@@ -153,5 +153,18 @@ module EE
         s_('Geo|Unknown state')
       end
     end
+
+    def remove_tracking_entry_modal_data(path)
+      {
+        path: path,
+        method: 'delete',
+        modal_attributes: {
+          title: s_('Geo|Remove tracking database entry'),
+          message: s_('Geo|Tracking database entry will be removed. Are you sure?'),
+          okVariant: 'danger',
+          okTitle: s_('Geo|Remove entry')
+        }
+      }
+    end
   end
 end

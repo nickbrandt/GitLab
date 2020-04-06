@@ -18,7 +18,7 @@ NuGet CLI is probably already installed.
 
 Alternatively, you can use [.NET SDK 3.0 or later](https://dotnet.microsoft.com/download/dotnet-core/3.0), which installs NuGet CLI.
 
-You can confirm that [nuget CLI](https://www.nuget.org/) is properly installed with:
+You can confirm that [NuGet CLI](https://www.nuget.org/) is properly installed with:
 
 ```shell
 nuget help
@@ -34,6 +34,18 @@ Type 'NuGet help <command>' for help on a specific command.
 Available commands:
 
 [output truncated]
+```
+
+### macOS support
+
+For macOS, you can also use [Mono](https://www.mono-project.com/) to run
+the NuGet CLI. For Homebrew users, run `brew install mono` to install
+Mono. Then you should be able to download the Windows C# binary
+`nuget.exe` from the [NuGet CLI page](https://www.nuget.org/downloads)
+and run:
+
+```shell
+mono nuget.exe
 ```
 
 ## Enabling the NuGet Repository
@@ -94,7 +106,7 @@ nuget source Add -Name "GitLab" -Source "https//gitlab.example/api/v4/projects/1
    - **Name**: Desired name for the source
    - **Location**: `https://gitlab.com/api/v4/projects/<your_project_id>/packages/nuget/index.json`
      - Replace `<your_project_id>` with your project ID.
-     - If you have a self-hosted GitLab installation, replace `gitlab.com` with your domain name.
+     - If you have a self-managed GitLab installation, replace `gitlab.com` with your domain name.
    - **Username**: Your GitLab username
    - **Password**: Your personal access token
 
@@ -104,7 +116,7 @@ nuget source Add -Name "GitLab" -Source "https//gitlab.example/api/v4/projects/1
 
    ![Visual Studio NuGet source added](img/visual_studio_nuget_source_added.png)
 
-In case of any warning, please make sure that the **Location**, **Username** and **Password** are correct.
+In case of any warning, please make sure that the **Location**, **Username**, and **Password** are correct.
 
 ### Add NuGet Repository source with .NET CLI
 
@@ -178,6 +190,7 @@ CAUTION: **Warning:**
 By default, `nuget` checks the official source at `nuget.org` first. If you have a package in the
 GitLab NuGet Repository with the same name as a package at `nuget.org`, you must specify the source
 name or the wrong package will be installed.
+
 Install the latest version of a package using the following command:
 
 ```shell

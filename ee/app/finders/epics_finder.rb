@@ -18,9 +18,12 @@
 #   updated_before: datetime
 #   include_ancestor_groups: boolean
 #   include_descendant_groups: boolean
+#   starts_with_iid: string (containing a number)
 
 class EpicsFinder < IssuableFinder
   include TimeFrameFilter
+
+  IID_STARTS_WITH_PATTERN = %r{\A(\d)+\z}.freeze
 
   def self.scalar_params
     @scalar_params ||= %i[
@@ -38,6 +41,10 @@ class EpicsFinder < IssuableFinder
     @array_params ||= { label_name: [] }
   end
 
+  def self.valid_iid_query?(query)
+    query.match?(IID_STARTS_WITH_PATTERN)
+  end
+
   def klass
     Epic
   end
@@ -48,13 +55,19 @@ class EpicsFinder < IssuableFinder
     items = init_collection
     items = by_created_at(items)
     items = by_updated_at(items)
-    items = by_search(items)
     items = by_author(items)
     items = by_timeframe(items)
     items = by_state(items)
     items = by_label(items)
     items = by_parent(items)
     items = by_iids(items)
+    items = starts_with_iid(items)
+
+    # This has to be last as we use a CTE as an optimization fence
+    # for counts by passing the force_cte param and enabling the
+    # attempt_group_search_optimizations feature flag
+    # https://www.postgresql.org/docs/current/static/queries-with.html
+    items = by_search(items)
 
     sort(items)
   end
@@ -90,6 +103,15 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def starts_with_iid(items)
+    return items unless params[:iid_starts_with].present?
+
+    query = params[:iid_starts_with]
+    raise ArgumentError unless self.class.valid_iid_query?(query)
+
+    items.iid_starts_with(query)
+  end
 
   def related_groups
     include_ancestors = params.fetch(:include_ancestor_groups, false)

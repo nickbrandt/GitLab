@@ -20,7 +20,7 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
   end
 
   def self_url
-    return unless ::Feature.enabled?(:release_show_page, project)
+    return unless ::Feature.enabled?(:release_show_page, project, default_enabled: true)
 
     project_release_url(project, release)
   end
@@ -44,9 +44,10 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
   end
 
   def evidence_file_path
-    return unless release.evidence.present?
+    evidence = release.evidences.first
+    return unless evidence
 
-    evidence_project_release_url(project, release.to_param, format: :json)
+    project_evidence_url(project, release, evidence, format: :json)
   end
 
   private

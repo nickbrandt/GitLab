@@ -61,6 +61,7 @@ The following API resources are available in the project context:
 | [Protected tags](protected_tags.md)                                 | `/projects/:id/protected_tags`                                                                                                                                                                        |
 | [Releases](releases/index.md)                                       | `/projects/:id/releases`                                                                                                                                                                              |
 | [Release links](releases/links.md)                                  | `/projects/:id/releases/.../assets/links`                                                                                                                                                             |
+| [Remote mirrors](remote_mirrors.md)                                 | `/projects/:id/remote_mirrors`                                                                                                                                                                        |
 | [Repositories](repositories.md)                                     | `/projects/:id/repository`                                                                                                                                                                            |
 | [Repository files](repository_files.md)                             | `/projects/:id/repository/files`                                                                                                                                                                      |
 | [Repository submodules](repository_submodules.md)                   | `/projects/:id/repository/submodules`                                                                                                                                                                 |
@@ -119,6 +120,7 @@ The following API resources are available outside of project and group contexts 
 | [Events](events.md)                                | `/events`, `/users/:id/events` (also available for projects)            |
 | [Feature flags](features.md)                       | `/features`                                                             |
 | [Geo Nodes](geo_nodes.md) **(PREMIUM ONLY)**       | `/geo_nodes`                                                            |
+| [Group Activity Analytics](group_activity_analytics.md) **(STARTER)**  | `/analytics/group_activity/{issues_count | merge_requests_count | new_members_count }`  |
 | [Import repository from GitHub](import.md)         | `/import/github`                                                        |
 | [Issues](issues.md)                                | `/issues` (also available for groups and projects)                      |
 | [Issues Statistics](issues_statistics.md)          | `/issues_statistics` (also available for groups and projects)           |
@@ -148,5 +150,5 @@ Endpoints are available for:
 
 - [Dockerfile templates](templates/dockerfiles.md).
 - [`.gitignore` templates](templates/gitignores.md).
-- [GitLab CI YAML templates](templates/gitlab_ci_ymls.md).
+- [GitLab CI/CD YAML templates](templates/gitlab_ci_ymls.md).
 - [Open source license templates](templates/licenses.md).

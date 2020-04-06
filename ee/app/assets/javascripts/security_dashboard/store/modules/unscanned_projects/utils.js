@@ -1,13 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { getDayDifference } from '~/lib/utils/datetime_utility';
-
-/**
- * Checks if a given date instance has been created with a valid date
- *
- * @param date {Date}
- * @returns {boolean}
- */
-const isValidDate = date => !Number.isNaN(date.getTime());
+import { getDayDifference, isValidDate } from '~/lib/utils/datetime_utility';
 
 /**
  * Checks if a given number of days is within a date range

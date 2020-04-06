@@ -40,14 +40,6 @@ export default {
     state.pipelineId = id;
   },
 
-  [types.SET_CAN_CREATE_ISSUE_PERMISSION](state, permission) {
-    state.canCreateIssuePermission = permission;
-  },
-
-  [types.SET_CAN_CREATE_FEEDBACK_PERMISSION](state, permission) {
-    state.canCreateFeedbackPermission = permission;
-  },
-
   // CONTAINER SCANNING
   [types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT](state, path) {
     Vue.set(state.containerScanning.paths, 'diffEndpoint', path);
@@ -143,52 +135,46 @@ export default {
   },
 
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    state.isDismissingVulnerability = true;
     // reset error in case previous state was error
     Vue.set(state.modal, 'error', null);
   },
 
   [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state) {
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    state.isDismissingVulnerability = false;
   },
 
   [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
     Vue.set(state.modal, 'error', error);
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    state.isDismissingVulnerability = false;
   },
 
   [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
 
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', true);
     Vue.set(state.modal.vulnerability, 'dismissalFeedback', payload.data);
   },
 
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state, error) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', error);
   },
   [types.REQUEST_DELETE_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;
-    Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](state, payload) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', true);
     Vue.set(state.modal.vulnerability, 'dismissalFeedback', payload.data);
   },
   [types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](state, error) {
     state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', error);
   },
   [types.SHOW_DISMISSAL_DELETE_BUTTONS](state) {
@@ -249,23 +235,22 @@ export default {
   },
 
   [types.REQUEST_CREATE_ISSUE](state) {
-    Vue.set(state.modal, 'isCreatingNewIssue', true);
+    state.isCreatingIssue = true;
     // reset error in case previous state was error
     Vue.set(state.modal, 'error', null);
   },
 
   [types.RECEIVE_CREATE_ISSUE_SUCCESS](state) {
-    Vue.set(state.modal, 'isCreatingNewIssue', false);
+    state.isCreatingIssue = false;
   },
 
   [types.RECEIVE_CREATE_ISSUE_ERROR](state, error) {
     Vue.set(state.modal, 'error', error);
-    Vue.set(state.modal, 'isCreatingNewIssue', false);
+    state.isCreatingIssue = false;
   },
 
   [types.REQUEST_CREATE_MERGE_REQUEST](state) {
     state.isCreatingMergeRequest = true;
-    Vue.set(state.modal, 'isCreatingMergeRequest', true);
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
@@ -274,7 +259,6 @@ export default {
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state, error) {
     state.isCreatingMergeRequest = false;
-    Vue.set(state.modal, 'isCreatingMergeRequest', false);
     Vue.set(state.modal, 'error', error);
   },
   [types.OPEN_DISMISSAL_COMMENT_BOX](state) {

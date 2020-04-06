@@ -109,7 +109,7 @@ become available, you will be able to share job templates like this
 Dependencies should be kept to the minimum. The introduction of a new
 dependency should be argued in the merge request, as per our [Approval
 Guidelines](../code_review.md#approval-guidelines). Both [License
-Management](../../user/application_security/license_compliance/index.md)
+Management](../../user/compliance/license_compliance/index.md)
 **(ULTIMATE)** and [Dependency
 Scanning](../../user/application_security/dependency_scanning/index.md)
 **(ULTIMATE)** should be activated on all projects to ensure new dependencies
@@ -242,7 +242,7 @@ to make the test output easily readable.
 - Ideally, each test case should have a field with a unique identifier
   to use for naming subtests. In the Go standard library, this is commonly the
   `name string` field.
-- Use `want`/`expect`/`actual` when you are specifcing something in the
+- Use `want`/`expect`/`actual` when you are specifying something in the
   test case that will be used for assertion.
 
 #### Variable names

@@ -1,6 +1,6 @@
 import component from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 
@@ -71,7 +71,7 @@ describe('User onboarding help content popover', () => {
       it('emits clickExitTourButton when called', () => {
         createComponent(exitTourProps);
 
-        wrapper.find(GlButton).vm.$emit('click');
+        wrapper.find(GlDeprecatedButton).vm.$emit('click');
 
         expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickExitTourButton', args: [] }]);
       });
@@ -81,7 +81,7 @@ describe('User onboarding help content popover', () => {
       it('emits clickFeedbackButton when called', () => {
         createComponent(feedbackProps);
 
-        wrapper.find(GlButton).vm.$emit('click');
+        wrapper.find(GlDeprecatedButton).vm.$emit('click');
 
         expect(wrapper.emittedByOrder()).toEqual([
           { name: 'clickFeedbackButton', args: [{ feedbackResult: 1 }] },

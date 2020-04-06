@@ -10,7 +10,7 @@ describe API::ManagedLicenses do
   let_it_be(:software_license_policy) { create(:software_license_policy, project: project) }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
     project.add_maintainer(maintainer_user)
     project.add_developer(dev_user)
     project.add_reporter(reporter_user)
@@ -19,7 +19,7 @@ describe API::ManagedLicenses do
   describe 'GET /projects/:id/managed_licenses' do
     context 'with license management not available' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       it 'returns a forbidden status' do
@@ -107,7 +107,7 @@ describe API::ManagedLicenses do
       end
 
       it 'responds with 404 Not Found if requesting non-existing managed license' do
-        get api("/projects/#{project.id}/managed_licenses/1234512345", dev_user)
+        get api("/projects/#{project.id}/managed_licenses/#{non_existing_record_id}", dev_user)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -232,7 +232,7 @@ describe API::ManagedLicenses do
       end
 
       it 'responds with 404 Not Found if requesting non-existing managed license' do
-        patch api("/projects/#{project.id}/managed_licenses/1234512345", maintainer_user)
+        patch api("/projects/#{project.id}/managed_licenses/#{non_existing_record_id}", maintainer_user)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -275,7 +275,7 @@ describe API::ManagedLicenses do
 
       it 'responds with 404 Not Found if requesting non-existing managed license' do
         expect do
-          delete api("/projects/#{project.id}/managed_licenses/1234512345", maintainer_user)
+          delete api("/projects/#{project.id}/managed_licenses/#{non_existing_record_id}", maintainer_user)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end.not_to change {project.software_license_policies.count}

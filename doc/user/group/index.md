@@ -17,7 +17,7 @@ Find your groups by clicking **Groups > Your Groups** in the top navigation.
 
 ![GitLab Groups](img/groups.png)
 
-> The **Groups** dropdown in the top navigation was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/36234) in [GitLab 11.1](https://about.gitlab.com/blog/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
+> The **Groups** dropdown in the top navigation was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/36234) in [GitLab 11.1](https://about.gitlab.com/releases/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
 
 The **Groups** page displays:
 
@@ -256,10 +256,9 @@ and give all group members access to the project at once.
 
 Alternatively, you can [lock the sharing with group feature](#share-with-group-lock).
 
-## Sharing a group with another group **(CORE ONLY)**
+## Sharing a group with another group
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/18328) in GitLab 12.7.
-> This feature has been [disabled on GitLab.com](https://gitlab.com/gitlab-com/gl-infra/production/issues/1635).
 
 Similarly to [sharing a project with a group](#sharing-a-project-with-a-group),
 you can share a group with another group to give direct group members access
@@ -347,7 +346,7 @@ Changing a group's path can have unintended side effects. Read
 before proceeding.
 
 If you are vacating the path so it can be claimed by another group or user,
-you may need to rename the group, too, since both names and paths must
+you may need to rename the group too, since both names and paths must
 be unique.
 
 To change your group path:

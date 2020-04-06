@@ -2,8 +2,8 @@ import ListIssue from '~/boards/models/issue';
 import IssueProject from '~/boards/models/project';
 
 class ListIssueEE extends ListIssue {
-  constructor(obj, defaultAvatar) {
-    super(obj, defaultAvatar, {
+  constructor(obj) {
+    super(obj, {
       IssueProject,
     });
 

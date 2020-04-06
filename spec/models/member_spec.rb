@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Member do
+  using RSpec::Parameterized::TableSyntax
+
   describe "Associations" do
     it { is_expected.to belong_to(:user) }
   end
@@ -35,10 +37,6 @@ describe Member do
         create(:project_member, source: member.source, invite_email: member.invite_email)
 
         expect(member).not_to be_valid
-      end
-
-      it "is valid otherwise" do
-        expect(member).to be_valid
       end
     end
 
@@ -340,6 +338,17 @@ describe Member do
               expect(source.members.invite.pluck(:invite_email)).to include('user@example.com')
             end
           end
+
+          context 'when called with an unknown user email starting with a number' do
+            it 'creates an invited member', :aggregate_failures do
+              email_starting_with_number = "#{user.id}_email@example.com"
+
+              described_class.add_user(source, email_starting_with_number, :maintainer)
+
+              expect(source.members.invite.pluck(:invite_email)).to include(email_starting_with_number)
+              expect(source.users.reload).not_to include(user)
+            end
+          end
         end
 
         context 'when current_user can update member' do
@@ -580,6 +589,56 @@ describe Member do
       member.destroy
 
       expect(user.authorized_projects).not_to include(project)
+    end
+  end
+
+  context 'when after_commit :update_highest_role' do
+    where(:member_type, :source_type) do
+      :project_member | :project
+      :group_member   | :group
+    end
+
+    with_them do
+      describe 'create member' do
+        it 'initializes a new Members::UpdateHighestRoleService object' do
+          source = create(source_type) # source owner initializes a new service object too
+          user = create(:user)
+
+          expect(Members::UpdateHighestRoleService).to receive(:new).with(user.id).and_call_original
+
+          create(member_type, :guest, user: user, source_type => source)
+        end
+      end
+
+      context 'when member exists' do
+        let!(:member) { create(member_type) }
+
+        describe 'update member' do
+          context 'when access level was changed' do
+            it 'initializes a new Members::UpdateHighestRoleService object' do
+              expect(Members::UpdateHighestRoleService).to receive(:new).with(member.user_id).and_call_original
+
+              member.update(access_level: Gitlab::Access::GUEST)
+            end
+          end
+
+          context 'when access level was not changed' do
+            it 'does not initialize a new Members::UpdateHighestRoleService object' do
+              expect(Members::UpdateHighestRoleService).not_to receive(:new).with(member.user_id)
+
+              member.update(notification_level: NotificationSetting.levels[:disabled])
+            end
+          end
+        end
+
+        describe 'destroy member' do
+          it 'initializes a new Members::UpdateHighestRoleService object' do
+            expect(Members::UpdateHighestRoleService).to receive(:new).with(member.user_id).and_call_original
+
+            member.destroy
+          end
+        end
+      end
     end
   end
 end

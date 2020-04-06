@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { mapState, mapActions } from 'vuex';
 import { GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
@@ -77,10 +77,10 @@ export default {
     },
     isValid() {
       return (
-        !_.isEmpty(this.country) &&
-        !_.isEmpty(this.streetAddressLine1) &&
-        !_.isEmpty(this.city) &&
-        !_.isEmpty(this.zipCode)
+        !isEmpty(this.country) &&
+        !isEmpty(this.streetAddressLine1) &&
+        !isEmpty(this.city) &&
+        !isEmpty(this.zipCode)
       );
     },
     countryOptionsWithDefault() {

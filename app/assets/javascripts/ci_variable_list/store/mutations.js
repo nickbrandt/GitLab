@@ -1,5 +1,5 @@
 import * as types from './mutation_types';
-import { __ } from '~/locale';
+import { displayText } from '../constants';
 
 export default {
   [types.REQUEST_VARIABLES](state) {
@@ -61,7 +61,7 @@ export default {
   [types.RECEIVE_ENVIRONMENTS_SUCCESS](state, environments) {
     state.isLoading = false;
     state.environments = environments;
-    state.environments.unshift(__('All environments'));
+    state.environments.unshift(displayText.allEnvironmentsText);
   },
 
   [types.VARIABLE_BEING_EDITED](state, variable) {
@@ -70,17 +70,38 @@ export default {
 
   [types.CLEAR_MODAL](state) {
     state.variable = {
-      variable_type: __('Variable'),
+      variable_type: displayText.variableText,
       key: '',
       secret_value: '',
       protected: false,
       masked: false,
-      environment_scope: __('All environments'),
+      environment_scope: displayText.allEnvironmentsText,
     };
   },
 
   [types.RESET_EDITING](state) {
     state.variableBeingEdited = null;
     state.showInputValue = false;
+  },
+
+  [types.SET_ENVIRONMENT_SCOPE](state, environment) {
+    if (state.variableBeingEdited) {
+      state.variableBeingEdited.environment_scope = environment;
+    } else {
+      state.variable.environment_scope = environment;
+    }
+  },
+
+  [types.ADD_WILD_CARD_SCOPE](state, environment) {
+    state.environments.push(environment);
+    state.environments.sort();
+  },
+
+  [types.RESET_SELECTED_ENVIRONMENT](state) {
+    state.selectedEnvironment = '';
+  },
+
+  [types.SET_SELECTED_ENVIRONMENT](state, environment) {
+    state.selectedEnvironment = environment;
   },
 };

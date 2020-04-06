@@ -6,6 +6,9 @@ class ApplicationSetting < ApplicationRecord
   include TokenAuthenticatable
   include ChronicDurationAttribute
 
+  GRAFANA_URL_ERROR_MESSAGE = 'Please check your Grafana URL setting in ' \
+    'Admin Area > Settings > Metrics and profiling > Metrics - Grafana'
+
   add_authentication_token_field :runners_registration_token, encrypted: -> { Feature.enabled?(:application_settings_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
   add_authentication_token_field :health_check_access_token
   add_authentication_token_field :static_objects_external_storage_auth_token
@@ -37,6 +40,14 @@ class ApplicationSetting < ApplicationRecord
   default_value_for :id, 1
 
   chronic_duration_attr_writer :archive_builds_in_human_readable, :archive_builds_in_seconds
+
+  validates :grafana_url,
+            system_hook_url: {
+              blocked_message: "is blocked: %{exception_message}. " + GRAFANA_URL_ERROR_MESSAGE
+            },
+            if: :grafana_url_absolute?
+
+  validate :validate_grafana_url
 
   validates :uuid, presence: true
 
@@ -126,7 +137,7 @@ class ApplicationSetting < ApplicationRecord
 
   validates :max_pages_size,
             presence: true,
-            numericality: { only_integer: true, greater_than: 0,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0,
                             less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
   validates :default_artifacts_expire_in, presence: true, duration: true
@@ -246,7 +257,7 @@ class ApplicationSetting < ApplicationRecord
 
   validates :snippet_size_limit, numericality: { only_integer: true, greater_than: 0 }
 
-  validate :email_restrictions_regex_valid?
+  validates :email_restrictions, untrusted_regexp: true
 
   SUPPORTED_KEY_TYPES.each do |type|
     validates :"#{type}_key_restriction", presence: true, key_restriction: { type: type }
@@ -326,6 +337,10 @@ class ApplicationSetting < ApplicationRecord
     length: { maximum: 255 },
     allow_blank: true
 
+  validates :namespace_storage_size_limit,
+            presence: true,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
   attr_encrypted :asset_proxy_secret_key,
                  mode: :per_attribute_iv,
                  key: Settings.attr_encrypted_db_key_base_truncated,
@@ -362,6 +377,19 @@ class ApplicationSetting < ApplicationRecord
   end
   after_commit :expire_performance_bar_allowed_user_ids_cache, if: -> { previous_changes.key?('performance_bar_allowed_group_id') }
 
+  def validate_grafana_url
+    unless parsed_grafana_url
+      self.errors.add(
+        :grafana_url,
+        "must be a valid relative or absolute URL. #{GRAFANA_URL_ERROR_MESSAGE}"
+      )
+    end
+  end
+
+  def grafana_url_absolute?
+    parsed_grafana_url&.absolute?
+  end
+
   def sourcegraph_url_is_com?
     !!(sourcegraph_url =~ /\Ahttps:\/\/(www\.)?sourcegraph\.com/)
   end
@@ -387,12 +415,10 @@ class ApplicationSetting < ApplicationRecord
     recaptcha_enabled || login_recaptcha_protection_enabled
   end
 
-  def email_restrictions_regex_valid?
-    return if email_restrictions.blank?
+  private
 
-    Gitlab::UntrustedRegexp.new(email_restrictions)
-  rescue RegexpError
-    errors.add(:email_restrictions, _('is not a valid regular expression'))
+  def parsed_grafana_url
+    @parsed_grafana_url ||= Gitlab::Utils.parse_url(grafana_url)
   end
 end
 

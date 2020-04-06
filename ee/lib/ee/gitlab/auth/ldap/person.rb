@@ -5,7 +5,7 @@ require 'net/ldap/dn'
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Person
           extend ActiveSupport::Concern
 
@@ -42,7 +42,7 @@ module EE
             # LDAP DN and constructs a domain name from them
             def domain_from_dn(dn)
               dn_components = []
-              ::Gitlab::Auth::LDAP::DN.new(dn).each_pair { |name, value| dn_components << { name: name, value: value } }
+              ::Gitlab::Auth::Ldap::DN.new(dn).each_pair { |name, value| dn_components << { name: name, value: value } }
               dn_components
                 .reverse
                 .take_while { |rdn| rdn[:name].casecmp('DC').zero? } # Domain Component

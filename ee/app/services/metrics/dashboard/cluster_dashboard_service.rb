@@ -9,14 +9,15 @@ module Metrics
       DASHBOARD_NAME = 'Cluster'
 
       SEQUENCE = [
-        STAGES::CommonMetricsInserter,
         STAGES::ClusterEndpointInserter,
         STAGES::Sorter
       ].freeze
 
       class << self
         def valid_params?(params)
-          params[:cluster].present?
+          # support selecting this service by cluster id via .find
+          # Use super to support selecting this service by dashboard_path via .find_raw
+          (params[:cluster].present? && params[:embedded] != 'true') || super
         end
       end
 

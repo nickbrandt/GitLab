@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectWiki
-  include Gitlab::ShellAdapter
   include Storage::LegacyProjectWiki
+  include Gitlab::Utils::StrongMemoize
 
   MARKUPS = {
     'Markdown' => :markdown,
@@ -19,10 +19,11 @@ class ProjectWiki
   DIRECTION_DESC = 'desc'
   DIRECTION_ASC = 'asc'
 
+  attr_reader :project, :user
+
   # Returns a string describing what went wrong after
   # an operation fails.
   attr_reader :error_message
-  attr_reader :project
 
   def initialize(project, user = nil)
     @project = project
@@ -38,16 +39,17 @@ class ProjectWiki
   def full_path
     @project.full_path + '.wiki'
   end
+  alias_method :id, :full_path
 
   # @deprecated use full_path when you need it for an URL route or disk_path when you want to point to the filesystem
   alias_method :path_with_namespace, :full_path
 
-  def web_url
-    Gitlab::Routing.url_helpers.project_wiki_url(@project, :home)
+  def web_url(only_path: nil)
+    Gitlab::UrlBuilder.build(self, only_path: only_path)
   end
 
   def url_to_repo
-    gitlab_shell.url_to_repo(full_path)
+    Gitlab::Shell.url_to_repo(full_path)
   end
 
   def ssh_url_to_repo
@@ -64,14 +66,15 @@ class ProjectWiki
 
   # Returns the Gitlab::Git::Wiki object.
   def wiki
-    @wiki ||= begin
-      gl_repository = Gitlab::GlRepository::WIKI.identifier_for_container(project)
-      raw_repository = Gitlab::Git::Repository.new(project.repository_storage, disk_path + '.git', gl_repository, full_path)
+    strong_memoize(:wiki) do
+      repository.create_if_not_exists
+      raise CouldNotCreateWikiError unless repository_exists?
 
-      create_repo!(raw_repository) unless raw_repository.exists?
-
-      Gitlab::Git::Wiki.new(raw_repository)
+      Gitlab::Git::Wiki.new(repository.raw)
     end
+  rescue => err
+    Gitlab::ErrorTracking.track_exception(err, project_wiki: { project_id: project.id, full_path: full_path, disk_path: disk_path })
+    raise CouldNotCreateWikiError
   end
 
   def repository_exists?
@@ -193,19 +196,11 @@ class ProjectWiki
 
   private
 
-  def create_repo!(raw_repository)
-    gitlab_shell.create_wiki_repository(project)
-
-    raise CouldNotCreateWikiError unless raw_repository.exists?
-
-    repository.after_create
-  end
-
   def commit_details(action, message = nil, title = nil)
     commit_message = message.presence || default_message(action, title)
-    git_user = Gitlab::Git::User.from_gitlab(@user)
+    git_user = Gitlab::Git::User.from_gitlab(user)
 
-    Gitlab::Git::Wiki::CommitDetails.new(@user.id,
+    Gitlab::Git::Wiki::CommitDetails.new(user.id,
                                          git_user.username,
                                          git_user.name,
                                          git_user.email,
@@ -213,7 +208,7 @@ class ProjectWiki
   end
 
   def default_message(action, title)
-    "#{@user.username} #{action} page: #{title}"
+    "#{user.username} #{action} page: #{title}"
   end
 
   def update_project_activity

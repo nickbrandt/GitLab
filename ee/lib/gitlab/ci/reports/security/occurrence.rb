@@ -65,19 +65,6 @@ module Gitlab
             @location = new_location
           end
 
-          def ==(other)
-            other.report_type == report_type &&
-              other.location == location &&
-              other.primary_identifier == primary_identifier
-          end
-
-          # Array.difference (-) method uses hash and eq? methods to do comparison
-          def hash
-            compare_key.hash
-          end
-
-          alias_method :eql?, :== # eql? is necessary in some cases like array intersection
-
           private
 
           def generate_project_fingerprint

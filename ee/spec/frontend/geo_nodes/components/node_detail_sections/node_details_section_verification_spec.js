@@ -1,36 +1,45 @@
-import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
+import { GlPopover, GlSprintf } from '@gitlab/ui';
 
 import NodeDetailsSectionVerificationComponent from 'ee/geo_nodes/components/node_detail_sections/node_details_section_verification.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import SectionRevealButton from 'ee/geo_nodes/components/node_detail_sections/section_reveal_button.vue';
+
 import { mockNodeDetails } from '../../mock_data';
 
-const createComponent = ({ nodeDetails = mockNodeDetails, nodeTypePrimary = false }) => {
-  const Component = Vue.extend(NodeDetailsSectionVerificationComponent);
-
-  return mountComponent(Component, {
-    nodeDetails,
-    nodeTypePrimary,
-  });
-};
-
 describe('NodeDetailsSectionVerification', () => {
-  let vm;
+  let wrapper;
+
+  const defaultProps = {
+    nodeDetails: mockNodeDetails,
+    nodeTypePrimary: false,
+  };
+
+  const createComponent = (props = {}) => {
+    wrapper = shallowMount(NodeDetailsSectionVerificationComponent, {
+      propsData: {
+        ...defaultProps,
+        ...props,
+      },
+    });
+  };
 
   beforeEach(() => {
-    vm = createComponent({});
+    createComponent();
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
+
+  const findGlPopover = () => wrapper.find(GlPopover);
 
   describe('data', () => {
     it('returns default data props', () => {
-      expect(vm.showSectionItems).toBe(false);
-      expect(Array.isArray(vm.primaryNodeDetailItems)).toBe(true);
-      expect(Array.isArray(vm.secondaryNodeDetailItems)).toBe(true);
-      expect(vm.primaryNodeDetailItems.length).toBeGreaterThan(0);
-      expect(vm.secondaryNodeDetailItems.length).toBeGreaterThan(0);
+      expect(wrapper.vm.showSectionItems).toBe(false);
+      expect(Array.isArray(wrapper.vm.primaryNodeDetailItems)).toBe(true);
+      expect(Array.isArray(wrapper.vm.secondaryNodeDetailItems)).toBe(true);
+      expect(wrapper.vm.primaryNodeDetailItems.length).toBeGreaterThan(0);
+      expect(wrapper.vm.secondaryNodeDetailItems.length).toBeGreaterThan(0);
     });
   });
 
@@ -48,7 +57,7 @@ describe('NodeDetailsSectionVerification', () => {
       ];
 
       it('returns array containing items to show under primary node', () => {
-        const actualPrimaryItems = vm.getPrimaryNodeDetailItems();
+        const actualPrimaryItems = wrapper.vm.getPrimaryNodeDetailItems();
         primaryItems.forEach((item, index) => {
           expect(actualPrimaryItems[index].itemTitle).toBe(item.title);
           expect(actualPrimaryItems[index].itemValue).toBe(mockNodeDetails[item.valueProp]);
@@ -69,7 +78,7 @@ describe('NodeDetailsSectionVerification', () => {
       ];
 
       it('returns array containing items to show under secondary node', () => {
-        const actualSecondaryItems = vm.getSecondaryNodeDetailItems();
+        const actualSecondaryItems = wrapper.vm.getSecondaryNodeDetailItems();
         secondaryItems.forEach((item, index) => {
           expect(actualSecondaryItems[index].itemTitle).toBe(item.title);
           expect(actualSecondaryItems[index].itemValue).toBe(mockNodeDetails[item.valueProp]);
@@ -78,23 +87,60 @@ describe('NodeDetailsSectionVerification', () => {
     });
   });
 
+  describe('computed', () => {
+    describe('nodeText', () => {
+      describe('on Primary node', () => {
+        beforeEach(() => {
+          createComponent({ nodeTypePrimary: true });
+        });
+
+        it('returns text about secondary nodes', () => {
+          expect(wrapper.vm.nodeText).toBe('secondary nodes');
+        });
+      });
+
+      describe('on Secondary node', () => {
+        beforeEach(() => {
+          createComponent();
+        });
+
+        it('returns text about secondary nodes', () => {
+          expect(wrapper.vm.nodeText).toBe('primary node');
+        });
+      });
+    });
+  });
+
   describe('template', () => {
     it('renders component container element', () => {
-      expect(vm.$el.classList.contains('verification-section')).toBe(true);
+      expect(wrapper.vm.$el.classList.contains('verification-section')).toBe(true);
     });
 
     it('renders show section button element', () => {
-      expect(vm.$el.querySelector('.btn-link')).not.toBeNull();
-      expect(vm.$el.querySelector('.btn-link > span').innerText.trim()).toBe(
+      expect(wrapper.find(SectionRevealButton).exists()).toBeTruthy();
+      expect(wrapper.find(SectionRevealButton).attributes('buttontitle')).toBe(
         'Verification information',
       );
     });
 
-    it('renders section items container element', done => {
-      vm.showSectionItems = true;
-      Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();
-        done();
+    it('renders section items container element', () => {
+      wrapper.vm.showSectionItems = true;
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.vm.$el.querySelector('.section-items-container')).not.toBeNull();
+      });
+    });
+
+    describe('GlPopover', () => {
+      it('renders always', () => {
+        expect(findGlPopover().exists()).toBeTruthy();
+      });
+
+      it('contains text about Replicated data', () => {
+        expect(
+          findGlPopover()
+            .find(GlSprintf)
+            .attributes('message'),
+        ).toContain('Replicated data is verified');
       });
     });
   });

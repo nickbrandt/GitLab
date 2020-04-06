@@ -31,8 +31,14 @@ module Approvable
     end
   end
 
-  def approval_state
-    @approval_state ||= ApprovalState.new(self)
+  def approval_state(target_branch: nil)
+    approval_state = strong_memoize(:approval_state) do
+      Hash.new do |h, key|
+        h[key] = ApprovalState.new(self, target_branch: key)
+      end
+    end
+
+    approval_state[target_branch]
   end
 
   def approvals_given

@@ -359,7 +359,9 @@ describe Projects::UpdateMirrorService do
 
           it 'updates LFS objects' do
             expect(Projects::LfsPointers::LfsImportService).to receive(:new).and_call_original
-            expect_any_instance_of(Projects::LfsPointers::LfsObjectDownloadListService).to receive(:execute).and_return({})
+            expect_next_instance_of(Projects::LfsPointers::LfsObjectDownloadListService) do |instance|
+              expect(instance).to receive(:execute).and_return({})
+            end
 
             service.execute
           end
@@ -368,7 +370,9 @@ describe Projects::UpdateMirrorService do
             let(:error_message) { 'error_message' }
 
             before do
-              expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: error_message)
+              expect_next_instance_of(Projects::LfsPointers::LfsImportService) do |instance|
+                expect(instance).to receive(:execute).and_return(status: :error, message: error_message)
+              end
             end
 
             # Uncomment once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
@@ -389,7 +393,9 @@ describe Projects::UpdateMirrorService do
             end
 
             it 'logs the error' do
-              expect_any_instance_of(Gitlab::UpdateMirrorServiceJsonLogger).to receive(:error).with(hash_including(error_message: error_message))
+              expect_next_instance_of(Gitlab::UpdateMirrorServiceJsonLogger) do |instance|
+                expect(instance).to receive(:error).with(hash_including(error_message: error_message))
+              end
 
               subject.execute
             end

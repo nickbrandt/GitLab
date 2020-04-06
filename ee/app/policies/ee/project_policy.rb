@@ -33,6 +33,9 @@ module EE
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
 
+      with_scope :subject
+      condition(:requirements_available) { @subject.feature_available?(:requirements) }
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -67,6 +70,11 @@ module EE
             .prevent_merge_requests_committers_approval
       end
 
+      with_scope :global
+      condition(:cluster_health_available) do
+        License.feature_available?(:cluster_health)
+      end
+
       with_scope :subject
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
@@ -78,17 +86,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:pod_logs_enabled) do
-        @subject.feature_available?(:pod_logs, @user)
-      end
-
-      with_scope :subject
       condition(:security_dashboard_enabled) do
         @subject.feature_available?(:security_dashboard)
-      end
-
-      condition(:prometheus_alerts_enabled) do
-        @subject.feature_available?(:prometheus_alerts, @user)
       end
 
       with_scope :subject
@@ -103,7 +102,7 @@ module EE
 
       with_scope :subject
       condition(:threat_monitoring_enabled) do
-        @subject.beta_feature_available?(:threat_monitoring)
+        @subject.feature_available?(:threat_monitoring)
       end
 
       with_scope :subject
@@ -119,6 +118,11 @@ module EE
       with_scope :subject
       condition(:code_review_analytics_enabled) do
         @subject.feature_available?(:code_review_analytics, @user)
+      end
+
+      condition(:status_page_available) do
+        @subject.feature_available?(:status_page, @user) &&
+          @subject.beta_feature_available?(:status_page)
       end
 
       condition(:group_timelogs_available) do
@@ -166,6 +170,7 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :admin_board
+        enable :read_vulnerability_feedback
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
@@ -181,8 +186,6 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
-
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
@@ -190,13 +193,12 @@ module EE
       rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
         enable :create_vulnerability
+        enable :create_vulnerability_export
         enable :admin_vulnerability
         enable :admin_vulnerability_issue_link
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
-
-      rule { can?(:read_security_findings) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
@@ -229,9 +231,6 @@ module EE
       end
 
       rule { license_scanning_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
-
-      rule { pod_logs_enabled & can?(:maintainer_access) }.enable :read_pod_logs
-      rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
 
       rule { auditor }.policy do
         enable :public_user_access
@@ -335,6 +334,8 @@ module EE
         prevent :modify_merge_request_committer_setting
       end
 
+      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
+
       rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
         prevent :modify_approvers_list
       end
@@ -352,6 +353,18 @@ module EE
       rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
+
+      rule { can?(:read_project) & requirements_available }.enable :read_requirement
+
+      rule { requirements_available & reporter }.policy do
+        enable :create_requirement
+        enable :admin_requirement
+        enable :update_requirement
+      end
+
+      rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end
 
     override :lookup_access_level!

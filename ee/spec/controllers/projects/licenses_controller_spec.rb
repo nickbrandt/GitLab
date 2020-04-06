@@ -16,7 +16,7 @@ describe Projects::LicensesController do
     context 'with authorized user' do
       context 'when feature is available' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
         end
 
         context 'with reporter' do
@@ -43,7 +43,7 @@ describe Projects::LicensesController do
           end
 
           context 'with existing report' do
-            let!(:pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
+            let!(:pipeline) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
 
             before do
               get_licenses
@@ -280,7 +280,7 @@ describe Projects::LicensesController do
 
     context 'with unauthorized user' do
       before do
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
 
         get_licenses
       end
@@ -309,7 +309,7 @@ describe Projects::LicensesController do
       let(:current_user) { create(:user) }
 
       before do
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
         sign_in(current_user)
       end
 
@@ -427,7 +427,7 @@ describe Projects::LicensesController do
       let(:current_user) { create(:user) }
 
       before do
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
         sign_in(current_user)
       end
 

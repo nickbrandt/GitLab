@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { __, sprintf } from '~/locale';
 
@@ -24,7 +24,7 @@ export default {
       const issueLink = `<a href="${feedback.issue_url}">#${feedback.issue_iid}</a>`;
 
       if (project && project.value && project.url) {
-        const projectLink = `<a href="${_.escape(project.url)}">${_.escape(project.value)}</a>`;
+        const projectLink = `<a href="${esc(project.url)}">${esc(project.value)}</a>`;
 
         return sprintf(
           __('Created issue %{issueLink} at %{projectLink}'),

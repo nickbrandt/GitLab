@@ -17,7 +17,7 @@ services.
 
 [GitLab Omnibus can help you install Grafana (recommended)](https://docs.gitlab.com/omnibus/settings/grafana.html)
 or Grafana supplies package repositories (Yum/Apt) for easy installation.
-See [Grafana installation documentation](https://grafana.com/docs/installation/)
+See [Grafana installation documentation](https://grafana.com/docs/grafana/latest/installation/)
 for detailed steps.
 
 NOTE: **Note:**
@@ -39,8 +39,8 @@ Test Connection to ensure the configuration is correct.
 - **Name**: `InfluxDB`
 - **Default**: Checked
 - **Type**: `InfluxDB 0.9.x` (Even if you're using InfluxDB 0.10.x)
-- **Url**: `https://localhost:8086` (Or the remote URL if you've installed InfluxDB
-  on a separate server)
+- For the URL, use `https://localhost:8086`, or provide the remote URL if you've installed InfluxDB
+  on a separate server
 - **Access**: `proxy`
 - **Database**: `gitlab`
 - **User**: `admin` (Or the username configured when setting up InfluxDB)
@@ -52,7 +52,7 @@ Test Connection to ensure the configuration is correct.
 
 If you intend to import the GitLab provided Grafana dashboards, you will need to
 set up the right retention policies and continuous queries. The easiest way of
-doing this is by using the [influxdb-management](https://gitlab.com/gitlab-org/influxdb-management)
+doing this is by using the [InfluxDB Management](https://gitlab.com/gitlab-org/influxdb-management)
 repository.
 
 To use this repository you must first clone it:
@@ -74,13 +74,13 @@ and then editing the `.env` file to contain the correct InfluxDB settings. Once
 configured you can simply run `bundle exec rake` and the InfluxDB database will
 be configured for you.
 
-For more information see the [influxdb-management README](https://gitlab.com/gitlab-org/influxdb-management/blob/master/README.md).
+For more information see the [InfluxDB Management README](https://gitlab.com/gitlab-org/influxdb-management/blob/master/README.md).
 
 ## Import Dashboards
 
 You can now import a set of default dashboards that will give you a good
 start on displaying useful information. GitLab has published a set of default
-[Grafana dashboards][grafana-dashboards] to get you started. Clone the
+[Grafana dashboards](https://gitlab.com/gitlab-org/grafana-dashboards) to get you started. Clone the
 repository or download a zip/tarball, then follow these steps to import each
 JSON file.
 
@@ -102,10 +102,8 @@ navigate away.
 Repeat this process for each dashboard you wish to import.
 
 Alternatively you can automatically import all the dashboards into your Grafana
-instance. See the README of the [Grafana dashboards][grafana-dashboards]
+instance. See the README of the [Grafana dashboards](https://gitlab.com/gitlab-org/grafana-dashboards)
 repository for more information on this process.
-
-[grafana-dashboards]: https://gitlab.com/gitlab-org/grafana-dashboards
 
 ## Integration with GitLab UI
 
@@ -117,8 +115,9 @@ If you have set up Grafana, you can enable a link to access it easily from the s
 1. Expand **Metrics - Grafana**.
 1. Check the "Enable access to Grafana" checkbox.
 1. If Grafana is enabled through Omnibus GitLab and on the same server,
-   leave "Grafana URL" unchanged. In any other case, enter the full URL
-   path of the Grafana instance.
+   leave **Grafana URL** unchanged. It should be `/-/grafana`.
+
+   In any other case, enter the full URL of the Grafana instance.
 1. Click **Save changes**.
 1. The new link will be available in the **Admin Area > Monitoring > Metrics Dashboard**.
 
@@ -151,13 +150,13 @@ However, you should **not** reinstate your old data _except_ under one of the fo
 If you require access to your old Grafana data but do not meet one of these criteria, you may consider:
 
 1. Reinstating it temporarily.
-1. [Exporting the dashboards](https://grafana.com/docs/reference/export_import/#exporting-a-dashboard) you need.
-1. Refreshing the data and [re-importing your dashboards](https://grafana.com/docs/reference/export_import/#importing-a-dashboard).
+1. [Exporting the dashboards](https://grafana.com/docs/grafana/latest/reference/export_import/#exporting-a-dashboard) you need.
+1. Refreshing the data and [re-importing your dashboards](https://grafana.com/docs/grafana/latest/reference/export_import/#importing-a-dashboard).
 
 DANGER: **Danger:**
 This poses a temporary vulnerability while your old Grafana data is in use and the decision to do so should be weighed carefully with your need to access existing data and dashboards.
 
-For more information and further mitigation details, please refer to our [blog post on the security release](https://about.gitlab.com/blog/2019/08/12/critical-security-release-gitlab-12-dot-1-dot-6-released/).
+For more information and further mitigation details, please refer to our [blog post on the security release](https://about.gitlab.com/releases/2019/08/12/critical-security-release-gitlab-12-dot-1-dot-6-released/).
 
 ---
 

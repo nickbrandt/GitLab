@@ -12,7 +12,7 @@ The [epic issues API](epic_issues.md) allows you to interact with issues associa
 
 ## Milestone dates integration
 
-> [Introduced][ee-6448] in GitLab 11.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448) in GitLab 11.3.
 
 Since start date and due date can be dynamically sourced from related issue milestones, when user has edit permission,
 additional fields will be shown. These include two boolean fields `start_date_is_fixed` and `due_date_is_fixed`,
@@ -53,7 +53,7 @@ GET /groups/:id/epics?state=opened
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user               |
 | `author_id`         | integer          | no         | Return epics created by the given user `id`                                                                                 |
 | `labels`            | string           | no         | Return epics matching a comma separated list of labels names. Label names from the epic group or a parent group can be used |
-| `with_labels_details` | Boolean        | no         | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413)|
+| `with_labels_details` | boolean        | no         | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413)|
 | `order_by`          | string           | no         | Return epics ordered by `created_at` or `updated_at` fields. Default is `created_at`                                        |
 | `sort`              | string           | no         | Return epics sorted in `asc` or `desc` order. Default is `desc`                                                             |
 | `search`            | string           | no         | Search epics against their `title` and `description`                                                                        |
@@ -167,7 +167,7 @@ GET /groups/:id/epics/:epic_iid
 | Attribute           | Type             | Required   | Description                                                                            |
 | ------------------- | ---------------- | ---------- | ---------------------------------------------------------------------------------------|
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user                |
-| `epic_iid`          | integer/string   | yes        | The internal ID  of the epic.  |
+| `epic_iid`          | integer/string   | yes        | The internal ID of the epic.  |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5
@@ -224,7 +224,7 @@ Example response:
 Creates a new epic.
 
 NOTE: **Note:**
-Starting with GitLab [11.3][ee-6448], `start_date` and `end_date` should no longer be assigned
+Starting with GitLab [11.3](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448), `start_date` and `end_date` should no longer be assigned
 directly, as they now represent composite values. You can configure it via the `*_is_fixed` and
 `*_fixed` fields instead.
 
@@ -298,7 +298,7 @@ Example response:
 Updates an epic.
 
 NOTE: **Note:**
-Starting with GitLab [11.3][ee-6448], `start_date` and `end_date` should no longer be assigned
+Starting with GitLab [11.3](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448), `start_date` and `end_date` should no longer be assigned
 directly, as they now represent composite values. You can configure it via the `*_is_fixed` and
 `*_fixed` fields instead.
 
@@ -309,7 +309,7 @@ PUT /groups/:id/epics/:epic_iid
 | Attribute           | Type             | Required   | Description                                                                            |
 | ------------------- | ---------------- | ---------- | ---------------------------------------------------------------------------------------|
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user                |
-| `epic_iid`          | integer/string   | yes        | The internal ID  of the epic  |
+| `epic_iid`          | integer/string   | yes        | The internal ID of the epic  |
 | `title`             | string           | no         | The title of an epic |
 | `description`       | string           | no         | The description of an epic. Limited to 1,048,576 characters.  |
 | `labels`            | string           | no         | The comma separated list of labels |
@@ -379,7 +379,7 @@ DELETE /groups/:id/epics/:epic_iid
 | Attribute           | Type             | Required   | Description                                                                            |
 | ------------------- | ---------------- | ---------- | ---------------------------------------------------------------------------------------|
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user                |
-| `epic_iid`          | integer/string   | yes        | The internal ID  of the epic.  |
+| `epic_iid`          | integer/string   | yes        | The internal ID of the epic.  |
 
 ```shell
 curl --header DELETE "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5
@@ -460,5 +460,3 @@ Example response:
   "created_at": "2016-07-01T11:09:13.992Z"
 }
 ```
-
-[ee-6448]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448

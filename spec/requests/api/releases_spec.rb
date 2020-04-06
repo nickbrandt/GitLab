@@ -6,6 +6,7 @@ describe API::Releases do
   let(:project) { create(:project, :repository, :private) }
   let(:maintainer) { create(:user) }
   let(:reporter) { create(:user) }
+  let(:developer) { create(:user) }
   let(:guest) { create(:user) }
   let(:non_project_member) { create(:user) }
   let(:commit) { create(:commit, project: project) }
@@ -15,6 +16,7 @@ describe API::Releases do
     project.add_maintainer(maintainer)
     project.add_reporter(reporter)
     project.add_guest(guest)
+    project.add_developer(developer)
 
     project.repository.add_tag(maintainer, 'v0.1', commit.id)
     project.repository.add_tag(maintainer, 'v0.2', commit.id)
@@ -102,6 +104,21 @@ describe API::Releases do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response.first['upcoming_release']).to eq(false)
+    end
+
+    it 'avoids N+1 queries' do
+      create(:release, :with_evidence, project: project, tag: 'v0.1', author: maintainer)
+
+      control_count = ActiveRecord::QueryRecorder.new do
+        get api("/projects/#{project.id}/releases", maintainer)
+      end.count
+
+      create(:release, :with_evidence, project: project, tag: 'v0.1', author: maintainer)
+      create(:release, :with_evidence, project: project, tag: 'v0.1', author: maintainer)
+
+      expect do
+        get api("/projects/#{project.id}/releases", maintainer)
+      end.not_to exceed_query_limit(control_count)
     end
 
     context 'when tag does not exist in git repository' do
@@ -233,28 +250,21 @@ describe API::Releases do
           .to match_array(release.sources.map(&:url))
       end
 
-      context "when release description contains confidential issue's link" do
-        let(:confidential_issue) do
-          create(:issue,
-                 :confidential,
-                 project: project,
-                 title: 'A vulnerability')
-        end
+      context 'with evidence' do
+        let!(:evidence) { create(:evidence, release: release) }
 
-        let!(:release) do
-          create(:release,
-                 project: project,
-                 tag: 'v0.1',
-                 sha: commit.id,
-                 author: maintainer,
-                 description: "This is confidential #{confidential_issue.to_reference}")
-        end
-
-        it "does not expose confidential issue's title" do
+        it 'returns the evidence' do
           get api("/projects/#{project.id}/releases/v0.1", maintainer)
 
-          expect(json_response['description_html']).to include(confidential_issue.to_reference)
-          expect(json_response['description_html']).not_to include('A vulnerability')
+          expect(json_response['evidences'].count).to eq(1)
+        end
+
+        it '#collected_at' do
+          Timecop.freeze(Time.now.round) do
+            get api("/projects/#{project.id}/releases/v0.1", maintainer)
+
+            expect(json_response['evidences'].first['collected_at'].to_datetime.to_i).to be_within(1.minute).of(release.evidences.first.created_at.to_i)
+          end
         end
       end
 
@@ -359,10 +369,27 @@ describe API::Releases do
 
           let(:milestone) { create(:milestone, project: project) }
 
+          it 'matches schema' do
+            get api("/projects/#{project.id}/releases/v0.1", non_project_member)
+
+            expect(response).to match_response_schema('public_api/v4/release')
+          end
+
           it 'exposes milestones' do
             get api("/projects/#{project.id}/releases/v0.1", non_project_member)
 
             expect(json_response['milestones'].first['title']).to eq(milestone.title)
+          end
+
+          it 'returns issue stats for milestone' do
+            create_list(:issue, 2, milestone: milestone, project: project)
+            create_list(:issue, 3, :closed, milestone: milestone, project: project)
+
+            get api("/projects/#{project.id}/releases/v0.1", non_project_member)
+
+            issue_stats = json_response['milestones'].first["issue_stats"]
+            expect(issue_stats["total"]).to eq(5)
+            expect(issue_stats["closed"]).to eq(3)
           end
 
           context 'when project restricts visibility of issues and merge requests' do
@@ -414,6 +441,22 @@ describe API::Releases do
       expect(project.releases.last.description).to eq('Super nice release')
     end
 
+    it 'creates a new release without description' do
+      params = {
+          name: 'New release without description',
+          tag_name: 'v0.1',
+          released_at: '2019-03-25 10:00:00'
+      }
+
+      expect do
+        post api("/projects/#{project.id}/releases", maintainer), params: params
+      end.to change { Release.count }.by(1)
+
+      expect(project.releases.last.name).to eq('New release without description')
+      expect(project.releases.last.tag).to eq('v0.1')
+      expect(project.releases.last.description).to eq(nil)
+    end
+
     it 'sets the released_at to the current time if the released_at parameter is not provided' do
       now = Time.zone.parse('2015-08-25 06:00:00Z')
       Timecop.freeze(now) do
@@ -457,26 +500,6 @@ describe API::Releases do
       post api("/projects/#{project.id}/releases", maintainer), params: params
 
       expect(project.releases.last.released_at).to eq('2019-03-25T01:00:00Z')
-    end
-
-    context 'when description is empty' do
-      let(:params) do
-        {
-          name: 'New release',
-          tag_name: 'v0.1',
-          description: ''
-        }
-      end
-
-      it 'returns an error as validation failure' do
-        expect do
-          post api("/projects/#{project.id}/releases", maintainer), params: params
-        end.not_to change { Release.count }
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['message'])
-          .to eq("Validation failed: Description can't be blank")
-      end
     end
 
     it 'matches response schema' do
@@ -737,7 +760,7 @@ describe API::Releases do
         end
 
         it 'does not create an Evidence object', :sidekiq_inline do
-          expect { subject }.not_to change(Evidence, :count)
+          expect { subject }.not_to change(Releases::Evidence, :count)
         end
 
         it 'is a historical release' do
@@ -767,7 +790,7 @@ describe API::Releases do
         end
 
         it 'creates Evidence', :sidekiq_inline do
-          expect { subject }.to change(Evidence, :count).by(1)
+          expect { subject }.to change(Releases::Evidence, :count).by(1)
         end
 
         it 'is not a historical release' do
@@ -797,7 +820,7 @@ describe API::Releases do
         end
 
         it 'creates Evidence', :sidekiq_inline do
-          expect { subject }.to change(Evidence, :count).by(1)
+          expect { subject }.to change(Releases::Evidence, :count).by(1)
         end
 
         it 'is not a historical release' do

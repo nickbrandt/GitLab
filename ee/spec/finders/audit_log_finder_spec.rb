@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe AuditLogFinder do
-  describe '#execute' do
-    let_it_be(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
-    let_it_be(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
-    let_it_be(:group_audit_event) { create(:group_audit_event, created_at: 1.day.ago) }
+  let_it_be(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
+  let_it_be(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
+  let_it_be(:group_audit_event) { create(:group_audit_event, created_at: 1.day.ago) }
 
+  describe '#execute' do
     subject { described_class.new(params).execute }
 
     context 'no filtering' do
@@ -24,6 +24,14 @@ describe AuditLogFinder do
 
         it 'ignores entity_id and returns all events' do
           expect(subject.count).to eq(3)
+        end
+      end
+
+      context 'invalid entity_id' do
+        let(:params) { { entity_type: 'User', entity_id: '0' } }
+
+        it 'ignores entity_id and returns all events for given entity_type' do
+          expect(subject.count).to eq(1)
         end
       end
 
@@ -137,22 +145,21 @@ describe AuditLogFinder do
         end
       end
     end
+  end
 
-    context 'filtering by id' do
-      context 'non-existent id provided' do
-        let(:params) { { id: 'non-existent-id' } }
+  describe '#find_by!' do
+    let(:params) { {} }
+    let(:id) { user_audit_event.id }
 
-        it 'returns nil' do
-          expect(subject).to be_nil
-        end
-      end
+    subject { described_class.new(params).find_by!(id: id) }
 
-      context 'existent id provided' do
-        let(:params) { { id: user_audit_event.id } }
+    it { is_expected.to eq(user_audit_event) }
 
-        it 'returns the specific audit events with the id' do
-          expect(subject).to eql(user_audit_event)
-        end
+    context 'non-existent id provided' do
+      let(:id) { 'non-existent-id' }
+
+      it 'raises exception' do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

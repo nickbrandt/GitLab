@@ -25,8 +25,8 @@ describe 'clusters/clusters/show' do
       it 'displays the Cluster health section' do
         render
 
-        expect(rendered).to have_selector('#cluster-health')
-        expect(rendered).to have_content('Cluster health')
+        expect(rendered).to have_selector('#cluster-health-tab')
+        expect(rendered).to have_content('Health')
       end
     end
 

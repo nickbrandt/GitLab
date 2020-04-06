@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
@@ -55,7 +55,7 @@ describe('EE MRWidget approvals', () => {
     });
   };
 
-  const findAction = () => wrapper.find(GlButton);
+  const findAction = () => wrapper.find(GlDeprecatedButton);
   const findActionData = () => {
     const action = findAction();
 

@@ -40,7 +40,7 @@ module API
 
           # Stores some Git-specific env thread-safely
           env = parse_env
-          Gitlab::Git::HookEnv.set(gl_repository, env) if project
+          Gitlab::Git::HookEnv.set(gl_repository, env) if container
 
           actor.update_last_used_at!
           access_checker = access_checker_for(actor, params[:protocol])
@@ -67,7 +67,7 @@ module API
           when ::Gitlab::GitAccessResult::Success
             payload = {
               gl_repository: gl_repository,
-              gl_project_path: gl_project_path,
+              gl_project_path: gl_repository_path,
               gl_id: Gitlab::GlId.gl_id(actor.user),
               gl_username: actor.username,
               git_config_options: [],
@@ -108,6 +108,10 @@ module API
         #   check_ip - optional, only in EE version, may limit access to
         #     group resources based on its IP restrictions
         post "/allowed" do
+          if repo_type.snippet? && Feature.disabled?(:version_snippets, actor.user)
+            break response_with_status(code: 404, success: false, message: 'The project you were looking for could not be found.')
+          end
+
           # It was moved to a separate method so that EE can alter its behaviour more
           # easily.
           check_allowed(params)
@@ -216,7 +220,7 @@ module API
         post '/post_receive' do
           status 200
 
-          response = PostReceiveService.new(actor.user, project, params).execute
+          response = PostReceiveService.new(actor.user, repository, project, params).execute
 
           ee_post_receive_response_hook(response)
 

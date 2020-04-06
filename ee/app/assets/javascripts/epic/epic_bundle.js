@@ -4,6 +4,7 @@ import { mapActions } from 'vuex';
 import Cookies from 'js-cookie';
 import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { convertObjectPropsToCamelCase, parseBoolean } from '~/lib/utils/common_utils';
+import labelsSelectModule from '~/vue_shared/components/sidebar/labels_select_vue/store';
 
 import createStore from './store';
 import EpicApp from './components/epic_app.vue';
@@ -17,6 +18,7 @@ export default (epicCreate = false) => {
   }
 
   const store = createStore();
+  store.registerModule('labelsSelect', labelsSelectModule());
 
   if (epicCreate) {
     return new Vue({

@@ -1,6 +1,6 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
-import _ from 'underscore';
+/* eslint-disable @gitlab/vue-require-i18n-strings */
+import { isEmpty } from 'lodash';
 import { GlTooltipDirective } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -15,8 +15,9 @@ import ActionsComponent from './environment_actions.vue';
 import ExternalUrlComponent from './environment_external_url.vue';
 import MonitoringButtonComponent from './environment_monitoring.vue';
 import PinComponent from './environment_pin.vue';
-import RollbackComponent from './environment_rollback.vue';
+import DeleteComponent from './environment_delete.vue';
 import StopComponent from './environment_stop.vue';
+import RollbackComponent from './environment_rollback.vue';
 import TerminalButtonComponent from './environment_terminal_button.vue';
 
 /**
@@ -33,6 +34,7 @@ export default {
     Icon,
     MonitoringButtonComponent,
     PinComponent,
+    DeleteComponent,
     RollbackComponent,
     StopComponent,
     TerminalButtonComponent,
@@ -77,7 +79,7 @@ export default {
      * @returns {Boolean}
      */
     hasLastDeploymentKey() {
-      if (this.model && this.model.last_deployment && !_.isEmpty(this.model.last_deployment)) {
+      if (this.model && this.model.last_deployment && !isEmpty(this.model.last_deployment)) {
         return true;
       }
       return false;
@@ -110,6 +112,15 @@ export default {
      */
     canStopEnvironment() {
       return this.model && this.model.can_stop;
+    },
+
+    /**
+     * Returns whether the environment can be deleted.
+     *
+     * @returns {Boolean}
+     */
+    canDeleteEnvironment() {
+      return Boolean(this.model && this.model.can_delete && this.model.delete_path);
     },
 
     /**
@@ -342,7 +353,7 @@ export default {
     isLastDeployment() {
       // name: 'last?' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
       // Vue i18n ESLint rules issue: https://gitlab.com/gitlab-org/gitlab-foss/issues/63560
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       return this.model && this.model.last_deployment && this.model.last_deployment['last?'];
     },
 
@@ -379,8 +390,8 @@ export default {
     deploymentHasUser() {
       return (
         this.model &&
-        !_.isEmpty(this.model.last_deployment) &&
-        !_.isEmpty(this.model.last_deployment.user)
+        !isEmpty(this.model.last_deployment) &&
+        !isEmpty(this.model.last_deployment.user)
       );
     },
 
@@ -393,8 +404,8 @@ export default {
     deploymentUser() {
       if (
         this.model &&
-        !_.isEmpty(this.model.last_deployment) &&
-        !_.isEmpty(this.model.last_deployment.user)
+        !isEmpty(this.model.last_deployment) &&
+        !isEmpty(this.model.last_deployment.user)
       ) {
         return this.model.last_deployment.user;
       }
@@ -420,8 +431,8 @@ export default {
     shouldRenderBuildName() {
       return (
         !this.isFolder &&
-        !_.isEmpty(this.model.last_deployment) &&
-        !_.isEmpty(this.model.last_deployment.deployable)
+        !isEmpty(this.model.last_deployment) &&
+        !isEmpty(this.model.last_deployment.deployable)
       );
     },
 
@@ -462,7 +473,7 @@ export default {
     shouldRenderDeploymentID() {
       return (
         !this.isFolder &&
-        !_.isEmpty(this.model.last_deployment) &&
+        !isEmpty(this.model.last_deployment) &&
         this.model.last_deployment.iid !== undefined
       );
     },
@@ -485,6 +496,7 @@ export default {
         this.externalURL ||
         this.monitoringUrl ||
         this.canStopEnvironment ||
+        this.canDeleteEnvironment ||
         this.canRetry
       );
     },
@@ -680,6 +692,8 @@ export default {
         />
 
         <stop-component v-if="canStopEnvironment" :environment="model" />
+
+        <delete-component v-if="canDeleteEnvironment" :environment="model" />
       </div>
     </div>
   </div>

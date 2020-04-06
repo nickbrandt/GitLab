@@ -66,7 +66,7 @@ export default {
       return {
         variant: 'info',
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        // eslint-disable-next-line @gitlab/require-i18n-strings
         rel: 'noopener noreferrer',
         class: 'discover-button justify-content-center',
         'data-track-event': 'click_button',

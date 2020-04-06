@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { uniqueId } from 'lodash';
 import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
 import EmptyRuleName from 'ee/approvals/components/empty_rule_name.vue';
 import { RULE_TYPE_CODE_OWNER, RULE_TYPE_ANY_APPROVER } from 'ee/approvals/constants';
@@ -34,12 +34,12 @@ export default {
     sections() {
       return [
         {
-          id: _.uniqueId(),
+          id: uniqueId(),
           title: '',
           rules: this.approvalRules.filter(rule => rule.rule_type !== RULE_TYPE_CODE_OWNER),
         },
         {
-          id: _.uniqueId(),
+          id: uniqueId(),
           title: __('Code Owners'),
           rules: this.approvalRules
             .filter(rule => rule.rule_type === RULE_TYPE_CODE_OWNER)
@@ -89,7 +89,7 @@ export default {
         <th class="w-0"></th>
         <th class="w-25">{{ s__('MRApprovals|Approvers') }}</th>
         <th class="w-50"></th>
-        <th>{{ s__('MRApprovals|Pending approvals') }}</th>
+        <th>{{ s__('MRApprovals|Approvals') }}</th>
         <th>{{ s__('MRApprovals|Approved by') }}</th>
       </tr>
     </thead>

@@ -114,16 +114,16 @@ export default class SamlSettingsForm {
       .filter(setting => setting.dependsOn)
       .forEach(setting => {
         const { helperText, callout, toggle } = setting;
-        const dependentToggleValue = this.getValueWithDeps(setting.dependsOn);
+        const isRelatedToggleOn = this.getValueWithDeps(setting.dependsOn);
         if (helperText) {
-          helperText.style.display = dependentToggleValue ? 'none' : 'block';
+          helperText.style.display = isRelatedToggleOn ? 'none' : 'block';
         }
 
-        toggle.classList.toggle('is-disabled', dependentToggleValue);
-        toggle.disabled = !dependentToggleValue;
+        toggle.classList.toggle('is-disabled', !isRelatedToggleOn);
+        toggle.disabled = !isRelatedToggleOn;
 
         if (callout) {
-          callout.style.display = setting.value && dependentToggleValue ? 'block' : 'none';
+          callout.style.display = setting.value && isRelatedToggleOn ? 'block' : 'none';
         }
       });
   }

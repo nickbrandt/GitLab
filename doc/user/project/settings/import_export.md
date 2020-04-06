@@ -11,7 +11,7 @@ The **GitLab import/export** button is displayed if the project import option is
 See also:
 
 - [Project import/export API](../../../api/project_import_export.md)
-- [Project import/export administration rake tasks](../../../administration/raketasks/project_import_export.md) **(CORE ONLY)**
+- [Project import/export administration Rake tasks](../../../administration/raketasks/project_import_export.md) **(CORE ONLY)**
 - [Group import/export API](../../../api/group_import_export.md)
 
 To set up a project import/export:
@@ -29,10 +29,11 @@ Note the following:
 - Exports are stored in a temporary [shared directory](../../../development/shared_files.md)
   and are deleted every 24 hours by a specific worker.
 - Group members are exported as project members, as long as the user has
-  maintainer or admin access to the group where the exported project lives. Import admins should map users by email address.
+  maintainer or admin access to the group where the exported project lives.
+- Project members with owner access will be imported as maintainers.
+- Using an admin account to import will map users by email address (self-managed only).
   Otherwise, a supplementary comment is left to mention that the original author and
   the MRs, notes, or issues will be owned by the importer.
-- Project members with owner access will be imported as maintainers.
 - If an imported project contains merge requests originating from forks,
   then new branches associated with such merge requests will be created
   within a project during the import/export. Thus, the number of branches
@@ -74,9 +75,10 @@ The following items will be exported:
 - Project configuration, including services
 - Issues with comments, merge requests with diffs and comments, labels, milestones, snippets,
   and other project entities
-- Design Management files and data **(PREMIUM)**
+- Design Management files and data
 - LFS objects
 - Issue boards
+- Pipelines history
 
 The following items will NOT be exported:
 
@@ -141,4 +143,4 @@ To help avoid abuse, users are rate limited to:
 | ---------------- | --------------------------- |
 | Export           | 1 project per 5 minutes     |
 | Download export  | 10 projects per 10 minutes  |
-| Import           | 30 projects per 10 minutes  |
+| Import           | 30 projects per 5 minutes  |

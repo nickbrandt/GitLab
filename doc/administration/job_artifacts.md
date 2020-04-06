@@ -3,7 +3,7 @@
 > - Introduced in GitLab 8.2 and GitLab Runner 0.7.0.
 > - Starting with GitLab 8.4 and GitLab Runner 1.0, the artifacts archive format changed to `ZIP`.
 > - Starting with GitLab 8.17, builds are renamed to jobs.
-> - This is the administration documentation. For the user guide see [pipelines/job_artifacts](../user/project/pipelines/job_artifacts.md).
+> - This is the administration documentation. For the user guide see [pipelines/job_artifacts](../ci/pipelines/job_artifacts.md).
 
 Artifacts is a list of files and directories which are attached to a job after it
 finishes. This feature is enabled by default in all GitLab installations. Keep reading
@@ -21,7 +21,7 @@ To disable artifacts site-wide, follow the steps below.
    gitlab_rails['artifacts_enabled'] = false
    ```
 
-1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Save the file and [reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 **In installations from source:**
 
@@ -32,7 +32,7 @@ To disable artifacts site-wide, follow the steps below.
      enabled: false
    ```
 
-1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Save the file and [restart GitLab](restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ## Storing job artifacts
 
@@ -57,7 +57,7 @@ _The artifacts are stored by default in
    gitlab_rails['artifacts_path'] = "/mnt/storage/artifacts"
    ```
 
-1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Save the file and [reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 **In installations from source:**
 
@@ -73,13 +73,13 @@ _The artifacts are stored by default in
      path: /mnt/storage/artifacts
    ```
 
-1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Save the file and [restart GitLab](restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ### Using object storage
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1762) in
 >   [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
-> - Since version 9.5, artifacts are [browsable](../user/project/pipelines/job_artifacts.md#browsing-artifacts),
+> - Since version 9.5, artifacts are [browsable](../ci/pipelines/job_artifacts.md#browsing-artifacts),
 >   when object storage is enabled. 9.4 lacks this feature.
 > - Since version 10.6, available in [GitLab Core](https://about.gitlab.com/pricing/)
 > - Since version 11.0, we support `direct_upload` to S3.
@@ -153,7 +153,7 @@ _The artifacts are stored by default in
    }
    ```
 
-1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Save the file and [reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
    ```shell
@@ -186,7 +186,7 @@ _The artifacts are stored by default in
          region: eu-central-1
    ```
 
-1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Save the file and [restart GitLab](restart_gitlab.md#installations-from-source) for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
    ```shell
@@ -198,6 +198,85 @@ JUnit test report artifact (`junit.xml.gz`) migration
 [is not supported](https://gitlab.com/gitlab-org/gitlab/issues/27698)
 by the `gitlab:artifacts:migrate` script.
 
+### OpenStack compatible connection settings
+
+The connection settings match those provided by [Fog](https://github.com/fog), and are as follows:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `provider` | Always `OpenStack` for compatible hosts | OpenStack |
+| `openstack_username` | OpenStack username | |
+| `openstack_api_key` | OpenStack API key  | |
+| `openstack_temp_url_key` | OpenStack key for generating temporary urls | |
+| `openstack_auth_url` | OpenStack authentication endpont | |
+| `openstack_region` | OpenStack region | |
+| `openstack_tenant_id` | OpenStack tenant ID |
+
+**In Omnibus installations:**
+
+_The uploads are stored by default in
+`/var/opt/gitlab/gitlab-rails/shared/artifacts`._
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the following lines by replacing with
+   the values you want:
+
+   ```ruby
+   gitlab_rails['artifacts_enabled'] = true
+   gitlab_rails['artifacts_object_store_enabled'] = true
+   gitlab_rails['artifacts_object_store_remote_directory'] = "artifacts"
+   gitlab_rails['artifacts_object_store_connection'] = {
+    'provider' => 'OpenStack',
+    'openstack_username' => 'OS_USERNAME',
+    'openstack_api_key' => 'OS_PASSWORD',
+    'openstack_temp_url_key' => 'OS_TEMP_URL_KEY',
+    'openstack_auth_url' => 'https://auth.cloud.ovh.net',
+    'openstack_region' => 'GRA',
+    'openstack_tenant_id' => 'OS_TENANT_ID',
+   }
+   ```
+
+1. Save the file and [reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. Migrate any existing local artifacts to the object storage:
+
+   ```shell
+   gitlab-rake gitlab:artifacts:migrate
+   ```
+
+---
+
+**In installations from source:**
+
+_The uploads are stored by default in
+`/home/git/gitlab/shared/artifacts`._
+
+1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following
+   lines:
+
+   ```yaml
+   uploads:
+     object_store:
+       enabled: true
+       direct_upload: false
+       background_upload: true
+       proxy_download: false
+       remote_directory: "artifacts"
+       connection:
+         provider: OpenStack
+         openstack_username: OS_USERNAME
+         openstack_api_key: OS_PASSWORD
+         openstack_temp_url_key: OS_TEMP_URL_KEY
+         openstack_auth_url: 'https://auth.cloud.ovh.net'
+         openstack_region: GRA
+         openstack_tenant_id: OS_TENANT_ID
+   ```
+
+1. Save the file and [restart GitLab](restart_gitlab.md#installations-from-source) for the changes to take effect.
+1. Migrate any existing local artifacts to the object storage:
+
+   ```shell
+   sudo -u git -H bundle exec rake gitlab:artifacts:migrate RAILS_ENV=production
+   ```
+
 ### Migrating from object storage to local storage
 
 **In Omnibus installations:**
@@ -205,13 +284,13 @@ by the `gitlab:artifacts:migrate` script.
 In order to migrate back to local storage:
 
 1. Set both `direct_upload` and `background_upload` to false in `gitlab.rb`, under the artifacts object storage settings.
-1. [reconfigure GitLab][].
+1. [Reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Run `gitlab-rake gitlab:artifacts:migrate_to_local`.
 1. Disable object_storage for artifacts in `gitlab.rb`:
    - Set `gitlab_rails['artifacts_object_store_enabled'] = false`.
    - Comment out all other `artifacts_object_store` settings, including the entire
      `artifacts_object_store_connection` section, including the closing `}`.
-1. [reconfigure GitLab][].
+1. [Reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ## Expiring artifacts
 
@@ -231,7 +310,7 @@ steps below.
    gitlab_rails['expire_build_artifacts_worker_cron'] = "50 * * * *"
    ```
 
-1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Save the file and [reconfigure GitLab](restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 **In installations from source:**
 
@@ -243,7 +322,7 @@ steps below.
      cron: "50 * * * *"
    ```
 
-1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Save the file and [restart GitLab](restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ## Validation for dependencies
 
@@ -295,7 +374,7 @@ and [projects APIs](../api/projects.md).
 ## Implementation details
 
 When GitLab receives an artifacts archive, an archive metadata file is also
-generated by [GitLab Workhorse]. This metadata file describes all the entries
+generated by [GitLab Workhorse](https://gitlab.com/gitlab-org/gitlab-workhorse). This metadata file describes all the entries
 that are located in the artifacts archive itself.
 The metadata file is in a binary format, with additional GZIP compression.
 
@@ -304,13 +383,9 @@ and disk I/O. It instead inspects the metadata file which contains all the
 relevant information. This is especially important when there is a lot of
 artifacts, or an archive is a very large file.
 
-When clicking on a specific file, [GitLab Workhorse] extracts it
+When clicking on a specific file, [GitLab Workhorse](https://gitlab.com/gitlab-org/gitlab-workhorse) extracts it
 from the archive and the download begins. This implementation saves space,
 memory and disk I/O.
-
-[reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
-[restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
-[gitlab workhorse]: https://gitlab.com/gitlab-org/gitlab-workhorse "GitLab Workhorse repository"
 
 ## Troubleshooting
 
@@ -386,7 +461,7 @@ If you need to manually remove job artifacts associated with multiple jobs while
 
    NOTE: **NOTE:**
    This step will also erase artifacts that users have chosen to
-   ["keep"](../user/project/pipelines/job_artifacts.md#browsing-artifacts).
+   ["keep"](../ci/pipelines/job_artifacts.md#browsing-artifacts).
 
    ```ruby
    builds_to_clear = builds_with_artifacts.where("finished_at < ?", 1.week.ago)

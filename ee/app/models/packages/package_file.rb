@@ -2,9 +2,6 @@
 class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
   include ::Gitlab::Geo::ReplicableModel
-  include IgnorableColumns
-
-  ignore_column :file_type, remove_with: '12.10', remove_after: '2019-03-22'
 
   delegate :project, :project_id, to: :package
   delegate :conan_file_type, to: :conan_file_metadatum
@@ -30,12 +27,16 @@ class Packages::PackageFile < ApplicationRecord
       .where(packages_conan_file_metadata: { conan_file_type: ::Packages::ConanFileMetadatum.conan_file_types[file_type] })
   end
 
+  scope :with_conan_package_reference, ->(conan_package_reference) do
+    joins(:conan_file_metadatum)
+      .where(packages_conan_file_metadata: { conan_package_reference: conan_package_reference })
+  end
+
   mount_uploader :file, Packages::PackageFileUploader
 
   with_replicator Geo::PackageFileReplicator
 
   after_save :update_file_metadata, if: :saved_change_to_file?
-  after_create_commit -> { replicator.publish_created_event }
 
   update_project_statistics project_statistics_name: :packages_size
 
@@ -53,5 +54,9 @@ class Packages::PackageFile < ApplicationRecord
 
   def download_path
     Gitlab::Routing.url_helpers.download_project_package_file_path(project, self)
+  end
+
+  def local?
+    file_store == ::Packages::PackageFileUploader::Store::LOCAL
   end
 end

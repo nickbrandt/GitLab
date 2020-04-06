@@ -18,13 +18,14 @@ describe JiraConnect::SyncService do
     end
 
     def expect_jira_client_call(return_value = { 'status': 'success' })
-      expect_any_instance_of(Atlassian::JiraConnect::Client)
-        .to receive(:store_dev_info).with(
+      expect_next_instance_of(Atlassian::JiraConnect::Client) do |instance|
+        expect(instance).to receive(:store_dev_info).with(
           project: project,
           commits: commits,
           branches: [instance_of(Gitlab::Git::Branch)],
           merge_requests: merge_requests
         ).and_return(return_value)
+      end
     end
 
     def expect_log(type, message)

@@ -61,7 +61,9 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
       context 'when the update fails' do
         before do
           invalid_stage = Analytics::CycleAnalytics::GroupStage.new(name: '')
-          expect_any_instance_of(described_class).to receive(:find_stage).and_return(invalid_stage)
+          expect_next_instance_of(described_class) do |instance|
+            expect(instance).to receive(:find_stage).and_return(invalid_stage)
+          end
         end
 
         it 'returns unsuccessful service response' do
@@ -116,6 +118,22 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
     let!(:first_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 10) }
     let!(:middle_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 11) }
     let!(:last_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 12) }
+
+    context 'when there are stages without position' do
+      let!(:unpositioned_stage1) { create(:cycle_analytics_group_stage, group: group) }
+      let!(:unpositioned_stage2) { create(:cycle_analytics_group_stage, group: group) }
+
+      before do
+        params[:id] = first_stage.id
+        params[:move_after_id] = unpositioned_stage2.id
+      end
+
+      it 'when moving the stage down' do
+        subject
+
+        expect(persisted_stages.last(3)).to eq([unpositioned_stage1, unpositioned_stage2, first_stage])
+      end
+    end
 
     context 'when moving the stage down' do
       before do

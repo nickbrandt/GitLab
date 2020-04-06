@@ -43,7 +43,7 @@ module EE
       end
 
       override :check_for_console_messages
-      def check_for_console_messages(cmd)
+      def check_for_console_messages
         super.push(
           *current_replication_lag_message
         )
@@ -97,8 +97,8 @@ module EE
       end
 
       def check_size_before_push!
-        if check_size_limit? && project.above_size_limit?
-          raise ::Gitlab::GitAccess::ForbiddenError, ::Gitlab::RepositorySizeError.new(project).push_error
+        if check_size_limit? && size_checker.above_size_limit?
+          raise ::Gitlab::GitAccess::ForbiddenError, size_checker.error_message.push_error
         end
       end
 
@@ -153,16 +153,20 @@ module EE
       end
 
       def check_size_against_limit(size)
-        if project.changes_will_exceed_size_limit?(size)
-          raise ::Gitlab::GitAccess::ForbiddenError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+        if size_checker.changes_will_exceed_size_limit?(size)
+          raise ::Gitlab::GitAccess::ForbiddenError, size_checker.error_message.new_changes_error
         end
       end
 
       def check_size_limit?
         strong_memoize(:check_size_limit) do
-          project.size_limit_enabled? &&
+          size_checker.enabled? &&
             changes_list.any? { |change| !::Gitlab::Git.blank_ref?(change[:newrev]) }
         end
+      end
+
+      def size_checker
+        project.repository_size_checker
       end
     end
   end

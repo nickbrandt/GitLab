@@ -199,7 +199,7 @@ module EE
     end
 
     def feature_available_in_plan?(feature)
-      return true if ::License::ANY_PLAN_FEATURES.include?(feature)
+      return true if ::License.promo_feature_available?(feature)
 
       available_features = strong_memoize(:features_available_in_plan) do
         Hash.new do |h, f|
@@ -444,7 +444,7 @@ module EE
       return if ::Gitlab::Database.read_only?
 
       create_gitlab_subscription(
-        plan_code: plan&.name,
+        plan_code: Plan::FREE,
         trial: trial_active?,
         start_date: created_at,
         seats: 0

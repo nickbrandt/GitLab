@@ -1,3 +1,6 @@
+-# Please have a look at app/assets/javascripts/boards/components/board_column.vue
+  This haml file is deprecated and will be deleted soon, please change the Vue app
+  https://gitlab.com/gitlab-org/gitlab/-/issues/212300
 .board.h-100.px-2.align-top.ws-normal{ ":class" => '{ "is-draggable": !list.preset, "is-expandable": list.isExpandable, "is-collapsed": !list.isExpanded, "board-type-assignee": list.type === "assignee" }',
   ":data-id" => "list.id", data: { qa_selector: "board_list" } }
   .board-inner.d-flex.flex-column.position-relative.h-100.rounded
@@ -55,7 +58,7 @@
             = render_if_exists "shared/boards/components/list_weight"
 
         %gl-button-group.board-list-button-group.pl-2{ "v-if" => "isNewIssueShown || isSettingsShown" }
-          %gl-button.issue-count-badge-add-button.no-drag{ type: "button",
+          %gl-deprecated-button.issue-count-badge-add-button.no-drag{ type: "button",
             "@click" => "showNewIssueForm",
             "v-if" => "isNewIssueShown",
             ":class": "{ 'd-none': !list.isExpanded, 'rounded-right': isNewIssueShown && !isSettingsShown }",

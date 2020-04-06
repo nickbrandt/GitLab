@@ -43,15 +43,15 @@ module Gitlab
     PUSH_COMMANDS = %w{git-receive-pack}.freeze
     ALL_COMMANDS = DOWNLOAD_COMMANDS + PUSH_COMMANDS
 
-    attr_reader :actor, :project, :protocol, :authentication_abilities, :namespace_path, :project_path, :redirected_path, :auth_result_type, :changes, :logger
+    attr_reader :actor, :project, :protocol, :authentication_abilities, :namespace_path, :repository_path, :redirected_path, :auth_result_type, :changes, :logger
 
-    def initialize(actor, project, protocol, authentication_abilities:, namespace_path: nil, project_path: nil, redirected_path: nil, auth_result_type: nil)
+    def initialize(actor, project, protocol, authentication_abilities:, namespace_path: nil, repository_path: nil, redirected_path: nil, auth_result_type: nil)
       @actor    = actor
       @project  = project
       @protocol = protocol
-      @authentication_abilities = authentication_abilities
+      @authentication_abilities = Array(authentication_abilities)
       @namespace_path = namespace_path || project&.namespace&.full_path
-      @project_path = project_path || project&.path
+      @repository_path = repository_path || project&.path
       @redirected_path = redirected_path
       @auth_result_type = auth_result_type
     end
@@ -81,7 +81,7 @@ module Gitlab
         check_push_access!
       end
 
-      success_result(cmd)
+      success_result
     end
 
     def guest_can_download_code?
@@ -119,12 +119,24 @@ module Gitlab
       nil
     end
 
-    def check_for_console_messages(cmd)
+    def check_for_console_messages
+      return console_messages unless key?
+
+      key_status = Gitlab::Auth::KeyStatusChecker.new(actor)
+
+      if key_status.show_console_message?
+        console_messages.push(key_status.console_message)
+      else
+        console_messages
+      end
+    end
+
+    def console_messages
       []
     end
 
     def check_valid_actor!
-      return unless actor.is_a?(Key)
+      return unless key?
 
       unless actor.valid?
         raise ForbiddenError, "Your SSH key #{actor.errors[:key].first}."
@@ -176,7 +188,7 @@ module Gitlab
     def add_project_moved_message!
       return if redirected_path.nil?
 
-      project_moved = Checks::ProjectMoved.new(project, user, protocol, redirected_path)
+      project_moved = Checks::ProjectMoved.new(repository, user, protocol, redirected_path)
 
       project_moved.add_message
     end
@@ -224,7 +236,7 @@ module Gitlab
       return unless user&.can?(:create_projects, namespace)
 
       project_params = {
-        path: project_path,
+        path: repository_path,
         namespace_id: namespace.id,
         visibility_level: Gitlab::VisibilityLevel::PRIVATE
       }
@@ -238,7 +250,7 @@ module Gitlab
       @project = project
       user_access.project = @project
 
-      Checks::ProjectCreated.new(project, user, protocol).add_message
+      Checks::ProjectCreated.new(repository, user, protocol).add_message
     end
 
     def check_repository_existence!
@@ -340,6 +352,10 @@ module Gitlab
       actor == :ci
     end
 
+    def key?
+      actor.is_a?(Key)
+    end
+
     def can_read_project?
       if deploy_key?
         deploy_key.has_access_to?(project)
@@ -374,8 +390,8 @@ module Gitlab
 
     protected
 
-    def success_result(cmd)
-      ::Gitlab::GitAccessResult::Success.new(console_messages: check_for_console_messages(cmd))
+    def success_result
+      ::Gitlab::GitAccessResult::Success.new(console_messages: check_for_console_messages)
     end
 
     def changes_list

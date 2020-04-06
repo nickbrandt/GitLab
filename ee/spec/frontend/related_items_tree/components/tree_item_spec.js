@@ -1,5 +1,6 @@
-import { shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 
 import TreeItem from 'ee/related_items_tree/components/tree_item.vue';
 import TreeItemBody from 'ee/related_items_tree/components/tree_item_body.vue';
@@ -7,21 +8,20 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
-import { ChildType } from 'ee/related_items_tree/constants';
+import { ChildType, treeItemChevronBtnClassName } from 'ee/related_items_tree/constants';
 import { PathIdSeparator } from 'ee/related_issues/constants';
 
 import Icon from '~/vue_shared/components/icon.vue';
 
-import {
-  mockParentItem,
-  mockQueryResponse,
-  mockEpic1,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
 
 const mockItem = Object.assign({}, mockEpic1, {
   type: ChildType.Epic,
   pathIdSeparator: PathIdSeparator.Epic,
 });
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
@@ -44,6 +44,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   });
 
   return shallowMount(TreeItem, {
+    localVue,
     store,
     stubs: {
       'tree-root': TreeRoot,
@@ -136,10 +137,16 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders expand/collapse button', () => {
-        const chevronButton = wrapper.find(GlButton);
+        const chevronButton = wrapper.find(GlDeprecatedButton);
 
         expect(chevronButton.isVisible()).toBe(true);
         expect(chevronButton.attributes('title')).toBe('Collapse');
+      });
+
+      it('has the proper class on the expand/collapse button to avoid dragging', () => {
+        const chevronButton = wrapper.find(GlDeprecatedButton);
+
+        expect(chevronButton.attributes('class')).toContain(treeItemChevronBtnClassName);
       });
 
       it('renders expand/collapse icon', () => {
@@ -152,18 +159,16 @@ describe('RelatedItemsTree', () => {
         expect(collapsedIcon.props('name')).toBe('chevron-right');
       });
 
-      it('renders loading icon when item expand is in progress', done => {
+      it('renders loading icon when item expand is in progress', () => {
         wrapper.vm.$store.dispatch('requestItems', {
           parentItem: mockItem,
           isSubItem: true,
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           const loadingIcon = wrapper.find(GlLoadingIcon);
 
           expect(loadingIcon.isVisible()).toBe(true);
-
-          done();
         });
       });
 

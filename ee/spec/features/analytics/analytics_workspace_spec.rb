@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe 'accessing the analytics workspace' do
-  include AnalyticsHelpers
   let(:user) { create(:user) }
 
   before do

@@ -17,16 +17,18 @@ describe ApprovalRules::ParamsFilteringService do
       project.add_reporter(project_member)
 
       accessible_group.add_developer(user)
-
-      allow(Ability).to receive(:allowed?).and_call_original
-
-      allow(Ability)
-        .to receive(:allowed?)
-        .with(user, :update_approvers, merge_request)
-        .and_return(can_update_approvers?)
     end
 
     shared_examples_for(:assigning_users_and_groups) do
+      before do
+        allow(Ability).to receive(:allowed?).and_call_original
+
+        allow(Ability)
+          .to receive(:allowed?)
+          .with(user, :update_approvers, merge_request)
+          .and_return(can_update_approvers?)
+      end
+
       context 'user can update approvers' do
         let(:can_update_approvers?) { true }
 
@@ -77,6 +79,89 @@ describe ApprovalRules::ParamsFilteringService do
         let(:expected_groups) { [accessible_group] }
       end
 
+      context 'inapplicable user defined rules' do
+        let!(:source_rule) { create(:approval_project_rule, project: project) }
+        let!(:another_source_rule) { create(:approval_project_rule, project: project) }
+        let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+
+        let(:approval_rules_attributes) do
+          [
+            { name: another_source_rule.name, approval_project_rule_id: another_source_rule.id, user_ids: [project_member.id, outsider.id] }
+          ]
+        end
+
+        before do
+          source_rule.update!(protected_branches: [protected_branch])
+        end
+
+        context 'when multiple_approval_rules feature is available' do
+          before do
+            stub_licensed_features(multiple_approval_rules: true)
+          end
+
+          it 'adds inapplicable user defined rules' do
+            params = service.execute
+            approval_rules_attrs = params[:approval_rules_attributes]
+
+            aggregate_failures do
+              expect(approval_rules_attrs.size).to eq(2)
+
+              expect(approval_rules_attrs.first).to include(
+                name: another_source_rule.name,
+                approval_project_rule_id: another_source_rule.id
+              )
+
+              expect(approval_rules_attrs.last).to include(
+                name: source_rule.name,
+                approval_project_rule_id: source_rule.id,
+                user_ids: source_rule.user_ids,
+                group_ids: source_rule.group_ids,
+                approvals_required: source_rule.approvals_required,
+                rule_type: source_rule.rule_type
+              )
+            end
+          end
+
+          context 'when scoped_approval_rules feature is disabled' do
+            before do
+              stub_feature_flags(scoped_approval_rules: false)
+            end
+
+            it 'does not add inapplicable user defined rules' do
+              params = service.execute
+              approval_rules_attrs = params[:approval_rules_attributes]
+
+              aggregate_failures do
+                expect(approval_rules_attrs.size).to eq(1)
+                expect(approval_rules_attrs.first).to include(
+                  name: another_source_rule.name,
+                  approval_project_rule_id: another_source_rule.id
+                )
+              end
+            end
+          end
+        end
+
+        context 'when multiple_approval_rules feature is not available' do
+          before do
+            stub_licensed_features(multiple_approval_rules: false)
+          end
+
+          it 'does not add inapplicable user defined rules' do
+            params = service.execute
+            approval_rules_attrs = params[:approval_rules_attributes]
+
+            aggregate_failures do
+              expect(approval_rules_attrs.size).to eq(1)
+              expect(approval_rules_attrs.first).to include(
+                name: another_source_rule.name,
+                approval_project_rule_id: another_source_rule.id
+              )
+            end
+          end
+        end
+      end
+
       context 'any approver rule' do
         let(:can_update_approvers?) { true }
         let(:approval_rules_attributes) do
@@ -96,7 +181,7 @@ describe ApprovalRules::ParamsFilteringService do
     end
 
     context 'update' do
-      let(:merge_request) { create(:merge_request, target_project: project, source_project: project)}
+      let(:merge_request) { create(:merge_request, target_project: project, source_project: project) }
       let(:existing_private_group) { create(:group, :private) }
       let!(:rule1) { create(:approval_merge_request_rule, merge_request: merge_request, users: [create(:user)]) }
       let!(:rule2) { create(:approval_merge_request_rule, merge_request: merge_request, groups: [existing_private_group]) }
@@ -111,6 +196,30 @@ describe ApprovalRules::ParamsFilteringService do
           }
         end
         let(:expected_groups) { [accessible_group, existing_private_group] }
+      end
+
+      context 'inapplicable user defined rules' do
+        let!(:source_rule) { create(:approval_project_rule, project: project) }
+        let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+
+        let(:params) do
+          {
+            approval_rules_attributes: [
+              { id: rule1.id, name: 'foo', user_ids: [project_member.id, outsider.id] }
+            ]
+          }
+        end
+
+        before do
+          source_rule.update!(protected_branches: [protected_branch])
+        end
+
+        it 'does not add inapplicable user defined rules' do
+          params = service.execute
+
+          expect(params[:approval_rules_attributes].size).to eq(1)
+          expect(params[:approval_rules_attributes].first[:name]).to eq('foo')
+        end
       end
 
       context 'with remove_hidden_groups being true' do

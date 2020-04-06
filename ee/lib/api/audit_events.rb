@@ -37,8 +37,10 @@ module API
         requires :id, type: Integer, desc: 'The ID of audit event'
       end
       get ':id' do
-        audit_event = AuditEvent.find_by_id(params[:id])
-        not_found!('Audit Event') unless audit_event
+        # rubocop: disable CodeReuse/ActiveRecord
+        # This is not `find_by!` from ActiveRecord
+        audit_event = AuditLogFinder.new.find_by!(id: params[:id])
+        # rubocop: enable CodeReuse/ActiveRecord
 
         present audit_event, with: EE::API::Entities::AuditEvent
       end

@@ -121,6 +121,7 @@ export const createIssue = ({ dispatch }, { vulnerability, flashError }) => {
       vulnerability_feedback: {
         feedback_type: 'issue',
         category: vulnerability.report_type,
+        project_fingerprint: vulnerability.project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
           category: vulnerability.report_type,
@@ -440,11 +441,11 @@ export const receiveUndoDismissError = ({ commit }, { flashError }) => {
 };
 
 export const downloadPatch = ({ state }) => {
-  /* 
+  /*
     This action doesn't actually mutate the Vuex state and is a dirty
-    workaround to modifying the dom. We do this because gl-split-button 
-    relies on a old version of vue-bootstrap and it doesn't allow us to 
-    set a href for a file download. 
+    workaround to modifying the dom. We do this because gl-split-button
+    relies on a old version of vue-bootstrap and it doesn't allow us to
+    set a href for a file download.
 
     https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
   */

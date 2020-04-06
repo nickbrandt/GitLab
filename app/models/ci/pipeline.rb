@@ -11,7 +11,7 @@ module Ci
     include Gitlab::Utils::StrongMemoize
     include AtomicInternalId
     include EnumWithNil
-    include HasRef
+    include Ci::HasRef
     include ShaAttribute
     include FromUnion
     include UpdatedAtFilterable
@@ -81,6 +81,8 @@ module Ci
     has_one :source_bridge, through: :source_pipeline, source: :source_bridge
 
     has_one :pipeline_config, class_name: 'Ci::PipelineConfig', inverse_of: :pipeline
+
+    has_many :daily_report_results, class_name: 'Ci::DailyReportResult', foreign_key: :last_pipeline_id
 
     accepts_nested_attributes_for :variables, reject_if: :persisted?
 
@@ -189,7 +191,10 @@ module Ci
       end
 
       after_transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success do |pipeline|
-        pipeline.run_after_commit { PipelineSuccessWorker.perform_async(pipeline.id) }
+        # We wait a little bit to ensure that all BuildFinishedWorkers finish first
+        # because this is where some metrics like code coverage is parsed and stored
+        # in CI build records which the daily build metrics worker relies on.
+        pipeline.run_after_commit { Ci::DailyReportResultsWorker.perform_in(10.minutes, pipeline.id) }
       end
 
       after_transition do |pipeline, transition|
@@ -226,17 +231,13 @@ module Ci
         end
       end
 
-      after_transition created: :pending do |pipeline|
-        next if Feature.enabled?(:ci_drop_bridge_on_downstream_errors, pipeline.project, default_enabled: true)
-        next unless pipeline.bridge_triggered?
-        next if pipeline.bridge_waiting?
-
-        pipeline.update_bridge_status!
-      end
-
       after_transition any => [:success, :failed] do |pipeline|
         pipeline.run_after_commit do
-          PipelineUpdateCiRefStatusWorker.perform_async(pipeline.id)
+          if Feature.enabled?(:ci_pipeline_fixed_notifications)
+            PipelineUpdateCiRefStatusWorker.perform_async(pipeline.id)
+          else
+            PipelineNotificationWorker.perform_async(pipeline.id)
+          end
         end
       end
 
@@ -752,15 +753,6 @@ module Ci
       end
     end
 
-    def update_bridge_status!
-      raise ArgumentError unless bridge_triggered?
-      raise BridgeStatusError unless source_bridge.active?
-
-      source_bridge.success!
-    rescue => e
-      Gitlab::ErrorTracking.track_exception(e, pipeline_id: id)
-    end
-
     def bridge_triggered?
       source_bridge.present?
     end
@@ -787,6 +779,10 @@ module Ci
         .fabricate!
     end
 
+    def find_job_with_archive_artifacts(name)
+      builds.latest.with_artifacts_archive.find_by_name(name)
+    end
+
     def latest_builds_with_artifacts
       # We purposely cast the builds to an Array here. Because we always use the
       # rows if there are more than 0 this prevents us from having to run two
@@ -800,7 +796,7 @@ module Ci
 
     def test_reports
       Gitlab::Ci::Reports::TestReports.new.tap do |test_reports|
-        builds.latest.with_reports(Ci::JobArtifact.test_reports).each do |build|
+        builds.latest.with_reports(Ci::JobArtifact.test_reports).preload(:project).find_each do |build|
           build.collect_test_reports!(test_reports)
         end
       end
@@ -809,6 +805,14 @@ module Ci
     def test_reports_count
       Rails.cache.fetch(['project', project.id, 'pipeline', id, 'test_reports_count'], force: false) do
         test_reports.total_count
+      end
+    end
+
+    def coverage_reports
+      Gitlab::Ci::Reports::CoverageReports.new.tap do |coverage_reports|
+        builds.latest.with_reports(Ci::JobArtifact.coverage_reports).each do |build|
+          build.collect_coverage_reports!(coverage_reports)
+        end
       end
     end
 
@@ -925,6 +929,14 @@ module Ci
       Ci::PipelineEnums.ci_config_sources.key?(config_source.to_sym)
     end
 
+    def source_ref_path
+      if branch? || merge_request?
+        Gitlab::Git::BRANCH_REF_PREFIX + source_ref.to_s
+      elsif tag?
+        Gitlab::Git::TAG_REF_PREFIX + source_ref.to_s
+      end
+    end
+
     private
 
     def pipeline_data
@@ -956,7 +968,7 @@ module Ci
     def latest_builds_status
       return 'failed' unless yaml_errors.blank?
 
-      statuses.latest.slow_composite_status || 'skipped'
+      statuses.latest.slow_composite_status(project: project) || 'skipped'
     end
 
     def keep_around_commits

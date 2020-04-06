@@ -1,6 +1,6 @@
 <script>
 import { GlLink } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -15,10 +15,6 @@ export default {
       default: false,
     },
     helpPagePath: {
-      type: String,
-      required: true,
-    },
-    pipelinesHelpPagePath: {
       type: String,
       required: true,
     },
@@ -44,15 +40,7 @@ export default {
       return sprintf(body, { wordBreakOpportunity }, false);
     },
     callOutLink() {
-      if (this.autoDevopsEnabled) {
-        return this.autoDevopsHelpPagePath;
-      }
-
-      if (this.latestPipelinePath) {
-        return this.latestPipelinePath;
-      }
-
-      return this.pipelinesHelpPagePath;
+      return this.autoDevopsEnabled ? this.autoDevopsHelpPagePath : this.latestPipelinePath;
     },
     calloutContent() {
       const bodyDefault = __(`The configuration status of the table below only applies to the default branch and
@@ -69,6 +57,13 @@ export default {
       const linkEnd = '</a>';
 
       return sprintf(body, { linkStart, linkEnd }, false);
+    },
+  },
+  methods: {
+    getFeatureDocumentationLinkLabel(featureName) {
+      return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
+        featureName,
+      });
     },
   },
 };
@@ -119,16 +114,15 @@ export default {
                 <div class="text-2 gl-text-gray-900">
                   {{ feature.name }}
                 </div>
-                <gl-link
-                  class="d-inline-flex ml-1"
-                  target="_blank"
-                  :href="feature.link"
-                  :aria-label="s__('SecurityConfiguration|Feature documentation')"
-                  ><icon name="external-link"
-                /></gl-link>
               </div>
               <div class="text-secondary">
                 {{ feature.description }}
+                <gl-link
+                  target="_blank"
+                  :href="feature.link"
+                  :aria-label="getFeatureDocumentationLinkLabel(feature.name)"
+                  >{{ __('More information') }}</gl-link
+                >
               </div>
             </div>
           </div>

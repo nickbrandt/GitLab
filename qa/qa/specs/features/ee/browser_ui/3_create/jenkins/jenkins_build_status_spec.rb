@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Create', :docker, :orchestrated, :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/195179', type: :flaky } do
+  context 'Create', :docker, :orchestrated, :requires_admin do
     describe 'Jenkins integration' do
       let(:project_name) { "project_with_jenkins_#{SecureRandom.hex(4)}" }
 
@@ -41,13 +41,13 @@ module QA
             push.file_name = "file_#{SecureRandom.hex(4)}.txt"
           end
 
-          Vendor::Jenkins::Page::Job.perform do |job|
-            job.job_name = project_name
+          Vendor::Jenkins::Page::LastJobConsole.perform do |job_console|
+            job_console.job_name = project_name
 
-            job.visit!
+            job_console.visit!
 
             Support::Waiter.wait_until(sleep_interval: 1, reload_page: page) do
-              job.has_successful_build?
+              job_console.has_successful_build? && job_console.no_failed_status_update?
             end
           end
 

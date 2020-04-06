@@ -17,11 +17,11 @@ class License < ApplicationRecord
     description_diffs
     elastic_search
     export_issues
+    group_activity_analytics
     group_bulk_edit
     group_burndown_charts
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     ldap_group_sync
@@ -35,6 +35,7 @@ class License < ApplicationRecord
     related_issues
     repository_mirrors
     repository_size_limit
+    seat_link
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -57,13 +58,11 @@ class License < ApplicationRecord
     custom_file_templates
     custom_file_templates_for_namespace
     custom_project_templates
-    custom_prometheus_metrics
     cycle_analytics_for_groups
     db_load_balancing
     default_project_deletion_protection
     dependency_proxy
     deploy_board
-    design_management
     disable_name_update_for_users
     email_additional_text
     epics
@@ -120,12 +119,13 @@ class License < ApplicationRecord
     license_management
     license_scanning
     personal_access_token_expiration_policy
-    pod_logs
     prometheus_alerts
     pseudonymizer
     report_approver_rules
+    requirements
     sast
     security_dashboard
+    status_page
     subepics
     threat_monitoring
     tracing
@@ -149,7 +149,6 @@ class License < ApplicationRecord
     file_locks
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     merge_request_approvers
@@ -214,6 +213,7 @@ class License < ApplicationRecord
     project_aliases
     repository_size_limit
     required_ci_templates
+    seat_link
     usage_quotas
   ].freeze
 
@@ -281,6 +281,12 @@ class License < ApplicationRecord
 
     def trial_ends_on
       Gitlab::CurrentSettings.license_trial_ends_on
+    end
+
+    def promo_feature_available?(feature)
+      return false unless ::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
+
+      ANY_PLAN_FEATURES.include?(feature)
     end
   end
 

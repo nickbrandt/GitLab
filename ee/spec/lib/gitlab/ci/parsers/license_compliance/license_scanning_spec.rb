@@ -42,7 +42,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
     end
 
     context 'when parsing a valid v1.1 report' do
-      let(:v1_1_data) { fixture_file('security_reports/gl-license-management-report-v1.1.json', dir: 'ee') }
+      let(:v1_1_data) { fixture_file('security_reports/gl-license-scanning-report-v1.1.json', dir: 'ee') }
 
       before do
         subject.parse!(v1_1_data, report)
@@ -74,7 +74,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
     end
 
     context 'when parsing a valid v2 report' do
-      let(:v2_data) { fixture_file('security_reports/gl-license-management-report-v2.json', dir: 'ee') }
+      let(:v2_data) { fixture_file('security_reports/gl-license-scanning-report-v2.json', dir: 'ee') }
 
       before do
         subject.parse!(v2_data, report)

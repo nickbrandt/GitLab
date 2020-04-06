@@ -17,9 +17,12 @@
 #     tags: string[]
 #     personal: boolean
 #     search: string
+#     search_namespaces: boolean
 #     non_archived: boolean
 #     archived: 'only' or boolean
 #     min_access_level: integer
+#     last_activity_after: datetime
+#     last_activity_before: datetime
 #
 class ProjectsFinder < UnionFinder
   include CustomAttributesFilter
@@ -72,6 +75,8 @@ class ProjectsFinder < UnionFinder
     collection = by_archived(collection)
     collection = by_custom_attributes(collection)
     collection = by_deleted_status(collection)
+    collection = by_last_activity_after(collection)
+    collection = by_last_activity_before(collection)
     collection
   end
 
@@ -171,11 +176,27 @@ class ProjectsFinder < UnionFinder
 
   def by_search(items)
     params[:search] ||= params[:name]
-    params[:search].present? ? items.search(params[:search]) : items
+    items.optionally_search(params[:search], include_namespace: params[:search_namespaces].present?)
   end
 
   def by_deleted_status(items)
     params[:without_deleted].present? ? items.without_deleted : items
+  end
+
+  def by_last_activity_after(items)
+    if params[:last_activity_after].present?
+      items.where("last_activity_at > ?", params[:last_activity_after]) # rubocop: disable CodeReuse/ActiveRecord
+    else
+      items
+    end
+  end
+
+  def by_last_activity_before(items)
+    if params[:last_activity_before].present?
+      items.where("last_activity_at < ?", params[:last_activity_before]) # rubocop: disable CodeReuse/ActiveRecord
+    else
+      items
+    end
   end
 
   def sort(items)

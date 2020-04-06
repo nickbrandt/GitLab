@@ -2,6 +2,7 @@
 class Packages::Package < ApplicationRecord
   include Sortable
   include Gitlab::SQL::Pattern
+  include UsageStatistics
 
   belongs_to :project
   # package_files must be destroyed by ruby code in order to properly remove carrierwave uploads and update project statistics
@@ -29,8 +30,9 @@ class Packages::Package < ApplicationRecord
   validate :valid_conan_package_recipe, if: :conan?
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
+  validates :version, format: { with: Gitlab::Regex.semver_regex }, if: :npm?
 
-  enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4 }
+  enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4, pypi: 5 }
 
   scope :with_name, ->(name) { where(name: name) }
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }
@@ -70,6 +72,8 @@ class Packages::Package < ApplicationRecord
   scope :order_type_desc, -> { reorder('package_type DESC') }
   scope :order_project_name, -> { joins(:project).reorder('projects.name ASC') }
   scope :order_project_name_desc, -> { joins(:project).reorder('projects.name DESC') }
+  scope :order_project_path, -> { joins(:project).reorder('projects.path ASC, id ASC') }
+  scope :order_project_path_desc, -> { joins(:project).reorder('projects.path DESC, id DESC') }
 
   def self.for_projects(projects)
     return none unless projects.any?
@@ -107,6 +111,8 @@ class Packages::Package < ApplicationRecord
     when 'type_desc' then order_type_desc
     when 'project_name_asc' then order_project_name
     when 'project_name_desc' then order_project_name_desc
+    when 'project_path_asc' then order_project_path
+    when 'project_path_desc' then order_project_path_desc
     else
       order_created_desc
     end

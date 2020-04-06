@@ -63,6 +63,7 @@ module API
         optional :visibility, type: String, values: Gitlab::VisibilityLevel.string_values,
                               desc: 'Limit by visibility'
         optional :search, type: String, desc: 'Return list of projects matching the search criteria'
+        optional :search_namespaces, type: Boolean, desc: "Include ancestor namespaces when matching search criteria"
         optional :owned, type: Boolean, default: false, desc: 'Limit by owned by authenticated user'
         optional :starred, type: Boolean, default: false, desc: 'Limit by starred status'
         optional :membership, type: Boolean, default: false, desc: 'Limit by projects that the current user is a member of'
@@ -72,6 +73,8 @@ module API
         optional :min_access_level, type: Integer, values: Gitlab::Access.all_values, desc: 'Limit by minimum access level of authenticated user'
         optional :id_after, type: Integer, desc: 'Limit results to projects with IDs greater than the specified ID'
         optional :id_before, type: Integer, desc: 'Limit results to projects with IDs less than the specified ID'
+        optional :last_activity_after, type: DateTime, desc: 'Limit results to projects with last_activity after specified time. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ'
+        optional :last_activity_before, type: DateTime, desc: 'Limit results to projects with last_activity before specified time. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ'
 
         use :optional_filter_params_ee
       end
@@ -177,6 +180,7 @@ module API
         use :create_params
       end
       post do
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/21139')
         attrs = declared_params(include_missing: false)
         attrs = translate_params_for_compatibility(attrs)
         filter_attributes_using_license!(attrs)
@@ -209,6 +213,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post "user/:user_id" do
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/21139')
         authenticated_as_admin!
         user = User.find_by(id: params.delete(:user_id))
         not_found!('User') unless user
@@ -261,7 +266,9 @@ module API
         success Entities::Project
       end
       params do
-        optional :namespace, type: String, desc: 'The ID or name of the namespace that the project will be forked into'
+        optional :namespace, type: String, desc: '(deprecated) The ID or name of the namespace that the project will be forked into'
+        optional :namespace_id, type: Integer, desc: 'The ID of the namespace that the project will be forked into'
+        optional :namespace_path, type: String, desc: 'The path of the namespace that the project will be forked into'
         optional :path, type: String, desc: 'The path that will be assigned to the fork'
         optional :name, type: String, desc: 'The name that will be assigned to the fork'
       end
@@ -271,7 +278,15 @@ module API
         not_found! unless can?(current_user, :fork_project, user_project)
 
         fork_params = declared_params(include_missing: false)
-        fork_params[:namespace] = find_namespace!(fork_params[:namespace]) if fork_params[:namespace].present?
+
+        fork_params[:namespace] =
+          if fork_params[:namespace_id].present?
+            find_namespace!(fork_params[:namespace_id])
+          elsif fork_params[:namespace_path].present?
+            find_namespace_by_path!(fork_params[:namespace_path])
+          elsif fork_params[:namespace].present?
+            find_namespace!(fork_params[:namespace])
+          end
 
         service = ::Projects::ForkService.new(user_project, current_user, fork_params)
 
@@ -283,8 +298,8 @@ module API
           conflict!(forked_project.errors.messages)
         else
           present forked_project, with: Entities::Project,
-                                  user_can_admin_project: can?(current_user, :admin_project, forked_project),
-                                  current_user: current_user
+                  user_can_admin_project: can?(current_user, :admin_project, forked_project),
+                  current_user: current_user
         end
       end
 

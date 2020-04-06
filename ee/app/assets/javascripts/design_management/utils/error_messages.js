@@ -16,6 +16,10 @@ export const UPLOAD_DESIGN_ERROR = s__(
   'DesignManagement|Error uploading a new design. Please try again.',
 );
 
+export const UPLOAD_DESIGN_INVALID_FILETYPE_ERROR = __(
+  'Could not upload your designs as one or more files uploaded are not supported.',
+);
+
 export const DESIGN_NOT_FOUND_ERROR = __('Could not find design');
 
 export const DESIGN_NOT_EXIST_ERROR = __('Requested design version does not exist');
@@ -25,6 +29,14 @@ const DESIGN_UPLOAD_SKIPPED_MESSAGE = s__('DesignManagement|Upload skipped.');
 const ALL_DESIGNS_SKIPPED_MESSAGE = `${DESIGN_UPLOAD_SKIPPED_MESSAGE} ${s__(
   'The designs you tried uploading did not change.',
 )}`;
+
+export const EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE = __(
+  'You can only upload one design when dropping onto an existing design.',
+);
+
+export const EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE = __(
+  'You must upload a file with the same file name when dropping onto an existing design.',
+);
 
 const MAX_SKIPPED_FILES_LISTINGS = 5;
 

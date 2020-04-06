@@ -33,6 +33,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    nodeRemovalAllowed: {
+      type: Boolean,
+      required: true,
+    },
     geoTroubleshootingHelpPath: {
       type: String,
       required: true,
@@ -72,6 +76,7 @@ export default {
       :node-details="nodeDetails"
       :node-actions-allowed="nodeActionsAllowed"
       :node-edit-allowed="nodeEditAllowed"
+      :node-removal-allowed="nodeRemovalAllowed"
       :version-mismatch="hasVersionMismatch"
     />
     <node-details-section-sync v-if="!node.primary" :node-details="nodeDetails" />

@@ -21,6 +21,7 @@ module Users
       discard_read_only_attributes
       assign_attributes
       assign_identity
+      build_canonical_email
 
       if @user.save(validate: validate) && update_status
         notify_success(user_exists)
@@ -40,6 +41,12 @@ module Users
 
     private
 
+    def build_canonical_email
+      return unless @user.email_changed?
+
+      Users::UpdateCanonicalEmailService.new(user: @user).execute
+    end
+
     def update_status
       return true unless @status_params
 
@@ -53,11 +60,7 @@ module Users
     end
 
     def discard_read_only_attributes
-      if Feature.enabled?(:ldap_readonly_attributes, default_enabled: true)
-        params.reject! { |key, _| @user.read_only_attribute?(key.to_sym) }
-      else
-        discard_synced_attributes
-      end
+      discard_synced_attributes
     end
 
     def discard_synced_attributes

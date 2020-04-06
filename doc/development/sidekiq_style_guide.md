@@ -124,13 +124,13 @@ Consider skipping the cop if you're not confident your job can safely run multip
 ## Job urgency
 
 Jobs can have an `urgency` attribute set, which can be `:high`,
-`:default`, or `:none`. These have the below targets:
+`:low`, or `:throttled`. These have the below targets:
 
-| **Urgency** | **Queue Scheduling Target** | **Execution Latency Requirement**  |
-|-------------|-----------------------------|------------------------------------|
-| `:high`     | 100 milliseconds            | p50 of 1 second, p99 of 10 seconds |
-| `:default`  | 1 minute                    | Maximum run time of 1 hour         |
-| `:none`     | None                        | Maximum run time of 1 hour         |
+| **Urgency**  | **Queue Scheduling Target** | **Execution Latency Requirement**  |
+|--------------|-----------------------------|------------------------------------|
+| `:high`      | 100 milliseconds            | p50 of 1 second, p99 of 10 seconds |
+| `:low`       | 1 minute                    | Maximum run time of 1 hour         |
+| `:throttled` | None                        | Maximum run time of 1 hour         |
 
 To set a job's urgency, use the `urgency` class method:
 
@@ -175,13 +175,13 @@ these jobs also have very strict execution duration requirements:
 If a worker cannot meet these expectations, then it cannot be treated as a
 `urgency :high` worker: consider redesigning the worker, or splitting the
 work between two different workers, one with `urgency :high` code that
-executes quickly, and the other with `urgency :default`, which has no
+executes quickly, and the other with `urgency :low`, which has no
 execution latency requirements (but also has lower scheduling targets).
 
 ## Jobs with External Dependencies
 
 Most background jobs in the GitLab application communicate with other GitLab
-services. For example, Postgres, Redis, Gitaly, and Object Storage. These are considered
+services. For example, PostgreSQL, Redis, Gitaly, and Object Storage. These are considered
 to be "internal" dependencies for a job.
 
 However, some jobs will be dependent on external services in order to complete
@@ -224,7 +224,7 @@ Workers that are constrained by CPU or memory resource limitations should be
 annotated with the `worker_resource_boundary` method.
 
 Most workers tend to spend most of their time blocked, wait on network responses
-from other services such as Redis, Postgres and Gitaly. Since Sidekiq is a
+from other services such as Redis, PostgreSQL, and Gitaly. Since Sidekiq is a
 multithreaded environment, these jobs can be scheduled with high concurrency.
 
 Some workers, however, spend large amounts of time _on-CPU_ running logic in
@@ -255,7 +255,7 @@ discouraged, and alternative approaches to processing the work should be
 considered.
 
 If a worker needs large amounts of both memory and CPU time, it should
-be marked as memory-bound, due to the above restrction on high urgency
+be marked as memory-bound, due to the above restriction on high urgency
 memory-bound workers.
 
 ## Declaring a Job as CPU-bound

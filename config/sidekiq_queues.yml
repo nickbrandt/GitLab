@@ -30,6 +30,8 @@
   - 1
 - - analytics_code_review_metrics
   - 1
+- - authorized_keys
+  - 2
 - - authorized_projects
   - 2
 - - auto_devops
@@ -125,6 +127,8 @@
 - - irker
   - 1
 - - jira_connect
+  - 1
+- - jira_importer
   - 1
 - - ldap_group_sync
   - 2
@@ -230,12 +234,18 @@
   - 2
 - - service_desk_email_receiver
   - 1
+- - status_page_publish
+  - 1
+- - sync_seat_link_request
+  - 1
 - - system_hook_push
   - 1
 - - todos_destroyer
   - 1
 - - update_external_pull_requests
   - 3
+- - update_highest_role
+  - 2
 - - update_merge_requests
   - 3
 - - update_namespace_statistics
@@ -244,5 +254,11 @@
   - 1
 - - upload_checksum
   - 1
+- - vulnerability_exports_export
+  - 1
+- - vulnerability_exports_export_deletion
+  - 1
 - - web_hook
+  - 1
+- - x509_certificate_revoke
   - 1

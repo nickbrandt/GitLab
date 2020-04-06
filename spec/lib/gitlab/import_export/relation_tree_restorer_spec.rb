@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This spec is a lightweight version of:
-#   * project_tree_restorer_spec.rb
+#   * project/tree_restorer_spec.rb
 #
 # In depth testing is being done in the above specs.
 # This spec tests that restore project works
@@ -14,36 +14,30 @@ describe Gitlab::ImportExport::RelationTreeRestorer do
 
   let(:user) { create(:user) }
   let(:shared) { Gitlab::ImportExport::Shared.new(importable) }
-  let(:members_mapper) { Gitlab::ImportExport::MembersMapper.new(exported_members: {}, user: user, importable: importable) }
+  let(:attributes) { {} }
 
-  let(:importable_hash) do
-    json = IO.read(path)
-    ActiveSupport::JSON.decode(json)
+  let(:members_mapper) do
+    Gitlab::ImportExport::MembersMapper.new(exported_members: {}, user: user, importable: importable)
   end
 
   let(:relation_tree_restorer) do
     described_class.new(
-      user:             user,
-      shared:           shared,
-      tree_hash:        tree_hash,
-      importable:       importable,
-      object_builder:   object_builder,
-      members_mapper:   members_mapper,
-      relation_factory: relation_factory,
-      reader:           reader
+      user:                  user,
+      shared:                shared,
+      relation_reader:       relation_reader,
+      object_builder:        object_builder,
+      members_mapper:        members_mapper,
+      relation_factory:      relation_factory,
+      reader:                reader,
+      importable:            importable,
+      importable_path:       nil,
+      importable_attributes: attributes
     )
   end
 
   subject { relation_tree_restorer.restore }
 
-  context 'when restoring a project' do
-    let(:path) { 'spec/fixtures/lib/gitlab/import_export/complex/project.json' }
-    let(:importable) { create(:project, :builds_enabled, :issues_disabled, name: 'project', path: 'project') }
-    let(:object_builder) { Gitlab::ImportExport::Project::ObjectBuilder }
-    let(:relation_factory) { Gitlab::ImportExport::Project::RelationFactory }
-    let(:reader) { Gitlab::ImportExport::Reader.new(shared: shared) }
-    let(:tree_hash) { importable_hash }
-
+  shared_examples 'import project successfully' do
     it 'restores project tree' do
       expect(subject).to eq(true)
     end
@@ -65,5 +59,82 @@ describe Gitlab::ImportExport::RelationTreeRestorer do
         expect(project.snippets.count).to eq(1)
       end
     end
+  end
+
+  shared_examples 'logging of relations creation' do
+    context 'when log_import_export_relation_creation feature flag is enabled' do
+      before do
+        stub_feature_flags(log_import_export_relation_creation: { enabled: true, thing: group })
+      end
+
+      it 'logs top-level relation creation' do
+        expect(relation_tree_restorer.shared.logger)
+          .to receive(:info)
+          .with(hash_including(message: '[Project/Group Import] Created new object relation'))
+          .at_least(:once)
+
+        subject
+      end
+    end
+
+    context 'when log_import_export_relation_creation feature flag is disabled' do
+      before do
+        stub_feature_flags(log_import_export_relation_creation: { enabled: false, thing: group })
+      end
+
+      it 'does not log top-level relation creation' do
+        expect(relation_tree_restorer.shared.logger)
+          .to receive(:info)
+          .with(hash_including(message: '[Project/Group Import] Created new object relation'))
+          .never
+
+        subject
+      end
+    end
+  end
+
+  context 'when restoring a project' do
+    let(:path) { 'spec/fixtures/lib/gitlab/import_export/complex/project.json' }
+    let(:importable) { create(:project, :builds_enabled, :issues_disabled, name: 'project', path: 'project') }
+    let(:object_builder) { Gitlab::ImportExport::Project::ObjectBuilder }
+    let(:relation_factory) { Gitlab::ImportExport::Project::RelationFactory }
+    let(:reader) { Gitlab::ImportExport::Reader.new(shared: shared) }
+
+    context 'using legacy reader' do
+      let(:relation_reader) do
+        Gitlab::ImportExport::JSON::LegacyReader::File.new(
+          path,
+          relation_names: reader.project_relation_names
+        )
+      end
+
+      let(:attributes) { relation_reader.consume_attributes(nil) }
+
+      it_behaves_like 'import project successfully'
+
+      context 'logging of relations creation' do
+        let(:group) { create(:group) }
+        let(:importable) { create(:project, :builds_enabled, :issues_disabled, name: 'project', path: 'project', group: group) }
+
+        include_examples 'logging of relations creation'
+      end
+    end
+  end
+
+  context 'when restoring a group' do
+    let(:path) { 'spec/fixtures/lib/gitlab/import_export/group_exports/no_children/group.json' }
+    let(:group) { create(:group) }
+    let(:importable) { create(:group, parent: group) }
+    let(:object_builder) { Gitlab::ImportExport::Group::ObjectBuilder }
+    let(:relation_factory) { Gitlab::ImportExport::Group::RelationFactory }
+    let(:relation_reader) { Gitlab::ImportExport::JSON::LegacyReader::File.new(path, relation_names: reader.group_relation_names) }
+    let(:reader) do
+      Gitlab::ImportExport::Reader.new(
+        shared: shared,
+        config: Gitlab::ImportExport::Config.new(config: Gitlab::ImportExport.group_config_file).to_h
+      )
+    end
+
+    include_examples 'logging of relations creation'
   end
 end

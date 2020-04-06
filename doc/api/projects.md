@@ -41,25 +41,28 @@ GET /projects
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `archived`                    | boolean | no | Limit by archived status |
-| `visibility`                  | string  | no | Limit by visibility `public`, `internal`, or `private` |
-| `order_by`                    | string  | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
-| `sort`                        | string  | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
-| `search`                      | string  | no | Return list of projects matching the search criteria |
-| `simple`                      | boolean | no | Return only limited fields for each project. This is a no-op without authentication as then _only_ simple fields are returned. |
-| `owned`                       | boolean | no | Limit by projects explicitly owned by the current user |
-| `membership`                  | boolean | no | Limit by projects that the current user is a member of |
-| `starred`                     | boolean | no | Limit by projects starred by the current user |
-| `statistics`                  | boolean | no | Include project statistics |
-| `with_custom_attributes`      | boolean | no | Include [custom attributes](custom_attributes.md) in response (admins only) |
-| `with_issues_enabled`         | boolean | no | Limit by enabled issues feature |
-| `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
-| `with_programming_language`   | string  | no | Limit by projects which use the given programming language |
-| `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
-| `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
-| `min_access_level`            | integer | no | Limit by current user minimal [access level](members.md) |
-| `id_after`                    | integer | no | Limit results to projects with IDs greater than the specified ID |
-| `id_before`                   | integer | no | Limit results to projects with IDs less than the specified ID |
+| `archived`                    | boolean  | no | Limit by archived status |
+| `visibility`                  | string   | no | Limit by visibility `public`, `internal`, or `private` |
+| `order_by`                    | string   | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
+| `sort`                        | string   | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
+| `search`                      | string   | no | Return list of projects matching the search criteria |
+| `search_namespaces`           | boolean  | no | Include ancestor namespaces when matching search criteria. Default is `false` |
+| `simple`                      | boolean  | no | Return only limited fields for each project. This is a no-op without authentication as then _only_ simple fields are returned. |
+| `owned`                       | boolean  | no | Limit by projects explicitly owned by the current user |
+| `membership`                  | boolean  | no | Limit by projects that the current user is a member of |
+| `starred`                     | boolean  | no | Limit by projects starred by the current user |
+| `statistics`                  | boolean  | no | Include project statistics |
+| `with_custom_attributes`      | boolean  | no | Include [custom attributes](custom_attributes.md) in response (admins only) |
+| `with_issues_enabled`         | boolean  | no | Limit by enabled issues feature |
+| `with_merge_requests_enabled` | boolean  | no | Limit by enabled merge requests feature |
+| `with_programming_language`   | string   | no | Limit by projects which use the given programming language |
+| `wiki_checksum_failed`        | boolean  | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `repository_checksum_failed`  | boolean  | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `min_access_level`            | integer  | no | Limit by current user minimal [access level](members.md) |
+| `id_after`                    | integer  | no | Limit results to projects with IDs greater than the specified ID |
+| `id_before`                   | integer  | no | Limit results to projects with IDs less than the specified ID |
+| `last_activity_after`         | datetime | no | Limit results to projects with last_activity after specified time. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ |
+| `last_activity_before`        | datetime | no | Limit results to projects with last_activity before specified time. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ |
 
 NOTE: **Note:**
 This endpoint supports [keyset pagination](README.md#keyset-based-pagination) for selected `order_by` options.
@@ -159,6 +162,8 @@ When the user is authenticated and `simple` is not set this returns something li
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
     "suggestion_commit_message": null,
+    "marked_for_deletion_at": "2020-04-03",
+    "marked_for_deletion_on": "2020-04-03",
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -403,6 +408,8 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
     "suggestion_commit_message": null,
+    "marked_for_deletion_at": "2020-04-03",
+    "marked_for_deletion_on": "2020-04-03",
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -867,6 +874,8 @@ GET /projects/:id
   "service_desk_address": null,
   "autoclose_referenced_issues": true,
   "suggestion_commit_message": null,
+  "marked_for_deletion_at": "2020-04-03",
+  "marked_for_deletion_on": "2020-04-03",
   "statistics": {
     "commit_count": 37,
     "storage_size": 1038090,
@@ -961,6 +970,7 @@ GET /projects/:id/users
 
 | Attribute    | Type          | Required | Description |
 | ------------ | ------------- | -------- | ----------- |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `search`     | string        | no       | Search for specific users |
 | `skip_users` | integer array | no       | Filter out users with the specified IDs |
 
@@ -1012,6 +1022,7 @@ POST /projects
 | `issues_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `repository_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `merge_requests_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `forking_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
@@ -1080,6 +1091,7 @@ POST /projects/user/:user_id
 | `issues_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `repository_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `merge_requests_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `forking_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
@@ -1147,6 +1159,7 @@ PUT /projects/:id
 | `issues_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `repository_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `merge_requests_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `forking_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
@@ -1174,7 +1187,7 @@ PUT /projects/:id
 | `auto_cancel_pending_pipelines` | string | no | Auto-cancel pending pipelines (Note: this is not a boolean, but enabled/disabled |
 | `build_coverage_regex` | string | no | Test coverage parsing |
 | `ci_config_path` | string | no | The path to CI config file |
-| `ci_default_git_depth` | integer | no | Default number of revisions for [shallow cloning](../user/project/pipelines/settings.md#git-shallow-clone) |
+| `ci_default_git_depth` | integer | no | Default number of revisions for [shallow cloning](../ci/pipelines/settings.md#git-shallow-clone) |
 | `auto_devops_enabled` | boolean | no | Enable Auto DevOps for this project |
 | `auto_devops_deploy_strategy` | string | no | Auto Deploy strategy (`continuous`, `manual` or `timed_incremental`) |
 | `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
@@ -1207,7 +1220,9 @@ POST /projects/:id/fork
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
-| `namespace` | integer/string | yes | The ID or path of the namespace that the project will be forked to |
+| `namespace` | integer/string | no | (deprecated) The ID or path of the namespace that the project will be forked to |
+| `namespace_id` | integer | no | The ID of the namespace that the project will be forked to |
+| `namespace_path` | string | no | The path of the namespace that the project will be forked to |
 | `path` | string | no | The path that will be assigned to the resultant project after forking |
 | `name` | string | no | The name that will be assigned to the resultant project after forking |
 
@@ -1501,6 +1516,7 @@ GET /projects/:id/starrers
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `search` | string | no | Search for specific users. |
 
 ```shell
@@ -1543,6 +1559,10 @@ Get languages used in a project with percentage value.
 ```plaintext
 GET /projects/:id/languages
 ```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/languages"
@@ -2169,6 +2189,7 @@ PUT /projects/:id/transfer
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `namespace` | integer/string | yes | The ID or path of the namespace to transfer to project to |
 
 ## Branches

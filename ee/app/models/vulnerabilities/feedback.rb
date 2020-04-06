@@ -26,11 +26,19 @@ module Vulnerabilities
     validates :feedback_type, presence: true
     validates :category, presence: true
     validates :project_fingerprint, presence: true, uniqueness: { scope: [:project_id, :category, :feedback_type] }
+    validates :pipeline, same_project_association: true, if: :pipeline_id?
 
     scope :with_associations, -> { includes(:pipeline, :issue, :merge_request, :author, :comment_author) }
 
     scope :all_preloaded, -> do
       preload(:author, :comment_author, :project, :issue, :merge_request, :pipeline)
+    end
+
+    # TODO remove once filtered data has been cleaned
+    def self.only_valid_feedback
+      pipeline = Ci::Pipeline.arel_table
+      feedback = arel_table
+      joins(:pipeline).where(pipeline[:project_id].eq(feedback[:project_id]))
     end
 
     def self.find_or_init_for(feedback_params)

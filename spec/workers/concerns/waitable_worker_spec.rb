@@ -44,10 +44,19 @@ describe WaitableWorker do
       expect(worker.counter).to eq(6)
     end
 
-    it 'runs > 3 jobs using sidekiq' do
+    it 'runs > 3 jobs using sidekiq and a waiter key' do
       expect(worker).to receive(:bulk_perform_async)
+                          .with([[1, anything], [2, anything], [3, anything], [4, anything]])
 
       worker.bulk_perform_and_wait([[1], [2], [3], [4]])
+    end
+
+    it 'runs > 10 * timeout jobs using sidekiq and no waiter key' do
+      arguments = 1.upto(21).map { |i| [i] }
+
+      expect(worker).to receive(:bulk_perform_async).with(arguments)
+
+      worker.bulk_perform_and_wait(arguments, timeout: 2)
     end
   end
 

@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { NEW_GROUP } from 'ee/subscriptions/new/constants';
@@ -74,13 +74,13 @@ export default {
     isValid() {
       if (this.isSetupForCompany) {
         return (
-          !_.isEmpty(this.selectedPlan) &&
-          (!_.isEmpty(this.organizationName) || this.isGroupSelected) &&
+          !isEmpty(this.selectedPlan) &&
+          (!isEmpty(this.organizationName) || this.isGroupSelected) &&
           this.numberOfUsers > 0 &&
           this.numberOfUsers >= this.selectedGroupUsers
         );
       }
-      return !_.isEmpty(this.selectedPlan) && this.numberOfUsers === 1;
+      return !isEmpty(this.selectedPlan) && this.numberOfUsers === 1;
     },
     isShowingGroupSelector() {
       return !this.isNewUser && this.groupData.length;

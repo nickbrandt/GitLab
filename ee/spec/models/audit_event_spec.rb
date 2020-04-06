@@ -13,6 +13,30 @@ RSpec.describe AuditEvent, type: :model do
     it { is_expected.to validate_presence_of(:entity_type) }
   end
 
+  describe '.order_by' do
+    let_it_be(:event_1) { create(:audit_event) }
+    let_it_be(:event_2) { create(:audit_event) }
+    let_it_be(:event_3) { create(:audit_event) }
+
+    subject(:event) { described_class.order_by(method) }
+
+    context 'when sort by created_at in ascending order' do
+      let(:method) { 'created_asc' }
+
+      it 'sorts results by id in ascending order' do
+        expect(event).to eq([event_1, event_2, event_3])
+      end
+    end
+
+    context 'when it is default' do
+      let(:method) { nil }
+
+      it 'sorts results by id in descending order' do
+        expect(event).to eq([event_3, event_2, event_1])
+      end
+    end
+  end
+
   describe '#author_name' do
     context 'when user exists' do
       let(:user) { create(:user, name: 'John Doe') }
@@ -25,7 +49,7 @@ RSpec.describe AuditEvent, type: :model do
     end
 
     context 'when user does not exists anymore' do
-      subject(:event) { described_class.new(author_id: 99999) }
+      subject(:event) { described_class.new(author_id: non_existing_record_id) }
 
       context 'when details contains author_name' do
         it 'returns author_name' do
@@ -65,10 +89,10 @@ RSpec.describe AuditEvent, type: :model do
     end
 
     context 'when entity does not exist' do
-      subject(:event) { described_class.new(entity_id: 99999, entity_type: 'User') }
+      subject(:event) { described_class.new(entity_id: non_existing_record_id, entity_type: 'User') }
 
-      it 'returns nil' do
-        expect(event.entity).to be_blank
+      it 'returns a NullEntity' do
+        expect(event.entity).to be_a(Gitlab::Audit::NullEntity)
       end
     end
   end

@@ -215,7 +215,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
             pipeline = service.execute(bridge)
             pipeline.reload
 
-            expect(pipeline.builds.map(&:name)).to eq %w[rspec echo]
+            expect(pipeline.builds.map(&:name)).to match_array(%w[rspec echo])
             expect(pipeline.user).to eq bridge.user
             expect(pipeline.project).to eq bridge.project
             expect(bridge.sourced_pipelines.first.pipeline).to eq pipeline
@@ -359,6 +359,26 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         expect(pipeline.reload).to be_failed
         expect(bridge.reload).to be_failed
         expect(bridge.failure_reason).to eq('downstream_pipeline_creation_failed')
+      end
+    end
+
+    context 'when bridge job status update raises state machine errors' do
+      let(:stub_config) { false }
+
+      before do
+        stub_ci_pipeline_yaml_file(YAML.dump(invalid: { yaml: 'error' }))
+        bridge.drop!
+      end
+
+      it 'tracks the exception' do
+        expect(Gitlab::ErrorTracking)
+          .to receive(:track_exception)
+          .with(
+            instance_of(Ci::Bridge::InvalidTransitionError),
+            bridge_id: bridge.id,
+            downstream_pipeline_id: kind_of(Numeric))
+
+        service.execute(bridge)
       end
     end
 

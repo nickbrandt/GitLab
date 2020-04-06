@@ -159,6 +159,9 @@ In most of the below cases, the notification will be sent to:
 - Subscribers: anyone who manually subscribed to the issue, merge request, or epic **(ULTIMATE)**
 - Custom: Users with notification level "custom" who turned on notifications for any of the events present in the table below
 
+NOTE: **Note:**
+To minimize the number of notifications that do not require any action, from [GitLab 12.9 onwards](https://gitlab.com/gitlab-org/gitlab/issues/616), eligible approvers are no longer notified for all the activities in their projects. To receive them they have to change their user notification settings to **Watch** instead.
+
 | Event                  | Sent to |
 |------------------------|---------|
 | New issue              |         |
@@ -178,7 +181,7 @@ In most of the below cases, the notification will be sent to:
 | Remove milestone merge request | Subscribers, participants mentioned, and Custom notification level with this event selected |
 | New comment            | The above, plus anyone mentioned by `@username` in the comment, with notification level "Mention" or higher |
 | Failed pipeline        | The author of the pipeline |
-| Fixed pipeline    | The author of the pipeline |
+| Fixed pipeline    | The author of the pipeline. Disabled by default. To activate it you must [enable the `ci_pipeline_fixed_notifications` feature flag](../../development/feature_flags/development.md#enabling-a-feature-flag-in-development). |
 | Successful pipeline    | The author of the pipeline, if they have the custom notification setting for successful pipelines set. If the pipeline failed previously, a `Fixed pipeline` message will be sent for the first successful pipeline after the failure, then a `Successful pipeline` message for any further successful pipelines. |
 | New epic **(ULTIMATE)** |        |
 | Close epic **(ULTIMATE)** |      |

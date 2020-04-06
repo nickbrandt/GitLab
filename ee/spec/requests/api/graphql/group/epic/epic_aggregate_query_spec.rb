@@ -7,26 +7,26 @@ describe 'Epic aggregates (count and weight)' do
 
   let_it_be(:current_user) { create(:user) }
   let_it_be(:group) { create(:group, :public) }
-  let_it_be(:parent_epic) { create(:epic, id: 1, group: group, title: 'parent epic') }
+  let_it_be(:parent_epic) { create(:epic, group: group, title: 'parent epic') }
 
+  let(:target_epic) { parent_epic }
   let(:query) do
-    graphql_query_for('group', { fullPath: group.full_path }, query_graphql_field('epics', { iid: parent_epic.iid }, epic_aggregates_query))
+    graphql_query_for('group', { fullPath: target_epic.group.full_path }, query_graphql_field('epics', { iid: target_epic.iid }, epic_aggregates_query))
   end
-
   let(:epic_aggregates_query) do
     <<~QUERY
-        nodes {
-          descendantWeightSum {
-            openedIssues
-            closedIssues
-          }
-          descendantCounts {
-            openedEpics
-            closedEpics
-            openedIssues
-            closedIssues
-          }
+      nodes {
+        descendantWeightSum {
+          openedIssues
+          closedIssues
         }
+        descendantCounts {
+          openedEpics
+          closedEpics
+          openedIssues
+          closedIssues
+        }
+      }
     QUERY
   end
 
@@ -34,69 +34,148 @@ describe 'Epic aggregates (count and weight)' do
     stub_licensed_features(epics: true)
   end
 
-  context 'with feature flag enabled' do
+  context 'count and weight totals' do
+    subject { graphql_data.dig('group', 'epics', 'nodes') }
+
+    let_it_be(:subgroup) { create(:group, :private, parent: group)}
+    let_it_be(:subsubgroup) { create(:group, :private, parent: subgroup)}
+
+    let_it_be(:project) { create(:project, namespace: group) }
+
+    let_it_be(:epic_with_issues) { create(:epic, group: subgroup, parent: parent_epic, title: 'epic with issues') }
+    let_it_be(:epic_without_issues) { create(:epic, :closed, group: subgroup, parent: parent_epic, title: 'epic without issues') }
+    let_it_be(:closed_epic) { create(:epic, :closed, group: subgroup, parent: parent_epic, title: 'closed epic') }
+
+    let_it_be(:issue1) { create(:issue, project: project, weight: 5, state: :opened) }
+    let_it_be(:issue2) { create(:issue, project: project, weight: 7, state: :closed) }
+    let_it_be(:issue3) { create(:issue, project: project, weight: 0) }
+
+    let_it_be(:epic_issue1) { create(:epic_issue, epic: epic_with_issues, issue: issue1) }
+    let_it_be(:epic_issue2) { create(:epic_issue, epic: epic_with_issues, issue: issue2) }
+    let_it_be(:epic_issue3) { create(:epic_issue, epic: parent_epic, issue: issue3) }
+
     before do
-      stub_feature_flags(unfiltered_epic_aggregates: true)
+      group.add_developer(current_user)
+      post_graphql(query, current_user: current_user)
     end
 
-    it 'returns a placeholder with -1 weights and does not error' do
-      post_graphql(query, current_user: current_user)
+    shared_examples 'counts properly' do
+      it_behaves_like 'a working graphql query'
 
-      actual_result = graphql_data.dig('group', 'epics', 'nodes').first
-      expected_result = {
-        "descendantWeightSum" => {
-          "openedIssues" => -1,
-          "closedIssues" => -1
+      it 'returns the epic counts' do
+        epic_count_result = {
+          "openedEpics" => 1,
+          "closedEpics" => 2
         }
+
+        is_expected.to include(
+          a_hash_including('descendantCounts' => a_hash_including(epic_count_result))
+        )
+      end
+
+      it 'returns the issue counts' do
+        issue_count_result = {
+          "openedIssues" => 2,
+          "closedIssues" => 1
+        }
+
+        is_expected.to include(
+          a_hash_including('descendantCounts' => a_hash_including(issue_count_result))
+        )
+      end
+    end
+
+    shared_examples 'having correct values for' do |field_name|
+      let(:epic_aggregates_query) do
+        <<~QUERY
+          nodes {
+            #{field_name}
+          }
+        QUERY
+      end
+
+      it_behaves_like 'a working graphql query'
+
+      context 'when target epic has child epics or issues' do
+        let(:target_epic) { parent_epic }
+
+        it 'returns true' do
+          post_graphql(query, current_user: current_user)
+
+          expect(subject).to include(a_hash_including(field_name => true))
+        end
+      end
+
+      context 'when target epic has no child epics nor issues' do
+        let(:target_epic) { epic_without_issues }
+
+        it 'returns false' do
+          post_graphql(query, current_user: current_user)
+
+          expect(subject).to include(a_hash_including(field_name => false))
+        end
+      end
+    end
+
+    shared_examples 'efficient query' do
+      it 'does not result in N+1' do
+        control_count = ActiveRecord::QueryRecorder.new { post_graphql(query, current_user: current_user) }.count
+
+        query_with_multiple_epics = graphql_query_for('group', { fullPath: epic_with_issues.group.full_path }, query_graphql_field('epics', { iids: [epic_with_issues.iid, epic_without_issues.iid, parent_epic.iid] }, epic_aggregates_query))
+
+        # We still get multiple of these lines
+        # Group Load (0.6ms)  SELECT "namespaces".* FROM "namespaces" WHERE "namespaces"."type" = 'Group' AND "namespaces"."id" = x LIMIT 1
+        #   -> ee/app/policies/epic_policy.rb:4:in `block in <class:EpicPolicy>'
+        # So I'll add n to this number to take this into account.
+        # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27551#note_307716428
+        expect { post_graphql(query_with_multiple_epics, current_user: current_user) }.not_to exceed_query_limit(control_count + 2)
+      end
+    end
+
+    it 'uses the LazyEpicAggregate service' do
+      # one for count, one for weight_sum, even though the share the same tree state as part of the context
+      expect(Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate).to receive(:new).twice
+
+      post_graphql(query, current_user: current_user)
+    end
+
+    it_behaves_like 'counts properly'
+
+    it 'returns the weights' do
+      descendant_weight_result = {
+        "openedIssues" => 5,
+        "closedIssues" => 7
       }
 
-      expect(actual_result).to include expected_result
-    end
-  end
-
-  context 'with feature flag disabled' do
-    before do
-      stub_feature_flags(unfiltered_epic_aggregates: false)
+      is_expected.to include(
+        a_hash_including('descendantWeightSum' => a_hash_including(descendant_weight_result))
+      )
     end
 
-    context 'when requesting counts' do
+    context 'when requesting has_issues' do
       let(:epic_aggregates_query) do
         <<~QUERY
-        nodes {
-          descendantCounts {
-            openedEpics
-            closedEpics
-            openedIssues
-            closedIssues
+          nodes {
+            hasIssues
           }
-        }
         QUERY
       end
 
-      it 'uses the DescendantCountService' do
-        expect(Epics::DescendantCountService).to receive(:new)
-
-        post_graphql(query, current_user: current_user)
-      end
+      it_behaves_like 'having correct values for', 'hasIssues'
+      it_behaves_like 'efficient query'
     end
 
-    context 'when requesting weights' do
+    context 'when requesting has_children' do
       let(:epic_aggregates_query) do
         <<~QUERY
-        nodes {
-          descendantWeightSum {
-            openedIssues
-            closedIssues
+          nodes {
+            hasChildren
           }
-        }
         QUERY
       end
 
-      it 'returns an error' do
-        post_graphql(query, current_user: current_user)
-
-        expect_graphql_errors_to_include /Field 'descendantWeightSum' doesn't exist on type 'Epic/
-      end
+      it_behaves_like 'having correct values for', 'hasChildren'
+      it_behaves_like 'efficient query'
     end
   end
 end

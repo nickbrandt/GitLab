@@ -44,7 +44,7 @@ describe EE::AuthHelper do
 
     before do
       allow(::Gitlab::Auth::Smartcard).to receive(:enabled?).and_return(true)
-      allow(::Gitlab::Auth::LDAP::Config).to receive(:servers).and_return([ldap_server_config])
+      allow(::Gitlab::Auth::Ldap::Config).to receive(:servers).and_return([ldap_server_config])
     end
 
     context 'LDAP server with optional smartcard auth' do
@@ -109,7 +109,7 @@ describe EE::AuthHelper do
 
     before do
       allow(::Gitlab::Auth::Smartcard).to receive(:enabled?).and_return(true)
-      allow(::Gitlab::Auth::LDAP::Config).to receive(:servers).and_return([ldap_server_config])
+      allow(::Gitlab::Auth::Ldap::Config).to receive(:servers).and_return([ldap_server_config])
     end
 
     context 'when smartcard auth is optional' do

@@ -1,154 +1,232 @@
-import Vue from 'vue';
+import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { shallowMount } from '@vue/test-utils';
+import EpicItemDetails from 'ee/roadmap/components/epic_item_details.vue';
+import eventHub from 'ee/roadmap/event_hub';
+import {
+  mockGroupId,
+  mockFormattedEpic,
+  mockFormattedChildEpic2,
+  mockFormattedChildEpic1,
+} from '../mock_data';
 
-import epicItemDetailsComponent from 'ee/roadmap/components/epic_item_details.vue';
-
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockGroupId, mockEpic } from '../mock_data';
-
-const createComponent = (epic = mockEpic, currentGroupId = mockGroupId) => {
-  const Component = Vue.extend(epicItemDetailsComponent);
-
-  return mountComponent(Component, {
-    epic,
-    currentGroupId,
+const createComponent = (
+  epic = mockFormattedEpic,
+  currentGroupId = mockGroupId,
+  timeframeString = 'Jul 10, 2017 – Jun 2, 2018',
+) => {
+  return shallowMount(EpicItemDetails, {
+    propsData: {
+      epic,
+      currentGroupId,
+      timeframeString,
+    },
   });
 };
 
-describe('EpicItemDetailsComponent', () => {
-  let vm;
+const getTitle = wrapper => wrapper.find('.epic-title');
+
+const getGroupName = wrapper => wrapper.find('.epic-group');
+
+const getExpandIconButton = wrapper => wrapper.find(GlNewButton);
+
+const getChildEpicsCount = wrapper => wrapper.find({ ref: 'childEpicsCount' });
+
+describe('EpicItemDetails', () => {
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('computed', () => {
-    describe('isEpicGroupDifferent', () => {
-      it('returns true when Epic.groupId is different from currentGroupId', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, { groupId: 1 });
-        vm = createComponent(mockEpicItem, 2);
+  describe('epic title', () => {
+    beforeEach(() => {
+      wrapper = createComponent();
+    });
 
-        expect(vm.isEpicGroupDifferent).toBe(true);
+    it('is displayed', () => {
+      expect(getTitle(wrapper).text()).toBe(mockFormattedEpic.title);
+    });
+
+    it('contains a link to the epic', () => {
+      expect(getTitle(wrapper).attributes('href')).toBe(mockFormattedEpic.webUrl);
+    });
+  });
+
+  describe('epic group name', () => {
+    describe('when the epic group ID is different from the current group ID', () => {
+      let epic;
+
+      beforeEach(() => {
+        epic = {
+          mockFormattedEpic,
+          groupId: 1,
+          groupName: 'Bar',
+          groupFullName: 'Foo / Bar',
+        };
+
+        wrapper = createComponent(epic, 2);
       });
 
-      it('returns false when Epic.groupId is same as currentGroupId', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, { groupId: 1 });
-        vm = createComponent(mockEpicItem, 1);
+      it('is displayed', () => {
+        expect(getGroupName(wrapper).text()).toContain(epic.groupName);
+      });
 
-        expect(vm.isEpicGroupDifferent).toBe(false);
+      it('is set to the title attribute', () => {
+        expect(getGroupName(wrapper).attributes('title')).toBe(epic.groupFullName);
       });
     });
 
-    describe('startDate', () => {
-      it('returns Epic.startDate when start date is within range', () => {
-        vm = createComponent(mockEpic);
+    describe('when the epic group ID is the same as the current group ID', () => {
+      let epic;
 
-        expect(vm.startDate).toBe(mockEpic.startDate);
+      beforeEach(() => {
+        epic = {
+          ...mockFormattedEpic,
+          groupId: 1,
+          groupName: 'Bar',
+          groupFullName: 'Foo / Bar',
+        };
+
+        wrapper = createComponent(epic, 1);
       });
 
-      it('returns Epic.originalStartDate when start date is out of range', () => {
-        const mockStartDate = new Date(2018, 0, 1);
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDateOutOfRange: true,
-          originalStartDate: mockStartDate,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.startDate).toBe(mockStartDate);
-      });
-    });
-
-    describe('endDate', () => {
-      it('returns Epic.endDate when end date is within range', () => {
-        vm = createComponent(mockEpic);
-
-        expect(vm.endDate).toBe(mockEpic.endDate);
-      });
-
-      it('returns Epic.originalEndDate when end date is out of range', () => {
-        const mockEndDate = new Date(2018, 0, 1);
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          endDateOutOfRange: true,
-          originalEndDate: mockEndDate,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.endDate).toBe(mockEndDate);
-      });
-    });
-
-    describe('timeframeString', () => {
-      it('returns timeframe string correctly when both start and end dates are defined', () => {
-        vm = createComponent(mockEpic);
-
-        expect(vm.timeframeString).toBe('Jul 10, 2017 &ndash; Jun 2, 2018');
-      });
-
-      it('returns timeframe string correctly when only start date is defined', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          endDateUndefined: true,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('From Jul 10, 2017');
-      });
-
-      it('returns timeframe string correctly when only end date is defined', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDateUndefined: true,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('Until Jun 2, 2018');
-      });
-
-      it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDate: new Date(2018, 0, 1),
-          endDate: new Date(2018, 3, 1),
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('Jan 1 &ndash; Apr 1, 2018');
+      it('is hidden', () => {
+        expect(getGroupName(wrapper).exists()).toBe(false);
       });
     });
   });
 
-  describe('template', () => {
-    it('renders component container element with class `epic-details-cell`', () => {
-      vm = createComponent();
+  describe('timeframe', () => {
+    it('is displayed', () => {
+      wrapper = createComponent();
+      const timeframe = wrapper.find('.epic-timeframe');
 
-      expect(vm.$el.classList.contains('epic-details-cell')).toBe(true);
+      expect(timeframe.text()).toBe('Jul 10, 2017 – Jun 2, 2018');
     });
+  });
 
-    it('renders Epic title correctly', () => {
-      vm = createComponent();
-      const epicTitleEl = vm.$el.querySelector('.epic-title .epic-url');
+  describe('epic', () => {
+    describe('expand icon', () => {
+      it('is hidden when epic has no child epics', () => {
+        wrapper = createComponent();
 
-      expect(epicTitleEl).not.toBeNull();
-      expect(epicTitleEl.getAttribute('href')).toBe(mockEpic.webUrl);
-      expect(epicTitleEl.innerText.trim()).toBe(mockEpic.title);
-    });
-
-    it('renders Epic group name and tooltip', () => {
-      const mockEpicItem = Object.assign({}, mockEpic, {
-        groupId: 1,
-        groupName: 'Bar',
-        groupFullName: 'Foo / Bar',
+        expect(getExpandIconButton(wrapper).classes()).toContain('invisible');
       });
-      vm = createComponent(mockEpicItem, 2);
-      const epicGroupNameEl = vm.$el.querySelector('.epic-group-timeframe .epic-group');
 
-      expect(epicGroupNameEl).not.toBeNull();
-      expect(epicGroupNameEl.innerText.trim()).toContain(mockEpicItem.groupName);
-      expect(epicGroupNameEl.getAttribute('title')).toBe(mockEpicItem.groupFullName);
+      it('is shown when epic has child epics', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          children: {
+            edges: [mockFormattedChildEpic1],
+          },
+        };
+        wrapper = createComponent(epic);
+
+        expect(getExpandIconButton(wrapper).classes()).not.toContain('invisible');
+      });
+
+      it('shows "chevron-right" icon when child epics are not expanded', () => {
+        wrapper = createComponent();
+
+        expect(wrapper.find(GlIcon).attributes('name')).toBe('chevron-right');
+      });
+
+      it('shows "chevron-down" icon when child epics are expanded', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          isChildEpicShowing: true,
+        };
+        wrapper = createComponent(epic);
+
+        expect(wrapper.find(GlIcon).attributes('name')).toBe('chevron-down');
+      });
+
+      it('has "Expand child epics" label when child epics are not expanded', () => {
+        wrapper = createComponent();
+
+        expect(getExpandIconButton(wrapper).attributes('aria-label')).toBe('Expand child epics');
+      });
+
+      it('has "Collapse child epics" label when child epics are expanded', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          isChildEpicShowing: true,
+        };
+        wrapper = createComponent(epic);
+
+        expect(getExpandIconButton(wrapper).attributes('aria-label')).toBe('Collapse child epics');
+      });
+
+      it('emits toggleIsEpicExpanded event when clicked', () => {
+        spyOn(eventHub, '$emit');
+
+        const id = 42;
+        const epic = {
+          ...mockFormattedEpic,
+          id,
+          children: {
+            edges: [mockFormattedChildEpic1],
+          },
+        };
+        wrapper = createComponent(epic);
+
+        getExpandIconButton(wrapper).vm.$emit('click');
+
+        expect(eventHub.$emit).toHaveBeenCalledWith('toggleIsEpicExpanded', id);
+      });
+
+      it('is hidden when it is child epic', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          isChildEpic: true,
+        };
+        wrapper = createComponent(epic);
+
+        expect(getExpandIconButton(wrapper).classes()).toContain('invisible');
+      });
     });
 
-    it('renders Epic timeframe', () => {
-      vm = createComponent();
-      const epicTimeframeEl = vm.$el.querySelector('.epic-group-timeframe .epic-timeframe');
+    describe('child epics count', () => {
+      it('shows the correct count of child epics', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          children: {
+            edges: [mockFormattedChildEpic1, mockFormattedChildEpic2],
+          },
+        };
+        wrapper = createComponent(epic);
 
-      expect(epicTimeframeEl).not.toBeNull();
-      expect(epicTimeframeEl.innerText.trim()).toBe('Jul 10, 2017 – Jun 2, 2018');
+        expect(getChildEpicsCount(wrapper).text()).toBe('2');
+      });
+
+      it('shows the count as 0 when there are no child epics', () => {
+        wrapper = createComponent();
+
+        expect(getChildEpicsCount(wrapper).text()).toBe('0');
+      });
+
+      it('has a tooltip with the count', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          children: {
+            edges: [mockFormattedChildEpic1],
+          },
+        };
+        wrapper = createComponent(epic);
+
+        expect(wrapper.find(GlTooltip).text()).toBe('1 child epic');
+      });
+
+      it('is hidden when it is a child epic', () => {
+        const epic = {
+          ...mockFormattedEpic,
+          isChildEpic: true,
+        };
+        wrapper = createComponent(epic);
+
+        expect(getChildEpicsCount(wrapper).classes()).toContain('invisible');
+      });
     });
   });
 });

@@ -23,7 +23,7 @@ Default client accepts two parameters: `resolvers` and `config`.
 
 - `resolvers` parameter is created to accept an object of resolvers for [local state management](#local-state-with-apollo) queries and mutations
 - `config` parameter takes an object of configuration settings:
-  - `cacheConfig` field accepts an optional object of settings to [customize Apollo cache](https://github.com/apollographql/apollo-client/tree/master/packages/apollo-cache-inmemory#configuration)
+  - `cacheConfig` field accepts an optional object of settings to [customize Apollo cache](https://www.apollographql.com/docs/react/caching/cache-configuration/#configuring-the-cache)
   - `baseUrl` allows us to pass a URL for GraphQL endpoint different from our main endpoint (i.e.`${gon.relative_url_root}/api/graphql`)
   - `assumeImmutableResults` (set to `false` by default) - this setting, when set to `true`, will assume that every single operation on updating Apollo Cache is immutable. It also sets `freezeResults` to `true`, so any attempt on mutating Apollo Cache will throw a console warning in development environment. Please ensure you're following the immutability pattern on cache update operations before setting this option to `true`.
 
@@ -35,9 +35,9 @@ of the client doing compilation of queries.
 
 To distinguish queries from mutations and fragments, the following naming convention is recommended:
 
-- `allUsers.query.graphql` for queries;
-- `addUser.mutation.graphql` for mutations;
-- `basicUser.fragment.graphql` for fragments.
+- `all_users.query.graphql` for queries;
+- `add_user.mutation.graphql` for mutations;
+- `basic_user.fragment.graphql` for fragments.
 
 ### Fragments
 
@@ -56,8 +56,8 @@ fragment DesignListItem on Design {
 Fragments can be stored in separate files, imported and used in queries, mutations, or other fragments.
 
 ```javascript
-#import "./designList.fragment.graphql"
-#import "./diffRefs.fragment.graphql"
+#import "./design_list.fragment.graphql"
+#import "./diff_refs.fragment.graphql"
 
 fragment DesignItem on Design {
   ...DesignListItem
@@ -149,7 +149,7 @@ Using local Apollo Cache is handy when we have a need to mock some GraphQL API r
 
 For example, we have a [fragment](#fragments) on `DesignVersion` used in our queries:
 
-```
+```javascript
 fragment VersionListItem on DesignVersion {
   id
   sha
@@ -158,7 +158,7 @@ fragment VersionListItem on DesignVersion {
 
 We need to fetch also version author and the 'created at' property to display them in the versions dropdown but these changes are still not implemented in our API. We can change the existing fragment to get a mocked response for these new fields:
 
-```
+```javascript
 fragment VersionListItem on DesignVersion {
   id
   sha
@@ -257,6 +257,170 @@ export default {
   },
 };
 ```
+
+### Manually triggering queries
+
+Queries on a component's `apollo` property are made automatically when the component is created.
+Some components instead want the network request made on-demand, for example a dropdown with lazy-loaded items.
+
+There are two ways to do this:
+
+1. Use the `skip` property
+
+```javascript
+export default {
+  apollo: {
+    user: {
+      query: QUERY_IMPORT,
+      skip() {
+        // only make the query when dropdown is open
+        return !this.isOpen;
+      },
+    }
+  },
+};
+```
+
+1. Using `addSmartQuery`
+
+You can manually create the Smart Query in your method.
+
+```javascript
+handleClick() {
+  this.$apollo.addSmartQuery('user', {
+    // this takes the same values as you'd have in the `apollo` section
+    query: QUERY_IMPORT,
+  }),
+};
+```
+
+### Working with pagination
+
+GitLab's GraphQL API uses [Relay-style cursor pagination](https://www.apollographql.com/docs/react/data/pagination/#cursor-based)
+for connection types. This means a "cursor" is used to keep track of where in the data
+set the next items should be fetched from.
+
+Every connection type (for example, `DesignConnection` and `DiscussionConnection`) has a field `pageInfo` that contains an information required for pagination:
+
+```javascript
+pageInfo {
+  endCursor
+  hasNextPage
+  hasPreviousPage
+  startCursor
+}
+```
+
+Here:
+
+- `startCursor` and `endCursor` display the cursor of the first and last items
+  respectively.
+- `hasPreviousPage` and `hasNextPage` allow us to check if there are more pages
+  available before or after the current page.
+
+When we fetch data with a connection type, we can pass cursor as `after` or `before`
+parameter, indicating a starting or ending point of our pagination. They should be
+followed with `first` or `last` parameter respectively to indicate _how many_ items
+we want to fetch after or before a given endpoint.
+
+For example, here we're fetching 10 designs after a cursor:
+
+```javascript
+query {
+  project(fullPath: "root/my-project") {
+    id
+    issue(iid: "42") {
+      designCollection {
+        designs(atVersion: null, after: "Ihwffmde0i", first: 10) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Using `fetchMore` method in components
+
+When making an initial fetch, we usually want to start a pagination from the beginning.
+In this case, we can either:
+
+- Skip passing a cursor.
+- Pass `null` explicitly to `after`.
+
+After data is fetched, we should save a `pageInfo` object. Let's assume we're storing
+it to Vue component `data`:
+
+```javascript
+data() {
+  return {
+    pageInfo: null,
+  }
+},
+apollo: {
+  designs: {
+    query: projectQuery,
+    variables() {
+      return {
+        // rest of design variables
+        ...
+        first: 10,
+      };
+    },
+    result(res) {
+      this.pageInfo = res.data?.project?.issue?.designCollection?.designs?.pageInfo;
+    },
+  },
+},
+```
+
+When we want to move to the next page, we use an Apollo `fetchMore` method, passing a
+new cursor (and, optionally, new variables) there. In the `updateQuery` hook, we have
+to return a result we want to see in the Apollo cache after fetching the next page.
+
+```javascript
+fetchNextPage() {
+  // as a first step, we're checking if we have more pages to move forward
+  if (this.pageInfo?.hasNextPage) {
+    this.$apollo.queries.designs.fetchMore({
+      variables: {
+        // rest of design variables
+        ...
+        first: 10,
+        after: this.pageInfo?.endCursor,
+      },
+      updateQuery(previousResult, { fetchMoreResult }) {
+        // here we can implement the logic of adding new designs to fetched one (for example, if we use infinite scroll)
+        // or replacing old result with the new one if we use numbered pages
+
+        const newDesigns = fetchMoreResult.project.issue.designCollection.designs;
+        previousResult.project.issue.designCollection.designs.push(...newDesigns)
+
+        return previousResult;
+      },
+    });
+  }
+}
+```
+
+Please note we don't have to save `pageInfo` one more time; `fetchMore` triggers a query
+`result` hook as well.
+
+#### Limitations
+
+Currently, bidirectional pagination doesn't work:
+
+- `hasNextPage` returns a correct value only when we paginate forward using `endCursor`
+  and `first` parameters.
+- `hasPreviousPage` returns a correct value only when we paginate backward using
+  `startCursor` and `last` parameters.
+
+This should be resolved in the scope of the issue
+[Bi-directional Pagination in GraphQL doesn't work as expected](https://gitlab.com/gitlab-org/gitlab/-/issues/208301).
 
 ### Testing
 
@@ -437,7 +601,7 @@ defaultClient.query({ query })
 Read more about the [Apollo] client in the [Apollo documentation](https://www.apollographql.com/docs/tutorial/client/).
 
 [Apollo]: https://www.apollographql.com/
-[vue-apollo]: https://github.com/Akryum/vue-apollo/
+[vue-apollo]: https://github.com/vuejs/vue-apollo
 [feature-flags]: ../feature_flags.md
 [default-client]: https://gitlab.com/gitlab-org/gitlab/blob/master/app/assets/javascripts/lib/graphql.js
 [vue-test-utils]: https://vue-test-utils.vuejs.org/

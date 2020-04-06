@@ -30,13 +30,14 @@ export const receiveEpicsFailure = ({ commit }) => {
   flash(s__('Epics|Something went wrong while fetching group epics.'));
   commit(types.RECEIVE_EPICS_FAILURE);
 };
-export const fetchEpics = ({ state, dispatch }) => {
+export const fetchEpics = ({ state, dispatch }, search = '') => {
   dispatch('requestEpics');
 
   Api.groupEpics({
     groupId: state.groupId,
     includeDescendantGroups: false,
     includeAncestorGroups: true,
+    search,
   })
     .then(({ data }) => {
       dispatch('receiveEpicsSuccess', data);
