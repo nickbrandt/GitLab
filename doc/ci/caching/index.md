@@ -332,9 +332,9 @@ rspec:
 ### Caching Go dependencies
 
 Assuming your project is using [Go Modules](https://github.com/golang/go/wiki/Modules) to install
-the Go dependencies, the following example defines `cache` globally so that
-all jobs inherit it. Go modules are installed in `${GOPATH}/pkg/mod/` and
-are cached for all of all the `go` projects:
+Go dependencies, the following example defines `cache` in a `go-cache` template, that
+any job can extend. Go modules are installed in `${GOPATH}/pkg/mod/` and
+are cached for all of the `go` projects:
 
 ```yaml
 .go-cache:
