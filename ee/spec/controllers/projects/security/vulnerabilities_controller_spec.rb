@@ -80,7 +80,7 @@ describe Projects::Security::VulnerabilitiesController do
       it 'renders the file location' do
         show_vulnerability
 
-        expect(response.body).to have_text(vulnerability.finding.location["file"])
+        expect(response.body).to have_text(vulnerability.finding.location['file'])
       end
 
       it 'renders the solution card' do

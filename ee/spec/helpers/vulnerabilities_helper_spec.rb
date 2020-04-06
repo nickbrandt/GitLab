@@ -129,6 +129,7 @@ describe VulnerabilitiesHelper do
       it 'uses the default branch' do
         vulnerability.finding.pipelines = []
         vulnerability.finding.save
+
         expect(subject).to include(
           vulnerability.project.default_branch
         )
@@ -139,6 +140,7 @@ describe VulnerabilitiesHelper do
       it 'does not include a reference to the line number' do
         vulnerability.finding.location['start_line'] = nil
         vulnerability.finding.save
+
         expect(subject).not_to include('#L')
       end
     end
