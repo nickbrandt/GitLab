@@ -393,4 +393,3 @@ RSpec/RepeatedExample:
     - 'spec/features/projects/files/template_type_dropdown_spec.rb'
     - 'spec/helpers/users_helper_spec.rb'
     - 'spec/services/notification_service_spec.rb'
-    - 'spec/services/web_hook_service_spec.rb'
