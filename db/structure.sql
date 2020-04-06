@@ -9373,6 +9373,8 @@ CREATE INDEX index_import_failures_on_correlation_id_value ON public.import_fail
 
 CREATE INDEX index_import_failures_on_group_id_not_null ON public.import_failures USING btree (group_id) WHERE (group_id IS NOT NULL);
 
+CREATE INDEX index_import_failures_on_project_id_and_correlation_id_value ON public.import_failures USING btree (project_id, correlation_id_value) WHERE (retry_count = 0);
+
 CREATE INDEX index_import_failures_on_project_id_not_null ON public.import_failures USING btree (project_id) WHERE (project_id IS NOT NULL);
 
 CREATE UNIQUE INDEX index_index_statuses_on_project_id ON public.index_statuses USING btree (project_id);
@@ -13196,6 +13198,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408154604
 20200408154624
 20200408175424
+20200409085956
 20200409211607
 20200410232012
 20200414144547
