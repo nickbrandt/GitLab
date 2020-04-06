@@ -10322,8 +10322,6 @@ CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON pub
 
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_index ON public.snippet_user_mentions USING btree (snippet_id) WHERE (note_id IS NULL);
 
-CREATE INDEX status_page_settings_project_id_enabled_eq_true_partial ON public.status_page_settings USING btree (project_id) WHERE (enabled = true);
-
 CREATE UNIQUE INDEX taggings_idx ON public.taggings USING btree (tag_id, taggable_id, taggable_type, context, tagger_id, tagger_type);
 
 CREATE UNIQUE INDEX term_agreements_unique_index ON public.term_agreements USING btree (user_id, term_id);
@@ -12941,3 +12939,4 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200403185127
 20200403185422
 \.
+
