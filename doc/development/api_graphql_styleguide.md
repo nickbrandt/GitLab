@@ -45,8 +45,8 @@ For example, `app/graphql/types/issue_type.rb`:
 ```ruby
 graphql_name 'Issue'
 
-field :iid, GraphQL::ID_TYPE, null: false
-field :title, GraphQL::STRING_TYPE, null: false
+field :iid, GraphQL::ID_TYPE, null: true
+field :title, GraphQL::STRING_TYPE, null: true
 
 # we also have a method here that we've defined, that extends `field`
 markdown_field :title_html, null: true
@@ -273,7 +273,7 @@ For example:
 
 ```ruby
 field :test_field, type: GraphQL::STRING_TYPE,
-      null: false,
+      null: true,
       description: 'Some test field',
       feature_flag: :some_feature_flag
 ```
@@ -741,7 +741,7 @@ and handles time inputs.
 Example:
 
 ```ruby
-field :created_at, Types::TimeType, null: false, description: 'Timestamp of when the issue was created'
+field :created_at, Types::TimeType, null: true, description: 'Timestamp of when the issue was created'
 ```
 
 ## Testing
