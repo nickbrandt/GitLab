@@ -1,8 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
 import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
+import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import { TEST_HOST } from 'helpers/test_constants';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+
+const mockAxios = new MockAdapter(axios);
+jest.mock('~/flash');
 
 describe('Vulnerability Footer', () => {
   let wrapper;
@@ -56,6 +63,7 @@ describe('Vulnerability Footer', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    mockAxios.reset();
   });
 
   describe('solution card', () => {
@@ -84,6 +92,45 @@ describe('Vulnerability Footer', () => {
     it('does not show issue history when there is not one', () => {
       createWrapper();
       expect(wrapper.contains(IssueNote)).toBe(false);
+    });
+  });
+
+  describe('state history', () => {
+    const discussionUrl = 'http://localhost/discussions';
+
+    const historyList = () => wrapper.find({ ref: 'historyList' });
+    const historyEntries = () => wrapper.findAll(HistoryEntry);
+
+    it('does not render the history list if there are no history items', () => {
+      mockAxios.onGet(discussionUrl).replyOnce(200, []);
+      createWrapper();
+      expect(historyList().exists()).toBe(false);
+    });
+
+    it('does render the history list if there are history items', () => {
+      // The shape of this object doesn't matter for this test, we just need to verify that it's passed to the history
+      // entry.
+      const historyItems = [{ id: 1, note: 'some note' }, { id: 2, note: 'another note' }];
+      mockAxios.onGet(discussionUrl).replyOnce(200, historyItems);
+      createWrapper();
+
+      return axios.waitForAll().then(() => {
+        expect(historyList().exists()).toBe(true);
+        expect(historyEntries().length).toBe(2);
+        const entry1 = historyEntries().at(0);
+        const entry2 = historyEntries().at(1);
+        expect(entry1.props('discussion')).toEqual(historyItems[0]);
+        expect(entry2.props('discussion')).toEqual(historyItems[1]);
+      });
+    });
+
+    it('shows an error the history list could not be retrieved', () => {
+      mockAxios.onGet(discussionUrl).replyOnce(500);
+      createWrapper();
+
+      return axios.waitForAll().then(() => {
+        expect(createFlash).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });

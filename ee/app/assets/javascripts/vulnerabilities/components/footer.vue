@@ -1,10 +1,15 @@
 <script>
+import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+import { s__ } from '~/locale';
+import { joinPaths } from '~/lib/utils/url_utility';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
+import HistoryEntry from './history_entry.vue';
 
 export default {
   name: 'VulnerabilityFooter',
-  components: { IssueNote, SolutionCard },
+  components: { IssueNote, SolutionCard, HistoryEntry },
   props: {
     feedback: {
       type: Object,
@@ -20,6 +25,11 @@ export default {
       required: true,
     },
   },
+
+  data: () => ({
+    discussions: [],
+  }),
+
   computed: {
     hasIssue() {
       return Boolean(this.feedback?.issue_iid);
@@ -27,6 +37,21 @@ export default {
     hasSolution() {
       return this.solutionInfo.solution || this.solutionInfo.hasRemediation;
     },
+  },
+
+  created() {
+    axios
+      .get(joinPaths(window.location.href, 'discussions'))
+      .then(({ data }) => {
+        this.discussions = data;
+      })
+      .catch(() => {
+        createFlash(
+          s__(
+            'VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later.',
+          ),
+        );
+      });
   },
 };
 </script>
@@ -37,5 +62,13 @@ export default {
       <issue-note :feedback="feedback" :project="project" class="card-body" />
     </div>
     <hr />
+
+    <ul v-if="discussions.length" ref="historyList" class="notes">
+      <history-entry
+        v-for="discussion in discussions"
+        :key="discussion.id"
+        :discussion="discussion"
+      />
+    </ul>
   </div>
 </template>
