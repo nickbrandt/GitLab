@@ -7,7 +7,6 @@ const issue = {
   code: 'WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.A.NoContent',
   status: 'failed',
   className: 'spec.test_spec',
-  parsedTECHSCode: 'H91',
   learnMoreUrl: 'https://www.w3.org/TR/WCAG20-TECHS/H91.html',
 };
 
@@ -39,12 +38,9 @@ describe('CustomMetricsForm', () => {
     wrapper.destroy();
   });
 
-  it('Parses the TECHS Code from the issue code correctly', () => {
-    expect(wrapper.vm.parsedTECHSCode).toEqual(issue.parsedTECHSCode);
-  });
-
   it('Creates the correct URL for learning more about the issue code', () => {
-    expect(wrapper.vm.learnMoreUrl).toEqual(issue.learnMoreUrl);
+    const learnMoreUrl = wrapper.find({ ref: 'accessibility-issue-learn-more' }).attributes('href');
+    expect(learnMoreUrl).toEqual(issue.learnMoreUrl);
   });
 
   describe('When issue is new', () => {
