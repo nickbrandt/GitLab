@@ -10,8 +10,8 @@ class ApprovalWrappedRule
 
   def_delegators(:@approval_rule,
                  :regular?, :any_approver?, :code_owner?, :report_approver?,
-                 :id, :name, :users, :groups, :code_owner, :source_rule,
-                 :rule_type, :approvals_required)
+                 :overridden?, :id, :name, :users, :groups, :code_owner,
+                 :source_rule, :rule_type, :approvals_required)
 
   def self.wrap(merge_request, rule)
     if rule.any_approver?

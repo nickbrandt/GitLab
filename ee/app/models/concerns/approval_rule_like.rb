@@ -54,4 +54,13 @@ module ApprovalRuleLike
   def user_defined?
     regular? || any_approver?
   end
+
+  def overridden?
+    return false unless source_rule.present?
+
+    source_rule.name != name ||
+      source_rule.approvals_required != approvals_required ||
+      source_rule.user_ids.to_set != user_ids.to_set ||
+      source_rule.group_ids.to_set != group_ids.to_set
+  end
 end
