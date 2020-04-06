@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Profile > Pipeline Quota' do
+describe 'Profile > Usage Quota' do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:user, reload: true) { create(:user) }
@@ -13,14 +13,13 @@ describe 'Profile > Pipeline Quota' do
 
   before do
     gitlab_sign_in(user)
-    stub_feature_flags(user_usage_quota: false)
   end
 
   it 'is linked within the profile page' do
     visit profile_path
 
     page.within('.nav-sidebar') do
-      expect(page).to have_selector(:link_or_button, 'Pipeline quota')
+      expect(page).to have_selector(:link_or_button, 'Usage Quotas')
     end
   end
 
@@ -40,7 +39,7 @@ describe 'Profile > Pipeline Quota' do
         statistics.update!(shared_runners_seconds: used.minutes.to_i)
         namespace.update!(shared_runners_minutes_limit: quota)
 
-        visit profile_pipeline_quota_path
+        visit profile_usage_quotas_path
       end
 
       it 'shows the correct quota status' do
