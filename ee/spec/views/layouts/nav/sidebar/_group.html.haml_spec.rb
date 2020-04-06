@@ -98,12 +98,10 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   describe 'security dashboard tab' do
-    let(:group) { create(:group, plan: :gold_plan) }
+    let(:group) { create(:group_with_plan, plan: :gold_plan) }
 
     before do
       enable_namespace_license_check!
-
-      create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
     end
 
     context 'when security dashboard feature is enabled' do
@@ -192,7 +190,7 @@ describe 'layouts/nav/sidebar/_group' do
     end
 
     context 'when security dashboard feature is disabled' do
-      let(:group) { create(:group, plan: :bronze_plan) }
+      let(:group) { create(:group_with_plan, plan: :bronze_plan) }
 
       it 'is not visible' do
         render

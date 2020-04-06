@@ -2,16 +2,6 @@
 
 FactoryBot.modify do
   factory :namespace do
-    transient do
-      plan { nil }
-    end
-
-    before(:create) do |namespace, evaluator|
-      if evaluator.plan.present?
-        namespace.plan = create(evaluator.plan)
-      end
-    end
-
     trait :with_build_minutes do
       namespace_statistics factory: :namespace_statistics, shared_runners_seconds: 400.minutes.to_i
     end

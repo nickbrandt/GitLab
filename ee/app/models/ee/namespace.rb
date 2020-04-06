@@ -36,7 +36,6 @@ module EE
 
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
       scope :join_gitlab_subscription, -> { joins("LEFT OUTER JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id=namespaces.id") }
-      scope :with_plan, -> { where.not(plan_id: nil) }
       scope :with_shared_runners_minutes_limit, -> { where("namespaces.shared_runners_minutes_limit > 0") }
       scope :with_extra_shared_runners_minutes_limit, -> { where("namespaces.extra_shared_runners_minutes_limit > 0") }
       scope :with_shared_runners_minutes_exceeding_default_limit, -> do
