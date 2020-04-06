@@ -42,13 +42,26 @@ module Gitlab
       #   subject to the same limit.
       #
       if merge_request.diff_size == "1000+"
-        merge_request.project.repository.diff_stats(
-          merge_request.commits.last.sha,
-          merge_request.commits.first.sha
-        ).paths
+        slow_path_lookup(merge_request, merge_request_diff)
       else
-        merge_request.modified_paths(past_merge_request_diff: merge_request_diff)
+        fast_path_lookup(merge_request, merge_request_diff)
       end
     end
+    private_class_method :paths_for_merge_request
+
+    def self.slow_path_lookup(merge_request, merge_request_diff)
+      merge_request_diff = merge_request_diff || merge_request.merge_request_diff
+
+      merge_request.project.repository.diff_stats(
+        merge_request_diff.base_commit_sha,
+        merge_request_diff.head_commit_sha
+      ).paths
+    end
+    private_class_method :slow_path_lookup
+
+    def self.fast_path_lookup(merge_request, merge_request_diff)
+      merge_request.modified_paths(past_merge_request_diff: merge_request_diff)
+    end
+    private_class_method :fast_path_lookup
   end
 end
