@@ -14,25 +14,23 @@ describe 'Trial Select Namespace', :js do
   end
 
   context 'when user' do
-    let(:setup_for_company) { nil }
+    let(:url_params) { {} }
 
     before do
-      user.update! setup_for_company: setup_for_company
-
-      visit select_trials_path
+      visit select_trials_path(url_params)
       wait_for_all_requests
 
-      choose :trial_entity_company if setup_for_company.nil?
+      choose :trial_entity_company if url_params[:glm_source] != 'about.gitlab.com'
     end
 
-    context 'when setup_for_company is not chosen' do
-      it 'shows company/individual duplicate question' do
+    context 'when source is not about.gitlab.com' do
+      it 'shows company/individual question' do
         expect(page).to have_content('Is this GitLab trial for your company?')
       end
     end
 
-    context 'when setup_for_company is already chosen' do
-      let(:setup_for_company) { true }
+    context 'when source is about.gitlab.com' do
+      let(:url_params) { { glm_source: 'about.gitlab.com' } }
 
       it 'hides company/individual duplicate question' do
         expect(page).not_to have_content('Is this GitLab trial for your company?')
