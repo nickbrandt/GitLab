@@ -51,6 +51,21 @@ exports[`GroupActivity component matches the snapshot 1`] = `
           Issues created
         </p>
       </div>
+      <div
+        class="flex-grow text-center"
+      >
+        <h3
+          class="my-2"
+        >
+          30
+        </h3>
+         
+        <p
+          class="text-secondary gl-font-size-small mb-2"
+        >
+          New Members created
+        </p>
+      </div>
     </div>
      
   </div>

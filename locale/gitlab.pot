@@ -10079,6 +10079,9 @@ msgstr ""
 msgid "Group: %{name}"
 msgstr ""
 
+msgid "GroupActivityMetrics|New Members created"
+msgstr ""
+
 msgid "GroupActivyMetrics|Issues created"
 msgstr ""
 
