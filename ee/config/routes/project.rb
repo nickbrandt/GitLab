@@ -130,12 +130,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      namespace :prometheus do
-        resources :metrics, constraints: { id: %r{[^\/]+} }, only: [] do
-          post :validate_query, on: :collection
-        end
-      end
-
       resource :tracing, only: [:show]
 
       resources :web_ide_terminals, path: :ide_terminals, only: [:create, :show], constraints: { id: /\d+/, format: :json } do
