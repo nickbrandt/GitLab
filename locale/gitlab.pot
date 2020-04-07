@@ -380,9 +380,6 @@ msgstr ""
 msgid "%{name}'s avatar"
 msgstr ""
 
-msgid "%{numberOfDays} days"
-msgstr ""
-
 msgid "%{number_commits_behind} commits behind %{default_branch}, %{number_commits_ahead} commits ahead"
 msgstr ""
 
