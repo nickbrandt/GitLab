@@ -93,7 +93,7 @@ describe "Pages with Let's Encrypt", :https_pages_enabled do
     it 'user can retry obtaining certificate' do
       visit project_pages_domain_path(project, domain)
 
-      expect(page).to have_text("Something went wrong while obtaining Let's Encrypt certificate.")
+      expect(page).to have_text("Something went wrong while obtaining the Let's Encrypt certificate.")
 
       click_on('Retry')
 

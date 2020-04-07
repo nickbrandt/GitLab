@@ -1,12 +1,11 @@
 - verification_enabled = Gitlab::CurrentSettings.pages_domain_verification_enabled?
 
-- if can?(current_user, :update_pages, @project) && @domains.load.any?
+- if can?(current_user, :update_pages, @project) && @domains.any?
   .card
     .card-header
       Domains (#{@domains.size})
     %ul.list-group.list-group-flush.pages-domain-list{ class: ("has-verification-status" if verification_enabled) }
       - @domains.each do |domain|
-        - domain = Gitlab::View::Presenter::Factory.new(domain, current_user: current_user).fabricate!
         %li.pages-domain-list-item.list-group-item.d-flex.justify-content-between
           - if verification_enabled
             - tooltip, status = domain.unverified? ? [s_('GitLabPages|Unverified'), 'failed'] : [s_('GitLabPages|Verified'), 'success']

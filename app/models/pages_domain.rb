@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PagesDomain < ApplicationRecord
+  include Presentable
+
   VERIFICATION_KEY = 'gitlab-pages-verification-code'
   VERIFICATION_THRESHOLD = 3.days.freeze
   SSL_RENEWAL_THRESHOLD = 30.days.freeze
@@ -13,7 +15,7 @@ class PagesDomain < ApplicationRecord
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"
   has_many :serverless_domain_clusters, class_name: 'Serverless::DomainCluster', inverse_of: :pages_domain
 
-  before_validation :clear_auto_ssl_fauilure, unless: :auto_ssl_enabled
+  before_validation :clear_auto_ssl_failure, unless: :auto_ssl_enabled
 
   validates :domain, hostname: { allow_numeric_hostname: true }
   validates :domain, uniqueness: { case_sensitive: false }
@@ -210,7 +212,7 @@ class PagesDomain < ApplicationRecord
     Pages::VirtualDomain.new([project], domain: self)
   end
 
-  def clear_auto_ssl_fauilure
+  def clear_auto_ssl_failure
     self.auto_ssl_failed = false
   end
 

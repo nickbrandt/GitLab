@@ -88,10 +88,6 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   end
 
   def domain
-    @domain ||=
-      begin
-        domain = @project.pages_domains.find_by_domain!(params[:id].to_s)
-        Gitlab::View::Presenter::Factory.new(domain, current_user: current_user).fabricate!
-      end
+    @domain ||= @project.pages_domains.find_by_domain!(params[:id].to_s).present(current_user: current_user)
   end
 end
