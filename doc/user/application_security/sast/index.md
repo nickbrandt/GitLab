@@ -18,7 +18,7 @@ vulnerabilities using Static Application Security Testing (SAST).
 
 You can take advantage of SAST by doing one of the following:
 
-- [Including the CI job](#configuration) in your existing `.gitlab-ci.yml` file.
+- [Including the SAST template](#configuration) in your existing `.gitlab-ci.yml` file.
 - Implicitly using [Auto SAST](../../../topics/autodevops/stages.md#auto-sast-ultimate) provided by
   [Auto DevOps](../../../topics/autodevops/index.md).
 
