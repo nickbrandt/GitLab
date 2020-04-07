@@ -157,6 +157,7 @@ function install_external_dns() {
 
   if ! deploy_exists "${namespace}" "${release}" || previous_deploy_failed "${namespace}" "${release}" ; then
     echoinfo "Installing external-dns Helm chart"
+    helm repo add bitnami https://charts.bitnami.com/bitnami
     helm repo update
 
     # Default requested: CPU => 0, memory => 0
