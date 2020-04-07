@@ -6,7 +6,6 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { flow, reverse, sortBy } from 'lodash/fp';
 import environmentTableMixin from 'ee_else_ce/environments/mixins/environments_table_mixin';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import EnvironmentItem from './environment_item.vue';
 
 export default {
@@ -17,7 +16,7 @@ export default {
     CanaryDeploymentCallout: () =>
       import('ee_component/environments/components/canary_deployment_callout.vue'),
   },
-  mixins: [environmentTableMixin, glFeatureFlagsMixin()],
+  mixins: [environmentTableMixin],
   props: {
     environments: {
       type: Array,
@@ -42,9 +41,6 @@ export default {
           ? { ...env, children: this.sortEnvironments(env.children) }
           : env,
       );
-    },
-    shouldShowAutoStopDate() {
-      return this.glFeatures.autoStopEnvironments;
     },
     tableData() {
       return {
@@ -74,7 +70,7 @@ export default {
           spacing: 'section-5',
         },
         actions: {
-          spacing: this.shouldShowAutoStopDate ? 'section-25' : 'section-30',
+          spacing: 'section-25',
         },
       };
     },
@@ -132,7 +128,6 @@ export default {
         {{ tableData.date.title }}
       </div>
       <div
-        v-if="shouldShowAutoStopDate"
         class="table-section"
         :class="tableData.autoStop.spacing"
         role="columnheader"
@@ -146,7 +141,6 @@ export default {
         :key="`environment-item-${i}`"
         :model="model"
         :can-read-environment="canReadEnvironment"
-        :should-show-auto-stop-date="shouldShowAutoStopDate"
         :table-data="tableData"
       />
 
@@ -180,7 +174,6 @@ export default {
             :model="children"
             :can-read-environment="canReadEnvironment"
             :table-data="tableData"
-            :should-show-auto-stop-date="shouldShowAutoStopDate"
           />
 
           <div :key="`sub-div-${i}`">
