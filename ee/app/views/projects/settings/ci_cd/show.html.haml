@@ -1,5 +1,6 @@
 = render_ce 'projects/settings/ci_cd/show'
 
-= render 'projects/settings/ci_cd/managed_licenses'
+- unless @only_show_deploy_keys_and_tokens
+  = render 'projects/settings/ci_cd/managed_licenses'
 
-= render 'projects/settings/ci_cd/pipeline_subscriptions'
+  = render 'projects/settings/ci_cd/pipeline_subscriptions'

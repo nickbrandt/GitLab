@@ -5,6 +5,7 @@ module Projects
     class CiCdController < Projects::ApplicationController
       before_action :authorize_admin_pipeline!
       before_action :define_variables
+      before_action :define_visibility
       before_action do
         push_frontend_feature_flag(:new_variables_ui, @project)
         push_frontend_feature_flag(:ajax_new_deploy_token, @project)
@@ -120,6 +121,10 @@ module Projects
         define_badges_variables
         define_auto_devops_variables
         define_deploy_keys
+      end
+
+      def define_visibility
+        @only_show_deploy_keys_and_tokens = @project.archived? || !@project.feature_available?(:builds, current_user)
       end
 
       def define_runners_variables

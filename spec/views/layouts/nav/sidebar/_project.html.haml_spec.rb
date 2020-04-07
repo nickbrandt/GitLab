@@ -117,10 +117,10 @@ describe 'layouts/nav/sidebar/_project' do
     context 'when project is archived' do
       let(:project_archived) { true }
 
-      it 'does not show the ci/cd settings tab' do
+      it 'shows the ci/cd settings tab' do
         render
 
-        expect(rendered).not_to have_link('CI / CD', href: project_settings_ci_cd_path(project))
+        expect(rendered).to have_link('CI / CD', href: project_settings_ci_cd_path(project))
       end
     end
 
