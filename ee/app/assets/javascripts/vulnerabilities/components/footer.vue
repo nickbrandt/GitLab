@@ -21,6 +21,9 @@ export default {
     },
   },
   computed: {
+    hasIssue() {
+      return Boolean(this.feedback?.issue_iid);
+    },
     hasSolution() {
       return this.solutionInfo.solution || this.solutionInfo.hasRemediation;
     },
@@ -35,7 +38,7 @@ export default {
     <li>
       <hr />
     </li>
-    <li v-if="feedback" class="note card my-4 border-bottom">
+    <li v-if="hasIssue" class="note card my-4 border-bottom">
       <div class="card-body">
         <issue-note :feedback="feedback" :project="project" />
       </div>
