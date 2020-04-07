@@ -306,7 +306,7 @@ describe('CustomStageForm', () => {
 
       expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex - 1);
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
 
       return Vue.nextTick().then(() => {
         stopOptions = wrapper.find(sel.endEvent);

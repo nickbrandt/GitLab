@@ -20,11 +20,17 @@ module Analytics
       end
 
       def allowed_end_events
-        pairing_rules.fetch(object, []).map(&:identifier)
+        pairing_rules.fetch(object, []).map do |event|
+          event.identifier unless stage_events.internal_events.include?(event)
+        end.compact
       end
 
       def pairing_rules
-        Gitlab::Analytics::CycleAnalytics::StageEvents.pairing_rules
+        stage_events.pairing_rules
+      end
+
+      def stage_events
+        Gitlab::Analytics::CycleAnalytics::StageEvents
       end
     end
   end
