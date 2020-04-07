@@ -19,8 +19,16 @@ describe PagesDomains::RetryAcmeOrderService do
     service.execute
   end
 
-  it "doesn't schedule renewal worker if acme order is already present" do
-    create(:pages_domain_acme_order, pages_domain: domain)
+  it "doesn't schedule renewal worker if Let's Encrypt integration is not enabled" do
+    domain.update!(auto_ssl_enabled: false)
+
+    expect(PagesDomainSslRenewalWorker).not_to receive(:new)
+
+    service.execute
+  end
+
+  it "doesn't schedule renewal worker if auto ssl has not failed yet" do
+    domain.update!(auto_ssl_failed: false)
 
     expect(PagesDomainSslRenewalWorker).not_to receive(:new)
 

@@ -9,10 +9,13 @@ module PagesDomains
     end
 
     def execute
-      pages_domain.update!(auto_ssl_failed: false)
+      updated = pages_domain.with_lock do
+        next unless pages_domain.auto_ssl_enabled && pages_domain.auto_ssl_failed
 
-      # Don't schedule worker if already have acme order to prevent users from abusing retries
-      PagesDomainSslRenewalWorker.perform_async(pages_domain.id) unless pages_domain.acme_orders.exists?
+        pages_domain.update!(auto_ssl_failed: false)
+      end
+
+      PagesDomainSslRenewalWorker.perform_async(pages_domain.id) if updated
     end
   end
 end
