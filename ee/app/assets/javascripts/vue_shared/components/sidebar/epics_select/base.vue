@@ -101,7 +101,7 @@ export default {
      */
     searchQuery(value) {
       if (value) {
-        if (!this.groupEpics.length) this.fetchEpics(this.searchQuery);
+        this.fetchEpics(this.searchQuery);
       } else {
         this.fetchEpics();
       }
