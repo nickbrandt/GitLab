@@ -148,6 +148,7 @@ review-stop-failed-deployment:
   stage: prepare
   script:
     - delete_failed_release
+    - delete_helm2_release
 
 review-stop:
   extends:
