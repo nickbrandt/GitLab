@@ -813,7 +813,7 @@ describe User, :do_not_mock_admin_mode do
     describe '.active_without_ghosts' do
       let_it_be(:user1) { create(:user, :external) }
       let_it_be(:user2) { create(:user, state: 'blocked') }
-      let_it_be(:user3) { create(:user, ghost: true) }
+      let_it_be(:user3) { create(:user, :ghost) }
       let_it_be(:user4) { create(:user) }
 
       it 'returns all active users but ghost users' do
@@ -824,7 +824,7 @@ describe User, :do_not_mock_admin_mode do
     describe '.without_ghosts' do
       let_it_be(:user1) { create(:user, :external) }
       let_it_be(:user2) { create(:user, state: 'blocked') }
-      let_it_be(:user3) { create(:user, ghost: true) }
+      let_it_be(:user3) { create(:user, :ghost) }
 
       it 'returns users without ghosts users' do
         expect(described_class.without_ghosts).to match_array([user1, user2])
@@ -3275,7 +3275,6 @@ describe User, :do_not_mock_admin_mode do
       expect(ghost.namespace).not_to be_nil
       expect(ghost.namespace).to be_persisted
       expect(ghost.user_type).to eq 'ghost'
-      expect(ghost.ghost).to eq true
     end
 
     it "does not create a second ghost user if one is already present" do
@@ -4077,7 +4076,7 @@ describe User, :do_not_mock_admin_mode do
 
     context 'in single-user environment' do
       it 'requires user consent after one week' do
-        create(:user, ghost: true)
+        create(:user, :ghost)
 
         expect(user.requires_usage_stats_consent?).to be true
       end
@@ -4503,7 +4502,7 @@ describe User, :do_not_mock_admin_mode do
         where(:attributes) do
           [
             { state: 'blocked' },
-            { ghost: true },
+            { user_type: :ghost },
             { user_type: :alert_bot }
           ]
         end
@@ -4546,7 +4545,7 @@ describe User, :do_not_mock_admin_mode do
 
     context 'when user is a ghost user' do
       before do
-        user.update(ghost: true)
+        user.update(user_type: :ghost)
       end
 
       it { is_expected.to be false }
@@ -4585,7 +4584,7 @@ describe User, :do_not_mock_admin_mode do
 
     context 'when user is an internal user' do
       before do
-        user.update(ghost: true)
+        user.update(user_type: :ghost)
       end
 
       it { is_expected.to be User::LOGIN_FORBIDDEN }

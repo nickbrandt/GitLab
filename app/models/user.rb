@@ -323,7 +323,7 @@ class User < ApplicationRecord
   scope :external, -> { where(external: true) }
   scope :active, -> { with_state(:active).non_internal }
   scope :active_without_ghosts, -> { with_state(:active).without_ghosts }
-  scope :without_ghosts, -> { where('ghost IS NOT TRUE') }
+  scope :without_ghosts, -> { humans.or(where.not(user_type: :ghost)) }
   scope :deactivated, -> { with_state(:deactivated).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
@@ -624,7 +624,7 @@ class User < ApplicationRecord
     # owns records previously belonging to deleted users.
     def ghost
       email = 'ghost%s@example.com'
-      unique_internal(where(ghost: true, user_type: :ghost), 'ghost', email) do |u|
+      unique_internal(where(user_type: :ghost), 'ghost', email) do |u|
         u.bio = _('This is a "Ghost User", created to hold all issues authored by users that have since been deleted. This user cannot be removed.')
         u.name = 'Ghost User'
       end
@@ -664,17 +664,8 @@ class User < ApplicationRecord
     ghost? || (bot? && !project_bot?)
   end
 
-  # We are transitioning from ghost boolean column to user_type
-  # so we need to read from old column for now
-  # @see https://gitlab.com/gitlab-org/gitlab/-/issues/210025
-  def ghost?
-    ghost
-  end
-
-  # The explicit check for project_bot will be removed with Bot Categorization
-  # Ref: https://gitlab.com/gitlab-org/gitlab/-/issues/213945
   def self.internal
-    where(ghost: true).or(bots_without_project_bot)
+    where(user_type: :ghost).or(bots)
   end
 
   # The explicit check for project_bot will be removed with Bot Categorization

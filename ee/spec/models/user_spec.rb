@@ -90,7 +90,7 @@ describe User do
     describe '.active_without_ghosts' do
       let_it_be(:user1) { create(:user, :external) }
       let_it_be(:user2) { create(:user, state: 'blocked') }
-      let_it_be(:user3) { create(:user, ghost: true) }
+      let_it_be(:user3) { create(:user, :ghost) }
       let_it_be(:user4) { create(:user, user_type: :support_bot) }
       let_it_be(:user5) { create(:user, state: 'blocked', user_type: :support_bot) }
 
@@ -637,7 +637,7 @@ describe User do
         end
 
         context 'when user is a ghost' do
-          let(:user) { create(:user, ghost: true) }
+          let(:user) { create(:user, :ghost) }
 
           it 'returns false' do
             expect(user.using_license_seat?).to eq false
