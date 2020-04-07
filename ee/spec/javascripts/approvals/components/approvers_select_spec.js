@@ -68,6 +68,7 @@ describe('Approvals ApproversSelect', () => {
   };
   const search = (term = '') => {
     $input.select2('search', term);
+    jasmine.clock().mockDate();
     jasmine.clock().tick(DEBOUNCE_TIME);
   };
 

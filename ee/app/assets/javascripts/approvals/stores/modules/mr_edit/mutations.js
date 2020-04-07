@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import base from '../base/mutations';
 import * as types from './mutation_types';
 import { RULE_TYPE_ANY_APPROVER } from '../../../constants';
@@ -6,7 +5,7 @@ import { RULE_TYPE_ANY_APPROVER } from '../../../constants';
 export default {
   ...base,
   [types.DELETE_RULE](state, id) {
-    const idx = _.findIndex(state.rules, x => x.id === id);
+    const idx = state.rules.findIndex(x => x.id === id);
 
     if (idx < 0) {
       return;
@@ -35,7 +34,7 @@ export default {
     state.rules = [newRule];
   },
   [types.PUT_RULE](state, { id, ...newRule }) {
-    const idx = _.findIndex(state.rules, x => x.id === id);
+    const idx = state.rules.findIndex(x => x.id === id);
 
     if (idx < 0) {
       return;
