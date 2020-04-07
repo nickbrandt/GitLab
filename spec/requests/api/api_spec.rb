@@ -34,7 +34,7 @@ describe API::API do
       let_it_be(:group) { create(:group) }
       let_it_be(:token) { create(:personal_access_token, user: user, scopes: [:read_api]) }
 
-      before do
+      before_all do
         group.add_owner(user)
       end
 
