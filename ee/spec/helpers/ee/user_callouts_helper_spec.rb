@@ -201,7 +201,10 @@ describe EE::UserCalloutsHelper do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
         allow(helper).to receive(:has_some_namespaces_with_no_trials?) { has_some_namespaces_with_no_trials? }
-        namespace.update(plan: gold_plan) unless has_no_trial_or_gold_plan?
+
+        unless has_no_trial_or_gold_plan?
+          create(:gitlab_subscription, hosted_plan: gold_plan, namespace: namespace)
+        end
       end
 
       it do
