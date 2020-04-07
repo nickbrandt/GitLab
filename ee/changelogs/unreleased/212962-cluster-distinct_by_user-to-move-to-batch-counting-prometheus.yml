@@ -1,0 +1,5 @@
+---
+title: Move Clusters Application Prometheus to batch counting
+merge_request: 29006
+author:
+type: performance

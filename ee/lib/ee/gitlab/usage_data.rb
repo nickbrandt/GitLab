@@ -257,7 +257,7 @@ module EE
         def usage_activity_by_stage_monitor(time_period)
           {
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
-            clusters_applications_prometheus: ::Clusters::Applications::Prometheus.where(time_period).distinct_by_user,
+            clusters_applications_prometheus: distinct_count(::Clusters::Applications::Prometheus.where(time_period).available.joins(:cluster), 'clusters.user_id'),
             operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
             operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
