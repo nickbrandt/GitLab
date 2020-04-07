@@ -123,7 +123,7 @@ describe LicenseHelper do
   end
 
   describe '#seats_calculation_message' do
-    subject { seats_calculation_message(license: license) }
+    subject { seats_calculation_message(license) }
 
     context 'with a license' do
       let(:license) { double("License", 'exclude_guests_from_active_count?' => exclude_guests) }
