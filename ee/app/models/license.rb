@@ -111,6 +111,7 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
+    enterprise_templates
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management
@@ -202,6 +203,7 @@ class License < ApplicationRecord
     custom_project_templates
     db_load_balancing
     elastic_search
+    enterprise_templates
     extended_audit_events
     external_authorization_service_api_management
     geo
