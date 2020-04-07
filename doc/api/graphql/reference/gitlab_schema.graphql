@@ -9143,6 +9143,11 @@ type Vulnerability {
   location: JSON
 
   """
+  Fingerprint used to associate the vulnerability's finding with feedback
+  """
+  projectFingerprint: String
+
+  """
   Type of the security report that found the vulnerability (SAST, DEPENDENCY_SCANNING, CONTAINER_SCANNING, DAST)
   """
   reportType: VulnerabilityReportType
