@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 
 import { GlLink, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
+import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 
 import { requirement1, mockUserPermissions } from '../mock_data';
 
@@ -65,9 +66,32 @@ describe('RequirementItem', () => {
     });
   });
 
+  describe('methods', () => {
+    describe('handleUpdateRequirementSave', () => {
+      it('emits `updateSave` event on component with params passed as it is', () => {
+        wrapper.vm.handleUpdateRequirementSave('foo');
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.emitted('updateSave')).toBeTruthy();
+          expect(wrapper.emitted('updateSave')[0]).toEqual(['foo']);
+        });
+      });
+    });
+  });
+
   describe('template', () => {
     it('renders component container element containing class `requirement`', () => {
       expect(wrapper.classes()).toContain('requirement');
+    });
+
+    it('renders requirement-form component', () => {
+      wrapper.setProps({
+        showUpdateForm: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(RequirementForm).exists()).toBe(true);
+      });
     });
 
     it('renders element containing requirement reference', () => {
