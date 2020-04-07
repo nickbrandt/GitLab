@@ -2748,6 +2748,7 @@ Possible values for `when` are:
 - `unmet_prerequisites`: Retry if the job failed to complete prerequisite tasks.
 - `scheduler_failure`: Retry if the scheduler failed to assign the job to a runner.
 - `data_integrity_failure`: Retry if there was a structural integrity problem detected.
+- `deployment_freeze`: TODO
 
 ### `timeout`
 

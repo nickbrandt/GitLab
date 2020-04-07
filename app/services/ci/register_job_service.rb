@@ -113,6 +113,11 @@ module Ci
         return false
       end
 
+      if build.frozen?
+        build.drop!(:deployment_freeze)
+        return false
+      end
+
       build.run!
       true
     end
@@ -137,6 +142,10 @@ module Ci
         pipeline_id: build.pipeline_id,
         project_id: build.project_id
       )
+    end
+
+    def build_frozen?(build)
+      DeployFreezePeriodService.new(project_id: build.project_id).execute
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

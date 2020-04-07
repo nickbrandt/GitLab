@@ -1536,6 +1536,40 @@ module Gitlab
             end
           end
         end
+
+        context 'deployment freeze' do
+          let(:config) do
+            {
+              deploy_to_production: {
+                stage: 'deploy',
+                script: 'deploy_to_prod.sh',
+                environment: {
+                  name: 'production',
+                  url: 'https://prod.example.com'
+                },
+                rules: [
+                  { if: '$CI_ENVIRONMENT_FROZEN == null' }
+                ]
+              }
+            }
+          end
+
+          it 'accepts deployment freeze config' do
+            expect(builds.size).to eq(1)
+            expect(builds.first[:options]).to eq(
+              script: ["deploy_to_prod.sh"],
+              environment: {
+                name: "production",
+                url: "https://prod.example.com"
+              }
+            )
+            expect(builds.first[:rules]).to eq([
+              {
+                if: "$CI_ENVIRONMENT_FROZEN == null"
+              }
+            ])
+          end
+        end
       end
 
       describe "Timeout" do

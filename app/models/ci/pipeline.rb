@@ -684,6 +684,10 @@ module Ci
         if external_pull_request_event? && external_pull_request
           variables.concat(external_pull_request.predefined_variables)
         end
+
+        if Ci::FreezePeriodService.new(project_id: self.project_id).execute
+          variables.append(key: 'CI_ENVIRONMENT_FROZEN', value: 'true')
+        end
       end
     end
 

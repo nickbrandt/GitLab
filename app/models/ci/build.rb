@@ -440,6 +440,10 @@ module Ci
       max_allowed_retries > 0 && retries_count < max_allowed_retries
     end
 
+    def frozen?
+      Ci::DeployFrozenService.new(build: self).execute
+    end
+
     def options_retry_max
       options_retry[:max]
     end
