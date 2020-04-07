@@ -58,12 +58,6 @@ export default {
       required: true,
     },
 
-    shouldShowAutoStopDate: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-
     tableData: {
       type: Object,
       required: true,
@@ -639,7 +633,7 @@ export default {
     </div>
 
     <div
-      v-if="!isFolder && shouldShowAutoStopDate"
+      v-if="!isFolder"
       class="table-section"
       :class="tableData.autoStop.spacing"
       role="gridcell"
@@ -663,7 +657,7 @@ export default {
     >
       <div class="btn-group table-action-buttons" role="group">
         <pin-component
-          v-if="canShowAutoStopDate && shouldShowAutoStopDate"
+          v-if="canShowAutoStopDate"
           :auto-stop-url="autoStopUrl"
         />
 
