@@ -23,7 +23,7 @@ describe Ci::Build do
   it { is_expected.to have_many(:trace_sections) }
   it { is_expected.to have_many(:needs) }
   it { is_expected.to have_many(:sourced_pipelines) }
-  it { is_expected.to have_many(:job_variables) }
+  it { is_expected.to have_many(:job_spec/models/ci) }
 
   it { is_expected.to have_one(:deployment) }
   it { is_expected.to have_one(:runner_session) }
@@ -2858,6 +2858,18 @@ describe Ci::Build do
       end
 
       it { is_expected.to include(deployment_variable) }
+    end
+
+    context 'when build has a freeze period' do
+      let(:freeze_variable) { { key: 'CI_DEPLOY_FREEZE', value: 'true', masked: false, public: true } }
+
+      before do
+        allow_any_instance_of(Ci::FreezePeriodService)
+          .to receive(:execute)
+          .and_return(true)
+      end
+
+      it { is_expected.to include(freeze_variable) }
     end
 
     context 'when project has default CI config path' do

@@ -2061,11 +2061,11 @@ CREATE SEQUENCE public.design_management_designs_id_seq
 ALTER SEQUENCE public.design_management_designs_id_seq OWNED BY public.design_management_designs.id;
 
 CREATE TABLE public.design_management_designs_versions (
-    id bigint NOT NULL,
     design_id bigint NOT NULL,
     version_id bigint NOT NULL,
     event smallint DEFAULT 0 NOT NULL,
-    image_v432x230 character varying(255)
+    image_v432x230 character varying(255),
+    id bigint NOT NULL
 );
 
 CREATE SEQUENCE public.design_management_designs_versions_id_seq
@@ -4045,8 +4045,8 @@ CREATE TABLE public.notification_settings (
     issue_due boolean,
     new_epic boolean,
     notification_email character varying,
-    fixed_pipeline boolean,
-    new_release boolean
+    new_release boolean,
+    fixed_pipeline boolean
 );
 
 CREATE SEQUENCE public.notification_settings_id_seq
@@ -4676,6 +4676,25 @@ CREATE SEQUENCE public.project_daily_statistics_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.project_daily_statistics_id_seq OWNED BY public.project_daily_statistics.id;
+
+CREATE TABLE public.project_deploy_freeze_periods (
+    id bigint NOT NULL,
+    project_id bigint,
+    freeze_start character varying,
+    freeze_end character varying,
+    timezone character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+CREATE SEQUENCE public.project_deploy_freeze_periods_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.project_deploy_freeze_periods_id_seq OWNED BY public.project_deploy_freeze_periods.id;
 
 CREATE TABLE public.project_deploy_tokens (
     id integer NOT NULL,
@@ -6165,8 +6184,8 @@ CREATE SEQUENCE public.user_details_user_id_seq
 ALTER SEQUENCE public.user_details_user_id_seq OWNED BY public.user_details.user_id;
 
 CREATE TABLE public.user_highest_roles (
-    user_id bigint NOT NULL,
     updated_at timestamp with time zone NOT NULL,
+    user_id bigint NOT NULL,
     highest_access_level integer
 );
 
@@ -7214,6 +7233,8 @@ ALTER TABLE ONLY public.project_custom_attributes ALTER COLUMN id SET DEFAULT ne
 
 ALTER TABLE ONLY public.project_daily_statistics ALTER COLUMN id SET DEFAULT nextval('public.project_daily_statistics_id_seq'::regclass);
 
+ALTER TABLE ONLY public.project_deploy_freeze_periods ALTER COLUMN id SET DEFAULT nextval('public.project_deploy_freeze_periods_id_seq'::regclass);
+
 ALTER TABLE ONLY public.project_deploy_tokens ALTER COLUMN id SET DEFAULT nextval('public.project_deploy_tokens_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_export_jobs ALTER COLUMN id SET DEFAULT nextval('public.project_export_jobs_id_seq'::regclass);
@@ -8033,6 +8054,9 @@ ALTER TABLE ONLY public.project_custom_attributes
 
 ALTER TABLE ONLY public.project_daily_statistics
     ADD CONSTRAINT project_daily_statistics_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_deploy_freeze_periods
+    ADD CONSTRAINT project_deploy_freeze_periods_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.project_deploy_tokens
     ADD CONSTRAINT project_deploy_tokens_pkey PRIMARY KEY (id);
@@ -9601,6 +9625,8 @@ CREATE UNIQUE INDEX index_project_custom_attributes_on_project_id_and_key ON pub
 
 CREATE UNIQUE INDEX index_project_daily_statistics_on_project_id_and_date ON public.project_daily_statistics USING btree (project_id, date DESC);
 
+CREATE INDEX index_project_deploy_freeze_periods_on_project_id ON public.project_deploy_freeze_periods USING btree (project_id);
+
 CREATE INDEX index_project_deploy_tokens_on_deploy_token_id ON public.project_deploy_tokens USING btree (deploy_token_id);
 
 CREATE UNIQUE INDEX index_project_deploy_tokens_on_project_id_and_deploy_token_id ON public.project_deploy_tokens USING btree (project_id, deploy_token_id);
@@ -9678,8 +9704,6 @@ CREATE INDEX index_projects_api_vis20_path ON public.projects USING btree (path,
 CREATE INDEX index_projects_api_vis20_updated_at ON public.projects USING btree (updated_at, id) WHERE (visibility_level = 20);
 
 CREATE INDEX index_projects_on_created_at_and_id ON public.projects USING btree (created_at, id);
-
-CREATE INDEX index_projects_on_creator_id_and_created_at ON public.projects USING btree (creator_id, created_at);
 
 CREATE INDEX index_projects_on_description_trigram ON public.projects USING gin (description public.gin_trgm_ops);
 
@@ -10232,6 +10256,8 @@ CREATE INDEX partial_index_ci_builds_on_scheduled_at_with_scheduled_jobs ON publ
 CREATE INDEX partial_index_deployments_for_legacy_successful_deployments ON public.deployments USING btree (id) WHERE ((finished_at IS NULL) AND (status = 2));
 
 CREATE INDEX partial_index_deployments_for_project_id_and_tag ON public.deployments USING btree (project_id) WHERE (tag IS TRUE);
+
+CREATE INDEX snippet_mentions_temp_index ON public.notes USING btree (id) WHERE ((note ~~ '%@%'::text) AND ((noteable_type)::text = 'Snippet'::text));
 
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON public.snippet_user_mentions USING btree (snippet_id, note_id);
 
@@ -11341,6 +11367,9 @@ ALTER TABLE ONLY public.approval_merge_request_rules_approved_approvers
 
 ALTER TABLE ONLY public.protected_branch_push_access_levels
     ADD CONSTRAINT fk_rails_8dcb712d65 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+ALTER TABLE ONLY public.project_deploy_freeze_periods
+    ADD CONSTRAINT fk_rails_8dcc9f6cf4 FOREIGN KEY (project_id) REFERENCES public.projects(id);
 
 ALTER TABLE ONLY public.design_user_mentions
     ADD CONSTRAINT fk_rails_8de8c6d632 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
@@ -12624,6 +12653,10 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200124143014
 20200127090233
 20200127111840
+20200127111953
+20200127131953
+20200127141953
+20200127151953
 20200128105731
 20200128132510
 20200128133510
@@ -12694,6 +12727,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200214025454
 20200214034836
 20200214085940
+20200214173000
+20200214174519
+20200214174607
 20200214214934
 20200215222507
 20200215225103
@@ -12755,6 +12791,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200306170531
 20200306192548
 20200306193236
+20200309105539
 20200309140540
 20200309162244
 20200309195209
@@ -12801,5 +12838,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200323122201
 20200323134519
 20200324115359
+20200326123122
 \.
 
