@@ -1,5 +1,6 @@
 - page_title _('Start a Free Gold Trial')
 - glm_params = { glm_source: params[:glm_source], glm_content: params[:glm_content] }
+- should_ask_company_question = glm_params[:glm_source] != 'about.gitlab.com'
 
 %h3.center.pt-6
   = _('Almost there')
@@ -16,7 +17,7 @@
   #group_name.form-group.hidden
     = label_tag :new_group_name, _('New Group Name'), for: :new_group_name, class: 'col-form-label'
     = text_field_tag :new_group_name, nil, class: 'form-control'
-  - if current_user.setup_for_company.nil?
+  - if should_ask_company_question
     .form-group
       = label_tag :trial_entity, _('Is this GitLab trial for your company?')
       .gl-form-checkbox-group
