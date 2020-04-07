@@ -46,10 +46,6 @@ module EE
         render_approvals_json
       end
 
-      def license_management_reports
-        reports_response(merge_request.compare_license_management_reports(current_user))
-      end
-
       def license_scanning_reports
         reports_response(merge_request.compare_license_management_reports(current_user))
       end
