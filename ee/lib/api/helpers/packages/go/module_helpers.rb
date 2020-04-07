@@ -8,9 +8,6 @@ module API
           # basic semver regex
           SEMVER_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?/i.freeze
 
-          # basic semver, but bounded (^expr$)
-          SEMVER_TAG_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?$/i.freeze
-
           # semver, but the prerelease component follows a specific format
           PSEUDO_VERSION_REGEX = /^v\d+\.(0\.0-|\d+\.\d+-([^+]*\.)?0\.)\d{14}-[A-Za-z0-9]+(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/i.freeze
 
@@ -25,23 +22,15 @@ module API
           def semver?(tag)
             return false if tag.dereferenced_target.nil?
 
-            SEMVER_TAG_REGEX.match?(tag.name)
+            ::Packages::SemVer.match?(tag.name, prefixed: true)
           end
 
           def pseudo_version?(str)
-            SEMVER_TAG_REGEX.match?(str) && PSEUDO_VERSION_REGEX.match?(str)
+            ::Packages::SemVer.match?(str, prefixed: true) && PSEUDO_VERSION_REGEX.match?(str)
           end
 
           def parse_semver(str)
-            m = SEMVER_TAG_REGEX.match(str)
-            return unless m
-
-            OpenStruct.new(
-              major: m[1].to_i,
-              minor: m[2].to_i,
-              patch: m[3].to_i,
-              prerelease: m[4],
-              build: m[5])
+            ::Packages::SemVer.parse(str, prefixed: true)
           end
         end
       end

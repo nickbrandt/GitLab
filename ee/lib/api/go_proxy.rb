@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 module API
   class GoProxy < Grape::API
-    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::PackagesManagerClientsHelpers
+    helpers ::API::Helpers::Packages::BasicAuthHelpers
     helpers ::API::Helpers::Packages::Go::ModuleHelpers
 
     # basic semver, except case encoded (A => !a)
@@ -12,15 +13,27 @@ module API
     before { require_packages_enabled! }
 
     helpers do
-      def case_decode(str)
-        str.gsub(/![[:alpha:]]/) { |s| s[1..].upcase }
+      # support personal access tokens for HTTP Basic in addition to the usual methods
+      def find_personal_access_token
+        pa = find_personal_access_token_from_http_basic_auth
+        return pa if pa
+
+        # copied from Gitlab::Auth::AuthFinders
+        token =
+          current_request.params[::Gitlab::Auth::AuthFinders::PRIVATE_TOKEN_PARAM].presence ||
+          current_request.env[::Gitlab::Auth::AuthFinders::PRIVATE_TOKEN_HEADER].presence ||
+          parsed_oauth_token
+        return unless token
+
+        # Expiration, revocation and scopes are verified in `validate_access_token!`
+        PersonalAccessToken.find_by_token(token) || raise(::Gitlab::Auth::UnauthorizedError)
       end
 
       def find_module
         module_name = case_decode params[:module_name]
         bad_request!('Module Name') if module_name.blank?
 
-        mod = ::Packages::Go::ModuleFinder.new(user_project, module_name).execute
+        mod = ::Packages::Go::ModuleFinder.new(authorized_user_project, module_name).execute
 
         not_found! unless mod
 
@@ -29,25 +42,14 @@ module API
 
       def find_version
         module_version = case_decode params[:module_version]
-        ver = ::Packages::Go::VersionFinder.new(find_module).find(module_version)
+        ver = find_module.find_version(module_version)
 
         not_found! unless ver&.valid?
 
         ver
-      end
 
-      def find_project!(id)
-        project = find_project(id)
-
-        ability = job_token_authentication? ? :build_read_project : :read_project
-
-        if can?(current_user, ability, project)
-          project
-        elsif current_user.nil?
-          unauthorized!
-        else
-          not_found!('Project')
-        end
+      rescue ArgumentError
+        not_found!
       end
     end
 
@@ -58,8 +60,8 @@ module API
     route_setting :authentication, job_token_allowed: true
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_read_package!
-        authorize_packages_feature!
+        authorize_read_package!(authorized_user_project)
+        authorize_packages_feature!(authorized_user_project)
       end
 
       namespace ':id/packages/go/*module_name/@v' do

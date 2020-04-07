@@ -3,6 +3,8 @@
 class Packages::GoModuleVersion
   include ::API::Helpers::Packages::Go::ModuleHelpers
 
+  VALID_TYPES = %i[ref commit pseudo].freeze
+
   attr_reader :mod, :type, :ref, :commit
 
   delegate :major, to: :@semver, allow_nil: true
@@ -12,6 +14,17 @@ class Packages::GoModuleVersion
   delegate :build, to: :@semver, allow_nil: true
 
   def initialize(mod, type, commit, name: nil, semver: nil, ref: nil)
+    raise ArgumentError.new("invalid type '#{type}'") unless VALID_TYPES.include? type
+    raise ArgumentError.new("mod is required") unless mod
+    raise ArgumentError.new("commit is required") unless commit
+
+    if type == :ref
+      raise ArgumentError.new("ref is required") unless ref
+    elsif type == :pseudo
+      raise ArgumentError.new("name is required") unless name
+      raise ArgumentError.new("semver is required") unless semver
+    end
+
     @mod = mod
     @type = type
     @commit = commit

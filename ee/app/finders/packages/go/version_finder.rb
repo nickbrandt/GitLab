@@ -21,14 +21,10 @@ module Packages
       def find(target)
         case target
         when String
-          unless pseudo_version? target
-            return mod.versions.filter { |v| v.name == target }.first
-          end
-
-          begin
+          if pseudo_version? target
             find_pseudo_version target
-          rescue ArgumentError
-            nil
+          else
+            mod.versions.find { |v| v.name == target }
           end
 
         when Gitlab::Git::Ref
