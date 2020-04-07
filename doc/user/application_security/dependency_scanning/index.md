@@ -16,7 +16,7 @@ If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your dep
 vulnerabilities using Dependency Scanning.
 All dependencies are scanned, including the transitive dependencies (also known as nested dependencies).
 
-You can take advantage of Dependency Scanning by either [including the CI job](#configuration)
+You can take advantage of Dependency Scanning by either [including the Dependency Scanning template](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto Dependency Scanning](../../../topics/autodevops/stages.md#auto-dependency-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
