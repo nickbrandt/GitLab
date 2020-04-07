@@ -112,7 +112,7 @@ module EE
       scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
-      scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
+      scope :for_plan_name, -> (name) { joins(namespace: { gitlab_subscription: :hosted_plan }).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
             -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
       scope :with_active_services, -> { joins(:services).merge(::Service.active) }
