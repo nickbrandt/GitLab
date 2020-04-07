@@ -72,7 +72,7 @@ A lot of different types of metrics are supported in the monitoring dashboard.
 To import these metrics, you can run:
 
 ```shell
-sudo gitlab-rake 'metrics:setup_development_metrics[your_project_id]'
+bundle exec rake 'gitlab:seed:development_metrics[your_project_id]'
 ```
 
 ### Automation
