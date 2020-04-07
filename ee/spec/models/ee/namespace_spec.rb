@@ -214,53 +214,19 @@ describe Namespace do
   end
 
   context 'scopes' do
-    describe '.with_plan' do
-      let!(:namespace) { create :namespace, plan: namespace_plan }
-
-      context 'plan is set' do
-        let(:namespace_plan) { :bronze_plan }
-
-        it 'returns namespaces with plan' do
-          expect(described_class.with_plan).to eq([namespace])
-        end
-      end
-
-      context 'plan is not set' do
-        context 'plan is empty string' do
-          let(:namespace_plan) { '' }
-
-          it 'returns no namespace' do
-            expect(described_class.with_plan).to be_empty
-          end
-        end
-
-        context 'plan is nil' do
-          let(:namespace_plan) { nil }
-
-          it 'returns no namespace' do
-            expect(described_class.with_plan).to be_empty
-          end
-        end
-      end
-    end
-
     describe '.with_feature_available_in_plan' do
-      let!(:namespace) { create :namespace, plan: namespace_plan }
+      let!(:namespace) { create(:namespace) }
 
       context 'plan is nil' do
-        let(:namespace_plan) { nil }
-
         it 'returns no namespace' do
           expect(described_class.with_feature_available_in_plan(:group_project_templates)).to be_empty
         end
       end
 
       context 'plan is set' do
-        let(:namespace_plan) { :bronze_plan }
-
         it 'returns namespaces with plan' do
           create(:gitlab_subscription, :bronze, namespace: namespace)
-          create(:gitlab_subscription, :free, namespace: create(:namespace))
+          create(:namespace_with_plan, plan: :free_plan)
 
           expect(described_class.with_feature_available_in_plan(:audit_events)).to eq([namespace])
         end

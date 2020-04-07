@@ -121,8 +121,8 @@ describe GitlabSubscription do
       end
 
       it 'always returns 1 seat' do
-        %w[bronze silver gold].each do |plan|
-          user_namespace.update!(plan: plan)
+        [bronze_plan, silver_plan, gold_plan].each do |plan|
+          gitlab_subscription.update!(hosted_plan: plan)
 
           expect(gitlab_subscription.seats_in_use).to eq(1)
         end

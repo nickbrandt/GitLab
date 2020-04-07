@@ -60,4 +60,21 @@ FactoryBot.define do
         group: group)
     end
   end
+
+  factory :group_with_plan, parent: :group do
+    transient do
+      plan { :default_plan }
+      trial_ends_on { nil }
+    end
+
+    after(:create) do |group, evaluator|
+      if evaluator.plan
+        create(:gitlab_subscription,
+               namespace: group,
+               hosted_plan: create(evaluator.plan),
+               trial: evaluator.trial_ends_on.present?,
+               trial_ends_on: evaluator.trial_ends_on)
+      end
+    end
+  end
 end

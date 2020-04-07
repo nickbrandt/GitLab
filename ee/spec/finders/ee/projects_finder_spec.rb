@@ -50,7 +50,10 @@ describe ProjectsFinder do
       private
 
       def create_project(plan)
-        create(:project, :public, namespace: create(:namespace, plan: plan))
+        namespace = create(:namespace_with_plan, plan: plan)
+        namespace.update(plan: namespace.gitlab_subscription&.hosted_plan)
+
+        create(:project, :public, namespace: namespace)
       end
     end
   end
