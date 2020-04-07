@@ -9626,6 +9626,9 @@ msgstr ""
 msgid "GitLab Support Bot"
 msgstr ""
 
+msgid "GitLab Team Member"
+msgstr ""
+
 msgid "GitLab User"
 msgstr ""
 
