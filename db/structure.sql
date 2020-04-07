@@ -4051,7 +4051,8 @@ CREATE TABLE public.namespaces (
     mentions_disabled boolean,
     default_branch_protection smallint,
     unlock_membership_to_ldap boolean,
-    max_personal_access_token_lifetime integer
+    max_personal_access_token_lifetime integer,
+    push_rule_id bigint
 );
 
 CREATE SEQUENCE public.namespaces_id_seq
@@ -9667,6 +9668,8 @@ CREATE INDEX index_namespaces_on_path_trigram ON public.namespaces USING gin (pa
 
 CREATE INDEX index_namespaces_on_plan_id ON public.namespaces USING btree (plan_id);
 
+CREATE UNIQUE INDEX index_namespaces_on_push_rule_id ON public.namespaces USING btree (push_rule_id);
+
 CREATE INDEX index_namespaces_on_require_two_factor_authentication ON public.namespaces USING btree (require_two_factor_authentication);
 
 CREATE UNIQUE INDEX index_namespaces_on_runners_token ON public.namespaces USING btree (runners_token);
@@ -10622,6 +10625,9 @@ ALTER TABLE ONLY public.merge_requests
 
 ALTER TABLE ONLY public.ci_group_variables
     ADD CONSTRAINT fk_33ae4d58d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.namespaces
+    ADD CONSTRAINT fk_3448c97865 FOREIGN KEY (push_rule_id) REFERENCES public.push_rules(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_3654b61b03 FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE CASCADE;
@@ -13160,6 +13166,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200406193427
 20200407094005
 20200407094923
+20200407120000
+20200407121321
 20200407171133
 20200407171417
 20200408110856
