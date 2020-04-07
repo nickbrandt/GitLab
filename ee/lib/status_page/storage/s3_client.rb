@@ -16,7 +16,7 @@ module StatusPage
       #
       # Note: We are making sure that
       # * we control +content+ (not the user)
-      # * this upload is done a background job (not in a web request)
+      # * this upload is done as a background job (not in a web request)
       def upload_object(key, content)
         wrap_errors(key: key) do
           client.put_object(bucket: bucket_name, key: key, body: content)

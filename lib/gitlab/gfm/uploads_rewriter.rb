@@ -22,9 +22,8 @@ module Gitlab
         return @text unless needs_rewrite?
 
         @text.gsub(@pattern) do |markdown|
-          Gitlab::Utils.check_path_traversal!($~[:file])
-
           file = find_file(@source_project, $~[:secret], $~[:file])
+
           break markdown unless file.try(:exists?)
 
           klass = target_parent.is_a?(Namespace) ? NamespaceFileUploader : FileUploader
@@ -59,10 +58,8 @@ module Gitlab
 
       private
 
-      def find_file(project, secret, file)
-        uploader = FileUploader.new(project, secret: secret)
-        uploader.retrieve_from_store!(file)
-        uploader
+      def find_file(project, secret, file_path)
+        UploadFinder.new(project, secret, file_path).execute
       end
     end
   end
