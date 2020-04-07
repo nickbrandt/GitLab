@@ -210,8 +210,11 @@ review-qa-all:
 
 review-performance:
   extends:
-    - .review-docker
+    - .default-retry
     - .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise
+  image:
+    name: sitespeedio/sitespeed.io:6.3.1
+    entrypoint: [""]
   stage: qa
   # This is needed so that manual jobs with needs don't block the pipeline.
   # See https://gitlab.com/gitlab-org/gitlab/-/issues/199979.
@@ -224,7 +227,7 @@ review-performance:
     - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir -p sitespeed-results
   script:
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
+    - /start.sh --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
   after_script:
     - mv sitespeed-results/data/performance.json performance.json
   artifacts:
