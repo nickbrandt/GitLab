@@ -197,7 +197,11 @@ module Gitlab
       #
       # @abstract
       def primary_checksum
-        nil
+        model_record.verification_checksum
+      end
+
+      def secondary_checksum
+        registry.verification_checksum
       end
 
       protected
