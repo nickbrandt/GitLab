@@ -202,9 +202,9 @@ module EE
         # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
-            clusters_applications_cert_managers: distinct_count(::Clusters::Applications::CertManager.where(time_period).available.joins(:cluster), 'clusters.user_id'),
+            clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
             clusters_applications_helm: ::Clusters::Applications::Helm.where(time_period).distinct_by_user,
-            clusters_applications_ingress: ::Clusters::Applications::Ingress.where(time_period).distinct_by_user,
+            clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
             clusters_applications_knative: ::Clusters::Applications::Knative.where(time_period).distinct_by_user,
             clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
             clusters_enabled: distinct_count(::Clusters::Cluster.enabled.where(time_period), :user_id),
@@ -351,6 +351,9 @@ module EE
           distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
         end
 
+        def clusters_user_distinct_count(clusters, time_period)
+          distinct_count(clusters.where(time_period).available.joins(:cluster), 'clusters.user_id')
+        end
         # rubocop:enable CodeReuse/ActiveRecord
       end
     end
