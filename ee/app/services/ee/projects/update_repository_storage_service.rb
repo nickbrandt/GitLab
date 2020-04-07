@@ -6,11 +6,11 @@ module EE
       extend ::Gitlab::Utils::Override
 
       override :mirror_repositories
-      def mirror_repositories(new_repository_storage_key)
+      def mirror_repositories
         super
 
         if project.design_repository.exists?
-          mirror_repository(new_repository_storage_key, type: ::Gitlab::GlRepository::DESIGN)
+          mirror_repository(type: ::Gitlab::GlRepository::DESIGN)
         end
       end
 

@@ -324,6 +324,8 @@ class Project < ApplicationRecord
 
   has_many :daily_report_results, class_name: 'Ci::DailyReportResult'
 
+  has_many :repository_storage_moves, class_name: 'ProjectRepositoryStorageMove'
+
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
   accepts_nested_attributes_for :import_data
@@ -2073,7 +2075,18 @@ class Project < ApplicationRecord
 
     raise ArgumentError unless ::Gitlab.config.repositories.storages.key?(new_repository_storage_key)
 
-    run_after_commit { ProjectUpdateRepositoryStorageWorker.perform_async(id, new_repository_storage_key) }
+    storage_move = repository_storage_moves.create!(
+      source_storage_name: repository_storage,
+      destination_storage_name: new_repository_storage_key
+    )
+
+    run_after_commit do
+      ProjectUpdateRepositoryStorageWorker.perform_async(
+        id, new_repository_storage_key,
+        repository_storage_move_id: storage_move.id
+      )
+    end
+
     self.repository_read_only = true
   end
 
