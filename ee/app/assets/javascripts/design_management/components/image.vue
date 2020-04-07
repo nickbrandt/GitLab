@@ -1,7 +1,11 @@
 <script>
 import { throttle } from 'lodash';
+import { GlIcon } from '@gitlab/ui';
 
 export default {
+  components: {
+    GlIcon,
+  },
   props: {
     image: {
       type: String,
@@ -23,6 +27,7 @@ export default {
     return {
       baseImageSize: null,
       imageStyle: null,
+      imageError: false,
     };
   },
   watch: {
@@ -48,6 +53,9 @@ export default {
   methods: {
     onImgLoad() {
       requestIdleCallback(this.setBaseImageSize, { timeout: 1000 });
+    },
+    onImgError() {
+      this.imageError = true;
     },
     setBaseImageSize() {
       const { contentImg } = this.$refs;
@@ -86,13 +94,16 @@ export default {
 
 <template>
   <div class="m-auto js-design-image">
+    <gl-icon v-if="imageError" class="text-secondary-100" name="media-broken" :size="48" />
     <img
+      v-show="!imageError"
       ref="contentImg"
       class="mh-100"
       :src="image"
       :alt="name"
       :style="imageStyle"
       :class="{ 'img-fluid': !imageStyle }"
+      @error="onImgError"
       @load="onImgLoad"
     />
   </div>

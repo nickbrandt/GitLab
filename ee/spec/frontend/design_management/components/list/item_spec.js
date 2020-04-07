@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlIcon, GlIntersectionObserver } from '@gitlab/ui';
 import VueRouter from 'vue-router';
 import Item from 'ee/design_management/components/list/item.vue';
-import { GlIntersectionObserver } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -59,16 +59,28 @@ describe('Design management list item component', () => {
   });
 
   describe('when item appears in view', () => {
+    let image;
+
     beforeEach(() => {
       createComponent();
+      image = wrapper.find('img');
+
+      expect(image.attributes('src')).toBe('');
 
       wrapper.find(GlIntersectionObserver).vm.$emit('appear');
       return wrapper.vm.$nextTick();
     });
 
     it('renders an image', () => {
-      const image = wrapper.find('img');
       expect(image.attributes('src')).toBe('http://via.placeholder.com/300');
+    });
+
+    it('renders media broken icon when image onerror triggered', () => {
+      image.trigger('error');
+      return wrapper.vm.$nextTick().then(() => {
+        expect(image.isVisible()).toBe(false);
+        expect(wrapper.find(GlIcon).element).toMatchSnapshot();
+      });
     });
 
     describe('when imageV432x230 and image provided', () => {
@@ -77,7 +89,6 @@ describe('Design management list item component', () => {
         wrapper.setProps({ imageV432x230: mockSrc });
 
         return wrapper.vm.$nextTick().then(() => {
-          const image = wrapper.find('img');
           expect(image.attributes('src')).toBe(mockSrc);
         });
       });

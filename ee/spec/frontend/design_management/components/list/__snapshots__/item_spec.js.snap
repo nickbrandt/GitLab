@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Design management list item component when item appears in view renders media broken icon when image onerror triggered 1`] = `
+<gl-icon-stub
+  class="text-secondary"
+  name="media-broken"
+  size="32"
+/>
+`;
+
 exports[`Design management list item component with no notes renders item with correct status icon for creation event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
@@ -23,16 +31,11 @@ exports[`Design management list item component with no notes renders item with c
       </span>
     </div>
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -96,16 +99,11 @@ exports[`Design management list item component with no notes renders item with c
       </span>
     </div>
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -169,16 +167,11 @@ exports[`Design management list item component with no notes renders item with c
       </span>
     </div>
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -229,16 +222,11 @@ exports[`Design management list item component with no notes renders item with n
   >
     <!---->
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -289,15 +277,15 @@ exports[`Design management list item component with no notes renders loading spi
   >
     <!---->
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <gl-loading-icon-stub
+        color="orange"
+        label="Loading"
+        size="md"
+      />
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -349,16 +337,11 @@ exports[`Design management list item component with notes renders item with mult
   >
     <!---->
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
@@ -426,16 +409,11 @@ exports[`Design management list item component with notes renders item with sing
   >
     <!---->
      
-    <gl-loading-icon-stub
-      color="orange"
-      label="Loading"
-      size="md"
-      style="display: none;"
-    />
-     
     <gl-intersection-observer-stub
       options="[object Object]"
     >
+      <!---->
+       
       <img
         alt="test"
         class="block mx-auto mw-100 mh-100 design-img"
