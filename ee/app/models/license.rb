@@ -203,6 +203,7 @@ class License < ApplicationRecord
     custom_project_templates
     db_load_balancing
     elastic_search
+    enterprise_templates
     extended_audit_events
     external_authorization_service_api_management
     geo
