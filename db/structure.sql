@@ -1017,7 +1017,8 @@ CREATE TABLE public.ci_group_variables (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     masked boolean DEFAULT false NOT NULL,
-    variable_type smallint DEFAULT 1 NOT NULL
+    variable_type smallint DEFAULT 1 NOT NULL,
+    environment_scope character varying(255) DEFAULT '*'::character varying NOT NULL
 );
 
 CREATE SEQUENCE public.ci_group_variables_id_seq
@@ -8815,7 +8816,7 @@ CREATE UNIQUE INDEX index_ci_builds_runner_session_on_build_id ON public.ci_buil
 
 CREATE INDEX index_ci_daily_report_results_on_last_pipeline_id ON public.ci_daily_report_results USING btree (last_pipeline_id);
 
-CREATE UNIQUE INDEX index_ci_group_variables_on_group_id_and_key ON public.ci_group_variables USING btree (group_id, key);
+CREATE UNIQUE INDEX index_ci_group_variables_on_group_id_key_environment_scope ON public.ci_group_variables USING btree (group_id, key, environment_scope);
 
 CREATE INDEX index_ci_job_artifacts_file_store_is_null ON public.ci_job_artifacts USING btree (id) WHERE (file_store IS NULL);
 
@@ -13086,6 +13087,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200403184110
 20200403185127
 20200403185422
+20200406123112
+20200406123802
+20200406125011
 20200406135648
 20200407094005
 20200407094923

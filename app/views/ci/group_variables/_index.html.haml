@@ -11,3 +11,6 @@
           .table-section.section-40.append-right-10
             %a.group-origin-link{ href: group_settings_ci_cd_path(variable.group) }
               = variable.group.name
+          - if Feature.enabled?(:ci_group_variable_environment_scope, variable.group)
+            .table-section.section-40.append-right-10
+              = variable.environment_scope

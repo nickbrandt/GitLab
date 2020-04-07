@@ -9,7 +9,22 @@ describe Ci::GroupVariable do
 
   it { is_expected.to include_module(Presentable) }
   it { is_expected.to include_module(Ci::Maskable) }
-  it { is_expected.to validate_uniqueness_of(:key).scoped_to(:group_id).with_message(/\(\w+\) has already been taken/) }
+
+  context 'ci_group_variable_environment_scope is enabled' do
+    before do
+      stub_feature_flags(ci_group_variable_environment_scope: { enabled: true, thing: subject.group })
+    end
+
+    it { is_expected.to validate_uniqueness_of(:key).scoped_to(:group_id, :environment_scope).with_message(/\(\w+\) has already been taken/) }
+  end
+
+  context 'ci_group_variable_environment_scope is disabled' do
+    before do
+      stub_feature_flags(ci_group_variable_environment_scope: { enabled: false, thing: subject.group })
+    end
+
+    it { is_expected.to validate_uniqueness_of(:key).scoped_to(:group_id).with_message(/\(\w+\) has already been taken/) }
+  end
 
   describe '.unprotected' do
     subject { described_class.unprotected }

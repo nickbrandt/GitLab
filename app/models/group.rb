@@ -67,7 +67,7 @@ class Group < Namespace
   validate :visibility_level_allowed_by_projects
   validate :visibility_level_allowed_by_sub_groups
   validate :visibility_level_allowed_by_parent
-  validates :variables, variable_duplicates: true
+  validates :variables, variable_duplicates: { scope: :environment_scope }
 
   validates :two_factor_grace_period, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :name,
@@ -402,12 +402,12 @@ class Group < Namespace
     }
   end
 
-  def ci_variables_for(ref, project)
-    cache_key = "ci_variables_for:group:#{self&.id}:project:#{project&.id}:ref:#{ref}"
+  def ci_variables_for(ref:, project:, environment: nil)
+    cache_key = "ci_variables_for:group:#{self&.id}:project:#{project&.id}:ref:#{ref}:environment:#{environment}"
 
     ::Gitlab::SafeRequestStore.fetch(cache_key) do
       list_of_ids = [self] + ancestors
-      variables = Ci::GroupVariable.where(group: list_of_ids)
+      variables = Ci::GroupVariable.where(group: list_of_ids).on_environment(environment)
       variables = variables.unprotected unless project.protected_for?(ref)
       variables = variables.group_by(&:group_id)
       list_of_ids.reverse.flat_map { |group| variables[group.id] }.compact

@@ -3,3 +3,6 @@
     = s_('Key')
   .bold.table-section.section-40.append-right-10
     = s_('Origin')
+  - if Feature.enabled?(:ci_group_variable_environment_scope, @project.group)
+    .bold.table-section.section-40.append-right-10
+      = s_('Scope')
