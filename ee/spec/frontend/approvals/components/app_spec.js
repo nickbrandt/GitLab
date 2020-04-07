@@ -47,6 +47,49 @@ describe('EE Approvals App', () => {
     jest.spyOn(store.modules.createModal.actions, 'open');
   });
 
+  describe('targetBranch', () => {
+    const targetBranchName = 'development';
+
+    beforeEach(() => {
+      store.state.settings.mrCreateTargetBranch = targetBranchName;
+    });
+
+    it('passes the target branch name in fetchRules for MR create path', () => {
+      store.state.settings.prefix = 'mr-edit';
+      store.state.settings.mrSettingsPath = null;
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        targetBranchName,
+        undefined,
+      );
+    });
+
+    it('does not pass the target branch name in fetchRules for MR edit path', () => {
+      store.state.settings.prefix = 'mr-edit';
+      store.state.settings.mrSettingsPath = 'some/path';
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        null,
+        undefined,
+      );
+    });
+
+    it('does not pass the target branch name in fetchRules for project settings path', () => {
+      store.state.settings.prefix = 'project-settings';
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        null,
+        undefined,
+      );
+    });
+  });
+
   describe('when allow multi rule', () => {
     beforeEach(() => {
       store.state.settings.allowMultiRule = true;
