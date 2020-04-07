@@ -1,5 +1,5 @@
 import { s__ } from '~/locale';
-import CE_TEMPLATES from '../../../../../app/assets/javascripts/projects/default_project_templates';
+import CE_TEMPLATES from '~/projects/default_project_templates';
 
 export default {
   ...CE_TEMPLATES,
