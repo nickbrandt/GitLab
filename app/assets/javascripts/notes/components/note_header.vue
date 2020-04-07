@@ -1,7 +1,7 @@
 <script>
 import { mapActions } from 'vuex';
-import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
-import GitlabTeamMemberBadge from '../../vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
+import timeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 export default {
   components: {
