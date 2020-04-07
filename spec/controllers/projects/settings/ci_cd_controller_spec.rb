@@ -20,6 +20,12 @@ describe Projects::Settings::CiCdController do
       expect(response).to render_template(:show)
     end
 
+    it 'sets variable to only show deploy key and deploy tokens' do
+      get :show, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(assigns(:only_show_deploy_keys_and_tokens)).to be_falsey
+    end
+
     context 'with group runners' do
       let(:parent_group) { create(:group) }
       let(:group) { create(:group, parent: parent_group) }
@@ -34,6 +40,16 @@ describe Projects::Settings::CiCdController do
         get :show, params: { namespace_id: project.namespace, project_id: project }
 
         expect(assigns(:assignable_runners)).to contain_exactly(project_runner)
+      end
+    end
+
+    context 'with build project not available' do
+      let(:project) { create(:project, :builds_disabled) }
+
+      it 'sets variable to only show deploy key and deploy tokens' do
+        get :show, params: { namespace_id: project.namespace, project_id: project }
+
+        expect(assigns(:only_show_deploy_keys_and_tokens)).to be_truthy
       end
     end
   end
