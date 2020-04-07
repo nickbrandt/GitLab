@@ -127,11 +127,7 @@ export default {
       <div class="table-section" :class="tableData.date.spacing" role="columnheader">
         {{ tableData.date.title }}
       </div>
-      <div
-        class="table-section"
-        :class="tableData.autoStop.spacing"
-        role="columnheader"
-      >
+      <div class="table-section" :class="tableData.autoStop.spacing" role="columnheader">
         {{ tableData.autoStop.title }}
       </div>
     </div>
