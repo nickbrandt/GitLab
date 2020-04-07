@@ -2266,6 +2266,9 @@ msgstr ""
 msgid "Approvals"
 msgstr ""
 
+msgid "Approvals (you've approved)"
+msgstr ""
+
 msgid "Approve"
 msgstr ""
 
