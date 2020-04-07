@@ -29,9 +29,15 @@ export default {
     removeModalId() {
       return `${this.settings.prefix}-approvals-remove-modal`;
     },
+    targetBranch() {
+      if (this.settings.prefix === 'mr-edit' && !this.settings.mrSettingsPath) {
+        return this.settings.mrCreateTargetBranch;
+      }
+      return null;
+    },
   },
-  created() {
-    this.fetchRules();
+  mounted() {
+    return this.fetchRules(this.targetBranch);
   },
   methods: {
     ...mapActions(['fetchRules']),
