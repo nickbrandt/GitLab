@@ -632,12 +632,7 @@ export default {
       </span>
     </div>
 
-    <div
-      v-if="!isFolder"
-      class="table-section"
-      :class="tableData.autoStop.spacing"
-      role="gridcell"
-    >
+    <div v-if="!isFolder" class="table-section" :class="tableData.autoStop.spacing" role="gridcell">
       <div role="rowheader" class="table-mobile-header">{{ tableData.autoStop.title }}</div>
       <span
         v-if="canShowAutoStopDate"
@@ -656,10 +651,7 @@ export default {
       role="gridcell"
     >
       <div class="btn-group table-action-buttons" role="group">
-        <pin-component
-          v-if="canShowAutoStopDate"
-          :auto-stop-url="autoStopUrl"
-        />
+        <pin-component v-if="canShowAutoStopDate" :auto-stop-url="autoStopUrl" />
 
         <external-url-component
           v-if="externalURL && canReadEnvironment"
