@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :group_saml, :orchestrated, :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212378', type: :bug } do
+  context 'Manage', :group_saml, :orchestrated, :requires_admin do
     describe 'Group SAML SSO - Non enforced SSO' do
       include Support::Api
 
