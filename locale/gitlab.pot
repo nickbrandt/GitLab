@@ -18324,6 +18324,12 @@ msgstr ""
 msgid "Set up CI/CD"
 msgstr ""
 
+msgid "Set up Jira Integration"
+msgstr ""
+
+msgid "Set up Jira Integration illustration"
+msgstr ""
+
 msgid "Set up a %{type} Runner automatically"
 msgstr ""
 
@@ -23581,6 +23587,9 @@ msgid "You tried to fork %{link_to_the_project} but it failed for the following 
 msgstr ""
 
 msgid "You will be removed from existing projects/groups"
+msgstr ""
+
+msgid "You will first need to set up Jira Integration to use this feature."
 msgstr ""
 
 msgid "You will lose all changes you've made to this file. This action cannot be undone."
