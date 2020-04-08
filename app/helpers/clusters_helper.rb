@@ -51,7 +51,7 @@ module ClustersHelper
       s_('ClusterIntegration|Instance cluster')
     else
       Gitlab::ErrorTracking.track_exception(
-        ArgumentError.new,
+        ArgumentError.new('Cluster Type Missing'),
         cluster_error: { error: 'Cluster Type Missing', cluster_type: cluster_type }
       )
       _('Cluster')
