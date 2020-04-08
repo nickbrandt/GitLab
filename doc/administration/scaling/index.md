@@ -228,11 +228,11 @@ On different cloud vendors a best effort like for like can be used.
       For smaller architectures (up to 5,000 users) we suggest one Redis cluster for all
       classes and that Redis Sentinel is hosted alongside Consul.
       For larger architectures (10,000 users or more) we suggest running a separate
-      [Redis Cluster](redis.md#running-multiple-redis-clusters) for the Cache class
+      [Redis Cluster](../high_availability/redis.md#running-multiple-redis-clusters) for the Cache class
       and another for the Queues and Shared State classes respectively. We also recommend
       that you run the Redis Sentinel clusters separately as well for each Redis Cluster.
 
-[^4]: For data objects such as LFS, Uploads, Artifacts, etc. We recommend a [Cloud Object Storage service](object_storage.md)
+[^4]: For data objects such as LFS, Uploads, Artifacts, etc. We recommend a [Cloud Object Storage service](../object_storage.md)
       over NFS where possible, due to better performance and availability.
 
 [^5]: NFS can be used as an alternative for both repository data (replacing Gitaly) and
