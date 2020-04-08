@@ -198,6 +198,11 @@ means that when introducing files or dependencies for a new language or package 
 corresponding scans won't be triggered in the MR and will only run on the default branch once the
 MR is merged. This will be addressed by [#211702](https://gitlab.com/gitlab-org/gitlab/-/issues/211702).
 
+NOTE: **Note:**
+With the current language detection logic, any new languages or frameworks introduced within the
+context of a merge request don't trigger a corresponding scan. These scans only occur once the code
+is committed to the default branch.
+
 #### Enabling kubesec analyzer
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12752) in GitLab Ultimate 12.6.
