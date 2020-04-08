@@ -3,8 +3,10 @@
 require 'spec_helper'
 
 describe StatusPage::IncidentEntity do
-  let_it_be(:issue) do
-    create(:issue, title: ':ok:', description: ':tada:')
+  let_it_be(:user) { create(:user) }
+
+  let_it_be(:issue, reload: true) do
+    create(:issue, title: ':ok:', description: ':tada:', author: user)
   end
 
   let(:json) { subject.as_json }
@@ -22,6 +24,20 @@ describe StatusPage::IncidentEntity do
       comments: [],
       links: { details: "data/incident/#{issue.iid}.json" }
     )
+  end
+
+  describe 'cross project references' do
+    let(:object) { issue }
+
+    it_behaves_like 'redacts HTML attributes' do
+      let(:field) { :title }
+      let(:redacted_value) { json[:title] }
+    end
+
+    it_behaves_like 'redacts HTML attributes' do
+      let(:field) { :description }
+      let(:redacted_value) { json[:description] }
+    end
   end
 
   context 'with user notes' do

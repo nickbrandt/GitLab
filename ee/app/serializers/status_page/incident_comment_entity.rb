@@ -2,7 +2,11 @@
 
 module StatusPage
   class IncidentCommentEntity < Grape::Entity
-    expose :note_html, as: :note
+    include StatusPage::Redacting
+
+    expose :note
     expose :created_at
+
+    redact :note
   end
 end
