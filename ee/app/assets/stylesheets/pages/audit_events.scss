@@ -4,6 +4,10 @@
     position: absolute !important;
   }
 
+  .gl-form-input {
+    background-color: $white;
+  }
+
   .dropdown-menu-toggle {
     // New GitLab UI inputs are 32px high, while the older inputs are 34px
     // This can be removed once the audit log fields are converted to use GitLab UI's dropdown instead
