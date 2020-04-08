@@ -6,8 +6,8 @@ module StatusPage
   class IncidentEntity < Grape::Entity
     expose :iid, as: :id
     expose :state, as: :status
-    expose :title_html, as: :title
-    expose :description_html, as: :description
+    expose(:title) { |entity| StatusPage::Renderer.markdown(entity, :title) }
+    expose(:description) { |entity| StatusPage::Renderer.markdown(entity, :description) }
     expose :updated_at
     expose :created_at
     expose :user_notes, as: :comments, using: IncidentCommentEntity

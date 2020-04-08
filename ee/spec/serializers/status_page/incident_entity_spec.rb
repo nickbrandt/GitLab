@@ -3,8 +3,10 @@
 require 'spec_helper'
 
 describe StatusPage::IncidentEntity do
-  let_it_be(:issue) do
-    create(:issue, title: ':ok:', description: ':tada:')
+  let_it_be(:user) { create(:user) }
+
+  let_it_be(:issue, reload: true) do
+    create(:issue, title: ':ok:', description: ':tada:', author: user)
   end
 
   let(:json) { subject.as_json }
@@ -22,6 +24,22 @@ describe StatusPage::IncidentEntity do
       comments: [],
       links: { details: "data/incident/#{issue.iid}.json" }
     )
+  end
+
+  describe 'field #title' do
+    it_behaves_like 'reference links for status page' do
+      let(:object) { issue }
+      let(:field) { :title }
+      let(:value) { json[:title] }
+    end
+  end
+
+  describe 'field #description' do
+    it_behaves_like 'reference links for status page' do
+      let(:object) { issue }
+      let(:field) { :description }
+      let(:value) { json[:description] }
+    end
   end
 
   context 'with user notes' do
