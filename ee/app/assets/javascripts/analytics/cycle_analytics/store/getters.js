@@ -23,7 +23,7 @@ export const durationChartPlottableData = state => {
   const selectedStagesDurationData = durationData.filter(stage => stage.selected);
   const plottableData = getDurationChartData(selectedStagesDurationData, startDate, endDate);
 
-  return plottableData.length ? plottableData : null;
+  return plottableData.length ? plottableData : [];
 };
 
 export const durationChartMedianData = state => {
