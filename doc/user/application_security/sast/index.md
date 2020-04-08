@@ -287,12 +287,10 @@ The following are Docker image-related variables.
 
 | Environment variable         | Description                                                                                                                                                                                                              |
 |------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `SAST_ANALYZER_IMAGES`       | Comma separated list of custom images. Default images are still enabled. Read more about [customizing analyzers](analyzers.md). Not available when [Docker in Docker is disabled](#disabling-docker-in-docker-for-sast). |
 | `SAST_ANALYZER_IMAGE_PREFIX` | Override the name of the Docker registry providing the default images (proxy). Read more about [customizing analyzers](analyzers.md).                                                                                    |
-| `SAST_ANALYZER_IMAGE_TAG`    | Override the Docker tag of the default images. Read more about [customizing analyzers](analyzers.md).                                                                                                                    |
+| `SAST_ANALYZER_IMAGE_TAG`    | **DEPRECATED:** Override the Docker tag of the default images. Read more about [customizing analyzers](analyzers.md).                                                                                                                    |
 | `SAST_DEFAULT_ANALYZERS`     | Override the names of default images. Read more about [customizing analyzers](analyzers.md).                                                                                                                             |
 | `SAST_DISABLE_DIND`          | Disable Docker in Docker and run analyzers [individually](#disabling-docker-in-docker-for-sast).                                                                                                                         |
-| `SAST_PULL_ANALYZER_IMAGES`  | Pull the images from the Docker registry (set to 0 to disable). Read more about [customizing analyzers](analyzers.md). Not available when [Docker in Docker is disabled](#disabling-docker-in-docker-for-sast).          |
 
 #### Vulnerability filters
 
@@ -310,12 +308,14 @@ Some analyzers make it possible to filter out vulnerabilities under a given thre
 | `SAST_GITLEAKS_COMMIT_TO` | -       | The commit a gitleaks scan ends at. |
 | `SAST_GITLEAKS_HISTORIC_SCAN` | false | Flag to enable a historic gitleaks scan. |
 
-#### Timeouts
+#### Docker-in-Docker orchestrator
 
-The following variables configure timeouts.
+The following variables configure the Docker-in-Docker orchestrator.
 
-| Environment variable | Default value | Description |
-|----------------------|---------------|-------------|
+| Environment variable                     | Default value | Description |
+|------------------------------------------|---------------|-------------|
+| `SAST_ANALYZER_IMAGES`                   |         |  Comma-separated list of custom images. Default images are still enabled. Read more about [customizing analyzers](analyzers.md). Not available when [Docker-in-Docker is disabled](#disabling-docker-in-docker-for-sast). |
+| `SAST_PULL_ANALYZER_IMAGES`              |       1 | Pull the images from the Docker registry (set to 0 to disable). Read more about [customizing analyzers](analyzers.md). Not available when [Docker-in-Docker is disabled](#disabling-docker-in-docker-for-sast).          |
 | `SAST_DOCKER_CLIENT_NEGOTIATION_TIMEOUT` |      2m | Time limit for Docker client negotiation. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "300ms", "1.5h" or "2h45m". |
 | `SAST_PULL_ANALYZER_IMAGE_TIMEOUT`       |      5m | Time limit when pulling the image of an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "300ms", "1.5h" or "2h45m". |
 | `SAST_RUN_ANALYZER_TIMEOUT`              |     20m | Time limit when running an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "300ms", "1.5h" or "2h45m".|
