@@ -30,12 +30,7 @@ export default {
         return null;
       }
 
-      const splitCode = this.issue.code.split('.');
-      if (splitCode.length < 5) {
-        return null;
-      }
-
-      return this.issue.code.split('.')[4];
+      return this.issue.code.split('.')[4] || null;
     },
     learnMoreUrl() {
       if (this.parsedTECHSCode === null) {
