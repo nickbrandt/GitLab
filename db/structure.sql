@@ -10117,6 +10117,8 @@ CREATE UNIQUE INDEX index_routes_on_path ON public.routes USING btree (path);
 
 CREATE INDEX index_routes_on_path_text_pattern_ops ON public.routes USING btree (path varchar_pattern_ops);
 
+CREATE INDEX index_routes_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
+
 CREATE UNIQUE INDEX index_routes_on_source_type_and_source_id ON public.routes USING btree (source_type, source_id);
 
 CREATE INDEX index_saml_providers_on_group_id ON public.saml_providers USING btree (group_id);
@@ -13150,6 +13152,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200407094005
 20200407094923
 20200408110856
+20200408133211
 20200408153842
 20200408175424
 20200409211607
