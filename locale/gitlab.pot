@@ -7538,6 +7538,9 @@ msgstr ""
 msgid "Enable classification control using an external service"
 msgstr ""
 
+msgid "Enable container expiration and retention policies for projects created earlier than GitLab 12.7."
+msgstr ""
+
 msgid "Enable email restrictions for sign ups"
 msgstr ""
 
@@ -8355,6 +8358,9 @@ msgid "Excluding merge commits. Limited to 6,000 commits."
 msgstr ""
 
 msgid "Existing members and groups"
+msgstr ""
+
+msgid "Existing projects will be able to use expiration policies. Avoid enabling this if an external Container Registry is being used, as there is a performance risk if many images exist on one project."
 msgstr ""
 
 msgid "Existing shares"
