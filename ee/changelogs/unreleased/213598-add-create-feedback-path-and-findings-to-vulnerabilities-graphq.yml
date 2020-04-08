@@ -1,0 +1,6 @@
+---
+title: Add createVulnerabilityFeedbackDismissalPath, findings and userPermissions
+  to Vulnerabilities GraphQL API
+merge_request: 29140
+author:
+type: added
