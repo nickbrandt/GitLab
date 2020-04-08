@@ -203,7 +203,7 @@ module EE
         def usage_activity_by_stage_configure(time_period)
           {
             clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
-            clusters_applications_helm: ::Clusters::Applications::Helm.where(time_period).distinct_by_user,
+            clusters_applications_helm: clusters_user_distinct_count(::Clusters::Applications::Helm, time_period),
             clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
             clusters_applications_knative: clusters_user_distinct_count(::Clusters::Applications::Knative, time_period),
             clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
