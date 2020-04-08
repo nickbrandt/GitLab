@@ -111,7 +111,7 @@ describe('Cycle analytics getters', () => {
       );
     });
 
-    it('returns null if there is no plottable data for the selected stages', () => {
+    it('returns an empty array if there is no plottable data for the selected stages', () => {
       const stateWithDurationData = {
         startDate,
         endDate,
