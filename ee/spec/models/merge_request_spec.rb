@@ -294,7 +294,7 @@ describe MergeRequest do
       it { is_expected.to be_truthy }
     end
 
-    context 'when head pipeline does not have license management reports' do
+    context 'when head pipeline does not have license scanning reports' do
       let(:merge_request) { create(:ee_merge_request, source_project: project) }
 
       it { is_expected.to be_falsey }
