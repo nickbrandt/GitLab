@@ -17,7 +17,7 @@ how GitLab can be scaled out and made highly available. These examples progress
 from simple to complex as scaling or highly-available components are added.
 
 For larger setups serving 2,000 or more users, we provide
-[reference architectures](#reference-architectures) based on GitLab's
+[reference architectures](../scaling/index.md#reference-architectures) based on GitLab's
 experience with GitLab.com and internal scale testing that aim to achieve the
 right balance of scalability and availability.
 
