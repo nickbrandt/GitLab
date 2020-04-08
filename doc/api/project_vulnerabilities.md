@@ -51,56 +51,56 @@ Example response:
 
 ```json
 [
-  {
-    "id": 2,
-    "title": "Predictable pseudorandom number generator",
-    "description": null,
-    "state": "closed",
-    "severity": "medium",
-    "confidence": "medium",
-    "report_type": "sast",
-    "project": {
-      "id": 32,
-      "name": "security-reports",
-      "full_path": "/gitlab-examples/security/security-reports",
-      "full_name": "gitlab-examples / security / security-reports"
-    },
-    "author_id": 1,
-    "updated_by_id": null,
-    "last_edited_by_id": null,
-    "closed_by_id": null,
-    "start_date": null,
-    "due_date": null,
-    "created_at": "2019-10-13T15:08:40.219Z",
-    "updated_at": "2019-10-13T15:09:40.382Z",
-    "last_edited_at": null,
-    "closed_at": null
-  },
-  {
-    "id": 3,
-    "title": "ECB mode is insecure",
-    "description": null,
-    "state": "opened",
-    "severity": "medium",
-    "confidence": "high",
-    "report_type": "sast",
-    "project": {
-      "id": 32,
-      "name": "security-reports",
-      "full_path": "/gitlab-examples/security/security-reports",
-      "full_name": "gitlab-examples / security / security-reports"
-    },
-    "author_id": 1,
-    "updated_by_id": null,
-    "last_edited_by_id": null,
-    "closed_by_id": null,
-    "start_date": null,
-    "due_date": null,
-    "created_at": "2019-10-16T11:19:21.691Z",
-    "updated_at": "2019-10-16T11:19:21.691Z",
-    "last_edited_at": null,
-    "closed_at": null
-  }
+    {
+        "author_id": 1,
+        "confidence": "medium",
+        "created_at": "2020-04-07T14:01:04.655Z",
+        "description": null,
+        "dismissed_at": null,
+        "dismissed_by_id": null,
+        "due_date": null,
+        "finding": {
+            "confidence": "medium",
+            "created_at": "2020-04-07T14:01:04.630Z",
+            "id": 103,
+            "location_fingerprint": "228998b5db51d86d3b091939e2f5873ada0a14a1",
+            "metadata_version": "2.0",
+            "name": "Regular Expression Denial of Service in debug",
+            "primary_identifier_id": 135,
+            "project_fingerprint": "05e7cc9978ca495cf739a9f707ed34811e41c615",
+            "project_id": 24,
+            "raw_metadata": "{\"category\":\"dependency_scanning\",\"name\":\"Regular Expression Denial of Service\",\"message\":\"Regular Expression Denial of Service in debug\",\"description\":\"The debug module is vulnerable to regular expression denial of service when untrusted user input is passed into the `o` formatter. It takes around 50k characters to block for 2 seconds making this a low severity issue.\",\"cve\":\"yarn.lock:debug:gemnasium:37283ed4-0380-40d7-ada7-2d994afcc62a\",\"severity\":\"Unknown\",\"solution\":\"Upgrade to latest versions.\",\"scanner\":{\"id\":\"gemnasium\",\"name\":\"Gemnasium\"},\"location\":{\"file\":\"yarn.lock\",\"dependency\":{\"package\":{\"name\":\"debug\"},\"version\":\"1.0.5\"}},\"identifiers\":[{\"type\":\"gemnasium\",\"name\":\"Gemnasium-37283ed4-0380-40d7-ada7-2d994afcc62a\",\"value\":\"37283ed4-0380-40d7-ada7-2d994afcc62a\",\"url\":\"https://deps.sec.gitlab.com/packages/npm/debug/versions/1.0.5/advisories\"}],\"links\":[{\"url\":\"https://nodesecurity.io/advisories/534\"},{\"url\":\"https://github.com/visionmedia/debug/issues/501\"},{\"url\":\"https://github.com/visionmedia/debug/pull/504\"}],\"remediations\":[null]}",
+            "report_type": "dependency_scanning",
+            "scanner_id": 63,
+            "severity": "low",
+            "updated_at": "2020-04-07T14:01:04.664Z",
+            "uuid": "f1d528ae-d0cc-47f6-a72f-936cec846ae7",
+            "vulnerability_id": 103
+        },
+        "id": 103,
+        "last_edited_at": null,
+        "last_edited_by_id": null,
+        "project": {
+            "created_at": "2020-04-07T13:54:25.634Z",
+            "description": "",
+            "id": 24,
+            "name": "security-reports",
+            "name_with_namespace": "gitlab-org / security-reports",
+            "path": "security-reports",
+            "path_with_namespace": "gitlab-org/security-reports"
+        },
+        "project_default_branch": "master",
+        "report_type": "dependency_scanning",
+        "resolved_at": null,
+        "resolved_by_id": null,
+        "resolved_on_default_branch": false,
+        "severity": "low",
+        "start_date": null,
+        "state": "detected",
+        "title": "Regular Expression Denial of Service in debug",
+        "updated_at": "2020-04-07T14:01:04.655Z",
+        "updated_by_id": null
+    }
 ]
 ```
 
@@ -140,29 +140,54 @@ Example response:
 
 ```json
 {
-  "id": 2,
-  "title": "Predictable pseudorandom number generator",
-  "description": null,
-  "state": "opened",
-  "severity": "medium",
-  "confidence": "medium",
-  "report_type": "sast",
-  "project": {
-    "id": 32,
-    "name": "security-reports",
-    "full_path": "/gitlab-examples/security/security-reports",
-    "full_name": "gitlab-examples / security / security-reports"
-  },
-  "author_id": 1,
-  "updated_by_id": null,
-  "last_edited_by_id": null,
-  "closed_by_id": null,
-  "start_date": null,
-  "due_date": null,
-  "created_at": "2019-10-13T15:08:40.219Z",
-  "updated_at": "2019-10-13T15:09:40.382Z",
-  "last_edited_at": null,
-  "closed_at": null
+    "author_id": 1,
+    "confidence": "medium",
+    "created_at": "2020-04-07T14:01:04.655Z",
+    "description": null,
+    "dismissed_at": null,
+    "dismissed_by_id": null,
+    "due_date": null,
+    "finding": {
+        "confidence": "medium",
+        "created_at": "2020-04-07T14:01:04.630Z",
+        "id": 103,
+        "location_fingerprint": "228998b5db51d86d3b091939e2f5873ada0a14a1",
+        "metadata_version": "2.0",
+        "name": "Regular Expression Denial of Service in debug",
+        "primary_identifier_id": 135,
+        "project_fingerprint": "05e7cc9978ca495cf739a9f707ed34811e41c615",
+        "project_id": 24,
+        "raw_metadata": "{\"category\":\"dependency_scanning\",\"name\":\"Regular Expression Denial of Service\",\"message\":\"Regular Expression Denial of Service in debug\",\"description\":\"The debug module is vulnerable to regular expression denial of service when untrusted user input is passed into the `o` formatter. It takes around 50k characters to block for 2 seconds making this a low severity issue.\",\"cve\":\"yarn.lock:debug:gemnasium:37283ed4-0380-40d7-ada7-2d994afcc62a\",\"severity\":\"Unknown\",\"solution\":\"Upgrade to latest versions.\",\"scanner\":{\"id\":\"gemnasium\",\"name\":\"Gemnasium\"},\"location\":{\"file\":\"yarn.lock\",\"dependency\":{\"package\":{\"name\":\"debug\"},\"version\":\"1.0.5\"}},\"identifiers\":[{\"type\":\"gemnasium\",\"name\":\"Gemnasium-37283ed4-0380-40d7-ada7-2d994afcc62a\",\"value\":\"37283ed4-0380-40d7-ada7-2d994afcc62a\",\"url\":\"https://deps.sec.gitlab.com/packages/npm/debug/versions/1.0.5/advisories\"}],\"links\":[{\"url\":\"https://nodesecurity.io/advisories/534\"},{\"url\":\"https://github.com/visionmedia/debug/issues/501\"},{\"url\":\"https://github.com/visionmedia/debug/pull/504\"}],\"remediations\":[null]}",
+        "report_type": "dependency_scanning",
+        "scanner_id": 63,
+        "severity": "low",
+        "updated_at": "2020-04-07T14:01:04.664Z",
+        "uuid": "f1d528ae-d0cc-47f6-a72f-936cec846ae7",
+        "vulnerability_id": 103
+    },
+    "id": 103,
+    "last_edited_at": null,
+    "last_edited_by_id": null,
+    "project": {
+        "created_at": "2020-04-07T13:54:25.634Z",
+        "description": "",
+        "id": 24,
+        "name": "security-reports",
+        "name_with_namespace": "gitlab-org / security-reports",
+        "path": "security-reports",
+        "path_with_namespace": "gitlab-org/security-reports"
+    },
+    "project_default_branch": "master",
+    "report_type": "dependency_scanning",
+    "resolved_at": null,
+    "resolved_by_id": null,
+    "resolved_on_default_branch": false,
+    "severity": "low",
+    "start_date": null,
+    "state": "detected",
+    "title": "Regular Expression Denial of Service in debug",
+    "updated_at": "2020-04-07T14:01:04.655Z",
+    "updated_by_id": null
 }
 ```
 
