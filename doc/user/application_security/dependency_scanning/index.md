@@ -204,7 +204,11 @@ to start relevant analyzers depending on the detected repository language(s) ins
 are some differences in the way repository languages are detected between DIND and non-DIND. You can
 observe these differences by checking both Linguist and the common library. For instance, Linguist
 looks for `*.java` files to spin up the [gemnasium-maven](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven)
-image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`.
+image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`. GitLab uses
+Linguist to detect new file types in the default branch. This means that when introducing files or
+dependencies for a new language or package manager, the corresponding scans won't be triggered in
+the MR and will only run on the default branch once the MR is merged. This will be addressed by
+[#211702](https://gitlab.com/gitlab-org/gitlab/-/issues/211702).
 
 ## Interacting with the vulnerabilities
 
