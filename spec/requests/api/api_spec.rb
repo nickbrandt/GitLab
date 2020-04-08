@@ -11,7 +11,7 @@ describe API::API do
     # to represent any API endpoint
     let(:user) { create(:user, last_activity_on: Date.yesterday) }
 
-    it 'updates the users last_activity_on date' do
+    it 'updates the users last_activity_on to the current date' do
       expect { get api('/groups', user) }.to change { user.reload.last_activity_on }.to(Date.today)
     end
 
@@ -25,7 +25,7 @@ describe API::API do
   end
 
   describe 'User with only read_api scope personal access token' do
-    # It does not matter which endpoint is used because this should
+    # It does not matter which endpoint is used because this should behave
     # in the same way for every request. `/groups` is used as an example
     # to represent any API endpoint
 
@@ -45,9 +45,9 @@ describe API::API do
       end
 
       it 'does not authorize user for post request' do
-        group_attributes = attributes_for_group_api
+        params = attributes_for_group_api
 
-        post api("/groups", personal_access_token: token), params: group_attributes
+        post api("/groups", personal_access_token: token), params: params
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
