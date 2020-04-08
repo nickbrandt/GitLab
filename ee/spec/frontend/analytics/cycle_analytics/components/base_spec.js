@@ -13,7 +13,6 @@ import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue'
 import 'bootstrap';
 import '~/gl_dropdown';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
-import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
 import waitForPromises from 'helpers/wait_for_promises';
@@ -40,8 +39,6 @@ const defaultStubs = {
   'stage-nav-item': true,
   'tasks-by-type-chart': true,
   'labels-selector': true,
-  'stage-dropdown-filter': true,
-  Scatterplot: true,
   DurationChart: true,
 };
 
@@ -131,8 +128,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(StageTable).exists()).toBe(flag);
   };
 
-  const displaysDurationScatterPlot = flag => {
-    expect(wrapper.find(Scatterplot).exists()).toBe(flag);
+  const displaysDurationChart = flag => {
+    expect(wrapper.find(DurationChart).exists()).toBe(flag);
   };
 
   const displaysTasksByType = flag => {
@@ -187,8 +184,8 @@ describe('Cycle Analytics component', () => {
         displaysStageTable(false);
       });
 
-      it('does not display the duration scatter plot', () => {
-        displaysDurationScatterPlot(false);
+      it('does not display the duration chart', () => {
+        displaysDurationChart(false);
       });
 
       describe('hideGroupDropDown = true', () => {
@@ -213,13 +210,6 @@ describe('Cycle Analytics component', () => {
           wrapper = createComponent({
             withStageSelected: true,
             tasksByTypeChartEnabled: false,
-
-            opts: {
-              stubs: {
-                ...defaultStubs,
-                'duration-chart': false,
-              },
-            },
           });
         });
 
@@ -257,16 +247,7 @@ describe('Cycle Analytics component', () => {
 
         describe('with no durationData', () => {
           it('displays the duration chart', () => {
-            expect(wrapper.find(Scatterplot).exists()).toBe(false);
-          });
-
-          it('displays the no data message', () => {
-            const element = wrapper.find({ ref: 'duration-chart-no-data' });
-
-            expect(element.exists()).toBe(true);
-            expect(element.text()).toBe(
-              'There is no data available. Please change your selection.',
-            );
+            displaysDurationChart(true);
           });
         });
 
@@ -371,7 +352,7 @@ describe('Cycle Analytics component', () => {
         });
 
         it('does not display the duration chart', () => {
-          displaysDurationScatterPlot(false);
+          displaysDurationChart(false);
         });
       });
 

@@ -32,11 +32,14 @@ export default {
   },
   computed: {
     hasData() {
-      // TODO: check if we want to display when only the median data is available
-      return Boolean(this.scatterData.length || this.medianLineData.length);
+      return Boolean(this.scatterData.length);
     },
   },
-  methods: {},
+  methods: {
+    onSelectStage(selectedStages) {
+      this.$emit('stageSelected', selectedStages);
+    },
+  },
   durationChartTooltipDateFormat: dateFormats.defaultDate,
 };
 </script>
@@ -50,7 +53,7 @@ export default {
         v-if="stages.length"
         class="ml-auto"
         :stages="stages"
-        @selected="$emit('stageSelected')"
+        @selected="onSelectStage"
       />
     </div>
     <scatterplot
