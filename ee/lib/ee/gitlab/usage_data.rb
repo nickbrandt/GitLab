@@ -205,7 +205,7 @@ module EE
             clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
             clusters_applications_helm: ::Clusters::Applications::Helm.where(time_period).distinct_by_user,
             clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
-            clusters_applications_knative: ::Clusters::Applications::Knative.where(time_period).distinct_by_user,
+            clusters_applications_knative: clusters_user_distinct_count(::Clusters::Applications::Knative, time_period),
             clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
             clusters_enabled: distinct_count(::Clusters::Cluster.enabled.where(time_period), :user_id),
             clusters_platforms_gke: distinct_count(::Clusters::Cluster.gcp_installed.enabled.where(time_period), :user_id),
