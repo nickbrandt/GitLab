@@ -4,7 +4,7 @@ disqus_identifier: 'https://docs.gitlab.com/ee/workflow/lfs/lfs_administration.h
 
 # GitLab Git LFS Administration
 
-Documentation on how to use Git LFS are under [Managing large binary files with Git LFS doc](manage_large_binaries_with_git_lfs.md).
+Documentation on how to use Git LFS are under [Managing large binary files with Git LFS doc](../../topics/git/lfs/index.md).
 
 ## Requirements
 
@@ -136,7 +136,7 @@ and comparing the output of the returned headers.
 
 There are two ways to manually do the same thing as automatic uploading (described above).
 
-**Option 1: rake task**
+**Option 1: Rake task**
 
 ```shell
 rake gitlab:lfs:migrate

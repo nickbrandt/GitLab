@@ -248,8 +248,7 @@ describe API::Groups do
         end
 
         it 'returns 404 for a non existing group' do
-          non_existent_group_id = Group.maximum(:id).to_i + 1
-          ldap_sync(non_existent_group_id, user, :disable!)
+          ldap_sync(non_existing_record_id, user, :disable!)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -303,13 +302,11 @@ describe API::Groups do
       subject { get api("/groups/#{group.id}/projects", user), params: { with_security_reports: true } }
 
       context 'when security dashboard is enabled for a group' do
-        let(:group) { create(:group, plan: :gold_plan) } # overriding group from parent context
+        let(:group) { create(:group_with_plan, plan: :gold_plan) } # overriding group from parent context
 
         before do
           stub_licensed_features(security_dashboard: true)
           enable_namespace_license_check!
-
-          create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
         end
 
         it "returns only projects with security reports" do

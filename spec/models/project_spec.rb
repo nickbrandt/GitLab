@@ -110,14 +110,12 @@ describe Project do
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:prometheus_alert_events) }
     it { is_expected.to have_many(:self_managed_prometheus_alert_events) }
+    it { is_expected.to have_many(:jira_imports) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
       let(:stubbed_container) { build_stubbed(:project) }
       let(:expected_full_path) { "#{container.namespace.full_path}/somewhere" }
-      let(:expected_repository_klass) { Repository }
-      let(:expected_storage_klass) { Storage::Hashed }
-      let(:expected_web_url_path) { "#{container.namespace.full_path}/somewhere" }
     end
 
     it 'has an inverse relationship with merge requests' do
@@ -827,7 +825,7 @@ describe Project do
       end
 
       it 'returns nil when no issue found' do
-        expect(project.get_issue(999, user)).to be_nil
+        expect(project.get_issue(non_existing_record_id, user)).to be_nil
       end
 
       it "returns nil when user doesn't have access" do
@@ -5729,6 +5727,20 @@ describe Project do
     end
   end
 
+  describe 'with services and chat names' do
+    subject { create(:project) }
+
+    let(:service) { create(:service, project: subject) }
+
+    before do
+      create_list(:chat_name, 5, service: service)
+    end
+
+    it 'removes chat names on removal' do
+      expect { subject.destroy }.to change { ChatName.count }.by(-5)
+    end
+  end
+
   describe 'with_issues_or_mrs_available_for_user' do
     before do
       Project.delete_all
@@ -5970,6 +5982,34 @@ describe Project do
       environment = project.environments.first
 
       expect(project.environments_for_scope(environment.name)).to eq([environment])
+    end
+  end
+
+  describe '#latest_jira_import' do
+    let_it_be(:project) { create(:project) }
+    context 'when no jira imports' do
+      it 'returns nil' do
+        expect(project.latest_jira_import).to be nil
+      end
+    end
+
+    context 'when single jira import' do
+      let!(:jira_import1) { create(:jira_import_state, project: project) }
+
+      it 'returns the jira import' do
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
+    end
+
+    context 'when multiple jira imports' do
+      let!(:jira_import1) { create(:jira_import_state, :finished, created_at: 1.day.ago, project: project) }
+      let!(:jira_import2) { create(:jira_import_state, :failed, created_at: 2.days.ago, project: project) }
+      let!(:jira_import3) { create(:jira_import_state, :started, created_at: 3.days.ago, project: project) }
+
+      it 'returns latest jira import by created_at' do
+        expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
     end
   end
 

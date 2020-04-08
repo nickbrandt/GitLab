@@ -23,6 +23,7 @@ class User < ApplicationRecord
   include BatchDestroyDependentAssociations
   include HasUniqueInternalUsers
   include IgnorableColumns
+  include UpdateHighestRole
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -57,6 +58,8 @@ class User < ApplicationRecord
          :validatable, :omniauthable, :confirmable, :registerable
 
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
+                    "administrator if you think this is an error."
+  LOGIN_FORBIDDEN = "Your account does not have the required permission to login. Please contact your GitLab " \
                     "administrator if you think this is an error."
 
   MINIMUM_INACTIVE_DAYS = 180
@@ -107,7 +110,6 @@ class User < ApplicationRecord
 
   # Groups
   has_many :members
-  has_one  :max_access_level_membership, -> { select(:id, :user_id, :access_level).order(access_level: :desc).readonly }, class_name: 'Member'
   has_many :group_members, -> { where(requested_at: nil) }, source: 'GroupMember'
   has_many :groups, through: :group_members
   has_many :owned_groups, -> { where(members: { access_level: Gitlab::Access::OWNER }) }, through: :group_members, source: :group
@@ -298,14 +300,6 @@ class User < ApplicationRecord
       def blocked?
         true
       end
-
-      def active_for_authentication?
-        false
-      end
-
-      def inactive_message
-        BLOCKED_MESSAGE
-      end
     end
 
     before_transition do
@@ -351,6 +345,20 @@ class User < ApplicationRecord
           ::PersonalAccessToken
             .where('personal_access_tokens.user_id = users.id')
             .expiring_and_not_notified(at).select(1))
+  end
+
+  def active_for_authentication?
+    super && can?(:log_in)
+  end
+
+  def inactive_message
+    if blocked?
+      BLOCKED_MESSAGE
+    elsif internal?
+      LOGIN_FORBIDDEN
+    else
+      super
+    end
   end
 
   def self.with_visible_profile(user)
@@ -1071,7 +1079,7 @@ class User < ApplicationRecord
   end
 
   def highest_role
-    max_access_level_membership&.access_level || Gitlab::Access::NO_ACCESS
+    user_highest_role&.highest_access_level || Gitlab::Access::NO_ACCESS
   end
 
   def accessible_deploy_keys
@@ -1396,7 +1404,7 @@ class User < ApplicationRecord
         .select('ci_runners.*')
 
       group_runners = Ci::RunnerNamespace
-        .where(namespace_id: owned_groups.select(:id))
+        .where(namespace_id: Gitlab::ObjectHierarchy.new(owned_groups).base_and_descendants.select(:id))
         .joins(:runner)
         .select('ci_runners.*')
 
@@ -1582,13 +1590,6 @@ class User < ApplicationRecord
   end
 
   def read_only_attribute?(attribute)
-    if Feature.enabled?(:ldap_readonly_attributes, default_enabled: true)
-      enabled = Gitlab::Auth::Ldap::Config.enabled?
-      read_only = attribute.to_sym.in?(UserSyncedAttributesMetadata::SYNCABLE_ATTRIBUTES)
-
-      return true if enabled && read_only
-    end
-
     user_synced_attributes_metadata&.read_only?(attribute)
   end
 
@@ -1694,8 +1695,8 @@ class User < ApplicationRecord
 
   def gitlab_employee?
     strong_memoize(:gitlab_employee) do
-      if Gitlab.com?
-        Mail::Address.new(email).domain == "gitlab.com"
+      if Feature.enabled?(:gitlab_employee_badge) && Gitlab.com?
+        Mail::Address.new(email).domain == "gitlab.com" && confirmed?
       else
         false
       end
@@ -1705,6 +1706,14 @@ class User < ApplicationRecord
   # Load the current highest access by looking directly at the user's memberships
   def current_highest_access_level
     members.non_request.maximum(:access_level)
+  end
+
+  def confirmation_required_on_sign_in?
+    !confirmed? && !confirmation_period_valid?
+  end
+
+  def organization
+    gitlab_employee? ? 'GitLab' : super
   end
 
   protected
@@ -1843,6 +1852,16 @@ class User < ApplicationRecord
 
   def no_recent_activity?
     last_active_at.to_i <= MINIMUM_INACTIVE_DAYS.days.ago.to_i
+  end
+
+  def update_highest_role?
+    return false unless persisted?
+
+    (previous_changes.keys & %w(state user_type ghost)).any?
+  end
+
+  def update_highest_role_attribute
+    id
   end
 end
 

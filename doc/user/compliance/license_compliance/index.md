@@ -13,7 +13,7 @@ using License Compliance.
 
 You can take advantage of License Compliance by either [including the job](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto License Compliance](../../../topics/autodevops/index.md#auto-license-compliance-ultimate)
+[Auto License Compliance](../../../topics/autodevops/stages.md#auto-license-compliance-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the License Compliance report, compares the licenses between the
@@ -60,7 +60,7 @@ The following languages and package managers are supported.
 | Elixir     | [mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types)) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | C++/C      | [conan](https://conan.io/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 | Scala      | [sbt](https://www.scala-sbt.org/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
-| Rust       | [cargo](https://crates.io) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
+| Rust       | [cargo](https://crates.io/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 | PHP        | [composer](https://getcomposer.org/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 
 ## Requirements
@@ -191,35 +191,10 @@ If you still need to run tests during `mvn install`, add `-DskipTests=false` to
 
 #### Using private Maven repos
 
-If you have a private Maven repository that requires login credentials, you can use the
-`MAVEN_CLI_OPTS` variable to specify a custom [`settings.xml`](http://maven.apache.org/settings.html)
-file.
+If you have a private Maven repository which requires login credentials,
+you can use the `MAVEN_CLI_OPTS` environment variable.
 
-For example, you may have a settings file like this in your project source:
-
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>my-server</id>
-      <username>${private.username}</username>
-      <username>${private.password}</username>
-    </server>
-  </servers>
-</settings>
-```
-
-You can use this file through the following declaration in your `gitlab-ci.yml` file:
-
-```yaml
-license_scanning:
-  variables:
-    MAVEN_CLI_OPTS: --settings settings.xml -Dprivate.username=foo -Dprivate.password=bar
-```
-
-NOTE: **Note:**
-If you don't want to expose the credentials in your `.gitlab-ci.yml` file, then
-you can [set the variable in your project's settings](../../../ci/variables/README.md#via-the-ui).
+Read more on [how to use private Maven repos](../../application_security/index.md#using-private-maven-repos).
 
 ### Selecting the version of Python
 

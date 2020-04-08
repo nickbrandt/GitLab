@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { shallowMount } from '@vue/test-utils';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
@@ -76,7 +76,7 @@ describe('Feature flags > Environments dropdown ', () => {
 
         it('emits event when a suggestion is clicked', () => {
           const button = wrapper
-            .findAll(GlButton)
+            .findAll(GlDeprecatedButton)
             .filter(b => b.text() === 'production')
             .at(0);
           button.vm.$emit('click');
@@ -88,7 +88,7 @@ describe('Feature flags > Environments dropdown ', () => {
       });
       describe('on click clear button', () => {
         beforeEach(() => {
-          wrapper.find(GlButton).vm.$emit('click');
+          wrapper.find(GlDeprecatedButton).vm.$emit('click');
         });
 
         it('resets filter value', () => {
@@ -115,7 +115,7 @@ describe('Feature flags > Environments dropdown ', () => {
 
     it('emits create event', () => {
       wrapper
-        .findAll(GlButton)
+        .findAll(GlDeprecatedButton)
         .at(1)
         .vm.$emit('click');
 

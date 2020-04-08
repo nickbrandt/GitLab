@@ -17,6 +17,10 @@ class Geo::BaseRegistry < Geo::TrackingBase
     where.not(self::MODEL_FOREIGN_KEY => ids)
   end
 
+  def self.replication_enabled?
+    true
+  end
+
   def self.insert_for_model_ids(ids)
     records = ids.map do |id|
       new(self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now)

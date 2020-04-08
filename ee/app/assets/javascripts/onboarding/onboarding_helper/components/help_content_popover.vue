@@ -1,11 +1,11 @@
 <script>
-import { GlPopover, GlButton, GlButtonGroup } from '@gitlab/ui';
+import { GlPopover, GlDeprecatedButton, GlButtonGroup } from '@gitlab/ui';
 
 export default {
   name: 'HelpContentPopover',
   components: {
     GlPopover,
-    GlButton,
+    GlDeprecatedButton,
     GlButtonGroup,
   },
   props: {
@@ -61,7 +61,7 @@ export default {
       <p v-html="helpContent.text"></p>
       <template v-if="helpContent.buttons">
         <template v-for="(button, index) in helpContent.buttons">
-          <gl-button
+          <gl-deprecated-button
             v-if="!button.readOnly"
             :key="index"
             :class="button.btnClass"
@@ -69,20 +69,20 @@ export default {
             @click="callStepContentButton(button)"
           >
             {{ button.text }}
-          </gl-button>
+          </gl-deprecated-button>
           <span v-else :key="index" :class="button.btnClass" class="btn btn-sm mr-2">
             {{ button.text }}
           </span>
         </template>
       </template>
       <template v-if="helpContent.exitTour">
-        <gl-button class="btn btn-sm btn-primary mr-2" @click="callExitTour">
+        <gl-deprecated-button class="btn btn-sm btn-primary mr-2" @click="callExitTour">
           {{ helpContent.buttonText }}
-        </gl-button>
+        </gl-deprecated-button>
       </template>
       <template v-if="helpContent.feedbackButtons">
         <gl-button-group>
-          <gl-button
+          <gl-deprecated-button
             v-for="feedbackValue in helpContent.feedbackSize"
             :key="feedbackValue"
             @click="
@@ -92,7 +92,7 @@ export default {
             "
           >
             {{ feedbackValue }}
-          </gl-button>
+          </gl-deprecated-button>
         </gl-button-group>
         <div class="pt-1">
           <small>{{ __('Not helpful') }}</small>

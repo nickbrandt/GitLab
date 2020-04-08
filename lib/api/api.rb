@@ -105,7 +105,7 @@ module API
 
     namespace do
       after do
-        ::Users::ActivityService.new(@current_user).execute if Feature.enabled?(:api_activity_logging)
+        ::Users::ActivityService.new(@current_user).execute
       end
 
       # Keep in alphabetical order
@@ -172,6 +172,7 @@ module API
       mount ::API::ProjectSnippets
       mount ::API::ProjectStatistics
       mount ::API::ProjectTemplates
+      mount ::API::Terraform::State
       mount ::API::ProtectedBranches
       mount ::API::ProtectedTags
       mount ::API::Releases

@@ -53,7 +53,7 @@ describe API::Internal::Base do
       post api('/internal/two_factor_recovery_codes'),
            params: {
              secret_token: secret_token,
-             key_id: 12345
+             key_id: non_existing_record_id
            }
 
       expect(json_response['success']).to be_falsey
@@ -152,13 +152,13 @@ describe API::Internal::Base do
       end
 
       it 'returns a 404 when the wrong key is provided' do
-        lfs_auth_key(key.id + 12345, project)
+        lfs_auth_key(non_existing_record_id, project)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns a 404 when the wrong user is provided' do
-        lfs_auth_user(user.id + 12345, project)
+        lfs_auth_user(non_existing_record_id, project)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -217,7 +217,7 @@ describe API::Internal::Base do
       it "finds the key" do
         get(api('/internal/authorized_keys'), params: { fingerprint: key.fingerprint, secret_token: secret_token })
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response["key"]).to eq(key.key)
       end
     end
@@ -226,7 +226,7 @@ describe API::Internal::Base do
       it "returns 404" do
         get(api('/internal/authorized_keys'), params: { fingerprint: "no:t-:va:li:d0", secret_token: secret_token })
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -234,7 +234,7 @@ describe API::Internal::Base do
       it "returns 404" do
         get(api('/internal/authorized_keys'), params: { fingerprint: "#{key.fingerprint[0..5]}%", secret_token: secret_token })
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -242,20 +242,20 @@ describe API::Internal::Base do
       it "finds the key" do
         get(api('/internal/authorized_keys'), params: { key: key.key.split[1], secret_token: secret_token })
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response["key"]).to eq(key.key)
       end
 
       it "returns 404 with a partial key" do
         get(api('/internal/authorized_keys'), params: { key: key.key.split[1][0...-3], secret_token: secret_token })
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it "returns 404 with an not valid base64 string" do
         get(api('/internal/authorized_keys'), params: { key: "whatever!", secret_token: secret_token })
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -325,13 +325,34 @@ describe API::Internal::Base do
 
       shared_examples 'snippets with disabled feature flag' do
         context 'when feature flag :version_snippets is disabled' do
-          it 'returns 404' do
+          it 'returns 401' do
             stub_feature_flags(version_snippets: false)
 
             subject
 
-            expect(response).to have_gitlab_http_status(:not_found)
+            expect(response).to have_gitlab_http_status(:unauthorized)
           end
+        end
+      end
+
+      shared_examples 'snippet success' do
+        it 'responds with success' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['status']).to be_truthy
+        end
+      end
+
+      shared_examples 'snippets with web protocol' do
+        it_behaves_like 'snippet success'
+
+        context 'with disabled version flag' do
+          before do
+            stub_feature_flags(version_snippets: false)
+          end
+
+          it_behaves_like 'snippet success'
         end
       end
 
@@ -349,14 +370,21 @@ describe API::Internal::Base do
         end
 
         it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { push(key, personal_snippet, 'web', env: env.to_json, changes: snippet_changes) }
+        end
+
         it_behaves_like 'sets hook env' do
           let(:gl_repository) { Gitlab::GlRepository::SNIPPET.identifier_for_container(personal_snippet) }
         end
       end
 
       context 'git pull with personal snippet' do
+        subject { pull(key, personal_snippet) }
+
         it 'responds with success' do
-          pull(key, personal_snippet)
+          subject
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response["status"]).to be_truthy
@@ -365,8 +393,10 @@ describe API::Internal::Base do
           expect(user.reload.last_activity_on).to eql(Date.today)
         end
 
-        it_behaves_like 'snippets with disabled feature flag' do
-          subject { pull(key, personal_snippet) }
+        it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { pull(key, personal_snippet, 'web') }
         end
       end
 
@@ -384,6 +414,11 @@ describe API::Internal::Base do
         end
 
         it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { push(key, project_snippet, 'web', env: env.to_json, changes: snippet_changes) }
+        end
+
         it_behaves_like 'sets hook env' do
           let(:gl_repository) { Gitlab::GlRepository::SNIPPET.identifier_for_container(project_snippet) }
         end
@@ -402,6 +437,10 @@ describe API::Internal::Base do
 
         it_behaves_like 'snippets with disabled feature flag' do
           subject { pull(key, project_snippet) }
+        end
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { pull(key, project_snippet, 'web') }
         end
       end
 
@@ -812,7 +851,7 @@ describe API::Internal::Base do
         project.add_developer(user)
         push(key, project, 'web')
 
-        expect(response.status).to eq(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['status']).to be_truthy
       end
     end

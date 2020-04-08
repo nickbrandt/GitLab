@@ -7,20 +7,20 @@ module QA::EE
         class LicenseCompliance < QA::Page::Base
           include QA::Page::Component::Select2 # Select2 is an external library, so we can't add our own selectors
 
-          view 'ee/app/assets/javascripts/vue_shared/license_management/license_management.vue' do
+          view 'ee/app/assets/javascripts/vue_shared/license_compliance/license_management.vue' do
             element :license_add_button
           end
 
-          view 'ee/app/assets/javascripts/vue_shared/license_management/components/add_license_form.vue' do
+          view 'ee/app/assets/javascripts/vue_shared/license_compliance/components/add_license_form.vue' do
             element :license_radio, 'data-qa-selector="`${option.value}_license_radio`"' # rubocop:disable QA/ElementWithPattern
             element :add_license_submit_button
           end
 
-          view 'ee/app/assets/javascripts/vue_shared/license_management/license_management.vue' do
+          view 'ee/app/assets/javascripts/vue_shared/license_compliance/license_management.vue' do
             element :license_compliance_list
           end
 
-          view 'ee/app/assets/javascripts/vue_shared/license_management/components/admin_license_management_row.vue' do
+          view 'ee/app/assets/javascripts/vue_shared/license_compliance/components/admin_license_management_row.vue' do
             element :admin_license_compliance_row
             element :license_name_content
           end

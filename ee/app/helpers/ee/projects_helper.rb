@@ -180,10 +180,6 @@ module EE
       "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
     end
 
-    def project_above_size_limit_message
-      ::Gitlab::RepositorySizeError.new(@project).above_size_limit_message
-    end
-
     override :membership_locked?
     def membership_locked?
       group = @project.group
@@ -209,6 +205,7 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
+          project_full_path: project.full_path,
           vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
           vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),

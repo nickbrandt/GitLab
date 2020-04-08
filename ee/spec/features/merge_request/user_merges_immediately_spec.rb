@@ -16,7 +16,7 @@ describe 'Merge requests > User merges immediately', :js do
     { test: { stage: 'test', script: 'echo', only: ['merge_requests'] } }
   end
 
-  before(:all) do
+  before_all do
     project.add_maintainer(user)
     project.update!(merge_pipelines_enabled: true)
     merge_request.all_pipelines.first.succeed!

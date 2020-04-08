@@ -125,7 +125,7 @@ describe Projects::JobsController do
       end
 
       context 'and invalid id' do
-        let(:extra_params) { { id: 1234 } }
+        let(:extra_params) { { id: non_existing_record_id } }
 
         it 'returns 404' do
           make_request

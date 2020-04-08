@@ -82,7 +82,6 @@ describe('EpicsSelect', () => {
         });
 
         it('should call action `fetchEpics` with `searchQuery` when value is set and `groupEpics` is empty', () => {
-          wrapper.vm.$store.dispatch('receiveEpicsSuccess', []);
           wrapper.vm.$store.dispatch('setSearchQuery', 'foo');
 
           return wrapper.vm.$nextTick(() => {

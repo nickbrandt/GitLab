@@ -319,7 +319,7 @@ gem 'peek', '~> 1.1'
 gem 'snowplow-tracker', '~> 0.6.1'
 
 # Memory benchmarks
-gem 'gitlab-derailed_benchmarks', require: false
+gem 'derailed_benchmarks', require: false
 
 # Metrics
 group :metrics do
@@ -366,7 +366,7 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 3.1.0', require: false
+  gem 'gitlab-styles', '~> 3.2.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
   gem 'rubocop', '~> 0.74.0'
   gem 'rubocop-performance', '~> 1.4.1'
@@ -457,9 +457,9 @@ end
 # Gitaly GRPC protocol definitions
 gem 'gitaly', '~> 12.9.0.pre.rc4'
 
-gem 'grpc', '~> 1.24.0'
+gem 'grpc', '~> 1.27.0'
 
-gem 'google-protobuf', '~> 3.8.0'
+gem 'google-protobuf', '~> 3.11.2'
 
 gem 'toml-rb', '~> 1.0.0'
 

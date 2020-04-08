@@ -12,9 +12,15 @@ module DesignManagement
     include ObjectStorage::Concern
     prepend ObjectStorage::Extension::RecordsUploads
 
-    # We currently cannot resize `image/ico` or `image/svg+xml` mime types.
-    # See https://gitlab.com/gitlab-org/gitlab/issues/207069
-    MIME_TYPE_WHITELIST = %w(image/png image/jpeg image/bmp image/gif image/tiff).freeze
+    # We choose not to resize `image/ico` as we assume there will be no
+    # benefit in generating an 432x230 sized icon.
+    #
+    # We currently cannot resize `image/tiff`.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/207740
+    #
+    # We currently choose not to resize `image/svg+xml` for security reasons.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/207740#note_302766171
+    MIME_TYPE_WHITELIST = %w(image/png image/jpeg image/bmp image/gif).freeze
 
     process resize_to_fit: [432, 230]
 

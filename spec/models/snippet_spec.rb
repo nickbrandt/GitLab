@@ -696,6 +696,23 @@ describe Snippet do
     end
   end
 
+  describe '#repository_size_checker' do
+    subject { build(:personal_snippet) }
+
+    let(:checker) { subject.repository_size_checker }
+    let(:current_size) { 60 }
+
+    before do
+      allow(subject.repository).to receive(:_uncached_size).and_return(current_size)
+    end
+
+    it 'sets up size checker', :aggregate_failures do
+      expect(checker.current_size).to eq(current_size.megabytes)
+      expect(checker.limit).to eq(Gitlab::CurrentSettings.snippet_size_limit)
+      expect(checker.enabled?).to be_truthy
+    end
+  end
+
   describe '#can_cache_field?' do
     using RSpec::Parameterized::TableSyntax
 
@@ -715,22 +732,6 @@ describe Snippet do
 
     with_them do
       it { is_expected.to eq result }
-    end
-  end
-
-  describe '#url_to_repo' do
-    subject { snippet.url_to_repo }
-
-    context 'with personal snippet' do
-      let(:snippet) { create(:personal_snippet) }
-
-      it { is_expected.to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + "snippets/#{snippet.id}.git") }
-    end
-
-    context 'with project snippet' do
-      let(:snippet) { create(:project_snippet) }
-
-      it { is_expected.to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + "#{snippet.project.full_path}/snippets/#{snippet.id}.git") }
     end
   end
 

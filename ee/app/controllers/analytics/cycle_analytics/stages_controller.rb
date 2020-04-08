@@ -53,7 +53,7 @@ module Analytics
       def duration_chart
         return render_403 unless can?(current_user, :read_group_stage, @group)
 
-        render json: Analytics::CycleAnalytics::DurationChartItemEntity.represent(data_collector.duration_chart_data)
+        render json: ::Analytics::CycleAnalytics::DurationChartItemEntity.represent(data_collector.duration_chart_data)
       end
 
       private
@@ -81,35 +81,35 @@ module Analytics
       end
 
       def stage
-        @stage ||= Analytics::CycleAnalytics::StageFinder.new(parent: @group, stage_id: params[:id]).execute
+        @stage ||= ::Analytics::CycleAnalytics::StageFinder.new(parent: @group, stage_id: params[:id]).execute
       end
 
       def cycle_analytics_configuration(stages)
         stage_presenters = stages.map { |s| StagePresenter.new(s) }
 
-        Analytics::CycleAnalytics::ConfigurationEntity.new(stages: stage_presenters)
+        ::Analytics::CycleAnalytics::ConfigurationEntity.new(stages: stage_presenters)
       end
 
       def list_service
-        Stages::ListService.new(parent: @group, current_user: current_user)
+        ::Analytics::CycleAnalytics::Stages::ListService.new(parent: @group, current_user: current_user)
       end
 
       def create_service
-        Stages::CreateService.new(parent: @group, current_user: current_user, params: create_params)
+        ::Analytics::CycleAnalytics::Stages::CreateService.new(parent: @group, current_user: current_user, params: create_params)
       end
 
       def update_service
-        Stages::UpdateService.new(parent: @group, current_user: current_user, params: update_params)
+        ::Analytics::CycleAnalytics::Stages::UpdateService.new(parent: @group, current_user: current_user, params: update_params)
       end
 
       def delete_service
-        Stages::DeleteService.new(parent: @group, current_user: current_user, params: delete_params)
+        ::Analytics::CycleAnalytics::Stages::DeleteService.new(parent: @group, current_user: current_user, params: delete_params)
       end
 
       def render_stage_service_result(result)
         if result.success?
           stage = StagePresenter.new(result.payload[:stage])
-          render json: Analytics::CycleAnalytics::StageEntity.new(stage), status: result.http_status
+          render json: ::Analytics::CycleAnalytics::StageEntity.new(stage), status: result.http_status
         else
           render json: { message: result.message, errors: result.payload[:errors] }, status: result.http_status
         end

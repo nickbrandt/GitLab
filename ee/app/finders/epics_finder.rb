@@ -55,7 +55,6 @@ class EpicsFinder < IssuableFinder
     items = init_collection
     items = by_created_at(items)
     items = by_updated_at(items)
-    items = by_search(items)
     items = by_author(items)
     items = by_timeframe(items)
     items = by_state(items)
@@ -63,6 +62,12 @@ class EpicsFinder < IssuableFinder
     items = by_parent(items)
     items = by_iids(items)
     items = starts_with_iid(items)
+
+    # This has to be last as we use a CTE as an optimization fence
+    # for counts by passing the force_cte param and enabling the
+    # attempt_group_search_optimizations feature flag
+    # https://www.postgresql.org/docs/current/static/queries-with.html
+    items = by_search(items)
 
     sort(items)
   end

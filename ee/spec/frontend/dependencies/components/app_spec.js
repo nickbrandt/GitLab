@@ -30,7 +30,7 @@ describe('DependenciesApp component', () => {
     addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
     jest.spyOn(store, 'dispatch').mockImplementation();
 
-    const canBeStubbed = component => !['GlTab', 'GlTabs'].includes(component);
+    const canBeStubbed = component => !['GlSprintf', 'GlTab', 'GlTabs'].includes(component);
     const stubs = Object.keys(DependenciesApp.components).filter(canBeStubbed);
 
     wrapper = mount(DependenciesApp, {
@@ -107,7 +107,7 @@ describe('DependenciesApp component', () => {
 
   const findHeader = () => wrapper.find('section > header');
   const findHeaderHelpLink = () => findHeader().find(GlLink);
-  const findHeaderJobLink = () => findHeader().find('a');
+  const findHeaderJobLink = () => wrapper.find({ ref: 'jobLink' });
 
   const expectComponentWithProps = (Component, props = {}) => {
     const componentWrapper = wrapper.find(Component);

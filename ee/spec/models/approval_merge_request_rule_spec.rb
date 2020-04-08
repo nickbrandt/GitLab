@@ -189,8 +189,12 @@ describe ApprovalMergeRequestRule do
 
     subject { described_class.applicable_to_branch(branch) }
 
-    context 'when there are no associated source rules' do
+    shared_examples_for 'with applicable rules to specified branch' do
       it { is_expected.to eq([rule]) }
+    end
+
+    context 'when there are no associated source rules' do
+      it_behaves_like 'with applicable rules to specified branch'
     end
 
     context 'when there are associated source rules' do
@@ -200,26 +204,45 @@ describe ApprovalMergeRequestRule do
         rule.update!(approval_project_rule: source_rule)
       end
 
-      context 'and there are no associated protected branches to source rule' do
-        it { is_expected.to eq([rule]) }
+      context 'and rule is not overridden' do
+        before do
+          rule.update!(
+            name: source_rule.name,
+            approvals_required: source_rule.approvals_required,
+            users: source_rule.users,
+            groups: source_rule.groups
+          )
+        end
+
+        context 'and there are no associated protected branches to source rule' do
+          it_behaves_like 'with applicable rules to specified branch'
+        end
+
+        context 'and there are associated protected branches to source rule' do
+          before do
+            source_rule.update!(protected_branches: protected_branches)
+          end
+
+          context 'and branch matches' do
+            let(:protected_branches) { [create(:protected_branch, name: branch)] }
+
+            it_behaves_like 'with applicable rules to specified branch'
+          end
+
+          context 'but branch does not match anything' do
+            let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
+
+            it { is_expected.to be_empty }
+          end
+        end
       end
 
-      context 'and there are associated protected branches to source rule' do
+      context 'but rule is overridden' do
         before do
-          source_rule.update!(protected_branches: protected_branches)
+          rule.update!(name: 'Overridden Rule')
         end
 
-        context 'and branch matches' do
-          let(:protected_branches) { [create(:protected_branch, name: branch)] }
-
-          it { is_expected.to eq([rule]) }
-        end
-
-        context 'but branch does not match anything' do
-          let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
-
-          it { is_expected.to be_empty }
-        end
+        it_behaves_like 'with applicable rules to specified branch'
       end
     end
   end
@@ -373,10 +396,10 @@ describe ApprovalMergeRequestRule do
     end
 
     context "when the rule is a `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` rule" do
-      subject { create(:report_approver_rule, :requires_approval, :license_management, merge_request: open_merge_request) }
+      subject { create(:report_approver_rule, :requires_approval, :license_scanning, merge_request: open_merge_request) }
 
       let(:open_merge_request) { create(:merge_request, :opened, target_project: project, source_project: project) }
-      let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
+      let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_scanning, project: project) }
       let(:project) { create(:project) }
       let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
       let!(:denied_policy) { create(:software_license_policy, project: project, software_license: license, classification: :denied) }

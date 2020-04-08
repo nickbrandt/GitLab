@@ -100,7 +100,7 @@ The "Gitaly relative path" is shown there, for example:
 This is the path under `/var/opt/gitlab/git-data/repositories/` on a
 default Omnibus installation.
 
-In a [Rails console](troubleshooting/debug.md#starting-a-rails-console),
+In a [Rails console](troubleshooting/debug.md#starting-a-rails-console-session),
 get this information using either the numeric project ID or the full path:
 
 ```ruby
@@ -112,7 +112,7 @@ Project.find_by_full_path('group/project').disk_path
 
 To translate from a hashed storage path to a project name:
 
-1. Start a [Rails console](troubleshooting/debug.md#starting-a-rails-console).
+1. Start a [Rails console](troubleshooting/debug.md#starting-a-rails-console-session).
 1. Run the following:
 
 ```ruby
@@ -162,7 +162,7 @@ either runs on the same machine as your repositories are located, or may login t
 to access data (for example, a remote backup solution).
 
 To schedule a complete rollout, see the
-[rake task documentation for storage migration][rake/migrate-to-hashed] for instructions.
+[Rake task documentation for storage migration][rake/migrate-to-hashed] for instructions.
 
 If you do have any existing integration, you may want to do a small rollout first,
 to validate. You can do so by specifying a range with the operation.
@@ -186,7 +186,7 @@ projects:
 1. Uncheck the **Use hashed storage paths for newly created and renamed projects** checkbox.
 
 To schedule a complete rollback, see the
-[rake task documentation for storage rollback](raketasks/storage.md#rollback-from-hashed-storage-to-legacy-storage) for instructions.
+[Rake task documentation for storage rollback](raketasks/storage.md#rollback-from-hashed-storage-to-legacy-storage) for instructions.
 
 The rollback task also supports specifying a range of Project IDs. Here is an example
 of limiting the rollout to Project IDs 50 to 100, in an Omnibus GitLab installation:
@@ -235,7 +235,7 @@ CI Artifacts are S3 compatible since **9.4** (GitLab Premium), and available in 
 
 ##### LFS Objects
 
-[LFS Objects in GitLab](lfs/manage_large_binaries_with_git_lfs.md) implement a similar
+[LFS Objects in GitLab](../topics/git/lfs/index.md) implement a similar
 storage pattern using 2 chars, 2 level folders, following Git's own implementation:
 
 ```ruby

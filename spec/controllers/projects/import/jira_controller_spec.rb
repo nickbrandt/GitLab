@@ -59,6 +59,7 @@ describe Projects::Import::JiraController do
     context 'when feature flag enabled' do
       before do
         stub_feature_flags(jira_issue_import: true)
+        stub_feature_flags(jira_issue_import_vue: false)
       end
 
       context 'when jira service is enabled for the project' do
@@ -66,29 +67,56 @@ describe Projects::Import::JiraController do
 
         context 'when running jira import first time' do
           context 'get show' do
-            it 'renders show template' do
-              allow(JIRA::Resource::Project).to receive(:all).and_return([])
+            before do
+              allow(JIRA::Resource::Project).to receive(:all).and_return(jira_projects)
+
               expect(project.import_state).to be_nil
 
               get :show, params: { namespace_id: project.namespace.to_param, project_id: project }
+            end
 
-              expect(response).to render_template :show
+            context 'when no projects have been retrieved from Jira' do
+              let(:jira_projects) { [] }
+
+              it 'render an error message' do
+                expect(flash[:alert]).to eq('No projects have been returned from Jira. Please check your Jira configuration.')
+                expect(response).to render_template(:show)
+              end
+            end
+
+            context 'when everything is ok' do
+              let(:jira_projects) { [double(name: 'FOO project', key: 'FOO')] }
+
+              it 'renders show template' do
+                expect(response).to render_template(:show)
+              end
             end
           end
 
           context 'post import' do
-            it 'creates import state' do
-              expect(project.import_state).to be_nil
+            context 'when jira project key is empty' do
+              it 'redirects back to show with an error' do
+                post :import, params: { namespace_id: project.namespace, project_id: project, jira_project_key: '' }
 
-              post :import, params: { namespace_id: project.namespace, project_id: project, jira_project_key: 'Test' }
+                expect(response).to redirect_to(project_import_jira_path(project))
+                expect(flash[:alert]).to eq('No jira project key has been provided.')
+              end
+            end
 
-              project.reload
+            context 'when everything is ok' do
+              it 'creates import state' do
+                expect(project.import_state).to be_nil
 
-              jira_project = project.import_data.data.dig('jira', 'projects').first
-              expect(project.import_type).to eq 'jira'
-              expect(project.import_state.status).to eq 'scheduled'
-              expect(jira_project['key']).to eq 'Test'
-              expect(response).to redirect_to(project_import_jira_path(project))
+                post :import, params: { namespace_id: project.namespace, project_id: project, jira_project_key: 'Test' }
+
+                project.reload
+
+                jira_project = project.import_data.data.dig('jira', 'projects').first
+                expect(project.import_type).to eq 'jira'
+                expect(project.import_state.status).to eq 'scheduled'
+                expect(jira_project['key']).to eq 'Test'
+                expect(response).to redirect_to(project_import_jira_path(project))
+              end
             end
           end
         end

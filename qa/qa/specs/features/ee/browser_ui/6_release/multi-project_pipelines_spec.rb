@@ -85,7 +85,7 @@ module QA
         end
 
         Page::Project::Pipeline::Show.perform do |show|
-          expect(show).to be_passed
+          expect(show).to have_passed
           expect(show).to have_no_job("downstream_job")
 
           show.click_linked_job(downstream_project_name)

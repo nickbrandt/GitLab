@@ -9,6 +9,7 @@ module EE
         end
 
         expose :source_rule, using: MergeRequestApprovalRule::SourceRule
+        expose :overridden?, as: :overridden
       end
     end
   end

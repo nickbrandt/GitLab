@@ -87,8 +87,8 @@ Use the following job in `.gitlab-ci.yml`. This includes the `artifacts:paths` k
 ruby:
   stage: test
   script:
-  - bundle install
-  - rspec spec/lib/ --format RspecJunitFormatter --out rspec.xml
+    - bundle install
+    - rspec spec/lib/ --format RspecJunitFormatter --out rspec.xml
   artifacts:
     paths:
       - rspec.xml
@@ -105,8 +105,8 @@ Use the following job in `.gitlab-ci.yml`:
 golang:
   stage: test
   script:
-  - go get -u github.com/jstemmer/go-junit-report
-  - go test -v 2>&1 | go-junit-report > report.xml
+    - go get -u github.com/jstemmer/go-junit-report
+    - go test -v 2>&1 | go-junit-report > report.xml
   artifacts:
     reports:
       junit: report.xml
@@ -127,7 +127,7 @@ matching by defining the following path: `build/test-results/test/**/TEST-*.xml`
 java:
   stage: test
   script:
-  - gradle test
+    - gradle test
   artifacts:
     reports:
       junit: build/test-results/test/**/TEST-*.xml
@@ -143,12 +143,27 @@ reports, use the following job in `.gitlab-ci.yml`:
 java:
   stage: test
   script:
-  - mvn verify
+    - mvn verify
   artifacts:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
         - target/failsafe-reports/TEST-*.xml
+```
+
+### Python example
+
+This example uses pytest with the `--junitxml=report.xml` flag to format the output
+for JUnit:
+
+```yaml
+pytest:
+  stage: test
+  script:
+    - pytest --junitxml=report.xml
+  artifacts:
+    reports:
+      junit: report.xml
 ```
 
 ### C/C++ example
@@ -166,7 +181,7 @@ will then be aggregated together.
 cpp:
   stage: test
   script:
-  - gtest.exe --gtest_output="xml:report.xml"
+    - gtest.exe --gtest_output="xml:report.xml"
   artifacts:
     reports:
       junit: report.xml
@@ -195,7 +210,7 @@ Test:
       - ./**/*test-result.xml
     reports:
       junit:
-       - ./**/*test-result.xml
+        - ./**/*test-result.xml
 ```
 
 ## Limitations
@@ -224,7 +239,7 @@ with failed showing at the top, skipped next and successful cases last.
 
 This feature comes with the `:junit_pipeline_view` feature flag disabled by default. This
 feature is disabled due to some performance issues with very large data sets.
-When [the performance issue](https://gitlab.com/gitlab-org/gitlab/issues/37725) is resolved, the feature will be enabled by default.
+When [the performance is improved](https://gitlab.com/groups/gitlab-org/-/epics/2854), the feature will be enabled by default.
 
 To enable this feature, ask a GitLab administrator with Rails console access to run the
 following command:

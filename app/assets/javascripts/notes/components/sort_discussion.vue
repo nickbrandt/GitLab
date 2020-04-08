@@ -1,7 +1,10 @@
+gs
 <script>
 import { GlIcon } from '@gitlab/ui';
 import { mapActions, mapGetters } from 'vuex';
 import { __ } from '~/locale';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
+import Tracking from '~/tracking';
 import { ASC, DESC } from '../constants';
 
 const SORT_OPTIONS = [
@@ -13,14 +16,19 @@ export default {
   SORT_OPTIONS,
   components: {
     GlIcon,
+    LocalStorageSync,
   },
+  mixins: [Tracking.mixin()],
   computed: {
-    ...mapGetters(['sortDirection']),
+    ...mapGetters(['sortDirection', 'noteableType']),
     selectedOption() {
       return SORT_OPTIONS.find(({ key }) => this.sortDirection === key);
     },
     dropdownText() {
       return this.selectedOption.text;
+    },
+    storageKey() {
+      return `sort_direction_${this.noteableType.toLowerCase()}`;
     },
   },
   methods: {
@@ -31,6 +39,7 @@ export default {
       }
 
       this.setDiscussionSortDirection(direction);
+      this.track('change_discussion_sort_direction', { property: direction });
     },
     isDropdownItemActive(sortDir) {
       return sortDir === this.sortDirection;
@@ -41,6 +50,11 @@ export default {
 
 <template>
   <div class="mr-2 d-inline-block align-bottom full-width-mobile">
+    <local-storage-sync
+      :value="sortDirection"
+      :storage-key="storageKey"
+      @input="setDiscussionSortDirection"
+    />
     <button class="btn btn-sm js-dropdown-text" data-toggle="dropdown" aria-expanded="false">
       {{ dropdownText }}
       <gl-icon name="chevron-down" />

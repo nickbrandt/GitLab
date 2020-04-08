@@ -289,12 +289,12 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
 
       context 'unused tracked IDs' do
         context 'with an orphaned registry' do
-          let!(:orphaned) { create(:geo_job_artifact_registry, artifact_id: 1234567) }
+          let!(:orphaned) { create(:geo_job_artifact_registry, artifact_id: non_existing_record_id) }
 
           it 'includes tracked IDs that do not exist in the model table' do
-            _, unused_tracked_ids = subject.find_registry_differences(1234567..1234567)
+            _, unused_tracked_ids = subject.find_registry_differences(non_existing_record_id..non_existing_record_id)
 
-            expect(unused_tracked_ids).to match_array([1234567])
+            expect(unused_tracked_ids).to match_array([non_existing_record_id])
           end
 
           it 'excludes IDs outside the ID range' do

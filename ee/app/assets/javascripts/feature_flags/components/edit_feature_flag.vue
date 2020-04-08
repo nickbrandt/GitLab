@@ -36,10 +36,12 @@ export default {
       'name',
       'description',
       'scopes',
+      'strategies',
       'isLoading',
       'hasError',
       'iid',
       'active',
+      'version',
     ]),
     title() {
       return this.iid
@@ -80,10 +82,12 @@ export default {
         :name="name"
         :description="description"
         :scopes="scopes"
+        :strategies="strategies"
         :cancel-path="path"
         :submit-text="__('Save changes')"
         :environments-endpoint="environmentsEndpoint"
         :active="active"
+        :version="version"
         @handleSubmit="data => updateFeatureFlag(data)"
       />
     </template>

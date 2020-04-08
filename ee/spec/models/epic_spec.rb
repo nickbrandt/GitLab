@@ -19,6 +19,17 @@ describe Epic do
     it { is_expected.to have_many(:user_mentions).class_name("EpicUserMention") }
   end
 
+  describe 'scopes' do
+    describe '.public_only' do
+      it 'only returns public epics' do
+        public_epic = create(:epic)
+        create(:epic, confidential: true)
+
+        expect(described_class.public_only).to eq([public_epic])
+      end
+    end
+  end
+
   describe 'validations' do
     subject { build(:epic) }
 
@@ -34,6 +45,41 @@ describe Epic do
 
     it 'is not valid with invalid parent' do
       epic = build(:epic, group: group, parent: create(:epic))
+
+      expect(epic).not_to be_valid
+    end
+
+    it 'is valid if epic is confidential and has only confidential issues' do
+      issue = create(:issue, :confidential)
+      epic = create(:epic_issue, issue: issue).epic
+
+      epic.confidential = true
+
+      expect(epic).to be_valid
+    end
+
+    it 'is not valid if epic is confidential and has not-confidential issues' do
+      epic = create(:epic_issue).epic
+
+      epic.confidential = true
+
+      expect(epic).not_to be_valid
+    end
+
+    it 'is valid if epic is confidential and has only confidential subepics' do
+      epic = create(:epic, group: group)
+      create(:epic, :confidential, parent: epic, group: group)
+
+      epic.confidential = true
+
+      expect(epic).to be_valid
+    end
+
+    it 'is not valid if epic is confidential and has not-confidential subepics' do
+      epic = create(:epic, group: group)
+      create(:epic, parent: epic, group: group)
+
+      epic.confidential = true
 
       expect(epic).not_to be_valid
     end

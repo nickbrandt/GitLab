@@ -15,4 +15,16 @@ class EpicIssue < ApplicationRecord
 
   scope :in_epic, ->(epic_id) { where(epic_id: epic_id) }
   scope :related_issues_for_batches, ->(epic_ids) { select(:id, :relative_position).where(epic_id: epic_ids) }
+
+  validate :validate_confidential_epic
+
+  private
+
+  def validate_confidential_epic
+    return unless epic && issue
+
+    if epic.confidential? && !issue.confidential?
+      errors.add :issue, _('Cannot set confidential epic for not-confidential issue')
+    end
+  end
 end

@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlIcon, GlIntersectionObserver } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 import { n__, __ } from '~/locale';
@@ -8,6 +8,8 @@ import { DESIGN_ROUTE_NAME } from '../../router/constants';
 export default {
   components: {
     GlLoadingIcon,
+    GlIntersectionObserver,
+    GlIcon,
     Icon,
     Timeago,
   },
@@ -42,10 +44,17 @@ export default {
       required: false,
       default: true,
     },
+    imageV432x230: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
       imageLoading: true,
+      imageError: false,
+      isInView: false,
     };
   },
   computed: {
@@ -74,13 +83,31 @@ export default {
     notesLabel() {
       return n__('%d comment', '%d comments', this.notesCount);
     },
+    imageLink() {
+      return this.isInView ? this.imageV432x230 || this.image : '';
+    },
     showLoadingSpinner() {
       return this.imageLoading || this.isUploading;
+    },
+    showImageErrorIcon() {
+      return this.imageError && this.isInView;
+    },
+    showImage() {
+      return !this.showLoadingSpinner && !this.showImageErrorIcon;
     },
   },
   methods: {
     onImageLoad() {
       this.imageLoading = false;
+      this.imageError = false;
+    },
+    onImageError() {
+      this.imageLoading = false;
+      this.imageError = true;
+    },
+    onAppear() {
+      this.isInView = true;
+      this.imageLoading = true;
     },
   },
   DESIGN_ROUTE_NAME,
@@ -102,15 +129,24 @@ export default {
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
-      <gl-loading-icon v-show="showLoadingSpinner" size="md" />
-      <img
-        v-show="!showLoadingSpinner"
-        :src="image"
-        :alt="filename"
-        class="block ml-auto mr-auto mw-100 mh-100 design-img"
-        data-qa-selector="design_image"
-        @load="onImageLoad"
-      />
+      <gl-intersection-observer @appear="onAppear">
+        <gl-loading-icon v-if="showLoadingSpinner" size="md" />
+        <gl-icon
+          v-else-if="showImageErrorIcon"
+          name="media-broken"
+          class="text-secondary"
+          :size="32"
+        />
+        <img
+          v-show="showImage"
+          :src="imageLink"
+          :alt="filename"
+          class="block mx-auto mw-100 mh-100 design-img"
+          data-qa-selector="design_image"
+          @load="onImageLoad"
+          @error="onImageError"
+        />
+      </gl-intersection-observer>
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">

@@ -29,7 +29,6 @@ export default () => ({
 
   stages: [],
   summary: [],
-  labels: [],
   topRankedLabels: [],
   medians: {},
 

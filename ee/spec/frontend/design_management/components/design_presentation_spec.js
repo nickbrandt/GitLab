@@ -31,6 +31,58 @@ describe('Design management design presentation component', () => {
     wrapper.setData(data);
   }
 
+  /**
+   * Spy on $refs and mock given values
+   * @param {Object} viewportDimensions {width, height}
+   * @param {Object} childDimensions {width, height}
+   * @param {Float} scrollTopPerc 0 < x < 1
+   * @param {Float} scrollLeftPerc  0 < x < 1
+   */
+  function mockRefDimensions(
+    ref,
+    viewportDimensions,
+    childDimensions,
+    scrollTopPerc,
+    scrollLeftPerc,
+  ) {
+    jest.spyOn(ref, 'scrollWidth', 'get').mockReturnValue(childDimensions.width);
+    jest.spyOn(ref, 'scrollHeight', 'get').mockReturnValue(childDimensions.height);
+    jest.spyOn(ref, 'offsetWidth', 'get').mockReturnValue(viewportDimensions.width);
+    jest.spyOn(ref, 'offsetHeight', 'get').mockReturnValue(viewportDimensions.height);
+    jest
+      .spyOn(ref, 'scrollLeft', 'get')
+      .mockReturnValue((childDimensions.width - viewportDimensions.width) * scrollLeftPerc);
+    jest
+      .spyOn(ref, 'scrollTop', 'get')
+      .mockReturnValue((childDimensions.height - viewportDimensions.height) * scrollTopPerc);
+  }
+
+  function clickDragExplore(startCoords, endCoords, { useTouchEvents } = {}) {
+    const event = useTouchEvents
+      ? {
+          mousedown: 'touchstart',
+          mousemove: 'touchmove',
+          mouseup: 'touchend',
+        }
+      : {
+          mousedown: 'mousedown',
+          mousemove: 'mousemove',
+          mouseup: 'mouseup',
+        };
+
+    wrapper.trigger(event.mousedown, {
+      clientX: startCoords.clientX,
+      clientY: startCoords.clientY,
+    });
+    return wrapper.vm.$nextTick().then(() => {
+      wrapper.trigger(event.mousemove, {
+        clientX: endCoords.clientX,
+        clientY: endCoords.clientY,
+      });
+      return wrapper.vm.$nextTick();
+    });
+  }
+
   afterEach(() => {
     wrapper.destroy();
   });
@@ -76,7 +128,7 @@ describe('Design management design presentation component', () => {
   });
 
   describe('currentCommentForm', () => {
-    it('currentCommentForm is null when isAnnotating is false', () => {
+    it('is null when isAnnotating is false', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -91,7 +143,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is null when isAnnotating is true but annotation position is falsey', () => {
+    it('is null when isAnnotating is true but annotation position is falsey', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -107,7 +159,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is equal to current annotation position when isAnnotating is true', () => {
+    it('is equal to current annotation position when isAnnotating is true', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -124,6 +176,7 @@ describe('Design management design presentation component', () => {
           },
         },
       );
+
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.currentCommentForm).toEqual({
           x: 1,
@@ -190,39 +243,6 @@ describe('Design management design presentation component', () => {
   });
 
   describe('getViewportCenter', () => {
-    /**
-     * Spy on $refs.presentationViewport with given values
-     * @param {Object} viewportDimensions {width, height}
-     * @param {Object} childDimensions {width, height}
-     * @param {Float} scrollTopPerc 0 < x < 1
-     * @param {Float} scrollLeftPerc  0 < x < 1
-     */
-    const spyOnPresentationViewport = (
-      viewportDimensions,
-      childDimensions,
-      scrollTopPerc,
-      scrollLeftPerc,
-    ) => {
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'scrollWidth', 'get')
-        .mockReturnValue(childDimensions.width);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'scrollHeight', 'get')
-        .mockReturnValue(childDimensions.height);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get')
-        .mockReturnValue(viewportDimensions.width);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get')
-        .mockReturnValue(viewportDimensions.height);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'scrollLeft', 'get')
-        .mockReturnValue((childDimensions.width - viewportDimensions.width) * scrollLeftPerc);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationViewport, 'scrollTop', 'get')
-        .mockReturnValue((childDimensions.height - viewportDimensions.height) * scrollTopPerc);
-    };
-
     beforeEach(() => {
       createComponent(
         {
@@ -234,7 +254,13 @@ describe('Design management design presentation component', () => {
     });
 
     it('calculate center correctly with no scroll', () => {
-      spyOnPresentationViewport({ width: 10, height: 10 }, { width: 20, height: 20 }, 0, 0);
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationViewport,
+        { width: 10, height: 10 },
+        { width: 20, height: 20 },
+        0,
+        0,
+      );
 
       expect(wrapper.vm.getViewportCenter()).toEqual({
         x: 5,
@@ -243,7 +269,13 @@ describe('Design management design presentation component', () => {
     });
 
     it('calculate center correctly with some scroll', () => {
-      spyOnPresentationViewport({ width: 10, height: 10 }, { width: 20, height: 20 }, 0.5, 0.5);
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationViewport,
+        { width: 10, height: 10 },
+        { width: 20, height: 20 },
+        0.5,
+        0.5,
+      );
 
       expect(wrapper.vm.getViewportCenter()).toEqual({
         x: 10,
@@ -252,7 +284,13 @@ describe('Design management design presentation component', () => {
     });
 
     it('Returns default case if no overflow (scrollWidth==offsetWidth, etc.)', () => {
-      spyOnPresentationViewport({ width: 20, height: 20 }, { width: 20, height: 20 }, 0.5, 0.5);
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationViewport,
+        { width: 20, height: 20 },
+        { width: 20, height: 20 },
+        0.5,
+        0.5,
+      );
 
       expect(wrapper.vm.getViewportCenter()).toEqual({
         x: 10,
@@ -262,7 +300,7 @@ describe('Design management design presentation component', () => {
   });
 
   describe('scaleZoomFocalPoint', () => {
-    it('scaleZoomFocalPoint scales focal point correctly when zooming in', () => {
+    it('scales focal point correctly when zooming in', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -288,7 +326,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('scaleZoomFocalPoint scales focal point correctly when zooming out', () => {
+    it('scales focal point correctly when zooming out', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -343,6 +381,79 @@ describe('Design management design presentation component', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.scaleZoomFocalPoint).toHaveBeenCalled();
         expect(wrapper.vm.scrollToFocalPoint).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('onPresentationMousedown', () => {
+    it.each`
+      scenario                        | width  | height
+      ${'width overflows'}            | ${101} | ${100}
+      ${'height overflows'}           | ${100} | ${101}
+      ${'width and height overflows'} | ${200} | ${200}
+    `('sets lastDragPosition when design $scenario', ({ width, height }) => {
+      createComponent();
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationContainer,
+        { width: 100, height: 100 },
+        { width, height },
+      );
+
+      const newLastDragPosition = { x: 2, y: 2 };
+      wrapper.vm.onPresentationMousedown({
+        clientX: newLastDragPosition.x,
+        clientY: newLastDragPosition.y,
+      });
+
+      expect(wrapper.vm.lastDragPosition).toStrictEqual(newLastDragPosition);
+    });
+
+    it('does not set lastDragPosition if design does not overflow', () => {
+      const lastDragPosition = { x: 1, y: 1 };
+
+      createComponent({}, { lastDragPosition });
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationContainer,
+        { width: 100, height: 100 },
+        { width: 50, height: 50 },
+      );
+
+      wrapper.vm.onPresentationMousedown({ clientX: 2, clientY: 2 });
+
+      // check lastDragPosition is unchanged
+      expect(wrapper.vm.lastDragPosition).toStrictEqual(lastDragPosition);
+    });
+  });
+
+  describe('when clicking and dragging', () => {
+    it.each`
+      description               | useTouchEvents
+      ${'with touch events'}    | ${true}
+      ${'without touch events'} | ${false}
+    `('calls scrollTo with correct arguments $description', ({ useTouchEvents }) => {
+      createComponent(
+        {
+          image: 'test.jpg',
+          imageName: 'test',
+        },
+        mockOverlayData,
+      );
+      mockRefDimensions(
+        wrapper.vm.$refs.presentationContainer,
+        { width: 10, height: 10 },
+        { width: 20, height: 20 },
+        0,
+        0,
+      );
+
+      wrapper.element.scrollTo = jest.fn();
+      return clickDragExplore(
+        { clientX: 0, clientY: 0 },
+        { clientX: 10, clientY: 10 },
+        { useTouchEvents },
+      ).then(() => {
+        expect(wrapper.element.scrollTo).toHaveBeenCalledTimes(1);
+        expect(wrapper.element.scrollTo).toHaveBeenCalledWith(-10, -10);
       });
     });
   });

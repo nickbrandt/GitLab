@@ -53,14 +53,14 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   enum report_type: {
     security: 1,
-    license_management: 2
+    license_scanning: 2
   }
 
   # Deprecated scope until code_owner column has been migrated to rule_type
   # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
   scope :code_owner, -> { where(code_owner: true).or(where(rule_type: :code_owner)) }
   scope :security_report, -> { report_approver.where(report_type: :security) }
-  scope :license_compliance, -> { report_approver.where(report_type: :license_management) }
+  scope :license_compliance, -> { report_approver.where(report_type: :license_scanning) }
   scope :with_head_pipeline, -> { includes(merge_request: [:head_pipeline]) }
   scope :open_merge_requests, -> { merge(MergeRequest.opened) }
   scope :for_checks_that_can_be_refreshed, -> { license_compliance.open_merge_requests.with_head_pipeline }
@@ -75,8 +75,9 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   def self.applicable_to_branch(branch)
-    includes(approval_project_rule: :protected_branches).select do |rule|
+    includes(:users, :groups, approval_project_rule: [:users, :groups, :protected_branches]).select do |rule|
       next true unless rule.approval_project_rule.present?
+      next true if rule.overridden?
 
       rule.approval_project_rule.applies_to_branch?(branch)
     end
@@ -136,7 +137,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   def refresh_required_approvals!(project_approval_rule)
     return unless report_approver?
 
-    refresh_license_management_approvals(project_approval_rule) if license_management?
+    refresh_license_scanning_approvals(project_approval_rule) if license_scanning?
   end
 
   private
@@ -148,7 +149,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
     errors.add(:approval_project_rule, 'must be for the same project')
   end
 
-  def refresh_license_management_approvals(project_approval_rule)
+  def refresh_license_scanning_approvals(project_approval_rule)
     license_report = merge_request.head_pipeline&.license_scanning_report
     return if license_report.blank?
 

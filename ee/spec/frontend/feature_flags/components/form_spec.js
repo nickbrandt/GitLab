@@ -1,13 +1,16 @@
 import _ from 'underscore';
 import { shallowMount } from '@vue/test-utils';
-import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
+import { GlFormTextarea, GlFormCheckbox, GlDeprecatedButton } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
+import Strategy from 'ee/feature_flags/components/strategy.vue';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
   INTERNAL_ID_PREFIX,
   DEFAULT_PERCENT_ROLLOUT,
+  LEGACY_FLAG,
+  NEW_VERSION_FLAG,
 } from 'ee/feature_flags/constants';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import { featureFlag } from '../mock_data';
@@ -26,6 +29,7 @@ describe('feature flag form', () => {
       provide: {
         glFeatures: {
           featureFlagPermissions: true,
+          featureFlagsNewVersion: true,
         },
       },
     });
@@ -100,6 +104,7 @@ describe('feature flag form', () => {
         name: featureFlag.name,
         description: featureFlag.description,
         active: true,
+        version: LEGACY_FLAG,
         scopes: [
           {
             id: 1,
@@ -377,6 +382,62 @@ describe('feature flag form', () => {
               },
             ]);
           });
+      });
+    });
+  });
+
+  describe('with strategies', () => {
+    beforeEach(() => {
+      factory({
+        ...requiredProps,
+        name: featureFlag.name,
+        description: featureFlag.description,
+        active: true,
+        version: NEW_VERSION_FLAG,
+        strategies: [
+          {
+            type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+            paramters: { percentage: '30' },
+            scopes: [],
+          },
+          {
+            type: ROLLOUT_STRATEGY_ALL_USERS,
+            paramters: {},
+            scopes: [{ environment_scope: 'review/*' }],
+          },
+        ],
+      });
+    });
+
+    it('should show the strategy component', () => {
+      const strategy = wrapper.find(Strategy);
+      expect(strategy.exists()).toBe(true);
+      expect(strategy.props('strategy')).toEqual({
+        type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+        paramters: { percentage: '30' },
+        scopes: [],
+      });
+    });
+
+    it('should show one strategy component per strategy', () => {
+      expect(wrapper.findAll(Strategy)).toHaveLength(2);
+    });
+
+    it('should add a strategy when clicking the Add button', () => {
+      wrapper.find(GlDeprecatedButton).vm.$emit('click');
+      return wrapper.vm.$nextTick().then(() => expect(wrapper.findAll(Strategy)).toHaveLength(3));
+    });
+
+    it('should remove a strategy on delete', () => {
+      const strategy = {
+        type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+        paramters: { percentage: '30' },
+        scopes: [],
+      };
+      wrapper.find(Strategy).vm.$emit('delete');
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.findAll(Strategy)).toHaveLength(1);
+        expect(wrapper.find(Strategy).props('strategy')).not.toEqual(strategy);
       });
     });
   });

@@ -75,7 +75,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
           # this not does not have actual mentions
           let!(:note4) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
           # this not points to an innexistent noteable record in desigs table
-          let!(:note5) { notes.create!(noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
+          let!(:note5) { notes.create!(noteable_id: non_existing_record_id, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
 
           it_behaves_like 'resource notes mentions migration', MigrateEpicNotesMentionsToDb, Epic
         end
@@ -96,7 +96,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
       # this not does not have actual mentions
       let!(:note4) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
       # this not points to an innexistent noteable record in desigs table
-      let!(:note5) { notes.create!(noteable_id: designs.maximum(:id) + 10, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
+      let!(:note5) { notes.create!(noteable_id: non_existing_record_id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
 
       let(:user_mentions) { design_user_mentions }
       let(:resource) { design }

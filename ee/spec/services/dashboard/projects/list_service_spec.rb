@@ -3,14 +3,11 @@
 require 'spec_helper'
 
 describe Dashboard::Projects::ListService do
-  PUBLIC = Gitlab::VisibilityLevel::PUBLIC
-  PRIVATE = Gitlab::VisibilityLevel::PRIVATE
-
   let!(:license) { create(:license, plan: License::ULTIMATE_PLAN) }
 
   let(:user) { create(:user) }
-  let(:project) { create(:project, namespace: namespace, visibility_level: PRIVATE) }
-  let(:namespace) { create(:namespace, visibility_level: PRIVATE) }
+  let(:project) { create(:project, namespace: namespace, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
+  let(:namespace) { create(:namespace, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
   let(:service) { described_class.new(user, feature: :operations_dashboard) }
 
   describe '#execute' do
@@ -131,14 +128,17 @@ describe Dashboard::Projects::ListService do
       using RSpec::Parameterized::TableSyntax
 
       where(:check_namespace_plan, :project_visibility, :namespace_visibility, :available) do
-        true  | PUBLIC  | PUBLIC  | true
-        true  | PRIVATE | PUBLIC  | false
-        true  | PUBLIC  | PRIVATE | false
-        true  | PRIVATE | PRIVATE | false
-        false | PUBLIC  | PUBLIC  | true
-        false | PRIVATE | PUBLIC  | true
-        false | PUBLIC  | PRIVATE | true
-        false | PRIVATE | PRIVATE | true
+        public_visibility = Gitlab::VisibilityLevel::PUBLIC
+        private_visibility = Gitlab::VisibilityLevel::PRIVATE
+
+        true  | public_visibility  | public_visibility  | true
+        true  | private_visibility | public_visibility  | false
+        true  | public_visibility  | private_visibility | false
+        true  | private_visibility | private_visibility | false
+        false | public_visibility  | public_visibility  | true
+        false | private_visibility | public_visibility  | true
+        false | public_visibility  | private_visibility | true
+        false | private_visibility | private_visibility | true
       end
 
       with_them do

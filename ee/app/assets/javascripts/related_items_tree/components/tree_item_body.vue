@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTooltipDirective, GlModalDirective, GlLink, GlButton } from '@gitlab/ui';
+import { GlTooltipDirective, GlModalDirective, GlLink, GlDeprecatedButton } from '@gitlab/ui';
 import _ from 'underscore';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
@@ -20,7 +20,7 @@ export default {
   components: {
     Icon,
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     StateTooltip,
     ItemMilestone,
     ItemAssignees,
@@ -195,7 +195,7 @@ export default {
             class="item-assignees d-inline-flex align-items-center align-self-end ml-0 ml-md-2 mt-2 mt-md-0 mt-xl-0 mr-xl-1 mb-md-0 order-2 flex-xl-grow-0"
           />
         </div>
-        <gl-button
+        <gl-deprecated-button
           v-if="parentItem.userPermissions.adminEpic"
           v-gl-tooltip.hover
           v-gl-modal-directive="$options.itemRemoveModalId"
@@ -205,7 +205,7 @@ export default {
           @click="handleRemoveClick"
         >
           <icon :size="16" name="close" class="btn-item-remove-icon" />
-        </gl-button>
+        </gl-deprecated-button>
         <span v-if="showEmptySpacer" class="p-3"></span>
       </div>
     </div>

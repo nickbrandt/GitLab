@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 import App from 'ee/approvals/components/app.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
@@ -25,7 +25,7 @@ describe('EE Approvals App', () => {
       store: new Vuex.Store(store),
     });
   };
-  const findAddButton = () => wrapper.find(GlButton);
+  const findAddButton = () => wrapper.find(GlDeprecatedButton);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findRules = () => wrapper.find(`.${TEST_RULES_CLASS}`);
 
@@ -45,6 +45,49 @@ describe('EE Approvals App', () => {
 
     jest.spyOn(store.modules.approvals.actions, 'fetchRules');
     jest.spyOn(store.modules.createModal.actions, 'open');
+  });
+
+  describe('targetBranch', () => {
+    const targetBranchName = 'development';
+
+    beforeEach(() => {
+      store.state.settings.mrCreateTargetBranch = targetBranchName;
+    });
+
+    it('passes the target branch name in fetchRules for MR create path', () => {
+      store.state.settings.prefix = 'mr-edit';
+      store.state.settings.mrSettingsPath = null;
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        targetBranchName,
+        undefined,
+      );
+    });
+
+    it('does not pass the target branch name in fetchRules for MR edit path', () => {
+      store.state.settings.prefix = 'mr-edit';
+      store.state.settings.mrSettingsPath = 'some/path';
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        null,
+        undefined,
+      );
+    });
+
+    it('does not pass the target branch name in fetchRules for project settings path', () => {
+      store.state.settings.prefix = 'project-settings';
+      factory();
+
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledWith(
+        expect.anything(),
+        null,
+        undefined,
+      );
+    });
   });
 
   describe('when allow multi rule', () => {

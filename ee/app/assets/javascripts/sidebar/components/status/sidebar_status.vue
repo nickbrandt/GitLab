@@ -31,6 +31,6 @@ export default {
     :is-editable="mediator.store.editable"
     :is-fetching="mediator.store.isFetching.status"
     :status="mediator.store.status"
-    @onFormSubmit="handleFormSubmission"
+    @onStatusChange="handleFormSubmission"
   />
 </template>

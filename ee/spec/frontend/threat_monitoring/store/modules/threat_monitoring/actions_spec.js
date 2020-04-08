@@ -16,16 +16,6 @@ const environmentsEndpoint = 'environmentsEndpoint';
 const wafStatisticsEndpoint = 'wafStatisticsEndpoint';
 const networkPolicyStatisticsEndpoint = 'networkPolicyStatisticsEndpoint';
 
-const stubFeatureFlags = features => {
-  beforeEach(() => {
-    window.gon.features = features;
-  });
-
-  afterEach(() => {
-    delete window.gon.features;
-  });
-};
-
 describe('Threat Monitoring actions', () => {
   let state;
 
@@ -208,58 +198,32 @@ describe('Threat Monitoring actions', () => {
   describe('setCurrentEnvironmentId', () => {
     const environmentId = 1;
 
-    it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF fetch action', () =>
+    it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF and Network Policy fetch actions', () =>
       testAction(
         actions.setCurrentEnvironmentId,
         environmentId,
         state,
         [{ type: types.SET_CURRENT_ENVIRONMENT_ID, payload: environmentId }],
-        [{ type: 'threatMonitoringWaf/fetchStatistics', payload: null }],
+        [
+          { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
+          { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
+        ],
       ));
-
-    describe('given the networkPolicyUi feature flag is enabled', () => {
-      stubFeatureFlags({ networkPolicyUi: true });
-
-      it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF and Network Policy fetch actions', () =>
-        testAction(
-          actions.setCurrentEnvironmentId,
-          environmentId,
-          state,
-          [{ type: types.SET_CURRENT_ENVIRONMENT_ID, payload: environmentId }],
-          [
-            { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
-            { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
-          ],
-        ));
-    });
   });
 
   describe('setCurrentTimeWindow', () => {
     const timeWindow = { name: 'foo' };
 
-    it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF fetch action', () =>
+    it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF and Network Policy fetch actions', () =>
       testAction(
         actions.setCurrentTimeWindow,
         timeWindow,
         state,
         [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow.name }],
-        [{ type: 'threatMonitoringWaf/fetchStatistics', payload: null }],
+        [
+          { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
+          { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
+        ],
       ));
-
-    describe('given the networkPolicyUi feature flag is enabled', () => {
-      stubFeatureFlags({ networkPolicyUi: true });
-
-      it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF and Network Policy fetch actions', () =>
-        testAction(
-          actions.setCurrentTimeWindow,
-          timeWindow,
-          state,
-          [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow.name }],
-          [
-            { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
-            { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
-          ],
-        ));
-    });
   });
 });

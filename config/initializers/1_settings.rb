@@ -210,6 +210,7 @@ Gitlab.ee do
   Settings.gitlab['mirror_max_delay'] ||= 300
   Settings.gitlab['mirror_max_capacity'] ||= 30
   Settings.gitlab['mirror_capacity_threshold'] ||= 15
+  Settings.gitlab['seat_link_enabled'] = true if Settings.gitlab['seat_link_enabled'].nil?
 end
 
 #
@@ -551,6 +552,9 @@ Gitlab.ee do
   Settings.cron_jobs['sync_seat_link_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['sync_seat_link_worker']['cron'] ||= "#{rand(60)} 0 * * *"
   Settings.cron_jobs['sync_seat_link_worker']['job_class'] = 'SyncSeatLinkWorker'
+  Settings.cron_jobs['users_create_statistics_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['users_create_statistics_worker']['cron'] ||= '2 15 * * *'
+  Settings.cron_jobs['users_create_statistics_worker']['job_class'] = 'Users::CreateStatisticsWorker'
 end
 
 #

@@ -64,11 +64,14 @@ source projects, GitLab grants access to **Gold** features for all GitLab.com
 
 #### Self-managed
 
-A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. For instances that aren't air-gapped or on a closed network, the maximum number of simultaneous users in the self-managed installation is checked each quarter, using [Seat Link](#seat-link).
+A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. For instances that aren't offline or on a closed network, the maximum number of simultaneous users in the self-managed installation is checked each quarter, using [Seat Link](#seat-link).
 
 Every occupied seat, whether by person, job, or bot is counted in the subscription, with the following exceptions:
 
-- Blocked users who are blocked prior to the renewal of a subscription won't be counted as active users for the renewal subscription. They may count as active users in the subscription period in which they were originally added.
+- [Deactivated](../user/admin_area/activating_deactivating_users.md#deactivating-a-user) and
+[blocked](../user/admin_area/blocking_unblocking_users.md) users who are restricted prior to the
+renewal of a subscription won't be counted as active users for the renewal subscription. They may
+count as active users in the subscription period in which they were originally added.
 - Members with Guest permissions on an Ultimate subscription.
 - GitLab-created service accounts: `Ghost User` and `Support Bot`.
 
@@ -170,7 +173,7 @@ To see the status of your GitLab.com subscription, log into GitLab.com and go to
   1. Go to **User Avatar > Settings**.
   1. Click **Billing**.
 - For groups:
-  1. From the group page (*not* from a project within the group), go to **Settings > Billing**.
+  1. From the group page (*not* from a project within the group), go to **Administration > Billing**.
 
 The following table describes details of your subscription for groups:
 
@@ -245,13 +248,14 @@ Seat Link allows us to provide our self-managed customers with prorated charges 
 
 Seat Link sends to GitLab daily a count of all users in connected self-managed instances. That information is used to automate prorated reconciliations. The data is sent securely through an encrypted HTTPS connection.
 
-Seat Link is mandatory because we need the user count data to enable prorated billing. Seat Link provides **only** the following information to GitLab:
+Seat Link provides **only** the following information to GitLab:
 
 - Date
 - License key
 - Historical maximum user count
+- Active users count
 
-For air-gapped or closed network customers, the existing [true-up model](#users-over-license) will be used. Prorated charges are not possible without user count data.
+For offline or closed network customers, the existing [true-up model](#users-over-license) will be used. Prorated charges are not possible without user count data.
 
 <details>
 <summary>Click here to view example content of a Seat Link POST request.</summary>
@@ -293,11 +297,41 @@ TjJ4eVlVUkdkWEJtDQpkSHByYWpreVJrcG9UVlo0Y0hKSU9URndiV2RzVFdO
 VlhHNXRhVmszTkV0SVEzcEpNMWRyZEVoRU4ydHINCmRIRnFRVTlCVUVVM1pV
 SlRORE4xUjFaYVJGb3JlWGM5UFZ4dUlpd2lhWFlpt2lKV00yRnNVbk5RTjJk
 Sg0KU1hNMGExaE9SVGR2V2pKQlBUMWNiaUo5DQo=',
-  max_historical_user_count: 10
+  max_historical_user_count: 10,
+  active_users: 6
 }
 </code></pre>
 
 </details>
+
+#### Disable Seat Link
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/212375) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.10.
+
+Seat Link is enabled by default.
+
+To disable this feature, go to
+**{admin}** **Admin Area > Settings > Metrics and profiling** and clear the **Seat Link** checkbox.
+
+To disable Seat Link in an Omnibus GitLab installation, and prevent it from
+being configured in the future through the administration panel, set the following in
+[`gitlab.rb`](https://docs.gitlab.com/omnibus/settings/configuration.html#configuration-options):
+
+```ruby
+gitlab_rails['seat_link_enabled'] = false
+```
+
+To disable Seat Link in a GitLab source installation, and prevent it from
+being configured in the future through the administration panel,
+set the following in `gitlab.yml`:
+
+```yaml
+production: &base
+  # ...
+  gitlab:
+    # ...
+    seat_link_enabled: false
+```
 
 ### Renew or change a GitLab.com subscription
 
@@ -396,7 +430,7 @@ CI pipeline minutes are the execution time for your [pipelines](../ci/pipelines/
 
 Quotas apply to:
 
-- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Settings > Usage Quotas**.
+- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Administration > Usage Quotas**.
 - Your personal account, where the minutes are available for your personal projects. To view and buy personal minutes, click your avatar, then **{settings}** **Settings > Pipeline quota**.
 
 Only pipeline minutes for GitLab shared runners are restricted. If you have a specific runner set up for your projects, there is no limit to your build time on GitLab.com.
@@ -417,10 +451,10 @@ main quota. Additional minutes:
 
 To purchase additional minutes for your group on GitLab.com:
 
-1. From your group, go to **{settings}** **Settings > Usage Quotas**.
+1. From your group, go to **{settings}** **Administration > Usage Quotas**.
 1. Locate the subscription card that's linked to your group on GitLab.com, click **Buy more CI minutes**, and complete the details about the transaction.
 1. Once we have processed your payment, the extra CI minutes will be synced to your group.
-1. To confirm the available CI minutes, go to your group, then **{settings}** **Settings > Usage Quotas**.
+1. To confirm the available CI minutes, go to your group, then **{settings}** **Administration > Usage Quotas**.
    The **Additional minutes** displayed now includes the purchased additional CI minutes, plus any minutes rolled over from last month.
 
 To purchase additional minutes for your personal namespace:

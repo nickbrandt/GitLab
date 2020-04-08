@@ -287,6 +287,24 @@ describe Groups::EpicsController do
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/epic', dir: 'ee')
+          # TODO: when removing confidential_epics feature flag, we can just move
+          # `confidential` attribute to required params in the epics schema
+          expect(json_response).to include("confidential")
+        end
+
+        context 'when confidential_epics flag is disabled' do
+          before do
+            stub_feature_flags(confidential_epics: false)
+          end
+
+          it 'does not include confidential attribute' do
+            group.add_developer(user)
+            show_epic(:json)
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to match_response_schema('entities/epic', dir: 'ee')
+            expect(json_response).not_to include("confidential")
+          end
         end
 
         context 'with unauthorized user' do
@@ -307,7 +325,8 @@ describe Groups::EpicsController do
           title: 'New title',
           label_ids: [label.id],
           start_date_fixed: '2002-01-01',
-          start_date_is_fixed: true
+          start_date_is_fixed: true,
+          confidential: true
         }
       end
 
@@ -319,7 +338,7 @@ describe Groups::EpicsController do
         it 'returns status 200' do
           update_epic(epic, params)
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'updates the epic correctly' do
@@ -331,7 +350,8 @@ describe Groups::EpicsController do
             start_date_fixed: date,
             start_date: date,
             start_date_is_fixed: true,
-            state: 'opened'
+            state: 'opened',
+            confidential: true
           )
         end
       end
@@ -397,7 +417,11 @@ describe Groups::EpicsController do
 
     describe '#create' do
       subject do
-        post :create, params: { group_id: group, epic: { title: 'new epic', description: 'some descripition', label_ids: [label.id] } }
+        post :create, params: { group_id: group,
+                                epic: { title: 'new epic',
+                                        description: 'some descripition',
+                                        label_ids: [label.id],
+                                        confidential: true } }
       end
 
       context 'when user has permissions to create an epic' do
@@ -507,7 +531,7 @@ describe Groups::EpicsController do
           it 'returns status 404' do
             subject
 
-            expect(response.status).to eq(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
 
           it 'does not update merge requests milestone' do
@@ -525,7 +549,7 @@ describe Groups::EpicsController do
           it 'returns status 200' do
             subject
 
-            expect(response.status).to eq(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           it 'updates epics labels' do

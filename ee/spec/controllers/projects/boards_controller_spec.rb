@@ -102,6 +102,7 @@ describe Projects::BoardsController do
 
       context 'with unauthorized user' do
         before do
+          expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
           allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
           allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
         end
@@ -170,7 +171,7 @@ describe Projects::BoardsController do
 
     context 'with invalid board id' do
       it 'returns a not found 404 response' do
-        update_board 999, name: nil
+        update_board non_existing_record_id, name: nil
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -178,6 +179,7 @@ describe Projects::BoardsController do
 
     context 'with unauthorized user' do
       before do
+        expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
         allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
         allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
       end
@@ -219,7 +221,7 @@ describe Projects::BoardsController do
 
     context 'with invalid board id' do
       it 'returns a not found 404 response' do
-        remove_board board: 999
+        remove_board board: non_existing_record_id
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -227,6 +229,7 @@ describe Projects::BoardsController do
 
     context 'with unauthorized user' do
       before do
+        expect(Ability).to receive(:allowed?).with(user, :log_in, :global).and_call_original
         allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
         allow(Ability).to receive(:allowed?).with(user, :admin_board, project).and_return(false)
       end

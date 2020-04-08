@@ -134,7 +134,7 @@ Make sure you have the right version of Git installed:
 # Install Git
 sudo apt-get install -y git-core
 
-# Make sure Git is version 2.24.1 or higher (minimal supported version is 2.22.0)
+# Make sure Git is version 2.26.0 or higher (minimal supported version is 2.22.0)
 git --version
 ```
 
@@ -171,9 +171,9 @@ sudo make install
 
 # Download and compile from source
 cd /tmp
-curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.24.1.tar.gz
-echo 'ad5334956301c86841eb1e5b1bb20884a6bad89a10a6762c958220c7cf64da02  git-2.24.1.tar.gz' | shasum -a256 -c - && tar -xzf git-2.24.1.tar.gz
-cd git-2.24.1/
+curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.26.0.tar.gz
+echo 'aa168c2318e7187cd295a645f7370cc6d71a324aafc932f80f00c780b6a26bed  git-2.26.0.tar.gz' | shasum -a256 -c - && tar -xzf git-2.26.0.tar.gz
+cd git-2.26.0/
 ./configure --with-libpcre
 make prefix=/usr/local all
 
@@ -301,6 +301,13 @@ use of extensions and concurrent index removal, you need at least PostgreSQL 9.2
 
    ```shell
    sudo apt-get install -y postgresql postgresql-client libpq-dev postgresql-contrib
+   ```
+
+1. Start the PostgreSQL service and confirm that the service is running:
+
+   ```shell
+   sudo service postgresql start
+   sudo service postgresql status
    ```
 
 1. Create a database user for GitLab:
@@ -961,6 +968,15 @@ If you want to switch back to Unicorn, follow these steps:
 
 1. Edit the system `init.d` script to set the `USE_UNICORN=1` flag. If you have `/etc/default/gitlab`, then you should edit it instead.
 1. Restart GitLab.
+
+### Using Sidekiq instead of Sidekiq Cluster
+
+As of GitLab 12.10, Source installations are using `bin/sidekiq-cluster` for managing Sidekiq processes.
+Using Sidekiq directly will still be supported until 14.0. So if you're experiencing issues, please:
+
+1. Edit the system `init.d` script to remove the `SIDEKIQ_WORKERS` flag. If you have `/etc/default/gitlab`, then you should edit it instead.
+1. Restart GitLab.
+1. [Create an issue](https://gitlab.com/gitlab-org/gitlab/issues/-/new) describing the problem.
 
 ## Troubleshooting
 

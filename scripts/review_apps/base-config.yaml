@@ -146,8 +146,7 @@ prometheus:
   install: false
 redis:
   metrics:
-    resources:
-      enabled: false
+    enabled: false
   resources:
     requests:
       cpu: 100m
@@ -155,8 +154,6 @@ redis:
     limits:
       cpu: 200m
       memory: 130M
-redis-ha:
-  enabled: false
 registry:
   hpa:
     minReplicas: 1

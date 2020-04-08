@@ -112,7 +112,7 @@ module EE
       scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
-      scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
+      scope :for_plan_name, -> (name) { joins(namespace: { gitlab_subscription: :hosted_plan }).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
             -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
       scope :with_active_services, -> { joins(:services).merge(::Service.active) }
@@ -290,6 +290,10 @@ module EE
 
     def push_audit_events_enabled?
       ::Feature.enabled?(:repository_push_audit_event, self)
+    end
+
+    def first_class_vulnerabilities_enabled?
+      ::Feature.enabled?(:first_class_vulnerabilities, self)
     end
 
     def feature_available?(feature, user = nil)
@@ -492,6 +496,16 @@ module EE
       ::Gitlab::UrlSanitizer.new(bare_url, credentials: { user: import_data&.user }).full_url
     end
 
+    def repository_size_checker
+      strong_memoize(:repository_size_checker) do
+        ::Gitlab::RepositorySizeChecker.new(
+          current_size_proc: -> { statistics.total_repository_size },
+          limit: (repository_size_limit || namespace.actual_size_limit),
+          enabled: License.feature_available?(:repository_size_limit)
+        )
+      end
+    end
+
     def username_only_import_url=(value)
       unless ::Gitlab::UrlSanitizer.valid?(value)
         self.import_url = value
@@ -506,38 +520,6 @@ module EE
       create_or_update_import_data(credentials: creds)
 
       username_only_import_url
-    end
-
-    def repository_and_lfs_size
-      statistics.total_repository_size
-    end
-
-    def above_size_limit?
-      return false unless size_limit_enabled?
-
-      repository_and_lfs_size > actual_size_limit
-    end
-
-    def size_to_remove
-      repository_and_lfs_size - actual_size_limit
-    end
-
-    def actual_size_limit
-      return namespace.actual_size_limit if repository_size_limit.nil?
-
-      repository_size_limit
-    end
-
-    def size_limit_enabled?
-      return false unless License.feature_available?(:repository_size_limit)
-
-      actual_size_limit != 0
-    end
-
-    def changes_will_exceed_size_limit?(size_in_bytes)
-      size_limit_enabled? &&
-        (size_in_bytes > actual_size_limit ||
-         size_in_bytes + repository_and_lfs_size > actual_size_limit)
     end
 
     def remove_import_data
@@ -555,6 +537,7 @@ module EE
         [].tap do |services|
           services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
+          ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
         end
       end
     end
@@ -662,13 +645,7 @@ module EE
 
     # LFS and hashed repository storage are required for using Design Management.
     def design_management_enabled?
-      lfs_enabled? &&
-        # We will allow the hashed storage requirement to be disabled for
-        # a few releases until we are able to understand the impact of the
-        # hashed storage requirement for existing design management projects.
-        # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
-        (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
-        feature_available?(:design_management)
+      lfs_enabled? && hashed_storage?(:repository)
     end
 
     def design_repository

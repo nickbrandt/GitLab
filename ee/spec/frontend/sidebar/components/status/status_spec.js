@@ -1,4 +1,4 @@
-import { GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormRadioGroup, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Status from 'ee/sidebar/components/status/status.vue';
@@ -11,6 +11,8 @@ const getTooltipText = wrapper => wrapper.find(GlTooltip).text();
 const getStatusIconCssClasses = wrapper => wrapper.find('[name="severity-low"]').classes();
 
 const getEditButton = wrapper => wrapper.find({ ref: 'editButton' });
+
+const getRemoveStatusButton = wrapper => wrapper.find(GlDeprecatedButton);
 
 const getEditForm = wrapper => wrapper.find('form');
 
@@ -84,6 +86,43 @@ describe('Status', () => {
       shallowMountStatus(props);
 
       expect(getEditButton(wrapper).exists()).toBe(false);
+    });
+  });
+
+  describe('remove status button', () => {
+    it('is hidden when there is no status', () => {
+      const props = {
+        isEditable: true,
+        status: '',
+      };
+
+      shallowMountStatus(props);
+
+      expect(getRemoveStatusButton(wrapper).exists()).toBe(false);
+    });
+
+    it('is displayed when there is a status', () => {
+      const props = {
+        isEditable: true,
+        status: healthStatus.AT_RISK,
+      };
+
+      shallowMountStatus(props);
+
+      expect(getRemoveStatusButton(wrapper).exists()).toBe(true);
+    });
+
+    it('emits an onStatusChange event with argument null when clicked', () => {
+      const props = {
+        isEditable: true,
+        status: healthStatus.AT_RISK,
+      };
+
+      shallowMountStatus(props);
+
+      getRemoveStatusButton(wrapper).vm.$emit('click');
+
+      expect(wrapper.emitted().onStatusChange[0]).toEqual([null]);
     });
   });
 
@@ -228,7 +267,7 @@ describe('Status', () => {
 
       // Test that "onTrack", "needsAttention", and "atRisk" values are emitted when form is submitted
       it.each(Object.values(healthStatus))(
-        'emits onFormSubmit event with argument "%s" when user selects the option and submits form',
+        'emits onStatusChange event with argument "%s" when user selects the option and submits form',
         status => {
           getEditForm(wrapper)
             .find(`input[value="${status}"]`)
@@ -236,7 +275,7 @@ describe('Status', () => {
 
           return Vue.nextTick().then(() => {
             getEditForm(wrapper).trigger('submit');
-            expect(wrapper.emitted().onFormSubmit[0]).toEqual([status]);
+            expect(wrapper.emitted().onStatusChange[0]).toEqual([status]);
           });
         },
       );

@@ -3,7 +3,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import {
   GlTable,
   GlFormCheckbox,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
   GlTooltipDirective,
   GlPagination,
@@ -41,7 +41,7 @@ export default {
   components: {
     GlTable,
     GlFormCheckbox,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     ClipboardButton,
     GlPagination,
@@ -77,9 +77,10 @@ export default {
       return name;
     },
     fields() {
+      const tagClass = this.isDesktop ? 'w-25' : '';
       return [
         { key: LIST_KEY_CHECKBOX, label: '', class: 'gl-w-16' },
-        { key: LIST_KEY_TAG, label: LIST_LABEL_TAG, class: 'w-25' },
+        { key: LIST_KEY_TAG, label: LIST_LABEL_TAG, class: `${tagClass} js-tag-column` },
         { key: LIST_KEY_IMAGE_ID, label: LIST_LABEL_IMAGE_ID },
         { key: LIST_KEY_SIZE, label: LIST_LABEL_SIZE },
         { key: LIST_KEY_LAST_UPDATED, label: LIST_LABEL_LAST_UPDATED },
@@ -249,7 +250,7 @@ export default {
         />
       </template>
       <template #head(actions)>
-        <gl-button
+        <gl-deprecated-button
           ref="bulkDeleteButton"
           v-gl-tooltip
           :disabled="!selectedItems || selectedItems.length === 0"
@@ -260,7 +261,7 @@ export default {
           @click="deleteMultipleItems()"
         >
           <gl-icon name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </template>
 
       <template #cell(checkbox)="{index}">
@@ -303,7 +304,7 @@ export default {
         </span>
       </template>
       <template #cell(actions)="{index, item}">
-        <gl-button
+        <gl-deprecated-button
           ref="singleDeleteButton"
           :title="s__('ContainerRegistry|Remove tag')"
           :aria-label="s__('ContainerRegistry|Remove tag')"
@@ -313,7 +314,7 @@ export default {
           @click="deleteSingleItem(index)"
         >
           <gl-icon name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </template>
 
       <template #empty>

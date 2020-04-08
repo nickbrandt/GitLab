@@ -89,7 +89,6 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 
   const { stages } = state;
   const params = {
-    group_id: currentGroupPath,
     created_after,
     created_before,
     project_ids,
@@ -132,7 +131,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
-    .then(() => dispatch('fetchGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
@@ -192,8 +190,7 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
     selectedGroup: { fullPath },
   } = state;
 
-  return Api.cycleAnalyticsSummaryData({
-    group_id: fullPath,
+  return Api.cycleAnalyticsSummaryData(fullPath, {
     created_after,
     created_before,
     project_ids,
@@ -206,29 +203,6 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
-
-export const receiveGroupLabelsSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
-
-export const receiveGroupLabelsError = ({ commit }, error) => {
-  commit(types.RECEIVE_GROUP_LABELS_ERROR, error);
-  createFlash(__('There was an error fetching label data for the selected group'));
-};
-
-export const requestGroupLabels = ({ commit }) => commit(types.REQUEST_GROUP_LABELS);
-
-export const fetchGroupLabels = ({ dispatch, state }) => {
-  dispatch('requestGroupLabels');
-  const {
-    selectedGroup: { fullPath, parentId = null },
-  } = state;
-
-  return Api.cycleAnalyticsGroupLabels(parentId || fullPath)
-    .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
-    );
-};
 
 export const receiveTopRankedGroupLabelsSuccess = ({ commit, dispatch }, data) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
@@ -254,11 +228,10 @@ export const fetchTopRankedGroupLabels = ({
   dispatch('requestTopRankedGroupLabels');
   const { subject } = state.tasksByType;
 
-  return Api.cycleAnalyticsTopLabels({
+  return Api.cycleAnalyticsTopLabels(currentGroupPath, {
     subject,
     created_after,
     created_before,
-    group_id: currentGroupPath,
   })
     .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
     .catch(error =>
@@ -383,7 +356,6 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   // dont request if we have no labels selected...for now
   if (selectedLabelIds.length) {
     const params = {
-      group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
@@ -393,7 +365,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
     dispatch('requestTasksByTypeData');
 
-    return Api.cycleAnalyticsTasksByType(params)
+    return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
       .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
@@ -496,8 +468,7 @@ export const fetchDurationData = ({ state, dispatch, getters }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after,
         created_before,
         project_ids,
@@ -545,8 +516,7 @@ export const fetchDurationMedianData = ({ state, dispatch, getters }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
         created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
         project_ids,

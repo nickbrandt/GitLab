@@ -29,6 +29,7 @@ FactoryBot.define do
     end
 
     pipeline factory: :ci_pipeline
+    project { pipeline.project }
 
     trait :degenerated do
       options { nil }
@@ -220,10 +221,6 @@ FactoryBot.define do
       end
     end
 
-    after(:build) do |build, evaluator|
-      build.project ||= build.pipeline.project
-    end
-
     trait :with_deployment do
       after(:build) do |build, evaluator|
         ##
@@ -308,6 +305,12 @@ FactoryBot.define do
     trait :test_reports do
       after(:build) do |build|
         build.job_artifacts << create(:ci_job_artifact, :junit, job: build)
+      end
+    end
+
+    trait :test_reports_with_attachment do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :junit_with_attachment, job: build)
       end
     end
 

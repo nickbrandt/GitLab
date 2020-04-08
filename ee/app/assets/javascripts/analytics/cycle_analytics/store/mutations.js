@@ -56,15 +56,6 @@ export default {
     state.isEmptyStage = true;
     state.isLoadingStage = false;
   },
-  [types.REQUEST_GROUP_LABELS](state) {
-    state.labels = [];
-  },
-  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
-    state.labels = data.map(convertObjectPropsToCamelCase);
-  },
-  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
-    state.labels = [];
-  },
   [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
     state.topRankedLabels = [];
     state.tasksByType = {

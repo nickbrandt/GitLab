@@ -23,6 +23,10 @@ module QA
         SUPPORTED_FEATURES
       end
 
+      def dot_com?
+        Runtime::Scenario.gitlab_address.include?(".com")
+      end
+
       def additional_repository_storage
         ENV['QA_ADDITIONAL_REPOSITORY_STORAGE']
       end
@@ -41,6 +45,10 @@ module QA
 
       def admin_personal_access_token
         ENV['GITLAB_QA_ADMIN_ACCESS_TOKEN']
+      end
+
+      def ci_project_name
+        ENV['CI_PROJECT_NAME']
       end
 
       def debug?

@@ -41,6 +41,13 @@ describe Gitlab::UsageData do
       # for group_view testing
       create(:user) # user with group_view = NULL (should be counted as having default value 'details')
       create(:user, group_view: :details)
+
+      # Status Page
+      create(:status_page_setting, project: projects[0], enabled: true)
+      create(:status_page_setting, project: projects[1], enabled: false)
+      # 1 public issue on 1 projects with status page enabled
+      create(:issue, project: projects[0])
+      create(:issue, :confidential, project: projects[0])
     end
 
     subject { described_class.data }
@@ -93,6 +100,8 @@ describe Gitlab::UsageData do
         projects_with_prometheus_alerts
         projects_with_tracing_enabled
         sast_jobs
+        status_page_projects
+        status_page_issues
         design_management_designs_create
         design_management_designs_update
         design_management_designs_delete
@@ -105,6 +114,8 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
       expect(count_data[:feature_flags]).to eq(1)
+      expect(count_data[:status_page_projects]).to eq(1)
+      expect(count_data[:status_page_issues]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do
@@ -384,6 +395,7 @@ describe Gitlab::UsageData do
                 create(:group_member, user: user)
                 create(:key, type: 'LDAPKey', user: user)
                 create(:group_member, ldap: true, user: user)
+                create(:cycle_analytics_group_stage)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
@@ -391,14 +403,16 @@ describe Gitlab::UsageData do
                 groups: 2,
                 ldap_keys: 2,
                 ldap_users: 2,
-                users_created: 6
+                users_created: 6,
+                value_stream_management_customized_group_stages: 2
               )
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to eq(
                 events: 1,
                 groups: 1,
                 ldap_keys: 1,
                 ldap_users: 1,
-                users_created: 4
+                users_created: 4,
+                value_stream_management_customized_group_stages: 2
               )
             end
           end

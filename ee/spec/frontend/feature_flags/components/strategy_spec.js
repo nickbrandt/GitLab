@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlFormSelect, GlFormTextarea, GlFormInput, GlToken, GlButton } from '@gitlab/ui';
+import { GlFormSelect, GlFormTextarea, GlFormInput, GlToken, GlDeprecatedButton } from '@gitlab/ui';
 import {
   PERCENT_ROLLOUT_GROUP_ID,
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -142,7 +142,7 @@ describe('Feature flags strategy', () => {
                 name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 parameters: { percentage: '50', groupId: PERCENT_ROLLOUT_GROUP_ID },
                 scopes: [
-                  { environmentScope: '*', shouldDestroy: true },
+                  { environmentScope: '*', shouldBeDestroyed: true },
                   { environmentScope: 'production' },
                 ],
               },
@@ -152,7 +152,7 @@ describe('Feature flags strategy', () => {
       });
 
       it('should emit a delete if the delete button is clicked', () => {
-        wrapper.find(GlButton).vm.$emit('click');
+        wrapper.find(GlDeprecatedButton).vm.$emit('click');
         expect(wrapper.emitted('delete')).toEqual([[]]);
       });
 
@@ -160,7 +160,7 @@ describe('Feature flags strategy', () => {
         const propsData = { strategy, index: 0, endpoint: '', canDelete: false };
         factory({ propsData });
 
-        expect(wrapper.find(GlButton).exists()).toBe(false);
+        expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
       });
     });
 

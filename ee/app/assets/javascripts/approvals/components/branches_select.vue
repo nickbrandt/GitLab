@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import 'select2/select2';
-import _ from 'underscore';
+import { debounce } from 'lodash';
 import Api from 'ee/api';
 import { __ } from '~/locale';
 
@@ -62,7 +62,7 @@ export default {
         formatResult,
         formatSelection,
         initSelection: (element, callback) => this.initialOption(element, callback),
-        query: _.debounce(({ term, callback }) => this.fetchBranches(term).then(callback), 250),
+        query: debounce(({ term, callback }) => this.fetchBranches(term).then(callback), 250),
         id: ({ type, id }) => `${type}${id}`,
       })
       .on('change', e => this.onChange(e))

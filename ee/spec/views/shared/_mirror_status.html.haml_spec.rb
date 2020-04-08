@@ -25,7 +25,7 @@ describe 'shared/_mirror_status.html.haml' do
 
       render 'shared/mirror_status'
 
-      expect(rendered).to have_content("Updated")
+      expect(rendered).to have_content("Pull mirroring updated")
     end
   end
 
@@ -39,13 +39,13 @@ describe 'shared/_mirror_status.html.haml' do
     it 'renders failure message' do
       render 'shared/mirror_status', raw_message: true
 
-      expect(rendered).to have_content("The repository failed to update")
+      expect(rendered).to have_content("Pull mirroring failed")
     end
 
     it 'renders failure message with icon' do
       render 'shared/mirror_status'
 
-      expect(rendered).to have_content('The repository failed to update')
+      expect(rendered).to have_content("Pull mirroring failed")
       expect(rendered).to have_css('i', class: 'fa-warning fa-triangle')
     end
 

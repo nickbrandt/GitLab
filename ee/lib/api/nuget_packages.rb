@@ -8,10 +8,8 @@
 module API
   class NugetPackages < Grape::API
     helpers ::API::Helpers::PackagesManagerClientsHelpers
+    helpers ::API::Helpers::Packages::BasicAuthHelpers
 
-    AUTHORIZATION_HEADER = 'Authorization'
-    AUTHENTICATE_REALM_HEADER = 'Www-Authenticate: Basic realm'
-    AUTHENTICATE_REALM_NAME = 'GitLab Nuget Package Registry'
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
     NON_NEGATIVE_INTEGER_REGEX = %r{\A0|[1-9]\d*\z}.freeze
 
@@ -24,39 +22,6 @@ module API
     end
 
     helpers do
-      def find_personal_access_token
-        find_personal_access_token_from_http_basic_auth
-      end
-
-      def authorized_user_project
-        @authorized_user_project ||= authorized_project_find!(params[:id])
-      end
-
-      def authorized_project_find!(id)
-        project = find_project(id)
-
-        unless project && can?(current_user, :read_project, project)
-          return unauthorized_or! { not_found! }
-        end
-
-        project
-      end
-
-      def authorize!(action, subject = :global, reason = nil)
-        return if can?(current_user, action, subject)
-
-        unauthorized_or! { forbidden!(reason) }
-      end
-
-      def unauthorized_or!
-        current_user ? yield : unauthorized_with_header!
-      end
-
-      def unauthorized_with_header!
-        header(AUTHENTICATE_REALM_HEADER, AUTHENTICATE_REALM_NAME)
-        unauthorized!
-      end
-
       def find_packages
         packages = package_finder.execute
 
@@ -101,6 +66,8 @@ module API
         end
         get 'index', format: :json do
           authorize_read_package!(authorized_user_project)
+
+          track_event('nuget_service_index')
 
           present ::Packages::Nuget::ServiceIndexPresenter.new(authorized_user_project),
             with: EE::API::Entities::Nuget::ServiceIndex
@@ -201,6 +168,8 @@ module API
 
             not_found!('Package') unless package_file
 
+            track_event('pull_package')
+
             # nuget and dotnet don't support 302 Moved status codes, supports_direct_download has to be set to false
             present_carrierwave_file!(package_file.file, supports_direct_download: false)
           end
@@ -230,6 +199,8 @@ module API
             search = Packages::Nuget::SearchService
               .new(authorized_user_project, params[:q], search_options)
               .execute
+
+            track_event('search_package')
 
             present ::Packages::Nuget::SearchResultsPresenter.new(search),
               with: EE::API::Entities::Nuget::SearchResults

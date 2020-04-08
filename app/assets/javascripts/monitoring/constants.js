@@ -49,7 +49,7 @@ export const sidebarAnimationDuration = 300; // milliseconds.
 export const chartHeight = 300;
 
 export const graphTypes = {
-  deploymentData: 'scatter',
+  annotationsData: 'scatter',
 };
 
 export const symbolSizes = {
@@ -67,13 +67,6 @@ export const colorValues = {
   anomalyAreaColor: '#1f78d1',
 };
 
-export const chartColorValues = [
-  '#1f78d1', // $blue-500 (see variables.scss)
-  '#1aaa55', // $green-500
-  '#fc9403', // $orange-500
-  '#6d49cb', // $purple
-];
-
 export const lineTypes = {
   default: 'solid',
 };
@@ -86,3 +79,33 @@ export const dateFormats = {
   timeOfDay: 'h:MM TT',
   default: 'dd mmm yyyy, h:MMTT',
 };
+
+/**
+ * These Vuex store properties are allowed to be
+ * replaced dynamically after component has been created
+ * and initial state has been set.
+ *
+ * Currently used in `receiveMetricsDashboardSuccess` action.
+ */
+export const endpointKeys = [
+  'metricsEndpoint',
+  'deploymentsEndpoint',
+  'dashboardEndpoint',
+  'dashboardsEndpoint',
+  'currentDashboard',
+  'projectPath',
+  'logsPath',
+];
+
+/**
+ * These Vuex store properties are set as soon as the
+ * dashboard component has been created. The values are
+ * passed as data-* attributes and received by dashboard
+ * as Vue props.
+ */
+export const initialStateKeys = [...endpointKeys, 'currentEnvironmentName'];
+
+/**
+ * Constant to indicate if a metric exists in the database
+ */
+export const NOT_IN_DB_PREFIX = 'NO_DB';

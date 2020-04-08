@@ -33,7 +33,8 @@ const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
 
-const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stages/${stageId}`;
+const stageEndpoint = ({ stageId }) =>
+  `/groups/${group.full_path}/-/analytics/value_stream_analytics/stages/${stageId}`;
 
 describe('Cycle analytics actions', () => {
   let state;
@@ -185,69 +186,6 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('fetchGroupLabels', () => {
-    describe('succeeds', () => {
-      beforeEach(() => {
-        gon.api_version = 'v4';
-        state = { selectedGroup };
-        mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
-      });
-
-      it('dispatches receiveGroupLabels if the request succeeds', () => {
-        return testAction(
-          actions.fetchGroupLabels,
-          null,
-          state,
-          [],
-          [
-            { type: 'requestGroupLabels' },
-            {
-              type: 'receiveGroupLabelsSuccess',
-              payload: groupLabels,
-            },
-          ],
-        );
-      });
-    });
-
-    describe('with an error', () => {
-      beforeEach(() => {
-        state = { selectedGroup };
-        mock.onGet(endpoints.groupLabels).replyOnce(404);
-      });
-
-      it('dispatches receiveGroupLabelsError if the request fails', () => {
-        return testAction(
-          actions.fetchGroupLabels,
-          null,
-          state,
-          [],
-          [
-            { type: 'requestGroupLabels' },
-            {
-              type: 'receiveGroupLabelsError',
-              payload: error,
-            },
-          ],
-        );
-      });
-    });
-
-    describe('receiveGroupLabelsError', () => {
-      beforeEach(() => {
-        setFixtures('<div class="flash-container"></div>');
-      });
-
-      it('flashes an error message if the request fails', () => {
-        actions.receiveGroupLabelsError({
-          commit: () => {},
-        });
-
-        shouldFlashAMessage('There was an error fetching label data for the selected group');
-      });
-    });
-  });
-
   describe('fetchTopRankedGroupLabels', () => {
     beforeEach(() => {
       gon.api_version = 'v4';
@@ -334,7 +272,6 @@ describe('Cycle analytics actions', () => {
       const mocks = {
         requestCycleAnalyticsData:
           overrides.requestCycleAnalyticsData || jest.fn().mockResolvedValue(),
-        fetchGroupLabels: overrides.fetchGroupLabels || jest.fn().mockResolvedValue(),
         fetchStageMedianValues: overrides.fetchStageMedianValues || jest.fn().mockResolvedValue(),
         fetchGroupStagesAndEvents:
           overrides.fetchGroupStagesAndEvents || jest.fn().mockResolvedValue(),
@@ -347,7 +284,6 @@ describe('Cycle analytics actions', () => {
         mockDispatchContext: jest
           .fn()
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
-          .mockImplementationOnce(mocks.fetchGroupLabels)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchStageMedianValues)
           .mockImplementationOnce(mocks.fetchSummaryData)
@@ -369,7 +305,6 @@ describe('Cycle analytics actions', () => {
         [],
         [
           { type: 'requestCycleAnalyticsData' },
-          { type: 'fetchGroupLabels' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'fetchSummaryData' },
@@ -377,34 +312,6 @@ describe('Cycle analytics actions', () => {
         ],
         done,
       );
-    });
-
-    // TOOD: parameterize?
-    it(`displays an error if fetchGroupLabels fails`, done => {
-      const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
-        fetchGroupLabels: actions.fetchGroupLabels({
-          dispatch: jest
-            .fn()
-            .mockResolvedValueOnce()
-            .mockImplementation(actions.receiveGroupLabelsError({ commit: () => {} })),
-          commit: () => {},
-          state: { ...state },
-          getters,
-        }),
-      });
-
-      actions
-        .fetchCycleAnalyticsData({
-          dispatch: mockDispatchContext,
-          state: {},
-          commit: () => {},
-        })
-
-        .then(() => {
-          shouldFlashAMessage('There was an error fetching label data for the selected group');
-          done();
-        })
-        .catch(done.fail);
     });
 
     it(`displays an error if fetchStageMedianValues fails`, done => {

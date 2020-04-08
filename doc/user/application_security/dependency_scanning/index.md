@@ -18,7 +18,7 @@ All dependencies are scanned, including the transitive dependencies (also known 
 
 You can take advantage of Dependency Scanning by either [including the CI job](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning-ultimate)
+[Auto Dependency Scanning](../../../topics/autodevops/stages.md#auto-dependency-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the Dependency Scanning report, compares the found vulnerabilities
@@ -58,11 +58,11 @@ The following languages and dependency managers are supported.
 |----------------------------- | --------- | ------------ |
 | Java ([Gradle](https://gradle.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Java ([Maven](https://maven.apache.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| JavaScript ([npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/en/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [Retire.js](https://retirejs.github.io/retire.js/)         |
+| JavaScript ([npm](https://www.npmjs.com/), [yarn](https://classic.yarnpkg.com/en/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [Retire.js](https://retirejs.github.io/retire.js/)         |
 | PHP ([Composer](https://getcomposer.org/))  | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Python ([pip](https://pip.pypa.io/en/stable/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Python ([Pipfile](https://pipenv.kennethreitz.org/en/latest/basics/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/11756 "Pipfile.lock support for Dependency Scanning"))| not available |
-| Python ([poetry](https://poetry.eustace.io/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7006 "Support Poetry in Dependency Scanning")) | not available |
+| Python ([poetry](https://python-poetry.org/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7006 "Support Poetry in Dependency Scanning")) | not available |
 | Ruby ([gem](https://rubygems.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [bundler-audit](https://github.com/rubysec/bundler-audit) |
 | Scala ([sbt](https://www.scala-sbt.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Go ([Go Modules](https://github.com/golang/go/wiki/Modules)) | yes ([alpha](https://gitlab.com/gitlab-org/gitlab/issues/7132)) | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
@@ -160,14 +160,15 @@ The following variables are used for configuring specific analyzers (used for a 
 | `GEMNASIUM_DB_LOCAL_PATH`               | `gemnasium`        | `/gemnasium-db`              | Path to local gemnasium database. |
 | `GEMNASIUM_DB_REMOTE_URL`               | `gemnasium`        | `https://gitlab.com/gitlab-org/security-products/gemnasium-db.git` | Repository URL for fetching the gemnasium database. |
 | `GEMNASIUM_DB_REF_NAME`                 | `gemnasium`        | `master`                     | Branch name for remote repository database. `GEMNASIUM_DB_REMOTE_URL` is required. |
+| `DS_REMEDIATE`                          | `gemnasium`        | `"true"`                       | Enable automatic remediation of vulnerable dependencies.  |
 | `PIP_INDEX_URL`                         | `gemnasium-python` | `https://pypi.org/simple`    | Base URL of Python Package Index. |
 | `PIP_EXTRA_INDEX_URL`                   | `gemnasium-python` |                              | Array of [extra URLs](https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-extra-index-url) of package indexes to use in addition to `PIP_INDEX_URL`. Comma separated. |
 | `PIP_REQUIREMENTS_FILE`                 | `gemnasium-python` |                              | Pip requirements file to be scanned. |
 | `DS_PIP_VERSION`                        | `gemnasium-python` |                              | Force the install of a specific pip version (example: `"19.3"`), otherwise the pip installed in the Docker image is used. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12811) in GitLab 12.7) |
 | `DS_PIP_DEPENDENCY_PATH`                | `gemnasium-python` |                              | Path to load Python pip dependencies from. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12412) in GitLab 12.2) |
 | `DS_PYTHON_VERSION`                     | `retire.js`        |                              | Version of Python. If set to 2, dependencies are installed using Python 2.7 instead of Python 3.6. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12296) in GitLab 12.1)|
-| `MAVEN_CLI_OPTS`                        | `gemnasium-maven`  | `"-DskipTests --batch-mode"` | List of command line arguments that will be passed to `maven` by the analyzer. See an example for [using private repos](#using-private-maven-repos). |
-| `BUNDLER_AUDIT_UPDATE_DISABLED`         | `bundler-audit`    | `false`                      | Disable automatic updates for the `bundler-audit` analyzer. Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
+| `MAVEN_CLI_OPTS`                        | `gemnasium-maven`  | `"-DskipTests --batch-mode"` | List of command line arguments that will be passed to `maven` by the analyzer. See an example for [using private repos](../index.md#using-private-maven-repos). |
+| `BUNDLER_AUDIT_UPDATE_DISABLED`         | `bundler-audit`    | `"false"`                      | Disable automatic updates for the `bundler-audit` analyzer. Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
 | `BUNDLER_AUDIT_ADVISORY_DB_URL`         | `bundler-audit`    | `https://github.com/rubysec/ruby-advisory-db` | URL of the advisory database used by bundler-audit. |
 | `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME`    | `bundler-audit`    | `master`                     | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL`. |
 | `RETIREJS_JS_ADVISORY_DB`               | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json` | Path or URL to Retire.js js vulnerability data file. |
@@ -176,28 +177,9 @@ The following variables are used for configuring specific analyzers (used for a 
 ### Using private Maven repos
 
 If you have a private Maven repository which requires login credentials,
-you can use the `MAVEN_CLI_OPTS` environment variable to pass variables
-specified in your settings (e.g., username, password, etc.).
+you can use the `MAVEN_CLI_OPTS` environment variable.
 
-For example, if you have a settings file in your project source (e.g., `mysettings.xml`)
-that looks like the following, you can specify the variables
-[by adding an entry under your project's settings](../../../ci/variables/README.md#via-the-ui),
-so that you don't have to expose your private data in `.gitlab-ci.yml` (e.g., adding
-`MAVEN_CLI_OPTS` with value `--settings mysettings.xml -Dprivate.username=foo -Dprivate.password=bar`).
-
-```xml
-<!-- mysettings.xml -->
-<settings>
-    ...
-    <servers>
-        <server>
-            <id>private_server</id>
-            <username>${private.username}</username>
-            <password>${private.password}</password>
-        </server>
-    </servers>
-</settings>
-```
+Read more on [how to use private Maven repos](../index.md#using-private-maven-repos).
 
 ### Disabling Docker in Docker for Dependency Scanning
 
@@ -215,6 +197,14 @@ variables:
 ```
 
 This will create individual `<analyzer-name>-dependency_scanning` jobs for each analyzer that runs in your CI/CD pipeline.
+
+By removing Docker-in-Docker (DIND), GitLab relies on [Linguist](https://github.com/github/linguist)
+to start relevant analyzers depending on the detected repository language(s) instead of the
+[orchestrator](https://gitlab.com/gitlab-org/security-products/dependency-scanning/). However, there
+are some differences in the way repository languages are detected between DIND and non-DIND. You can
+observe these differences by checking both Linguist and the common library. For instance, Linguist
+looks for `*.java` files to spin up the [gemnasium-maven](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven)
+image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`.
 
 ## Interacting with the vulnerabilities
 

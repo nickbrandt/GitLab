@@ -19,6 +19,28 @@ will fail.
 
 - **Max limit:** 5.000 comments
 
+## Size of comments and descriptions of issues, merge requests, and epics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61974) in GitLab 12.2.
+
+There is a limit to the size of comments and descriptions of issues, merge requests, and epics.
+Attempting to add a body of text larger than the limit will result in an error, and the
+item will not be created.
+
+It's possible that this limit will be changed to a lower number in the future.
+
+- **Max size:** ~1 million characters / ~1 MB
+
+## Number of issues in the milestone overview
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39453) in GitLab 12.10.
+
+The maximum number of issues loaded on the milestone overview page is 3000.
+When the number exceeds the limit the page displays an alert and links to a paginated
+[issue list](../user/project/issues/index.md#issues-list) of all issues in the milestone.
+
+- **Limit:** 3000 issues
+
 ## Number of pipelines per Git push
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/51401) in GitLab 11.10.
@@ -48,7 +70,7 @@ There is a limit when embedding metrics in GFM for performance reasons.
 On GitLab.com, the [maximum number of webhooks](../user/gitlab_com/index.md#maximum-number-of-webhooks) per project, and per group, is limited.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 # If limits don't exist for the default plan, you can create one with:
@@ -69,6 +91,13 @@ NOTE: **Note:** Set the limit to `0` to disable it.
 
 GitLab ignores all incoming emails sent from auto-responders by looking for the `X-Autoreply`
 header. Such emails don't create comments on issues or merge requests.
+
+## Amount of data sent from Sentry via Error Tracking
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14926) in GitLab 12.6.
+
+Sentry payloads sent to GitLab have a 1 MB maximum limit, both for security reasons
+and to limit memory consumption.
 
 ## CI/CD limits
 
@@ -91,7 +120,7 @@ will fail with a `job_activity_limit_exceeded` error.
   This limit is disabled by default.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 # If limits don't exist for the default plan, you can create one with:
@@ -116,7 +145,7 @@ limit, the subscription will be considered invalid.
 - On [GitLab Starter](https://about.gitlab.com/pricing/#self-managed) tier or higher self-managed installations, this limit is defined for the `default` plan that affects all projects.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 Plan.default.limits.update!(ci_project_subscriptions: 500)
@@ -141,11 +170,19 @@ or higher tiers), this limit is defined for the `default` plan that affects all
 projects. By default, there is no limit.
 
 To set this limit on a self-managed installation, run the following in the
-[GitLab Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session):
+[GitLab Rails console](troubleshooting/debug.md#starting-a-rails-console-session):
 
 ```ruby
 Plan.default.limits.update!(ci_pipeline_schedules: 100)
 ```
+
+## Instance monitoring and metrics
+
+### Prometheus Alert JSON payloads
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14929) in GitLab 12.6.
+
+Prometheus alert payloads sent to the `notify.json` endpoint are limited to 1 MB in size.
 
 ## Environment data on Deploy Boards
 

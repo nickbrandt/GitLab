@@ -43,6 +43,7 @@ module EE
         :max_personal_access_token_lifetime,
         :pseudonymizer_enabled,
         :repository_size_limit,
+        :seat_link_enabled,
         :shared_runners_minutes,
         :slack_app_enabled,
         :slack_app_id,

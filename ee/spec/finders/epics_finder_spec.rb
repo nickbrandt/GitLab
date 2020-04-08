@@ -272,6 +272,21 @@ describe EpicsFinder do
             expect { epics(iid_starts_with: '-1') }.to raise_error(ArgumentError)
           end
         end
+
+        context 'when using group cte for search' do
+          context 'and two labels more search string are present' do
+            let_it_be(:label1) { create(:label) }
+            let_it_be(:label2) { create(:label) }
+            let!(:labeled_epic) { create(:labeled_epic, group: group, title: 'filtered epic', labels: [label1, label2]) }
+
+            it 'returns correct epics' do
+              filtered_epics =
+                epics(attempt_group_search_optimizations: true, label_name: [label1.title, label2.title], search: 'filtered')
+
+              expect(filtered_epics).to contain_exactly(labeled_epic)
+            end
+          end
+        end
       end
     end
   end

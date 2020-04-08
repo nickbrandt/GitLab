@@ -183,7 +183,7 @@ we recommend doing this as one of the last steps in your CI/CD release pipeline.
 
 ## Editing a release
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/26016) in GitLab 12.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/26016) in GitLab 12.6. Asset link editing was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/9427) in GitLab 12.10.
 
 To edit the details of a release, navigate to **Project overview > Releases** and click
 the edit button (pencil icon) in the top-right corner of the release you want to modify.
@@ -193,14 +193,13 @@ the edit button (pencil icon) in the top-right corner of the release you want to
 This will bring you to the **Edit Release** page, from which you can
 change some of the release's details.
 
-![Edit release page](img/edit_release_page_v12_6.png)
+![Edit release page](img/edit_release_page_v12_10.png)
 
-Currently, it is only possible to edit the release title and notes.
-To change other release information, such as its tag, associated
-milestones, or release date, use the
-[Releases API](../../../api/releases/index.md#update-a-release). Editing this
-information through the **Edit Release** page is planned for a future version
-of GitLab.
+Currently, it is only possible to edit the release title, notes, and asset
+links. To change other release information, such as its tag, associated
+milestones, or release date, use the [Releases
+API](../../../api/releases/index.md#update-a-release). Editing this information
+through the **Edit Release** page is planned for a future version of GitLab.
 
 ## Notification for Releases
 
@@ -244,16 +243,20 @@ You can also edit an existing tag to add release notes:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/26019) in GitLab 12.6.
 
-Each time a new release is created, specific related data is collected in
-parallel. This dataset will be a snapshot this new release (including linked
-milestones and issues) at moment of creation. Such collection of data will
-provide a chain of custody and facilitate processes like external audits, for example.
+Each time a release is created, GitLab takes a snapshot of data that's related to it.
+This data is called Release Evidence. It includes linked milestones and issues, and
+it is taken at moment the release is created. It provides a chain of custody and can
+facilitate processes like external audits, for example.
 
-The gathered evidence data is stored in the database upon creation of a new
-release as a JSON object. In GitLab 12.6, a link to
-the evidence data is provided for [each Release](#releases-list).
+You can also [use the API](../../../api/releases/index.md#collect-release-evidence-premium-only) to
+generate Release Evidence for an existing release. Because of this, [each release](#releases-list)
+can have multiple Release Evidence snapshots. You can view the Release Evidence and
+its details on the Release page.
 
-Here is what this object can look like:
+Release Evidence is stored as a JSON object, so you can compare evidence by using
+commonly-available tools.
+
+Here is an example of a Release Evidence object:
 
 ```json
 {
@@ -319,7 +322,14 @@ Please note that Release Evidence's data is collected regardless of this
 feature flag, which only enables or disables the display of the data on the
 Releases page.
 
-### Scheduled Evidence creation
+### Collect release evidence **(PREMIUM ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/199065) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.10.
+
+Evidence collection can be initiated by using an [API call](../../../api/releases/index.md#collect-release-evidence-premium-only) at any time. Evidence snapshots are visible on
+the Release page, along with the timestamp the Evidence was collected.
+
+### Schedule release evidence collection
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/23697) in GitLab 12.8.
 

@@ -1,4 +1,4 @@
-# Design Management **(PREMIUM)**
+# Design Management
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/660) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
 
@@ -22,7 +22,7 @@ For an overview, see the video [Design Management (GitLab 12.2)](https://www.you
 ## Requirements
 
 Design Management requires
-[Large File Storage (LFS)](../../../administration/lfs/manage_large_binaries_with_git_lfs.md)
+[Large File Storage (LFS)](../../../topics/git/lfs/index.md)
 to be enabled:
 
 - For GitLab.com, LFS is already enabled.
@@ -75,6 +75,19 @@ you can drag and drop designs onto the dedicated dropzone to upload them.
 
 ![Drag and drop design uploads](img/design_drag_and_drop_uploads_v12_9.png)
 
+[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/202634)
+in GitLab 12.10, you can also copy images from your file system and
+paste them directly on GitLab's Design page as a new design.
+
+On macOS you can also take a screenshot and immediately copy it to
+the clipboard by simultaneously clicking <kbd>Control</kbd> + <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>3</kbd>, and then paste it as a design.
+
+Copy-and-pasting has some limitations:
+
+- You can paste only one image at a time. When copy/pasting multiple files, only the first one will be uploaded.
+- All images will be converted to `png` format under the hood, so when you want to copy/paste `gif` file, it will result in broken animation.
+- Copy/pasting designs is not supported on Internet Explorer.
+
 Designs with the same filename as an existing uploaded design will create a new version
 of the design, and will replace the previous version. [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34353) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9, dropping a design on an existing uploaded design will also create a new version,
 provided the filenames are the same.
@@ -113,6 +126,8 @@ to help summarize changes between versions.
 Designs can be explored in greater detail by zooming in and out of the image.
 Control the amount of zoom with the `+` and `-` buttons at the bottom of the image.
 While zoomed, you can still [start new discussions](#starting-discussions-on-designs) on the image, and see any existing ones.
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/197324) in GitLab 12.10, while zoomed in,
+you can click-and-drag on the image to move around it.
 
 ![Design zooming](img/design_zooming_v12_7.png)
 

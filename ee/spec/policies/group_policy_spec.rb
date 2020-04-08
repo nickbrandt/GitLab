@@ -273,6 +273,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
 
       context 'does not allow group owners to manage ldap' do
         before do
@@ -280,6 +281,7 @@ describe GroupPolicy do
         end
 
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -288,6 +290,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
   end
 
@@ -301,6 +304,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'guests' do
@@ -308,6 +312,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'reporter' do
@@ -315,6 +320,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'developer' do
@@ -322,6 +328,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'maintainer' do
@@ -329,6 +336,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'owner' do
@@ -345,6 +353,7 @@ describe GroupPolicy do
 
         it { is_expected.to be_disallowed(:override_group_member) }
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -353,6 +362,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_allowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
 
     context 'when memberships locked to LDAP' do
@@ -369,6 +379,53 @@ describe GroupPolicy do
       end
 
       context 'owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.not_to be_allowed(:admin_group_member) }
+        it { is_expected.not_to be_allowed(:override_group_member) }
+        it { is_expected.not_to be_allowed(:update_group_member) }
+      end
+
+      context 'when LDAP sync is enabled' do
+        let(:current_user) { owner }
+
+        before do
+          allow(group).to receive(:ldap_synced?).and_return(true)
+        end
+
+        context 'Group Owner disable membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: true)
+            stub_feature_flags(ldap_settings_unlock_groups_by_owners: true)
+          end
+
+          it { is_expected.to be_allowed(:admin_group_member) }
+          it { is_expected.to be_allowed(:override_group_member) }
+          it { is_expected.to be_allowed(:update_group_member) }
+
+          context 'ldap_settings_unlock_groups_by_owners is disabled' do
+            before do
+              stub_feature_flags(ldap_settings_unlock_groups_by_owners: false)
+            end
+
+            it { is_expected.to be_disallowed(:admin_group_member) }
+            it { is_expected.to be_disallowed(:override_group_member) }
+            it { is_expected.to be_disallowed(:update_group_member) }
+          end
+        end
+
+        context 'Group Owner keeps the membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: false)
+          end
+
+          it { is_expected.not_to be_allowed(:admin_group_member) }
+          it { is_expected.not_to be_allowed(:override_group_member) }
+          it { is_expected.not_to be_allowed(:update_group_member) }
+        end
+      end
+
+      context 'when LDAP sync is disable' do
         let(:current_user) { owner }
 
         it { is_expected.not_to be_allowed(:admin_group_member) }

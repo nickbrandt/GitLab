@@ -1,11 +1,11 @@
 <script>
-import { GlModal, GlModalDirective, GlButton } from '@gitlab/ui';
+import { GlModal, GlModalDirective, GlDeprecatedButton } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
 export default {
   components: {
     GlModal,
-    GlButton,
+    GlDeprecatedButton,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -33,7 +33,9 @@ export default {
 </script>
 <template>
   <div class="d-inline-block float-right mr-3">
-    <gl-button v-gl-modal="$options.modalId" variant="danger"> {{ __('Delete') }} </gl-button>
+    <gl-deprecated-button v-gl-modal="$options.modalId" variant="danger">
+      {{ __('Delete') }}
+    </gl-deprecated-button>
     <gl-modal
       :title="s__('Metrics|Delete metric?')"
       :ok-title="s__('Metrics|Delete metric')"

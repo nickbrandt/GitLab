@@ -11,7 +11,7 @@ describe API::Analytics::GroupActivityAnalytics do
 
   let_it_be(:anonymous_user) { create(:user) }
 
-  shared_examples 'GET group_activity' do |activity|
+  shared_examples 'GET group_activity' do |activity, count|
     let(:feature_enabled) { true }
     let(:params) { { group_path: group.full_path } }
     let(:current_user) { reporter }
@@ -29,7 +29,7 @@ describe API::Analytics::GroupActivityAnalytics do
     end
 
     it 'is returns a count' do
-      expect(response.parsed_body).to eq({ "#{activity}_count" => 0 })
+      expect(response.parsed_body).to eq({ "#{activity}_count" => count })
     end
 
     context 'when feature is not available in plan' do
@@ -48,7 +48,7 @@ describe API::Analytics::GroupActivityAnalytics do
       end
     end
 
-    context 'when user has no authorization to view a private group' do
+    context 'when user does not have access to a group' do
       let(:current_user) { anonymous_user }
 
       it 'is returns `not_found`' do
@@ -58,10 +58,14 @@ describe API::Analytics::GroupActivityAnalytics do
   end
 
   context 'GET /group_activity/issues_count' do
-    it_behaves_like 'GET group_activity', 'issues'
+    it_behaves_like 'GET group_activity', 'issues', 0
   end
 
   context 'GET /group_activity/merge_requests_count' do
-    it_behaves_like 'GET group_activity', 'merge_requests'
+    it_behaves_like 'GET group_activity', 'merge_requests', 0
+  end
+
+  context 'GET /group_activity/new_members_count' do
+    it_behaves_like 'GET group_activity', 'new_members', 1 # reporter
   end
 end

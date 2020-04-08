@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
-import { GlDropdownItem, GlButton } from '@gitlab/ui';
+import { GlDropdownItem, GlDeprecatedButton } from '@gitlab/ui';
 import VueDraggable from 'vuedraggable';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
@@ -88,11 +88,17 @@ describe('Dashboard', () => {
       expect(findEnvironmentsDropdown().exists()).toBe(true);
     });
 
-    it('sets endpoints: logs path', () => {
-      expect(store.dispatch).toHaveBeenCalledWith(
-        'monitoringDashboard/setEndpoints',
-        expect.objectContaining({ logsPath: propsData.logsPath }),
-      );
+    it('sets initial state', () => {
+      expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/setInitialState', {
+        currentDashboard: '',
+        currentEnvironmentName: 'production',
+        dashboardEndpoint: 'https://invalid',
+        dashboardsEndpoint: 'https://invalid',
+        deploymentsEndpoint: null,
+        logsPath: '/path/to/logs',
+        metricsEndpoint: 'http://test.host/monitoring/mock',
+        projectPath: '/path/to/project',
+      });
     });
   });
 
@@ -196,7 +202,7 @@ describe('Dashboard', () => {
     createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
     wrapper.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
       metricsDashboardPayload,
     );
     wrapper.vm.$store.commit(
@@ -228,7 +234,7 @@ describe('Dashboard', () => {
       const refreshBtn = wrapper.findAll({ ref: 'refreshDashboardBtn' });
 
       expect(refreshBtn).toHaveLength(1);
-      expect(refreshBtn.is(GlButton)).toBe(true);
+      expect(refreshBtn.is(GlDeprecatedButton)).toBe(true);
     });
   });
 
@@ -511,7 +517,7 @@ describe('Dashboard', () => {
       const externalDashboardButton = wrapper.find('.js-external-dashboard-link');
 
       expect(externalDashboardButton.exists()).toBe(true);
-      expect(externalDashboardButton.is(GlButton)).toBe(true);
+      expect(externalDashboardButton.is(GlDeprecatedButton)).toBe(true);
       expect(externalDashboardButton.text()).toContain('View full dashboard');
     });
   });

@@ -7,6 +7,10 @@ require:
   - ./rubocop/rubocop
   - rubocop-rspec
 
+inherit_mode:
+  merge:
+    - Include
+
 AllCops:
   TargetRubyVersion: 2.6
   TargetRailsVersion: 5.0
@@ -161,6 +165,14 @@ Rails/ApplicationRecord:
     - ee/db/**/*.rb
     - ee/spec/**/*.rb
 
+Rails/FindBy:
+  Enabled: true
+  Include:
+    - 'ee/app/**/*.rb'
+    - 'ee/lib/**/*.rb'
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+
 # GitLab ###################################################################
 
 Gitlab/ModuleWithInstanceVariables:
@@ -204,23 +216,9 @@ Gitlab/DuplicateSpecLocation:
   Exclude:
     - ee/spec/helpers/auth_helper_spec.rb
     - ee/spec/lib/gitlab/gl_repository_spec.rb
-    - ee/spec/models/namespace_spec.rb
-    - ee/spec/models/note_spec.rb
-    - ee/spec/serializers/environment_entity_spec.rb
-    - ee/spec/services/issues/create_service_spec.rb
-    - ee/spec/services/merge_requests/create_service_spec.rb
     - ee/spec/services/merge_requests/refresh_service_spec.rb
-    - ee/spec/services/merge_requests/update_service_spec.rb
-    - ee/spec/services/system_hooks_service_spec.rb
     - ee/spec/helpers/ee/auth_helper_spec.rb
-    - ee/spec/models/ee/namespace_spec.rb
-    - ee/spec/models/ee/note_spec.rb
-    - ee/spec/serializers/ee/environment_entity_spec.rb
-    - ee/spec/services/ee/issues/create_service_spec.rb
-    - ee/spec/services/ee/merge_requests/create_service_spec.rb
     - ee/spec/services/ee/merge_requests/refresh_service_spec.rb
-    - ee/spec/services/ee/merge_requests/update_service_spec.rb
-    - ee/spec/services/ee/system_hooks_service_spec.rb
 
 Cop/InjectEnterpriseEditionModule:
   Enabled: true
@@ -325,13 +323,6 @@ RSpec/LeakyConstantDeclaration:
   Exclude:
     - 'spec/**/*.rb'
     - 'qa/spec/**/*.rb'
-    - 'ee/spec/presenters/security/vulnerable_project_presenter_spec.rb'
-    - 'ee/spec/serializers/vulnerable_project_entity_spec.rb'
-    - 'ee/spec/services/clusters/applications/check_upgrade_progress_service_spec.rb'
-    - 'ee/spec/services/dashboard/projects/list_service_spec.rb'
-    - 'ee/spec/services/metrics/dashboard/clone_dashboard_service_spec.rb'
-    - 'ee/spec/support/shared_contexts/epic_aggregate_constants.rb'
-    - 'ee/spec/workers/elastic_namespace_rollout_worker_spec.rb'
 
 RSpec/EmptyLineAfterHook:
   Enabled: false
@@ -383,37 +374,9 @@ Cop/BanCatchThrow:
 Performance/ReadlinesEach:
   Enabled: true
 
-# https://gitlab.com/gitlab-org/gitlab/-/issues/212541
-RSpec/RepeatedExample:
-  Exclude:
-    - 'spec/features/issues/filtered_search/filter_issues_spec.rb'
-    - 'spec/features/merge_request/user_posts_diff_notes_spec.rb'
-    - 'spec/features/projects/files/template_type_dropdown_spec.rb'
-    - 'spec/finders/environments_finder_spec.rb'
-    - 'spec/frontend/fixtures/merge_requests.rb'
-    - 'spec/graphql/gitlab_schema_spec.rb'
-    - 'spec/helpers/users_helper_spec.rb'
-    - 'spec/lib/banzai/filter/autolink_filter_spec.rb'
-    - 'spec/lib/banzai/filter/issuable_state_filter_spec.rb'
-    - 'spec/lib/gitlab/closing_issue_extractor_spec.rb'
-    - 'spec/lib/gitlab/danger/changelog_spec.rb'
-    - 'spec/lib/gitlab/git/blob_spec.rb'
-    - 'spec/lib/gitlab/import_export/project/relation_factory_spec.rb'
-    - 'spec/models/ability_spec.rb'
-    - 'spec/models/ci/build_spec.rb'
-    - 'spec/models/concerns/issuable_spec.rb'
-    - 'spec/models/member_spec.rb'
-    - 'spec/models/project_services/chat_message/pipeline_message_spec.rb'
-    - 'spec/models/user_spec.rb'
-    - 'spec/models/wiki_page_spec.rb'
-    - 'spec/requests/api/merge_requests_spec.rb'
-    - 'spec/routing/admin_routing_spec.rb'
-    - 'spec/rubocop/cop/migration/update_large_table_spec.rb'
-    - 'spec/services/notification_service_spec.rb'
-    - 'spec/services/web_hook_service_spec.rb'
-    - 'ee/spec/models/group_spec.rb'
-    - 'ee/spec/models/user_spec.rb'
-    - 'ee/spec/requests/api/merge_request_approvals_spec.rb'
-    - 'ee/spec/services/boards/lists/update_service_spec.rb'
-    - 'ee/spec/services/geo/repository_verification_primary_service_spec.rb'
-    - 'ee/spec/workers/geo/file_download_dispatch_worker_spec.rb'
+Performance/ChainArrayAllocation:
+  Enabled: true
+  Include:
+    - 'lib/gitlab/import_export/**/*'
+    - 'ee/lib/gitlab/import_export/**/*'
+    - 'ee/lib/ee/gitlab/import_export/**/*'

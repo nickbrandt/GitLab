@@ -80,7 +80,7 @@ describe Projects::Security::VulnerabilitiesController do
       it 'renders the solution card' do
         show_vulnerability
 
-        expect(response.body).to have_css("#js-vulnerability-solution")
+        expect(response.body).to have_css("#js-vulnerability-footer")
       end
     end
 
@@ -103,6 +103,39 @@ describe Projects::Security::VulnerabilitiesController do
 
       it 'renders the 404 page' do
         show_vulnerability
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
+  describe 'GET #discussions' do
+    let_it_be(:vulnerability) { create(:vulnerability, project: project, author: user) }
+    let_it_be(:discussion_note) { create(:discussion_note_on_vulnerability, noteable: vulnerability, project: vulnerability.project) }
+
+    render_views
+
+    def show_vulnerability_discussion_list
+      sign_in(user)
+      get :discussions, params: { namespace_id: project.namespace, project_id: project, id: vulnerability }
+    end
+
+    it 'renders discussions' do
+      show_vulnerability_discussion_list
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to match_response_schema('entities/discussions')
+
+      expect(json_response.pluck('id')).to eq([discussion_note.discussion_id])
+    end
+
+    context 'when the feature flag is disabled' do
+      before do
+        stub_feature_flags(first_class_vulnerabilities: false)
+      end
+
+      it 'renders the 404 page' do
+        show_vulnerability_discussion_list
 
         expect(response).to have_gitlab_http_status(:not_found)
       end

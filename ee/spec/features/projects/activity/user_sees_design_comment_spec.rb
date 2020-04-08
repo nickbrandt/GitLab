@@ -19,7 +19,7 @@ describe 'Projects > Activity > User sees design comment', :js do
     "#{user.name} #{user.to_reference} closed issue #{issue.to_reference}"
   end
 
-  before(:all) do
+  before_all do
     project.add_developer(commenter)
     create(:event, :for_design, project: project, author: commenter, design: design)
     create(:closed_issue_event, project: project, author: user, target: issue)

@@ -9933,6 +9933,131 @@
               "deprecationReason": null
             },
             {
+              "name": "vulnerabilities",
+              "description": "Vulnerabilities reported on the projects in the group and its subgroups. Available only when feature flag `first_class_vulnerabilities` is enabled",
+              "args": [
+                {
+                  "name": "projectId",
+                  "description": "Filter vulnerabilities by project",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "ID",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "reportType",
+                  "description": "Filter vulnerabilities by report type",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "VulnerabilityReportType",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "severity",
+                  "description": "Filter vulnerabilities by severity",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "VulnerabilitySeverity",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Filter vulnerabilities by state",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "VulnerabilityState",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "after",
+                  "description": "Returns the elements in the list that come after the specified cursor.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "before",
+                  "description": "Returns the elements in the list that come before the specified cursor.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "first",
+                  "description": "Returns the first _n_ elements from the list.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "last",
+                  "description": "Returns the last _n_ elements from the list.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "VulnerabilityConnection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "webUrl",
               "description": "Web URL of the group",
               "args": [
@@ -11791,6 +11916,132 @@
             {
               "name": "node",
               "description": "The item at the end of the edge.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "JiraImport",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "JiraImportStartInput",
+          "description": "Autogenerated input type of JiraImportStart",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "projectPath",
+              "description": "The project to import the Jira project into",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "jiraProjectKey",
+              "description": "Project key of the importer Jira project",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "jiraProjectName",
+              "description": "Project name of the importer Jira project",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "JiraImportStartPayload",
+          "description": "Autogenerated return type of JiraImportStart",
+          "fields": [
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "Reasons why the mutation failed.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "jiraImport",
+              "description": "The Jira import data after mutation",
               "args": [
 
               ],
@@ -15291,6 +15542,33 @@
               "deprecationReason": null
             },
             {
+              "name": "jiraImportStart",
+              "description": null,
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "JiraImportStartInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "JiraImportStartPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "markAsSpamSnippet",
               "description": null,
               "args": [
@@ -17508,6 +17786,24 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "states",
+                  "description": "States of environments that should be included in result",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -18066,7 +18362,7 @@
             },
             {
               "name": "issuesEnabled",
-              "description": "(deprecated) Does this project have issues enabled?. Use `issues_access_level` instead",
+              "description": "Indicates if Issues are enabled for the current user",
               "args": [
 
               ],
@@ -18147,7 +18443,7 @@
             },
             {
               "name": "jobsEnabled",
-              "description": "(deprecated) Enable jobs for this project. Use `builds_access_level` instead",
+              "description": "Indicates if CI/CD pipeline jobs are enabled for the current user",
               "args": [
 
               ],
@@ -18193,7 +18489,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "The IID of the merge request, e.g., \"1\"",
+                  "description": "IID of the merge request, for example `1`",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -18203,7 +18499,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "The list of IIDs of issues, e.g., [1, 2]",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -18234,7 +18530,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "The IID of the merge request, e.g., \"1\"",
+                  "description": "IID of the merge request, for example `1`",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -18244,7 +18540,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "The list of IIDs of issues, e.g., [1, 2]",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -18311,7 +18607,7 @@
             },
             {
               "name": "mergeRequestsEnabled",
-              "description": "(deprecated) Does this project have merge_requests enabled?. Use `merge_requests_access_level` instead",
+              "description": "Indicates if Merge Requests are enabled for the current user",
               "args": [
 
               ],
@@ -18847,7 +19143,7 @@
             },
             {
               "name": "sharedRunnersEnabled",
-              "description": "Indicates if shared runners are enabled on the project",
+              "description": "Indicates if Shared Runners are enabled for the project",
               "args": [
 
               ],
@@ -18942,7 +19238,7 @@
             },
             {
               "name": "snippetsEnabled",
-              "description": "(deprecated) Does this project have snippets enabled?. Use `snippets_access_level` instead",
+              "description": "Indicates if Snippets are enabled for the current user",
               "args": [
 
               ],
@@ -19215,7 +19511,7 @@
             },
             {
               "name": "wikiEnabled",
-              "description": "(deprecated) Does this project have wiki enabled?. Use `wiki_access_level` instead",
+              "description": "Indicates if Wikis are enabled for the current user",
               "args": [
 
               ],

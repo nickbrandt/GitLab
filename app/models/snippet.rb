@@ -258,10 +258,22 @@ class Snippet < ApplicationRecord
     super
   end
 
+  override :repository
   def repository
     @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path, repo_type: Gitlab::GlRepository::SNIPPET)
   end
 
+  override :repository_size_checker
+  def repository_size_checker
+    strong_memoize(:repository_size_checker) do
+      ::Gitlab::RepositorySizeChecker.new(
+        current_size_proc: -> { repository._uncached_size.megabytes },
+        limit: Gitlab::CurrentSettings.snippet_size_limit
+      )
+    end
+  end
+
+  override :storage
   def storage
     @storage ||= Storage::Hashed.new(self, prefix: Storage::Hashed::SNIPPET_REPOSITORY_PATH_PREFIX)
   end
@@ -269,6 +281,7 @@ class Snippet < ApplicationRecord
   # This is the full_path used to identify the
   # the snippet repository. It will be used mostly
   # for logging purposes.
+  override :full_path
   def full_path
     return unless persisted?
 
@@ -279,10 +292,6 @@ class Snippet < ApplicationRecord
       components << self.id
       components.join('/')
     end
-  end
-
-  def url_to_repo
-    Gitlab::Shell.url_to_repo(full_path.delete('@'))
   end
 
   def repository_storage
@@ -310,7 +319,7 @@ class Snippet < ApplicationRecord
   end
 
   def versioned_enabled_for?(user)
-    repository_exists? && ::Feature.enabled?(:version_snippets, user)
+    ::Feature.enabled?(:version_snippets, user) && repository_exists?
   end
 
   class << self

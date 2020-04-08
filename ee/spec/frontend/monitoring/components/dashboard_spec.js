@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlModal, GlButton } from '@gitlab/ui';
+import { GlModal, GlDeprecatedButton } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import {
   mockApiEndpoint,
@@ -34,7 +34,7 @@ describe('Dashboard', () => {
     wrapper = shallowMount(localVue.extend(Component), {
       propsData: { ...propsData, ...props },
       stubs: {
-        GlButton,
+        GlDeprecatedButton,
       },
       store,
       localVue,
@@ -58,7 +58,7 @@ describe('Dashboard', () => {
 
   function setupComponentStore(component) {
     component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
       metricsDashboardPayload,
     );
 

@@ -23,7 +23,9 @@ module EE
                description: 'Counts for each severity of vulnerability of the project',
                feature_flag: :first_class_vulnerabilities,
                resolve: -> (obj, _args, ctx) do
-                 Hash.new(0).merge(obj.vulnerabilities.counts_by_severity)
+                 Hash.new(0).merge(
+                   obj.vulnerabilities.with_states([:detected, :confirmed]).counts_by_severity
+                 )
                end
 
         field :requirement, ::Types::RequirementType, null: true,
@@ -32,7 +34,6 @@ module EE
 
         field :requirements, ::Types::RequirementType.connection_type, null: true,
               description: 'Find requirements. Available only when feature flag `requirements_management` is enabled.',
-              max_page_size: 2000,
               resolver: ::Resolvers::RequirementsResolver
 
         field :requirement_states_count, ::Types::RequirementStatesCountType, null: true,

@@ -71,18 +71,6 @@ describe Resolvers::EpicsResolver do
             expect(epics).to match_array([epic1, epic2])
           end
         end
-
-        context 'when only start_date is present' do
-          it 'raises error' do
-            expect { resolve_epics(start_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
-          end
-        end
-
-        context 'when only end_date is present' do
-          it 'raises error' do
-            expect { resolve_epics(end_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
-          end
-        end
       end
 
       context 'with state' do
@@ -225,18 +213,6 @@ describe Resolvers::EpicsResolver do
           epics = resolve_epics(iid_starts_with: '62')
 
           expect(epics).to contain_exactly(epic5)
-        end
-
-        it 'fails if iid_starts_with contains a non-numeric string' do
-          expect { resolve_epics(iid_starts_with: 'foo') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'foo is not a valid iid search term')
-        end
-
-        it 'fails if iid_starts_with contains a non-numeric string with line breaks' do
-          expect { resolve_epics(iid_starts_with: "foo\n1") }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, "foo\n1 is not a valid iid search term")
-        end
-
-        it 'fails if iid_starts_with contains a string which contains a negative number' do
-          expect { resolve_epics(iid_starts_with: '-1') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, '-1 is not a valid iid search term')
         end
       end
     end

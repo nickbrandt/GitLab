@@ -306,7 +306,9 @@ module EE
     end
 
     def vulnerabilities
-      ::Vulnerability.where(project: ::Project.for_group_and_its_subgroups(self))
+      ::Vulnerability.where(
+        project: ::Project.for_group_and_its_subgroups(self).non_archived.without_deleted
+      )
     end
 
     private

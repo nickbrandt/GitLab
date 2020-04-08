@@ -60,6 +60,8 @@ module EE
                 presence: { message: "can't be blank when indexing is enabled" },
                 if: ->(setting) { setting.elasticsearch_indexing? }
 
+      validate :check_elasticsearch_url_scheme, if: :elasticsearch_url_changed?
+
       validates :elasticsearch_aws_region,
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
                 if: ->(setting) { setting.elasticsearch_indexing? && setting.elasticsearch_aws? }
@@ -115,7 +117,8 @@ module EE
           slack_app_secret: nil,
           slack_app_verification_token: nil,
           custom_project_templates_group_id: nil,
-          geo_node_allowed_ips: '0.0.0.0/0, ::/0'
+          geo_node_allowed_ips: '0.0.0.0/0, ::/0',
+          seat_link_enabled: Settings.gitlab['seat_link_enabled']
         )
       end
     end
@@ -156,6 +159,18 @@ module EE
 
     def pseudonymizer_enabled?
       pseudonymizer_available? && super
+    end
+
+    def seat_link_available?
+      License.feature_available?(:seat_link)
+    end
+
+    def seat_link_can_be_configured?
+      Settings.gitlab.seat_link_enabled
+    end
+
+    def seat_link_enabled?
+      seat_link_available? && seat_link_can_be_configured? && super
     end
 
     def should_check_namespace_plan?
@@ -290,6 +305,19 @@ module EE
       ::Gitlab::CIDR.new(geo_node_allowed_ips)
     rescue ::Gitlab::CIDR::ValidationError => e
       errors.add(:geo_node_allowed_ips, e.message)
+    end
+
+    def check_elasticsearch_url_scheme
+      # ElasticSearch only exposes a RESTful API, hence we need
+      # to use the HTTP protocol on all URLs.
+      elasticsearch_url.each do |str|
+        ::Gitlab::UrlBlocker.validate!(str,
+                                       schemes: %w[http https],
+                                       allow_localhost: true,
+                                       dns_rebind_protection: false)
+      end
+    rescue ::Gitlab::UrlBlocker::BlockedUrlError
+      errors.add(:elasticsearch_url, "only supports valid HTTP(S) URLs.")
     end
   end
 end

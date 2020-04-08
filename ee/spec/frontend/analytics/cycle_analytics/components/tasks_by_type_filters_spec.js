@@ -1,29 +1,52 @@
-import { shallowMount, mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { GlDropdownItem, GlSegmentedControl } from '@gitlab/ui';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type_filters.vue';
+import LabelsSelector from 'ee/analytics/cycle_analytics/components/labels_selector.vue';
 import {
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
+import waitForPromises from 'helpers/wait_for_promises';
 import { shouldFlashAMessage } from '../helpers';
 import { groupLabels } from '../mock_data';
+import createStore from 'ee/analytics/cycle_analytics/store';
+import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 
 const selectedLabelIds = [groupLabels[0].id];
 
 const findSubjectFilters = ctx => ctx.find(GlSegmentedControl);
 const findSelectedSubjectFilters = ctx => findSubjectFilters(ctx).attributes('checked');
-const findDropdownLabels = ctx => ctx.findAll(GlDropdownItem);
+const findDropdownLabels = ctx => ctx.find(LabelsSelector).findAll(GlDropdownItem);
 
 const selectLabelAtIndex = (ctx, index) => {
   findDropdownLabels(ctx)
     .at(index)
-    .vm.$emit('click');
-  return ctx.vm.$nextTick();
+    .trigger('click');
+
+  return waitForPromises();
 };
 
+const mockGroupLabelsRequest = () => new MockAdapter(axios).onGet().reply(200, groupLabels);
+
+let store = null;
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 function createComponent({ props = {}, mountFn = shallowMount }) {
+  store = createStore();
   return mountFn(TasksByTypeFilters, {
+    localVue,
+    store: {
+      ...store,
+      getters: {
+        ...getters,
+        currentGroupPath: 'fake',
+      },
+    },
     propsData: {
       selectedLabelIds,
       labels: groupLabels,
@@ -31,42 +54,50 @@ function createComponent({ props = {}, mountFn = shallowMount }) {
       ...props,
     },
     stubs: {
-      GlNewDropdown: true,
-      GlDropdownItem: true,
+      LabelsSelector,
     },
   });
 }
 
 describe('TasksByTypeFilters', () => {
   let wrapper = null;
+  let mock = null;
 
   beforeEach(() => {
+    mock = mockGroupLabelsRequest();
     wrapper = createComponent({});
+
+    return waitForPromises();
   });
 
   afterEach(() => {
+    mock.restore();
     wrapper.destroy();
   });
 
   describe('labels', () => {
     beforeEach(() => {
+      mock = mockGroupLabelsRequest();
       wrapper = createComponent({});
+
+      return waitForPromises();
     });
 
-    it('emits the `updateFilter` event when a subject label is clicked', () => {
+    it('emits the `updateFilter` event when a label is selected', () => {
       expect(wrapper.emitted('updateFilter')).toBeUndefined();
-      return selectLabelAtIndex(wrapper, 0).then(() => {
-        expect(wrapper.emitted('updateFilter')).toBeDefined();
 
-        expect(wrapper.emitted('updateFilter')[0]).toEqual([
-          { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: groupLabels[0].id },
-        ]);
-      });
+      wrapper.find(LabelsSelector).vm.$emit('selectLabel', groupLabels[0].id);
+
+      expect(wrapper.emitted('updateFilter')).toBeDefined();
+      expect(wrapper.emitted('updateFilter')[0]).toEqual([
+        { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: groupLabels[0].id },
+      ]);
     });
 
     describe('with the warningMessageThreshold label threshold reached', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
+        mock = mockGroupLabelsRequest();
         wrapper = createComponent({
           props: {
             maxLabels: 5,
@@ -75,7 +106,7 @@ describe('TasksByTypeFilters', () => {
           },
         });
 
-        return selectLabelAtIndex(wrapper, 2);
+        return waitForPromises().then(() => selectLabelAtIndex(wrapper, 2));
       });
 
       it('should indicate how many labels are selected', () => {
@@ -86,6 +117,8 @@ describe('TasksByTypeFilters', () => {
     describe('with maximum labels selected', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
+        mock = mockGroupLabelsRequest();
+
         wrapper = createComponent({
           props: {
             maxLabels: 2,
@@ -94,7 +127,9 @@ describe('TasksByTypeFilters', () => {
           },
         });
 
-        return selectLabelAtIndex(wrapper, 2);
+        return waitForPromises().then(() => {
+          wrapper.find(LabelsSelector).vm.$emit('selectLabel', groupLabels[2].id);
+        });
       });
 
       it('should indicate how many labels are selected', () => {

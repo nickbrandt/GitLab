@@ -1,25 +1,29 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton, GlLink, GlFormInput, GlFormGroup } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink, GlFormInput, GlFormGroup } from '@gitlab/ui';
 import { escape as esc } from 'lodash';
 import { __, sprintf } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { BACK_URL_PARAM } from '~/releases/constants';
 import { getParameterByName } from '~/lib/utils/common_utils';
+import AssetLinksForm from './asset_links_form.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'ReleaseEditApp',
   components: {
     GlFormInput,
     GlFormGroup,
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
     MarkdownField,
+    AssetLinksForm,
   },
   directives: {
     autofocusonshow,
   },
+  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState('detail', [
       'isFetchingRelease',
@@ -35,7 +39,7 @@ export default {
     subtitleText() {
       return sprintf(
         __(
-          'Releases are based on Git tags. We recommend naming tags that fit within semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}.',
+          'Releases are based on Git tags. We recommend tags that use semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}.',
         ),
         {
           codeStart: '<code>',
@@ -79,6 +83,9 @@ export default {
     },
     cancelPath() {
       return getParameterByName(BACK_URL_PARAM) || this.releasesPagePath;
+    },
+    showAssetLinksForm() {
+      return this.glFeatures.releaseAssetLinkEditing;
     },
   },
   created() {
@@ -153,15 +160,17 @@ export default {
         </div>
       </gl-form-group>
 
+      <asset-links-form v-if="showAssetLinksForm" />
+
       <div class="d-flex pt-3">
-        <gl-button
+        <gl-deprecated-button
           class="mr-auto js-submit-button"
           variant="success"
           type="submit"
           :aria-label="__('Save changes')"
         >
           {{ __('Save changes') }}
-        </gl-button>
+        </gl-deprecated-button>
         <gl-link :href="cancelPath" class="js-cancel-button btn btn-default">
           {{ __('Cancel') }}
         </gl-link>

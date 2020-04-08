@@ -38,7 +38,7 @@ describe Projects::ProjectMembersController do
         it 'responds with 403' do
           apply_import
 
-          expect(response.status).to eq 403
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -70,7 +70,7 @@ describe Projects::ProjectMembersController do
       it 'responds with 403' do
         create_member
 
-        expect(response.status).to eq 403
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -96,7 +96,7 @@ describe Projects::ProjectMembersController do
       it 'responds with 403' do
         import
 
-        expect(response.status).to eq 403
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

@@ -22,7 +22,6 @@ class License < ApplicationRecord
     group_burndown_charts
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     ldap_group_sync
@@ -36,6 +35,7 @@ class License < ApplicationRecord
     related_issues
     repository_mirrors
     repository_size_limit
+    seat_link
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -58,13 +58,11 @@ class License < ApplicationRecord
     custom_file_templates
     custom_file_templates_for_namespace
     custom_project_templates
-    custom_prometheus_metrics
     cycle_analytics_for_groups
     db_load_balancing
     default_project_deletion_protection
     dependency_proxy
     deploy_board
-    design_management
     disable_name_update_for_users
     email_additional_text
     epics
@@ -113,6 +111,7 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
+    enterprise_templates
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management
@@ -151,7 +150,6 @@ class License < ApplicationRecord
     file_locks
     group_webhooks
     issuable_default_templates
-    issue_board_focus_mode
     issue_weights
     jenkins_integration
     merge_request_approvers
@@ -205,6 +203,7 @@ class License < ApplicationRecord
     custom_project_templates
     db_load_balancing
     elastic_search
+    enterprise_templates
     extended_audit_events
     external_authorization_service_api_management
     geo
@@ -216,6 +215,7 @@ class License < ApplicationRecord
     project_aliases
     repository_size_limit
     required_ci_templates
+    seat_link
     usage_quotas
   ].freeze
 

@@ -27,6 +27,7 @@ import {
   mockFormattedEpic,
   mockSortedBy,
   mockGroupEpicsQueryResponse,
+  mockGroupEpicsQueryResponseFormatted,
   mockEpicChildEpicsQueryResponse,
   mockGroupMilestonesQueryResponse,
   rawMilestones,
@@ -181,6 +182,10 @@ describe('Roadmap Vuex Actions', () => {
             Object.assign({}, mockRawEpic, {
               start_date: '2017-12-31',
               end_date: '2018-2-15',
+              descendantWeightSum: {
+                closedIssues: 3,
+                openedIssues: 2,
+              },
             }),
           ],
         },
@@ -209,7 +214,19 @@ describe('Roadmap Vuex Actions', () => {
     it('should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', done => {
       testAction(
         actions.receiveEpicsSuccess,
-        { rawEpics: [mockRawEpic], newEpic: true, timeframeExtended: true },
+        {
+          rawEpics: [
+            {
+              ...mockRawEpic,
+              descendantWeightSum: {
+                closedIssues: 3,
+                openedIssues: 2,
+              },
+            },
+          ],
+          newEpic: true,
+          timeframeExtended: true,
+        },
         state,
         [
           { type: types.UPDATE_EPIC_IDS, payload: mockRawEpic.id },
@@ -262,7 +279,11 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('success', () => {
       it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', done => {
-        mock.onGet(epicsPath).replyOnce(200, rawEpics);
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.resolve({
+            data: mockGroupEpicsQueryResponse.data,
+          }),
+        );
 
         testAction(
           actions.fetchEpics,
@@ -275,7 +296,7 @@ describe('Roadmap Vuex Actions', () => {
             },
             {
               type: 'receiveEpicsSuccess',
-              payload: { rawEpics },
+              payload: { rawEpics: mockGroupEpicsQueryResponseFormatted },
             },
           ],
           done,
@@ -285,7 +306,9 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('failure', () => {
       it('should dispatch requestEpics and receiveEpicsFailure when request fails', done => {
-        mock.onGet(epicsPath).replyOnce(500, {});
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.reject(new Error('error message')),
+        );
 
         testAction(
           actions.fetchEpics,
@@ -321,7 +344,11 @@ describe('Roadmap Vuex Actions', () => {
 
     describe('success', () => {
       it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', done => {
-        mock.onGet(mockEpicsPath).replyOnce(200, rawEpics);
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.resolve({
+            data: mockGroupEpicsQueryResponse.data,
+          }),
+        );
 
         testAction(
           actions.fetchEpicsForTimeframe,
@@ -334,7 +361,11 @@ describe('Roadmap Vuex Actions', () => {
             },
             {
               type: 'receiveEpicsSuccess',
-              payload: { rawEpics, newEpic: true, timeframeExtended: true },
+              payload: {
+                rawEpics: mockGroupEpicsQueryResponseFormatted,
+                newEpic: true,
+                timeframeExtended: true,
+              },
             },
           ],
           done,
@@ -593,6 +624,19 @@ describe('Roadmap Vuex Actions', () => {
         {},
         { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), milestones },
         [{ type: types.SET_MILESTONES, payload: milestones }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleExpandedEpic', () => {
+    it('should perform TOGGLE_EXPANDED_EPIC mutation with epic ID payload', done => {
+      testAction(
+        actions.toggleExpandedEpic,
+        10,
+        state,
+        [{ type: types.TOGGLE_EXPANDED_EPIC, payload: 10 }],
         [],
         done,
       );

@@ -53,7 +53,7 @@ describe JiraConnect::SyncBranchWorker do
     end
 
     context 'when project no longer exists' do
-      let(:project_id) { Project.maximum(:id).to_i + 1 }
+      let(:project_id) { non_existing_record_id }
 
       it 'does not call JiraConnect::SyncService' do
         expect(JiraConnect::SyncService).not_to receive(:new)

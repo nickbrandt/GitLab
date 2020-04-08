@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import { createLocalVue, mount } from '@vue/test-utils';
+import waitForPromises from 'helpers/wait_for_promises';
 import CustomStageForm, {
   initializeFormData,
 } from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
+  endpoints,
   groupLabels,
   customStageEvents as events,
   labelStartEvent,
@@ -40,14 +44,18 @@ describe('CustomStageForm', () => {
       store,
       propsData: {
         events,
-        labels: groupLabels,
         ...props,
       },
-      stubs,
+      stubs: {
+        'labels-selector': false,
+        ...stubs,
+      },
     });
   }
 
   let wrapper = null;
+  let mock;
+
   const findEvent = ev => wrapper.emitted()[ev];
 
   const sel = {
@@ -104,12 +112,17 @@ describe('CustomStageForm', () => {
     return _wrapper.vm.$nextTick();
   }
 
+  const mockGroupLabelsRequest = () =>
+    new MockAdapter(axios).onGet(endpoints.groupLabels).reply(200, groupLabels);
+
   beforeEach(() => {
+    mock = mockGroupLabelsRequest();
     wrapper = createComponent({});
   });
 
   afterEach(() => {
     wrapper.destroy();
+    mock.restore();
   });
 
   describe.each([
@@ -170,14 +183,20 @@ describe('CustomStageForm', () => {
 
       it('selects events with canBeStartEvent=true for the start events dropdown', () => {
         const select = wrapper.find(sel.startEvent);
-        expect(select.html()).toMatchSnapshot();
+
+        events
+          .filter(ev => ev.canBeStartEvent)
+          .forEach(ev => {
+            expect(select.html()).toHaveHtml(
+              `<option value="${ev.identifier}">${ev.name}</option>`,
+            );
+          });
       });
 
       it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
         const select = wrapper.find(sel.startEvent);
-        expect(select.html()).toMatchSnapshot();
 
-        stopEvents
+        events
           .filter(ev => !ev.canBeStartEvent)
           .forEach(ev => {
             expect(select.html()).not.toHaveHtml(
@@ -189,7 +208,10 @@ describe('CustomStageForm', () => {
 
     describe('start event label', () => {
       beforeEach(() => {
+        mock = mockGroupLabelsRequest();
         wrapper = createComponent();
+
+        return wrapper.vm.$nextTick();
       });
 
       afterEach(() => {
@@ -217,14 +239,13 @@ describe('CustomStageForm', () => {
         expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
 
         wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
-        return Vue.nextTick()
+        return waitForPromises()
           .then(() => {
             wrapper
               .find(sel.startEventLabel)
               .findAll('.dropdown-item')
               .at(1) // item at index 0 is 'select a label'
               .trigger('click');
-
             return Vue.nextTick();
           })
           .then(() => {
@@ -400,7 +421,7 @@ describe('CustomStageForm', () => {
           },
         });
 
-        return Vue.nextTick()
+        return waitForPromises()
           .then(() => {
             wrapper
               .find(sel.endEventLabel)

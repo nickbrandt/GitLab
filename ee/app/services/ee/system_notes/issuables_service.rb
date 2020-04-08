@@ -44,6 +44,22 @@ module EE
 
         create_note(NoteSummary.new(noteable, project, author, body, action: 'weight'))
       end
+
+      # Called when the health_status of an Issue is changed
+      #
+      # Example Note text:
+      #
+      #   "removed the health status"
+      #
+      #   "changed health status to at risk"
+      #
+      # Returns the created Note object
+      def change_health_status_note
+        health_status = noteable.health_status&.humanize(capitalize: false)
+        body = health_status ? "changed health status to **#{health_status}**" : 'removed the health status'
+
+        create_note(NoteSummary.new(noteable, project, author, body, action: 'health_status'))
+      end
     end
   end
 end

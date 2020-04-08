@@ -51,9 +51,9 @@ module EE
 
         def features_usage_data_ee
           {
-            elasticsearch_enabled: ::Gitlab::CurrentSettings.elasticsearch_search?,
-            license_trial_ends_on: License.trial_ends_on,
-            geo_enabled: ::Gitlab::Geo.enabled?
+            elasticsearch_enabled: alt_usage_data { ::Gitlab::CurrentSettings.elasticsearch_search? },
+            license_trial_ends_on: alt_usage_data { License.trial_ends_on },
+            geo_enabled: alt_usage_data { ::Gitlab::Geo.enabled? }
           }
         end
 
@@ -140,29 +140,31 @@ module EE
         override :system_usage_data
         def system_usage_data
           super.tap do |usage_data|
-            usage_data[:counts].merge!({
-                                         dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
-                                         epics: count(::Epic),
-                                         feature_flags: count(Operations::FeatureFlag),
-                                         geo_nodes: count(::GeoNode),
-                                         ldap_group_links: count(::LdapGroupLink),
-                                         ldap_keys: count(::LDAPKey),
-                                         ldap_users: count(::User.ldap, 'users.id'),
-                                         pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
-                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-                                         merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
-                                         merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
-                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
-                                         projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-                                         projects_with_packages: distinct_count(::Packages::Package, :project_id),
-                                         projects_with_prometheus_alerts: distinct_count(PrometheusAlert, :project_id),
-                                         projects_with_tracing_enabled: count(ProjectTracingSetting),
-                                         template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
-                                       },
-                                       service_desk_counts,
-                                       security_products_usage,
-                                       epics_deepest_relationship_level,
-                                       operations_dashboard_usage)
+            usage_data[:counts].merge!(
+              {
+                dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
+                epics: count(::Epic),
+                feature_flags: count(Operations::FeatureFlag),
+                geo_nodes: count(::GeoNode),
+                ldap_group_links: count(::LdapGroupLink),
+                ldap_keys: count(::LDAPKey),
+                ldap_users: count(::User.ldap, 'users.id'),
+                pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
+                projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
+                merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
+                merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
+                projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
+                projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+                projects_with_packages: distinct_count(::Packages::Package, :project_id),
+                projects_with_tracing_enabled: count(ProjectTracingSetting),
+                status_page_projects: count(::StatusPageSetting.enabled),
+                status_page_issues: count(::Issue.on_status_page),
+                template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
+              },
+              service_desk_counts,
+              security_products_usage,
+              epics_deepest_relationship_level,
+              operations_dashboard_usage)
           end
         end
 
@@ -200,9 +202,9 @@ module EE
         # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
-            clusters_applications_cert_managers: ::Clusters::Applications::CertManager.where(time_period).distinct_by_user,
+            clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
             clusters_applications_helm: ::Clusters::Applications::Helm.where(time_period).distinct_by_user,
-            clusters_applications_ingress: ::Clusters::Applications::Ingress.where(time_period).distinct_by_user,
+            clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
             clusters_applications_knative: ::Clusters::Applications::Knative.where(time_period).distinct_by_user,
             clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
             clusters_enabled: distinct_count(::Clusters::Cluster.enabled.where(time_period), :user_id),
@@ -233,7 +235,10 @@ module EE
             protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id),
             remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
             snippets: distinct_count(::Snippet.where(time_period), :author_id),
-            suggestions: distinct_count(::Note.with_suggestions.where(time_period), :author_id)
+            suggestions: distinct_count(::Note.with_suggestions.where(time_period),
+                                        :author_id,
+                                        start: ::User.minimum(:id),
+                                        finish: ::User.maximum(:id))
           }
         end
 
@@ -244,7 +249,8 @@ module EE
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
-            users_created: count(::User.where(time_period))
+            users_created: count(::User.where(time_period)),
+            value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true))
           }
         end
 
@@ -281,7 +287,7 @@ module EE
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
-            service_desk_enabled_projects: distinct_count(::Project.with_active_services.service_desk_enabled.where(time_period), :creator_id),
+            service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
             service_desk_issues: count(::Issue.service_desk.where(time_period)),
             todos: distinct_count(::Todo.where(time_period), :author_id)
           }
@@ -334,6 +340,19 @@ module EE
           results[combined_license_key] += license_scan_count
 
           results
+        end
+
+        private
+
+        def distinct_count_service_desk_enabled_projects(time_period)
+          project_creator_id_start = ::User.minimum(:id)
+          project_creator_id_finish = ::User.maximum(:id)
+
+          distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
+        end
+
+        def clusters_user_distinct_count(clusters, time_period)
+          distinct_count(clusters.where(time_period).available.joins(:cluster), 'clusters.user_id')
         end
         # rubocop:enable CodeReuse/ActiveRecord
       end

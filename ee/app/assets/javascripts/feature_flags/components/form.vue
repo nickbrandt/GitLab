@@ -1,38 +1,44 @@
 <script>
 import Vue from 'vue';
-import { memoize, isString } from 'lodash';
+import { memoize, isString, cloneDeep, isNumber } from 'lodash';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlBadge,
   GlTooltip,
   GlTooltipDirective,
   GlFormTextarea,
   GlFormCheckbox,
+  GlSprintf,
 } from '@gitlab/ui';
-import { s__, sprintf } from '~/locale';
+import { s__ } from '~/locale';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import EnvironmentsDropdown from './environments_dropdown.vue';
+import Strategy from './strategy.vue';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
   ROLLOUT_STRATEGY_USER_ID,
   ALL_ENVIRONMENTS_NAME,
   INTERNAL_ID_PREFIX,
+  NEW_VERSION_FLAG,
+  LEGACY_FLAG,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlBadge,
     GlFormTextarea,
     GlFormCheckbox,
     GlTooltip,
+    GlSprintf,
     ToggleButton,
     Icon,
     EnvironmentsDropdown,
+    Strategy,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -71,22 +77,29 @@ export default {
       type: String,
       required: true,
     },
+    strategies: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    version: {
+      type: String,
+      required: false,
+      default: LEGACY_FLAG,
+    },
   },
+  translations: {
+    allEnvironmentsText: s__('FeatureFlags|* (All Environments)'),
 
-  allEnvironmentsText: s__('FeatureFlags|* (All Environments)'),
-
-  helpText: sprintf(
-    s__(
+    helpText: s__(
       'FeatureFlags|Feature Flag behavior is built up by creating a set of rules to define the status of target environments. A default wildcard rule %{codeStart}*%{codeEnd} for %{boldStart}All Environments%{boldEnd} is set, and you are able to add as many rules as you need by choosing environment specs below. You can toggle the behavior for each of your rules to set them %{boldStart}Active%{boldEnd} or %{boldStart}Inactive%{boldEnd}.',
     ),
-    {
-      codeStart: '<code>',
-      codeEnd: '</code>',
-      boldStart: '<b>',
-      boldEnd: '</b>',
-    },
-    false,
-  ),
+
+    newHelpText: s__(
+      'FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies. By default, features are available to all users in all environments.',
+    ),
+    noStrategiesText: s__('FeatureFlags|Feature Flag has no strategies'),
+  },
 
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
@@ -102,6 +115,7 @@ export default {
 
       // operate on a clone to avoid mutating props
       formScopes: this.scopes.map(s => ({ ...s })),
+      formStrategies: cloneDeep(this.strategies),
 
       newScope: '',
     };
@@ -110,14 +124,36 @@ export default {
     filteredScopes() {
       return this.formScopes.filter(scope => !scope.shouldBeDestroyed);
     },
+    filteredStrategies() {
+      return this.formStrategies.filter(s => !s.shouldBeDestroyed);
+    },
     canUpdateFlag() {
       return !this.permissionsFlag || (this.formScopes || []).every(scope => scope.canUpdate);
     },
     permissionsFlag() {
       return this.glFeatures.featureFlagPermissions;
     },
+    supportsStrategies() {
+      return this.glFeatures.featureFlagsNewVersion && this.version === NEW_VERSION_FLAG;
+    },
+
+    canDeleteStrategy() {
+      return this.formStrategies.length > 1;
+    },
   },
   methods: {
+    addStrategy() {
+      this.formStrategies.push({ name: '', parameters: {}, scopes: [] });
+    },
+
+    deleteStrategy(s) {
+      if (isNumber(s.id)) {
+        Vue.set(s, 'shouldBeDestroyed', true);
+      } else {
+        this.formStrategies = this.formStrategies.filter(strategy => strategy !== s);
+      }
+    },
+
     isAllEnvironment(name) {
       return name === ALL_ENVIRONMENTS_NAME;
     },
@@ -157,12 +193,20 @@ export default {
      * it triggers an event with the form data
      */
     handleSubmit() {
-      this.$emit('handleSubmit', {
+      const flag = {
         name: this.formName,
         description: this.formDescription,
-        scopes: this.formScopes,
         active: this.active,
-      });
+        version: this.version,
+      };
+
+      if (this.version === LEGACY_FLAG) {
+        flag.scopes = this.formScopes;
+      } else {
+        flag.strategies = this.formStrategies;
+      }
+
+      this.$emit('handleSubmit', flag);
     },
 
     canUpdateScope(scope) {
@@ -208,6 +252,14 @@ export default {
         scope.rolloutUserIds.length > 0 &&
         scope.rolloutStrategy === ROLLOUT_STRATEGY_PERCENT_ROLLOUT;
     },
+    onFormStrategyChange({ id, name, parameters, scopes }, index) {
+      Object.assign(this.filteredStrategies[index], {
+        id,
+        name,
+        parameters,
+        scopes,
+      });
+    },
   },
 };
 </script>
@@ -241,10 +293,46 @@ export default {
         </div>
       </div>
 
-      <div class="row">
+      <template v-if="supportsStrategies">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>{{ s__('FeatureFlags|Strategies') }}</h4>
+            <div class="flex align-items-baseline justify-content-between">
+              <p class="mr-3">{{ $options.translations.newHelpText }}</p>
+              <gl-deprecated-button variant="success" category="secondary" @click="addStrategy">
+                {{ s__('FeatureFlags|Add strategy') }}
+              </gl-deprecated-button>
+            </div>
+          </div>
+        </div>
+        <template v-if="filteredStrategies.length > 0">
+          <strategy
+            v-for="(strategy, index) in filteredStrategies"
+            :key="strategy.id"
+            :strategy="strategy"
+            :index="index"
+            :endpoint="environmentsEndpoint"
+            :can-delete="canDeleteStrategy"
+            @change="onFormStrategyChange($event, index)"
+            @delete="deleteStrategy(strategy)"
+          />
+        </template>
+        <div v-else class="flex justify-content-center border-top py-4 w-100">
+          <span>{{ $options.translations.noStrategiesText }}</span>
+        </div>
+      </template>
+
+      <div v-else class="row">
         <div class="form-group col-md-12">
           <h4>{{ s__('FeatureFlags|Target environments') }}</h4>
-          <div v-html="$options.helpText"></div>
+          <gl-sprintf :message="$options.translations.helpText">
+            <template #code="{ content }">
+              <code>{{ content }}</code>
+            </template>
+            <template #bold="{ content }">
+              <b>{{ content }}</b>
+            </template>
+          </gl-sprintf>
 
           <div class="js-scopes-table prepend-top-default">
             <div class="gl-responsive-table-row table-row-header" role="row">
@@ -274,7 +362,7 @@ export default {
                   class="table-mobile-content js-feature-flag-status d-flex align-items-center justify-content-start"
                 >
                   <p v-if="isAllEnvironment(scope.environmentScope)" class="js-scope-all pl-3">
-                    {{ $options.allEnvironmentsText }}
+                    {{ $options.translations.allEnvironmentsText }}
                   </p>
 
                   <environments-dropdown
@@ -394,7 +482,7 @@ export default {
                   {{ s__('FeatureFlags|Remove') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-delete">
-                  <gl-button
+                  <gl-deprecated-button
                     v-if="!isAllEnvironment(scope.environmentScope) && canUpdateScope(scope)"
                     v-gl-tooltip
                     :title="s__('FeatureFlags|Remove')"
@@ -402,7 +490,7 @@ export default {
                     @click="removeScope(scope)"
                   >
                     <icon name="clear" />
-                  </gl-button>
+                  </gl-deprecated-button>
                 </div>
               </div>
             </div>
@@ -463,7 +551,7 @@ export default {
     </fieldset>
 
     <div class="form-actions">
-      <gl-button
+      <gl-deprecated-button
         ref="submitButton"
         type="button"
         variant="success"
@@ -471,10 +559,14 @@ export default {
         @click="handleSubmit"
       >
         {{ submitText }}
-      </gl-button>
-      <gl-button :href="cancelPath" variant="secondary" class="js-ff-cancel col-xs-12 float-right">
+      </gl-deprecated-button>
+      <gl-deprecated-button
+        :href="cancelPath"
+        variant="secondary"
+        class="js-ff-cancel col-xs-12 float-right"
+      >
         {{ __('Cancel') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
   </form>
 </template>

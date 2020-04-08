@@ -84,7 +84,7 @@ following is most likely true:
 
 - The `bind_dn` user doesn't have enough permissions to traverse the user tree.
 - The user(s) don't fall under the [configured `base`](ldap.md#configuration).
-- The [configured `user_filter`][user-filter] blocks access to the user(s).
+- The [configured `user_filter`](ldap.md#using-an-ldap-filter-to-limit-access-to-your-gitlab-server) blocks access to the user(s).
 
 In this case, you con confirm which of the above is true using
 [ldapsearch](#ldapsearch) with the existing LDAP configuration in your
@@ -97,7 +97,7 @@ here are some questions to ask yourself:
 
 - Does the user fall under the [configured `base`](ldap.md#configuration) in
   LDAP? The user must fall under this `base` to login.
-- Does the user pass through the [configured `user_filter`][user-filter]?
+- Does the user pass through the [configured `user_filter`](ldap.md#using-an-ldap-filter-to-limit-access-to-your-gitlab-server)?
   If one is not configured, this question can be ignored. If it is, then the
   user must also pass through this filter to be allowed to login.
   - Refer to our docs on [debugging the `user_filter`](#debug-ldap-user-filter).
@@ -132,7 +132,7 @@ are true for the user in question:
 #### Email has already been taken
 
 A user tries to login with the correct LDAP credentials, is denied access,
-and the [production.log][production-log] shows an error that looks like this:
+and the [production.log](../logs.md#productionlog) shows an error that looks like this:
 
 ```plaintext
 (LDAP) Error saving user <USER DN> (email@example.com): ["Email has already been taken"]
@@ -168,7 +168,7 @@ profile](../../user/profile/index.md#user-profile) or an admin can do it.
 #### Debug LDAP user filter
 
 [`ldapsearch`](#ldapsearch) allows you to test your configured
-[user filter][user-filter]
+[user filter](ldap.md#using-an-ldap-filter-to-limit-access-to-your-gitlab-server)
 to confirm that it returns the users you expect it to return.
 
 ```shell
@@ -184,7 +184,7 @@ ldapsearch -H ldaps://$host:$port -D "$bind_dn" -y bind_dn_password.txt  -b "$ba
 
 #### Sync all users **(STARTER ONLY)**
 
-The output from a manual [user sync][user-sync] can show you what happens when
+The output from a manual [user sync](ldap-ee.md#user-sync) can show you what happens when
 GitLab tries to sync its users against LDAP. Enter the [rails console](#rails-console)
 and then run:
 
@@ -297,9 +297,9 @@ LDAP group sync, but for some reason it's not happening. There are several
 things to check to debug the situation.
 
 - Ensure LDAP configuration has a `group_base` specified.
-  [This configuration][group-sync] is required for group sync to work properly.
+  [This configuration](ldap-ee.md#group-sync) is required for group sync to work properly.
 - Ensure the correct [LDAP group link is added to the GitLab
-  group][group-links].
+  group](ldap-ee.md#adding-group-links).
 - Check that the user has an LDAP identity:
   1. Sign in to GitLab as an administrator user.
   1. Navigate to **Admin area -> Users**.
@@ -311,8 +311,8 @@ things to check to debug the situation.
 - You've waited an hour or [the configured
   interval](ldap-ee.md#adjusting-ldap-group-sync-schedule) for the group to
   sync. To speed up the process, either go to the GitLab group **Settings ->
-  Members** and press **Sync now** (sync one group) or [run the group sync rake
-  task][group-sync-rake] (sync all groups).
+  Members** and press **Sync now** (sync one group) or [run the group sync Rake
+  task](../raketasks/ldap.md#run-a-group-sync) (sync all groups).
 
 If all of the above looks good, jump in to a little more advanced debugging in
 the rails console.
@@ -351,10 +351,10 @@ GitLab syncs the `admin_group`.
 #### Sync all groups **(STARTER ONLY)**
 
 NOTE: **NOTE:**
-To sync all groups manually when debugging is unnecessary, [use the rake
-task][group-sync-rake] instead.
+To sync all groups manually when debugging is unnecessary, [use the Rake
+task](../raketasks/ldap.md#run-a-group-sync) instead.
 
-The output from a manual [group sync][group-sync] can show you what happens
+The output from a manual [group sync](ldap-ee.md#group-sync) can show you what happens
 when GitLab syncs its LDAP group memberships against LDAP.
 
 ```ruby
@@ -449,7 +449,7 @@ this line will indicate the sync is finished:
 Finished syncing admin users for 'ldapmain' provider
 ```
 
-If [admin sync][admin-sync] is not configured, you'll see a message
+If [admin sync](ldap-ee.md#administrator-sync) is not configured, you'll see a message
 stating as such:
 
 ```shell
@@ -541,7 +541,7 @@ for each of these users.
 
 ### LDAP check
 
-The [rake task to check LDAP][ldap-check] is a valuable tool
+The [Rake task to check LDAP](../raketasks/ldap.md#check) is a valuable tool
 to help determine whether GitLab can successfully establish a connection to
 LDAP and can get so far as to even read users.
 
@@ -550,7 +550,7 @@ with your configuration or a firewall blocking the connection.
 
 - Ensure you don't have a firewall blocking the
 connection, and that the LDAP server is accessible to the GitLab host.
-- Look for an error message in the rake check output, which may lead to your LDAP configuration to
+- Look for an error message in the Rake check output, which may lead to your LDAP configuration to
 confirm that the configuration values (specifically `host`, `port`, `bind_dn`, and
 `password`) are correct.
 - Look for [errors](#connection) in [the logs](#gitlab-logs) to further debug connection failures.
@@ -561,11 +561,11 @@ users, [see what to do when no users are found](#no-users-are-found).
 ### GitLab logs
 
 If a user account is blocked or unblocked due to the LDAP configuration, a
-message will be [logged to `application.log`][application-log].
+message will be [logged to `application.log`](../logs.md#applicationlog).
 
 If there is an unexpected error during an LDAP lookup (configuration error,
 timeout), the login is rejected and a message will be [logged to
-`production.log`][production-log].
+`production.log`](../logs.md#productionlog).
 
 ### ldapsearch
 
@@ -634,7 +634,7 @@ The rails console is a valuable tool to help debug LDAP problems. It allows you 
 directly interact with the application by running commands and seeing how GitLab
 responds to them.
 
-Please refer to [this guide](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session)
+Please refer to [this guide](../troubleshooting/debug.md#starting-a-rails-console-session)
 for instructions on how to use the rails console.
 
 #### Enable debug output
@@ -649,24 +649,3 @@ console](#rails-console) and run:
 ```ruby
 Rails.logger.level = Logger::DEBUG
 ```
-
-<!-- LINK REFERENCES -->
-
-[tail-logs]: https://docs.gitlab.com/omnibus/settings/logs.html#tail-logs-in-a-console-on-the-server
-[production-log]: ../logs.md#productionlog
-[application-log]: ../logs.md#applicationlog
-[reconfigure]: ../restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart]: ../restart_gitlab.md#installations-from-source
-[ldap-check]: ../raketasks/ldap.md#check
-[group-sync-rake]: ../raketasks/ldap.md#run-a-group-sync
-[user-filter]: ldap.md#using-an-ldap-filter-to-limit-access-to-your-gitlab-server
-[user-sync]: ldap-ee.md#user-sync
-[group-sync]: ldap-ee.md#group-sync
-[admin-sync]: ldap-ee.md#administrator-sync
-[config]: ldap.md#configuration
-[group-links]: ldap-ee.md#adding-group-links
-
-[^1]: In Active Directory, a user is marked as disabled/blocked if the user
-      account control attribute (`userAccountControl:1.2.840.113556.1.4.803`)
-      has bit 2 set. See <https://ctogonewild.com/2009/09/03/bitmask-searches-in-ldap/>
-      for more information.

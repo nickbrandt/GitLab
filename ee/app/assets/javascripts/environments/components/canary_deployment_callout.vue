@@ -1,11 +1,11 @@
 <script>
-import { GlButton, GlLink } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
     Icon,
   },
@@ -57,11 +57,11 @@ export default {
         <gl-link :href="helpCanaryDeploymentsPath">{{ __('Read more') }}</gl-link>
       </p>
 
-      <gl-button
+      <gl-deprecated-button
         href="https://about.gitlab.com/sales/"
         variant="outline-primary"
         class="canary-deployment-callout-button"
-        >{{ __('Contact sales to upgrade') }}</gl-button
+        >{{ __('Contact sales to upgrade') }}</gl-deprecated-button
       >
     </div>
 

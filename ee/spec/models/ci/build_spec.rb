@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  let_it_be(:group) { create(:group, plan: :bronze_plan) }
+  let_it_be(:group) { create(:group_with_plan, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -203,8 +203,22 @@ describe Ci::Build do
 
     it { expect(license_scanning_report.licenses.count).to eq(0) }
 
-    context 'when build has a license management report' do
-      context 'when there is a license scanning report' do
+    context 'when build has a license scanning report' do
+      context 'when there is a new type report' do
+        before do
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
+        end
+
+        it 'parses blobs and add the results to the report' do
+          expect { subject }.not_to raise_error
+
+          expect(license_scanning_report.licenses.count).to eq(4)
+          expect(license_scanning_report.licenses.map(&:name)).to contain_exactly("Apache 2.0", "MIT", "New BSD", "unknown")
+          expect(license_scanning_report.licenses.find { |x| x.name == 'MIT' }.dependencies.count).to eq(52)
+        end
+      end
+
+      context 'when there is an old type report' do
         before do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
@@ -218,7 +232,7 @@ describe Ci::Build do
         end
       end
 
-      context 'when there is a corrupted license management report' do
+      context 'when there is a corrupted report' do
         before do
           create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: job, project: job.project)
         end
@@ -231,7 +245,7 @@ describe Ci::Build do
       context 'when Feature flag is disabled for License Scanning reports parsing' do
         before do
           stub_feature_flags(parse_license_management_reports: false)
-          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
         end
 
         it 'does NOT parse license scanning report' do
@@ -241,10 +255,10 @@ describe Ci::Build do
         end
       end
 
-      context 'when the license management feature is disabled' do
+      context 'when the license scanning feature is disabled' do
         before do
           stub_licensed_features(license_scanning: false)
-          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
         end
 
         it 'does NOT parse license scanning report' do
@@ -289,7 +303,7 @@ describe Ci::Build do
   end
 
   describe '#collect_licenses_for_dependency_list!' do
-    let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
+    let!(:license_scan_artifact) { create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
     let(:dependency) { build(:dependency, :nokogiri) }
 
@@ -378,7 +392,7 @@ describe Ci::Build do
   describe ".license_scan" do
     it 'returns only license artifacts' do
       create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)])
-      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)])
+      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_scanning, file_format: :raw)])
 
       expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
     end

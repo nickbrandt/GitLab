@@ -35,7 +35,7 @@ to be careful when using canaries with user-facing changes, because by default,
 requests from the same user will be randomly distributed between canary and
 non-canary pods, which could result in confusion or even errors. If needed, you
 may want to consider [setting `service.spec.sessionAffinity` to `ClientIP` in
-your Kubernetes service definitions][kube-net](https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies), but that is beyond the scope of
+your Kubernetes service definitions](https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies), but that is beyond the scope of
 this document.
 
 ## Enabling Canary Deployments
@@ -44,7 +44,7 @@ Canary deployments require that you properly configure Deploy Boards:
 
 1. Follow the steps to [enable Deploy Boards](deploy_boards.md#enabling-deploy-boards).
 1. To track canary deployments you need to label your Kubernetes deployments and
-   pods with `track: canary`. To get started quickly, you can use the [Auto Deploy](../../topics/autodevops/index.md#auto-deploy)
+   pods with `track: canary`. To get started quickly, you can use the [Auto Deploy](../../topics/autodevops/stages.md#auto-deploy)
    template for canary deployments that GitLab provides.
 
 Depending on the deploy, the label should be either `stable` or `canary`.

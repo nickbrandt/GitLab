@@ -43,12 +43,20 @@ FactoryBot.define do
 
     trait :with_findings do
       after(:build) do |vulnerability|
-        vulnerability.findings = build_list(
+        occurrences_with_solution = build_list(
           :vulnerabilities_occurrence,
           2,
           vulnerability: vulnerability,
           report_type: vulnerability.report_type,
           project: vulnerability.project)
+        occurrences_with_remediation = build_list(
+          :vulnerabilities_occurrence,
+          2,
+          :with_remediation,
+          vulnerability: vulnerability,
+          report_type: vulnerability.report_type,
+          project: vulnerability.project)
+        vulnerability.findings = occurrences_with_solution + occurrences_with_remediation
       end
     end
 

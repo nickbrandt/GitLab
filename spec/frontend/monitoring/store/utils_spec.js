@@ -220,6 +220,15 @@ describe('mapToDashboardViewModel', () => {
 
       expect(getMappedPanel().yAxis.format).toBe(SUPPORTED_FORMATS.number);
     });
+
+    // This property allows single_stat panels to render percentile values
+    it('group maxValue', () => {
+      setupWithPanel({
+        max_value: 100,
+      });
+
+      expect(getMappedPanel().maxValue).toBe(100);
+    });
   });
 
   describe('metrics mapping', () => {
@@ -298,7 +307,7 @@ describe('mapToDashboardViewModel', () => {
 
 describe('uniqMetricsId', () => {
   [
-    { input: { id: 1 }, expected: 'undefined_1' },
+    { input: { id: 1 }, expected: 'NO_DB_1' },
     { input: { metric_id: 2 }, expected: '2_undefined' },
     { input: { metric_id: 2, id: 21 }, expected: '2_21' },
     { input: { metric_id: 22, id: 1 }, expected: '22_1' },

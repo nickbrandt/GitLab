@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Metrics::Dashboard::CloneDashboardService, :use_clean_rails_memory_store_caching do
-  STAGES = ::Gitlab::Metrics::Dashboard::Stages
-
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:environment) { create(:environment, project: project) }
@@ -30,9 +28,20 @@ describe Metrics::Dashboard::CloneDashboardService, :use_clean_rails_memory_stor
             branch: branch
           }
         end
+        let(:stages) { ::Gitlab::Metrics::Dashboard::Stages }
 
-        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH, [STAGES::CommonMetricsInserter, STAGES::CustomMetricsInserter, STAGES::Sorter]
-        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH, [STAGES::CommonMetricsInserter, STAGES::Sorter]
+        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH,
+          [
+            ::Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+            ::Gitlab::Metrics::Dashboard::Stages::CustomMetricsInserter,
+            ::Gitlab::Metrics::Dashboard::Stages::Sorter
+          ]
+
+        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH,
+          [
+            ::Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+            ::Gitlab::Metrics::Dashboard::Stages::Sorter
+          ]
       end
     end
   end

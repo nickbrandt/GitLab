@@ -1,6 +1,14 @@
-// eslint-disable-next-line import/prefer-default-export
+import { __ } from '~/locale';
+
 export const FilterState = {
-  Open: 'opened',
-  Closed: 'closed',
-  All: 'all',
+  opened: 'OPENED',
+  archived: 'ARCHIVED',
+  all: 'ALL',
 };
+
+export const FilterStateEmptyMessage = {
+  OPENED: __('There are no open requirements'),
+  ARCHIVED: __('There are no archived requirements'),
+};
+
+export const DEFAULT_PAGE_SIZE = 20;

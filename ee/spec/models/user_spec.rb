@@ -165,7 +165,7 @@ describe User do
       end
 
       it "returns false for an auditor user if a license is not present" do
-        stub_licensed_features(auditor_user: false)
+        allow(License).to receive(:current).and_return nil
 
         expect(build(:user, :auditor)).not_to be_auditor
       end
@@ -1003,6 +1003,30 @@ describe User do
       end
 
       it { is_expected.to eq [free_group_a, free_group_z] }
+    end
+  end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+
+    let(:user) { create(:user) }
+
+    context 'based on user type' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:user_type, :expected_result) do
+        'service_user'      | true
+        'support_bot'       | false
+        'visual_review_bot' | false
+      end
+
+      with_them do
+        before do
+          user.update(user_type: user_type)
+        end
+
+        it { is_expected.to be expected_result }
+      end
     end
   end
 end

@@ -262,6 +262,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: cronjob:users_create_statistics
+  :feature_category: :users
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: deployment:deployments_finished
   :feature_category: :continuous_delivery
   :has_external_dependencies: 
@@ -919,7 +926,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: 
+  :idempotent: true
 - :name: authorized_keys
   :feature_category: :source_code_management
   :has_external_dependencies: 
@@ -1021,7 +1028,7 @@
 - :name: emails_on_push
   :feature_category: :source_code_management
   :has_external_dependencies: 
-  :urgency: :high
+  :urgency: :low
   :resource_boundary: :cpu
   :weight: 2
   :idempotent: 

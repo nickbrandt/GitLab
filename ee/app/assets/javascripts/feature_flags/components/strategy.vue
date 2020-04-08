@@ -1,13 +1,13 @@
 <script>
 import Vue from 'vue';
-import { isString } from 'lodash';
+import { isNumber } from 'lodash';
 import {
   GlFormSelect,
   GlFormInput,
   GlFormTextarea,
   GlFormGroup,
   GlToken,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
@@ -27,7 +27,7 @@ export default {
     GlFormTextarea,
     GlFormSelect,
     GlToken,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     NewEnvironmentsDropdown,
   },
@@ -122,18 +122,18 @@ export default {
       return (
         this.filteredEnvironments.length === 0 ||
         (this.filteredEnvironments.length === 1 &&
-          this.filteredEnvironments[0].environment_scope === '*')
+          this.filteredEnvironments[0].environmentScope === '*')
       );
     },
     filteredEnvironments() {
-      return this.environments.filter(e => !e.shouldDestroy);
+      return this.environments.filter(e => !e.shouldBeDestroyed);
     },
   },
   methods: {
     addEnvironment(environment) {
       const allEnvironmentsScope = this.environments.find(scope => scope.environmentScope === '*');
       if (allEnvironmentsScope) {
-        allEnvironmentsScope.shouldDestroy = true;
+        allEnvironmentsScope.shouldBeDestroyed = true;
       }
       this.environments.push({ environmentScope: environment });
       this.onStrategyChange();
@@ -158,7 +158,7 @@ export default {
       });
     },
     removeScope(environment) {
-      if (isString(environment.id)) {
+      if (isNumber(environment.id)) {
         Vue.set(environment, 'shouldBeDestroyed', true);
       } else {
         this.environments = this.environments.filter(e => e !== environment);
@@ -224,12 +224,12 @@ export default {
       </div>
 
       <div class="align-self-end align-self-md-stretch order-first offset-md-0 order-md-0 ml-auto">
-        <gl-button v-if="canDelete" variant="danger" @click="$emit('delete')">
+        <gl-deprecated-button v-if="canDelete" variant="danger" @click="$emit('delete')">
           <span class="d-md-none">
             {{ $options.translations.removeLabel }}
           </span>
           <gl-icon class="d-none d-md-inline-flex" name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
     <div class="flex flex-column">

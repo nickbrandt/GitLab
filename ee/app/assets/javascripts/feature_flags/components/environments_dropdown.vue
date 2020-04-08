@@ -1,6 +1,6 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -29,7 +29,7 @@ import createFlash from '~/flash';
 export default {
   name: 'EnvironmentsSearchableInput',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlLoadingIcon,
     Icon,
   },
@@ -184,13 +184,13 @@ export default {
         @input="fetchEnvironments"
       />
 
-      <gl-button
+      <gl-deprecated-button
         v-if="!disabled"
         class="js-clear-search-input btn-transparent clear-search-input position-right-0"
         @click="clearInput"
       >
         <icon name="clear" :aria-label="__('Clear input')" />
-      </gl-button>
+      </gl-deprecated-button>
 
       <div
         v-if="showSuggestions"
@@ -201,9 +201,9 @@ export default {
 
           <ul v-else-if="results.length">
             <li v-for="(result, i) in results" :key="i">
-              <gl-button class="btn-transparent" @click="selectEnvironment(result)">{{
+              <gl-deprecated-button class="btn-transparent" @click="selectEnvironment(result)">{{
                 result
-              }}</gl-button>
+              }}</gl-deprecated-button>
             </li>
           </ul>
           <div v-else-if="!results.length" class="text-secondary p-2">
@@ -211,9 +211,11 @@ export default {
           </div>
 
           <div v-if="shouldRenderCreateButton" class="dropdown-footer">
-            <gl-button class="js-create-button btn-blank dropdown-item" @click="createClicked">{{
-              composedCreateButtonLabel
-            }}</gl-button>
+            <gl-deprecated-button
+              class="js-create-button btn-blank dropdown-item"
+              @click="createClicked"
+              >{{ composedCreateButtonLabel }}</gl-deprecated-button
+            >
           </div>
         </div>
       </div>

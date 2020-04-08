@@ -49,7 +49,7 @@ RSpec.describe AuditEvent, type: :model do
     end
 
     context 'when user does not exists anymore' do
-      subject(:event) { described_class.new(author_id: 99999) }
+      subject(:event) { described_class.new(author_id: non_existing_record_id) }
 
       context 'when details contains author_name' do
         it 'returns author_name' do
@@ -89,10 +89,10 @@ RSpec.describe AuditEvent, type: :model do
     end
 
     context 'when entity does not exist' do
-      subject(:event) { described_class.new(entity_id: 99999, entity_type: 'User') }
+      subject(:event) { described_class.new(entity_id: non_existing_record_id, entity_type: 'User') }
 
-      it 'returns nil' do
-        expect(event.entity).to be_blank
+      it 'returns a NullEntity' do
+        expect(event.entity).to be_a(Gitlab::Audit::NullEntity)
       end
     end
   end

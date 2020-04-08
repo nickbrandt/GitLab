@@ -1,5 +1,5 @@
 <script>
-import { GlModal, GlButton, GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
+import { GlModal, GlDeprecatedButton, GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -19,7 +19,7 @@ export default {
 
   components: {
     GlModal,
-    GlButton,
+    GlDeprecatedButton,
     ModalCopyButton,
     Icon,
     Callout,
@@ -136,7 +136,7 @@ export default {
         />
 
         <div class="input-group-append">
-          <gl-button
+          <gl-deprecated-button
             v-if="canUserRotateToken"
             v-gl-tooltip.hover
             :title="$options.regenerateInstanceIdTooltip"
@@ -144,7 +144,7 @@ export default {
             @click="rotateToken"
           >
             <icon name="retry" />
-          </gl-button>
+          </gl-deprecated-button>
           <modal-copy-button
             :text="instanceId"
             :title="$options.instanceIdCopyText"

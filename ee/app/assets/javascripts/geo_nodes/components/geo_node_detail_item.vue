@@ -1,25 +1,20 @@
 <script>
-import { s__ } from '~/locale';
 import popover from '~/vue_shared/directives/popover';
-import tooltip from '~/vue_shared/directives/tooltip';
-import Icon from '~/vue_shared/components/icon.vue';
-import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 
 import { VALUE_TYPE, CUSTOM_TYPE } from '../constants';
 
 import GeoNodeSyncSettings from './geo_node_sync_settings.vue';
 import GeoNodeEventStatus from './geo_node_event_status.vue';
+import GeoNodeSyncProgress from './geo_node_sync_progress.vue';
 
 export default {
   components: {
-    Icon,
-    StackedProgressBar,
     GeoNodeSyncSettings,
     GeoNodeEventStatus,
+    GeoNodeSyncProgress,
   },
   directives: {
     popover,
-    tooltip,
   },
   props: {
     itemTitle: {
@@ -45,21 +40,6 @@ export default {
       required: false,
       default: '',
     },
-    successLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Synced'),
-    },
-    failureLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Failed'),
-    },
-    neutralLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Out of sync'),
-    },
     itemValueType: {
       type: String,
       required: true,
@@ -78,6 +58,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    detailsPath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   computed: {
@@ -108,25 +93,16 @@ export default {
     <div v-if="isValueTypePlain" :class="cssClass" class="mt-1 node-detail-value">
       {{ itemValue }}
     </div>
-    <div v-if="isValueTypeGraph" :class="{ 'd-flex': itemValueStale }" class="mt-1">
-      <stacked-progress-bar
-        :css-class="itemValueStale ? 'flex-fill' : ''"
-        :success-label="successLabel"
-        :failure-label="failureLabel"
-        :neutral-label="neutralLabel"
-        :success-count="itemValue.successCount"
-        :failure-count="itemValue.failureCount"
-        :total-count="itemValue.totalCount"
-      />
-      <icon
-        v-show="itemValueStale"
-        v-tooltip
-        :title="itemValueStaleTooltip"
-        name="time-out"
-        class="ml-2 text-warning-500"
-        data-container="body"
-      />
-    </div>
+    <geo-node-sync-progress
+      v-if="isValueTypeGraph"
+      :item-title="itemTitle"
+      :item-value="itemValue"
+      :item-value-stale="itemValueStale"
+      :item-value-stale-tooltip="itemValueStaleTooltip"
+      :details-path="detailsPath"
+      :class="{ 'd-flex': itemValueStale }"
+      class="mt-1"
+    />
     <template v-if="isValueTypeCustom">
       <geo-node-sync-settings
         v-if="isCustomTypeSync"

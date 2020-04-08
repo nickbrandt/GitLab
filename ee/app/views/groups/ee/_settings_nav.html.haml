@@ -4,12 +4,6 @@
       %span
         LDAP Synchronization
 
-- if show_saml_in_sidebar?(@group)
-  = nav_link(path: 'saml_providers#show') do
-    = link_to group_saml_providers_path(@group), title: 'SAML SSO', class: 'qa-group-saml-sso-link' do
-      %span
-        SAML SSO
-
 - if @group.feature_available?(:group_webhooks) || show_promotions?
   = nav_link(path: 'hooks#index') do
     = link_to group_hooks_path(@group), title: 'Webhooks' do
@@ -21,16 +15,3 @@
     = link_to group_audit_events_path(@group), title: 'Audit Events', data: { qa_selector: 'audit_events_settings_link' } do
       %span
         Audit Events
-
--# Check if this is not a sub group
-- if License.feature_available?(:usage_quotas) && @group.parent.nil?
-  = nav_link(path: 'usage_quota#index') do
-    = link_to group_usage_quotas_path(@group), title: s_('UsageQuota|Usage Quotas') do
-      %span
-        = s_('UsageQuota|Usage Quotas')
-
-- if Gitlab::CurrentSettings.should_check_namespace_plan?
-  = nav_link(path: 'billings#index') do
-    = link_to group_billings_path(@group), title: 'Billing' do
-      %span
-        Billing

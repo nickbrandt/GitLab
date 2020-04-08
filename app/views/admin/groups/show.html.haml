@@ -4,7 +4,7 @@
 %h3.page-title
   = _('Group: %{group_name}') % { group_name: @group.full_name }
 
-  = link_to admin_group_edit_path(@group), class: "btn float-right" do
+  = link_to admin_group_edit_path(@group), class: "btn float-right", data: { qa_selector: 'edit_group_link' } do
     %i.fa.fa-pencil-square-o
     = _('Edit')
 %hr
@@ -55,7 +55,7 @@
           %span.light= _('Group Git LFS status:')
           %strong
             = group_lfs_status(@group)
-            = link_to icon('question-circle'), help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs')
+            = link_to icon('question-circle'), help_page_path('topics/git/lfs/index')
 
         = render_if_exists 'namespaces/shared_runner_status', namespace: @group
 

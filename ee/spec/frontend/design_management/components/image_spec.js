@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlIcon } from '@gitlab/ui';
 import DesignImage from 'ee/design_management/components/image.vue';
 
 describe('Design management large image component', () => {
@@ -52,6 +53,21 @@ describe('Design management large image component', () => {
     });
   });
 
+  it('renders media broken icon on error', () => {
+    createComponent({
+      isLoading: false,
+      image: 'test.jpg',
+      name: 'test',
+    });
+
+    const image = wrapper.find('img');
+    image.trigger('error');
+    return wrapper.vm.$nextTick().then(() => {
+      expect(image.isVisible()).toBe(false);
+      expect(wrapper.find(GlIcon).element).toMatchSnapshot();
+    });
+  });
+
   describe('zoom', () => {
     const baseImageWidth = 100;
     const baseImageHeight = 100;
@@ -75,12 +91,10 @@ describe('Design management large image component', () => {
         },
       );
 
-      jest
-        .spyOn(wrapper.vm.$refs.contentImg, 'offsetWidth', 'get')
-        .mockImplementation(() => baseImageWidth);
+      jest.spyOn(wrapper.vm.$refs.contentImg, 'offsetWidth', 'get').mockReturnValue(baseImageWidth);
       jest
         .spyOn(wrapper.vm.$refs.contentImg, 'offsetHeight', 'get')
-        .mockImplementation(() => baseImageHeight);
+        .mockReturnValue(baseImageHeight);
     });
 
     it('emits @resize event on zoom', () => {

@@ -91,7 +91,7 @@ There are multiple ways to create a branch from GitLab's web interface.
 
 ### Create a new branch from an issue
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2808) in GitLab 8.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/2808) in GitLab 8.6.
 
 If your development workflow dictates to have an issue for every merge
 request, you can quickly create a branch directly from the issue to speed the process up.
@@ -126,7 +126,7 @@ a blank `README.md` file to it, and creates and redirects you to a new branch
 based on the issue title.
 If your [project is already configured with a deployment service](../integrations/overview.md),
 such as Kubernetes, GitLab takes one step further and prompts you to set up
-[auto deploy](../../../topics/autodevops/index.md#auto-deploy)
+[auto deploy](../../../topics/autodevops/stages.md#auto-deploy)
 by helping you create a `.gitlab-ci.yml` file.
 
 After the branch is created, you can edit files in the repository to fix

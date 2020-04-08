@@ -51,6 +51,7 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:projects_with_repositories_enabled]).to eq(3)
         expect(count_data[:projects_with_error_tracking_enabled]).to eq(1)
         expect(count_data[:projects_with_alerts_service_enabled]).to eq(1)
+        expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
         expect(count_data[:issues_created_from_gitlab_error_tracking_ui]).to eq(1)
         expect(count_data[:issues_with_associated_zoom_link]).to eq(2)
         expect(count_data[:issues_using_zoom_quick_actions]).to eq(3)
@@ -147,6 +148,8 @@ describe Gitlab::UsageData, :aggregate_failures do
         subject { described_class.components_usage_data }
 
         it 'gathers components usage data' do
+          expect(Gitlab::UsageData).to receive(:app_server_type).and_return('server_type')
+          expect(subject[:app_server][:type]).to eq('server_type')
           expect(subject[:gitlab_pages][:enabled]).to eq(Gitlab.config.pages.enabled)
           expect(subject[:gitlab_pages][:version]).to eq(Gitlab::Pages::VERSION)
           expect(subject[:git][:version]).to eq(Gitlab::Git.version)
@@ -156,6 +159,28 @@ describe Gitlab::UsageData, :aggregate_failures do
           expect(subject[:gitaly][:servers]).to be >= 1
           expect(subject[:gitaly][:filesystems]).to be_an(Array)
           expect(subject[:gitaly][:filesystems].first).to be_a(String)
+        end
+      end
+
+      describe '#app_server_type' do
+        subject { described_class.app_server_type }
+
+        it 'successfully identifies runtime and returns the identifier' do
+          expect(Gitlab::Runtime).to receive(:identify).and_return(:runtime_identifier)
+
+          is_expected.to eq('runtime_identifier')
+        end
+
+        context 'when runtime is not identified' do
+          let(:exception) { Gitlab::Runtime::IdentificationError.new('exception message from runtime identify') }
+
+          it 'logs the exception and returns unknown app server type' do
+            expect(Gitlab::Runtime).to receive(:identify).and_raise(exception)
+
+            expect(Gitlab::AppLogger).to receive(:error).with(exception.message)
+            expect(Gitlab::ErrorTracking).to receive(:track_exception).with(exception)
+            expect(subject).to eq('unknown_app_server_type')
+          end
         end
       end
 
@@ -243,5 +268,19 @@ describe Gitlab::UsageData, :aggregate_failures do
     end
 
     it_behaves_like 'usage data execution'
+  end
+
+  describe '#alt_usage_data' do
+    it 'returns the fallback when it gets an error' do
+      expect(described_class.alt_usage_data { raise StandardError } ).to eq(-1)
+    end
+
+    it 'returns the evaluated block when give' do
+      expect(described_class.alt_usage_data { Gitlab::CurrentSettings.uuid } ).to eq(Gitlab::CurrentSettings.uuid)
+    end
+
+    it 'returns the value when given' do
+      expect(described_class.alt_usage_data(1)).to eq 1
+    end
   end
 end

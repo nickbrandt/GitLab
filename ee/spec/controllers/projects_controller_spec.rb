@@ -17,7 +17,9 @@ describe ProjectsController do
     render_views
 
     it 'shows the over size limit warning message if above_size_limit' do
-      allow_any_instance_of(EE::Project).to receive(:above_size_limit?).and_return(true)
+      allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
+        expect(checker).to receive(:above_size_limit?).and_return(true)
+      end
       allow(controller).to receive(:current_user).and_return(user)
 
       get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }

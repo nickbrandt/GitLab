@@ -1,7 +1,13 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 import { isEmpty } from 'lodash';
-import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective, GlLink } from '@gitlab/ui';
+import {
+  GlEmptyState,
+  GlLoadingIcon,
+  GlDeprecatedButton,
+  GlModalDirective,
+  GlLink,
+} from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __, s__ } from '~/locale';
@@ -25,7 +31,7 @@ export default {
     TablePagination,
     GlEmptyState,
     GlLoadingIcon,
-    GlButton,
+    GlDeprecatedButton,
     GlLink,
     ConfigureFeatureFlagsModal,
   },
@@ -231,12 +237,12 @@ export default {
           {{ s__('FeatureFlags|Configure') }}
         </button>
 
-        <gl-button
+        <gl-deprecated-button
           v-if="hasNewPath"
           :href="newFeatureFlagPath"
           variant="success"
           class="js-ff-new"
-          >{{ s__('FeatureFlags|New feature flag') }}</gl-button
+          >{{ s__('FeatureFlags|New feature flag') }}</gl-deprecated-button
         >
       </div>
     </h3>

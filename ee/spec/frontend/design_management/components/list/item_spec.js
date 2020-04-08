@@ -1,4 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlIcon, GlIntersectionObserver } from '@gitlab/ui';
 import VueRouter from 'vue-router';
 import Item from 'ee/design_management/components/list/item.vue';
 
@@ -16,6 +17,7 @@ const DESIGN_VERSION_EVENT = {
 
 describe('Design management list item component', () => {
   let wrapper;
+
   function createComponent({
     notesCount = 0,
     event = DESIGN_VERSION_EVENT.NO_CHANGE,
@@ -45,6 +47,52 @@ describe('Design management list item component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  describe('when item is not in view', () => {
+    it('image is not rendered', () => {
+      createComponent();
+
+      const image = wrapper.find('img');
+      expect(image.attributes('src')).toBe('');
+    });
+  });
+
+  describe('when item appears in view', () => {
+    let image;
+
+    beforeEach(() => {
+      createComponent();
+      image = wrapper.find('img');
+
+      expect(image.attributes('src')).toBe('');
+
+      wrapper.find(GlIntersectionObserver).vm.$emit('appear');
+      return wrapper.vm.$nextTick();
+    });
+
+    it('renders an image', () => {
+      expect(image.attributes('src')).toBe('http://via.placeholder.com/300');
+    });
+
+    it('renders media broken icon when image onerror triggered', () => {
+      image.trigger('error');
+      return wrapper.vm.$nextTick().then(() => {
+        expect(image.isVisible()).toBe(false);
+        expect(wrapper.find(GlIcon).element).toMatchSnapshot();
+      });
+    });
+
+    describe('when imageV432x230 and image provided', () => {
+      it('renders imageV432x230 image', () => {
+        const mockSrc = 'mock-imageV432x230-url';
+        wrapper.setProps({ imageV432x230: mockSrc });
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(image.attributes('src')).toBe(mockSrc);
+        });
+      });
+    });
   });
 
   describe('with notes', () => {

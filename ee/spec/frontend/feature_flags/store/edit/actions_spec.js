@@ -13,6 +13,15 @@ import {
   toggleActive,
 } from 'ee/feature_flags/store/modules/edit/actions';
 import state from 'ee/feature_flags/store/modules/edit/state';
+import {
+  mapStrategiesToRails,
+  mapFromScopesViewModel,
+} from 'ee/feature_flags/store/modules/helpers';
+import {
+  NEW_VERSION_FLAG,
+  LEGACY_FLAG,
+  ROLLOUT_STRATEGY_ALL_USERS,
+} from 'ee/feature_flags/constants';
 import * as types from 'ee/feature_flags/store/modules/edit/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
@@ -67,15 +76,62 @@ describe('Feature flags Edit Module actions', () => {
 
     describe('success', () => {
       it('dispatches requestUpdateFeatureFlag and receiveUpdateFeatureFlagSuccess ', done => {
-        mock.onPut(mockedState.endpoint).replyOnce(200);
+        const featureFlag = {
+          name: 'feature_flag',
+          description: 'feature flag',
+          scopes: [
+            {
+              id: '1',
+              environmentScope: '*',
+              active: true,
+              shouldBeDestroyed: false,
+              canUpdate: true,
+              protected: false,
+              rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+            },
+          ],
+          version: LEGACY_FLAG,
+          active: true,
+        };
+        mock.onPut(mockedState.endpoint, mapFromScopesViewModel(featureFlag)).replyOnce(200);
 
         testAction(
           updateFeatureFlag,
-          {
-            name: 'feature_flag',
-            description: 'feature flag',
-            scopes: [{ environmentScope: '*', active: true }],
-          },
+          featureFlag,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestUpdateFeatureFlag',
+            },
+            {
+              type: 'receiveUpdateFeatureFlagSuccess',
+            },
+          ],
+          done,
+        );
+      });
+      it('handles new version flags as well', done => {
+        const featureFlag = {
+          name: 'name',
+          description: 'description',
+          active: true,
+          version: NEW_VERSION_FLAG,
+          strategies: [
+            {
+              name: ROLLOUT_STRATEGY_ALL_USERS,
+              parameters: {},
+              id: 1,
+              scopes: [{ id: 1, environmentScope: 'environmentScope', shouldBeDestroyed: false }],
+              shouldBeDestroyed: false,
+            },
+          ],
+        };
+        mock.onPut(mockedState.endpoint, mapStrategiesToRails(featureFlag)).replyOnce(200);
+
+        testAction(
+          updateFeatureFlag,
+          featureFlag,
           mockedState,
           [],
           [

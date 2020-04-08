@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 
 import TreeItem from 'ee/related_items_tree/components/tree_item.vue';
 import TreeItemBody from 'ee/related_items_tree/components/tree_item_body.vue';
@@ -137,14 +137,14 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders expand/collapse button', () => {
-        const chevronButton = wrapper.find(GlButton);
+        const chevronButton = wrapper.find(GlDeprecatedButton);
 
         expect(chevronButton.isVisible()).toBe(true);
         expect(chevronButton.attributes('title')).toBe('Collapse');
       });
 
       it('has the proper class on the expand/collapse button to avoid dragging', () => {
-        const chevronButton = wrapper.find(GlButton);
+        const chevronButton = wrapper.find(GlDeprecatedButton);
 
         expect(chevronButton.attributes('class')).toContain(treeItemChevronBtnClassName);
       });

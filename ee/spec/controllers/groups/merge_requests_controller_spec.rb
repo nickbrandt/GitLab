@@ -52,7 +52,7 @@ describe Groups::MergeRequestsController do
         it 'returns status 200' do
           subject
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'updates merge requests milestone' do
@@ -70,7 +70,7 @@ describe Groups::MergeRequestsController do
         it 'returns status 404' do
           subject
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'does not update merge requests milestone' do

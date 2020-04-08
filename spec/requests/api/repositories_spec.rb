@@ -48,7 +48,7 @@ describe API::Repositories do
         it 'returns recursive project paths tree' do
           get api("#{route}?recursive=1", current_user)
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an Array
           expect(response).to include_pagination_headers
           expect(json_response[4]['name']).to eq('html')
@@ -117,7 +117,7 @@ describe API::Repositories do
 
       context 'when sha does not exist' do
         it_behaves_like '404 response' do
-          let(:request) { get api(route.sub(sample_blob.oid, '123456'), current_user) }
+          let(:request) { get api(route.sub(sample_blob.oid, 'abcd9876'), current_user) }
           let(:message) { '404 Blob Not Found' }
         end
       end
@@ -179,7 +179,7 @@ describe API::Repositories do
 
       context 'when sha does not exist' do
         it_behaves_like '404 response' do
-          let(:request) { get api(route.sub(sample_blob.oid, '123456'), current_user) }
+          let(:request) { get api(route.sub(sample_blob.oid, 'abcd9876'), current_user) }
           let(:message) { '404 Blob Not Found' }
         end
       end

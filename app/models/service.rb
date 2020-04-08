@@ -184,8 +184,10 @@ class Service < ApplicationRecord
     { success: result.present?, result: result }
   end
 
+  # Disable test for instance-level services.
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/213138
   def can_test?
-    true
+    !instance?
   end
 
   # Provide convenient accessor methods
@@ -348,7 +350,7 @@ class Service < ApplicationRecord
 
     service.template = false
     service.project_id = project_id
-    service.active = false if service.active? && !service.valid?
+    service.active = false if service.active? && service.invalid?
     service
   end
 

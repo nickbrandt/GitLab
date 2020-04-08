@@ -126,7 +126,7 @@ associated label or assignee will change to match that of the new column. The en
 board can also be filtered to only include issues from a certain milestone or an overarching
 label.
 
-### Design Management **(PREMIUM)**
+### Design Management
 
 With [Design Management](design_management.md), you can upload design
 assets to issues and view them all together to easily share and
@@ -168,15 +168,15 @@ requires [GraphQL](../../../api/graphql/index.md) to be enabled.
 
 ### Status **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/36427) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/36427) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
 
 To help you track the status of your issues, you can assign a status to each issue to flag work that's progressing as planned or needs attention to keep on schedule:
 
-- `On track` (green)
-- `Needs attention` (amber)
-- `At risk` (red)
+- **On track** (green)
+- **Needs attention** (amber)
+- **At risk** (red)
 
-!["On track" health status on an issue](img/issue_health_status_v12_9.png)
+!["On track" health status on an issue](img/issue_health_status_v12_10.png)
 
 ---
 
@@ -201,18 +201,3 @@ Feature.disable(:save_issuable_health_status)
 - [Issues API](../../../api/issues.md)
 - Configure an [external issue tracker](../../../integration/external-issue-tracker.md)
   such as Jira, Redmine, or Bugzilla.
-
-## Limits
-
-This section gives an overview of limits of Issues and an overview of their background.
-
-### Description and comment length
-
-> Introduced in [GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/61974).
-
-Descriptions and comments on [issuable](../../../development/issuable-like-models.md) can be no
-longer than 1 million characters.
-
-Previously, there was no limit to issuable description size, which created a
-[possibility of a DoS attack](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/61974) by allowing
-very long descriptions. It's possible that we will set this limit to a lower number in the future.

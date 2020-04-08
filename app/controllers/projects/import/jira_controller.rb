@@ -7,17 +7,31 @@ module Projects
       before_action :jira_integration_configured?
 
       def show
+        return if Feature.enabled?(:jira_issue_import_vue, @project)
+
         unless @project.import_state&.in_progress?
           jira_client = @project.jira_service.client
-          @jira_projects = jira_client.Project.all.map { |p| ["#{p.name} (#{p.key})", p.key] }
+          jira_projects = jira_client.Project.all
+
+          if jira_projects.present?
+            @jira_projects = jira_projects.map { |p| ["#{p.name} (#{p.key})", p.key] }
+          else
+            flash[:alert] = 'No projects have been returned from Jira. Please check your Jira configuration.'
+          end
         end
 
         flash[:notice] = _("Import %{status}") % { status: @project.import_state.status } if @project.import_state.present? && !@project.import_state.none?
       end
 
       def import
-        response = ::JiraImport::StartImportService.new(current_user, @project, jira_import_params[:jira_project_key]).execute
-        flash[:notice] = response.message if response.message.present?
+        jira_project_key = jira_import_params[:jira_project_key]
+
+        if jira_project_key.present?
+          response = ::JiraImport::StartImportService.new(current_user, @project, jira_project_key).execute
+          flash[:notice] = response.message if response.message.present?
+        else
+          flash[:alert] = 'No jira project key has been provided.'
+        end
 
         redirect_to project_import_jira_path(@project)
       end

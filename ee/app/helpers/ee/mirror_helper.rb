@@ -4,7 +4,7 @@ module EE
   module MirrorHelper
     def render_mirror_failed_message(raw_message:)
       mirror_last_update_at = @project.import_state.last_update_at
-      message = "The repository failed to update #{time_ago_with_tooltip(mirror_last_update_at)}.".html_safe
+      message = "Pull mirroring failed #{time_ago_with_tooltip(mirror_last_update_at)}.".html_safe
 
       return message if raw_message
 
@@ -38,7 +38,7 @@ module EE
     end
 
     def mirror_lfs_sync_message
-      docs_link_url = help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs')
+      docs_link_url = help_page_path('topics/git/lfs/index')
       docs_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: docs_link_url }
 
       _('Git LFS objects will be synced in pull mirrors if LFS is %{docs_link_start}enabled for the project%{docs_link_end}. They will <strong>not</strong> be synced in push mirrors.').html_safe % { docs_link_start: docs_link_start, docs_link_end: '</a>'.html_safe }

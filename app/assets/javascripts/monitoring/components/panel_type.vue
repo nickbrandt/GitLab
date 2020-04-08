@@ -68,6 +68,11 @@ export default {
       required: false,
       default: 'panel-type-chart',
     },
+    namespace: {
+      type: String,
+      required: false,
+      default: 'monitoringDashboard',
+    },
   },
   data() {
     return {
@@ -76,12 +81,28 @@ export default {
     };
   },
   computed: {
-    ...mapState('monitoringDashboard', ['deploymentData', 'projectPath', 'logsPath', 'timeRange']),
+    // Use functions to support dynamic namespaces in mapXXX helpers. Pattern described
+    // in https://github.com/vuejs/vuex/issues/863#issuecomment-329510765
+    ...mapState({
+      deploymentData(state) {
+        return state[this.namespace].deploymentData;
+      },
+      projectPath(state) {
+        return state[this.namespace].projectPath;
+      },
+      logsPath(state) {
+        return state[this.namespace].logsPath;
+      },
+      timeRange(state) {
+        return state[this.namespace].timeRange;
+      },
+    }),
     title() {
       return this.graphData.title || '';
     },
     alertWidgetAvailable() {
-      return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint && this.graphData;
+      // This method is extended by ee functionality
+      return false;
     },
     graphDataHasMetrics() {
       return (
@@ -189,7 +210,7 @@ export default {
       >
         <div class="d-flex align-items-center">
           <alert-widget
-            v-if="alertWidgetAvailable && graphData"
+            v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"
             :alerts-endpoint="alertsEndpoint"
             :relevant-queries="graphData.metrics"
@@ -239,7 +260,7 @@ export default {
               :data-clipboard-text="clipboardText"
               @click="showToast(clipboardText)"
             >
-              {{ __('Generate link to chart') }}
+              {{ __('Copy link to chart') }}
             </gl-dropdown-item>
             <gl-dropdown-item
               v-if="alertWidgetAvailable"

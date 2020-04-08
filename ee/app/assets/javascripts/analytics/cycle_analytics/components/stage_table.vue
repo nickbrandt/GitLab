@@ -72,10 +72,6 @@ export default {
       required: false,
       default: () => {},
     },
-    labels: {
-      type: Array,
-      required: true,
-    },
     noDataSvgPath: {
       type: String,
       required: true,
@@ -230,7 +226,6 @@ export default {
           <custom-stage-form
             v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
-            :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
             :initial-fields="customStageFormInitialData"
             :is-editing-custom-stage="isEditingCustomStage"

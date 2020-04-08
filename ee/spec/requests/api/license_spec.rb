@@ -30,7 +30,7 @@ describe API::License, api: true do
   describe 'GET /license' do
     it 'retrieves the license information if admin is logged in' do
       get api('/license', admin)
-      expect(response.status).to eq 200
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['user_limit']).to eq 0
       expect(Date.parse(json_response['starts_at'])).to eq Date.today - 1.month
       expect(Date.parse(json_response['expires_at'])).to eq Date.today + 11.months
@@ -41,7 +41,7 @@ describe API::License, api: true do
 
     it 'denies access if not admin' do
       get api('/license', user)
-      expect(response.status).to eq 403
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -49,7 +49,7 @@ describe API::License, api: true do
     it 'adds a new license if admin is logged in' do
       post api('/license', admin), params: { license: gl_license.export }
 
-      expect(response.status).to eq 201
+      expect(response).to have_gitlab_http_status(:created)
       expect(json_response['user_limit']).to eq 0
       expect(Date.parse(json_response['starts_at'])).to eq Date.today - 1.month
       expect(Date.parse(json_response['expires_at'])).to eq Date.today + 11.months
@@ -60,13 +60,13 @@ describe API::License, api: true do
     it 'denies access if not admin' do
       post api('/license', user), params: { license: license }
 
-      expect(response.status).to eq 403
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'returns 400 if the license cannot be saved' do
       post api('/license', admin), params: { license: 'foo' }
 
-      expect(response.status).to eq(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
   end
 
@@ -77,7 +77,7 @@ describe API::License, api: true do
     it 'destroys a license and returns 204' do
       delete api(endpoint, admin)
 
-      expect(response.status).to eq(204)
+      expect(response).to have_gitlab_http_status(:no_content)
       expect(response.message).to eq('No Content')
       expect(License.where(id: license.id)).not_to exist
     end
@@ -85,14 +85,14 @@ describe API::License, api: true do
     it "returns an error if the license doesn't exist" do
       delete api("/license/0", admin)
 
-      expect(response.status).to eq(404)
+      expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Not found')
     end
 
     it 'returns 403 if the user is not an admin' do
       delete api(endpoint, user)
 
-      expect(response.status).to eq(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
       expect(json_response['message']).to eq('403 Forbidden')
     end
   end
@@ -111,7 +111,7 @@ describe API::License, api: true do
     it 'returns a collection of licenses' do
       get api(endpoint, admin)
 
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
 
       2.times do
         expect(json_response.shift.symbolize_keys).to contain_exactly(*license_json(licenses.pop))
@@ -123,14 +123,14 @@ describe API::License, api: true do
 
       get api(endpoint, admin)
 
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
 
     it 'returns 403 if the user is not an admin' do
       get api(endpoint, user)
 
-      expect(response.status).to eq(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
       expect(json_response['message']).to eq('403 Forbidden')
     end
   end
