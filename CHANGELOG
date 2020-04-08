@@ -1,7 +1,5 @@
 # Changelog for gitlab-workhorse
 
-Formerly known as 'gitlab-git-http-server'.
-
 v 8.30.0
 
 - Proxy ActionCable websocket connection !454

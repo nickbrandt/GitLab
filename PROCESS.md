@@ -22,13 +22,9 @@ maintainers. The release process is:
 
 -   pick a release branch. For x.y.0, use `master`. For all other
     versions (x.y.1, x.y.2 etc.) , use `x-y-stable`. Also see [below](#versioning)
--   create a merge request to update CHANGELOG and VERSION on the
-    release branch
--   You can use `git log --first-parent <last-version>..master` to see the list of changes
--   merge the merge request
--   run `make tag` or `make signed_tag` on the release branch. This will
-    make a tag matching the VERSION file.
--   push the tag to gitlab.com
+-   run `make tag VERSION=x.y.z"` or `make signed_tag VERSION=x.y.z` on the release branch. This will
+    compile the changelog, bump the VERSION file, and make a tag matching it.
+-   push the branch and the tag to gitlab.com
 
 ## Versioning
 
