@@ -15,7 +15,7 @@ To get this functioning, you need to be registered with Google.
 Pay close attention to:
 
 - Email account used by GitLab to send notification emails needs to have "Consistent history of sending a high volume of mail from your domain (order of hundred emails a day minimum to Gmail) for a few weeks at least".
-- "A very very low rate of spam complaints from users."
+- A very low rate of spam complaints from users.
 - Emails must be authenticated via DKIM or SPF.
 - Before sending the final form ("Gmail Schema Whitelist Request"), you must send a real email from your production server. This means that you will have to find a way to send this email from the email address you are registering. You can do this by, for example, forwarding the real email from the email address you are registering or going into the rails console on the GitLab server and triggering the email sending from there.
 

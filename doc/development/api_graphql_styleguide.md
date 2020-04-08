@@ -84,7 +84,7 @@ the context.
 
 ### Nullable fields
 
-GraphQL allows fields to be be "nullable" or "non-nullable". The former means
+GraphQL allows fields to be "nullable" or "non-nullable". The former means
 that `null` may be returned instead of a value of the specified type. **In
 general**, you should prefer using nullable fields to non-nullable ones, for
 the following reasons:
