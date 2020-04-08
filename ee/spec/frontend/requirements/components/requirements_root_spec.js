@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
 import { GlPagination } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 import createFlash from '~/flash';
 
 import RequirementsRoot from 'ee/requirements/components/requirements_root.vue';
@@ -21,6 +22,11 @@ import {
 
 jest.mock('ee/requirements/constants', () => ({
   DEFAULT_PAGE_SIZE: 2,
+  FilterState: {
+    opened: 'OPENED',
+    archived: 'ARCHIVED',
+    all: 'ALL',
+  },
 }));
 
 jest.mock('~/flash');
@@ -61,7 +67,16 @@ describe('RequirementsRoot', () => {
   let wrapper;
 
   beforeEach(() => {
-    setFixtures('<button class="js-new-requirement">New requirement</button>');
+    setFixtures(`
+      <div class="js-nav-requirements-count"></div>
+      <div class="js-nav-requirements-count-fly-out"></div>
+      <div class="js-requirements-state-filters">
+        <span class="js-opened-count"></span>
+        <span class="js-archived-count"></span>
+        <span class="js-all-count"></span>
+      </div>
+      <button class="js-new-requirement">New requirement</button>
+    `);
     wrapper = createComponent();
   });
 
@@ -139,6 +154,18 @@ describe('RequirementsRoot', () => {
   });
 
   describe('methods', () => {
+    const mockUpdateMutationResult = {
+      data: {
+        updateRequirement: {
+          errors: [],
+          requirement: {
+            iid: '1',
+            title: 'foo',
+          },
+        },
+      },
+    };
+
     describe('updateUrl', () => {
       it('updates window URL with query params `page` and `prev`', () => {
         wrapper.vm.updateUrl({
@@ -156,6 +183,87 @@ describe('RequirementsRoot', () => {
         });
 
         expect(global.window.location.href).toContain(`?page=1&next=${mockPageInfo.endCursor}`);
+      });
+    });
+
+    describe('updateRequirement', () => {
+      it('calls `$apollo.mutate` with `updateRequirement` mutation and variables containing `projectPath` & `iid`', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockUpdateMutationResult);
+
+        wrapper.vm.updateRequirement({
+          iid: '1',
+        });
+
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: updateRequirement,
+            variables: {
+              updateRequirementInput: {
+                projectPath: 'gitlab-org/gitlab-shell',
+                iid: '1',
+              },
+            },
+          }),
+        );
+      });
+
+      it('calls `$apollo.mutate` with variables containing `title` when it is included in object param', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockUpdateMutationResult);
+
+        wrapper.vm.updateRequirement({
+          iid: '1',
+          title: 'foo',
+        });
+
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: updateRequirement,
+            variables: {
+              updateRequirementInput: {
+                projectPath: 'gitlab-org/gitlab-shell',
+                iid: '1',
+                title: 'foo',
+              },
+            },
+          }),
+        );
+      });
+
+      it('calls `$apollo.mutate` with variables containing `state` when it is included in object param', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockUpdateMutationResult);
+
+        wrapper.vm.updateRequirement({
+          iid: '1',
+          state: FilterState.opened,
+        });
+
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: updateRequirement,
+            variables: {
+              updateRequirementInput: {
+                projectPath: 'gitlab-org/gitlab-shell',
+                iid: '1',
+                state: FilterState.opened,
+              },
+            },
+          }),
+        );
+      });
+
+      it('calls `createFlash` with provided `errorFlashMessage` param and `Sentry.captureException` when request fails', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue(new Error());
+        jest.spyOn(Sentry, 'captureException').mockImplementation();
+
+        return wrapper.vm
+          .updateRequirement({
+            iid: '1',
+            errorFlashMessage: 'Something went wrong',
+          })
+          .then(() => {
+            expect(createFlash).toHaveBeenCalledWith('Something went wrong');
+            expect(Sentry.captureException).toHaveBeenCalledWith(expect.any(Object));
+          });
       });
     });
 
@@ -242,56 +350,35 @@ describe('RequirementsRoot', () => {
     });
 
     describe('handleUpdateRequirementSave', () => {
-      const mockMutationResult = {
-        data: {
-          createRequirement: {
-            errors: [],
-            requirement: {
-              iid: '1',
-              title: 'foo',
-            },
-          },
-        },
-      };
-
       it('sets `createRequirementRequestActive` prop to `true`', () => {
-        jest
-          .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockReturnValue(Promise.resolve(mockMutationResult));
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
 
-        wrapper.vm.handleUpdateRequirementSave('foo');
+        wrapper.vm.handleUpdateRequirementSave({
+          title: 'foo',
+        });
 
         expect(wrapper.vm.createRequirementRequestActive).toBe(true);
       });
 
-      it('calls `$apollo.mutate` with updateRequirement mutation and `projectPath`, `iid` & `title` as variables', () => {
-        jest
-          .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockReturnValue(Promise.resolve(mockMutationResult));
+      it('calls `updateRequirement` with object containing `iid`, `title` & `errorFlashMessage` props', () => {
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
 
         wrapper.vm.handleUpdateRequirementSave({
           iid: '1',
           title: 'foo',
         });
 
-        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith(
+        expect(wrapper.vm.updateRequirement).toHaveBeenCalledWith(
           expect.objectContaining({
-            mutation: updateRequirement,
-            variables: {
-              updateRequirementInput: {
-                projectPath: 'gitlab-org/gitlab-shell',
-                iid: '1',
-                title: 'foo',
-              },
-            },
+            iid: '1',
+            title: 'foo',
+            errorFlashMessage: 'Something went wrong while updating a requirement.',
           }),
         );
       });
 
       it('sets `showUpdateFormForRequirement` to `0` and `createRequirementRequestActive` prop to `false` when request is successful', () => {
-        jest
-          .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockReturnValue(Promise.resolve(mockMutationResult));
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
 
         return wrapper.vm
           .handleUpdateRequirementSave({
@@ -304,15 +391,16 @@ describe('RequirementsRoot', () => {
           });
       });
 
-      it('sets `createRequirementRequestActive` prop to `false` and calls `createFlash` when `$apollo.mutate` request fails', () => {
-        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
+      it('sets `createRequirementRequestActive` prop to `false` when request fails', () => {
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockRejectedValue(new Error());
 
-        return wrapper.vm.handleUpdateRequirementSave('foo').then(() => {
-          expect(createFlash).toHaveBeenCalledWith(
-            'Something went wrong while updating a requirement.',
-          );
-          expect(wrapper.vm.createRequirementRequestActive).toBe(false);
-        });
+        return wrapper.vm
+          .handleUpdateRequirementSave({
+            title: 'foo',
+          })
+          .catch(() => {
+            expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+          });
       });
     });
 
@@ -325,6 +413,99 @@ describe('RequirementsRoot', () => {
         wrapper.vm.handleNewRequirementCancel();
 
         expect(wrapper.vm.showCreateForm).toBe(false);
+      });
+    });
+
+    describe('handleRequirementStateChange', () => {
+      beforeEach(() => {
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
+      });
+
+      it('sets `stateChangeRequestActiveFor` value to `iid` provided within object param', () => {
+        wrapper.vm.handleRequirementStateChange({
+          iid: '1',
+        });
+
+        expect(wrapper.vm.stateChangeRequestActiveFor).toBe('1');
+      });
+
+      it('calls `updateRequirement` with object containing params and errorFlashMessage when `params.state` is "OPENED"', () => {
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.opened,
+          })
+          .then(() => {
+            expect(wrapper.vm.updateRequirement).toHaveBeenCalledWith(
+              expect.objectContaining({
+                iid: '1',
+                state: FilterState.opened,
+                errorFlashMessage: 'Something went wrong while reopening a requirement.',
+              }),
+            );
+          });
+      });
+
+      it('calls `updateRequirement` with object containing params and errorFlashMessage when `params.state` is "ARCHIVED"', () => {
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.archived,
+          })
+          .then(() => {
+            expect(wrapper.vm.updateRequirement).toHaveBeenCalledWith(
+              expect.objectContaining({
+                iid: '1',
+                state: FilterState.archived,
+                errorFlashMessage: 'Something went wrong while archiving a requirement.',
+              }),
+            );
+          });
+      });
+
+      it('sets `stateChangeRequestActiveFor` to 0', () => {
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.opened,
+          })
+          .then(() => {
+            expect(wrapper.vm.stateChangeRequestActiveFor).toBe(0);
+          });
+      });
+
+      it('increments `openedCount` by 1 and decrements `archivedCount` by 1 when `params.state` is "OPENED"', () => {
+        wrapper.setData({
+          openedCount: 1,
+          archivedCount: 1,
+        });
+
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.opened,
+          })
+          .then(() => {
+            expect(wrapper.vm.openedCount).toBe(2);
+            expect(wrapper.vm.archivedCount).toBe(0);
+          });
+      });
+
+      it('decrements `openedCount` by 1 and increments `archivedCount` by 1 when `params.state` is "ARCHIVED"', () => {
+        wrapper.setData({
+          openedCount: 1,
+          archivedCount: 1,
+        });
+
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.archived,
+          })
+          .then(() => {
+            expect(wrapper.vm.openedCount).toBe(0);
+            expect(wrapper.vm.archivedCount).toBe(2);
+          });
       });
     });
 

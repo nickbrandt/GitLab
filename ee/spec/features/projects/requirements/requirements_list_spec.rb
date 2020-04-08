@@ -10,6 +10,19 @@ describe 'Requirements list', :js do
   let_it_be(:requirement3) { create(:requirement, project: project, title: 'Some requirement-3', author: user, created_at: 7.days.ago, updated_at: 2.days.ago) }
   let_it_be(:requirement_archived) { create(:requirement, project: project, title: 'Some requirement-3', state: :archived, author: user, created_at: 8.days.ago, updated_at: 2.days.ago) }
 
+  def create_requirement(title)
+    page.within('.nav-controls') do
+      find('button.js-new-requirement').click
+    end
+
+    page.within('.requirements-list-container') do
+      find('textarea#requirementTitle').native.send_keys title
+      find('button.js-requirement-save').click
+
+      wait_for_all_requests
+    end
+  end
+
   before do
     stub_licensed_features(requirements: true)
     project.add_maintainer(user)
@@ -46,13 +59,6 @@ describe 'Requirements list', :js do
     end
 
     context 'new requirement' do
-      it 'shows button "New requirement"' do
-        page.within('.nav-controls') do
-          expect(page).to have_selector('button.js-new-requirement')
-          expect(find('button.js-new-requirement')).to have_content('New requirement')
-        end
-      end
-
       it 'shows requirement create form when "New requirement" button is clicked' do
         page.within('.nav-controls') do
           find('button.js-new-requirement').click
@@ -64,27 +70,43 @@ describe 'Requirements list', :js do
       end
 
       it 'creates new requirement' do
-        page.within('.nav-controls') do
-          find('button.js-new-requirement').click
-        end
+        requirement_title = 'Foobar'
+
+        create_requirement(requirement_title)
 
         page.within('.requirements-list-container') do
-          requirement_title = 'Foobar'
-
-          find('textarea#requirementTitle').native.send_keys requirement_title
-          find('button.js-requirement-save').click
-
-          wait_for_all_requests
-
           expect(page).to have_selector('li.requirement', count: 4)
           page.within('.requirements-list li.requirement', match: :first) do
             expect(page.find('.issue-title-text')).to have_content(requirement_title)
           end
         end
       end
+
+      it 'updates requirements count in nav sidebar and opened and all tab badges' do
+        expect(page.find('.js-nav-requirements-count')).to have_content('4')
+        page.within('.requirements-state-filters') do
+          expect(find('li > a#state-opened .badge')).to have_content('3')
+          expect(find('li > a#state-all .badge')).to have_content('4')
+        end
+
+        create_requirement('Foobar')
+
+        expect(page.find('.js-nav-requirements-count')).to have_content('5')
+        page.within('.requirements-state-filters') do
+          expect(find('li > a#state-opened .badge')).to have_content('4')
+          expect(find('li > a#state-all .badge')).to have_content('5')
+        end
+      end
     end
 
     context 'open tab' do
+      it 'shows button "New requirement"' do
+        page.within('.nav-controls') do
+          expect(page).to have_selector('button.js-new-requirement')
+          expect(find('button.js-new-requirement')).to have_content('New requirement')
+        end
+      end
+
       it 'shows list of all open requirements' do
         page.within('.requirements-list-container .requirements-list') do
           expect(page).to have_selector('li.requirement', count: 3)
@@ -131,6 +153,20 @@ describe 'Requirements list', :js do
           end
         end
       end
+
+      it 'archives a requirement' do
+        page.within('.requirements-list li.requirement', match: :first) do
+          find('li.requirement-archive button[title="Archive"]').click
+
+          wait_for_requests
+        end
+
+        expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 2)
+        page.within('.requirements-state-filters') do
+          expect(find('li > a#state-opened .badge')).to have_content('2')
+          expect(find('li > a#state-archived .badge')).to have_content('2')
+        end
+      end
     end
 
     context 'archived tab' do
@@ -138,6 +174,12 @@ describe 'Requirements list', :js do
         find('li > a#state-archived').click
 
         wait_for_requests
+      end
+
+      it 'does not show button "New requirement"' do
+        page.within('.nav-controls') do
+          expect(page).not_to have_selector('button.js-new-requirement')
+        end
       end
 
       it 'shows list of all archived requirements' do
@@ -152,7 +194,22 @@ describe 'Requirements list', :js do
           expect(page.find('.issue-title-text')).to have_content(requirement_archived.title)
           expect(page.find('.issuable-authored')).to have_content('created 1 week ago by')
           expect(page.find('.author')).to have_content(user.name)
+          expect(page.find('.controls')).to have_selector('li.requirement-reopen button', text: 'Reopen')
           expect(page.find('.issuable-updated-at')).to have_content('updated 2 days ago')
+        end
+      end
+
+      it 'reopens a requirement' do
+        page.within('.requirements-list li.requirement', match: :first) do
+          find('li.requirement-reopen button').click
+
+          wait_for_requests
+        end
+
+        expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 0)
+        page.within('.requirements-state-filters') do
+          expect(find('li > a#state-opened .badge')).to have_content('4')
+          expect(find('li > a#state-archived .badge')).to have_content('0')
         end
       end
     end
@@ -162,6 +219,12 @@ describe 'Requirements list', :js do
         find('li > a#state-all').click
 
         wait_for_requests
+      end
+
+      it 'does not show button "New requirement"' do
+        page.within('.nav-controls') do
+          expect(page).not_to have_selector('button.js-new-requirement')
+        end
       end
 
       it 'shows list of all requirements' do

@@ -6,6 +6,7 @@ import {
   GlAvatar,
   GlDeprecatedButton,
   GlIcon,
+  GlLoadingIcon,
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
@@ -14,6 +15,8 @@ import timeagoMixin from '~/vue_shared/mixins/timeago';
 
 import RequirementForm from './requirement_form.vue';
 
+import { FilterState } from '../constants';
+
 export default {
   components: {
     GlPopover,
@@ -21,6 +24,7 @@ export default {
     GlAvatar,
     GlDeprecatedButton,
     GlIcon,
+    GlLoadingIcon,
     RequirementForm,
   },
   directives: {
@@ -46,6 +50,11 @@ export default {
       required: false,
       default: false,
     },
+    stateChangeRequestActive: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     reference() {
@@ -67,6 +76,9 @@ export default {
         timeAgo: esc(getTimeago().format(this.requirement.updatedAt)),
       });
     },
+    isArchived() {
+      return this.requirement?.state === FilterState.archived;
+    },
     author() {
       return this.requirement.author;
     },
@@ -86,12 +98,24 @@ export default {
     handleUpdateRequirementSave(params) {
       this.$emit('updateSave', params);
     },
+    handleArchiveClick() {
+      this.$emit('archiveClick', {
+        iid: this.requirement.iid,
+        state: FilterState.archived,
+      });
+    },
+    handleReopenClick() {
+      this.$emit('reopenClick', {
+        iid: this.requirement.iid,
+        state: FilterState.opened,
+      });
+    },
   },
 };
 </script>
 
 <template>
-  <li class="issue requirement">
+  <li class="issue requirement" :class="{ 'disabled-content': stateChangeRequestActive }">
     <requirement-form
       v-if="showUpdateForm"
       :requirement="requirement"
@@ -123,7 +147,7 @@ export default {
         </div>
         <div class="issuable-meta">
           <ul v-if="canUpdate || canArchive" class="controls flex-column flex-sm-row">
-            <li v-if="canUpdate" class="requirement-edit d-sm-block">
+            <li v-if="canUpdate && !isArchived" class="requirement-edit d-sm-block">
               <gl-deprecated-button
                 v-gl-tooltip
                 size="sm"
@@ -134,10 +158,26 @@ export default {
                 <gl-icon name="pencil" />
               </gl-deprecated-button>
             </li>
-            <li v-if="canArchive" class="requirement-archive d-sm-block">
-              <gl-deprecated-button v-gl-tooltip size="sm" class="border-0" :title="__('Archive')">
-                <gl-icon name="archive" />
+            <li v-if="canArchive && !isArchived" class="requirement-archive d-sm-block">
+              <gl-deprecated-button
+                v-gl-tooltip
+                size="sm"
+                class="border-0"
+                :title="__('Archive')"
+                @click="handleArchiveClick"
+              >
+                <gl-icon v-if="!stateChangeRequestActive" name="archive" />
+                <gl-loading-icon v-else />
               </gl-deprecated-button>
+            </li>
+            <li v-if="isArchived" class="requirement-reopen d-sm-block">
+              <gl-deprecated-button
+                size="xs"
+                class="p-2"
+                :loading="stateChangeRequestActive"
+                @click="handleReopenClick"
+                >{{ __('Reopen') }}</gl-deprecated-button
+              >
             </li>
           </ul>
           <div class="float-right issuable-updated-at d-none d-sm-inline-block">
