@@ -2014,7 +2014,7 @@ release-job:
     - tags
 ```
 
-You can use wildcards for directories too. For example, if you want to get all the files inside the directories that ends with `xyz`:
+You can use wildcards for directories too. For example, if you want to get all the files inside the directories that end with `xyz`:
 
 ```yaml
 job:
