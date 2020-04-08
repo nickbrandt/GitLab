@@ -4323,6 +4323,25 @@ CREATE SEQUENCE public.operations_strategies_id_seq
 
 ALTER SEQUENCE public.operations_strategies_id_seq OWNED BY public.operations_strategies.id;
 
+CREATE TABLE public.operations_user_lists (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    iid integer NOT NULL,
+    name character varying(255) NOT NULL,
+    user_xids text DEFAULT ''::text NOT NULL
+);
+
+CREATE SEQUENCE public.operations_user_lists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.operations_user_lists_id_seq OWNED BY public.operations_user_lists.id;
+
 CREATE TABLE public.packages_build_infos (
     id bigint NOT NULL,
     package_id integer NOT NULL,
@@ -7289,6 +7308,8 @@ ALTER TABLE ONLY public.operations_scopes ALTER COLUMN id SET DEFAULT nextval('p
 
 ALTER TABLE ONLY public.operations_strategies ALTER COLUMN id SET DEFAULT nextval('public.operations_strategies_id_seq'::regclass);
 
+ALTER TABLE ONLY public.operations_user_lists ALTER COLUMN id SET DEFAULT nextval('public.operations_user_lists_id_seq'::regclass);
+
 ALTER TABLE ONLY public.packages_build_infos ALTER COLUMN id SET DEFAULT nextval('public.packages_build_infos_id_seq'::regclass);
 
 ALTER TABLE ONLY public.packages_conan_file_metadata ALTER COLUMN id SET DEFAULT nextval('public.packages_conan_file_metadata_id_seq'::regclass);
@@ -8096,6 +8117,9 @@ ALTER TABLE ONLY public.operations_scopes
 
 ALTER TABLE ONLY public.operations_strategies
     ADD CONSTRAINT operations_strategies_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.operations_user_lists
+    ADD CONSTRAINT operations_user_lists_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.packages_build_infos
     ADD CONSTRAINT packages_build_infos_pkey PRIMARY KEY (id);
@@ -9663,6 +9687,10 @@ CREATE UNIQUE INDEX index_operations_scopes_on_strategy_id_and_environment_scope
 
 CREATE INDEX index_operations_strategies_on_feature_flag_id ON public.operations_strategies USING btree (feature_flag_id);
 
+CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_iid ON public.operations_user_lists USING btree (project_id, iid);
+
+CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_name ON public.operations_user_lists USING btree (project_id, name);
+
 CREATE UNIQUE INDEX index_packages_build_infos_on_package_id ON public.packages_build_infos USING btree (package_id);
 
 CREATE INDEX index_packages_build_infos_on_pipeline_id ON public.packages_build_infos USING btree (pipeline_id);
@@ -10976,6 +11004,9 @@ ALTER TABLE ONLY public.project_deploy_tokens
 
 ALTER TABLE ONLY public.packages_conan_file_metadata
     ADD CONSTRAINT fk_rails_0afabd9328 FOREIGN KEY (package_file_id) REFERENCES public.packages_package_files(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.operations_user_lists
+    ADD CONSTRAINT fk_rails_0c716e079b FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.geo_node_statuses
     ADD CONSTRAINT fk_rails_0ecc699c2a FOREIGN KEY (geo_node_id) REFERENCES public.geo_nodes(id) ON DELETE CASCADE;
@@ -13029,6 +13060,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200331132103
 20200331195952
 20200331220930
+20200401211005
 20200402123926
 20200402135250
 20200402185044
