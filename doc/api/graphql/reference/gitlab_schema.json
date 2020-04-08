@@ -27481,6 +27481,20 @@
               "deprecationReason": null
             },
             {
+              "name": "dismissalPath",
+              "description": "WHatever",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": "GraphQL ID of the vulnerability",
               "args": [

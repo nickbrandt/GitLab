@@ -9132,6 +9132,11 @@ type Vulnerability {
   description: String
 
   """
+  WHatever
+  """
+  dismissalPath: String
+
+  """
   GraphQL ID of the vulnerability
   """
   id: ID!
