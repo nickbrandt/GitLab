@@ -1,6 +1,7 @@
 %p.mb-1.mb-sm-2.mt-2.mt-sm-3
   %span.middle-dot-divider
     @#{@user.username}
+    = render_if_exists 'shared/issuable/gitlab_team_member_badge', { author: @user }
   - if can?(current_user, :read_user_profile, @user)
     %span.middle-dot-divider
       = s_('Member since %{date}') % { date: @user.created_at.to_date.to_s(:long) }
