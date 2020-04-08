@@ -1104,4 +1104,76 @@ describe User do
       end
     end
   end
+
+  describe '#gitlab_employee?' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { user.gitlab_employee? }
+
+    where(:email, :is_com, :expected_result) do
+      'test@gitlab.com'   | true  | true
+      'test@example.com'  | true  | false
+      'test@gitlab.com'   | false | false
+      'test@example.com'  | false | false
+    end
+
+    with_them do
+      let(:user) { build(:user, email: email) }
+
+      before do
+        allow(Gitlab).to receive(:com?).and_return(is_com)
+      end
+
+      it { is_expected.to be expected_result }
+    end
+
+    context 'when email is of Gitlab and is not confirmed' do
+      let(:user) { build(:user, email: 'test@gitlab.com', confirmed_at: nil) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when user is a bot' do
+      let(:user) { build(:user, email: 'test@gitlab.com', user_type: :alert_bot) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when user is ghost' do
+      let(:user) { build(:user, email: 'test@gitlab.com', ghost: true) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when `:gitlab_employee_badge` feature flag is disabled' do
+      let(:user) { build(:user, email: 'test@gitlab.com') }
+
+      before do
+        stub_feature_flags(gitlab_employee_badge: false)
+      end
+
+      it { is_expected.to be false }
+    end
+  end
+
+  describe '#organization' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:user) { build(:user, organization: 'ACME') }
+
+    subject { user.organization }
+
+    where(:gitlab_employee?, :expected_result) do
+      true  | 'GitLab'
+      false | 'ACME'
+    end
+
+    with_them do
+      before do
+        allow(user).to receive(:gitlab_employee?).and_return(gitlab_employee?)
+      end
+
+      it { is_expected.to eql(expected_result) }
+    end
+  end
 end
