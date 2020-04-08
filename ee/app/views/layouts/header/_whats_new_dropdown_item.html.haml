@@ -1,0 +1,3 @@
+- if show_whats_new_dropdown_item?
+  %li
+    = link_to _("See what's new at GitLab"), "#{promo_url}/releases/categories/releases/", target: '_blank', rel: 'noopener noreferrer', data: { track_event: 'click_whats_new', track_property: 'question_menu' }
