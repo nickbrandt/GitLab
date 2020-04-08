@@ -91,34 +91,21 @@ describe VulnerabilitiesHelper do
   end
 
   describe '#vulnerability_finding_data' do
+    let(:finding) { build(:vulnerabilities_occurrence) }
+
     subject { helper.vulnerability_finding_data(finding) }
 
-    it "returns finding information" do
-      expect(subject).to include(
+    it 'returns finding information' do
+      expect(subject).to match(
         description: finding.description,
-        identifiers: finding.identifiers,
+        identifiers: kind_of(Array),
+        issue_feedback: anything,
         links: finding.links,
         location: finding.location,
         name: finding.name,
-        issue_feedback: anything,
-        project: anything
+        project: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        solution: kind_of(String)
       )
-    end
-
-    context "when finding has a remediations key" do
-      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("remediations") }.first }
-
-      it "uses the first remediation summary" do
-        expect(subject[:solution]).to start_with "Use GCM mode"
-      end
-    end
-
-    context "when finding has a solution key" do
-      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("solution") }.first }
-
-      it "uses the solution key" do
-        expect(subject[:solution]).to start_with "GCM mode"
-      end
     end
   end
 end

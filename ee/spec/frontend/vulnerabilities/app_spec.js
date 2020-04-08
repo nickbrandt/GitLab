@@ -26,7 +26,7 @@ describe('Vulnerability management app', () => {
     state: 'detected',
   };
 
-  const defaultFinding = {
+  const findingWithIssue = {
     description: 'description',
     identifiers: 'identifiers',
     links: 'links',
@@ -35,6 +35,14 @@ describe('Vulnerability management app', () => {
     issue_feedback: {
       issue_iid: 12,
     },
+  };
+
+  const findingWithoutIssue = {
+    description: 'description',
+    identifiers: 'identifiers',
+    links: 'links',
+    location: 'location',
+    name: 'name',
   };
 
   const dataset = {
@@ -60,7 +68,7 @@ describe('Vulnerability management app', () => {
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
-  const createWrapper = (vulnerability = {}, finding = {}) => {
+  const createWrapper = (vulnerability = {}, finding = findingWithoutIssue) => {
     wrapper = shallowMount(App, {
       propsData: {
         ...dataset,
@@ -115,7 +123,7 @@ describe('Vulnerability management app', () => {
     });
 
     it('does not display if there is an issue already created', () => {
-      createWrapper({}, defaultFinding);
+      createWrapper({}, findingWithIssue);
       expect(findCreateIssueButton().exists()).toBe(false);
     });
 
@@ -137,6 +145,7 @@ describe('Vulnerability management app', () => {
             project_fingerprint: dataset.projectFingerprint,
             vulnerability_data: {
               ...defaultVulnerability,
+              ...findingWithoutIssue,
               category: defaultVulnerability.report_type,
               vulnerability_id: defaultVulnerability.id,
             },

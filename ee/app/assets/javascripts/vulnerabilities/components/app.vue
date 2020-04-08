@@ -122,6 +122,7 @@ export default {
             project_fingerprint: this.projectFingerprint,
             vulnerability_data: {
               ...this.vulnerability,
+              ...this.finding,
               category: this.vulnerability.report_type,
               vulnerability_id: this.vulnerability.id,
             },
