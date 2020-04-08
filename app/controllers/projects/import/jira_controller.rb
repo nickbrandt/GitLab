@@ -39,7 +39,7 @@ module Projects
       private
 
       def jira_import_enabled?
-        return if Feature.enabled?(:jira_issue_import, @project)
+        return if @project.jira_issues_import_feature_flag_enabled?
 
         redirect_to project_issues_path(@project)
       end
