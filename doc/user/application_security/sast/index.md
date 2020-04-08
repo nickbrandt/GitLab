@@ -195,6 +195,11 @@ looks for `*.java` files to spin up the [spotbugs](https://gitlab.com/gitlab-org
 image, while orchestrator only looks for the existence of `pom.xml`, `build.xml`, `gradlew`,
 `grailsw`, or `mvnw`.
 
+NOTE: **Note:**
+With the current language detection logic, any new languages or frameworks introduced within the
+context of a merge request don't trigger a corresponding scan. These scans only occur once the code
+is committed to the default branch.
+
 #### Enabling kubesec analyzer
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12752) in GitLab Ultimate 12.6.
