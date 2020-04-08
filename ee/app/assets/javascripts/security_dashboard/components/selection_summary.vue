@@ -1,9 +1,9 @@
 <script>
 import { s__, __, n__ } from '~/locale';
 import { GlDeprecatedButton, GlFormSelect } from '@gitlab/ui';
-import axios from '~/lib/utils/axios_utils';
 import toast from '~/vue_shared/plugins/global_toast';
 import createFlash from '~/flash';
+import dismissVulnerability from '../graphql/dismissVulnerability.graphql';
 
 const REASON_NONE = __('[No reason]');
 const REASON_WONT_FIX = __("Won't fix / Accept risk");
@@ -17,6 +17,10 @@ export default {
   },
   props: {
     refetchVulnerabilities: {
+      type: Function,
+      required: true,
+    },
+    deselectAllVulnerabilities: {
       type: Function,
       required: true,
     },
@@ -44,7 +48,7 @@ export default {
     },
   },
   methods: {
-    handleDismiss(e) {
+    handleDismiss() {
       if (!this.canDismissVulnerability) {
         return;
       }
@@ -55,26 +59,18 @@ export default {
         this.dismissSelectedVulnerabilities({ comment: this.dismissalReason });
       }
     },
-    dismissSelectedVulnerabilities(e) {
-      console.log(__('dismissed e: '), e);
+    dismissSelectedVulnerabilities() {
       const promises = this.selectedVulnerabilities.map(vulnerability =>
-        axios.post('/root/security-reports/-/vulnerability_feedback', {
-          // TODO need vulnerability.create_vulnerability_feedback_dismissal_path
-          vulnerability_feedback: {
-            category: vulnerability.reportType.toLowerCase(),
-            comment: this.dismissalReason,
-            feedback_type: 'dismissal',
-            // TODO NEED PROJECT_FINGERPRINT
-            // project_fingerprint: vulnerability.project_fingerprint,
-            vulnerability_data: {
-              id: parseInt(vulnerability.id.split('/').slice(-1)[0], 10),
-            },
-          },
-        }),
+        this.$apollo
+          .mutate({
+            mutation: dismissVulnerability,
+            variables: { id: vulnerability.id, comment: this.dismissalReason },
+          })
       );
 
       Promise.all(promises)
         .then(() => {
+          this.deselectAllVulnerabilities();
           toast(
             n__(
               '%d vulnerability dismissed',
@@ -91,7 +87,6 @@ export default {
           );
         })
         .finally(() => {
-          // TODO: Make sure this works
           this.refetchVulnerabilities();
         });
     },

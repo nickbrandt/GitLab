@@ -21,6 +21,7 @@ describe('Vulnerabilities app component', () => {
       mocks: {
         $apollo,
         fetchNextPage: () => {},
+        refetchVulnerabilities: () => {},
       },
       ...options,
     });
