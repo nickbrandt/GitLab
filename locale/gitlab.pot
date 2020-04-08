@@ -1320,10 +1320,34 @@ msgstr ""
 msgid "Admin notes"
 msgstr ""
 
+msgid "AdminArea|Active users"
+msgstr ""
+
+msgid "AdminArea|Billable users"
+msgstr ""
+
+msgid "AdminArea|Blocked users"
+msgstr ""
+
 msgid "AdminArea|Bots"
 msgstr ""
 
+msgid "AdminArea|Developer"
+msgstr ""
+
+msgid "AdminArea|Guest"
+msgstr ""
+
 msgid "AdminArea|Included Free in license"
+msgstr ""
+
+msgid "AdminArea|Maintainer"
+msgstr ""
+
+msgid "AdminArea|Owner"
+msgstr ""
+
+msgid "AdminArea|Reporter"
 msgstr ""
 
 msgid "AdminArea|Stop all jobs"
@@ -1338,13 +1362,16 @@ msgstr ""
 msgid "AdminArea|Stopping jobs failed"
 msgstr ""
 
+msgid "AdminArea|Total users"
+msgstr ""
+
 msgid "AdminArea|Users statistics"
 msgstr ""
 
-msgid "AdminArea|Users total"
+msgid "AdminArea|Users with highest role"
 msgstr ""
 
-msgid "AdminArea|Users with highest role"
+msgid "AdminArea|Users without a Group and Project"
 msgstr ""
 
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."

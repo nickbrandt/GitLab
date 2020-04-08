@@ -465,6 +465,10 @@ class License < ApplicationRecord
     settings.update license_trial_ends_on: license.expires_at
   end
 
+  def paid?
+    [License::STARTER_PLAN, License::PREMIUM_PLAN, License::ULTIMATE_PLAN].include?(plan)
+  end
+
   private
 
   def restricted_attr(name, default = nil)
