@@ -238,7 +238,7 @@ describe('User onboarding tour parts list', () => {
       const findExitTourLink = () => wrapper.find('.qa-exit-tour-link');
 
       it('emits the "showDntExitContent" event when the "Exit Learn GitLab" link is clicked and tracking is not enabled', () => {
-        spyOn(Tracking, 'enabled').and.returnValue(false);
+        jest.spyOn(Tracking, 'enabled').mockReturnValue(false);
 
         findExitTourLink().vm.$emit('click');
 
@@ -247,7 +247,7 @@ describe('User onboarding tour parts list', () => {
       });
 
       it('emits the "showFeedbackContent" event when the "Exit Learn GitLab" link is clicked and tracking is enabled', () => {
-        spyOn(Tracking, 'enabled').and.returnValue(true);
+        jest.spyOn(Tracking, 'enabled').mockReturnValue(true);
 
         findExitTourLink().vm.$emit('click');
 
@@ -348,7 +348,7 @@ describe('User onboarding tour parts list', () => {
       expect(wrapper.find(TourPartsList).exists()).toBe(true);
 
       expect(wrapper.find(TourPartsList).props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           tourTitles,
           activeTour,
           totalStepsForTour,
