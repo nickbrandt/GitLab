@@ -26,6 +26,7 @@ describe('AlertWidgetForm', () => {
     alertsToManage: {
       alert: { alert_path: alertPath, operator: '<', threshold: 5, metricId },
     },
+    configuredAlert: metricId,
   };
 
   function createComponent(props = {}) {
@@ -116,6 +117,14 @@ describe('AlertWidgetForm', () => {
     expect(wrapper.vm.operator).toBe(null);
     expect(wrapper.vm.threshold).toBe(null);
     expect(wrapper.vm.prometheusMetricId).toBe(null);
+  });
+
+  it('sets selectedAlert to the provided configuredAlert on modal show', () => {
+    createComponent(propsWithAlertData);
+
+    modal().vm.$emit('shown');
+
+    expect(wrapper.vm.selectedAlert).toEqual(propsWithAlertData.alertsToManage[alertPath]);
   });
 
   describe('with existing alert', () => {
