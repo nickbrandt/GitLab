@@ -217,14 +217,14 @@ module EE
 
     def any_namespace_with_trial?
       ::Namespace
-        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
         .where('trial_ends_on > ?', Time.now.utc)
         .any?
     end
 
     def any_namespace_without_trial?
       ::Namespace
-        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
         .where(trial_ends_on: nil)
         .any?
     end
@@ -233,7 +233,15 @@ module EE
       ::Namespace
         .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan_id: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .any?
+    end
+
+    def owns_paid_namespace?
+      ::Namespace
+        .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
@@ -335,7 +343,7 @@ module EE
 
     private
 
-    def namespace_union(select = :id)
+    def namespace_union_for_owned(select = :id)
       ::Gitlab::SQL::Union.new([
         ::Namespace.select(select).where(type: nil, owner: self),
         owned_groups.select(select).where(parent_id: nil)
