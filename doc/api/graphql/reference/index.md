@@ -1479,6 +1479,7 @@ Represents a vulnerability.
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `createVulnerabilityFeedbackDismissalPath` | String | URL to the API for create vulnerability feedback dismissal |
 | `description` | String | Description of the vulnerability |
 | `id` | ID! | GraphQL ID of the vulnerability |
 | `location` | JSON | The JSON location metadata for the vulnerability. Its format depends on the type of the security scan that found the vulnerability |
@@ -1486,7 +1487,32 @@ Represents a vulnerability.
 | `severity` | VulnerabilitySeverity | Severity of the vulnerability (INFO, UNKNOWN, LOW, MEDIUM, HIGH, CRITICAL) |
 | `state` | VulnerabilityState | State of the vulnerability (DETECTED, DISMISSED, RESOLVED, CONFIRMED) |
 | `title` | String | Title of the vulnerability |
+| `userPermissions` | VulnerabilityPermissions! | Permissions for the current user on the resource |
 | `vulnerabilityPath` | String | URL to the vulnerability's details page |
+
+## VulnerabilityFinding
+
+Represents a vulnerability finding.
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `id` | ID! | GraphQL ID of the vulnerability finding |
+| `projectFingerprint` | String | Fingerprint used to associate the vulnerability's finding with feedback |
+
+## VulnerabilityPermissions
+
+Check permissions for the current user on an vulnerability
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `adminVulnerability` | Boolean! | Indicates the user can perform `admin_vulnerability` on this resource |
+| `adminVulnerabilityIssueLink` | Boolean! | Indicates the user can perform `admin_vulnerability_issue_link` on this resource |
+| `createVulnerability` | Boolean! | Indicates the user can perform `create_vulnerability` on this resource |
+| `createVulnerabilityExport` | Boolean! | Indicates the user can perform `create_vulnerability_export` on this resource |
+| `createVulnerabilityFeedback` | Boolean! | Indicates the user can perform `create_vulnerability_feedback` on this resource |
+| `destroyVulnerabilityFeedback` | Boolean! | Indicates the user can perform `destroy_vulnerability_feedback` on this resource |
+| `readVulnerabilityFeedback` | Boolean! | Indicates the user can perform `read_vulnerability_feedback` on this resource |
+| `updateVulnerabilityFeedback` | Boolean! | Indicates the user can perform `update_vulnerability_feedback` on this resource |
 
 ## VulnerabilitySeveritiesCount
 

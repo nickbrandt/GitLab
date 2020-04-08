@@ -9417,9 +9417,39 @@ Represents a vulnerability.
 """
 type Vulnerability {
   """
+  URL to the API for create vulnerability feedback dismissal
+  """
+  createVulnerabilityFeedbackDismissalPath: String
+
+  """
   Description of the vulnerability
   """
   description: String
+
+  """
+  Vulnerabilities findings associated with the vulnerability
+  """
+  findings(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): VulnerabilityFindingConnection
 
   """
   GraphQL ID of the vulnerability
@@ -9451,6 +9481,11 @@ type Vulnerability {
   Title of the vulnerability
   """
   title: String
+
+  """
+  Permissions for the current user on the resource
+  """
+  userPermissions: VulnerabilityPermissions!
 
   """
   URL to the vulnerability's details page
@@ -9491,6 +9526,101 @@ type VulnerabilityEdge {
   The item at the end of the edge.
   """
   node: Vulnerability
+}
+
+"""
+Represents a vulnerability finding.
+"""
+type VulnerabilityFinding {
+  """
+  GraphQL ID of the vulnerability finding
+  """
+  id: ID!
+
+  """
+  Fingerprint used to associate the vulnerability's finding with feedback
+  """
+  projectFingerprint: String
+}
+
+"""
+The connection type for VulnerabilityFinding.
+"""
+type VulnerabilityFindingConnection {
+  """
+  A list of edges.
+  """
+  edges: [VulnerabilityFindingEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [VulnerabilityFinding]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type VulnerabilityFindingEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: VulnerabilityFinding
+}
+
+"""
+Check permissions for the current user on an vulnerability
+"""
+type VulnerabilityPermissions {
+  """
+  Indicates the user can perform `admin_vulnerability` on this resource
+  """
+  adminVulnerability: Boolean!
+
+  """
+  Indicates the user can perform `admin_vulnerability_issue_link` on this resource
+  """
+  adminVulnerabilityIssueLink: Boolean!
+
+  """
+  Indicates the user can perform `create_vulnerability` on this resource
+  """
+  createVulnerability: Boolean!
+
+  """
+  Indicates the user can perform `create_vulnerability_export` on this resource
+  """
+  createVulnerabilityExport: Boolean!
+
+  """
+  Indicates the user can perform `create_vulnerability_feedback` on this resource
+  """
+  createVulnerabilityFeedback: Boolean!
+
+  """
+  Indicates the user can perform `destroy_vulnerability_feedback` on this resource
+  """
+  destroyVulnerabilityFeedback: Boolean!
+
+  """
+  Indicates the user can perform `read_vulnerability_feedback` on this resource
+  """
+  readVulnerabilityFeedback: Boolean!
+
+  """
+  Indicates the user can perform `update_vulnerability_feedback` on this resource
+  """
+  updateVulnerabilityFeedback: Boolean!
 }
 
 """
