@@ -92,7 +92,7 @@ namespace :gitlab do
       Rake::Task[task_name].reenable
     end
 
-    # Inform Rake that gitlab:schema:fix_structure_sql should be run every time rake db:structure:dump is run
+    # Inform Rake that gitlab:schema:clean_structure_sql should be run every time rake db:structure:dump is run
     Rake::Task['db:structure:dump'].enhance do
       Rake::Task['gitlab:db:clean_structure_sql'].invoke
     end
