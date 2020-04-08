@@ -26,6 +26,11 @@ export default {
       type: String,
       required: true,
     },
+    filters: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -41,6 +46,7 @@ export default {
         return {
           fullPath: this.groupFullPath,
           first: VULNERABILITIES_PER_PAGE,
+          ...this.filters,
         };
       },
       update: ({ group }) => group.vulnerabilities.nodes,
