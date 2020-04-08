@@ -1,3 +1,5 @@
+@import "@gitlab/ui/src/scss/variables";
+
 /*
  * Layout
  */
@@ -150,18 +152,6 @@ $orange-700: #c26700;
 $orange-800: #a35200;
 $orange-900: #853c00;
 $orange-950: #592800;
-
-$red-50: #fef6f5;
-$red-100: #fbe5e1;
-$red-200: #f2b4a9;
-$red-300: #ea8271;
-$red-400: #e05842;
-$red-500: #db3b21;
-$red-600: #c0341d;
-$red-700: #a62d19;
-$red-800: #8b2615;
-$red-900: #711e11;
-$red-950: #4b140b;
 
 $gray-50: #fafafa;
 $gray-100: #f2f2f2;
