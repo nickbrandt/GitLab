@@ -16,7 +16,6 @@ class License < ApplicationRecord
     contribution_analytics
     description_diffs
     elastic_search
-    export_issues
     group_activity_analytics
     group_bulk_edit
     group_burndown_charts
@@ -147,7 +146,6 @@ class License < ApplicationRecord
     contribution_analytics
     cross_project_pipelines
     deploy_board
-    export_issues
     file_locks
     group_webhooks
     issuable_default_templates

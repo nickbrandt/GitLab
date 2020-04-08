@@ -15,7 +15,6 @@ module EE
         alias_method :export_csv_authenticate_user!, :authenticate_user!
 
         before_action :export_csv_authenticate_user!, only: [:export_csv]
-        before_action :check_export_issues_available!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
       end
