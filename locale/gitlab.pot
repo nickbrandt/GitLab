@@ -19404,6 +19404,9 @@ msgstr ""
 msgid "StaticSiteEditor|Return to site"
 msgstr ""
 
+msgid "StaticSiteEditor|Static site editor"
+msgstr ""
+
 msgid "StaticSiteEditor|Success!"
 msgstr ""
 
