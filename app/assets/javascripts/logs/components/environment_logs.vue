@@ -3,11 +3,10 @@ import { throttle } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import {
   GlSprintf,
-  GlIcon,
   GlAlert,
-  GlDropdown,
-  GlDropdownHeader,
-  GlDropdownItem,
+  GlNewDropdown,
+  GlNewDropdownHeader,
+  GlNewDropdownItem,
   GlInfiniteScroll,
 } from '@gitlab/ui';
 
@@ -22,11 +21,10 @@ import { formatDate } from '../utils';
 export default {
   components: {
     GlSprintf,
-    GlIcon,
     GlAlert,
-    GlDropdown,
-    GlDropdownHeader,
-    GlDropdownItem,
+    GlNewDropdown,
+    GlNewDropdownHeader,
+    GlNewDropdownItem,
     GlInfiniteScroll,
     LogSimpleFilters,
     LogAdvancedFilters,
@@ -160,29 +158,24 @@ export default {
 
     <div class="top-bar d-md-flex border bg-secondary-50 pt-2 pr-1 pb-0 pl-2">
       <div class="flex-grow-0">
-        <gl-dropdown
-          id="environments-dropdown"
+        <gl-new-dropdown
           :text="environments.current"
           :disabled="environments.isLoading"
           class="mb-2 gl-h-32 pr-2 d-flex d-md-block js-environments-dropdown"
         >
-          <gl-dropdown-header class="text-center">
+          <gl-new-dropdown-header class="text-center">
             {{ s__('Environments|Select environment') }}
-          </gl-dropdown-header>
-          <gl-dropdown-item
+          </gl-new-dropdown-header>
+          <gl-new-dropdown-item
             v-for="env in environments.options"
             :key="env.id"
+            :is-checked="isCurrentEnvironment(env.name)"
+            is-check-item
             @click="showEnvironment(env.name)"
           >
-            <div class="d-flex">
-              <gl-icon
-                :class="{ invisible: !isCurrentEnvironment(env.name) }"
-                name="status_success_borderless"
-              />
-              <div class="flex-grow-1">{{ env.name }}</div>
-            </div>
-          </gl-dropdown-item>
-        </gl-dropdown>
+            {{ env.name }}
+          </gl-new-dropdown-item>
+        </gl-new-dropdown>
       </div>
 
       <log-advanced-filters
