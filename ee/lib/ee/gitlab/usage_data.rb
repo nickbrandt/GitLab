@@ -315,7 +315,7 @@ module EE
             ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
             ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id),
             ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
-            clusters_applications_runner: ::Clusters::Applications::Runner.where(time_period).distinct_by_user,
+            clusters_applications_runner: clusters_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
           }
         end
