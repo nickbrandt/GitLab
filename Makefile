@@ -81,15 +81,19 @@ clean-workhorse:
 	$(call message,$@)
 	rm -f $(EXE_ALL)
 
+.PHONY: check-version
+check-version:
+	@test -n "$(VERSION)" || (echo "VERSION not set." ; exit 1)
+
 .PHONY:	tag
-tag:
+tag: check-version
 	$(call message,$@)
-	sh _support/tag.sh
+	sh _support/tag.sh "$(VERSION)"
 
 .PHONY:	signed_tag
-signed_tag:
+signed_tag: check-version
 	$(call message,$@)
-	TAG_OPTS=-s sh _support/tag.sh
+	TAG_OPTS=-s sh _support/tag.sh "$(VERSION)"
 
 .PHONY:	clean-build
 clean-build:
