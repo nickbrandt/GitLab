@@ -3,6 +3,7 @@ import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
+import FirstClassGroupSecurityDashboard from './components/first_class_group_security_dashboard.vue';
 
 const isRequired = message => {
   throw new Error(message);
@@ -24,19 +25,21 @@ export default (
     emptyStateSvgPath,
     dashboardDocumentation,
   };
-  let element;
+  let component;
 
-  // We'll add more of these for group and instance once we have the components
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
-    element = FirstClassProjectSecurityDashboard;
+    component = FirstClassProjectSecurityDashboard;
     props.projectFullPath = el.dataset.projectFullPath;
+  } else if (dashboardType === DASHBOARD_TYPES.GROUP) {
+    component = FirstClassGroupSecurityDashboard;
+    props.groupFullPath = el.dataset.groupFullPath;
   }
 
   return new Vue({
     el,
     apolloProvider,
     render(createElement) {
-      return createElement(element, { props });
+      return createElement(component, { props });
     },
   });
 };

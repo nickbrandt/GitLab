@@ -1,0 +1,15 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "ee/vulnerabilities/graphql/vulnerability.fragment.graphql"
+
+query group($fullPath: ID!, $after: String, $first: Int) {
+  group(fullPath: $fullPath) {
+    vulnerabilities(after:$after, first:$first){
+      nodes{
+        ...Vulnerability
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+}

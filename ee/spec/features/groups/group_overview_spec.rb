@@ -8,6 +8,7 @@ describe 'Group overview', :js do
   let(:empty_project) { create(:project, namespace: group) }
 
   before do
+    stub_feature_flags(first_class_vulnerabilities: false)
     group.add_owner(user)
     sign_in(user)
   end
