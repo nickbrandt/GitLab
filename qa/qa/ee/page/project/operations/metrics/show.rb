@@ -22,7 +22,7 @@ module QA
                     element :add_metric_button
                   end
 
-                  view 'ee/app/assets/javascripts/custom_metrics/components/custom_metrics_form_fields.vue' do
+                  view 'app/assets/javascripts/custom_metrics/components/custom_metrics_form_fields.vue' do
                     element :custom_metric_prometheus_title_field
                     element :custom_metric_prometheus_query_field
                     element :custom_metric_prometheus_y_label_field
