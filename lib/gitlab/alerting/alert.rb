@@ -21,6 +21,12 @@ module Gitlab
         end
       end
 
+      def gitlab_prometheus_alert_id
+        strong_memoize(:gitlab_prometheus_alert_id) do
+          payload&.dig('labels', 'gitlab_prometheus_alert_id')
+        end
+      end
+
       def title
         strong_memoize(:title) do
           gitlab_alert&.title || parse_title_from_payload
@@ -114,10 +120,10 @@ module Gitlab
       end
 
       def parse_gitlab_alert_from_payload
-        return unless metric_id
+        return unless metric_id || gitlab_prometheus_alert_id
 
         Projects::Prometheus::AlertsFinder
-          .new(project: project, metric: metric_id)
+          .new(project: project, metric: metric_id, id: gitlab_prometheus_alert_id)
           .execute
           .first
       end
