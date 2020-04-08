@@ -4,7 +4,7 @@ This document outlines the styleguide for GitLab's [GraphQL API](../api/graphql/
 
 ## How GitLab implements GraphQL
 
-We use the [graphql-ruby gem](https://graphql-ruby.org/) written by [Robert Mosolgo](https://github.com/rmosolgo/).
+We use the [GraphQL Ruby gem](https://graphql-ruby.org/) written by [Robert Mosolgo](https://github.com/rmosolgo/).
 
 All GraphQL queries are directed to a single endpoint
 ([`app/controllers/graphql_controller.rb#execute`](https://gitlab.com/gitlab-org/gitlab/blob/master/app%2Fcontrollers%2Fgraphql_controller.rb)),
@@ -865,7 +865,7 @@ the analyzer, and the final value is also available to you.
 
 [Multiplex queries](https://graphql-ruby.org/queries/multiplex.html) enable
 multiple queries to be sent in a single request. This reduces the number of requests sent to the server.
-(there are custom Multiplex Query Analyzers and Multiplex Instrumentation provided by graphql-ruby).
+(there are custom Multiplex Query Analyzers and Multiplex Instrumentation provided by GraphQL Ruby).
 
 ### Query limits
 
@@ -888,7 +888,7 @@ end
 ```
 
 More about complexity:
-[graphql-ruby docs](https://graphql-ruby.org/queries/complexity_and_depth.html)
+[GraphQL Ruby documentation](https://graphql-ruby.org/queries/complexity_and_depth.html).
 
 ## Documentation and Schema
 
