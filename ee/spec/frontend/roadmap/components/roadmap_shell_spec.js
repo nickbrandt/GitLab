@@ -7,8 +7,13 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate, mockGroupId, mockMilestone } from '../mock_data';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import {
+  mockEpic,
+  mockTimeframeInitialDate,
+  mockGroupId,
+  mockMilestone,
+} from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -73,13 +78,13 @@ describe('RoadmapShellComponent', () => {
     describe('handleScroll', () => {
       it('emits `epicsListScrolled` event via eventHub', done => {
         const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
-        spyOn(eventHub, '$emit');
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
         Vue.nextTick()
           .then(() => {
             vmWithParentEl.handleScroll();
 
-            expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Object));
+            expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', expect.any(Object));
 
             vmWithParentEl.$destroy();
           })

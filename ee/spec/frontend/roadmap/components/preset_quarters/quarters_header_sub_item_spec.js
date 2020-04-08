@@ -4,8 +4,8 @@ import QuartersHeaderSubItemComponent from 'ee/roadmap/components/preset_quarter
 import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockTimeframeInitialDate } from '../../mock_data';
 
 const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 

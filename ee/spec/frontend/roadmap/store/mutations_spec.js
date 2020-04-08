@@ -3,7 +3,7 @@ import * as types from 'ee/roadmap/store/mutation_types';
 
 import defaultState from 'ee/roadmap/store/state';
 
-import { mockGroupId, basePath, epicsPath, mockSortedBy } from '../mock_data';
+import { mockGroupId, basePath, epicsPath, mockSortedBy } from 'ee_jest/roadmap/mock_data';
 
 const getEpic = (epicId, epics) => epics.find(e => e.id === epicId);
 
@@ -36,7 +36,7 @@ describe('Roadmap Store Mutations', () => {
 
       mutations[types.SET_INITIAL_DATA](state, initialData);
 
-      expect(state).toEqual(jasmine.objectContaining(initialData));
+      expect(state).toEqual(expect.objectContaining(initialData));
     });
   });
 

@@ -8,8 +8,8 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic, mockGroupId } from '../mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockTimeframeInitialDate, mockEpic, mockGroupId } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -111,7 +111,7 @@ describe('EpicItemComponent', () => {
   describe('methods', () => {
     describe('removeHighlight', () => {
       it('should call _.delay after 3 seconds with a callback function which would set `epic.newEpic` to false when it is true already', done => {
-        spyOn(_, 'delay');
+        jest.spyOn(_, 'delay').mockImplementation(() => {});
 
         vm.epic.newEpic = true;
 
@@ -119,7 +119,7 @@ describe('EpicItemComponent', () => {
 
         vm.$nextTick()
           .then(() => {
-            expect(_.delay).toHaveBeenCalledWith(jasmine.any(Function), 3000);
+            expect(_.delay).toHaveBeenCalledWith(expect.any(Function), 3000);
           })
           .then(done)
           .catch(done.fail);

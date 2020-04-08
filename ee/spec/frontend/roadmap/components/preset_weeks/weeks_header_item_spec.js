@@ -3,8 +3,8 @@ import Vue from 'vue';
 import WeeksHeaderItemComponent from 'ee/roadmap/components/preset_weeks/weeks_header_item.vue';
 import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockTimeframeInitialDate } from '../../mock_data';
 
 const mockTimeframeIndex = 0;
 const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);

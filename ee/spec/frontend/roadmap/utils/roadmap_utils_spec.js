@@ -43,8 +43,8 @@ describe('getTimeframeForQuartersView', () => {
   it('each timeframe item has `quarterSequence`, `year` and `range` present', () => {
     const timeframeItem = timeframe[0];
 
-    expect(timeframeItem.quarterSequence).toEqual(jasmine.any(Number));
-    expect(timeframeItem.year).toEqual(jasmine.any(Number));
+    expect(timeframeItem.quarterSequence).toEqual(expect.any(Number));
+    expect(timeframeItem.year).toEqual(expect.any(Number));
     expect(Array.isArray(timeframeItem.range)).toBe(true);
   });
 
@@ -307,7 +307,7 @@ describe('getEpicsTimeframeRange', () => {
     });
 
     expect(range).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         startDate: '2017-7-1',
         dueDate: '2019-3-31',
       }),
@@ -322,7 +322,7 @@ describe('getEpicsTimeframeRange', () => {
     });
 
     expect(range).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         startDate: '2017-11-1',
         dueDate: '2018-6-30',
       }),
@@ -337,7 +337,7 @@ describe('getEpicsTimeframeRange', () => {
     });
 
     expect(range).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         startDate: '2017-12-17',
         dueDate: '2018-2-3',
       }),

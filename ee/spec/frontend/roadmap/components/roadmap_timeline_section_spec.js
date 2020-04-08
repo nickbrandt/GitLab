@@ -6,8 +6,8 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate } from '../mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockEpic, mockTimeframeInitialDate } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -46,7 +46,7 @@ describe('RoadmapTimelineSectionComponent', () => {
     describe('sectionContainerStyles', () => {
       it('returns object containing `width` with value based on epic details cell width, timeline cell width and timeframe length', () => {
         expect(vm.sectionContainerStyles).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             width: '1760px',
           }),
         );
@@ -73,21 +73,21 @@ describe('RoadmapTimelineSectionComponent', () => {
 
   describe('mounted', () => {
     it('binds `epicsListScrolled` event listener via eventHub', () => {
-      spyOn(eventHub, '$on');
+      jest.spyOn(eventHub, '$on').mockImplementation(() => {});
       const vmX = createComponent({});
 
-      expect(eventHub.$on).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('epicsListScrolled', expect.any(Function));
       vmX.$destroy();
     });
   });
 
   describe('beforeDestroy', () => {
     it('unbinds `epicsListScrolled` event listener via eventHub', () => {
-      spyOn(eventHub, '$off');
+      jest.spyOn(eventHub, '$off').mockImplementation(() => {});
       const vmX = createComponent({});
       vmX.$destroy();
 
-      expect(eventHub.$off).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('epicsListScrolled', expect.any(Function));
     });
   });
 
