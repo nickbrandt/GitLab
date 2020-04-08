@@ -193,7 +193,10 @@ are some differences in the way repository languages are detected between DIND a
 observe these differences by checking both Linguist and the common library. For instance, Linguist
 looks for `*.java` files to spin up the [spotbugs](https://gitlab.com/gitlab-org/security-products/analyzers/spotbugs)
 image, while orchestrator only looks for the existence of `pom.xml`, `build.xml`, `gradlew`,
-`grailsw`, or `mvnw`.
+`grailsw`, or `mvnw`. GitLab uses Linguist to detect new file types in the default branch. This
+means that when introducing files or dependencies for a new language or package manager, the
+corresponding scans won't be triggered in the MR and will only run on the default branch once the
+MR is merged. This will be addressed by [#211702](https://gitlab.com/gitlab-org/gitlab/-/issues/211702).
 
 #### Enabling kubesec analyzer
 
