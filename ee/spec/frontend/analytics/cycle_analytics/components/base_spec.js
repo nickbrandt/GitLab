@@ -12,6 +12,7 @@ import RecentActivityCard from 'ee/analytics/cycle_analytics/components/recent_a
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
 import '~/gl_dropdown';
+import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
@@ -39,6 +40,9 @@ const defaultStubs = {
   'stage-nav-item': true,
   'tasks-by-type-chart': true,
   'labels-selector': true,
+  'stage-dropdown-filter': true,
+  Scatterplot: true,
+  DurationChart: true,
 };
 
 function createComponent({
@@ -206,7 +210,17 @@ describe('Cycle Analytics component', () => {
     describe('after a filter has been selected', () => {
       describe('the user has access to the group', () => {
         beforeEach(() => {
-          wrapper = createComponent({ withStageSelected: true, tasksByTypeChartEnabled: false });
+          wrapper = createComponent({
+            withStageSelected: true,
+            tasksByTypeChartEnabled: false,
+
+            opts: {
+              stubs: {
+                ...defaultStubs,
+                'duration-chart': false,
+              },
+            },
+          });
         });
 
         it('hides the empty state', () => {
@@ -271,7 +285,7 @@ describe('Cycle Analytics component', () => {
           });
 
           it('displays the duration chart', () => {
-            expect(wrapper.find(Scatterplot).exists()).toBe(true);
+            expect(wrapper.find(DurationChart).exists()).toBe(true);
           });
         });
 

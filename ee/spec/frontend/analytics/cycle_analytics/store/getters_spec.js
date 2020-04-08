@@ -118,7 +118,7 @@ describe('Cycle analytics getters', () => {
         durationData: [],
       };
 
-      expect(getters.durationChartPlottableData(stateWithDurationData)).toBeNull();
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toEqual([]);
     });
   });
 
