@@ -8,7 +8,7 @@ import {
   GlDeprecatedButton,
   GlTooltip,
 } from '@gitlab/ui';
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 import { __ } from '~/locale';
@@ -71,7 +71,7 @@ export default {
       return this.item.state === ChildState.Closed;
     },
     hasMilestone() {
-      return !_.isEmpty(this.item.milestone);
+      return !isEmpty(this.item.milestone);
     },
     hasAssignees() {
       return this.item.assignees && this.item.assignees.length > 0;
