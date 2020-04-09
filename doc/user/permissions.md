@@ -107,8 +107,12 @@ The following table depicts the various user permission levels in a project.
 | Remove a container registry image                 |         |            | ✓           | ✓        | ✓      |
 | Create/edit/delete project milestones             |         |            | ✓           | ✓        | ✓      |
 | Use security dashboard **(ULTIMATE)**             |         |            | ✓           | ✓        | ✓      |
-| View vulnerabilities in Dependency list **(ULTIMATE)** |    |            | ✓           | ✓        | ✓      |
-| Create issue from vulnerability **(ULTIMATE)**    |         |            | ✓           | ✓        | ✓      |
+| View vulnerability findings in Dependency list **(ULTIMATE)** |    |     | ✓           | ✓        | ✓      |
+| Create issue from vulnerability finding **(ULTIMATE)** |    |            | ✓           | ✓        | ✓      |
+| Dismiss vulnerability finding **(ULTIMATE)**      |         |            | ✓           | ✓        | ✓      |
+| View vulnerability **(ULTIMATE)**                 |         |            | ✓           | ✓        | ✓      |
+| Create vulnerability from vulnerability finding **(ULTIMATE)** |   |     | ✓           | ✓        | ✓      |
+| Resolve vulnerability **(ULTIMATE)**              |         |            | ✓           | ✓        | ✓      |
 | Dismiss vulnerability **(ULTIMATE)**              |         |            | ✓           | ✓        | ✓      |
 | Apply code change suggestions                     |         |            | ✓           | ✓        | ✓      |
 | Create and edit wiki pages                        |         |            | ✓           | ✓        | ✓      |
