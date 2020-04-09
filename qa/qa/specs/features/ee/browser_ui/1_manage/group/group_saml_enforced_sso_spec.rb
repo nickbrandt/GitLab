@@ -5,7 +5,7 @@ module QA
     describe 'Group SAML SSO - Enforced SSO' do
       include Support::Api
 
-      before(:all) do
+      before do
         Support::Retrier.retry_on_exception do
           Flow::Saml.remove_saml_idp_service(@saml_idp_service) if @saml_idp_service
 
@@ -20,85 +20,11 @@ module QA
           @saml_idp_service = Flow::Saml.run_saml_idp_service(@group.path)
 
           @managed_group_url = setup_and_enable_enforce_sso
-        end
-      end
 
-      before do
-        Flow::Saml.logout_from_idp(@saml_idp_service)
+          Flow::Saml.logout_from_idp(@saml_idp_service)
 
-        page.visit Runtime::Scenario.gitlab_address
-        Page::Main::Menu.perform(&:sign_out_if_signed_in)
-      end
-
-      context 'Access', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/205455', type: :flaky } do
-        let(:project) do
-          Resource::Project.fabricate! do |project|
-            project.name = 'project-in-saml-enforced-group-for-access-test'
-            project.description = 'project in SAML enforced group for access test'
-            project.group = @group
-            project.initialize_with_readme = true
-            project.visibility = 'private'
-          end
-        end
-
-        let(:sub_group) do
-          Resource::Group.fabricate_via_api! do |group|
-            group.sandbox = @group
-            group.path = "saml-sub-group"
-          end
-        end
-
-        let(:sub_group_project) do
-          Resource::Project.fabricate! do |project|
-            project.name = 'sub-group-project-in-saml-enforced-group-for-access-test'
-            project.description = 'Sub Group project in SAML enforced group for access test'
-            project.group = sub_group
-            project.initialize_with_readme = true
-            project.visibility = 'private'
-          end
-        end
-
-        shared_examples 'user access' do
-          it 'is not allowed without SSO' do
-            Page::Main::Login.perform do |login|
-              login.sign_in_using_credentials(user: user)
-            end
-
-            expected_single_signon_text = 'group allows you to sign in with your Single Sign-On Account'
-
-            @group.visit!
-
-            expect(page).to have_content(expected_single_signon_text)
-
-            sub_group.visit!
-
-            expect(page).to have_content(expected_single_signon_text)
-
-            project.visit!
-
-            expect(page).to have_content(expected_single_signon_text)
-
-            sub_group_project.visit!
-
-            expect(page).to have_content(expected_single_signon_text)
-          end
-        end
-
-        before(:all) do
-          @owner_user = Resource::User.fabricate_via_api!
-
-          @group.add_member(@owner_user, Resource::Members::AccessLevel::OWNER)
-        end
-
-        after(:all) do
-          @group.remove_member(@owner_user) if @owner_user
-        end
-
-        it_behaves_like 'user access' do
-          let(:user) { @developer_user }
-        end
-        it_behaves_like 'user access' do
-          let(:user) { @owner_user }
+          page.visit Runtime::Scenario.gitlab_address
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
         end
       end
 
@@ -123,7 +49,7 @@ module QA
         end.not_to raise_error
       end
 
-      after(:all) do
+      after do
         page.visit Runtime::Scenario.gitlab_address
         %w[enforced_sso enforced_sso_requires_session].each do |flag|
           Runtime::Feature.remove(flag)
