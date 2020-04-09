@@ -12,7 +12,6 @@ import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import {
   group,
-  summaryData,
   allowedStages as stages,
   groupLabels,
   startDate,
@@ -275,7 +274,6 @@ describe('Cycle analytics actions', () => {
         fetchStageMedianValues: overrides.fetchStageMedianValues || jest.fn().mockResolvedValue(),
         fetchGroupStagesAndEvents:
           overrides.fetchGroupStagesAndEvents || jest.fn().mockResolvedValue(),
-        fetchSummaryData: overrides.fetchSummaryData || jest.fn().mockResolvedValue(),
         receiveCycleAnalyticsDataSuccess:
           overrides.receiveCycleAnalyticsDataSuccess || jest.fn().mockResolvedValue(),
       };
@@ -286,14 +284,12 @@ describe('Cycle analytics actions', () => {
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchStageMedianValues)
-          .mockImplementationOnce(mocks.fetchSummaryData)
           .mockImplementationOnce(mocks.receiveCycleAnalyticsDataSuccess),
       };
     }
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
-      mock.onGet(endpoints.summaryData).replyOnce(200, summaryData);
       state = { ...state, selectedGroup, startDate, endDate };
     });
 
@@ -307,7 +303,6 @@ describe('Cycle analytics actions', () => {
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
-          { type: 'fetchSummaryData' },
           { type: 'receiveCycleAnalyticsDataSuccess' },
         ],
         done,
@@ -335,34 +330,6 @@ describe('Cycle analytics actions', () => {
         })
         .then(() => {
           shouldFlashAMessage('There was an error fetching median data for stages');
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it(`displays an error if fetchSummaryData fails`, done => {
-      const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
-        fetchSummaryData: actions.fetchSummaryData({
-          dispatch: jest
-            .fn()
-            .mockResolvedValueOnce()
-            .mockImplementation(actions.receiveSummaryDataError({ commit: () => {} })),
-          commit: () => {},
-          state: { ...state },
-          getters,
-        }),
-      });
-
-      actions
-        .fetchCycleAnalyticsData({
-          dispatch: mockDispatchContext,
-          state: {},
-          commit: () => {},
-        })
-        .then(() => {
-          shouldFlashAMessage(
-            'There was an error while fetching value stream analytics summary data.',
-          );
           done();
         })
         .catch(done.fail);
@@ -684,7 +651,7 @@ describe('Cycle analytics actions', () => {
         title: 'NEW - COOL',
       };
 
-      it('will dispatch fetchGroupStagesAndEvents and fetchSummaryData', () =>
+      it('will dispatch fetchGroupStagesAndEvents', () =>
         testAction(
           actions.receiveUpdateStageSuccess,
           response,
@@ -1502,13 +1469,13 @@ describe('Cycle analytics actions', () => {
       },
     };
 
-    it('will dispatch fetchGroupStagesAndEvents and fetchSummaryData', () =>
+    it('will dispatch fetchGroupStagesAndEvents', () =>
       testAction(
         actions.receiveCreateCustomStageSuccess,
         response,
         state,
         [{ type: types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS }],
-        [{ type: 'fetchGroupStagesAndEvents' }, { type: 'fetchSummaryData' }],
+        [{ type: 'fetchGroupStagesAndEvents' }],
       ));
 
     describe('with an error', () => {

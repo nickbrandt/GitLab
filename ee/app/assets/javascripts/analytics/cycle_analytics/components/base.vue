@@ -10,11 +10,11 @@ import Scatterplot from '../../shared/components/scatterplot.vue';
 import { LAST_ACTIVITY_AT, dateFormats, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
-import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
 import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
 import { toYmd } from '../../shared/utils';
+import RecentActivityCard from './recent_activity_card.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -24,11 +24,11 @@ export default {
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
-    SummaryTable,
     StageTable,
     StageDropdownFilter,
     Scatterplot,
     TasksByTypeChart,
+    RecentActivityCard,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -84,6 +84,7 @@ export default {
       'activeStages',
       'selectedProjectIds',
       'enableCustomOrdering',
+      'cycleAnalyticsRequestParams',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -281,11 +282,16 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
+        <div class="js-recent-activity mt-3">
+          <recent-activity-card
+            :group-path="currentGroupPath"
+            :additional-params="cycleAnalyticsRequestParams"
+          />
+        </div>
         <div v-if="isLoading">
           <gl-loading-icon class="mt-4" size="md" />
         </div>
         <div v-else>
-          <summary-table class="js-summary-table" :items="summary" />
           <stage-table
             v-if="selectedStage"
             :key="stageCount"
