@@ -5,6 +5,11 @@ require 'spec_helper'
 describe ElasticIndexerWorker, :elastic do
   subject { described_class.new }
 
+  # Create admin user and search globally to avoid dealing with permissions in
+  # these tests
+  let(:user) { create(:admin) }
+  let(:search_options) { { options: { current_user: user, project_ids: :any } } }
+
   before do
     stub_ee_application_setting(elasticsearch_indexing: true)
 
@@ -23,12 +28,12 @@ describe ElasticIndexerWorker, :elastic do
   describe 'Indexing, updating, and deleting records' do
     using RSpec::Parameterized::TableSyntax
 
-    where(:type, :name, :attribute) do
-      :project       | "Project"      | :name
-      :issue         | "Issue"        | :title
-      :note          | "Note"         | :note
-      :milestone     | "Milestone"    | :title
-      :merge_request | "MergeRequest" | :title
+    where(:type, :name) do
+      :project       | "Project"
+      :issue         | "Issue"
+      :note          | "Note"
+      :milestone     | "Milestone"
+      :merge_request | "MergeRequest"
     end
 
     with_them do
@@ -47,6 +52,13 @@ describe ElasticIndexerWorker, :elastic do
 
         Sidekiq::Testing.disable! do
           object = create(type)
+
+          if type != :project
+            # You cannot find anything in the index if it's parent project is
+            # not first indexed.
+            subject.perform("index", "Project", object.project.id, object.project.es_id)
+          end
+
           subject.perform("index", name, object.id, object.es_id)
           ensure_elasticsearch_index!
           object.destroy
@@ -55,7 +67,7 @@ describe ElasticIndexerWorker, :elastic do
         expect do
           subject.perform("delete", name, object.id, object.es_id, { 'es_parent' => object.es_parent })
           ensure_elasticsearch_index!
-        end.to change { Elasticsearch::Model.search('*').total_count }.by(-1)
+        end.to change { object.class.elastic_search('*', search_options).total_count }.by(-1)
       end
     end
   end
@@ -84,12 +96,20 @@ describe ElasticIndexerWorker, :elastic do
     ensure_elasticsearch_index!
 
     ## All database objects + data from repository. The absolute value does not matter
-    expect(Elasticsearch::Model.search('*').total_count).to be > 40
+    expect(Project.elastic_search('*', search_options).records).to include(project)
+    expect(Issue.elastic_search('*', search_options).records).to include(issue)
+    expect(Milestone.elastic_search('*', search_options).records).to include(milestone)
+    expect(Note.elastic_search('*', search_options).records).to include(note)
+    expect(MergeRequest.elastic_search('*', search_options).records).to include(merge_request)
 
     subject.perform("delete", "Project", project.id, project.es_id)
     ensure_elasticsearch_index!
 
-    expect(Elasticsearch::Model.search('*').total_count).to be(0)
+    expect(Project.elastic_search('*', search_options).total_count).to be(0)
+    expect(Issue.elastic_search('*', search_options).total_count).to be(0)
+    expect(Milestone.elastic_search('*', search_options).total_count).to be(0)
+    expect(Note.elastic_search('*', search_options).total_count).to be(0)
+    expect(MergeRequest.elastic_search('*', search_options).total_count).to be(0)
   end
 
   it 'retries if index raises error' do
