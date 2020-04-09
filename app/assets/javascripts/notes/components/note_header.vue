@@ -2,6 +2,7 @@
 import { mapActions } from 'vuex';
 import timeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
+import $ from 'jquery';
 
 export default {
   components: {
@@ -45,6 +46,11 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      isUsernameLinkHovered: false,
+    };
+  },
   computed: {
     toggleChevronClass() {
       return this.expanded ? 'fa-chevron-up' : 'fa-chevron-down';
@@ -58,6 +64,46 @@ export default {
     showGitlabTeamMemberBadge() {
       return this.author?.is_gitlab_employee;
     },
+    authorLinkClasses() {
+      return {
+        hover: this.isUsernameLinkHovered,
+        'text-underline': this.isUsernameLinkHovered,
+        'author-name-link': true,
+        'js-user-link': true,
+      };
+    },
+    authorPath() {
+      return this.author.path;
+    },
+    authorName() {
+      return this.author.name;
+    },
+    authorUsername() {
+      return this.author.username;
+    },
+    authorId() {
+      return this.author.id;
+    },
+    authorStatus() {
+      return this.author.status_tooltip_html;
+    },
+  },
+  mounted() {
+    // Temporarily remove `title` attribute from emoji when tooltip is open
+    // Prevents duplicate tooltips (Bootstrap tooltip and browser title tooltip)
+    const { authorStatus } = this.$refs;
+    if (authorStatus && authorStatus.querySelector('.has-tooltip')) {
+      const emoji = authorStatus.querySelector('gl-emoji');
+      const emojiTitle = emoji.getAttribute('title');
+
+      $(this.$refs.authorStatus).on('show.bs.tooltip', () => {
+        emoji.removeAttribute('title');
+      });
+
+      $(this.$refs.authorStatus).on('hidden.bs.tooltip', () => {
+        emoji.setAttribute('title', emojiTitle);
+      });
+    }
   },
   methods: {
     ...mapActions(['setTargetNoteHash']),
@@ -68,6 +114,16 @@ export default {
       if (this.$store) {
         this.setTargetNoteHash(this.noteTimestampLink);
       }
+    },
+    handleUsernameMouseEnter() {
+      this.$refs.authorNameLink.dispatchEvent(new Event('mouseenter'));
+
+      this.isUsernameLinkHovered = true;
+    },
+    handleUsernameMouseLeave() {
+      this.$refs.authorNameLink.dispatchEvent(new Event('mouseleave'));
+
+      this.isUsernameLinkHovered = false;
     },
   },
 };
@@ -87,18 +143,27 @@ export default {
     </div>
     <template v-if="hasAuthor">
       <a
-        v-once
-        :href="author.path"
-        class="js-user-link"
-        :data-user-id="author.id"
-        :data-username="author.username"
+        ref="authorNameLink"
+        :href="authorPath"
+        :class="authorLinkClasses"
+        :data-user-id="authorId"
+        :data-username="authorUsername"
       >
         <slot name="note-header-info"></slot>
-        <span class="note-header-author-name bold">{{ author.name }}</span>
-        <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
-        <span class="note-headline-light">@{{ author.username }}</span>
+        <span class="note-header-author-name bold">{{ authorName }}</span>
       </a>
-      <gitlab-team-member-badge v-if="showGitlabTeamMemberBadge" />
+      <span v-if="authorStatus" ref="authorStatus" v-html="authorStatus"></span>
+      <span class="text-nowrap author-username">
+        <a
+          ref="authorUsernameLink"
+          class="author-username-link"
+          :href="authorPath"
+          @mouseenter="handleUsernameMouseEnter"
+          @mouseleave="handleUsernameMouseLeave"
+          ><span class="note-headline-light">@{{ authorUsername }}</span>
+        </a>
+        <gitlab-team-member-badge v-if="showGitlabTeamMemberBadge" />
+      </span>
     </template>
     <span v-else>{{ __('A deleted user') }}</span>
     <span class="note-headline-light note-headline-meta">

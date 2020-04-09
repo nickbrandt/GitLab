@@ -179,4 +179,26 @@ describe('NoteHeader component', () => {
       expect(findTimestamp().exists()).toBe(true);
     });
   });
+
+  describe('author username link', () => {
+    it('proxies `mouseenter` event to author name link', () => {
+      createComponent({ author });
+
+      const dispatchEvent = jest.spyOn(wrapper.vm.$refs.authorNameLink, 'dispatchEvent');
+
+      wrapper.find({ ref: 'authorUsernameLink' }).trigger('mouseenter');
+
+      expect(dispatchEvent).toHaveBeenCalledWith(new Event('mouseenter'));
+    });
+
+    it('proxies `mouseleave` event to author name link', () => {
+      createComponent({ author });
+
+      const dispatchEvent = jest.spyOn(wrapper.vm.$refs.authorNameLink, 'dispatchEvent');
+
+      wrapper.find({ ref: 'authorUsernameLink' }).trigger('mouseleave');
+
+      expect(dispatchEvent).toHaveBeenCalledWith(new Event('mouseleave'));
+    });
+  });
 });
