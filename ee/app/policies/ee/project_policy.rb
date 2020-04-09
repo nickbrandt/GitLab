@@ -36,6 +36,8 @@ module EE
       with_scope :subject
       condition(:requirements_available) { @subject.feature_available?(:requirements) }
 
+      condition(:compliance_framework_available) { @subject.feature_available?(:compliance_framework, @user) }
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -363,6 +365,8 @@ module EE
       end
 
       rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { compliance_framework_available & can?(:admin_project) }.enable :admin_compliance_framework
 
       rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end

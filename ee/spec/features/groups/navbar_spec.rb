@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'Group navbar' do
   include NavbarStructureHelper
+  include WaitForRequests
 
   include_context 'group navbar structure'
 
@@ -45,6 +46,16 @@ describe 'Group navbar' do
     end
 
     it_behaves_like 'verified navigation bar'
+
+    it 'redirects to value stream when Analytics item is clicked' do
+      page.within('.sidebar-top-level-items') do
+        find('[data-qa-selector=analytics_anchor]').click
+      end
+
+      wait_for_requests
+
+      expect(page).to have_current_path(group_analytics_cycle_analytics_path(group))
+    end
   end
 
   context 'when epics are available' do

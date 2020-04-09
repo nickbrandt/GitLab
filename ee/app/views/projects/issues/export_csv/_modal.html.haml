@@ -1,4 +1,4 @@
-- if current_user && @project.feature_available?(:export_issues)
+- if current_user
   .issues-export-modal.modal
     .modal-dialog
       .modal-content{ data: { qa_selector: 'export_issues_modal' } }

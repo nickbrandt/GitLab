@@ -203,9 +203,9 @@ module EE
         def usage_activity_by_stage_configure(time_period)
           {
             clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
-            clusters_applications_helm: ::Clusters::Applications::Helm.where(time_period).distinct_by_user,
+            clusters_applications_helm: clusters_user_distinct_count(::Clusters::Applications::Helm, time_period),
             clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
-            clusters_applications_knative: ::Clusters::Applications::Knative.where(time_period).distinct_by_user,
+            clusters_applications_knative: clusters_user_distinct_count(::Clusters::Applications::Knative, time_period),
             clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
             clusters_enabled: distinct_count(::Clusters::Cluster.enabled.where(time_period), :user_id),
             clusters_platforms_gke: distinct_count(::Clusters::Cluster.gcp_installed.enabled.where(time_period), :user_id),
@@ -257,7 +257,7 @@ module EE
         def usage_activity_by_stage_monitor(time_period)
           {
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
-            clusters_applications_prometheus: ::Clusters::Applications::Prometheus.where(time_period).distinct_by_user,
+            clusters_applications_prometheus: clusters_user_distinct_count(::Clusters::Applications::Prometheus, time_period),
             operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
             operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
@@ -315,7 +315,7 @@ module EE
             ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
             ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id),
             ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
-            clusters_applications_runner: ::Clusters::Applications::Runner.where(time_period).distinct_by_user,
+            clusters_applications_runner: clusters_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
           }
         end

@@ -25,6 +25,7 @@ query childItems(
           ...PageInfo
         }
       }
+
       issues(first: $pageSize, after: $issueEndCursor) {
         edges {
           node {

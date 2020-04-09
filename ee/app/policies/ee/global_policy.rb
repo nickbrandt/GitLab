@@ -18,6 +18,7 @@ module EE
       rule { admin }.policy do
         enable :read_licenses
         enable :destroy_licenses
+        enable :read_all_geo
       end
 
       rule { admin & pages_size_limit_available }.enable :update_max_pages_size

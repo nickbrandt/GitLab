@@ -1,23 +1,23 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { GlDeprecatedButton, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltip, GlIcon } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
-import Icon from '~/vue_shared/components/icon.vue';
-
 import EpicActionsSplitButton from './epic_actions_split_button.vue';
+import EpicHealthStatus from './epic_health_status.vue';
 
 export default {
   components: {
-    Icon,
     GlDeprecatedButton,
     GlTooltip,
+    GlIcon,
+    EpicHealthStatus,
     EpicActionsSplitButton,
   },
   computed: {
-    ...mapState(['parentItem', 'descendantCounts', 'allowSubEpics']),
+    ...mapState(['parentItem', 'descendantCounts', 'healthStatus', 'allowSubEpics']),
     totalEpicsCount() {
       return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
     },
@@ -74,16 +74,19 @@ export default {
           </span>
         </p>
       </gl-tooltip>
-      <div ref="countBadge" class="issue-count-badge">
+      <div ref="countBadge" class="issue-count-badge text-secondary">
         <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
-          <icon :size="16" name="epic" class="text-secondary mr-1" />
+          <gl-icon name="epic" class="mr-1" />
           {{ totalEpicsCount }}
+          <span class="ml-2 bullet-separator">&bull;</span>
         </span>
         <span class="d-inline-flex align-items-center" :class="{ 'ml-2': allowSubEpics }">
-          <icon :size="16" name="issues" class="text-secondary mr-1" />
+          <gl-icon name="issues" class="mr-1" />
           {{ totalIssuesCount }}
+          <span class="ml-2 bullet-separator">&bull;</span>
         </span>
       </div>
+      <epic-health-status v-if="healthStatus" :health-status="healthStatus" />
     </div>
     <div class="d-inline-flex js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">

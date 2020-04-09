@@ -121,6 +121,8 @@ License Compliance can be configured using environment variables.
 | `LM_JAVA_VERSION`      | no | Version of Java. If set to `11`, Maven and Gradle use Java 11 instead of Java 8. |
 | `LM_PYTHON_VERSION`    | no | Version of Python. If set to `3`, dependencies are installed using Python 3 instead of Python 2.7. |
 | `SETUP_CMD`            | no | Custom setup for the dependency installation. (experimental) |
+| `PIP_INDEX_URL` | no | Base URL of Python Package Index (default: `https://pypi.org/simple/`). |
+| `ADDITIONAL_CA_CERT_BUNDLE` | no | Bundle of trusted CA certificates (currently supported in Python projects). |
 
 ### Installing custom dependencies
 
@@ -215,6 +217,37 @@ license_scanning:
     LM_PYTHON_VERSION: 2
 ```
 
+### Custom root certificates for Python
+
+You can supply a custom root certificate to complete TLS verification by using the
+`ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables).
+
+To bypass TLS verification, you can use a custom [`pip.conf`](https://pip.pypa.io/en/stable/user_guide/#config-file)
+file to configure trusted hosts.
+
+The following `gitlab-ci.yml` file uses a [`before_script`](../../../ci/yaml/README.md#before_script-and-after_script)
+to inject a custom [`pip.conf`](https://pip.pypa.io/en/stable/user_guide/#config-file):
+
+```yaml
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
+license_scanning:
+  variables:
+    PIP_INDEX_URL: 'https://pypi.example.com/simple/'
+  before_script:
+    - mkdir -p ~/.config/pip/
+    - cp pip.conf ~/.config/pip/pip.conf
+```
+
+The [`pip.conf`](https://pip.pypa.io/en/stable/reference/pip/) allows you to specify a list of
+[trusted hosts](https://pip.pypa.io/en/stable/reference/pip/#cmdoption-trusted-host):
+
+```text
+[global]
+trusted-host = pypi.example.com
+```
+
 ### Migration from `license_management` to `license_scanning`
 
 In GitLab 12.8 a new name for `license_management` job was introduced. This change was made to improve clarity around the purpose of the scan, which is to scan and collect the types of licenses present in a projects dependencies.
@@ -249,6 +282,28 @@ license_scanning:
     reports:
       license_scanning: gl-license-scanning-report.json
 ```
+
+## Running License Compliance in an offline environment
+
+License Compliance can be executed on an offline GitLab Ultimate installation by using the following
+process:
+
+1. Host the License Compliance image
+   `registry.gitlab.com/gitlab-org/security-products/license-management:latest` in your local Docker
+   container registry.
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+   to the License Compliance Docker image hosted on your local Docker container registry:
+
+   ```yaml
+   include:
+     - template: License-Scanning.gitlab-ci.yml
+
+   license_scanning:
+     image: registry.example.com/namespace/license-management:latest
+   ```
+
+1. Ensure the package registry is reachable from within the GitLab environment and that the package
+   manager is configured to use your preferred package registry.
 
 ## Project policies for License Compliance
 

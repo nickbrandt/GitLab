@@ -14,6 +14,11 @@ fragment BaseEpic on Epic {
     openedIssues
     closedIssues
   }
+  healthStatus {
+    issuesAtRisk
+    issuesOnTrack
+    issuesNeedingAttention
+  }
 }
 
 fragment EpicNode on Epic {

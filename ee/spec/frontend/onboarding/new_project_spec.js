@@ -66,7 +66,7 @@ describe('User onboarding new project utils', () => {
       form = document.getElementById('new_project');
       submitBtn = document.getElementById('submitBtn');
       form.addEventListener('submit', submitSpy);
-      jest.spyOn(form, 'submit').mockImplementation(() => {});
+      jest.spyOn(form, 'submit');
     });
 
     describe('when onboarding is not dismissed and there is an onboarding state on the local storage', () => {
@@ -82,7 +82,7 @@ describe('User onboarding new project utils', () => {
 
         bindOnboardingEvents(form);
 
-        expect(form.addEventListener).toHaveBeenCalledWith('submit', jasmine.any(Function));
+        expect(form.addEventListener).toHaveBeenCalledWith('submit', expect.any(Function));
       });
 
       it('calls updateLocalStorage with the correct project path when the form is submitted', () => {

@@ -397,7 +397,7 @@ Starting in [version 12.8](https://gitlab.com/gitlab-org/gitlab/issues/202696), 
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16530) in GitLab 12.5.
 
-To add an anomaly chart panel type to a dashboard, add add a panel with *exactly* 3 metrics.
+To add an anomaly chart panel type to a dashboard, add a panel with *exactly* 3 metrics.
 
 The first metric represents the current state, and the second and third metrics represent the upper and lower limit respectively:
 
@@ -775,7 +775,7 @@ GitLab unfurls the link as an embedded metrics panel:
 ![Embedded Metrics Rendered](img/embedded_metrics_rendered_v12_8.png)
 
 You can also embed a single chart. To get a link to a chart, click the
-**{ellipsis_v}** **More info** menu in the upper right corner of the chart,
+**{ellipsis_v}** **More actions** menu in the upper right corner of the chart,
 and select **Copy link to chart**, as shown in this example:
 
 ![Copy Link To Chart](img/copy_link_to_chart_v12_10.png)

@@ -104,6 +104,9 @@ export default {
     formattedFiringAlerts() {
       return this.firingAlerts.map(alert => this.formatAlertSummary(alert.alert_path));
     },
+    configuredAlert() {
+      return this.hasAlerts ? values(this.alertsToManage)[0].metricId : '';
+    },
   },
   created() {
     this.service = new AlertsService({ alertsEndpoint: this.alertsEndpoint });
@@ -271,6 +274,7 @@ export default {
       :alerts-to-manage="alertsToManage"
       :relevant-queries="relevantQueries"
       :error-message="errorMessage"
+      :configured-alert="configuredAlert"
       :modal-id="modalId"
       @create="handleCreate"
       @update="handleUpdate"

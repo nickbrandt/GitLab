@@ -1024,6 +1024,15 @@ msgstr ""
 msgid "AccessTokens|reset it"
 msgstr ""
 
+msgid "AccessibilityReport|Learn More"
+msgstr ""
+
+msgid "AccessibilityReport|Message: %{message}"
+msgstr ""
+
+msgid "AccessibilityReport|New"
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -1320,10 +1329,34 @@ msgstr ""
 msgid "Admin notes"
 msgstr ""
 
+msgid "AdminArea|Active users"
+msgstr ""
+
+msgid "AdminArea|Billable users"
+msgstr ""
+
+msgid "AdminArea|Blocked users"
+msgstr ""
+
 msgid "AdminArea|Bots"
 msgstr ""
 
+msgid "AdminArea|Developer"
+msgstr ""
+
+msgid "AdminArea|Guest"
+msgstr ""
+
 msgid "AdminArea|Included Free in license"
+msgstr ""
+
+msgid "AdminArea|Maintainer"
+msgstr ""
+
+msgid "AdminArea|Owner"
+msgstr ""
+
+msgid "AdminArea|Reporter"
 msgstr ""
 
 msgid "AdminArea|Stop all jobs"
@@ -1338,13 +1371,16 @@ msgstr ""
 msgid "AdminArea|Stopping jobs failed"
 msgstr ""
 
+msgid "AdminArea|Total users"
+msgstr ""
+
 msgid "AdminArea|Users statistics"
 msgstr ""
 
-msgid "AdminArea|Users total"
+msgid "AdminArea|Users with highest role"
 msgstr ""
 
-msgid "AdminArea|Users with highest role"
+msgid "AdminArea|Users without a Group and Project"
 msgstr ""
 
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
@@ -2061,6 +2097,12 @@ msgid "An error occurred while validating username"
 msgstr ""
 
 msgid "An error occurred. Please try again."
+msgstr ""
+
+msgid "An error ocurred while loading your content. Please try again."
+msgstr ""
+
+msgid "An example project for managing Kubernetes clusters integrated with GitLab."
 msgstr ""
 
 msgid "An instance-level serverless domain already exists."
@@ -3803,6 +3845,9 @@ msgstr ""
 msgid "Choose which status most accurately reflects the current state of this issue:"
 msgstr ""
 
+msgid "Choose your framework"
+msgstr ""
+
 msgid "CiStatusLabel|canceled"
 msgstr ""
 
@@ -5207,6 +5252,24 @@ msgid "Compliance"
 msgstr ""
 
 msgid "Compliance Dashboard"
+msgstr ""
+
+msgid "Compliance framework (optional)"
+msgstr ""
+
+msgid "ComplianceFramework|GDPR - General Data Protection Regulation"
+msgstr ""
+
+msgid "ComplianceFramework|HIPAA - Health Insurance Portability and Accountability Act"
+msgstr ""
+
+msgid "ComplianceFramework|PCI-DSS - Payment Card Industry-Data Security Standard"
+msgstr ""
+
+msgid "ComplianceFramework|SOC 2 - Service Organization Control 2"
+msgstr ""
+
+msgid "ComplianceFramework|SOX - Sarbanes-Oxley"
 msgstr ""
 
 msgid "Confidence: %{confidence}"
@@ -7538,6 +7601,9 @@ msgstr ""
 msgid "Enable classification control using an external service"
 msgstr ""
 
+msgid "Enable container expiration and retention policies for projects created earlier than GitLab 12.7."
+msgstr ""
+
 msgid "Enable email restrictions for sign ups"
 msgstr ""
 
@@ -7932,6 +7998,9 @@ msgid "Environments|Stop environment"
 msgstr ""
 
 msgid "Environments|Stopping"
+msgstr ""
+
+msgid "Environments|There was an error fetching the logs. Please try again."
 msgstr ""
 
 msgid "Environments|This action will relaunch the job for commit %{commit_id}, putting the environment in a previous version. Are you sure you want to continue?"
@@ -8355,6 +8424,9 @@ msgid "Excluding merge commits. Limited to 6,000 commits."
 msgstr ""
 
 msgid "Existing members and groups"
+msgstr ""
+
+msgid "Existing projects will be able to use expiration policies. Avoid enabling this if an external Container Registry is being used, as there is a performance risk if many images exist on one project."
 msgstr ""
 
 msgid "Existing shares"
@@ -10250,6 +10322,9 @@ msgstr ""
 msgid "GroupSAML|should be a random persistent ID, emails are discouraged"
 msgstr ""
 
+msgid "GroupSettings|Apply integration settings to all Projects"
+msgstr ""
+
 msgid "GroupSettings|Auto DevOps pipeline was updated for the group"
 msgstr ""
 
@@ -10284,6 +10359,9 @@ msgid "GroupSettings|Disable group mentions"
 msgstr ""
 
 msgid "GroupSettings|If the parent group's visibility is lower than the group current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility."
+msgstr ""
+
+msgid "GroupSettings|Integrations configured here will automatically apply to all projects in this group."
 msgstr ""
 
 msgid "GroupSettings|Learn more about badges."
@@ -10648,9 +10726,6 @@ msgid "IDE|Go to project"
 msgstr ""
 
 msgid "IDE|Live Preview"
-msgstr ""
-
-msgid "IDE|Open in file view"
 msgstr ""
 
 msgid "IDE|Preview your web application using Web IDE client-side evaluation."
@@ -12808,9 +12883,6 @@ msgstr ""
 msgid "Metrics|There was an error fetching the environments data, please try again"
 msgstr ""
 
-msgid "Metrics|There was an error fetching the logs, please try again"
-msgstr ""
-
 msgid "Metrics|There was an error getting deployment information."
 msgstr ""
 
@@ -13904,9 +13976,6 @@ msgid "Open errors"
 msgstr ""
 
 msgid "Open in Xcode"
-msgstr ""
-
-msgid "Open in file view"
 msgstr ""
 
 msgid "Open issues"
@@ -15827,6 +15896,9 @@ msgid "ProjectTemplates|.NET Core"
 msgstr ""
 
 msgid "ProjectTemplates|Android"
+msgstr ""
+
+msgid "ProjectTemplates|GitLab Cluster Management"
 msgstr ""
 
 msgid "ProjectTemplates|Go Micro"
@@ -17940,6 +18012,9 @@ msgstr ""
 msgid "Select projects you want to import."
 msgstr ""
 
+msgid "Select required regulatory standard"
+msgstr ""
+
 msgid "Select shards to replicate"
 msgstr ""
 
@@ -19170,6 +19245,30 @@ msgid "State your message to activate"
 msgstr ""
 
 msgid "Static Application Security Testing (SAST)"
+msgstr ""
+
+msgid "StaticSiteEditor|A merge request was created:"
+msgstr ""
+
+msgid "StaticSiteEditor|A new branch was created:"
+msgstr ""
+
+msgid "StaticSiteEditor|Return to site"
+msgstr ""
+
+msgid "StaticSiteEditor|Success!"
+msgstr ""
+
+msgid "StaticSiteEditor|Summary of changes"
+msgstr ""
+
+msgid "StaticSiteEditor|View merge request"
+msgstr ""
+
+msgid "StaticSiteEditor|Your changes have been submitted and a merge request has been created. The changes won’t be visible on the site until the merge request has been accepted."
+msgstr ""
+
+msgid "StaticSiteEditor|Your changes were committed to it:"
 msgstr ""
 
 msgid "Statistics"
@@ -23316,6 +23415,9 @@ msgstr ""
 msgid "You could not create a new trigger."
 msgstr ""
 
+msgid "You didn't renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} so it was downgraded to the free plan."
+msgstr ""
+
 msgid "You didn't renew your %{strong}%{plan_name}%{strong_close} subscription so it was downgraded to the GitLab Core Plan."
 msgstr ""
 
@@ -23544,6 +23646,9 @@ msgstr ""
 msgid "YouTube"
 msgstr ""
 
+msgid "Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features."
+msgstr ""
+
 msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features."
 msgstr ""
 
@@ -23766,6 +23871,9 @@ msgid "archived"
 msgstr ""
 
 msgid "assign yourself"
+msgstr ""
+
+msgid "at risk"
 msgstr ""
 
 msgid "attach a new file"
@@ -24271,6 +24379,15 @@ msgstr ""
 msgid "issue"
 msgstr ""
 
+msgid "issues at risk"
+msgstr ""
+
+msgid "issues need attention"
+msgstr ""
+
+msgid "issues on track"
+msgstr ""
+
 msgid "it is stored externally"
 msgstr ""
 
@@ -24651,6 +24768,9 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
+msgid "need attention"
+msgstr ""
+
 msgid "needs to be between 10 minutes and 1 month"
 msgstr ""
 
@@ -24682,6 +24802,9 @@ msgid "nounSeries|%{item}, %{nextItem}"
 msgstr ""
 
 msgid "nounSeries|%{item}, and %{lastItem}"
+msgstr ""
+
+msgid "on track"
 msgstr ""
 
 msgid "opened %{timeAgoString} by %{user}"

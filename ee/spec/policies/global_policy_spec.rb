@@ -36,9 +36,11 @@ describe GlobalPolicy do
 
   it { is_expected.to be_disallowed(:read_licenses) }
   it { is_expected.to be_disallowed(:destroy_licenses) }
+  it { is_expected.to be_disallowed(:read_all_geo) }
 
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:read_licenses) }
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:destroy_licenses) }
+  it { expect(described_class.new(create(:admin), [user])).to be_allowed(:read_all_geo) }
 
   shared_examples 'analytics policy' do |action|
     context 'anonymous user' do

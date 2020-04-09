@@ -760,4 +760,25 @@ describe License do
       trueup_to: Date.today.to_s
     }
   end
+
+  describe '#paid?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:plan, :paid_result) do
+      License::STARTER_PLAN  | true
+      License::PREMIUM_PLAN  | true
+      License::ULTIMATE_PLAN | true
+      nil                    | true
+    end
+
+    with_them do
+      let(:license) { build(:license, plan: plan) }
+
+      subject { license.paid? }
+
+      it do
+        is_expected.to eq(paid_result)
+      end
+    end
+  end
 end

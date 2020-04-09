@@ -27,6 +27,9 @@ export const setInitialParentItem = ({ commit }, data) =>
 export const setChildrenCount = ({ commit, state }, data) =>
   commit(types.SET_CHILDREN_COUNT, { ...state.descendantCounts, ...data });
 
+export const setHealthStatus = ({ commit, state }, data) =>
+  commit(types.SET_HEALTH_STATUS, { ...state.healthStatus, ...data });
+
 export const updateChildrenCount = ({ state, dispatch }, { item, isRemoved = false }) => {
   const descendantCounts = {};
 
@@ -120,6 +123,7 @@ export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
 
       if (!isSubItem) {
         dispatch('setChildrenCount', data.group.epic.descendantCounts);
+        dispatch('setHealthStatus', data.group.epic.healthStatus);
       }
     })
     .catch(() => {

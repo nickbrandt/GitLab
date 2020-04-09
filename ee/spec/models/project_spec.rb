@@ -23,6 +23,7 @@ describe Project do
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
     it { is_expected.to have_one(:status_page_setting).class_name('StatusPageSetting') }
+    it { is_expected.to have_one(:compliance_framework_setting).class_name('ComplianceManagement::ComplianceFramework::ProjectSettings') }
 
     it { is_expected.to have_many(:reviews).inverse_of(:project) }
     it { is_expected.to have_many(:path_locks) }
@@ -2602,6 +2603,25 @@ describe Project do
         expect(project.jira_import?).to be false
         expect { project.remove_import_data }.not_to change { ProjectImportData.count }
       end
+    end
+  end
+
+  describe '#gitlab_subscription' do
+    subject { project.gitlab_subscription }
+
+    let(:project) { create(:project, namespace: namespace) }
+
+    context 'has a gitlab subscription' do
+      let(:namespace) { subscription.namespace }
+      let(:subscription) { create(:gitlab_subscription) }
+
+      it { is_expected.to eq(subscription) }
+    end
+
+    context 'does not have a gitlab subscription' do
+      let(:namespace) { create(:namespace) }
+
+      it { is_expected.to be_nil }
     end
   end
 end
