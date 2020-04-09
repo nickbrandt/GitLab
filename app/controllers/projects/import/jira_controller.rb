@@ -7,6 +7,7 @@ module Projects
       before_action :jira_integration_configured?
 
       def show
+        @is_jira_configured = @project.jira_service.present?
         return if Feature.enabled?(:jira_issue_import_vue, @project)
 
         unless @project.latest_jira_import&.in_progress?
@@ -45,6 +46,7 @@ module Projects
       end
 
       def jira_integration_configured?
+        return if Feature.enabled?(:jira_issue_import_vue, @project)
         return if @project.jira_service
 
         flash[:notice] = _("Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page." %
