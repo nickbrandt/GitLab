@@ -1,4 +1,6 @@
-/* eslint-disable @gitlab/require-i18n-strings */
+import { __, s__ } from '~/locale';
+
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 /*
  * Endpoint still returns 'approved' & 'blacklisted'
@@ -14,6 +16,7 @@ export const LICENSE_APPROVAL_ACTION = {
   DENY: 'deny',
 };
 
+/* eslint-disable @gitlab/require-i18n-strings */
 export const KNOWN_LICENSES = [
   'AGPL-1.0',
   'AGPL-3.0',
@@ -40,4 +43,23 @@ export const KNOWN_LICENSES = [
   'Simplified BSD',
   'WTFPL',
   'Zlib',
+];
+/* eslint-enable @gitlab/require-i18n-strings */
+
+export const REPORT_GROUPS = [
+  {
+    name: s__('LicenseManagement|Denied'),
+    description: __("Out-of-compliance with this project's policies and should be removed"),
+    status: STATUS_FAILED,
+  },
+  {
+    name: s__('LicenseManagement|Uncategorized'),
+    description: __('No policy matches this license'),
+    status: STATUS_NEUTRAL,
+  },
+  {
+    name: s__('LicenseManagement|Allowed'),
+    description: __('Acceptable for use in this project'),
+    status: STATUS_SUCCESS,
+  },
 ];
