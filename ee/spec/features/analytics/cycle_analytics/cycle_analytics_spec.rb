@@ -189,7 +189,7 @@ describe 'Group Value Stream Analytics', :js do
   shared_examples 'group value stream analytics' do
     context 'summary table', :js do
       it 'will display recent activity' do
-        page.within(find('.js-summary-table')) do
+        page.within(find('.js-recent-activity')) do
           expect(page).to have_selector('.card-header')
           expect(page).to have_content('Recent Activity')
         end
@@ -221,23 +221,27 @@ describe 'Group Value Stream Analytics', :js do
   end
 
   context 'with a group selected' do
+    card_metric_selector = ".js-recent-activity .js-metric-card-item"
+
     before do
       select_group
+
+      expect(page).to have_css(card_metric_selector)
     end
 
     it_behaves_like 'group value stream analytics'
 
     it 'displays the number of issues' do
-      expect(page).to have_content('New Issues')
+      issue_count = page.all(card_metric_selector).first
 
-      issue_count = find(".card .header", match: :first)
+      expect(issue_count).to have_content('New Issues')
       expect(issue_count).to have_content('3')
     end
 
     it 'displays the number of deploys' do
-      expect(page).to have_content('Deploys')
+      deploys_count = page.all(card_metric_selector).last
 
-      deploys_count = page.all(".card .header").last
+      expect(deploys_count).to have_content('Deploys')
       expect(deploys_count).to have_content('-')
     end
   end
