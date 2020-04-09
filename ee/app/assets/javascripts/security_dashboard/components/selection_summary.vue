@@ -83,7 +83,6 @@ export default {
           createFlash(
             s__('Security Reports|There was an error dismissing the vulnerabilities.'),
             'alert',
-            document.querySelector('.ci-table'),
           );
         })
         .finally(() => {
