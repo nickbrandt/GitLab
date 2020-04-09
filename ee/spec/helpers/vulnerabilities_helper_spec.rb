@@ -108,4 +108,41 @@ describe VulnerabilitiesHelper do
       )
     end
   end
+
+  describe '#vulnerability_file_link' do
+    let(:project) { create(:project, :repository, :public) }
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+    let(:finding) { create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high) }
+    let(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
+
+    subject { helper.vulnerability_file_link(vulnerability) }
+
+    it 'returns a link to the vulnerability file location' do
+      expect(subject).to include(
+        vulnerability.finding.location['file'],
+        "#{vulnerability.finding.location['start_line']}",
+        vulnerability.finding.pipelines&.last&.sha
+      )
+    end
+
+    context 'when vulnerability is not linked to a commit' do
+      it 'uses the default branch' do
+        vulnerability.finding.pipelines = []
+        vulnerability.finding.save
+
+        expect(subject).to include(
+          vulnerability.project.default_branch
+        )
+      end
+    end
+
+    context 'when vulnerability is not on a specific line' do
+      it 'does not include a reference to the line number' do
+        vulnerability.finding.location['start_line'] = nil
+        vulnerability.finding.save
+
+        expect(subject).not_to include('#L')
+      end
+    end
+  end
 end

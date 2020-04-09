@@ -3,6 +3,8 @@
 - breadcrumb_title @vulnerability.id
 - page_title @vulnerability.title
 - page_description @vulnerability.description
+- finding = @vulnerability.finding
+- location = finding.location
 
 #js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline) }
 
@@ -12,30 +14,43 @@
     .description
       .md
         %h3= "Description"
-        %p= @vulnerability.finding.description
+        %p= finding.description
         %ul
           %li= _("Severity: %{severity}") % { severity: @vulnerability.severity }
           %li= _("Confidence: %{confidence}") % { confidence: @vulnerability.confidence }
           %li= _("Report Type: %{report_type}") % { report_type: @vulnerability.report_type }
 
-          - if @vulnerability.finding.location["image"]
-            %li= _("Image: %{image}") % { image: @vulnerability.finding.location['image'] }
+          - if location['image']
+            %li= _("Image: %{image}") % { image: location['image'] }
 
-          - if @vulnerability.finding.location["operating_system"]
-            %li= _("Namespace: %{namespace}") % { namespace: @vulnerability.finding.location['operating_system'] }
+          - if location['operating_system']
+            %li= _("Namespace: %{namespace}") % { namespace: location['operating_system'] }
 
-        - if @vulnerability.finding.links.any?
-          %h3= _("Links")
+        - if location['file']
+          %h3= _('Location')
           %ul
-            - @vulnerability.finding.links.each do |link|
+            %li
+              = _('File:')
+              = vulnerability_file_link(@vulnerability)
+            - if location['class']
               %li
-                %a{ :href=>link["url"], target: "_blank", rel: 'noopener noreferrer' }= link["url"]
+                = _('Class:')
+                = location['class']
+            - if location['method']
+              %li
+                = _('Method:')
+                %code= location['method']
 
-        - if @vulnerability.finding.identifiers.any?
-          %h3= _("Identifiers")
+        - if finding.links.any?
+          %h3= _('Links')
           %ul
-            - @vulnerability.finding.identifiers.each do |identifier|
-              %li
-                %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
+            - finding.links.each do |link|
+              %li= link_to link['url'], target: '_blank', rel: 'noopener noreferrer'
+
+        - if finding.identifiers.any?
+          %h3= _('Identifiers')
+          %ul
+            - finding.identifiers.each do |identifier|
+              %li= link_to identifier.name, identifier.url, target: '_blank', rel: 'noopener noreferrer'
 
 #js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline) }

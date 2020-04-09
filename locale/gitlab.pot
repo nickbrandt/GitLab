@@ -4001,6 +4001,9 @@ msgstr ""
 msgid "Class"
 msgstr ""
 
+msgid "Class:"
+msgstr ""
+
 msgid "Classification Label (optional)"
 msgstr ""
 
@@ -8999,6 +9002,9 @@ msgstr ""
 msgid "File upload error."
 msgstr ""
 
+msgid "File:"
+msgstr ""
+
 msgid "Files"
 msgstr ""
 
@@ -12173,6 +12179,9 @@ msgstr ""
 msgid "Localization"
 msgstr ""
 
+msgid "Location"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
@@ -12750,6 +12759,9 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method"
+msgstr ""
+
+msgid "Method:"
 msgstr ""
 
 msgid "Metric was successfully added."

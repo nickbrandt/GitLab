@@ -41,4 +41,15 @@ module VulnerabilitiesHelper
       solution: remediation ? remediation['summary'] : occurrence[:solution]
     )
   end
+
+  def vulnerability_file_link(vulnerability)
+    finding = vulnerability.finding
+    location = finding.location
+    branch = finding.pipelines&.last&.sha || vulnerability.project.default_branch
+    link_text = "#{location['file']}:#{location['start_line']}"
+    offset = location['start_line'] ? "#L#{location['start_line']}" : ''
+    link_path = project_blob_path(vulnerability.project, tree_join(branch, location['file'])) + offset
+
+    link_to link_text, link_path, target: '_blank', rel: 'noopener noreferrer'
+  end
 end
