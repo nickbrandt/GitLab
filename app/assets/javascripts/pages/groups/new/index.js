@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     new GroupPathValidator(); // eslint-disable-line no-new
   }
   BindInOut.initAll();
-  new Group(); // eslint-disable-line no-new
   initAvatarPicker();
+
+  return new Group();
 });

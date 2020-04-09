@@ -11,7 +11,6 @@ import projectSelect from '~/project_select';
 
 document.addEventListener('DOMContentLoaded', () => {
   initAvatarPicker();
-  new TransferDropdown(); // eslint-disable-line no-new
   initConfirmDangerModal();
   initSettingsPanels();
   dirtySubmitFactory(
@@ -24,4 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
   groupsSelect();
 
   projectSelect();
+
+  return new TransferDropdown();
 });
