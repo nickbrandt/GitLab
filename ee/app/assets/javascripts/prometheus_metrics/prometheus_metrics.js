@@ -55,6 +55,14 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
     this.isServiceActive = this.$monitoredCustomMetricsPanel.data('service-active');
   }
 
+  init() {
+    if (this.isServiceActive) {
+      this.loadActiveCustomMetrics();
+    } else {
+      this.setNoIntegrationActiveState();
+    }
+  }
+
   // eslint-disable-next-line class-methods-use-this
   setHidden(els) {
     els.forEach(el => el.addClass('hidden'));
