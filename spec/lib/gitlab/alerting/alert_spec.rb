@@ -13,7 +13,10 @@ describe Gitlab::Alerting::Alert do
     let(:gitlab_alert_id) { gitlab_alert.id }
 
     before do
-      payload['labels'] = { 'gitlab_prometheus_alert_id' => gitlab_alert_id }
+      payload['labels'] = {
+        'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s,
+        'gitlab_prometheus_alert_id' => gitlab_alert_id
+      }
     end
   end
 
@@ -81,7 +84,10 @@ describe Gitlab::Alerting::Alert do
 
       context 'alert id given in params' do
         before do
-          payload['labels'] = { 'gitlab_prometheus_alert_id' => second_gitlab_alert.id }
+          payload['labels'] = {
+            'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s,
+            'gitlab_prometheus_alert_id' => second_gitlab_alert.id
+          }
         end
 
         it { is_expected.to eq(second_gitlab_alert) }
