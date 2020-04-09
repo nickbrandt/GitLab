@@ -27,4 +27,5 @@ fragment IssueNode on EpicIssue {
     startDate
     dueDate
   }
+  healthStatus
 }

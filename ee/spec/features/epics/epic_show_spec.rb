@@ -52,7 +52,7 @@ describe 'Epic show', :js do
           expect(page).to have_selector('.related-items-tree-container')
 
           page.within('.related-items-tree-container') do
-            expect(page.find('.issue-count-badge')).to have_content('2')
+            expect(page.find('.issue-count-badge', text: '2')).to be_present
             expect(find('.tree-item:nth-child(1) .sortable-link')).to have_content('Child epic B')
             expect(find('.tree-item:nth-child(2) .sortable-link')).to have_content('Child epic A')
           end
@@ -109,7 +109,7 @@ describe 'Epic show', :js do
           expect(page).to have_selector('.related-items-tree-container')
 
           page.within('.related-items-tree-container') do
-            expect(page.find('.issue-count-badge')).to have_content('1')
+            expect(page.find('.issue-count-badge', text: '1')).to be_present
           end
         end
       end

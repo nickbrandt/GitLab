@@ -359,9 +359,13 @@ describe('RelatedItemTree', () => {
           );
 
           const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
-          const epicPageInfo = mockQueryResponse.data.group.epic.children.pageInfo;
-          const issuesPageInfo = mockQueryResponse.data.group.epic.issues.pageInfo;
-          const epicDescendantCounts = mockQueryResponse.data.group.epic.descendantCounts;
+
+          const {
+            children: { pageInfo: epicPageInfo },
+            issues: { pageInfo: issuesPageInfo },
+            descendantCounts: epicDescendantCounts,
+            healthStatus,
+          } = mockQueryResponse.data.group.epic;
 
           testAction(
             actions.fetchItems,
@@ -414,6 +418,12 @@ describe('RelatedItemTree', () => {
                 type: 'setChildrenCount',
                 payload: {
                   ...epicDescendantCounts,
+                },
+              },
+              {
+                type: 'setHealthStatus',
+                payload: {
+                  ...healthStatus,
                 },
               },
             ],
