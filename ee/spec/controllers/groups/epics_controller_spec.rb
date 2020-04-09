@@ -287,9 +287,6 @@ describe Groups::EpicsController do
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/epic', dir: 'ee')
-          # TODO: when removing confidential_epics feature flag, we can just move
-          # `confidential` attribute to required params in the epics schema
-          expect(json_response).to include("confidential")
         end
 
         context 'when confidential_epics flag is disabled' do
@@ -302,7 +299,6 @@ describe Groups::EpicsController do
             show_epic(:json)
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response).to match_response_schema('entities/epic', dir: 'ee')
             expect(json_response).not_to include("confidential")
           end
         end
