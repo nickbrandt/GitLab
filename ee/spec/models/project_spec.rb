@@ -1761,35 +1761,20 @@ describe Project do
     end
 
     context 'when mirror true on a jira imported project' do
-      let(:user) { create(:user) }
-      let(:symbol_keys_project) do
-        { key: 'AA', scheduled_at: 2.days.ago.strftime('%Y-%m-%d %H:%M:%S'), scheduled_by: { 'user_id' => 1, 'name' => 'tester1' } }
-      end
-      let(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+      let_it_be(:user) { create(:user) }
+      let_it_be(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id) }
+      let_it_be(:jira_import) { create(:jira_import_state, project: project) }
 
-      context 'when jira import is forced' do
-        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project], JiraImportData::FORCE_IMPORT_KEY => true } }) }
-
-        it 'does not trigger mirror update' do
-          expect(RepositoryUpdateMirrorWorker).not_to receive(:perform_async)
-          expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async)
-          expect(project.mirror).to be true
-          expect(project.jira_import?).to be true
-          expect(project.jira_force_import?).to be true
-
-          project.add_import_job
+      context 'when jira import is in progress' do
+        before do
+          jira_import.start
         end
-      end
-
-      context 'when jira import is not forced' do
-        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project] } }) }
 
         it 'does trigger mirror update' do
           expect(RepositoryUpdateMirrorWorker).to receive(:perform_async)
           expect(Gitlab::JiraImport::Stage::StartImportWorker).not_to receive(:perform_async)
           expect(project.mirror).to be true
           expect(project.jira_import?).to be true
-          expect(project.jira_force_import?).to be false
 
           project.add_import_job
         end
