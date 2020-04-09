@@ -91,6 +91,59 @@ describe('getters', () => {
     });
   });
 
+  describe('licenseReportGroups', () => {
+    it('returns an array of objects containing information about the group and licenses', () => {
+      const licensesSuccess = [
+        { status: 'success', value: 'foo' },
+        { status: 'success', value: 'bar' },
+      ];
+      const licensesNeutral = [
+        { status: 'neutral', value: 'foo' },
+        { status: 'neutral', value: 'bar' },
+      ];
+      const licensesFailed = [
+        { status: 'failed', value: 'foo' },
+        { status: 'failed', value: 'bar' },
+      ];
+      const newLicenses = [...licensesSuccess, ...licensesNeutral, ...licensesFailed];
+
+      expect(getters.licenseReportGroups({ newLicenses })).toEqual([
+        {
+          name: 'Denied',
+          description: `Out-of-compliance with this project's policies and should be removed`,
+          status: 'failed',
+          licenses: licensesFailed,
+        },
+        {
+          name: 'Uncategorized',
+          description: 'No policy matches this license',
+          status: 'neutral',
+          licenses: licensesNeutral,
+        },
+        {
+          name: 'Allowed',
+          description: 'Acceptable for use in this project',
+          status: 'success',
+          licenses: licensesSuccess,
+        },
+      ]);
+    });
+
+    it.each(['failed', 'neutral', 'success'])(
+      `it filters report-groups that don't have the given status: %s`,
+      status => {
+        const newLicenses = [{ status }];
+
+        expect(getters.licenseReportGroups({ newLicenses })).toEqual([
+          expect.objectContaining({
+            status,
+            licenses: newLicenses,
+          }),
+        ]);
+      },
+    );
+  });
+
   describe('licenseSummaryText', () => {
     describe('when licenses exist on both the HEAD and the BASE', () => {
       beforeEach(() => {
