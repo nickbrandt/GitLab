@@ -241,7 +241,7 @@ describe ProjectsHelper do
       allow(Gitlab).to receive(:com?).and_return(true)
       allow(helper).to receive(:signed_in?).and_return(true)
       allow(helper).to receive(:current_user).and_return(user)
-      allow(helper).to receive(:can?).with(user, :developer_access, project).and_return(true)
+      allow(helper).to receive(:can?).with(user, :owner_access, project).and_return(true)
       allow(project).to receive(:gitlab_subscription).and_return(gitlab_subscription)
 
       expect(SubscriptionPresenter).to receive(:new).with(gitlab_subscription).and_return(decorated_mock)
