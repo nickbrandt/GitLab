@@ -1,11 +1,13 @@
 <script>
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import GroupSecurityVulnerabilities from './first_class_group_security_dashboard_vulnerabilities.vue';
+import VulnerabilitySeverity from './vulnerability_severity.vue';
 
 export default {
   components: {
     SecurityDashboardLayout,
     GroupSecurityVulnerabilities,
+    VulnerabilitySeverity,
   },
   props: {
     dashboardDocumentation: {
@@ -20,6 +22,10 @@ export default {
       type: String,
       required: true,
     },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>
@@ -31,5 +37,8 @@ export default {
       :empty-state-svg-path="emptyStateSvgPath"
       :group-full-path="groupFullPath"
     />
+    <template #aside>
+      <vulnerability-severity :endpoint="vulnerableProjectsEndpoint" />
+    </template>
   </security-dashboard-layout>
 </template>
