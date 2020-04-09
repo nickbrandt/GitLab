@@ -13,7 +13,6 @@ export const getMilestoneTitle = $boardApp => ({
   milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
 });
 
-export const getBoardsModalData = $boardApp => ({
+export const getBoardsModalData = () => ({
   isFullscreen: false,
-  focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
 });
