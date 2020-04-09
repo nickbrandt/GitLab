@@ -213,9 +213,8 @@ module EE
     def project_security_dashboard_config(project, pipeline)
       if pipeline.nil?
         {
-          empty_state_illustration_path: image_path('illustrations/security-dashboard_empty.svg'),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
-          has_pipeline_data: "false"
+          empty_state_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index')
         }
       else
         {

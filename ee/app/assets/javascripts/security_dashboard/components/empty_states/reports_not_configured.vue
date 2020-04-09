@@ -1,0 +1,33 @@
+<script>
+import { GlEmptyState } from '@gitlab/ui';
+import { s__ } from '~/locale';
+
+export default {
+  components: {
+    GlEmptyState,
+  },
+  props: {
+    helpPath: {
+      type: String,
+      required: true,
+    },
+    svgPath: {
+      type: String,
+      required: true,
+    },
+  },
+  DESCRIPTION: s__(
+    `SecurityDashboard|The security dashboard displays the latest security report. Use it to find and fix vulnerabilities.`,
+  ),
+};
+</script>
+
+<template>
+  <gl-empty-state
+    :title="s__('SecurityDashboard|Monitor vulnerabilities in your code')"
+    :svg-path="svgPath"
+    :description="$options.DESCRIPTION"
+    :primary-button-link="helpPath"
+    :primary-button-text="__('Learn more')"
+  />
+</template>
