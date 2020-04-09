@@ -1,12 +1,22 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { parseAccessibilityReport, compareAccessibilityReports } from './utils';
+import { s__ } from '~/locale';
 
 export const setBaseEndpoint = ({ commit }, endpoint) => commit(types.SET_BASE_ENDPOINT, endpoint);
 export const setHeadEndpoint = ({ commit }, endpoint) => commit(types.SET_HEAD_ENDPOINT, endpoint);
 
 export const fetchReport = ({ state, dispatch, commit }) => {
   commit(types.REQUEST_REPORT);
+
+  // If we don't have both endpoints, throw an error.
+  if (!state.baseEndpoint || !state.headEndpoint) {
+    commit(
+      types.RECEIVE_REPORT_ERROR,
+      s__('AccessibilityReport|Accessibility report artifact not found'),
+    );
+    return;
+  }
 
   Promise.all([
     axios.get(state.baseEndpoint).then(response => ({
@@ -19,7 +29,12 @@ export const fetchReport = ({ state, dispatch, commit }) => {
     })),
   ])
     .then(responses => dispatch('receiveReportSuccess', responses))
-    .catch(() => commit(types.RECEIVE_REPORT_ERROR));
+    .catch(() =>
+      commit(
+        types.RECEIVE_REPORT_ERROR,
+        s__('AccessibilityReport|Failed to retrieve accessibility report'),
+      ),
+    );
 };
 
 export const receiveReportSuccess = ({ commit }, responses) => {

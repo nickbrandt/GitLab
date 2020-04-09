@@ -55,6 +55,30 @@ describe('Accessibility Reports actions', () => {
       mock.restore();
     });
 
+    describe('when no endpoints are given', () => {
+      beforeEach(() => {
+        localState.baseEndpoint = null;
+        localState.headEndpoint = null;
+      });
+
+      it('should commit REQUEST_REPORT and RECEIVE_REPORT_ERROR mutations', done => {
+        testAction(
+          actions.fetchReport,
+          null,
+          localState,
+          [
+            { type: types.REQUEST_REPORT },
+            {
+              type: types.RECEIVE_REPORT_ERROR,
+              payload: 'Accessibility report artifact not found',
+            },
+          ],
+          [],
+          done,
+        );
+      });
+    });
+
     describe('success', () => {
       it('should commit REQUEST_REPORT mutation and dispatch receiveReportSuccess', done => {
         const data = { report: { summary: {} } };
@@ -84,7 +108,13 @@ describe('Accessibility Reports actions', () => {
           actions.fetchReport,
           null,
           localState,
-          [{ type: types.REQUEST_REPORT }, { type: types.RECEIVE_REPORT_ERROR }],
+          [
+            { type: types.REQUEST_REPORT },
+            {
+              type: types.RECEIVE_REPORT_ERROR,
+              payload: 'Failed to retrieve accessibility report',
+            },
+          ],
           [],
           done,
         );

@@ -69,5 +69,11 @@ describe('Accessibility Reports mutations', () => {
 
       expect(localState.hasError).toEqual(true);
     });
+
+    it('sets errorMessage to given message', () => {
+      mutations.RECEIVE_REPORT_ERROR(localState, 'message');
+
+      expect(localState.errorMessage).toEqual('message');
+    });
   });
 });
