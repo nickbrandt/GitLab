@@ -183,7 +183,7 @@ module EE
       compare_reports(::Ci::CompareDependencyScanningReportsService, current_user)
     end
 
-    def has_license_management_reports?
+    def has_license_scanning_reports?
       !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_scanning_reports))
     end
 
@@ -217,8 +217,8 @@ module EE
       compare_reports(::Ci::CompareDastReportsService, current_user)
     end
 
-    def compare_license_management_reports(current_user)
-      return missing_report_error("license management") unless has_license_management_reports?
+    def compare_license_scanning_reports(current_user)
+      return missing_report_error("license scanning") unless has_license_scanning_reports?
 
       compare_reports(::Ci::CompareLicenseScanningReportsService, current_user)
     end
