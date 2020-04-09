@@ -18,30 +18,25 @@ module LicenseHelper
     License.current&.maximum_user_count || 0
   end
 
-  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)
+  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?, license: License.current)
     Gitlab::ExpiringSubscriptionMessage.new(
-      subscribable: current_license,
+      subscribable: license,
       signed_in: signed_in,
       is_admin: is_admin
     ).message
   end
 
-  def seats_calculation_message
-    if current_license&.exclude_guests_from_active_count?
-      content_tag :p do
-        "Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license."
-      end
+  def seats_calculation_message(license)
+    return unless license.present?
+    return unless license.exclude_guests_from_active_count?
+
+    content_tag :p do
+      "Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license."
     end
   end
 
-  def current_license
-    return @current_license if defined?(@current_license)
-
-    @current_license = License.current
-  end
-
   def current_license_title
-    @current_license_title ||= License.current ? License.current.plan.titleize : 'Core'
+    License.current&.plan&.titleize || 'Core'
   end
 
   def new_trial_url
@@ -50,15 +45,6 @@ module LicenseHelper
     uri.path = '/trials/new'
     uri.query = "return_to=#{return_to_url}&id=#{Base64.strict_encode64(current_user.email)}"
     uri.to_s
-  end
-
-  def upgrade_plan_url
-    group = @project&.group || @group
-    if group
-      group_billings_path(group)
-    else
-      profile_billings_path
-    end
   end
 
   def show_promotions?(selected_user = current_user)
