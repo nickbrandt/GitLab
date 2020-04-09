@@ -96,7 +96,7 @@ export default {
           <td class="old_line diff-line-num"></td>
           <td class="new_line diff-line-num"></td>
           <td v-if="error" class="js-error-lazy-load-diff diff-loading-error-block">
-            {{ error }} Unable to load the diff
+            Unable to load the diff
             <button
               class="btn-link btn-link-retry btn-no-padding js-toggle-lazy-diff-retry-button"
               @click="fetchDiff"
