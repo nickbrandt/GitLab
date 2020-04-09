@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::GitPushSSHProxy, :geo do
+describe Gitlab::Geo::GitSSHProxy, :geo do
   include ::EE::GeoHelpers
 
   # TODO This spec doesn't work with a relative_url_root https://gitlab.com/gitlab-org/gitlab/issues/11173
@@ -47,13 +47,13 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
       allow(base_request).to receive(:authorization).and_return('secret')
     end
 
-    describe '#info_refs' do
+    describe '#info_refs_receive_pack' do
       context 'against primary node' do
         let(:current_node) { primary_node }
 
         it 'raises an exception' do
           expect do
-            subject.info_refs
+            subject.info_refs_receive_pack
           end.to raise_error(described_class::MustBeASecondaryNode, 'Node is not a secondary or there is no primary Geo node')
         end
       end
@@ -62,20 +62,19 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
         let(:current_node) { secondary_node }
 
         let(:full_info_refs_url) { "#{primary_repo_http}/info/refs?service=git-receive-pack" }
-        let(:info_refs_headers) { base_headers.merge('Content-Type' => 'application/x-git-upload-pack-request') }
         let(:info_refs_http_body_full) { "001f# service=git-receive-pack\n0000#{info_refs_body_short}" }
 
         context 'authorization header is scoped' do
-          it 'passes the scope when .info_refs is called' do
+          it 'passes the scope when .info_refs_receive_pack is called' do
             expect(Gitlab::Geo::BaseRequest).to receive(:new).with(scope: project.repository.full_path)
 
-            subject.info_refs
+            subject.info_refs_receive_pack
           end
 
-          it 'passes the scope when .push is called' do
+          it 'passes the scope when .receive_pack is called' do
             expect(Gitlab::Geo::BaseRequest).to receive(:new).with(scope: project.repository.full_path)
 
-            subject.push(info_refs_body_short)
+            subject.receive_pack(info_refs_body_short)
           end
         end
 
@@ -86,24 +85,24 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:get, full_info_refs_url).to_timeout
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.info_refs_receive_pack).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
           end
 
           it 'has a code of 500' do
-            expect(subject.info_refs.code).to be(500)
+            expect(subject.info_refs_receive_pack.code).to be(500)
           end
 
           it 'has a status of false' do
-            expect(subject.info_refs.body[:status]).to be_falsey
+            expect(subject.info_refs_receive_pack.body[:status]).to be_falsey
           end
 
           it 'has a messsage' do
-            expect(subject.info_refs.body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.info_refs_receive_pack.body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.info_refs.body[:result]).to be_nil
+            expect(subject.info_refs_receive_pack.body[:result]).to be_nil
           end
         end
 
@@ -111,65 +110,65 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
           let(:error_msg) { 'dial unix /Users/ash/src/gdk/gdk-ee/gitlab.socket: connect: connection refused' }
 
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg, headers: info_refs_headers)
+            stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.info_refs_receive_pack).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 502' do
-            expect(subject.info_refs.code).to be(502)
+            expect(subject.info_refs_receive_pack.code).to be(502)
           end
 
           it 'has a status of false' do
-            expect(subject.info_refs.body[:status]).to be_falsey
+            expect(subject.info_refs_receive_pack.body[:status]).to be_falsey
           end
 
           it 'has a messsage' do
-            expect(subject.info_refs.body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.info_refs_receive_pack.body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.info_refs.body[:result]).to be_nil
+            expect(subject.info_refs_receive_pack.body[:result]).to be_nil
           end
         end
 
         context 'with a valid response' do
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full, headers: info_refs_headers)
+            stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::APIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
+            expect(subject.info_refs_receive_pack).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 200' do
-            expect(subject.info_refs.code).to be(200)
+            expect(subject.info_refs_receive_pack.code).to be(200)
           end
 
           it 'has a status of true' do
-            expect(subject.info_refs.body[:status]).to be_truthy
+            expect(subject.info_refs_receive_pack.body[:status]).to be_truthy
           end
 
           it 'has no messsage' do
-            expect(subject.info_refs.body[:message]).to be_nil
+            expect(subject.info_refs_receive_pack.body[:message]).to be_nil
           end
 
           it 'returns a modified body' do
-            expect(subject.info_refs.body[:result]).to eql(Base64.encode64(info_refs_body_short))
+            expect(subject.info_refs_receive_pack.body[:result]).to eql(Base64.encode64(info_refs_body_short))
           end
         end
       end
     end
 
-    describe '#push' do
+    describe '#receive_pack' do
       context 'against primary node' do
         let(:current_node) { primary_node }
 
         it 'raises an exception' do
           expect do
-            subject.push(info_refs_body_short)
+            subject.receive_pack(info_refs_body_short)
           end.to raise_error(described_class::MustBeASecondaryNode)
         end
       end
@@ -178,7 +177,7 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
         let(:current_node) { secondary_node }
 
         let(:full_git_receive_pack_url) { "#{primary_repo_http}/git-receive-pack" }
-        let(:push_headers) do
+        let(:receive_pack_headers) do
           base_headers.merge(
             'Content-Type' => 'application/x-git-receive-pack-request',
             'Accept' => 'application/x-git-receive-pack-result'
@@ -192,16 +191,16 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:post, full_git_receive_pack_url).to_timeout
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
           end
 
           it 'has a messsage' do
-            expect(subject.push(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.receive_pack(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.push(info_refs_body_short).body[:result]).to be_nil
+            expect(subject.receive_pack(info_refs_body_short).body[:result]).to be_nil
           end
         end
 
@@ -209,19 +208,19 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
           let(:error_msg) { 'dial unix /Users/ash/src/gdk/gdk-ee/gitlab.socket: connect: connection refused' }
 
           before do
-            stub_request(:post, full_git_receive_pack_url).to_return(status: 502, body: error_msg, headers: push_headers)
+            stub_request(:post, full_git_receive_pack_url).to_return(status: 502, body: error_msg, headers: receive_pack_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a messsage' do
-            expect(subject.push(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
+            expect(subject.receive_pack(info_refs_body_short).body[:message]).to eql("Failed to contact primary #{primary_repo_http}\nError: #{error_msg}")
           end
 
           it 'has no result' do
-            expect(subject.push(info_refs_body_short).body[:result]).to be_nil
+            expect(subject.receive_pack(info_refs_body_short).body[:result]).to be_nil
           end
         end
 
@@ -230,23 +229,23 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
           let(:base64_encoded_body) { Base64.encode64(body) }
 
           before do
-            stub_request(:post, full_git_receive_pack_url).to_return(status: 201, body: body, headers: push_headers)
+            stub_request(:post, full_git_receive_pack_url).to_return(status: 201, body: body, headers: receive_pack_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::APIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
+            expect(subject.receive_pack(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 201' do
-            expect(subject.push(info_refs_body_short).code).to be(201)
+            expect(subject.receive_pack(info_refs_body_short).code).to be(201)
           end
 
           it 'has no messsage' do
-            expect(subject.push(info_refs_body_short).body[:message]).to be_nil
+            expect(subject.receive_pack(info_refs_body_short).body[:message]).to be_nil
           end
 
           it 'has a result' do
-            expect(subject.push(info_refs_body_short).body[:result]).to eql(base64_encoded_body)
+            expect(subject.receive_pack(info_refs_body_short).body[:result]).to eql(base64_encoded_body)
           end
         end
       end

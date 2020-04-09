@@ -87,8 +87,8 @@ module EE
 
       def custom_action_api_endpoints
         [
-          api_v4_geo_proxy_git_push_ssh_info_refs_path,
-          api_v4_geo_proxy_git_push_ssh_push_path
+          api_v4_geo_proxy_git_ssh_info_refs_receive_pack_path,
+          api_v4_geo_proxy_git_ssh_receive_pack_path
         ]
       end
     end
