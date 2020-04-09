@@ -5,6 +5,8 @@ require 'spec_helper'
 describe ElasticIndexerWorker, :elastic do
   subject { described_class.new }
 
+  let(:search_options) { { options: { public_and_internal_projects: true }} }
+
   before do
     stub_ee_application_setting(elasticsearch_indexing: true)
 
@@ -64,7 +66,7 @@ describe ElasticIndexerWorker, :elastic do
     project, issue, milestone, note, merge_request = nil
 
     Sidekiq::Testing.disable! do
-      project = create :project, :repository
+      project = create :project, :repository, :public
       subject.perform("index", "Project", project.id, project.es_id)
 
       issue = create :issue, project: project
@@ -84,12 +86,20 @@ describe ElasticIndexerWorker, :elastic do
     ensure_elasticsearch_index!
 
     ## All database objects + data from repository. The absolute value does not matter
-    expect(Elasticsearch::Model.search('*').total_count).to be > 40
+    expect(Project.elastic_search('*', search_options).records.to_a).to include(project)
+    expect(Issue.elastic_search('*', search_options).records.to_a).to include(issue)
+    expect(Milestone.elastic_search('*', search_options).records.to_a).to include(milestone)
+    expect(Note.elastic_search('*', search_options).records.to_a).to include(note)
+    expect(MergeRequest.elastic_search('*', search_options).records.to_a).to include(merge_request)
 
     subject.perform("delete", "Project", project.id, project.es_id)
     ensure_elasticsearch_index!
 
-    expect(Elasticsearch::Model.search('*').total_count).to be(0)
+    expect(Project.elastic_search('*', search_options).total_count).to be(0)
+    expect(Issue.elastic_search('*', search_options).total_count).to be(0)
+    expect(Milestone.elastic_search('*', search_options).total_count).to be(0)
+    expect(Note.elastic_search('*', search_options).total_count).to be(0)
+    expect(MergeRequest.elastic_search('*', search_options).total_count).to be(0)
   end
 
   it 'retries if index raises error' do
