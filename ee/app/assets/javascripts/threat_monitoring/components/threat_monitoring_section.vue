@@ -101,12 +101,12 @@ export default {
 
 <template>
   <div class="my-3">
-    <h4 class="h4">{{ title }}</h4>
-    <h5 class="h5">{{ subtitle }}</h5>
+    <h4 ref="chartTitle" class="h4">{{ title }}</h4>
 
     <loading-skeleton v-if="isLoading" class="mt-3" />
 
     <template v-else-if="hasHistory">
+      <h5 ref="chartSubtitle" class="h5">{{ subtitle }}</h5>
       <statistics-summary class="mt-3" :data="summary" />
       <statistics-history class="mt-3" :data="chart" :y-legend="yLegend" />
     </template>
