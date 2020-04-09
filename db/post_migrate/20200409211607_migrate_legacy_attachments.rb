@@ -7,9 +7,9 @@ class MigrateLegacyAttachments < ActiveRecord::Migration[6.0]
 
   DOWNTIME = false
 
-  MIGRATION = 'LegacyUploadsMigrator'.freeze
+  MIGRATION = 'LegacyUploadsMigrator'
   BATCH_SIZE = 5000
-  DELAY_INTERVAL = 5.minutes.to_i
+  INTERVAL = 5.minutes.to_i
 
   class Upload < ActiveRecord::Base
     self.table_name = 'uploads'
@@ -18,12 +18,10 @@ class MigrateLegacyAttachments < ActiveRecord::Migration[6.0]
   end
 
   def up
-    Upload.where(uploader: 'AttachmentUploader', model_type: 'Note').each_batch(of: BATCH_SIZE) do |relation, index|
-      start_id, end_id = relation.pluck('MIN(id), MAX(id)').first
-      delay = index * delay_interval
-
-      BackgroundMigrationWorker.perform_in(delay, migration, [start_id, end_id])
-    end
+    queue_background_migration_jobs_by_range_at_intervals(Upload.where(uploader: 'AttachmentUploader', model_type: 'Note'),
+                                                          MIGRATION,
+                                                          INTERVAL,
+                                                          batch_size: BATCH_SIZE)
   end
 
   def down
