@@ -3,42 +3,32 @@
 class Packages::GoModule
   attr_reader :project, :name, :path
 
-  def initialize(project, name)
+  def initialize(project, name, path)
     @project = project
     @name = name
-
-    @path =
-      if @name == package_base
-        ''
-      elsif @name.start_with?(package_base + '/')
-        @name[(package_base.length + 1)..]
-      else
-        nil
-      end
+    @path = path
   end
 
   def versions
-    @versions ||= @project.repository.tags
-      .filter { |tag| ::Packages::GoModuleVersion.semver? tag }
-      .map    { |tag| ::Packages::GoModuleVersion.new self, tag }
-      .filter { |ver| ver.valid? }
+    @versions ||= Packages::Go::VersionFinder.new(self).execute
   end
 
   def find_version(name)
-    if ::Packages::GoModuleVersion.pseudo_version? name
-      begin
-        ::Packages::GoModuleVersion.new self, name
-      rescue ArgumentError
-        nil
-      end
+    Packages::Go::VersionFinder.new(self).find(name)
+  end
+
+  def path_valid?(major)
+    m = /\/v(\d+)$/i.match(@name)
+
+    case major
+    when 0, 1
+      m.nil?
     else
-      versions.filter { |ver| ver.name == name }.first
+      !m.nil? && m[1].to_i == major
     end
   end
 
-  private
-
-  def package_base
-    @package_base ||= Gitlab::Routing.url_helpers.project_url(@project).split('://', 2)[1]
+  def gomod_valid?(gomod)
+    gomod&.split("\n", 2)&.first == "module #{@name}"
   end
 end

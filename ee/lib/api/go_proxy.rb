@@ -2,8 +2,11 @@
 module API
   class GoProxy < Grape::API
     helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::Packages::Go::ModuleHelpers
 
+    # basic semver, except case encoded (A => !a)
     MODULE_VERSION_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.!a-z0-9]+))?(?:\+([-.!a-z0-9]+))?/.freeze
+
     MODULE_VERSION_REQUIREMENTS = { module_version: MODULE_VERSION_REGEX }.freeze
 
     before { require_packages_enabled! }
@@ -15,25 +18,24 @@ module API
 
       def find_module
         module_name = case_decode params[:module_name]
-
         bad_request!('Module Name') if module_name.blank?
 
-        mod = ::Packages::GoModule.new user_project, module_name
-        not_found! if mod.path.nil?
+        mod = ::Packages::Go::ModuleFinder.new(user_project, module_name).execute
+
+        not_found! unless mod
 
         mod
       end
 
       def find_version
-        mod = find_module
+        module_version = case_decode params[:module_version]
+        ver = ::Packages::Go::VersionFinder.new(find_module).find(module_version)
 
-        ver = mod.find_version case_decode params[:module_version]
         not_found! unless ver&.valid?
 
         ver
       end
 
-      # override :find_project!
       def find_project!(id)
         project = find_project(id)
 
