@@ -79,11 +79,26 @@ describe Gitlab::Alerting::Alert do
         )
       end
 
-      before do
-        payload['labels'] = { 'gitlab_prometheus_alert_id' => second_gitlab_alert.id }
+      context 'alert id given in params' do
+        before do
+          payload['labels'] = { 'gitlab_prometheus_alert_id' => second_gitlab_alert.id }
+        end
+
+        it { is_expected.to eq(second_gitlab_alert) }
       end
 
-      it { is_expected.to eq(second_gitlab_alert) }
+      context 'metric id given in params' do
+        # This tests the case when two alerts are found, as metric id
+        # is not unique.
+
+        # Note the metric id was incorrectly named as 'gitlab_alert_id'
+        # in PrometheusAlert#to_param.
+        before do
+          payload['labels'] = { 'gitlab_alert_id' => gitlab_alert.prometheus_metric_id }
+        end
+
+        it { is_expected.to be_nil }
+      end
     end
   end
 

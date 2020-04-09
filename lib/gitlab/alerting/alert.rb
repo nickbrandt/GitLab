@@ -122,10 +122,13 @@ module Gitlab
       def parse_gitlab_alert_from_payload
         return unless metric_id || gitlab_prometheus_alert_id
 
-        Projects::Prometheus::AlertsFinder
+        alerts_found = Projects::Prometheus::AlertsFinder
           .new(project: project, metric: metric_id, id: gitlab_prometheus_alert_id)
           .execute
-          .first
+
+        return if alerts_found.empty? || alerts_found.size > 1
+
+        alerts_found.first
       end
 
       def parse_title_from_payload
