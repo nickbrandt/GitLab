@@ -50,7 +50,7 @@ module ClustersHelper
     when 'instance_type'
       s_('ClusterIntegration|Instance cluster')
     else
-      Gitlab::ErrorTracking.track_exception(
+      Gitlab::ErrorTracking.track_and_raise_for_dev_exception(
         ArgumentError.new('Cluster Type Missing'),
         cluster_error: { error: 'Cluster Type Missing', cluster_type: cluster_type }
       )
