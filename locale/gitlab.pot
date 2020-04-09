@@ -931,6 +931,9 @@ msgstr ""
 msgid "Accept terms"
 msgstr ""
 
+msgid "Acceptable for use in this project"
+msgstr ""
+
 msgid "Accepted MR"
 msgstr ""
 
@@ -12014,6 +12017,15 @@ msgstr ""
 msgid "LicenseCompliance|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
+msgid "LicenseManagement|Allowed"
+msgstr ""
+
+msgid "LicenseManagement|Denied"
+msgstr ""
+
+msgid "LicenseManagement|Uncategorized"
+msgstr ""
+
 msgid "Licensed Features"
 msgstr ""
 
@@ -13576,6 +13588,9 @@ msgstr ""
 msgid "No pods available"
 msgstr ""
 
+msgid "No policy matches this license"
+msgstr ""
+
 msgid "No preview for this file type"
 msgstr ""
 
@@ -14104,6 +14119,9 @@ msgid "Other merge requests block this MR"
 msgstr ""
 
 msgid "Other visibility settings have been disabled by the administrator."
+msgstr ""
+
+msgid "Out-of-compliance with this project's policies and should be removed"
 msgstr ""
 
 msgid "Outbound requests"

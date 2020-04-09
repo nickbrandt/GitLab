@@ -1,3 +1,4 @@
+import { groupBy } from 'lodash';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
 import { s__, n__, sprintf } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
@@ -93,3 +94,30 @@ export const convertToOldReportFormat = license => {
     status: getIssueStatusFromLicenseStatus(approvalStatus),
   };
 };
+
+/**
+ * Takes an array of licenses and returns a function that takes an report-group objects
+ *
+ * It returns a fresh object, containing all properties of the original report-group and added "license" property,
+ * containing an array of licenses, matching the report-group's status
+ *
+ * @param {Array} licenses
+ * @returns {function(*): {licenses: (*|*[])}}
+ */
+export const addLicensesMatchingReportGroupStatus = licenses => {
+  const licensesGroupedByStatus = groupBy(licenses, 'status');
+
+  return reportGroup => ({
+    ...reportGroup,
+    licenses: licensesGroupedByStatus[reportGroup.status] || [],
+  });
+};
+
+/**
+ * Returns true of the given object has a "license" property, containing an array with at least licenses. Otherwise false.
+ *
+ *
+ * @param {Object}
+ * @returns {boolean}
+ */
+export const reportGroupHasAtLeastOneLicense = ({ licenses }) => licenses?.length > 0;
