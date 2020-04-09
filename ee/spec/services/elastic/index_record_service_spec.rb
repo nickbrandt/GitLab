@@ -8,7 +8,7 @@ describe Elastic::IndexRecordService, :elastic do
   # Create admin user and search globally to avoid dealing with permissions in
   # these tests
   let(:user) { create(:admin) }
-  let(:search_options) { { options: { current_user: user, project_ids: :any }} }
+  let(:search_options) { { options: { current_user: user, project_ids: :any } } }
 
   before do
     stub_ee_application_setting(elasticsearch_indexing: true)
