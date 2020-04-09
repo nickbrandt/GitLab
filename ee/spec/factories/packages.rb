@@ -175,6 +175,8 @@ FactoryBot.define do
       file { fixture_file_upload('ee/spec/fixtures/npm/foo-1.0.1.tgz') }
       file_name { 'foo-1.0.1.tgz' }
       file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+      verified_at { Date.current }
+      verification_checksum { '4437b5775e61455588a7e5187a2e5c58c680694260bbe5501c235ec690d17f83' }
       size { 400.kilobytes }
     end
 
