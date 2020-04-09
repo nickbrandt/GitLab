@@ -1,3 +1,5 @@
+#import "./epic.fragment.graphql"
+
 query groupEpics(
   $fullPath: ID!
   $state: EpicState
@@ -22,39 +24,11 @@ query groupEpics(
     ) {
       edges {
         node {
-          id
-          title
-          description
-          state
-          webUrl
-          startDate
-          dueDate
-          descendantWeightSum {
-            closedIssues
-            openedIssues
-          }
-          group {
-            name
-            fullName
-          }
+          ...BaseEpic
           children {
             edges {
               node {
-                id
-                title
-                description
-                state
-                webUrl
-                startDate
-                dueDate
-                descendantWeightSum {
-                  closedIssues
-                  openedIssues
-                }
-                group {
-                  name
-                  fullName
-                }
+                ...EpicNode
               }
             }
           }

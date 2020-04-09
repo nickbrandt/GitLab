@@ -322,6 +322,10 @@ module EE
       issues.any?
     end
 
+    def has_parent?
+      !!parent_id
+    end
+
     def child?(id)
       children.where(id: id).exists?
     end

@@ -84,6 +84,9 @@ module Types
           description: 'Indicates if the epic has children'
     field :has_issues, GraphQL::BOOLEAN_TYPE, null: false,
           description: 'Indicates if the epic has direct issues'
+    field :has_parent, GraphQL::BOOLEAN_TYPE, null: false,
+          method: :has_parent?,
+          description: 'Indicates if the epic has a parent epic'
 
     field :web_path, GraphQL::STRING_TYPE, null: false,
           description: 'Web path of the epic',
