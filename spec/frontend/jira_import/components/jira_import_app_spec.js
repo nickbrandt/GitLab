@@ -11,19 +11,7 @@ describe('JiraImportApp', () => {
   });
 
   describe('set up Jira integration page', () => {
-    it('is shown when Jira integration is not configured', () => {
-      wrapper = shallowMount(JiraImportApp, {
-        propsData: {
-          isJiraConfigured: false,
-          projectPath: 'gitlab-org/gitlab-test',
-          setupIllustration: 'illustration.svg',
-        },
-      });
-
-      expect(wrapper.find(JiraImportSetup).exists()).toBe(true);
-    });
-
-    it('is not shown when Jira integration is configured', () => {
+    beforeEach(() => {
       wrapper = shallowMount(JiraImportApp, {
         propsData: {
           isJiraConfigured: true,
@@ -31,7 +19,19 @@ describe('JiraImportApp', () => {
           setupIllustration: 'illustration.svg',
         },
       });
+    });
 
+    it('is shown when Jira integration is not configured', () => {
+      wrapper.setProps({
+        isJiraConfigured: false,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(JiraImportSetup).exists()).toBe(true);
+      });
+    });
+
+    it('is not shown when Jira integration is configured', () => {
       expect(wrapper.find(JiraImportSetup).exists()).toBe(false);
     });
   });
