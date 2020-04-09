@@ -1,7 +1,7 @@
 <script>
 import PackageTags from '../../shared/components/package_tags.vue';
 import PublishMethod from './publish_method.vue';
-import { GlDeprecatedButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
+import { GlNewButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { getPackageType } from '../../shared/utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -10,7 +10,7 @@ import { mapState } from 'vuex';
 export default {
   name: 'PackagesListRow',
   components: {
-    GlDeprecatedButton,
+    GlNewButton,
     GlIcon,
     GlLink,
     GlSprintf,
@@ -113,16 +113,16 @@ export default {
     </div>
 
     <div v-if="deleteAvailable" class="table-section section-10 d-flex justify-content-end">
-      <gl-deprecated-button
+      <gl-new-button
         ref="action-delete"
+        icon="remove"
+        category="primary"
         variant="danger"
         :title="s__('PackageRegistry|Remove package')"
         :aria-label="s__('PackageRegistry|Remove package')"
         :disabled="!packageEntity._links.delete_api_path"
         @click="$emit('packageToDelete', packageEntity)"
-      >
-        <gl-icon name="remove" />
-      </gl-deprecated-button>
+      />
     </div>
   </div>
 </template>

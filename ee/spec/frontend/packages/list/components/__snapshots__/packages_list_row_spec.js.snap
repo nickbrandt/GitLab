@@ -80,17 +80,14 @@ exports[`packages_list_row renders 1`] = `
   <div
     class="table-section section-10 d-flex justify-content-end"
   >
-    <gl-deprecated-button-stub
+    <gl-new-button-stub
       aria-label="Remove package"
-      size="md"
+      category="primary"
+      icon="remove"
+      size="medium"
       title="Remove package"
       variant="danger"
-    >
-      <gl-icon-stub
-        name="remove"
-        size="16"
-      />
-    </gl-deprecated-button-stub>
+    />
   </div>
 </div>
 `;
