@@ -37,7 +37,7 @@ export default {
       return this.selectedVulnerabilities.length;
     },
     canDismissVulnerability() {
-      return this.dismissalReason && this.selectedVulnerabilitiesCount > 0;
+      return Boolean(this.dismissalReason && this.selectedVulnerabilitiesCount > 0);
     },
     message() {
       return n__(
@@ -48,36 +48,30 @@ export default {
     },
   },
   methods: {
+    dismissalSuccessMessage() {
+      return n__(
+        '%d vulnerability dismissed',
+        '%d vulnerabilities dismissed',
+        this.selectedVulnerabilities.length,
+      );
+    },
     handleDismiss() {
-      if (!this.canDismissVulnerability) {
-        return;
-      }
+      if (!this.canDismissVulnerability) return;
 
-      if (this.dismissalReason === REASON_NONE) {
-        this.dismissSelectedVulnerabilities();
-      } else {
-        this.dismissSelectedVulnerabilities({ comment: this.dismissalReason });
-      }
+      this.dismissSelectedVulnerabilities();
     },
     dismissSelectedVulnerabilities() {
       const promises = this.selectedVulnerabilities.map(vulnerability =>
-        this.$apollo
-          .mutate({
-            mutation: dismissVulnerability,
-            variables: { id: vulnerability.id, comment: this.dismissalReason },
-          })
+        this.$apollo.mutate({
+          mutation: dismissVulnerability,
+          variables: { id: vulnerability.id, comment: this.dismissalReason },
+        }),
       );
 
       Promise.all(promises)
         .then(() => {
+          toast(this.dismissalSuccessMessage());
           this.deselectAllVulnerabilities();
-          toast(
-            n__(
-              '%d vulnerability dismissed',
-              '%d vulnerabilities dismissed',
-              this.selectedVulnerabilities.length,
-            ),
-          );
         })
         .catch(() => {
           createFlash(
