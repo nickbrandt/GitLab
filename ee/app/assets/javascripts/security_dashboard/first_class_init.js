@@ -41,6 +41,7 @@ export default (
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
     component = FirstClassProjectSecurityDashboard;
     props.projectFullPath = el.dataset.projectFullPath;
+    props.vulnerabilitiesExportEndpoint = el.dataset.vulnerabilitiesExportEndpoint;
   } else if (dashboardType === DASHBOARD_TYPES.GROUP) {
     component = FirstClassGroupSecurityDashboard;
     props.groupFullPath = el.dataset.groupFullPath;

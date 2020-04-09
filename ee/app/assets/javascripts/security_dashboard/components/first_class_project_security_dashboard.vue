@@ -4,6 +4,7 @@ import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import VulnerabilitiesCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
+import CsvExportButton from './csv_export_button.vue';
 
 export default {
   components: {
@@ -11,6 +12,7 @@ export default {
     ReportsNotConfigured,
     SecurityDashboardLayout,
     VulnerabilitiesCountList,
+    CsvExportButton,
     Filters,
   },
   props: {
@@ -37,6 +39,10 @@ export default {
       required: false,
       default: false,
     },
+    vulnerabilitiesExportEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -56,6 +62,10 @@ export default {
     <template v-if="hasPipelineData">
       <security-dashboard-layout>
         <template #header>
+          <div class="mt-4 d-flex">
+            <h4 class="flex-grow mt-0 mb-0">{{ __('Vulnerabilities') }}</h4>
+            <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
+          </div>
           <vulnerabilities-count-list :project-full-path="projectFullPath" />
           <filters @filterChange="handleFilterChange" />
         </template>

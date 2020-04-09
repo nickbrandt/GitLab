@@ -4,12 +4,14 @@ import Filters from 'ee/security_dashboard/components/first_class_vulnerability_
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
 import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
+import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 
 const props = {
   dashboardDocumentation: '/help/docs',
   emptyStateSvgPath: '/svgs/empty/svg',
   projectFullPath: '/group/project',
   securityDashboardHelpPath: '/security/dashboard/help-path',
+  vulnerabilitiesExportEndpoint: '/vulnerabilities/exports',
 };
 const filters = { foo: 'bar' };
 
@@ -19,6 +21,7 @@ describe('First class Project Security Dashboard component', () => {
   const findFilters = () => wrapper.find(Filters);
   const findVulnerabilities = () => wrapper.find(ProjectVulnerabilitiesApp);
   const findUnconfiguredState = () => wrapper.find(ReportsNotConfigured);
+  const findCsvExportButton = () => wrapper.find(CsvExportButton);
 
   const createComponent = options => {
     wrapper = shallowMount(FirstClassProjectSecurityDashboard, {
@@ -58,6 +61,12 @@ describe('First class Project Security Dashboard component', () => {
 
     it('does not display the unconfigured state', () => {
       expect(findUnconfiguredState().exists()).toBe(false);
+    });
+
+    it('should display the csv export button', () => {
+      expect(findCsvExportButton().props('vulnerabilitiesExportEndpoint')).toEqual(
+        props.vulnerabilitiesExportEndpoint,
+      );
     });
   });
 

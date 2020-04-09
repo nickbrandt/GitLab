@@ -8,67 +8,36 @@ import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const securityTab = document.getElementById('js-security-report-app');
-
-  const {
-    commitId,
-    commitPath,
-    dashboardDocumentation,
-    emptyStateSvgPath,
-    hasPipelineData,
-    pipelineCreated,
-    pipelineId,
-    pipelinePath,
-    projectId,
-    projectName,
-    refId,
-    refPath,
-    securityDashboardHelpPath,
-    userAvatarPath,
-    userName,
-    userPath,
-    vulnerabilitiesEndpoint,
-    vulnerabilitiesSummaryEndpoint,
-    vulnerabilityFeedbackHelpPath,
-  } = securityTab.dataset;
-
-  const parsedPipelineId = parseInt(pipelineId, 10);
-  const parsedHasPipelineData = parseBoolean(hasPipelineData);
-
-  let props = {
-    dashboardDocumentation,
-    emptyStateSvgPath,
-    hasPipelineData: parsedHasPipelineData,
-    securityDashboardHelpPath,
-    vulnerabilitiesEndpoint,
-    vulnerabilitiesSummaryEndpoint,
-    vulnerabilityFeedbackHelpPath,
+  const props = {
+    ...securityTab.dataset,
+    hasPipelineData: parseBoolean(securityTab.dataset.hasPipelineData),
   };
-  if (parsedHasPipelineData) {
-    props = {
-      ...props,
+
+  if (props.hasPipelineData) {
+    Object.assign(props, {
       project: {
-        id: projectId,
-        name: projectName,
+        id: props.projectId,
+        name: props.projectName,
       },
       triggeredBy: {
-        avatarPath: userAvatarPath,
-        name: userName,
-        path: userPath,
+        avatarPath: props.userAvatarPath,
+        name: props.userName,
+        path: props.userPath,
       },
       pipeline: {
-        id: parsedPipelineId,
-        created: pipelineCreated,
-        path: pipelinePath,
+        id: parseInt(props.pipelineId, 10),
+        created: props.pipelineCreated,
+        path: props.pipelinePath,
       },
       commit: {
-        id: commitId,
-        path: commitPath,
+        id: props.commitId,
+        path: props.commitPath,
       },
       branch: {
-        id: refId,
-        path: refPath,
+        id: props.refId,
+        path: props.refPath,
       },
-    };
+    });
   }
 
   const router = createRouter();
