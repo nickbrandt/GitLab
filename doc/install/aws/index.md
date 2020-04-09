@@ -555,7 +555,7 @@ In `/etc/ssh/sshd_config` update the following:
 
 #### Amazon S3 object storage
 
-Since we're not using NFS for shared storage, we will use [Amazon S3](https://aws.amazon.com/s3/) buckets to store backups, artifacts, LFS objects, uploads, merge request diffs, container registry images, and more. For instructions on how to configure each of these, please see [Cloud Object Storage](../../administration/high_availability/object_storage.md).
+Since we're not using NFS for shared storage, we will use [Amazon S3](https://aws.amazon.com/s3/) buckets to store backups, artifacts, LFS objects, uploads, merge request diffs, container registry images, and more. Our [documentation includes configuration instructions](../../administration/object_storage.md) for each of these, and other information about using object storage with GitLab.
 
 Remember to run `sudo gitlab-ctl reconfigure` after saving the changes to the `gitlab.rb` file.
 
