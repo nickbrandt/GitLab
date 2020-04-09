@@ -54,7 +54,7 @@ export default {
     return {
       imageLoading: true,
       imageError: false,
-      isInView: false,
+      wasInView: false,
     };
   },
   computed: {
@@ -84,13 +84,13 @@ export default {
       return n__('%d comment', '%d comments', this.notesCount);
     },
     imageLink() {
-      return this.isInView ? this.imageV432x230 || this.image : '';
+      return this.wasInView ? this.imageV432x230 || this.image : '';
     },
     showLoadingSpinner() {
       return this.imageLoading || this.isUploading;
     },
     showImageErrorIcon() {
-      return this.imageError && this.isInView;
+      return this.wasInView && this.imageError;
     },
     showImage() {
       return !this.showLoadingSpinner && !this.showImageErrorIcon;
@@ -106,7 +106,13 @@ export default {
       this.imageError = true;
     },
     onAppear() {
-      this.isInView = true;
+      // do nothing if image has previously
+      // been in view
+      if (this.wasInView) {
+        return;
+      }
+
+      this.wasInView = true;
       this.imageLoading = true;
     },
   },
