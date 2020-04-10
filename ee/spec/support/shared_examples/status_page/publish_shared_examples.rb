@@ -20,17 +20,14 @@ RSpec.shared_examples 'publish incidents' do
       .and_return(serializer)
   end
 
-  shared_examples 'feature is not available' do
-  end
-
-  context 'when upload succeeds' do
+  context 'when json upload succeeds' do
     before do
       allow(storage_client).to receive(:upload_object).with(key, content_json)
     end
 
     it 'publishes details as JSON' do
       expect(result).to be_success
-      expect(result.payload).to eq(object_key: key)
+      expect(result.payload[:json_object_key]).to eq(key)
     end
   end
 

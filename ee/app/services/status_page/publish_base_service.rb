@@ -50,13 +50,13 @@ module StatusPage
       content = json.to_json
       storage_client.upload_object(key, content)
 
-      success(object_key: key)
+      success(json_object_key: key)
     end
 
     def delete(key)
       storage_client.delete_object(key)
 
-      success(object_key: key)
+      success(json_object_key: key)
     end
 
     def limit_exceeded?(json)

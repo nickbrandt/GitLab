@@ -16,7 +16,7 @@ module StatusPage
 
       image_object_keys = publish_images(issue, user_notes)
 
-      success_payload = publish_image_response.payload.merge!({ image_object_keys: image_object_keys })
+      success_payload = publish_json_response.payload.merge!({ image_object_keys: image_object_keys })
 
       success(success_payload)
     end
@@ -25,7 +25,7 @@ module StatusPage
 
     def publish_json(issue, user_notes)
       json = serialize(issue, user_notes)
-      key = object_key(json)
+      key = json_object_key(json)
       return error('Missing object key') unless key
 
       upload_json(key, json)
@@ -35,7 +35,7 @@ module StatusPage
       serializer.represent_details(issue, user_notes)
     end
 
-    def object_key(json)
+    def json_object_key(json)
       id = json[:id]
       return unless id
 
@@ -45,32 +45,38 @@ module StatusPage
     # Publish Images
 
     def publish_images(issue, user_notes)
-      publish_image_uploads(markdown_field: issue.description)
+      upload_keys = []
+      upload_keys += publish_image_uploads(markdown_field: issue.description)
       user_notes.each do |user_note|
-        publish_image_uploads(markdown_field: user_note.note)
+        upload_keys += publish_image_uploads(markdown_field: user_note.note)
       end
 
-      uploads
+      upload_keys
     end
 
     def publish_image_uploads(markdown_field:)
-      image_object_keys = []
+      upload_keys = []
 
-      markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do
-        file = UploadFinder.new(@project, $~[:secret], $~[:file]).execute.file.file
-        key = "uploads/#{$~[:secret]}/#{$~[:file]}"
-
+      markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |md|
+        file = find_upload($~[:secret], $~[:file])
+        key = StatusPage::Storage.upload_path($~[:secret], $~[:file])
         upload_image(file, key)
-        image_object_keys << key
+        upload_keys << key
       end
 
-      image_object_keys
+      upload_keys
     end
 
     def upload_image(file, key)
       File.open(file) do |body|
         storage_client.upload_object(key, body)
       end
+    end
+
+    def find_upload(secret, file_path)
+      uploader = FileUploader.new(@project, secret: secret)
+      uploader.retrieve_from_store!(file_path)
+      uploader
     end
   end
 end
