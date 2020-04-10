@@ -61,7 +61,7 @@ describe('Autosave', () => {
       });
     });
 
-    describe('if .islocalstorageavailable is `true`', () => {
+    describe('if .isLocalStorageAvailable is `true`', () => {
       beforeEach(() => {
         autosave.isLocalStorageAvailable = true;
       });
@@ -126,7 +126,7 @@ describe('Autosave', () => {
       });
     });
 
-    describe('if .islocalstorageavailable is `true`', () => {
+    describe('if .isLocalStorageAvailable is `true`', () => {
       beforeEach(() => {
         autosave.isLocalStorageAvailable = true;
       });
