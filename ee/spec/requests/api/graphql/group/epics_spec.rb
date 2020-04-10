@@ -163,6 +163,7 @@ describe 'Epics through GroupQuery' do
         expect(graphql_errors).to be_nil
         expect(epic_data['id']).to eq epic.to_global_id.to_s
         expect(graphql_data['group']['epicsEnabled']).to be_truthy
+        expect(epic_data['confidential']).to be_falsey
       end
     end
   end

@@ -19,6 +19,11 @@ module Mutations
                 required: false,
                 description: 'The description of the epic'
 
+      argument :confidential,
+                GraphQL::BOOLEAN_TYPE,
+                required: false,
+                description: 'Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled'
+
       argument :start_date_fixed,
                 GraphQL::STRING_TYPE,
                 required: false,
