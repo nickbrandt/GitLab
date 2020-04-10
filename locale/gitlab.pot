@@ -4135,6 +4135,9 @@ msgstr ""
 msgid "Closes this %{quick_action_target}."
 msgstr ""
 
+msgid "Cluster"
+msgstr ""
+
 msgid "Cluster Health"
 msgstr ""
 
