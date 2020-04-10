@@ -18,6 +18,16 @@ describe PerformanceMonitoring::PrometheusPanel do
     }
   end
 
+  describe '#new' do
+    it 'accepts old schema format' do
+      expect { described_class.new(json_content) }.not_to raise_error
+    end
+
+    it 'accepts new schema format' do
+      expect { described_class.new(json_content.merge("y_axis" => { "precision" => 0 })) }.not_to raise_error
+    end
+  end
+
   describe '.from_json' do
     subject { described_class.from_json(json_content) }
 
@@ -50,6 +60,17 @@ describe PerformanceMonitoring::PrometheusPanel do
 
         it { expect { subject }.to raise_error(ActiveModel::ValidationError) }
       end
+    end
+  end
+
+  describe '.id' do
+    it 'returns hexdigest of group_title, type and title as the panel id' do
+      group_title = 'Business Group'
+      panel_type  = 'area-chart'
+      panel_title = 'New feature requests made'
+
+      expect(Digest::SHA2).to receive(:hexdigest).with("#{group_title}#{panel_type}#{panel_title}").and_return('hexdigest')
+      expect(described_class.new(title: panel_title, type: panel_type).id(group_title)).to eql 'hexdigest'
     end
   end
 end
