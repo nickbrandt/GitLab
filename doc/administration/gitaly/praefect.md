@@ -532,7 +532,7 @@ Particular attention should be shown to:
    `/etc/gitlab/gitlab.rb`
 
    ```ruby
-   gitaly['listen_addr'] = 'tcp://GITLAB_HOST:8075'
+   gitaly['listen_addr'] = 'GITLAB_HOST:8075'
    ```
 
 1. Configure the `gitlab_shell['secret_token']` so that callbacks from Gitaly
