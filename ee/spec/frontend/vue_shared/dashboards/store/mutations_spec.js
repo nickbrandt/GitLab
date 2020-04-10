@@ -1,9 +1,15 @@
 import state from 'ee/vue_shared/dashboards/store/state';
 import mutations from 'ee/vue_shared/dashboards/store/mutations';
 import * as types from 'ee/vue_shared/dashboards/store/mutation_types';
-import { mockProjectData } from '../mock_data';
+import { mockProjectData } from 'ee_jest/vue_shared/dashboards/mock_data';
+import createFlash from '~/flash';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
+
+jest.mock('~/flash');
 
 describe('mutations', () => {
+  useLocalStorageSpy();
+
   const projects = mockProjectData(3);
   const projectIds = projects.map(p => p.id);
   const mockEndpoint = 'https://mock-endpoint';
@@ -35,8 +41,6 @@ describe('mutations', () => {
     });
 
     it('sets projects', () => {
-      spyOn(window.localStorage, 'setItem');
-
       mutations[types.SET_PROJECTS](localState, projects);
 
       expect(localState.projects).toEqual(projects);
@@ -44,16 +48,15 @@ describe('mutations', () => {
     });
 
     it('stores project IDs in localstorage', () => {
-      const saveToLocalStorage = spyOn(window.localStorage, 'setItem');
-
       mutations[types.SET_PROJECTS](localState, projects);
 
-      expect(saveToLocalStorage).toHaveBeenCalledWith('listEndpoint', projectIds);
+      expect(window.localStorage.setItem).toHaveBeenCalledWith('listEndpoint', projectIds);
     });
 
     it('shows warning Alert if localStorage not available', () => {
-      spyOn(window.localStorage, 'setItem').and.throwError('QUOTA_EXCEEDED_ERR: DOM Exception 22');
-      const createFlash = spyOnDependency(mutations, 'createFlash');
+      jest.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+        throw new Error('QUOTA_EXCEEDED_ERR: DOM Exception 22');
+      });
 
       mutations[types.SET_PROJECTS](localState, projects);
 
@@ -112,11 +115,9 @@ describe('mutations', () => {
 
   describe('RECEIVE_PROJECTS_SUCCESS', () => {
     const projectListEndpoint = 'projectListEndpoint';
-    let saveToLocalStorage;
 
     beforeEach(() => {
       localState.projectEndpoints.list = projectListEndpoint;
-      saveToLocalStorage = spyOn(window.localStorage, 'setItem');
     });
 
     it('sets the project list and clears the loading status', () => {
@@ -129,11 +130,11 @@ describe('mutations', () => {
     it('saves projects to localStorage', () => {
       mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
 
-      expect(saveToLocalStorage).toHaveBeenCalledWith(projectListEndpoint, projectIds);
+      expect(window.localStorage.setItem).toHaveBeenCalledWith(projectListEndpoint, projectIds);
     });
 
     it('orders the projects from localstorage', () => {
-      spyOn(window.localStorage, 'getItem').and.callFake(key => {
+      jest.spyOn(window.localStorage, 'getItem').mockImplementation(key => {
         if (key === projectListEndpoint) {
           return '2,0,1';
         }
@@ -147,7 +148,7 @@ describe('mutations', () => {
     });
 
     it('places unsorted projects after sorted ones', () => {
-      spyOn(window.localStorage, 'getItem').and.callFake(key => {
+      jest.spyOn(window.localStorage, 'getItem').mockImplementation(key => {
         if (key === projectListEndpoint) {
           return '1,2';
         }

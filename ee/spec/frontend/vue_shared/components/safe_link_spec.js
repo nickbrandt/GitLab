@@ -1,6 +1,6 @@
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
-import { mountComponentWithSlots } from 'spec/helpers/vue_mount_component_helper';
-import { TEST_HOST } from 'spec/test_constants';
+import { mountComponentWithSlots } from 'helpers/vue_mount_component_helper';
+import { TEST_HOST } from 'helpers/test_constants';
 import Vue from 'vue';
 
 describe('SafeLink', () => {

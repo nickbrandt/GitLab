@@ -1,10 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MetricReportsIssueBody from 'ee/vue_shared/metrics_reports/components/metrics_reports_issue_body.vue';
 
-const localVue = createLocalVue();
-
 describe('Metrics reports issue body', () => {
-  const Component = localVue.extend(MetricReportsIssueBody);
   let wrapper;
 
   afterEach(() => {
@@ -15,8 +12,7 @@ describe('Metrics reports issue body', () => {
 
   describe('when metric did not change', () => {
     it('should render metric with no changes text', () => {
-      wrapper = shallowMount(Component, {
-        localVue,
+      wrapper = shallowMount(MetricReportsIssueBody, {
         propsData: {
           issue: {
             name: 'name',
@@ -33,8 +29,7 @@ describe('Metrics reports issue body', () => {
 
   describe('when metric changed', () => {
     it('should render metric with change', () => {
-      wrapper = shallowMount(Component, {
-        localVue,
+      wrapper = shallowMount(MetricReportsIssueBody, {
         propsData: {
           issue: {
             name: 'name',
@@ -52,8 +47,7 @@ describe('Metrics reports issue body', () => {
 
   describe('when metric is new', () => {
     it('should render metric with new badge', () => {
-      wrapper = shallowMount(Component, {
-        localVue,
+      wrapper = shallowMount(MetricReportsIssueBody, {
         propsData: {
           issue: {
             name: 'name',
@@ -73,8 +67,7 @@ describe('Metrics reports issue body', () => {
 
   describe('when metric was removed', () => {
     it('should render metric with removed badge', () => {
-      wrapper = shallowMount(Component, {
-        localVue,
+      wrapper = shallowMount(MetricReportsIssueBody, {
         propsData: {
           issue: {
             name: 'name',

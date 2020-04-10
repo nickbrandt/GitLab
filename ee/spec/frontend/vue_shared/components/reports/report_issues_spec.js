@@ -1,33 +1,33 @@
 import Vue from 'vue';
 import { componentNames } from 'ee/reports/components/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
-import mountComponent, { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { codequalityParsedIssues } from 'ee_spec/vue_mr_widget/mock_data';
+import mountComponent, { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { codequalityParsedIssues } from 'ee_jest/vue_mr_widget/mock_data';
 import {
   sastParsedIssues,
   dockerReportParsed,
   parsedDast,
   secretScanningParsedIssues,
-} from 'ee_spec/vue_shared/security_reports/mock_data';
+} from 'ee_jest/vue_shared/security_reports/mock_data';
 import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
-import reportIssue from '~/reports/components/report_item.vue';
+import reportIssues from '~/reports/components/report_item.vue';
 
-describe('Report issue', () => {
+describe('Report issues', () => {
   let vm;
-  let ReportIssue;
+  let ReportIssues;
 
   beforeEach(() => {
-    ReportIssue = Vue.extend(reportIssue);
+    ReportIssues = Vue.extend(reportIssues);
   });
 
   afterEach(() => {
     vm.$destroy();
   });
 
-  describe('for codequality issue', () => {
-    describe('resolved issue', () => {
+  describe('for codequality issues', () => {
+    describe('resolved issues', () => {
       beforeEach(() => {
-        vm = mountComponent(ReportIssue, {
+        vm = mountComponent(ReportIssues, {
           issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_SUCCESS,
@@ -42,9 +42,9 @@ describe('Report issue', () => {
       });
     });
 
-    describe('unresolved issue', () => {
+    describe('unresolved issues', () => {
       beforeEach(() => {
-        vm = mountComponent(ReportIssue, {
+        vm = mountComponent(ReportIssues, {
           issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_FAILED,
@@ -59,14 +59,14 @@ describe('Report issue', () => {
 
   describe('with location', () => {
     it('should render location', () => {
-      vm = mountComponent(ReportIssue, {
+      vm = mountComponent(ReportIssues, {
         issue: sastParsedIssues[0],
         component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
 
       expect(vm.$el.textContent).toContain('in');
-      expect(vm.$el.querySelector('li a').getAttribute('href')).toEqual(
+      expect(vm.$el.querySelector('.report-block-list-issue a').getAttribute('href')).toEqual(
         sastParsedIssues[0].urlPath,
       );
     });
@@ -74,7 +74,7 @@ describe('Report issue', () => {
 
   describe('without location', () => {
     it('should not render location', () => {
-      vm = mountComponent(ReportIssue, {
+      vm = mountComponent(ReportIssues, {
         issue: {
           title: 'foo',
         },
@@ -83,13 +83,13 @@ describe('Report issue', () => {
       });
 
       expect(vm.$el.textContent).not.toContain('in');
-      expect(vm.$el.querySelector('a')).toEqual(null);
+      expect(vm.$el.querySelector('.report-block-list-issue a')).toEqual(null);
     });
   });
 
-  describe('for container scanning issue', () => {
+  describe('for container scanning issues', () => {
     beforeEach(() => {
-      vm = mountComponent(ReportIssue, {
+      vm = mountComponent(ReportIssues, {
         issue: dockerReportParsed.unapproved[0],
         component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
@@ -101,15 +101,15 @@ describe('Report issue', () => {
     });
 
     it('renders CVE name', () => {
-      expect(vm.$el.querySelector('button').textContent.trim()).toEqual(
+      expect(vm.$el.querySelector('.report-block-list-issue button').textContent.trim()).toEqual(
         dockerReportParsed.unapproved[0].title,
       );
     });
   });
 
-  describe('for dast issue', () => {
+  describe('for dast issues', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(ReportIssue, {
+      vm = mountComponentWithStore(ReportIssues, {
         store,
         props: {
           issue: parsedDast[0],
@@ -125,9 +125,9 @@ describe('Report issue', () => {
     });
   });
 
-  describe('for secret scanning issue', () => {
+  describe('for secret scanning issues', () => {
     beforeEach(() => {
-      vm = mountComponent(ReportIssue, {
+      vm = mountComponent(ReportIssues, {
         issue: secretScanningParsedIssues[0],
         component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
@@ -139,38 +139,9 @@ describe('Report issue', () => {
     });
 
     it('renders CVE name', () => {
-      expect(vm.$el.querySelector('button').textContent.trim()).toEqual(
+      expect(vm.$el.querySelector('.report-block-list-issue button').textContent.trim()).toEqual(
         secretScanningParsedIssues[0].title,
       );
-    });
-  });
-
-  describe('showReportSectionStatusIcon', () => {
-    it('does not render CI Status Icon when showReportSectionStatusIcon is false', () => {
-      vm = mountComponentWithStore(ReportIssue, {
-        store,
-        props: {
-          issue: parsedDast[0],
-          component: componentNames.SecurityIssueBody,
-          status: STATUS_SUCCESS,
-          showReportSectionStatusIcon: false,
-        },
-      });
-
-      expect(vm.$el.querySelectorAll('.report-block-list-icon')).toHaveLength(0);
-    });
-
-    it('shows status icon when unspecified', () => {
-      vm = mountComponentWithStore(ReportIssue, {
-        store,
-        props: {
-          issue: parsedDast[0],
-          component: componentNames.SecurityIssueBody,
-          status: STATUS_SUCCESS,
-        },
-      });
-
-      expect(vm.$el.querySelectorAll('.report-block-list-icon')).toHaveLength(1);
     });
   });
 });
