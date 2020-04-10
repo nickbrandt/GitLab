@@ -3,19 +3,6 @@
 module Gitlab
   module WikiPages
     class FrontMatterParser
-      # A ParseResult contains the de-serialized front-matter, the stripped
-      # content, and maybe an error, explaining why there is no front-matter.
-      ParseResult = Struct.new(:front_matter, :content, :reason, :error, keyword_init: true)
-
-      class NoFrontMatter < StandardError
-        attr_reader :reason
-
-        def initialize(reason)
-          super
-          @reason = reason
-        end
-      end
-
       FEATURE_FLAG = :wiki_front_matter
 
       # We limit the maximum length of text we are prepared to parse as YAML, to
@@ -29,9 +16,21 @@ module Gitlab
       SLUG_LINE_LENGTH = (4 + Gitlab::WikiPages::MAX_DIRECTORY_BYTES + 1 + Gitlab::WikiPages::MAX_TITLE_BYTES)
       MAX_FRONT_MATTER_LENGTH = (8 + Gitlab::WikiPages::MAX_TITLE_BYTES) + 7 + (SLUG_LINE_LENGTH * MAX_SLUGS)
 
+      ParseError = Class.new(StandardError)
+
+      class Result
+        attr_reader :front_matter, :content, :reason, :error
+
+        def initialize(content:, front_matter: {}, reason: nil, error: nil)
+          @content      = content
+          @front_matter = front_matter.freeze
+          @reason       = reason
+          @error        = error
+        end
+      end
+
       # @param [String] wiki_content
       # @param [FeatureGate] feature_gate The scope for feature availability
-      #                                    (usually a project)
       def initialize(wiki_content, feature_gate)
         @wiki_content = wiki_content
         @feature_gate = feature_gate
@@ -42,52 +41,78 @@ module Gitlab
       end
 
       def parse
-        ParseResult.new(front_matter: extract_front_matter, content: strip_front_matter)
-      rescue NoFrontMatter => e
-        ParseResult.new(front_matter: {}, content: wiki_content, reason: e.reason, error: e.cause)
+        return empty_result unless enabled? && wiki_content.present?
+        return empty_result(block.error) unless block.valid?
+
+        Result.new(front_matter: block.data, content: strip_front_matter_block)
+      rescue ParseError => error
+        empty_result(:parse_error, error)
+      end
+
+      class Block
+        include Gitlab::Utils::StrongMemoize
+
+        def initialize(delim = nil, lang = '', text = nil)
+          @lang = lang.downcase.presence || Gitlab::FrontMatter::DELIM_LANG[delim]
+          @text = text
+        end
+
+        def data
+          @data ||= YAML.safe_load(text, symbolize_names: true)
+        rescue Psych::DisallowedClass, Psych::SyntaxError => error
+          raise ParseError, error.message
+        end
+
+        def valid?
+          error.nil?
+        end
+
+        def error
+          strong_memoize(:error) { no_match? || too_long? || not_yaml? || not_mapping? }
+        end
+
+        private
+
+        attr_reader :lang, :text
+
+        def no_match?
+          :no_match if text.nil?
+        end
+
+        def not_yaml?
+          :not_yaml if lang != 'yaml'
+        end
+
+        def too_long?
+          :too_long if text.size > MAX_FRONT_MATTER_LENGTH
+        end
+
+        def not_mapping?
+          :not_mapping unless data.is_a?(Hash)
+        end
       end
 
       private
 
       attr_reader :wiki_content, :feature_gate
 
-      def extract_front_matter
-        ensure_enabled!
-        front_matter, lang = extract
-        front_matter = parse_string(front_matter, lang)
-        validate(front_matter)
-
-        front_matter
+      def empty_result(reason = nil, error = nil)
+        Result.new(content: wiki_content, reason: reason, error: error)
       end
 
-      def parse_string(source, lang)
-        raise NoFrontMatter, :not_yaml unless lang == 'yaml'
-
-        YAML.safe_load(source, symbolize_names: true)
-      rescue Psych::DisallowedClass, Psych::SyntaxError
-        raise NoFrontMatter, :parse_error
+      def enabled?
+        self.class.enabled?(feature_gate)
       end
 
-      def validate(parsed)
-        raise NoFrontMatter, :not_mapping unless Hash === parsed
+      def block
+        @block ||= parse_front_matter_block
       end
 
-      def extract
-        raise NoFrontMatter, :no_content unless wiki_content.present?
-
-        match = Gitlab::FrontMatter::PATTERN.match(wiki_content) if wiki_content.present?
-        raise NoFrontMatter, :no_pattern_match unless match
-        raise NoFrontMatter, :too_long if match[:front_matter].size > MAX_FRONT_MATTER_LENGTH
-
-        lang = match[:lang].downcase.presence || Gitlab::FrontMatter::DELIM_LANG[match[:delim]]
-        [match[:front_matter], lang]
+      def parse_front_matter_block
+        wiki_content.match(Gitlab::FrontMatter::PATTERN) { |m| Block.new(*m.captures) } || Block.new
       end
 
-      def ensure_enabled!
-        raise NoFrontMatter, :feature_flag_disabled unless self.class.enabled?(feature_gate)
-      end
-
-      def strip_front_matter
+      def strip_front_matter_block
         wiki_content.gsub(Gitlab::FrontMatter::PATTERN, '')
       end
     end

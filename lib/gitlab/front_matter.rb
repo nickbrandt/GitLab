@@ -15,7 +15,7 @@ module Gitlab
       \s*
       ^(?<delim>#{DELIM})[ \t]*(?<lang>\S*)  # opening front matter marker (optional language specifier)
       \s*
-      ^(?<front_matter>.*?)                  # front matter (not greedy)
+      ^(?<front_matter>.*?)                  # front matter block content (not greedy)
       \s*
       ^(\k<delim> | \.{3})                   # closing front matter marker
       \s*

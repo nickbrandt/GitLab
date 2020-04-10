@@ -45,7 +45,13 @@ describe Gitlab::WikiPages::FrontMatterParser do
     context 'there is no content' do
       let(:raw_content) { '' }
 
-      it { is_expected.to have_attributes(reason: :no_content) }
+      it do
+        is_expected.to have_attributes(
+          front_matter: {},
+          content: raw_content,
+          error: be_nil
+        )
+      end
     end
 
     context 'there is no front_matter' do
@@ -53,7 +59,7 @@ describe Gitlab::WikiPages::FrontMatterParser do
 
       it { is_expected.to have_attributes(front_matter: be_empty, content: raw_content) }
 
-      it { is_expected.to have_attributes(reason: :no_pattern_match) }
+      it { is_expected.to have_attributes(reason: :no_match) }
     end
 
     context 'the feature flag is disabled' do
@@ -263,14 +269,6 @@ describe Gitlab::WikiPages::FrontMatterParser do
       end
 
       it { is_expected.to have_attributes(reason: :not_mapping) }
-    end
-  end
-
-  describe '#strip_front_matter' do
-    let(:raw_content) { with_front_matter }
-
-    it 'removes the front-matter from the content' do
-      expect(subject.send(:strip_front_matter)).to eq(content + "\n")
     end
   end
 end
