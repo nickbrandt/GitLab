@@ -18,11 +18,14 @@ module QA
           group.sandbox = @sandbox_group
         end
 
-        enable_plan_on_group(@group.name, "Gold") if Runtime::Env.dot_com?
+        enable_plan_on_group(@sandbox_group.path, "Gold") if Runtime::Env.dot_com?
       end
 
       after(:all) do
         @sandbox_group.remove_via_api!
+
+        page.visit Runtime::Scenario.gitlab_address
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       before do
