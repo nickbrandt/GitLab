@@ -45,13 +45,17 @@ export default {
           )
         }}
       </p>
-      <div>
+      <div class="d-flex justify-content-end">
         <gl-new-button ref="returnToSiteButton" :href="returnUrl">{{
           s__('StaticSiteEditor|Return to site')
         }}</gl-new-button>
-        <gl-new-button ref="mergeRequestButton" :href="mergeRequest.url" variant="info">{{
-          s__('StaticSiteEditor|View merge request')
-        }}</gl-new-button>
+        <gl-new-button
+          ref="mergeRequestButton"
+          class="ml-2"
+          :href="mergeRequest.url"
+          variant="success"
+          >{{ s__('StaticSiteEditor|View merge request') }}</gl-new-button
+        >
       </div>
     </div>
 
@@ -61,18 +65,18 @@ export default {
       <h4>{{ s__('StaticSiteEditor|Summary of changes') }}</h4>
       <ul>
         <li>
-          {{ s__('StaticSiteEditor|A new branch was created:') }}
+          {{ s__('StaticSiteEditor|You created a new branch:') }}
           <gl-link ref="branchLink" :href="branch.url">{{ branch.label }}</gl-link>
         </li>
         <li>
-          {{ s__('StaticSiteEditor|Your changes were committed to it:') }}
-          <gl-link ref="commitLink" :href="commit.url">{{ commit.label }}</gl-link>
-        </li>
-        <li>
-          {{ s__('StaticSiteEditor|A merge request was created:') }}
+          {{ s__('StaticSiteEditor|You created a merge request:') }}
           <gl-link ref="mergeRequestLink" :href="mergeRequest.url">{{
             mergeRequest.label
           }}</gl-link>
+        </li>
+        <li>
+          {{ s__('StaticSiteEditor|You added a commit:') }}
+          <gl-link ref="commitLink" :href="commit.url">{{ commit.label }}</gl-link>
         </li>
       </ul>
     </div>
