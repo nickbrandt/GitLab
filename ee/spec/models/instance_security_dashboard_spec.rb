@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe InstanceSecurityDashboard do
-  let(:pipeline1) { create(:ci_pipeline, project: project1) }
-  let(:pipeline2) { create(:ci_pipeline, project: project2) }
-  let(:project1) { create(:project) }
-  let(:project2) { create(:project) }
+  let_it_be(:project1) { create(:project) }
+  let_it_be(:project2) { create(:project) }
+  let_it_be(:pipeline1) { create(:ci_pipeline, project: project1) }
+  let_it_be(:pipeline2) { create(:ci_pipeline, project: project2) }
   let(:project_ids) { [project1.id] }
   let(:user) { create(:user) }
 
@@ -93,6 +93,25 @@ describe InstanceSecurityDashboard do
 
       it "returns all projects on the user's dashboard" do
         expect(subject.projects).to contain_exactly(project1, project2)
+      end
+    end
+  end
+
+  describe '#vulnerabilities' do
+    let_it_be(:vulnerability1) { create(:vulnerability, project: project1) }
+    let_it_be(:vulnerability2) { create(:vulnerability, project: project2) }
+
+    context 'when the user cannot read all resources' do
+      it 'returns only vulnerabilities from projects on their dashboard that they can read' do
+        expect(subject.vulnerabilities).to contain_exactly(vulnerability1)
+      end
+    end
+
+    context 'when the user can read all resources' do
+      let(:user) { create(:auditor) }
+
+      it "returns vulnerabilities from all projects on the user's dashboard" do
+        expect(subject.vulnerabilities).to contain_exactly(vulnerability1, vulnerability2)
       end
     end
   end
