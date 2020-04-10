@@ -47,12 +47,10 @@ module StatusPage
     end
 
     def publish_incident
-      PublishImagesService.new(project: project).execute(issue)
       PublishDetailsService.new(project: project).execute(issue, user_notes)
     end
 
     def unpublish_incident
-      UnpublishImagesService.new(project: project).execute(issue)
       UnpublishDetailsService.new(project: project).execute(issue)
     end
 

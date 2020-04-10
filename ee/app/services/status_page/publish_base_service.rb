@@ -44,7 +44,7 @@ module StatusPage
       project.status_page_setting&.enabled?
     end
 
-    def upload(key, json)
+    def upload_json(key, json)
       return error_limit_exceeded(key) if limit_exceeded?(json)
 
       content = json.to_json
