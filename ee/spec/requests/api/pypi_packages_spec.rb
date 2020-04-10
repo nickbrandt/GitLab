@@ -125,7 +125,9 @@ describe API::PypiPackages do
     let_it_be(:file_name) { 'package.whl' }
     let(:url) { "/projects/#{project.id}/packages/pypi" }
     let(:headers) { {} }
-    let(:params) { { content: temp_file(file_name) } }
+    let(:base_params) { { requires_python: '>=3.7', version: '1.0.0', name: 'sample-project', sha256_digest: '123' } }
+    let(:params) { base_params.merge(content: temp_file(file_name)) }
+    let(:send_rewritten_field) { true }
 
     subject do
       workhorse_finalize(
@@ -133,7 +135,8 @@ describe API::PypiPackages do
         method: :post,
         file_key: :content,
         params: params,
-        headers: headers
+        headers: headers,
+        send_rewritten_field: send_rewritten_field
       )
     end
 
@@ -146,7 +149,7 @@ describe API::PypiPackages do
         using RSpec::Parameterized::TableSyntax
 
         where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
-          'PUBLIC'  | :developer  | true  | true  | 'process PyPi api request' | :created
+          'PUBLIC'  | :developer  | true  | true  | 'PyPi package creation'    | :created
           'PUBLIC'  | :guest      | true  | true  | 'process PyPi api request' | :forbidden
           'PUBLIC'  | :developer  | true  | false | 'process PyPi api request' | :unauthorized
           'PUBLIC'  | :guest      | true  | false | 'process PyPi api request' | :unauthorized
@@ -177,6 +180,19 @@ describe API::PypiPackages do
 
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
+      end
+
+      context 'with an invalid package' do
+        let(:token) { personal_access_token.token }
+        let(:user_headers) { build_basic_auth_header(user.username, token) }
+        let(:headers) { user_headers.merge(workhorse_header) }
+
+        before do
+          params[:name] = '.$/@!^*'
+          project.add_developer(user)
+        end
+
+        it_behaves_like 'returning response status', :bad_request
       end
 
       it_behaves_like 'rejects PyPI access with unknown project id'
