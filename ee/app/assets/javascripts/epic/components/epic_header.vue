@@ -94,7 +94,7 @@ export default {
         {{ __('Opened') }}
         <timeago-tooltip :time="created" />
         {{ __('by') }}
-        <strong>
+        <strong class="text-nowrap">
           <user-avatar-link
             :link-href="author.url"
             :img-src="author.src"
