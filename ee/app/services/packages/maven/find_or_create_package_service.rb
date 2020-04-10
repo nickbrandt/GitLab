@@ -2,20 +2,10 @@
 module Packages
   module Maven
     class FindOrCreatePackageService < BaseService
-      MAVEN_METADATA_FILE = 'maven-metadata.xml'.freeze
-
       def execute
         package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, project: project).execute
 
-        # Maven uploads several files during `mvn deploy` in next order:
-        #   - my-company/my-app/1.0-SNAPSHOT/my-app.jar
-        #   - my-company/my-app/1.0-SNAPSHOT/my-app.pom
-        #   - my-company/my-app/1.0-SNAPSHOT/maven-metadata.xml
-        #   - my-company/my-app/maven-metadata.xml
-        #
-        # The last xml file does not have VERSION in URL because it contains
-        # information about all versions.
         unless package
           package_name, _, version = params[:path].rpartition('/')
           package_params = {
