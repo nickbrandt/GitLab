@@ -1,6 +1,6 @@
 <script>
 import { cloneDeep } from 'lodash';
-import { GlBadge, GlIcon, GlLink, GlNewButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
+import { GlBadge, GlIcon, GlLink, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import DependenciesTableRow from './dependencies_table_row.vue';
@@ -32,7 +32,7 @@ export default {
     GlBadge,
     GlIcon,
     GlLink,
-    GlNewButton,
+    GlButton,
     GlSkeletonLoading,
     GlTable,
   },
@@ -105,7 +105,7 @@ export default {
       GlTable; they mutate/read the item's _showDetails property, which GlTable
       uses to show/hide the row-details slot -->
     <template #cell(component)="{ item, toggleDetails, detailsShowing }">
-      <gl-new-button
+      <gl-button
         v-if="anyDependencyHasVulnerabilities"
         class="d-none d-md-inline"
         :class="{ invisible: !item.vulnerabilities.length }"
@@ -117,7 +117,7 @@ export default {
           :name="detailsShowing ? 'chevron-up' : 'chevron-down'"
           class="text-secondary-900"
         />
-      </gl-new-button>
+      </gl-button>
       <span class="bold">{{ item.name }}</span
       >&nbsp;{{ item.version }}
     </template>

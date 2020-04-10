@@ -1,6 +1,6 @@
 import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
-import { GlBadge, GlNewButton, GlLink, GlSkeletonLoading } from '@gitlab/ui';
+import { GlBadge, GlButton, GlLink, GlSkeletonLoading } from '@gitlab/ui';
 import DependenciesTable from 'ee/dependencies/components/dependencies_table.vue';
 import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_row.vue';
 import DependencyLicenseLinks from 'ee/dependencies/components/dependency_license_links.vue';
@@ -82,7 +82,7 @@ describe('DependenciesTable component', () => {
     };
 
     const findTableRows = () => wrapper.findAll('tbody > tr');
-    const findRowToggleButtons = () => wrapper.findAll(GlNewButton);
+    const findRowToggleButtons = () => wrapper.findAll(GlButton);
     const findDependencyVulnerabilities = () => wrapper.find(DependencyVulnerabilities);
     const normalizeWhitespace = string => string.replace(/\s+/g, ' ');
 
