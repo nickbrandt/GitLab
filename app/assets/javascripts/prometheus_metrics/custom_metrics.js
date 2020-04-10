@@ -1,12 +1,12 @@
 import $ from 'jquery';
 import { escape, sortBy } from 'lodash';
-import PrometheusMetrics from '~/prometheus_metrics/prometheus_metrics';
+import PrometheusMetrics from './prometheus_metrics';
 import PANEL_STATE from './constants';
 import axios from '~/lib/utils/axios_utils';
 import { s__ } from '~/locale';
 import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 
-export default class EEPrometheusMetrics extends PrometheusMetrics {
+export default class CustomMetrics extends PrometheusMetrics {
   constructor(wrapperSelector) {
     super(wrapperSelector);
     this.customMetrics = [];
@@ -106,7 +106,7 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
     const sortedMetrics = sortBy(this.customMetrics.map(capitalizeGroup), ['group', 'title']);
 
     sortedMetrics.forEach(metric => {
-      this.$monitoredCustomMetricsList.append(EEPrometheusMetrics.customMetricTemplate(metric));
+      this.$monitoredCustomMetricsList.append(CustomMetrics.customMetricTemplate(metric));
     });
 
     this.$monitoredCustomMetricsCount.text(this.customMetrics.length);

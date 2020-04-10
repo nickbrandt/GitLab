@@ -10,7 +10,9 @@
     .card-header
       %strong
         = s_('PrometheusService|Custom metrics')
+      -# haml-lint:disable NoPlainNodes
       %span.badge.badge-pill.js-custom-monitored-count 0
+      -# haml-lint:enable NoPlainNodes
       = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success js-new-metric-button hidden'
     .card-body
       .flash-container.hidden
@@ -26,5 +28,3 @@
         %p.text-tertiary.m-3.js-new-metric-text.hidden
           = s_('PrometheusService|No custom metrics have been created. Create one using the button above')
       %ul.list-unstyled.metrics-list.hidden.js-custom-metrics-list
-
-= render_ce 'projects/services/prometheus/metrics', project: project
