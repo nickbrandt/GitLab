@@ -80,10 +80,16 @@ To use a built-in template on the **New project** page:
 1. Finish creating the project by filling out the project's details. The process is
    the same as creating a [blank project](#blank-projects).
 
+##### Enterprise templates **(ULTIMATE)**
+
+Built-in Enterprise templates contain the following:
+
+- HIPAA Audit Protocol template ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13756) in GitLab 12.10)
+
 TIP: **Tip:**
 You can improve the existing built-in templates or contribute new ones in the
 [`project-templates`](https://gitlab.com/gitlab-org/project-templates) and
-[`pages`](https://gitlab.com/pages) groups.
+[`pages`](https://gitlab.com/pages) groups by following [these steps](https://gitlab.com/gitlab-org/project-templates/contributing).
 
 #### Custom project templates **(PREMIUM)**
 
