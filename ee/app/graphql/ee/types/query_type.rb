@@ -9,6 +9,12 @@ module EE
       DesignManagementObject = Struct.new(:issue)
 
       prepended do
+        field :vulnerabilities,
+              ::Types::VulnerabilityType.connection_type,
+              null: true,
+              description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
+              resolver: Resolvers::VulnerabilitiesResolver
+
         field :design_management, ::Types::DesignManagementType,
               null: false,
               description: 'Fields related to design management'
