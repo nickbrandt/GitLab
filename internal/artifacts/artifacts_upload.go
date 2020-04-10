@@ -10,12 +10,24 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
+
+var zipSubcommandsErrorsCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "gitlab_workhorse_zip_subcommand_errors_total",
+		Help: "Errors comming from subcommands used for processing ZIP archives",
+	}, []string{"error"})
+
+func init() {
+	prometheus.MustRegister(zipSubcommandsErrorsCounter)
+}
 
 type artifactsUploadProcessor struct {
 	opts *filestore.SaveFileOpts
@@ -63,10 +75,21 @@ func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, 
 	}()
 
 	if err := zipMd.Wait(); err != nil {
-		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
+		st, ok := helper.ExitStatus(err)
+
+		if !ok {
+			return nil, err
+		}
+
+		zipSubcommandsErrorsCounter.WithLabelValues(zipartifacts.ErrorLabelByCode(st)).Inc()
+
+		if st == zipartifacts.CodeNotZip {
 			return nil, nil
 		}
-		return nil, err
+
+		if st == zipartifacts.CodeLimitsReached {
+			return nil, zipartifacts.ErrBadMetadata
+		}
 	}
 
 	metaWriter.Close()
@@ -93,7 +116,7 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 		// TODO: can we rely on disk for shipping metadata? Not if we split workhorse and rails in 2 different PODs
 		metadata, err := a.generateMetadataFromZip(ctx, file)
 		if err != nil {
-			return fmt.Errorf("generateMetadataFromZip: %v", err)
+			return err
 		}
 
 		if metadata != nil {
@@ -109,6 +132,7 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 			a.Track("metadata", metadata.LocalPath)
 		}
 	}
+
 	return nil
 }
 

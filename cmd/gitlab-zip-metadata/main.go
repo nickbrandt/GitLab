@@ -4,8 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/cmd/gitlab-zip-metadata/limit"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
@@ -29,10 +31,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	readerFunc := func(reader io.ReaderAt, size int64) io.ReaderAt {
+		readLimit := limit.SizeToLimit(size)
+
+		return limit.NewLimitedReaderAt(reader, readLimit, func(read int64) {
+			fmt.Fprintf(os.Stderr, "%s: zip archive limit exceeded after reading %d bytes\n", progName, read)
+
+			fatalError(zipartifacts.ErrorCode[zipartifacts.CodeLimitsReached])
+		})
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	archive, err := zipartifacts.OpenArchive(ctx, os.Args[1])
+	archive, err := zipartifacts.OpenArchiveWithReaderFunc(ctx, os.Args[1], readerFunc)
 	if err != nil {
 		fatalError(err)
 	}
@@ -43,9 +55,13 @@ func main() {
 }
 
 func fatalError(err error) {
-	fmt.Fprintf(os.Stderr, "%s: %v\n", progName, err)
-	if err == zipartifacts.ErrNotAZip {
-		os.Exit(zipartifacts.StatusNotZip)
+	code := zipartifacts.ExitCodeByError(err)
+
+	fmt.Fprintf(os.Stderr, "%s error: %v, code: %d\n", progName, err, code)
+
+	if code > 0 {
+		os.Exit(code)
+	} else {
+		os.Exit(1)
 	}
-	os.Exit(1)
 }

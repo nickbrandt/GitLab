@@ -3,8 +3,8 @@ package zipartifacts
 import (
 	"archive/zip"
 	"context"
-	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -17,12 +17,6 @@ import (
 	"gitlab.com/gitlab-org/labkit/mask"
 	"gitlab.com/gitlab-org/labkit/tracing"
 )
-
-// ErrNotAZip will be used when the file is not a zip archive
-var ErrNotAZip = errors.New("not a zip")
-
-// ErrArchiveNotFound will be used when the file can't be found
-var ErrArchiveNotFound = errors.New("archive not found")
 
 var httpClient = &http.Client{
 	Transport: tracing.NewRoundTripper(correlation.NewInstrumentedRoundTripper(&http.Transport{
@@ -38,23 +32,52 @@ var httpClient = &http.Client{
 	})),
 }
 
+type archive struct {
+	reader io.ReaderAt
+	size   int64
+}
+
 // OpenArchive will open a zip.Reader from a local path or a remote object store URL
 // in case of remote url it will make use of ranged requestes to support seeking.
 // If the path do not exists error will be ErrArchiveNotFound,
 // if the file isn't a zip archive error will be ErrNotAZip
 func OpenArchive(ctx context.Context, archivePath string) (*zip.Reader, error) {
-	if isURL(archivePath) {
-		return openHTTPArchive(ctx, archivePath)
+	archive, err := openArchiveLocation(ctx, archivePath)
+	if err != nil {
+		return nil, err
 	}
 
-	return openFileArchive(ctx, archivePath)
+	return openZipReader(archive.reader, archive.size)
+}
+
+// OpenArchiveWithReaderFunc opens a zip.Reader from either local path or a
+// remote object, similarly to OpenArchive function. The difference is that it
+// allows passing a readerFunc that takes a io.ReaderAt that is either going to
+// be os.File or a custom reader we use to read from object storage. The
+// readerFunc can augment the archive reader and return a type that satisfies
+// io.ReaderAt.
+func OpenArchiveWithReaderFunc(ctx context.Context, location string, readerFunc func(io.ReaderAt, int64) io.ReaderAt) (*zip.Reader, error) {
+	archive, err := openArchiveLocation(ctx, location)
+	if err != nil {
+		return nil, err
+	}
+
+	return openZipReader(readerFunc(archive.reader, archive.size), archive.size)
+}
+
+func openArchiveLocation(ctx context.Context, location string) (*archive, error) {
+	if isURL(location) {
+		return openHTTPArchive(ctx, location)
+	}
+
+	return openFileArchive(ctx, location)
 }
 
 func isURL(path string) bool {
 	return strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://")
 }
 
-func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, error) {
+func openHTTPArchive(ctx context.Context, archivePath string) (*archive, error) {
 	scrubbedArchivePath := mask.URL(archivePath)
 	req, err := http.NewRequest(http.MethodGet, archivePath, nil)
 	if err != nil {
@@ -66,7 +89,7 @@ func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, erro
 	if err != nil {
 		return nil, fmt.Errorf("HTTP GET %q: %v", scrubbedArchivePath, err)
 	} else if resp.StatusCode == http.StatusNotFound {
-		return nil, ErrArchiveNotFound
+		return nil, ErrorCode[CodeArchiveNotFound]
 	} else if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP GET %q: %d: %v", scrubbedArchivePath, resp.StatusCode, resp.Status)
 	}
@@ -79,28 +102,36 @@ func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, erro
 		rs.Close()
 	}()
 
-	archive, err := zip.NewReader(rs, resp.ContentLength)
-	if err != nil {
-		return nil, ErrNotAZip
-	}
-
-	return archive, nil
+	return &archive{reader: rs, size: resp.ContentLength}, nil
 }
 
-func openFileArchive(ctx context.Context, archivePath string) (*zip.Reader, error) {
-	archive, err := zip.OpenReader(archivePath)
+func openFileArchive(ctx context.Context, archivePath string) (*archive, error) {
+	file, err := os.Open(archivePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, ErrArchiveNotFound
+			return nil, ErrorCode[CodeArchiveNotFound]
 		}
-		return nil, ErrNotAZip
 	}
 
 	go func() {
 		<-ctx.Done()
 		// We close the archive from this goroutine so that we can safely return a *zip.Reader instead of a *zip.ReadCloser
-		archive.Close()
+		file.Close()
 	}()
 
-	return &archive.Reader, nil
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	return &archive{reader: file, size: stat.Size()}, nil
+}
+
+func openZipReader(archive io.ReaderAt, size int64) (*zip.Reader, error) {
+	reader, err := zip.NewReader(archive, size)
+	if err != nil {
+		return nil, ErrorCode[CodeNotZip]
+	}
+
+	return reader, nil
 }

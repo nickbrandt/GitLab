@@ -100,5 +100,5 @@ func TestErrNotAZip(t *testing.T) {
 	defer cancel()
 
 	_, err = zipartifacts.OpenArchive(ctx, f.Name())
-	assert.Equal(t, zipartifacts.ErrNotAZip, err, "OpenArchive requires a zip file")
+	assert.Equal(t, zipartifacts.ErrorCode[zipartifacts.CodeNotZip], err, "OpenArchive requires a zip file")
 }
