@@ -786,10 +786,9 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.119.0.tgz#ff35c160b1e726f4f1702a4a152712fb669cde4e"
   integrity sha512-bI+kewDLJy1N0//BpUPMx3h5AqG6lfIiV53lxQP9ttn8j/jhyxigZXq1wZ901PI4/ALv9IY1DOSSuLouK4sJsQ==
 
-"@gitlab/ui@11.2.1":
+"@gitlab/ui@https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/506670040/artifacts/raw/gitlab-ui.608-button-migration-rename-gl-new-button.tgz":
   version "11.2.1"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-11.2.1.tgz#c031c92204eb2a6036ae3c7482387f66c75524fd"
-  integrity sha512-AhDPYmrBtaW6Qu+inSjoMCWx+Ou3CVIhhGAEjyVsAG7rSOilevVMZui2IlSb6fPtLcXS8F78DTWjp3R1YgxxbQ==
+  resolved "https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/506670040/artifacts/raw/gitlab-ui.608-button-migration-rename-gl-new-button.tgz#aa9236d07837cfed50ceef402d756b8923bdb892"
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
