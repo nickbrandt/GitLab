@@ -55,6 +55,30 @@ exports[`Status Page settings form default state should match the default snapsh
        
       <gl-form-group-stub
         class="col-8 col-md-9 gl-pl-0 mb-3"
+        label="Status page URL"
+        label-for="status-page-url"
+        label-size="sm"
+      >
+        <gl-form-input-stub
+          id="status-page-url"
+          value=""
+        />
+         
+        <p
+          class="form-text text-muted"
+        >
+          <gl-link-stub
+            href="/help/user/project/status_page/index.html"
+          >
+            
+            Status page frontend documentation
+          
+          </gl-link-stub>
+        </p>
+      </gl-form-group-stub>
+       
+      <gl-form-group-stub
+        class="col-8 col-md-9 gl-pl-0 mb-3"
         label="S3 Bucket name"
         label-for="status-page-s3-bucket-name"
         label-size="sm"
@@ -97,7 +121,7 @@ exports[`Status Page settings form default state should match the default snapsh
       <gl-form-group-stub
         class="col-8 col-md-9 gl-pl-0 mb-3"
         label="AWS access key ID"
-        label-for="status-page-aws-access-key-id"
+        label-for="status-page-aws-access-key"
         label-size="sm"
       >
         <gl-form-input-stub
