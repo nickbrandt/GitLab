@@ -1,0 +1,5 @@
+---
+title: Add scanned URL count and link to scanned resources in DAST reports
+merge_request: 26825
+author:
+type: added
