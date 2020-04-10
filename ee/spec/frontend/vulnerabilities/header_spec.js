@@ -69,7 +69,7 @@ describe('Vulnerability Header', () => {
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
   const createWrapper = (vulnerability = {}, finding = findingWithoutIssue) => {
-    wrapper = shallowMount(App, {
+    wrapper = shallowMount(Header, {
       propsData: {
         ...dataset,
         initialVulnerability: { ...defaultVulnerability, ...vulnerability },

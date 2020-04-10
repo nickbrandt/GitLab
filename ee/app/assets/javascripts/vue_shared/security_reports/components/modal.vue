@@ -156,10 +156,10 @@ export default {
       return this.dismissalFeedback || this.modal.isCommentingOnDismissal;
     },
     showDismissalCommentActions() {
-      return !this.dismissalFeedbackComment || !this.isEditingExistingFeedback;
+      return !this.dismissalFeedback?.comment_details || !this.isEditingExistingFeedback;
     },
     showDismissalCommentTextbox() {
-      return !this.dismissalFeedbackComment || this.isEditingExistingFeedback;
+      return !this.dismissalFeedback?.comment_details || this.isEditingExistingFeedback;
     },
   },
   methods: {
