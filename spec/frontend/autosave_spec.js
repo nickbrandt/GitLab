@@ -10,6 +10,8 @@ describe('Autosave', () => {
   const field = $('<textarea></textarea>');
   const key = 'key';
   const fallbackKey = 'fallbackKey';
+  const lockVersionKey = 'lockVersionKey';
+  const lockVersion = 1;
 
   describe('class constructor', () => {
     beforeEach(() => {
@@ -26,6 +28,13 @@ describe('Autosave', () => {
 
     it('should set .isLocalStorageAvailable if fallbackKey is passed', () => {
       autosave = new Autosave(field, key, fallbackKey);
+
+      expect(AccessorUtilities.isLocalStorageAccessSafe).toHaveBeenCalled();
+      expect(autosave.isLocalStorageAvailable).toBe(true);
+    });
+
+    it('should set .isLocalStorageAvailable if lockVersion is passed', () => {
+      autosave = new Autosave(field, key, null, lockVersion);
 
       expect(AccessorUtilities.isLocalStorageAccessSafe).toHaveBeenCalled();
       expect(autosave.isLocalStorageAvailable).toBe(true);
@@ -52,7 +61,7 @@ describe('Autosave', () => {
       });
     });
 
-    describe('if .isLocalStorageAvailable is `true`', () => {
+    describe('if .islocalstorageavailable is `true`', () => {
       beforeEach(() => {
         autosave.isLocalStorageAvailable = true;
       });
@@ -96,6 +105,40 @@ describe('Autosave', () => {
     });
   });
 
+  describe('getLockVersion', () => {
+    beforeEach(() => {
+      autosave = {
+        field,
+        key,
+        lockVersionKey,
+      };
+    });
+
+    describe('if .isLocalStorageAvailable is `false`', () => {
+      beforeEach(() => {
+        autosave.isLocalStorageAvailable = false;
+
+        Autosave.prototype.getLockVersion.call(autosave);
+      });
+
+      it('should not call .getItem', () => {
+        expect(window.localStorage.getItem).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('if .islocalstorageavailable is `true`', () => {
+      beforeEach(() => {
+        autosave.isLocalStorageAvailable = true;
+      });
+
+      it('should call .getItem', () => {
+        Autosave.prototype.getLockVersion.call(autosave);
+
+        expect(window.localStorage.getItem).toHaveBeenCalledWith(lockVersionKey);
+      });
+    });
+  });
+
   describe('save', () => {
     beforeEach(() => {
       autosave = { reset: jest.fn() };
@@ -124,6 +167,43 @@ describe('Autosave', () => {
 
       it('should call .setItem', () => {
         expect(window.localStorage.setItem).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('save with lockVersion', () => {
+    beforeEach(() => {
+      autosave = {
+        field,
+        key,
+        lockVersionKey,
+        lockVersion,
+      };
+      autosave.isLocalStorageAvailable = true;
+    });
+
+    describe('lockVersion is valid', () => {
+      it('should call .setItem', () => {
+        Autosave.prototype.save.call(autosave);
+        expect(window.localStorage.setItem).toHaveBeenCalledWith(lockVersionKey, lockVersion);
+      });
+
+      it('should call .setItem when version is 0', () => {
+        autosave.lockVersion = 0;
+        Autosave.prototype.save.call(autosave);
+        expect(window.localStorage.setItem).toHaveBeenCalledWith(
+          lockVersionKey,
+          autosave.lockVersion,
+        );
+      });
+    });
+
+    describe('lockVersion is invalid', () => {
+      it('should only call .setItem once', () => {
+        delete autosave.lockVersion;
+        Autosave.prototype.save.call(autosave);
+
+        expect(window.localStorage.setItem).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -185,7 +265,8 @@ describe('Autosave', () => {
     it('should call .removeItem for key and fallbackKey', () => {
       Autosave.prototype.reset.call(autosave);
 
-      expect(window.localStorage.removeItem).toHaveBeenCalledTimes(2);
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith(fallbackKey);
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith(key);
     });
   });
 });
