@@ -119,8 +119,8 @@ GitLab offers Linux and Windows shared runners hosted on GitLab.com for executin
 
 Linux Shared Runners on GitLab.com run in [autoscale mode](https://docs.gitlab.com/runner/configuration/autoscale.html) and are powered by Google Cloud Platform.
 Autoscaling means reduced waiting times to spin up CI/CD jobs, and isolated VMs for each project,
-thus maximizing security. They're free to use for public open source projects and limited
-to 2000 CI minutes per month per group for private projects. More minutes
+thus maximizing security. Starting GitLab 13.0, both public open source and private projects will be limited
+to 2000 CI minutes per month per group. Prior to 13.0, they're free to use for public open source projects. More minutes
 [can be purchased](../../subscriptions/index.md#purchasing-additional-ci-minutes), if
 needed. Read about all [GitLab.com plans](https://about.gitlab.com/pricing/).
 
