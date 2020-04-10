@@ -46,6 +46,7 @@ export default {
         height: 0,
       },
       initialLoad: true,
+      startDragPosition: null,
       lastDragPosition: null,
     };
   },
@@ -218,10 +219,12 @@ export default {
     onPresentationMousedown({ clientX, clientY }) {
       if (!this.isDesignOverflowing()) return;
 
-      this.lastDragPosition = {
+      this.startDragPosition = {
         x: clientX,
         y: clientY,
       };
+
+      this.lastDragPosition = { ...this.startDragPosition };
     },
     onPresentationMousemove({ clientX, clientY }) {
       if (!this.lastDragPosition) return;
@@ -239,7 +242,14 @@ export default {
         y: clientY,
       };
     },
-    onPresentationMouseup() {
+    onPresentationMouseup({ offsetX, offsetY }) {
+      if (
+        this.startDragPosition?.x === this.lastDragPosition?.x &&
+        this.startDragPosition?.y === this.lastDragPosition?.y
+      ) {
+        this.openCommentForm({ x: offsetX, y: offsetY });
+      }
+
       this.lastDragPosition = null;
     },
     isDesignOverflowing() {
