@@ -1,8 +1,20 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 #import "ee/vulnerabilities/graphql/vulnerability.fragment.graphql"
 
-query instance($after: String, $first: Int) {
-  vulnerabilities(after:$after, first:$first) {
+query instance(
+  $after: String,
+  $first: Int
+  $severity: [VulnerabilitySeverity!]
+  $reportType: [VulnerabilityReportType!]
+  $state: [VulnerabilityState!]
+) {
+  vulnerabilities(
+    after:$after,
+    first:$first,
+    severity: $severity
+    reportType: $reportType
+    state: $state
+  ) {
     nodes {
       ...Vulnerability
     }
