@@ -284,8 +284,8 @@ describe API::Users, :do_not_mock_admin_mode do
         admin
         user
         user_without_projects = create(:user)
-        project = create(:project, :repository, namespace: user.namespace)
-        project2 = create(:project, namespace: admin.namespace)
+        create(:project, namespace: user.namespace)
+        create(:project, namespace: admin.namespace)
 
         get api('/users', admin), params: { without_projects: true }
 
