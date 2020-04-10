@@ -86,15 +86,15 @@ export default {
       },
       update(data) {
         const requirementsRoot = data.project?.requirements;
-        const count = data.project?.requirementStatesCount;
+        const { opened = 0, archived = 0 } = data.project?.requirementStatesCount;
 
         return {
           list: requirementsRoot?.nodes || [],
           pageInfo: requirementsRoot?.pageInfo || {},
           count: {
-            OPENED: count.opened,
-            ARCHIVED: count.archived,
-            ALL: count.opened + count.archived,
+            OPENED: opened,
+            ARCHIVED: archived,
+            ALL: opened + archived,
           },
         };
       },
@@ -105,10 +105,13 @@ export default {
     },
   },
   data() {
+    const tabsContainerEl = document.querySelector('.js-requirements-state-filters');
+
     return {
       showCreateForm: false,
       showUpdateFormForRequirement: 0,
       createRequirementRequestActive: false,
+      stateChangeRequestActiveFor: 0,
       currentPage: this.page,
       prevPageCursor: this.prev,
       nextPageCursor: this.next,
@@ -117,9 +120,23 @@ export default {
         count: {},
         pageInfo: {},
       },
+      openedCount: this.requirementsCount[FilterState.opened],
+      archivedCount: this.requirementsCount[FilterState.archived],
+      countEls: {
+        opened: tabsContainerEl.querySelector('.js-opened-count'),
+        archived: tabsContainerEl.querySelector('.js-archived-count'),
+        all: tabsContainerEl.querySelector('.js-all-count'),
+        nav: document.querySelector('.js-nav-requirements-count'),
+        navFlyOut: document.querySelector('.js-nav-requirements-count-fly-out'),
+      },
     };
   },
   computed: {
+    requirementsList() {
+      return this.filterBy !== FilterState.all
+        ? this.requirements.list.filter(({ state }) => state === this.filterBy)
+        : this.requirements.list;
+    },
     requirementsListLoading() {
       return this.$apollo.queries.requirements.loading;
     },
@@ -140,15 +157,34 @@ export default {
       return nextPage > Math.ceil(this.totalRequirements / DEFAULT_PAGE_SIZE) ? null : nextPage;
     },
   },
+  watch: {
+    requirements() {
+      const totalCount = this.requirements.count.ALL;
+
+      this.countEls.all.innerText = totalCount;
+      this.countEls.nav.innerText = totalCount;
+      this.countEls.navFlyOut.innerText = totalCount;
+    },
+    openedCount(value) {
+      this.countEls.opened.innerText = value;
+    },
+    archivedCount(value) {
+      this.countEls.archived.innerText = value;
+    },
+  },
   mounted() {
-    document
-      .querySelector('.js-new-requirement')
-      .addEventListener('click', this.handleNewRequirementClick);
+    if (this.filterBy === FilterState.opened) {
+      document
+        .querySelector('.js-new-requirement')
+        .addEventListener('click', this.handleNewRequirementClick);
+    }
   },
   beforeDestroy() {
-    document
-      .querySelector('.js-new-requirement')
-      .removeEventListener('click', this.handleNewRequirementClick);
+    if (this.filterBy === FilterState.opened) {
+      document
+        .querySelector('.js-new-requirement')
+        .removeEventListener('click', this.handleNewRequirementClick);
+    }
   },
   methods: {
     /**
@@ -180,6 +216,31 @@ export default {
         replace: true,
       });
     },
+    updateRequirement({ iid, title, state, errorFlashMessage }) {
+      const updateRequirementInput = {
+        projectPath: this.projectPath,
+        iid,
+      };
+
+      if (title) {
+        updateRequirementInput.title = title;
+      }
+      if (state) {
+        updateRequirementInput.state = state;
+      }
+
+      return this.$apollo
+        .mutate({
+          mutation: updateRequirement,
+          variables: {
+            updateRequirementInput,
+          },
+        })
+        .catch(e => {
+          createFlash(errorFlashMessage);
+          Sentry.captureException(e);
+        });
+    },
     handleNewRequirementClick() {
       this.showCreateForm = true;
     },
@@ -202,6 +263,7 @@ export default {
           if (!data.createRequirement.errors.length) {
             this.showCreateForm = false;
             this.$apollo.queries.requirements.refetch();
+            this.openedCount += 1;
           } else {
             throw new Error(`Error creating a requirement`);
           }
@@ -217,19 +279,12 @@ export default {
     handleNewRequirementCancel() {
       this.showCreateForm = false;
     },
-    handleUpdateRequirementSave({ iid, title }) {
+    handleUpdateRequirementSave(params) {
       this.createRequirementRequestActive = true;
-      return this.$apollo
-        .mutate({
-          mutation: updateRequirement,
-          variables: {
-            updateRequirementInput: {
-              projectPath: this.projectPath,
-              iid,
-              title,
-            },
-          },
-        })
+      return this.updateRequirement({
+        ...params,
+        errorFlashMessage: __('Something went wrong while updating a requirement.'),
+      })
         .then(({ data }) => {
           if (!data.updateRequirement.errors.length) {
             this.showUpdateFormForRequirement = 0;
@@ -237,13 +292,33 @@ export default {
             throw new Error(`Error updating a requirement`);
           }
         })
-        .catch(e => {
-          createFlash(__('Something went wrong while updating a requirement.'));
-          Sentry.captureException(e);
-        })
         .finally(() => {
           this.createRequirementRequestActive = false;
         });
+    },
+    handleRequirementStateChange(params) {
+      this.stateChangeRequestActiveFor = params.iid;
+      return this.updateRequirement({
+        ...params,
+        errorFlashMessage:
+          params.state === FilterState.opened
+            ? __('Something went wrong while reopening a requirement.')
+            : __('Something went wrong while archiving a requirement.'),
+      }).then(({ data }) => {
+        if (!data.updateRequirement.errors.length) {
+          this.stateChangeRequestActiveFor = 0;
+        } else {
+          throw new Error(`Error archiving a requirement`);
+        }
+
+        if (params.state === FilterState.opened) {
+          this.openedCount += 1;
+          this.archivedCount -= 1;
+        } else {
+          this.openedCount -= 1;
+          this.archivedCount += 1;
+        }
+      });
     },
     handleUpdateRequirementCancel() {
       this.showUpdateFormForRequirement = 0;
@@ -295,14 +370,17 @@ export default {
       class="content-list issuable-list issues-list requirements-list"
     >
       <requirement-item
-        v-for="requirement in requirements.list"
+        v-for="requirement in requirementsList"
         :key="requirement.iid"
         :requirement="requirement"
         :show-update-form="showUpdateFormForRequirement === requirement.iid"
         :update-requirement-request-active="createRequirementRequestActive"
+        :state-change-request-active="stateChangeRequestActiveFor === requirement.iid"
         @updateSave="handleUpdateRequirementSave"
         @updateCancel="handleUpdateRequirementCancel"
         @editClick="handleEditRequirementClick"
+        @archiveClick="handleRequirementStateChange"
+        @reopenClick="handleRequirementStateChange"
       />
     </ul>
     <gl-pagination
