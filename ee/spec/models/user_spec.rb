@@ -1029,4 +1029,70 @@ describe User do
       end
     end
   end
+
+  context 'paid namespaces' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:gold_group) { create(:group_with_plan, plan: :gold_plan) }
+    let_it_be(:bronze_group) { create(:group_with_plan, plan: :bronze_plan) }
+    let_it_be(:free_group) { create(:group_with_plan, plan: :free_plan) }
+    let_it_be(:group_without_plan) { create(:group) }
+
+    describe '#has_paid_namespace?' do
+      context 'when the user has Reporter or higher on at least one paid group' do
+        it 'returns true' do
+          gold_group.add_reporter(user)
+          bronze_group.add_guest(user)
+
+          expect(user.has_paid_namespace?).to eq(true)
+        end
+      end
+
+      context 'when the user is only a Guest on paid groups' do
+        it 'returns false' do
+          gold_group.add_guest(user)
+          bronze_group.add_guest(user)
+          free_group.add_owner(user)
+
+          expect(user.has_paid_namespace?).to eq(false)
+        end
+      end
+
+      context 'when the user is not a member of any groups with plans' do
+        it 'returns false' do
+          group_without_plan.add_owner(user)
+
+          expect(user.has_paid_namespace?).to eq(false)
+        end
+      end
+    end
+
+    describe '#owns_paid_namespace?' do
+      context 'when the user is an owner of at least one paid group' do
+        it 'returns true' do
+          gold_group.add_owner(user)
+          bronze_group.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(true)
+        end
+      end
+
+      context 'when the user is only a Maintainer on paid groups' do
+        it 'returns false' do
+          gold_group.add_maintainer(user)
+          bronze_group.add_maintainer(user)
+          free_group.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(false)
+        end
+      end
+
+      context 'when the user is not a member of any groups with plans' do
+        it 'returns false' do
+          group_without_plan.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(false)
+        end
+      end
+    end
+  end
 end
