@@ -25,6 +25,8 @@ module Types
           description: 'Description of the epic'
     field :state, EpicStateEnum, null: false,
           description: 'State of the epic'
+    field :confidential, GraphQL::BOOLEAN_TYPE, null: true,
+          description: 'Indicates if the epic is confidential'
 
     field :group, GroupType, null: false,
           description: 'Group to which the epic belongs',

@@ -15,7 +15,8 @@ describe 'Creating an Epic' do
       start_date_fixed: '2019-09-17',
       due_date_fixed: '2019-09-18',
       start_date_is_fixed: true,
-      due_date_is_fixed: true
+      due_date_is_fixed: true,
+      confidential: true
     }
   end
 
@@ -73,6 +74,7 @@ describe 'Creating an Epic' do
         expect(epic_hash['startDateIsFixed']).to eq(true)
         expect(epic_hash['dueDateFixed']).to eq('2019-09-18')
         expect(epic_hash['dueDateIsFixed']).to eq(true)
+        expect(epic_hash['confidential']).to eq(true)
       end
 
       context 'when there are ActiveRecord validation errors' do
@@ -94,6 +96,19 @@ describe 'Creating an Epic' do
 
         it 'does not create the epic' do
           expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Epic, :count)
+        end
+      end
+
+      context 'when confidential_epics is disabled' do
+        before do
+          stub_feature_flags(confidential_epics: false)
+        end
+
+        it 'ignores confidential field' do
+          post_graphql_mutation(mutation, current_user: current_user)
+
+          epic_hash = mutation_response['epic']
+          expect(epic_hash['confidential']).to be_falsey
         end
       end
     end
