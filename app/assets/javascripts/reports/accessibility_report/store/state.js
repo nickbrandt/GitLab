@@ -1,8 +1,9 @@
-export default () => ({
-  endpoint: null,
+export default (initialState = {}) => ({
+  baseEndpoint: initialState.baseEndpoint || '',
+  headEndpoint: initialState.headEndpoint || '',
 
-  isLoading: false,
-  hasError: false,
+  isLoading: initialState.isLoading || false,
+  hasError: initialState.hasError || false,
 
   /**
    * Report will have the following format:
@@ -25,5 +26,5 @@ export default () => ({
    *   resolved_warnings: {Array.<Object>},
    * }
    */
-  report: {},
+  report: initialState.report || {},
 });

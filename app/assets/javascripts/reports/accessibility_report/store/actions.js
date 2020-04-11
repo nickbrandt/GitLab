@@ -3,9 +3,6 @@ import * as types from './mutation_types';
 import { parseAccessibilityReport, compareAccessibilityReports } from './utils';
 import { s__ } from '~/locale';
 
-export const setBaseEndpoint = ({ commit }, endpoint) => commit(types.SET_BASE_ENDPOINT, endpoint);
-export const setHeadEndpoint = ({ commit }, endpoint) => commit(types.SET_HEAD_ENDPOINT, endpoint);
-
 export const fetchReport = ({ state, dispatch, commit }) => {
   commit(types.REQUEST_REPORT);
 

@@ -16,32 +16,6 @@ describe('Accessibility Reports actions', () => {
     localState = localStore.state;
   });
 
-  describe('setBaseEndpoint', () => {
-    it('should commit SET_BASE_ENDPOINT mutation', done => {
-      testAction(
-        actions.setBaseEndpoint,
-        'endpoint.json',
-        localState,
-        [{ type: types.SET_BASE_ENDPOINT, payload: 'endpoint.json' }],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setHeadEndpoint', () => {
-    it('should commit SET_HEAD_ENDPOINT mutation', done => {
-      testAction(
-        actions.setHeadEndpoint,
-        'endpoint.json',
-        localState,
-        [{ type: types.SET_HEAD_ENDPOINT, payload: 'endpoint.json' }],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('fetchReport', () => {
     let mock;
 

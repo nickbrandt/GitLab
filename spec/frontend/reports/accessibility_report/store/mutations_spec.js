@@ -10,24 +10,6 @@ describe('Accessibility Reports mutations', () => {
     localState = localStore.state;
   });
 
-  describe('SET_BASE_ENDPOINT', () => {
-    it('sets the given endpoint', () => {
-      const endpoint = '/test-endpoint';
-      mutations.SET_BASE_ENDPOINT(localState, endpoint);
-
-      expect(localState.baseEndpoint).toEqual(endpoint);
-    });
-  });
-
-  describe('SET_HEAD_ENDPOINT', () => {
-    it('sets the given endpoint', () => {
-      const endpoint = '/test-endpoint';
-      mutations.SET_HEAD_ENDPOINT(localState, endpoint);
-
-      expect(localState.headEndpoint).toEqual(endpoint);
-    });
-  });
-
   describe('REQUEST_REPORT', () => {
     it('sets isLoading to true', () => {
       mutations.REQUEST_REPORT(localState);
