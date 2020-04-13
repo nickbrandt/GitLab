@@ -4,6 +4,7 @@ import createDefaultClient from '~/lib/graphql';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
 import FirstClassGroupSecurityDashboard from './components/first_class_group_security_dashboard.vue';
+import FirstClassInstanceSecurityDashboard from './components/first_class_instance_security_dashboard.vue';
 import createStore from './store';
 import createRouter from './store/router';
 import projectsPlugin from './store/plugins/projects';
@@ -46,6 +47,8 @@ export default (
     component = FirstClassGroupSecurityDashboard;
     props.groupFullPath = el.dataset.groupFullPath;
     props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
+  } else if (dashboardType === DASHBOARD_TYPES.INSTANCE) {
+    component = FirstClassInstanceSecurityDashboard;
   }
 
   const router = createRouter();
