@@ -43,7 +43,11 @@ module Clusters
         # https://gitlab.com/gitlab-org/gitlab/issues/34650 is resolved
         include_subgroups = cluster.group_type?
 
-        ::GroupProjectsFinder.new(group: group, current_user: current_user, options: { only_owned: true, include_subgroups: include_subgroups }).execute
+        ::GroupProjectsFinder.new(
+          group: group,
+          current_user: current_user,
+          options: { only_owned: true, include_subgroups: include_subgroups }
+        ).execute
       end
     end
   end
