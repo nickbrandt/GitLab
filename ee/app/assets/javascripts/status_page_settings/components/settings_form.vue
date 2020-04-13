@@ -86,7 +86,7 @@ export default {
       <p>
         <gl-sprintf :message="$options.i18n.introText">
           <template #docsLink>
-            <gl-link href="#">
+            <gl-link href="/help/user/project/status_page/index.html">
               <span>{{ $options.i18n.introLinkText }}</span>
             </gl-link>
           </template>
