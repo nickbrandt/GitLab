@@ -339,5 +339,36 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         end
       end
     end
+
+    describe '#find_registry_differences' do
+      it 'returns untracked IDs as well as tracked IDs that are unused', :aggregate_failures do
+        max_id = Upload.maximum(:id)
+        create(:geo_upload_registry, :avatar, file_id: upload_synced_group.id)
+        create(:geo_upload_registry, :file, file_id: upload_issuable_synced_nested_project.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_synced_project.id)
+        create(:geo_upload_registry, :personal_file, file_id: upload_personal_snippet.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_remote_synced_project.id)
+        unused_registry_1 = create(:geo_upload_registry, :attachment, file_id: max_id + 1)
+        unused_registry_2 = create(:geo_upload_registry, :personal_file, file_id: max_id + 2)
+        range = 1..(max_id + 2)
+
+        untracked, unused = subject.find_registry_differences(range)
+
+        expected_untracked = [
+          [upload_unsynced_group.id, 'avatar'],
+          [upload_unsynced_project.id, 'avatar'],
+          [upload_remote_unsynced_project.id, 'avatar'],
+          [upload_remote_synced_group.id, 'avatar']
+        ]
+
+        expected_unused = [
+          [unused_registry_1.file_id, 'attachment'],
+          [unused_registry_2.file_id, 'personal_file']
+        ]
+
+        expect(untracked).to match_array(expected_untracked)
+        expect(unused).to match_array(expected_unused)
+      end
+    end
   end
 end
