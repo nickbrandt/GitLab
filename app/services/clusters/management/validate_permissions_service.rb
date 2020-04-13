@@ -13,14 +13,7 @@ module Clusters
         if management_project_id.present?
           management_project = management_project_scope(cluster).find_by_id(management_project_id)
 
-          unless management_project
-            cluster.errors.add(:management_project_id, _('Project does not exist or you don\'t have permission to perform this action'))
-
-            return false
-          end
-
-          unless can_admin_pipeline_for_project?(management_project)
-            # Use same message as not found to prevent enumeration
+          unless management_project && can_admin_pipeline_for_project?(management_project)
             cluster.errors.add(:management_project_id, _('Project does not exist or you don\'t have permission to perform this action'))
 
             return false
