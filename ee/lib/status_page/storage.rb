@@ -13,8 +13,8 @@ module StatusPage
       "data/incident/#{id}.json"
     end
 
-    def self.upload_path(secret, file_name)
-      File.join('/uploads', secret, file_name)
+    def self.upload_path(issue_iid, secret, file_name)
+      File.join('data', issue_iid.to_s, secret, file_name)
     end
 
     def self.list_path

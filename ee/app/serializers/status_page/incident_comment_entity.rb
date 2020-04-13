@@ -2,7 +2,8 @@
 
 module StatusPage
   class IncidentCommentEntity < Grape::Entity
-    expose(:note) { |entity| Redactor.redact(entity.note_html) }
+    # All published notables will be issues due to upstream logic
+    expose(:note) { |entity| PostProcessor.process(entity.note, issue_iid: entity.noteable.iid) }
     expose :created_at
   end
 end

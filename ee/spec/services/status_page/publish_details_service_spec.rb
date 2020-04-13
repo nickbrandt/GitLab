@@ -33,6 +33,9 @@ describe StatusPage::PublishDetailsService do
     end
 
     context 'publishes images' do
+      # no upload in markdown
+      # s3 not avalible
+
       context 'when upload is in markdown' do
         let(:upload_secret) { '734b8524a16d44eb0ff28a2c2e4ff3c0' }
         let(:image_file_name) { 'tanuki.png'}
@@ -55,7 +58,8 @@ describe StatusPage::PublishDetailsService do
         it 'publishes images in incident markdown' do
           expect(result).to be_success
           expect(result.payload).to have_key(:json_object_key)
-          expect(result.payload[:image_object_keys]).to eq([upload_path, upload_path])
+          status_page_upload_path = StatusPage::Storage.upload_path(issue.id, upload_secret, image_file_name)
+          expect(result.payload[:image_object_keys]).to eq([status_page_upload_path, status_page_upload_path])
         end
       end
     end

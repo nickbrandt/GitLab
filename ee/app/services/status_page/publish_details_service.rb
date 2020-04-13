@@ -46,20 +46,20 @@ module StatusPage
 
     def publish_images(issue, user_notes)
       upload_keys = []
-      upload_keys += publish_image_uploads(markdown_field: issue.description)
+      upload_keys += publish_image_uploads(markdown_field: issue.description, issue_iid: issue.iid)
       user_notes.each do |user_note|
-        upload_keys += publish_image_uploads(markdown_field: user_note.note)
+        upload_keys += publish_image_uploads(markdown_field: user_note.note, issue_iid: issue.iid)
       end
 
       upload_keys
     end
 
-    def publish_image_uploads(markdown_field:)
+    def publish_image_uploads(markdown_field:, issue_iid:)
       upload_keys = []
 
       markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |md|
-        file = find_upload($~[:secret], $~[:file])
-        key = StatusPage::Storage.upload_path($~[:secret], $~[:file])
+        file = find_upload($~[:secret], $~[:file]).file.file
+        key = StatusPage::Storage.upload_path(issue_iid, $~[:secret], $~[:file])
         upload_image(file, key)
         upload_keys << key
       end
