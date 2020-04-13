@@ -82,7 +82,17 @@ To use a built-in template on the **New project** page:
 
 ##### Enterprise templates **(ULTIMATE)**
 
-Built-in Enterprise templates contain the following:
+GitLab is developing Enterprise templates to help you streamline audit management with selected regulatory standards. These templates automatically import issues that correspond to each regulatory requirement.
+
+To create a new project with an Enterprise template, on the **New project** page:
+
+1. On the **Create from template** tab, select the **Built-in** tab.
+1. From the list of available built-in Enterprise templates, click the:
+   - **Preview** button to look at the template source itself.
+   - **Use template** button to start creating the project.
+1. Finish creating the project by filling out the project's details. The process is the same as creating a [blank project](#blank-projects).
+
+Available Enterprise templates include:
 
 - HIPAA Audit Protocol template ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13756) in GitLab 12.10)
 
