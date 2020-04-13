@@ -1,11 +1,13 @@
 <script>
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import InstanceSecurityVulnerabilities from './first_class_instance_security_dashboard_vulnerabilities.vue';
+import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 
 export default {
   components: {
     SecurityDashboardLayout,
     InstanceSecurityVulnerabilities,
+    VulnerabilitySeverity,
   },
   props: {
     dashboardDocumentation: {
@@ -13,6 +15,10 @@ export default {
       required: true,
     },
     emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    vulnerableProjectsEndpoint: {
       type: String,
       required: true,
     },
@@ -26,5 +32,8 @@ export default {
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
     />
+    <template #aside>
+      <vulnerability-severity :endpoint="vulnerableProjectsEndpoint" />
+    </template>
   </security-dashboard-layout>
 </template>
