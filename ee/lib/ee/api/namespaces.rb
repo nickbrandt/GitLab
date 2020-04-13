@@ -51,7 +51,6 @@ module EE
             success Entities::Namespace
           end
           params do
-            optional :plan, type: String, desc: "Namespace or Group plan"
             optional :shared_runners_minutes_limit, type: Integer, desc: "Pipeline minutes quota for this namespace"
             optional :extra_shared_runners_minutes_limit, type: Integer, desc: "Extra pipeline minutes for this namespace"
             optional :trial_ends_on, type: Date, desc: "Trial expiration date"
