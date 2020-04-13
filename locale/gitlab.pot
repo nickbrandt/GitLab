@@ -15632,6 +15632,12 @@ msgstr ""
 msgid "Project name"
 msgstr ""
 
+msgid "Project name suffix"
+msgstr ""
+
+msgid "Project name suffix is a user-defined string which will be appended to the project path, and will form the Service Desk email address."
+msgstr ""
+
 msgid "Project order will not be saved as local storage is not available."
 msgstr ""
 
