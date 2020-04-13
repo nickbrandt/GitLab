@@ -36,7 +36,7 @@ export default {
 
 <template>
   <div>
-    <div>
+    <div class="border-bottom pb-4">
       <h3>{{ s__('StaticSiteEditor|Success!') }}</h3>
       <p>
         {{
@@ -59,9 +59,7 @@ export default {
       </div>
     </div>
 
-    <hr />
-
-    <div>
+    <div class="pt-2">
       <h4>{{ s__('StaticSiteEditor|Summary of changes') }}</h4>
       <ul>
         <li>
