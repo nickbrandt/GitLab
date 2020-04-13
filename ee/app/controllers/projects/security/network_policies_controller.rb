@@ -19,7 +19,7 @@ module Projects
           interval: params[:interval] || "minute",
           from:     (Time.parse(params[:from]) rescue 1.hour.ago),
           to:       (Time.parse(params[:to]) rescue Time.now)
-        )
+        ) || {}
 
         respond_to do |format|
           format.json do

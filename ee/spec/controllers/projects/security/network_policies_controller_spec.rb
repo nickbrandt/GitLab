@@ -88,6 +88,15 @@ describe Projects::Security::NetworkPoliciesController do
             end
           end
         end
+
+        context 'with nil results' do
+          it 'returns network policies summary' do
+            allow(adapter).to receive(:query).and_return(nil)
+            subject
+
+            expect(response).to have_gitlab_http_status(:bad_request)
+          end
+        end
       end
 
       context 'without prometheus configured' do
