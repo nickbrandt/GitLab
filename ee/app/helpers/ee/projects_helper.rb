@@ -192,7 +192,11 @@ module EE
     end
 
     def decorated_subscription
-      SubscriptionPresenter.new(@project.gitlab_subscription)
+      subscription = @project.gitlab_subscription
+
+      return unless subscription
+
+      SubscriptionPresenter.new(subscription)
     end
 
     override :membership_locked?

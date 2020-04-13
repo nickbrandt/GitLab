@@ -5,7 +5,7 @@
   - subscribable = License.current
   - message = license_message(license: subscribable)
 
-- if message.present?
+- if message.present? && subscribable.present?
   .container-fluid.container-limited.pt-3
     .alert.alert-dismissible.gitlab-ee-license-banner.hidden.js-gitlab-ee-license-banner.pb-5.border-width-1px.border-style-solid.border-color-default.border-radius-default{ role: 'alert', data: { license_expiry: subscribable.expires_at } }
       %button.close.p-2{ type: 'button', 'data-dismiss' => 'alert', 'aria-label' => 'Dismiss banner' }

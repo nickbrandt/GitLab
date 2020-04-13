@@ -16,7 +16,7 @@ describe LicenseHelper do
       allow(License).to receive(:current).and_return(license)
     end
 
-    it 'calls another class with args' do
+    it 'calls Gitlab::ExpiringSubscriptionMessage to get expiring message' do
       expect(Gitlab::ExpiringSubscriptionMessage).to receive(:new).with(
         subscribable: license,
         signed_in: true,
@@ -93,23 +93,19 @@ describe LicenseHelper do
 
   describe '#current_license_title' do
     context 'when there is a current license' do
-      context 'and it has a plan associated to it' do
-        it 'returns the plan titleized' do
-          custom_plan = 'custom plan'
-          license = double('License', plan: custom_plan)
-          allow(License).to receive(:current).and_return(license)
+      it 'returns the plan titleized if it has a plan associated to it' do
+        custom_plan = 'custom plan'
+        license = double('License', plan: custom_plan)
+        allow(License).to receive(:current).and_return(license)
 
-          expect(current_license_title).to eq(custom_plan.titleize)
-        end
+        expect(current_license_title).to eq(custom_plan.titleize)
       end
 
-      context 'and it does not have a plan associated to it' do
-        it 'returns the default title' do
-          license = double('License', plan: nil)
-          allow(License).to receive(:current).and_return(license)
+      it 'returns the default title if it does not have a plan associated to it' do
+        license = double('License', plan: nil)
+        allow(License).to receive(:current).and_return(license)
 
-          expect(current_license_title).to eq('Core')
-        end
+        expect(current_license_title).to eq('Core')
       end
     end
 

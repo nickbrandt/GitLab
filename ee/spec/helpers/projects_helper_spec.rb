@@ -237,7 +237,7 @@ describe ProjectsHelper do
       expect(helper.subscription_message).to be_nil
     end
 
-    it 'calls 2 classes if is Gitlab.com?' do
+    it 'calls Gitlab::ExpiringSubscriptionMessage and SubscriptionPresenter if is Gitlab.com?' do
       allow(Gitlab).to receive(:com?).and_return(true)
       allow(helper).to receive(:signed_in?).and_return(true)
       allow(helper).to receive(:current_user).and_return(user)
@@ -254,6 +254,28 @@ describe ProjectsHelper do
       expect(message_mock).to receive(:message).and_return('hey yay yay yay')
 
       expect(helper.subscription_message).to eq('hey yay yay yay')
+    end
+  end
+
+  describe '#decorated_subscription' do
+    subject { helper.decorated_subscription }
+
+    context 'when a subscription exists' do
+      let(:gitlab_subscription) { build_stubbed(:gitlab_subscription) }
+
+      it 'returns a decorator' do
+        allow(project).to receive(:gitlab_subscription).and_return(gitlab_subscription)
+
+        expect(subject).to be_a(SubscriptionPresenter)
+      end
+    end
+
+    context 'when no subscription exists' do
+      it 'returns a nil object' do
+        allow(project).to receive(:gitlab_subscription).and_return(nil)
+
+        expect(subject).to be_nil
+      end
     end
   end
 end
