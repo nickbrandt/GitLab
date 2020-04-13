@@ -40,8 +40,10 @@ export default {
   },
 
   created() {
+    // window.location.pathname is the URL without the protocol or hash/querystring
+    // i.e. http://server/url?query=string#note_123 -> /server/url
     axios
-      .get(joinPaths(window.location.href, 'discussions'))
+      .get(joinPaths(window.location.pathname, 'discussions'))
       .then(({ data }) => {
         this.discussions = data;
       })
