@@ -68,9 +68,11 @@ module Gitlab
             clusters_enabled: count(::Clusters::Cluster.enabled),
             project_clusters_enabled: count(::Clusters::Cluster.enabled.project_type),
             group_clusters_enabled: count(::Clusters::Cluster.enabled.group_type),
+            instance_clusters_enabled: count(::Clusters::Cluster.enabled.instance_type),
             clusters_disabled: count(::Clusters::Cluster.disabled),
             project_clusters_disabled: count(::Clusters::Cluster.disabled.project_type),
             group_clusters_disabled: count(::Clusters::Cluster.disabled.group_type),
+            instance_clusters_disabled: count(::Clusters::Cluster.disabled.instance_type),
             clusters_platforms_eks: count(::Clusters::Cluster.aws_installed.enabled),
             clusters_platforms_gke: count(::Clusters::Cluster.gcp_installed.enabled),
             clusters_platforms_user: count(::Clusters::Cluster.user_provided.enabled),
@@ -83,6 +85,7 @@ module Gitlab
             clusters_applications_knative: count(::Clusters::Applications::Knative.available),
             clusters_applications_elastic_stack: count(::Clusters::Applications::ElasticStack.available),
             clusters_applications_jupyter: count(::Clusters::Applications::Jupyter.available),
+            clusters_management_project: count(::Clusters::Cluster.with_management_project),
             in_review_folder: count(::Environment.in_review_folder),
             grafana_integrated_projects: count(GrafanaIntegration.enabled),
             groups: count(Group),
@@ -90,7 +93,7 @@ module Gitlab
             issues_created_from_gitlab_error_tracking_ui: count(SentryIssue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: distinct_count(ZoomMeeting, :issue_id),
-            issues_with_embedded_grafana_charts_approx: ::Gitlab::GrafanaEmbedUsageData.issue_count,
+            issues_with_embedded_grafana_charts_approx: grafana_embed_usage_data,
             incident_issues: count(::Issue.authored(::User.alert_bot)),
             keys: count(Key),
             label_lists: count(List.label),
@@ -133,6 +136,14 @@ module Gitlab
         { avg_cycle_analytics: {} }
       end
 
+      # rubocop:disable CodeReuse/ActiveRecord
+      def grafana_embed_usage_data
+        count(Issue.joins('JOIN grafana_integrations USING (project_id)')
+          .where("issues.description LIKE '%' || grafana_integrations.grafana_url || '%'")
+          .where(grafana_integrations: { enabled: true }))
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
       def features_usage_data
         features_usage_data_ce
       end
@@ -152,8 +163,31 @@ module Gitlab
           signup_enabled: alt_usage_data { Gitlab::CurrentSettings.allow_signup? },
           web_ide_clientside_preview_enabled: alt_usage_data { Gitlab::CurrentSettings.web_ide_clientside_preview_enabled? },
           ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
-        }
+        }.merge(features_usage_data_container_expiration_policies)
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def features_usage_data_container_expiration_policies
+        results = {}
+        start = ::Project.minimum(:id)
+        finish = ::Project.maximum(:id)
+
+        results[:projects_with_expiration_policy_disabled] = distinct_count(::ContainerExpirationPolicy.where(enabled: false), :project_id, start: start, finish: finish)
+        base = ::ContainerExpirationPolicy.active
+        results[:projects_with_expiration_policy_enabled] = distinct_count(base, :project_id, start: start, finish: finish)
+
+        %i[keep_n cadence older_than].each do |option|
+          ::ContainerExpirationPolicy.public_send("#{option}_options").keys.each do |value| # rubocop: disable GitlabSecurity/PublicSend
+            results["projects_with_expiration_policy_enabled_with_#{option}_set_to_#{value}".to_sym] = distinct_count(base.where(option => value), :project_id, start: start, finish: finish)
+          end
+        end
+
+        results[:projects_with_expiration_policy_enabled_with_keep_n_unset] = distinct_count(base.where(keep_n: nil), :project_id, start: start, finish: finish)
+        results[:projects_with_expiration_policy_enabled_with_older_than_unset] = distinct_count(base.where(older_than: nil), :project_id, start: start, finish: finish)
+
+        results
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       # @return [Hash<Symbol, Integer>]
       def usage_counters

@@ -2,8 +2,8 @@
   - subscribable = decorated_subscription
   - message = subscription_message
 - else
-  - subscribable = current_license
-  - message = license_message
+  - subscribable = License.current
+  - message = license_message(license: subscribable)
 
 - if message.present?
   .container-fluid.container-limited.pt-3

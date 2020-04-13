@@ -2650,7 +2650,8 @@ CREATE TABLE public.geo_node_statuses (
     design_repositories_count integer,
     design_repositories_synced_count integer,
     design_repositories_failed_count integer,
-    design_repositories_registry_count integer
+    design_repositories_registry_count integer,
+    status jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE public.geo_node_statuses_id_seq
@@ -4492,6 +4493,11 @@ CREATE SEQUENCE public.packages_packages_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.packages_packages_id_seq OWNED BY public.packages_packages.id;
+
+CREATE TABLE public.packages_pypi_metadata (
+    package_id bigint NOT NULL,
+    required_python character varying(50) NOT NULL
+);
 
 CREATE TABLE public.packages_tags (
     id bigint NOT NULL,
@@ -8146,6 +8152,9 @@ ALTER TABLE ONLY public.packages_package_files
 ALTER TABLE ONLY public.packages_packages
     ADD CONSTRAINT packages_packages_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT packages_pypi_metadata_pkey PRIMARY KEY (package_id);
+
 ALTER TABLE ONLY public.packages_tags
     ADD CONSTRAINT packages_tags_pkey PRIMARY KEY (id);
 
@@ -10036,6 +10045,8 @@ CREATE INDEX index_resource_label_events_on_merge_request_id ON public.resource_
 
 CREATE INDEX index_resource_label_events_on_user_id ON public.resource_label_events USING btree (user_id);
 
+CREATE INDEX index_resource_milestone_events_created_at ON public.resource_milestone_events USING btree (created_at);
+
 CREATE INDEX index_resource_milestone_events_on_issue_id ON public.resource_milestone_events USING btree (issue_id);
 
 CREATE INDEX index_resource_milestone_events_on_merge_request_id ON public.resource_milestone_events USING btree (merge_request_id);
@@ -11594,6 +11605,9 @@ ALTER TABLE ONLY public.board_labels
 ALTER TABLE ONLY public.scim_identities
     ADD CONSTRAINT fk_rails_9421a0bffb FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT fk_rails_9698717cdd FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.packages_dependency_links
     ADD CONSTRAINT fk_rails_96ef1c00d3 FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
 
@@ -13007,6 +13021,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200311165635
 20200311192351
 20200311214912
+20200312053852
 20200312125121
 20200312160532
 20200312163407
@@ -13029,6 +13044,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200318164448
 20200318165448
 20200318175008
+20200318183553
 20200319071702
 20200319123041
 20200319124127
@@ -13061,6 +13077,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200331132103
 20200331195952
 20200331220930
+20200401095430
 20200401211005
 20200402123926
 20200402124802
@@ -13069,7 +13086,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200403184110
 20200403185127
 20200403185422
+20200406135648
 20200407094005
 20200407094923
+20200408110856
 \.
 

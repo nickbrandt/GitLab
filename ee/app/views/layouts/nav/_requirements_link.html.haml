@@ -9,12 +9,12 @@
       = sprite_icon('requirements')
     %span.nav-item-name
       = _('Requirements')
-    %span.badge.badge-pill.count= number_with_delimiter(total_count)
+    %span.badge.badge-pill.count.js-nav-requirements-count= number_with_delimiter(total_count)
   %ul.sidebar-sub-level-items
     = nav_link(path: 'requirements#index', html_options: { class: "fly-out-top-item" } ) do
       = link_to project_requirements_path(project) do
         %strong.fly-out-top-item-name= _('Requirements')
-        %span.badge.badge-pill.count.requirements_counter.fly-out-badge= number_with_delimiter(total_count)
+        %span.badge.badge-pill.count.requirements_counter.fly-out-badge.js-nav-requirements-count-fly-out= number_with_delimiter(total_count)
     %li.divider.fly-out-top-item
     = nav_link(path: 'requirements#index', html_options: { class: 'home' }) do
       = link_to project_requirements_path(project), title: 'List' do

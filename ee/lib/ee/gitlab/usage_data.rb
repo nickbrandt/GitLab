@@ -202,19 +202,22 @@ module EE
         # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
-            clusters_applications_cert_managers: clusters_user_distinct_count(::Clusters::Applications::CertManager, time_period),
-            clusters_applications_helm: clusters_user_distinct_count(::Clusters::Applications::Helm, time_period),
-            clusters_applications_ingress: clusters_user_distinct_count(::Clusters::Applications::Ingress, time_period),
-            clusters_applications_knative: clusters_user_distinct_count(::Clusters::Applications::Knative, time_period),
-            clusters_disabled: distinct_count(::Clusters::Cluster.disabled.where(time_period), :user_id),
-            clusters_enabled: distinct_count(::Clusters::Cluster.enabled.where(time_period), :user_id),
-            clusters_platforms_gke: distinct_count(::Clusters::Cluster.gcp_installed.enabled.where(time_period), :user_id),
-            clusters_platforms_eks: distinct_count(::Clusters::Cluster.aws_installed.enabled.where(time_period), :user_id),
-            clusters_platforms_user: distinct_count(::Clusters::Cluster.user_provided.enabled.where(time_period), :user_id),
-            group_clusters_disabled: distinct_count(::Clusters::Cluster.disabled.group_type.where(time_period), :user_id),
-            group_clusters_enabled: distinct_count(::Clusters::Cluster.enabled.group_type.where(time_period), :user_id),
-            project_clusters_disabled: distinct_count(::Clusters::Cluster.disabled.project_type.where(time_period), :user_id),
-            project_clusters_enabled: distinct_count(::Clusters::Cluster.enabled.project_type.where(time_period), :user_id),
+            clusters_applications_cert_managers: cluster_applications_user_distinct_count(::Clusters::Applications::CertManager, time_period),
+            clusters_applications_helm: cluster_applications_user_distinct_count(::Clusters::Applications::Helm, time_period),
+            clusters_applications_ingress: cluster_applications_user_distinct_count(::Clusters::Applications::Ingress, time_period),
+            clusters_applications_knative: cluster_applications_user_distinct_count(::Clusters::Applications::Knative, time_period),
+            clusters_management_project: clusters_user_distinct_count(::Clusters::Cluster.with_management_project, time_period),
+            clusters_disabled: clusters_user_distinct_count(::Clusters::Cluster.disabled, time_period),
+            clusters_enabled: clusters_user_distinct_count(::Clusters::Cluster.enabled, time_period),
+            clusters_platforms_gke: clusters_user_distinct_count(::Clusters::Cluster.gcp_installed.enabled, time_period),
+            clusters_platforms_eks: clusters_user_distinct_count(::Clusters::Cluster.aws_installed.enabled, time_period),
+            clusters_platforms_user: clusters_user_distinct_count(::Clusters::Cluster.user_provided.enabled, time_period),
+            instance_clusters_disabled: clusters_user_distinct_count(::Clusters::Cluster.disabled.instance_type, time_period),
+            instance_clusters_enabled: clusters_user_distinct_count(::Clusters::Cluster.enabled.instance_type, time_period),
+            group_clusters_disabled: clusters_user_distinct_count(::Clusters::Cluster.disabled.group_type, time_period),
+            group_clusters_enabled: clusters_user_distinct_count(::Clusters::Cluster.enabled.group_type, time_period),
+            project_clusters_disabled: clusters_user_distinct_count(::Clusters::Cluster.disabled.project_type, time_period),
+            project_clusters_enabled: clusters_user_distinct_count(::Clusters::Cluster.enabled.project_type, time_period),
             projects_slack_notifications_active: distinct_count(::Project.with_slack_service.where(time_period), :creator_id),
             projects_slack_slash_active: distinct_count(::Project.with_slack_slash_commands_service.where(time_period), :creator_id),
             projects_with_prometheus_alerts: distinct_count(::Project.with_prometheus_service.where(time_period), :creator_id)
@@ -257,7 +260,7 @@ module EE
         def usage_activity_by_stage_monitor(time_period)
           {
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
-            clusters_applications_prometheus: clusters_user_distinct_count(::Clusters::Applications::Prometheus, time_period),
+            clusters_applications_prometheus: cluster_applications_user_distinct_count(::Clusters::Applications::Prometheus, time_period),
             operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
             operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
@@ -315,7 +318,7 @@ module EE
             ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
             ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id),
             ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
-            clusters_applications_runner: clusters_user_distinct_count(::Clusters::Applications::Runner, time_period),
+            clusters_applications_runner: cluster_applications_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
           }
         end
@@ -351,8 +354,12 @@ module EE
           distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
         end
 
+        def cluster_applications_user_distinct_count(applications, time_period)
+          distinct_count(applications.where(time_period).available.joins(:cluster), 'clusters.user_id')
+        end
+
         def clusters_user_distinct_count(clusters, time_period)
-          distinct_count(clusters.where(time_period).available.joins(:cluster), 'clusters.user_id')
+          distinct_count(clusters.where(time_period), :user_id)
         end
         # rubocop:enable CodeReuse/ActiveRecord
       end

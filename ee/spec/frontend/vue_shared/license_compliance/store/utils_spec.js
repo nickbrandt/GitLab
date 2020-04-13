@@ -4,6 +4,8 @@ import {
   getStatusTranslationsFromLicenseStatus,
   getIssueStatusFromLicenseStatus,
   convertToOldReportFormat,
+  addLicensesMatchingReportGroupStatus,
+  reportGroupHasAtLeastOneLicense,
 } from 'ee/vue_shared/license_compliance/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
 import { licenseReport } from '../mock_data';
@@ -110,5 +112,56 @@ describe('utils', () => {
     it('should retain the license name', () => {
       expect(parsedLicense.name).toEqual(rawLicense.name);
     });
+  });
+
+  describe('addLicensesMatchingReportGroupStatus', () => {
+    describe('with matching licenses', () => {
+      it(`adds a "licenses" property containing an array of licenses matching the report's status to the report object`, () => {
+        const licenses = [
+          { status: 'match' },
+          { status: 'no-match' },
+          { status: 'match' },
+          { status: 'no-match' },
+        ];
+        const reportGroup = { description: 'description', status: 'match' };
+
+        expect(addLicensesMatchingReportGroupStatus(licenses)(reportGroup)).toEqual({
+          ...reportGroup,
+          licenses: [licenses[0], licenses[2]],
+        });
+      });
+    });
+
+    describe('without matching licenses', () => {
+      it('adds a "licenses" property containing an empty array to the report object', () => {
+        const licenses = [
+          { status: 'no-match' },
+          { status: 'no-match' },
+          { status: 'no-match' },
+          { status: 'no-match' },
+        ];
+        const reportGroup = { description: 'description', status: 'match' };
+
+        expect(addLicensesMatchingReportGroupStatus(licenses)(reportGroup)).toEqual({
+          ...reportGroup,
+          licenses: [],
+        });
+      });
+    });
+  });
+
+  describe('reportGroupHasAtLeastOneLicense', () => {
+    it.each`
+      givenReportGroup                   | expected
+      ${{ licenses: [{ foo: 'foo ' }] }} | ${true}
+      ${{ licenses: [] }}                | ${false}
+      ${{ licenses: null }}              | ${false}
+      ${{ licenses: undefined }}         | ${false}
+    `(
+      'returns "$expected" if the given report-group contains $licenses.length licenses',
+      ({ givenReportGroup, expected }) => {
+        expect(reportGroupHasAtLeastOneLicense(givenReportGroup)).toBe(expected);
+      },
+    );
   });
 });

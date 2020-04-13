@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Design management list item component when item appears in view renders media broken icon when image onerror triggered 1`] = `
+exports[`Design management list item component when item appears in view after image is loaded renders media broken icon when image onerror triggered 1`] = `
 <gl-icon-stub
   class="text-secondary"
   name="media-broken"

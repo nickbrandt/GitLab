@@ -425,6 +425,39 @@ describe('Design management design presentation component', () => {
     });
   });
 
+  describe('onPresentationMouseUp when design is overflowing', () => {
+    it('does not open a comment form if design was dragged', () => {
+      const startDragPosition = { x: 1, y: 1 };
+      const lastDragPosition = { x: 2, y: 2 };
+      createComponent({}, { startDragPosition, lastDragPosition });
+
+      wrapper.vm.onPresentationMouseup({ offsetX: 2, offsetY: 2 });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('openCommentForm')).toBeFalsy();
+      });
+    });
+
+    it('opens a comment form if design was not dragged', () => {
+      const startDragPosition = { x: 1, y: 1 };
+      const lastDragPosition = { x: 1, y: 1 };
+      createComponent(
+        {},
+        {
+          startDragPosition,
+          lastDragPosition,
+          ...mockOverlayData,
+        },
+      );
+
+      wrapper.vm.onPresentationMouseup({ offsetX: 2, offsetY: 2 });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('openCommentForm')).toBeDefined();
+      });
+    });
+  });
+
   describe('when clicking and dragging', () => {
     it.each`
       description               | useTouchEvents

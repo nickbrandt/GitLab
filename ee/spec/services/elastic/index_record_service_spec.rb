@@ -5,6 +5,11 @@ require 'spec_helper'
 describe Elastic::IndexRecordService, :elastic do
   subject { described_class.new }
 
+  # Create admin user and search globally to avoid dealing with permissions in
+  # these tests
+  let(:user) { create(:admin) }
+  let(:search_options) { { options: { current_user: user, project_ids: :any } } }
+
   before do
     stub_ee_application_setting(elasticsearch_indexing: true)
 
@@ -27,13 +32,21 @@ describe Elastic::IndexRecordService, :elastic do
       it 'indexes new records' do
         object = create(type)
 
+        Sidekiq::Testing.disable! do
+          if type != :project
+            # You cannot find anything in the index if it's parent project is
+            # not first indexed.
+            subject.execute(object.project, true)
+          end
+        end
+
         # Prevent records from being added via bulk indexing updates
         ::Elastic::ProcessBookkeepingService.clear_tracking!
 
         expect do
           expect(subject.execute(object, true)).to eq(true)
           ensure_elasticsearch_index!
-        end.to change { Elasticsearch::Model.search('*').records.size }.by(1)
+        end.to change { object.class.elastic_search('*', search_options).total_count }.by(1)
       end
 
       it 'updates the index when object is changed' do
@@ -41,6 +54,13 @@ describe Elastic::IndexRecordService, :elastic do
 
         Sidekiq::Testing.disable! do
           object = create(type)
+
+          if type != :project
+            # You cannot find anything in the index if it's parent project is
+            # not first indexed.
+            subject.execute(object.project, true)
+          end
+
           expect(subject.execute(object, true)).to eq(true)
           object.update(attribute => "new")
         end
@@ -48,7 +68,7 @@ describe Elastic::IndexRecordService, :elastic do
         expect do
           expect(subject.execute(object, false)).to eq(true)
           ensure_elasticsearch_index!
-        end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
+        end.to change { object.class.elastic_search('new', search_options).total_count }.by(1)
       end
 
       it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound errors' do
@@ -74,7 +94,11 @@ describe Elastic::IndexRecordService, :elastic do
       end
 
       # Nothing should be in the index at this point
-      expect(Elasticsearch::Model.search('*').total_count).to be(0)
+      expect(Project.elastic_search('*', search_options).total_count).to be(0)
+      expect(Issue.elastic_search('*', search_options).total_count).to be(0)
+      expect(Milestone.elastic_search('*', search_options).total_count).to be(0)
+      expect(MergeRequest.elastic_search('*', search_options).total_count).to be(0)
+      expect(ProjectSnippet.elastic_search('*', search_options).total_count).to be(0)
     end
 
     it 'indexes records associated with the project' do

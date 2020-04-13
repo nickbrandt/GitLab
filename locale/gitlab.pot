@@ -71,6 +71,11 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "%d URL scanned"
+msgid_plural "%d URLs scanned"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d changed file"
 msgid_plural "%d changed files"
 msgstr[0] ""
@@ -929,6 +934,9 @@ msgid "Accept invitation"
 msgstr ""
 
 msgid "Accept terms"
+msgstr ""
+
+msgid "Acceptable for use in this project"
 msgstr ""
 
 msgid "Accepted MR"
@@ -3842,9 +3850,6 @@ msgstr ""
 msgid "Choose which shards you wish to synchronize to this secondary node"
 msgstr ""
 
-msgid "Choose which status most accurately reflects the current state of this issue:"
-msgstr ""
-
 msgid "Choose your framework"
 msgstr ""
 
@@ -4001,6 +4006,9 @@ msgstr ""
 msgid "Class"
 msgstr ""
 
+msgid "Class:"
+msgstr ""
+
 msgid "Classification Label (optional)"
 msgstr ""
 
@@ -4125,6 +4133,9 @@ msgid "Closed: %{closedIssuesCount}"
 msgstr ""
 
 msgid "Closes this %{quick_action_target}."
+msgstr ""
+
+msgid "Cluster"
 msgstr ""
 
 msgid "Cluster Health"
@@ -6645,6 +6656,11 @@ msgid_plural "Dependencies|%d vulnerabilities"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Dependencies|%d vulnerability detected"
+msgid_plural "Dependencies|%d vulnerabilities detected"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Dependencies|%{remainingLicensesCount} more"
 msgstr ""
 
@@ -6682,6 +6698,9 @@ msgid "Dependencies|Status"
 msgstr ""
 
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
+msgstr ""
+
+msgid "Dependencies|Toggle vulnerability list"
 msgstr ""
 
 msgid "Dependencies|Unsupported file(s) detected"
@@ -8999,6 +9018,9 @@ msgstr ""
 msgid "File upload error."
 msgstr ""
 
+msgid "File:"
+msgstr ""
+
 msgid "Files"
 msgstr ""
 
@@ -9147,6 +9169,9 @@ msgid "Font Color"
 msgstr ""
 
 msgid "Footer message"
+msgstr ""
+
+msgid "For each Jira issue successfully imported, we'll create a new GitLab issue with the following data:"
 msgstr ""
 
 msgid "For internal projects, any logged in user can view pipelines and access job details (output logs and artifacts)"
@@ -10112,6 +10137,15 @@ msgstr ""
 msgid "Group details"
 msgstr ""
 
+msgid "Group export could not be started."
+msgstr ""
+
+msgid "Group export link has expired. Please generate a new export from your group settings."
+msgstr ""
+
+msgid "Group export started."
+msgstr ""
+
 msgid "Group has been already marked for deletion"
 msgstr ""
 
@@ -10869,6 +10903,9 @@ msgstr ""
 msgid "Import an exported GitLab project"
 msgstr ""
 
+msgid "Import from"
+msgstr ""
+
 msgid "Import from Jira"
 msgstr ""
 
@@ -11274,6 +11311,9 @@ msgid "Issue events"
 msgstr ""
 
 msgid "Issue first depoloyed to production"
+msgstr ""
+
+msgid "Issue label"
 msgstr ""
 
 msgid "Issue or Merge Request ID is required"
@@ -11991,6 +12031,15 @@ msgstr ""
 msgid "LicenseCompliance|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
+msgid "LicenseManagement|Allowed"
+msgstr ""
+
+msgid "LicenseManagement|Denied"
+msgstr ""
+
+msgid "LicenseManagement|Uncategorized"
+msgstr ""
+
 msgid "Licensed Features"
 msgstr ""
 
@@ -12162,6 +12211,9 @@ msgid "Loading…"
 msgstr ""
 
 msgid "Localization"
+msgstr ""
+
+msgid "Location"
 msgstr ""
 
 msgid "Lock"
@@ -12743,6 +12795,9 @@ msgstr ""
 msgid "Method"
 msgstr ""
 
+msgid "Method:"
+msgstr ""
+
 msgid "Metric was successfully added."
 msgstr ""
 
@@ -13268,6 +13323,9 @@ msgid_plural "New Issues"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "New Jira import"
+msgstr ""
+
 msgid "New Label"
 msgstr ""
 
@@ -13545,6 +13603,9 @@ msgid "No parent group"
 msgstr ""
 
 msgid "No pods available"
+msgstr ""
+
+msgid "No policy matches this license"
 msgstr ""
 
 msgid "No preview for this file type"
@@ -14075,6 +14136,9 @@ msgid "Other merge requests block this MR"
 msgstr ""
 
 msgid "Other visibility settings have been disabled by the administrator."
+msgstr ""
+
+msgid "Out-of-compliance with this project's policies and should be removed"
 msgstr ""
 
 msgid "Outbound requests"
@@ -16898,6 +16962,9 @@ msgstr ""
 msgid "Rename/Move"
 msgstr ""
 
+msgid "Reopen"
+msgstr ""
+
 msgid "Reopen epic"
 msgstr ""
 
@@ -16950,6 +17017,9 @@ msgid "Report abuse to admin"
 msgstr ""
 
 msgid "Reported %{timeAgo} by %{reportedBy}"
+msgstr ""
+
+msgid "Reporter"
 msgstr ""
 
 msgid "Reporting"
@@ -17091,6 +17161,9 @@ msgid "Require users to prove ownership of custom domains"
 msgstr ""
 
 msgid "Requirement"
+msgstr ""
+
+msgid "Requirement title cannot have more than %{limit} characters."
 msgstr ""
 
 msgid "Requirements"
@@ -17841,9 +17914,6 @@ msgstr ""
 msgid "SecurityConfiguration|Status"
 msgstr ""
 
-msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
-msgstr ""
-
 msgid "SecurityDashboard|%{firstProject} and %{secondProject}"
 msgstr ""
 
@@ -17902,6 +17972,12 @@ msgid "SecurityDashboard|Status"
 msgstr ""
 
 msgid "SecurityDashboard|The security dashboard displays the latest security findings for projects you wish to monitor. Select \"Edit dashboard\" to add and remove projects."
+msgstr ""
+
+msgid "SecurityDashboard|The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
+msgstr ""
+
+msgid "SecurityDashboard|There was an error while generating the report."
 msgstr ""
 
 msgid "SecurityDashboard|Unable to add %{invalidProjects}"
@@ -17983,6 +18059,9 @@ msgid "Select group or project"
 msgstr ""
 
 msgid "Select groups to replicate"
+msgstr ""
+
+msgid "Select health status"
 msgstr ""
 
 msgid "Select labels"
@@ -18315,6 +18394,12 @@ msgstr ""
 msgid "Set up CI/CD"
 msgstr ""
 
+msgid "Set up Jira Integration"
+msgstr ""
+
+msgid "Set up Jira Integration illustration"
+msgstr ""
+
 msgid "Set up a %{type} Runner automatically"
 msgstr ""
 
@@ -18515,16 +18600,22 @@ msgstr ""
 msgid "Side-by-side"
 msgstr ""
 
+msgid "Sidebar|Assign health status"
+msgstr ""
+
 msgid "Sidebar|Change weight"
+msgstr ""
+
+msgid "Sidebar|Health status"
+msgstr ""
+
+msgid "Sidebar|No status"
 msgstr ""
 
 msgid "Sidebar|None"
 msgstr ""
 
 msgid "Sidebar|Only numeral characters allowed"
-msgstr ""
-
-msgid "Sidebar|Status"
 msgstr ""
 
 msgid "Sidebar|Weight"
@@ -18752,6 +18843,9 @@ msgstr ""
 msgid "Something went wrong while applying the suggestion. Please try again."
 msgstr ""
 
+msgid "Something went wrong while archiving a requirement."
+msgstr ""
+
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
 msgstr ""
 
@@ -18822,6 +18916,9 @@ msgid "Something went wrong while moving issues."
 msgstr ""
 
 msgid "Something went wrong while performing the action."
+msgstr ""
+
+msgid "Something went wrong while reopening a requirement."
 msgstr ""
 
 msgid "Something went wrong while reopening the %{issuable}. Please try again later"
@@ -19377,6 +19474,9 @@ msgid "Subject Key Identifier:"
 msgstr ""
 
 msgid "Subkeys"
+msgstr ""
+
+msgid "Submit Changes"
 msgstr ""
 
 msgid "Submit a review"
@@ -20501,7 +20601,7 @@ msgstr ""
 msgid "There was an error while fetching value stream analytics duration median data."
 msgstr ""
 
-msgid "There was an error while fetching value stream analytics summary data."
+msgid "There was an error while fetching value stream analytics recent activity data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
@@ -22565,6 +22665,9 @@ msgstr ""
 msgid "View deployment"
 msgstr ""
 
+msgid "View details"
+msgstr ""
+
 msgid "View details: %{details_url}"
 msgstr ""
 
@@ -23346,6 +23449,9 @@ msgstr ""
 msgid "You can move around the graph by using the arrow keys."
 msgstr ""
 
+msgid "You can now export your security dashboard to a CSV report."
+msgstr ""
+
 msgid "You can now submit a merge request to get this change into the original branch."
 msgstr ""
 
@@ -23569,6 +23675,9 @@ msgid "You tried to fork %{link_to_the_project} but it failed for the following 
 msgstr ""
 
 msgid "You will be removed from existing projects/groups"
+msgstr ""
+
+msgid "You will first need to set up Jira Integration to use this feature."
 msgstr ""
 
 msgid "You will lose all changes you've made to this file. This action cannot be undone."
@@ -24400,6 +24509,12 @@ msgstr ""
 msgid "jigsaw is not defined"
 msgstr ""
 
+msgid "jira.issue.description.content"
+msgstr ""
+
+msgid "jira.issue.summary"
+msgstr ""
+
 msgid "latest"
 msgstr ""
 
@@ -24882,9 +24997,6 @@ msgid "remove"
 msgstr ""
 
 msgid "remove due date"
-msgstr ""
-
-msgid "remove status"
 msgstr ""
 
 msgid "remove weight"

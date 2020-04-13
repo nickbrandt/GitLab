@@ -1,24 +1,28 @@
 <script>
+import Tracking from '~/tracking';
 import {
-  GlDeprecatedButton,
-  GlFormGroup,
-  GlFormRadioGroup,
   GlIcon,
+  GlNewButton,
   GlLoadingIcon,
   GlTooltip,
+  GlDropdownItem,
+  GlDropdown,
+  GlDropdownDivider,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import { healthStatusColorMap, healthStatusTextMap } from '../../constants';
+import { healthStatusTextMap } from '../../constants';
 
 export default {
   components: {
-    GlDeprecatedButton,
     GlIcon,
+    GlNewButton,
     GlLoadingIcon,
-    GlFormGroup,
-    GlFormRadioGroup,
     GlTooltip,
+    GlDropdown,
+    GlDropdownItem,
+    GlDropdownDivider,
   },
+  mixins: [Tracking.mixin()],
   props: {
     isEditable: {
       type: Boolean,
@@ -38,11 +42,11 @@ export default {
   },
   data() {
     return {
-      isFormShowing: false,
+      isDropdownShowing: false,
       selectedStatus: this.status,
       statusOptions: Object.keys(healthStatusTextMap).map(key => ({
-        value: key,
-        text: healthStatusTextMap[key],
+        key,
+        value: healthStatusTextMap[key],
       })),
     };
   },
@@ -53,11 +57,11 @@ export default {
     statusText() {
       return this.status ? healthStatusTextMap[this.status] : s__('Sidebar|None');
     },
-    statusColor() {
-      return healthStatusColorMap[this.status];
+    dropdownText() {
+      return this.status ? healthStatusTextMap[this.status] : s__('Select health status');
     },
     tooltipText() {
-      let tooltipText = s__('Sidebar|Status');
+      let tooltipText = s__('Sidebar|Health status');
 
       if (this.status) {
         tooltipText += `: ${this.statusText}`;
@@ -72,19 +76,33 @@ export default {
     },
   },
   methods: {
-    handleFormSubmission() {
-      this.$emit('onStatusChange', this.selectedStatus);
-      this.hideForm();
+    handleDropdownClick(status) {
+      this.selectedStatus = status;
+      this.$emit('onDropdownClick', status);
+      this.track('change_health_status', { property: status });
+      this.hideDropdown();
     },
-    hideForm() {
-      this.isFormShowing = false;
-      this.$refs.editButton.focus();
+    hideDropdown() {
+      this.isDropdownShowing = false;
     },
     toggleFormDropdown() {
-      this.isFormShowing = !this.isFormShowing;
+      this.isDropdownShowing = !this.isDropdownShowing;
+
+      /**
+       * We need to programmatically open the dropdown to make the
+       * outside click on document close the dropdown.
+       */
+      const { dropdown } = this.$refs.dropdown.$refs;
+
+      if (dropdown && this.isDropdownShowing) {
+        dropdown.show();
+      }
     },
     removeStatus() {
-      this.$emit('onStatusChange', null);
+      this.handleDropdownClick(null);
+    },
+    isSelected(status) {
+      return this.status === status;
     },
   },
 };
@@ -104,62 +122,75 @@ export default {
 
     <div class="hide-collapsed">
       <p class="title d-flex justify-content-between">
-        {{ s__('Sidebar|Status') }}
+        {{ s__('Sidebar|Health status') }}
         <a
           v-if="isEditable"
           ref="editButton"
           class="btn-link"
           href="#"
           @click="toggleFormDropdown"
-          @keydown.esc="hideForm"
+          @keydown.esc="hideDropdown"
         >
           {{ __('Edit') }}
         </a>
       </p>
 
-      <div v-if="isFormShowing" class="dropdown show">
-        <form class="dropdown-menu p-3" @submit.prevent="handleFormSubmission">
-          <p>
-            {{
-              __('Choose which status most accurately reflects the current state of this issue:')
-            }}
-          </p>
-          <gl-form-group>
-            <gl-form-radio-group
-              v-model="selectedStatus"
-              :checked="selectedStatus"
-              :options="statusOptions"
-              stacked
-              @keydown.esc.native="hideForm"
+      <div
+        class="dropdown dropdown-menu-selectable"
+        :class="{ show: isDropdownShowing, 'd-none': !isDropdownShowing }"
+      >
+        <gl-dropdown
+          ref="dropdown"
+          class="w-100"
+          :text="dropdownText"
+          @keydown.esc.native="hideDropdown"
+          @hide="hideDropdown"
+        >
+          <div class="dropdown-title">
+            <span class="health-title">{{ s__('Sidebar|Assign health status') }}</span>
+            <gl-new-button
+              :aria-label="__('Close')"
+              variant="link"
+              class="dropdown-title-button dropdown-menu-close"
+              icon="close"
+              @click="hideDropdown"
             />
-          </gl-form-group>
-          <gl-form-group class="mb-0">
-            <gl-deprecated-button type="button" class="append-right-10" @click="hideForm">
-              {{ __('Cancel') }}
-            </gl-deprecated-button>
-            <gl-deprecated-button type="submit" variant="success">
-              {{ __('Save') }}
-            </gl-deprecated-button>
-          </gl-form-group>
-        </form>
+          </div>
+
+          <div class="dropdown-content dropdown-body">
+            <gl-dropdown-item @click="handleDropdownClick(null)">
+              <gl-new-button
+                variant="link"
+                class="dropdown-item health-dropdown-item"
+                :class="{ 'is-active': isSelected(null) }"
+              >
+                {{ s__('Sidebar|No status') }}
+              </gl-new-button>
+            </gl-dropdown-item>
+
+            <gl-dropdown-divider class="divider health-divider" />
+
+            <gl-dropdown-item
+              v-for="option in statusOptions"
+              :key="option.key"
+              @click="handleDropdownClick(option.key)"
+            >
+              <gl-new-button
+                variant="link"
+                class="dropdown-item health-dropdown-item"
+                :class="{ 'is-active': isSelected(option.key) }"
+              >
+                {{ option.value }}
+              </gl-new-button>
+            </gl-dropdown-item>
+          </div>
+        </gl-dropdown>
       </div>
 
       <gl-loading-icon v-if="isFetching" :inline="true" />
-      <p v-else class="value d-flex align-items-center m-0" :class="{ 'no-value': !status }">
-        <gl-icon
-          v-if="status"
-          name="severity-low"
-          :size="14"
-          class="align-bottom append-right-10"
-          :class="statusColor"
-        />
-        {{ statusText }}
-        <template v-if="canRemoveStatus">
-          <span class="text-secondary mx-1" aria-hidden="true">-</span>
-          <gl-deprecated-button variant="link" class="text-secondary" @click="removeStatus">
-            {{ __('remove status') }}
-          </gl-deprecated-button>
-        </template>
+      <p v-else-if="!isDropdownShowing" class="value m-0" :class="{ 'no-value': !status }">
+        <span v-if="status" class="text-plain bold">{{ statusText }}</span>
+        <span v-else>{{ __('None') }}</span>
       </p>
     </div>
   </div>

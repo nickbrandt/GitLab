@@ -30,8 +30,10 @@ module API
                                 desc: 'Return packages with this name'
       end
       get ':id/packages' do
-        packages = ::Packages::PackagesFinder
-          .new(user_project, declared(params)).execute
+        packages = ::Packages::PackagesFinder.new(
+          user_project,
+          declared_params.slice(:order_by, :sort, :package_type, :package_name)
+        ).execute
 
         present paginate(packages), with: EE::API::Entities::Package, user: current_user
       end

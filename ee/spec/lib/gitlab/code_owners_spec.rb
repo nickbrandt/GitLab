@@ -29,7 +29,7 @@ describe Gitlab::CodeOwners do
       end
 
       it 'returns users for a blob' do
-        expect(described_class.for_blob(blob)).to include(code_owner)
+        expect(described_class.for_blob(project, blob)).to include(code_owner)
       end
     end
 
@@ -39,7 +39,7 @@ describe Gitlab::CodeOwners do
       end
 
       it 'returns no users' do
-        expect(described_class.for_blob(blob)).to be_empty
+        expect(described_class.for_blob(project, blob)).to be_empty
       end
     end
   end

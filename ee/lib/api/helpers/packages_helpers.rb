@@ -9,6 +9,10 @@ module API
         not_found! unless ::Gitlab.config.packages.enabled
       end
 
+      def require_dependency_proxy_enabled!
+        not_found! unless ::Gitlab.config.dependency_proxy.enabled
+      end
+
       def authorize_packages_feature!(subject = user_project)
         forbidden! unless subject.feature_available?(:packages)
       end

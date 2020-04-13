@@ -41,6 +41,7 @@ export default () => ({
     resolvedIssues: [],
     baseReportOutofDate: false,
     hasBaseReport: false,
+    scans: [],
   },
 
   dependencyScanning: {

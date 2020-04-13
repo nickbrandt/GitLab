@@ -177,7 +177,7 @@ describe EE::UserCalloutsHelper do
     let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
 
-    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
+    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
       true  | true  | true  | true  | true
       true  | true  | true  | false | false
       true  | true  | false | true  | false
@@ -201,7 +201,10 @@ describe EE::UserCalloutsHelper do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
         allow(helper).to receive(:has_some_namespaces_with_no_trials?) { has_some_namespaces_with_no_trials? }
-        namespace.update(plan: gold_plan) unless has_no_trial_or_gold_plan?
+
+        unless has_no_trial_or_paid_plan?
+          create(:gitlab_subscription, hosted_plan: gold_plan, namespace: namespace)
+        end
       end
 
       it do
@@ -210,6 +213,22 @@ describe EE::UserCalloutsHelper do
         else
           expect(helper).not_to receive(:render)
         end
+
+        helper.render_dashboard_gold_trial(user)
+      end
+    end
+
+    context 'when render_dashboard_gold_trial feature is disabled' do
+      before do
+        stub_feature_flags(render_dashboard_gold_trial: false)
+
+        allow(helper).to receive(:show_gold_trial?).and_return(true)
+        allow(helper).to receive(:user_default_dashboard?).and_return(true)
+        allow(helper).to receive(:has_some_namespaces_with_no_trials?).and_return(true)
+      end
+
+      it 'does not render' do
+        expect(helper).not_to receive(:render)
 
         helper.render_dashboard_gold_trial(user)
       end

@@ -192,6 +192,13 @@
   :resource_boundary: :cpu
   :weight: 1
   :idempotent: 
+- :name: dependency_proxy:purge_dependency_proxy_cache
+  :feature_category: :dependency_proxy
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: epics:epics_update_epics_dates
   :feature_category: :epics
   :has_external_dependencies: 

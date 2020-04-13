@@ -309,6 +309,7 @@ The following tables outline the details of expected properties.
 | `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. Can contain time series labels as interpolated variables. |
 | `query` | string | yes if `query_range` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
 | `query_range` | string | yes if `query` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query_range` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
+| `step` | number | no, value is calculated if not defined | Defines query resolution step width in float number of seconds. Metrics on the same panel should use the same `step` value. |
 
 ##### Dynamic labels
 
@@ -801,6 +802,22 @@ Metric charts may also be hidden:
 It is also possible to embed either the default dashboard metrics or individual metrics in issue templates. For charts to render side-by-side, links to the entire metrics dashboard or individual metrics should be separated by either a comma or a space.
 
 ![Embedded Metrics in issue templates](img/embed_metrics_issue_template.png)
+
+### Embedding metrics based on alerts in incident issues
+
+For [GitLab-managed alerting rules](#setting-up-alerts-for-prometheus-metrics-ultimate), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
+
+For [manually configured Prometheus instances](#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
+
+- The alert corresponds to an environment managed through GitLab.
+- The alert corresponds to a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries).
+- The alert contains the required attributes listed in the chart below.
+
+| Attributes | Required | Description |
+| ---------- | -------- | ----------- |
+| `annotations/gitlab_environment_name` | Yes | Name of the GitLab-managed environment corresponding to the alert |
+| One of `annotations/title`, `annotations/summary`, `labels/alertname` | Yes | Will be used as the chart title |
+| `annotations/gitlab_y_label` | No | Will be used as the chart's y-axis label |
 
 ### Embedding Cluster Health Charts **(ULTIMATE)**
 

@@ -1,21 +1,24 @@
-import Vue from 'vue';
 import Vuex from 'vuex';
-
 import LicenseManagement from 'ee/vue_shared/license_compliance/mr_widget_license_report.vue';
+import ReportSection from '~/reports/components/report_section.vue';
+import ReportItem from '~/reports/components/report_item.vue';
 import { LOADING, ERROR, SUCCESS } from 'ee/vue_shared/security_reports/store/constants';
-import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { TEST_HOST } from 'spec/test_constants';
 import {
   approvedLicense,
   blacklistedLicense,
   licenseReport as licenseReportMock,
+  generateReportGroup,
 } from './mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('License Report MR Widget', () => {
-  const Component = Vue.extend(LicenseManagement);
   const apiUrl = `${TEST_HOST}/license_management`;
   const securityApprovalsHelpPagePath = `${TEST_HOST}/path/to/security/approvals/help`;
-  let vm;
+  let wrapper;
 
   const defaultState = {
     managedLicenses: [approvedLicense, blacklistedLicense],
@@ -35,6 +38,9 @@ describe('License Report MR Widget', () => {
     },
     reportContainsBlacklistedLicense() {
       return false;
+    },
+    licenseReportGroups() {
+      return [];
     },
   };
 
@@ -60,6 +66,7 @@ describe('License Report MR Widget', () => {
     getters = defaultGetters,
     state = defaultState,
     actions = defaultActions,
+    stubs = {},
   } = {}) => {
     const store = new Vuex.Store({
       modules: {
@@ -71,15 +78,19 @@ describe('License Report MR Widget', () => {
         },
       },
     });
-    return mountComponentWithStore(Component, { props, store });
+    wrapper = shallowMount(LicenseManagement, {
+      localVue,
+      propsData: props,
+      store,
+      stubs,
+    });
   };
 
-  beforeEach(() => {
-    vm = mountComponent();
-  });
+  const findAllReportItems = () => wrapper.findAll(ReportItem);
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('computed', () => {
@@ -91,13 +102,15 @@ describe('License Report MR Widget', () => {
             return [];
           },
         };
-        vm = mountComponent({ getters });
+        mountComponent({ getters });
 
-        expect(vm.hasLicenseReportIssues).toBe(false);
+        expect(wrapper.vm.hasLicenseReportIssues).toBe(false);
       });
 
       it('should be true, if the report is not empty', () => {
-        expect(vm.hasLicenseReportIssues).toBe(true);
+        mountComponent();
+
+        expect(wrapper.vm.hasLicenseReportIssues).toBe(true);
       });
     });
 
@@ -109,20 +122,22 @@ describe('License Report MR Widget', () => {
             return true;
           },
         };
-        vm = mountComponent({ getters });
+        mountComponent({ getters });
 
-        expect(vm.licenseReportStatus).toBe(LOADING);
+        expect(wrapper.vm.licenseReportStatus).toBe(LOADING);
       });
 
       it('should be `ERROR`, if the report is has an error', () => {
         const state = { ...defaultState, loadLicenseReportError: new Error('test') };
-        vm = mountComponent({ state });
+        mountComponent({ state });
 
-        expect(vm.licenseReportStatus).toBe(ERROR);
+        expect(wrapper.vm.licenseReportStatus).toBe(ERROR);
       });
 
       it('should be `SUCCESS`, if the report is successful', () => {
-        expect(vm.licenseReportStatus).toBe(SUCCESS);
+        mountComponent();
+
+        expect(wrapper.vm.licenseReportStatus).toBe(SUCCESS);
       });
     });
 
@@ -131,16 +146,16 @@ describe('License Report MR Widget', () => {
 
       it('should be true if fullReportPath AND licenseManagementSettingsPath prop are provided', () => {
         const props = { ...otherProps, fullReportPath, licenseManagementSettingsPath };
-        vm = mountComponent({ props });
+        mountComponent({ props });
 
-        expect(vm.showActionButtons).toBe(true);
+        expect(wrapper.vm.showActionButtons).toBe(true);
       });
 
       it('should be true if only licenseManagementSettingsPath is provided', () => {
         const props = { ...otherProps, fullReportPath: null, licenseManagementSettingsPath };
-        vm = mountComponent({ props });
+        mountComponent({ props });
 
-        expect(vm.showActionButtons).toBe(true);
+        expect(wrapper.vm.showActionButtons).toBe(true);
       });
 
       it('should be true if only fullReportPath is provided', () => {
@@ -149,9 +164,9 @@ describe('License Report MR Widget', () => {
           fullReportPath,
           licenseManagementSettingsPath: null,
         };
-        vm = mountComponent({ props });
+        mountComponent({ props });
 
-        expect(vm.showActionButtons).toBe(true);
+        expect(wrapper.vm.showActionButtons).toBe(true);
       });
 
       it('should be false if fullReportPath and licenseManagementSettingsPath prop are not provided', () => {
@@ -160,39 +175,138 @@ describe('License Report MR Widget', () => {
           fullReportPath: null,
           licenseManagementSettingsPath: null,
         };
-        vm = mountComponent({ props });
+        mountComponent({ props });
 
-        expect(vm.showActionButtons).toBe(false);
+        expect(wrapper.vm.showActionButtons).toBe(false);
       });
     });
   });
 
-  it('should render report section wrapper', () => {
-    expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
-  });
+  describe('report section', () => {
+    it('should render correctly', () => {
+      const mockReportGroups = [generateReportGroup()];
 
-  it('should render report widget section', () => {
-    expect(vm.$el.querySelector('.report-block-container')).not.toBeNull();
+      mountComponent({
+        getters: {
+          ...defaultGetters,
+          licenseReportGroups() {
+            return mockReportGroups;
+          },
+        },
+      });
+
+      expect(wrapper.find(ReportSection).element).toMatchSnapshot();
+    });
+
+    describe('report body', () => {
+      it('should render correctly', () => {
+        const mockReportGroups = [generateReportGroup()];
+
+        mountComponent({
+          getters: {
+            ...defaultGetters,
+            licenseReportGroups() {
+              return mockReportGroups;
+            },
+          },
+          stubs: { ReportSection },
+        });
+
+        expect(wrapper.find({ ref: 'reportSectionBody' }).element).toMatchSnapshot();
+      });
+
+      it.each`
+        givenStatuses                       | expectedNumberOfReportHeadings
+        ${[]}                               | ${0}
+        ${['failed', 'neutral']}            | ${2}
+        ${['failed', 'neutral', 'success']} | ${3}
+      `(
+        'given reports for: $givenStatuses it has $expectedNumberOfReportHeadings report headings',
+        ({ givenStatuses, expectedNumberOfReportHeadings }) => {
+          const mockReportGroups = givenStatuses.map(status => generateReportGroup({ status }));
+
+          mountComponent({
+            getters: {
+              ...defaultGetters,
+              licenseReportGroups() {
+                return mockReportGroups;
+              },
+            },
+            stubs: { ReportSection },
+          });
+
+          expect(wrapper.findAll({ ref: 'reportHeading' }).length).toBe(
+            expectedNumberOfReportHeadings,
+          );
+        },
+      );
+
+      it.each([0, 1, 2])(
+        'should include %d report items when section has that many licenses',
+        numberOfLicenses => {
+          const mockReportGroups = [
+            generateReportGroup({
+              numberOfLicenses,
+            }),
+          ];
+
+          mountComponent({
+            getters: {
+              ...defaultGetters,
+              licenseReportGroups() {
+                return mockReportGroups;
+              },
+            },
+            stubs: { ReportSection },
+          });
+
+          expect(findAllReportItems().length).toBe(numberOfLicenses);
+        },
+      );
+
+      it('renders the report items in the correct order', () => {
+        const mockReportGroups = [
+          generateReportGroup({ status: 'failed', numberOfLicenses: 1 }),
+          generateReportGroup({ status: 'neutral', numberOfLicenses: 1 }),
+          generateReportGroup({ status: 'success', numberOfLicenses: 1 }),
+        ];
+
+        mountComponent({
+          getters: {
+            ...defaultGetters,
+            licenseReportGroups() {
+              return mockReportGroups;
+            },
+          },
+          stubs: { ReportSection },
+        });
+
+        const allReportItems = findAllReportItems();
+        mockReportGroups.forEach((group, index) => {
+          expect(allReportItems.at(index).props('status')).toBe(group.status);
+        });
+      });
+    });
   });
 
   describe('`View full report` button', () => {
     const selector = '.js-full-report';
 
     it('should be rendered when fullReportPath prop is provided', () => {
-      const linkEl = vm.$el.querySelector(selector);
+      mountComponent();
 
-      expect(linkEl).not.toBeNull();
-      expect(linkEl.getAttribute('href')).toEqual(defaultProps.fullReportPath);
-      expect(linkEl.textContent.trim()).toEqual('View full report');
+      const linkEl = wrapper.find(selector);
+
+      expect(linkEl.exists()).toBe(true);
+      expect(linkEl.attributes('href')).toEqual(defaultProps.fullReportPath);
+      expect(linkEl.text()).toBe('View full report');
     });
 
     it('should not be rendered when fullReportPath prop is not provided', () => {
       const props = { ...defaultProps, fullReportPath: null };
-      vm = mountComponent({ props });
+      mountComponent({ props });
 
-      const linkEl = vm.$el.querySelector(selector);
-
-      expect(linkEl).toBeNull();
+      expect(wrapper.contains(selector)).toBe(false);
     });
   });
 
@@ -200,25 +314,27 @@ describe('License Report MR Widget', () => {
     const selector = '.js-manage-licenses';
 
     it('should be rendered when licenseManagementSettingsPath prop is provided', () => {
-      const linkEl = vm.$el.querySelector(selector);
+      mountComponent();
 
-      expect(linkEl).not.toBeNull();
-      expect(linkEl.getAttribute('href')).toEqual(defaultProps.licenseManagementSettingsPath);
-      expect(linkEl.textContent.trim()).toEqual('Manage licenses');
+      const linkEl = wrapper.find(selector);
+
+      expect(linkEl.exists()).toBe(true);
+      expect(linkEl.attributes('href')).toEqual(defaultProps.licenseManagementSettingsPath);
+      expect(linkEl.text()).toBe('Manage licenses');
     });
 
     it('should not be rendered when licenseManagementSettingsPath prop is not provided', () => {
       const props = { ...defaultProps, licenseManagementSettingsPath: null };
-      vm = mountComponent({ props });
+      mountComponent({ props });
 
-      const linkEl = vm.$el.querySelector(selector);
-
-      expect(linkEl).toBeNull();
+      expect(wrapper.contains(selector)).toBe(false);
     });
   });
 
   it('should render set approval modal', () => {
-    expect(vm.$el.querySelector('#modal-set-license-approval')).not.toBeNull();
+    mountComponent();
+
+    expect(wrapper.find('#modal-set-license-approval')).not.toBeNull();
   });
 
   it('should init store after mount', () => {
@@ -226,7 +342,7 @@ describe('License Report MR Widget', () => {
       setAPISettings: jest.fn(() => {}),
       fetchParsedLicenseReport: jest.fn(() => {}),
     };
-    vm = mountComponent({ actions });
+    mountComponent({ actions });
 
     expect(actions.setAPISettings).toHaveBeenCalledWith(
       expect.any(Object),
@@ -246,11 +362,14 @@ describe('License Report MR Widget', () => {
   });
 
   describe('approval status', () => {
-    const findSecurityApprovalHelpLink = () =>
-      vm.$el.querySelector('.js-security-approval-help-link');
+    const findSecurityApprovalHelpLink = () => wrapper.find('.js-security-approval-help-link');
 
     it('does not show a link to security approval help page if report does not contain blacklisted licenses', () => {
-      expect(findSecurityApprovalHelpLink()).toBeNull();
+      mountComponent({
+        stubs: { ReportSection },
+      });
+
+      expect(findSecurityApprovalHelpLink().exists()).toBe(false);
     });
 
     it('shows a link to security approval help page if report contains blacklisted licenses', () => {
@@ -260,11 +379,15 @@ describe('License Report MR Widget', () => {
           return true;
         },
       };
-      vm = mountComponent({ getters });
+      mountComponent({
+        getters,
+        stubs: { ReportSection },
+      });
+
       const securityApprovalHelpLink = findSecurityApprovalHelpLink();
 
-      expect(findSecurityApprovalHelpLink()).not.toBeNull();
-      expect(securityApprovalHelpLink.getAttribute('href')).toEqual(securityApprovalsHelpPagePath);
+      expect(findSecurityApprovalHelpLink().exists()).toBe(true);
+      expect(securityApprovalHelpLink.attributes('href')).toBe(securityApprovalsHelpPagePath);
     });
   });
 });

@@ -14,7 +14,7 @@ describe Gitlab::UsageData, :aggregate_failures do
       let!(:ud) { build(:usage_data) }
 
       before do
-        allow(Gitlab::GrafanaEmbedUsageData).to receive(:issue_count).and_return(2)
+        allow(described_class).to receive(:grafana_embed_usage_data).and_return(2)
       end
 
       subject { described_class.data }
@@ -58,13 +58,14 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:issues_with_embedded_grafana_charts_approx]).to eq(2)
         expect(count_data[:incident_issues]).to eq(4)
 
-        expect(count_data[:clusters_enabled]).to eq(4)
-        expect(count_data[:project_clusters_enabled]).to eq(3)
+        expect(count_data[:clusters_enabled]).to eq(6)
+        expect(count_data[:project_clusters_enabled]).to eq(4)
         expect(count_data[:group_clusters_enabled]).to eq(1)
+        expect(count_data[:instance_clusters_enabled]).to eq(1)
         expect(count_data[:clusters_disabled]).to eq(3)
         expect(count_data[:project_clusters_disabled]).to eq(1)
-        expect(count_data[:group_clusters_disabled]).to eq(2)
-        expect(count_data[:group_clusters_enabled]).to eq(1)
+        expect(count_data[:group_clusters_disabled]).to eq(1)
+        expect(count_data[:instance_clusters_disabled]).to eq(1)
         expect(count_data[:clusters_platforms_eks]).to eq(1)
         expect(count_data[:clusters_platforms_gke]).to eq(1)
         expect(count_data[:clusters_platforms_user]).to eq(1)
@@ -78,6 +79,7 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:clusters_applications_elastic_stack]).to eq(1)
         expect(count_data[:grafana_integrated_projects]).to eq(2)
         expect(count_data[:clusters_applications_jupyter]).to eq(1)
+        expect(count_data[:clusters_management_project]).to eq(1)
       end
 
       it 'works when queries time out' do
@@ -141,6 +143,43 @@ describe Gitlab::UsageData, :aggregate_failures do
           expect(subject[:dependency_proxy_enabled]).to eq(Gitlab.config.dependency_proxy.enabled)
           expect(subject[:gitlab_shared_runners_enabled]).to eq(Gitlab.config.gitlab_ci.shared_runners_enabled)
           expect(subject[:web_ide_clientside_preview_enabled]).to eq(Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?)
+        end
+
+        context 'with existing container expiration policies' do
+          let_it_be(:disabled) { create(:container_expiration_policy, enabled: false) }
+          let_it_be(:enabled) { create(:container_expiration_policy, enabled: true) }
+          %i[keep_n cadence older_than].each do |attribute|
+            ContainerExpirationPolicy.send("#{attribute}_options").keys.each do |value|
+              let_it_be("container_expiration_policy_with_#{attribute}_set_to_#{value}") { create(:container_expiration_policy, attribute => value) }
+            end
+          end
+
+          let(:inactive_policies) { ::ContainerExpirationPolicy.where(enabled: false) }
+          let(:active_policies) { ::ContainerExpirationPolicy.active }
+
+          it 'gathers usage data' do
+            expect(subject[:projects_with_expiration_policy_enabled]).to eq 16
+            expect(subject[:projects_with_expiration_policy_disabled]).to eq 1
+
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_unset]).to eq 10
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_1]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_5]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_10]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_25]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_50]).to eq 1
+
+            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_unset]).to eq 12
+            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_7d]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_14d]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_30d]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_90d]).to eq 1
+
+            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1d]).to eq 12
+            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_7d]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_14d]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1month]).to eq 1
+            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_3month]).to eq 1
+          end
         end
       end
 
@@ -217,6 +256,71 @@ describe Gitlab::UsageData, :aggregate_failures do
 
           expect(subject[:ingress_modsecurity_blocking]).to eq(1)
           expect(subject[:ingress_modsecurity_disabled]).to eq(2)
+        end
+      end
+
+      describe '#grafana_embed_usage_data' do
+        subject { described_class.grafana_embed_usage_data }
+
+        let(:project) { create(:project) }
+        let(:description_with_embed) { "Some comment\n\nhttps://grafana.example.com/d/xvAk4q0Wk/go-processes?orgId=1&from=1573238522762&to=1573240322762&var-job=prometheus&var-interval=10m&panelId=1&fullscreen" }
+        let(:description_with_unintegrated_embed) { "Some comment\n\nhttps://grafana.exp.com/d/xvAk4q0Wk/go-processes?orgId=1&from=1573238522762&to=1573240322762&var-job=prometheus&var-interval=10m&panelId=1&fullscreen" }
+        let(:description_with_non_grafana_inline_metric) { "Some comment\n\n#{Gitlab::Routing.url_helpers.metrics_namespace_project_environment_url(*['foo', 'bar', 12])}" }
+
+        shared_examples "zero count" do
+          it "does not count the issue" do
+            expect(subject).to eq(0)
+          end
+        end
+
+        context 'with project grafana integration enabled' do
+          before do
+            create(:grafana_integration, project: project, enabled: true)
+          end
+
+          context 'with valid and invalid embeds' do
+            before do
+              # Valid
+              create(:issue, project: project, description: description_with_embed)
+              create(:issue, project: project, description: description_with_embed)
+              # In-Valid
+              create(:issue, project: project, description: description_with_unintegrated_embed)
+              create(:issue, project: project, description: description_with_non_grafana_inline_metric)
+              create(:issue, project: project, description: nil)
+              create(:issue, project: project, description: '')
+              create(:issue, project: project)
+            end
+
+            it 'counts only the issues with embeds' do
+              expect(subject).to eq(2)
+            end
+          end
+        end
+
+        context 'with project grafana integration disabled' do
+          before do
+            create(:grafana_integration, project: project, enabled: false)
+          end
+
+          context 'with one issue having a grafana link in the description and one without' do
+            before do
+              create(:issue, project: project, description: description_with_embed)
+              create(:issue, project: project)
+            end
+
+            it_behaves_like('zero count')
+          end
+        end
+
+        context 'with an un-integrated project' do
+          context 'with one issue having a grafana link in the description and one without' do
+            before do
+              create(:issue, project: project, description: description_with_embed)
+              create(:issue, project: project)
+            end
+
+            it_behaves_like('zero count')
+          end
         end
       end
 

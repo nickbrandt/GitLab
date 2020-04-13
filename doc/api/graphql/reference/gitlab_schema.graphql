@@ -468,6 +468,11 @@ input CreateEpicInput {
   clientMutationId: String
 
   """
+  Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled
+  """
+  confidential: Boolean
+
+  """
   The description of the epic
   """
   description: String
@@ -1878,6 +1883,16 @@ type Environment {
   id: ID!
 
   """
+  Metrics dashboard schema for the environment
+  """
+  metricsDashboard(
+    """
+    Path to a file which defines metrics dashboard eg: 'config/prometheus/common_metrics.yml'
+    """
+    path: String!
+  ): MetricsDashboard
+
+  """
   Human-readable name of the environment
   """
   name: String!
@@ -2013,6 +2028,11 @@ type Epic implements Noteable {
   Timestamp of the epic's closure
   """
   closedAt: Time
+
+  """
+  Indicates if the epic is confidential
+  """
+  confidential: Boolean
 
   """
   Timestamp of the epic's creation
@@ -4265,7 +4285,7 @@ type JiraImport {
   jiraProjectKey: String!
 
   """
-  Timestamp of when the Jira import was created/started
+  Timestamp of when the Jira import was created
   """
   scheduledAt: Time
 
@@ -5266,6 +5286,13 @@ type Metadata {
   Version
   """
   version: String!
+}
+
+type MetricsDashboard {
+  """
+  Path to a file with the dashboard definition
+  """
+  path: String
 }
 
 """
@@ -7147,6 +7174,51 @@ type Query {
     """
     visibility: VisibilityScopesEnum
   ): SnippetConnection
+
+  """
+  Vulnerabilities reported on projects on the current user's instance security dashboard
+  """
+  vulnerabilities(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filter vulnerabilities by project
+    """
+    projectId: [ID!]
+
+    """
+    Filter vulnerabilities by report type
+    """
+    reportType: [VulnerabilityReportType!]
+
+    """
+    Filter vulnerabilities by severity
+    """
+    severity: [VulnerabilitySeverity!]
+
+    """
+    Filter vulnerabilities by state
+    """
+    state: [VulnerabilityState!]
+  ): VulnerabilityConnection
 }
 
 """
@@ -8343,14 +8415,19 @@ scalar Time
 
 type Timelog {
   """
-  The date when the time tracked was spent at
+  Timestamp of when the time tracked was spent at. Deprecated in 12.10: Use `spentAt`
   """
-  date: Time!
+  date: Time! @deprecated(reason: "Use `spentAt`. Deprecated in 12.10")
 
   """
   The issue that logged time was added to
   """
   issue: Issue
+
+  """
+  Timestamp of when the time tracked was spent at
+  """
+  spentAt: Time
 
   """
   The time spent displayed in seconds
@@ -8902,6 +8979,11 @@ input UpdateEpicInput {
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled
+  """
+  confidential: Boolean
 
   """
   The description of the epic
