@@ -577,13 +577,13 @@ class MergeRequest < ApplicationRecord
     merge_request_diff&.real_size || diff_stats&.real_size || diffs.real_size
   end
 
-  def modified_paths(past_merge_request_diff: nil)
+  def modified_paths(past_merge_request_diff: nil, fallback_on_overflow: false)
     if past_merge_request_diff
-      past_merge_request_diff.modified_paths
+      past_merge_request_diff.modified_paths(fallback_on_overflow: fallback_on_overflow)
     elsif compare
       diff_stats&.paths || compare.modified_paths
     else
-      merge_request_diff.modified_paths
+      merge_request_diff.modified_paths(fallback_on_overflow: fallback_on_overflow)
     end
   end
 
