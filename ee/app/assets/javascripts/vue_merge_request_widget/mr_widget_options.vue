@@ -47,7 +47,7 @@ export default {
       return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
-      return this.mr.enabledReports?.licenseManagement;
+      return this.mr.enabledReports?.licenseScanning;
     },
     hasCodequalityIssues() {
       return (
