@@ -281,8 +281,6 @@ describe API::Users, :do_not_mock_admin_mode do
       end
 
       it "returns users without projects" do
-        admin
-        user
         user_without_projects = create(:user)
         create(:project, namespace: user.namespace)
         create(:project, namespace: admin.namespace)
