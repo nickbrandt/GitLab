@@ -224,4 +224,36 @@ describe ProjectsHelper do
       end
     end
   end
+
+  describe '#subscription_message' do
+    let(:gitlab_subscription) { double(:gitlab_subscription) }
+    let(:decorated_mock) { double(:decorated_mock) }
+    let(:message_mock) { double(:message_mock) }
+    let(:user) { double(:user_mock) }
+
+    it 'if it is not Gitlab.com? it returns nil' do
+      allow(Gitlab).to receive(:com?).and_return(false)
+
+      expect(helper.subscription_message).to be_nil
+    end
+
+    it 'calls 2 classes if is Gitlab.com?' do
+      allow(Gitlab).to receive(:com?).and_return(true)
+      allow(helper).to receive(:signed_in?).and_return(true)
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).with(user, :owner_access, project).and_return(true)
+      allow(project).to receive(:gitlab_subscription).and_return(gitlab_subscription)
+
+      expect(SubscriptionPresenter).to receive(:new).with(gitlab_subscription).and_return(decorated_mock)
+      expect(::Gitlab::ExpiringSubscriptionMessage).to receive(:new).with(
+        subscribable: decorated_mock,
+        signed_in: true,
+        is_admin: true,
+        namespace: project.namespace
+      ).and_return(message_mock)
+      expect(message_mock).to receive(:message).and_return('hey yay yay yay')
+
+      expect(helper.subscription_message).to eq('hey yay yay yay')
+    end
+  end
 end
