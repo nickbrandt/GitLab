@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require_relative 'shared_processing_service.rb'
+require_relative 'shared_processing_service_tests_with_yaml.rb'
 
 describe Ci::PipelineProcessing::AtomicProcessingService do
   before do
@@ -9,6 +10,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService do
   end
 
   it_behaves_like 'Pipeline Processing Service'
+  it_behaves_like 'Pipeline Processing Service Tests With Yaml'
 
   private
 
