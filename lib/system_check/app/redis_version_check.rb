@@ -37,7 +37,7 @@ module SystemCheck
           @custom_error_message
         )
         for_more_information(
-          'gitlab-public-wiki/wiki/Trouble-Shooting-Guide in section sidekiq'
+          'doc/administration/high_availability/redis.md#provide-your-own-redis-instance-core-only'
         )
         fix_and_rerun
       end
