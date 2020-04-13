@@ -1,37 +1,31 @@
 <script>
-import { s__, __, n__ } from '~/locale';
-import { GlDeprecatedButton, GlFormSelect } from '@gitlab/ui';
+import { s__, n__ } from '~/locale';
+import { GlNewButton, GlFormSelect } from '@gitlab/ui';
 import toast from '~/vue_shared/plugins/global_toast';
 import createFlash from '~/flash';
 import dismissVulnerability from '../graphql/dismissVulnerability.graphql';
 
-const REASON_NONE = __('[No reason]');
-const REASON_WONT_FIX = __("Won't fix / Accept risk");
-const REASON_FALSE_POSITIVE = __('False positive');
+const REASON_NONE = s__('Security Reports|[No reason]');
+const REASON_WONT_FIX = s__("Security Reports|Won't fix / Accept risk");
+const REASON_FALSE_POSITIVE = s__('Security Reports|False positive');
 
 export default {
   name: 'SelectionSummary',
   components: {
-    GlDeprecatedButton,
+    GlNewButton,
     GlFormSelect,
   },
   props: {
-    refetchVulnerabilities: {
-      type: Function,
-      required: true,
-    },
-    deselectAllVulnerabilities: {
-      type: Function,
-      required: true,
-    },
     selectedVulnerabilities: {
       type: Array,
       required: true,
     },
   },
-  data: () => ({
-    dismissalReason: null,
-  }),
+  data() {
+    return {
+      dismissalReason: null,
+    };
+  },
   computed: {
     selectedVulnerabilitiesCount() {
       return this.selectedVulnerabilities.length;
@@ -61,6 +55,7 @@ export default {
       this.dismissSelectedVulnerabilities();
     },
     dismissSelectedVulnerabilities() {
+      // TODO: Batch vulnerability dismissal with https://gitlab.com/gitlab-org/gitlab/-/issues/214376
       const promises = this.selectedVulnerabilities.map(vulnerability =>
         this.$apollo.mutate({
           mutation: dismissVulnerability,
@@ -71,21 +66,19 @@ export default {
       Promise.all(promises)
         .then(() => {
           toast(this.dismissalSuccessMessage());
-          this.deselectAllVulnerabilities();
+          this.$emit('deselect-all-vulnerabilities');
+          this.$emit('refetch-vulnerabilities');
         })
         .catch(() => {
           createFlash(
             s__('Security Reports|There was an error dismissing the vulnerabilities.'),
             'alert',
           );
-        })
-        .finally(() => {
-          this.refetchVulnerabilities();
         });
     },
   },
   dismissalReasons: [
-    { value: null, text: __('Select a reason') },
+    { value: null, text: s__('Security Reports|Select a reason') },
     REASON_FALSE_POSITIVE,
     REASON_WONT_FIX,
     REASON_NONE,
@@ -96,15 +89,21 @@ export default {
 <template>
   <div class="card">
     <form class="card-body d-flex align-items-center" @submit.prevent="handleDismiss">
-      <span>{{ message }}</span>
+      <span ref="dismiss-message">{{ message }}</span>
       <gl-form-select
         v-model="dismissalReason"
         class="mx-3 w-auto"
         :options="$options.dismissalReasons"
       />
-      <gl-deprecated-button type="submit" variant="close" :disabled="!canDismissVulnerability">
-        {{ __('Dismiss Selected') }}
-      </gl-deprecated-button>
+      <gl-new-button
+        type="submit"
+        class="js-no-auto-disable"
+        category="secondary"
+        variant="warning"
+        :disabled="!canDismissVulnerability"
+      >
+        {{ s__('Security Reports|Dismiss Selected') }}
+      </gl-new-button>
     </form>
   </div>
 </template>

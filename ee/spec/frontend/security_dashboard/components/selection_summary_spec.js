@@ -1,18 +1,38 @@
 import { mount } from '@vue/test-utils';
-import SelectionSummary from 'ee//security_dashboard/components/selection_summary.vue';
+import SelectionSummary from 'ee/security_dashboard/components/selection_summary.vue';
+import { GlFormSelect, GlNewButton } from '@gitlab/ui';
+import createFlash from '~/flash';
+import toast from '~/vue_shared/plugins/global_toast';
+
+jest.mock('~/flash');
+jest.mock('~/vue_shared/plugins/global_toast');
 
 describe('Selection Summary component', () => {
   let wrapper;
+  let spyMutate;
 
   const defaultData = {
     dismissalReason: null,
   };
 
-  const createComponent = ({ props = {}, data = defaultData }) => {
+  const defaultMocks = {
+    $apollo: {
+      mutate: jest.fn().mockResolvedValue(),
+    },
+  };
+
+  const dismissButton = () => wrapper.find(GlNewButton);
+  const dismissMessage = () => wrapper.find({ ref: 'dismiss-message' });
+  const formSelect = () => wrapper.find(GlFormSelect);
+
+  const createComponent = ({ props = {}, data = defaultData, mocks = defaultMocks }) => {
+    spyMutate = mocks.$apollo.mutate;
     wrapper = mount(SelectionSummary, {
+      mocks: {
+        ...defaultMocks,
+        ...mocks,
+      },
       propsData: {
-        refetchVulnerabilities: jest.fn(),
-        deselectAllVulnerabilities: jest.fn(),
         selectedVulnerabilities: [],
         ...props,
       },
@@ -20,102 +40,96 @@ describe('Selection Summary component', () => {
     });
   };
 
-  beforeEach(() => {
-    createComponent({});
-  });
-
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('computed', () => {
-    describe('selectedVulnerabilitiesCount', () => {
-      it('returns the length if this.selectedVulnerabilities is empty', () => {
-        expect(wrapper.vm.selectedVulnerabilitiesCount).toBe(0);
-      });
-
-      it('returns the length if this.selectedVulnerabilities is not empty', () => {
+  describe('when vulnerabilities are selected', () => {
+    describe('it renders correctly', () => {
+      beforeEach(() => {
         createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
-        expect(wrapper.vm.selectedVulnerabilitiesCount).toBe(1);
-      });
-    });
-
-    describe('canDismissVulnerability', () => {
-      it('returns true if there is a dismissal reason and a selectedVulnerabilitiesCount greater than zero', () => {
-        createComponent({
-          props: { selectedVulnerabilities: [{ id: 'id_0' }] },
-          data: { dismissalReason: 'Will Not Fix' },
-        });
-        expect(wrapper.vm.canDismissVulnerability).toBe(true);
-      });
-
-      it('returns false if there is a dismissal reason and not a selectedVulnerabilitiesCount greater than zero', () => {
-        createComponent({
-          props: { selectedVulnerabilities: [] },
-          data: { dismissalReason: 'Will Not Fix' },
-        });
-        expect(wrapper.vm.canDismissVulnerability).toBe(false);
-      });
-
-      it('returns false if there is not a dismissal reason and a selectedVulnerabilitiesCount greater than zero', () => {
-        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
-        expect(wrapper.vm.canDismissVulnerability).toBe(false);
-      });
-
-      it('returns false if there is not a dismissal reason and not a selectedVulnerabilitiesCount greater than zero', () => {
-        expect(wrapper.vm.canDismissVulnerability).toBe(false);
-      });
-    });
-
-    describe('message', () => {
-      it('returns the right message for zero selected vulnerabilities', () => {
-        expect(wrapper.vm.message).toBe('Dismiss 0 selected vulnerabilities as');
       });
 
       it('returns the right message for one selected vulnerabilities', () => {
-        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
-        expect(wrapper.vm.message).toBe('Dismiss 1 selected vulnerability as');
+        expect(dismissMessage().text()).toBe('Dismiss 1 selected vulnerability as');
       });
 
       it('returns the right message for greater than one selected vulnerabilities', () => {
         createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }, { id: 'id_1' }] } });
-        expect(wrapper.vm.message).toBe('Dismiss 2 selected vulnerabilities as');
+        expect(dismissMessage().text()).toBe('Dismiss 2 selected vulnerabilities as');
+      });
+    });
+
+    describe('dismiss button', () => {
+      beforeEach(() => {
+        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
+      });
+
+      it('should have the button disabled if an option is not selected', () => {
+        expect(dismissButton().attributes('disabled')).toBe('disabled');
+      });
+
+      it('should have the button enabled if a vulnerability is selected and an option is selected', () => {
+        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
+        expect(wrapper.vm.dismissalReason).toBe(null);
+        expect(wrapper.findAll('option').length).toBe(4);
+        formSelect()
+          .findAll('option')
+          .at(1)
+          .setSelected();
+        formSelect().trigger('change');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.vm.dismissalReason).toEqual(expect.any(String));
+          expect(dismissButton().attributes('disabled')).toBe(undefined);
+        });
+      });
+    });
+
+    describe('clicking the dismiss vulnerability button', () => {
+      beforeEach(() => {
+        createComponent({
+          props: { selectedVulnerabilities: [{ id: 'id_0' }, { id: 'id_1' }] },
+          data: { dismissalReason: 'Will Not Fix' },
+        });
+      });
+
+      it('should make an API request for each vulnerability', () => {
+        dismissButton().trigger('submit');
+        expect(spyMutate).toHaveBeenCalledTimes(2);
+      });
+
+      it('should show toast with the right message if all calls were successful', () => {
+        dismissButton().trigger('submit');
+        setImmediate(() => {
+          // return wrapper.vm.$nextTick().then(() => {
+          expect(toast).toHaveBeenCalledWith('2 vulnerabilities dismissed');
+        });
+      });
+
+      it('should show flash with the right message if some calls failed', () => {
+        createComponent({
+          props: { selectedVulnerabilities: [{ id: 'id_0' }, { id: 'id_1' }] },
+          data: { dismissalReason: 'Will Not Fix' },
+          mocks: { $apollo: { mutate: jest.fn().mockRejectedValue() } },
+        });
+        dismissButton().trigger('submit');
+        setImmediate(() => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'There was an error dismissing the vulnerabilities.',
+            'alert',
+          );
+        });
       });
     });
   });
 
-  describe('methods', () => {
-    describe('getSuccessMessage', () => {
-      it('returns the right message for zero selected vulnerabilities', () => {
-        expect(wrapper.vm.dismissalSuccessMessage()).toBe('0 vulnerabilities dismissed');
-      });
-
-      it('returns the right message for one selected vulnerabilities', () => {
-        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
-        expect(wrapper.vm.dismissalSuccessMessage()).toBe('1 vulnerability dismissed');
-      });
-
-      it('returns the right message for greater than one selected vulnerabilities', () => {
-        createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }, { id: 'id_1' }] } });
-        expect(wrapper.vm.dismissalSuccessMessage()).toBe('2 vulnerabilities dismissed');
-      });
+  describe('when vulnerabilities are not selected', () => {
+    beforeEach(() => {
+      createComponent({});
     });
-    describe('handleDismiss', () => {
-      it('does call dismissSelectedVulnerabilities when canDismissVulnerability is true', () => {
-        createComponent({
-          props: { selectedVulnerabilities: [{ id: 'id_0' }] },
-          data: { dismissalReason: 'Will Not Fix' },
-        });
-        const spy = jest.spyOn(wrapper.vm, 'dismissSelectedVulnerabilities').mockImplementation();
-        wrapper.vm.handleDismiss();
-        expect(spy).toHaveBeenCalled();
-      });
-
-      it('does not call dismissSelectedVulnerabilities when canDismissVulnerability is false', () => {
-        const spy = jest.spyOn(wrapper.vm, 'dismissSelectedVulnerabilities');
-        wrapper.vm.handleDismiss();
-        expect(spy).not.toHaveBeenCalled();
-      });
+    it('should have the button disabled', () => {
+      expect(dismissButton().attributes().disabled).toBe('disabled');
     });
   });
 });
