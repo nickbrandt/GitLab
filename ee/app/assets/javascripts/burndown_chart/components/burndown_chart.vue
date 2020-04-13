@@ -2,7 +2,7 @@
 import { GlLineChart } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
-import { __, sprintf } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 
 export default {
   components: {
@@ -50,7 +50,15 @@ export default {
   computed: {
     dataSeries() {
       let name;
-      const data = this.issuesSelected ? this.openIssuesCount : this.openIssuesWeight;
+      let data;
+
+      if (this.issuesSelected) {
+        name = s__('BurndownChartLabel|Open issues');
+        data = this.openIssuesCount;
+      } else {
+        name = s__('BurndownChartLabel|Open issue weight');
+        data = this.openIssuesWeight;
+      }
 
       const series = [
         {

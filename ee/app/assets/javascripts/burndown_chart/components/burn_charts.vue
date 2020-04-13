@@ -4,7 +4,6 @@ import { __ } from '~/locale';
 import BurndownChart from './burndown_chart.vue';
 
 export default {
-  burnupChartsEnabled: gon.features.burnupCharts,
   components: {
     GlDeprecatedButton,
     GlButtonGroup,
@@ -33,11 +32,12 @@ export default {
   data() {
     return {
       issuesSelected: true,
+      burnupChartsEnabled: gon.features.burnupCharts,
     };
   },
   computed: {
     title() {
-      return this.$options.burnupChartsEnabled ? __('Charts') : __('Burndown chart');
+      return this.burnupChartsEnabled ? __('Charts') : __('Burndown chart');
     },
   },
   methods: {
@@ -75,7 +75,7 @@ export default {
         </gl-deprecated-button>
       </gl-button-group>
     </div>
-    <div v-if="$options.burnupChartsEnabled" class="row">
+    <div v-if="burnupChartsEnabled" class="row">
       <burndown-chart
         :start-date="startDate"
         :due-date="dueDate"
