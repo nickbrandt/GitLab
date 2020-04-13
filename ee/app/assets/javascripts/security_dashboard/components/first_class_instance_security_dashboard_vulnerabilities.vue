@@ -22,6 +22,11 @@ export default {
       type: String,
       required: true,
     },
+    filters: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -36,6 +41,7 @@ export default {
       variables() {
         return {
           first: VULNERABILITIES_PER_PAGE,
+          ...this.filters,
         };
       },
       update: ({ vulnerabilities }) => vulnerabilities.nodes,
