@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Clusters::Management::ValidatePermissionsService do
+describe Clusters::Management::ValidateManagementProjectPermissionsService do
   describe '#execute' do
     subject { described_class.new(user).execute(cluster, management_project_id) }
 

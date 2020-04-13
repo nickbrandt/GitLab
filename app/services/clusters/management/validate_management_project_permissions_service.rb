@@ -2,7 +2,7 @@
 
 module Clusters
   module Management
-    class ValidatePermissionsService
+    class ValidateManagementProjectPermissionsService
       attr_reader :current_user
 
       def initialize(user = nil)

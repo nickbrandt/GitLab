@@ -61,7 +61,7 @@ module Clusters
     end
 
     def validate_management_project_permissions(cluster)
-      Clusters::Management::ValidatePermissionsService.new(current_user)
+      Clusters::Management::ValidateManagementProjectPermissionsService.new(current_user)
         .execute(cluster, params[:management_project_id])
     end
   end
