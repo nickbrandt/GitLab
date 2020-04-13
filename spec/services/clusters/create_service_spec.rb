@@ -84,10 +84,8 @@ describe Clusters::CreateService do
     let(:management_project_namespace) { project.namespace }
     let(:management_project) { create(:project, namespace: management_project_namespace) }
 
-    context 'management_project is non-existent' do
-      let(:management_project_id) { 0 }
-
-      it 'does not persist the cluster' do
+    shared_examples 'invalid project or cluster permissions' do
+      it 'does not persist the cluster and adds errors' do
         expect(cluster).not_to be_persisted
 
         expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
@@ -108,11 +106,7 @@ describe Clusters::CreateService do
       end
 
       context 'when user is not authorized to adminster manangement_project' do
-        it 'does not persist the cluster' do
-          expect(cluster).not_to be_persisted
-
-          expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
-        end
+        include_examples 'invalid project or cluster permissions'
       end
     end
 
@@ -126,6 +120,12 @@ describe Clusters::CreateService do
           expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
         end
       end
+    end
+
+    context 'management_project is non-existent' do
+      let(:management_project_id) { 0 }
+
+      include_examples 'invalid project or cluster permissions'
     end
 
     context 'project cluster' do
