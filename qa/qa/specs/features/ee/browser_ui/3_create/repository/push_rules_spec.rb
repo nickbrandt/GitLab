@@ -4,7 +4,7 @@ module QA
   context 'Create' do
     context 'Push Rules' do
       describe 'using non signed commits' do
-        before :context do
+        before(:context) do
           prepare
 
           @file_name_limitation = 'denied_file'
@@ -16,18 +16,22 @@ module QA
 
           Page::Project::Settings::Repository.perform do |repository|
             repository.expand_push_rules do |push_rules|
-              push_rules.fill_file_name @file_name_limitation
-              push_rules.fill_file_size @file_size_limitation
-              push_rules.fill_author_email @authors_email_limitation
-              push_rules.fill_branch_name @branch_name_limitation
-              push_rules.fill_commit_message_rule @needed_phrase_limitation
-              push_rules.fill_deny_commit_message_rule @deny_message_phrase_limitation
+              push_rules.fill_file_name(@file_name_limitation)
+              push_rules.fill_file_size(@file_size_limitation)
+              push_rules.fill_author_email(@authors_email_limitation)
+              push_rules.fill_branch_name(@branch_name_limitation)
+              push_rules.fill_commit_message_rule(@needed_phrase_limitation)
+              push_rules.fill_deny_commit_message_rule(@deny_message_phrase_limitation)
               push_rules.check_prevent_secrets
               push_rules.check_restrict_author
               push_rules.check_deny_delete_tag
               push_rules.click_submit
             end
           end
+        end
+
+        it 'allows an unrestricted push' do
+          expect_no_error_on_push(file: standard_file)
         end
 
         it 'restricts files by name and size' do
@@ -40,28 +44,31 @@ module QA
             content: SecureRandom.hex(100)
           }]
 
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: large_file
-          expect_error_on_push file: wrongly_named_file
+          expect_error_on_push(file: large_file,
+            error: 'File "file" is larger than the allowed size of 1 MB')
+          expect_error_on_push(file: wrongly_named_file,
+            error: Regexp.escape("File name #{@file_name_limitation} was blacklisted by the pattern #{@file_name_limitation}"))
         end
 
         it 'restricts users by email format' do
           gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
-          @project.add_member(gitlab_user)
+          @project.add_member(gitlab_user, Resource::Members::AccessLevel::MAINTAINER)
 
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: standard_file, user: gitlab_user
+          expect_error_on_push(file: standard_file, user: gitlab_user,
+            error: Regexp.escape("Committer's email '#{gitlab_user.email}' does not follow the pattern '#{@authors_email_limitation}'"))
         end
 
         it 'restricts branches by branch name' do
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: standard_file, branch: 'forbidden_branch'
+          expect_error_on_push(file: standard_file, branch: 'forbidden_branch',
+            error: Regexp.escape("Branch name does not follow the pattern '#{@branch_name_limitation}'"))
         end
 
         it 'restricts commit by message format' do
-          expect_no_error_on_push file: standard_file, commit_message: @needed_phrase_limitation
-          expect_error_on_push file: standard_file, commit_message: 'forbidden message'
-          expect_error_on_push file: standard_file, commit_message: "#{@needed_phrase_limitation} - #{@deny_message_phrase_limitation}"
+          expect_no_error_on_push(file: standard_file, commit_message: @needed_phrase_limitation)
+          expect_error_on_push(file: standard_file, commit_message: 'forbidden message',
+            error: Regexp.escape("Commit message does not follow the pattern '#{@needed_phrase_limitation}'"))
+          expect_error_on_push(file: standard_file, commit_message: "#{@needed_phrase_limitation} - #{@deny_message_phrase_limitation}",
+            error: Regexp.escape("Commit message contains the forbidden pattern '#{@deny_message_phrase_limitation}'"))
         end
 
         it 'restricts committing files with secrets' do
@@ -70,13 +77,13 @@ module QA
             content: SecureRandom.hex(100)
           }]
 
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: secret_file
+          expect_error_on_push(file: secret_file,
+            error: Regexp.escape('File name id_rsa was blacklisted by the pattern id_rsa$'))
         end
 
         it 'restricts commits by user' do
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: standard_file, user: @root
+          expect_error_on_push(file: standard_file, user: @root,
+            error: Regexp.escape("Author '#{@root.email}' is not a member of team"))
         end
 
         it 'restricts removal of tag' do
@@ -86,19 +93,37 @@ module QA
             tag.name = 'test_tag'
           end
 
-          expect_no_error_on_push file: standard_file
-          expect_error_on_push file: standard_file, tag: tag.name
+          expect_error_on_push(file: standard_file, tag: tag.name,
+            error: 'You cannot delete a tag')
+        end
+      end
+
+      describe 'with commits restricted to verified emails' do
+        before do
+          prepare
+
+          Page::Project::Settings::Repository.perform do |repository|
+            repository.expand_push_rules do |push_rules|
+              push_rules.check_committer_restriction
+              push_rules.click_submit
+            end
+          end
+        end
+
+        it 'rejects unverified emails' do
+          expect_no_error_on_push(file: standard_file)
+          expect_error_on_push(file: standard_file, user: @root,
+            error: 'You can only push commits that were committed with one of your own verified emails')
         end
       end
 
       describe 'using signed commits' do
-        before :context do
+        before do
           prepare
 
           Page::Project::Settings::Repository.perform do |repository|
             repository.expand_push_rules do |push_rules|
               push_rules.check_reject_unsigned_commits
-              push_rules.check_committer_restriction
               push_rules.click_submit
             end
           end
@@ -107,16 +132,8 @@ module QA
         end
 
         it 'restricts to signed commits' do
-          expect_no_error_on_push file: standard_file, gpg: @gpg
-          expect_error_on_push file: standard_file
-        end
-
-        it 'restricts commits to current authenticated user' do
-          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
-          @project.add_member(gitlab_user)
-
-          expect_no_error_on_push file: standard_file, gpg: @gpg
-          expect_error_on_push file: standard_file, gpg: @gpg, user: gitlab_user
+          expect_no_error_on_push(file: standard_file, gpg: @gpg)
+          expect_error_on_push(file: standard_file, error: 'Commit must be signed with a GPG key')
         end
       end
 
@@ -146,10 +163,10 @@ module QA
         end.not_to raise_error
       end
 
-      def expect_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: @creator, tag: nil, gpg: nil)
+      def expect_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: @creator, tag: nil, gpg: nil, error: nil)
         expect do
           push commit_message: commit_message, branch: branch, file: file, user: user, tag: tag, gpg: gpg
-        end.to raise_error(QA::Git::Repository::RepositoryCommandError)
+        end.to raise_error(QA::Git::Repository::RepositoryCommandError, /#{error}/)
       end
 
       def prepare
