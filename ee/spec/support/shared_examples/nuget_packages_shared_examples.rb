@@ -98,7 +98,7 @@ shared_examples 'process nuget upload' do |user_type, status, add_member = true|
 
     context 'with object storage disabled' do
       context 'without a file from workhorse' do
-        let(:params) { { file: nil } }
+        let(:send_rewritten_field) { false }
 
         it_behaves_like 'returning response status', :bad_request
       end
@@ -137,6 +137,19 @@ shared_examples 'process nuget upload' do |user_type, status, add_member = true|
 
             it_behaves_like 'returning response status', :forbidden
           end
+        end
+
+        context 'with crafted package.path param' do
+          let(:crafted_file) { Tempfile.new('nuget.crafted.package.path') }
+          let(:url) { "/projects/#{project.id}/packages/nuget?package.path=#{crafted_file.path}" }
+          let(:params) { { package: temp_file(file_name, Dir.tmpdir) } }
+          let(:file_key) { :package }
+
+          it 'does not create a package file' do
+            expect { subject }.to change { ::Packages::PackageFile.count }.by(0)
+          end
+
+          it_behaves_like 'returning response status', :bad_request
         end
       end
 

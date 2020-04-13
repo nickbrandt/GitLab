@@ -177,15 +177,18 @@ describe API::NugetPackages do
     let_it_be(:file_name) { 'package.nupkg' }
     let(:url) { "/projects/#{project.id}/packages/nuget" }
     let(:headers) { {} }
-    let(:params) { { file: temp_file(file_name) } }
+    let(:params) { { file: temp_file(file_name, Dir.tmpdir) } }
+    let(:file_key) { :file }
+    let(:send_rewritten_field) { true }
 
     subject do
       workhorse_finalize(
         api(url),
         method: :put,
-        file_key: :file,
+        file_key: file_key,
         params: params,
-        headers: headers
+        headers: headers,
+        send_rewritten_field: send_rewritten_field
       )
     end
 
