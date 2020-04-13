@@ -124,11 +124,14 @@ export default {
       wikiAccessLevel: 20,
       snippetsAccessLevel: 20,
       pagesAccessLevel: 20,
+      metricsAccessLevel: visibilityOptions.PRIVATE,
       containerRegistryEnabled: true,
       lfsEnabled: true,
       requestAccessEnabled: true,
       highlightChangesClass: false,
       emailsDisabled: false,
+      featureAccessLevelEveryone,
+      featureAccessLevelMembers,
     };
 
     return { ...defaults, ...this.currentSettings };
@@ -188,6 +191,10 @@ export default {
       return s__(
         'ProjectSettings|View and edit files in this project. Non-project members will only have read access',
       );
+    },
+
+    metricVisibilityToggleAvailable() {
+      return gon.features?.metricsVisibilityToggle;
     },
   },
 
@@ -461,6 +468,39 @@ export default {
           :options="pagesFeatureAccessLevelOptions"
           name="project[project_feature_attributes][pages_access_level]"
         />
+      </project-setting-row>
+      <project-setting-row
+        v-if="metricVisibilityToggleAvailable"
+        ref="metrics-visibility-settings"
+        :label="s__('ProjectSettings|Metrics Dashboard')"
+        :help-text="
+          s__(
+            'ProjectSettings|With Metrics Dashboard you can visualize this project performance metrics',
+          )
+        "
+      >
+        <div class="project-feature-controls">
+          <div class="select-wrapper">
+            <select
+              v-model="metricsAccessLevel"
+              :disabled="false"
+              name="project[project_feature_attributes][metrics_access_level]"
+              class="form-control select-control"
+            >
+              <option
+                :value="visibilityOptions.PRIVATE"
+                :disabled="!visibilityAllowed(visibilityOptions.PRIVATE)"
+                >{{ featureAccessLevelMembers[1] }}</option
+              >
+              <option
+                :value="visibilityOptions.PUBLIC"
+                :disabled="!visibilityAllowed(visibilityOptions.PUBLIC)"
+                >{{ featureAccessLevelEveryone[1] }}</option
+              >
+            </select>
+            <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"></i>
+          </div>
+        </div>
       </project-setting-row>
     </div>
     <project-setting-row v-if="canDisableEmails" ref="email-settings" class="mb-3">
