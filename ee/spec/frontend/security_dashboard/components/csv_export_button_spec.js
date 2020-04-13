@@ -10,6 +10,9 @@ import CsvExportButton, {
 import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/flash');
+jest.mock('~/lib/utils/datetime_utility', () => ({
+  formatDate: () => '2020-04-12-10T14_32_35',
+}));
 
 const vulnerabilitiesExportEndpoint = `${TEST_HOST}/vulnerability_findings.csv`;
 
@@ -81,7 +84,9 @@ describe('Csv Button Export', () => {
       return axios.waitForAll().then(() => {
         expect(spy).toHaveBeenCalledWith('a');
         expect(downloadAnchor.href).toContain(downloadLink);
-        expect(downloadAnchor.hasAttribute('download')).toBe(true);
+        expect(downloadAnchor.getAttribute('download')).toBe(
+          `csv-export-2020-04-12-10T14_32_35.csv`,
+        );
         expect(downloadAnchor.click).toHaveBeenCalled();
       });
     });
