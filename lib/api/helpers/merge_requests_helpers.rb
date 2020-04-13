@@ -4,7 +4,6 @@ module API
   module Helpers
     module MergeRequestsHelpers
       extend Grape::API::Helpers
-      include ::API::Helpers::CustomValidators
 
       params :merge_requests_base_params do
         optional :state,
@@ -36,7 +35,11 @@ module API
                  type: String,
                  values: %w[simple],
                  desc: 'If simple, returns the `iid`, URL, title, description, and basic state of merge request'
+
         optional :author_id, type: Integer, desc: 'Return merge requests which are authored by the user with the given ID'
+        optional :author_username, type: String, desc: 'Return merge requests which are authored by the user with the given username'
+        mutually_exclusive :author_id, :author_username
+
         optional :assignee_id,
                  types: [Integer, String],
                  integer_none_any: true,

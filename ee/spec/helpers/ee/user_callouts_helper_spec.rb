@@ -177,7 +177,7 @@ describe EE::UserCalloutsHelper do
     let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
 
-    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
+    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
       true  | true  | true  | true  | true
       true  | true  | true  | false | false
       true  | true  | false | true  | false
@@ -201,7 +201,10 @@ describe EE::UserCalloutsHelper do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
         allow(helper).to receive(:has_some_namespaces_with_no_trials?) { has_some_namespaces_with_no_trials? }
-        namespace.update(plan: gold_plan) unless has_no_trial_or_gold_plan?
+
+        unless has_no_trial_or_paid_plan?
+          create(:gitlab_subscription, hosted_plan: gold_plan, namespace: namespace)
+        end
       end
 
       it do
@@ -210,6 +213,22 @@ describe EE::UserCalloutsHelper do
         else
           expect(helper).not_to receive(:render)
         end
+
+        helper.render_dashboard_gold_trial(user)
+      end
+    end
+
+    context 'when render_dashboard_gold_trial feature is disabled' do
+      before do
+        stub_feature_flags(render_dashboard_gold_trial: false)
+
+        allow(helper).to receive(:show_gold_trial?).and_return(true)
+        allow(helper).to receive(:user_default_dashboard?).and_return(true)
+        allow(helper).to receive(:has_some_namespaces_with_no_trials?).and_return(true)
+      end
+
+      it 'does not render' do
+        expect(helper).not_to receive(:render)
 
         helper.render_dashboard_gold_trial(user)
       end
@@ -224,7 +243,6 @@ describe EE::UserCalloutsHelper do
     let_it_be(:silver_plan) { create(:silver_plan) }
     let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
-    let(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
     where(:never_had_trial?, :show_gold_trial?, :gold_plan?, :free_plan?, :should_render?) do
       true  | true  | false | false | true
@@ -248,12 +266,13 @@ describe EE::UserCalloutsHelper do
     with_them do
       before do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
-        namespace.update(plan: gold_plan) if gold_plan?
-        namespace.update(plan: silver_plan) if !gold_plan? && !free_plan?
 
-        unless never_had_trial?
-          namespace.update(plan: free_plan)
-          namespace.create_gitlab_subscription(trial_ends_on: Date.yesterday)
+        if !never_had_trial?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: free_plan, trial_ends_on: Date.yesterday)
+        elsif gold_plan?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+        elsif !free_plan?
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: silver_plan)
         end
       end
 

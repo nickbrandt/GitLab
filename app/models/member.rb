@@ -9,6 +9,7 @@ class Member < ApplicationRecord
   include Presentable
   include Gitlab::Utils::StrongMemoize
   include FromUnion
+  include UpdateHighestRole
 
   attr_accessor :raw_invite_token
 
@@ -256,7 +257,9 @@ class Member < ApplicationRecord
     def retrieve_user(user)
       return user if user.is_a?(User)
 
-      User.find_by(id: user) || User.find_by(email: user) || user
+      return User.find_by(id: user) if user.is_a?(Integer)
+
+      User.find_by(email: user) || user
     end
 
     def retrieve_member(source, user, existing_members)
@@ -458,6 +461,16 @@ class Member < ApplicationRecord
 
       errors.add(:access_level, s_("should be greater than or equal to %{access} inherited membership from group %{group_name}") % error_parameters)
     end
+  end
+
+  def update_highest_role?
+    return unless user_id.present?
+
+    previous_changes[:access_level].present?
+  end
+
+  def update_highest_role_attribute
+    user_id
   end
 end
 

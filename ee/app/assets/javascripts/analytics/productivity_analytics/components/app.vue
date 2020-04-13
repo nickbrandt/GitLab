@@ -5,7 +5,7 @@ import {
   GlLoadingIcon,
   GlDropdown,
   GlDropdownItem,
-  GlButton,
+  GlDeprecatedButton,
   GlTooltipDirective,
 } from '@gitlab/ui';
 import dateFormat from 'dateformat';
@@ -27,7 +27,7 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlColumnChart,
-    GlButton,
+    GlDeprecatedButton,
     Icon,
     MetricChart,
     Scatterplot,
@@ -181,14 +181,14 @@ export default {
     <template v-if="showAppContent">
       <div class="d-flex justify-content-between">
         <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
-        <gl-button
+        <gl-deprecated-button
           v-if="isFilteringByDaysToMerge"
           ref="clearChartFiltersBtn"
           class="btn-link float-right"
           type="button"
           variant="default"
           @click="resetMainChartSelection()"
-          >{{ __('Clear chart filters') }}</gl-button
+          >{{ __('Clear chart filters') }}</gl-deprecated-button
         >
       </div>
       <metric-chart
@@ -322,9 +322,13 @@ export default {
                     </span>
                   </gl-dropdown-item>
                 </gl-dropdown>
-                <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">
+                <gl-deprecated-button
+                  v-gl-tooltip.hover
+                  :title="sortTooltipTitle"
+                  @click="toggleSortOrder"
+                >
                   <icon :name="sortIcon" />
-                </gl-button>
+                </gl-deprecated-button>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import {
   GlTooltipDirective,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
   GlFormInput,
   GlLink,
@@ -11,7 +11,7 @@ import {
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     GlFormInput,
     GlLink,
@@ -58,19 +58,19 @@ export default {
 </script>
 
 <template>
-  <div class="labels-select-contents-create">
+  <div class="labels-select-contents-create js-labels-create">
     <div class="dropdown-title d-flex align-items-center pt-0 pb-2">
-      <gl-button
+      <gl-deprecated-button
         :aria-label="__('Go back')"
         variant="link"
         size="sm"
-        class="dropdown-header-button p-0"
+        class="js-btn-back dropdown-header-button p-0"
         @click="toggleDropdownContentsCreateView"
       >
         <gl-icon name="arrow-left" />
-      </gl-button>
+      </gl-deprecated-button>
       <span class="flex-grow-1">{{ labelsCreateTitle }}</span>
-      <gl-button
+      <gl-deprecated-button
         :aria-label="__('Close')"
         variant="link"
         size="sm"
@@ -78,7 +78,7 @@ export default {
         @click="toggleDropdownContents"
       >
         <gl-icon name="close" />
-      </gl-button>
+      </gl-deprecated-button>
     </div>
     <div class="dropdown-input">
       <gl-form-input
@@ -107,7 +107,7 @@ export default {
       </div>
     </div>
     <div class="dropdown-actions clearfix pt-2 px-2">
-      <gl-button
+      <gl-deprecated-button
         :disabled="disableCreate"
         variant="primary"
         class="pull-left d-flex align-items-center"
@@ -115,10 +115,13 @@ export default {
       >
         <gl-loading-icon v-show="labelCreateInProgress" :inline="true" class="mr-1" />
         {{ __('Create') }}
-      </gl-button>
-      <gl-button class="pull-right" @click="toggleDropdownContentsCreateView">
+      </gl-deprecated-button>
+      <gl-deprecated-button
+        class="pull-right js-btn-cancel-create"
+        @click="toggleDropdownContentsCreateView"
+      >
         {{ __('Cancel') }}
-      </gl-button>
+      </gl-deprecated-button>
     </div>
   </div>
 </template>

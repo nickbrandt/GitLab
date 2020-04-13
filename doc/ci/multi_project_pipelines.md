@@ -10,8 +10,6 @@ type: reference
 You can set up [GitLab CI/CD](README.md) across multiple projects, so that a pipeline
 in one project can trigger a pipeline in another project.
 
-## Overview
-
 GitLab CI/CD is a powerful continuous integration tool that works not only per project,
 but also across projects with multi-project pipelines.
 
@@ -39,8 +37,8 @@ With Multi-Project Pipelines you can visualize the entire pipeline, including al
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2121) in [GitLab Premium 9.3](https://about.gitlab.com/releases/2017/06/22/gitlab-9-3-released/#multi-project-pipeline-graphs).
 
-When you configure GitLab CI for your project, you can visualize the stages of your
-[jobs](pipelines/index.md#configuring-pipelines) on a [pipeline graph](pipelines/index.md#visualizing-pipelines).
+When you configure GitLab CI/CD for your project, you can visualize the stages of your
+[jobs](pipelines/index.md#configure-a-pipeline) on a [pipeline graph](pipelines/index.md#visualize-pipelines).
 
 ![Multi-project pipeline graph](img/multi_project_pipeline_graph.png)
 
@@ -51,7 +49,7 @@ and when hovering or tapping (on touchscreen devices) they will expand and be sh
 
 ## Triggering multi-project pipelines through API
 
-> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017) in [GitLab Premium][ee] 9.3.
+> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.3.
 > - Use of `CI_JOB_TOKEN` for multi-project pipelines was [made available](https://gitlab.com/gitlab-org/gitlab/issues/31573) in all tiers in GitLab 12.4.
 
 When you use the [`CI_JOB_TOKEN` to trigger pipelines](triggers/README.md#ci-job-token), GitLab

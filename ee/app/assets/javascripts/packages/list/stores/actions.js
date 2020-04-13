@@ -10,11 +10,13 @@ import {
   DEFAULT_PAGE_SIZE,
   MISSING_DELETE_PATH_ERROR,
 } from '../constants';
+import { getNewPaginationPage } from '../utils';
 
 export const setInitialState = ({ commit }, data) => commit(types.SET_INITIAL_STATE, data);
 export const setLoading = ({ commit }, data) => commit(types.SET_MAIN_LOADING, data);
 export const setSorting = ({ commit }, data) => commit(types.SET_SORTING, data);
 export const setSelectedType = ({ commit }, data) => commit(types.SET_SELECTED_TYPE, data);
+export const setFilter = ({ commit }, data) => commit(types.SET_FILTER, data);
 
 export const receivePackagesListSuccess = ({ commit }, { data, headers }) => {
   commit(types.SET_PACKAGE_LIST_SUCCESS, data);
@@ -26,12 +28,15 @@ export const requestPackagesList = ({ dispatch, state }, params = {}) => {
 
   const { page = DEFAULT_PAGE, per_page = DEFAULT_PAGE_SIZE } = params;
   const { sort, orderBy } = state.sorting;
+
   const type = state.selectedType?.type?.toLowerCase();
-  const packageType = { package_type: type };
+  const nameFilter = state.filterQuery?.toLowerCase();
+  const packageFilters = { package_type: type, package_name: nameFilter };
+
   const apiMethod = state.config.isGroupPage ? 'groupPackages' : 'projectPackages';
 
   return Api[apiMethod](state.config.resourceId, {
-    params: { page, per_page, sort, order_by: orderBy, ...packageType },
+    params: { page, per_page, sort, order_by: orderBy, ...packageFilters },
   })
     .then(({ data, headers }) => {
       dispatch('receivePackagesListSuccess', { data, headers });
@@ -44,7 +49,7 @@ export const requestPackagesList = ({ dispatch, state }, params = {}) => {
     });
 };
 
-export const requestDeletePackage = ({ dispatch }, { _links }) => {
+export const requestDeletePackage = ({ dispatch, state }, { _links }) => {
   if (!_links || !_links.delete_api_path) {
     createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
     const error = new Error(MISSING_DELETE_PATH_ERROR);
@@ -55,14 +60,15 @@ export const requestDeletePackage = ({ dispatch }, { _links }) => {
   return axios
     .delete(_links.delete_api_path)
     .then(() => {
-      dispatch('requestPackagesList');
+      const { page: currentPage, perPage, total } = state.pagination;
+      const page = getNewPaginationPage(currentPage, perPage, total - 1);
+
+      dispatch('requestPackagesList', { page });
       createFlash(DELETE_PACKAGE_SUCCESS_MESSAGE, 'success');
     })
     .catch(() => {
-      createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
-    })
-    .finally(() => {
       dispatch('setLoading', false);
+      createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
     });
 };
 

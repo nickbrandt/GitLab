@@ -1,26 +1,48 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlBadge } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
+import waitForPromises from 'helpers/wait_for_promises';
+import UsersMockHelper from 'helpers/user_mock_data_helper';
+import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import * as urlUtility from '~/lib/utils/url_utility';
-
 import createFlash from '~/flash';
 import App from 'ee/vulnerabilities/components/app.vue';
-import waitForPromises from 'helpers/wait_for_promises';
+import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
+import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
-import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
+import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 
-const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATES);
+const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
 
 describe('Vulnerability management app', () => {
   let wrapper;
 
-  const vulnerability = {
+  const defaultVulnerability = {
     id: 1,
     created_at: new Date().toISOString(),
     report_type: 'sast',
+    state: 'detected',
+  };
+
+  const findingWithIssue = {
+    description: 'description',
+    identifiers: 'identifiers',
+    links: 'links',
+    location: 'location',
+    name: 'name',
+    issue_feedback: {
+      issue_iid: 12,
+    },
+  };
+
+  const findingWithoutIssue = {
+    description: 'description',
+    identifiers: 'identifiers',
+    links: 'links',
+    location: 'location',
+    name: 'name',
   };
 
   const dataset = {
@@ -33,13 +55,25 @@ describe('Vulnerability management app', () => {
     },
   };
 
-  const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
+  const createRandomUser = () => {
+    const user = UsersMockHelper.createRandomUser();
+    const url = Api.buildUrl(Api.userPath).replace(':id', user.id);
+    mockAxios.onGet(url).replyOnce(200, user);
 
-  const createWrapper = (state = 'detected') => {
+    return user;
+  };
+
+  const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
+  const findBadge = () => wrapper.find({ ref: 'badge' });
+  const findResolutionAlert = () => wrapper.find(ResolutionAlert);
+  const findStatusDescription = () => wrapper.find(StatusDescription);
+
+  const createWrapper = (vulnerability = {}, finding = findingWithoutIssue) => {
     wrapper = shallowMount(App, {
       propsData: {
-        vulnerability: Object.assign({ state }, vulnerability),
         ...dataset,
+        initialVulnerability: { ...defaultVulnerability, ...vulnerability },
+        finding,
       },
     });
   };
@@ -84,8 +118,13 @@ describe('Vulnerability management app', () => {
   describe('create issue button', () => {
     beforeEach(createWrapper);
 
-    it('renders properly', () => {
+    it('does display if there is not an issue already created', () => {
       expect(findCreateIssueButton().exists()).toBe(true);
+    });
+
+    it('does not display if there is an issue already created', () => {
+      createWrapper({}, findingWithIssue);
+      expect(findCreateIssueButton().exists()).toBe(false);
     });
 
     it('calls create issue endpoint on click and redirects to new issue', () => {
@@ -102,9 +141,14 @@ describe('Vulnerability management app', () => {
         expect(JSON.parse(postRequest.data)).toMatchObject({
           vulnerability_feedback: {
             feedback_type: 'issue',
-            category: vulnerability.report_type,
+            category: defaultVulnerability.report_type,
             project_fingerprint: dataset.projectFingerprint,
-            vulnerability_data: { ...vulnerability, category: vulnerability.report_type },
+            vulnerability_data: {
+              ...defaultVulnerability,
+              ...findingWithoutIssue,
+              category: defaultVulnerability.report_type,
+              vulnerability_id: defaultVulnerability.id,
+            },
           },
         });
         expect(spy).toHaveBeenCalledWith(issueUrl);
@@ -125,14 +169,121 @@ describe('Vulnerability management app', () => {
 
   describe('state badge', () => {
     test.each(vulnerabilityStateEntries)(
-      'the vulnerability state badge has the correct variant for the %s state',
-      (stateString, stateObject) => {
-        createWrapper(stateString);
-        const badge = wrapper.find(GlBadge);
+      'the vulnerability state badge has the correct style for the %s state',
+      (state, stateObject) => {
+        createWrapper({ state });
 
-        expect(badge.attributes('variant')).toBe(stateObject.variant);
-        expect(badge.text()).toBe(stateString);
+        expect(findBadge().classes()).toContain(`status-box-${stateObject.statusBoxStyle}`);
+        expect(findBadge().text()).toBe(state);
       },
     );
+  });
+
+  describe('status description', () => {
+    it('the status description is rendered and passed the correct data', () => {
+      const user = createRandomUser();
+      const vulnerability = {
+        ...defaultVulnerability,
+        ...{ state: 'confirmed', confirmed_by_id: user.id },
+      };
+
+      createWrapper(vulnerability);
+
+      return waitForPromises().then(() => {
+        expect(findStatusDescription().exists()).toBe(true);
+        expect(findStatusDescription().props()).toEqual({
+          vulnerability,
+          pipeline: dataset.pipeline,
+          user,
+          isLoadingVulnerability: wrapper.vm.isLoadingVulnerability,
+          isLoadingUser: wrapper.vm.isLoadingUser,
+        });
+      });
+    });
+  });
+
+  describe('when the vulnerability is no longer detected on the default branch', () => {
+    const branchName = 'master';
+
+    beforeEach(() => {
+      createWrapper({
+        resolved_on_default_branch: true,
+        default_branch_name: branchName,
+      });
+    });
+
+    it('should show the resolution alert component', () => {
+      const alert = findResolutionAlert();
+
+      expect(alert.exists()).toBe(true);
+    });
+
+    it('should pass down the default branch name', () => {
+      const alert = findResolutionAlert();
+
+      expect(alert.props().defaultBranchName).toEqual(branchName);
+    });
+
+    describe('when the vulnerability is already resolved', () => {
+      beforeEach(() => {
+        createWrapper({
+          resolved_on_default_branch: true,
+          state: 'resolved',
+        });
+      });
+
+      it('should not show the resolution alert component', () => {
+        const alert = findResolutionAlert();
+
+        expect(alert.exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('vulnerability user watcher', () => {
+    it.each(vulnerabilityStateEntries)(
+      `loads the correct user for the vulnerability state "%s"`,
+      state => {
+        const user = createRandomUser();
+        createWrapper({ state, [`${state}_by_id`]: user.id });
+
+        return waitForPromises().then(() => {
+          expect(mockAxios.history.get.length).toBe(1);
+          expect(findStatusDescription().props('user')).toEqual(user);
+        });
+      },
+    );
+
+    it('does not load a user if there is no user ID', () => {
+      createWrapper({ state: 'detected' });
+
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.get.length).toBe(0);
+        expect(findStatusDescription().props('user')).toBeUndefined();
+      });
+    });
+
+    it('will show an error when the user cannot be loaded', () => {
+      createWrapper({ state: 'confirmed', confirmed_by_id: 1 });
+
+      mockAxios.onGet().replyOnce(500);
+
+      return waitForPromises().then(() => {
+        expect(createFlash).toHaveBeenCalledTimes(1);
+        expect(mockAxios.history.get.length).toBe(1);
+      });
+    });
+
+    it('will set the isLoadingUser property correctly when the user is loading and finished loading', () => {
+      const user = createRandomUser();
+      createWrapper({ state: 'confirmed', confirmed_by_id: user.id });
+
+      expect(findStatusDescription().props('isLoadingUser')).toBe(true);
+
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.get.length).toBe(1);
+        expect(findStatusDescription().props('isLoadingUser')).toBe(false);
+      });
+    });
   });
 });

@@ -22,7 +22,7 @@ You can specify one or more coverage reports to collect, including wildcard path
 GitLab will then take the coverage information in all the files and combine it
 together.
 
-For the coverage analysis to work, you have to provide a properly formated
+For the coverage analysis to work, you have to provide a properly formatted
 [Cobertura XML](https://cobertura.github.io/cobertura/) report to
 [`artifacts:reports:cobertura`](../../../ci/yaml/README.md#artifactsreportscobertura).
 This format was originally developed for Java, but most coverage analysis frameworks
@@ -34,7 +34,7 @@ for other languages have plugins to add support for it, like:
 Other coverage analysis frameworks support the format out of the box, for example:
 
 - [Istanbul](https://istanbul.js.org/docs/advanced/alternative-reporters/#cobertura) (JavaScript)
-- [Coverage.py](https://coverage.readthedocs.io/en/coverage-5.0/cmd.html#xml-reporting) (Python)
+- [Coverage.py](https://coverage.readthedocs.io/en/coverage-5.0.4/cmd.html#xml-reporting) (Python)
 
 Once configured, if you create a merge request that triggers a pipeline which collects
 coverage reports, the coverage will be shown in the diff view. This includes reports

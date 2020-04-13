@@ -6,7 +6,7 @@ class CreateFileRegistry < ActiveRecord::Migration[4.2]
       t.integer :bytes
       t.string  :sha256 # rubocop:disable Migration/AddLimitToStringColumns
 
-      t.datetime :created_at, null: false
+      t.datetime :created_at, null: false # rubocop:disable Migration/Datetime
     end
 
     add_index :file_registry, :file_type

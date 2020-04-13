@@ -2,6 +2,51 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.9.2 (2020-03-31)
+
+### Fixed (5 changes)
+
+- Ensure import by URL works after a failed import. !27546
+- Fix issue/MR state not being preserved when importing a project using Project Import/Export. !27816
+- Leave upload Content-Type unchaged. !27864
+- Disable archive rate limit by default. !28264
+- Fix rake gitlab:setup failing on new installs. !28270
+
+### Changed (1 change)
+
+- Rename feature on the FE and locale.
+
+### Performance (1 change)
+
+- Index issues on sent_notifications table. !27034
+
+
+## 12.9.1 (2020-03-26)
+
+### Security (16 changes)
+
+- Add permission check for pipeline status of MR.
+- Ignore empty remote_id params from Workhorse accelerated uploads.
+- External user can not create personal snippet through API.
+- Prevent malicious entry for group name.
+- Restrict mirroring changes to admins only when mirroring is disabled.
+- Reject all container registry requests from blocked users.
+- Deny localhost requests on fogbugz importer.
+- Redact notes in moved confidential issues.
+- Fix UploadRewriter Path Traversal vulnerability.
+- Block hotlinking to repository archives.
+- Restrict access to project pipeline metrics reports.
+- vulnerability_feedback records should be restricted to a dev role and above.
+- Exclude Carrierwave remote URL methods from import.
+- Update Nokogiri to fix CVE-2020-7595.
+- Prevent updating trigger by other maintainers.
+- Fix XSS vulnerability in `admin/email` "Recipient Group" dropdown.
+
+### Fixed (1 change)
+
+- Fix updating the authorized_keys file. !27798
+
+
 ## 12.9.0 (2020-03-22)
 
 ### Security (1 change)

@@ -202,7 +202,7 @@ describe SubscriptionsController do
           group.save
           subject
 
-          expect(response.body).to eq({ name: ["can't be blank"] }.to_json)
+          expect(response.body).to include({ name: ["can't be blank", Gitlab::Regex.group_name_regex_message] }.to_json)
         end
       end
 
@@ -268,7 +268,7 @@ describe SubscriptionsController do
       context 'when selecting a non existing group' do
         let(:params) do
           {
-            selected_group: 999,
+            selected_group: non_existing_record_id,
             customer: { country: 'NL' },
             subscription: { plan_id: 'x', quantity: 1 }
           }

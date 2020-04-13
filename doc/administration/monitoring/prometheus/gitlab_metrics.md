@@ -92,15 +92,7 @@ The following metrics are available:
 | `failed_login_captcha_total`                                   | Gauge     |                   11.0 | Counter of failed CAPTCHA attempts during login                                                     |                                                     |
 | `successful_login_captcha_total`                               | Gauge     |                   11.0 | Counter of successful CAPTCHA attempts during login                                                 |                                                     |
 | `auto_devops_pipelines_completed_total`                        | Counter   |                   12.7 | Counter of completed Auto DevOps pipelines, labeled by status                                       |                                                     |
-| `sidekiq_jobs_cpu_seconds`                                     | Histogram |                   12.4 | Seconds of cpu time to run Sidekiq job                                                              | queue, boundary, external_dependencies, feature_category, job_status, urgency |
-| `sidekiq_jobs_completion_seconds`                              | Histogram |                   12.2 | Seconds to complete Sidekiq job                                                                     | queue, boundary, external_dependencies, feature_category, job_status, urgency |
-| `sidekiq_jobs_db_seconds`                                      | Histogram |                   12.9 | Seconds of DB time to run Sidekiq job                                                               | queue, boundary, external_dependencies, feature_category, job_status, urgency |
-| `sidekiq_jobs_gitaly_seconds`                                  | Histogram |                   12.9 | Seconds of Gitaly time to run Sidekiq job                                                           | queue, boundary, external_dependencies, feature_category, job_status, urgency |
-| `sidekiq_jobs_queue_duration_seconds`                          | Histogram |                   12.5 | Duration in seconds that a Sidekiq job was queued before being executed                             | queue, boundary, external_dependencies, feature_category, urgency |
-| `sidekiq_jobs_failed_total`                                    | Counter   |                   12.2 | Sidekiq jobs failed                                                                                 | queue, boundary, external_dependencies, feature_category, urgency |
-| `sidekiq_jobs_retried_total`                                   | Counter   |                   12.2 | Sidekiq jobs retried                                                                                | queue, boundary, external_dependencies, feature_category, urgency |
-| `sidekiq_running_jobs`                                         | Gauge     |                   12.2 | Number of Sidekiq jobs running                                                                      | queue, boundary, external_dependencies, feature_category, urgency |
-| `sidekiq_concurrency`                                          | Gauge     |                   12.5 | Maximum number of Sidekiq jobs                                                                      |                                                                   |
+| `gitlab_metrics_dashboard_processing_time_ms` | Summary | 12.10 | Metrics dashboard processing time in milliseconds | service, stages |
 
 ## Metrics controlled by a feature flag
 
@@ -120,6 +112,15 @@ configuration option in `gitlab.yml`. These metrics are served from the
 
 | Metric                                         | Type    | Since | Description | Labels |
 |:---------------------------------------------- |:------- |:----- |:----------- |:------ |
+| `sidekiq_jobs_cpu_seconds`                     | Histogram | 12.4 | Seconds of cpu time to run Sidekiq job                                                              | queue, boundary, external_dependencies, feature_category, job_status, urgency |
+| `sidekiq_jobs_completion_seconds`              | Histogram | 12.2 | Seconds to complete Sidekiq job                                                                     | queue, boundary, external_dependencies, feature_category, job_status, urgency |
+| `sidekiq_jobs_db_seconds`                      | Histogram | 12.9 | Seconds of DB time to run Sidekiq job                                                               | queue, boundary, external_dependencies, feature_category, job_status, urgency |
+| `sidekiq_jobs_gitaly_seconds`                  | Histogram | 12.9 | Seconds of Gitaly time to run Sidekiq job                                                           | queue, boundary, external_dependencies, feature_category, job_status, urgency |
+| `sidekiq_jobs_queue_duration_seconds`          | Histogram | 12.5 | Duration in seconds that a Sidekiq job was queued before being executed                             | queue, boundary, external_dependencies, feature_category, urgency |
+| `sidekiq_jobs_failed_total`                    | Counter   | 12.2 | Sidekiq jobs failed                                                                                 | queue, boundary, external_dependencies, feature_category, urgency |
+| `sidekiq_jobs_retried_total`                   | Counter   | 12.2 | Sidekiq jobs retried                                                                                | queue, boundary, external_dependencies, feature_category, urgency |
+| `sidekiq_running_jobs`                         | Gauge     | 12.2 | Number of Sidekiq jobs running                                                                      | queue, boundary, external_dependencies, feature_category, urgency |
+| `sidekiq_concurrency`                          | Gauge     | 12.5 | Maximum number of Sidekiq jobs                                                                      |                                                                   |
 | `geo_db_replication_lag_seconds`               | Gauge   | 10.2  | Database replication lag (seconds) | url |
 | `geo_repositories`                             | Gauge   | 10.2  | Total number of repositories available on primary | url |
 | `geo_repositories_synced`                      | Gauge   | 10.2  | Number of repositories synced on secondary | url |
@@ -170,7 +171,7 @@ Some basic Ruby runtime metrics are available:
 | Metric                               | Type      | Since | Description |
 |:------------------------------------ |:--------- |:----- |:----------- |
 | `ruby_gc_duration_seconds`           | Counter   | 11.1  | Time spent by Ruby in GC |
-| `ruby_gc_stat_...`                   | Gauge     | 11.1  | Various metrics from [GC.stat] |
+| `ruby_gc_stat_...`                   | Gauge     | 11.1  | Various metrics from [GC.stat](https://ruby-doc.org/core-2.6.5/GC.html#method-c-stat) |
 | `ruby_file_descriptors`              | Gauge     | 11.1  | File descriptors per process |
 | `ruby_memory_bytes`                  | Gauge     | 11.1  | Memory usage by process |
 | `ruby_sampler_duration_seconds`      | Counter   | 11.1  | Time spent collecting stats |
@@ -178,8 +179,6 @@ Some basic Ruby runtime metrics are available:
 | `ruby_process_max_fds`               | Gauge     | 12.0  | Maximum number of open file descriptors per process |
 | `ruby_process_resident_memory_bytes` | Gauge     | 12.0  | Memory usage by process |
 | `ruby_process_start_time_seconds`    | Gauge     | 12.0  | UNIX timestamp of process start time |
-
-[GC.stat]: https://ruby-doc.org/core-2.6.5/GC.html#method-c-stat
 
 ## Unicorn Metrics
 

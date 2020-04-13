@@ -28,7 +28,7 @@ describe Boards::IssuesController do
 
     context 'with invalid board id' do
       it 'returns a not found 404 response' do
-        list_issues user: user, board: 999, list: list2
+        list_issues user: user, board: non_existing_record_id, list: list2
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -109,7 +109,7 @@ describe Boards::IssuesController do
 
       context 'with invalid list id' do
         it 'returns a not found 404 response' do
-          list_issues user: user, board: board, list: 999
+          list_issues user: user, board: board, list: non_existing_record_id
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -226,7 +226,7 @@ describe Boards::IssuesController do
 
       context 'with invalid board id' do
         it 'returns a not found 404 response' do
-          create_issue user: user, board: 999, list: list1, title: 'New issue'
+          create_issue user: user, board: non_existing_record_id, list: list1, title: 'New issue'
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -234,7 +234,7 @@ describe Boards::IssuesController do
 
       context 'with invalid list id' do
         it 'returns a not found 404 response' do
-          create_issue user: user, board: board, list: 999, title: 'New issue'
+          create_issue user: user, board: board, list: non_existing_record_id, title: 'New issue'
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -286,13 +286,13 @@ describe Boards::IssuesController do
       end
 
       it 'returns a not found 404 response for invalid board id' do
-        move user: user, board: 999, issue: issue, from_list_id: list1.id, to_list_id: list2.id
+        move user: user, board: non_existing_record_id, issue: issue, from_list_id: list1.id, to_list_id: list2.id
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns a not found 404 response for invalid issue id' do
-        move user: user, board: board, issue: double(id: 999), from_list_id: list1.id, to_list_id: list2.id
+        move user: user, board: board, issue: double(id: non_existing_record_id), from_list_id: list1.id, to_list_id: list2.id
 
         expect(response).to have_gitlab_http_status(:not_found)
       end

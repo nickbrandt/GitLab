@@ -17,6 +17,7 @@ const mockClosedAtYear = currentDate.getFullYear() - 1;
 const createComponent = ({
   getTargetRef = () => {},
   isOpen = false,
+  path = '/foo/bar#1',
   state = 'closed',
   createdAt = mockCreatedAt,
   closedAt = mockClosedAt,
@@ -25,6 +26,7 @@ const createComponent = ({
     propsData: {
       getTargetRef,
       isOpen,
+      path,
       state,
       createdAt,
       closedAt,
@@ -154,10 +156,19 @@ describe('RelatedItemsTree', () => {
         expect(wrapper.find(GlTooltip).isVisible()).toBe(true);
       });
 
+      it('renders path in bold', () => {
+        expect(
+          wrapper
+            .find({ ref: 'statePath' })
+            .text()
+            .trim(),
+        ).toBe('/foo/bar#1');
+      });
+
       it('renders stateText in bold', () => {
         expect(
           wrapper
-            .find('span.bold')
+            .find({ ref: 'stateText' })
             .text()
             .trim(),
         ).toBe('Closed');
@@ -170,7 +181,7 @@ describe('RelatedItemsTree', () => {
       it('renders stateTimestamp in muted', () => {
         expect(
           wrapper
-            .find('span.text-tertiary')
+            .find({ ref: 'stateTimestamp' })
             .text()
             .trim(),
         ).toContain(mockClosedAtYear);

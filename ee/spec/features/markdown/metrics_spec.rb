@@ -26,6 +26,8 @@ describe 'Metrics rendering', :js, :use_clean_rails_memory_store_caching, :sidek
 
     import_common_metrics
     stub_any_prometheus_request_with_response
+
+    allow(Prometheus::ProxyService).to receive(:new).and_call_original
   end
 
   after do
@@ -56,6 +58,11 @@ describe 'Metrics rendering', :js, :use_clean_rails_memory_store_caching, :sidek
       expect(page).to have_text(metric.title)
       expect(page).to have_text(metric.y_label)
       expect(page).not_to have_text(metrics_url)
+
+      expect(Prometheus::ProxyService)
+        .to have_received(:new)
+        .with(alert.environment, 'GET', 'query_range', hash_including('start', 'end', 'step'))
+        .at_least(:once)
     end
 
     # Delete when moving to CE
@@ -93,6 +100,11 @@ describe 'Metrics rendering', :js, :use_clean_rails_memory_store_caching, :sidek
       expect(page).to have_text(query_params[:title])
       expect(page).to have_text(query_params[:y_label])
       expect(page).not_to have_text(metrics_url)
+
+      expect(Prometheus::ProxyService)
+        .to have_received(:new)
+        .with(cluster, 'GET', 'query_range', hash_including('start', 'end', 'step'))
+        .at_least(:once)
     end
 
     # Delete when moving to CE

@@ -38,6 +38,7 @@ issues:
 - vulnerability_links
 - related_vulnerabilities
 - user_mentions
+- system_note_metadata
 events:
 - author
 - project
@@ -152,6 +153,7 @@ merge_requests:
 - deployment_merge_requests
 - deployments
 - user_mentions
+- system_note_metadata
 external_pull_requests:
 - project
 merge_request_diff:
@@ -252,6 +254,7 @@ services:
 - service_hook
 - jira_tracker_data
 - issue_tracker_data
+- open_project_tracker_data
 hooks:
 - project
 - web_hook_logs
@@ -473,6 +476,8 @@ project:
 - requirements
 - export_jobs
 - daily_report_results
+- jira_imports
+- compliance_framework_setting
 award_emoji:
 - awardable
 - user
@@ -619,3 +624,6 @@ epic:
 epic_issue:
 - epic
 - issue
+system_note_metadata:
+- note
+- description_version

@@ -174,6 +174,9 @@ export default {
     isMRBranchOutdated() {
       return this.divergedCommitsCount > 0;
     },
+    dastScans() {
+      return this.dast.scans.filter(scan => scan.scanned_resources_count > 0);
+    },
   },
 
   created() {
@@ -377,7 +380,20 @@ export default {
             :popover-options="dastPopover"
             class="js-dast-widget"
             data-qa-selector="dast_scan_report"
-          />
+          >
+            <template v-if="dastScans.length">
+              <div class="text-nowrap">
+                {{ n__('%d URL scanned', '%d URLs scanned', dastScans[0].scanned_resources_count) }}
+              </div>
+              <gl-link
+                class="ml-2"
+                data-qa-selector="dast-ci-job-link"
+                :href="dastScans[0].job_path"
+              >
+                {{ __('View details') }}
+              </gl-link>
+            </template>
+          </summary-row>
 
           <issues-list
             v-if="dast.newIssues.length || dast.resolvedIssues.length"

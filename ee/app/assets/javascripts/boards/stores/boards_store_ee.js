@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import _ from 'underscore';
+import { sortBy } from 'lodash';
 import Cookies from 'js-cookie';
 import { __, sprintf } from '~/locale';
 import sidebarEventHub from '~/sidebar/event_hub';
@@ -156,7 +156,7 @@ class BoardsStoreEE {
       position: 0,
     });
 
-    this.store.state.lists = _.sortBy(this.store.state.lists, 'position');
+    this.store.state.lists = sortBy(this.store.state.lists, 'position');
   }
 
   removePromotion() {

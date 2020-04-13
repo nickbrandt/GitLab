@@ -14,6 +14,8 @@ module Gitlab
 
     attr_reader :snippet
 
+    alias_method :container, :snippet
+
     def initialize(actor, snippet, protocol, **kwargs)
       @snippet = snippet
 
@@ -53,11 +55,6 @@ module Gitlab
       check_change_access!
     end
 
-    override :repository
-    def repository
-      snippet&.repository
-    end
-
     def check_snippet_accessibility!
       if snippet.blank?
         raise NotFoundError, ERROR_MESSAGES[:snippet_not_found]
@@ -89,19 +86,20 @@ module Gitlab
         raise ForbiddenError, ERROR_MESSAGES[:update_snippet]
       end
 
+      check_size_before_push!
+
       changes_list.each do |change|
         # If user does not have access to make at least one change, cancel all
         # push by allowing the exception to bubble up
         check_single_change_access(change)
       end
+
+      check_push_size!
     end
 
     def check_single_change_access(change)
       Checks::SnippetCheck.new(change, logger: logger).validate!
-
-      if Feature.enabled?(:snippet_count_check)
-        Checks::PushFileCountCheck.new(change, repository: repository, limit: Snippet::MAX_FILE_COUNT, logger: logger).validate!
-      end
+      Checks::PushFileCountCheck.new(change, repository: repository, limit: Snippet::MAX_FILE_COUNT, logger: logger).validate!
     rescue Checks::TimedLogger::TimeoutError
       raise TimeoutError, logger.full_message
     end

@@ -32,8 +32,8 @@
 
     &::before {
       content: '';
-      border: 1px solid $white-light;
-      background: $white-light;
+      border: 1px solid $white;
+      background: $white;
       transform: rotate(45deg);
       position: absolute;
       border-radius: 1px;
@@ -58,11 +58,11 @@
   }
 
   &-unknown {
-    background-color: $white-light;
+    background-color: $white;
     border-color: $gray-700;
 
     &.link:hover {
-      background-color: $white-light;
+      background-color: $white;
       border-color: $gray-900;
     }
   }
@@ -71,7 +71,7 @@
     &::after {
       width: 7px;
       height: 7px;
-      border: 1px solid $white-light;
+      border: 1px solid $white;
       background-color: $orange-300;
       border-radius: 50%;
       content: '';

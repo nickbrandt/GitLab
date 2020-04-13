@@ -449,4 +449,48 @@ describe 'New project' do
       end
     end
   end
+
+  context 'Built-in project templates' do
+    let(:enterprise_templates) { EE::Gitlab::ProjectTemplate::ENTERPRISE_TEMPLATES_TABLE }
+
+    context 'when `enterprise_templates` is licensed' do
+      before do
+        stub_licensed_features(enterprise_templates: true)
+      end
+
+      it 'shows enterprise templates' do
+        visit_create_from_built_in_templates_tab
+
+        enterprise_templates.each do |template|
+          expect(page).to have_content(template.title)
+          expect(page).to have_link('Preview', href: template.preview)
+        end
+      end
+    end
+
+    context 'when `enterprise_templates` is unlicensed' do
+      before do
+        stub_licensed_features(enterprise_templates: false)
+      end
+
+      it 'does not show enterprise templates' do
+        visit_create_from_built_in_templates_tab
+
+        enterprise_templates.each do |template|
+          expect(page).not_to have_content(template.title)
+          expect(page).not_to have_link('Preview', href: template.preview)
+        end
+      end
+    end
+
+    private
+
+    def visit_create_from_built_in_templates_tab
+      visit new_project_path
+
+      expect(page).to have_css('#create-from-template-tab')
+
+      find('#create-from-template-tab').click
+    end
+  end
 end

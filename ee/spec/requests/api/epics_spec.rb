@@ -315,25 +315,25 @@ describe API::Epics do
       end
 
       it 'returns an array of epics with any label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_ANY }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_ANY }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with any label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_ANY] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_ANY] }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with no label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_NONE }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_NONE }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_NONE] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_NONE] }
 
         expect_paginated_array_response(epic.id)
       end
@@ -527,7 +527,8 @@ describe API::Epics do
         labels: 'label1',
         due_date_fixed: '2018-07-17',
         due_date_is_fixed: true,
-        parent_id: parent_epic.id
+        parent_id: parent_epic.id,
+        confidential: true
       }
     end
 
@@ -573,6 +574,7 @@ describe API::Epics do
           expect(epic.labels.first.title).to eq('label1')
           expect(epic.parent).to eq(parent_epic)
           expect(epic.relative_position).not_to be_nil
+          expect(epic.confidential).to be_truthy
         end
 
         context 'when deprecated start_date and end_date params are present' do
@@ -589,12 +591,26 @@ describe API::Epics do
         end
       end
 
+      context 'when confidential_epics flag is disabled' do
+        before do
+          stub_feature_flags(confidential_epics: false)
+
+          post api(url, user), params: params
+        end
+
+        it 'ignores confidential attribute' do
+          epic = Epic.last
+
+          expect(epic.confidential).to be_falsey
+        end
+      end
+
       it 'creates a new epic with labels param as array' do
         params[:labels] = ['label1', 'label2', 'foo, bar', '&,?']
 
         post api(url, user), params: params
 
-        expect(response.status).to eq(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['title']).to include 'new epic'
         expect(json_response['description']).to include 'epic description'
         expect(json_response['labels']).to include 'label1'
@@ -615,7 +631,8 @@ describe API::Epics do
         description: 'new description',
         labels: 'label2',
         start_date_fixed: "2018-07-17",
-        start_date_is_fixed: true
+        start_date_is_fixed: true,
+        confidential: true
       }
     end
 
@@ -673,6 +690,20 @@ describe API::Epics do
             expect(result.start_date_is_fixed).to eq(true)
             expect(result.due_date_fixed).to eq(nil)
             expect(result.due_date_is_fixed).to be_falsey
+            expect(result.confidential).to be_truthy
+          end
+        end
+
+        context 'when confidential_epics flag is disabled' do
+          before do
+            stub_feature_flags(confidential_epics: false)
+            stub_licensed_features(epics: true)
+
+            put api(url, user), params: params
+          end
+
+          it 'does not include confidential attribute' do
+            expect(epic.reload.confidential).to be_falsey
           end
         end
 
@@ -683,7 +714,7 @@ describe API::Epics do
 
           put api(url, user), params: params
 
-          expect(response.status).to eq(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['title']).to include 'new title'
           expect(json_response['description']).to include 'new description'
           expect(json_response['labels']).to include 'label1'

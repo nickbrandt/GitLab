@@ -4,9 +4,11 @@ require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200113151354_remove_creations_in_gitlab_subscription_histories.rb')
 
 describe RemoveCreationsInGitlabSubscriptionHistories do
-  GITLAB_SUBSCRIPTION_CREATED = 0
-  GITLAB_SUBSCRIPTION_UPDATED = 1
-  GITLAB_SUBSCRIPTION_DESTROYED = 2
+  before do
+    stub_const('GITLAB_SUBSCRIPTION_CREATED', 0)
+    stub_const('GITLAB_SUBSCRIPTION_UPDATED', 1)
+    stub_const('GITLAB_SUBSCRIPTION_DESTROYED', 2)
+  end
 
   let(:gitlab_subscriptions) { table(:gitlab_subscriptions) }
   let(:gitlab_subscription_histories) { table(:gitlab_subscription_histories) }

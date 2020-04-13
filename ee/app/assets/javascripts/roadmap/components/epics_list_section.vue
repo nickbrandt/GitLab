@@ -1,10 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import VirtualList from 'vue-virtual-scroll-list';
-
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import eventHub from '../event_hub';
+import { generateKey } from '../utils/epic_utils';
 
 import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, EPIC_ITEM_HEIGHT } from '../constants';
 
@@ -62,18 +62,29 @@ export default {
         left: `${this.offsetLeft}px`,
       };
     },
+    displayedEpics() {
+      return this.epics.reduce((acc, epic) => {
+        acc.push(epic);
+        if (epic.isChildEpicShowing) {
+          acc.push(...epic.children.edges);
+        }
+        return acc;
+      }, []);
+    },
   },
   mounted() {
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$on('toggleIsEpicExpanded', this.toggleIsEpicExpanded);
     window.addEventListener('resize', this.syncClientWidth);
     this.initMounted();
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$off('toggleIsEpicExpanded', this.toggleIsEpicExpanded);
     window.removeEventListener('resize', this.syncClientWidth);
   },
   methods: {
-    ...mapActions(['setBufferSize']),
+    ...mapActions(['setBufferSize', 'toggleExpandedEpic']),
     initMounted() {
       this.roadmapShellEl = this.$root.$el && this.$root.$el.firstChild;
       this.setBufferSize(Math.ceil((window.innerHeight - this.$el.offsetTop) / EPIC_ITEM_HEIGHT));
@@ -130,6 +141,10 @@ export default {
         },
       };
     },
+    toggleIsEpicExpanded(epicId) {
+      this.toggleExpandedEpic(epicId);
+    },
+    generateKey,
   },
 };
 </script>
@@ -150,9 +165,9 @@ export default {
     </template>
     <template v-else>
       <epic-item
-        v-for="(epic, index) in epics"
+        v-for="(epic, index) in displayedEpics"
         ref="epicItems"
-        :key="index"
+        :key="generateKey(epic)"
         :first-epic="index === 0"
         :preset-type="presetType"
         :epic="epic"

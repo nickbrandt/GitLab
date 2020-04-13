@@ -48,6 +48,7 @@ module EE
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
       has_one :status_page_setting, inverse_of: :project
+      has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
 
       has_many :reviews, inverse_of: :project
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -112,7 +113,7 @@ module EE
       scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
-      scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
+      scope :for_plan_name, -> (name) { joins(namespace: { gitlab_subscription: :hosted_plan }).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
             -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
       scope :with_active_services, -> { joins(:services).merge(::Service.active) }
@@ -159,6 +160,7 @@ module EE
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled?, to: :ci_cd_settings
       delegate :actual_limits, :actual_plan_name, to: :namespace, allow_nil: true
+      delegate :gitlab_subscription, to: :namespace
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
@@ -180,6 +182,7 @@ module EE
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :status_page_setting, update_only: true, allow_destroy: true
+      accepts_nested_attributes_for :compliance_framework_setting, update_only: true, allow_destroy: true
 
       alias_attribute :fallback_approvals_required, :approvals_before_merge
     end
@@ -292,6 +295,10 @@ module EE
       ::Feature.enabled?(:repository_push_audit_event, self)
     end
 
+    def first_class_vulnerabilities_enabled?
+      ::Feature.enabled?(:first_class_vulnerabilities, self)
+    end
+
     def feature_available?(feature, user = nil)
       if ::ProjectFeature::FEATURES.include?(feature)
         super
@@ -339,14 +346,7 @@ module EE
       # Historically this was intended ensure `super` is only called
       # when a project is imported(usually on project creation only) so `repository_exists?`
       # check was added so that it does not stop mirroring if later on mirroring option is added to the project.
-      #
-      # With jira importer we need to allow to run the import multiple times on same project,
-      # which can conflict with scheduled mirroring(if that project had or will have mirroring enabled),
-      # so we are checking if its a jira reimport then we trigger that and skip mirroring even if mirroring
-      # should have been started. When we run into race condition with mirroring on a jira imported project
-      # the mirroring would still be picked up 1 minute later, based on `Gitlab::Mirror::SCHEDULER_CRON` and
-      # `ProjectUpdateState#mirror_update_due?``
-      return super if jira_force_import? || import? && !repository_exists?
+      return super if import? && !repository_exists?
 
       if mirror?
         ::Gitlab::Metrics.add_event(:mirrors_scheduled)
@@ -404,9 +404,13 @@ module EE
     end
 
     def visible_approval_rules(target_branch: nil)
-      strong_memoize(:"visible_approval_rules_#{target_branch}") do
-        visible_user_defined_rules(branch: target_branch) + approval_rules.report_approver
+      rules = strong_memoize(:visible_approval_rules) do
+        Hash.new do |h, key|
+          h[key] = visible_user_defined_rules(branch: key) + approval_rules.report_approver
+        end
       end
+
+      rules[target_branch]
     end
 
     def visible_user_defined_rules(branch: nil)
@@ -414,6 +418,12 @@ module EE
       return user_defined_rules unless branch
 
       user_defined_rules.applicable_to_branch(branch)
+    end
+
+    def visible_user_defined_inapplicable_rules(branch)
+      return [] unless multiple_approval_rules_available?
+
+      user_defined_rules.inapplicable_to_branch(branch)
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
@@ -482,6 +492,16 @@ module EE
       ::Gitlab::UrlSanitizer.new(bare_url, credentials: { user: import_data&.user }).full_url
     end
 
+    def repository_size_checker
+      strong_memoize(:repository_size_checker) do
+        ::Gitlab::RepositorySizeChecker.new(
+          current_size_proc: -> { statistics.total_repository_size },
+          limit: (repository_size_limit || namespace.actual_size_limit),
+          enabled: License.feature_available?(:repository_size_limit)
+        )
+      end
+    end
+
     def username_only_import_url=(value)
       unless ::Gitlab::UrlSanitizer.valid?(value)
         self.import_url = value
@@ -496,38 +516,6 @@ module EE
       create_or_update_import_data(credentials: creds)
 
       username_only_import_url
-    end
-
-    def repository_and_lfs_size
-      statistics.total_repository_size
-    end
-
-    def above_size_limit?
-      return false unless size_limit_enabled?
-
-      repository_and_lfs_size > actual_size_limit
-    end
-
-    def size_to_remove
-      repository_and_lfs_size - actual_size_limit
-    end
-
-    def actual_size_limit
-      return namespace.actual_size_limit if repository_size_limit.nil?
-
-      repository_size_limit
-    end
-
-    def size_limit_enabled?
-      return false unless License.feature_available?(:repository_size_limit)
-
-      actual_size_limit != 0
-    end
-
-    def changes_will_exceed_size_limit?(size_in_bytes)
-      size_limit_enabled? &&
-        (size_in_bytes > actual_size_limit ||
-         size_in_bytes + repository_and_lfs_size > actual_size_limit)
     end
 
     def remove_import_data
@@ -545,6 +533,7 @@ module EE
         [].tap do |services|
           services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
+          ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
         end
       end
     end
@@ -652,13 +641,7 @@ module EE
 
     # LFS and hashed repository storage are required for using Design Management.
     def design_management_enabled?
-      lfs_enabled? &&
-        # We will allow the hashed storage requirement to be disabled for
-        # a few releases until we are able to understand the impact of the
-        # hashed storage requirement for existing design management projects.
-        # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
-        (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
-        feature_available?(:design_management)
+      lfs_enabled? && hashed_storage?(:repository)
     end
 
     def design_repository

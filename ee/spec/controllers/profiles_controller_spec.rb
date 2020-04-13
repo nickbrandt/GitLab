@@ -18,7 +18,7 @@ describe ProfilesController, :request_store do
         it 'updates their name' do
           subject
 
-          expect(response.status).to eq(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(current_user.reload.name).to eq('New Name')
         end
       end
@@ -55,7 +55,7 @@ describe ProfilesController, :request_store do
             it 'does not update their name' do
               subject
 
-              expect(response.status).to eq(302)
+              expect(response).to have_gitlab_http_status(:found)
               expect(user.reload.name).not_to eq('New Name')
             end
           end

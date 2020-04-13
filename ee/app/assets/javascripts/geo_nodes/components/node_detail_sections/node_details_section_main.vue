@@ -26,6 +26,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    nodeRemovalAllowed: {
+      type: Boolean,
+      required: true,
+    },
     versionMismatch: {
       type: Boolean,
       required: true,
@@ -47,10 +51,20 @@ export default {
 
 <template>
   <div class="row-fluid clearfix py-3 primary-section">
-    <div class="col-md-8">
-      <div class="d-flex flex-column">
-        <span class="text-secondary-700 js-node-url-title">{{ s__('GeoNodes|Node URL') }}</span>
-        <span class="mt-1 font-weight-bold js-node-url-value">{{ node.url }}</span>
+    <div class="col-md-12">
+      <div class="d-flex geo-node-actions-container">
+        <div class="d-flex flex-column">
+          <span class="text-secondary-700 js-node-url-title">{{ s__('GeoNodes|Node URL') }}</span>
+          <span class="mt-1 font-weight-bold js-node-url-value">{{ node.url }}</span>
+        </div>
+        <geo-node-actions
+          class="flex-grow-1"
+          :node="node"
+          :node-actions-allowed="nodeActionsAllowed"
+          :node-edit-allowed="nodeEditAllowed"
+          :node-removal-allowed="nodeRemovalAllowed"
+          :node-missing-oauth="nodeDetails.missingOAuthApplication"
+        />
       </div>
       <div class="d-flex flex-column mt-2">
         <span class="text-secondary-700 js-node-version-title">{{
@@ -65,11 +79,5 @@ export default {
       </div>
       <geo-node-health-status :status="nodeHealthStatus" />
     </div>
-    <geo-node-actions
-      :node="node"
-      :node-actions-allowed="nodeActionsAllowed"
-      :node-edit-allowed="nodeEditAllowed"
-      :node-missing-oauth="nodeDetails.missingOAuthApplication"
-    />
   </div>
 </template>

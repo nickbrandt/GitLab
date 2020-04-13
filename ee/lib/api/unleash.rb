@@ -72,12 +72,13 @@ module API
       def feature_flags
         return [] unless unleash_app_name.present?
 
+        flags = Operations::FeatureFlagScope.for_unleash_client(project, unleash_app_name)
+
         if Feature.enabled?(:feature_flags_new_version, project)
-          Operations::FeatureFlagScope.for_unleash_client(project, unleash_app_name) +
-            Operations::FeatureFlag.for_unleash_client(project, unleash_app_name)
-        else
-          Operations::FeatureFlagScope.for_unleash_client(project, unleash_app_name)
+          flags += Operations::FeatureFlag.for_unleash_client(project, unleash_app_name)
         end
+
+        flags
       end
     end
   end

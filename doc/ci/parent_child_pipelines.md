@@ -33,7 +33,7 @@ set of concurrently running child pipelines, but within the same project:
 - Imports are done at the child pipeline level, reducing the likelihood of collisions.
 - Each pipeline has only relevant steps, making it easier to understand what's going on.
 
-Child pipelines work well with other GitLab CI features:
+Child pipelines work well with other GitLab CI/CD features:
 
 - Use [`only: changes`](yaml/README.md#onlychangesexceptchanges) to trigger pipelines only when
   certain files change. This is useful for monorepos, for example.
@@ -136,12 +136,11 @@ your own script to generate a YAML file, which is then [used to trigger a child 
 This technique can be very powerful in generating pipelines targeting content that changed or to
 build a matrix of targets and architectures.
 
+In GitLab 12.9, the child pipeline could fail to be created in certain cases, causing the parent pipeline to fail.
+This is [resolved in GitLab 12.10](https://gitlab.com/gitlab-org/gitlab/-/issues/209070).
+
 ## Limitations
 
 A parent pipeline can trigger many child pipelines, but a child pipeline cannot trigger
 further child pipelines. See the [related issue](https://gitlab.com/gitlab-org/gitlab/issues/29651)
 for discussion on possible future improvements.
-
-When triggering dynamic child pipelines, if the job containing the CI config artifact is not a predecessor of the
-trigger job, the child pipeline will fail to be created, causing also the parent pipeline to fail.
-In the future we want to validate the trigger job's dependencies [at the time the parent pipeline is created](https://gitlab.com/gitlab-org/gitlab/-/issues/209070) rather than when the child pipeline is created.

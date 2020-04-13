@@ -20,7 +20,7 @@ module Gitlab
       paid_signup_flow: {
         feature_toggle: :paid_signup_flow,
         environment: ::Gitlab.dev_env_or_com?,
-        enabled_ratio: 0.5,
+        enabled_ratio: 1,
         tracking_category: 'Growth::Acquisition::Experiment::PaidSignUpFlow'
       },
       suggest_pipeline: {
@@ -34,6 +34,12 @@ module Gitlab
         environment: ::Gitlab.dev_env_or_com?,
         enabled_ratio: 0.1,
         tracking_category: 'Growth::Expansion::Experiment::CiNotificationDot'
+      },
+      buy_ci_minutes_version_a: {
+        feature_toggle: :buy_ci_minutes_version_a,
+        environment: ::Gitlab.dev_env_or_com?,
+        enabled_ratio: 0.2,
+        tracking_category: 'Growth::Expansion::Experiment::BuyCiMinutesVersionA'
       }
     }.freeze
 

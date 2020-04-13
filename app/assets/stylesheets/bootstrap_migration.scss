@@ -8,7 +8,7 @@ $brand-danger: $red-500;
 
 $border-radius-base: 3px !default;
 
-$modal-body-bg: $white-light;
+$modal-body-bg: $white;
 $input-border: $border-color;
 
 $padding-base-vertical: $gl-vert-padding;
@@ -39,16 +39,6 @@ html [type="button"],
   // Override bootstrap reboot
   -webkit-appearance: inherit;
   cursor: pointer;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: $gl-text-color;
-  font-weight: 600;
 }
 
 h1,
@@ -168,7 +158,7 @@ table {
 .bg-danger,
 .bg-warning {
   .card-header {
-    color: $white-light;
+    color: $white;
   }
 }
 
@@ -310,11 +300,11 @@ pre code {
 .alert-info,
 .alert-warning,
 .alert-danger {
-  color: $white-light;
+  color: $white;
 
   h4,
   .alert-link {
-    color: $white-light;
+    color: $white;
   }
 }
 

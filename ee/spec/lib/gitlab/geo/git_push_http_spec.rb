@@ -75,7 +75,7 @@ describe Gitlab::Geo::GitPushHttp, :geo, :use_clean_rails_memory_store_caching d
 
       context 'when the GeoNode does not exist' do
         it 'returns nil' do
-          Rails.cache.write(cache_key, 9999998, expires_in: described_class::EXPIRES_IN)
+          Rails.cache.write(cache_key, non_existing_record_id, expires_in: described_class::EXPIRES_IN)
 
           expect(subject.fetch_referrer_node).to be_nil
         end

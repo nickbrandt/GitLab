@@ -211,7 +211,7 @@ The following documentation relates to the DevOps **Create** stage:
 | [GitLab Integration](integration/README.md)                                   | Integrate with multiple third-party services with GitLab to allow external issue trackers and external authentication. |
 | [GitLab Webhooks](user/project/integrations/webhooks.md)                      | Let GitLab notify you when new code has been pushed to your project.                                                   |
 | [Jira Development Panel](integration/jira_development_panel.md) **(PREMIUM)** | See GitLab information in the Jira Development Panel.                                                                  |
-| [Project Services](user/project/integrations/project_services.md)             | Integrate a project with external services, such as CI and chat.                                                       |
+| [Integrations](user/project/integrations/overview.md)             | Integrate a project with external services, such as CI and chat.                                                       |
 | [Trello Power-Up](integration/trello_power_up.md)                             | Integrate with GitLab's Trello Power-Up.                                                                               |
 
 <div align="right">
@@ -238,7 +238,7 @@ The following documentation relates to the DevOps **Verify** stage:
 | [GitLab CI/CD](ci/README.md)                                                      | Explore the features and capabilities of Continuous Integration with GitLab.                            |
 | [JUnit test reports](ci/junit_test_reports.md)                                    | Display JUnit test reports on merge requests.                                                           |
 | [Multi-project pipelines](ci/multi_project_pipelines.md) **(PREMIUM)**            | Visualize entire pipelines that span multiple projects, including all cross-project inter-dependencies. |
-| [Pipeline Graphs](ci/pipelines/index.md#visualizing-pipelines)                          | Visualize builds.                                                                                       |
+| [Pipeline Graphs](ci/pipelines/index.md#visualize-pipelines)                      | Visualize builds.                                                                                       |
 | [Review Apps](ci/review_apps/index.md)                                            | Preview changes to your application right from a merge request.                                         |
 
 <div align="right">
@@ -279,7 +279,7 @@ The following documentation relates to the DevOps **Release** stage:
 
 | Release Topics                                                                                                                      | Description                                                                                                                           |
 |:------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
-| [Auto Deploy](topics/autodevops/index.md#auto-deploy)                                                                               | Configure GitLab for the deployment of your application.                                                                              |
+| [Auto Deploy](topics/autodevops/stages.md#auto-deploy)                                                                               | Configure GitLab for the deployment of your application.                                                                              |
 | [Canary Deployments](user/project/canary_deployments.md) **(PREMIUM)**                                                              | Employ a popular CI strategy where a small portion of the fleet is updated to the new version first.                                  |
 | [Deploy Boards](user/project/deploy_boards.md) **(PREMIUM)**                                                                        | View the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment. |
 | [Environments and deployments](ci/environments.md)                                                                                  | With environments, you can control the continuous deployment of your software within GitLab.                                          |
@@ -306,7 +306,7 @@ The following documentation relates to the DevOps **Configure** stage:
 | Configure Topics                                                                                                                   | Description                                                               |
 |:-----------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------|
 | [Auto DevOps](topics/autodevops/index.md)                                                                                          | Automatically employ a complete DevOps lifecycle.                         |
-| [Create Kubernetes clusters](user/project/clusters/add_remove_clusters.md#add-new-cluster)                                         | Use Kubernetes and GitLab.                                                |
+| [Create Kubernetes clusters](user/project/clusters/add_remove_clusters.md#create-new-cluster)                                      | Use Kubernetes and GitLab.                                                |
 | [Executable Runbooks](user/project/clusters/runbooks/index.md)                                                                     | Documented procedures that explain how to carry out particular processes. |
 | [GitLab ChatOps](ci/chatops/README.md)                                                                                             | Interact with CI/CD jobs through chat services.                           |
 | [Installing Applications](user/project/clusters/index.md#installing-applications)                                                  | Deploy Helm, Ingress, and Prometheus on Kubernetes.                       |

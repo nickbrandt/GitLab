@@ -1,11 +1,11 @@
 <script>
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlDeprecatedButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import { uniqueId } from 'lodash';
 
 export default {
   name: 'DeleteButton',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     GlModal,
   },
   directives: {
@@ -52,13 +52,13 @@ export default {
     >
       <p>{{ s__('DesignManagement|Are you sure you want to delete the selected designs?') }}</p>
     </gl-modal>
-    <gl-button
+    <gl-deprecated-button
       v-gl-modal-directive="modalId"
       :variant="buttonVariant"
       :disabled="isDeleting || !hasSelectedDesigns"
       :class="buttonClass"
     >
       <slot></slot>
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>

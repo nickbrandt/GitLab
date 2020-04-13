@@ -52,7 +52,7 @@ Some applications are installable only for a project-level cluster.
 Support for installing these applications in a group-level cluster is
 planned for future releases.
 For updates, see [the issue tracking
-progress](https://gitlab.com/gitlab-org/gitlab-foss/issues/51989).
+progress](https://gitlab.com/gitlab-org/gitlab/-/issues/24411).
 
 CAUTION: **Caution:**
 If you have an existing Kubernetes cluster with Helm already installed,
@@ -79,7 +79,7 @@ is available.
 
 > Introduced in GitLab 11.6 for project- and group-level clusters.
 
-[cert-manager](https://docs.cert-manager.io/en/latest/) is a native
+[cert-manager](https://cert-manager.io/docs/) is a native
 Kubernetes certificate management controller that helps with issuing
 certificates. Installing cert-manager on your cluster will issue a
 certificate by [Let's Encrypt](https://letsencrypt.org/) and ensure that
@@ -98,7 +98,7 @@ If you have installed cert-manager prior to GitLab 12.3, Let's Encrypt will
 
 To resolve this:
 
-1. Uninstall cert-manager (consider [backing up any additional configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html)).
+1. Uninstall cert-manager (consider [backing up any additional configuration](https://cert-manager.io/docs/tutorials/backup/)).
 1. Install cert-manager again.
 
 ### GitLab Runner
@@ -295,7 +295,7 @@ from processing any requests for the given application or environment.
 1. Switching its respective toggle to the disabled position and applying changes through the **Save changes** button. This will reinstall
 Ingress with the recent changes.
 
-![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_9.png)
+![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_10.png)
 
 ##### Viewing Web Application Firewall traffic
 
@@ -312,7 +312,7 @@ From there, you can see tracked over time:
 
 If a significant percentage of traffic is anomalous, it should be investigated
 for potential threats, which can be done by
-[examining the application logs](#web-application-firewall-modsecurity).
+[examining the Web Application Firewall logs](#web-application-firewall-modsecurity).
 
 ![Threat Monitoring](img/threat_monitoring_v12_9.png)
 
@@ -427,7 +427,7 @@ file.
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34702) in GitLab 12.5 for project-level clusters.
 
-[Crossplane](https://crossplane.io/docs) is a multi-cloud control plane useful for
+[Crossplane](https://crossplane.github.io/docs/v0.9/) is a multi-cloud control plane useful for
 managing applications and infrastructure across multiple clouds. It extends the
 Kubernetes API using:
 
@@ -452,14 +452,14 @@ For information on configuring Crossplane installed on the cluster, see
 NOTE: **Note:**
 [`alpha/crossplane`](https://charts.crossplane.io/alpha/) chart v0.4.1 is used to
 install Crossplane using the
-[`values.yaml`](https://github.com/crossplaneio/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
+[`values.yaml`](https://github.com/crossplane/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
 file.
 
 ### Elastic Stack
 
 > Introduced in GitLab 12.7 for project- and group-level clusters.
 
-[Elastic Stack](https://www.elastic.co/products/elastic-stack) is a complete end-to-end
+[Elastic Stack](https://www.elastic.co/elastic-stack) is a complete end-to-end
 log analysis solution which helps in deep searching, analyzing and visualizing the logs
 generated from different machines.
 
@@ -592,6 +592,8 @@ will be saved as a [CI job artifact](../../ci/pipelines/job_artifacts.md).
 
 Note the following:
 
+- We recommend using the cluster management project exclusively for managing deployments to a cluster.
+  Do not add your application's source code to such projects.
 - When you set the value for `installed` key back to `false`, the application will be
   unprovisioned from the cluster.
 - If you update `.gitlab/managed-apps/<application>/values.yaml` with new values, the
@@ -752,7 +754,7 @@ available configuration options.
 [Cilium](https://cilium.io/) is a networking plugin for Kubernetes
 that you can use to implement support for
 [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-resources. For more information on [Network Policies](../../topics/autodevops/index.md#network-policy), see the documentation.
+resources. For more information on [Network Policies](../../topics/autodevops/stages.md#network-policy), see the documentation.
 
 Enable Cilium in the `.gitlab/managed-apps/config.yaml` file to install it:
 
@@ -823,11 +825,33 @@ agent:
     enabled: false
 ```
 
+The [Hubble](https://github.com/cilium/hubble) monitoring daemon is
+enabled by default and it's set to collect per namespace flow
+metrics. This metrics are accessible on the [Threat Monitoring](../application_security/threat_monitoring/index.md)
+dashboard. You can disable Hubble by adding the following to
+`.gitlab/managed-apps/config.yaml`:
+
+```yaml
+cilium:
+  installed: true
+  hubble:
+    installed: false
+```
+
+You can also adjust Helm values for Hubble via
+`.gitlab/managed-apps/cilium/hubble-values.yaml`:
+
+```yaml
+metrics:
+  enabled:
+    - 'flow:sourceContext=namespace;destinationContext=namespace'
+```
+
 ### Install Vault using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9982) in GitLab 12.9.
 
-[Hashicorp Vault](https://vaultproject.io/) is a secrets management solution which
+[Hashicorp Vault](https://www.vaultproject.io/) is a secrets management solution which
 can be used to safely manage and store passwords, credentials, certificates and more. A Vault
 installation could be leveraged to provide a single secure data store for credentials
 used in your applications, GitLab CI/CD jobs, and more. It could also serve as a way of
@@ -1045,7 +1069,7 @@ The applications below can be uninstalled.
 
 | Application | GitLab version | Notes |
 | ----------- | -------------- | ----- |
-| cert-manager | 12.2+         | The associated private key will be deleted and cannot be restored. Deployed applications will continue to use HTTPS, but certificates will not be renewed. Before uninstalling, you may wish to [back up your configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html) or [revoke your certificates](https://letsencrypt.org/docs/revoking/). |
+| cert-manager | 12.2+         | The associated private key will be deleted and cannot be restored. Deployed applications will continue to use HTTPS, but certificates will not be renewed. Before uninstalling, you may wish to [back up your configuration](https://cert-manager.io/docs/tutorials/backup/) or [revoke your certificates](https://letsencrypt.org/docs/revoking/). |
 | GitLab Runner  | 12.2+         | Any running pipelines will be canceled. |
 | Helm  | 12.2+         | The associated Tiller pod, the `gitlab-managed-apps` namespace, and all of its resources will be deleted and cannot be restored. |
 | Ingress  | 12.1+         | The associated load balancer and IP will be deleted and cannot be restored. Furthermore, it can only be uninstalled if JupyterHub is not installed. |
@@ -1092,3 +1116,22 @@ To avoid installation errors:
   kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem
   diff a.pem b.pem
   ```
+
+### Error installing managed apps on EKS cluster
+
+If you're using a managed cluster on AWS EKS, and you are not able to install some of the managed
+apps, consider checking the logs.
+
+You can check the logs by running following commands:
+
+```shell
+kubectl get pods --all-namespaces
+kubectl get services --all-namespaces
+```
+
+If you are getting the `Failed to assign an IP address to container` error, it's probably due to the
+instance type you've specified in the AWS configuration.
+The number and size of nodes might not have enough IP addresses to run or install those pods.
+
+For reference, all the AWS instance IP limits are found
+[in this AWS repository on GitHub](https://github.com/aws/amazon-vpc-cni-k8s/blob/master/pkg/awsutils/vpc_ip_resource_limit.go) (search for `InstanceENIsAvailable`).

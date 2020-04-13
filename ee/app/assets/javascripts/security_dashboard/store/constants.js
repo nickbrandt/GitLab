@@ -7,8 +7,6 @@ export const SEVERITY_LEVELS = {
   low: s__('severity|Low'),
   unknown: s__('severity|Unknown'),
   info: s__('severity|Info'),
-  undefined: s__('severity|Undefined'),
-  none: s__('severity|None'),
 };
 
 export const REPORT_TYPES = {

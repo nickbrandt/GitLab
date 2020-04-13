@@ -5,15 +5,10 @@ module Epics
     PromoteError = Class.new(StandardError)
 
     def execute(issue)
-      @group = issue.project.group
+      @issue = issue
+      @parent_group = issue.project.group
 
-      unless @group
-        raise PromoteError, 'Cannot promote issue because it does not belong to a group!'
-      end
-
-      unless current_user.can?(:admin_issue, issue) && current_user.can?(:create_epic, @group)
-        raise PromoteError, 'Cannot promote issue due to insufficient permissions!'
-      end
+      validate_promotion!
 
       super
 
@@ -23,6 +18,18 @@ module Epics
 
     private
 
+    attr_reader :issue, :parent_group
+
+    def validate_promotion!
+      raise PromoteError, _('Cannot promote issue because it does not belong to a group.') if parent_group.nil?
+      raise PromoteError, _('Cannot promote issue due to insufficient permissions.') unless can_promote?
+      raise PromoteError, _('Issue already promoted to epic.') if issue.promoted?
+    end
+
+    def can_promote?
+      current_user.can?(:admin_issue, issue) && current_user.can?(:create_epic, parent_group)
+    end
+
     def track_event
       ::Gitlab::Tracking.event(
         'epics', 'promote', property: 'issue_id', value: original_entity.id
@@ -30,7 +37,7 @@ module Epics
     end
 
     def create_new_entity
-      @new_entity = Epics::CreateService.new(@group, current_user, params).execute
+      @new_entity = Epics::CreateService.new(parent_group, current_user, params).execute
     end
 
     def update_old_entity

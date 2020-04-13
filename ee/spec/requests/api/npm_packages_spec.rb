@@ -63,42 +63,26 @@ describe API::NpmPackages do
     context 'a public project' do
       it_behaves_like 'returning the npm package info'
 
-      context 'with forward_npm_package_registry_requests enabled' do
+      context 'with application setting enabled' do
         before do
-          stub_feature_flags(forward_npm_package_registry_requests: { enabled: true })
+          stub_application_setting(npm_package_requests_forwarding: true)
         end
 
-        context 'with application setting enabled' do
-          before do
-            stub_application_setting(npm_package_requests_forwarding: true)
+        it_behaves_like 'returning the npm package info'
+
+        context 'with unknown package' do
+          it 'returns a redirect' do
+            get api("/packages/npm/unknown")
+
+            expect(response).to have_gitlab_http_status(:found)
+            expect(response.headers['Location']).to eq('https://registry.npmjs.org/unknown')
           end
-
-          it_behaves_like 'returning the npm package info'
-
-          context 'with unknown package' do
-            it 'returns a redirect' do
-              get api("/packages/npm/unknown")
-
-              expect(response).to have_gitlab_http_status(:found)
-              expect(response.headers['Location']).to eq('https://registry.npmjs.org/unknown')
-            end
-          end
-        end
-
-        context 'with application setting disabled' do
-          before do
-            stub_application_setting(npm_package_requests_forwarding: false)
-          end
-
-          it_behaves_like 'returning the npm package info'
-
-          it_behaves_like 'returning forbidden for unknown package'
         end
       end
 
-      context 'with forward_npm_package_registry_requests disabled' do
+      context 'with application setting disabled' do
         before do
-          stub_feature_flags(forward_npm_package_registry_requests: { enabled: false })
+          stub_application_setting(npm_package_requests_forwarding: false)
         end
 
         it_behaves_like 'returning the npm package info'
@@ -246,21 +230,25 @@ describe API::NpmPackages do
   end
 
   describe 'PUT /api/v4/projects/:id/packages/npm/:package_name' do
+    RSpec.shared_examples 'handling invalid record with 400 error' do
+      it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
+        expect { upload_package_with_token(package_name, params) }
+          .not_to change { project.packages.count }
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+      end
+    end
+
     context 'when params are correct' do
       context 'invalid package record' do
         context 'unscoped package' do
           let(:package_name) { 'my_unscoped_package' }
-          let(:params) { upload_params(package_name) }
+          let(:params) { upload_params(package_name: package_name) }
 
-          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
-            expect { upload_package_with_token(package_name, params) }
-              .not_to change { project.packages.count }
-
-            expect(response).to have_gitlab_http_status(:bad_request)
-          end
+          it_behaves_like 'handling invalid record with 400 error'
 
           context 'with empty versions' do
-            let(:params) { upload_params(package_name).merge!(versions: {}) }
+            let(:params) { upload_params(package_name: package_name).merge!(versions: {}) }
 
             it 'throws a 400 error' do
               expect { upload_package_with_token(package_name, params) }
@@ -273,20 +261,37 @@ describe API::NpmPackages do
 
         context 'invalid package name' do
           let(:package_name) { "@#{group.path}/my_inv@@lid_package_name" }
-          let(:params) { upload_params(package_name) }
+          let(:params) { upload_params(package_name: package_name) }
 
-          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
-            expect { upload_package_with_token(package_name, params) }
-              .not_to change { project.packages.count }
+          it_behaves_like 'handling invalid record with 400 error'
+        end
 
-            expect(response).to have_gitlab_http_status(:bad_request)
+        context 'invalid package version' do
+          using RSpec::Parameterized::TableSyntax
+
+          let(:package_name) { "@#{group.path}/my_package_name" }
+
+          where(:version) do
+            [
+              '1',
+              '1.2',
+              '1./2.3',
+              '../../../../../1.2.3',
+              '%2e%2e%2f1.2.3'
+            ]
+          end
+
+          with_them do
+            let(:params) { upload_params(package_name: package_name, package_version: version) }
+
+            it_behaves_like 'handling invalid record with 400 error'
           end
         end
       end
 
       context 'scoped package' do
         let(:package_name) { "@#{group.path}/my_package_name" }
-        let(:params) { upload_params(package_name) }
+        let(:params) { upload_params(package_name: package_name) }
 
         context 'with access token' do
           subject { upload_package_with_token(package_name, params) }
@@ -335,7 +340,7 @@ describe API::NpmPackages do
 
       context 'package creation fails' do
         let(:package_name) { "@#{group.path}/my_package_name" }
-        let(:params) { upload_params(package_name) }
+        let(:params) { upload_params(package_name: package_name) }
 
         it 'returns an error if the package already exists' do
           create(:npm_package, project: project, version: '1.0.1', name: "@#{group.path}/my_package_name")
@@ -348,7 +353,7 @@ describe API::NpmPackages do
 
       context 'with dependencies' do
         let(:package_name) { "@#{group.path}/my_package_name" }
-        let(:params) { upload_params(package_name, 'npm/payload_with_duplicated_packages.json') }
+        let(:params) { upload_params(package_name: package_name, file: 'npm/payload_with_duplicated_packages.json') }
 
         it 'creates npm package with file and dependencies' do
           expect { upload_package_with_token(package_name, params) }
@@ -363,7 +368,7 @@ describe API::NpmPackages do
         context 'with existing dependencies' do
           before do
             name = "@#{group.path}/existing_package"
-            upload_package_with_token(name, upload_params(name, 'npm/payload_with_duplicated_packages.json'))
+            upload_package_with_token(name, upload_params(package_name: name, file: 'npm/payload_with_duplicated_packages.json'))
           end
 
           it 'reuses them' do
@@ -389,10 +394,11 @@ describe API::NpmPackages do
       upload_package(package_name, params.merge(job_token: job.token))
     end
 
-    def upload_params(package_name, file = 'npm/payload.json')
+    def upload_params(package_name:, package_version: '1.0.1', file: 'npm/payload.json')
       JSON.parse(
         fixture_file(file, dir: 'ee')
-          .gsub('@root/npm-test', package_name))
+          .gsub('@root/npm-test', package_name)
+          .gsub('1.0.1', package_version))
     end
   end
 

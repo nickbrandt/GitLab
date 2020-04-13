@@ -39,6 +39,7 @@ describe Groups::Analytics::ProductivityAnalyticsController do
 
     context 'when user is not authorized to view productivity analytics' do
       before do
+        expect(Ability).to receive(:allowed?).with(current_user, :log_in, :global).and_call_original
         expect(Ability).to receive(:allowed?).with(current_user, :read_group, group).and_return(true)
         expect(Ability).to receive(:allowed?).with(current_user, :view_productivity_analytics, group).and_return(false)
       end

@@ -395,7 +395,10 @@ CREATE TABLE public.application_settings (
     prevent_merge_requests_committers_approval boolean DEFAULT false NOT NULL,
     email_restrictions_enabled boolean DEFAULT false NOT NULL,
     email_restrictions text,
-    npm_package_requests_forwarding boolean DEFAULT true NOT NULL
+    npm_package_requests_forwarding boolean DEFAULT true NOT NULL,
+    namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
+    seat_link_enabled boolean DEFAULT true NOT NULL,
+    container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -1309,7 +1312,9 @@ CREATE TABLE public.ci_runners (
     ip_address character varying,
     maximum_timeout integer,
     runner_type smallint NOT NULL,
-    token_encrypted character varying
+    token_encrypted character varying,
+    public_projects_minutes_cost_factor double precision DEFAULT 0.0 NOT NULL,
+    private_projects_minutes_cost_factor double precision DEFAULT 1.0 NOT NULL
 );
 
 CREATE SEQUENCE public.ci_runners_id_seq
@@ -1645,6 +1650,28 @@ CREATE SEQUENCE public.clusters_applications_elastic_stacks_id_seq
 
 ALTER SEQUENCE public.clusters_applications_elastic_stacks_id_seq OWNED BY public.clusters_applications_elastic_stacks.id;
 
+CREATE TABLE public.clusters_applications_fluentd (
+    id bigint NOT NULL,
+    protocol smallint NOT NULL,
+    status integer NOT NULL,
+    port integer NOT NULL,
+    cluster_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    version character varying(255) NOT NULL,
+    host character varying(255) NOT NULL,
+    status_reason text
+);
+
+CREATE SEQUENCE public.clusters_applications_fluentd_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.clusters_applications_fluentd_id_seq OWNED BY public.clusters_applications_fluentd.id;
+
 CREATE TABLE public.clusters_applications_helm (
     id integer NOT NULL,
     cluster_id integer NOT NULL,
@@ -1745,7 +1772,8 @@ CREATE TABLE public.clusters_applications_prometheus (
     updated_at timestamp with time zone NOT NULL,
     last_update_started_at timestamp with time zone,
     encrypted_alert_manager_token character varying,
-    encrypted_alert_manager_token_iv character varying
+    encrypted_alert_manager_token_iv character varying,
+    healthy boolean
 );
 
 CREATE SEQUENCE public.clusters_applications_prometheus_id_seq
@@ -1837,7 +1865,7 @@ CREATE TABLE public.container_expiration_policies (
     cadence character varying(12) DEFAULT '7d'::character varying NOT NULL,
     older_than character varying(12),
     keep_n integer,
-    enabled boolean DEFAULT false NOT NULL
+    enabled boolean DEFAULT true NOT NULL
 );
 
 CREATE TABLE public.container_repositories (
@@ -1845,7 +1873,8 @@ CREATE TABLE public.container_repositories (
     project_id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    status smallint
 );
 
 CREATE SEQUENCE public.container_repositories_id_seq
@@ -2266,7 +2295,7 @@ CREATE TABLE public.epics (
     state_id smallint DEFAULT 1 NOT NULL,
     start_date_sourcing_epic_id integer,
     due_date_sourcing_epic_id integer,
-    health_status smallint,
+    confidential boolean DEFAULT false NOT NULL,
     external_key character varying(255)
 );
 
@@ -2621,7 +2650,8 @@ CREATE TABLE public.geo_node_statuses (
     design_repositories_count integer,
     design_repositories_synced_count integer,
     design_repositories_failed_count integer,
-    design_repositories_registry_count integer
+    design_repositories_registry_count integer,
+    status jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE public.geo_node_statuses_id_seq
@@ -3299,6 +3329,33 @@ CREATE SEQUENCE public.jira_connect_subscriptions_id_seq
 
 ALTER SEQUENCE public.jira_connect_subscriptions_id_seq OWNED BY public.jira_connect_subscriptions.id;
 
+CREATE TABLE public.jira_imports (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    user_id bigint,
+    label_id bigint,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    finished_at timestamp with time zone,
+    jira_project_xid bigint NOT NULL,
+    total_issue_count integer DEFAULT 0 NOT NULL,
+    imported_issues_count integer DEFAULT 0 NOT NULL,
+    failed_to_import_count integer DEFAULT 0 NOT NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    jid character varying(255),
+    jira_project_key character varying(255) NOT NULL,
+    jira_project_name character varying(255) NOT NULL
+);
+
+CREATE SEQUENCE public.jira_imports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.jira_imports_id_seq OWNED BY public.jira_imports.id;
+
 CREATE TABLE public.jira_tracker_data (
     id bigint NOT NULL,
     service_id integer NOT NULL,
@@ -3716,7 +3773,9 @@ CREATE TABLE public.merge_request_metrics (
     modified_paths_size integer,
     commits_count integer,
     first_approved_at timestamp with time zone,
-    first_reassigned_at timestamp with time zone
+    first_reassigned_at timestamp with time zone,
+    added_lines integer,
+    removed_lines integer
 );
 
 CREATE SEQUENCE public.merge_request_metrics_id_seq
@@ -3836,6 +3895,26 @@ CREATE SEQUENCE public.merge_trains_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.merge_trains_id_seq OWNED BY public.merge_trains.id;
+
+CREATE TABLE public.metrics_dashboard_annotations (
+    id bigint NOT NULL,
+    starting_at timestamp with time zone NOT NULL,
+    ending_at timestamp with time zone,
+    environment_id bigint,
+    cluster_id bigint,
+    dashboard_path character varying(255) NOT NULL,
+    panel_xid character varying(255),
+    description text NOT NULL
+);
+
+CREATE SEQUENCE public.metrics_dashboard_annotations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.metrics_dashboard_annotations_id_seq OWNED BY public.metrics_dashboard_annotations.id;
 
 CREATE TABLE public.milestone_releases (
     milestone_id bigint NOT NULL,
@@ -4245,6 +4324,25 @@ CREATE SEQUENCE public.operations_strategies_id_seq
 
 ALTER SEQUENCE public.operations_strategies_id_seq OWNED BY public.operations_strategies.id;
 
+CREATE TABLE public.operations_user_lists (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    iid integer NOT NULL,
+    name character varying(255) NOT NULL,
+    user_xids text DEFAULT ''::text NOT NULL
+);
+
+CREATE SEQUENCE public.operations_user_lists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.operations_user_lists_id_seq OWNED BY public.operations_user_lists.id;
+
 CREATE TABLE public.packages_build_infos (
     id bigint NOT NULL,
     package_id integer NOT NULL,
@@ -4360,7 +4458,12 @@ CREATE TABLE public.packages_package_files (
     file_sha1 bytea,
     file_name character varying NOT NULL,
     file text NOT NULL,
-    file_sha256 bytea
+    file_sha256 bytea,
+    verification_retry_at timestamp with time zone,
+    verified_at timestamp with time zone,
+    verification_checksum character varying(255),
+    verification_failure character varying(255),
+    verification_retry_count integer
 );
 
 CREATE SEQUENCE public.packages_package_files_id_seq
@@ -4390,6 +4493,11 @@ CREATE SEQUENCE public.packages_packages_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.packages_packages_id_seq OWNED BY public.packages_packages.id;
+
+CREATE TABLE public.packages_pypi_metadata (
+    package_id bigint NOT NULL,
+    required_python character varying(50) NOT NULL
+);
 
 CREATE TABLE public.packages_tags (
     id bigint NOT NULL,
@@ -4448,7 +4556,8 @@ CREATE TABLE public.pages_domains (
     certificate_source smallint DEFAULT 0 NOT NULL,
     wildcard boolean DEFAULT false NOT NULL,
     usage smallint DEFAULT 0 NOT NULL,
-    scope smallint DEFAULT 2 NOT NULL
+    scope smallint DEFAULT 2 NOT NULL,
+    auto_ssl_failed boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.pages_domains_id_seq
@@ -4508,10 +4617,10 @@ CREATE TABLE public.plan_limits (
     ci_active_pipelines integer DEFAULT 0 NOT NULL,
     ci_pipeline_size integer DEFAULT 0 NOT NULL,
     ci_active_jobs integer DEFAULT 0 NOT NULL,
-    project_hooks integer DEFAULT 0 NOT NULL,
-    group_hooks integer DEFAULT 0 NOT NULL,
-    ci_project_subscriptions integer DEFAULT 0 NOT NULL,
-    ci_pipeline_schedules integer DEFAULT 0 NOT NULL
+    project_hooks integer DEFAULT 100 NOT NULL,
+    group_hooks integer DEFAULT 50 NOT NULL,
+    ci_project_subscriptions integer DEFAULT 2 NOT NULL,
+    ci_pipeline_schedules integer DEFAULT 10 NOT NULL
 );
 
 CREATE SEQUENCE public.plan_limits_id_seq
@@ -4637,6 +4746,20 @@ CREATE SEQUENCE public.project_ci_cd_settings_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.project_ci_cd_settings_id_seq OWNED BY public.project_ci_cd_settings.id;
+
+CREATE TABLE public.project_compliance_framework_settings (
+    project_id bigint NOT NULL,
+    framework smallint NOT NULL
+);
+
+CREATE SEQUENCE public.project_compliance_framework_settings_project_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.project_compliance_framework_settings_project_id_seq OWNED BY public.project_compliance_framework_settings.project_id;
 
 CREATE TABLE public.project_custom_attributes (
     id integer NOT NULL,
@@ -4815,7 +4938,8 @@ CREATE TABLE public.project_mirror_data (
     jid character varying,
     last_error text,
     last_update_at timestamp with time zone,
-    last_successful_update_at timestamp with time zone
+    last_successful_update_at timestamp with time zone,
+    correlation_id_value character varying(128)
 );
 
 CREATE SEQUENCE public.project_mirror_data_id_seq
@@ -5547,7 +5671,8 @@ CREATE TABLE public.security_scans (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     build_id bigint NOT NULL,
-    scan_type smallint NOT NULL
+    scan_type smallint NOT NULL,
+    scanned_resources_count integer
 );
 
 CREATE SEQUENCE public.security_scans_id_seq
@@ -5971,6 +6096,24 @@ CREATE SEQUENCE public.term_agreements_id_seq
 
 ALTER SEQUENCE public.term_agreements_id_seq OWNED BY public.term_agreements.id;
 
+CREATE TABLE public.terraform_states (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    file_store smallint,
+    file character varying(255)
+);
+
+CREATE SEQUENCE public.terraform_states_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.terraform_states_id_seq OWNED BY public.terraform_states.id;
+
 CREATE TABLE public.timelogs (
     id integer NOT NULL,
     time_spent integer NOT NULL,
@@ -6147,7 +6290,8 @@ ALTER SEQUENCE public.user_custom_attributes_id_seq OWNED BY public.user_custom_
 
 CREATE TABLE public.user_details (
     user_id bigint NOT NULL,
-    job_title character varying(200) DEFAULT ''::character varying NOT NULL
+    job_title character varying(200) DEFAULT ''::character varying NOT NULL,
+    bio character varying(255) DEFAULT ''::character varying NOT NULL
 );
 
 CREATE SEQUENCE public.user_details_user_id_seq
@@ -6610,6 +6754,24 @@ CREATE SEQUENCE public.vulnerability_scanners_id_seq
 
 ALTER SEQUENCE public.vulnerability_scanners_id_seq OWNED BY public.vulnerability_scanners.id;
 
+CREATE TABLE public.vulnerability_user_mentions (
+    id bigint NOT NULL,
+    vulnerability_id bigint NOT NULL,
+    note_id integer,
+    mentioned_users_ids integer[],
+    mentioned_projects_ids integer[],
+    mentioned_groups_ids integer[]
+);
+
+CREATE SEQUENCE public.vulnerability_user_mentions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.vulnerability_user_mentions_id_seq OWNED BY public.vulnerability_user_mentions.id;
+
 CREATE TABLE public.web_hook_logs (
     id integer NOT NULL,
     web_hook_id integer NOT NULL,
@@ -6919,6 +7081,8 @@ ALTER TABLE ONLY public.clusters_applications_crossplane ALTER COLUMN id SET DEF
 
 ALTER TABLE ONLY public.clusters_applications_elastic_stacks ALTER COLUMN id SET DEFAULT nextval('public.clusters_applications_elastic_stacks_id_seq'::regclass);
 
+ALTER TABLE ONLY public.clusters_applications_fluentd ALTER COLUMN id SET DEFAULT nextval('public.clusters_applications_fluentd_id_seq'::regclass);
+
 ALTER TABLE ONLY public.clusters_applications_helm ALTER COLUMN id SET DEFAULT nextval('public.clusters_applications_helm_id_seq'::regclass);
 
 ALTER TABLE ONLY public.clusters_applications_ingress ALTER COLUMN id SET DEFAULT nextval('public.clusters_applications_ingress_id_seq'::regclass);
@@ -7071,6 +7235,8 @@ ALTER TABLE ONLY public.jira_connect_installations ALTER COLUMN id SET DEFAULT n
 
 ALTER TABLE ONLY public.jira_connect_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.jira_connect_subscriptions_id_seq'::regclass);
 
+ALTER TABLE ONLY public.jira_imports ALTER COLUMN id SET DEFAULT nextval('public.jira_imports_id_seq'::regclass);
+
 ALTER TABLE ONLY public.jira_tracker_data ALTER COLUMN id SET DEFAULT nextval('public.jira_tracker_data_id_seq'::regclass);
 
 ALTER TABLE ONLY public.keys ALTER COLUMN id SET DEFAULT nextval('public.keys_id_seq'::regclass);
@@ -7115,6 +7281,8 @@ ALTER TABLE ONLY public.merge_requests_closing_issues ALTER COLUMN id SET DEFAUL
 
 ALTER TABLE ONLY public.merge_trains ALTER COLUMN id SET DEFAULT nextval('public.merge_trains_id_seq'::regclass);
 
+ALTER TABLE ONLY public.metrics_dashboard_annotations ALTER COLUMN id SET DEFAULT nextval('public.metrics_dashboard_annotations_id_seq'::regclass);
+
 ALTER TABLE ONLY public.milestones ALTER COLUMN id SET DEFAULT nextval('public.milestones_id_seq'::regclass);
 
 ALTER TABLE ONLY public.namespace_statistics ALTER COLUMN id SET DEFAULT nextval('public.namespace_statistics_id_seq'::regclass);
@@ -7146,6 +7314,8 @@ ALTER TABLE ONLY public.operations_feature_flags_clients ALTER COLUMN id SET DEF
 ALTER TABLE ONLY public.operations_scopes ALTER COLUMN id SET DEFAULT nextval('public.operations_scopes_id_seq'::regclass);
 
 ALTER TABLE ONLY public.operations_strategies ALTER COLUMN id SET DEFAULT nextval('public.operations_strategies_id_seq'::regclass);
+
+ALTER TABLE ONLY public.operations_user_lists ALTER COLUMN id SET DEFAULT nextval('public.operations_user_lists_id_seq'::regclass);
 
 ALTER TABLE ONLY public.packages_build_infos ALTER COLUMN id SET DEFAULT nextval('public.packages_build_infos_id_seq'::regclass);
 
@@ -7186,6 +7356,8 @@ ALTER TABLE ONLY public.project_aliases ALTER COLUMN id SET DEFAULT nextval('pub
 ALTER TABLE ONLY public.project_auto_devops ALTER COLUMN id SET DEFAULT nextval('public.project_auto_devops_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_ci_cd_settings ALTER COLUMN id SET DEFAULT nextval('public.project_ci_cd_settings_id_seq'::regclass);
+
+ALTER TABLE ONLY public.project_compliance_framework_settings ALTER COLUMN project_id SET DEFAULT nextval('public.project_compliance_framework_settings_project_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_custom_attributes ALTER COLUMN id SET DEFAULT nextval('public.project_custom_attributes_id_seq'::regclass);
 
@@ -7305,6 +7477,8 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 ALTER TABLE ONLY public.term_agreements ALTER COLUMN id SET DEFAULT nextval('public.term_agreements_id_seq'::regclass);
 
+ALTER TABLE ONLY public.terraform_states ALTER COLUMN id SET DEFAULT nextval('public.terraform_states_id_seq'::regclass);
+
 ALTER TABLE ONLY public.timelogs ALTER COLUMN id SET DEFAULT nextval('public.timelogs_id_seq'::regclass);
 
 ALTER TABLE ONLY public.todos ALTER COLUMN id SET DEFAULT nextval('public.todos_id_seq'::regclass);
@@ -7356,6 +7530,8 @@ ALTER TABLE ONLY public.vulnerability_occurrence_pipelines ALTER COLUMN id SET D
 ALTER TABLE ONLY public.vulnerability_occurrences ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_occurrences_id_seq'::regclass);
 
 ALTER TABLE ONLY public.vulnerability_scanners ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_scanners_id_seq'::regclass);
+
+ALTER TABLE ONLY public.vulnerability_user_mentions ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_user_mentions_id_seq'::regclass);
 
 ALTER TABLE ONLY public.web_hook_logs ALTER COLUMN id SET DEFAULT nextval('public.web_hook_logs_id_seq'::regclass);
 
@@ -7579,6 +7755,9 @@ ALTER TABLE ONLY public.clusters_applications_crossplane
 
 ALTER TABLE ONLY public.clusters_applications_elastic_stacks
     ADD CONSTRAINT clusters_applications_elastic_stacks_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.clusters_applications_fluentd
+    ADD CONSTRAINT clusters_applications_fluentd_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.clusters_applications_helm
     ADD CONSTRAINT clusters_applications_helm_pkey PRIMARY KEY (id);
@@ -7820,6 +7999,9 @@ ALTER TABLE ONLY public.jira_connect_installations
 ALTER TABLE ONLY public.jira_connect_subscriptions
     ADD CONSTRAINT jira_connect_subscriptions_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.jira_imports
+    ADD CONSTRAINT jira_imports_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.jira_tracker_data
     ADD CONSTRAINT jira_tracker_data_pkey PRIMARY KEY (id);
 
@@ -7886,6 +8068,9 @@ ALTER TABLE ONLY public.merge_requests
 ALTER TABLE ONLY public.merge_trains
     ADD CONSTRAINT merge_trains_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.metrics_dashboard_annotations
+    ADD CONSTRAINT metrics_dashboard_annotations_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.milestones
     ADD CONSTRAINT milestones_pkey PRIMARY KEY (id);
 
@@ -7940,6 +8125,9 @@ ALTER TABLE ONLY public.operations_scopes
 ALTER TABLE ONLY public.operations_strategies
     ADD CONSTRAINT operations_strategies_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.operations_user_lists
+    ADD CONSTRAINT operations_user_lists_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.packages_build_infos
     ADD CONSTRAINT packages_build_infos_pkey PRIMARY KEY (id);
 
@@ -7963,6 +8151,9 @@ ALTER TABLE ONLY public.packages_package_files
 
 ALTER TABLE ONLY public.packages_packages
     ADD CONSTRAINT packages_packages_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT packages_pypi_metadata_pkey PRIMARY KEY (package_id);
 
 ALTER TABLE ONLY public.packages_tags
     ADD CONSTRAINT packages_tags_pkey PRIMARY KEY (id);
@@ -8002,6 +8193,9 @@ ALTER TABLE ONLY public.project_auto_devops
 
 ALTER TABLE ONLY public.project_ci_cd_settings
     ADD CONSTRAINT project_ci_cd_settings_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_compliance_framework_settings
+    ADD CONSTRAINT project_compliance_framework_settings_pkey PRIMARY KEY (project_id);
 
 ALTER TABLE ONLY public.project_custom_attributes
     ADD CONSTRAINT project_custom_attributes_pkey PRIMARY KEY (id);
@@ -8204,6 +8398,9 @@ ALTER TABLE ONLY public.tags
 ALTER TABLE ONLY public.term_agreements
     ADD CONSTRAINT term_agreements_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT terraform_states_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.timelogs
     ADD CONSTRAINT timelogs_pkey PRIMARY KEY (id);
 
@@ -8284,6 +8481,9 @@ ALTER TABLE ONLY public.vulnerability_occurrences
 
 ALTER TABLE ONLY public.vulnerability_scanners
     ADD CONSTRAINT vulnerability_scanners_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.vulnerability_user_mentions
+    ADD CONSTRAINT vulnerability_user_mentions_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.web_hook_logs
     ADD CONSTRAINT web_hook_logs_pkey PRIMARY KEY (id);
@@ -8429,6 +8629,8 @@ CREATE INDEX index_analytics_ca_project_stages_on_relative_position ON public.an
 
 CREATE INDEX index_analytics_ca_project_stages_on_start_event_label_id ON public.analytics_cycle_analytics_project_stages USING btree (start_event_label_id);
 
+CREATE INDEX index_analytics_cycle_analytics_group_stages_custom_only ON public.analytics_cycle_analytics_group_stages USING btree (id) WHERE (custom = true);
+
 CREATE INDEX index_application_settings_on_custom_project_templates_group_id ON public.application_settings USING btree (custom_project_templates_group_id);
 
 CREATE INDEX index_application_settings_on_file_template_project_id ON public.application_settings USING btree (file_template_project_id);
@@ -8535,6 +8737,8 @@ CREATE INDEX index_boards_on_project_id ON public.boards USING btree (project_id
 
 CREATE INDEX index_broadcast_message_on_ends_at_and_broadcast_type_and_id ON public.broadcast_messages USING btree (ends_at, broadcast_type, id);
 
+CREATE INDEX index_chat_names_on_service_id ON public.chat_names USING btree (service_id);
+
 CREATE UNIQUE INDEX index_chat_names_on_service_id_and_team_id_and_chat_id ON public.chat_names USING btree (service_id, team_id, chat_id);
 
 CREATE UNIQUE INDEX index_chat_names_on_user_id_and_service_id ON public.chat_names USING btree (user_id, service_id);
@@ -8575,7 +8779,7 @@ CREATE INDEX index_ci_builds_on_commit_id_and_type_and_name_and_ref ON public.ci
 
 CREATE INDEX index_ci_builds_on_commit_id_and_type_and_ref ON public.ci_builds USING btree (commit_id, type, ref);
 
-CREATE INDEX index_ci_builds_on_name_for_security_reports_values ON public.ci_builds USING btree (name) WHERE ((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('license_scanning'::character varying)::text]));
+CREATE INDEX index_ci_builds_on_name_and_security_type_eq_ci_build ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
 
 CREATE INDEX index_ci_builds_on_project_id_and_id ON public.ci_builds USING btree (project_id, id);
 
@@ -8612,6 +8816,8 @@ CREATE UNIQUE INDEX index_ci_builds_runner_session_on_build_id ON public.ci_buil
 CREATE INDEX index_ci_daily_report_results_on_last_pipeline_id ON public.ci_daily_report_results USING btree (last_pipeline_id);
 
 CREATE UNIQUE INDEX index_ci_group_variables_on_group_id_and_key ON public.ci_group_variables USING btree (group_id, key);
+
+CREATE INDEX index_ci_job_artifacts_file_store_is_null ON public.ci_job_artifacts USING btree (id) WHERE (file_store IS NULL);
 
 CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON public.ci_job_artifacts USING btree (expire_at, job_id);
 
@@ -8766,6 +8972,8 @@ CREATE UNIQUE INDEX index_clusters_applications_cert_managers_on_cluster_id ON p
 CREATE UNIQUE INDEX index_clusters_applications_crossplane_on_cluster_id ON public.clusters_applications_crossplane USING btree (cluster_id);
 
 CREATE UNIQUE INDEX index_clusters_applications_elastic_stacks_on_cluster_id ON public.clusters_applications_elastic_stacks USING btree (cluster_id);
+
+CREATE UNIQUE INDEX index_clusters_applications_fluentd_on_cluster_id ON public.clusters_applications_fluentd USING btree (cluster_id);
 
 CREATE UNIQUE INDEX index_clusters_applications_helm_on_cluster_id ON public.clusters_applications_helm USING btree (cluster_id);
 
@@ -8970,6 +9178,8 @@ CREATE UNIQUE INDEX index_feature_flags_clients_on_project_id_and_token_encrypte
 CREATE UNIQUE INDEX index_feature_gates_on_feature_key_and_key_and_value ON public.feature_gates USING btree (feature_key, key, value);
 
 CREATE UNIQUE INDEX index_features_on_key ON public.features USING btree (key);
+
+CREATE INDEX index_for_migrating_user_highest_roles_table ON public.users USING btree (id) WHERE (((state)::text = 'active'::text) AND (user_type IS NULL) AND (bot_type IS NULL) AND (ghost IS NOT TRUE));
 
 CREATE INDEX index_for_resource_group ON public.ci_builds USING btree (resource_group_id, id) WHERE (resource_group_id IS NOT NULL);
 
@@ -9183,6 +9393,12 @@ CREATE UNIQUE INDEX index_jira_connect_installations_on_client_key ON public.jir
 
 CREATE INDEX index_jira_connect_subscriptions_on_namespace_id ON public.jira_connect_subscriptions USING btree (namespace_id);
 
+CREATE INDEX index_jira_imports_on_label_id ON public.jira_imports USING btree (label_id);
+
+CREATE INDEX index_jira_imports_on_project_id_and_jira_project_key ON public.jira_imports USING btree (project_id, jira_project_key);
+
+CREATE INDEX index_jira_imports_on_user_id ON public.jira_imports USING btree (user_id);
+
 CREATE INDEX index_jira_tracker_data_on_service_id ON public.jira_tracker_data USING btree (service_id);
 
 CREATE UNIQUE INDEX index_keys_on_fingerprint ON public.keys USING btree (fingerprint);
@@ -9224,6 +9440,8 @@ CREATE INDEX index_labels_on_type_and_project_id ON public.labels USING btree (t
 CREATE UNIQUE INDEX index_lfs_file_locks_on_project_id_and_path ON public.lfs_file_locks USING btree (project_id, path);
 
 CREATE INDEX index_lfs_file_locks_on_user_id ON public.lfs_file_locks USING btree (user_id);
+
+CREATE INDEX index_lfs_objects_file_store_is_null ON public.lfs_objects USING btree (id) WHERE (file_store IS NULL);
 
 CREATE INDEX index_lfs_objects_on_file_store ON public.lfs_objects USING btree (file_store);
 
@@ -9349,6 +9567,10 @@ CREATE INDEX index_merge_trains_on_pipeline_id ON public.merge_trains USING btre
 
 CREATE INDEX index_merge_trains_on_user_id ON public.merge_trains USING btree (user_id);
 
+CREATE INDEX index_metrics_dashboard_annotations_on_cluster_id_and_3_columns ON public.metrics_dashboard_annotations USING btree (cluster_id, dashboard_path, starting_at, ending_at) WHERE (cluster_id IS NOT NULL);
+
+CREATE INDEX index_metrics_dashboard_annotations_on_environment_id_and_3_col ON public.metrics_dashboard_annotations USING btree (environment_id, dashboard_path, starting_at, ending_at) WHERE (environment_id IS NOT NULL);
+
 CREATE INDEX index_milestone_releases_on_release_id ON public.milestone_releases USING btree (release_id);
 
 CREATE INDEX index_milestones_on_description_trigram ON public.milestones USING gin (description public.gin_trgm_ops);
@@ -9415,7 +9637,7 @@ CREATE INDEX index_namespaces_on_type_partial ON public.namespaces USING btree (
 
 CREATE UNIQUE INDEX index_note_diff_files_on_diff_note_id ON public.note_diff_files USING btree (diff_note_id);
 
-CREATE INDEX index_notes_on_author_id_and_created_at ON public.notes USING btree (author_id, created_at);
+CREATE INDEX index_notes_on_author_id_and_created_at_and_id ON public.notes USING btree (author_id, created_at, id);
 
 CREATE INDEX index_notes_on_commit_id ON public.notes USING btree (commit_id);
 
@@ -9474,6 +9696,10 @@ CREATE UNIQUE INDEX index_operations_feature_flags_on_project_id_and_name ON pub
 CREATE UNIQUE INDEX index_operations_scopes_on_strategy_id_and_environment_scope ON public.operations_scopes USING btree (strategy_id, environment_scope);
 
 CREATE INDEX index_operations_strategies_on_feature_flag_id ON public.operations_strategies USING btree (feature_flag_id);
+
+CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_iid ON public.operations_user_lists USING btree (project_id, iid);
+
+CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_name ON public.operations_user_lists USING btree (project_id, name);
 
 CREATE UNIQUE INDEX index_packages_build_infos_on_package_id ON public.packages_build_infos USING btree (package_id);
 
@@ -9567,6 +9793,8 @@ CREATE UNIQUE INDEX index_project_auto_devops_on_project_id ON public.project_au
 
 CREATE UNIQUE INDEX index_project_ci_cd_settings_on_project_id ON public.project_ci_cd_settings USING btree (project_id);
 
+CREATE INDEX index_project_compliance_framework_settings_on_project_id ON public.project_compliance_framework_settings USING btree (project_id);
+
 CREATE INDEX index_project_custom_attributes_on_key_and_value ON public.project_custom_attributes USING btree (key, value);
 
 CREATE UNIQUE INDEX index_project_custom_attributes_on_project_id_and_key ON public.project_custom_attributes USING btree (project_id, key);
@@ -9626,6 +9854,12 @@ CREATE UNIQUE INDEX index_project_statistics_on_project_id ON public.project_sta
 CREATE UNIQUE INDEX index_project_tracing_settings_on_project_id ON public.project_tracing_settings USING btree (project_id);
 
 CREATE INDEX index_projects_api_created_at_id_desc ON public.projects USING btree (created_at, id DESC);
+
+CREATE INDEX index_projects_api_created_at_id_for_archived ON public.projects USING btree (created_at, id) WHERE ((archived = true) AND (pending_delete = false));
+
+CREATE INDEX index_projects_api_created_at_id_for_archived_vis20 ON public.projects USING btree (created_at, id) WHERE ((archived = true) AND (visibility_level = 20) AND (pending_delete = false));
+
+CREATE INDEX index_projects_api_created_at_id_for_vis10 ON public.projects USING btree (created_at, id) WHERE ((visibility_level = 10) AND (pending_delete = false));
 
 CREATE INDEX index_projects_api_last_activity_at_id_desc ON public.projects USING btree (last_activity_at, id DESC);
 
@@ -9811,6 +10045,8 @@ CREATE INDEX index_resource_label_events_on_merge_request_id ON public.resource_
 
 CREATE INDEX index_resource_label_events_on_user_id ON public.resource_label_events USING btree (user_id);
 
+CREATE INDEX index_resource_milestone_events_created_at ON public.resource_milestone_events USING btree (created_at);
+
 CREATE INDEX index_resource_milestone_events_on_issue_id ON public.resource_milestone_events USING btree (issue_id);
 
 CREATE INDEX index_resource_milestone_events_on_merge_request_id ON public.resource_milestone_events USING btree (merge_request_id);
@@ -9858,6 +10094,8 @@ CREATE INDEX index_sentry_issues_on_sentry_issue_identifier ON public.sentry_iss
 CREATE INDEX index_serverless_domain_cluster_on_creator_id ON public.serverless_domain_cluster USING btree (creator_id);
 
 CREATE INDEX index_serverless_domain_cluster_on_pages_domain_id ON public.serverless_domain_cluster USING btree (pages_domain_id);
+
+CREATE INDEX index_service_desk_enabled_projects_on_id_creator_id_created_at ON public.projects USING btree (id, creator_id, created_at) WHERE (service_desk_enabled = true);
 
 CREATE INDEX index_services_on_project_id_and_type ON public.services USING btree (project_id, type);
 
@@ -9939,6 +10177,8 @@ CREATE INDEX index_term_agreements_on_term_id ON public.term_agreements USING bt
 
 CREATE INDEX index_term_agreements_on_user_id ON public.term_agreements USING btree (user_id);
 
+CREATE INDEX index_terraform_states_on_project_id ON public.terraform_states USING btree (project_id);
+
 CREATE INDEX index_timelogs_on_issue_id ON public.timelogs USING btree (issue_id);
 
 CREATE INDEX index_timelogs_on_merge_request_id ON public.timelogs USING btree (merge_request_id);
@@ -9980,6 +10220,8 @@ CREATE INDEX index_uploads_on_model_id_and_model_type ON public.uploads USING bt
 CREATE INDEX index_uploads_on_store ON public.uploads USING btree (store);
 
 CREATE INDEX index_uploads_on_uploader_and_path ON public.uploads USING btree (uploader, path);
+
+CREATE INDEX index_uploads_store_is_null ON public.uploads USING btree (id) WHERE (store IS NULL);
 
 CREATE INDEX index_user_agent_details_on_subject_id_and_subject_type ON public.user_agent_details USING btree (subject_id, subject_type);
 
@@ -10127,6 +10369,12 @@ CREATE INDEX index_vulnerability_occurrences_on_vulnerability_id ON public.vulne
 
 CREATE UNIQUE INDEX index_vulnerability_scanners_on_project_id_and_external_id ON public.vulnerability_scanners USING btree (project_id, external_id);
 
+CREATE UNIQUE INDEX index_vulnerability_user_mentions_on_note_id ON public.vulnerability_user_mentions USING btree (note_id) WHERE (note_id IS NOT NULL);
+
+CREATE UNIQUE INDEX index_vulns_user_mentions_on_vulnerability_id ON public.vulnerability_user_mentions USING btree (vulnerability_id) WHERE (note_id IS NULL);
+
+CREATE UNIQUE INDEX index_vulns_user_mentions_on_vulnerability_id_and_note_id ON public.vulnerability_user_mentions USING btree (vulnerability_id, note_id);
+
 CREATE INDEX index_web_hook_logs_on_created_at_and_web_hook_id ON public.web_hook_logs USING btree (created_at, web_hook_id);
 
 CREATE INDEX index_web_hook_logs_on_web_hook_id ON public.web_hook_logs USING btree (web_hook_id);
@@ -10175,8 +10423,6 @@ CREATE UNIQUE INDEX issue_user_mentions_on_issue_id_and_note_id_index ON public.
 
 CREATE UNIQUE INDEX issue_user_mentions_on_issue_id_index ON public.issue_user_mentions USING btree (issue_id) WHERE (note_id IS NULL);
 
-CREATE INDEX job_artifacts_secure_reports_temp_index ON public.ci_job_artifacts USING btree (id, file_type, job_id, created_at, updated_at) WHERE ((file_type >= 5) AND (file_type <= 8));
-
 CREATE UNIQUE INDEX kubernetes_namespaces_cluster_and_namespace ON public.clusters_kubernetes_namespaces USING btree (cluster_id, namespace);
 
 CREATE INDEX merge_request_mentions_temp_index ON public.merge_requests USING btree (id) WHERE ((description ~~ '%@%'::text) OR ((title)::text ~~ '%@%'::text));
@@ -10205,15 +10451,16 @@ CREATE UNIQUE INDEX term_agreements_unique_index ON public.term_agreements USING
 
 CREATE INDEX tmp_build_stage_position_index ON public.ci_builds USING btree (stage_id, stage_idx) WHERE (stage_idx IS NOT NULL);
 
-CREATE INDEX undefined_vulnerabilities ON public.vulnerability_occurrences USING btree (id) WHERE (severity = 0);
-
-CREATE INDEX undefined_vulnerability ON public.vulnerabilities USING btree (id) WHERE (severity = 0);
+CREATE INDEX tmp_idx_on_user_id_where_bio_is_filled ON public.users USING btree (id) WHERE ((COALESCE(bio, ''::character varying))::text IS DISTINCT FROM ''::text);
 
 CREATE UNIQUE INDEX users_security_dashboard_projects_unique_index ON public.users_security_dashboard_projects USING btree (project_id, user_id);
 
 CREATE UNIQUE INDEX vulnerability_feedback_unique_idx ON public.vulnerability_feedback USING btree (project_id, category, feedback_type, project_fingerprint);
 
 CREATE UNIQUE INDEX vulnerability_occurrence_pipelines_on_unique_keys ON public.vulnerability_occurrence_pipelines USING btree (occurrence_id, pipeline_id);
+
+ALTER TABLE ONLY public.chat_names
+    ADD CONSTRAINT fk_00797a2bf9 FOREIGN KEY (service_id) REFERENCES public.services(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_013c9f36ca FOREIGN KEY (due_date_sourcing_epic_id) REFERENCES public.epics(id) ON DELETE SET NULL;
@@ -10770,6 +11017,9 @@ ALTER TABLE ONLY public.project_deploy_tokens
 ALTER TABLE ONLY public.packages_conan_file_metadata
     ADD CONSTRAINT fk_rails_0afabd9328 FOREIGN KEY (package_file_id) REFERENCES public.packages_package_files(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.operations_user_lists
+    ADD CONSTRAINT fk_rails_0c716e079b FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.geo_node_statuses
     ADD CONSTRAINT fk_rails_0ecc699c2a FOREIGN KEY (geo_node_id) REFERENCES public.geo_nodes(id) ON DELETE CASCADE;
 
@@ -10841,6 +11091,9 @@ ALTER TABLE ONLY public.open_project_tracker_data
 
 ALTER TABLE ONLY public.gpg_signatures
     ADD CONSTRAINT fk_rails_19d4f1c6f9 FOREIGN KEY (gpg_key_subkey_id) REFERENCES public.gpg_key_subkeys(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.vulnerability_user_mentions
+    ADD CONSTRAINT fk_rails_1a41c485cd FOREIGN KEY (vulnerability_id) REFERENCES public.vulnerabilities(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.board_assignees
     ADD CONSTRAINT fk_rails_1c0ff59e82 FOREIGN KEY (assignee_id) REFERENCES public.users(id) ON DELETE CASCADE;
@@ -10929,6 +11182,9 @@ ALTER TABLE ONLY public.suggestions
 ALTER TABLE ONLY public.requirements
     ADD CONSTRAINT fk_rails_33fed8aa4e FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.metrics_dashboard_annotations
+    ADD CONSTRAINT fk_rails_345ab51043 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.wiki_page_slugs
     ADD CONSTRAINT fk_rails_358b46be14 FOREIGN KEY (wiki_page_meta_id) REFERENCES public.wiki_page_meta(id) ON DELETE CASCADE;
 
@@ -10997,6 +11253,9 @@ ALTER TABLE ONLY public.ci_refs
 
 ALTER TABLE ONLY public.ci_resources
     ADD CONSTRAINT fk_rails_430336af2d FOREIGN KEY (resource_group_id) REFERENCES public.ci_resource_groups(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.clusters_applications_fluentd
+    ADD CONSTRAINT fk_rails_4319b1dcd2 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.lfs_file_locks
     ADD CONSTRAINT fk_rails_43df7a0412 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -11139,6 +11398,9 @@ ALTER TABLE ONLY public.deployment_clusters
 ALTER TABLE ONLY public.evidences
     ADD CONSTRAINT fk_rails_6388b435a6 FOREIGN KEY (release_id) REFERENCES public.releases(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.jira_imports
+    ADD CONSTRAINT fk_rails_63cbe52ada FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.vulnerability_occurrence_pipelines
     ADD CONSTRAINT fk_rails_6421e35d7d FOREIGN KEY (pipeline_id) REFERENCES public.ci_pipelines(id) ON DELETE CASCADE;
 
@@ -11178,6 +11440,9 @@ ALTER TABLE ONLY public.operations_feature_flags_clients
 ALTER TABLE ONLY public.web_hook_logs
     ADD CONSTRAINT fk_rails_666826e111 FOREIGN KEY (web_hook_id) REFERENCES public.web_hooks(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.jira_imports
+    ADD CONSTRAINT fk_rails_675d38c03b FOREIGN KEY (label_id) REFERENCES public.labels(id) ON DELETE SET NULL;
+
 ALTER TABLE ONLY public.geo_hashed_storage_migrated_events
     ADD CONSTRAINT fk_rails_687ed7d7c5 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -11189,6 +11454,9 @@ ALTER TABLE ONLY public.prometheus_alerts
 
 ALTER TABLE ONLY public.term_agreements
     ADD CONSTRAINT fk_rails_6ea6520e4a FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.project_compliance_framework_settings
+    ADD CONSTRAINT fk_rails_6f5294f16c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.users_security_dashboard_projects
     ADD CONSTRAINT fk_rails_6f6cf8e66e FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
@@ -11234,6 +11502,9 @@ ALTER TABLE ONLY public.pages_domain_acme_orders
 
 ALTER TABLE ONLY public.ci_subscriptions_projects
     ADD CONSTRAINT fk_rails_7871f9a97b FOREIGN KEY (upstream_project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT fk_rails_78f54ca485 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.software_license_policies
     ADD CONSTRAINT fk_rails_7a7a2a92de FOREIGN KEY (software_license_id) REFERENCES public.software_licenses(id) ON DELETE CASCADE;
@@ -11334,6 +11605,9 @@ ALTER TABLE ONLY public.board_labels
 ALTER TABLE ONLY public.scim_identities
     ADD CONSTRAINT fk_rails_9421a0bffb FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT fk_rails_9698717cdd FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.packages_dependency_links
     ADD CONSTRAINT fk_rails_96ef1c00d3 FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
 
@@ -11378,6 +11652,9 @@ ALTER TABLE ONLY public.namespace_root_storage_statistics
 
 ALTER TABLE ONLY public.project_aliases
     ADD CONSTRAINT fk_rails_a1804f74a7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.vulnerability_user_mentions
+    ADD CONSTRAINT fk_rails_a18600f210 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.todos
     ADD CONSTRAINT fk_rails_a27c483435 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
@@ -11435,6 +11712,9 @@ ALTER TABLE ONLY public.clusters
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_group_stages
     ADD CONSTRAINT fk_rails_ae5da3409b FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.metrics_dashboard_annotations
+    ADD CONSTRAINT fk_rails_aeb11a7643 FOREIGN KEY (environment_id) REFERENCES public.environments(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.pool_repositories
     ADD CONSTRAINT fk_rails_af3f8c5d62 FOREIGN KEY (shard_id) REFERENCES public.shards(id) ON DELETE RESTRICT;
@@ -11586,6 +11866,9 @@ ALTER TABLE ONLY public.vulnerability_issue_links
 ALTER TABLE ONLY public.geo_hashed_storage_attachments_events
     ADD CONSTRAINT fk_rails_d496b088e9 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.jira_imports
+    ADD CONSTRAINT fk_rails_da617096ce FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
 ALTER TABLE ONLY public.dependency_proxy_blobs
     ADD CONSTRAINT fk_rails_db58bbc5d7 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
@@ -11736,1018 +12019,1076 @@ ALTER TABLE ONLY public.timelogs
 ALTER TABLE ONLY public.timelogs
     ADD CONSTRAINT fk_timelogs_merge_requests_merge_request_id FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE CASCADE;
 
-INSERT INTO "schema_migrations" (version) VALUES
-('20171230123729'),
-('20180101160629'),
-('20180101160630'),
-('20180102220145'),
-('20180103123548'),
-('20180104131052'),
-('20180105212544'),
-('20180109183319'),
-('20180113220114'),
-('20180115094742'),
-('20180115113902'),
-('20180115201419'),
-('20180116193854'),
-('20180119121225'),
-('20180119135717'),
-('20180119160751'),
-('20180122154930'),
-('20180122162010'),
-('20180125214301'),
-('20180129193323'),
-('20180201102129'),
-('20180201110056'),
-('20180201145907'),
-('20180204200836'),
-('20180206200543'),
-('20180208183958'),
-('20180209115333'),
-('20180209165249'),
-('20180212030105'),
-('20180212101828'),
-('20180212101928'),
-('20180212102028'),
-('20180213131630'),
-('20180214093516'),
-('20180214155405'),
-('20180215181245'),
-('20180216120000'),
-('20180216120010'),
-('20180216120020'),
-('20180216120030'),
-('20180216120040'),
-('20180216120050'),
-('20180216121020'),
-('20180216121030'),
-('20180219153455'),
-('20180220150310'),
-('20180221151752'),
-('20180222043024'),
-('20180223120443'),
-('20180223124427'),
-('20180223144945'),
-('20180226050030'),
-('20180227182112'),
-('20180228172924'),
-('20180301010859'),
-('20180301084653'),
-('20180302152117'),
-('20180305095250'),
-('20180305100050'),
-('20180305144721'),
-('20180306074045'),
-('20180306134842'),
-('20180306164012'),
-('20180307012445'),
-('20180308052825'),
-('20180308125206'),
-('20180309121820'),
-('20180309160427'),
-('20180314100728'),
-('20180314145917'),
-('20180315160435'),
-('20180319190020'),
-('20180320182229'),
-('20180323150945'),
-('20180326202229'),
-('20180327101207'),
-('20180330121048'),
-('20180403035759'),
-('20180405101928'),
-('20180405142733'),
-('20180408143354'),
-('20180408143355'),
-('20180409170809'),
-('20180413022611'),
-('20180416155103'),
-('20180417090132'),
-('20180417101040'),
-('20180417101940'),
-('20180418053107'),
-('20180420010016'),
-('20180420010616'),
-('20180420080616'),
-('20180423204600'),
-('20180424090541'),
-('20180424134533'),
-('20180424151928'),
-('20180424160449'),
-('20180425075446'),
-('20180425131009'),
-('20180425205249'),
-('20180426102016'),
-('20180430101916'),
-('20180430143705'),
-('20180502122856'),
-('20180503131624'),
-('20180503141722'),
-('20180503150427'),
-('20180503175053'),
-('20180503175054'),
-('20180503193542'),
-('20180503193953'),
-('20180503200320'),
-('20180504195842'),
-('20180507083701'),
-('20180508055821'),
-('20180508100222'),
-('20180508102840'),
-('20180508135515'),
-('20180511090724'),
-('20180511131058'),
-('20180511174224'),
-('20180512061621'),
-('20180514161336'),
-('20180515005612'),
-('20180515121227'),
-('20180517082340'),
-('20180523042841'),
-('20180523125103'),
-('20180524132016'),
-('20180529093006'),
-('20180529152628'),
-('20180530135500'),
-('20180531185349'),
-('20180531220618'),
-('20180601213245'),
-('20180603190921'),
-('20180604123514'),
-('20180607071808'),
-('20180608091413'),
-('20180608110058'),
-('20180608201435'),
-('20180612103626'),
-('20180613081317'),
-('20180625113853'),
-('20180626125654'),
-('20180628124813'),
-('20180629153018'),
-('20180629191052'),
-('20180702120647'),
-('20180702124358'),
-('20180702134423'),
-('20180704145007'),
-('20180704204006'),
-('20180705160945'),
-('20180706223200'),
-('20180710162338'),
-('20180711103851'),
-('20180711103922'),
-('20180713092803'),
-('20180717125853'),
-('20180718005113'),
-('20180720023512'),
-('20180722103201'),
-('20180723135214'),
-('20180726172057'),
-('20180807153545'),
-('20180808162000'),
-('20180809195358'),
-('20180813101999'),
-('20180813102000'),
-('20180814153625'),
-('20180815040323'),
-('20180815160409'),
-('20180815170510'),
-('20180815175440'),
-('20180816161409'),
-('20180816193530'),
-('20180824202952'),
-('20180826111825'),
-('20180831164905'),
-('20180831164907'),
-('20180831164908'),
-('20180831164909'),
-('20180831164910'),
-('20180901171833'),
-('20180901200537'),
-('20180902070406'),
-('20180906101639'),
-('20180907015926'),
-('20180910115836'),
-('20180910153412'),
-('20180910153413'),
-('20180912111628'),
-('20180913142237'),
-('20180914162043'),
-('20180914201132'),
-('20180916011959'),
-('20180917172041'),
-('20180924141949'),
-('20180924190739'),
-('20180924201039'),
-('20180925200829'),
-('20180927073410'),
-('20181002172433'),
-('20181005110927'),
-('20181005125926'),
-('20181006004100'),
-('20181008145341'),
-('20181008145359'),
-('20181008200441'),
-('20181009190428'),
-('20181010133639'),
-('20181010235606'),
-('20181013005024'),
-('20181014203236'),
-('20181015155839'),
-('20181016141739'),
-('20181016152238'),
-('20181017001059'),
-('20181019032400'),
-('20181019032408'),
-('20181019105553'),
-('20181022135539'),
-('20181022173835'),
-('20181023104858'),
-('20181023144439'),
-('20181025115728'),
-('20181026091631'),
-('20181026143227'),
-('20181027114222'),
-('20181028120717'),
-('20181030135124'),
-('20181030154446'),
-('20181031145139'),
-('20181031190558'),
-('20181031190559'),
-('20181101091005'),
-('20181101091124'),
-('20181101144347'),
-('20181101191341'),
-('20181105201455'),
-('20181106135939'),
-('20181107054254'),
-('20181108091549'),
-('20181112103239'),
-('20181115140140'),
-('20181116050532'),
-('20181116141415'),
-('20181116141504'),
-('20181119081539'),
-('20181119132520'),
-('20181120082911'),
-('20181120091639'),
-('20181120151656'),
-('20181121101842'),
-('20181121101843'),
-('20181121111200'),
-('20181122160027'),
-('20181123042307'),
-('20181123135036'),
-('20181123144235'),
-('20181126150622'),
-('20181126153547'),
-('20181128123704'),
-('20181129104854'),
-('20181129104944'),
-('20181130102132'),
-('20181203002526'),
-('20181205171941'),
-('20181211092510'),
-('20181211092514'),
-('20181212104941'),
-('20181212171634'),
-('20181219130552'),
-('20181219145520'),
-('20181219145521'),
-('20181228175414'),
-('20190102152410'),
-('20190103140724'),
-('20190104182041'),
-('20190107151020'),
-('20190108192941'),
-('20190109153125'),
-('20190114172110'),
-('20190115054215'),
-('20190115054216'),
-('20190115092821'),
-('20190116234221'),
-('20190124200344'),
-('20190130091630'),
-('20190131122559'),
-('20190204115450'),
-('20190206193120'),
-('20190211131150'),
-('20190214112022'),
-('20190215154930'),
-('20190218134158'),
-('20190218134209'),
-('20190219201635'),
-('20190220142344'),
-('20190220150130'),
-('20190222051615'),
-('20190225152525'),
-('20190225160300'),
-('20190225160301'),
-('20190228192410'),
-('20190301081611'),
-('20190301182457'),
-('20190312071108'),
-('20190312113229'),
-('20190312113634'),
-('20190313092516'),
-('20190315191339'),
-('20190320174702'),
-('20190322132835'),
-('20190322164830'),
-('20190325080727'),
-('20190325105715'),
-('20190325111602'),
-('20190325165127'),
-('20190326164045'),
-('20190327163904'),
-('20190329085614'),
-('20190402150158'),
-('20190402224749'),
-('20190403161806'),
-('20190404143330'),
-('20190404231137'),
-('20190408163745'),
-('20190409224933'),
-('20190410173409'),
-('20190412155659'),
-('20190412183653'),
-('20190414185432'),
-('20190415030217'),
-('20190415095825'),
-('20190415172035'),
-('20190416185130'),
-('20190416213556'),
-('20190416213615'),
-('20190416213631'),
-('20190418132125'),
-('20190418132750'),
-('20190418182545'),
-('20190419121952'),
-('20190419123057'),
-('20190422082247'),
-('20190423124640'),
-('20190424134256'),
-('20190426180107'),
-('20190429082448'),
-('20190430131225'),
-('20190430142025'),
-('20190506135337'),
-('20190506135400'),
-('20190511144331'),
-('20190513174947'),
-('20190514105711'),
-('20190515125613'),
-('20190516011213'),
-('20190516151857'),
-('20190516155724'),
-('20190517153211'),
-('20190520200123'),
-('20190520201748'),
-('20190521174505'),
-('20190522143720'),
-('20190523112344'),
-('20190524062810'),
-('20190524071727'),
-('20190524073827'),
-('20190527011309'),
-('20190527194830'),
-('20190527194900'),
-('20190528173628'),
-('20190528180441'),
-('20190529142545'),
-('20190530042141'),
-('20190530154715'),
-('20190531153110'),
-('20190602014139'),
-('20190603124955'),
-('20190604091310'),
-('20190604184643'),
-('20190605104727'),
-('20190605184422'),
-('20190606014128'),
-('20190606034427'),
-('20190606054649'),
-('20190606054742'),
-('20190606054832'),
-('20190606163724'),
-('20190606175050'),
-('20190606202100'),
-('20190607085356'),
-('20190607145325'),
-('20190607190856'),
-('20190607205656'),
-('20190610142825'),
-('20190611090827'),
-('20190611100201'),
-('20190611100202'),
-('20190611161641'),
-('20190611161642'),
-('20190612111201'),
-('20190612111404'),
-('20190613030606'),
-('20190613044655'),
-('20190613073003'),
-('20190613231640'),
-('20190617123615'),
-('20190618171120'),
-('20190619175843'),
-('20190620105427'),
-('20190620112608'),
-('20190621022810'),
-('20190621151636'),
-('20190623212503'),
-('20190624123615'),
-('20190625115224'),
-('20190625184066'),
-('20190626175626'),
-('20190627051902'),
-('20190627100221'),
-('20190627122264'),
-('20190628145246'),
-('20190628185000'),
-('20190628185004'),
-('20190628191740'),
-('20190702173936'),
-('20190703043358'),
-('20190703130053'),
-('20190703171157'),
-('20190703171555'),
-('20190703185326'),
-('20190709204413'),
-('20190709220014'),
-('20190709220143'),
-('20190710151229'),
-('20190711124721'),
-('20190711200053'),
-('20190711200508'),
-('20190711201818'),
-('20190712040400'),
-('20190712040412'),
-('20190712064021'),
-('20190715042813'),
-('20190715043944'),
-('20190715043954'),
-('20190715044501'),
-('20190715114644'),
-('20190715140740'),
-('20190715142138'),
-('20190715173819'),
-('20190715193142'),
-('20190715215532'),
-('20190715215549'),
-('20190716144222'),
-('20190719122333'),
-('20190719174505'),
-('20190722104947'),
-('20190722132830'),
-('20190722144316'),
-('20190723105753'),
-('20190723153247'),
-('20190724112147'),
-('20190725012225'),
-('20190725080128'),
-('20190725183432'),
-('20190726101050'),
-('20190726101133'),
-('20190729062536'),
-('20190729090456'),
-('20190729180447'),
-('20190731084415'),
-('20190801060809'),
-('20190801114109'),
-('20190801142441'),
-('20190801193427'),
-('20190802012622'),
-('20190802091750'),
-('20190802195602'),
-('20190802235445'),
-('20190805140353'),
-('20190806071559'),
-('20190807023052'),
-('20190808152507'),
-('20190809072552'),
-('20190812070645'),
-('20190814205640'),
-('20190815093936'),
-('20190815093949'),
-('20190816151221'),
-('20190819131155'),
-('20190819231552'),
-('20190820163320'),
-('20190821040941'),
-('20190822175441'),
-('20190822181528'),
-('20190822185441'),
-('20190823055948'),
-('20190826090628'),
-('20190826100605'),
-('20190827102026'),
-('20190827222124'),
-('20190828083843'),
-('20190828110802'),
-('20190828170945'),
-('20190828172831'),
-('20190829131130'),
-('20190830075508'),
-('20190830080123'),
-('20190830080626'),
-('20190830140240'),
-('20190901174200'),
-('20190902131045'),
-('20190902152329'),
-('20190902160015'),
-('20190903150358'),
-('20190903150435'),
-('20190904173203'),
-('20190904205212'),
-('20190905022045'),
-('20190905074652'),
-('20190905091812'),
-('20190905091831'),
-('20190905140605'),
-('20190905223800'),
-('20190905223900'),
-('20190906104555'),
-('20190907184714'),
-('20190909045845'),
-('20190909141517'),
-('20190910000130'),
-('20190910103144'),
-('20190910114843'),
-('20190910125852'),
-('20190910211526'),
-('20190910212256'),
-('20190911115056'),
-('20190911115109'),
-('20190911115207'),
-('20190911115222'),
-('20190911251732'),
-('20190912061145'),
-('20190912223232'),
-('20190913174707'),
-('20190913175827'),
-('20190914223900'),
-('20190917173107'),
-('20190918025618'),
-('20190918102042'),
-('20190918104212'),
-('20190918104222'),
-('20190918104731'),
-('20190918121135'),
-('20190919040324'),
-('20190919091300'),
-('20190919104119'),
-('20190919162036'),
-('20190919183411'),
-('20190920122420'),
-('20190920194925'),
-('20190920224341'),
-('20190924124627'),
-('20190924152703'),
-('20190925055714'),
-('20190925055902'),
-('20190926041216'),
-('20190926180443'),
-('20190926225633'),
-('20190927055500'),
-('20190927055540'),
-('20190927074328'),
-('20190929180751'),
-('20190929180813'),
-('20190929180827'),
-('20190930025655'),
-('20190930063627'),
-('20190930082942'),
-('20190930153535'),
-('20191001040549'),
-('20191001170300'),
-('20191002031332'),
-('20191002123516'),
-('20191003015155'),
-('20191003060227'),
-('20191003064615'),
-('20191003130045'),
-('20191003150045'),
-('20191003161031'),
-('20191003161032'),
-('20191003195218'),
-('20191003195620'),
-('20191003200045'),
-('20191003250045'),
-('20191003300045'),
-('20191003350045'),
-('20191004080818'),
-('20191004081520'),
-('20191004133612'),
-('20191004151428'),
-('20191007163701'),
-('20191007163736'),
-('20191008013056'),
-('20191008142331'),
-('20191008143850'),
-('20191008180203'),
-('20191008200204'),
-('20191009100244'),
-('20191009110124'),
-('20191009110757'),
-('20191009222222'),
-('20191010174846'),
-('20191011084019'),
-('20191013100213'),
-('20191014025629'),
-('20191014030134'),
-('20191014030730'),
-('20191014084150'),
-('20191014123159'),
-('20191014132931'),
-('20191015154408'),
-('20191016072826'),
-('20191016133352'),
-('20191016220135'),
-('20191017001326'),
-('20191017045817'),
-('20191017094449'),
-('20191017134513'),
-('20191017180026'),
-('20191017191341'),
-('20191021101942'),
-('20191022113635'),
-('20191023093207'),
-('20191023132005'),
-('20191023152913'),
-('20191024134020'),
-('20191025092748'),
-('20191026041447'),
-('20191026120008'),
-('20191026120112'),
-('20191026124116'),
-('20191028130054'),
-('20191028162543'),
-('20191028184740'),
-('20191029095537'),
-('20191029125305'),
-('20191029191901'),
-('20191030135044'),
-('20191030152934'),
-('20191030193050'),
-('20191030223057'),
-('20191031095636'),
-('20191031112603'),
-('20191101092917'),
-('20191103202505'),
-('20191104142124'),
-('20191104205020'),
-('20191105094558'),
-('20191105094625'),
-('20191105134413'),
-('20191105140942'),
-('20191105155113'),
-('20191105193652'),
-('20191106144901'),
-('20191106150931'),
-('20191107064946'),
-('20191107173446'),
-('20191107220314'),
-('20191108031900'),
-('20191108202723'),
-('20191111115229'),
-('20191111115431'),
-('20191111121500'),
-('20191111165017'),
-('20191111175230'),
-('20191112023159'),
-('20191112090226'),
-('20191112105448'),
-('20191112115247'),
-('20191112115317'),
-('20191112214305'),
-('20191112221821'),
-('20191112232338'),
-('20191114132259'),
-('20191114173508'),
-('20191114173602'),
-('20191114173624'),
-('20191114201118'),
-('20191114204343'),
-('20191115001123'),
-('20191115001843'),
-('20191115091425'),
-('20191115114032'),
-('20191115115043'),
-('20191115115522'),
-('20191118053631'),
-('20191118155702'),
-('20191118173522'),
-('20191118182722'),
-('20191118211629'),
-('20191119023952'),
-('20191119220425'),
-('20191119221041'),
-('20191119231621'),
-('20191120084627'),
-('20191120115530'),
-('20191120200015'),
-('20191121111621'),
-('20191121121947'),
-('20191121122856'),
-('20191121161018'),
-('20191121193110'),
-('20191122135327'),
-('20191122161519'),
-('20191123062354'),
-('20191123081456'),
-('20191124150431'),
-('20191125024005'),
-('20191125114345'),
-('20191125133353'),
-('20191125140458'),
-('20191126134210'),
-('20191127030005'),
-('20191127151619'),
-('20191127151629'),
-('20191127163053'),
-('20191127221608'),
-('20191128145231'),
-('20191128145232'),
-('20191128145233'),
-('20191128162854'),
-('20191129134844'),
-('20191129144630'),
-('20191129144631'),
-('20191202031812'),
-('20191202181924'),
-('20191203121729'),
-('20191204070713'),
-('20191204093410'),
-('20191204114127'),
-('20191204192726'),
-('20191205060723'),
-('20191205084057'),
-('20191205094702'),
-('20191205145647'),
-('20191205212923'),
-('20191205212924'),
-('20191206014412'),
-('20191206022133'),
-('20191206122926'),
-('20191207104000'),
-('20191208071111'),
-('20191208071112'),
-('20191208110214'),
-('20191209143606'),
-('20191209215316'),
-('20191210211253'),
-('20191212140117'),
-('20191212162434'),
-('20191213104838'),
-('20191213120427'),
-('20191213143656'),
-('20191213184609'),
-('20191214175727'),
-('20191216074800'),
-('20191216074802'),
-('20191216074803'),
-('20191216094119'),
-('20191216183531'),
-('20191216183532'),
-('20191217165641'),
-('20191217212348'),
-('20191218084115'),
-('20191218122457'),
-('20191218124915'),
-('20191218125015'),
-('20191218190253'),
-('20191218225624'),
-('20191223124940'),
-('20191225071320'),
-('20191227140254'),
-('20191229140154'),
-('20200102140148'),
-('20200102170221'),
-('20200103190741'),
-('20200103192859'),
-('20200103192914'),
-('20200103195205'),
-('20200104113850'),
-('20200106071113'),
-('20200106085831'),
-('20200107172020'),
-('20200108100603'),
-('20200108155731'),
-('20200108233040'),
-('20200109030418'),
-('20200109085206'),
-('20200109233938'),
-('20200110089001'),
-('20200110090153'),
-('20200110121314'),
-('20200110144316'),
-('20200110203532'),
-('20200113133352'),
-('20200113151354'),
-('20200114112932'),
-('20200114113341'),
-('20200114140305'),
-('20200114204949'),
-('20200115135132'),
-('20200115135234'),
-('20200116051619'),
-('20200116175538'),
-('20200117112554'),
-('20200117194830'),
-('20200117194840'),
-('20200117194850'),
-('20200117194900'),
-('20200120083607'),
-('20200121132641'),
-('20200121192942'),
-('20200121194000'),
-('20200121194048'),
-('20200121194154'),
-('20200121200203'),
-('20200122123016'),
-('20200122144759'),
-('20200122161638'),
-('20200123040535'),
-('20200123045415'),
-('20200123090839'),
-('20200123091422'),
-('20200123091622'),
-('20200123091734'),
-('20200123091854'),
-('20200123155929'),
-('20200124053531'),
-('20200124110831'),
-('20200124143014'),
-('20200127090233'),
-('20200127111840'),
-('20200128105731'),
-('20200128132510'),
-('20200128133510'),
-('20200128134110'),
-('20200128141125'),
-('20200128184209'),
-('20200128210353'),
-('20200129034515'),
-('20200129035446'),
-('20200129035708'),
-('20200129133716'),
-('20200129172428'),
-('20200130134335'),
-('20200130145430'),
-('20200130161817'),
-('20200131140428'),
-('20200131181354'),
-('20200131191754'),
-('20200202100932'),
-('20200203015140'),
-('20200203025400'),
-('20200203025602'),
-('20200203025619'),
-('20200203025744'),
-('20200203025801'),
-('20200203025821'),
-('20200203104214'),
-('20200203173508'),
-('20200203183508'),
-('20200203232433'),
-('20200204070729'),
-('20200204113223'),
-('20200204113224'),
-('20200204131054'),
-('20200204131831'),
-('20200205143231'),
-('20200206091544'),
-('20200206112850'),
-('20200206135203'),
-('20200206141511'),
-('20200207062728'),
-('20200207090921'),
-('20200207132752'),
-('20200207151640'),
-('20200207182131'),
-('20200207184023'),
-('20200207185149'),
-('20200209131152'),
-('20200210062432'),
-('20200210092405'),
-('20200210135504'),
-('20200210184410'),
-('20200210184420'),
-('20200211152410'),
-('20200211155000'),
-('20200211155100'),
-('20200211155539'),
-('20200211174946'),
-('20200212014653'),
-('20200212052620'),
-('20200212133945'),
-('20200212134201'),
-('20200213093702'),
-('20200213155311'),
-('20200213204737'),
-('20200213220159'),
-('20200213220211'),
-('20200214025454'),
-('20200214034836'),
-('20200214085940'),
-('20200214214934'),
-('20200215222507'),
-('20200215225103'),
-('20200217223651'),
-('20200217225719'),
-('20200219105209'),
-('20200219133859'),
-('20200219135440'),
-('20200219141307'),
-('20200219142522'),
-('20200219183456'),
-('20200219184219'),
-('20200219193058'),
-('20200219193117'),
-('20200220180944'),
-('20200221023320'),
-('20200221074028'),
-('20200221100514'),
-('20200221105436'),
-('20200221142216'),
-('20200221144534'),
-('20200222055543'),
-('20200224020219'),
-('20200224163804'),
-('20200224185814'),
-('20200225111018'),
-('20200225123228'),
-('20200226100614'),
-('20200226100624'),
-('20200226100634'),
-('20200226162156'),
-('20200226162239'),
-('20200226162634'),
-('20200226162723'),
-('20200227140242'),
-('20200227164113'),
-('20200227165129'),
-('20200228160542'),
-('20200302142052'),
-('20200302152516'),
-('20200303055348'),
-('20200303074328'),
-('20200304085423'),
-('20200304090155'),
-('20200304121828'),
-('20200304121844'),
-('20200304124406'),
-('20200304160800'),
-('20200304160801'),
-('20200304160823'),
-('20200304211738'),
-('20200305121159'),
-('20200305151736'),
-('20200306095654'),
-('20200306160521'),
-('20200306170211'),
-('20200306170321'),
-('20200306170531'),
-('20200306192548'),
-('20200306193236'),
-('20200309140540'),
-('20200309162244'),
-('20200309195209'),
-('20200309195710'),
-('20200310075115'),
-('20200310123229'),
-('20200310132654'),
-('20200310133822'),
-('20200310135818'),
-('20200310135823'),
-('20200310145304'),
-('20200311074438'),
-('20200311082301'),
-('20200311084025'),
-('20200311093210'),
-('20200311094020'),
-('20200311141053'),
-('20200311141943'),
-('20200311154110'),
-('20200311165635'),
-('20200311192351'),
-('20200311214912'),
-('20200312125121'),
-('20200312160532'),
-('20200312163407'),
-('20200313101649'),
-('20200313123934'),
-('20200316111759'),
-('20200316162648'),
-('20200316173312'),
-('20200317142110'),
-('20200318152134'),
-('20200318162148'),
-('20200318163148'),
-('20200318164448'),
-('20200318165448'),
-('20200318175008'),
-('20200319203901'),
-('20200323075043'),
-('20200323122201');
+COPY "schema_migrations" (version) FROM STDIN;
+20171230123729
+20180101160629
+20180101160630
+20180102220145
+20180103123548
+20180104131052
+20180105212544
+20180109183319
+20180113220114
+20180115094742
+20180115113902
+20180115201419
+20180116193854
+20180119121225
+20180119135717
+20180119160751
+20180122154930
+20180122162010
+20180125214301
+20180129193323
+20180201102129
+20180201110056
+20180201145907
+20180204200836
+20180206200543
+20180208183958
+20180209115333
+20180209165249
+20180212030105
+20180212101828
+20180212101928
+20180212102028
+20180213131630
+20180214093516
+20180214155405
+20180215181245
+20180216120000
+20180216120010
+20180216120020
+20180216120030
+20180216120040
+20180216120050
+20180216121020
+20180216121030
+20180219153455
+20180220150310
+20180221151752
+20180222043024
+20180223120443
+20180223124427
+20180223144945
+20180226050030
+20180227182112
+20180228172924
+20180301010859
+20180301084653
+20180302152117
+20180305095250
+20180305100050
+20180305144721
+20180306074045
+20180306134842
+20180306164012
+20180307012445
+20180308052825
+20180308125206
+20180309121820
+20180309160427
+20180314100728
+20180314145917
+20180315160435
+20180319190020
+20180320182229
+20180323150945
+20180326202229
+20180327101207
+20180330121048
+20180403035759
+20180405101928
+20180405142733
+20180408143354
+20180408143355
+20180409170809
+20180413022611
+20180416155103
+20180417090132
+20180417101040
+20180417101940
+20180418053107
+20180420010016
+20180420010616
+20180420080616
+20180423204600
+20180424090541
+20180424134533
+20180424151928
+20180424160449
+20180425075446
+20180425131009
+20180425205249
+20180426102016
+20180430101916
+20180430143705
+20180502122856
+20180503131624
+20180503141722
+20180503150427
+20180503175053
+20180503175054
+20180503193542
+20180503193953
+20180503200320
+20180504195842
+20180507083701
+20180508055821
+20180508100222
+20180508102840
+20180508135515
+20180511090724
+20180511131058
+20180511174224
+20180512061621
+20180514161336
+20180515005612
+20180515121227
+20180517082340
+20180523042841
+20180523125103
+20180524132016
+20180529093006
+20180529152628
+20180530135500
+20180531185349
+20180531220618
+20180601213245
+20180603190921
+20180604123514
+20180607071808
+20180608091413
+20180608110058
+20180608201435
+20180612103626
+20180613081317
+20180625113853
+20180626125654
+20180628124813
+20180629153018
+20180629191052
+20180702120647
+20180702124358
+20180702134423
+20180704145007
+20180704204006
+20180705160945
+20180706223200
+20180710162338
+20180711103851
+20180711103922
+20180713092803
+20180717125853
+20180718005113
+20180720023512
+20180722103201
+20180723135214
+20180726172057
+20180807153545
+20180808162000
+20180809195358
+20180813101999
+20180813102000
+20180814153625
+20180815040323
+20180815160409
+20180815170510
+20180815175440
+20180816161409
+20180816193530
+20180824202952
+20180826111825
+20180831164905
+20180831164907
+20180831164908
+20180831164909
+20180831164910
+20180901171833
+20180901200537
+20180902070406
+20180906101639
+20180907015926
+20180910115836
+20180910153412
+20180910153413
+20180912111628
+20180913142237
+20180914162043
+20180914201132
+20180916011959
+20180917172041
+20180924141949
+20180924190739
+20180924201039
+20180925200829
+20180927073410
+20181002172433
+20181005110927
+20181005125926
+20181006004100
+20181008145341
+20181008145359
+20181008200441
+20181009190428
+20181010133639
+20181010235606
+20181013005024
+20181014203236
+20181015155839
+20181016141739
+20181016152238
+20181017001059
+20181019032400
+20181019032408
+20181019105553
+20181022135539
+20181022173835
+20181023104858
+20181023144439
+20181025115728
+20181026091631
+20181026143227
+20181027114222
+20181028120717
+20181030135124
+20181030154446
+20181031145139
+20181031190558
+20181031190559
+20181101091005
+20181101091124
+20181101144347
+20181101191341
+20181105201455
+20181106135939
+20181107054254
+20181108091549
+20181112103239
+20181115140140
+20181116050532
+20181116141415
+20181116141504
+20181119081539
+20181119132520
+20181120082911
+20181120091639
+20181120151656
+20181121101842
+20181121101843
+20181121111200
+20181122160027
+20181123042307
+20181123135036
+20181123144235
+20181126150622
+20181126153547
+20181128123704
+20181129104854
+20181129104944
+20181130102132
+20181203002526
+20181205171941
+20181211092510
+20181211092514
+20181212104941
+20181212171634
+20181219130552
+20181219145520
+20181219145521
+20181228175414
+20190102152410
+20190103140724
+20190104182041
+20190107151020
+20190108192941
+20190109153125
+20190114172110
+20190115054215
+20190115054216
+20190115092821
+20190116234221
+20190124200344
+20190130091630
+20190131122559
+20190204115450
+20190206193120
+20190211131150
+20190214112022
+20190215154930
+20190218134158
+20190218134209
+20190219201635
+20190220142344
+20190220150130
+20190222051615
+20190225152525
+20190225160300
+20190225160301
+20190228192410
+20190301081611
+20190301182457
+20190312071108
+20190312113229
+20190312113634
+20190313092516
+20190315191339
+20190320174702
+20190322132835
+20190322164830
+20190325080727
+20190325105715
+20190325111602
+20190325165127
+20190326164045
+20190327163904
+20190329085614
+20190402150158
+20190402224749
+20190403161806
+20190404143330
+20190404231137
+20190408163745
+20190409224933
+20190410173409
+20190412155659
+20190412183653
+20190414185432
+20190415030217
+20190415095825
+20190415172035
+20190416185130
+20190416213556
+20190416213615
+20190416213631
+20190418132125
+20190418132750
+20190418182545
+20190419121952
+20190419123057
+20190422082247
+20190423124640
+20190424134256
+20190426180107
+20190429082448
+20190430131225
+20190430142025
+20190506135337
+20190506135400
+20190511144331
+20190513174947
+20190514105711
+20190515125613
+20190516011213
+20190516151857
+20190516155724
+20190517153211
+20190520200123
+20190520201748
+20190521174505
+20190522143720
+20190523112344
+20190524062810
+20190524071727
+20190524073827
+20190527011309
+20190527194830
+20190527194900
+20190528173628
+20190528180441
+20190529142545
+20190530042141
+20190530154715
+20190531153110
+20190602014139
+20190603124955
+20190604091310
+20190604184643
+20190605104727
+20190605184422
+20190606014128
+20190606034427
+20190606054649
+20190606054742
+20190606054832
+20190606163724
+20190606175050
+20190606202100
+20190607085356
+20190607145325
+20190607190856
+20190607205656
+20190610142825
+20190611090827
+20190611100201
+20190611100202
+20190611161641
+20190611161642
+20190612111201
+20190612111404
+20190613030606
+20190613044655
+20190613073003
+20190613231640
+20190617123615
+20190618171120
+20190619175843
+20190620105427
+20190620112608
+20190621022810
+20190621151636
+20190623212503
+20190624123615
+20190625115224
+20190625184066
+20190626175626
+20190627051902
+20190627100221
+20190627122264
+20190628145246
+20190628185000
+20190628185004
+20190628191740
+20190702173936
+20190703043358
+20190703130053
+20190703171157
+20190703171555
+20190703185326
+20190709204413
+20190709220014
+20190709220143
+20190710151229
+20190711124721
+20190711200053
+20190711200508
+20190711201818
+20190712040400
+20190712040412
+20190712064021
+20190715042813
+20190715043944
+20190715043954
+20190715044501
+20190715114644
+20190715140740
+20190715142138
+20190715173819
+20190715193142
+20190715215532
+20190715215549
+20190716144222
+20190719122333
+20190719174505
+20190722104947
+20190722132830
+20190722144316
+20190723105753
+20190723153247
+20190724112147
+20190725012225
+20190725080128
+20190725183432
+20190726101050
+20190726101133
+20190729062536
+20190729090456
+20190729180447
+20190731084415
+20190801060809
+20190801114109
+20190801142441
+20190801193427
+20190802012622
+20190802091750
+20190802195602
+20190802235445
+20190805140353
+20190806071559
+20190807023052
+20190808152507
+20190809072552
+20190812070645
+20190814205640
+20190815093936
+20190815093949
+20190816151221
+20190819131155
+20190819231552
+20190820163320
+20190821040941
+20190822175441
+20190822181528
+20190822185441
+20190823055948
+20190826090628
+20190826100605
+20190827102026
+20190827222124
+20190828083843
+20190828110802
+20190828170945
+20190828172831
+20190829131130
+20190830075508
+20190830080123
+20190830080626
+20190830140240
+20190901174200
+20190902131045
+20190902152329
+20190902160015
+20190903150358
+20190903150435
+20190904173203
+20190904205212
+20190905022045
+20190905074652
+20190905091812
+20190905091831
+20190905140605
+20190905223800
+20190905223900
+20190906104555
+20190907184714
+20190909045845
+20190909141517
+20190910000130
+20190910103144
+20190910114843
+20190910125852
+20190910211526
+20190910212256
+20190911115056
+20190911115109
+20190911115207
+20190911115222
+20190911251732
+20190912061145
+20190912223232
+20190913174707
+20190913175827
+20190914223900
+20190917173107
+20190918025618
+20190918102042
+20190918104212
+20190918104222
+20190918104731
+20190918121135
+20190919040324
+20190919091300
+20190919104119
+20190919162036
+20190919183411
+20190920122420
+20190920194925
+20190920224341
+20190924124627
+20190924152703
+20190925055714
+20190925055902
+20190926041216
+20190926180443
+20190926225633
+20190927055500
+20190927055540
+20190927074328
+20190929180751
+20190929180813
+20190929180827
+20190930025655
+20190930063627
+20190930082942
+20190930153535
+20191001040549
+20191001170300
+20191002031332
+20191002123516
+20191003015155
+20191003060227
+20191003064615
+20191003130045
+20191003150045
+20191003161031
+20191003161032
+20191003195218
+20191003195620
+20191003200045
+20191003250045
+20191003300045
+20191003350045
+20191004080818
+20191004081520
+20191004133612
+20191004151428
+20191007163701
+20191007163736
+20191008013056
+20191008142331
+20191008143850
+20191008180203
+20191008200204
+20191009100244
+20191009110124
+20191009110757
+20191009222222
+20191010174846
+20191011084019
+20191013100213
+20191014025629
+20191014030134
+20191014030730
+20191014084150
+20191014123159
+20191014132931
+20191015154408
+20191016072826
+20191016133352
+20191016220135
+20191017001326
+20191017045817
+20191017094449
+20191017134513
+20191017180026
+20191017191341
+20191021101942
+20191022113635
+20191023093207
+20191023132005
+20191023152913
+20191024134020
+20191025092748
+20191026041447
+20191026120008
+20191026120112
+20191026124116
+20191028130054
+20191028162543
+20191028184740
+20191029095537
+20191029125305
+20191029191901
+20191030135044
+20191030152934
+20191030193050
+20191030223057
+20191031095636
+20191031112603
+20191101092917
+20191103202505
+20191104142124
+20191104205020
+20191105094558
+20191105094625
+20191105134413
+20191105140942
+20191105155113
+20191105193652
+20191106144901
+20191106150931
+20191107064946
+20191107173446
+20191107220314
+20191108031900
+20191108202723
+20191111115229
+20191111115431
+20191111121500
+20191111165017
+20191111175230
+20191112023159
+20191112090226
+20191112105448
+20191112115247
+20191112115317
+20191112214305
+20191112221821
+20191112232338
+20191114132259
+20191114173508
+20191114173602
+20191114173624
+20191114201118
+20191114204343
+20191115001123
+20191115001843
+20191115091425
+20191115114032
+20191115115043
+20191115115522
+20191118053631
+20191118155702
+20191118173522
+20191118182722
+20191118211629
+20191119023952
+20191119220425
+20191119221041
+20191119231621
+20191120084627
+20191120115530
+20191120200015
+20191121111621
+20191121121947
+20191121122856
+20191121161018
+20191121193110
+20191122135327
+20191122161519
+20191123062354
+20191123081456
+20191124150431
+20191125024005
+20191125114345
+20191125133353
+20191125140458
+20191126134210
+20191127030005
+20191127151619
+20191127151629
+20191127163053
+20191127221608
+20191128145231
+20191128145232
+20191128145233
+20191128162854
+20191129134844
+20191129144630
+20191129144631
+20191202031812
+20191202181924
+20191203121729
+20191204070713
+20191204093410
+20191204114127
+20191204192726
+20191205060723
+20191205084057
+20191205094702
+20191205145647
+20191205212923
+20191205212924
+20191206014412
+20191206022133
+20191206122926
+20191207104000
+20191208071111
+20191208071112
+20191208110214
+20191209143606
+20191209215316
+20191210211253
+20191212140117
+20191212162434
+20191213104838
+20191213120427
+20191213143656
+20191213184609
+20191214175727
+20191216074800
+20191216074802
+20191216074803
+20191216094119
+20191216183531
+20191216183532
+20191217165641
+20191217212348
+20191218084115
+20191218122457
+20191218124915
+20191218125015
+20191218190253
+20191218225624
+20191223124940
+20191225071320
+20191227140254
+20191229140154
+20200102140148
+20200102170221
+20200103190741
+20200103192859
+20200103192914
+20200103195205
+20200104113850
+20200106071113
+20200106085831
+20200107172020
+20200108100603
+20200108155731
+20200108233040
+20200109030418
+20200109085206
+20200109233938
+20200110089001
+20200110090153
+20200110121314
+20200110144316
+20200110203532
+20200113133352
+20200113151354
+20200114112932
+20200114113341
+20200114140305
+20200114204949
+20200115135132
+20200115135234
+20200116051619
+20200116175538
+20200117112554
+20200117194830
+20200117194840
+20200117194850
+20200117194900
+20200120083607
+20200121132641
+20200121192942
+20200121194000
+20200121194048
+20200121194154
+20200121200203
+20200122123016
+20200122144759
+20200122161638
+20200123040535
+20200123045415
+20200123090839
+20200123091422
+20200123091622
+20200123091734
+20200123091854
+20200123155929
+20200124053531
+20200124110831
+20200124143014
+20200127090233
+20200127111840
+20200128105731
+20200128132510
+20200128133510
+20200128134110
+20200128141125
+20200128184209
+20200128210353
+20200129034515
+20200129035446
+20200129035708
+20200129133716
+20200129172428
+20200130134335
+20200130145430
+20200130161817
+20200131140428
+20200131181354
+20200131191754
+20200202100932
+20200203015140
+20200203025400
+20200203025602
+20200203025619
+20200203025744
+20200203025801
+20200203025821
+20200203104214
+20200203173508
+20200203183508
+20200203232433
+20200204070729
+20200204113223
+20200204113224
+20200204131054
+20200204131831
+20200205143231
+20200206091544
+20200206112850
+20200206135203
+20200206141511
+20200207062728
+20200207090921
+20200207132752
+20200207151640
+20200207182131
+20200207184023
+20200207185149
+20200209131152
+20200210062432
+20200210092405
+20200210135504
+20200210184410
+20200210184420
+20200211152410
+20200211155000
+20200211155100
+20200211155539
+20200211174946
+20200212014653
+20200212052620
+20200212133945
+20200212134201
+20200213093702
+20200213100530
+20200213155311
+20200213204737
+20200213220159
+20200213220211
+20200214025454
+20200214034836
+20200214085940
+20200214214934
+20200215222507
+20200215225103
+20200217223651
+20200217225719
+20200219105209
+20200219133859
+20200219135440
+20200219141307
+20200219142522
+20200219183456
+20200219184219
+20200219193058
+20200219193117
+20200220115023
+20200220180944
+20200221023320
+20200221074028
+20200221100514
+20200221105436
+20200221142216
+20200221144534
+20200222055543
+20200224020219
+20200224163804
+20200224185814
+20200225111018
+20200225123228
+20200226100614
+20200226100624
+20200226100634
+20200226124757
+20200226162156
+20200226162239
+20200226162634
+20200226162723
+20200227140242
+20200227164113
+20200227165129
+20200228160542
+20200302142052
+20200302152516
+20200303055348
+20200303074328
+20200303181648
+20200304085423
+20200304090155
+20200304121828
+20200304121844
+20200304124406
+20200304160800
+20200304160801
+20200304160823
+20200304211738
+20200305121159
+20200305151736
+20200305200641
+20200306095654
+20200306160521
+20200306170211
+20200306170321
+20200306170531
+20200306192548
+20200306193236
+20200309140540
+20200309162244
+20200309195209
+20200309195710
+20200310075115
+20200310123229
+20200310132654
+20200310133822
+20200310135818
+20200310135823
+20200310145304
+20200311074438
+20200311082301
+20200311084025
+20200311093210
+20200311094020
+20200311130802
+20200311141053
+20200311141943
+20200311154110
+20200311165635
+20200311192351
+20200311214912
+20200312053852
+20200312125121
+20200312160532
+20200312163407
+20200313101649
+20200313123934
+20200313202430
+20200313203525
+20200313203550
+20200313204021
+20200314060834
+20200316111759
+20200316162648
+20200316173312
+20200317110602
+20200317142110
+20200318140400
+20200318152134
+20200318162148
+20200318163148
+20200318164448
+20200318165448
+20200318175008
+20200318183553
+20200319071702
+20200319123041
+20200319124127
+20200319203901
+20200320112455
+20200320123839
+20200323011225
+20200323011955
+20200323071918
+20200323074147
+20200323075043
+20200323080714
+20200323122201
+20200323134519
+20200324093258
+20200324115359
+20200325152327
+20200325160952
+20200325183636
+20200326114443
+20200326124443
+20200326134443
+20200326135443
+20200326144443
+20200326145443
+20200330074719
+20200330121000
+20200330123739
+20200330132913
+20200331132103
+20200331195952
+20200331220930
+20200401095430
+20200401211005
+20200402123926
+20200402124802
+20200402135250
+20200402185044
+20200403184110
+20200403185127
+20200403185422
+20200406135648
+20200407094005
+20200407094923
+20200408110856
+\.
 

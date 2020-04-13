@@ -37,7 +37,7 @@ For information on how to resolve common errors reported from the UI, see
 If the UI is not working, or you are unable to log in, you can run the Geo
 health check manually to get this information as well as a few more details.
 
-This rake task can be run on an app node in the **primary** or **secondary**
+This Rake task can be run on an app node in the **primary** or **secondary**
 Geo nodes:
 
 ```shell
@@ -70,7 +70,7 @@ All projects are in hashed storage? ... yes
 Checking Geo ... Finished
 ```
 
-Current sync information can be found manually by running this rake task on any
+Current sync information can be found manually by running this Rake task on any
 **secondary** app node:
 
 ```shell
@@ -147,9 +147,9 @@ This machine's Geo node name matches a database record ... no
   doc/administration/geo/replication/troubleshooting.md#can-geo-detect-the-current-node-correctly
 ```
 
-## Fixing errors found when running the Geo check rake task
+## Fixing errors found when running the Geo check Rake task
 
-When running this rake task, you may see errors if the nodes are not properly configured:
+When running this Rake task, you may see errors if the nodes are not properly configured:
 
 ```shell
 sudo gitlab-rake gitlab:geo:check
@@ -261,7 +261,7 @@ default to 1. You may need to increase this value if you have more
 
 Be sure to restart PostgreSQL for this to take
 effect. See the [PostgreSQL replication
-setup][database-pg-replication] guide for more details.
+setup](database.md#postgresql-replication) guide for more details.
 
 ### Message: `FATAL:  could not start WAL streaming: ERROR:  replication slot "geo_secondary_my_domain_com" does not exist`?
 
@@ -273,7 +273,7 @@ process](database.md) on the **secondary** node .
 
 ### Message: "Command exceeded allowed execution time" when setting up replication?
 
-This may happen while [initiating the replication process][database-start-replication] on the **secondary** node,
+This may happen while [initiating the replication process](database.md#step-3-initiate-the-replication-process) on the **secondary** node,
 and indicates that your initial dataset is too large to be replicated in the default timeout (30 minutes).
 
 Re-run `gitlab-ctl replicate-geo-database`, but include a larger value for
@@ -354,6 +354,30 @@ sudo gitlab-ctl reconfigure
 
 To help us resolve this problem, consider commenting on
 [the issue](https://gitlab.com/gitlab-org/gitlab/issues/4489).
+
+### Message: `LOG:  invalid CIDR mask in address`
+
+This happens on wrongly-formatted addresses in `postgresql['md5_auth_cidr_addresses']`.
+
+```plaintext
+2020-03-20_23:59:57.60499 LOG:  invalid CIDR mask in address "***"
+2020-03-20_23:59:57.60501 CONTEXT:  line 74 of configuration file "/var/opt/gitlab/postgresql/data/pg_hba.conf"
+```
+
+To fix this, update the IP addresses in `/etc/gitlab/gitlab.rb` under `postgresql['md5_auth_cidr_addresses']`
+to respect the CIDR format (i.e. `1.2.3.4/32`).
+
+### Message: `LOG:  invalid IP mask "md5": Name or service not known`
+
+This happens when you have added IP addresses without a subnet mask in `postgresql['md5_auth_cidr_addresses']`.
+
+```plaintext
+2020-03-21_00:23:01.97353 LOG:  invalid IP mask "md5": Name or service not known
+2020-03-21_00:23:01.97354 CONTEXT:  line 75 of configuration file "/var/opt/gitlab/postgresql/data/pg_hba.conf"
+```
+
+To fix this, add the subnet mask in `/etc/gitlab/gitlab.rb` under `postgresql['md5_auth_cidr_addresses']`
+to respect the CIDR format (i.e. `1.2.3.4/32`).
 
 ### Very large repositories never successfully synchronize on the **secondary** node
 
@@ -462,9 +486,9 @@ to start again from scratch, there are a few steps that can help you:
 1. Reset the Tracking Database
 
    ```shell
-   gitlab-rake geo:db:drop
-   gitlab-ctl reconfigure
-   gitlab-rake geo:db:setup
+   gitlab-rake geo:db:drop  # on a secondary app node
+   gitlab-ctl reconfigure   # on the tracking database node
+   gitlab-rake geo:db:setup # on a secondary app node
    ```
 
 1. Restart previously stopped services
@@ -612,7 +636,7 @@ To check the configuration:
 
    If everything is working, you should see something like this:
 
-   ```
+   ```plaintext
    gitlabhq_geo_production=# SELECT * from information_schema.foreign_tables;
      foreign_table_catalog  | foreign_table_schema |               foreign_table_name                | foreign_server_catalog  | foreign_server_name
    -------------------------+----------------------+-------------------------------------------------+-------------------------+---------------------
@@ -743,9 +767,6 @@ reload of the FDW schema. To manually reload the FDW schema:
    SELECT * FROM gitlab_secondary.projects limit 1;
    ```
 
-[database-start-replication]: database.md#step-3-initiate-the-replication-process
-[database-pg-replication]: database.md#postgresql-replication
-
 ### "Geo database has an outdated FDW remote schema" error
 
 GitLab can error with a `Geo database has an outdated FDW remote schema` message.
@@ -765,7 +786,7 @@ sudo gitlab-rake geo:db:refresh_foreign_tables
 ## Expired artifacts
 
 If you notice for some reason there are more artifacts on the Geo
-secondary node than on the Geo primary node, you can use the rake task
+secondary node than on the Geo primary node, you can use the Rake task
 to [cleanup orphan artifact files](../../../raketasks/cleanup.md#remove-orphan-artifact-files).
 
 On a Geo **secondary** node, this command will also clean up all Geo

@@ -1,0 +1,5 @@
+---
+title: Fix analytics group and project loading spinners styling
+merge_request: 28094
+author:
+type: fixed

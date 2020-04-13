@@ -64,11 +64,14 @@ source projects, GitLab grants access to **Gold** features for all GitLab.com
 
 #### Self-managed
 
-A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. For instances that aren't air-gapped or on a closed network, the maximum number of simultaneous users in the self-managed installation is checked each quarter, using [Seat Link](#seat-link).
+A self-managed subscription uses a hybrid model. You pay for a subscription according to the maximum number of users enabled during the subscription period. For instances that aren't offline or on a closed network, the maximum number of simultaneous users in the self-managed installation is checked each quarter, using [Seat Link](#seat-link).
 
 Every occupied seat, whether by person, job, or bot is counted in the subscription, with the following exceptions:
 
-- Blocked users who are blocked prior to the renewal of a subscription won't be counted as active users for the renewal subscription. They may count as active users in the subscription period in which they were originally added.
+- [Deactivated](../user/admin_area/activating_deactivating_users.md#deactivating-a-user) and
+[blocked](../user/admin_area/blocking_unblocking_users.md) users who are restricted prior to the
+renewal of a subscription won't be counted as active users for the renewal subscription. They may
+count as active users in the subscription period in which they were originally added.
 - Members with Guest permissions on an Ultimate subscription.
 - GitLab-created service accounts: `Ghost User` and `Support Bot`.
 
@@ -245,15 +248,19 @@ Seat Link allows us to provide our self-managed customers with prorated charges 
 
 Seat Link sends to GitLab daily a count of all users in connected self-managed instances. That information is used to automate prorated reconciliations. The data is sent securely through an encrypted HTTPS connection.
 
-Seat Link is mandatory because we need the user count data to enable prorated billing. Seat Link provides **only** the following information to GitLab:
+Seat Link provides **only** the following information to GitLab:
 
 - Date
-- Historical maximum user count
 - License key
+- Historical maximum user count
+- Active users count
 
-Here is an example of the POST request:
+For offline or closed network customers, the existing [true-up model](#users-over-license) will be used. Prorated charges are not possible without user count data.
 
-```plaintext
+<details>
+<summary>Click here to view example content of a Seat Link POST request.</summary>
+
+<pre><code>
 {
   date: '2020-01-29',
   license_key: 'ZXlKa1lYUmhJam9pWm5WNmVsTjVZekZ2YTJoV2NucDBh
@@ -290,11 +297,41 @@ TjJ4eVlVUkdkWEJtDQpkSHByYWpreVJrcG9UVlo0Y0hKSU9URndiV2RzVFdO
 VlhHNXRhVmszTkV0SVEzcEpNMWRyZEVoRU4ydHINCmRIRnFRVTlCVUVVM1pV
 SlRORE4xUjFaYVJGb3JlWGM5UFZ4dUlpd2lhWFlpt2lKV00yRnNVbk5RTjJk
 Sg0KU1hNMGExaE9SVGR2V2pKQlBUMWNiaUo5DQo=',
-  max_historical_user_count: 10
+  max_historical_user_count: 10,
+  active_users: 6
 }
+</code></pre>
+
+</details>
+
+#### Disable Seat Link
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/212375) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.10.
+
+Seat Link is enabled by default.
+
+To disable this feature, go to
+**{admin}** **Admin Area > Settings > Metrics and profiling** and clear the **Seat Link** checkbox.
+
+To disable Seat Link in an Omnibus GitLab installation, and prevent it from
+being configured in the future through the administration panel, set the following in
+[`gitlab.rb`](https://docs.gitlab.com/omnibus/settings/configuration.html#configuration-options):
+
+```ruby
+gitlab_rails['seat_link_enabled'] = false
 ```
 
-For air-gapped or closed network customers, the existing [true-up model](#users-over-license) will be used. Prorated charges are not possible without user count data.
+To disable Seat Link in a GitLab source installation, and prevent it from
+being configured in the future through the administration panel,
+set the following in `gitlab.yml`:
+
+```yaml
+production: &base
+  # ...
+  gitlab:
+    # ...
+    seat_link_enabled: false
+```
 
 ### Renew or change a GitLab.com subscription
 

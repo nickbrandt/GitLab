@@ -32,15 +32,15 @@ RSpec.shared_examples 'a read-only GitLab instance' do
         {
           'action' => 'geo_proxy_to_primary',
           'data' => {
-            'api_endpoints' => %w{/api/v4/geo/proxy_git_push_ssh/info_refs /api/v4/geo/proxy_git_push_ssh/push},
+            'api_endpoints' => %w{/api/v4/geo/proxy_git_ssh/info_refs_receive_pack /api/v4/geo/proxy_git_ssh/receive_pack},
             'primary_repo' => primary_repo_url
           }
         }
       end
       let(:console_messages) do
         [
-          "You're pushing to a Geo secondary! We'll help you by proxying this",
-          "request to the primary:",
+          "This request to a Geo secondary node will be forwarded to the",
+          "Geo primary node:",
           "",
           "  #{primary_repo_ssh_url}"
         ]

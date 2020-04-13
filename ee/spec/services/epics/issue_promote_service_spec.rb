@@ -54,7 +54,7 @@ describe Epics::IssuePromoteService do
           end
         end
 
-        context 'when issue is promoted' do
+        context 'when promoting issue' do
           let!(:issue_mentionable_note) { create(:note, noteable: issue, author: user, project: project, note: "note with mention #{user.to_reference}") }
           let!(:issue_note) { create(:note, noteable: issue, author: user, project: project, note: "note without mention") }
 
@@ -96,11 +96,21 @@ describe Epics::IssuePromoteService do
             let(:issue) { create(:issue, project: project, description: "description with mention to #{user.to_reference}") }
 
             it 'only saves user mentions with actual mentions' do
-              expect(epic.user_mentions.where(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
+              expect(epic.user_mentions.find_by(note_id: nil).mentioned_users_ids).to match_array([user.id])
               expect(epic.user_mentions.where.not(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
               expect(epic.user_mentions.where.not(note_id: nil).count).to eq 1
               expect(epic.user_mentions.count).to eq 2
             end
+          end
+        end
+
+        context 'when issue was already promoted' do
+          it 'raises error' do
+            epic = create(:epic, group: group)
+            issue.update(promoted_to_epic_id: epic.id)
+
+            expect { subject.execute(issue) }
+              .to raise_error(Epics::IssuePromoteService::PromoteError, /already promoted/)
           end
         end
 

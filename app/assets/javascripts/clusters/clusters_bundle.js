@@ -8,13 +8,20 @@ import Flash from '../flash';
 import Poll from '../lib/utils/poll';
 import initSettingsPanels from '../settings_panels';
 import eventHub from './event_hub';
-import { APPLICATION_STATUS, INGRESS, INGRESS_DOMAIN_SUFFIX, CROSSPLANE } from './constants';
+import {
+  APPLICATION_STATUS,
+  INGRESS,
+  INGRESS_DOMAIN_SUFFIX,
+  CROSSPLANE,
+  KNATIVE,
+} from './constants';
 import ClustersService from './services/clusters_service';
 import ClustersStore from './stores/clusters_store';
 import Applications from './components/applications.vue';
 import RemoveClusterConfirmation from './components/remove_cluster_confirmation.vue';
 import setupToggleButtons from '../toggle_buttons';
 import initProjectSelectDropdown from '~/project_select';
+import initServerlessSurveyBanner from '~/serverless/survey_banner';
 
 const Environments = () => import('ee_component/clusters/components/environments.vue');
 
@@ -252,7 +259,7 @@ export default class Clusters {
     eventHub.$on('installApplication', this.installApplication);
     eventHub.$on('updateApplication', data => this.updateApplication(data));
     eventHub.$on('saveKnativeDomain', data => this.saveKnativeDomain(data));
-    eventHub.$on('setKnativeHostname', data => this.setKnativeHostname(data));
+    eventHub.$on('setKnativeDomain', data => this.setKnativeDomain(data));
     eventHub.$on('uninstallApplication', data => this.uninstallApplication(data));
     eventHub.$on('setCrossplaneProviderStack', data => this.setCrossplaneProviderStack(data));
     eventHub.$on('setIngressModSecurityEnabled', data => this.setIngressModSecurityEnabled(data));
@@ -268,7 +275,7 @@ export default class Clusters {
     eventHub.$off('installApplication', this.installApplication);
     eventHub.$off('updateApplication', this.updateApplication);
     eventHub.$off('saveKnativeDomain');
-    eventHub.$off('setKnativeHostname');
+    eventHub.$off('setKnativeDomain');
     eventHub.$off('setCrossplaneProviderStack');
     eventHub.$off('uninstallApplication');
     eventHub.$off('setIngressModSecurityEnabled');
@@ -325,6 +332,10 @@ export default class Clusters {
         prevApplicationMap[INGRESS],
         this.store.state.applications[INGRESS],
       );
+    }
+
+    if (this.store.state.applications[KNATIVE]?.status === APPLICATION_STATUS.INSTALLED) {
+      initServerlessSurveyBanner();
     }
   }
 
@@ -510,10 +521,10 @@ export default class Clusters {
     });
   }
 
-  setKnativeHostname(data) {
-    const appId = data.id;
-    this.store.updateAppProperty(appId, 'isEditingHostName', true);
-    this.store.updateAppProperty(appId, 'hostname', data.hostname);
+  setKnativeDomain({ id: appId, domain, domainId }) {
+    this.store.updateAppProperty(appId, 'isEditingDomain', true);
+    this.store.updateAppProperty(appId, 'hostname', domain);
+    this.store.updateAppProperty(appId, 'pagesDomain', domainId ? { id: domainId, domain } : null);
   }
 
   setCrossplaneProviderStack(data) {

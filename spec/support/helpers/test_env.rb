@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rspec/mocks'
-require 'toml-rb'
 
 module TestEnv
   extend ActiveSupport::Concern
@@ -61,11 +60,11 @@ module TestEnv
     'merge-commit-analyze-before'        => '1adbdef',
     'merge-commit-analyze-side-branch'   => '8a99451',
     'merge-commit-analyze-after'         => '646ece5',
-    'snippet/single-file'                => '43e4080',
-    'snippet/multiple-files'             => 'b80faa8',
-    'snippet/rename-and-edit-file'       => '220a1e4',
-    'snippet/edit-file'                  => 'c2f074f',
-    'snippet/no-files'                   => '671aaa8',
+    'snippet/single-file'                => '43e4080aaa14fc7d4b77ee1f5c9d067d5a7df10e',
+    'snippet/multiple-files'             => 'b80faa8c5b2b62f6489a0d84755580e927e1189b',
+    'snippet/rename-and-edit-file'       => '220a1e4b4dff37feea0625a7947a4c60fbe78365',
+    'snippet/edit-file'                  => 'c2f074f4f26929c92795a75775af79a6ed6d8430',
+    'snippet/no-files'                   => '671aaa842a4875e5f30082d1ab6feda345fdb94d',
     '2-mb-file'                          => 'bf12d25',
     'before-create-delete-modify-move'   => '845009f',
     'between-create-delete-modify-move'  => '3f5f443',
@@ -87,7 +86,7 @@ module TestEnv
     'conflict-resolvable-fork'   => '404fa3f'
   }.freeze
 
-  TMP_TEST_PATH = Rails.root.join('tmp', 'tests', '**')
+  TMP_TEST_PATH = Rails.root.join('tmp', 'tests').freeze
   REPOS_STORAGE = 'default'.freeze
   SECOND_STORAGE_PATH = Rails.root.join('tmp', 'tests', 'second_storage')
 
@@ -140,7 +139,7 @@ module TestEnv
   #
   # Keeps gitlab-shell and gitlab-test
   def clean_test_path
-    Dir[TMP_TEST_PATH].each do |entry|
+    Dir[File.join(TMP_TEST_PATH, '**')].each do |entry|
       unless test_dirs.include?(File.basename(entry))
         FileUtils.rm_rf(entry)
       end
@@ -164,7 +163,8 @@ module TestEnv
       install_dir: gitaly_dir,
       version: Gitlab::GitalyClient.expected_server_version,
       task: "gitlab:gitaly:install[#{install_gitaly_args}]") do
-        Gitlab::SetupHelper.create_gitaly_configuration(gitaly_dir, { 'default' => repos_path }, force: true)
+        Gitlab::SetupHelper::Gitaly.create_configuration(gitaly_dir, { 'default' => repos_path }, force: true)
+        Gitlab::SetupHelper::Praefect.create_configuration(gitaly_dir, { 'praefect' => repos_path }, force: true)
         start_gitaly(gitaly_dir)
       end
   end
@@ -192,17 +192,38 @@ module TestEnv
       end
     end
 
-    @gitaly_pid = Integer(File.read('tmp/tests/gitaly.pid'))
+    gitaly_pid = Integer(File.read(TMP_TEST_PATH.join('gitaly.pid')))
+    praefect_pid = Integer(File.read(TMP_TEST_PATH.join('praefect.pid')))
 
-    Kernel.at_exit { stop_gitaly }
+    Kernel.at_exit { stop(gitaly_pid) }
+    Kernel.at_exit { stop(praefect_pid) }
 
-    wait_gitaly
+    wait('gitaly')
+    wait('praefect')
   end
 
-  def wait_gitaly
+  def stop(pid)
+    Process.kill('KILL', pid)
+  rescue Errno::ESRCH
+    # The process can already be gone if the test run was INTerrupted.
+  end
+
+  def gitaly_url
+    ENV.fetch('GITALY_REPO_URL', nil)
+  end
+
+  def socket_path(service)
+    TMP_TEST_PATH.join('gitaly', "#{service}.socket").to_s
+  end
+
+  def praefect_socket_path
+    "unix:" + socket_path(:praefect)
+  end
+
+  def wait(service)
     sleep_time = 10
     sleep_interval = 0.1
-    socket = Gitlab::GitalyClient.address('default').sub('unix:', '')
+    socket = socket_path(service)
 
     Integer(sleep_time / sleep_interval).times do
       Socket.unix(socket)
@@ -211,19 +232,7 @@ module TestEnv
       sleep sleep_interval
     end
 
-    raise "could not connect to gitaly at #{socket.inspect} after #{sleep_time} seconds"
-  end
-
-  def stop_gitaly
-    return unless @gitaly_pid
-
-    Process.kill('KILL', @gitaly_pid)
-  rescue Errno::ESRCH
-    # The process can already be gone if the test run was INTerrupted.
-  end
-
-  def gitaly_url
-    ENV.fetch('GITALY_REPO_URL', nil)
+    raise "could not connect to #{service} at #{socket.inspect} after #{sleep_time} seconds"
   end
 
   def setup_workhorse

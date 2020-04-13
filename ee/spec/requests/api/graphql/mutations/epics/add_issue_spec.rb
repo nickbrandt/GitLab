@@ -50,7 +50,7 @@ describe 'Add an issue to an Epic' do
         expect(response['errors']).to be_empty
         expect(response['epicIssue']['iid']).to eq(issue.iid.to_s)
         expect(response['epicIssue']['epic']['iid']).to eq(epic.iid.to_s)
-        expect(issue.epic).to eq(epic)
+        expect(issue.reload.epic).to eq(epic)
       end
     end
 

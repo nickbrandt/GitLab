@@ -103,6 +103,16 @@ describe SystemNoteService do
     end
   end
 
+  describe '.change_health_status_note' do
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:change_health_status_note)
+      end
+
+      described_class.change_health_status_note(noteable, project, author)
+    end
+  end
+
   describe '.change_epic_date_note' do
     let(:date_type) { double }
     let(:date) { double }
@@ -218,6 +228,16 @@ describe SystemNoteService do
       end
 
       described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, message)
+    end
+  end
+
+  describe '.change_vulnerability_state' do
+    it 'calls VulnerabilitiesService' do
+      expect_next_instance_of(EE::SystemNotes::VulnerabilitiesService) do |service|
+        expect(service).to receive(:change_vulnerability_state)
+      end
+
+      described_class.change_vulnerability_state(noteable, author)
     end
   end
 end

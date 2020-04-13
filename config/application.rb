@@ -24,6 +24,7 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab/current_settings')
     require_dependency Rails.root.join('lib/gitlab/middleware/read_only')
     require_dependency Rails.root.join('lib/gitlab/middleware/basic_health_check')
+    require_dependency Rails.root.join('lib/gitlab/middleware/same_site_cookies')
     require_dependency Rails.root.join('lib/gitlab/runtime')
 
     # Settings in config/environments/* take precedence over those specified here.
@@ -231,6 +232,8 @@ module Gitlab
 
     config.middleware.insert_after Warden::Manager, Rack::Attack
 
+    config.middleware.insert_before ActionDispatch::Cookies, ::Gitlab::Middleware::SameSiteCookies
+
     # Allow access to GitLab API from other domains
     config.middleware.insert_before Warden::Manager, Rack::Cors do
       headers_to_expose = %w[Link X-Total X-Total-Pages X-Per-Page X-Page X-Next-Page X-Prev-Page X-Gitlab-Blob-Id X-Gitlab-Commit-Id X-Gitlab-Content-Sha256 X-Gitlab-Encoding X-Gitlab-File-Name X-Gitlab-File-Path X-Gitlab-Last-Commit-Id X-Gitlab-Ref X-Gitlab-Size]
@@ -258,18 +261,11 @@ module Gitlab
     # Use caching across all environments
     # Full list of options:
     # https://api.rubyonrails.org/classes/ActiveSupport/Cache/RedisCacheStore.html#method-c-new
-    caching_config_hash = Gitlab::Redis::Cache.params
+    caching_config_hash = {}
+    caching_config_hash[:redis] = Gitlab::Redis::Cache.pool
     caching_config_hash[:compress] = Gitlab::Utils.to_boolean(ENV.fetch('ENABLE_REDIS_CACHE_COMPRESSION', '1'))
     caching_config_hash[:namespace] = Gitlab::Redis::Cache::CACHE_NAMESPACE
     caching_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
-    if Gitlab::Runtime.multi_threaded?
-      caching_config_hash[:pool_size] = Gitlab::Redis::Cache.pool_size
-      caching_config_hash[:pool_timeout] = 1
-    end
-
-    # Overrides RedisCacheStore's default value of 0
-    # This makes the default value the same with Gitlab::Redis::Cache
-    caching_config_hash[:reconnect_attempts] ||= ::Redis::Client::DEFAULTS[:reconnect_attempts]
 
     config.cache_store = :redis_cache_store, caching_config_hash
 

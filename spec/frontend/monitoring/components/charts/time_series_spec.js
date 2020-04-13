@@ -1,10 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { setTestTimeout } from 'helpers/timeout';
 import { GlLink } from '@gitlab/ui';
-import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
+import {
+  GlAreaChart,
+  GlLineChart,
+  GlChartSeriesLabel,
+  GlChartLegend,
+} from '@gitlab/ui/dist/charts';
 import { cloneDeep } from 'lodash';
 import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
-import { chartColorValues } from '~/monitoring/constants';
 import { createStore } from '~/monitoring/stores';
 import TimeSeries from '~/monitoring/components/charts/time_series.vue';
 import * as types from '~/monitoring/stores/mutation_types';
@@ -42,13 +46,16 @@ describe('Time series component', () => {
   let store;
 
   const makeTimeSeriesChart = (graphData, type) =>
-    shallowMount(TimeSeries, {
+    mount(TimeSeries, {
       propsData: {
         graphData: { ...graphData, type },
         deploymentData: store.state.monitoringDashboard.deploymentData,
         projectPath: `${mockHost}${mockProjectDir}`,
       },
       store,
+      stubs: {
+        GlPopover: true,
+      },
     });
 
   describe('With a single time series', () => {
@@ -58,7 +65,7 @@ describe('Time series component', () => {
       store = createStore();
 
       store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+        `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
         metricsDashboardPayload,
       );
 
@@ -148,42 +155,56 @@ describe('Time series component', () => {
 
       describe('methods', () => {
         describe('formatTooltipText', () => {
-          let mockDate;
-          let mockCommitUrl;
-          let generateSeriesData;
-
-          beforeEach(() => {
-            mockDate = deploymentData[0].created_at;
-            mockCommitUrl = deploymentData[0].commitUrl;
-            generateSeriesData = type => ({
-              seriesData: [
-                {
-                  seriesName: timeSeriesChart.vm.chartData[0].name,
-                  componentSubType: type,
-                  value: [mockDate, 5.55555],
-                  dataIndex: 0,
-                },
-              ],
-              value: mockDate,
-            });
+          const mockCommitUrl = deploymentData[0].commitUrl;
+          const mockDate = deploymentData[0].created_at;
+          const mockSha = 'f5bcd1d9';
+          const mockLineSeriesData = () => ({
+            seriesData: [
+              {
+                seriesName: timeSeriesChart.vm.chartData[0].name,
+                componentSubType: 'line',
+                value: [mockDate, 5.55555],
+                dataIndex: 0,
+              },
+            ],
+            value: mockDate,
           });
 
+          const annotationsMetadata = {
+            tooltipData: {
+              sha: mockSha,
+              commitUrl: mockCommitUrl,
+            },
+          };
+
+          const mockAnnotationsSeriesData = {
+            seriesData: [
+              {
+                componentSubType: 'scatter',
+                seriesName: 'series01',
+                dataIndex: 0,
+                value: [mockDate, 5.55555],
+                type: 'scatter',
+                name: 'deployments',
+              },
+            ],
+            value: mockDate,
+          };
+
           it('does not throw error if data point is outside the zoom range', () => {
-            const seriesDataWithoutValue = generateSeriesData('line');
-            expect(
-              timeSeriesChart.vm.formatTooltipText({
-                ...seriesDataWithoutValue,
-                seriesData: seriesDataWithoutValue.seriesData.map(data => ({
-                  ...data,
-                  value: undefined,
-                })),
-              }),
-            ).toBeUndefined();
+            const seriesDataWithoutValue = {
+              ...mockLineSeriesData(),
+              seriesData: mockLineSeriesData().seriesData.map(data => ({
+                ...data,
+                value: undefined,
+              })),
+            };
+            expect(timeSeriesChart.vm.formatTooltipText(seriesDataWithoutValue)).toBeUndefined();
           });
 
           describe('when series is of line type', () => {
             beforeEach(done => {
-              timeSeriesChart.vm.formatTooltipText(generateSeriesData('line'));
+              timeSeriesChart.vm.formatTooltipText(mockLineSeriesData());
               timeSeriesChart.vm.$nextTick(done);
             });
 
@@ -215,7 +236,18 @@ describe('Time series component', () => {
 
           describe('when series is of scatter type, for deployments', () => {
             beforeEach(() => {
-              timeSeriesChart.vm.formatTooltipText(generateSeriesData('scatter'));
+              timeSeriesChart.vm.formatTooltipText({
+                ...mockAnnotationsSeriesData,
+                seriesData: mockAnnotationsSeriesData.seriesData.map(data => ({
+                  ...data,
+                  data: annotationsMetadata,
+                })),
+              });
+              return timeSeriesChart.vm.$nextTick;
+            });
+
+            it('set tooltip type to deployments', () => {
+              expect(timeSeriesChart.vm.tooltip.type).toBe('deployments');
             });
 
             it('formats tooltip title', () => {
@@ -228,6 +260,25 @@ describe('Time series component', () => {
 
             it('formats tooltip commit url', () => {
               expect(timeSeriesChart.vm.tooltip.commitUrl).toBe(mockCommitUrl);
+            });
+          });
+
+          describe('when series is of scatter type and deployments data is missing', () => {
+            beforeEach(() => {
+              timeSeriesChart.vm.formatTooltipText(mockAnnotationsSeriesData);
+              return timeSeriesChart.vm.$nextTick;
+            });
+
+            it('formats tooltip title', () => {
+              expect(timeSeriesChart.vm.tooltip.title).toBe('16 Jul 2019, 10:14AM');
+            });
+
+            it('formats tooltip sha', () => {
+              expect(timeSeriesChart.vm.tooltip.sha).toBeUndefined();
+            });
+
+            it('formats tooltip commit url', () => {
+              expect(timeSeriesChart.vm.tooltip.commitUrl).toBeUndefined();
             });
           });
         });
@@ -307,10 +358,6 @@ describe('Time series component', () => {
 
           it('formats line width correctly', () => {
             expect(chartData[0].lineStyle.width).toBe(2);
-          });
-
-          it('formats line color correctly', () => {
-            expect(chartData[0].lineStyle.color).toBe(chartColorValues[0]);
           });
         });
 
@@ -410,16 +457,24 @@ describe('Time series component', () => {
           });
         });
 
-        describe('deploymentSeries', () => {
+        describe('annotationSeries', () => {
           it('utilizes deployment data', () => {
-            expect(timeSeriesChart.vm.deploymentSeries.yAxisIndex).toBe(1); // same as deployment y axis
-            expect(timeSeriesChart.vm.deploymentSeries.data).toEqual([
-              ['2019-07-16T10:14:25.589Z', expect.any(Number)],
-              ['2019-07-16T11:14:25.589Z', expect.any(Number)],
-              ['2019-07-16T12:14:25.589Z', expect.any(Number)],
+            const annotationSeries = timeSeriesChart.vm.chartOptionSeries[0];
+            expect(annotationSeries.yAxisIndex).toBe(1); // same as annotations y axis
+            expect(annotationSeries.data).toEqual([
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T10:14:25.589Z', expect.any(Number)],
+              }),
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T11:14:25.589Z', expect.any(Number)],
+              }),
+              expect.objectContaining({
+                symbolSize: 14,
+                value: ['2019-07-16T12:14:25.589Z', expect.any(Number)],
+              }),
             ]);
-
-            expect(timeSeriesChart.vm.deploymentSeries.symbolSize).toBe(14);
           });
         });
 
@@ -510,7 +565,11 @@ describe('Time series component', () => {
             const commitUrl = `${mockProjectDir}/-/commit/${mockSha}`;
 
             beforeEach(done => {
-              timeSeriesAreaChart.vm.tooltip.isDeployment = true;
+              timeSeriesAreaChart.setData({
+                tooltip: {
+                  type: 'deployments',
+                },
+              });
               timeSeriesAreaChart.vm.$nextTick(done);
             });
 
@@ -557,19 +616,39 @@ describe('Time series component', () => {
         timeSeriesChart.destroy();
       });
 
-      describe('computed', () => {
-        let chartData;
+      describe('Color match', () => {
+        let lineColors;
 
         beforeEach(() => {
-          ({ chartData } = timeSeriesChart.vm);
+          lineColors = timeSeriesChart
+            .find(GlAreaChart)
+            .vm.series.map(item => item.lineStyle.color);
         });
 
-        it('should contain different colors for each time series', () => {
-          expect(chartData[0].lineStyle.color).toBe('#1f78d1');
-          expect(chartData[1].lineStyle.color).toBe('#1aaa55');
-          expect(chartData[2].lineStyle.color).toBe('#fc9403');
-          expect(chartData[3].lineStyle.color).toBe('#6d49cb');
-          expect(chartData[4].lineStyle.color).toBe('#1f78d1');
+        it('should contain different colors for contiguous time series', () => {
+          lineColors.forEach((color, index) => {
+            expect(color).not.toBe(lineColors[index + 1]);
+          });
+        });
+
+        it('should match series color with tooltip label color', () => {
+          const labels = timeSeriesChart.findAll(GlChartSeriesLabel);
+
+          lineColors.forEach((color, index) => {
+            const labelColor = labels.at(index).props('color');
+            expect(color).toBe(labelColor);
+          });
+        });
+
+        it('should match series color with legend color', () => {
+          const legendColors = timeSeriesChart
+            .find(GlChartLegend)
+            .props('seriesInfo')
+            .map(item => item.color);
+
+          lineColors.forEach((color, index) => {
+            expect(color).toBe(legendColors[index]);
+          });
         });
       });
     });

@@ -555,22 +555,28 @@ class MergeRequest < ApplicationRecord
     end
   end
 
+  def diff_stats
+    return unless diff_refs
+
+    strong_memoize(:diff_stats) do
+      project.repository.diff_stats(diff_refs.base_sha, diff_refs.head_sha)
+    end
+  end
+
   def diff_size
     # Calling `merge_request_diff.diffs.real_size` will also perform
     # highlighting, which we don't need here.
-    merge_request_diff&.real_size || diffs.real_size
+    merge_request_diff&.real_size || diff_stats&.real_size || diffs.real_size
   end
 
   def modified_paths(past_merge_request_diff: nil)
-    diffs = if past_merge_request_diff
-              past_merge_request_diff
-            elsif compare
-              compare
-            else
-              self.merge_request_diff
-            end
-
-    diffs.modified_paths
+    if past_merge_request_diff
+      past_merge_request_diff.modified_paths
+    elsif compare
+      diff_stats&.paths || compare.modified_paths
+    else
+      merge_request_diff.modified_paths
+    end
   end
 
   def new_paths
@@ -1290,7 +1296,7 @@ class MergeRequest < ApplicationRecord
       variables.append(key: 'CI_MERGE_REQUEST_PROJECT_URL', value: project.web_url)
       variables.append(key: 'CI_MERGE_REQUEST_TARGET_BRANCH_NAME', value: target_branch.to_s)
       variables.append(key: 'CI_MERGE_REQUEST_TITLE', value: title)
-      variables.append(key: 'CI_MERGE_REQUEST_ASSIGNEES', value: assignee_username_list) if assignees.any?
+      variables.append(key: 'CI_MERGE_REQUEST_ASSIGNEES', value: assignee_username_list) if assignees.present?
       variables.append(key: 'CI_MERGE_REQUEST_MILESTONE', value: milestone.title) if milestone
       variables.append(key: 'CI_MERGE_REQUEST_LABELS', value: label_names.join(',')) if labels.present?
       variables.concat(source_project_variables)

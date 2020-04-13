@@ -121,7 +121,7 @@ namespace :admin do
     get '/', to: redirect('admin/application_settings/general'), as: nil
 
     resources :services, only: [:index, :edit, :update]
-    resources :integrations, only: [:edit, :update, :test] do
+    resources :integrations, only: [:edit, :update] do
       member do
         put :test
       end
@@ -160,6 +160,8 @@ namespace :admin do
   end
 
   concerns :clusterable
+
+  get '/dashboard/stats', to: 'dashboard#stats'
 
   root to: 'dashboard#index'
 end

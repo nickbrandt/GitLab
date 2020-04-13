@@ -26,6 +26,9 @@ FactoryBot.define do
       create_list(:issue, 2, project: projects[0], author: User.alert_bot)
       create_list(:issue, 2, project: projects[1], author: User.alert_bot)
       create_list(:issue, 4, project: projects[0])
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[1])
       create(:zoom_meeting, project: projects[0], issue: projects[0].issues[0], issue_status: :added)
       create_list(:zoom_meeting, 2, project: projects[0], issue: projects[0].issues[1], issue_status: :removed)
       create(:zoom_meeting, project: projects[0], issue: projects[0].issues[2], issue_status: :added)
@@ -36,12 +39,14 @@ FactoryBot.define do
       gcp_cluster = create(:cluster_provider_gcp, :created).cluster
       create(:cluster_provider_aws, :created)
       create(:cluster_platform_kubernetes)
+      create(:cluster, :management_project, management_project: projects[0])
       create(:cluster, :group)
+      create(:cluster, :instance, :production_environment)
 
       # Disabled clusters
       create(:cluster, :disabled)
       create(:cluster, :group, :disabled)
-      create(:cluster, :group, :disabled)
+      create(:cluster, :instance, :disabled)
 
       # Applications
       create(:clusters_applications_helm, :installed, cluster: gcp_cluster)

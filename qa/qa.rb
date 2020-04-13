@@ -134,7 +134,6 @@ module QA
         autoload :LDAPNoServer, 'qa/scenario/test/integration/ldap_no_server'
         autoload :LDAPTLS, 'qa/scenario/test/integration/ldap_tls'
         autoload :InstanceSAML, 'qa/scenario/test/integration/instance_saml'
-        autoload :OAuth, 'qa/scenario/test/integration/oauth'
         autoload :Kubernetes, 'qa/scenario/test/integration/kubernetes'
         autoload :Mattermost, 'qa/scenario/test/integration/mattermost'
         autoload :ObjectStorage, 'qa/scenario/test/integration/object_storage'
@@ -169,6 +168,7 @@ module QA
       autoload :Menu, 'qa/page/main/menu'
       autoload :OAuth, 'qa/page/main/oauth'
       autoload :SignUp, 'qa/page/main/sign_up'
+      autoload :Terms, 'qa/page/main/terms'
     end
 
     module Settings
@@ -370,6 +370,12 @@ module QA
           autoload :Index, 'qa/page/admin/overview/users/index'
           autoload :Show, 'qa/page/admin/overview/users/show'
         end
+
+        module Groups
+          autoload :Index, 'qa/page/admin/overview/groups/index'
+          autoload :Show, 'qa/page/admin/overview/groups/show'
+          autoload :Edit, 'qa/page/admin/overview/groups/edit'
+        end
       end
     end
 
@@ -482,17 +488,6 @@ module QA
         autoload :LastJobConsole, 'qa/vendor/jenkins/page/last_job_console'
         autoload :ConfigureJob, 'qa/vendor/jenkins/page/configure_job'
       end
-    end
-
-    module Github
-      module Page
-        autoload :Base, 'qa/vendor/github/page/base'
-        autoload :Login, 'qa/vendor/github/page/login'
-      end
-    end
-
-    module OnePassword
-      autoload :CLI, 'qa/vendor/one_password/cli'
     end
   end
 

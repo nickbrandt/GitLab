@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import Component from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 
 describe('Configure Feature Flags Modal', () => {
@@ -26,7 +26,7 @@ describe('Configure Feature Flags Modal', () => {
 
   describe('rotate token', () => {
     it('should emit a `token` event on click', () => {
-      wrapper.find(GlButton).vm.$emit('click');
+      wrapper.find(GlDeprecatedButton).vm.$emit('click');
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.emitted('token')).toEqual([[]]);
       });

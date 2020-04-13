@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module StatusPage
+  # Note: Any new fields exposures should also be added to
+  # +StatusPage::TriggerPublishService::PUBLISH_WHEN_ISSUE_CHANGED+.
   class IncidentEntity < Grape::Entity
     expose :iid, as: :id
     expose :state, as: :status

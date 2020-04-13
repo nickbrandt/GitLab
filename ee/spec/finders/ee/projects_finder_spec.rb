@@ -4,18 +4,19 @@ require 'spec_helper'
 
 describe ProjectsFinder do
   describe '#execute' do
+    let_it_be(:user) { create(:user) }
     let(:finder) { described_class.new(current_user: user, params: params, project_ids_relation: project_ids_relation) }
-    let(:user) { create(:user) }
 
     subject { finder.execute }
 
     describe 'filter by plans' do
       let(:params) { { plans: plans } }
       let(:project_ids_relation) { nil }
-      let!(:gold_project) { create_project(:gold_plan) }
-      let!(:gold_project2) { create_project(:gold_plan) }
-      let!(:silver_project) { create_project(:silver_plan) }
-      let!(:no_plan_project) { create_project(nil) }
+
+      let_it_be(:gold_project) { create_project(:gold_plan) }
+      let_it_be(:gold_project2) { create_project(:gold_plan) }
+      let_it_be(:silver_project) { create_project(:silver_plan) }
+      let_it_be(:no_plan_project) { create_project(nil) }
 
       context 'with gold plan' do
         let(:plans) { ['gold'] }
@@ -50,7 +51,7 @@ describe ProjectsFinder do
       private
 
       def create_project(plan)
-        create(:project, :public, namespace: create(:namespace, plan: plan))
+        create(:project, :public, namespace: create(:namespace_with_plan, plan: plan))
       end
     end
   end

@@ -5,16 +5,15 @@ require "spec_helper"
 describe API::MergeRequests do
   include ProjectForksHelper
 
-  set(:user)        { create(:user) }
-  set(:user2)       { create(:user) }
-  set(:project)     { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
-  set(:milestone)   { create(:milestone, title: '1.0.0', project: project) }
-  set(:milestone1)  { create(:milestone, title: '0.9', project: project) }
-  set(:label)       { create(:label, title: 'label', color: '#FFAABB', project: project) }
-  set(:label2)      { create(:label, title: 'a-test', color: '#FFFFFF', project: project) }
-
-  let(:base_time) { Time.now }
-  let!(:merge_request) { create(:merge_request, :simple, milestone: milestone1, author: user, assignees: [user, user2], source_project: project, target_project: project, title: "Test", created_at: base_time) }
+  let_it_be(:user)       { create(:user) }
+  let_it_be(:user2)      { create(:user) }
+  let_it_be(:project)    { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
+  let_it_be(:milestone)  { create(:milestone, title: '1.0.0', project: project) }
+  let_it_be(:milestone1) { create(:milestone, title: '0.9', project: project) }
+  let_it_be(:label)      { create(:label, title: 'label', color: '#FFAABB', project: project) }
+  let_it_be(:label2)     { create(:label, title: 'a-test', color: '#FFFFFF', project: project) }
+  let(:base_time)        { Time.now }
+  let!(:merge_request)   { create(:merge_request, :simple, milestone: milestone1, author: user, assignees: [user, user2], source_project: project, target_project: project, title: "Test", created_at: base_time) }
 
   before do
     project.add_reporter(user)

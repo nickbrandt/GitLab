@@ -2,18 +2,19 @@
 require 'spec_helper'
 
 describe API::MavenPackages do
-  let(:group)   { create(:group) }
-  let(:user)    { create(:user) }
-  let(:project) { create(:project, :public, namespace: group) }
-  let(:package) { create(:maven_package, project: project) }
-  let(:maven_metadatum) { package.maven_metadatum }
-  let(:package_file) { package.package_files.where('file_name like ?', '%.xml').first }
-  let(:jar_file) { package.package_files.where('file_name like ?', '%.jar').first }
-  let(:personal_access_token) { create(:personal_access_token, user: user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project, reload: true) { create(:project, :public, namespace: group) }
+  let_it_be(:package, reload: true) { create(:maven_package, project: project, name: project.full_path) }
+  let_it_be(:maven_metadatum, reload: true) { package.maven_metadatum }
+  let_it_be(:package_file) { package.package_files.with_file_name_like('%.xml').first }
+  let_it_be(:jar_file) { package.package_files.with_file_name_like('%.jar').first }
+  let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
+  let_it_be(:job) { create(:ci_build, user: user) }
+
   let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
   let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
-  let(:job) { create(:ci_build, user: user) }
   let(:version) { '1.0-SNAPSHOT' }
 
   before do
@@ -23,15 +24,61 @@ describe API::MavenPackages do
 
   shared_examples 'tracking the file download event' do
     context 'with jar file' do
-      let(:package_file) { jar_file }
+      let_it_be(:package_file) { jar_file }
 
       it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
     end
   end
 
-  describe 'GET /api/v4/packages/maven/*path/:file_name' do
-    let(:package) { create(:maven_package, project: project, name: project.full_path) }
+  shared_examples 'processing HEAD requests' do
+    subject { head api(url) }
 
+    before do
+      allow_any_instance_of(::Packages::PackageFileUploader).to receive(:fog_credentials).and_return(object_storage_credentials)
+      stub_package_file_object_storage(enabled: object_storage_enabled)
+    end
+
+    context 'with object storage enabled' do
+      let(:object_storage_enabled) { true }
+
+      before do
+        allow_any_instance_of(::Packages::PackageFileUploader).to receive(:file_storage?).and_return(false)
+      end
+
+      context 'non AWS provider' do
+        let(:object_storage_credentials) { { provider: 'Google' } }
+
+        it 'does not generated a signed url for head' do
+          expect_any_instance_of(Fog::AWS::Storage::Files).not_to receive(:head_url)
+
+          subject
+        end
+      end
+
+      context 'with AWS provider' do
+        let(:object_storage_credentials) { { provider: 'AWS', aws_access_key_id: 'test', aws_secret_access_key: 'test' } }
+
+        it 'generates a signed url for head' do
+          expect_any_instance_of(Fog::AWS::Storage::Files).to receive(:head_url).and_call_original
+
+          subject
+        end
+      end
+    end
+
+    context 'with object storage disabled' do
+      let(:object_storage_enabled) { false }
+      let(:object_storage_credentials) { {} }
+
+      it 'does not generate a signed url for head' do
+        expect_any_instance_of(Fog::AWS::Storage::Files).not_to receive(:head_url)
+
+        subject
+      end
+    end
+  end
+
+  describe 'GET /api/v4/packages/maven/*path/:file_name' do
     context 'a public project' do
       subject { download_file(package_file.file_name) }
 
@@ -131,7 +178,9 @@ describe API::MavenPackages do
     end
 
     context 'project name is different from a package name' do
-      let(:package) { create(:maven_package, project: project) }
+      before do
+        maven_metadatum.update!(path: "wrong_name/#{package.version}")
+      end
 
       it 'rejects request' do
         download_file(package_file.file_name)
@@ -147,6 +196,12 @@ describe API::MavenPackages do
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
       download_file(file_name, params, request_headers)
     end
+  end
+
+  describe 'HEAD /api/v4/packages/maven/*path/:file_name' do
+    let(:url) { "/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
   end
 
   describe 'GET /api/v4/groups/:id/-/packages/maven/*path/:file_name' do
@@ -262,6 +317,12 @@ describe API::MavenPackages do
     end
   end
 
+  describe 'HEAD /api/v4/groups/:id/-/packages/maven/*path/:file_name' do
+    let(:url) { "/groups/#{group.id}/-/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
+  end
+
   describe 'GET /api/v4/projects/:id/packages/maven/*path/:file_name' do
     context 'a public project' do
       subject { download_file(package_file.file_name) }
@@ -338,6 +399,12 @@ describe API::MavenPackages do
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
       download_file(file_name, params, request_headers)
     end
+  end
+
+  describe 'HEAD /api/v4/projects/:id/packages/maven/*path/:file_name' do
+    let(:url) { "/projects/#{project.id}/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/maven/*path/:file_name/authorize' do
@@ -423,8 +490,6 @@ describe API::MavenPackages do
     end
 
     context 'when params from workhorse are correct' do
-      let(:package) { project.packages.reload.last }
-      let(:package_file) { package.package_files.reload.last }
       let(:params) do
         {
           'file.path' => file_upload.path,
@@ -445,8 +510,6 @@ describe API::MavenPackages do
       end
 
       context 'event tracking' do
-        let(:package_file) { jar_file }
-
         subject { upload_file_with_token(params) }
 
         it_behaves_like 'a gitlab tracking event', described_class.name, 'push_package'
@@ -458,14 +521,14 @@ describe API::MavenPackages do
           .and change { Packages::PackageFile.count }.by(1)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(package_file.file_name).to eq(file_upload.original_filename)
+        expect(jar_file.file_name).to eq(file_upload.original_filename)
       end
 
       it 'allows upload with job token' do
         upload_file(params.merge(job_token: job.token))
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(package.build_info.pipeline).to eq job.pipeline
+        expect(project.reload.packages.last.build_info.pipeline).to eq job.pipeline
       end
 
       context 'version is not correct' do

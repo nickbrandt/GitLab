@@ -4,7 +4,6 @@ require 'carrierwave/orm/activerecord'
 
 class Project < ApplicationRecord
   include Gitlab::ConfigHelper
-  include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
   include AccessRequestable
   include Avatarable
@@ -67,10 +66,7 @@ class Project < ApplicationRecord
   default_value_for :resolve_outdated_diff_discussions, false
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
   default_value_for(:repository_storage) do
-    # We need to ensure application settings are fresh when we pick
-    # a repository storage to use.
-    Gitlab::CurrentSettings.expire_current_application_settings
-    Gitlab::CurrentSettings.pick_repository_storage
+    pick_repository_storage
   end
 
   default_value_for(:shared_runners_enabled) { Gitlab::CurrentSettings.shared_runners_enabled }
@@ -110,6 +106,7 @@ class Project < ApplicationRecord
   after_update :update_forks_visibility_level
 
   before_destroy :remove_private_deploy_keys
+  before_destroy :cleanup_chat_names
 
   use_fast_destroy :build_trace_chunks
 
@@ -316,6 +313,7 @@ class Project < ApplicationRecord
   has_one :pages_metadatum, class_name: 'ProjectPagesMetadatum', inverse_of: :project
 
   has_many :import_failures, inverse_of: :project
+  has_many :jira_imports, -> { order 'jira_imports.created_at' }, class_name: 'JiraImportState', inverse_of: :project
 
   has_many :daily_report_results, class_name: 'Ci::DailyReportResult'
 
@@ -788,6 +786,10 @@ class Project < ApplicationRecord
     Feature.enabled?(:context_commits, default_enabled: true)
   end
 
+  def jira_issues_import_feature_flag_enabled?
+    Feature.enabled?(:jira_issue_import, self, default_enabled: true)
+  end
+
   def team
     @team ||= ProjectTeam.new(self)
   end
@@ -860,6 +862,10 @@ class Project < ApplicationRecord
     import_state&.status || 'none'
   end
 
+  def jira_import_status
+    latest_jira_import&.status || 'initial'
+  end
+
   def human_import_status_name
     import_state&.human_status_name || 'none'
   end
@@ -871,8 +877,6 @@ class Project < ApplicationRecord
       elsif gitlab_project_import?
         # Do not retry on Import/Export until https://gitlab.com/gitlab-org/gitlab-foss/issues/26189 is solved.
         RepositoryImportWorker.set(retry: false).perform_async(self.id)
-      elsif jira_import?
-        Gitlab::JiraImport::Stage::StartImportWorker.perform_async(self.id)
       else
         RepositoryImportWorker.perform_async(self.id)
       end
@@ -905,7 +909,7 @@ class Project < ApplicationRecord
 
   # This method is overridden in EE::Project model
   def remove_import_data
-    import_data&.destroy unless jira_import?
+    import_data&.destroy
   end
 
   def ci_config_path=(value)
@@ -968,11 +972,7 @@ class Project < ApplicationRecord
   end
 
   def jira_import?
-    import_type == 'jira' && Feature.enabled?(:jira_issue_import, self)
-  end
-
-  def jira_force_import?
-    jira_import? && import_data&.becomes(JiraImportData)&.force_import?
+    import_type == 'jira' && latest_jira_import.present? && jira_issues_import_feature_flag_enabled?
   end
 
   def gitlab_project_import?
@@ -1117,10 +1117,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def web_url(only_path: nil)
-    Gitlab::Routing.url_helpers.project_url(self, only_path: only_path)
-  end
-
   def readme_url
     readme_path = repository.readme_path
     if readme_path
@@ -1235,14 +1231,12 @@ class Project < ApplicationRecord
     update_column(:has_external_wiki, services.external_wikis.any?) if Gitlab::Database.read_write?
   end
 
-  def find_or_initialize_services(exceptions: [])
-    available_services_names = Service.available_services_names - exceptions
+  def find_or_initialize_services
+    available_services_names = Service.available_services_names - disabled_services
 
-    available_services = available_services_names.map do |service_name|
+    available_services_names.map do |service_name|
       find_or_initialize_service(service_name)
     end
-
-    available_services.compact
   end
 
   def disabled_services
@@ -1255,13 +1249,11 @@ class Project < ApplicationRecord
     service = find_service(services, name)
     return service if service
 
-    # We should check if template for the service exists
     template = find_service(services_templates, name)
 
     if template
       Service.build_from_template(id, template)
     else
-      # If no template, we should create an instance. Ex `build_gitlab_ci_service`
       public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
     end
   end
@@ -1274,10 +1266,6 @@ class Project < ApplicationRecord
     end
   end
   # rubocop: enable CodeReuse/ServiceClass
-
-  def find_service(list, name)
-    list.find { |service| service.to_param == name }
-  end
 
   def ci_services
     services.where(category: :ci)
@@ -1913,6 +1901,17 @@ class Project < ApplicationRecord
     import_export_upload&.export_file
   end
 
+  # Before 12.9 we did not correctly clean up chat names and this causes issues.
+  # In 12.9, we add a foreign key relationship, but this code is used ensure the chat names are cleaned up while a post
+  # migration enables the foreign key relationship.
+  #
+  # This should be removed in 13.0.
+  #
+  # https://gitlab.com/gitlab-org/gitlab/issues/204787
+  def cleanup_chat_names
+    ChatName.where(service: services.select(:id)).delete_all
+  end
+
   def full_path_slug
     Gitlab::Utils.slugify(full_path.to_s)
   end
@@ -2417,7 +2416,15 @@ class Project < ApplicationRecord
     environments.where("name LIKE (#{::Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
   end
 
+  def latest_jira_import
+    jira_imports.last
+  end
+
   private
+
+  def find_service(services, name)
+    services.find { |service| service.to_param == name }
+  end
 
   def closest_namespace_setting(name)
     namespace.closest_setting(name)

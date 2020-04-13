@@ -50,7 +50,18 @@ describe Namespaces::ScheduleAggregationWorker, '#perform', :clean_gitlab_redis_
     it 'logs the error' do
       expect(Gitlab::ErrorTracking).to receive(:track_exception).once
 
-      worker.perform(12345)
+      worker.perform(non_existing_record_id)
+    end
+  end
+
+  it_behaves_like 'an idempotent worker' do
+    let(:job_args) { [group.id] }
+
+    it 'creates a single aggregation schedule' do
+      expect { worker.perform(*job_args) }
+        .to change { Namespace::AggregationSchedule.count }.by(1)
+      expect { worker.perform(*job_args) }
+        .not_to change { Namespace::AggregationSchedule.count }
     end
   end
 

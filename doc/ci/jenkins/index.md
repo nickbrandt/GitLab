@@ -50,7 +50,7 @@ There are some high level differences between the products worth mentioning:
 
   - on push
   - on [schedule](../pipelines/schedules.md)
-  - from the [GitLab UI](../pipelines/index.md#manually-executing-pipelines)
+  - from the [GitLab UI](../pipelines/index.md#run-a-pipeline-manually)
   - by [API call](../triggers/README.md)
   - by [webhook](../triggers/README.md#triggering-a-pipeline-from-a-webhook)
   - by [ChatOps](../chatops/README.md)
@@ -185,7 +185,7 @@ In self-managed GitLab instances, you can build an [Instance Template Repository
 Development teams across the whole organization can select templates from a dropdown menu.
 A group administrator is able to set a group to use as the source for the
 [custom project templates](../../user/admin_area/custom_project_templates.md), which can
-be used by all projects in the group. An instance adminsitrator can set a group as
+be used by all projects in the group. An instance administrator can set a group as
 the source for [instance project templates](../../user/group/custom_project_templates.md),
 which can be used by projects in that instance.
 
@@ -243,7 +243,7 @@ default:
 
 #### `stages`
 
-GitLab CI also lets you define stages, but is a little bit more free-form to configure. The GitLab [`stages` keyword](../yaml/README.md#stages)
+GitLab CI/CD also lets you define stages, but is a little bit more free-form to configure. The GitLab [`stages` keyword](../yaml/README.md#stages)
 is a top level setting that enumerates the list of stages, but you are not required to nest individual jobs underneath
 the `stages` section. Any job defined in the `.gitlab-ci.yml` can be made a part of any stage through use of the
 [`stage:` keyword](../yaml/README.md#stage).

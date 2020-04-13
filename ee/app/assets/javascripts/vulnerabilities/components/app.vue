@@ -1,36 +1,38 @@
 <script>
-import { GlLoadingIcon, GlBadge, GlLink, GlSprintf } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import UsersCache from '~/lib/utils/users_cache';
+import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
-import { VULNERABILITY_STATES } from '../constants';
+import StatusDescription from './status_description.vue';
+import { VULNERABILITY_STATE_OBJECTS } from '../constants';
 
 export default {
   name: 'VulnerabilityManagementApp',
   components: {
+    GlDeprecatedButton,
     GlLoadingIcon,
-    GlBadge,
-    GlLink,
-    GlSprintf,
-    TimeAgoTooltip,
+    ResolutionAlert,
     VulnerabilityStateDropdown,
-    LoadingButton,
+    StatusDescription,
   },
 
   props: {
-    vulnerability: {
+    initialVulnerability: {
+      type: Object,
+      required: true,
+    },
+    finding: {
       type: Object,
       required: true,
     },
     pipeline: {
       type: Object,
-      required: false,
-      default: undefined,
+      required: true,
     },
     createIssueUrl: {
       type: String,
@@ -46,24 +48,58 @@ export default {
     return {
       isLoadingVulnerability: false,
       isCreatingIssue: false,
-      state: this.vulnerability.state,
+      isLoadingUser: false,
+      vulnerability: this.initialVulnerability,
+      user: undefined,
     };
   },
 
   computed: {
-    variant() {
-      // Get the badge variant based on the vulnerability state, defaulting to 'warning'.
-      return VULNERABILITY_STATES[this.state]?.variant || 'warning';
+    hasIssue() {
+      return Boolean(this.finding.issue_feedback?.issue_iid);
+    },
+    statusBoxStyle() {
+      // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
+      return VULNERABILITY_STATE_OBJECTS[this.vulnerability.state]?.statusBoxStyle || 'expired';
+    },
+    showResolutionAlert() {
+      return (
+        this.vulnerability.resolved_on_default_branch && this.vulnerability.state !== 'resolved'
+      );
+    },
+  },
+
+  watch: {
+    'vulnerability.state': {
+      immediate: true,
+      handler(state) {
+        const id = this.vulnerability[`${state}_by_id`];
+
+        if (id === undefined) return; // Don't do anything if there's no ID.
+
+        this.isLoadingUser = true;
+
+        UsersCache.retrieveById(id)
+          .then(userData => {
+            this.user = userData;
+          })
+          .catch(() => {
+            createFlash(s__('VulnerabilityManagement|Something went wrong, could not get user.'));
+          })
+          .finally(() => {
+            this.isLoadingUser = false;
+          });
+      },
     },
   },
 
   methods: {
-    onVulnerabilityStateChange(newState) {
+    changeVulnerabilityState(newState) {
       this.isLoadingVulnerability = true;
 
       Api.changeVulnerabilityState(this.vulnerability.id, newState)
         .then(({ data }) => {
-          this.state = data.state;
+          Object.assign(this.vulnerability, data);
         })
         .catch(() => {
           createFlash(
@@ -84,7 +120,12 @@ export default {
             feedback_type: 'issue',
             category: this.vulnerability.report_type,
             project_fingerprint: this.projectFingerprint,
-            vulnerability_data: { ...this.vulnerability, category: this.vulnerability.report_type },
+            vulnerability_data: {
+              ...this.vulnerability,
+              ...this.finding,
+              category: this.vulnerability.report_type,
+              vulnerability_id: this.vulnerability.id,
+            },
           },
         })
         .then(({ data: { issue_url } }) => {
@@ -102,37 +143,54 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex align-items-center border-bottom pt-2 pb-2">
-    <gl-loading-icon v-if="isLoadingVulnerability" />
-    <gl-badge v-else ref="badge" class="text-capitalize" :variant="variant">{{ state }}</gl-badge>
-
-    <span v-if="pipeline" class="mx-2">
-      <gl-sprintf :message="__('Detected %{timeago} in pipeline %{pipelineLink}')">
-        <template #timeago>
-          <time-ago-tooltip :time="pipeline.created_at" />
-        </template>
-        <template v-if="pipeline.id" #pipelineLink>
-          <gl-link :href="pipeline.url" target="_blank">{{ pipeline.id }}</gl-link>
-        </template>
-      </gl-sprintf>
-    </span>
-
-    <time-ago-tooltip v-else class="ml-2" :time="vulnerability.created_at" />
-
-    <label class="mb-0 ml-auto mr-2">{{ __('Status') }}</label>
-    <gl-loading-icon v-if="isLoadingVulnerability" />
-    <vulnerability-state-dropdown
-      v-else
-      :initial-state="state"
-      @change="onVulnerabilityStateChange"
+  <div>
+    <resolution-alert
+      v-if="showResolutionAlert"
+      :default-branch-name="vulnerability.default_branch_name"
     />
-    <loading-button
-      ref="create-issue-btn"
-      class="align-items-center d-inline-flex ml-2"
-      :loading="isCreatingIssue"
-      :label="s__('VulnerabilityManagement|Create issue')"
-      container-class="btn btn-success btn-inverted"
-      @click="createIssue"
-    />
+    <div class="detail-page-header">
+      <div class="detail-page-header-body align-items-center">
+        <gl-loading-icon v-if="isLoadingVulnerability" class="mr-2" />
+        <span
+          v-else
+          ref="badge"
+          :class="
+            `text-capitalize align-self-center issuable-status-box status-box status-box-${statusBoxStyle}`
+          "
+        >
+          {{ vulnerability.state }}
+        </span>
+
+        <status-description
+          class="issuable-meta"
+          :vulnerability="vulnerability"
+          :pipeline="pipeline"
+          :user="user"
+          :is-loading-vulnerability="isLoadingVulnerability"
+          :is-loading-user="isLoadingUser"
+        />
+      </div>
+
+      <div class="detail-page-header-actions align-items-center">
+        <label class="mb-0 mx-2">{{ __('Status') }}</label>
+        <gl-loading-icon v-if="isLoadingVulnerability" class="d-inline" />
+        <vulnerability-state-dropdown
+          v-else
+          :initial-state="vulnerability.state"
+          @change="changeVulnerabilityState"
+        />
+        <gl-deprecated-button
+          v-if="!hasIssue"
+          ref="create-issue-btn"
+          class="ml-2"
+          variant="success"
+          category="secondary"
+          :loading="isCreatingIssue"
+          @click="createIssue"
+        >
+          {{ s__('VulnerabilityManagement|Create issue') }}
+        </gl-deprecated-button>
+      </div>
+    </div>
   </div>
 </template>

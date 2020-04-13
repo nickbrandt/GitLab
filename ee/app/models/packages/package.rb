@@ -10,6 +10,7 @@ class Packages::Package < ApplicationRecord
   has_many :dependency_links, inverse_of: :package, class_name: 'Packages::DependencyLink'
   has_many :tags, inverse_of: :package, class_name: 'Packages::Tag'
   has_one :conan_metadatum, inverse_of: :package
+  has_one :pypi_metadatum, inverse_of: :package
   has_one :maven_metadatum, inverse_of: :package
   has_one :build_info, inverse_of: :package
 
@@ -30,8 +31,9 @@ class Packages::Package < ApplicationRecord
   validate :valid_conan_package_recipe, if: :conan?
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
+  validates :version, format: { with: Gitlab::Regex.semver_regex }, if: :npm?
 
-  enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4 }
+  enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4, pypi: 5 }
 
   scope :with_name, ->(name) { where(name: name) }
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }

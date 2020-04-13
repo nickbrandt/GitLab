@@ -3,6 +3,9 @@ import { GlModal, GlSprintf, GlLink } from '@gitlab/ui';
 import { sprintf, s__, __ } from '~/locale';
 import Cookies from 'js-cookie';
 import { glEmojiTag } from '~/emoji';
+import Tracking from '~/tracking';
+
+const trackingMixin = Tracking.mixin();
 
 export default {
   beginnerLink:
@@ -18,11 +21,14 @@ export default {
     },
     false,
   ),
+  goToTrackValue: 10,
+  trackEvent: 'click_button',
   components: {
     GlModal,
     GlSprintf,
     GlLink,
   },
+  mixins: [trackingMixin],
   props: {
     goToPipelinesPath: {
       type: String,
@@ -32,8 +38,26 @@ export default {
       type: String,
       required: true,
     },
+    humanAccess: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      trackLabel: 'congratulate_first_pipeline',
+    };
+  },
+  computed: {
+    tracking() {
+      return {
+        label: this.trackLabel,
+        property: this.humanAccess,
+      };
+    },
   },
   mounted() {
+    this.track();
     this.disableModalFromRenderingAgain();
   },
   methods: {
@@ -72,7 +96,17 @@ export default {
       </template>
     </gl-sprintf>
     <template #modal-footer>
-      <a :href="goToPipelinesPath" class="btn btn-success">{{ __('Go to Pipelines') }}</a>
+      <a
+        ref="goto"
+        :href="goToPipelinesPath"
+        class="btn btn-success"
+        :data-track-property="humanAccess"
+        :data-track-value="$options.goToTrackValue"
+        :data-track-event="$options.trackEvent"
+        :data-track-label="trackLabel"
+      >
+        {{ __('Go to Pipelines') }}
+      </a>
     </template>
   </gl-modal>
 </template>

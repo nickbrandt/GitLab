@@ -245,7 +245,7 @@ ruleset in `.scss-lint.yml`, which is located in the home directory of the
 project.
 
 To check if any warnings will be produced by your changes, you can run `rake
-scss_lint` in the GitLab directory. SCSS Lint will also run in GitLab CI to
+scss_lint` in the GitLab directory. SCSS Lint will also run in GitLab CI/CD to
 catch any warnings.
 
 If the Rake task is throwing warnings you don't understand, SCSS Lint's
@@ -264,7 +264,7 @@ Note that this won't fix every problem, but it should fix a majority.
 ### Ignoring issues
 
 If you want a line or set of lines to be ignored by the linter, you can use
-`// scss-lint:disable RuleName` ([more info](https://github.com/sds/scss-lint#disabling-linters-via-source)):
+`// scss-lint:disable RuleName` ([more information](https://github.com/sds/scss-lint#disabling-linters-via-source)):
 
 ```scss
 // This lint rule is disabled because it is supported only in Chrome/Safari

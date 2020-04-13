@@ -5,7 +5,7 @@
 See also:
 
 - [Project import/export documentation](../user/project/settings/import_export.md).
-- [Project import/export administration rake tasks](../administration/raketasks/project_import_export.md). **(CORE ONLY)**
+- [Project import/export administration Rake tasks](../administration/raketasks/project_import_export.md). **(CORE ONLY)**
 
 ## Schedule an export
 
@@ -131,7 +131,7 @@ POST /projects/import
 | `overwrite` | boolean | no | If there is a project with the same path the import will overwrite it. Default to false |
 | `override_params` | Hash | no | Supports all fields defined in the [Project API](projects.md) |
 
-The override params passed will take precedence over all values defined inside the export file.
+The override parameters passed will take precedence over all values defined inside the export file.
 
 To upload a file from your file system, use the `--form` argument. This causes
 cURL to post data using the header `Content-Type: multipart/form-data`.
@@ -172,7 +172,8 @@ requests.post(url, headers=headers, data=data, files=files)
   "path": "api-project",
   "path_with_namespace": "root/api-project",
   "created_at": "2018-02-13T09:05:58.023Z",
-  "import_status": "scheduled"
+  "import_status": "scheduled",
+  "correlation_id": "mezklWso3Za"
 }
 ```
 
@@ -211,6 +212,7 @@ If the status is `failed`, it will include the import error message under `impor
   "path": "gitlab-test",
   "path_with_namespace": "gitlab-org/gitlab-test",
   "created_at": "2017-08-29T04:36:44.383Z",
-  "import_status": "started"
+  "import_status": "started",
+  "correlation_id": "mezklWso3Za"
 }
 ```

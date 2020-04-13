@@ -110,14 +110,12 @@ describe Project do
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:prometheus_alert_events) }
     it { is_expected.to have_many(:self_managed_prometheus_alert_events) }
+    it { is_expected.to have_many(:jira_imports) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
       let(:stubbed_container) { build_stubbed(:project) }
       let(:expected_full_path) { "#{container.namespace.full_path}/somewhere" }
-      let(:expected_repository_klass) { Repository }
-      let(:expected_storage_klass) { Storage::Hashed }
-      let(:expected_web_url_path) { "#{container.namespace.full_path}/somewhere" }
     end
 
     it 'has an inverse relationship with merge requests' do
@@ -827,7 +825,7 @@ describe Project do
       end
 
       it 'returns nil when no issue found' do
-        expect(project.get_issue(999, user)).to be_nil
+        expect(project.get_issue(non_existing_record_id, user)).to be_nil
       end
 
       it "returns nil when user doesn't have access" do
@@ -1391,34 +1389,13 @@ describe Project do
   context 'repository storage by default' do
     let(:project) { build(:project) }
 
-    before do
-      storages = {
-        'default' => Gitlab::GitalyClient::StorageSettings.new('path' => 'tmp/tests/repositories'),
-        'picked'  => Gitlab::GitalyClient::StorageSettings.new('path' => 'tmp/tests/repositories')
-      }
-      allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
-    end
-
     it 'picks storage from ApplicationSetting' do
-      expect_any_instance_of(ApplicationSetting).to receive(:pick_repository_storage).and_return('picked')
+      expect_next_instance_of(ApplicationSetting) do |instance|
+        expect(instance).to receive(:pick_repository_storage).and_return('picked')
+      end
+      expect(described_class).to receive(:pick_repository_storage).and_call_original
 
       expect(project.repository_storage).to eq('picked')
-    end
-
-    it 'picks from the latest available storage', :request_store do
-      stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
-      Gitlab::CurrentSettings.current_application_settings
-
-      settings = ApplicationSetting.last
-      settings.repository_storages = %w(picked)
-      settings.save!
-
-      expect(Gitlab::CurrentSettings.repository_storages).to eq(%w(default))
-
-      project
-
-      expect(project.repository.storage).to eq('picked')
-      expect(Gitlab::CurrentSettings.repository_storages).to eq(%w(picked))
     end
   end
 
@@ -2303,6 +2280,41 @@ describe Project do
     end
   end
 
+  describe '#jira_import_status' do
+    let(:project) { create(:project, import_type: 'jira') }
+
+    context 'when no jira imports' do
+      it 'returns none' do
+        expect(project.jira_import_status).to eq('initial')
+      end
+    end
+
+    context 'when there are jira imports' do
+      let(:jira_import1) { build(:jira_import_state, :finished, project: project) }
+      let(:jira_import2) { build(:jira_import_state, project: project) }
+
+      before do
+        expect(project).to receive(:latest_jira_import).and_return(jira_import2)
+      end
+
+      context 'when latest import status is initial or jira imports are mising' do
+        it 'returns initial' do
+          expect(project.jira_import_status).to eq('initial')
+        end
+      end
+
+      context 'when latest import status is scheduled' do
+        before do
+          jira_import2.schedule!
+        end
+
+        it 'returns scheduled' do
+          expect(project.jira_import_status).to eq('scheduled')
+        end
+      end
+    end
+  end
+
   describe '#human_import_status_name' do
     context 'with import_state' do
       it 'returns the right human import status' do
@@ -2360,52 +2372,46 @@ describe Project do
     context 'jira import' do
       it 'schedules a jira import job' do
         project = create(:project, import_type: 'jira')
+        jira_import = create(:jira_import_state, project: project)
 
         expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
-        expect(project.add_import_job).to eq(import_jid)
+
+        jira_import.schedule!
+
+        expect(jira_import.jid).to eq(import_jid)
       end
     end
   end
 
   describe '#jira_import?' do
-    subject(:project) { build(:project, import_type: 'jira') }
+    let_it_be(:project) { build(:project, import_type: 'jira') }
+    let_it_be(:jira_import) { build(:jira_import_state, project: project) }
+
+    before do
+      expect(project).to receive(:jira_imports).and_return([jira_import])
+    end
 
     it { expect(project.jira_import?).to be true }
     it { expect(project.import?).to be true }
   end
 
-  describe '#jira_force_import?' do
-    let(:imported_jira_project) do
-      JiraImportData::JiraProjectDetails.new('xx', Time.now.strftime('%Y-%m-%d %H:%M:%S'), { user_id: 1, name: 'root' })
-    end
-    let(:jira_import_data) do
-      data = JiraImportData.new
-      data << imported_jira_project
-      data.force_import!
-      data
-    end
-
-    subject(:project) { build(:project, import_type: 'jira', import_data: jira_import_data) }
-
-    it { expect(project.jira_force_import?).to be true }
-  end
-
   describe '#remove_import_data' do
-    let(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
+    let_it_be(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
 
     context 'when jira import' do
-      let!(:project) { create(:project, import_type: 'jira', import_data: import_data) }
+      let_it_be(:project, reload: true) { create(:project, import_type: 'jira', import_data: import_data) }
+      let_it_be(:jira_import) { create(:jira_import_state, project: project) }
 
-      it 'does not remove import data' do
+      it 'does remove import data' do
         expect(project.mirror?).to be false
         expect(project.jira_import?).to be true
-        expect { project.remove_import_data }.not_to change { ProjectImportData.count }
+        expect { project.remove_import_data }.to change { ProjectImportData.count }.by(-1)
       end
     end
 
-    context 'when not mirror neither jira import' do
-      let(:user) { create(:user) }
-      let!(:project) { create(:project, import_type: 'github', import_data: import_data) }
+    context 'when neither a mirror nor a jira import' do
+      let_it_be(:user) { create(:user) }
+      let_it_be(:project) { create(:project, import_type: 'github', import_data: import_data) }
 
       it 'removes import data' do
         expect(project.mirror?).to be false
@@ -5712,6 +5718,20 @@ describe Project do
     end
   end
 
+  describe 'with services and chat names' do
+    subject { create(:project) }
+
+    let(:service) { create(:service, project: subject) }
+
+    before do
+      create_list(:chat_name, 5, service: service)
+    end
+
+    it 'removes chat names on removal' do
+      expect { subject.destroy }.to change { ChatName.count }.by(-5)
+    end
+  end
+
   describe 'with_issues_or_mrs_available_for_user' do
     before do
       Project.delete_all
@@ -5739,7 +5759,7 @@ describe Project do
     subject { project.limited_protected_branches(1) }
 
     it 'returns limited number of protected branches based on specified limit' do
-      expect(subject).to eq([another_protected_branch])
+      expect(subject.count).to eq(1)
     end
   end
 
@@ -5953,6 +5973,34 @@ describe Project do
       environment = project.environments.first
 
       expect(project.environments_for_scope(environment.name)).to eq([environment])
+    end
+  end
+
+  describe '#latest_jira_import' do
+    let_it_be(:project) { create(:project) }
+    context 'when no jira imports' do
+      it 'returns nil' do
+        expect(project.latest_jira_import).to be nil
+      end
+    end
+
+    context 'when single jira import' do
+      let!(:jira_import1) { create(:jira_import_state, project: project) }
+
+      it 'returns the jira import' do
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
+    end
+
+    context 'when multiple jira imports' do
+      let!(:jira_import1) { create(:jira_import_state, :finished, created_at: 1.day.ago, project: project) }
+      let!(:jira_import2) { create(:jira_import_state, :failed, created_at: 2.days.ago, project: project) }
+      let!(:jira_import3) { create(:jira_import_state, :started, created_at: 3.days.ago, project: project) }
+
+      it 'returns latest jira import by created_at' do
+        expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
+        expect(project.latest_jira_import).to eq(jira_import1)
+      end
     end
   end
 

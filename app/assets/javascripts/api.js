@@ -41,10 +41,13 @@ const Api = {
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   releasesPath: '/api/:version/projects/:id/releases',
   releasePath: '/api/:version/projects/:id/releases/:tag_name',
+  releaseLinksPath: '/api/:version/projects/:id/releases/:tag_name/assets/links',
+  releaseLinkPath: '/api/:version/projects/:id/releases/:tag_name/assets/links/:link_id',
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
   adminStatisticsPath: '/api/:version/application/statistics',
   pipelineSinglePath: '/api/:version/projects/:id/pipelines/:pipeline_id',
   environmentsPath: '/api/:version/projects/:id/environments',
+  rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -460,6 +463,23 @@ const Api = {
     return axios.put(url, release);
   },
 
+  createReleaseLink(projectPath, tagName, link) {
+    const url = Api.buildUrl(this.releaseLinksPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName));
+
+    return axios.post(url, link);
+  },
+
+  deleteReleaseLink(projectPath, tagName, linkId) {
+    const url = Api.buildUrl(this.releaseLinkPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName))
+      .replace(':link_id', encodeURIComponent(linkId));
+
+    return axios.delete(url);
+  },
+
   adminStatistics() {
     const url = Api.buildUrl(this.adminStatisticsPath);
     return axios.get(url);
@@ -476,6 +496,14 @@ const Api = {
   environments(id) {
     const url = Api.buildUrl(this.environmentsPath).replace(':id', encodeURIComponent(id));
     return axios.get(url);
+  },
+
+  getRawFile(id, path, params = { ref: 'master' }) {
+    const url = Api.buildUrl(this.rawFilePath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':path', encodeURIComponent(path));
+
+    return axios.get(url, { params });
   },
 
   buildUrl(url) {

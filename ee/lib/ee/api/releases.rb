@@ -6,6 +6,26 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+          desc 'Create Evidence for a Release' do
+            detail 'This feature was introduced in GitLab 12.10.'
+            success Entities::Release
+          end
+          params do
+            requires :tag_name, type: String, desc: 'The name of the tag', as: :tag
+          end
+          post ':id/releases/:tag_name/evidence', requirements: ::API::Releases::RELEASE_ENDPOINT_REQUIREMENTS do
+            authorize_create_evidence!
+
+            if release.present?
+              CreateEvidenceWorker.perform_async(release.id)
+              status :accepted
+            else
+              status :not_found
+            end
+          end
+        end
+
         helpers do
           extend ::Gitlab::Utils::Override
 
@@ -37,6 +57,11 @@ module EE
               request.ip,
               release
             ).security_event
+          end
+
+          override :authorize_create_evidence!
+          def authorize_create_evidence!
+            authorize_create_release!
           end
         end
       end

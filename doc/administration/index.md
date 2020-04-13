@@ -34,7 +34,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Install](../install/README.md): Requirements, directory structures, and installation methods.
   - [Database load balancing](database_load_balancing.md): Distribute database queries among multiple database servers. **(STARTER ONLY)**
   - [Omnibus support for log forwarding](https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only) **(STARTER ONLY)**
-- [High Availability](high_availability/README.md): Configure multiple servers for scaling or high availability.
+- [High Availability](availability/index.md): Configure multiple servers for scaling or high availability.
   - [Installing GitLab HA on Amazon Web Services (AWS)](../install/aws/index.md): Set up GitLab High Availability on Amazon AWS.
 - [Geo](geo/replication/index.md): Replicate your GitLab instance to other geographic locations as a read-only fully operational version. **(PREMIUM ONLY)**
 - [Disaster Recovery](geo/disaster_recovery/index.md): Quickly fail-over to a different site with minimal effort in a disaster situation. **(PREMIUM ONLY)**
@@ -145,7 +145,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Repository checks](repository_checks.md): Periodic Git repository checks.
 - [Repository storage paths](repository_storage_paths.md): Manage the paths used to store repositories.
 - [Repository storage types](repository_storage_types.md): Information about the different repository storage types.
-- [Repository storage rake tasks](raketasks/storage.md): A collection of rake tasks to list and migrate existing projects and attachments associated with it from Legacy storage to Hashed storage.
+- [Repository storage Rake tasks](raketasks/storage.md): A collection of Rake tasks to list and migrate existing projects and attachments associated with it from Legacy storage to Hashed storage.
 - [Limit repository size](../user/admin_area/settings/account_and_limit_settings.md): Set a hard limit for your repositories' size. **(STARTER ONLY)**
 - [Static objects external storage](static_objects_external_storage.md): Set external storage for static objects in a repository.
 
@@ -167,7 +167,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 ## Git configuration options
 
 - [Server hooks](server_hooks.md): Server hooks (on the filesystem) for when webhooks aren't enough.
-- [Git LFS configuration](lfs/lfs_administration.md): Learn how to configure LFS for GitLab.
+- [Git LFS configuration](lfs/index.md): Learn how to configure LFS for GitLab.
 - [Housekeeping](housekeeping.md): Keep your Git repositories tidy and fast.
 - [Configuring Git Protocol v2](git_protocol.md): Git protocol version 2 support.
 - [Manage large files with `git-annex` (Deprecated)](git_annex.md)

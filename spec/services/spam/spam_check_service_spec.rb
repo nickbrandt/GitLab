@@ -49,6 +49,25 @@ describe Spam::SpamCheckService do
     end
   end
 
+  shared_examples 'only checks for spam if a request is provided' do
+    context 'when request is missing' do
+      let(:request) { nil }
+
+      it "doesn't check as spam" do
+        subject
+
+        expect(issue).not_to be_spam
+      end
+    end
+
+    context 'when request exists' do
+      it 'creates a spam log' do
+        expect { subject }
+            .to log_spam(title: issue.title, description: issue.description, noteable_type: 'Issue')
+      end
+    end
+  end
+
   describe '#execute' do
     let(:request) { double(:request, env: env) }
 
@@ -72,9 +91,7 @@ describe Spam::SpamCheckService do
       end
 
       it 'updates spam log' do
-        subject
-
-        expect(existing_spam_log.reload.recaptcha_verified).to be_truthy
+        expect { subject }.to change { existing_spam_log.reload.recaptcha_verified }.from(false).to(true)
       end
     end
 
@@ -103,7 +120,7 @@ describe Spam::SpamCheckService do
           issue.description = 'SPAM!'
         end
 
-        context 'when indicated as spam by akismet' do
+        context 'when indicated as spam by Akismet' do
           before do
             allow(Spam::AkismetService).to receive(:new).and_return(double(spam?: true))
           end
@@ -113,27 +130,27 @@ describe Spam::SpamCheckService do
               stub_feature_flags(allow_possible_spam: false)
             end
 
-            it_behaves_like 'akismet spam'
+            it_behaves_like 'only checks for spam if a request is provided'
 
-            it 'checks as spam' do
+            it 'marks as spam' do
               subject
 
-              expect(issue.reload.spam).to be_truthy
+              expect(issue).to be_spam
             end
           end
 
           context 'when allow_possible_spam feature flag is true' do
-            it_behaves_like 'akismet spam'
+            it_behaves_like 'only checks for spam if a request is provided'
 
-            it 'does not check as spam' do
+            it 'does not mark as spam' do
               subject
 
-              expect(issue.spam).to be_falsey
+              expect(issue).not_to be_spam
             end
           end
         end
 
-        context 'when not indicated as spam by akismet' do
+        context 'when not indicated as spam by Akismet' do
           before do
             allow(Spam::AkismetService).to receive(:new).and_return(double(spam?: false))
           end

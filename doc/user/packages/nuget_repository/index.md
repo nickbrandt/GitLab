@@ -18,7 +18,7 @@ NuGet CLI is probably already installed.
 
 Alternatively, you can use [.NET SDK 3.0 or later](https://dotnet.microsoft.com/download/dotnet-core/3.0), which installs NuGet CLI.
 
-You can confirm that [nuget CLI](https://www.nuget.org/) is properly installed with:
+You can confirm that [NuGet CLI](https://www.nuget.org/) is properly installed with:
 
 ```shell
 nuget help
@@ -34,6 +34,18 @@ Type 'NuGet help <command>' for help on a specific command.
 Available commands:
 
 [output truncated]
+```
+
+### macOS support
+
+For macOS, you can also use [Mono](https://www.mono-project.com/) to run
+the NuGet CLI. For Homebrew users, run `brew install mono` to install
+Mono. Then you should be able to download the Windows C# binary
+`nuget.exe` from the [NuGet CLI page](https://www.nuget.org/downloads)
+and run:
+
+```shell
+mono nuget.exe
 ```
 
 ## Enabling the NuGet Repository
@@ -178,6 +190,7 @@ CAUTION: **Warning:**
 By default, `nuget` checks the official source at `nuget.org` first. If you have a package in the
 GitLab NuGet Repository with the same name as a package at `nuget.org`, you must specify the source
 name or the wrong package will be installed.
+
 Install the latest version of a package using the following command:
 
 ```shell

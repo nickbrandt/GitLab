@@ -4,7 +4,7 @@ type: reference
 
 # GitLab CI/CD environment variables
 
-After a brief overview over the use of environment
+After a brief overview of the use of environment
 variables, this document teaches you how to use GitLab CI/CD's
 variables, presents the full reference for predefined variables,
 and dives into more advanced applications.
@@ -221,7 +221,7 @@ All variables are set as environment variables in the build environment, and
 they are accessible with normal methods that are used to access such variables.
 In most cases `bash` or `sh` is used to execute the job script.
 
-To access environment variables, use the syntax for your Runner's [shell][shellexecutors].
+To access environment variables, use the syntax for your Runner's [shell](https://docs.gitlab.com/runner/executors/).
 
 | Shell                | Usage           |
 |----------------------|-----------------|
@@ -317,7 +317,7 @@ export GITLAB_USER_ID="42"
 NOTE: **Note:**
 This feature requires GitLab Runner 0.5.0 or higher and GitLab 7.14 or higher.
 
-GitLab CI allows you to add to `.gitlab-ci.yml` variables that are set in the
+GitLab CI/CD allows you to add to `.gitlab-ci.yml` variables that are set in the
 build environment. The variables are hence saved in the repository, and they
 are meant to store non-sensitive project configuration. For example, `RAILS_ENV` or
 `DATABASE_URL`.
@@ -415,7 +415,7 @@ Click [here](where_variables_can_be_used.md) for a section that describes where 
 
 Variables can be protected. Whenever a variable is
 protected, it would only be securely passed to pipelines running on the
-[protected branches] or [protected tags]. The other pipelines would not get any
+[protected branches](../../user/project/protected_branches.md) or [protected tags](../../user/project/protected_tags.md). The other pipelines would not get any
 protected variables.
 
 Protected variables can be added by going to your project's
@@ -427,21 +427,21 @@ Once you set them, they will be available for all subsequent pipelines.
 ### Limiting environment scopes of environment variables
 
 You can limit the environment scope of a variable by
-[defining which environments][envs] it can be available for.
+[defining which environments](../environments.md) it can be available for.
 
-To learn more about about scoping environments, see [Scoping environments with specs](../environments.md#scoping-environments-with-specs).
+To learn more about scoping environments, see [Scoping environments with specs](../environments.md#scoping-environments-with-specs).
 
 ### Deployment environment variables
 
 > Introduced in GitLab 8.15.
 
-[Project services](../../user/project/integrations/project_services.md) that are
+[Integrations](../../user/project/integrations/overview.md) that are
 responsible for deployment configuration may define their own variables that
 are set in the build environment. These variables are only defined for
 [deployment jobs](../environments.md). Please consult the documentation of
-the project services that you are using to learn which variables they define.
+the integrations that you are using to learn which variables they define.
 
-An example project service that defines deployment variables is the
+An example integration that defines deployment variables is the
 [Kubernetes integration](../../user/project/clusters/index.md#deployment-variables).
 
 ### Auto DevOps environment variables
@@ -453,7 +453,7 @@ pass CI variables to the running application by prefixing the key of the
 variable with `K8S_SECRET_`.
 
 These [prefixed
-variables](../../topics/autodevops/index.md#application-secret-variables) will
+variables](../../topics/autodevops/customize.md#application-secret-variables) will
 then be available as environment variables on the running application
 container.
 
@@ -465,7 +465,7 @@ limitations with the current Auto DevOps scripting environment.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/44059) in GitLab 10.8.
 
-[Manually triggered pipelines](../pipelines/index.md#manually-executing-pipelines) allow you to override the value of a current variable.
+[Manually triggered pipelines](../pipelines/index.md#run-a-pipeline-manually) allow you to override the value of a current variable.
 
 For instance, suppose you added a
 [custom variable `$TEST`](#creating-a-custom-environment-variable)
@@ -621,7 +621,7 @@ variables that were set, etc.
 
 Before enabling this, you should ensure jobs are visible to
 [team members only](../../user/permissions.md#project-features). You should
-also [erase](../pipelines/index.md#accessing-individual-jobs) all generated job logs
+also [erase](../pipelines/index.md#view-jobs-in-a-pipeline) all generated job logs
 before making them visible again.
 
 To enable debug logs (traces), set the `CI_DEBUG_TRACE` variable to `true`:
@@ -715,8 +715,8 @@ if [[ -d "/builds/gitlab-examples/ci-debug-trace/.git" ]]; then
 ++ CI_SERVER_VERSION_PATCH=0
 ++ export CI_SERVER_REVISION=f4cc00ae823
 ++ CI_SERVER_REVISION=f4cc00ae823
-++ export GITLAB_FEATURES=audit_events,burndown_charts,code_owners,contribution_analytics,description_diffs,elastic_search,export_issues,group_bulk_edit,group_burndown_charts,group_webhooks,issuable_default_templates,issue_board_focus_mode,issue_weights,jenkins_integration,ldap_group_sync,member_lock,merge_request_approvers,multiple_issue_assignees,multiple_ldap_servers,multiple_merge_request_assignees,protected_refs_for_users,push_rules,related_issues,repository_mirrors,repository_size_limit,scoped_issue_board,usage_quotas,visual_review_app,wip_limits,adjourned_deletion_for_projects_and_groups,admin_audit_log,auditor_user,batch_comments,blocking_merge_requests,board_assignee_lists,board_milestone_lists,ci_cd_projects,cluster_deployments,code_analytics,code_owner_approval_required,commit_committer_check,cross_project_pipelines,custom_file_templates,custom_file_templates_for_namespace,custom_project_templates,custom_prometheus_metrics,cycle_analytics_for_groups,db_load_balancing,default_project_deletion_protection,dependency_proxy,deploy_board,design_management,email_additional_text,extended_audit_events,external_authorization_service_api_management,feature_flags,file_locks,geo,github_project_service_integration,group_allowed_email_domains,group_project_templates,group_saml,issues_analytics,jira_dev_panel_integration,ldap_group_sync_filter,merge_pipelines,merge_request_performance_metrics,merge_trains,metrics_reports,multiple_approval_rules,multiple_clusters,multiple_group_issue_boards,object_storage,operations_dashboard,packages,productivity_analytics,project_aliases,protected_environments,reject_unsigned_commits,required_ci_templates,scoped_labels,service_desk,smartcard_auth,group_timelogs,type_of_work_analytics,unprotection_restrictions,ci_project_subscriptions,cluster_health,container_scanning,dast,dependency_scanning,epics,group_ip_restriction,incident_management,insights,license_management,personal_access_token_expiration_policy,pod_logs,prometheus_alerts,pseudonymizer,report_approver_rules,sast,security_dashboard,tracing,web_ide_terminal
-++ GITLAB_FEATURES=audit_events,burndown_charts,code_owners,contribution_analytics,description_diffs,elastic_search,export_issues,group_bulk_edit,group_burndown_charts,group_webhooks,issuable_default_templates,issue_board_focus_mode,issue_weights,jenkins_integration,ldap_group_sync,member_lock,merge_request_approvers,multiple_issue_assignees,multiple_ldap_servers,multiple_merge_request_assignees,protected_refs_for_users,push_rules,related_issues,repository_mirrors,repository_size_limit,scoped_issue_board,usage_quotas,visual_review_app,wip_limits,adjourned_deletion_for_projects_and_groups,admin_audit_log,auditor_user,batch_comments,blocking_merge_requests,board_assignee_lists,board_milestone_lists,ci_cd_projects,cluster_deployments,code_analytics,code_owner_approval_required,commit_committer_check,cross_project_pipelines,custom_file_templates,custom_file_templates_for_namespace,custom_project_templates,custom_prometheus_metrics,cycle_analytics_for_groups,db_load_balancing,default_project_deletion_protection,dependency_proxy,deploy_board,design_management,email_additional_text,extended_audit_events,external_authorization_service_api_management,feature_flags,file_locks,geo,github_project_service_integration,group_allowed_email_domains,group_project_templates,group_saml,issues_analytics,jira_dev_panel_integration,ldap_group_sync_filter,merge_pipelines,merge_request_performance_metrics,merge_trains,metrics_reports,multiple_approval_rules,multiple_clusters,multiple_group_issue_boards,object_storage,operations_dashboard,packages,productivity_analytics,project_aliases,protected_environments,reject_unsigned_commits,required_ci_templates,scoped_labels,service_desk,smartcard_auth,group_timelogs,type_of_work_analytics,unprotection_restrictions,ci_project_subscriptions,cluster_health,container_scanning,dast,dependency_scanning,epics,group_ip_restriction,incident_management,insights,license_management,personal_access_token_expiration_policy,pod_logs,prometheus_alerts,pseudonymizer,report_approver_rules,sast,security_dashboard,tracing,web_ide_terminal
+++ export GITLAB_FEATURES=audit_events,burndown_charts,code_owners,contribution_analytics,description_diffs,elastic_search,group_bulk_edit,group_burndown_charts,group_webhooks,issuable_default_templates,issue_weights,jenkins_integration,ldap_group_sync,member_lock,merge_request_approvers,multiple_issue_assignees,multiple_ldap_servers,multiple_merge_request_assignees,protected_refs_for_users,push_rules,related_issues,repository_mirrors,repository_size_limit,scoped_issue_board,usage_quotas,visual_review_app,wip_limits,adjourned_deletion_for_projects_and_groups,admin_audit_log,auditor_user,batch_comments,blocking_merge_requests,board_assignee_lists,board_milestone_lists,ci_cd_projects,cluster_deployments,code_analytics,code_owner_approval_required,commit_committer_check,cross_project_pipelines,custom_file_templates,custom_file_templates_for_namespace,custom_project_templates,custom_prometheus_metrics,cycle_analytics_for_groups,db_load_balancing,default_project_deletion_protection,dependency_proxy,deploy_board,design_management,email_additional_text,extended_audit_events,external_authorization_service_api_management,feature_flags,file_locks,geo,github_project_service_integration,group_allowed_email_domains,group_project_templates,group_saml,issues_analytics,jira_dev_panel_integration,ldap_group_sync_filter,merge_pipelines,merge_request_performance_metrics,merge_trains,metrics_reports,multiple_approval_rules,multiple_clusters,multiple_group_issue_boards,object_storage,operations_dashboard,packages,productivity_analytics,project_aliases,protected_environments,reject_unsigned_commits,required_ci_templates,scoped_labels,service_desk,smartcard_auth,group_timelogs,type_of_work_analytics,unprotection_restrictions,ci_project_subscriptions,cluster_health,container_scanning,dast,dependency_scanning,epics,group_ip_restriction,incident_management,insights,license_management,personal_access_token_expiration_policy,pod_logs,prometheus_alerts,pseudonymizer,report_approver_rules,sast,security_dashboard,tracing,web_ide_terminal
+++ GITLAB_FEATURES=audit_events,burndown_charts,code_owners,contribution_analytics,description_diffs,elastic_search,group_bulk_edit,group_burndown_charts,group_webhooks,issuable_default_templates,issue_weights,jenkins_integration,ldap_group_sync,member_lock,merge_request_approvers,multiple_issue_assignees,multiple_ldap_servers,multiple_merge_request_assignees,protected_refs_for_users,push_rules,related_issues,repository_mirrors,repository_size_limit,scoped_issue_board,usage_quotas,visual_review_app,wip_limits,adjourned_deletion_for_projects_and_groups,admin_audit_log,auditor_user,batch_comments,blocking_merge_requests,board_assignee_lists,board_milestone_lists,ci_cd_projects,cluster_deployments,code_analytics,code_owner_approval_required,commit_committer_check,cross_project_pipelines,custom_file_templates,custom_file_templates_for_namespace,custom_project_templates,custom_prometheus_metrics,cycle_analytics_for_groups,db_load_balancing,default_project_deletion_protection,dependency_proxy,deploy_board,design_management,email_additional_text,extended_audit_events,external_authorization_service_api_management,feature_flags,file_locks,geo,github_project_service_integration,group_allowed_email_domains,group_project_templates,group_saml,issues_analytics,jira_dev_panel_integration,ldap_group_sync_filter,merge_pipelines,merge_request_performance_metrics,merge_trains,metrics_reports,multiple_approval_rules,multiple_clusters,multiple_group_issue_boards,object_storage,operations_dashboard,packages,productivity_analytics,project_aliases,protected_environments,reject_unsigned_commits,required_ci_templates,scoped_labels,service_desk,smartcard_auth,group_timelogs,type_of_work_analytics,unprotection_restrictions,ci_project_subscriptions,cluster_health,container_scanning,dast,dependency_scanning,epics,group_ip_restriction,incident_management,insights,license_management,personal_access_token_expiration_policy,pod_logs,prometheus_alerts,pseudonymizer,report_approver_rules,sast,security_dashboard,tracing,web_ide_terminal
 ++ export CI_PROJECT_ID=17893
 ++ CI_PROJECT_ID=17893
 ++ export CI_PROJECT_NAME=ci-debug-trace
@@ -802,15 +802,3 @@ if [[ -d "/builds/gitlab-examples/ci-debug-trace/.git" ]]; then
 
 ...
 ```
-
-[ce-13784]: https://gitlab.com/gitlab-org/gitlab-foss/issues/13784 "Simple protection of CI variables"
-[envs]: ../environments.md
-[protected branches]: ../../user/project/protected_branches.md
-[protected tags]: ../../user/project/protected_tags.md
-[shellexecutors]: https://docs.gitlab.com/runner/executors/
-[triggered]: ../triggers/README.md
-[trigger-job-token]: ../triggers/README.md#ci-job-token
-[gitlab-deploy-token]: ../../user/project/deploy_tokens/index.md#gitlab-deploy-token
-[registry]: ../../user/project/container_registry.md
-[dependent-repositories]: ../../user/project/new_ci_build_permissions_model.md#dependent-repositories
-[get-job-artifacts]:  ../../api/jobs.html#get-job-artifacts

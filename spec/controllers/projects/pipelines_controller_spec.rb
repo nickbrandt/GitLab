@@ -705,13 +705,45 @@ describe Projects::PipelinesController do
   end
 
   describe 'GET test_report.json' do
-    subject(:get_test_report_json) do
-      get :test_report, params: {
-        namespace_id: project.namespace,
-        project_id: project,
-        id: pipeline.id
-      },
-      format: :json
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+
+    context 'with attachments' do
+      let(:blob) do
+        <<~EOF
+          <testsuites>
+            <testsuite>
+              <testcase classname='Calculator' name='sumTest1' time='0.01'>
+                <failure>Some failure</failure>
+                <system-out>[[ATTACHMENT|some/path.png]]</system-out>
+              </testcase>
+            </testsuite>
+          </testsuites>
+        EOF
+      end
+
+      before do
+        allow_any_instance_of(Ci::JobArtifact).to receive(:each_blob).and_yield(blob)
+      end
+
+      it 'does not have N+1 problem with attachments' do
+        get_test_report_json
+
+        create(:ci_build, name: 'rspec', pipeline: pipeline).tap do |build|
+          create(:ci_job_artifact, :junit, job: build)
+        end
+
+        clear_controller_memoization
+
+        control_count = ActiveRecord::QueryRecorder.new { get_test_report_json }.count
+
+        create(:ci_build, name: 'karma', pipeline: pipeline).tap do |build|
+          create(:ci_job_artifact, :junit, job: build)
+        end
+
+        clear_controller_memoization
+
+        expect { get_test_report_json }.not_to exceed_query_limit(control_count)
+      end
     end
 
     context 'when feature is enabled' do
@@ -756,6 +788,52 @@ describe Projects::PipelinesController do
           expect(json_response['status']).to eq('error_parsing_report')
         end
       end
+
+      context 'when junit_pipeline_screenshots_view is enabled' do
+        before do
+          stub_feature_flags(junit_pipeline_screenshots_view: { enabled: true, thing: project })
+        end
+
+        context 'when test_report contains attachment and scope is with_attachment as a URL param' do
+          let(:pipeline) { create(:ci_pipeline, :with_test_reports_attachment, project: project) }
+
+          it 'returns a test reports with attachment' do
+            get_test_report_json(scope: 'with_attachment')
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response["test_suites"]).to be_present
+            expect(json_response["test_suites"].first["test_cases"].first).to include("attachment_url")
+          end
+        end
+
+        context 'when test_report does not contain attachment and scope is with_attachment as a URL param' do
+          let(:pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
+
+          it 'returns a test reports with empty values' do
+            get_test_report_json(scope: 'with_attachment')
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response["test_suites"]).to be_empty
+          end
+        end
+      end
+
+      context 'when junit_pipeline_screenshots_view is disabled' do
+        before do
+          stub_feature_flags(junit_pipeline_screenshots_view: { enabled: false, thing: project })
+        end
+
+        context 'when test_report contains attachment and scope is with_attachment as a URL param' do
+          let(:pipeline) { create(:ci_pipeline, :with_test_reports_attachment, project: project) }
+
+          it 'returns a test reports without attachment_url' do
+            get_test_report_json(scope: 'with_attachment')
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response["test_suites"].first["test_cases"].first).not_to include("attachment_url")
+          end
+        end
+      end
     end
 
     context 'when feature is disabled' do
@@ -771,6 +849,25 @@ describe Projects::PipelinesController do
         expect(response).to have_gitlab_http_status(:no_content)
         expect(response.body).to be_empty
       end
+    end
+
+    def get_test_report_json(**args)
+      params = {
+        namespace_id: project.namespace,
+        project_id: project,
+        id: pipeline.id
+      }
+
+      params.merge!(args) if args
+
+      get :test_report,
+        params: params,
+        format: :json
+    end
+
+    def clear_controller_memoization
+      controller.clear_memoization(:pipeline_test_report)
+      controller.instance_variable_set(:@pipeline, nil)
     end
   end
 
@@ -877,8 +974,16 @@ describe Projects::PipelinesController do
     end
 
     context 'ref provided' do
+      render_views
+
       before do
         create(:ci_pipeline, ref: 'master', project: project)
+      end
+
+      it 'shows a 404 if no pipeline exists' do
+        get :show, params: { namespace_id: project.namespace, project_id: project, latest: true, ref: 'non-existence' }
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'shows the latest pipeline for the provided ref' do

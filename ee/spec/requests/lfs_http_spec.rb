@@ -49,22 +49,30 @@ describe 'Git LFS API and storage' do
 
         context 'and project is above the limit' do
           let(:update_lfs_permissions) do
-            allow_any_instance_of(EE::Project).to receive_messages(
-              repository_and_lfs_size: 100.megabytes,
-              actual_size_limit: 99.megabytes)
+            allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
+              allow(checker).to receive_messages(
+                enabled?: true,
+                current_size: 110.megabytes,
+                limit: 100.megabytes
+              )
+            end
           end
 
           it 'responds with status 406' do
             expect(response).to have_gitlab_http_status(:not_acceptable)
-            expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 99 MB by 1 MB. Please contact your GitLab administrator for more information.')
+            expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 100 MB by 160 MB. Please contact your GitLab administrator for more information.')
           end
         end
 
         context 'and project will go over the limit' do
           let(:update_lfs_permissions) do
-            allow_any_instance_of(EE::Project).to receive_messages(
-              repository_and_lfs_size: 200.megabytes,
-              actual_size_limit: 300.megabytes)
+            allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
+              allow(checker).to receive_messages(
+                enabled?: true,
+                current_size: 200.megabytes,
+                limit: 300.megabytes
+              )
+            end
           end
 
           it 'responds with status 406' do
@@ -117,9 +125,9 @@ describe 'Git LFS API and storage' do
 
           context 'and project has limit enabled but will stay under the limit' do
             before do
-              allow_any_instance_of(EE::Project).to receive_messages(
-                actual_size_limit: 200,
-                size_limit_enabled?: true)
+              allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
+                allow(checker).to receive_messages(limit: 200, enabled?: true)
+              end
 
               put_finalize
             end

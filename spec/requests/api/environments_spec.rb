@@ -127,7 +127,7 @@ describe API::Environments do
       end
 
       it 'returns a 400 when the required params are missing' do
-        post api("/projects/12345/environments", non_member), params: { external_url: 'http://env.git.com' }
+        post api("/projects/#{non_existing_record_id}/environments", non_member), params: { external_url: 'http://env.git.com' }
       end
     end
   end
@@ -163,7 +163,7 @@ describe API::Environments do
     end
 
     it 'returns a 404 if the environment does not exist' do
-      put api("/projects/#{project.id}/environments/12345", user)
+      put api("/projects/#{project.id}/environments/#{non_existing_record_id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -171,20 +171,32 @@ describe API::Environments do
 
   describe 'DELETE /projects/:id/environments/:environment_id' do
     context 'as a maintainer' do
-      it 'returns a 200 for an existing environment' do
+      it "rejects the requests in environment isn't stopped" do
+        delete api("/projects/#{project.id}/environments/#{environment.id}", user)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+
+      it 'returns a 200 for stopped environment' do
+        environment.stop
+
         delete api("/projects/#{project.id}/environments/#{environment.id}", user)
 
         expect(response).to have_gitlab_http_status(:no_content)
       end
 
       it 'returns a 404 for non existing id' do
-        delete api("/projects/#{project.id}/environments/12345", user)
+        delete api("/projects/#{project.id}/environments/#{non_existing_record_id}", user)
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response['message']).to eq('404 Not found')
       end
 
       it_behaves_like '412 response' do
+        before do
+          environment.stop
+        end
+
         let(:request) { api("/projects/#{project.id}/environments/#{environment.id}", user) }
       end
     end
@@ -217,7 +229,7 @@ describe API::Environments do
       end
 
       it 'returns a 404 for non existing id' do
-        post api("/projects/#{project.id}/environments/12345/stop", user)
+        post api("/projects/#{project.id}/environments/#{non_existing_record_id}/stop", user)
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response['message']).to eq('404 Not found')

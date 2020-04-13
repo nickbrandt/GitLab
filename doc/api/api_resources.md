@@ -71,8 +71,10 @@ The following API resources are available in the project context:
 | [Services](services.md)                                             | `/projects/:id/services`                                                                                                                                                                              |
 | [Tags](tags.md)                                                     | `/projects/:id/repository/tags`                                                                                                                                                                       |
 | [Visual Review discussions](visual_review_discussions.md) **(STARTER**) | `/projects/:id/merge_requests/:merge_request_id/visual_review_discussions`                                                                                                                        |
-| [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**                | `/projects/:id/vulnerabilities`                                                                                                                                                                       |
-| [Vulnerability Findings](vulnerability_findings.md) **(ULTIMATE)**  | `/projects/:id/vulnerability_findings`                                                                                                                                                                |
+| [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**                | `/vulnerabilities/:id`                                                                                                                                                                       |
+| [Vulnerability exports](vulnerability_exports.md) **(ULTIMATE)**    | `/projects/:id/vulnerability_exports`                                                                                                                                                                       |
+| [Project vulnerabilities](project_vulnerabilities.md) **(ULTIMATE)**   | `/projects/:id/vulnerabilities`                                                                                                                                                                            |
+| [Vulnerability findings](vulnerability_findings.md) **(ULTIMATE)**  | `/projects/:id/vulnerability_findings`                                                                                                                                                                |
 | [Wikis](wikis.md)                                                   | `/projects/:id/wikis`                                                                                                                                                                                 |
 
 ## Group resources
@@ -120,7 +122,7 @@ The following API resources are available outside of project and group contexts 
 | [Events](events.md)                                | `/events`, `/users/:id/events` (also available for projects)            |
 | [Feature flags](features.md)                       | `/features`                                                             |
 | [Geo Nodes](geo_nodes.md) **(PREMIUM ONLY)**       | `/geo_nodes`                                                            |
-| [Group Activity Analytics](group_activity_analytics.md) **(STARTER)**  | `/analytics/group_activity/{issues_count | merge_requests_count}`  |
+| [Group Activity Analytics](group_activity_analytics.md) **(STARTER)**  | `/analytics/group_activity/{issues_count | merge_requests_count | new_members_count }`  |
 | [Import repository from GitHub](import.md)         | `/import/github`                                                        |
 | [Issues](issues.md)                                | `/issues` (also available for groups and projects)                      |
 | [Issues Statistics](issues_statistics.md)          | `/issues_statistics` (also available for groups and projects)           |
@@ -150,5 +152,5 @@ Endpoints are available for:
 
 - [Dockerfile templates](templates/dockerfiles.md).
 - [`.gitignore` templates](templates/gitignores.md).
-- [GitLab CI YAML templates](templates/gitlab_ci_ymls.md).
+- [GitLab CI/CD YAML templates](templates/gitlab_ci_ymls.md).
 - [Open source license templates](templates/licenses.md).

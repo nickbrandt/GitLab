@@ -8,8 +8,17 @@ import PanelType from '~/monitoring/components/panel_type.vue';
 import EmptyChart from '~/monitoring/components/charts/empty_chart.vue';
 import TimeSeriesChart from '~/monitoring/components/charts/time_series.vue';
 import AnomalyChart from '~/monitoring/components/charts/anomaly.vue';
-import { anomalyMockGraphData, graphDataPrometheusQueryRange } from 'jest/monitoring/mock_data';
-import { createStore } from '~/monitoring/stores';
+import {
+  anomalyMockGraphData,
+  graphDataPrometheusQueryRange,
+  mockLogsHref,
+  mockLogsPath,
+  mockNamespace,
+  mockNamespacedData,
+  mockTimeRange,
+} from 'jest/monitoring/mock_data';
+import { createStore, monitoringDashboard } from '~/monitoring/stores';
+import { createStore as createEmbedGroupStore } from '~/monitoring/stores/embed_group';
 
 global.IS_EE = true;
 global.URL.createObjectURL = jest.fn();
@@ -29,6 +38,7 @@ describe('Panel Type component', () => {
   const exampleText = 'example_text';
 
   const findCopyLink = () => wrapper.find({ ref: 'copyChartLink' });
+  const findTimeChart = () => wrapper.find({ ref: 'timeChart' });
 
   const createWrapper = props => {
     wrapper = shallowMount(PanelType, {
@@ -120,6 +130,21 @@ describe('Panel Type component', () => {
 
     it('sets no clipboard copy link on dropdown by default', () => {
       expect(findCopyLink().exists()).toBe(false);
+    });
+
+    it('should emit `timerange` event when a zooming in/out in a chart occcurs', () => {
+      const timeRange = {
+        start: '2020-01-01T00:00:00.000Z',
+        end: '2020-01-01T01:00:00.000Z',
+      };
+
+      jest.spyOn(wrapper.vm, '$emit');
+
+      findTimeChart().vm.$emit('datazoom', timeRange);
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.vm.$emit).toHaveBeenCalledWith('timerangezoom', timeRange);
+      });
     });
 
     describe('Time Series Chart panel type', () => {
@@ -225,10 +250,6 @@ describe('Panel Type component', () => {
   });
 
   describe('View Logs dropdown item', () => {
-    const mockLogsPath = '/path/to/logs';
-    const mockTimeRange = { duration: { seconds: 120 } };
-
-    const findTimeChart = () => wrapper.find({ ref: 'timeChart' });
     const findViewLogsLink = () => wrapper.find({ ref: 'viewLogsLink' });
 
     beforeEach(() => {
@@ -275,8 +296,7 @@ describe('Panel Type component', () => {
       state.timeRange = mockTimeRange;
 
       return wrapper.vm.$nextTick(() => {
-        const href = `${mockLogsPath}?duration_seconds=${mockTimeRange.duration.seconds}`;
-        expect(findViewLogsLink().attributes('href')).toMatch(href);
+        expect(findViewLogsLink().attributes('href')).toMatch(mockLogsHref);
       });
     });
 
@@ -321,7 +341,7 @@ describe('Panel Type component', () => {
     });
 
     it('adds a copy button to the dropdown', () => {
-      expect(findCopyLink().text()).toContain('Generate link to chart');
+      expect(findCopyLink().text()).toContain('Copy link to chart');
     });
 
     it('opens a toast on click', () => {
@@ -369,6 +389,55 @@ describe('Panel Type component', () => {
           }),
         );
       });
+    });
+  });
+
+  describe('when using dynamic modules', () => {
+    const { mockDeploymentData, mockProjectPath } = mockNamespacedData;
+
+    beforeEach(() => {
+      store = createEmbedGroupStore();
+      store.registerModule(mockNamespace, monitoringDashboard);
+      store.state.embedGroup.modules.push(mockNamespace);
+
+      wrapper = shallowMount(PanelType, {
+        propsData: {
+          graphData: graphDataPrometheusQueryRange,
+          namespace: mockNamespace,
+        },
+        store,
+        mocks,
+      });
+    });
+
+    it('handles namespaced time range and logs path state', () => {
+      store.state[mockNamespace].timeRange = mockTimeRange;
+      store.state[mockNamespace].logsPath = mockLogsPath;
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find({ ref: 'viewLogsLink' }).attributes().href).toBe(mockLogsHref);
+      });
+    });
+
+    it('handles namespaced deployment data state', () => {
+      store.state[mockNamespace].deploymentData = mockDeploymentData;
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findTimeChart().props().deploymentData).toEqual(mockDeploymentData);
+      });
+    });
+
+    it('handles namespaced project path state', () => {
+      store.state[mockNamespace].projectPath = mockProjectPath;
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findTimeChart().props().projectPath).toBe(mockProjectPath);
+      });
+    });
+
+    it('it renders a time series chart with no errors', () => {
+      expect(wrapper.find(TimeSeriesChart).isVueInstance()).toBe(true);
+      expect(wrapper.find(TimeSeriesChart).exists()).toBe(true);
     });
   });
 });

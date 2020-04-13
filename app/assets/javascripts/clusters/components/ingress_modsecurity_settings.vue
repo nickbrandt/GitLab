@@ -7,7 +7,7 @@ import {
   GlSprintf,
   GlLink,
   GlToggle,
-  GlButton,
+  GlDeprecatedButton,
   GlDropdown,
   GlDropdownItem,
   GlIcon,
@@ -25,7 +25,7 @@ export default {
     GlSprintf,
     GlLink,
     GlToggle,
-    GlButton,
+    GlDeprecatedButton,
     GlDropdown,
     GlDropdownItem,
     GlIcon,
@@ -93,7 +93,10 @@ export default {
       return [UPDATING].includes(this.ingress.status);
     },
     saveButtonDisabled() {
-      return [UNINSTALLING, UPDATING, INSTALLING].includes(this.ingress.status);
+      return (
+        [UNINSTALLING, UPDATING, INSTALLING].includes(this.ingress.status) ||
+        this.ingress.updateAvailable
+      );
     },
     saveButtonLabel() {
       return this.saving ? __('Saving') : __('Save changes');
@@ -105,12 +108,13 @@ export default {
      *     neither getting installed nor updated.
      */
     showButtons() {
-      return (
-        this.saving || (this.hasValueChanged && [INSTALLED, UPDATED].includes(this.ingress.status))
-      );
+      return this.saving || this.valuesChangedByUser;
     },
     modSecurityModeName() {
       return this.modes[this.ingress.modsecurity_mode].name;
+    },
+    valuesChangedByUser() {
+      return this.hasValueChanged && [INSTALLED, UPDATED].includes(this.ingress.status);
     },
   },
   methods: {
@@ -231,17 +235,17 @@ export default {
             </div>
           </div>
           <div v-if="showButtons" class="mt-3">
-            <gl-button
+            <gl-deprecated-button
               class="btn-success inline mr-1"
               :loading="saving"
               :disabled="saveButtonDisabled"
               @click="updateApplication"
             >
               {{ saveButtonLabel }}
-            </gl-button>
-            <gl-button :disabled="saveButtonDisabled" @click="resetStatus">
+            </gl-deprecated-button>
+            <gl-deprecated-button :disabled="saveButtonDisabled" @click="resetStatus">
               {{ __('Cancel') }}
-            </gl-button>
+            </gl-deprecated-button>
           </div>
         </div>
       </div>

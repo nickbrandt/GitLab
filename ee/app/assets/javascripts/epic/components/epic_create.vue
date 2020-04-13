@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
@@ -8,7 +8,7 @@ import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
 export default {
   components: {
-    GlButton,
+    GlDeprecatedButton,
     LoadingButton,
   },
   directives: {
@@ -48,9 +48,9 @@ export default {
 
 <template>
   <div class="dropdown epic-create-dropdown">
-    <gl-button variant="success" class="qa-new-epic-button" data-toggle="dropdown">
+    <gl-deprecated-button variant="success" class="qa-new-epic-button" data-toggle="dropdown">
       {{ __('New epic') }}
-    </gl-button>
+    </gl-deprecated-button>
     <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
       <input
         ref="epicTitleInput"

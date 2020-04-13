@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
 import Popover from '~/blob/suggest_gitlab_ci_yml/components/popover.vue';
-import Cookies from 'js-cookie';
-import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import { mockTracking, unmockTracking, triggerEvent } from 'helpers/tracking_helper';
 import * as utils from '~/lib/utils/common_utils';
+import { GlDeprecatedButton } from '@gitlab/ui';
 
 jest.mock('~/lib/utils/common_utils', () => ({
   ...jest.requireActual('~/lib/utils/common_utils'),
@@ -10,9 +10,11 @@ jest.mock('~/lib/utils/common_utils', () => ({
 }));
 
 const target = 'gitlab-ci-yml-selector';
-const dismissKey = 'suggest_gitlab_ci_yml_99';
+const dismissKey = '99';
 const defaultTrackLabel = 'suggest_gitlab_ci_yml';
 const commitTrackLabel = 'suggest_commit_first_project_gitlab_ci_yml';
+
+const dismissCookie = 'suggest_gitlab_ci_yml_99';
 const humanAccess = 'owner';
 
 describe('Suggest gitlab-ci.yml Popover', () => {
@@ -25,6 +27,9 @@ describe('Suggest gitlab-ci.yml Popover', () => {
         trackLabel,
         dismissKey,
         humanAccess,
+      },
+      stubs: {
+        'gl-popover': '<div><slot name="title"></slot><slot></slot></div>',
       },
     });
   }
@@ -46,7 +51,8 @@ describe('Suggest gitlab-ci.yml Popover', () => {
 
   describe('when the dismiss cookie is set', () => {
     beforeEach(() => {
-      Cookies.set(dismissKey, true);
+      utils.setCookie(dismissCookie, true);
+
       createWrapper(defaultTrackLabel);
     });
 
@@ -55,7 +61,7 @@ describe('Suggest gitlab-ci.yml Popover', () => {
     });
 
     afterEach(() => {
-      Cookies.remove(dismissKey);
+      utils.removeCookie(dismissCookie);
     });
   });
 
@@ -84,6 +90,22 @@ describe('Suggest gitlab-ci.yml Popover', () => {
       expect(trackingSpy).toHaveBeenCalledWith(expectedCategory, expectedAction, {
         label: expectedLabel,
         property: expectedProperty,
+      });
+    });
+
+    it('sends a tracking event when the popover is dismissed', () => {
+      const expectedLabel = commitTrackLabel;
+      const expectedAction = 'click_button';
+      const expectedProperty = 'owner';
+      const expectedValue = '10';
+      const dismissButton = wrapper.find(GlDeprecatedButton);
+
+      triggerEvent(dismissButton.element);
+
+      expect(trackingSpy).toHaveBeenCalledWith('_category_', expectedAction, {
+        label: expectedLabel,
+        property: expectedProperty,
+        value: expectedValue,
       });
     });
   });

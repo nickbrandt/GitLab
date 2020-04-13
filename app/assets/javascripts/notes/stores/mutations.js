@@ -169,7 +169,7 @@ export default {
     const { id, name, username } = state.userData;
 
     const hasEmojiAwardedByCurrentUser = note.award_emoji.filter(
-      emoji => emoji.name === data.awardName && emoji.user.id === id,
+      emoji => `${emoji.name}` === `${data.awardName}` && emoji.user.id === id,
     );
 
     if (hasEmojiAwardedByCurrentUser.length) {
@@ -261,6 +261,10 @@ export default {
     const discussion = utils.findNoteObjectById(state.discussions, discussionId);
 
     discussion.truncated_diff_lines = utils.prepareDiffLines(diffLines);
+  },
+
+  [types.SET_DISCUSSIONS_SORT](state, sort) {
+    state.discussionSortOrder = sort;
   },
 
   [types.DISABLE_COMMENTS](state, value) {

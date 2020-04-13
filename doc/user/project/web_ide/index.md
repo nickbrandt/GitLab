@@ -46,11 +46,8 @@ Single file editing is based on the [Ace Editor](https://ace.c9.io).
 ## Commit changes
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4539) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4 and [brought to GitLab Core](https://gitlab.com/gitlab-org/gitlab-foss/issues/44157) in 10.7.
-> - From [GitLab 12.7 onwards](https://gitlab.com/gitlab-org/gitlab/issues/33441),
-files were automatically staged.
-> - From [GitLab 12.9 onwards](https://gitlab.com/gitlab-org/gitlab/-/issues/196609), support for staging files was removed
-to prevent loss of unstaged data. All your current changes necessarily have to be
-committed or discarded.
+> - From [GitLab 12.7 onward](https://gitlab.com/gitlab-org/gitlab/issues/33441), files were automatically staged.
+> - From [GitLab 12.9 onward](https://gitlab.com/gitlab-org/gitlab/-/issues/196609), support for staging files was removed to prevent loss of unstaged data. All your current changes necessarily have to be committed or discarded.
 
 After making your changes, click the **Commit** button on the bottom-left to
 review the list of changed files.
@@ -146,7 +143,7 @@ below.
 
 CAUTION: **Warning:**
 Interactive Web Terminals for the Web IDE is currently in **Beta**.
-Shared Runners [do not yet support Interactive Web Terminals](https://gitlab.com/gitlab-org/gitlab-foss/issues/52611),
+Shared Runners [do not yet support Interactive Web Terminals](https://gitlab.com/gitlab-org/gitlab/-/issues/24674),
 so you would need to use your own private Runner(s) to make use of this feature.
 
 [Interactive Web Terminals](../../../ci/interactive_web_terminal/index.md)
@@ -273,7 +270,7 @@ terminal:
 - The `webide-file-sync` executable must start **after** the project
   directory is available. This is why we need to add `sleep 5` to the `command`.
   See [this issue](https://gitlab.com/gitlab-org/webide-file-sync/issues/7) for
-  more info.
+  more information.
 - `$CI_PROJECT_DIR` is a
   [predefined environment variable](../../../ci/variables/predefined_variables.md)
   for GitLab Runners. This is where your project's repository will be.

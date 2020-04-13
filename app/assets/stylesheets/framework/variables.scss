@@ -11,6 +11,38 @@ $default-transition-duration: 0.15s;
 $contextual-sidebar-width: 220px;
 $contextual-sidebar-collapsed-width: 50px;
 $toggle-sidebar-height: 48px;
+
+/**
+  🚨 Do not use this spacing scale — it is deprecated and being removed. 🚨
+  See https://gitlab.com/gitlab-org/gitlab/issues/36857 for more details.
+
+  Instead, if you need a spacing class, add it to app/assets/stylesheets/framework/common.scss,
+  using the following values.
+
+    $gl-spacing-scale-0: 0;
+    $gl-spacing-scale-1: 2px;
+    $gl-spacing-scale-2: 4px;
+    $gl-spacing-scale-3: 8px;
+    $gl-spacing-scale-4: 12px;
+    $gl-spacing-scale-5: 16px;
+    $gl-spacing-scale-6: 24px;
+    $gl-spacing-scale-7: 32px;
+    $gl-spacing-scale-8: 40px;
+    $gl-spacing-scale-9: 48px;
+    $gl-spacing-scale-10: 56px;
+    $gl-spacing-scale-11: 64px;
+    $gl-spacing-scale-12: 80px;
+    $gl-spacing-scale-13: 96px;
+
+  E.g., a padding top of 96px can be added using:
+  .gl-shim-pt-13 {
+    padding-top: 96px;
+  }
+
+  Please use -shim- so it can be differentiated from the old scale classes.
+
+  These will be replaced when the Gitlab UI utilities are included.
+**/
 $spacing-scale: (
   0: 0,
   1: #{0.5 * $grid-size},
@@ -49,7 +81,7 @@ $darken-dark-factor: 10%;
 $darken-border-factor: 5%;
 $darken-border-dashed-factor: 25%;
 
-$white-light: #fff;
+$white: #fff;
 $white-normal: #f0f0f0;
 $white-dark: #eaeaea;
 $white-transparent: rgba(255, 255, 255, 0.8);
@@ -291,7 +323,7 @@ $theme-light-red-500: #c24b38;
 $theme-light-red-600: #b03927;
 $theme-light-red-700: #a62e21;
 
-$border-white-light: darken($white-light, $darken-border-factor);
+$border-white-light: darken($white, $darken-border-factor);
 $border-white-normal: darken($white-normal, $darken-border-factor);
 
 $border-gray-light: darken($gray-light, $darken-border-factor);
@@ -386,6 +418,7 @@ $browser-scrollbar-size: 10px;
  * Misc
  */
 $header-height: 40px;
+$header-zindex: 1000;
 $suggestion-header-height: 46px;
 $ide-statusbar-height: 25px;
 $fixed-layout-width: 1280px;
@@ -608,6 +641,14 @@ $issue-boards-breadcrumbs-height-xs: 63px;
 $issue-board-list-difference-xs: $header-height + $issue-boards-breadcrumbs-height-xs;
 $issue-board-list-difference-sm: $header-height + $breadcrumb-min-height;
 $issue-board-list-difference-md: $issue-board-list-difference-sm + $issue-boards-filter-height;
+/*
+ The following heights are used in environment_logs.scss and are used for calculation of the log viewer height.
+*/
+$environment-logs-breadcrumbs-height: 63px;
+$environment-logs-breadcrumbs-height-md: $breadcrumb-min-height;
+
+$environment-logs-difference-xs-up: $header-height + $environment-logs-breadcrumbs-height;
+$environment-logs-difference-md-up: $header-height + $environment-logs-breadcrumbs-height-md;
 
 /*
 * Avatar
@@ -792,7 +833,7 @@ $perf-bar-production: #222;
 $perf-bar-staging: #291430;
 $perf-bar-development: #4c1210;
 $perf-bar-bucket-bg: #111;
-$perf-bar-bucket-box-shadow-from: rgba($white-light, 0.2);
+$perf-bar-bucket-box-shadow-from: rgba($white, 0.2);
 $perf-bar-bucket-box-shadow-to: rgba($black, 0.25);
 $perf-bar-canary-text: $orange-400;
 

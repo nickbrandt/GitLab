@@ -4,4 +4,5 @@ fragment DesignListItem on Design {
   event
   filename
   notesCount
+  imageV432x230
 }

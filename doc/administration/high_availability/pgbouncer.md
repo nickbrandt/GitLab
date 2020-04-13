@@ -4,7 +4,7 @@ type: reference
 
 # Working with the bundled PgBouncer service **(PREMIUM ONLY)**
 
-As part of its High Availability stack, GitLab Premium includes a bundled version of [PgBouncer](https://pgbouncer.github.io/) that can be managed through `/etc/gitlab/gitlab.rb`. PgBouncer is used to seamlessly migrate database connections between servers in a failover scenario. Additionally, it can be used in a non-HA setup to pool connections, speeding up response time while reducing resource usage.
+As part of its High Availability stack, GitLab Premium includes a bundled version of [PgBouncer](http://www.pgbouncer.org/) that can be managed through `/etc/gitlab/gitlab.rb`. PgBouncer is used to seamlessly migrate database connections between servers in a failover scenario. Additionally, it can be used in a non-HA setup to pool connections, speeding up response time while reducing resource usage.
 
 In a HA setup, it's recommended to run a PgBouncer node separately for each database node with an internal load balancer (TCP) serving each accordingly.
 
@@ -273,3 +273,11 @@ In case you are experiencing any issues connecting through PgBouncer, the first 
 ```
 
 Additionally, you can check the output from `show databases` in the [Administrative console](#administrative-console). In the output, you would expect to see values in the `host` field for the `gitlabhq_production` database. Additionally, `current_connections` should be greater than 1.
+
+### Message: `LOG:  invalid CIDR mask in address`
+
+See the suggested fix [in Geo documentation](../geo/replication/troubleshooting.md#message-log--invalid-cidr-mask-in-address).
+
+### Message: `LOG:  invalid IP mask "md5": Name or service not known`
+
+See the suggested fix [in Geo documentation](../geo/replication/troubleshooting.md#message-log--invalid-ip-mask-md5-name-or-service-not-known).

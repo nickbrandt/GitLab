@@ -219,24 +219,6 @@ describe 'Promotions', :js do
     end
   end
 
-  describe 'for issue export', :js do
-    before do
-      allow(License).to receive(:current).and_return(nil)
-      stub_application_setting(check_namespace_plan: false)
-
-      project.add_maintainer(user)
-      sign_in(user)
-    end
-
-    it 'appears on export modal' do
-      visit project_issues_path(project)
-
-      click_on 'Export as CSV'
-
-      expect(find('.issues-export-modal')).to have_content 'Export issues with GitLab Enterprise Edition.'
-    end
-  end
-
   describe 'for epics in issues sidebar', :js do
     shared_examples 'Epics promotion' do
       it 'appears on the page' do

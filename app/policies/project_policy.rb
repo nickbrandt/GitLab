@@ -224,6 +224,7 @@ class ProjectPolicy < BasePolicy
     enable :read_sentry_issue
     enable :update_sentry_issue
     enable :read_prometheus
+    enable :read_metrics_dashboard_annotation
   end
 
   # We define `:public_user_access` separately because there are cases in gitlab-ee
@@ -271,10 +272,14 @@ class ProjectPolicy < BasePolicy
     enable :destroy_container_image
     enable :create_environment
     enable :update_environment
+    enable :destroy_environment
     enable :create_deployment
     enable :update_deployment
     enable :create_release
     enable :update_release
+    enable :create_metrics_dashboard_annotation
+    enable :delete_metrics_dashboard_annotation
+    enable :update_metrics_dashboard_annotation
   end
 
   rule { can?(:developer_access) & user_confirmed? }.policy do
@@ -316,6 +321,8 @@ class ProjectPolicy < BasePolicy
     enable :create_deploy_token
     enable :read_pod_logs
     enable :destroy_deploy_token
+    enable :read_prometheus_alerts
+    enable :admin_terraform_state
   end
 
   rule { (mirror_available & can?(:admin_project)) | admin }.enable :admin_remote_mirror

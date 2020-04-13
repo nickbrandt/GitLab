@@ -2,8 +2,9 @@
 import { __ } from '~/locale';
 import { mapActions, mapState } from 'vuex';
 import { ADD_CI_VARIABLE_MODAL_ID } from '../constants';
+import CiEnvironmentsDropdown from './ci_environments_dropdown.vue';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlModal,
   GlFormSelect,
   GlFormGroup,
@@ -17,7 +18,8 @@ import {
 export default {
   modalId: ADD_CI_VARIABLE_MODAL_ID,
   components: {
-    GlButton,
+    CiEnvironmentsDropdown,
+    GlDeprecatedButton,
     GlModal,
     GlFormSelect,
     GlFormGroup,
@@ -36,6 +38,7 @@ export default {
       'variableBeingEdited',
       'isGroup',
       'maskableRegex',
+      'selectedEnvironment',
     ]),
     canSubmit() {
       if (this.variableData.masked && this.maskedState === false) {
@@ -80,6 +83,10 @@ export default {
       'displayInputValue',
       'clearModal',
       'deleteVariable',
+      'setEnvironmentScope',
+      'addWildCardScope',
+      'resetSelectedEnvironment',
+      'setSelectedEnvironment',
     ]),
     updateOrAddVariable() {
       if (this.variableBeingEdited) {
@@ -95,6 +102,7 @@ export default {
       } else {
         this.clearModal();
       }
+      this.resetSelectedEnvironment();
     },
     hideModal() {
       this.$refs.modal.hide();
@@ -158,10 +166,11 @@ export default {
           label-for="ci-variable-env"
           class="w-50"
         >
-          <gl-form-select
-            id="ci-variable-env"
-            v-model="variableData.environment_scope"
-            :options="environments"
+          <ci-environments-dropdown
+            class="w-100"
+            :value="variableData.environment_scope"
+            @selectEnvironment="setEnvironmentScope"
+            @createClicked="addWildCardScope"
           />
         </gl-form-group>
       </div>
@@ -203,22 +212,22 @@ export default {
       </gl-form-group>
     </form>
     <template #modal-footer>
-      <gl-button @click="hideModal">{{ __('Cancel') }}</gl-button>
-      <gl-button
+      <gl-deprecated-button @click="hideModal">{{ __('Cancel') }}</gl-deprecated-button>
+      <gl-deprecated-button
         v-if="variableBeingEdited"
         ref="deleteCiVariable"
         category="secondary"
         variant="danger"
         @click="deleteVarAndClose"
-        >{{ __('Delete variable') }}</gl-button
+        >{{ __('Delete variable') }}</gl-deprecated-button
       >
-      <gl-button
+      <gl-deprecated-button
         ref="updateOrAddVariable"
         :disabled="!canSubmit"
         variant="success"
         @click="updateOrAddVariable"
         >{{ modalActionText }}
-      </gl-button>
+      </gl-deprecated-button>
     </template>
   </gl-modal>
 </template>

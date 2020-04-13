@@ -8,6 +8,7 @@ module DesignManagement
     include Gitlab::Utils::StrongMemoize
     include Referable
     include Mentionable
+    include WhereComposite
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
@@ -29,6 +30,26 @@ module DesignManagement
     # Pre-fetching scope to include the data necessary to construct a
     # reference using `to_reference`.
     scope :for_reference, -> { includes(issue: [{ project: [:route, :namespace] }]) }
+
+    # A design can be uniquely identified by issue_id and filename
+    # Takes one or more sets of composite IDs of the form:
+    # `{issue_id: Integer, filename: String}`.
+    #
+    # @see WhereComposite::where_composite
+    #
+    # e.g:
+    #
+    #   by_issue_id_and_filename(issue_id: 1, filename: 'homescreen.jpg')
+    #   by_issue_id_and_filename([]) # returns ActiveRecord::NullRelation
+    #   by_issue_id_and_filename([
+    #     { issue_id: 1, filename: 'homescreen.jpg' },
+    #     { issue_id: 2, filename: 'homescreen.jpg' },
+    #     { issue_id: 1, filename: 'menu.png' }
+    #   ])
+    #
+    scope :by_issue_id_and_filename, ->(composites) do
+      where_composite(%i[issue_id filename], composites)
+    end
 
     # Find designs visible at the given version
     #

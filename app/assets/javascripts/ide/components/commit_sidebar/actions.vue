@@ -18,7 +18,7 @@ export default {
   computed: {
     ...mapState(['currentBranchId', 'changedFiles', 'stagedFiles']),
     ...mapCommitState(['commitAction']),
-    ...mapGetters(['currentBranch']),
+    ...mapGetters(['currentBranch', 'emptyRepo', 'canPushToBranch']),
     commitToCurrentBranchText() {
       return sprintf(
         s__('IDE|Commit to %{branchName} branch'),
@@ -29,6 +29,13 @@ export default {
     containsStagedChanges() {
       return this.changedFiles.length > 0 && this.stagedFiles.length > 0;
     },
+    shouldDefaultToCurrentBranch() {
+      if (this.emptyRepo) {
+        return true;
+      }
+
+      return this.canPushToBranch && !this.currentBranch?.default;
+    },
   },
   watch: {
     containsStagedChanges() {
@@ -36,18 +43,18 @@ export default {
     },
   },
   mounted() {
-    this.updateSelectedCommitAction();
+    if (!this.commitAction) {
+      this.updateSelectedCommitAction();
+    }
   },
   methods: {
     ...mapCommitActions(['updateCommitAction']),
     updateSelectedCommitAction() {
-      if (!this.currentBranch) {
+      if (!this.currentBranch && !this.emptyRepo) {
         return;
       }
 
-      const { can_push: canPush = false, default: isDefault = false } = this.currentBranch;
-
-      if (canPush && !isDefault) {
+      if (this.shouldDefaultToCurrentBranch) {
         this.updateCommitAction(consts.COMMIT_TO_CURRENT_BRANCH);
       } else {
         this.updateCommitAction(consts.COMMIT_TO_NEW_BRANCH);
@@ -66,7 +73,7 @@ export default {
   <div class="append-bottom-15 ide-commit-options">
     <radio-group
       :value="$options.commitToCurrentBranch"
-      :disabled="currentBranch && !currentBranch.can_push"
+      :disabled="!canPushToBranch"
       :title="$options.currentBranchPermissionsTooltip"
     >
       <span
@@ -75,11 +82,13 @@ export default {
         v-html="commitToCurrentBranchText"
       ></span>
     </radio-group>
-    <radio-group
-      :value="$options.commitToNewBranch"
-      :label="__('Create a new branch')"
-      :show-input="true"
-    />
-    <new-merge-request-option />
+    <template v-if="!emptyRepo">
+      <radio-group
+        :value="$options.commitToNewBranch"
+        :label="__('Create a new branch')"
+        :show-input="true"
+      />
+      <new-merge-request-option />
+    </template>
   </div>
 </template>

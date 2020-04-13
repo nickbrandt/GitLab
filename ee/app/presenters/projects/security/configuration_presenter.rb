@@ -20,8 +20,8 @@ module Projects
         container_scanning: 'user/application_security/container_scanning/index',
         dast: 'user/application_security/dast/index',
         dependency_scanning: 'user/application_security/dependency_scanning/index',
-        license_management: 'user/application_security/license_compliance/index',
-        license_scanning: 'user/application_security/license_compliance/index',
+        license_management: 'user/compliance/license_compliance/index',
+        license_scanning: 'user/compliance/license_compliance/index',
         sast: 'user/application_security/sast/index'
       }.freeze
 
@@ -77,7 +77,7 @@ module Projects
         return [] unless latest_default_branch_pipeline
 
         ::Security::SecurityJobsFinder.new(pipeline: latest_default_branch_pipeline).execute +
-          ::Security::LicenseManagementJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
+          ::Security::LicenseComplianceJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
       end
 
       def latest_default_branch_pipeline
@@ -123,7 +123,7 @@ module Projects
       end
 
       def scan_types
-        ::Security::SecurityJobsFinder.allowed_job_types + ::Security::LicenseManagementJobsFinder.allowed_job_types
+        ::Security::SecurityJobsFinder.allowed_job_types + ::Security::LicenseComplianceJobsFinder.allowed_job_types
       end
     end
   end

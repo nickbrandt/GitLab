@@ -199,8 +199,8 @@
 /*
 * Mixin that handles the container for the job logs (CI/CD and kubernetes pod logs)
 */
-@mixin build-trace {
-  background: $black;
+@mixin build-trace($background: $black) {
+  background: $background;
   color: $gray-darkest;
   white-space: pre;
   overflow-x: auto;
@@ -243,7 +243,7 @@
 /*
 * Mixin that handles the position of the controls placed on the top bar
 */
-@mixin build-controllers($control-font-size, $flex-direction, $with-grow, $flex-grow-size, $svg-display: 'block', $svg-top: '2px') {
+@mixin build-controllers($control-font-size, $flex-direction, $with-grow, $flex-grow-size, $svg-display: block, $svg-top: 2px) {
   display: flex;
   font-size: $control-font-size;
   justify-content: $flex-direction;
@@ -302,7 +302,7 @@
     margin: auto auto 12px;
     border-radius: 50%;
     animation: blinking-dot 1s linear infinite;
-    background: $white-light;
+    background: $white;
 
     &:nth-child(2) {
       animation-delay: 0.33s;
@@ -393,7 +393,7 @@
 
 @mixin avatar-counter($border-radius: 1em) {
   background-color: $gray-darkest;
-  color: $white-light;
+  color: $white;
   border: 1px solid $gray-normal;
   border-radius: $border-radius;
   font-family: $regular-font;

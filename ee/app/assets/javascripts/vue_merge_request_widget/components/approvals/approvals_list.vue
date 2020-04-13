@@ -89,7 +89,7 @@ export default {
         <th class="w-0"></th>
         <th class="w-25">{{ s__('MRApprovals|Approvers') }}</th>
         <th class="w-50"></th>
-        <th>{{ s__('MRApprovals|Pending approvals') }}</th>
+        <th>{{ s__('MRApprovals|Approvals') }}</th>
         <th>{{ s__('MRApprovals|Approved by') }}</th>
       </tr>
     </thead>

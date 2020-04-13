@@ -42,6 +42,11 @@ FactoryBot.define do
       end
     end
 
+    trait :dast_with_missing_file do
+      file_format { :raw }
+      file_type { :dast }
+    end
+
     trait :dast_deprecated_no_spider do
       file_format { :raw }
       file_type { :dast }
@@ -71,6 +76,26 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-report-multiple-sites.json'), 'application/json')
+      end
+    end
+
+    trait :dast_missing_scan_field do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-missing-scan.json'), 'application/json')
+      end
+    end
+
+    trait :dast_missing_scanned_resources_field do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-missing-scanned-resources.json'), 'application/json')
       end
     end
 
@@ -134,13 +159,13 @@ FactoryBot.define do
       end
     end
 
-    trait :license_management_feature_branch do
-      file_type { :license_management }
+    trait :license_scanning_feature_branch do
+      file_type { :license_scanning }
       file_format { :raw }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-license-management-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-license-scanning-report.json'), 'application/json')
       end
     end
 
@@ -275,7 +300,7 @@ FactoryBot.define do
     end
 
     trait :license_scan do
-      file_type { :license_management }
+      file_type { :license_scanning }
       file_format { :raw }
     end
 

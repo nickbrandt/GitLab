@@ -119,7 +119,7 @@ production:
 
 This example code does the following:
 
-1. Uses the `node:latest` image for all GitLab CI builds
+1. Uses the `node:latest` image for all GitLab CI/CD builds
 1. The `deploy` stage:
    - Installs the Serverless Framework.
    - Deploys the serverless function to your AWS account using the AWS credentials
@@ -140,7 +140,7 @@ NOTE: **Note:**
 In your GitLab deploy stage log, there will be output containing your AWS Lambda endpoint URL.
 The log line will look similar to this:
 
-```
+```plaintext
 endpoints:
   GET - https://u768nzby1j.execute-api.us-east-1.amazonaws.com/production/hello
 ```
@@ -164,7 +164,7 @@ That should output:
 }
 ```
 
-Hooray! You now have a AWS Lambda function deployed via GitLab CI.
+Hooray! You now have a AWS Lambda function deployed via GitLab CI/CD.
 
 Nice work!
 
@@ -222,7 +222,7 @@ provider:
 ```
 
 From there, you can reference them in your functions as well.
-Remember to add `A_VARIABLE` to your GitLab CI variables under **Settings > CI/CD > Variables**, and it will get picked up and deployed with your function.
+Remember to add `A_VARIABLE` to your GitLab CI/CD variables under **Settings > CI/CD > Variables**, and it will get picked up and deployed with your function.
 
 NOTE: **Note:**
 Anyone with access to the AWS environment may be able to see the values of those
@@ -368,7 +368,7 @@ variables.
 To set these:
 
 1. Navigate to the project's **{settings}** **Settings > CI / CD**.
-1. Expand the **Variables** section and create entires for `AWS_ACCESS_KEY_ID` and
+1. Expand the **Variables** section and create entries for `AWS_ACCESS_KEY_ID` and
    `AWS_SECRET_ACCESS_KEY`.
 1. Mask the credentials so they do not show in logs using the **Masked** toggle.
 

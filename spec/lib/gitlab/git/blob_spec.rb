@@ -301,26 +301,12 @@ describe Gitlab::Git::Blob, :seed_helper do
         stub_const('Gitlab::Git::Blob::BATCH_SIZE', 2)
       end
 
-      context 'blobs_fetch_in_batches is enabled' do
-        it 'fetches the blobs in batches' do
-          expect(client).to receive(:get_blobs).with(first_batch, limit).ordered
-          expect(client).to receive(:get_blobs).with(second_batch, limit).ordered
-          expect(client).to receive(:get_blobs).with(third_batch, limit).ordered
+      it 'fetches the blobs in batches' do
+        expect(client).to receive(:get_blobs).with(first_batch, limit).ordered
+        expect(client).to receive(:get_blobs).with(second_batch, limit).ordered
+        expect(client).to receive(:get_blobs).with(third_batch, limit).ordered
 
-          subject
-        end
-      end
-
-      context 'blobs_fetch_in_batches is disabled' do
-        before do
-          stub_feature_flags(blobs_fetch_in_batches: false)
-        end
-
-        it 'fetches the blobs in a single batch' do
-          expect(client).to receive(:get_blobs).with(blob_references, limit)
-
-          subject
-        end
+        subject
       end
     end
   end
@@ -409,37 +395,43 @@ describe Gitlab::Git::Blob, :seed_helper do
     end
   end
 
-  describe 'encoding' do
+  describe 'encoding', :aggregate_failures do
     context 'file with russian text' do
       let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "encoding/russian.rb") }
 
-      it { expect(blob.name).to eq("russian.rb") }
-      it { expect(blob.data.lines.first).to eq("Хороший файл") }
-      it { expect(blob.size).to eq(23) }
-      it { expect(blob.truncated?).to be_falsey }
-      # Run it twice since data is encoded after the first run
-      it { expect(blob.truncated?).to be_falsey }
-      it { expect(blob.mode).to eq("100755") }
+      it 'has the correct blob attributes' do
+        expect(blob.name).to eq("russian.rb")
+        expect(blob.data.lines.first).to eq("Хороший файл")
+        expect(blob.size).to eq(23)
+        expect(blob.truncated?).to be_falsey
+        # Run it twice since data is encoded after the first run
+        expect(blob.truncated?).to be_falsey
+        expect(blob.mode).to eq("100755")
+      end
     end
 
     context 'file with Japanese text' do
       let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "encoding/テスト.txt") }
 
-      it { expect(blob.name).to eq("テスト.txt") }
-      it { expect(blob.data).to include("これはテスト") }
-      it { expect(blob.size).to eq(340) }
-      it { expect(blob.mode).to eq("100755") }
-      it { expect(blob.truncated?).to be_falsey }
+      it 'has the correct blob attributes' do
+        expect(blob.name).to eq("テスト.txt")
+        expect(blob.data).to include("これはテスト")
+        expect(blob.size).to eq(340)
+        expect(blob.mode).to eq("100755")
+        expect(blob.truncated?).to be_falsey
+      end
     end
 
     context 'file with ISO-8859 text' do
       let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::LastCommit::ID, "encoding/iso8859.txt") }
 
-      it { expect(blob.name).to eq("iso8859.txt") }
-      it { expect(blob.loaded_size).to eq(4) }
-      it { expect(blob.size).to eq(4) }
-      it { expect(blob.mode).to eq("100644") }
-      it { expect(blob.truncated?).to be_falsey }
+      it 'has the correct blob attributes' do
+        expect(blob.name).to eq("iso8859.txt")
+        expect(blob.loaded_size).to eq(4)
+        expect(blob.size).to eq(4)
+        expect(blob.mode).to eq("100644")
+        expect(blob.truncated?).to be_falsey
+      end
     end
   end
 

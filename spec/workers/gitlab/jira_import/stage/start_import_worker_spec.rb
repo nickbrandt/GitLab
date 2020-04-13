@@ -3,16 +3,16 @@
 require 'spec_helper'
 
 describe Gitlab::JiraImport::Stage::StartImportWorker do
-  let(:project) { create(:project) }
+  let_it_be(:project) { create(:project, import_type: 'jira') }
+  let_it_be(:jid) { '12345678' }
   let(:worker) { described_class.new }
-  let(:jid) { '12345678' }
 
   describe 'modules' do
     it_behaves_like 'include import workers modules'
   end
 
   describe '#perform' do
-    context 'when feature flag not enabled' do
+    context 'when feature flag not disabled' do
       before do
         stub_feature_flags(jira_issue_import: false)
       end
@@ -24,14 +24,14 @@ describe Gitlab::JiraImport::Stage::StartImportWorker do
       end
     end
 
-    context 'when feature flag not enabled' do
+    context 'when feature flag enabled' do
+      let_it_be(:jira_import, reload: true) { create(:jira_import_state, project: project, jid: jid) }
+
       before do
         stub_feature_flags(jira_issue_import: true)
       end
 
-      context 'when import is not scheudled' do
-        let!(:import_state) { create(:import_state, project: project, status: :none, jid: jid) }
-
+      context 'when import is not scheduled' do
         it 'exits because import not started' do
           expect(Gitlab::JiraImport::Stage::ImportLabelsWorker).not_to receive(:perform_async)
 
@@ -40,7 +40,9 @@ describe Gitlab::JiraImport::Stage::StartImportWorker do
       end
 
       context 'when import is scheduled' do
-        let!(:import_state) { create(:import_state, project: project, status: :scheduled, jid: jid) }
+        before do
+          jira_import.schedule!
+        end
 
         it 'advances to importing labels' do
           expect(Gitlab::JiraImport::Stage::ImportLabelsWorker).to receive(:perform_async)
@@ -50,7 +52,9 @@ describe Gitlab::JiraImport::Stage::StartImportWorker do
       end
 
       context 'when import is started' do
-        let!(:import_state) { create(:import_state, project: project, status: :started, jid: jid) }
+        before do
+          jira_import.update!(status: :started)
+        end
 
         context 'when this is the same worker that stated import' do
           it 'advances to importing labels' do
@@ -72,7 +76,9 @@ describe Gitlab::JiraImport::Stage::StartImportWorker do
       end
 
       context 'when import is finished' do
-        let!(:import_state) { create(:import_state, project: project, status: :finished, jid: jid) }
+        before do
+          jira_import.update!(status: :finished)
+        end
 
         it 'advances to importing labels' do
           allow(worker).to receive(:jid).and_return(jid)

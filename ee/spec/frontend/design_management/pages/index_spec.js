@@ -96,6 +96,7 @@ describe('Design management index page', () => {
       localVue,
       router,
       stubs: { DesignDestroyer, ApolloMutation, ...stubs },
+      attachToDocument: true,
     });
 
     wrapper.setData({
@@ -196,6 +197,7 @@ describe('Design management index page', () => {
                 __typename: 'Design',
                 id: expect.anything(),
                 image: '',
+                imageV432x230: '',
                 filename: 'test',
                 fullPath: '',
                 event: 'NONE',
@@ -467,6 +469,51 @@ describe('Design management index page', () => {
 
     it('does not render Select All button', () => {
       expect(findSelectAllButton().exists()).toBe(false);
+    });
+  });
+
+  describe('pasting a design', () => {
+    let event;
+    beforeEach(() => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
+
+      wrapper.setMethods({
+        onUploadDesign: jest.fn(),
+      });
+
+      event = new Event('paste');
+
+      router.replace({
+        name: DESIGNS_ROUTE_NAME,
+        query: {
+          version: '2',
+        },
+      });
+    });
+
+    it('calls onUploadDesign with valid paste', () => {
+      event.clipboardData = {
+        files: [{ name: 'image.png', type: 'image/png' }],
+        getData: () => 'test.png',
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith([
+        new File([{ name: 'image.png' }], 'test.png'),
+      ]);
+    });
+
+    it('does not call onUploadDesign with invalid paste', () => {
+      event.clipboardData = {
+        items: [{ type: 'text/plain' }, { type: 'text' }],
+        files: [],
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).not.toHaveBeenCalled();
     });
   });
 });

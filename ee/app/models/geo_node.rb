@@ -51,6 +51,8 @@ class GeoNode < ApplicationRecord
 
   scope :with_url_prefix, ->(prefix) { where('url LIKE ?', "#{prefix}%") }
   scope :secondary_nodes, -> { where(primary: false) }
+  scope :name_in, -> (names) { where(name: names) }
+  scope :ordered, -> { order(:id) }
 
   attr_encrypted :secret_access_key,
                  key: Settings.attr_encrypted_db_key_base_truncated,
@@ -102,7 +104,7 @@ class GeoNode < ApplicationRecord
 
     # Tries to find a GeoNode by oauth_application_id, returning nil if none could be found.
     def find_by_oauth_application_id(oauth_application_id)
-      where(oauth_application_id: oauth_application_id).take
+      find_by(oauth_application_id: oauth_application_id)
     end
 
     private

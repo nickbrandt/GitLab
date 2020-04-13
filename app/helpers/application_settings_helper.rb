@@ -111,14 +111,6 @@ module ApplicationSettingsHelper
     ]
   end
 
-  def repository_storages_options_for_select(selected)
-    options = Gitlab.config.repositories.storages.map do |name, storage|
-      ["#{name} - #{storage['gitaly_address']}", name]
-    end
-
-    options_for_select(options, selected)
-  end
-
   def repository_storages_options_json
     options = Gitlab.config.repositories.storages.map do |name, storage|
       {
@@ -184,6 +176,7 @@ module ApplicationSettingsHelper
       :authorized_keys_enabled,
       :auto_devops_enabled,
       :auto_devops_domain,
+      :container_expiration_policies_enable_historic_entries,
       :container_registry_token_expire_delay,
       :default_artifacts_expire_in,
       :default_branch_protection,

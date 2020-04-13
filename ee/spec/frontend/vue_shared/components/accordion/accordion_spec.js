@@ -1,9 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { Accordion } from 'ee/vue_shared/components/accordion';
 
-import { uniqueId } from 'underscore';
-
-jest.mock('underscore');
+jest.mock('lodash/uniqueId', () => () => 'foo');
 
 describe('Accordion component', () => {
   let wrapper;
@@ -30,7 +28,6 @@ describe('Accordion component', () => {
 
   it('passes a unique "accordionId" to the default slot', () => {
     const mockUniqueIdValue = 'foo';
-    uniqueId.mockReturnValueOnce(mockUniqueIdValue);
 
     const defaultSlot = '<span>{{ props.accordionId }}</span>';
 

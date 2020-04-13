@@ -2,7 +2,6 @@
 
 module DesignManagementTestHelpers
   def enable_design_management(enabled = true, ref_filter = true)
-    stub_licensed_features(design_management: enabled)
     stub_lfs_setting(enabled: enabled)
     stub_feature_flags(design_management_reference_filter_gfm_pipeline: ref_filter)
   end

@@ -12,6 +12,7 @@ module EE
         expose :parent_id
         expose :title
         expose :description
+        expose :confidential
         expose :author, using: ::API::Entities::UserBasic
         expose :start_date
         expose :start_date_is_fixed?, as: :start_date_is_fixed, if: can_admin_epic

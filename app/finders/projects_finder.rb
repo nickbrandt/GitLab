@@ -21,11 +21,11 @@
 #     non_archived: boolean
 #     archived: 'only' or boolean
 #     min_access_level: integer
+#     last_activity_after: datetime
+#     last_activity_before: datetime
 #
 class ProjectsFinder < UnionFinder
   include CustomAttributesFilter
-
-  prepend_if_ee('::EE::ProjectsFinder') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   attr_accessor :params
   attr_reader :current_user, :project_ids_relation
@@ -73,6 +73,8 @@ class ProjectsFinder < UnionFinder
     collection = by_archived(collection)
     collection = by_custom_attributes(collection)
     collection = by_deleted_status(collection)
+    collection = by_last_activity_after(collection)
+    collection = by_last_activity_before(collection)
     collection
   end
 
@@ -138,8 +140,8 @@ class ProjectsFinder < UnionFinder
   # rubocop: disable CodeReuse/ActiveRecord
   def by_ids(items)
     items = items.where(id: project_ids_relation) if project_ids_relation
-    items = items.where('id > ?', params[:id_after]) if params[:id_after]
-    items = items.where('id < ?', params[:id_before]) if params[:id_before]
+    items = items.where('projects.id > ?', params[:id_after]) if params[:id_after]
+    items = items.where('projects.id < ?', params[:id_before]) if params[:id_before]
     items
   end
   # rubocop: enable CodeReuse/ActiveRecord
@@ -179,6 +181,22 @@ class ProjectsFinder < UnionFinder
     params[:without_deleted].present? ? items.without_deleted : items
   end
 
+  def by_last_activity_after(items)
+    if params[:last_activity_after].present?
+      items.where("last_activity_at > ?", params[:last_activity_after]) # rubocop: disable CodeReuse/ActiveRecord
+    else
+      items
+    end
+  end
+
+  def by_last_activity_before(items)
+    if params[:last_activity_before].present?
+      items.where("last_activity_at < ?", params[:last_activity_before]) # rubocop: disable CodeReuse/ActiveRecord
+    else
+      items
+    end
+  end
+
   def sort(items)
     params[:sort].present? ? items.sort_by_attribute(params[:sort]) : items.projects_order_id_desc
   end
@@ -205,3 +223,5 @@ class ProjectsFinder < UnionFinder
     { min_access_level: params[:min_access_level] }
   end
 end
+
+ProjectsFinder.prepend_if_ee('::EE::ProjectsFinder')

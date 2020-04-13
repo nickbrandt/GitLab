@@ -624,6 +624,16 @@ describe('security reports mutations', () => {
 
   describe('RECEIVE_DAST_DIFF_SUCCESS', () => {
     let reports = {};
+    const scans = [
+      {
+        scanned_resources_count: 123,
+        job_path: '/group/project/-/jobs/123546789',
+      },
+      {
+        scanned_resources_count: 321,
+        job_path: '/group/project/-/jobs/987654321',
+      },
+    ];
 
     beforeEach(() => {
       reports = {
@@ -635,6 +645,7 @@ describe('security reports mutations', () => {
           fixed: [{ name: 'fixed vuln 1', report_type: 'dast' }],
           existing: [{ name: 'existing vuln 1', report_type: 'dast' }],
           base_report_out_of_date: true,
+          scans,
         },
       };
       mutations[types.RECEIVE_DAST_DIFF_SUCCESS](stateCopy, reports);
@@ -642,6 +653,10 @@ describe('security reports mutations', () => {
 
     it('should set isLoading to false', () => {
       expect(stateCopy.dast.isLoading).toBe(false);
+    });
+
+    it('should set scans', () => {
+      expect(stateCopy.dast.scans).toEqual(scans);
     });
 
     it('should set baseReportOutofDate to true', () => {

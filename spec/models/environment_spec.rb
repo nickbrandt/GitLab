@@ -17,6 +17,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
   it { is_expected.to belong_to(:project).required }
   it { is_expected.to have_many(:deployments) }
+  it { is_expected.to have_many(:metrics_dashboard_annotations) }
 
   it { is_expected.to delegate_method(:stop_action).to(:last_deployment) }
   it { is_expected.to delegate_method(:manual_actions).to(:last_deployment) }
@@ -1299,6 +1300,15 @@ describe Environment, :use_clean_rails_memory_store_caching do
       it 'returns true' do
         expect(environment.elastic_stack_available?).to be(true)
       end
+    end
+  end
+
+  describe '#destroy' do
+    it 'remove the deployment refs from gitaly' do
+      deployment = create(:deployment, :success, environment: environment, project: project)
+      deployment.create_ref
+
+      expect { environment.destroy }.to change { project.commit(deployment.ref_path) }.to(nil)
     end
   end
 end

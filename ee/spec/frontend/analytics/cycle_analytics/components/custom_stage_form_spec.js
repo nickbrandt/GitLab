@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import { createLocalVue, mount } from '@vue/test-utils';
+import waitForPromises from 'helpers/wait_for_promises';
 import CustomStageForm, {
   initializeFormData,
 } from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
+  endpoints,
   groupLabels,
   customStageEvents as events,
   labelStartEvent,
@@ -25,6 +29,9 @@ const initData = {
   endEventLabelId: groupLabels[1].id,
 };
 
+const MERGE_REQUEST_CREATED = 'merge_request_created';
+const MERGE_REQUEST_CLOSED = 'merge_request_closed';
+
 let store = null;
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -37,14 +44,18 @@ describe('CustomStageForm', () => {
       store,
       propsData: {
         events,
-        labels: groupLabels,
         ...props,
       },
-      stubs,
+      stubs: {
+        'labels-selector': false,
+        ...stubs,
+      },
     });
   }
 
   let wrapper = null;
+  let mock;
+
   const findEvent = ev => wrapper.emitted()[ev];
 
   const sel = {
@@ -72,7 +83,20 @@ describe('CustomStageForm', () => {
     getDropdownOption(_wrapper, dropdown, index).setSelected();
   }
 
-  function setEventDropdowns({ startEventDropdownIndex = 1, stopEventDropdownIndex = 1 } = {}) {
+  // Valid start and end event pair: merge request created - merge request closed
+  const mergeRequestCreatedIndex = startEvents.findIndex(
+    e => e.identifier === MERGE_REQUEST_CREATED,
+  );
+  const mergeRequestCreatedDropdownIndex = mergeRequestCreatedIndex;
+  const mergeReqestCreatedEvent = startEvents[mergeRequestCreatedIndex];
+  const mergeRequestClosedDropdownIndex = mergeReqestCreatedEvent.allowedEndEvents.findIndex(
+    e => e === MERGE_REQUEST_CLOSED,
+  );
+
+  function setEventDropdowns({
+    startEventDropdownIndex = mergeRequestCreatedDropdownIndex,
+    stopEventDropdownIndex = mergeRequestClosedDropdownIndex,
+  } = {}) {
     selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
     return Vue.nextTick().then(() => {
       selectDropdownOption(wrapper, sel.endEvent, stopEventDropdownIndex);
@@ -88,12 +112,17 @@ describe('CustomStageForm', () => {
     return _wrapper.vm.$nextTick();
   }
 
+  const mockGroupLabelsRequest = () =>
+    new MockAdapter(axios).onGet(endpoints.groupLabels).reply(200, groupLabels);
+
   beforeEach(() => {
+    mock = mockGroupLabelsRequest();
     wrapper = createComponent({});
   });
 
   afterEach(() => {
     wrapper.destroy();
+    mock.restore();
   });
 
   describe.each([
@@ -154,14 +183,20 @@ describe('CustomStageForm', () => {
 
       it('selects events with canBeStartEvent=true for the start events dropdown', () => {
         const select = wrapper.find(sel.startEvent);
-        expect(select.html()).toMatchSnapshot();
+
+        events
+          .filter(ev => ev.canBeStartEvent)
+          .forEach(ev => {
+            expect(select.html()).toHaveHtml(
+              `<option value="${ev.identifier}">${ev.name}</option>`,
+            );
+          });
       });
 
       it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
         const select = wrapper.find(sel.startEvent);
-        expect(select.html()).toMatchSnapshot();
 
-        stopEvents
+        events
           .filter(ev => !ev.canBeStartEvent)
           .forEach(ev => {
             expect(select.html()).not.toHaveHtml(
@@ -173,7 +208,10 @@ describe('CustomStageForm', () => {
 
     describe('start event label', () => {
       beforeEach(() => {
+        mock = mockGroupLabelsRequest();
         wrapper = createComponent();
+
+        return wrapper.vm.$nextTick();
       });
 
       afterEach(() => {
@@ -201,14 +239,13 @@ describe('CustomStageForm', () => {
         expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
 
         wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
-        return Vue.nextTick()
+        return waitForPromises()
           .then(() => {
             wrapper
               .find(sel.startEventLabel)
               .findAll('.dropdown-item')
               .at(1) // item at index 0 is 'select a label'
               .trigger('click');
-
             return Vue.nextTick();
           })
           .then(() => {
@@ -219,8 +256,8 @@ describe('CustomStageForm', () => {
   });
 
   describe('Stop event', () => {
-    const startEventArrayIndex = 2;
-    const startEventDropdownIndex = 1;
+    const startEventArrayIndex = mergeRequestCreatedIndex;
+    const startEventDropdownIndex = startEventArrayIndex + 1;
     const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
 
     beforeEach(() => {
@@ -269,7 +306,7 @@ describe('CustomStageForm', () => {
 
       expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-      selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex - 1);
 
       return Vue.nextTick().then(() => {
         stopOptions = wrapper.find(sel.endEvent);
@@ -306,9 +343,9 @@ describe('CustomStageForm', () => {
         wrapper.setData({
           fields: {
             name: 'Cool stage',
-            startEventIdentifier: 'issue_created',
+            startEventIdentifier: MERGE_REQUEST_CREATED,
             startEventLabelId: null,
-            endEventIdentifier: 'issue_stage_end',
+            endEventIdentifier: MERGE_REQUEST_CLOSED,
             endEventLabelId: null,
           },
         });
@@ -384,7 +421,7 @@ describe('CustomStageForm', () => {
           },
         });
 
-        return Vue.nextTick()
+        return waitForPromises()
           .then(() => {
             wrapper
               .find(sel.endEventLabel)

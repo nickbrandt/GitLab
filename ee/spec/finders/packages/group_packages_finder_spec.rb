@@ -52,6 +52,12 @@ describe Packages::GroupPackagesFinder do
 
         it { is_expected.to match_array([package1, package2]) }
       end
+
+      context 'does not include packages without version number' do
+        let!(:package_without_version) { create(:maven_package, project: project, version: nil) }
+
+        it { is_expected.not_to include(package_without_version) }
+      end
     end
 
     context 'group has package of all types' do

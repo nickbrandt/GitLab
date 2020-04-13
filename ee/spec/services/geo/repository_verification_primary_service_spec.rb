@@ -32,41 +32,16 @@ describe Geo::RepositoryVerificationPrimaryService do
       )
     end
 
-    it 'calculates the checksum for outdated projects' do
-      stub_project_repository(project, repository)
-      stub_wiki_repository(project.wiki, wiki)
-
-      repository_state =
-        create(:repository_state,
-          project: project,
-          repository_verification_checksum: nil,
-          wiki_verification_checksum: nil)
-
-      subject.execute
-
-      expect(repository_state.reload).to have_attributes(
-        repository_verification_checksum: 'f123',
-        last_repository_verification_ran_at: be_present,
-        last_repository_verification_failure: nil,
-        wiki_verification_checksum: 'e321',
-        last_wiki_verification_ran_at: be_present,
-        last_wiki_verification_failure: nil,
-        repository_retry_at: nil,
-        repository_retry_count: nil,
-        wiki_retry_at: nil,
-        wiki_retry_count: nil
-      )
-    end
-
     it 'calculates the checksum for outdated repositories/wikis' do
       stub_project_repository(project, repository)
       stub_wiki_repository(project.wiki, wiki)
 
       repository_state =
         create(:repository_state,
-          project: project,
-          repository_verification_checksum: nil,
-          wiki_verification_checksum: nil)
+          :repository_outdated,
+          :wiki_outdated,
+          project: project
+        )
 
       subject.execute
 

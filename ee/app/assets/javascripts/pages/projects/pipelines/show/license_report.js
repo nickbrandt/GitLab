@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import LicenseReportApp from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
+import LicenseReportApp from 'ee/vue_shared/license_compliance/mr_widget_license_report.vue';
 import Translate from '~/vue_shared/translate';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { updateBadgeCount } from './utils';

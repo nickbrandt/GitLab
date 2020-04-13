@@ -70,7 +70,7 @@ version of Node.js 10.13.0.
 You can check which version you are running with `node -v`. If you are running
 a version older than `v10.13.0`, you need to update to a newer version. You
 can find instructions to install from community maintained packages or compile
-from source at the [Node.js website](https://nodejs.org/en/download).
+from source at the [Node.js website](https://nodejs.org/en/download/).
 
 ## Hardware requirements
 
@@ -189,7 +189,7 @@ To change the Unicorn workers when you have the Omnibus package (which defaults 
 ## Puma Workers
 
 For most instances we recommend using: max(CPU cores * 0.9, 2) = Puma workers.
-For example a node with 4 cores would have 3 Unicorn workers.
+For example a node with 4 cores would have 3 Puma workers.
 
 For all machines that have 4GB and up we recommend a minimum of three Puma workers.
 If you have a 2GB machine we recommend to configure only one Puma worker to prevent excessive swapping.

@@ -338,13 +338,13 @@ describe Projects::IssuesController do
 
       context 'with invalid params' do
         it 'returns a unprocessable entity 422 response for invalid move ids' do
-          reorder_issue(issue1, move_after_id: 99, move_before_id: 999)
+          reorder_issue(issue1, move_after_id: 99, move_before_id: non_existing_record_id)
 
           expect(response).to have_gitlab_http_status(:unprocessable_entity)
         end
 
         it 'returns a not found 404 response for invalid issue id' do
-          reorder_issue(object_double(issue1, iid: 999),
+          reorder_issue(object_double(issue1, iid: non_existing_record_iid),
             move_after_id: issue2.id,
             move_before_id: issue3.id)
 
@@ -725,7 +725,7 @@ describe Projects::IssuesController do
                 stub_feature_flags(allow_possible_spam: false)
               end
 
-              it 'rejects an issue recognized as a spam' do
+              it 'rejects an issue recognized as spam' do
                 expect { update_issue }.not_to change { issue.reload.title }
               end
 
@@ -981,7 +981,7 @@ describe Projects::IssuesController do
               stub_feature_flags(allow_possible_spam: false)
             end
 
-            it 'rejects an issue recognized as a spam' do
+            it 'rejects an issue recognized as spam' do
               expect { post_spam_issue }.not_to change(Issue, :count)
             end
 
@@ -1249,6 +1249,26 @@ describe Projects::IssuesController do
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
+    context 'invalid branch name' do
+      it 'is unprocessable' do
+        post(
+          :create_merge_request,
+          params: {
+            target_project_id: nil,
+            branch_name: 'master',
+            ref: 'master',
+            namespace_id: project.namespace.to_param,
+            project_id: project.to_param,
+            id: issue.to_param
+          },
+          format: :json
+        )
+
+        expect(response.body).to eq('Branch already exists')
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
+      end
+    end
+
     context 'target_project_id is set' do
       let(:target_project) { fork_project(project, user, repository: true) }
       let(:target_project_id) { target_project.id }
@@ -1377,7 +1397,7 @@ describe Projects::IssuesController do
       it 'returns discussion json' do
         get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid }
 
-        expect(json_response.first.keys).to match_array(%w[id reply_id expanded notes diff_discussion discussion_path individual_note resolvable resolved resolved_at resolved_by resolved_by_push commit_id for_commit project_id])
+        expect(json_response.first.keys).to match_array(%w[id reply_id expanded notes diff_discussion discussion_path individual_note resolvable resolved resolved_at resolved_by resolved_by_push commit_id for_commit project_id confidential])
       end
 
       it 'renders the author status html if there is a status' do

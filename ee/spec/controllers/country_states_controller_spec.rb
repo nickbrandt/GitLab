@@ -10,7 +10,7 @@ describe CountryStatesController do
 
       expected_json = World.states_for_country(country).to_json
 
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response.body).to eq(expected_json)
     end
 
@@ -18,7 +18,7 @@ describe CountryStatesController do
       country = 'NLX'
       get :index, params: { country: country }
 
-      expect(response.status).to eq(404)
+      expect(response).to have_gitlab_http_status(:not_found)
       expect(response.body).to eq("null")
     end
   end

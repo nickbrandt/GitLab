@@ -186,8 +186,8 @@ describe Gitlab::GitAccess do
       repository.delete_branch('2-mb-file')
       repository.delete_branch('wip')
 
-      allow(project).to receive(:repository_and_lfs_size).and_return(repository_size)
       project.update_attribute(:repository_size_limit, repository_size_limit)
+      allow(project.repository_size_checker).to receive_messages(current_size: repository_size)
     end
 
     shared_examples_for 'a push to repository over the limit' do

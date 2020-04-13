@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe 'Showing analytics' do
-  include AnalyticsHelpers
-
   before do
     sign_in user if user
   end
@@ -25,7 +23,6 @@ describe 'Showing analytics' do
 
     context 'without access to instance statistics and analytics features' do
       before do
-        disable_all_analytics_feature_flags
         stub_application_setting(instance_statistics_visibility_private: true)
       end
 

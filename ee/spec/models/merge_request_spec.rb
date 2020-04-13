@@ -115,9 +115,9 @@ describe MergeRequest do
       :container_scanning  | :with_container_scanning_reports  | :container_scanning
       :dast                | :with_dast_reports                | :dast
       :dependency_scanning | :with_dependency_scanning_reports | :dependency_scanning
-      :license_management  | :with_license_management_reports  | :license_management
-      :license_management  | :with_license_scanning_reports    | :license_management
-      :license_scanning    | :with_license_scanning_reports    | :license_management
+      :license_management  | :with_license_management_reports  | :license_scanning
+      :license_management  | :with_license_scanning_reports    | :license_scanning
+      :license_scanning    | :with_license_scanning_reports    | :license_scanning
     end
 
     with_them do
@@ -162,22 +162,22 @@ describe MergeRequest do
     end
   end
 
-  describe '#has_license_management_reports?' do
-    subject { merge_request.has_license_management_reports? }
+  describe '#has_license_scanning_reports?' do
+    subject { merge_request.has_license_scanning_reports? }
 
     let(:project) { create(:project, :repository) }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
-    context 'when head pipeline has license management reports' do
-      let(:merge_request) { create(:ee_merge_request, :with_license_management_reports, source_project: project) }
+    context 'when head pipeline has license scanning reports' do
+      let(:merge_request) { create(:ee_merge_request, :with_license_scanning_reports, source_project: project) }
 
       it { is_expected.to be_truthy }
     end
 
-    context 'when head pipeline does not have license management reports' do
+    context 'when head pipeline does not have license scanning reports' do
       let(:merge_request) { create(:ee_merge_request, source_project: project) }
 
       it { is_expected.to be_falsey }
@@ -294,7 +294,7 @@ describe MergeRequest do
       it { is_expected.to be_truthy }
     end
 
-    context 'when head pipeline does not have license management reports' do
+    context 'when head pipeline does not have license scanning reports' do
       let(:merge_request) { create(:ee_merge_request, source_project: project) }
 
       it { is_expected.to be_falsey }
@@ -439,8 +439,8 @@ describe MergeRequest do
     end
   end
 
-  describe '#compare_license_management_reports' do
-    subject { merge_request.compare_license_management_reports(current_user) }
+  describe '#compare_license_scanning_reports' do
+    subject { merge_request.compare_license_scanning_reports(current_user) }
 
     let(:project) { create(:project, :repository) }
     let(:current_user) { project.users.first }
@@ -448,7 +448,7 @@ describe MergeRequest do
 
     let!(:base_pipeline) do
       create(:ee_ci_pipeline,
-             :with_license_management_report,
+             :with_license_scanning_report,
              project: project,
              ref: merge_request.target_branch,
              sha: merge_request.diff_base_sha)
@@ -458,10 +458,10 @@ describe MergeRequest do
       merge_request.update!(head_pipeline_id: head_pipeline.id)
     end
 
-    context 'when head pipeline has license management reports' do
+    context 'when head pipeline has license scanning reports' do
       let!(:head_pipeline) do
         create(:ee_ci_pipeline,
-               :with_license_management_report,
+               :with_license_scanning_report,
                project: project,
                ref: merge_request.source_branch,
                sha: merge_request.diff_head_sha)
@@ -510,7 +510,7 @@ describe MergeRequest do
       end
     end
 
-    context 'when head pipeline does not have license management reports' do
+    context 'when head pipeline does not have license scanning reports' do
       let!(:head_pipeline) do
         create(:ci_pipeline,
                project: project,
@@ -520,7 +520,7 @@ describe MergeRequest do
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
-        expect(subject[:status_reason]).to eq('This merge request does not have license management reports')
+        expect(subject[:status_reason]).to eq('This merge request does not have license scanning reports')
       end
     end
   end

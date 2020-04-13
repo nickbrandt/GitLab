@@ -67,7 +67,7 @@ describe Projects::IssueLinksController do
 
       context 'when failing service result' do
         let(:user_role) { :developer }
-        let(:issuable_references) { ['#999'] }
+        let(:issuable_references) { ["##{non_existing_record_iid}"] }
 
         it 'returns failure JSON' do
           post namespace_project_issue_links_path(issue_links_params(issuable_references: issuable_references))

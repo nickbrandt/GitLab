@@ -63,6 +63,11 @@ input AdminSidekiqQueuesDeleteJobsInput {
   queueName: String!
 
   """
+  Delete jobs matching related_class in the context metadata
+  """
+  relatedClass: String
+
+  """
   Delete jobs matching root_namespace in the context metadata
   """
   rootNamespace: String
@@ -131,6 +136,18 @@ type AwardEmoji {
   The user who awarded the emoji
   """
   user: User!
+}
+
+type BaseService implements Service {
+  """
+  Indicates if the service is active
+  """
+  active: Boolean
+
+  """
+  Class name of the service
+  """
+  type: String
 }
 
 type Blob implements Entry {
@@ -449,6 +466,11 @@ input CreateEpicInput {
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled
+  """
+  confidential: Boolean
 
   """
   The description of the epic
@@ -1861,9 +1883,24 @@ type Environment {
   id: ID!
 
   """
+  Metrics dashboard schema for the environment
+  """
+  metricsDashboard(
+    """
+    Path to a file which defines metrics dashboard eg: 'config/prometheus/common_metrics.yml'
+    """
+    path: String!
+  ): MetricsDashboard
+
+  """
   Human-readable name of the environment
   """
   name: String!
+
+  """
+  State of the environment, for example: available/stopped
+  """
+  state: String!
 }
 
 """
@@ -1991,6 +2028,11 @@ type Epic implements Noteable {
   Timestamp of the epic's closure
   """
   closedAt: Time
+
+  """
+  Indicates if the epic is confidential
+  """
+  confidential: Boolean
 
   """
   Timestamp of the epic's creation
@@ -2962,6 +3004,103 @@ type EpicTreeReorderPayload {
   errors: [String!]!
 }
 
+type GeoNode {
+  """
+  The maximum concurrency of container repository sync for this secondary node
+  """
+  containerRepositoriesMaxCapacity: Int
+
+  """
+  Indicates whether this Geo node is enabled
+  """
+  enabled: Boolean
+
+  """
+  The maximum concurrency of LFS/attachment backfill for this secondary node
+  """
+  filesMaxCapacity: Int
+
+  """
+  ID of this GeoNode
+  """
+  id: ID!
+
+  """
+  The URL defined on the primary node that secondary nodes should use to contact it
+  """
+  internalUrl: String
+
+  """
+  The interval (in days) in which the repository verification is valid. Once expired, it will be reverified
+  """
+  minimumReverificationInterval: Int
+
+  """
+  The unique identifier for this Geo node
+  """
+  name: String
+
+  """
+  Indicates whether this Geo node is the primary
+  """
+  primary: Boolean
+
+  """
+  The maximum concurrency of repository backfill for this secondary node
+  """
+  reposMaxCapacity: Int
+
+  """
+  The namespaces that should be synced, if `selective_sync_type` == `namespaces`
+  """
+  selectiveSyncNamespaces(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): NamespaceConnection
+
+  """
+  The repository storages whose projects should be synced, if `selective_sync_type` == `shards`
+  """
+  selectiveSyncShards: [String!]
+
+  """
+  Indicates if syncing is limited to only specific groups, or shards
+  """
+  selectiveSyncType: String
+
+  """
+  Indicates if this secondary node will replicate blobs in Object Storage
+  """
+  syncObjectStorage: Boolean
+
+  """
+  The user-facing URL for this Geo node
+  """
+  url: String
+
+  """
+  The maximum concurrency of repository verification for this secondary node
+  """
+  verificationMaxCapacity: Int
+}
+
 type GrafanaIntegration {
   """
   Timestamp of the issue's creation
@@ -3495,6 +3634,52 @@ type Group {
   Visibility of the namespace
   """
   visibility: String
+
+  """
+  Vulnerabilities reported on the projects in the group and its subgroups.
+  Available only when feature flag `first_class_vulnerabilities` is enabled
+  """
+  vulnerabilities(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filter vulnerabilities by project
+    """
+    projectId: [ID!]
+
+    """
+    Filter vulnerabilities by report type
+    """
+    reportType: [VulnerabilityReportType!]
+
+    """
+    Filter vulnerabilities by severity
+    """
+    severity: [VulnerabilitySeverity!]
+
+    """
+    Filter vulnerabilities by state
+    """
+    state: [VulnerabilityState!]
+  ): VulnerabilityConnection
 
   """
   Web URL of the group
@@ -4092,6 +4277,115 @@ enum IssueState {
 Represents untyped JSON
 """
 scalar JSON
+
+type JiraImport {
+  """
+  Project key for the imported Jira project
+  """
+  jiraProjectKey: String!
+
+  """
+  Timestamp of when the Jira import was created
+  """
+  scheduledAt: Time
+
+  """
+  User that started the Jira import
+  """
+  scheduledBy: User
+}
+
+"""
+The connection type for JiraImport.
+"""
+type JiraImportConnection {
+  """
+  A list of edges.
+  """
+  edges: [JiraImportEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [JiraImport]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type JiraImportEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: JiraImport
+}
+
+"""
+Autogenerated input type of JiraImportStart
+"""
+input JiraImportStartInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Project key of the importer Jira project
+  """
+  jiraProjectKey: String!
+
+  """
+  Project name of the importer Jira project
+  """
+  jiraProjectName: String
+
+  """
+  The project to import the Jira project into
+  """
+  projectPath: ID!
+}
+
+"""
+Autogenerated return type of JiraImportStart
+"""
+type JiraImportStartPayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The Jira import data after mutation
+  """
+  jiraImport: JiraImport
+}
+
+type JiraService implements Service {
+  """
+  Indicates if the service is active
+  """
+  active: Boolean
+
+  """
+  Class name of the service
+  """
+  type: String
+}
 
 type Label {
   """
@@ -4994,6 +5288,13 @@ type Metadata {
   version: String!
 }
 
+type MetricsDashboard {
+  """
+  Path to a file with the dashboard definition
+  """
+  path: String
+}
+
 """
 Represents a milestone.
 """
@@ -5118,6 +5419,7 @@ type Mutation {
   issueSetConfidential(input: IssueSetConfidentialInput!): IssueSetConfidentialPayload
   issueSetDueDate(input: IssueSetDueDateInput!): IssueSetDueDatePayload
   issueSetWeight(input: IssueSetWeightInput!): IssueSetWeightPayload
+  jiraImportStart(input: JiraImportStartInput!): JiraImportStartPayload
   markAsSpamSnippet(input: MarkAsSpamSnippetInput!): MarkAsSpamSnippetPayload
   mergeRequestSetAssignees(input: MergeRequestSetAssigneesInput!): MergeRequestSetAssigneesPayload
   mergeRequestSetLabels(input: MergeRequestSetLabelsInput!): MergeRequestSetLabelsPayload
@@ -5257,6 +5559,41 @@ type Namespace {
   visibility: String
 }
 
+"""
+The connection type for Namespace.
+"""
+type NamespaceConnection {
+  """
+  A list of edges.
+  """
+  edges: [NamespaceEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Namespace]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type NamespaceEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Namespace
+}
+
 type Note {
   """
   User who wrote this note
@@ -5272,6 +5609,11 @@ type Note {
   The GitLab Flavored Markdown rendering of `note`
   """
   bodyHtml: String
+
+  """
+  Indicates if this note is confidential
+  """
+  confidential: Boolean
 
   """
   Timestamp of the note creation
@@ -5716,6 +6058,11 @@ type Project {
     Search query
     """
     search: String
+
+    """
+    States of environments that should be included in result
+    """
+    states: [String!]
   ): EnvironmentConnection
 
   """
@@ -5749,7 +6096,7 @@ type Project {
   id: ID!
 
   """
-  Status of project import background job of the project
+  Status of import background job of the project
   """
   importStatus: String
 
@@ -5934,12 +6281,42 @@ type Project {
   ): IssueConnection
 
   """
-  (deprecated) Does this project have issues enabled?. Use `issues_access_level` instead
+  Indicates if Issues are enabled for the current user
   """
   issuesEnabled: Boolean
 
   """
-  (deprecated) Enable jobs for this project. Use `builds_access_level` instead
+  Status of Jira import background job of the project
+  """
+  jiraImportStatus: String
+
+  """
+  Jira imports into the project
+  """
+  jiraImports(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): JiraImportConnection
+
+  """
+  Indicates if CI/CD pipeline jobs are enabled for the current user
   """
   jobsEnabled: Boolean
 
@@ -5958,12 +6335,12 @@ type Project {
   """
   mergeRequest(
     """
-    The IID of the merge request, e.g., "1"
+    IID of the merge request, for example `1`
     """
     iid: String
 
     """
-    The list of IIDs of issues, e.g., [1, 2]
+    Array of IIDs of merge requests, for example `[1, 2]`
     """
     iids: [String!]
   ): MergeRequest
@@ -5988,12 +6365,12 @@ type Project {
     first: Int
 
     """
-    The IID of the merge request, e.g., "1"
+    IID of the merge request, for example `1`
     """
     iid: String
 
     """
-    The list of IIDs of issues, e.g., [1, 2]
+    Array of IIDs of merge requests, for example `[1, 2]`
     """
     iids: [String!]
 
@@ -6004,7 +6381,7 @@ type Project {
   ): MergeRequestConnection
 
   """
-  (deprecated) Does this project have merge_requests enabled?. Use `merge_requests_access_level` instead
+  Indicates if Merge Requests are enabled for the current user
   """
   mergeRequestsEnabled: Boolean
 
@@ -6142,6 +6519,11 @@ type Project {
   ): Requirement
 
   """
+  Number of requirements for the project by their state
+  """
+  requirementStatesCount: RequirementStatesCount
+
+  """
   Find requirements. Available only when feature flag `requirements_management` is enabled.
   """
   requirements(
@@ -6212,7 +6594,42 @@ type Project {
   serviceDeskEnabled: Boolean
 
   """
-  Indicates if shared runners are enabled on the project
+  Project services
+  """
+  services(
+    """
+    Indicates if the service is active
+    """
+    active: Boolean
+
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Class name of the service
+    """
+    type: ServiceType
+  ): ServiceConnection
+
+  """
+  Indicates if Shared Runners are enabled for the project
   """
   sharedRunnersEnabled: Boolean
 
@@ -6252,7 +6669,7 @@ type Project {
   ): SnippetConnection
 
   """
-  (deprecated) Does this project have snippets enabled?. Use `snippets_access_level` instead
+  Indicates if Snippets are enabled for the current user
   """
   snippetsEnabled: Boolean
 
@@ -6314,7 +6731,33 @@ type Project {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Filter vulnerabilities by project
+    """
+    projectId: [ID!]
+
+    """
+    Filter vulnerabilities by report type
+    """
+    reportType: [VulnerabilityReportType!]
+
+    """
+    Filter vulnerabilities by severity
+    """
+    severity: [VulnerabilitySeverity!]
+
+    """
+    Filter vulnerabilities by state
+    """
+    state: [VulnerabilityState!]
   ): VulnerabilityConnection
+
+  """
+  Counts for each severity of vulnerability of the project. Available only when
+  feature flag `first_class_vulnerabilities` is enabled
+  """
+  vulnerabilitySeveritiesCount: VulnerabilitySeveritiesCount
 
   """
   Web URL of the project
@@ -6322,7 +6765,7 @@ type Project {
   webUrl: String
 
   """
-  (deprecated) Does this project have wiki enabled?. Use `wiki_access_level` instead
+  Indicates if Wikis are enabled for the current user
   """
   wikiEnabled: Boolean
 }
@@ -6578,37 +7021,37 @@ type ProjectStatistics {
   """
   Build artifacts size of the project
   """
-  buildArtifactsSize: Int!
+  buildArtifactsSize: Float!
 
   """
   Commit count of the project
   """
-  commitCount: Int!
+  commitCount: Float!
 
   """
   Large File Storage (LFS) object size of the project
   """
-  lfsObjectsSize: Int!
+  lfsObjectsSize: Float!
 
   """
   Packages size of the project
   """
-  packagesSize: Int!
+  packagesSize: Float!
 
   """
   Repository size of the project
   """
-  repositorySize: Int!
+  repositorySize: Float!
 
   """
   Storage size of the project
   """
-  storageSize: Int!
+  storageSize: Float!
 
   """
   Wiki size of the project
   """
-  wikiSize: Int
+  wikiSize: Float
 }
 
 type Query {
@@ -6631,6 +7074,16 @@ type Query {
     """
     text: String!
   ): String!
+
+  """
+  Find a Geo node
+  """
+  geoNode(
+    """
+    The name of the Geo node. Defaults to the current Geo node name.
+    """
+    name: String
+  ): GeoNode
 
   """
   Find a group
@@ -6721,6 +7174,51 @@ type Query {
     """
     visibility: VisibilityScopesEnum
   ): SnippetConnection
+
+  """
+  Vulnerabilities reported on projects on the current user's instance security dashboard
+  """
+  vulnerabilities(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filter vulnerabilities by project
+    """
+    projectId: [ID!]
+
+    """
+    Filter vulnerabilities by report type
+    """
+    reportType: [VulnerabilityReportType!]
+
+    """
+    Filter vulnerabilities by severity
+    """
+    severity: [VulnerabilitySeverity!]
+
+    """
+    Filter vulnerabilities by state
+    """
+    state: [VulnerabilityState!]
+  ): VulnerabilityConnection
 }
 
 """
@@ -6923,36 +7421,51 @@ enum RequirementState {
   OPENED
 }
 
+"""
+Counts of requirements by their state.
+"""
+type RequirementStatesCount {
+  """
+  Number of archived requirements
+  """
+  archived: Int
+
+  """
+  Number of opened requirements
+  """
+  opened: Int
+}
+
 type RootStorageStatistics {
   """
   The CI artifacts size in bytes
   """
-  buildArtifactsSize: Int!
+  buildArtifactsSize: Float!
 
   """
   The LFS objects size in bytes
   """
-  lfsObjectsSize: Int!
+  lfsObjectsSize: Float!
 
   """
   The packages size in bytes
   """
-  packagesSize: Int!
+  packagesSize: Float!
 
   """
   The Git repository size in bytes
   """
-  repositorySize: Int!
+  repositorySize: Float!
 
   """
   The total storage in bytes
   """
-  storageSize: Int!
+  storageSize: Float!
 
   """
   The wiki size in bytes
   """
-  wikiSize: Int!
+  wikiSize: Float!
 }
 
 """
@@ -7397,6 +7910,90 @@ type SentryErrorTags {
   logger: String
 }
 
+interface Service {
+  """
+  Indicates if the service is active
+  """
+  active: Boolean
+
+  """
+  Class name of the service
+  """
+  type: String
+}
+
+"""
+The connection type for Service.
+"""
+type ServiceConnection {
+  """
+  A list of edges.
+  """
+  edges: [ServiceEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Service]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type ServiceEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Service
+}
+
+enum ServiceType {
+  ALERTS_SERVICE
+  ASANA_SERVICE
+  ASSEMBLA_SERVICE
+  BAMBOO_SERVICE
+  BUGZILLA_SERVICE
+  BUILDKITE_SERVICE
+  CAMPFIRE_SERVICE
+  CUSTOM_ISSUE_TRACKER_SERVICE
+  DISCORD_SERVICE
+  DRONE_CI_SERVICE
+  EMAILS_ON_PUSH_SERVICE
+  EXTERNAL_WIKI_SERVICE
+  FLOWDOCK_SERVICE
+  GITHUB_SERVICE
+  HANGOUTS_CHAT_SERVICE
+  HIPCHAT_SERVICE
+  IRKER_SERVICE
+  JENKINS_DEPRECATED_SERVICE
+  JENKINS_SERVICE
+  JIRA_SERVICE
+  MATTERMOST_SERVICE
+  MATTERMOST_SLASH_COMMANDS_SERVICE
+  MICROSOFT_TEAMS_SERVICE
+  PACKAGIST_SERVICE
+  PIPELINES_EMAIL_SERVICE
+  PIVOTALTRACKER_SERVICE
+  PROMETHEUS_SERVICE
+  PUSHOVER_SERVICE
+  REDMINE_SERVICE
+  SLACK_SERVICE
+  SLACK_SLASH_COMMANDS_SERVICE
+  TEAMCITY_SERVICE
+  UNIFY_CIRCUIT_SERVICE
+  YOUTRACK_SERVICE
+}
+
 """
 Represents a snippet entry
 """
@@ -7818,14 +8415,19 @@ scalar Time
 
 type Timelog {
   """
-  The date when the time tracked was spent at
+  Timestamp of when the time tracked was spent at. Deprecated in 12.10: Use `spentAt`
   """
-  date: Time!
+  date: Time! @deprecated(reason: "Use `spentAt`. Deprecated in 12.10")
 
   """
   The issue that logged time was added to
   """
   issue: Issue
+
+  """
+  Timestamp of when the time tracked was spent at
+  """
+  spentAt: Time
 
   """
   The time spent displayed in seconds
@@ -8377,6 +8979,11 @@ input UpdateEpicInput {
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled
+  """
+  confidential: Boolean
 
   """
   The description of the epic
@@ -8976,6 +9583,41 @@ enum VulnerabilityReportType {
   DAST
   DEPENDENCY_SCANNING
   SAST
+}
+
+"""
+Represents vulnerability counts by severity
+"""
+type VulnerabilitySeveritiesCount {
+  """
+  Number of vulnerabilities of CRITICAL severity of the project
+  """
+  critical: Int
+
+  """
+  Number of vulnerabilities of HIGH severity of the project
+  """
+  high: Int
+
+  """
+  Number of vulnerabilities of INFO severity of the project
+  """
+  info: Int
+
+  """
+  Number of vulnerabilities of LOW severity of the project
+  """
+  low: Int
+
+  """
+  Number of vulnerabilities of MEDIUM severity of the project
+  """
+  medium: Int
+
+  """
+  Number of vulnerabilities of UNKNOWN severity of the project
+  """
+  unknown: Int
 }
 
 """

@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import envrionmentsAppMixin from 'ee_else_ce/environments/mixins/environments_app_mixin';
 import Flash from '~/flash';
 import { s__ } from '~/locale';
@@ -9,6 +9,7 @@ import environmentsMixin from '../mixins/environments_mixin';
 import CIPaginationMixin from '~/vue_shared/mixins/ci_pagination_api_mixin';
 import EnableReviewAppButton from './enable_review_app_button.vue';
 import StopEnvironmentModal from './stop_environment_modal.vue';
+import DeleteEnvironmentModal from './delete_environment_modal.vue';
 import ConfirmRollbackModal from './confirm_rollback_modal.vue';
 
 export default {
@@ -16,8 +17,9 @@ export default {
     ConfirmRollbackModal,
     emptyState,
     EnableReviewAppButton,
-    GlButton,
+    GlDeprecatedButton,
     StopEnvironmentModal,
+    DeleteEnvironmentModal,
   },
 
   mixins: [CIPaginationMixin, environmentsMixin, envrionmentsAppMixin],
@@ -95,6 +97,7 @@ export default {
 <template>
   <div>
     <stop-environment-modal :environment="environmentInStopModal" />
+    <delete-environment-modal :environment="environmentInDeleteModal" />
     <confirm-rollback-modal :environment="environmentInRollbackModal" />
 
     <div class="top-area">
@@ -102,14 +105,14 @@ export default {
 
       <div class="nav-controls">
         <enable-review-app-button v-if="state.reviewAppDetails.can_setup_review_app" class="mr-2" />
-        <gl-button
+        <gl-deprecated-button
           v-if="canCreateEnvironment && !isLoading"
           :href="newEnvironmentPath"
           category="primary"
           variant="success"
         >
           {{ s__('Environments|New environment') }}
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
 

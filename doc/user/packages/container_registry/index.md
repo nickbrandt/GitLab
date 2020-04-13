@@ -7,6 +7,7 @@
 >   to pass a [personal access token](../../profile/personal_access_tokens.md) instead of your password in order to
 >   login to GitLab's Container Registry.
 > - Multiple level image names support was added in GitLab 9.1.
+> - The group level Container Registry was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/23315) in GitLab 12.10.
 
 NOTE: **Note:**
 This document is the user guide. To learn how to enable GitLab Container
@@ -17,6 +18,8 @@ With the Docker Container Registry integrated into GitLab, every project can
 have its own space to store its Docker images.
 
 You can read more about Docker Registry at <https://docs.docker.com/registry/introduction/>.
+
+![Container Registry repositories](img/container_registry_repositories_v12_10.png)
 
 ## Enable the Container Registry for your project
 
@@ -45,11 +48,51 @@ project:
 
 ## Control Container Registry from within GitLab
 
-GitLab offers a simple Container Registry management panel. Go to your project
-and click **Packages > Container Registry** in the project menu.
+GitLab offers a simple Container Registry management panel. This management panel is available
+for both projects and groups.
 
-This view will show you all Docker images in your project and will easily allow you to
-delete them.
+### Control Container Registry for your project
+
+Navigate to your project's **{package}** **Packages > Container Registry**.
+
+![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v12_10.png)
+
+This view will:
+
+- Show all the image repositories that belong to the project.
+- Allow you to [delete](#delete-images-from-within-gitlab) one or more image repository.
+- Allow you to navigate to the image repository details page.
+- Show a **Quick start** dropdown with the most common commands to log in, build and push
+- Optionally, a banner will be visible if the [expiration policy](#expiration-policy) is enabled for this project.
+
+### Control Container Registry for your group
+
+Navigate to your groups's **{package}** **Packages > Container Registry**.
+
+![Container Registry group repositories](img/container_registry_group_repositories_v12_10.png)
+
+This view will:
+
+- Show all the image repositories of the projects that belong to this group.
+- Allow to [delete](#delete-images-from-within-gitlab) one or more image repositories.
+- Allow to navigate to a specific image repository details page.
+
+### Image Repository details page
+
+Clicking on the name of any image repository will navigate to the details.
+
+![Container Registry project repository details](img/container_registry_repository_details_v12.10.png)
+
+NOTE: **Note:**
+The following page has the same functionalities both in the **Group level container registry**
+and in the **Project level container registry**.
+
+This view:
+
+- Shows all the image repository details.
+- Shows all the tags of the image repository.
+- Allows you to quickly copy the tag path (by clicking on the clipboard button near the tag name).
+- Allows you to [delete one or more tags](#delete-images-from-within-gitlab).
 
 ## Use images from GitLab Container Registry
 
@@ -329,9 +372,125 @@ If you forget to set the service alias, the `docker:19.03.1` image won't find th
 error during connect: Get http://docker:2376/v1.39/info: dial tcp: lookup docker on 192.168.0.1:53: no such host
 ```
 
+## Delete images
+
+You can delete images from your Container Registry in multiple ways.
+
+CAUTION: **Warning:**
+Deleting images is a destructive action and can't be undone. To restore
+a deleted image, you must rebuild and re-upload it.
+
+NOTE: **Note:**
+Administrators should review how to
+[garbage collect](../../../administration/packages/container_registry.md#container-registry-garbage-collection)
+the deleted images.
+
+### Delete images from within GitLab
+
+To delete images from within GitLab:
+
+1. Navigate to your project's or group's **{package}** **Packages > Container Registry**.
+1. From the **Container Registry** page, you can select what you want to delete,
+   by either:
+
+   - Deleting the entire repository, and all the tags it contains, by clicking
+     the red **{remove}** **Trash** icon.
+   - Navigating to the repository, and deleting tags individually or in bulk
+     by clicking the red **{remove}** **Trash** icon next to the tag you want
+     to delete.
+
+1. In the dialog box, click **Remove tag**.
+
+   ![Container Registry tags](img/container_registry_tags_v12_10.png)
+
+### Delete images using the API
+
+If you want to automate the process of deleting images, GitLab provides an API. For more
+information, see the following endpoints:
+
+- [Delete a Registry repository](../../../api/container_registry.md#delete-registry-repository)
+- [Delete an individual Registry repository tag](../../../api/container_registry.md#delete-a-registry-repository-tag)
+- [Delete Registry repository tags in bulk](../../../api/container_registry.md#delete-registry-repository-tags-in-bulk)
+
+### Delete images using GitLab CI/CD
+
+CAUTION: **Warning:**
+GitLab CI/CD doesn't provide a built-in way to remove your images, but this example
+uses a third-party tool called [reg](https://github.com/genuinetools/reg)
+that talks to the GitLab Registry API. You are responsible for your own actions.
+For assistance with this tool, see
+[the issue queue for reg](https://github.com/genuinetools/reg/issues).
+
+The following example defines two stages: `build`, and `clean`. The
+`build_image` job builds the Docker image for the branch, and the
+`delete_image` job deletes it. The `reg` executable is downloaded and used to
+remove the image matching the `$CI_PROJECT_PATH:$CI_COMMIT_REF_SLUG`
+[environment variable](../../../ci/variables/predefined_variables.md).
+
+To use this example, change the `IMAGE_TAG` variable to match your needs:
+
+```yaml
+stages:
+  - build
+  - clean
+
+build_image:
+  image: docker:19.03.1
+  stage: build
+  services:
+    - docker:19.03.1-dind
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  only:
+    - branches
+  except:
+    - master
+
+delete_image:
+  image: docker:19.03.1
+  stage: clean
+  services:
+    - docker:19.03.1-dind
+  variables:
+    IMAGE_TAG: $CI_PROJECT_PATH:$CI_COMMIT_REF_SLUG
+    REG_SHA256: ade837fc5224acd8c34732bf54a94f579b47851cc6a7fd5899a98386b782e228
+    REG_VERSION: 0.16.1
+  before_script:
+    - apk add --no-cache curl
+    - curl --fail --show-error --location "https://github.com/genuinetools/reg/releases/download/v$REG_VERSION/reg-linux-amd64" --output /usr/local/bin/reg
+    - echo "$REG_SHA256  /usr/local/bin/reg" | sha256sum -c -
+    - chmod a+x /usr/local/bin/reg
+  script:
+    - /usr/local/bin/reg rm -d --auth-url $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $IMAGE_TAG
+  only:
+    - branches
+  except:
+    - master
+```
+
+TIP: **Tip:**
+You can download the latest `reg` release from
+[the releases page](https://github.com/genuinetools/reg/releases), then update
+the code example by changing the `REG_SHA256` and `REG_VERSION` variables
+defined in the `delete_image` job.
+
+### Delete images using an expiration policy
+
+You can create a per-project [expiration policy](#expiration-policy) to ensure
+older tags and images are regularly removed from the Container Registry.
+
 ## Expiration policy
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/15398) in GitLab 12.8.
+
+NOTE: **Note:**
+Expiration policies for projects created before GitLab 12.8 may be enabled by an
+admin in the [CI/CD Package Registry settings](./../../admin_area/settings/index.md#cicd).
+Note the inherant [risks involved](./index.md#use-with-external-container-registries).
 
 It is possible to create a per-project expiration policy, so that you can make sure that
 older tags and images are regularly removed from the Container Registry.
@@ -348,29 +507,9 @@ then goes through a process of excluding tags from it until only the ones to be 
 1. Excludes from the list the tags older than the `older_than` value (Expiration interval).
 1. Finally, the remaining tags in the list are deleted from the Container Registry.
 
-### Managing project expiration policy through the API
-
-You can set, update, and disable the expiration policies using the GitLab API.
-
-Examples:
-
-- Select all tags, keep at least 1 tag per image, expire any tag older than 14 days, run once a month, and the policy is enabled:
-
-  ```shell
-  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1month","enabled":true,"keep_n":1,"older_than":"14d","name_regex":".*"}' 'https://gitlab.example.com/api/v4/projects/2'
-  ```
-
-- Select only tags with a name that contains `stable`, keep at least 50 tag per image, expire any tag older than 7 days, run every day, and the policy is enabled:
-
-  ```shell
-  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1day","enabled":true,"keep_n":50"older_than":"7d","name_regex":"*stable"}' 'https://gitlab.example.com/api/v4/projects/2'
-  ```
-
-See the API documentation for further details: [Edit project](../../../api/projects.md#edit-project).
-
 ### Managing project expiration policy through the UI
 
-To manage project expiration policy, navigate to **Settings > CI/CD > Container Registry tag expiration policy**.
+To manage project expiration policy, navigate to **{settings}** **Settings > CI/CD > Container Registry tag expiration policy**.
 
 ![Expiration Policy App](img/expiration-policy-app.png)
 
@@ -381,6 +520,35 @@ The UI allows you to configure the following:
 - **Expiration schedule:** how often the cron job checking the tags should run.
 - **Expiration latest:** how many tags to _always_ keep for each image.
 - **Docker tags with names matching this regex pattern will expire:** the regex used to determine what tags should be expired. To qualify all tags for expiration, use the default value of `.*`.
+
+### Managing project expiration policy through the API
+
+You can set, update, and disable the expiration policies using the GitLab API.
+
+Examples:
+
+- Select all tags, keep at least 1 tag per image, expire any tag older than 14 days, run once a month, and the policy is enabled:
+
+  ```shell
+  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1month","enabled":true,"keep_n":1,"older_than":"14d","name_regex":".*"}}' 'https://gitlab.example.com/api/v4/projects/2'
+  ```
+
+- Select only tags with a name that contains `stable`, keep at least 50 tag per image, expire any tag older than 7 days, run every day, and the policy is enabled:
+
+  ```shell
+  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1day","enabled":true,"keep_n":50"older_than":"7d","name_regex":"*stable"}}' 'https://gitlab.example.com/api/v4/projects/2'
+  ```
+
+See the API documentation for further details: [Edit project](../../../api/projects.md#edit-project).
+
+### Use with external container registries
+
+When using an [external container registry](./../../../administration/packages/container_registry.md#use-an-external-container-registry-with-gitlab-as-an-auth-endpoint),
+running an experation policy on a project may have some performance risks. If a project is going to run
+a policy that will remove large quantities of tags (in the thousands), the GitLab background jobs that
+run the policy may get backed up or fail completely. It is recommended you only enable container expiration
+policies for projects that were created before GitLab 12.8 if you are confident the amount of tags
+being cleaned up will be minimal.
 
 ## Limitations
 

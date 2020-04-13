@@ -370,37 +370,32 @@ describe 'Billing plan pages', :feature do
   end
 
   context 'on sub-group' do
-    let(:user2) { create(:user) }
-    let(:user3) { create(:user) }
-    let(:group) { create(:group, plan: :bronze_plan) }
-    let!(:group_member) { create(:group_member, :owner, group: group, user: user) }
-    let(:subgroup1) { create(:group, parent: group, plan: :silver_plan) }
-    let!(:subgroup1_member) { create(:group_member, :owner, group: subgroup1, user: user2) }
-    let(:subgroup2) { create(:group, parent: subgroup1) }
-    let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
-    let(:page_path) { group_billings_path(subgroup2) }
+    let(:group) { create(:group_with_plan, plan: :bronze_plan) }
+    let(:plan) { bronze_plan }
     let(:namespace) { group }
 
-    context 'on bronze' do
-      let(:plan) { bronze_plan }
+    let!(:group_member) { create(:group_member, :owner, group: group, user: user) }
 
-      let!(:subscription) do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
+    let(:subgroup1) { create(:group, parent: group) }
+    let!(:subgroup1_member) { create(:group_member, :owner, group: subgroup1) }
+
+    let(:subgroup2) { create(:group, parent: subgroup1) }
+    let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2) }
+
+    let(:page_path) { group_billings_path(subgroup2) }
+
+    before do
+      visit page_path
+    end
+
+    it 'displays plan header' do
+      page.within('.billing-plan-header') do
+        expect(page).to have_content("#{subgroup2.full_name} is currently using the Bronze plan")
+        expect(page).to have_css('.billing-plan-logo .identicon')
+        expect(page.find('.btn-success')).to have_content('Manage plan')
       end
 
-      before do
-        visit page_path
-      end
-
-      it 'displays plan header' do
-        page.within('.billing-plan-header') do
-          expect(page).to have_content("#{subgroup2.full_name} is currently using the Bronze plan")
-          expect(page).to have_css('.billing-plan-logo .identicon')
-          expect(page.find('.btn-success')).to have_content('Manage plan')
-        end
-
-        expect(page).not_to have_css('.billing-plans')
-      end
+      expect(page).not_to have_css('.billing-plans')
     end
   end
 
@@ -425,7 +420,6 @@ describe 'Billing plan pages', :feature do
     end
 
     before do
-      expect_any_instance_of(EE::Namespace).to receive(:plan).at_least(:once).and_return(nil)
       visit profile_billings_path
     end
 

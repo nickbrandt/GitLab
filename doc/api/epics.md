@@ -12,7 +12,7 @@ The [epic issues API](epic_issues.md) allows you to interact with issues associa
 
 ## Milestone dates integration
 
-> [Introduced][ee-6448] in GitLab 11.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448) in GitLab 11.3.
 
 Since start date and due date can be dynamically sourced from related issue milestones, when user has edit permission,
 additional fields will be shown. These include two boolean fields `start_date_is_fixed` and `due_date_is_fixed`,
@@ -77,9 +77,11 @@ Example response:
   "id": 29,
   "iid": 4,
   "group_id": 7,
+  "parent_id": 23,
   "title": "Accusamus iste et ullam ratione voluptatem omnis debitis dolor est.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
+  "confidential": "false",
   "web_url": "http://localhost:3001/groups/test/-/epics/4",
   "reference": "&4",
   "references": {
@@ -117,6 +119,7 @@ Example response:
   "id": 50,
   "iid": 35,
   "group_id": 17,
+  "parent_id": 19,
   "title": "Accusamus iste et ullam ratione voluptatem omnis debitis dolor est.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
@@ -224,7 +227,7 @@ Example response:
 Creates a new epic.
 
 NOTE: **Note:**
-Starting with GitLab [11.3][ee-6448], `start_date` and `end_date` should no longer be assigned
+Starting with GitLab [11.3](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448), `start_date` and `end_date` should no longer be assigned
 directly, as they now represent composite values. You can configure it via the `*_is_fixed` and
 `*_fixed` fields instead.
 
@@ -238,6 +241,7 @@ POST /groups/:id/epics
 | `title`             | string           | yes        | The title of the epic |
 | `labels`            | string           | no         | The comma separated list of labels |
 | `description`       | string           | no         | The description of the epic. Limited to 1,048,576 characters.  |
+| `confidential`      | boolean          | no         | Whether the epic should be confidential. Will be ignored if `confidential_epics` feature flag is disabled. |
 | `start_date_is_fixed` | boolean        | no         | Whether start date should be sourced from `start_date_fixed` or from milestones (since 11.3) |
 | `start_date_fixed`  | string           | no         | The fixed start date of an epic (since 11.3) |
 | `due_date_is_fixed` | boolean          | no         | Whether due date should be sourced from `due_date_fixed` or from milestones (since 11.3) |
@@ -245,7 +249,7 @@ POST /groups/:id/epics
 | `parent_id`         | integer/string   | no         | The id of a parent epic (since 11.11) |
 
 ```shell
-curl --header POST "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics?title=Epic&description=Epic%20description
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics?title=Epic&description=Epic%20description
 ```
 
 Example response:
@@ -258,6 +262,7 @@ Example response:
   "title": "Epic",
   "description": "Epic description",
   "state": "opened",
+  "confidential": "false",
   "web_url": "http://localhost:3001/groups/test/-/epics/6",
   "reference": "&6",
   "references": {
@@ -298,7 +303,7 @@ Example response:
 Updates an epic.
 
 NOTE: **Note:**
-Starting with GitLab [11.3][ee-6448], `start_date` and `end_date` should no longer be assigned
+Starting with GitLab [11.3](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448), `start_date` and `end_date` should no longer be assigned
 directly, as they now represent composite values. You can configure it via the `*_is_fixed` and
 `*_fixed` fields instead.
 
@@ -312,6 +317,7 @@ PUT /groups/:id/epics/:epic_iid
 | `epic_iid`          | integer/string   | yes        | The internal ID of the epic  |
 | `title`             | string           | no         | The title of an epic |
 | `description`       | string           | no         | The description of an epic. Limited to 1,048,576 characters.  |
+| `confidential`      | boolean          | no         | Whether the epic should be confidential. Will be ignored if `confidential_epics` feature flag is disabled. |
 | `labels`            | string           | no         | The comma separated list of labels |
 | `start_date_is_fixed` | boolean        | no         | Whether start date should be sourced from `start_date_fixed` or from milestones (since 11.3) |
 | `start_date_fixed`  | string           | no         | The fixed start date of an epic (since 11.3) |
@@ -320,7 +326,7 @@ PUT /groups/:id/epics/:epic_iid
 | `state_event`       | string           | no         | State event for an epic. Set `close` to close the epic and `reopen` to reopen it (since 11.4) |
 
 ```shell
-curl --header PUT "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5?title=New%20Title
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5?title=New%20Title
 ```
 
 Example response:
@@ -333,6 +339,7 @@ Example response:
   "title": "New Title",
   "description": "Epic description",
   "state": "opened",
+  "confidential": "false",
   "web_url": "http://localhost:3001/groups/test/-/epics/6",
   "reference": "&6",
   "references": {
@@ -382,7 +389,7 @@ DELETE /groups/:id/epics/:epic_iid
 | `epic_iid`          | integer/string   | yes        | The internal ID of the epic.  |
 
 ```shell
-curl --header DELETE "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5
 ```
 
 ## Create a todo
@@ -460,5 +467,3 @@ Example response:
   "created_at": "2016-07-01T11:09:13.992Z"
 }
 ```
-
-[ee-6448]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6448

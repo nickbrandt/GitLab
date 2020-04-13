@@ -11,7 +11,7 @@ module EE
 
           override :noteable_types
           def noteable_types
-            [::Epic, *super]
+            [::Epic, ::Vulnerability, *super]
           end
         end
 

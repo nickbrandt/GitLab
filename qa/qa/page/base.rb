@@ -14,7 +14,25 @@ module QA
 
       ElementNotFound = Class.new(RuntimeError)
 
+      class NoRequiredElementsError < RuntimeError
+        def initialize(page_class)
+          @page_class = page_class
+          super
+        end
+
+        def to_s
+          <<~MSG.strip % { page: @page_class }
+            %{page} has no required elements.
+            See https://docs.gitlab.com/ee/development/testing_guide/end_to_end/dynamic_element_validation.html#required-elements
+          MSG
+        end
+      end
+
       def_delegators :evaluator, :view, :views
+
+      def initialize
+        @retry_later_backoff = QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME
+      end
 
       def assert_no_element(name)
         assert_no_selector(element_selector_css(name))
@@ -246,6 +264,8 @@ module QA
       end
 
       def element_selector_css(name, *attributes)
+        return name.selector_css if name.is_a? Page::Element
+
         Page::Element.new(name, *attributes).selector_css
       end
 
@@ -257,6 +277,19 @@ module QA
 
       def visit_link_in_element(name)
         visit find_element(name)['href']
+      end
+
+      def wait_if_retry_later
+        return if @retry_later_backoff > QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME * 5
+
+        if has_css?('body', text: 'Retry later', wait: 0)
+          QA::Runtime::Logger.warn("`Retry later` error occurred. Sleeping for #{@retry_later_backoff} seconds...")
+          sleep @retry_later_backoff
+          refresh
+          @retry_later_backoff += QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME
+
+          wait_if_retry_later
+        end
       end
 
       def self.path
@@ -279,8 +312,22 @@ module QA
         views.flat_map(&:elements)
       end
 
+      def self.required_elements
+        elements.select(&:required?)
+      end
+
       def send_keys_to_element(name, keys)
         find_element(name).send_keys(keys)
+      end
+
+      def visible?
+        raise NoRequiredElementsError.new(self.class) if self.class.required_elements.empty?
+
+        self.class.required_elements.each do |required_element|
+          return false if has_no_element? required_element
+        end
+
+        true
       end
 
       class DSL

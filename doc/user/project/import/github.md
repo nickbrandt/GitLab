@@ -14,7 +14,7 @@ GitHub repositories using a [personal access token](#using-a-github-token),
 but this method is not recommended because it cannot associate all user activity
 (such as issues and pull requests) with matching GitLab users.
 If you are an administrator of a self-managed GitLab instance, you can also use the
-[GitHub rake task](../../../administration/raketasks/github_import.md) to import projects from
+[GitHub Rake task](../../../administration/raketasks/github_import.md) to import projects from
 GitHub without the constraints of a Sidekiq worker.
 
 The following aspects of a project are imported:
@@ -74,7 +74,7 @@ Before you begin, ensure that any GitHub users who you want to map to GitLab use
 
 - A GitLab account that has logged in using the GitHub icon
   \- or -
-- A GitLab account with an email address that matches the [public email address](https://help.github.com/en/articles/setting-your-commit-email-address) of the GitHub user
+- A GitLab account with an email address that matches the [public email address](https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/setting-your-commit-email-address) of the GitHub user
 
 User-matching attempts occur in that order, and if a user is not identified either way, the activity is associated with
 the user account that is performing the import.

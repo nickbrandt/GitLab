@@ -35,7 +35,7 @@ describe Security::VulnerabilitiesFinder do
   end
 
   context 'when filtered by report type' do
-    let(:filters) { { report_types: %w[sast dast] } }
+    let(:filters) { { report_type: %w[sast dast] } }
 
     it 'only returns vulnerabilities matching the given report types' do
       is_expected.to contain_exactly(vulnerability1, vulnerability2)
@@ -43,7 +43,7 @@ describe Security::VulnerabilitiesFinder do
   end
 
   context 'when filtered by severity' do
-    let(:filters) { { severities: %w[medium high] } }
+    let(:filters) { { severity: %w[medium high] } }
 
     it 'only returns vulnerabilities matching the given severities' do
       is_expected.to contain_exactly(vulnerability2, vulnerability3)
@@ -51,7 +51,7 @@ describe Security::VulnerabilitiesFinder do
   end
 
   context 'when filtered by state' do
-    let(:filters) { { states: %w[detected confirmed] } }
+    let(:filters) { { state: %w[detected confirmed] } }
 
     it 'only returns vulnerabilities matching the given states' do
       is_expected.to contain_exactly(vulnerability1, vulnerability3)
@@ -62,7 +62,7 @@ describe Security::VulnerabilitiesFinder do
     let(:group) { create(:group) }
     let(:another_project) { create(:project, namespace: group) }
     let!(:another_vulnerability) { create(:vulnerability, project: another_project) }
-    let(:filters) { { project_ids: [another_project.id] } }
+    let(:filters) { { project_id: [another_project.id] } }
     let(:vulnerable) { group }
 
     before do
@@ -79,7 +79,7 @@ describe Security::VulnerabilitiesFinder do
       create(:vulnerability, severity: :medium, report_type: :sast, state: :detected, project: project)
     end
 
-    let(:filters) { { report_types: %w[sast], severities: %w[medium] } }
+    let(:filters) { { report_type: %w[sast], severity: %w[medium] } }
 
     it 'only returns vulnerabilities matching all of the given filters' do
       is_expected.to contain_exactly(vulnerability4)

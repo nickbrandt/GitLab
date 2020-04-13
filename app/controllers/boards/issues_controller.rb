@@ -21,20 +21,17 @@ module Boards
     before_action :validate_id_list, only: [:bulk_move]
     before_action :can_move_issues?, only: [:bulk_move]
     before_action do
-      push_frontend_feature_flag(:board_search_optimization, board.group)
+      push_frontend_feature_flag(:board_search_optimization, board.group, default_enabled: true)
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def index
       list_service = Boards::Issues::ListService.new(board_parent, current_user, filter_params)
-      issues = list_service.execute
-      issues = issues.page(params[:page]).per(params[:per] || 20).without_count
+      issues = issues_from(list_service)
+
       Issue.move_nulls_to_end(issues) if Gitlab::Database.read_write?
-      issues = issues.preload(associations_to_preload)
 
       render_issues(issues, list_service.metadata)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def create
       service = Boards::Issues::CreateService.new(board_parent, project, current_user, issue_params)
@@ -66,6 +63,14 @@ module Boards
     end
 
     private
+
+    def issues_from(list_service)
+      issues = list_service.execute
+      issues.page(params[:page]).per(params[:per] || 20)
+            .without_count
+            .preload(associations_to_preload) # rubocop: disable CodeReuse/ActiveRecord
+            .load
+    end
 
     def associations_to_preload
       [

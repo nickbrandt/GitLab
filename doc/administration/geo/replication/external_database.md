@@ -129,7 +129,7 @@ To configure the connection to the external read-replica database and enable Log
 database to keep track of replication status and automatically recover from
 potential replication issues. Omnibus automatically configures a tracking database
 when `roles ['geo_secondary_role']` is set. For high availability,
-refer to [Geo High Availability](../../high_availability/README.md).
+refer to [Geo High Availability](../../availability/index.md).
 If you want to run this database external to Omnibus, please follow the instructions below.
 
 The tracking database requires an [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html)
@@ -151,7 +151,7 @@ the tracking database on port 5432.
    sudo -i
    ```
 
-1. Edit `/etc/gitlab/gitlab.rb` with the connection params and credentials for
+1. Edit `/etc/gitlab/gitlab.rb` with the connection parameters and credentials for
    the machine with the PostgreSQL instance:
 
    ```ruby
@@ -177,7 +177,7 @@ the tracking database on port 5432.
    connection and credentials:
 
    Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
-   params to match your environment. Execute it to set up the FDW connection.
+   parameters to match your environment. Execute it to set up the FDW connection.
 
    ```shell
    #!/bin/bash

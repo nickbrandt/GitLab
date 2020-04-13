@@ -65,6 +65,16 @@ bin/rake "gitlab:seed:group_seed[subgroup_depth, username]"
 
 Group are additionally seeded with epics if GitLab instance has epics feature available.
 
+#### Seeding custom metrics for the monitoring dashboard
+
+A lot of different types of metrics are supported in the monitoring dashboard.
+
+To import these metrics, you can run:
+
+```shell
+bundle exec rake 'gitlab:seed:development_metrics[your_project_id]'
+```
+
 ### Automation
 
 If you're very sure that you want to **wipe the current database** and refill
@@ -129,11 +139,11 @@ To run several tests inside one directory:
 
 - `bin/rspec spec/requests/api/` for the rspec tests if you want to test API only
 
-### Speed-up tests, rake tasks, and migrations
+### Speed-up tests, Rake tasks, and migrations
 
 [Spring](https://github.com/rails/spring) is a Rails application preloader. It
 speeds up development by keeping your application running in the background so
-you don't need to boot it every time you run a test, rake task or migration.
+you don't need to boot it every time you run a test, Rake task or migration.
 
 If you want to use it, you'll need to export the `ENABLE_SPRING` environment
 variable to `1`:
@@ -247,7 +257,7 @@ To generate GraphQL documentation based on the GitLab schema, run:
 bundle exec rake gitlab:graphql:compile_docs
 ```
 
-In its current state, the rake task:
+In its current state, the Rake task:
 
 - Generates output for GraphQL objects.
 - Places the output at `doc/api/graphql/reference/index.md`.
@@ -270,4 +280,4 @@ To generate GraphQL schema files based on the GitLab schema, run:
 bundle exec rake gitlab:graphql:schema:dump
 ```
 
-This uses graphql-ruby's built-in rake tasks to generate files in both [IDL](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) and JSON formats.
+This uses GraphQL Ruby's built-in Rake tasks to generate files in both [IDL](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) and JSON formats.

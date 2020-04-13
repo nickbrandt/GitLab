@@ -12,7 +12,9 @@ class Projects::AuditEventsController < Projects::ApplicationController
   layout 'project_settings'
 
   def index
-    @events = AuditLogFinder.new(audit_logs_params).execute.page(params[:page])
+    events = AuditLogFinder.new(audit_logs_params).execute.page(params[:page])
+
+    @events = Gitlab::Audit::Events::Preloader.preload!(events)
   end
 
   private

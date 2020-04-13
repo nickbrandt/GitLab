@@ -8,7 +8,7 @@ In order to enable Shibboleth support in GitLab we need to use Apache instead of
 
 To enable the Shibboleth OmniAuth provider you must configure Apache Shibboleth module.
 The installation and configuration of the module itself is out of the scope of this document.
-Check <https://wiki.shibboleth.net/confluence/display/SP3/Apache> for more info.
+Check <https://wiki.shibboleth.net/confluence/display/SP3/Apache> for more information.
 
 You can find Apache config in [GitLab Recipes](https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache).
 
@@ -66,7 +66,7 @@ The following changes are needed to enable Shibboleth:
 
    The file should look like this:
 
-   ```
+   ```ruby
    external_url 'https://gitlab.example.com'
    gitlab_rails['internal_api_url'] = 'https://gitlab.example.com'
 
@@ -101,7 +101,7 @@ On the sign in page, there should now be a "Sign in with: Shibboleth" icon below
 The order of the first 2 Location directives is important. If they are reversed,
 you will not get a Shibboleth session!
 
-```
+```plaintext
 <Location />
   Require all granted
   ProxyPassReverse http://127.0.0.1:8181

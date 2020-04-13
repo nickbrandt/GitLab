@@ -153,6 +153,35 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'required instance ci template' do
+      let(:settings) { { required_instance_ci_template: 'Auto-DevOps' } }
+      let(:feature) { :required_ci_templates }
+
+      it_behaves_like 'settings for licensed features'
+
+      context 'when ApplicationSetting already has a required_instance_ci_template value' do
+        before do
+          ApplicationSetting.current.update!(required_instance_ci_template: 'Auto-DevOps')
+        end
+
+        context 'with a valid value' do
+          let(:settings) { { required_instance_ci_template: 'Code-Quality' } }
+
+          it_behaves_like 'settings for licensed features'
+        end
+
+        context 'with an empty value' do
+          it 'sets required_instance_ci_template as nil' do
+            stub_licensed_features(required_ci_templates: true)
+
+            put :update, params: { application_setting: { required_instance_ci_template: '' } }
+
+            expect(ApplicationSetting.current.required_instance_ci_template).to be_nil
+          end
+        end
+      end
+    end
+
     it 'updates repository_size_limit' do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 

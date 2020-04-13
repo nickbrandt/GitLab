@@ -20,6 +20,7 @@
           &middot;
           opened #{time_ago_with_tooltip(merge_request.created_at, placement: 'bottom')}
           by #{link_to_member(@project, merge_request.author, avatar: false)}
+          = gitlab_team_member_badge(merge_request.author)
         - if merge_request.milestone
           %span.issuable-milestone.d-none.d-sm-inline-block
             &nbsp;
@@ -46,9 +47,7 @@
           %li.issuable-status.d-none.d-sm-inline-block
             = icon('ban')
             = _('CLOSED')
-        - if can?(current_user, :read_pipeline, merge_request.head_pipeline)
-          %li.issuable-pipeline-status.d-none.d-sm-flex
-            = render 'ci/status/icon', status: merge_request.head_pipeline.detailed_status(current_user), option_css_classes: 'd-flex'
+        = render 'shared/merge_request_pipeline_status', merge_request: merge_request
         - if merge_request.open? && merge_request.broken?
           %li.issuable-pipeline-broken.d-none.d-sm-flex
             = link_to merge_request_path(merge_request), class: "has-tooltip", title: _('Cannot be merged automatically') do

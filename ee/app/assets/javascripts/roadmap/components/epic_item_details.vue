@@ -1,5 +1,14 @@
 <script>
+import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { __, n__ } from '~/locale';
+import eventHub from '../event_hub';
+
 export default {
+  components: {
+    GlNewButton,
+    GlIcon,
+    GlTooltip,
+  },
   props: {
     epic: {
       type: Object,
@@ -18,20 +27,64 @@ export default {
     isEpicGroupDifferent() {
       return this.currentGroupId !== this.epic.groupId;
     },
+    isExpandIconHidden() {
+      return this.epic.isChildEpic || !this.epic.children?.edges?.length;
+    },
+    expandIconName() {
+      return this.epic.isChildEpicShowing ? 'chevron-down' : 'chevron-right';
+    },
+    expandIconLabel() {
+      return this.epic.isChildEpicShowing ? __('Collapse child epics') : __('Expand child epics');
+    },
+    childEpicsCount() {
+      return this.epic.isChildEpic ? '-' : this.epic.children?.edges?.length || 0;
+    },
+    childEpicsCountText() {
+      return Number.isInteger(this.childEpicsCount)
+        ? n__(`%d child epic`, `%d child epics`, this.childEpicsCount)
+        : '';
+    },
+  },
+  methods: {
+    toggleIsEpicExpanded() {
+      eventHub.$emit('toggleIsEpicExpanded', this.epic.id);
+    },
   },
 };
 </script>
 
 <template>
-  <span class="epic-details-cell" data-qa-selector="epic_details_cell">
-    <div class="epic-title">
-      <a :href="epic.webUrl" :title="epic.title" class="epic-url">{{ epic.title }}</a>
+  <div class="epic-details-cell d-flex align-items-start p-2" data-qa-selector="epic_details_cell">
+    <gl-new-button
+      :class="{ invisible: isExpandIconHidden }"
+      variant="link"
+      :aria-label="expandIconLabel"
+      @click="toggleIsEpicExpanded"
+    >
+      <gl-icon :name="expandIconName" class="text-secondary" aria-hidden="true" />
+    </gl-new-button>
+    <div class="overflow-hidden flex-grow-1" :class="[epic.isChildEpic ? 'ml-4 mr-2' : 'mx-2']">
+      <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
+        {{ epic.title }}
+      </a>
+      <div class="epic-group-timeframe d-flex text-secondary">
+        <p v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group">
+          {{ epic.groupName }}
+        </p>
+        <span class="mx-1" aria-hidden="true">&middot;</span>
+        <p class="epic-timeframe" :title="timeframeString">{{ timeframeString }}</p>
+      </div>
     </div>
-    <div class="epic-group-timeframe">
-      <span v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group"
-        >{{ epic.groupName }} &middot;</span
-      >
-      <span class="epic-timeframe">{{ timeframeString }}</span>
+    <div
+      ref="childEpicsCount"
+      :class="{ invisible: epic.isChildEpic }"
+      class="d-flex text-secondary text-nowrap"
+    >
+      <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
+      <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
     </div>
-  </span>
+    <gl-tooltip v-if="!epic.isChildEpic" :target="() => $refs.childEpicsCount">
+      {{ childEpicsCountText }}
+    </gl-tooltip>
+  </div>
 </template>

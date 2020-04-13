@@ -120,7 +120,7 @@ Its feature set is listed on the table below according to DevOps stages.
 | [Using Docker images](docker/using_docker_images.md) | Use GitLab and GitLab Runner with Docker to build and test applications. |
 |---+---|
 | **Release** ||
-| [Auto Deploy](../topics/autodevops/index.md#auto-deploy) | Deploy your application to a production environment in a Kubernetes cluster. |
+| [Auto Deploy](../topics/autodevops/stages.md#auto-deploy) | Deploy your application to a production environment in a Kubernetes cluster. |
 | [Building Docker images](docker/using_docker_build.md) | Maintain Docker-based projects using GitLab CI/CD. |
 | [Canary Deployments](../user/project/canary_deployments.md) **(PREMIUM)** | Ship features to only a portion of your pods and let a percentage of your user base to visit the temporarily deployed feature. |
 | [Deploy Boards](../user/project/deploy_boards.md) **(PREMIUM)** | Check the current health and status of each CI/CD environment running on Kubernetes. |
@@ -160,11 +160,10 @@ See also:
 
 ### Why GitLab CI/CD?
 
-The following articles explain reasons to use GitLab CI/CD
-for your CI/CD infrastructure:
+Learn more about:
 
-- [Why we chose GitLab CI for our CI/CD solution](https://about.gitlab.com/blog/2016/10/17/gitlab-ci-oohlala/)
-- [Building our web-app on GitLab CI](https://about.gitlab.com/blog/2016/07/22/building-our-web-app-on-gitlab-ci/)
+- [Why you might chose GitLab CI/CD](https://about.gitlab.com/blog/2016/10/17/gitlab-ci-oohlala/).
+- [Reasons you might migrate from another platform](https://about.gitlab.com/blog/2016/07/22/building-our-web-app-on-gitlab-ci/).
 - [5 Teams that made the switch to GitLab CI/CD](https://about.gitlab.com/blog/2019/04/25/5-teams-that-made-the-switch-to-gitlab-ci-cd/)
 
 See also the [Why CI/CD?](https://docs.google.com/presentation/d/1OGgk2Tcxbpl7DJaIOzCX4Vqg3dlwfELC3u2jEeCBbDk) presentation.

@@ -2,14 +2,19 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectRegistry do
+describe Geo::ProjectRegistry, :geo_fdw do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project, description: 'kitten mittens') }
-  set(:registry) { create(:geo_project_registry, project_id: project.id) }
+  let(:project) { create(:project, description: 'kitten mittens') }
+  let(:registry) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
+
+  it_behaves_like 'a BulkInsertSafe model', Geo::ProjectRegistry do
+    let(:valid_items_for_bulk_insertion) { build_list(:geo_project_registry, 10, created_at: Time.zone.now) }
+    let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
+  end
 
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }

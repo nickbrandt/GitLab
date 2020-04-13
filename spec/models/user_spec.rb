@@ -5,6 +5,7 @@ require 'spec_helper'
 describe User, :do_not_mock_admin_mode do
   include ProjectForksHelper
   include TermsHelper
+  include ExclusiveLeaseHelpers
 
   it_behaves_like 'having unique enum values'
 
@@ -28,7 +29,6 @@ describe User, :do_not_mock_admin_mode do
   describe 'associations' do
     it { is_expected.to have_one(:namespace) }
     it { is_expected.to have_one(:status) }
-    it { is_expected.to have_one(:max_access_level_membership) }
     it { is_expected.to have_one(:user_detail) }
     it { is_expected.to have_one(:user_highest_role) }
     it { is_expected.to have_many(:snippets).dependent(:destroy) }
@@ -54,6 +54,67 @@ describe User, :do_not_mock_admin_mode do
     it { is_expected.to have_many(:reported_abuse_reports).dependent(:destroy).class_name('AbuseReport') }
     it { is_expected.to have_many(:custom_attributes).class_name('UserCustomAttribute') }
     it { is_expected.to have_many(:releases).dependent(:nullify) }
+
+    describe "#bio" do
+      it 'syncs bio with `user_details.bio` on create' do
+        user = create(:user, bio: 'my bio')
+
+        expect(user.bio).to eq(user.user_detail.bio)
+      end
+
+      context 'when `migrate_bio_to_user_details` feature flag is off' do
+        before do
+          stub_feature_flags(migrate_bio_to_user_details: false)
+        end
+
+        it 'does not sync bio with `user_details.bio`' do
+          user = create(:user, bio: 'my bio')
+
+          expect(user.bio).to eq('my bio')
+          expect(user.user_detail.bio).to eq('')
+        end
+      end
+
+      it 'syncs bio with `user_details.bio` on update' do
+        user = create(:user)
+
+        user.update!(bio: 'my bio')
+
+        expect(user.bio).to eq(user.user_detail.bio)
+      end
+
+      context 'when `user_details` association already exists' do
+        let(:user) { create(:user) }
+
+        before do
+          create(:user_detail, user: user)
+        end
+
+        it 'syncs bio with `user_details.bio`' do
+          user.update!(bio: 'my bio')
+
+          expect(user.bio).to eq(user.user_detail.bio)
+        end
+
+        it 'falls back to "" when nil is given' do
+          user.update!(bio: nil)
+
+          expect(user.bio).to eq(nil)
+          expect(user.user_detail.bio).to eq('')
+        end
+
+        # very unlikely scenario
+        it 'truncates long bio when syncing to user_details' do
+          invalid_bio = 'a' * 256
+          truncated_bio = 'a' * 255
+
+          user.bio = invalid_bio
+          user.save(validate: false)
+
+          expect(user.user_detail.bio).to eq(truncated_bio)
+        end
+      end
+    end
 
     describe "#abuse_report" do
       let(:current_user) { create(:user) }
@@ -468,7 +529,7 @@ describe User, :do_not_mock_admin_mode do
             user = build(:user, email: 'info@gitlab.com')
 
             expect(user).not_to be_valid
-            expect(user.errors.messages[:email].first).to eq(_('is not allowed for sign-up'))
+            expect(user.errors.messages[:email].first).to eq(_('is not allowed. Try again with a different email address, or contact your GitLab admin.'))
           end
 
           it 'does accept a valid email address' do
@@ -939,91 +1000,42 @@ describe User, :do_not_mock_admin_mode do
   end
 
   describe '#highest_role' do
-    let(:user) { create(:user) }
-    let(:group) { create(:group) }
+    let_it_be(:user) { create(:user) }
 
-    context 'with association :max_access_level_membership' do
-      let(:another_user) { create(:user) }
+    context 'when user_highest_role does not exist' do
+      it 'returns NO_ACCESS' do
+        expect(user.highest_role).to eq(Gitlab::Access::NO_ACCESS)
+      end
+    end
 
-      before do
-        create(:project, group: group) do |project|
-          group.add_user(user, GroupMember::GUEST)
-          group.add_user(another_user, GroupMember::DEVELOPER)
-        end
+    context 'when user_highest_role exists' do
+      context 'stored highest access level is nil' do
+        it 'returns Gitlab::Access::NO_ACCESS' do
+          create(:user_highest_role, user: user)
 
-        create(:project, group: create(:group)) do |project|
-          project.add_guest(another_user)
-        end
-
-        create(:project, group: create(:group)) do |project|
-          project.add_maintainer(user)
+          expect(user.highest_role).to eq(Gitlab::Access::NO_ACCESS)
         end
       end
 
-      it 'returns the correct highest role' do
-        users = User.includes(:max_access_level_membership).where(id: [user.id, another_user.id])
+      context 'stored highest access level present' do
+        context 'with association :user_highest_role' do
+          let(:another_user) { create(:user) }
 
-        expect(users.collect { |u| [u.id, u.highest_role] }).to contain_exactly(
-          [user.id, Gitlab::Access::MAINTAINER],
-          [another_user.id, Gitlab::Access::DEVELOPER]
-        )
+          before do
+            create(:user_highest_role, :maintainer, user: user)
+            create(:user_highest_role, :developer, user: another_user)
+          end
+
+          it 'returns the correct highest role' do
+            users = User.includes(:user_highest_role).where(id: [user.id, another_user.id])
+
+            expect(users.collect { |u| [u.id, u.highest_role] }).to contain_exactly(
+              [user.id, Gitlab::Access::MAINTAINER],
+              [another_user.id, Gitlab::Access::DEVELOPER]
+            )
+          end
+        end
       end
-    end
-
-    it 'returns NO_ACCESS if none has been set' do
-      expect(user.highest_role).to eq(Gitlab::Access::NO_ACCESS)
-    end
-
-    it 'returns MAINTAINER if user is maintainer of a project' do
-      create(:project, group: group) do |project|
-        project.add_maintainer(user)
-      end
-
-      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
-    end
-
-    it 'returns the highest role if user is member of multiple projects' do
-      create(:project, group: group) do |project|
-        project.add_maintainer(user)
-      end
-
-      create(:project, group: group) do |project|
-        project.add_developer(user)
-      end
-
-      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
-    end
-
-    it 'returns MAINTAINER if user is maintainer of a group' do
-      create(:group) do |group|
-        group.add_user(user, GroupMember::MAINTAINER)
-      end
-
-      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
-    end
-
-    it 'returns the highest role if user is member of multiple groups' do
-      create(:group) do |group|
-        group.add_user(user, GroupMember::MAINTAINER)
-      end
-
-      create(:group) do |group|
-        group.add_user(user, GroupMember::DEVELOPER)
-      end
-
-      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
-    end
-
-    it 'returns the highest role if user is member of multiple groups and projects' do
-      create(:group) do |group|
-        group.add_user(user, GroupMember::DEVELOPER)
-      end
-
-      create(:project, group: group) do |project|
-        project.add_maintainer(user)
-      end
-
-      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
     end
   end
 
@@ -1160,6 +1172,10 @@ describe User, :do_not_mock_admin_mode do
     end
 
     it 'uses SecureRandom to generate the incoming email token' do
+      allow_next_instance_of(User) do |user|
+        allow(user).to receive(:update_highest_role)
+      end
+
       expect(SecureRandom).to receive(:hex).and_return('3b8ca303')
 
       user = create(:user)
@@ -2770,61 +2786,88 @@ describe User, :do_not_mock_admin_mode do
 
   describe '#ci_owned_runners' do
     let(:user) { create(:user) }
-    let!(:project) { create(:project) }
-    let(:runner) { create(:ci_runner, :project, projects: [project]) }
 
-    context 'without any projects nor groups' do
-      it 'does not load' do
-        expect(user.ci_owned_runners).to be_empty
-      end
-    end
+    shared_examples :nested_groups_owner do
+      context 'when the user is the owner of a multi-level group' do
+        before do
+          set_permissions_for_users
+        end
 
-    context 'with personal projects runners' do
-      let(:namespace) { create(:namespace, owner: user) }
-      let!(:project) { create(:project, namespace: namespace) }
-
-      it 'loads' do
-        expect(user.ci_owned_runners).to contain_exactly(runner)
-      end
-    end
-
-    context 'with personal group runner' do
-      let!(:project) { create(:project) }
-      let(:group_runner) { create(:ci_runner, :group, groups: [group]) }
-      let!(:group) do
-        create(:group).tap do |group|
-          group.add_owner(user)
+        it 'loads all the runners in the tree of groups' do
+          expect(user.ci_owned_runners).to contain_exactly(runner, group_runner)
         end
       end
-
-      it 'loads' do
-        expect(user.ci_owned_runners).to contain_exactly(group_runner)
-      end
     end
 
-    context 'with personal project and group runner' do
-      let(:namespace) { create(:namespace, owner: user) }
-      let!(:project) { create(:project, namespace: namespace) }
-      let!(:group_runner) { create(:ci_runner, :group, groups: [group]) }
-
-      let!(:group) do
-        create(:group).tap do |group|
+    shared_examples :group_owner do
+      context 'when the user is the owner of a one level group' do
+        before do
           group.add_owner(user)
         end
-      end
 
-      it 'loads' do
-        expect(user.ci_owned_runners).to contain_exactly(runner, group_runner)
+        it 'loads the runners in the group' do
+          expect(user.ci_owned_runners).to contain_exactly(group_runner)
+        end
       end
     end
 
-    shared_examples :member do
+    shared_examples :project_owner do
+      context 'when the user is the owner of a project' do
+        it 'loads the runner belonging to the project' do
+          expect(user.ci_owned_runners).to contain_exactly(runner)
+        end
+      end
+    end
+
+    shared_examples :project_member do
       context 'when the user is a maintainer' do
         before do
           add_user(:maintainer)
         end
 
-        it 'does not load' do
+        it 'loads the runners of the project' do
+          expect(user.ci_owned_runners).to contain_exactly(project_runner)
+        end
+      end
+
+      context 'when the user is a developer' do
+        before do
+          add_user(:developer)
+        end
+
+        it 'does not load any runner' do
+          expect(user.ci_owned_runners).to be_empty
+        end
+      end
+
+      context 'when the user is a reporter' do
+        before do
+          add_user(:reporter)
+        end
+
+        it 'does not load any runner' do
+          expect(user.ci_owned_runners).to be_empty
+        end
+      end
+
+      context 'when the user is a guest' do
+        before do
+          add_user(:guest)
+        end
+
+        it 'does not load any runner' do
+          expect(user.ci_owned_runners).to be_empty
+        end
+      end
+    end
+
+    shared_examples :group_member do
+      context 'when the user is a maintainer' do
+        before do
+          add_user(:maintainer)
+        end
+
+        it 'does not load the runners of the group' do
           expect(user.ci_owned_runners).to be_empty
         end
       end
@@ -2834,40 +2877,49 @@ describe User, :do_not_mock_admin_mode do
           add_user(:developer)
         end
 
-        it 'does not load' do
+        it 'does not load any runner' do
+          expect(user.ci_owned_runners).to be_empty
+        end
+      end
+
+      context 'when the user is a reporter' do
+        before do
+          add_user(:reporter)
+        end
+
+        it 'does not load any runner' do
+          expect(user.ci_owned_runners).to be_empty
+        end
+      end
+
+      context 'when the user is a guest' do
+        before do
+          add_user(:guest)
+        end
+
+        it 'does not load any runner' do
           expect(user.ci_owned_runners).to be_empty
         end
       end
     end
 
-    shared_examples :group_member do
-      context 'when the user is owner' do
-        before do
-          add_user(:owner)
-        end
-
-        it 'loads' do
-          expect(user.ci_owned_runners).to contain_exactly(runner)
-        end
+    context 'without any projects nor groups' do
+      it 'does not load any runner' do
+        expect(user.ci_owned_runners).to be_empty
       end
-
-      it_behaves_like :member
     end
 
-    context 'with groups projects runners' do
-      let(:group) { create(:group) }
-      let!(:project) { create(:project, group: group) }
+    context 'with runner in a personal project' do
+      let!(:namespace) { create(:namespace, owner: user) }
+      let!(:project) { create(:project, namespace: namespace) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
 
-      def add_user(access)
-        group.add_user(user, access)
-      end
-
-      it_behaves_like :group_member
+      it_behaves_like :project_owner
     end
 
-    context 'with groups runners' do
-      let!(:runner) { create(:ci_runner, :group, groups: [group]) }
+    context 'with group runner in a non owned group' do
       let!(:group) { create(:group) }
+      let!(:runner) { create(:ci_runner, :group, groups: [group]) }
 
       def add_user(access)
         group.add_user(user, access)
@@ -2876,26 +2928,114 @@ describe User, :do_not_mock_admin_mode do
       it_behaves_like :group_member
     end
 
-    context 'with other projects runners' do
-      let!(:project) { create(:project) }
+    context 'with group runner in an owned group' do
+      let!(:group) { create(:group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [group]) }
+
+      it_behaves_like :group_owner
+    end
+
+    context 'with group runner in an owned group and group runner in a different owner subgroup' do
+      let!(:group) { create(:group) }
+      let!(:runner) { create(:ci_runner, :group, groups: [group]) }
+      let!(:subgroup) { create(:group, parent: group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [subgroup]) }
+      let!(:another_user) { create(:user) }
+
+      def set_permissions_for_users
+        group.add_owner(user)
+        subgroup.add_owner(another_user)
+      end
+
+      it_behaves_like :nested_groups_owner
+    end
+
+    context 'with personal project runner in an an owned group and a group runner in that same group' do
+      let!(:group) { create(:group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [group]) }
+      let!(:project) { create(:project, group: group) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
+
+      def set_permissions_for_users
+        group.add_owner(user)
+      end
+
+      it_behaves_like :nested_groups_owner
+    end
+
+    context 'with personal project runner in an owned group and a group runner in a subgroup' do
+      let!(:group) { create(:group) }
+      let!(:subgroup) { create(:group, parent: group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [subgroup]) }
+      let!(:project) { create(:project, group: group) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
+
+      def set_permissions_for_users
+        group.add_owner(user)
+      end
+
+      it_behaves_like :nested_groups_owner
+    end
+
+    context 'with personal project runner in an owned group in an owned namespace and a group runner in that group' do
+      let!(:namespace) { create(:namespace, owner: user) }
+      let!(:group) { create(:group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [group]) }
+      let!(:project) { create(:project, namespace: namespace, group: group) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
+
+      def set_permissions_for_users
+        group.add_owner(user)
+      end
+
+      it_behaves_like :nested_groups_owner
+    end
+
+    context 'with personal project runner in an owned namespace, an owned group, a subgroup and a group runner in that subgroup' do
+      let!(:namespace) { create(:namespace, owner: user) }
+      let!(:group) { create(:group) }
+      let!(:subgroup) { create(:group, parent: group) }
+      let!(:group_runner) { create(:ci_runner, :group, groups: [subgroup]) }
+      let!(:project) { create(:project, namespace: namespace, group: group) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
+
+      def set_permissions_for_users
+        group.add_owner(user)
+      end
+
+      it_behaves_like :nested_groups_owner
+    end
+
+    context 'with a project runner that belong to projects that belong to a not owned group' do
+      let!(:group) { create(:group) }
+      let!(:project) { create(:project, group: group) }
+      let!(:project_runner) { create(:ci_runner, :project, projects: [project]) }
 
       def add_user(access)
         project.add_user(user, access)
       end
 
-      it_behaves_like :member
+      it_behaves_like :project_member
     end
 
-    context 'with subgroup with different owner for project runner' do
-      let(:group) { create(:group) }
-      let(:another_user) { create(:user) }
-      let(:subgroup) { create(:group, parent: group) }
-      let!(:project) { create(:project, group: subgroup) }
+    context 'with project runners that belong to projects that do not belong to any group' do
+      let!(:project) { create(:project) }
+      let!(:runner) { create(:ci_runner, :project, projects: [project]) }
+
+      it 'does not load any runner' do
+        expect(user.ci_owned_runners).to be_empty
+      end
+    end
+
+    context 'with a group runner that belongs to a subgroup of a group owned by another user' do
+      let!(:group) { create(:group) }
+      let!(:subgroup) { create(:group, parent: group) }
+      let!(:runner) { create(:ci_runner, :group, groups: [subgroup]) }
+      let!(:another_user) { create(:user) }
 
       def add_user(access)
-        group.add_user(user, access)
+        subgroup.add_user(user, access)
         group.add_user(another_user, :owner)
-        subgroup.add_user(another_user, :owner)
       end
 
       it_behaves_like :group_member
@@ -3620,15 +3760,15 @@ describe User, :do_not_mock_admin_mode do
       end
 
       it 'returns false if email can not be synced' do
-        stub_omniauth_setting(sync_profile_attributes: %w(location email))
+        stub_omniauth_setting(sync_profile_attributes: %w(location name))
 
-        expect(user.sync_attribute?(:name)).to be_falsey
+        expect(user.sync_attribute?(:email)).to be_falsey
       end
 
       it 'returns false if location can not be synced' do
-        stub_omniauth_setting(sync_profile_attributes: %w(location email))
+        stub_omniauth_setting(sync_profile_attributes: %w(name email))
 
-        expect(user.sync_attribute?(:name)).to be_falsey
+        expect(user.sync_attribute?(:location)).to be_falsey
       end
 
       it 'returns true for all syncable attributes if all syncable attributes can be synced' do
@@ -4198,30 +4338,6 @@ describe User, :do_not_mock_admin_mode do
   end
 
   describe '#read_only_attribute?' do
-    context 'when LDAP server is enabled' do
-      before do
-        allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
-      end
-
-      %i[name email location].each do |attribute|
-        it "is true for #{attribute}" do
-          expect(subject.read_only_attribute?(attribute)).to be_truthy
-        end
-      end
-
-      context 'and ldap_readonly_attributes feature is disabled' do
-        before do
-          stub_feature_flags(ldap_readonly_attributes: false)
-        end
-
-        %i[name email location].each do |attribute|
-          it "is false" do
-            expect(subject.read_only_attribute?(attribute)).to be_falsey
-          end
-        end
-      end
-    end
-
     context 'when synced attributes metadata is present' do
       it 'delegates to synced_attributes_metadata' do
         subject.build_user_synced_attributes_metadata
@@ -4232,7 +4348,7 @@ describe User, :do_not_mock_admin_mode do
       end
     end
 
-    context 'when synced attributes metadata is present' do
+    context 'when synced attributes metadata is not present' do
       it 'is false for any attribute' do
         expect(subject.read_only_attribute?(:email)).to be_falsey
       end
@@ -4358,6 +4474,185 @@ describe User, :do_not_mock_admin_mode do
       end
 
       it { is_expected.to be expected_result }
+    end
+
+    context 'when email is of Gitlab and is not confirmed' do
+      let(:user) { build(:user, email: 'test@gitlab.com', confirmed_at: nil) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when `:gitlab_employee_badge` feature flag is disabled' do
+      let(:user) { build(:user, email: 'test@gitlab.com') }
+
+      before do
+        stub_feature_flags(gitlab_employee_badge: false)
+      end
+
+      it { is_expected.to be false }
+    end
+  end
+
+  describe '#current_highest_access_level' do
+    let_it_be(:user) { create(:user) }
+
+    context 'when no memberships exist' do
+      it 'returns nil' do
+        expect(user.current_highest_access_level).to be_nil
+      end
+    end
+
+    context 'when memberships exist' do
+      it 'returns the highest access level for non requested memberships' do
+        create(:group_member, :reporter, user_id: user.id)
+        create(:project_member, :guest, user_id: user.id)
+        create(:project_member, :maintainer, user_id: user.id, requested_at: Time.current)
+
+        expect(user.current_highest_access_level).to eq(Gitlab::Access::REPORTER)
+      end
+    end
+  end
+
+  describe '#organization' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:user) { build(:user, organization: 'ACME') }
+
+    subject { user.organization }
+
+    where(:gitlab_employee?, :expected_result) do
+      true  | 'GitLab'
+      false | 'ACME'
+    end
+
+    with_them do
+      before do
+        allow(user).to receive(:gitlab_employee?).and_return(gitlab_employee?)
+      end
+
+      it { is_expected.to eql(expected_result) }
+    end
+  end
+
+  context 'when after_commit :update_highest_role' do
+    describe 'create user' do
+      subject { create(:user) }
+
+      it 'schedules a job in the future', :aggregate_failures, :clean_gitlab_redis_shared_state do
+        allow_next_instance_of(Gitlab::ExclusiveLease) do |instance|
+          allow(instance).to receive(:try_obtain).and_return('uuid')
+        end
+
+        expect(UpdateHighestRoleWorker).to receive(:perform_in).and_call_original
+
+        expect { subject }.to change(UpdateHighestRoleWorker.jobs, :size).by(1)
+      end
+    end
+
+    context 'when user already exists' do
+      let!(:user) { create(:user) }
+      let(:user_id) { user.id }
+
+      describe 'update user' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:attributes) do
+          [
+            { state: 'blocked' },
+            { ghost: true },
+            { user_type: :alert_bot }
+          ]
+        end
+
+        with_them do
+          context 'when state was changed' do
+            subject { user.update(attributes) }
+
+            include_examples 'update highest role with exclusive lease'
+          end
+        end
+
+        context 'when state was not changed' do
+          subject { user.update(email: 'newmail@example.com') }
+
+          include_examples 'does not update the highest role'
+        end
+      end
+
+      describe 'destroy user' do
+        subject { user.destroy }
+
+        include_examples 'does not update the highest role'
+      end
+    end
+  end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+
+    let(:user) { create(:user) }
+
+    context 'when user is blocked' do
+      before do
+        user.block
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'when user is a ghost user' do
+      before do
+        user.update(ghost: true)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'based on user type' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:user_type, :expected_result) do
+        'human'             | true
+        'alert_bot'         | false
+      end
+
+      with_them do
+        before do
+          user.update(user_type: user_type)
+        end
+
+        it { is_expected.to be expected_result }
+      end
+    end
+  end
+
+  describe '#inactive_message' do
+    subject { user.inactive_message }
+
+    let(:user) { create(:user) }
+
+    context 'when user is blocked' do
+      before do
+        user.block
+      end
+
+      it { is_expected.to eq User::BLOCKED_MESSAGE }
+    end
+
+    context 'when user is an internal user' do
+      before do
+        user.update(ghost: true)
+      end
+
+      it { is_expected.to be User::LOGIN_FORBIDDEN }
+    end
+
+    context 'when user is locked' do
+      before do
+        user.lock_access!
+      end
+
+      it { is_expected.to be :locked }
     end
   end
 end

@@ -84,14 +84,14 @@ const fetchStageMedian = (currentGroupPath, stageId, params) =>
 export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
   const {
     currentGroupPath,
-    cycleAnalyticsRequestParams: { created_after, created_before },
+    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
   } = getters;
 
   const { stages } = state;
   const params = {
-    group_id: currentGroupPath,
     created_after,
     created_before,
+    project_ids,
   };
 
   dispatch('requestStageMedianValues');
@@ -131,10 +131,8 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
-    .then(() => dispatch('fetchGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
-    .then(() => dispatch('fetchSummaryData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -171,58 +169,8 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
   removeFlash();
 };
 
-export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
-
-export const receiveSummaryDataError = ({ commit }, error) => {
-  commit(types.RECEIVE_SUMMARY_DATA_ERROR, error);
-  createFlash(__('There was an error while fetching value stream analytics summary data.'));
-};
-
-export const receiveSummaryDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_SUMMARY_DATA_SUCCESS, data);
-
-export const fetchSummaryData = ({ state, dispatch, getters }) => {
-  const {
-    cycleAnalyticsRequestParams: { created_after, created_before },
-  } = getters;
-  dispatch('requestSummaryData');
-
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
-  return Api.cycleAnalyticsSummaryData({ group_id: fullPath, created_after, created_before })
-    .then(({ data }) => dispatch('receiveSummaryDataSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({ error, action: () => dispatch('receiveSummaryDataError', error) }),
-    );
-};
-
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
-
-export const receiveGroupLabelsSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
-
-export const receiveGroupLabelsError = ({ commit }, error) => {
-  commit(types.RECEIVE_GROUP_LABELS_ERROR, error);
-  createFlash(__('There was an error fetching label data for the selected group'));
-};
-
-export const requestGroupLabels = ({ commit }) => commit(types.REQUEST_GROUP_LABELS);
-
-export const fetchGroupLabels = ({ dispatch, state }) => {
-  dispatch('requestGroupLabels');
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
-  return Api.cycleAnalyticsGroupLabels(fullPath)
-    .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
-    );
-};
 
 export const receiveTopRankedGroupLabelsSuccess = ({ commit, dispatch }, data) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
@@ -248,11 +196,10 @@ export const fetchTopRankedGroupLabels = ({
   dispatch('requestTopRankedGroupLabels');
   const { subject } = state.tasksByType;
 
-  return Api.cycleAnalyticsTopLabels({
+  return Api.cycleAnalyticsTopLabels(currentGroupPath, {
     subject,
     created_after,
     created_before,
-    group_id: currentGroupPath,
   })
     .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
     .catch(error =>
@@ -315,7 +262,6 @@ export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { 
 
   return Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('fetchSummaryData'))
     .catch(() => {
       createFlash(__('There was a problem refreshing the data, please try again'));
     });
@@ -377,7 +323,6 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   // dont request if we have no labels selected...for now
   if (selectedLabelIds.length) {
     const params = {
-      group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
@@ -387,7 +332,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
     dispatch('requestTasksByTypeData');
 
-    return Api.cycleAnalyticsTasksByType(params)
+    return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
       .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
@@ -490,8 +435,7 @@ export const fetchDurationData = ({ state, dispatch, getters }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after,
         created_before,
         project_ids,
@@ -518,7 +462,7 @@ export const receiveDurationMedianDataError = ({ commit }) => {
   createFlash(__('There was an error while fetching value stream analytics duration median data.'));
 };
 
-export const fetchDurationMedianData = ({ state, dispatch }) => {
+export const fetchDurationMedianData = ({ state, dispatch, getters }) => {
   dispatch('requestDurationMedianData');
 
   const {
@@ -526,8 +470,10 @@ export const fetchDurationMedianData = ({ state, dispatch }) => {
     selectedGroup: { fullPath },
     startDate,
     endDate,
-    selectedProjectIds,
   } = state;
+  const {
+    cycleAnalyticsRequestParams: { project_ids },
+  } = getters;
 
   const offsetValue = getDayDifference(new Date(startDate), new Date(endDate));
   const offsetCreatedAfter = getDateInPast(new Date(startDate), offsetValue);
@@ -537,11 +483,10 @@ export const fetchDurationMedianData = ({ state, dispatch }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
         created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
-        project_ids: selectedProjectIds,
+        project_ids,
       }).then(({ data }) => ({
         slug,
         selected: true,

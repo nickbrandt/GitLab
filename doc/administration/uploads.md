@@ -55,6 +55,8 @@ If you don't want to use the local disk where GitLab is installed to store the
 uploads, you can use an object storage provider like AWS S3 instead.
 This configuration relies on valid AWS credentials to be configured already.
 
+[Read more about using object storage with GitLab](object_storage.md).
+
 ## Object Storage Settings
 
 For source installations the following settings are nested under `uploads:` and then `object_store:`. On Omnibus GitLab installs they are prefixed by `uploads_object_store_`.
@@ -116,7 +118,7 @@ _The uploads are stored by default in
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` Rake task](raketasks/uploads/migrate.md).
 
 **In installations from source:**
 
@@ -139,7 +141,7 @@ _The uploads are stored by default in
    ```
 
 1. Save the file and [restart GitLab][] for the changes to take effect.
-1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` Rake task](raketasks/uploads/migrate.md).
 
 ### Oracle Cloud S3 connection settings
 
@@ -193,7 +195,7 @@ _The uploads are stored by default in
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` Rake task](raketasks/uploads/migrate.md).
 
 ---
 
@@ -224,7 +226,7 @@ _The uploads are stored by default in
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` Rake task](raketasks/uploads/migrate.md).
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"

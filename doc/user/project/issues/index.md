@@ -52,7 +52,7 @@ must be set.
             <li>State</li>
             <ul>
                 <li>State (open or closed)</li>
-                <li>Status (On track, Needs attention, or At risk)</li>
+                <li>Health status (on track, needs attention, or at risk)</li>
                 <li>Confidentiality</li>
                 <li>Tasks (completed vs. outstanding)</li>
             </ul>
@@ -126,7 +126,7 @@ associated label or assignee will change to match that of the new column. The en
 board can also be filtered to only include issues from a certain milestone or an overarching
 label.
 
-### Design Management **(PREMIUM)**
+### Design Management
 
 With [Design Management](design_management.md), you can upload design
 assets to issues and view them all together to easily share and
@@ -166,28 +166,30 @@ requires [GraphQL](../../../api/graphql/index.md) to be enabled.
 
 ---
 
-### Status **(ULTIMATE)**
+### Health status **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/36427) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/36427) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
 
-To help you track the status of your issues, you can assign a status to each issue to flag work that's progressing as planned or needs attention to keep on schedule:
+To help you track the status of your issues, you can assign a status to each issue to flag work
+that's progressing as planned or needs attention to keep on schedule:
 
-- `On track` (green)
-- `Needs attention` (amber)
-- `At risk` (red)
+- **On track** (green)
+- **Needs attention** (amber)
+- **At risk** (red)
 
-!["On track" health status on an issue](img/issue_health_status_v12_9.png)
+!["On track" health status on an issue](img/issue_health_status_dropdown_v12_10.png)
 
----
+You can then see issue statuses on the
+[Epic tree](../../group/epics/index.md#issue-health-status-in-epic-tree-ultimate).
 
-#### Enable issue health status
+#### Disable issue health status
 
-This feature comes with the `:save_issuable_health_status` feature flag disabled by default. However, in some cases
-this feature is incompatible with old configuration. To turn on the feature while configuration is
+This feature comes with the `:save_issuable_health_status` feature flag enabled by default. However, in some cases
+this feature is incompatible with old configuration. To turn off the feature while configuration is
 migrated, ask a GitLab administrator with Rails console access to run the following command:
 
 ```ruby
-Feature.enable(:save_issuable_health_status)
+Feature.disable(:save_issuable_health_status)
 ```
 
 ## Other Issue actions
@@ -197,22 +199,7 @@ Feature.enable(:save_issuable_health_status)
 - [Bulk edit issues](../bulk_editing.md) - From the Issues List, select multiple issues
   in order to change their status, assignee, milestone, or labels in bulk.
 - [Import issues](csv_import.md)
-- [Export issues](csv_export.md) **(STARTER)**
+- [Export issues](csv_export.md)
 - [Issues API](../../../api/issues.md)
 - Configure an [external issue tracker](../../../integration/external-issue-tracker.md)
   such as Jira, Redmine, or Bugzilla.
-
-## Limits
-
-This section gives an overview of limits of Issues and an overview of their background.
-
-### Description and comment length
-
-> Introduced in [GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/61974).
-
-Descriptions and comments on [issuable](../../../development/issuable-like-models.md) can be no
-longer than 1 million characters.
-
-Previously, there was no limit to issuable description size, which created a
-[possibility of a DoS attack](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/61974) by allowing
-very long descriptions. It's possible that we will set this limit to a lower number in the future.

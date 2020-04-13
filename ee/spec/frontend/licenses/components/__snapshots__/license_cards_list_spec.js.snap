@@ -9,7 +9,7 @@ exports[`InstanceCardsList renders a list of license cards 1`] = `
       Instance license
     </h4>
      
-    <gl-button-stub
+    <gl-deprecated-button-stub
       class="my-3 js-add-license"
       href="/newLicensePath"
       size="md"
@@ -18,7 +18,7 @@ exports[`InstanceCardsList renders a list of license cards 1`] = `
       
       Add license
     
-    </gl-button-stub>
+    </gl-deprecated-button-stub>
   </div>
    
   <ul
@@ -48,7 +48,7 @@ exports[`InstanceCardsList renders a message when there are no licenses 1`] = `
       Instance license
     </h4>
      
-    <gl-button-stub
+    <gl-deprecated-button-stub
       class="my-3 js-add-license"
       href="/newLicensePath"
       size="md"
@@ -57,7 +57,7 @@ exports[`InstanceCardsList renders a message when there are no licenses 1`] = `
       
       Add license
     
-    </gl-button-stub>
+    </gl-deprecated-button-stub>
   </div>
    
   <ul
@@ -83,7 +83,7 @@ exports[`InstanceCardsList renders a skeleton loading card if loading licenses 1
       Instance license
     </h4>
      
-    <gl-button-stub
+    <gl-deprecated-button-stub
       class="my-3 js-add-license"
       href="/newLicensePath"
       size="md"
@@ -92,7 +92,7 @@ exports[`InstanceCardsList renders a skeleton loading card if loading licenses 1
       
       Add license
     
-    </gl-button-stub>
+    </gl-deprecated-button-stub>
   </div>
    
   <ul

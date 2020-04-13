@@ -95,7 +95,7 @@ describe Analytics::TasksByTypeController do
       it 'succeeds' do
         subject
 
-        expect(response).to be_successful
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('analytics/tasks_by_type', dir: 'ee')
       end
 
@@ -128,7 +128,7 @@ describe Analytics::TasksByTypeController do
       it 'succeeds' do
         subject
 
-        expect(response).to be_successful
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('analytics/tasks_by_type_top_labels', dir: 'ee')
       end
 

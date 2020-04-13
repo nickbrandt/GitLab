@@ -42,6 +42,7 @@ module ApplicationSettingImplementation
         asset_proxy_enabled: false,
         authorized_keys_enabled: true, # TODO default to false if the instance is configured to use AuthorizedKeysCommand
         commit_email_hostname: default_commit_email_hostname,
+        container_expiration_policies_enable_historic_entries: false,
         container_registry_token_expire_delay: 5,
         default_artifacts_expire_in: '30 days',
         default_branch_protection: Settings.gitlab['default_branch_protection'],
@@ -111,6 +112,7 @@ module ApplicationSettingImplementation
         sourcegraph_url: nil,
         sourcegraph_public_only: true,
         minimum_password_length: DEFAULT_MINIMUM_PASSWORD_LENGTH,
+        namespace_storage_size_limit: 0,
         terminal_max_session_time: 0,
         throttle_authenticated_api_enabled: false,
         throttle_authenticated_api_period_in_seconds: 3600,

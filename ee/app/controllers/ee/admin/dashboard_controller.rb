@@ -16,11 +16,6 @@ module EE
         @license = License.current
       end
 
-      def stats
-        @roles_count = ::ProjectAuthorization.roles_stats
-        @bot_count = ::User.bots.count
-      end
-
       # The license section may time out if the number of users is
       # high. To avoid 500 errors, just hide this section. This is a
       # workaround for https://gitlab.com/gitlab-org/gitlab/issues/32287.

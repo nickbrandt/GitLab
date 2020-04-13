@@ -5,6 +5,8 @@ import NewCommitForm from '../new_commit_form';
 import EditBlob from './edit_blob';
 import BlobFileDropzone from '../blob/blob_file_dropzone';
 import initPopover from '~/blob/suggest_gitlab_ci_yml';
+import { setCookie } from '~/lib/utils/common_utils';
+import Tracking from '~/tracking';
 
 export default () => {
   const editBlobForm = $('.js-edit-blob-form');
@@ -60,6 +62,25 @@ export default () => {
   }
 
   if (suggestEl) {
+    const commitButton = document.querySelector('#commit-changes');
+
     initPopover(suggestEl);
+
+    if (commitButton) {
+      const { dismissKey, humanAccess } = suggestEl.dataset;
+      const commitCookieName = `suggest_gitlab_ci_yml_commit_${dismissKey}`;
+      const commitTrackLabel = 'suggest_gitlab_ci_yml_commit_changes';
+      const commitTrackValue = '20';
+
+      commitButton.addEventListener('click', () => {
+        setCookie(commitCookieName, true);
+
+        Tracking.event(undefined, 'click_button', {
+          label: commitTrackLabel,
+          property: humanAccess,
+          value: commitTrackValue,
+        });
+      });
+    }
   }
 };

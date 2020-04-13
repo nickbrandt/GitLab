@@ -26,7 +26,7 @@ describe Projects::ServiceDeskController do
 
       expect(json_response["service_desk_address"]).to match(/\A[^@]+@[^@]+\z/)
       expect(json_response["service_desk_enabled"]).to be_truthy
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     context 'when user is not project maintainer' do
@@ -38,7 +38,7 @@ describe Projects::ServiceDeskController do
 
         get :show, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -75,7 +75,7 @@ describe Projects::ServiceDeskController do
 
       expect(json_response["service_desk_address"]).to be_present
       expect(json_response["service_desk_enabled"]).to be_truthy
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'sets issue_template_key' do
@@ -95,7 +95,7 @@ describe Projects::ServiceDeskController do
                              project_id: project,
                              issue_template_key: 'invalid key' }, format: :json
 
-      expect(response.status).to eq(422)
+      expect(response).to have_gitlab_http_status(:unprocessable_entity)
       expect(json_response['message']).to eq('Issue template key is empty or does not exist')
     end
 
@@ -106,7 +106,7 @@ describe Projects::ServiceDeskController do
         sign_in(other_user)
         put :update, params: { namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true }, format: :json
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

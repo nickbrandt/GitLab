@@ -180,8 +180,19 @@ module EE
       "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
     end
 
-    def project_above_size_limit_message
-      ::Gitlab::RepositorySizeError.new(@project).above_size_limit_message
+    def subscription_message
+      return unless ::Gitlab.com?
+
+      ::Gitlab::ExpiringSubscriptionMessage.new(
+        subscribable: decorated_subscription,
+        signed_in: signed_in?,
+        is_admin: can?(current_user, :developer_access, @project),
+        namespace: @project.namespace
+      ).message
+    end
+
+    def decorated_subscription
+      SubscriptionPresenter.new(@project.gitlab_subscription)
     end
 
     override :membership_locked?
@@ -202,13 +213,13 @@ module EE
     def project_security_dashboard_config(project, pipeline)
       if pipeline.nil?
         {
-          empty_state_illustration_path: image_path('illustrations/security-dashboard_empty.svg'),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
-          has_pipeline_data: "false"
+          empty_state_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index')
         }
       else
         {
           project: { id: project.id, name: project.name },
+          project_full_path: project.full_path,
           vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
           vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),

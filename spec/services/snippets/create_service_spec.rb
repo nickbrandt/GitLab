@@ -76,7 +76,7 @@ describe Snippets::CreateService do
 
     shared_examples 'spam check is performed' do
       shared_examples 'marked as spam' do
-        it 'marks a snippet as spam ' do
+        it 'marks a snippet as spam' do
           expect(snippet).to be_spam
         end
 
@@ -171,6 +171,10 @@ describe Snippets::CreateService do
 
         it 'returns the error' do
           expect(snippet.errors.full_messages).to include('Repository could not be created')
+        end
+
+        it 'does not return a snippet with an id' do
+          expect(snippet.id).to be_nil
         end
       end
 

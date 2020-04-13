@@ -7,10 +7,9 @@ module QA
         module Menu
           prepend QA::Page::Group::SubMenus::Common
 
-          def self.included(base)
+          def self.prepended(base)
             base.class_eval do
               view 'ee/app/views/groups/ee/_settings_nav.html.haml' do
-                element :group_saml_sso_link
                 element :ldap_synchronization_link
                 element :audit_events_settings_link
               end
@@ -35,6 +34,12 @@ module QA
                 element :group_sidebar_submenu
                 element :group_settings_item
               end
+
+              view 'ee/app/views/groups/ee/_administration_nav.html.haml' do
+                element :group_administration_link
+                element :group_sidebar_submenu_content
+                element :group_saml_sso_link
+              end
             end
           end
 
@@ -55,8 +60,8 @@ module QA
           end
 
           def go_to_saml_sso_group_settings
-            hover_element(:group_settings_item) do
-              within_submenu(:group_sidebar_submenu) do
+            hover_element(:group_administration_link) do
+              within_submenu(:group_sidebar_submenu_content) do
                 click_element(:group_saml_sso_link)
               end
             end

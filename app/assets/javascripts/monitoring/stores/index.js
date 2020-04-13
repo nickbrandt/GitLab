@@ -7,16 +7,18 @@ import state from './state';
 
 Vue.use(Vuex);
 
+export const monitoringDashboard = {
+  namespaced: true,
+  actions,
+  getters,
+  mutations,
+  state,
+};
+
 export const createStore = () =>
   new Vuex.Store({
     modules: {
-      monitoringDashboard: {
-        namespaced: true,
-        actions,
-        getters,
-        mutations,
-        state,
-      },
+      monitoringDashboard,
     },
   });
 

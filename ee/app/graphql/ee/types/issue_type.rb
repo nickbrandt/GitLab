@@ -15,7 +15,7 @@ module EE
 
         field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
               method: :design_collection,
-              deprecated: { reason: 'Use `designCollection`', milestone: 12.2 },
+              deprecated: { reason: 'Use `designCollection`', milestone: '12.2' },
               description: 'The designs associated with this issue'
 
         field :design_collection, ::Types::DesignManagement::DesignCollectionType, null: true,

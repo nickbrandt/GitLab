@@ -423,7 +423,7 @@ describe CommitStatus do
       end
 
       it 'returns a correct compound status' do
-        expect(described_class.all.slow_composite_status).to eq 'running'
+        expect(described_class.all.slow_composite_status(project: project)).to eq 'running'
       end
     end
 
@@ -433,7 +433,7 @@ describe CommitStatus do
       end
 
       it 'returns status that indicates success' do
-        expect(described_class.all.slow_composite_status).to eq 'success'
+        expect(described_class.all.slow_composite_status(project: project)).to eq 'success'
       end
     end
 
@@ -444,8 +444,21 @@ describe CommitStatus do
       end
 
       it 'returns status according to the scope' do
-        expect(described_class.latest.slow_composite_status).to eq 'success'
+        expect(described_class.latest.slow_composite_status(project: project)).to eq 'success'
       end
+    end
+  end
+
+  describe '.match_id_and_lock_version' do
+    let(:status_1) { create_status(lock_version: 1) }
+    let(:status_2) { create_status(lock_version: 2) }
+
+    it 'returns statuses that match the given id and lock versions' do
+      params = [
+        { id: status_1.id, lock_version: 1 },
+        { id: status_2.id, lock_version: 3 }
+      ]
+      expect(described_class.match_id_and_lock_version(params)).to contain_exactly(status_1)
     end
   end
 

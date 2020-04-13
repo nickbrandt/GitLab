@@ -69,6 +69,7 @@ module EE
           types Issue
           condition do
             quick_action_target.persisted? &&
+              !quick_action_target.promoted? &&
               current_user.can?(:admin_issue, project) &&
               current_user.can?(:create_epic, project.group)
           end

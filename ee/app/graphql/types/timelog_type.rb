@@ -10,7 +10,13 @@ module Types
           Types::TimeType,
           null: false,
           method: :spent_at,
-          description: 'The date when the time tracked was spent at'
+          deprecated: { reason: 'Use `spentAt`', milestone: '12.10' },
+          description: 'Timestamp of when the time tracked was spent at'
+
+    field :spent_at,
+          Types::TimeType,
+          null: true,
+          description: 'Timestamp of when the time tracked was spent at'
 
     field :time_spent,
           GraphQL::INT_TYPE,

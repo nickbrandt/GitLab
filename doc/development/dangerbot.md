@@ -1,6 +1,6 @@
 # Danger bot
 
-The GitLab CI pipeline includes a `danger-review` job that uses [Danger](https://github.com/danger/danger)
+The GitLab CI/CD pipeline includes a `danger-review` job that uses [Danger](https://github.com/danger/danger)
 to perform a variety of automated checks on the code under test.
 
 Danger is a gem that runs in the CI environment, like any other analysis tool.
@@ -31,7 +31,7 @@ from the start of the merge request.
 
 ## Run Danger locally
 
-A subset of the current checks can be run locally with the following rake task:
+A subset of the current checks can be run locally with the following Rake task:
 
 ```shell
 bin/rake danger_local

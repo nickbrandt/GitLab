@@ -40,7 +40,7 @@ describe IssuablesHelper do
     end
 
     it 'returns default label when a group was not found for the provided id' do
-      expect(group_dropdown_label(9999, default)).to eq('default label')
+      expect(group_dropdown_label(non_existing_record_id, default)).to eq('default label')
     end
   end
 
@@ -300,6 +300,48 @@ describe IssuablesHelper do
         end
 
         it { is_expected.to include({ can_merge: can_merge })}
+      end
+    end
+  end
+
+  describe '#gitlab_team_member_badge' do
+    let(:issue) { build(:issue, author: user) }
+
+    before do
+      allow(Gitlab).to receive(:com?).and_return(true)
+    end
+
+    context 'when `:gitlab_employee_badge` feature flag is disabled' do
+      let(:user) { build(:user, email: 'test@gitlab.com') }
+
+      before do
+        stub_feature_flags(gitlab_employee_badge: false)
+      end
+
+      it 'returns nil' do
+        expect(helper.gitlab_team_member_badge(issue.author)).to be_nil
+      end
+    end
+
+    context 'when issue author is not a GitLab team member' do
+      let(:user) { build(:user, email: 'test@example.com') }
+
+      it 'returns nil' do
+        expect(helper.gitlab_team_member_badge(issue.author)).to be_nil
+      end
+    end
+
+    context 'when issue author is a GitLab team member' do
+      let(:user) { build(:user, email: 'test@gitlab.com') }
+
+      it 'returns span with svg icon' do
+        expect(helper.gitlab_team_member_badge(issue.author)).to have_selector('span > svg')
+      end
+
+      context 'when `css_class` parameter is passed' do
+        it 'adds CSS classes' do
+          expect(helper.gitlab_team_member_badge(issue.author, css_class: 'foo bar baz')).to have_selector('span.foo.bar.baz')
+        end
       end
     end
   end

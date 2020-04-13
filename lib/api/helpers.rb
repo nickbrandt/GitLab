@@ -179,8 +179,10 @@ module API
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_project_issue(iid)
-      IssuesFinder.new(current_user, project_id: user_project.id).find_by!(iid: iid)
+    def find_project_issue(iid, project_id = nil)
+      project = project_id ? find_project!(project_id) : user_project
+
+      ::IssuesFinder.new(current_user, project_id: project.id).find_by!(iid: iid)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -247,6 +249,10 @@ module API
 
     def authorize_admin_project
       authorize! :admin_project, user_project
+    end
+
+    def authorize_admin_group
+      authorize! :admin_group, user_group
     end
 
     def authorize_read_builds!
@@ -365,6 +371,10 @@ module API
 
     def not_allowed!
       render_api_error!('405 Method Not Allowed', 405)
+    end
+
+    def not_acceptable!
+      render_api_error!('406 Not Acceptable', 406)
     end
 
     def service_unavailable!
@@ -497,20 +507,28 @@ module API
 
     protected
 
-    def project_finder_params_ce
-      finder_params = { without_deleted: true }
+    def project_finder_params_visibility_ce
+      finder_params = {}
+      finder_params[:min_access_level] = params[:min_access_level] if params[:min_access_level]
+      finder_params[:visibility_level] = Gitlab::VisibilityLevel.level_value(params[:visibility]) if params[:visibility]
       finder_params[:owned] = true if params[:owned].present?
       finder_params[:non_public] = true if params[:membership].present?
       finder_params[:starred] = true if params[:starred].present?
-      finder_params[:visibility_level] = Gitlab::VisibilityLevel.level_value(params[:visibility]) if params[:visibility]
       finder_params[:archived] = archived_param unless params[:archived].nil?
+      finder_params
+    end
+
+    def project_finder_params_ce
+      finder_params = project_finder_params_visibility_ce
+      finder_params[:without_deleted] = true
       finder_params[:search] = params[:search] if params[:search]
       finder_params[:search_namespaces] = true if params[:search_namespaces].present?
       finder_params[:user] = params.delete(:user) if params[:user]
       finder_params[:custom_attributes] = params[:custom_attributes] if params[:custom_attributes]
-      finder_params[:min_access_level] = params[:min_access_level] if params[:min_access_level]
       finder_params[:id_after] = params[:id_after] if params[:id_after]
       finder_params[:id_before] = params[:id_before] if params[:id_before]
+      finder_params[:last_activity_after] = params[:last_activity_after] if params[:last_activity_after]
+      finder_params[:last_activity_before] = params[:last_activity_before] if params[:last_activity_before]
       finder_params
     end
 

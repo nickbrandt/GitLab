@@ -1,7 +1,7 @@
 .protected-branch-push-access-list,
 .protected-branch-merge-access-list {
   a {
-    color: $white-light;
+    color: $white;
   }
 }
 
@@ -39,11 +39,6 @@
     &.invalidate {
       text-decoration: line-through;
     }
-  }
-
-  .changing-auth-method {
-    display: flex;
-    justify-content: center;
   }
 }
 

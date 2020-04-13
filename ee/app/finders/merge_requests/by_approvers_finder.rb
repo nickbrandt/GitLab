@@ -30,11 +30,11 @@ module MergeRequests
     private
 
     def by_no_approvers?
-      includes_custom_label?(IssuableFinder::FILTER_NONE)
+      includes_custom_label?(IssuableFinder::Params::FILTER_NONE)
     end
 
     def by_any_approvers?
-      includes_custom_label?(IssuableFinder::FILTER_ANY)
+      includes_custom_label?(IssuableFinder::Params::FILTER_ANY)
     end
 
     def includes_custom_label?(label)

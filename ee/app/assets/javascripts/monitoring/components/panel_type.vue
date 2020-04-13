@@ -1,5 +1,6 @@
 <script>
-import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import { mapGetters } from 'vuex';
+import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import CePanelType from '~/monitoring/components/panel_type.vue';
 import AlertWidget from './alert_widget.vue';
 
@@ -20,16 +21,26 @@ export default {
       required: false,
       default: false,
     },
-    groupId: {
-      type: String,
-      required: false,
-      default: 'panel-type-chart',
-    },
   },
   data() {
     return {
       allAlerts: {},
     };
+  },
+  computed: {
+    ...mapGetters('monitoringDashboard', ['metricsSavedToDb']),
+    hasMetricsInDb() {
+      const { metrics = [] } = this.graphData;
+      return metrics.some(({ metricId }) => this.metricsSavedToDb.includes(metricId));
+    },
+    alertWidgetAvailable() {
+      return (
+        this.prometheusAlertsAvailable &&
+        this.alertsEndpoint &&
+        this.graphData &&
+        this.hasMetricsInDb
+      );
+    },
   },
   methods: {
     setAlerts(alertPath, alertAttributes) {

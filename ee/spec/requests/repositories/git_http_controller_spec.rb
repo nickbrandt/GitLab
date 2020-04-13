@@ -4,13 +4,18 @@ require 'spec_helper'
 
 describe Repositories::GitHttpController, type: :request do
   include GitHttpHelpers
+  include ::EE::GeoHelpers
+
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository, :private) }
+  let(:env) { { user: user.username, password: user.password } }
+  let(:path) { "#{project.full_path}.git" }
+
+  before do
+    project.add_developer(user)
+  end
 
   describe 'GET #info_refs' do
-    let_it_be(:user) { create(:user) }
-    let_it_be(:project) { create(:project, :repository, :private) }
-    let(:path) { "#{project.full_path}.git" }
-    let(:env) { { user: user.username, password: user.password } }
-
     context 'smartcard session required' do
       subject { clone_get(path, env) }
 
@@ -60,6 +65,50 @@ describe Repositories::GitHttpController, type: :request do
 
           expect(response).to have_gitlab_http_status(:ok)
         end
+      end
+    end
+  end
+
+  describe 'POST #git_receive_pack' do
+    subject { push_post(path, env) }
+
+    context 'when node is a primary Geo one' do
+      before do
+        stub_primary_node
+      end
+
+      shared_examples 'triggers Geo' do
+        it 'executes ::Gitlab::Geo::GitPushHttp' do
+          expect_next_instance_of(::Gitlab::Geo::GitPushHttp) do |instance|
+            expect(instance).to receive(:cache_referrer_node)
+          end
+
+          subject
+        end
+
+        it 'returns 200' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+
+      context 'with projects' do
+        it_behaves_like 'triggers Geo'
+      end
+
+      context 'with personal snippet' do
+        let_it_be(:snippet) { create(:personal_snippet, :repository, author: user) }
+        let(:path) { "snippets/#{snippet.id}.git" }
+
+        it_behaves_like 'triggers Geo'
+      end
+
+      context 'with project snippet' do
+        let_it_be(:snippet) { create(:project_snippet, :repository, author: user, project: project) }
+        let(:path) { "#{project.full_path}/snippets/#{snippet.id}.git" }
+
+        it_behaves_like 'triggers Geo'
       end
     end
   end

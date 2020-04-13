@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
+import PackageFilter from './packages_filter.vue';
 import PackageList from './packages_list.vue';
 import PackageSort from './packages_sort.vue';
 import { PACKAGE_REGISTRY_TABS } from '../constants';
@@ -11,17 +12,21 @@ export default {
     GlEmptyState,
     GlTab,
     GlTabs,
+    PackageFilter,
     PackageList,
     PackageSort,
   },
   computed: {
     ...mapState({
-      resourceId: state => state.config.resourceId,
       emptyListIllustration: state => state.config.emptyListIllustration,
       emptyListHelpUrl: state => state.config.emptyListHelpUrl,
-      totalItems: state => state.pagination.total,
+      filterQuery: state => state.filterQuery,
     }),
     emptyListText() {
+      if (this.filterQuery) {
+        return s__('PackageRegistry|To widen your search, change or remove the filters above.');
+      }
+
       return sprintf(
         s__(
           'PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab.',
@@ -55,6 +60,10 @@ export default {
       this.requestPackagesList();
     },
     emptyStateTitle({ title, type }) {
+      if (this.filterQuery) {
+        return s__('PackageRegistry|Sorry, your filter produced no results');
+      }
+
       if (type) {
         return sprintf(s__('PackageRegistry|There are no %{packageType} packages yet'), {
           packageType: title,
@@ -70,7 +79,8 @@ export default {
 <template>
   <gl-tabs @input="tabChanged">
     <template #tabs-end>
-      <div class="align-self-center ml-auto">
+      <div class="d-flex align-self-center ml-md-auto py-1 py-md-0">
+        <package-filter class="mr-1" @filter="requestPackagesList" />
         <package-sort @sort:changed="requestPackagesList" />
       </div>
     </template>

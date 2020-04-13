@@ -12,7 +12,7 @@ Follow the Chatops document to [request access](../chatops_on_gitlabcom.md#reque
 Once you are added to the project test if your access propagated,
 run:
 
-```
+```shell
 /chatops run feature --help
 ```
 
@@ -70,7 +70,7 @@ and <https://dev.gitlab.org>.
 For example, to enable a feature for 25% of all users, run the following in
 Slack:
 
-```
+```shell
 /chatops run feature set new_navigation_bar 25 --dev
 /chatops run feature set new_navigation_bar 25 --staging
 ```
@@ -92,12 +92,14 @@ feature enabled, you can roll out the change to GitLab.com.
 Similar to above, to enable a feature for 25% of all users, run the following in
 Slack:
 
-```
+```shell
 /chatops run feature set new_navigation_bar 25
 ```
 
 This will enable the feature for GitLab.com, with `new_navigation_bar` being the
 name of the feature.
+This command does *not* enable the feature for 25% of the total users.
+Instead, when the feature is checked with `enabled?`, it will return `true` 25% of the time.
 
 If you are not certain what percentages to use, simply use the following steps:
 
@@ -117,13 +119,13 @@ Feature gates can also be actor based, for example a feature could first be
 enabled for only the `gitlab` project. The project is passed by supplying a
 `--project` flag:
 
-```
+```shell
 /chatops run feature set --project=gitlab-org/gitlab some_feature true
 ```
 
 For groups the `--group` flag is available:
 
-```
+```shell
 /chatops run feature set --group=gitlab-org some_feature true
 ```
 
@@ -131,14 +133,13 @@ Note that actor-based gates are applied before percentages. For example, conside
 `group/project` as `gitlab-org/gitlab` and a given example feature as `some_feature`, if
 you run these 2 commands:
 
-```
+```shell
 /chatops run feature set --project=gitlab-org/gitlab some_feature true
 /chatops run feature set some_feature 25
 ```
 
-Then `some_feature` will be enabled for 25% of the time the users are interacting with
-`gitlab-org/gitlab`. Note that the the feature is not enabled to 25%
-of the users, rather a simple randomization is made each time the `enabled?` is checked.
+Then `some_feature` will be enabled for both 25% of users and all users interacting with
+`gitlab-org/gitlab`.
 
 NOTE: **Note:**
 **Percentage of time** rollout is not a good idea if what you want is to make sure a feature

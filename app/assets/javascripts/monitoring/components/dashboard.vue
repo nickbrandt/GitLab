@@ -3,7 +3,7 @@ import { debounce, pickBy } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import VueDraggable from 'vuedraggable';
 import {
-  GlButton,
+  GlDeprecatedButton,
   GlDropdown,
   GlDropdownItem,
   GlDropdownHeader,
@@ -19,7 +19,12 @@ import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { mergeUrlParams, redirectTo, refreshCurrentPage } from '~/lib/utils/url_utility';
+import {
+  mergeUrlParams,
+  redirectTo,
+  refreshCurrentPage,
+  updateHistory,
+} from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
 import Icon from '~/vue_shared/components/icon.vue';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
@@ -39,7 +44,7 @@ export default {
     VueDraggable,
     PanelType,
     Icon,
-    GlButton,
+    GlDeprecatedButton,
     GlDropdown,
     GlLoadingIcon,
     GlDropdownItem,
@@ -245,7 +250,7 @@ export default {
     },
   },
   created() {
-    this.setEndpoints({
+    this.setInitialState({
       metricsEndpoint: this.metricsEndpoint,
       deploymentsEndpoint: this.deploymentsEndpoint,
       dashboardEndpoint: this.dashboardEndpoint,
@@ -253,6 +258,7 @@ export default {
       currentDashboard: this.currentDashboard,
       projectPath: this.projectPath,
       logsPath: this.logsPath,
+      currentEnvironmentName: this.currentEnvironmentName,
     });
   },
   mounted() {
@@ -268,7 +274,7 @@ export default {
       'setTimeRange',
       'fetchData',
       'setGettingStartedEmptyState',
-      'setEndpoints',
+      'setInitialState',
       'setPanelGroupMetrics',
       'filterEnvironments',
     ]),
@@ -356,6 +362,14 @@ export default {
     refreshDashboard() {
       refreshCurrentPage();
     },
+
+    onTimeRangeZoom({ start, end }) {
+      updateHistory({
+        url: mergeUrlParams({ start, end }, window.location.href),
+        title: document.title,
+      });
+      this.selectedTimeRange = { start, end };
+    },
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -380,6 +394,7 @@ export default {
         >
           <dashboards-dropdown
             id="monitor-dashboards-dropdown"
+            data-qa-selector="dashboards_filter_dropdown"
             class="mb-0 d-flex"
             toggle-class="dropdown-menu-toggle"
             :default-branch="defaultBranch"
@@ -444,6 +459,7 @@ export default {
           label-size="sm"
           label-for="monitor-time-window-dropdown"
           class="col-sm-auto col-md-auto col-lg-auto"
+          data-qa-selector="show_last_dropdown"
         >
           <date-time-picker
             ref="dateTimePicker"
@@ -455,15 +471,15 @@ export default {
         </gl-form-group>
 
         <gl-form-group class="col-sm-2 col-md-2 col-lg-1 refresh-dashboard-button">
-          <gl-button
+          <gl-deprecated-button
             ref="refreshDashboardBtn"
             v-gl-tooltip
             variant="default"
             :title="s__('Metrics|Reload this page')"
             @click="refreshDashboard"
           >
-            <icon name="repeat" />
-          </gl-button>
+            <icon name="retry" />
+          </gl-deprecated-button>
         </gl-form-group>
 
         <gl-form-group
@@ -472,22 +488,22 @@ export default {
           class="dropdown-buttons col-md d-md-flex col-lg d-lg-flex align-items-end"
         >
           <div id="prometheus-graphs-dropdown-buttons">
-            <gl-button
+            <gl-deprecated-button
               v-if="showRearrangePanelsBtn"
               :pressed="isRearrangingPanels"
               variant="default"
               class="mr-2 mt-1 js-rearrange-button"
               @click="toggleRearrangingPanels"
-              >{{ __('Arrange charts') }}</gl-button
+              >{{ __('Arrange charts') }}</gl-deprecated-button
             >
-            <gl-button
+            <gl-deprecated-button
               v-if="addingMetricsAvailable"
               ref="addMetricBtn"
               v-gl-modal="$options.addMetric.modalId"
               variant="outline-success"
               data-qa-selector="add_metric_button"
               class="mr-2 mt-1"
-              >{{ $options.addMetric.title }}</gl-button
+              >{{ $options.addMetric.title }}</gl-deprecated-button
             >
             <gl-modal
               v-if="addingMetricsAvailable"
@@ -503,26 +519,29 @@ export default {
                 />
               </form>
               <div slot="modal-footer">
-                <gl-button @click="hideAddMetricModal">{{ __('Cancel') }}</gl-button>
-                <gl-button
+                <gl-deprecated-button @click="hideAddMetricModal">{{
+                  __('Cancel')
+                }}</gl-deprecated-button>
+                <gl-deprecated-button
                   ref="submitCustomMetricsFormBtn"
                   v-track-event="getAddMetricTrackingOptions()"
                   :disabled="!formIsValid"
                   variant="success"
                   @click="submitCustomMetricsForm"
-                  >{{ __('Save changes') }}</gl-button
+                  >{{ __('Save changes') }}</gl-deprecated-button
                 >
               </div>
             </gl-modal>
 
-            <gl-button
+            <gl-deprecated-button
               v-if="selectedDashboard.can_edit"
               class="mt-1 js-edit-link"
               :href="selectedDashboard.project_blob_path"
-              >{{ __('Edit dashboard') }}</gl-button
+              data-qa-selector="edit_dashboard_button"
+              >{{ __('Edit dashboard') }}</gl-deprecated-button
             >
 
-            <gl-button
+            <gl-deprecated-button
               v-if="externalDashboardUrl.length"
               class="mt-1 js-external-dashboard-link"
               variant="primary"
@@ -532,7 +551,7 @@ export default {
             >
               {{ __('View full dashboard') }}
               <icon name="external-link" />
-            </gl-button>
+            </gl-deprecated-button>
           </div>
         </gl-form-group>
       </div>
@@ -577,6 +596,7 @@ export default {
                 :alerts-endpoint="alertsEndpoint"
                 :prometheus-alerts-available="prometheusAlertsAvailable"
                 :index="`${index}-${graphIndex}`"
+                @timerangezoom="onTimeRangeZoom"
               />
             </div>
           </div>

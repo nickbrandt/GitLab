@@ -42,6 +42,8 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 - Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
 - Should not be an email address or username. We strongly recommend against these as it is hard to guarantee they will never change, for example when a person's name changes. Email addresses are also case-insensitive, which can result in users being unable to sign in.
 
+The recommended field for supported providers are in the [provider specific notes](#providers).
+
 CAUTION: **Warning:**
 Once users have signed into GitLab using the SSO SAML setup, changing the `NameID` will break the configuration and potentially lock users out of the GitLab group.
 
@@ -232,6 +234,13 @@ Set other user attributes and claims according to the [assertions table](#assert
 
 Under Okta's **Single sign on URL** field, check the option **Use this for Recipient URL and Destination URL**.
 
+Please note that Okta's generic SAML app does not have a **Login URL** field, where the **Identity provider single sign on URL** would normally go. The **Identity provider single sign on URL** may be required the first time a user is logging in if they are having any difficulties.
+
+We recommend:
+
+- **Application username** (NameID) set to **Custom** `user.getInternalProperty("id")`.
+- **Name ID Format** set to **Persistent**.
+
 Set attribute statements according to the [assertions table](#assertions).
 
 ### OneLogin setup notes
@@ -272,7 +281,7 @@ GitLab [isn't limited to the SAML providers listed above](#my-identity-provider-
 | Additional URLs | | You may need to use the `Identifier` or `Assertion consumer service URL` in other fields on some providers. |
 | Single Sign Out URL | | Not supported |
 
-If the information information you need isn't listed above you may wish to check our [troubleshooting docs below](#i-need-additional-information-to-configure-my-identity-provider).
+If the information you need isn't listed above you may wish to check our [troubleshooting docs below](#i-need-additional-information-to-configure-my-identity-provider).
 
 ## Linking SAML to your existing GitLab.com account
 
@@ -313,6 +322,53 @@ For example, to unlink the `MyOrg` account, the following **Disconnect** button 
 | Assertion consumer service URL | The callback on GitLab where users will be redirected after successfully authenticating with the identity provider. |
 | Issuer | How GitLab identifies itself to the identity provider. Also known as a "Relying party trust identifier". |
 | Certificate fingerprint | Used to confirm that communications over SAML are secure by checking that the server is signing communications with the correct certificate. Also known as a certificate thumbprint. |
+
+## Configuring on a self-managed GitLab instance
+
+For self-managed GitLab instances we strongly recommend using the
+[instance-wide SAML OmniAuth Provider](../../../integration/saml.md) instead.
+
+Group SAML SSO helps if you need to allow access via multiple SAML identity providers, but as a multi-tenant solution is less suited to cases where you administer your own GitLab instance.
+
+To proceed with configuring Group SAML SSO instead, you'll need to enable the `group_saml` OmniAuth provider. This can be done from:
+
+- `gitlab.rb` for GitLab [Omnibus installations](#omnibus-installations).
+- `gitlab/config/gitlab.yml` for [source installations](#source-installations).
+
+### Limitations
+
+Group SAML on a self-managed instance is limited when compared to the recommended
+[instance-wide SAML](../../../integration/saml.md). The recommended solution allows you to take advantage of:
+
+- [LDAP compatibility](../../../administration/auth/ldap.md).
+- [LDAP group Sync](../../../administration/auth/how_to_configure_ldap_gitlab_ee/index.md#group-sync).
+- [Required groups](../../../integration/saml.md#required-groups-starter-only).
+- [Admin groups](../../../integration/saml.md#admin-groups-starter-only).
+- [Auditor groups](../../../integration/saml.md#auditor-groups-starter-only).
+
+### Omnibus installations
+
+1. Make sure GitLab is
+   [configured with HTTPS](../../../install/installation.md#using-https).
+1. Enable OmniAuth and the `group_saml` provider in `gitlab.rb`:
+
+   ```ruby
+   gitlab_rails['omniauth_enabled'] = true
+   gitlab_rails['omniauth_providers'] = [{ name: 'group_saml' }]
+   ```
+
+### Source installations
+
+1. Make sure GitLab is
+   [configured with HTTPS](../../../install/installation.md#using-https).
+1. Enable OmniAuth and the `group_saml` provider in `gitlab/config/gitlab.yml`:
+
+    ```yaml
+    omniauth:
+        enabled: true
+        providers:
+          - { name: 'group_saml' }
+    ```
 
 ## Troubleshooting
 
@@ -355,11 +411,29 @@ The user you are signed in with already has SAML linked to a different identity.
 
 To change which identity you sign in with, you can [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account.
 
+Alternatively, an admin of your Identity Provider can use the [SCIM API](../../../api/scim.md) to update your `extern_uid` to match the current **NameID**.
+
+### Message: "SAML authentication failed: Email has already been taken"
+
+| Cause                                                                                                                                    | Solution                                                                 |
+|------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| When a user account with the email address already exists in GitLab, but the user does not have the SAML identity tied to their account. | The user will need to [link their account](#user-access-and-management). |
+
 ### Message: "SAML authentication failed: Extern uid has already been taken, User has already been taken"
 
 Getting both of these errors at the same time suggests the NameID capitalization provided by the Identity Provider didn't exactly match the previous value for that user.
 
 This can be prevented by configuring the [NameID](#nameid) to return a consistent value. Fixing this for an individual user involves [unlinking SAML in the GitLab account](#unlinking-accounts), although this will cause group membership and Todos to be lost.
+
+### The NameID has changed
+
+As mentioned in the [NameID](#nameid) section, if the NameID changes for any user, the user can be locked out. This is common for setups using an email address as the identifier.
+
+To fix the issue, follow the steps outlined in the ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken) section. We recommend using the API method if many users are affected so that the changes can be done in a scripted batch.
+
+### I need to change my SAML app
+
+Users need to [unlink the previous SAML identity](#unlinking-accounts) and [link their identity](#user-access-and-management) using the new SAML app.
 
 ### My identity provider isn't listed
 
@@ -370,7 +444,7 @@ Your identity provider may also have relevant documentation. It may be generic S
 - [Auth0](https://auth0.com/docs/protocols/saml/saml-idp-generic)
 - [G Suite](https://support.google.com/a/answer/6087519?hl=en)
 - [JumpCloud](https://support.jumpcloud.com/support/s/article/single-sign-on-sso-with-gitlab-2019-08-21-10-36-47)
-- [OneLogin](https://onelogin.service-now.com/support?id=kb_article&sys_id=93f95543db109700d5505eea4b96198f).
+- [PingOne by Ping Identity](https://docs.pingidentity.com/bundle/pingone/page/xsh1564020480660-1.html)
 
 ### I need additional information to configure my identity provider
 

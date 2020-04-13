@@ -11,14 +11,15 @@ module Gitlab
           @project      = project
           @current_user = current_user
           @shared       = shared
-          @full_path    = File.join(@shared.export_path, ImportExport.project_filename)
         end
 
         def save
-          json_writer = ImportExport::JSON::LegacyWriter.new(@full_path)
-
-          serializer = ImportExport::JSON::StreamingSerializer.new(exportable, reader.project_tree, json_writer)
-          serializer.execute
+          ImportExport::JSON::StreamingSerializer.new(
+            exportable,
+            reader.project_tree,
+            json_writer,
+            exportable_path: "project"
+          ).execute
 
           true
         rescue => e
@@ -49,6 +50,18 @@ module Gitlab
 
         def presenter_class
           Projects::ImportExport::ProjectExportPresenter
+        end
+
+        def json_writer
+          @json_writer ||= begin
+            if ::Feature.enabled?(:project_export_as_ndjson, @project.namespace)
+              full_path = File.join(@shared.export_path, 'tree')
+              Gitlab::ImportExport::JSON::NdjsonWriter.new(full_path)
+            else
+              full_path = File.join(@shared.export_path, ImportExport.project_filename)
+              Gitlab::ImportExport::JSON::LegacyWriter.new(full_path, allowed_path: 'project')
+            end
+          end
         end
       end
     end

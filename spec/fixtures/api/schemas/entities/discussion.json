@@ -36,7 +36,7 @@
           "updated_at": { "type": "date" },
           "system": { "type": "boolean" },
           "noteable_id": { "type": "integer" },
-          "noteable_iid": { "type": "integer" },
+          "noteable_iid": { "type": ["integer", "null"] },
           "noteable_type": { "type": "string" },
           "resolved": { "type": "boolean" },
           "resolvable": { "type": "boolean" },
@@ -55,7 +55,8 @@
           "human_access": { "type": ["string", "null"] },
           "toggle_award_path": { "type": "string" },
           "path": { "type": "string" },
-          "commands_changes": { "type": "object", "additionalProperties": true }
+          "commands_changes": { "type": "object", "additionalProperties": true },
+          "confidential": { "type": ["boolean", "null"] }
         },
         "required": [
           "id", "attachment", "author", "created_at", "updated_at",

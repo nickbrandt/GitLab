@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import * as types from './mutation_types';
+import { issuableTypesMap } from 'ee/related_issues/constants';
 
 export default {
   [types.SET_INITIAL_CONFIG](
@@ -31,6 +32,10 @@ export default {
 
   [types.SET_CHILDREN_COUNT](state, data) {
     state.descendantCounts = data;
+  },
+
+  [types.SET_HEALTH_STATUS](state, data) {
+    state.healthStatus = data;
   },
 
   [types.SET_ITEM_CHILDREN](state, { parentItem, children, append }) {
@@ -142,6 +147,7 @@ export default {
   [types.TOGGLE_CREATE_EPIC_FORM](state, { toggleState }) {
     state.showCreateEpicForm = toggleState;
     state.showAddItemForm = false;
+    state.issuableType = issuableTypesMap.EPIC;
   },
 
   [types.TOGGLE_CREATE_ISSUE_FORM](state, { toggleState }) {

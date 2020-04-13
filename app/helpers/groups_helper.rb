@@ -10,8 +10,19 @@ module GroupsHelper
     ]
   end
 
-  def group_nav_link_paths
-    %w[groups#projects groups#edit badges#index ci_cd#show ldap_group_links#index hooks#index audit_events#index pipeline_quota#index]
+  def group_settings_nav_link_paths
+    %w[
+      groups#projects
+      groups#edit
+      badges#index
+      ci_cd#show
+      integrations#index
+      integrations#edit
+      ldap_group_links#index
+      hooks#index
+      audit_events#index
+      pipeline_quota#index
+    ]
   end
 
   def group_packages_nav_link_paths
@@ -22,8 +33,7 @@ module GroupsHelper
 
   def group_container_registry_nav?
     Gitlab.config.registry.enabled &&
-      can?(current_user, :read_container_image, @group) &&
-      Feature.enabled?(:group_container_registry_browser, @group)
+      can?(current_user, :read_container_image, @group)
   end
 
   def group_sidebar_links

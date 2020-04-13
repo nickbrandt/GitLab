@@ -9,7 +9,7 @@ describe CountriesController do
 
       expected_json = World.countries_for_select.to_json
 
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response.body).to eq(expected_json)
     end
 

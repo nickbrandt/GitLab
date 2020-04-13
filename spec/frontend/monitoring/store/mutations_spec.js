@@ -20,7 +20,7 @@ describe('Monitoring mutations', () => {
     stateCopy = state();
   });
 
-  describe('RECEIVE_METRICS_DATA_SUCCESS', () => {
+  describe('RECEIVE_METRICS_DASHBOARD_SUCCESS', () => {
     let payload;
     const getGroups = () => stateCopy.dashboard.panelGroups;
 
@@ -29,7 +29,7 @@ describe('Monitoring mutations', () => {
       payload = metricsDashboardPayload;
     });
     it('adds a key to the group', () => {
-      mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
+      mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, payload);
       const groups = getGroups();
 
       expect(groups[0].key).toBe('system-metrics-kubernetes-0');
@@ -37,7 +37,7 @@ describe('Monitoring mutations', () => {
       expect(groups[2].key).toBe('response-metrics-nginx-ingress-2');
     });
     it('normalizes values', () => {
-      mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
+      mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, payload);
       const expectedLabel = 'Pod average (MB)';
 
       const { label, queryRange } = getGroups()[0].panels[2].metrics[0];
@@ -45,7 +45,7 @@ describe('Monitoring mutations', () => {
       expect(queryRange.length).toBeGreaterThan(0);
     });
     it('contains six groups, with panels with a metric each', () => {
-      mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
+      mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, payload);
 
       const groups = getGroups();
 
@@ -61,18 +61,18 @@ describe('Monitoring mutations', () => {
       expect(groups[1].panels[0].metrics).toHaveLength(1);
     });
     it('assigns metrics a metric id', () => {
-      mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
+      mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, payload);
 
       const groups = getGroups();
 
       expect(groups[0].panels[0].metrics[0].metricId).toEqual(
-        'undefined_system_metrics_kubernetes_container_memory_total',
+        'NO_DB_system_metrics_kubernetes_container_memory_total',
       );
       expect(groups[1].panels[0].metrics[0].metricId).toEqual(
-        'undefined_response_metrics_nginx_ingress_throughput_status_code',
+        'NO_DB_response_metrics_nginx_ingress_throughput_status_code',
       );
       expect(groups[2].panels[0].metrics[0].metricId).toEqual(
-        'undefined_response_metrics_nginx_ingress_16_throughput_status_code',
+        'NO_DB_response_metrics_nginx_ingress_16_throughput_status_code',
       );
     });
   });
@@ -86,6 +86,58 @@ describe('Monitoring mutations', () => {
       expect(typeof stateCopy.deploymentData[0]).toEqual('object');
     });
   });
+
+  describe('SET_INITIAL_STATE', () => {
+    it('should set all the endpoints', () => {
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        metricsEndpoint: 'additional_metrics.json',
+        deploymentsEndpoint: 'deployments.json',
+        dashboardEndpoint: 'dashboard.json',
+        projectPath: '/gitlab-org/gitlab-foss',
+        currentEnvironmentName: 'production',
+      });
+      expect(stateCopy.metricsEndpoint).toEqual('additional_metrics.json');
+      expect(stateCopy.deploymentsEndpoint).toEqual('deployments.json');
+      expect(stateCopy.dashboardEndpoint).toEqual('dashboard.json');
+      expect(stateCopy.projectPath).toEqual('/gitlab-org/gitlab-foss');
+      expect(stateCopy.currentEnvironmentName).toEqual('production');
+    });
+
+    it('should not remove previously set properties', () => {
+      const defaultLogsPath = stateCopy.logsPath;
+
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        logsPath: defaultLogsPath,
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        dashboardEndpoint: 'dashboard.json',
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        projectPath: '/gitlab-org/gitlab-foss',
+      });
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        currentEnvironmentName: 'canary',
+      });
+
+      expect(stateCopy).toMatchObject({
+        logsPath: defaultLogsPath,
+        dashboardEndpoint: 'dashboard.json',
+        projectPath: '/gitlab-org/gitlab-foss',
+        currentEnvironmentName: 'canary',
+      });
+    });
+
+    it('should not update unknown properties', () => {
+      mutations[types.SET_INITIAL_STATE](stateCopy, {
+        dashboardEndpoint: 'dashboard.json',
+        someOtherProperty: 'some invalid value', // someOtherProperty is not allowed
+      });
+
+      expect(stateCopy.dashboardEndpoint).toBe('dashboard.json');
+      expect(stateCopy.someOtherProperty).toBeUndefined();
+    });
+  });
+
   describe('SET_ENDPOINTS', () => {
     it('should set all the endpoints', () => {
       mutations[types.SET_ENDPOINTS](stateCopy, {
@@ -132,7 +184,7 @@ describe('Monitoring mutations', () => {
   });
 
   describe('Individual panel/metric results', () => {
-    const metricId = 'undefined_response_metrics_nginx_ingress_throughput_status_code';
+    const metricId = 'NO_DB_response_metrics_nginx_ingress_throughput_status_code';
     const result = [
       {
         values: [[0, 1], [1, 1], [1, 3]],
@@ -143,7 +195,7 @@ describe('Monitoring mutations', () => {
 
     describe('REQUEST_METRIC_RESULT', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
+        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, dashboard);
       });
       it('stores a loading state on a metric', () => {
         expect(stateCopy.showEmptyState).toBe(true);
@@ -166,7 +218,7 @@ describe('Monitoring mutations', () => {
 
     describe('RECEIVE_METRIC_RESULT_SUCCESS', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
+        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, dashboard);
       });
       it('clears empty state', () => {
         expect(stateCopy.showEmptyState).toBe(true);
@@ -199,7 +251,7 @@ describe('Monitoring mutations', () => {
 
     describe('RECEIVE_METRIC_RESULT_FAILURE', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
+        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](stateCopy, dashboard);
       });
       it('maintains the loading state when a metric fails', () => {
         expect(stateCopy.showEmptyState).toBe(true);

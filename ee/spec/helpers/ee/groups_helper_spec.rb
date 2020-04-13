@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe GroupsHelper do
+  using RSpec::Parameterized::TableSyntax
+
   let(:owner) { create(:user, group_view: :security_dashboard) }
   let(:current_user) { owner }
   let(:group) { create(:group, :private) }
@@ -168,6 +170,122 @@ describe GroupsHelper do
 
       it 'returns true' do
         expect(helper.show_group_activity_analytics?).to be true
+      end
+    end
+  end
+
+  describe '#show_usage_quotas_in_sidebar?' do
+    where(:usage_quotas_feature_available?, :expected) do
+      true  | true
+      false | false
+    end
+
+    with_them do
+      it do
+        stub_licensed_features(usage_quotas: usage_quotas_feature_available?)
+
+        expect(helper.show_usage_quotas_in_sidebar?).to eq(expected)
+      end
+    end
+  end
+
+  describe '#show_billing_in_sidebar?' do
+    where(:should_check_namespace_plan_return_value, :expected) do
+      true  | true
+      false | false
+    end
+
+    with_them do
+      it do
+        allow(::Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?).and_return(should_check_namespace_plan_return_value)
+
+        expect(helper.show_billing_in_sidebar?).to eq(expected)
+      end
+    end
+  end
+
+  describe '#show_administration_nav?' do
+    context 'when user does not have admin_group permissions' do
+      before do
+        allow(helper).to receive(:can?).and_return(true)
+        allow(helper).to receive(:can?).with(current_user, :admin_group, group).and_return(false)
+      end
+
+      it 'returns false' do
+        expect(helper.show_administration_nav?(group)).to be false
+      end
+    end
+
+    context 'when user has admin_group permissions' do
+      before do
+        allow(helper).to receive(:can?).and_return(false)
+        allow(helper).to receive(:can?).with(current_user, :admin_group, group).and_return(true)
+      end
+
+      it 'returns true' do
+        allow(helper).to receive(:show_saml_in_sidebar?).with(group).and_return(true)
+
+        expect(helper.show_administration_nav?(group)).to be true
+      end
+
+      it 'returns false for a subgroup' do
+        subgroup = create(:group, :private, parent: group)
+
+        expect(helper.show_administration_nav?(subgroup)).to be false
+      end
+
+      context 'when `group_administration_nav_item` feature flag is disabled for the group' do
+        before do
+          stub_feature_flags(group_administration_nav_item: { enabled: false, thing: group })
+        end
+
+        it 'returns false' do
+          expect(helper.show_administration_nav?(group)).to be false
+        end
+      end
+    end
+  end
+
+  describe '#administration_nav_path' do
+    context 'when SAML providers feature is available' do
+      before do
+        allow(helper).to receive(:show_saml_in_sidebar?).with(group).and_return(true)
+      end
+
+      it 'returns path to SAML providers' do
+        expect(helper.administration_nav_path(group)).to eq(group_saml_providers_path(group))
+      end
+    end
+
+    context 'when SAML providers feature is not available' do
+      before do
+        allow(helper).to receive(:show_saml_in_sidebar?).with(group).and_return(false)
+      end
+
+      context 'and usage quotas feature is available' do
+        before do
+          allow(helper).to receive(:show_usage_quotas_in_sidebar?).and_return(true)
+        end
+
+        it 'returns path to usage quotas' do
+          expect(helper.administration_nav_path(group)).to eq(group_usage_quotas_path(group))
+        end
+      end
+
+      context 'and usage quotas feature is not available' do
+        before do
+          allow(helper).to receive(:show_usage_quotas_in_sidebar?).and_return(false)
+        end
+
+        context 'and billing feature is available' do
+          before do
+            allow(helper).to receive(:show_billing_in_sidebar?).and_return(true)
+          end
+
+          it 'returns path to billing' do
+            expect(helper.administration_nav_path(group)).to eq(group_billings_path(group))
+          end
+        end
       end
     end
   end

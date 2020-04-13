@@ -48,6 +48,18 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
 
       it 'does not validate presence of api_url' do
         expect(service).not_to validate_presence_of(:api_url)
+        expect(service.valid?).to eq(true)
+      end
+
+      context 'local connections allowed' do
+        before do
+          stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+        end
+
+        it 'does not validate presence of api_url' do
+          expect(service).not_to validate_presence_of(:api_url)
+          expect(service.valid?).to eq(true)
+        end
       end
     end
 
@@ -62,6 +74,18 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
             allow(Addrinfo).to receive(:getaddrinfo).with(domain, any_args).and_return([Addrinfo.tcp(url, 80)])
 
             expect(service.can_query?).to be false
+          end
+        end
+      end
+
+      it 'can query when local requests are allowed' do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+
+        aggregate_failures do
+          ['127.0.0.1', '192.168.2.3'].each do |url|
+            allow(Addrinfo).to receive(:getaddrinfo).with(domain, any_args).and_return([Addrinfo.tcp(url, 80)])
+
+            expect(service.can_query?).to be true
           end
         end
       end
@@ -94,6 +118,34 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
               expect(service.can_query?).to be false
             end
           end
+        end
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    context 'after_create' do
+      let(:project) { create(:project) }
+      let(:service) { build(:prometheus_service, project: project) }
+
+      subject(:create_service) { service.save! }
+
+      it 'creates default alerts' do
+        expect(Prometheus::CreateDefaultAlertsWorker)
+          .to receive(:perform_async)
+          .with(project_id: project.id)
+
+        create_service
+      end
+
+      context 'no project exists' do
+        let(:service) { build(:prometheus_service, :instance) }
+
+        it 'does not create default alerts' do
+          expect(Prometheus::CreateDefaultAlertsWorker)
+            .not_to receive(:perform_async)
+
+          create_service
         end
       end
     end
@@ -150,6 +202,54 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
 
       it 'no client provided' do
         expect(service.prometheus_client).to be_nil
+      end
+    end
+
+    context 'when local requests are allowed' do
+      let(:manual_configuration) { true }
+      let(:api_url) { 'http://192.168.1.1:9090' }
+
+      before do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+
+        stub_prometheus_request("#{api_url}/api/v1/query?query=1")
+      end
+
+      it 'allows local requests' do
+        expect(service.prometheus_client).not_to be_nil
+        expect { service.prometheus_client.ping }.not_to raise_error
+      end
+    end
+
+    context 'when local requests are blocked' do
+      let(:manual_configuration) { true }
+      let(:api_url) { 'http://192.168.1.1:9090' }
+
+      before do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: false)
+
+        stub_prometheus_request("#{api_url}/api/v1/query?query=1")
+      end
+
+      it 'blocks local requests' do
+        expect(service.prometheus_client).to be_nil
+      end
+
+      context 'with self monitoring project and internal Prometheus URL' do
+        before do
+          stub_application_setting(allow_local_requests_from_web_hooks_and_services: false)
+          stub_application_setting(self_monitoring_project_id: project.id)
+
+          stub_config(prometheus: {
+            enable: true,
+            listen_address: api_url
+          })
+        end
+
+        it 'allows local requests' do
+          expect(service.prometheus_client).not_to be_nil
+          expect { service.prometheus_client.ping }.not_to raise_error
+        end
       end
     end
   end

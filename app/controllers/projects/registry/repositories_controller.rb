@@ -17,11 +17,7 @@ module Projects
             serializer = ContainerRepositoriesSerializer
               .new(project: project, current_user: current_user)
 
-            if Feature.enabled?(:vue_container_registry_explorer, project.group)
-              render json: serializer.with_pagination(request, response).represent(@images)
-            else
-              render json: serializer.represent(@images)
-            end
+            render json: serializer.with_pagination(request, response).represent(@images)
           end
         end
       end
@@ -32,6 +28,7 @@ module Projects
       end
 
       def destroy
+        image.delete_scheduled!
         DeleteContainerRepositoryWorker.perform_async(current_user.id, image.id) # rubocop:disable CodeReuse/Worker
         track_event(:delete_repository)
 

@@ -30,18 +30,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    const roadmapGraphQL = gon.features && gon.features.roadmapGraphql;
-    return {
-      // TODO
-      // Remove these method alias and call actual
-      // method once feature flag is removed.
-      fetchEpicsFn: roadmapGraphQL ? this.fetchEpicsGQL : this.fetchEpics,
-      fetchEpicsForTimeframeFn: roadmapGraphQL
-        ? this.fetchEpicsForTimeframeGQL
-        : this.fetchEpicsForTimeframe,
-    };
-  },
   computed: {
     ...mapState([
       'currentGroupId',
@@ -74,16 +62,14 @@ export default {
     },
   },
   mounted() {
-    this.fetchEpicsFn();
+    this.fetchEpics();
     this.fetchMilestones();
   },
   methods: {
     ...mapActions([
       'setWindowResizeInProgress',
       'fetchEpics',
-      'fetchEpicsGQL',
       'fetchEpicsForTimeframe',
-      'fetchEpicsForTimeframeGQL',
       'extendTimeframe',
       'refreshEpicDates',
       'fetchMilestones',
@@ -121,7 +107,7 @@ export default {
       this.refreshMilestoneDates();
 
       this.$nextTick(() => {
-        this.fetchEpicsForTimeframeFn({
+        this.fetchEpicsForTimeframe({
           timeframe: this.extendedTimeframe,
         })
           .then(() => {

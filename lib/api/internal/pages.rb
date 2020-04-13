@@ -5,7 +5,6 @@ module API
   module Internal
     class Pages < Grape::API
       before do
-        not_found! unless Feature.enabled?(:pages_internal_api)
         authenticate_gitlab_pages_request!
       end
 
@@ -17,6 +16,13 @@ module API
 
       namespace 'internal' do
         namespace 'pages' do
+          desc 'Indicates that pages API is enabled and auth token is valid' do
+            detail 'This feature was introduced in GitLab 12.10.'
+          end
+          get "status" do
+            no_content!
+          end
+
           desc 'Get GitLab Pages domain configuration by hostname' do
             detail 'This feature was introduced in GitLab 12.3.'
           end

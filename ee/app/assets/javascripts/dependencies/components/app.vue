@@ -1,8 +1,18 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlLink, GlButton } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
+import {
+  GlBadge,
+  GlEmptyState,
+  GlIcon,
+  GlLoadingIcon,
+  GlSprintf,
+  GlTab,
+  GlTabs,
+  GlLink,
+  GlDeprecatedButton,
+} from '@gitlab/ui';
+import { __ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import DependenciesActions from './dependencies_actions.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
@@ -15,17 +25,19 @@ export default {
   components: {
     DependenciesActions,
     GlBadge,
+    GlIcon,
     GlEmptyState,
     GlLoadingIcon,
+    GlSprintf,
     GlTab,
     GlTabs,
     GlLink,
-    GlButton,
+    GlDeprecatedButton,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
-    Icon,
     PaginatedDependenciesTable,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     endpoint: {
       type: String,
@@ -71,18 +83,6 @@ export default {
         const { namespace } = this.listTypes[index] || {};
         this.setCurrentList(namespace);
       },
-    },
-    subHeadingText() {
-      const { jobPath } = this.reportInfo;
-
-      const body = __(
-        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest successful%{linkEnd} scan',
-      );
-
-      const linkStart = jobPath ? `<a href="${jobPath}">` : '';
-      const linkEnd = jobPath ? '</a>' : '';
-
-      return sprintf(body, { linkStart, linkEnd }, false);
     },
     showEmptyState() {
       return this.isJobNotSetUp || this.hasNoDependencies;
@@ -141,9 +141,9 @@ export default {
     :svg-path="emptyStateSvgPath"
   >
     <template #actions>
-      <gl-button variant="info" :href="emptyStateOptions.link">
+      <gl-deprecated-button variant="info" :href="emptyStateOptions.link">
         {{ emptyStateOptions.buttonLabel }}
-      </gl-button>
+      </gl-deprecated-button>
     </template>
   </gl-empty-state>
 
@@ -159,27 +159,47 @@ export default {
       @dismiss="dismissJobFailedAlert"
     />
 
-    <header class="my-3">
-      <h2 class="h4 mb-1">
-        {{ __('Dependencies') }}
-        <gl-link
-          target="_blank"
-          :href="documentationPath"
-          :aria-label="__('Dependencies help page link')"
-        >
-          <icon name="question" />
-        </gl-link>
-      </h2>
-      <p class="mb-0">
-        <span v-html="subHeadingText"></span>
-        <span v-if="generatedAtTimeAgo">
-          <span aria-hidden="true">&bull;</span>
-          <span class="text-secondary">{{ generatedAtTimeAgo }}</span>
-        </span>
-      </p>
+    <header class="d-md-flex align-items-end my-3">
+      <div class="mr-auto">
+        <h2 class="h4 mb-1 mt-0">
+          {{ __('Dependencies') }}
+          <gl-link
+            target="_blank"
+            :href="documentationPath"
+            :aria-label="__('Dependencies help page link')"
+          >
+            <gl-icon name="question" />
+          </gl-link>
+        </h2>
+        <p class="mb-0">
+          <gl-sprintf
+            :message="s__('Dependencies|Based on the %{linkStart}latest successful%{linkEnd} scan')"
+          >
+            <template #link="{ content }">
+              <gl-link v-if="reportInfo.jobPath" ref="jobLink" :href="reportInfo.jobPath">{{
+                content
+              }}</gl-link>
+              <template v-else>{{ content }}</template>
+            </template>
+          </gl-sprintf>
+          <span v-if="generatedAtTimeAgo">
+            <span aria-hidden="true">&bull;</span>
+            <span class="text-secondary">{{ generatedAtTimeAgo }}</span>
+          </span>
+        </p>
+      </div>
+      <dependencies-actions
+        v-if="glFeatures.dependencyListUi"
+        class="mt-2"
+        :namespace="currentList"
+      />
     </header>
 
-    <gl-tabs v-model="currentListIndex" content-class="pt-0">
+    <article v-if="glFeatures.dependencyListUi">
+      <paginated-dependencies-table :namespace="currentList" />
+    </article>
+
+    <gl-tabs v-else v-model="currentListIndex" content-class="pt-0">
       <gl-tab
         v-for="listType in listTypes"
         :key="listType.namespace"

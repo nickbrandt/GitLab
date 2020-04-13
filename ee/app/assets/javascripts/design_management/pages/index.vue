@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -20,7 +20,11 @@ import {
   designDeletionError,
 } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
-import { designUploadOptimisticResponse } from '../utils/design_management_utils';
+import {
+  designUploadOptimisticResponse,
+  isValidDesignFile,
+} from '../utils/design_management_utils';
+import { getFilename } from '~/lib/utils/file_upload';
 import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
@@ -28,8 +32,9 @@ const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 export default {
   components: {
     GlLoadingIcon,
+    GlAlert,
+    GlDeprecatedButton,
     UploadButton,
-    GlButton,
     Design,
     DesignDestroyer,
     DesignVersionDropdown,
@@ -91,6 +96,9 @@ export default {
         ? s__('DesignManagement|Deselect all')
         : s__('DesignManagement|Select all');
     },
+  },
+  mounted() {
+    this.toggleOnPasteListener(this.$route.name);
   },
   methods: {
     resetFilesToBeSaved() {
@@ -214,9 +222,34 @@ export default {
 
       this.onUploadDesign(files);
     },
+    onDesignPaste(event) {
+      const { clipboardData } = event;
+      const files = Array.from(clipboardData.files);
+      if (clipboardData && files.length > 0) {
+        if (!files.some(isValidDesignFile)) {
+          return;
+        }
+        event.preventDefault();
+        const filename = getFilename(event) || 'image.png';
+        const newFile = new File([files[0]], filename);
+        this.onUploadDesign([newFile]);
+      }
+    },
+    toggleOnPasteListener(route) {
+      if (route === DESIGNS_ROUTE_NAME) {
+        document.addEventListener('paste', this.onDesignPaste);
+      } else {
+        document.removeEventListener('paste', this.onDesignPaste);
+      }
+    },
   },
   beforeRouteUpdate(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     this.selectedDesigns = [];
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.toggleOnPasteListener(to.name);
     next();
   },
 };
@@ -228,12 +261,12 @@ export default {
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
         <div :class="['qa-selector-toolbar', { 'd-flex': hasDesigns, 'd-none': !hasDesigns }]">
-          <gl-button
+          <gl-deprecated-button
             v-if="isLatestVersion"
             variant="link"
             class="mr-2 js-select-all"
             @click="toggleDesignsSelection"
-            >{{ selectAllButtonText }}</gl-button
+            >{{ selectAllButtonText }}</gl-deprecated-button
           >
           <design-destroyer
             v-slot="{ mutate, loading }"
@@ -260,16 +293,16 @@ export default {
     </header>
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
-      <div v-else-if="error" class="alert alert-danger">
+      <gl-alert v-else-if="error" variant="danger" :dismissible="false">
         {{ __('An error occurred while loading designs. Please try again.') }}
-      </div>
+      </gl-alert>
       <ol v-else class="list-unstyled row">
         <li class="col-md-6 col-lg-4 mb-3">
           <design-dropzone class="design-list-item" @change="onUploadDesign" />
         </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
           <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
-            ><design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)"
+            ><design v-bind="design" :is-uploading="isDesignToBeSaved(design.filename)"
           /></design-dropzone>
 
           <input

@@ -29,7 +29,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
 
     this.initCodeclimate(data);
     this.initPerformanceReport(data);
-    this.licenseManagement = data.license_management;
+    this.licenseScanning = data.license_scanning;
     this.metricsReportsPath = data.metrics_reports_path;
 
     this.enabledReports = convertObjectPropsToCamelCase(data.enabled_reports);

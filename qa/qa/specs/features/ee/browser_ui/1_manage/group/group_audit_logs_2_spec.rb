@@ -3,8 +3,8 @@ require 'securerandom'
 
 module QA
   context 'Manage' do
-    shared_examples 'group audit event logs' do |expected_events|
-      it 'logs audit events' do
+    shared_examples 'audit event' do |expected_events|
+      it 'logs audit events for UI operations' do
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
         expected_events.each do |expected_event|
           expect(page).to have_text(expected_event)
@@ -12,7 +12,7 @@ module QA
       end
     end
 
-    describe 'Group audit logs' do
+    describe 'Group' do
       before(:all) do
         @group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "test-group-#{SecureRandom.hex(8)}"
@@ -31,7 +31,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_lfs_enabled)
         end
 
-        it_behaves_like 'group audit event logs', ["Change lfs enabled from false to true", "Change lfs enabled from true to false"]
+        it_behaves_like 'audit event', ["Change lfs enabled from false to true", "Change lfs enabled from true to false"]
       end
 
       context 'Enable and disable LFS' do
@@ -45,7 +45,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_membership_lock_disabled)
         end
 
-        it_behaves_like 'group audit event logs', ["Change membership lock from true to false", "Change membership lock from false to true"]
+        it_behaves_like 'audit event', ["Change membership lock from true to false", "Change membership lock from false to true"]
       end
 
       context 'Enable and disable allow user request access' do
@@ -59,7 +59,7 @@ module QA
           Page::Group::Settings::General.perform(&:toggle_request_access)
         end
 
-        it_behaves_like 'group audit event logs', ["Change request access enabled from true to false", "Change request access enabled from false to true"]
+        it_behaves_like 'audit event', ["Change request access enabled from true to false", "Change request access enabled from false to true"]
       end
 
       # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/31764
@@ -76,7 +76,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_require_2fa_disabled)
         end
 
-        it_behaves_like 'group audit event logs', ["Change require two factor authentication from true to false", "Change require two factor authentication from false to true"]
+        it_behaves_like 'audit event', ["Change require two factor authentication from true to false", "Change require two factor authentication from false to true"]
       end
 
       context 'Change project creation level' do
@@ -89,7 +89,7 @@ module QA
           end
         end
 
-        it_behaves_like 'group audit event logs', ["Change project creation level"]
+        it_behaves_like 'audit event', ["Change project creation level"]
       end
     end
 

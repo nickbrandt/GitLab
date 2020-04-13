@@ -19,23 +19,6 @@ module Gitlab
         @public_and_internal_projects = false
       end
 
-      def objects(scope, page = nil)
-        case scope
-        when 'notes'
-          notes.page(page).per(per_page).records
-        when 'blobs'
-          blobs(page: page, per_page: per_page)
-        when 'wiki_blobs'
-          wiki_blobs(page: page, per_page: per_page)
-        when 'commits'
-          commits(page: page, per_page: per_page)
-        when 'users'
-          users.page(page).per(per_page)
-        else
-          super
-        end
-      end
-
       def generic_search_results
         @generic_search_results ||= Gitlab::ProjectSearchResults.new(current_user, project, query, repository_ref)
       end

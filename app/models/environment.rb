@@ -3,6 +3,7 @@
 class Environment < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include ReactiveCaching
+  include FastDestroyAll::Helpers
 
   self.reactive_cache_refresh_interval = 1.minute
   self.reactive_cache_lifetime = 55.seconds
@@ -10,10 +11,14 @@ class Environment < ApplicationRecord
 
   belongs_to :project, required: true
 
-  has_many :deployments, -> { visible }, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  use_fast_destroy :all_deployments
+
+  has_many :all_deployments, class_name: 'Deployment'
+  has_many :deployments, -> { visible }
   has_many :successful_deployments, -> { success }, class_name: 'Deployment'
   has_many :active_deployments, -> { active }, class_name: 'Deployment'
   has_many :prometheus_alerts, inverse_of: :environment
+  has_many :metrics_dashboard_annotations, class_name: 'Metrics::Dashboard::Annotation', inverse_of: :environment
   has_many :self_managed_prometheus_alert_events, inverse_of: :environment
 
   has_one :last_deployment, -> { success.order('deployments.id DESC') }, class_name: 'Deployment'
@@ -112,6 +117,10 @@ class Environment < ApplicationRecord
 
   def self.find_or_create_by_name(name)
     find_or_create_by(name: name)
+  end
+
+  def self.valid_states
+    self.state_machine.states.map(&:name)
   end
 
   class << self

@@ -32,6 +32,14 @@ export default {
       type: String,
       required: true,
     },
+    wafNoDataSvgPath: {
+      type: String,
+      required: true,
+    },
+    networkPolicyNoDataSvgPath: {
+      type: String,
+      required: true,
+    },
     documentationPath: {
       type: String,
       required: true,
@@ -85,18 +93,16 @@ export default {
     settings to make sure you've set up the WAF correctly.`,
   ),
   wafChartEmptyStateDescription: s__(
-    `ThreatMonitoring|While it's rare to have no traffic coming to your
-    application, it can happen. In any event, we ask that you double check your
-    settings to make sure you've set up the WAF correctly.`,
+    `ThreatMonitoring|The firewall is not installed or has been disabled. To view
+     this data, ensure you firewall is installed and enabled for your cluster.`,
   ),
   networkPolicyChartEmptyStateDescription: s__(
-    `ThreatMonitoring|While it's rare to have no traffic coming to your
-    application, it can happen. In any event, we ask that you double check your
-    settings to make sure you've set up the Network Policies correctly.`,
+    `ThreatMonitoring|Container NetworkPolicies are not installed or has been disabled. To view
+     this data, ensure you NetworkPolicies are installed and enabled for your cluster.`,
   ),
   emptyStateDescription: s__(
-    `ThreatMonitoring|Threat monitoring provides security monitoring and rules
-    to protect production applications.`,
+    `ThreatMonitoring|To view this data, ensure you have configured an environment
+    for this project and that at least one threat monitoring feature is enabled.`,
   ),
   alertText: s__(
     `ThreatMonitoring|The graph below is an overview of traffic coming to your
@@ -105,7 +111,7 @@ export default {
     malicious traffic is trying to access your app. The docs link is also
     accessible by clicking the "?" icon next to the title below.`,
   ),
-  helpPopoverText: s__('ThreatMonitoring|At this time, threat monitoring only supports WAF data.'),
+  helpPopoverText: s__('ThreatMonitoring|View documentation'),
 };
 </script>
 
@@ -113,11 +119,11 @@ export default {
   <gl-empty-state
     v-if="!isSetUpMaybe"
     ref="emptyState"
-    :title="s__('ThreatMonitoring|Threat monitoring is not enabled')"
+    :title="s__('ThreatMonitoring|No environments detected')"
     :description="$options.emptyStateDescription"
     :svg-path="emptyStateSvgPath"
     :primary-button-link="documentationPath"
-    :primary-button-text="__('Learn More')"
+    :primary-button-text="__('More information')"
   />
 
   <section v-else>
@@ -158,26 +164,28 @@ export default {
       :anomalous-title="s__('ThreatMonitoring|Anomalous Requests')"
       :nominal-title="s__('ThreatMonitoring|Total Requests')"
       :y-legend="s__('ThreatMonitoring|Requests')"
+      :chart-empty-state-title="s__('ThreatMonitoring|Application firewall not detected')"
       :chart-empty-state-text="$options.wafChartEmptyStateDescription"
-      :chart-empty-state-svg-path="chartEmptyStateSvgPath"
+      :chart-empty-state-svg-path="wafNoDataSvgPath"
       :documentation-path="documentationPath"
+      documentation-anchor="web-application-firewall"
     />
 
-    <template v-if="glFeatures.networkPolicyUi">
-      <hr />
+    <hr />
 
-      <threat-monitoring-section
-        ref="networkPolicySection"
-        store-namespace="threatMonitoringNetworkPolicy"
-        :title="s__('ThreatMonitoring|Container Network Policy')"
-        :subtitle="s__('ThreatMonitoring|Packet Activity')"
-        :anomalous-title="s__('ThreatMonitoring|Dropped Packets')"
-        :nominal-title="s__('ThreatMonitoring|Total Packets')"
-        :y-legend="s__('ThreatMonitoring|Operations Per Second')"
-        :chart-empty-state-text="$options.networkPolicyChartEmptyStateDescription"
-        :chart-empty-state-svg-path="chartEmptyStateSvgPath"
-        :documentation-path="documentationPath"
-      />
-    </template>
+    <threat-monitoring-section
+      ref="networkPolicySection"
+      store-namespace="threatMonitoringNetworkPolicy"
+      :title="s__('ThreatMonitoring|Container Network Policy')"
+      :subtitle="s__('ThreatMonitoring|Packet Activity')"
+      :anomalous-title="s__('ThreatMonitoring|Dropped Packets')"
+      :nominal-title="s__('ThreatMonitoring|Total Packets')"
+      :y-legend="s__('ThreatMonitoring|Operations Per Second')"
+      :chart-empty-state-title="s__('ThreatMonitoring|Container NetworkPolicies not detected')"
+      :chart-empty-state-text="$options.networkPolicyChartEmptyStateDescription"
+      :chart-empty-state-svg-path="networkPolicyNoDataSvgPath"
+      :documentation-path="documentationPath"
+      documentation-anchor="container-network-policy"
+    />
   </section>
 </template>

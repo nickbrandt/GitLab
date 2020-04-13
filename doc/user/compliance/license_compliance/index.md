@@ -13,14 +13,14 @@ using License Compliance.
 
 You can take advantage of License Compliance by either [including the job](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto License Compliance](../../../topics/autodevops/index.md#auto-license-compliance-ultimate)
+[Auto License Compliance](../../../topics/autodevops/stages.md#auto-license-compliance-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the License Compliance report, compares the licenses between the
 source and target branches, and shows the information right on the merge request.
-Blacklisted licenses will be clearly visible with an `x` red icon next to them
+Denied licenses will be clearly visible with an `x` red icon next to them
 as well as new licenses which need a decision from you. In addition, you can
-[manually approve or blacklist](#project-policies-for-license-compliance)
+[manually allow or deny](#project-policies-for-license-compliance)
 licenses in your project's settings.
 
 NOTE: **Note:**
@@ -33,7 +33,7 @@ compliance report will be shown properly.
 ![License Compliance Widget](img/license_compliance.png)
 
 If you are a project or group Maintainer, you can click on a license to be given
-the choice to approve it or blacklist it.
+the choice to allow it or deny it.
 
 ![License approval decision](img/license_compliance_decision.png)
 
@@ -60,7 +60,7 @@ The following languages and package managers are supported.
 | Elixir     | [mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types)) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | C++/C      | [conan](https://conan.io/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 | Scala      | [sbt](https://www.scala-sbt.org/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
-| Rust       | [cargo](https://crates.io) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
+| Rust       | [cargo](https://crates.io/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 | PHP        | [composer](https://getcomposer.org/) ([experimental support](https://github.com/pivotal/LicenseFinder#experimental-project-types))|[License Finder](https://github.com/pivotal/LicenseFinder)|
 
 ## Requirements
@@ -121,6 +121,8 @@ License Compliance can be configured using environment variables.
 | `LM_JAVA_VERSION`      | no | Version of Java. If set to `11`, Maven and Gradle use Java 11 instead of Java 8. |
 | `LM_PYTHON_VERSION`    | no | Version of Python. If set to `3`, dependencies are installed using Python 3 instead of Python 2.7. |
 | `SETUP_CMD`            | no | Custom setup for the dependency installation. (experimental) |
+| `PIP_INDEX_URL` | no | Base URL of Python Package Index (default: `https://pypi.org/simple/`). |
+| `ADDITIONAL_CA_CERT_BUNDLE` | no | Bundle of trusted CA certificates (currently supported in Python projects). |
 
 ### Installing custom dependencies
 
@@ -191,35 +193,26 @@ If you still need to run tests during `mvn install`, add `-DskipTests=false` to
 
 #### Using private Maven repos
 
-If you have a private Maven repository that requires login credentials, you can use the
-`MAVEN_CLI_OPTS` variable to specify a custom [`settings.xml`](http://maven.apache.org/settings.html)
-file.
+If you have a private Maven repository which requires login credentials,
+you can use the `MAVEN_CLI_OPTS` environment variable.
 
-For example, you may have a settings file like this in your project source:
+Read more on [how to use private Maven repos](../../application_security/index.md#using-private-maven-repos).
 
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>my-server</id>
-      <username>${private.username}</username>
-      <username>${private.password}</username>
-    </server>
-  </servers>
-</settings>
-```
-
-You can use this file through the following declaration in your `gitlab-ci.yml` file:
+You can also use `MAVEN_CLI_OPTS` to connect to a trusted Maven repository that uses a self-signed
+or internally trusted certificate. For example:
 
 ```yaml
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
 license_scanning:
   variables:
-    MAVEN_CLI_OPTS: --settings settings.xml -Dprivate.username=foo -Dprivate.password=bar
+    MAVEN_CLI_OPTS: -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -Dmaven.wagon.http.ssl.insecure=true
 ```
 
-NOTE: **Note:**
-If you don't want to expose the credentials in your `.gitlab-ci.yml` file, then
-you can [set the variable in your project's settings](../../../ci/variables/README.md#via-the-ui).
+Alternatively, you can use a Java key store to verify the TLS connection. For instructions on how to
+generate a key store file, see the
+[Maven Guide to Remote repository access through authenticated HTTPS](http://maven.apache.org/guides/mini/guide-repository-ssl.html).
 
 ### Selecting the version of Python
 
@@ -238,6 +231,37 @@ include:
 license_scanning:
   variables:
     LM_PYTHON_VERSION: 2
+```
+
+### Custom root certificates for Python
+
+You can supply a custom root certificate to complete TLS verification by using the
+`ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables).
+
+To bypass TLS verification, you can use a custom [`pip.conf`](https://pip.pypa.io/en/stable/user_guide/#config-file)
+file to configure trusted hosts.
+
+The following `gitlab-ci.yml` file uses a [`before_script`](../../../ci/yaml/README.md#before_script-and-after_script)
+to inject a custom [`pip.conf`](https://pip.pypa.io/en/stable/user_guide/#config-file):
+
+```yaml
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
+license_scanning:
+  variables:
+    PIP_INDEX_URL: 'https://pypi.example.com/simple/'
+  before_script:
+    - mkdir -p ~/.config/pip/
+    - cp pip.conf ~/.config/pip/pip.conf
+```
+
+The [`pip.conf`](https://pip.pypa.io/en/stable/reference/pip/) allows you to specify a list of
+[trusted hosts](https://pip.pypa.io/en/stable/reference/pip/#cmdoption-trusted-host):
+
+```text
+[global]
+trusted-host = pypi.example.com
 ```
 
 ### Migration from `license_management` to `license_scanning`
@@ -275,6 +299,31 @@ license_scanning:
       license_scanning: gl-license-scanning-report.json
 ```
 
+## Running License Compliance in an offline environment
+
+License Compliance can be executed on an offline GitLab Ultimate installation by using the following
+process:
+
+1. Host the License Compliance image
+   `registry.gitlab.com/gitlab-org/security-products/license-management:latest` in your local Docker
+   container registry.
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+   to the License Compliance Docker image hosted on your local Docker container registry:
+
+   ```yaml
+   include:
+     - template: License-Scanning.gitlab-ci.yml
+
+   license_scanning:
+     image: registry.example.com/namespace/license-management:latest
+   ```
+
+1. Ensure the package registry is reachable from within the GitLab environment and that the package
+   manager is configured to use your preferred package registry.
+
+Additional [configuration](#using-private-maven-repos) may be needed for connecting to private Maven
+repositories.
+
 ## Project policies for License Compliance
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/5940) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.4.
@@ -282,9 +331,9 @@ license_scanning:
 From the project's settings:
 
 - The list of licenses and their status can be managed.
-- Licenses can be manually approved or blacklisted.
+- Licenses can be manually allowed or denied.
 
-To approve or blacklist a license:
+To allow or deny a license:
 
 1. Either use the **Manage licenses** button in the merge request widget, or
    navigate to the project's **Settings > CI/CD** and expand the
@@ -298,12 +347,12 @@ To approve or blacklist a license:
      at the top of the list.
    - Enter arbitrary text in the field at the top of the list. This will cause the text to be
      added as a license name to the list.
-1. Select the **Approve** or **Blacklist** radio button to approve or blacklist respectively
+1. Select the **Allow** or **Deny** radio button to allow or deny respectively
    the selected license.
 
 To modify an existing license:
 
-1. In the **License Compliance** list, click the **Approved/Declined** dropdown to change it to the desired status.
+1. In the **License Compliance** list, click the **Allow/Deny** dropdown to change it to the desired status.
 
    ![License Compliance Settings](img/license_compliance_settings_v12_3.png)
 

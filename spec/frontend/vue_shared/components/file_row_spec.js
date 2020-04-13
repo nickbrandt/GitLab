@@ -33,6 +33,35 @@ describe('File row component', () => {
     expect(name.text().trim()).toEqual(fileName);
   });
 
+  it('renders the full path as title', () => {
+    const filePath = 'path/to/file/with a very long folder name/';
+    const fileName = 'foo.txt';
+
+    createComponent({
+      file: {
+        name: fileName,
+        isHeader: false,
+        tree: [
+          {
+            parentPath: filePath,
+          },
+        ],
+      },
+      level: 1,
+    });
+
+    expect(wrapper.element.title.trim()).toEqual('path/to/file/with a very long folder name/');
+  });
+
+  it('does not render a title attribute if no tree present', () => {
+    createComponent({
+      file: file('f1.txt'),
+      level: 0,
+    });
+
+    expect(wrapper.element.title.trim()).toEqual('');
+  });
+
   it('emits toggleTreeOpen on click', () => {
     const fileName = 't3';
     createComponent({
@@ -70,19 +99,6 @@ describe('File row component', () => {
     return nextTick().then(() => {
       expect(wrapper.vm.scrollIntoView).toHaveBeenCalled();
     });
-  });
-
-  it('is marked as viewed if clicked', () => {
-    createComponent({
-      file: {
-        ...file(),
-        type: 'blob',
-        fileHash: '#123456789',
-      },
-      level: 0,
-      viewedFiles: ['#123456789'],
-    });
-    expect(wrapper.classes()).toContain('is-viewed');
   });
 
   it('indents row based on level', () => {

@@ -1,4 +1,4 @@
-# Export Issues to CSV **(STARTER)**
+# Export Issues to CSV
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1126) in [GitLab Starter 9.0](https://about.gitlab.com/releases/2017/03/22/gitlab-9-0-released/#export-issues-ees-eep).
 
@@ -30,7 +30,7 @@ Among numerous use cases for exporting issues for CSV, we can name a few:
 
 After selecting a project, from the issues page you can narrow down which issues to export using the search bar, along with the All/Open/Closed tabs. All issues returned will be exported, including those not shown on the first page.
 
-![CSV export button](img/csv_export_button.png)
+![CSV export button](img/csv_export_button_v12_9.png)
 
 You will be asked to confirm the number of issues and email address for the export, after which the email will begin being prepared.
 
@@ -61,7 +61,7 @@ Data will be encoded with a comma as the column delimiter, with `"` used to quot
 | Assignee Username | Username of the author, with the `@` symbol omitted |
 | Confidential | `Yes` or `No` |
 | Locked | `Yes` or `No` |
-| Due Date | Formated as `YYYY-MM-DD` |
+| Due Date | Formatted as `YYYY-MM-DD` |
 | Created At (UTC) | Formatted as `YYYY-MM-DD HH:MM:SS` |
 | Updated At (UTC) | Formatted as `YYYY-MM-DD HH:MM:SS` |
 | Milestone | Title of the issue milestone |

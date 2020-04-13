@@ -8,12 +8,21 @@ class ContainerRepository < ApplicationRecord
   validates :name, length: { minimum: 0, allow_nil: false }
   validates :name, uniqueness: { scope: :project_id }
 
+  enum status: { delete_scheduled: 0, delete_failed: 1 }
+
   delegate :client, to: :registry
 
   scope :ordered, -> { order(:name) }
   scope :with_api_entity_associations, -> { preload(project: [:route, { namespace: :route }]) }
   scope :for_group_and_its_subgroups, ->(group) do
     where(project_id: Project.for_group_and_its_subgroups(group).with_container_registry.select(:id))
+  end
+
+  def self.exists_by_path?(path)
+    where(
+      project: path.repository_project,
+      name: path.repository_name
+    ).exists?
   end
 
   # rubocop: disable CodeReuse/ServiceClass

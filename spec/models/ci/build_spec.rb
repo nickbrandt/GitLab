@@ -730,147 +730,6 @@ describe Ci::Build do
     end
   end
 
-  describe '#depends_on_builds' do
-    let!(:build) { create(:ci_build, pipeline: pipeline, name: 'build', stage_idx: 0, stage: 'build') }
-    let!(:rspec_test) { create(:ci_build, pipeline: pipeline, name: 'rspec', stage_idx: 1, stage: 'test') }
-    let!(:rubocop_test) { create(:ci_build, pipeline: pipeline, name: 'rubocop', stage_idx: 1, stage: 'test') }
-    let!(:staging) { create(:ci_build, pipeline: pipeline, name: 'staging', stage_idx: 2, stage: 'deploy') }
-
-    it 'expects to have no dependents if this is first build' do
-      expect(build.depends_on_builds).to be_empty
-    end
-
-    it 'expects to have one dependent if this is test' do
-      expect(rspec_test.depends_on_builds.map(&:id)).to contain_exactly(build.id)
-    end
-
-    it 'expects to have all builds from build and test stage if this is last' do
-      expect(staging.depends_on_builds.map(&:id)).to contain_exactly(build.id, rspec_test.id, rubocop_test.id)
-    end
-
-    it 'expects to have retried builds instead the original ones' do
-      project.add_developer(user)
-
-      retried_rspec = described_class.retry(rspec_test, user)
-
-      expect(staging.depends_on_builds.map(&:id))
-        .to contain_exactly(build.id, retried_rspec.id, rubocop_test.id)
-    end
-
-    describe '#dependencies' do
-      let(:dependencies) { }
-      let(:needs) { }
-
-      let!(:final) do
-        scheduling_type = needs.present? ? :dag : :stage
-
-        create(:ci_build,
-          pipeline: pipeline, name: 'final', scheduling_type: scheduling_type,
-          stage_idx: 3, stage: 'deploy', options: {
-            dependencies: dependencies
-          }
-        )
-      end
-
-      before do
-        needs.to_a.each do |need|
-          create(:ci_build_need, build: final, **need)
-        end
-      end
-
-      subject { final.dependencies }
-
-      context 'when dependencies are defined' do
-        let(:dependencies) { %w(rspec staging) }
-
-        it { is_expected.to contain_exactly(rspec_test, staging) }
-      end
-
-      context 'when needs are defined' do
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: true },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(build, rspec_test, staging) }
-
-        context 'when ci_dag_support is disabled' do
-          before do
-            stub_feature_flags(ci_dag_support: false)
-          end
-
-          it { is_expected.to contain_exactly(build, rspec_test, rubocop_test, staging) }
-        end
-      end
-
-      context 'when need artifacts are defined' do
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: false },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(build, staging) }
-      end
-
-      context 'when needs and dependencies are defined' do
-        let(:dependencies) { %w(rspec staging) }
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: true },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(rspec_test, staging) }
-      end
-
-      context 'when needs and dependencies contradict' do
-        let(:dependencies) { %w(rspec staging) }
-        let(:needs) do
-          [
-            { name: 'build',   artifacts: true },
-            { name: 'rspec',   artifacts: false },
-            { name: 'staging', artifacts: true }
-          ]
-        end
-
-        it { is_expected.to contain_exactly(staging) }
-      end
-
-      context 'when nor dependencies or needs are defined' do
-        it { is_expected.to contain_exactly(build, rspec_test, rubocop_test, staging) }
-      end
-    end
-
-    describe '#all_dependencies' do
-      let!(:final_build) do
-        create(:ci_build,
-          pipeline: pipeline, name: 'deploy',
-          stage_idx: 3, stage: 'deploy'
-        )
-      end
-
-      subject { final_build.all_dependencies }
-
-      it 'returns dependencies and cross_dependencies' do
-        dependencies = [1, 2, 3]
-        cross_dependencies = [3, 4]
-
-        allow(final_build).to receive(:dependencies).and_return(dependencies)
-        allow(final_build).to receive(:cross_dependencies).and_return(cross_dependencies)
-
-        is_expected.to match(a_collection_containing_exactly(1, 2, 3, 4))
-      end
-    end
-  end
-
   describe '#triggered_by?' do
     subject { build.triggered_by?(user) }
 
@@ -2023,7 +1882,7 @@ describe Ci::Build do
   describe '#options' do
     let(:options) do
       {
-        image: "ruby:2.1",
+        image: "ruby:2.7",
         services: ["postgres"],
         script: ["ls -a"]
       }
@@ -2034,11 +1893,11 @@ describe Ci::Build do
     end
 
     it 'allows to access with keys' do
-      expect(build.options[:image]).to eq('ruby:2.1')
+      expect(build.options[:image]).to eq('ruby:2.7')
     end
 
     it 'allows to access with strings' do
-      expect(build.options['image']).to eq('ruby:2.1')
+      expect(build.options['image']).to eq('ruby:2.7')
     end
 
     context 'when ci_build_metadata_config is set' do
@@ -3478,7 +3337,7 @@ describe Ci::Build do
         end
 
         it "doesn't save timeout" do
-          expect { run_job_without_exception }.not_to change { job.reload.ensure_metadata.timeout_source }
+          expect { run_job_without_exception }.not_to change { job.reload.ensure_metadata.timeout }
         end
 
         it "doesn't save timeout_source" do

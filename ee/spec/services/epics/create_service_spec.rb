@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Epics::CreateService do
-  let(:group) { create(:group, :internal)}
-  let(:user) { create(:user) }
-  let!(:parent_epic) { create(:epic, group: group) }
-  let(:params) { { title: 'new epic', description: 'epic description', parent_id: parent_epic.id } }
+  let_it_be(:group) { create(:group, :internal)}
+  let_it_be(:user) { create(:user) }
+  let_it_be(:parent_epic) { create(:epic, group: group) }
+  let(:params) { { title: 'new epic', description: 'epic description', parent_id: parent_epic.id, confidential: true } }
 
   subject { described_class.new(group, user, params).execute }
 
@@ -22,7 +22,22 @@ describe Epics::CreateService do
       expect(epic.description).to eq('epic description')
       expect(epic.parent).to eq(parent_epic)
       expect(epic.relative_position).not_to be_nil
+      expect(epic.confidential).to be_truthy
       expect(NewEpicWorker).to have_received(:perform_async).with(epic.id, user.id)
+    end
+
+    context 'when confidential_epics is disabled' do
+      before do
+        stub_feature_flags(confidential_epics: false)
+      end
+
+      it 'ignores confidential attribute' do
+        expect { subject }.to change { Epic.count }.by(1)
+
+        epic = Epic.last
+        expect(epic).to be_persisted
+        expect(epic.confidential).to be_falsey
+      end
     end
   end
 

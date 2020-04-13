@@ -235,6 +235,70 @@ describe Projects::UpdateService, '#execute' do
     end
   end
 
+  context 'when compliance frameworks is set' do
+    let(:project_setting) { create(:compliance_framework_project_setting) }
+
+    before do
+      stub_licensed_features(compliance_framework: true)
+      project.update!(compliance_framework_setting: project_setting)
+    end
+
+    context 'when framework is not blank' do
+      let(:framework) { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.without(project_setting.framework).sample }
+      let(:opts) { { compliance_framework_setting_attributes: { framework: framework } } }
+
+      it 'saves the framework' do
+        update_project(project, user, opts)
+
+        expect(project.reload.compliance_framework_setting.framework).to eq(framework)
+      end
+    end
+
+    context 'when framework is blank' do
+      let(:opts) { { compliance_framework_setting_attributes: { framework: '' } } }
+
+      it 'removes the framework record' do
+        update_project(project, user, opts)
+
+        expect(project.reload.compliance_framework_setting).to be_nil
+      end
+    end
+  end
+
+  context 'when compliance framework feature is disabled' do
+    before do
+      stub_licensed_features(compliance_framework: false)
+    end
+
+    context 'the project had the feature before' do
+      let(:project_setting) { create(:compliance_framework_project_setting) }
+
+      before do
+        project.update!(compliance_framework_setting: project_setting)
+      end
+
+      let(:framework) { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.without(project_setting.framework).sample }
+      let(:opts) { { compliance_framework_setting_attributes: { framework: framework } } }
+
+      it 'does not save the new framework and retains the old setting' do
+        update_project(project, user, opts)
+
+        expect(project.reload.compliance_framework_setting.framework).to eq(project_setting.framework)
+      end
+    end
+
+    context 'the project never had the feature' do
+      let(:framework) { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.sample }
+      let(:opts) { { compliance_framework_setting_attributes: { framework: framework } } }
+
+      it 'does not save the framework' do
+        update_project(project, user, opts)
+
+        expect(project.reload.compliance_framework_setting).to be_nil
+      end
+    end
+  end
+
   it 'returns an error result when record cannot be updated' do
     admin = create(:admin)
 

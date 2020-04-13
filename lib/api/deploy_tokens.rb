@@ -53,10 +53,10 @@ module API
 
       params do
         requires :name, type: String, desc: "New deploy token's name"
-        requires :expires_at, type: DateTime, desc: 'Expiration date for the deploy token. Does not expire if no value is provided.'
-        requires :username, type: String, desc: 'Username for deploy token. Default is `gitlab+deploy-token-{n}`'
         requires :scopes, type: Array[String], values: ::DeployToken::AVAILABLE_SCOPES.map(&:to_s),
           desc: 'Indicates the deploy token scopes. Must be at least one of "read_repository" or "read_registry".'
+        optional :expires_at, type: DateTime, desc: 'Expiration date for the deploy token. Does not expire if no value is provided.'
+        optional :username, type: String, desc: 'Username for deploy token. Default is `gitlab+deploy-token-{n}`'
       end
       desc 'Create a project deploy token' do
         detail 'This feature was introduced in GitLab 12.9'
@@ -65,11 +65,15 @@ module API
       post ':id/deploy_tokens' do
         authorize!(:create_deploy_token, user_project)
 
-        deploy_token = ::Projects::DeployTokens::CreateService.new(
+        result = ::Projects::DeployTokens::CreateService.new(
           user_project, current_user, scope_params.merge(declared(params, include_missing: false, include_parent_namespaces: false))
         ).execute
 
-        present deploy_token, with: Entities::DeployTokenWithToken
+        if result[:status] == :success
+          present result[:deploy_token], with: Entities::DeployTokenWithToken
+        else
+          render_api_error!(result[:message], result[:http_status])
+        end
       end
 
       desc 'Delete a project deploy token' do
@@ -81,12 +85,10 @@ module API
       delete ':id/deploy_tokens/:token_id' do
         authorize!(:destroy_deploy_token, user_project)
 
-        deploy_token = user_project.project_deploy_tokens
-          .find_by_deploy_token_id(params[:token_id])
+        ::Projects::DeployTokens::DestroyService.new(
+          user_project, current_user, token_id: params[:token_id]
+        ).execute
 
-        not_found!('Deploy Token') unless deploy_token
-
-        deploy_token.destroy
         no_content!
       end
     end
@@ -114,10 +116,10 @@ module API
 
       params do
         requires :name, type: String, desc: 'The name of the deploy token'
-        requires :expires_at, type: DateTime, desc: 'Expiration date for the deploy token. Does not expire if no value is provided.'
-        requires :username, type: String, desc: 'Username for deploy token. Default is `gitlab+deploy-token-{n}`'
         requires :scopes, type: Array[String], values: ::DeployToken::AVAILABLE_SCOPES.map(&:to_s),
           desc: 'Indicates the deploy token scopes. Must be at least one of "read_repository" or "read_registry".'
+        optional :expires_at, type: DateTime, desc: 'Expiration date for the deploy token. Does not expire if no value is provided.'
+        optional :username, type: String, desc: 'Username for deploy token. Default is `gitlab+deploy-token-{n}`'
       end
       desc 'Create a group deploy token' do
         detail 'This feature was introduced in GitLab 12.9'
@@ -126,23 +128,31 @@ module API
       post ':id/deploy_tokens' do
         authorize!(:create_deploy_token, user_group)
 
-        deploy_token = ::Groups::DeployTokens::CreateService.new(
+        result = ::Groups::DeployTokens::CreateService.new(
           user_group, current_user, scope_params.merge(declared(params, include_missing: false, include_parent_namespaces: false))
         ).execute
 
-        present deploy_token, with: Entities::DeployTokenWithToken
+        if result[:status] == :success
+          present result[:deploy_token], with: Entities::DeployTokenWithToken
+        else
+          render_api_error!(result[:message], result[:http_status])
+        end
       end
 
       desc 'Delete a group deploy token' do
         detail 'This feature was introduced in GitLab 12.9'
       end
+      params do
+        requires :token_id, type: Integer, desc: 'The deploy token ID'
+      end
       delete ':id/deploy_tokens/:token_id' do
         authorize!(:destroy_deploy_token, user_group)
 
-        deploy_token = user_group.group_deploy_tokens
-          .find_by_deploy_token_id!(params[:token_id])
+        ::Groups::DeployTokens::DestroyService.new(
+          user_group, current_user, token_id: params[:token_id]
+        ).execute
 
-        destroy_conditionally!(deploy_token)
+        no_content!
       end
     end
   end

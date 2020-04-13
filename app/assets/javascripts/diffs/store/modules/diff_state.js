@@ -15,7 +15,7 @@ export default () => ({
   endpoint: '',
   basePath: '',
   commit: null,
-  startVersion: null,
+  startVersion: null, // Null unless a target diff is selected for comparison that is not the "base" diff
   diffFiles: [],
   coverageFiles: {},
   mergeRequestDiffs: [],
@@ -26,7 +26,6 @@ export default () => ({
   showTreeList: true,
   currentDiffFileId: '',
   projectPath: '',
-  viewedDiffFileIds: [],
   commentForms: [],
   highlightedRow: null,
   renderTreeList: true,

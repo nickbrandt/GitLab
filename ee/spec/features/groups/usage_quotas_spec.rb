@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'Groups > Usage Quotas' do
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let!(:project) { create(:project, namespace: group, shared_runners_enabled: true) }
   let(:gitlab_dot_com) { true }
@@ -126,7 +126,7 @@ describe 'Groups > Usage Quotas' do
       end
     end
 
-    it 'shows correct group quota and projects info' do
+    it 'has correct tracking setup and shows correct group quota and projects info' do
       visit_pipeline_quota_page
 
       expect(page).to have_content('Buy additional minutes')
@@ -141,6 +141,12 @@ describe 'Groups > Usage Quotas' do
         expect(page).to have_content(project.full_name)
         expect(page).not_to have_content(other_project.full_name)
       end
+
+      link = page.find('a', text: 'Buy additional minutes')
+
+      expect(link['data-track-event']).to eq('click_buy_ci_minutes')
+      expect(link['data-track-label']).to eq(group.actual_plan_name)
+      expect(link['data-track-property']).to eq('pipeline_quota_page')
     end
   end
 

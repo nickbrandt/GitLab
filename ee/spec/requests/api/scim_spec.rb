@@ -277,18 +277,6 @@ describe API::Scim do
             end
           end
         end
-
-        context 'Remove user' do
-          before do
-            params = { Operations: [{ 'op': 'Replace', 'path': 'active', 'value': 'False' }] }.to_query
-
-            patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
-          end
-
-          it 'responds with 204' do
-            expect(response).to have_gitlab_http_status(:no_content)
-          end
-        end
       end
     end
 
@@ -375,12 +363,34 @@ describe API::Scim do
 
     describe 'PATCH api/scim/v2/groups/:group/Users/:id' do
       context 'Remove user' do
-        it 'removes the identity link' do
-          params = { Operations: [{ 'op': 'Replace', 'path': 'active', 'value': 'False' }] }.to_query
+        shared_examples 'remove user' do
+          it 'responds with 204' do
+            expect(response).to have_gitlab_http_status(:no_content)
+          end
 
-          patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+          it 'removes the identity link' do
+            expect { identity.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          end
+        end
 
-          expect { identity.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        context 'when path key is present' do
+          before do
+            params = { Operations: [{ 'op': 'Replace', 'path': 'active', 'value': 'False' }] }.to_query
+
+            patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+          end
+
+          it_behaves_like 'remove user'
+        end
+
+        context 'when the path key is not present' do
+          before do
+            params = { Operations: [{ 'op': 'replace', 'value': { 'active': false } }] }.to_query
+
+            patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+          end
+
+          it_behaves_like 'remove user'
         end
       end
     end

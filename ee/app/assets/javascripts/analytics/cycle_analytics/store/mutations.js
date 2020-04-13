@@ -56,15 +56,6 @@ export default {
     state.isEmptyStage = true;
     state.isLoadingStage = false;
   },
-  [types.REQUEST_GROUP_LABELS](state) {
-    state.labels = [];
-  },
-  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
-    state.labels = data.map(convertObjectPropsToCamelCase);
-  },
-  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
-    state.labels = [];
-  },
   [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
     state.topRankedLabels = [];
     state.tasksByType = {
@@ -123,18 +114,6 @@ export default {
   },
   [types.CLEAR_CUSTOM_STAGE_FORM_ERRORS](state) {
     state.customStageFormErrors = null;
-  },
-  [types.RECEIVE_SUMMARY_DATA_ERROR](state) {
-    state.summary = [];
-  },
-  [types.REQUEST_SUMMARY_DATA](state) {
-    state.summary = [];
-  },
-  [types.RECEIVE_SUMMARY_DATA_SUCCESS](state, data) {
-    state.summary = data.map(item => ({
-      ...item,
-      value: item.value || '-',
-    }));
   },
   [types.REQUEST_GROUP_STAGES_AND_EVENTS](state) {
     state.stages = [];

@@ -22,7 +22,10 @@ module EE
       'designs_added' => 'doc-image',
       'designs_modified' => 'doc-image',
       'designs_removed' => 'doc-image',
-      'designs_discussion_added' => 'doc-image'
+      'designs_discussion_added' => 'doc-image',
+      'vulnerability_confirmed' => 'shield',
+      'vulnerability_dismissed' => 'cancel',
+      'vulnerability_resolved' => 'status_closed'
     }.freeze
 
     override :system_note_icon_name

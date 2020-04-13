@@ -1,5 +1,5 @@
 <script>
-import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import CeDashboard from '~/monitoring/components/dashboard.vue';
 import AlertWidget from './alert_widget.vue';
 

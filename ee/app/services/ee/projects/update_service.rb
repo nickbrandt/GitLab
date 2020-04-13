@@ -18,6 +18,8 @@ module EE
           return project
         end
 
+        compliance_framework_setting
+
         result = super do
           # Repository size limit comes as MB from the view
           project.repository_size_limit = ::Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
@@ -46,6 +48,18 @@ module EE
 
         mirror_user_id == current_user.id ||
           mirror_user_id == project.mirror_user&.id
+      end
+
+      def compliance_framework_setting
+        settings = params[:compliance_framework_setting_attributes]
+        return unless settings.present?
+
+        unless can?(current_user, :admin_compliance_framework, project)
+          params.delete(:compliance_framework_setting_attributes)
+          return
+        end
+
+        settings.merge!(_destroy: settings[:framework].blank?)
       end
 
       def log_audit_events

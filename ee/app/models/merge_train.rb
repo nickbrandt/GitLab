@@ -92,11 +92,11 @@ class MergeTrain < ApplicationRecord
 
     def first_in_train_from(merge_request_ids)
       merge_request = MergeRequest.find(merge_request_ids.first)
-      all_active_mrs_in_train(merge_request.target_project_id, merge_request.target_branch).where(id: merge_request_ids).first
+      all_active_mrs_in_train(merge_request.target_project_id, merge_request.target_branch).find_by(id: merge_request_ids)
     end
 
     def last_complete_mr_in_train(target_project_id, target_branch)
-      MergeRequest.where(id: last_complete_merge_train(target_project_id, target_branch)).take
+      MergeRequest.find_by(id: last_complete_merge_train(target_project_id, target_branch))
     end
 
     def sha_exists_in_history?(target_project_id, target_branch, newrev, limit: 20)

@@ -28,6 +28,7 @@ module API
                   ]
 
     allow_access_with_scope :api
+    allow_access_with_scope :read_api, if: -> (request) { request.get? }
     prefix :api
 
     version 'v3', using: :path do
@@ -105,7 +106,7 @@ module API
 
     namespace do
       after do
-        ::Users::ActivityService.new(@current_user).execute if Feature.enabled?(:api_activity_logging)
+        ::Users::ActivityService.new(@current_user).execute
       end
 
       # Keep in alphabetical order
@@ -121,6 +122,7 @@ module API
       mount ::API::BroadcastMessages
       mount ::API::Commits
       mount ::API::CommitStatuses
+      mount ::API::ContainerRegistryEvent
       mount ::API::DeployKeys
       mount ::API::DeployTokens
       mount ::API::Deployments
@@ -171,6 +173,7 @@ module API
       mount ::API::ProjectSnippets
       mount ::API::ProjectStatistics
       mount ::API::ProjectTemplates
+      mount ::API::Terraform::State
       mount ::API::ProtectedBranches
       mount ::API::ProtectedTags
       mount ::API::Releases

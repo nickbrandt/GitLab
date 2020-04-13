@@ -15,7 +15,7 @@ describe Gitlab::Cleanup::OrphanLfsFileReferences do
     allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
 
     # Create a valid reference
-    oid = project.repository.gitaly_blob_client.get_all_lfs_pointers(nil).first.lfs_oid
+    oid = project.repository.gitaly_blob_client.get_all_lfs_pointers.first.lfs_oid
     lfs_object2 = create(:lfs_object, oid: oid)
     create(:lfs_objects_project, project: project, lfs_object: lfs_object2)
   end

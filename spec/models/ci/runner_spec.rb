@@ -526,14 +526,14 @@ describe Ci::Runner do
     it 'sets a new last_update value when it is called the first time' do
       last_update = runner.ensure_runner_queue_value
 
-      expect_value_in_queues.to eq(last_update)
+      expect(value_in_queues).to eq(last_update)
     end
 
     it 'does not change if it is not expired and called again' do
       last_update = runner.ensure_runner_queue_value
 
       expect(runner.ensure_runner_queue_value).to eq(last_update)
-      expect_value_in_queues.to eq(last_update)
+      expect(value_in_queues).to eq(last_update)
     end
 
     context 'updates runner queue after changing editable value' do
@@ -544,7 +544,7 @@ describe Ci::Runner do
       end
 
       it 'sets a new last_update value' do
-        expect_value_in_queues.not_to eq(last_update)
+        expect(value_in_queues).not_to eq(last_update)
       end
     end
 
@@ -556,14 +556,14 @@ describe Ci::Runner do
       end
 
       it 'has an old last_update value' do
-        expect_value_in_queues.to eq(last_update)
+        expect(value_in_queues).to eq(last_update)
       end
     end
 
-    def expect_value_in_queues
+    def value_in_queues
       Gitlab::Redis::SharedState.with do |redis|
         runner_queue_key = runner.send(:runner_queue_key)
-        expect(redis.get(runner_queue_key))
+        redis.get(runner_queue_key)
       end
     end
   end
@@ -837,5 +837,34 @@ describe Ci::Runner do
     subject { runner.uncached_contacted_at }
 
     it { is_expected.to eq(contacted_at_stored) }
+  end
+
+  describe '.belonging_to_group' do
+    it 'returns the specific group runner' do
+      group = create(:group)
+      runner = create(:ci_runner, :group, groups: [group])
+      unrelated_group = create(:group)
+      create(:ci_runner, :group, groups: [unrelated_group])
+
+      expect(described_class.belonging_to_group(group.id)).to contain_exactly(runner)
+    end
+
+    context 'runner belonging to parent group' do
+      let_it_be(:parent_group) { create(:group) }
+      let_it_be(:parent_runner) { create(:ci_runner, :group, groups: [parent_group]) }
+      let_it_be(:group) { create(:group, parent: parent_group) }
+
+      context 'when include_parent option is passed' do
+        it 'returns the group runner from the parent group' do
+          expect(described_class.belonging_to_group(group.id, include_ancestors: true)).to contain_exactly(parent_runner)
+        end
+      end
+
+      context 'when include_parent option is not passed' do
+        it 'does not return the group runner from the parent group' do
+          expect(described_class.belonging_to_group(group.id)).to be_empty
+        end
+      end
+    end
   end
 end

@@ -265,7 +265,7 @@ test:
 
 Assuming your project is using [pip](https://pip.pypa.io/en/stable/) to install
 the Python dependencies, the following example defines `cache` globally so that
-all jobs inherit it. Python libraries are installed in a virtualenv under `venv/`,
+all jobs inherit it. Python libraries are installed in a virtual environment under `venv/`,
 pip's cache is defined under `.cache/pip/` and both are cached per-branch:
 
 ```yaml
@@ -327,6 +327,30 @@ before_script:
 rspec:
   script:
   - rspec spec
+```
+
+### Caching Go dependencies
+
+Assuming your project is using [Go Modules](https://github.com/golang/go/wiki/Modules) to install
+Go dependencies, the following example defines `cache` in a `go-cache` template, that
+any job can extend. Go modules are installed in `${GOPATH}/pkg/mod/` and
+are cached for all of the `go` projects:
+
+```yaml
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
+test:
+  image: golang:1.13
+  extends: .go-cache
+  script:
+  - go test ./... -v -short
 ```
 
 ## Availability of the cache

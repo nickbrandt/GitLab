@@ -165,7 +165,7 @@ describe User do
       end
 
       it "returns false for an auditor user if a license is not present" do
-        stub_licensed_features(auditor_user: false)
+        allow(License).to receive(:current).and_return nil
 
         expect(build(:user, :auditor)).not_to be_auditor
       end
@@ -1003,6 +1003,96 @@ describe User do
       end
 
       it { is_expected.to eq [free_group_a, free_group_z] }
+    end
+  end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+
+    let(:user) { create(:user) }
+
+    context 'based on user type' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:user_type, :expected_result) do
+        'service_user'      | true
+        'support_bot'       | false
+        'visual_review_bot' | false
+      end
+
+      with_them do
+        before do
+          user.update(user_type: user_type)
+        end
+
+        it { is_expected.to be expected_result }
+      end
+    end
+  end
+
+  context 'paid namespaces' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:gold_group) { create(:group_with_plan, plan: :gold_plan) }
+    let_it_be(:bronze_group) { create(:group_with_plan, plan: :bronze_plan) }
+    let_it_be(:free_group) { create(:group_with_plan, plan: :free_plan) }
+    let_it_be(:group_without_plan) { create(:group) }
+
+    describe '#has_paid_namespace?' do
+      context 'when the user has Reporter or higher on at least one paid group' do
+        it 'returns true' do
+          gold_group.add_reporter(user)
+          bronze_group.add_guest(user)
+
+          expect(user.has_paid_namespace?).to eq(true)
+        end
+      end
+
+      context 'when the user is only a Guest on paid groups' do
+        it 'returns false' do
+          gold_group.add_guest(user)
+          bronze_group.add_guest(user)
+          free_group.add_owner(user)
+
+          expect(user.has_paid_namespace?).to eq(false)
+        end
+      end
+
+      context 'when the user is not a member of any groups with plans' do
+        it 'returns false' do
+          group_without_plan.add_owner(user)
+
+          expect(user.has_paid_namespace?).to eq(false)
+        end
+      end
+    end
+
+    describe '#owns_paid_namespace?' do
+      context 'when the user is an owner of at least one paid group' do
+        it 'returns true' do
+          gold_group.add_owner(user)
+          bronze_group.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(true)
+        end
+      end
+
+      context 'when the user is only a Maintainer on paid groups' do
+        it 'returns false' do
+          gold_group.add_maintainer(user)
+          bronze_group.add_maintainer(user)
+          free_group.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(false)
+        end
+      end
+
+      context 'when the user is not a member of any groups with plans' do
+        it 'returns false' do
+          group_without_plan.add_owner(user)
+
+          expect(user.owns_paid_namespace?).to eq(false)
+        end
+      end
     end
   end
 end

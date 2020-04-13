@@ -5,11 +5,12 @@ In this page you will find information about the settings that are used on
 
 ## SSH host keys fingerprints
 
-Below are the fingerprints for GitLab.com's SSH host keys.
+Below are the fingerprints for GitLab.com's SSH host keys. The first time you connect
+to a GitLab.com repository, you'll see one of these keys in the output.
 
-| Algorithm | MD5 | SHA256  |
+| Algorithm | MD5 (deprecated) | SHA256  |
 | --------- | --- | ------- |
-|  DSA      | `7a:47:81:3a:ee:89:89:64:33:ca:44:52:3d:30:d4:87` | `p8vZBUOR0XQz6sYiaWSMLmh0t9i8srqYKool/Xfdfqw` |
+|  DSA (deprecated)      | `7a:47:81:3a:ee:89:89:64:33:ca:44:52:3d:30:d4:87` | `p8vZBUOR0XQz6sYiaWSMLmh0t9i8srqYKool/Xfdfqw` |
 |  ECDSA    | `f1:d0:fb:46:73:7a:70:92:5a:ab:5d:ef:43:e2:1c:35` | `HbW3g8zUjNSksFbqTiUWPWg2Bq1x8xdGUrliXFzSnUw` |
 |  ED25519  | `2e:65:6a:c8:cf:bf:b2:8b:9a:bd:6d:9f:11:5c:12:16` | `eUXGGm1YGsMAS7vkcx6JOJdOGHPem5gQp4taiCfCLB8` |
 |  RSA      | `b6:03:0e:39:97:9e:d0:e7:24:ce:a3:77:3e:01:42:09` | `ROQFvPThGrW4RuWLoL9tq9I9zJ42fK4XywyRtbOz/EQ` |
@@ -87,13 +88,18 @@ or over the size limit, you can [reduce your repository size with Git](../projec
 | -----------             | ----------------- | ------------- |
 | Repository size including LFS | 10G         | Unlimited     |
 
+NOTE: **Note:**
+A single `git push` is limited to 5GB. LFS is not affected by this limit.
+
 ## IP range
 
 GitLab.com is using the IP range `34.74.90.64/28` for traffic from its Web/API
-fleet. You can expect connections from webhooks or repository mirroring to come
+fleet. This whole range is solely allocated to GitLab. You can expect connections from webhooks or repository mirroring to come
 from those IPs and whitelist them.
 
-For connections from CI/CD runners we are not providing static IP addresses.
+GitLab.com is fronted by Cloudflare. For incoming connections to GitLab.com you might need to whitelist CIDR blocks of Cloudflare ([IPv4](https://www.cloudflare.com/ips-v4) and [IPv6](https://www.cloudflare.com/ips-v6))
+
+For outgoing connections from CI/CD runners we are not providing static IP addresses.
 All our runners are deployed into Google Cloud Platform (GCP) - any IP based
 firewall can be configured by looking up all
 [IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).

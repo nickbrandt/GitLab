@@ -12,6 +12,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:feature_flag_permissions)
+    push_frontend_feature_flag(:feature_flags_new_version, project)
   end
 
   def index
@@ -117,7 +118,9 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
     params.require(:operations_feature_flag)
           .permit(:name, :description, :active,
                   scopes_attributes: [:id, :environment_scope, :active, :_destroy,
-                                      strategies: [:name, parameters: [:groupId, :percentage, :userIds]]])
+                                      strategies: [:name, parameters: [:groupId, :percentage, :userIds]]],
+                 strategies_attributes: [:id, :name, :_destroy, parameters: [:groupId, :percentage, :userIds],
+                                         scopes_attributes: [:id, :environment_scope, :_destroy]])
   end
 
   def feature_flag_json(feature_flag)

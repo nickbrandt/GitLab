@@ -240,6 +240,10 @@ Example response:
 ]
 ```
 
+NOTE: **Note:**
+
+To distinguish between a project in the group and a project shared to the group, the `namespace` attribute can be used. When a project has been shared to the group, its `namespace` will be different from the group the request is being made for.
+
 ## Details of a group
 
 Get all details of a group. This endpoint can be accessed without authentication
@@ -255,7 +259,7 @@ Parameters:
 | ------------------------ | -------------- | -------- | ----------- |
 | `id`                     | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `with_custom_attributes` | boolean        | no       | Include [custom attributes](custom_attributes.md) in response (admins only). |
-| `with_projects`          | boolean        | no       | Include details from projects that belong to the specified group (defaults to `true`). |
+| `with_projects`          | boolean        | no       | Include details from projects that belong to the specified group (defaults to `true`). (Deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects).)  |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4
@@ -552,7 +556,6 @@ PUT /groups/:id
 | `membership_lock`                    | boolean | no       | **(STARTER)** Prevent adding new members to project membership within this group. |
 | `share_with_group_lock`              | boolean | no       | Prevent sharing a project with another group within this group. |
 | `visibility`                         | string  | no       | The visibility level of the group. Can be `private`, `internal`, or `public`. |
-| `share_with_group_lock`              | boolean | no       | Prevent sharing a project with another group within this group. |
 | `require_two_factor_authentication`  | boolean | no       | Require all users in this group to setup Two-factor authentication. |
 | `two_factor_grace_period`            | integer | no       | Time before Two-factor authentication is enforced (in hours). |
 | `project_creation_level`             | string  | no       | Determine if developers can create projects in the group. Can be `noone` (No one), `maintainer` (Maintainers), or `developer` (Developers + Maintainers). |
@@ -578,6 +581,10 @@ This endpoint returns:
 - A maximum of 100 projects and shared projects [in GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/31031)
   and later. To get the details of all projects within a group, use the
   [list a group's projects endpoint](#list-a-groups-projects) instead.
+
+NOTE: **Note:**
+
+The `projects` and `shared_projects` attributes [will be deprecated in GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects) instead.
 
 Example response:
 
@@ -749,6 +756,7 @@ GET /groups/:id/hooks/:hook_id
   "merge_requests_events": true,
   "tag_push_events": true,
   "note_events": true,
+  "confidential_note_events": true,
   "job_events": true,
   "pipeline_events": true,
   "wiki_page_events": true,
@@ -775,6 +783,7 @@ POST /groups/:id/hooks
 | `merge_requests_events`      | boolean        | no       | Trigger hook on merge requests events |
 | `tag_push_events`            | boolean        | no       | Trigger hook on tag push events |
 | `note_events`                | boolean        | no       | Trigger hook on note events |
+| `confidential_note_events`   | boolean        | no       | Trigger hook on confidential note events |
 | `job_events`                 | boolean        | no       | Trigger hook on job events |
 | `pipeline_events`            | boolean        | no       | Trigger hook on pipeline events |
 | `wiki_page_events`           | boolean        | no       | Trigger hook on wiki events |
@@ -800,6 +809,7 @@ PUT /groups/:id/hooks/:hook_id
 | `merge_requests_events`      | boolean        | no       | Trigger hook on merge requests events |
 | `tag_push_events`            | boolean        | no       | Trigger hook on tag push events |
 | `note_events`                | boolean        | no       | Trigger hook on note events |
+| `confidential_note_events`   | boolean        | no       | Trigger hook on confidential note events |
 | `job_events`                 | boolean        | no       | Trigger hook on job events |
 | `pipeline_events`            | boolean        | no       | Trigger hook on pipeline events |
 | `wiki_events`                | boolean        | no       | Trigger hook on wiki events |

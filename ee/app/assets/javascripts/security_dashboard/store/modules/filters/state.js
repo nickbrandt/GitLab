@@ -1,17 +1,15 @@
+import { s__ } from '~/locale';
 import { BASE_FILTERS } from './constants';
 import { SEVERITY_LEVELS, REPORT_TYPES } from '../../constants';
-import { s__ } from '~/locale';
 
 const optionsObjectToArray = obj => Object.entries(obj).map(([id, name]) => ({ id, name }));
-const severityLevelsWithoutNone = { ...SEVERITY_LEVELS };
-delete severityLevelsWithoutNone.none;
 
 export default () => ({
   filters: [
     {
       name: s__('SecurityDashboard|Severity'),
       id: 'severity',
-      options: [BASE_FILTERS.severity, ...optionsObjectToArray(severityLevelsWithoutNone)],
+      options: [BASE_FILTERS.severity, ...optionsObjectToArray(SEVERITY_LEVELS)],
       hidden: false,
       selection: new Set([BASE_FILTERS.severity.id]),
     },

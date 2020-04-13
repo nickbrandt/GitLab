@@ -1,4 +1,4 @@
-# GitLab Dependency Proxy administration **(ULTIMATE ONLY)**
+# GitLab Dependency Proxy administration **(PREMIUM ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7934) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.11.
 
@@ -77,7 +77,9 @@ To change the local storage path:
 ### Using object storage
 
 Instead of relying on the local storage, you can use an object storage to
-upload the blobs of the dependency proxy:
+store the blobs of the dependency proxy.
+
+[Read more about using object storage with GitLab](../object_storage.md).
 
 **Omnibus GitLab installations**
 

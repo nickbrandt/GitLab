@@ -92,13 +92,13 @@ class Projects::MergeRequests::DiffsController < Projects::MergeRequests::Applic
   # Deprecated: https://gitlab.com/gitlab-org/gitlab/issues/37735
   def find_merge_request_diff_compare
     @merge_request_diff =
-      if diff_id = params[:diff_id].presence
-        @merge_request.merge_request_diffs.viewable.find_by(id: diff_id)
+      if params[:diff_id].present?
+        @merge_request.merge_request_diffs.viewable.find_by(id: params[:diff_id])
       else
         @merge_request.merge_request_diff
       end
 
-    return unless @merge_request_diff
+    return unless @merge_request_diff&.id
 
     @comparable_diffs = @merge_request_diffs.select { |diff| diff.id < @merge_request_diff.id }
 

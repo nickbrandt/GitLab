@@ -16,6 +16,7 @@ module EE
         expose :health_status
         expose :missing_oauth_application
 
+        expose :attachments_replication_enabled
         expose :attachments_count
         expose :attachments_synced_count
         expose :attachments_failed_count
@@ -26,6 +27,7 @@ module EE
 
         expose :db_replication_lag_seconds
 
+        expose :lfs_objects_replication_enabled
         expose :lfs_objects_count
         expose :lfs_objects_synced_count
         expose :lfs_objects_failed_count
@@ -34,6 +36,7 @@ module EE
           number_to_percentage(node.lfs_objects_synced_in_percentage, precision: 2)
         end
 
+        expose :job_artifacts_replication_enabled
         expose :job_artifacts_count
         expose :job_artifacts_synced_count
         expose :job_artifacts_failed_count
@@ -42,6 +45,7 @@ module EE
           number_to_percentage(node.job_artifacts_synced_in_percentage, precision: 2)
         end
 
+        expose :container_repositories_replication_enabled
         expose :container_repositories_count
         expose :container_repositories_synced_count
         expose :container_repositories_failed_count
@@ -49,6 +53,7 @@ module EE
           number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
         end
 
+        expose :design_repositories_replication_enabled
         expose :design_repositories_count
         expose :design_repositories_synced_count
         expose :design_repositories_failed_count
@@ -56,6 +61,7 @@ module EE
           number_to_percentage(node.design_repositories_synced_in_percentage, precision: 2)
         end
 
+        expose :repositories_replication_enabled
         expose :projects_count
 
         expose :repositories_failed_count

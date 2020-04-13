@@ -16,12 +16,7 @@ class DiffsEntity < Grape::Entity
   end
 
   expose :commit do |diffs, options|
-    CommitEntity.represent options[:commit], options.merge(
-      type: :full,
-      commit_url_params: { merge_request_iid: merge_request&.iid },
-      pipeline_ref: merge_request&.source_branch,
-      pipeline_project: merge_request&.source_project
-    )
+    CommitEntity.represent(options[:commit], commit_options(options))
   end
 
   expose :context_commits, using: API::Entities::Commit, if: -> (diffs, options) { merge_request&.project&.context_commits_enabled? } do |diffs|
@@ -70,14 +65,49 @@ class DiffsEntity < Grape::Entity
 
   expose :diff_files do |diffs, options|
     submodule_links = Gitlab::SubmoduleLinks.new(merge_request.project.repository)
-    DiffFileEntity.represent(diffs.diff_files, options.merge(submodule_links: submodule_links))
+    code_navigation_path =
+      Gitlab::CodeNavigationPath.new(merge_request.project, diffs.diff_refs.head_sha)
+
+    DiffFileEntity.represent(diffs.diff_files,
+      options.merge(submodule_links: submodule_links, code_navigation_path: code_navigation_path))
   end
 
   expose :merge_request_diffs, using: MergeRequestDiffEntity, if: -> (_, options) { options[:merge_request_diffs]&.any? } do |diffs|
     options[:merge_request_diffs]
   end
 
+  expose :definition_path_prefix, if: -> (diff_file) { Feature.enabled?(:code_navigation, merge_request.project) } do |diffs|
+    project_blob_path(merge_request.project, diffs.diff_refs.head_sha)
+  end
+
   def merge_request
     options[:merge_request]
+  end
+
+  private
+
+  def commit_ids
+    @commit_ids ||= merge_request.recent_commits.map(&:id)
+  end
+
+  def commit_neighbors(commit_id)
+    index = commit_ids.index(commit_id)
+
+    return [] unless index
+
+    [(index > 0 ? commit_ids[index - 1] : nil), commit_ids[index + 1]]
+  end
+
+  def commit_options(options)
+    next_commit_id, prev_commit_id = *commit_neighbors(options[:commit]&.id)
+
+    options.merge(
+      type: :full,
+      commit_url_params: { merge_request_iid: merge_request&.iid },
+      pipeline_ref: merge_request&.source_branch,
+      pipeline_project: merge_request&.source_project,
+      prev_commit_id: prev_commit_id,
+      next_commit_id: next_commit_id
+    )
   end
 end

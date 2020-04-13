@@ -1,0 +1,45 @@
+query projectRequirements(
+  $projectPath: ID!
+  $state: RequirementState
+  $firstPageSize: Int
+  $lastPageSize: Int
+  $prevPageCursor: String = ""
+  $nextPageCursor: String = ""
+) {
+  project(fullPath: $projectPath) {
+    requirementStatesCount {
+      opened
+      archived
+    }
+    requirements(
+      first: $firstPageSize
+      last: $lastPageSize
+      after: $nextPageCursor
+      before: $prevPageCursor
+      sort: created_desc
+      state: $state
+    ) {
+      nodes {
+        iid
+        title
+        createdAt
+        updatedAt
+        state
+        userPermissions {
+          updateRequirement
+          adminRequirement
+        }
+        author {
+          name
+          username
+          avatarUrl
+          webUrl
+        }
+      }
+      pageInfo {
+        startCursor
+        endCursor
+      }
+    }
+  }
+}

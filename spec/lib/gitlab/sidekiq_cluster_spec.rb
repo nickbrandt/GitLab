@@ -44,7 +44,7 @@ describe Gitlab::SidekiqCluster do
   end
 
   describe '.signal_processes' do
-    it 'sends a signal to every thread' do
+    it 'sends a signal to every given process' do
       expect(described_class).to receive(:signal).with(1, :INT)
 
       described_class.signal_processes([1], :INT)
@@ -58,6 +58,7 @@ describe Gitlab::SidekiqCluster do
         directory: 'foo/bar',
         max_concurrency: 20,
         min_concurrency: 10,
+        timeout: 25,
         dryrun: true
       }
 
@@ -74,6 +75,7 @@ describe Gitlab::SidekiqCluster do
         max_concurrency: 50,
         min_concurrency: 0,
         worker_id: an_instance_of(Integer),
+        timeout: 25,
         dryrun: false
       }
 
@@ -87,10 +89,10 @@ describe Gitlab::SidekiqCluster do
   describe '.start_sidekiq' do
     let(:first_worker_id) { 0 }
     let(:options) do
-      { env: :production, directory: 'foo/bar', max_concurrency: 20, min_concurrency: 0, worker_id: first_worker_id, dryrun: false }
+      { env: :production, directory: 'foo/bar', max_concurrency: 20, min_concurrency: 0, worker_id: first_worker_id, timeout: 10, dryrun: false }
     end
     let(:env) { { "ENABLE_SIDEKIQ_CLUSTER" => "1", "SIDEKIQ_WORKER_ID" => first_worker_id.to_s } }
-    let(:args) { ['bundle', 'exec', 'sidekiq', anything, '-eproduction', *([anything] * 5)] }
+    let(:args) { ['bundle', 'exec', 'sidekiq', anything, '-eproduction', '-t10', *([anything] * 5)] }
 
     it 'starts a Sidekiq process' do
       allow(Process).to receive(:spawn).and_return(1)

@@ -15,7 +15,21 @@ tag) with an API call.
 
 ## Authentication tokens
 
-The following methods of authentication are supported.
+The following methods of authentication are supported:
+
+- [Trigger token](#trigger-token)
+- [CI job token](#ci-job-token)
+
+If using the `$CI_PIPELINE_SOURCE` [predefined environment variable](../variables/predefined_variables.md#variables-reference)
+to limit which jobs run in a pipeline, the value could be either `pipeline` or `trigger`,
+depending on which trigger method is used.
+
+| `$CI_PIPELINE_SOURCE` value | Trigger method |
+|-----------------------------|----------------|
+| `pipeline`                  | Using the `trigger:` keyword in the CI/CD configuration file, or using the trigger API with `$CI_JOB_TOKEN`. |
+| `trigger`                   | Using the trigger API using a generated trigger token |
+
+This also applies when using the `pipelines` or `triggers` keywords with the legacy [`only/except` basic syntax](../yaml/README.md#onlyexcept-basic).
 
 ### Trigger token
 
@@ -29,12 +43,12 @@ to protect trigger tokens.
 
 ### CI job token
 
-You can use the `CI_JOB_TOKEN` [variable][predef] (used to authenticate
-with the [GitLab Container Registry][registry]) in the following cases.
+You can use the `CI_JOB_TOKEN` [variable](../variables/README.md#predefined-environment-variables) (used to authenticate
+with the [GitLab Container Registry](../../user/packages/container_registry/index.md)) in the following cases.
 
 #### When used with multi-project pipelines
 
-> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced][ee-2017] in [GitLab Premium][ee] 9.3.
+> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.3.
 > - Use of `CI_JOB_TOKEN` for multi-project pipelines was [made available](https://gitlab.com/gitlab-org/gitlab/issues/31573) in all tiers in GitLab 12.4.
 
 This way of triggering can only be used when invoked inside `.gitlab-ci.yml`,
@@ -53,11 +67,11 @@ build_docs:
 Pipelines triggered that way also expose a special variable:
 `CI_PIPELINE_SOURCE=pipeline`.
 
-Read more about the [pipelines trigger API][trigapi].
+Read more about the [pipelines trigger API](../../api/pipeline_triggers.md).
 
 #### When a pipeline depends on the artifacts of another pipeline **(PREMIUM)**
 
-> The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346] in [GitLab Premium][ee] 9.5.
+> The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.5.
 
 With the introduction of dependencies between different projects, one of
 them may need to access artifacts created by a previous one. This process
@@ -78,7 +92,7 @@ build_submodule:
 
 This allows you to use that for multi-project pipelines and download artifacts
 from any project to which you have access as this follows the same principles
-with the [permission model][permissions].
+with the [permission model](../../user/permissions.md#job-permissions).
 
 Read more about the [jobs API](../../api/jobs.md#download-the-artifacts-archive).
 
@@ -192,7 +206,7 @@ https://gitlab.example.com/api/v4/projects/9/ref/master/trigger/pipeline?token=T
 ## Making use of trigger variables
 
 You can pass any number of arbitrary variables in the trigger API call and they
-will be available in GitLab CI so that they can be used in your `.gitlab-ci.yml`
+will be available in GitLab CI/CD so that they can be used in your `.gitlab-ci.yml`
 file. The parameter is of the form:
 
 ```plaintext
@@ -273,12 +287,3 @@ Old triggers, created before GitLab 9.0 will be marked as legacy.
 Triggers with the legacy label do not have an associated user and only have
 access to the current project. They are considered deprecated and will be
 removed with one of the future versions of GitLab.
-
-[ee-2017]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017
-[ee-2346]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346
-[ee]: https://about.gitlab.com/pricing/
-[variables]: ../variables/README.md
-[predef]: ../variables/README.md#predefined-environment-variables
-[registry]: ../../user/packages/container_registry/index.md
-[permissions]: ../../user/permissions.md#job-permissions
-[trigapi]: ../../api/pipeline_triggers.md

@@ -23,6 +23,34 @@ describe Issuable::CommonSystemNotesService do
       end
     end
 
+    context 'when health status is updated' do
+      before do
+        issuable.update!(health_status: 2)
+      end
+
+      context 'when setting a health_status' do
+        it 'creates system note' do
+          expect do
+            described_class.new(project, user).execute(issuable, old_labels: [])
+          end.to change { Note.count }.from(0).to(1)
+
+          expect(Note.last.note).to eq('changed health status to **needs attention**')
+        end
+      end
+
+      context 'when health status is removed' do
+        it 'creates system note' do
+          issuable.update!(health_status: nil)
+
+          expect do
+            described_class.new(project, user).execute(issuable, old_labels: [])
+          end.to change { Note.count }.from(0).to(1)
+
+          expect(Note.last.note).to eq('removed the health status')
+        end
+      end
+    end
+
     context 'when issuable is an epic' do
       let(:timestamp) { Time.now }
       let(:issuable) { create(:epic, end_date: timestamp) }
@@ -49,11 +77,10 @@ describe Issuable::CommonSystemNotesService do
     subject { described_class.new(project, user).execute(issuable, old_labels: [], is_update: false) }
 
     before do
-      issuable.weight = 5
-      issuable.save
+      issuable.update(weight: 5, health_status: 'at_risk')
     end
 
-    it 'does not create a common system note for weight' do
+    it 'does not create common system notes' do
       expect { subject }.not_to change { issuable.notes.count }
     end
 

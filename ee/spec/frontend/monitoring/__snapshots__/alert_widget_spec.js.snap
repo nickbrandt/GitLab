@@ -1,18 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AlertWidget displays a warning icon and matches snapshopt 1`] = `
+exports[`AlertWidget Alert firing displays a warning icon and matches snapshot 1`] = `
 <gl-badge-stub
-  class="d-flex-center text-secondary text-truncate"
-  variant="secondary"
+  class="d-flex-center text-truncate"
+  pill=""
+  variant="danger"
 >
-  <icon-stub
-    class="s18 append-right-4"
+  <gl-icon-stub
+    class="flex-shrink-0"
     name="warning"
     size="16"
   />
    
   <span
-    class="text-truncate"
+    class="text-truncate gl-pl-1"
+  >
+    Firing: 
+            alert-label &gt; 42
+          
+  </span>
+</gl-badge-stub>
+`;
+
+exports[`AlertWidget Alert not firing displays a warning icon and matches snapshot 1`] = `
+<gl-badge-stub
+  class="d-flex-center text-truncate"
+  pill=""
+  variant="secondary"
+>
+  <gl-icon-stub
+    class="flex-shrink-0"
+    name="warning"
+    size="16"
+  />
+   
+  <span
+    class="text-truncate gl-pl-1"
   >
     alert-label &gt; 42
   </span>

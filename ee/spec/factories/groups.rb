@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :group_with_members, parent: :group do
     after(:create) do |group, evaluator|
-      group.add_developer(create :user)
+      group.add_developer(create(:user))
     end
   end
 
@@ -58,6 +58,23 @@ FactoryBot.define do
       create(:saml_provider,
         :enforced_group_managed_accounts,
         group: group)
+    end
+  end
+
+  factory :group_with_plan, parent: :group do
+    transient do
+      plan { :default_plan }
+      trial_ends_on { nil }
+    end
+
+    after(:create) do |group, evaluator|
+      if evaluator.plan
+        create(:gitlab_subscription,
+               namespace: group,
+               hosted_plan: create(evaluator.plan),
+               trial: evaluator.trial_ends_on.present?,
+               trial_ends_on: evaluator.trial_ends_on)
+      end
     end
   end
 end

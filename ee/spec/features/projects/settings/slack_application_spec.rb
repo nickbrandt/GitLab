@@ -16,6 +16,7 @@ describe 'Slack application' do
     create(:slack_integration, service: service)
 
     allow(Gitlab).to receive(:com?).and_return(true)
+    allow(Gitlab::CurrentSettings).to receive(:slack_app_enabled).and_return(true)
   end
 
   it 'I can edit slack integration' do

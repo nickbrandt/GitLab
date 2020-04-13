@@ -8,7 +8,13 @@ import MergeRequestTable from 'ee/analytics/productivity_analytics/components/mr
 import store from 'ee/analytics/productivity_analytics/store';
 import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
 import { TEST_HOST } from 'helpers/test_constants';
-import { GlEmptyState, GlLoadingIcon, GlDropdown, GlDropdownItem, GlButton } from '@gitlab/ui';
+import {
+  GlEmptyState,
+  GlLoadingIcon,
+  GlDropdown,
+  GlDropdownItem,
+  GlDeprecatedButton,
+} from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import * as commonUtils from '~/lib/utils/common_utils';
 import * as urlUtils from '~/lib/utils/url_utility';
@@ -73,7 +79,7 @@ describe('ProductivityApp component', () => {
   const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
   const findSortFieldDropdown = () => findMrTableSortSection().find(GlDropdown);
-  const findSortOrderToggle = () => findMrTableSortSection().find(GlButton);
+  const findSortOrderToggle = () => findMrTableSortSection().find(GlDeprecatedButton);
   const findMrTableSection = () => wrapper.find('.js-mr-table');
   const findMrTable = () => findMrTableSection().find(MergeRequestTable);
 

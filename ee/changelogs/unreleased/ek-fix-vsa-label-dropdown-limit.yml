@@ -1,0 +1,5 @@
+---
+title: Fix vsa label dropdown limit
+merge_request: 28073
+author:
+type: fixed

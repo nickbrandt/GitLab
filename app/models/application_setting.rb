@@ -137,10 +137,13 @@ class ApplicationSetting < ApplicationRecord
 
   validates :max_pages_size,
             presence: true,
-            numericality: { only_integer: true, greater_than: 0,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0,
                             less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
   validates :default_artifacts_expire_in, presence: true, duration: true
+
+  validates :container_expiration_policies_enable_historic_entries,
+             inclusion: { in: [true, false], message: 'must be a boolean value' }
 
   validates :container_registry_token_expire_delay,
             presence: true,
@@ -336,6 +339,10 @@ class ApplicationSetting < ApplicationRecord
               message: N_('cannot include leading slash or directory traversal.') },
     length: { maximum: 255 },
     allow_blank: true
+
+  validates :namespace_storage_size_limit,
+            presence: true,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   attr_encrypted :asset_proxy_secret_key,
                  mode: :per_attribute_iv,

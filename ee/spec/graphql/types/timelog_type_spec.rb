@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe GitlabSchema.types['Timelog'] do
-  let(:fields) { %i[date time_spent user issue] }
+  let(:fields) { %i[date spent_at time_spent user issue] }
 
   it { expect(described_class.graphql_name).to eq('Timelog') }
   it { expect(described_class).to have_graphql_fields(fields) }

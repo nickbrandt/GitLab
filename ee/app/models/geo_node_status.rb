@@ -11,7 +11,9 @@ class GeoNodeStatus < ApplicationRecord
 
   attr_accessor :storage_shards
 
-  attr_accessor :repository_verification_enabled
+  attr_accessor :attachments_replication_enabled, :lfs_objects_replication_enabled, :job_artifacts_replication_enabled,
+                :container_repositories_replication_enabled, :design_repositories_replication_enabled, :repositories_replication_enabled,
+                :repository_verification_enabled
 
   # Prometheus metrics, no need to store them in the database
   attr_accessor :event_log_max_id, :repository_created_max_id, :repository_updated_max_id,
@@ -32,9 +34,49 @@ class GeoNodeStatus < ApplicationRecord
   alias_attribute :last_event_timestamp, :last_event_date_timestamp
   alias_attribute :cursor_last_event_timestamp, :cursor_last_event_date_timestamp
 
+  RESOURCE_STATUS_FIELDS = %w(
+    repositories_synced_count
+    repositories_failed_count
+    lfs_objects_count
+    lfs_objects_synced_count
+    lfs_objects_failed_count
+    attachments_count
+    attachments_synced_count
+    attachments_failed_count
+    wikis_synced_count
+    wikis_failed_count
+    job_artifacts_count
+    job_artifacts_synced_count
+    job_artifacts_failed_count
+    repositories_verified_count
+    repositories_verification_failed_count
+    wikis_verified_count
+    wikis_verification_failed_count
+    lfs_objects_synced_missing_on_primary_count
+    job_artifacts_synced_missing_on_primary_count
+    attachments_synced_missing_on_primary_count
+    repositories_checksummed_count
+    repositories_checksum_failed_count
+    repositories_checksum_mismatch_count
+    wikis_checksummed_count
+    wikis_checksum_failed_count
+    wikis_checksum_mismatch_count
+    repositories_retrying_verification_count
+    wikis_retrying_verification_count
+    projects_count
+    container_repositories_count
+    container_repositories_synced_count
+    container_repositories_failed_count
+    container_repositories_registry_count
+    design_repositories_count
+    design_repositories_synced_count
+    design_repositories_failed_count
+  ).freeze
+
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
     db_replication_lag_seconds: 'Database replication lag (seconds)',
+    repositories_replication_enabled: 'Boolean denoting if replication is enabled for Repositories',
     repositories_count: 'Total number of repositories available on primary',
     repositories_synced_count: 'Number of repositories synced on secondary',
     repositories_failed_count: 'Number of repositories failed to sync on secondary',
@@ -50,16 +92,19 @@ class GeoNodeStatus < ApplicationRecord
     wikis_verified_count: 'Number of wikis verified on secondary',
     wikis_verification_failed_count: 'Number of wikis failed to verify on secondary',
     wikis_checksum_mismatch_count: 'Number of wikis that checksum mismatch on secondary',
+    lfs_objects_replication_enabled: 'Boolean denoting if replication is enabled for LFS Objects',
     lfs_objects_count: 'Total number of syncable LFS objects available on primary',
     lfs_objects_synced_count: 'Number of syncable LFS objects synced on secondary',
     lfs_objects_failed_count: 'Number of syncable LFS objects failed to sync on secondary',
     lfs_objects_registry_count: 'Number of LFS objects in the registry',
     lfs_objects_synced_missing_on_primary_count: 'Number of LFS objects marked as synced due to the file missing on the primary',
+    job_artifacts_replication_enabled: 'Boolean denoting if replication is enabled for Job Artifacts',
     job_artifacts_count: 'Total number of syncable job artifacts available on primary',
     job_artifacts_synced_count: 'Number of syncable job artifacts synced on secondary',
     job_artifacts_failed_count: 'Number of syncable job artifacts failed to sync on secondary',
     job_artifacts_registry_count: 'Number of job artifacts in the registry',
     job_artifacts_synced_missing_on_primary_count: 'Number of job artifacts marked as synced due to the file missing on the primary',
+    attachments_replication_enabled: 'Boolean denoting if replication is enabled for Attachments',
     attachments_count: 'Total number of syncable file attachments available on primary',
     attachments_synced_count: 'Number of syncable file attachments synced on secondary',
     attachments_failed_count: 'Number of syncable file attachments failed to sync on secondary',
@@ -88,10 +133,12 @@ class GeoNodeStatus < ApplicationRecord
     repositories_checked_failed_count: 'Number of failed repositories checked',
     repositories_retrying_verification_count: 'Number of repositories verification failures that Geo is actively trying to correct on secondary',
     wikis_retrying_verification_count: 'Number of wikis verification failures that Geo is actively trying to correct on secondary',
+    container_repositories_replication_enabled: 'Boolean denoting if replication is enabled for Container Repositories',
     container_repositories_count: 'Total number of syncable container repositories available on primary',
     container_repositories_synced_count: 'Number of syncable container repositories synced on secondary',
     container_repositories_failed_count: 'Number of syncable container repositories failed to sync on secondary',
     container_repositories_registry_count: 'Number of container repositories in the registry',
+    design_repositories_replication_enabled: 'Boolean denoting if replication is enabled for Design Repositories',
     design_repositories_count: 'Total number of syncable design repositories available on primary',
     design_repositories_synced_count: 'Number of syncable design repositories synced on secondary',
     design_repositories_failed_count: 'Number of syncable design repositories failed to sync on secondary',
@@ -101,6 +148,27 @@ class GeoNodeStatus < ApplicationRecord
   EXPIRATION_IN_MINUTES = 5
   HEALTHY_STATUS = 'Healthy'.freeze
   UNHEALTHY_STATUS = 'Unhealthy'.freeze
+
+  def self.alternative_status_store_accessor(attr_names)
+    attr_names.each do |attr_name|
+      define_method(attr_name) do
+        status[attr_name] || read_attribute(attr_name)
+      end
+
+      define_method("#{attr_name}=") do |val|
+        status[attr_name] = val.nil? ? nil : val.to_i
+        write_attribute(attr_name, val)
+      end
+    end
+  end
+
+  # We migrated from attributes stored in individual columns to
+  # a single JSONB hash. To create accessors method for every fields in hash we could use
+  # Rails embeded store_accessor but in this case we won't have smooth update procedure.
+  # The method "alternative_status_store_accessor" does actually the same that store_accessor would
+  # but it uses the old fashioned fields in case the new ones are not set yet. We also casting the type into integer when
+  # we set the value to preserve the old behaviour.
+  alternative_status_store_accessor RESOURCE_STATUS_FIELDS
 
   def self.current_node_status
     current_node = Gitlab::Geo.current_node
@@ -152,6 +220,12 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def initialize_feature_flags
+    self.attachments_replication_enabled = Geo::UploadRegistry.replication_enabled?
+    self.container_repositories_replication_enabled = Geo::ContainerRepositoryRegistry.replication_enabled?
+    self.design_repositories_replication_enabled = Geo::DesignRegistry.replication_enabled?
+    self.job_artifacts_replication_enabled = Geo::JobArtifactRegistry.replication_enabled?
+    self.lfs_objects_replication_enabled = Geo::LfsObjectRegistry.replication_enabled?
+    self.repositories_replication_enabled = Geo::ProjectRegistry.replication_enabled?
     self.repository_verification_enabled = Gitlab::Geo.repository_verification_enabled?
   end
 
@@ -226,9 +300,9 @@ class GeoNodeStatus < ApplicationRecord
 
   def self.attr_in_percentage(attr_name, count, total)
     define_method("#{attr_name}_in_percentage") do
-      return 0 if read_attribute(total).to_i.zero?
+      return 0 if self[total].to_i.zero?
 
-      (read_attribute(count).to_f / read_attribute(total).to_f) * 100.0
+      (self[count].to_f / self[total].to_f) * 100.0
     end
   end
 
@@ -312,6 +386,8 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_lfs_objects_data
+    return unless lfs_objects_replication_enabled
+
     self.lfs_objects_count = lfs_objects_finder.count_syncable
     self.lfs_objects_synced_count = lfs_objects_finder.count_synced
     self.lfs_objects_failed_count = lfs_objects_finder.count_failed
@@ -320,6 +396,8 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_job_artifacts_data
+    return unless job_artifacts_replication_enabled
+
     self.job_artifacts_count = job_artifacts_finder.count_syncable
     self.job_artifacts_synced_count = job_artifacts_finder.count_synced
     self.job_artifacts_failed_count = job_artifacts_finder.count_failed
@@ -328,6 +406,8 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_attachments_data
+    return unless attachments_replication_enabled
+
     self.attachments_count = attachments_finder.count_syncable
     self.attachments_synced_count = attachments_finder.count_synced
     self.attachments_failed_count = attachments_finder.count_failed
@@ -336,6 +416,8 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_container_registry_data
+    return unless container_repositories_replication_enabled
+
     self.container_repositories_count = container_registry_finder.count_syncable
     self.container_repositories_synced_count = container_registry_finder.count_synced
     self.container_repositories_failed_count = container_registry_finder.count_failed
@@ -343,6 +425,8 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_designs_data
+    return unless design_repositories_replication_enabled
+
     self.design_repositories_count = design_registry_finder.count_syncable
     self.design_repositories_synced_count = design_registry_finder.count_synced
     self.design_repositories_failed_count = design_registry_finder.count_failed

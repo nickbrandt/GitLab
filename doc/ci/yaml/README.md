@@ -18,7 +18,7 @@ This topic covers CI/CD pipeline configuration. For other CI/CD configuration in
 
 We have complete examples of configuring pipelines:
 
-- For a quick introduction to GitLab CI, follow our [quick start guide](../quick_start/README.md).
+- For a quick introduction to GitLab CI/CD, follow our [quick start guide](../quick_start/README.md).
 - For a collection of examples, see [GitLab CI/CD Examples](../examples/README.md).
 - To see a large `.gitlab-ci.yml` file used in an enterprise, see the [`.gitlab-ci.yml` file for `gitlab`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml).
 
@@ -58,7 +58,7 @@ independently from each other.
 
 ### Validate the `.gitlab-ci.yml`
 
-Each instance of GitLab CI has an embedded debug tool called Lint, which validates the
+Each instance of GitLab CI/CD has an embedded debug tool called Lint, which validates the
 content of your `.gitlab-ci.yml` files. You can find the Lint under the page `ci/lint` of your
 project namespace. For example, `https://gitlab.example.com/gitlab-org/project-123/-/ci/lint`.
 
@@ -312,31 +312,31 @@ For:
 
 - Simple definition examples, see [Define `image` and `services` from `.gitlab-ci.yml`](../docker/using_docker_images.md#define-image-and-services-from-gitlab-ciyml).
 - Detailed usage information, refer to [Docker integration](../docker/README.md) documentation.
-- For example services, see [GitLab CI Services](../services/README.md).
+- For example services, see [GitLab CI/CD Services](../services/README.md).
 
 #### `services:name`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:alias`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:entrypoint`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:command`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 ### `before_script` and `after_script`
 
@@ -543,7 +543,7 @@ In addition, `only` and `except` allow the use of special keywords:
 | `external`       | When using CI services other than GitLab. |
 | `pipelines`      | For multi-project triggers, created using the API with `CI_JOB_TOKEN`. |
 | `pushes`         | Pipeline is triggered by a `git push` by the user. |
-| `schedules`      | For [scheduled pipelines][schedules]. |
+| `schedules`      | For [scheduled pipelines](../pipelines/schedules.md). |
 | `triggers`       | For pipelines created using a trigger token. |
 | `web`            | For pipelines created using **Run pipeline** button in GitLab UI (under your project's **Pipelines**). |
 | `merge_requests` | When a merge request is created or updated (See [pipelines for merge requests](../merge_request_pipelines/index.md)). |
@@ -577,7 +577,7 @@ job:
 ```
 
 In this example, `job` will run only for refs that are tagged, or if a build is
-explicitly requested via an API trigger or a [Pipeline Schedule][schedules]:
+explicitly requested via an API trigger or a [Pipeline Schedule](../pipelines/schedules.md):
 
 ```yaml
 job:
@@ -739,7 +739,7 @@ The `refs` strategy can take the same values as the
 [simplified only/except configuration](#onlyexcept-basic).
 
 In the example below, the `deploy` job is going to be created only when the
-pipeline has been [scheduled][schedules] or runs for the `master` branch:
+pipeline has been [scheduled](../pipelines/schedules.md) or runs for the `master` branch:
 
 ```yaml
 deploy:
@@ -800,7 +800,7 @@ Learn more about [variables expressions](../variables/README.md#environment-vari
 
 #### `only:changes`/`except:changes`
 
-> `changes` policy [introduced][ce-19232] in GitLab 11.4.
+> `changes` policy [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/19232) in GitLab 11.4.
 
 Using the `changes` keyword with `only` or `except` makes it possible to define if
 a job should be created based on files modified by a Git push event.
@@ -1480,7 +1480,7 @@ GitLab Runner will pick your job soon and start the job.
 
 > - Introduced in GitLab 8.9.
 > - You can read more about environments and find more examples in the
->   [documentation about environments][environment].
+>   [documentation about environments](../environments.md).
 
 `environment` is used to define that a job deploys to a specific environment.
 If `environment` is specified and no environment under that name exists, a new
@@ -1562,7 +1562,7 @@ deploy to production:
 
 #### `environment:on_stop`
 
-> - [Introduced][ce-6669] in GitLab 8.13.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6669) in GitLab 8.13.
 > - Starting with GitLab 8.14, when you have an environment that has a stop action
 >   defined, GitLab will automatically trigger a stop action when the associated
 >   branch is deleted.
@@ -1575,7 +1575,7 @@ Read the `environment:action` section for an example.
 
 #### `environment:action`
 
-> [Introduced][ce-6669] in GitLab 8.13.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6669) in GitLab 8.13.
 
 The `action` keyword is to be used in conjunction with `on_stop` and is defined
 in the job that is called to close the environment.
@@ -1630,7 +1630,7 @@ The `stop_review_app` job is **required** to have the following keywords defined
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/20956) in GitLab 12.8.
 
 The `auto_stop_in` keyword is for specifying life period of the environment,
-that when expired, GitLab GitLab automatically stops them.
+that when expired, GitLab automatically stops them.
 
 For example,
 
@@ -1682,8 +1682,8 @@ To follow progress on support for GitLab-managed clusters, see the
 
 #### Dynamic environments
 
-> - [Introduced][ce-6323] in GitLab 8.12 and GitLab Runner 1.6.
-> - The `$CI_ENVIRONMENT_SLUG` was [introduced][ce-7983] in GitLab 8.15.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6323) in GitLab 8.12 and GitLab Runner 1.6.
+> - The `$CI_ENVIRONMENT_SLUG` was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7983) in GitLab 8.15.
 > - The `name` and `url` parameters can use any of the defined CI variables,
 >   including predefined, secure variables and `.gitlab-ci.yml` [`variables`](#variables).
 >   You however cannot use variables defined under `script`.
@@ -1701,7 +1701,7 @@ deploy as review app:
 
 The `deploy as review app` job will be marked as deployment to dynamically
 create the `review/$CI_COMMIT_REF_NAME` environment, where `$CI_COMMIT_REF_NAME`
-is an [environment variable][variables] set by the Runner. The
+is an [environment variable](../variables/README.md) set by the Runner. The
 `$CI_ENVIRONMENT_SLUG` variable is based on the environment name, but suitable
 for inclusion in URLs. In this case, if the `deploy as review app` job was run
 in a branch named `pow`, this environment would be accessible with an URL like
@@ -2012,6 +2012,15 @@ release-job:
       - target/*.war
   only:
     - tags
+```
+
+You can use wildcards for directories too. For example, if you want to get all the files inside the directories that end with `xyz`:
+
+```yaml
+job:
+  artifacts:
+    paths:
+      - path/*xyz/*
 ```
 
 #### `artifacts:expose_as`
@@ -2549,7 +2558,7 @@ This example creates four paths of execution:
 
 The maximum number of jobs that can be defined within `needs:` defaults to 10, but
 can be changed to 50 via a feature flag. To change the limit to 50,
-[start a Rails console session](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session)
+[start a Rails console session](../../administration/troubleshooting/debug.md#starting-a-rails-console-session)
 and run:
 
 ```ruby
@@ -2652,7 +2661,7 @@ Downloading artifacts from jobs that are run in [`parallel:`](#parallel) is not 
 
 ### `coverage`
 
-> [Introduced][ce-7447] in GitLab 8.17.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7447) in GitLab 8.17.
 
 `coverage` allows you to configure how code coverage will be extracted from the
 job output.
@@ -2672,7 +2681,7 @@ job1:
 
 ### `retry`
 
-> - [Introduced][ce-12909] in GitLab 9.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/12909) in GitLab 9.5.
 > - [Behaviour expanded](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/21758) in GitLab 11.5 to control on which failures to retry.
 
 `retry` allows you to configure how many times a job is going to be retried in
@@ -3588,8 +3597,8 @@ Floats are not legal and cannot be used.
 
 GitLab CI/CD allows you to define variables inside `.gitlab-ci.yml` that are
 then passed in the job environment. They can be set globally and per-job.
-When the `variables` keyword is used on a job level, it overrides the global
-YAML variables and predefined ones.
+When the `variables` keyword is used on a job level, it will override the global
+YAML variables and predefined ones of the same name.
 
 They are stored in the Git repository and are meant to store non-sensitive
 project configuration, for example:
@@ -3613,7 +3622,7 @@ which can be set in GitLab's UI.
 
 [YAML anchors for variables](#yaml-anchors-for-variables) are available.
 
-Learn more about [variables and their priority][variables].
+Learn more about [variables and their priority](../variables/README.md).
 
 #### Git strategy
 
@@ -3958,7 +3967,7 @@ lines where the job is defined:
 ```
 
 you can instead start its name with a dot (`.`) and it will not be processed by
-GitLab CI. In the following example, `.hidden_job` will be ignored:
+GitLab CI/CD. In the following example, `.hidden_job` will be ignored:
 
 ```yaml
 .hidden_job:
@@ -4202,14 +4211,3 @@ questions that you know someone might ask.
 Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
-
-[ce-6323]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6323
-[ce-6669]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6669
-[ce-7983]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7983
-[ce-7447]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7447
-[ce-12909]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/12909
-[ce-19232]: https://gitlab.com/gitlab-org/gitlab-foss/issues/19232
-[environment]: ../environments.md "CI/CD environments"
-[schedules]: ../pipelines/schedules.md "Pipelines schedules"
-[variables]: ../variables/README.md "CI/CD variables"
-[push-option]: https://git-scm.com/docs/git-push#Documentation/git-push.txt--oltoptiongt

@@ -1,5 +1,5 @@
 <script>
-import { uniqueId } from 'underscore';
+import { uniqueId } from 'lodash';
 import { GlSkeletonLoader } from '@gitlab/ui';
 
 import Icon from '~/vue_shared/components/icon.vue';

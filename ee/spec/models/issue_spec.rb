@@ -77,6 +77,27 @@ describe Issue do
       end
     end
 
+    describe '.on_status_page' do
+      context 'with public issue and private issue' do
+        let_it_be(:status_page_setting) { create(:status_page_setting, enabled: true) }
+        let_it_be(:public_issue) { create(:issue, project: status_page_setting.project) }
+        let_it_be(:private_issue) { create(:issue, :confidential, project: status_page_setting.project) }
+
+        it { expect(Issue.on_status_page.count).to eq(1) }
+        it { expect(Issue.on_status_page.first).to eq(public_issue) }
+      end
+
+      context 'with project status page settings enabled and disabled' do
+        let_it_be(:status_page_setting_enabled) { create(:status_page_setting, enabled: true) }
+        let_it_be(:status_page_setting_disabled) { create(:status_page_setting, enabled: false) }
+        let_it_be(:issue_with_enabled_project) { create(:issue, project: status_page_setting_enabled.project) }
+        let_it_be(:issue_with_disabled_project) { create(:issue, project: status_page_setting_disabled.project) }
+
+        it { expect(Issue.on_status_page.count).to eq(1) }
+        it { expect(Issue.on_status_page.first).to eq(issue_with_enabled_project) }
+      end
+    end
+
     context 'epics' do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }
@@ -105,9 +126,9 @@ describe Issue do
   end
 
   describe 'validations' do
-    subject { build(:issue) }
-
     describe 'weight' do
+      subject { build(:issue) }
+
       it 'is not valid when negative number' do
         subject.weight = -1
 
@@ -123,6 +144,26 @@ describe Issue do
         subject.weight = 1
 
         expect(subject).to be_valid
+      end
+    end
+
+    describe 'confidential' do
+      subject { build(:issue, :confidential) }
+
+      it 'is valid when changing to not-confidential and is associated with not-confidential epic' do
+        subject.epic = build(:epic)
+
+        subject.confidential = false
+
+        expect(subject).to be_valid
+      end
+
+      it 'is not valid when changing to not-confidential and is associated with confidential epic' do
+        subject.epic = build(:epic, :confidential)
+
+        subject.confidential = false
+
+        expect(subject).not_to be_valid
       end
     end
   end

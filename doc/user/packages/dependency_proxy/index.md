@@ -1,4 +1,4 @@
-# Dependency Proxy **(ULTIMATE ONLY)**
+# Dependency Proxy **(PREMIUM ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7934) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.11.
 
@@ -64,6 +64,13 @@ from GitLab.
 
 The blobs are kept forever, and there is no hard limit on how much data can be
 stored.
+
+## Clearing the cache
+
+It is possible to use the GitLab API to purge the dependency proxy cache for a
+given group to gain back disk space that may be taken up by image blobs that
+are no longer needed. See the [dependency proxy API documentation](../../../api/dependency_proxy.md)
+for more details.
 
 ## Limitations
 

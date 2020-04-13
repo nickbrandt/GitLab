@@ -7,40 +7,103 @@ last_update: 2019-07-03
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/15310) in GitLab 11.6.
 
-Usually, when you create a new merge request, a pipeline runs with the
-new change and checks if it's qualified to be merged into a target branch. This
-pipeline should contain only necessary jobs for validating the new changes.
-For example, unit tests, lint checks, and [Review Apps](../review_apps/index.md)
-are often used in this cycle.
+In a [basic configuration](../pipelines/pipeline_architectures.md), GitLab runs a pipeline each time
+changes are pushed to a branch. The settings in the [`.gitlab-ci.yml`](../yaml/README.md)
+file, including `rules`, `only`, and `except`, determine which jobs are added to a pipeline.
 
-With pipelines for merge requests, you can design a specific pipeline structure
-for when you are running a pipeline in a merge request. This
-could be either adding or removing steps in the pipeline, to make sure that
-your pipelines are as efficient as possible.
+If you want the pipeline to run jobs **only** when merge requests are created or updated,
+you can use *pipelines for merge requests*.
 
-## Requirements and limitations
+In the UI, these pipelines are labeled as `detached`.
 
-Pipelines for merge requests have the following requirements and limitations:
+![Merge request page](img/merge_request.png)
 
-- As of GitLab 11.10, pipelines for merge requests require GitLab Runner 11.9
-  or higher due to the
-  [recent refspecs changes](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25504).
+A few notes:
+
 - Pipelines for merge requests are incompatible with
   [CI/CD for external repositories](../ci_cd_for_external_repos/index.md).
+- [Since GitLab 11.10](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25504), pipelines for merge requests require GitLab Runner 11.9.
+- If you use this feature with [merge when pipeline succeeds](../../user/project/merge_requests/merge_when_pipeline_succeeds.md),
+  pipelines for merge requests take precedence over the other regular pipelines.
 
 ## Configuring pipelines for merge requests
 
-To configure pipelines for merge requests, add the `only: [merge_requests]` parameter to
-the jobs that you want to run only for merge requests.
+To configure pipelines for merge requests, configure your CI yaml file.
+There are a few different ways to do this.
 
-Then, when developers create or update merge requests, a pipeline runs
-every time a commit is pushed to GitLab.
+### Enable pipelines for merge requests for all jobs
+
+The recommended method for enabling pipelines for merge requests for all jobs in
+a pipeline is to use [`workflow:rules`](../yaml/README.md#workflowrules).
+
+In this example, the pipeline always runs for all merge requests, as well as for all changes
+to the master branch:
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_ID               # Execute jobs in merge request context
+    - if: $CI_COMMIT_BRANCH == 'master'      # Execute jobs when a new commit is pushed to master branch
+
+build:
+  stage: build
+  script: ./build
+
+test:
+  stage: test
+  script: ./test
+
+deploy:
+  stage: deploy
+  script: ./deploy
+```
+
+### Enable pipelines for merge requests for specific jobs
+
+To enable pipelines for merge requests for specific jobs, you can use
+[`rules`](../yaml/README.md#rules).
+
+In the following example:
+
+- The `build` job runs for all changes to the `master` branch, as well as for all merge requests.
+- The `test` job runs for all merge requests.
+- The `deploy` job runs for all changes to the `master` branch, but does *not* run
+  for merge requests.
+
+```yaml
+build:
+  stage: build
+  script: ./build
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'   # Execute jobs when a new commit is pushed to master branch
+    - if: $CI_MERGE_REQUEST_ID            # Execute jobs in merge request context
+
+test:
+  stage: test
+  script: ./test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID             # Execute jobs in merge request context
+
+deploy:
+  stage: deploy
+  script: ./deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'    # Execute jobs when a new commit is pushed to master branch
+```
+
+### Use `only` or `except` to run pipelines for merge requests
 
 NOTE: **Note**:
-If you use this feature with [merge when pipeline succeeds](../../user/project/merge_requests/merge_when_pipeline_succeeds.md),
-pipelines for merge requests take precedence over the other regular pipelines.
+The [`only` / `except`](../yaml/README.md#onlyexcept-basic) keywords are going to be deprecated
+and you should not use them.
 
-For example, consider the following [`.gitlab-ci.yml`](../yaml/README.md):
+To enable pipelines for merge requests, you can use `only / except`. When you use this method,
+you have to specify `only: - merge_requests` for each job.
+
+In this example, the pipeline contains a `test` job that is configured to run on merge requests.
+
+The `build` and `deploy` jobs don't have the `only: - merge_requests` parameter,
+so they will not run on merge requests.
 
 ```yaml
 build:
@@ -62,29 +125,7 @@ deploy:
   - master
 ```
 
-After the merge request is updated with new commits:
-
-- GitLab detects that changes have occurred and creates a new pipeline for the merge request.
-- The pipeline fetches the latest code from the source branch and run tests against it.
-
-In the above example, the pipeline contains only a `test` job.
-Since the `build` and `deploy` jobs don't have the `only: [merge_requests]` parameter,
-they will not run in the merge request.
-
-Pipelines tagged with the **detached** badge indicate that they were triggered
-when a merge request was created or updated. For example:
-
-![Merge request page](img/merge_request.png)
-
-## Pipelines for Merged Results **(PREMIUM)**
-
-Read the [documentation on Pipelines for Merged Results](pipelines_for_merged_results/index.md).
-
-### Merge Trains **(PREMIUM)**
-
-Read the [documentation on Merge Trains](pipelines_for_merged_results/merge_trains/index.md).
-
-## Excluding certain jobs
+#### Excluding certain jobs
 
 The behavior of the `only: [merge_requests]` parameter is such that _only_ jobs with
 that parameter are run in the context of a merge request; no other jobs will be run.
@@ -129,12 +170,10 @@ Therefore:
 - Since `C` specifies that it should only run for merge requests, it will not run for any pipeline
   except a merge request pipeline.
 
-As you can see, this will help you avoid a lot of boilerplate where you'd need
-to add that `only:` rule to all of your jobs in order to make them always run. You
-can use this for scenarios like having only pipelines with merge requests get a
-Review App set up, helping to save resources.
+This helps you avoid having to add the `only:` rule to all of your jobs
+in order to make them always run. You can use this format to set up a Review App, helping to save resources.
 
-## Excluding certain branches
+#### Excluding certain branches
 
 Pipelines for merge requests require special treatment when
 using [`only`/`except`](../yaml/README.md#onlyexcept-basic). Unlike ordinary
@@ -163,6 +202,14 @@ test:
     variables:
       - $CI_COMMIT_REF_NAME =~ /^docs-/
 ```
+
+## Pipelines for Merged Results **(PREMIUM)**
+
+Read the [documentation on Pipelines for Merged Results](pipelines_for_merged_results/index.md).
+
+### Merge Trains **(PREMIUM)**
+
+Read the [documentation on Merge Trains](pipelines_for_merged_results/merge_trains/index.md).
 
 ## Important notes about merge requests from forked projects
 

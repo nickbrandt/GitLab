@@ -85,7 +85,7 @@ module QA
       after(:all) do
         page.visit Runtime::Scenario.gitlab_address
 
-        %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim].each do |flag|
+        %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
           Runtime::Feature.remove(flag)
         end
 
@@ -105,7 +105,7 @@ module QA
 
       return if username_or_email.nil?
 
-      response = parse_body(get Runtime::API::Request.new(@api_client, "/users?search=#{username_or_email}").url)
+      response = parse_body(get(Runtime::API::Request.new(@api_client, "/users?search=#{username_or_email}").url))
 
       if response.any?
         raise "GET /users?search=#{username_or_email} returned multiple results. response: #{response}" if response.size > 1
@@ -119,7 +119,7 @@ module QA
     end
 
     def setup_and_enable_group_managed_accounts
-      %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim].each do |flag|
+      %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
         Runtime::Feature.enable_and_verify(flag)
       end
 

@@ -1,34 +1,16 @@
 <script>
 import { omit, throttle } from 'lodash';
-import { GlLink, GlButton, GlTooltip, GlResizeObserverDirective } from '@gitlab/ui';
+import { GlLink, GlDeprecatedButton, GlTooltip, GlResizeObserverDirective } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import { s__, __ } from '~/locale';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
-import {
-  chartHeight,
-  graphTypes,
-  lineTypes,
-  lineWidths,
-  symbolSizes,
-  dateFormats,
-  chartColorValues,
-} from '../../constants';
+import { chartHeight, lineTypes, lineWidths, dateFormats, tooltipTypes } from '../../constants';
 import { getYAxisOptions, getChartGrid, getTooltipFormatter } from './options';
+import { annotationsYAxis, generateAnnotationsSeries } from './annotations';
 import { makeDataSeries } from '~/helpers/monitor_helper';
 import { graphDataValidatorForValues } from '../../utils';
-
-/**
- * A "virtual" coordinates system for the deployment icons.
- * Deployment icons are displayed along the [min, max]
- * range at height `pos`.
- */
-const deploymentYAxisCoords = {
-  min: 0,
-  pos: 3, // 3% height of chart's grid
-  max: 100,
-};
 
 const THROTTLED_DATAZOOM_WAIT = 1000; // milliseconds
 const timestampToISODate = timestamp => new Date(timestamp).toISOString();
@@ -38,11 +20,12 @@ const events = {
 };
 
 export default {
+  tooltipTypes,
   components: {
     GlAreaChart,
     GlLineChart,
     GlTooltip,
-    GlButton,
+    GlDeprecatedButton,
     GlChartSeriesLabel,
     GlLink,
     Icon,
@@ -106,10 +89,10 @@ export default {
   data() {
     return {
       tooltip: {
+        type: '',
         title: '',
         content: [],
         commitUrl: '',
-        isDeployment: false,
         sha: '',
       },
       width: 0,
@@ -124,7 +107,7 @@ export default {
       // Transforms & supplements query data to render appropriate labels & styles
       // Input: [{ queryAttributes1 }, { queryAttributes2 }]
       // Output: [{ seriesAttributes1 }, { seriesAttributes2 }]
-      return this.graphData.metrics.reduce((acc, query, i) => {
+      return this.graphData.metrics.reduce((acc, query) => {
         const { appearance } = query;
         const lineType =
           appearance && appearance.line && appearance.line.type
@@ -145,7 +128,6 @@ export default {
           lineStyle: {
             type: lineType,
             width: lineWidth,
-            color: chartColorValues[i % chartColorValues.length],
           },
           showSymbol: false,
           areaStyle: this.graphData.type === 'area-chart' ? areaStyle : undefined,
@@ -156,8 +138,12 @@ export default {
       }, []);
     },
     chartOptionSeries() {
+      // After https://gitlab.com/gitlab-org/gitlab/-/issues/211330 is implemented,
+      // this method will have access to annotations data
       return (this.option.series || []).concat(
-        this.deploymentSeries ? [this.deploymentSeries] : [],
+        generateAnnotationsSeries({
+          deployments: this.recentDeployments,
+        }),
       );
     },
     chartOptions() {
@@ -167,16 +153,6 @@ export default {
       const dataYAxis = {
         ...getYAxisOptions(this.graphData.yAxis),
         ...yAxis,
-      };
-
-      const deploymentsYAxis = {
-        show: false,
-        min: deploymentYAxisCoords.min,
-        max: deploymentYAxisCoords.max,
-        axisLabel: {
-          // formatter fn required to trigger tooltip re-positioning
-          formatter: () => {},
-        },
       };
 
       const timeXAxis = {
@@ -194,7 +170,7 @@ export default {
       return {
         series: this.chartOptionSeries,
         xAxis: timeXAxis,
-        yAxis: [dataYAxis, deploymentsYAxis],
+        yAxis: [dataYAxis, annotationsYAxis],
         grid: getChartGrid(),
         dataZoom: [this.dataZoomConfig],
         ...option,
@@ -251,28 +227,13 @@ export default {
             tagUrl: tag ? `${this.tagsPath}/${ref.name}` : null,
             ref: ref.name,
             showDeploymentFlag: false,
+            icon: this.svgs.rocket,
+            color: this.primaryColor,
           });
         }
 
         return acc;
       }, []);
-    },
-    deploymentSeries() {
-      return {
-        type: graphTypes.deploymentData,
-
-        yAxisIndex: 1, // deploymentsYAxis index
-        data: this.recentDeployments.map(deployment => [
-          deployment.createdAt,
-          deploymentYAxisCoords.pos,
-        ]),
-
-        symbol: this.svgs.rocket,
-        symbolSize: symbolSizes.default,
-        itemStyle: {
-          color: this.primaryColor,
-        },
-      };
     },
     tooltipYFormatter() {
       // Use same format as y-axis
@@ -290,7 +251,10 @@ export default {
   },
   methods: {
     formatLegendLabel(query) {
-      return `${query.label}`;
+      return query.label;
+    },
+    isTooltipOfType(tooltipType, defaultType) {
+      return tooltipType === defaultType;
     },
     formatTooltipText(params) {
       this.tooltip.title = dateFormat(params.value, dateFormats.default);
@@ -298,14 +262,17 @@ export default {
 
       params.seriesData.forEach(dataPoint => {
         if (dataPoint.value) {
-          const [xVal, yVal] = dataPoint.value;
-          this.tooltip.isDeployment = dataPoint.componentSubType === graphTypes.deploymentData;
-          if (this.tooltip.isDeployment) {
-            const [deploy] = this.recentDeployments.filter(
-              deployment => deployment.createdAt === xVal,
-            );
-            this.tooltip.sha = deploy.sha.substring(0, 8);
-            this.tooltip.commitUrl = deploy.commitUrl;
+          const [, yVal] = dataPoint.value;
+          this.tooltip.type = dataPoint.name;
+          if (this.isTooltipOfType(this.tooltip.type, this.$options.tooltipTypes.deployments)) {
+            const { data = {} } = dataPoint;
+            this.tooltip.sha = data?.tooltipData?.sha;
+            this.tooltip.commitUrl = data?.tooltipData?.commitUrl;
+          } else if (
+            this.isTooltipOfType(this.tooltip.type, this.$options.tooltipTypes.annotations)
+          ) {
+            const { data } = dataPoint;
+            this.tooltip.content.push(data?.tooltipData?.description);
           } else {
             const { seriesName, color, dataIndex } = dataPoint;
 
@@ -334,7 +301,6 @@ export default {
     onChartUpdated(eChart) {
       [this.primaryColor] = eChart.getOption().color;
     },
-
     onChartCreated(eChart) {
       // Emit a datazoom event that corresponds to the eChart
       // `datazoom` event.
@@ -392,7 +358,7 @@ export default {
       @created="onChartCreated"
       @updated="onChartUpdated"
     >
-      <template v-if="tooltip.isDeployment">
+      <template v-if="isTooltipOfType(tooltip.type, this.$options.tooltipTypes.deployments)">
         <template slot="tooltipTitle">
           {{ __('Deployed') }}
         </template>
@@ -401,29 +367,35 @@ export default {
           <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
         </div>
       </template>
+      <template v-else-if="isTooltipOfType(tooltip.type, this.$options.tooltipTypes.annotations)">
+        <template slot="tooltipTitle">
+          <div class="text-nowrap">
+            {{ tooltip.title }}
+          </div>
+        </template>
+        <div slot="tooltipContent" class="d-flex align-items-center">
+          {{ tooltip.content.join('\n') }}
+        </div>
+      </template>
       <template v-else>
         <template slot="tooltipTitle">
-          <slot name="tooltipTitle">
-            <div class="text-nowrap">
-              {{ tooltip.title }}
-            </div>
-          </slot>
+          <div class="text-nowrap">
+            {{ tooltip.title }}
+          </div>
         </template>
-        <template slot="tooltipContent">
-          <slot name="tooltipContent" :tooltip="tooltip">
-            <div
-              v-for="(content, key) in tooltip.content"
-              :key="key"
-              class="d-flex justify-content-between"
-            >
-              <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
-                {{ content.name }}
-              </gl-chart-series-label>
-              <div class="prepend-left-32">
-                {{ content.value }}
-              </div>
+        <template slot="tooltipContent" :tooltip="tooltip">
+          <div
+            v-for="(content, key) in tooltip.content"
+            :key="key"
+            class="d-flex justify-content-between"
+          >
+            <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
+              {{ content.name }}
+            </gl-chart-series-label>
+            <div class="prepend-left-32">
+              {{ content.value }}
             </div>
-          </slot>
+          </div>
         </template>
       </template>
     </component>

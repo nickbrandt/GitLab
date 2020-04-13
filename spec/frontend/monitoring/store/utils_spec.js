@@ -25,6 +25,10 @@ describe('mapToDashboardViewModel', () => {
           panels: [
             {
               title: 'Title A',
+              xLabel: '',
+              xAxis: {
+                name: '',
+              },
               type: 'chart-type',
               y_label: 'Y Label A',
               metrics: [],
@@ -44,6 +48,10 @@ describe('mapToDashboardViewModel', () => {
             {
               title: 'Title A',
               type: 'chart-type',
+              xLabel: '',
+              xAxis: {
+                name: '',
+              },
               y_label: 'Y Label A',
               yAxis: {
                 name: 'Y Label A',
@@ -114,6 +122,28 @@ describe('mapToDashboardViewModel', () => {
 
     const getMappedPanel = () => mapToDashboardViewModel(dashboard).panelGroups[0].panels[0];
 
+    it('panel with x_label', () => {
+      setupWithPanel({
+        title: panelTitle,
+        x_label: 'x label',
+      });
+
+      expect(getMappedPanel()).toEqual({
+        title: panelTitle,
+        xLabel: 'x label',
+        xAxis: {
+          name: 'x label',
+        },
+        y_label: '',
+        yAxis: {
+          name: '',
+          format: SUPPORTED_FORMATS.number,
+          precision: 2,
+        },
+        metrics: [],
+      });
+    });
+
     it('group y_axis defaults', () => {
       setupWithPanel({
         title: panelTitle,
@@ -121,7 +151,11 @@ describe('mapToDashboardViewModel', () => {
 
       expect(getMappedPanel()).toEqual({
         title: panelTitle,
+        xLabel: '',
         y_label: '',
+        xAxis: {
+          name: '',
+        },
         yAxis: {
           name: '',
           format: SUPPORTED_FORMATS.number,
@@ -186,6 +220,15 @@ describe('mapToDashboardViewModel', () => {
 
       expect(getMappedPanel().yAxis.format).toBe(SUPPORTED_FORMATS.number);
     });
+
+    // This property allows single_stat panels to render percentile values
+    it('group maxValue', () => {
+      setupWithPanel({
+        max_value: 100,
+      });
+
+      expect(getMappedPanel().maxValue).toBe(100);
+    });
   });
 
   describe('metrics mapping', () => {
@@ -208,7 +251,7 @@ describe('mapToDashboardViewModel', () => {
     };
 
     it('creates a metric', () => {
-      const dashboard = dashboardWithMetric({});
+      const dashboard = dashboardWithMetric({ label: 'Panel Label' });
 
       expect(getMappedMetric(dashboard)).toEqual({
         label: expect.any(String),
@@ -225,11 +268,11 @@ describe('mapToDashboardViewModel', () => {
       expect(getMappedMetric(dashboard).metricId).toEqual('1_http_responses');
     });
 
-    it('creates a metric with a default label', () => {
+    it('creates a metric without a default label', () => {
       const dashboard = dashboardWithMetric({});
 
       expect(getMappedMetric(dashboard)).toMatchObject({
-        label: defaultLabel,
+        label: undefined,
       });
     });
 
@@ -264,7 +307,7 @@ describe('mapToDashboardViewModel', () => {
 
 describe('uniqMetricsId', () => {
   [
-    { input: { id: 1 }, expected: 'undefined_1' },
+    { input: { id: 1 }, expected: 'NO_DB_1' },
     { input: { metric_id: 2 }, expected: '2_undefined' },
     { input: { metric_id: 2, id: 21 }, expected: '2_21' },
     { input: { metric_id: 22, id: 1 }, expected: '22_1' },

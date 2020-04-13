@@ -11,6 +11,32 @@ module API
           valid_attributes = params.keys & allowed_attributes
           params.slice(*valid_attributes)
         end
+
+        def jwt_decoder
+          ::Gitlab::Geo::JwtRequestDecoder.new(headers['Authorization'])
+        end
+
+        # Check if a Geo request is legit or fail the flow
+        #
+        # @param [Hash] attributes to be matched against JWT
+        def authorize_geo_transfer!(**attributes)
+          unauthorized! unless jwt_decoder.valid_attributes?(**attributes)
+        end
+      end
+
+      params do
+        requires :replicable_name, type: String, desc: 'Replicable name (eg. package_file)'
+        requires :id, type: Integer, desc: 'The model ID that needs to be transferred'
+      end
+      get 'retrieve/:replicable_name/:id' do
+        check_gitlab_geo_request_ip!
+        authorize_geo_transfer!(replicable_name: params[:replicable_name], id: params[:id])
+
+        decoded_params = jwt_decoder.decode
+        service = Geo::BlobUploadService.new(replicable_name: params[:replicable_name],
+                                             blob_id: params[:id],
+                                             decoded_params: decoded_params)
+        service.execute
       end
 
       # Verify the GitLab Geo transfer request is valid
@@ -27,11 +53,11 @@ module API
       end
       get 'transfers/:type/:id' do
         check_gitlab_geo_request_ip!
+        authorize_geo_transfer!(file_type: params[:type], file_id: params[:id])
 
-        service = ::Geo::FileUploadService.new(params, headers['Authorization'])
+        decoded_params = jwt_decoder.decode
+        service = ::Geo::FileUploadService.new(params, decoded_params)
         response = service.execute
-
-        unauthorized! unless response.present?
 
         if response[:code] == :ok
           file = response[:file]
@@ -56,9 +82,9 @@ module API
         end
       end
 
-      # git push over SSH secondary -> primary related proxying logic
+      # git over SSH secondary endpoints -> primary related proxying logic
       #
-      resource 'proxy_git_push_ssh' do
+      resource 'proxy_git_ssh' do
         format :json
 
         # Responsible for making HTTP GET /repo.git/info/refs?service=git-receive-pack
@@ -71,11 +97,11 @@ module API
             requires :primary_repo, type: String
           end
         end
-        post 'info_refs' do
+        post 'info_refs_receive_pack' do
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).info_refs
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).info_refs_receive_pack
           status(response.code)
           response.body
         end
@@ -91,11 +117,11 @@ module API
           end
           requires :output, type: String, desc: 'Output from git-receive-pack'
         end
-        post 'push' do
+        post 'receive_pack' do
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).push(params['output'])
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).receive_pack(params['output'])
           status(response.code)
           response.body
         end

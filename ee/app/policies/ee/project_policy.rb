@@ -36,6 +36,8 @@ module EE
       with_scope :subject
       condition(:requirements_available) { @subject.feature_available?(:requirements) }
 
+      condition(:compliance_framework_available) { @subject.feature_available?(:compliance_framework, @user) }
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -88,10 +90,6 @@ module EE
       with_scope :subject
       condition(:security_dashboard_enabled) do
         @subject.feature_available?(:security_dashboard)
-      end
-
-      condition(:prometheus_alerts_enabled) do
-        @subject.feature_available?(:prometheus_alerts, @user)
       end
 
       with_scope :subject
@@ -174,6 +172,7 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :admin_board
+        enable :read_vulnerability_feedback
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
@@ -189,8 +188,6 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
-
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
@@ -204,8 +201,6 @@ module EE
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
-
-      rule { can?(:read_security_findings) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
@@ -238,8 +233,6 @@ module EE
       end
 
       rule { license_scanning_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
-
-      rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
 
       rule { auditor }.policy do
         enable :public_user_access
@@ -372,6 +365,8 @@ module EE
       end
 
       rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { compliance_framework_available & can?(:admin_project) }.enable :admin_compliance_framework
 
       rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end

@@ -110,6 +110,22 @@ module EE
       ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_weight_note
     end
 
+    # Called when the health_stauts of an Issue is changed
+    #
+    # noteable   - Noteable object
+    # project    - Project owning noteable
+    # author     - User performing the change
+    #
+    # Example Note text:
+    #
+    #   "removed the health status"
+    #   "changed health status to 'at risk'"
+    #
+    # Returns the created Note object
+    def change_health_status_note(noteable, project, author)
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_health_status_note
+    end
+
     # Called when the start or end date of an Issuable is changed
     #
     # noteable   - Noteable object
@@ -158,6 +174,11 @@ module EE
     # Called when 'add to merge train when pipeline succeeds' is aborted
     def abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, reason)
       EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).abort_add_when_pipeline_succeeds(reason)
+    end
+
+    # Called when state is changed for 'vulnerability'
+    def change_vulnerability_state(noteable, author)
+      EE::SystemNotes::VulnerabilitiesService.new(noteable: noteable, project: noteable.project, author: author).change_vulnerability_state
     end
   end
 end

@@ -3,33 +3,53 @@ import SidebarStatus from 'ee/sidebar/components/status/sidebar_status.vue';
 import Status from 'ee/sidebar/components/status/status.vue';
 
 describe('SidebarStatus', () => {
-  const mediator = {
-    store: {
-      isFetching: {
-        status: true,
+  let wrapper;
+  let handleDropdownClickMock;
+
+  beforeEach(() => {
+    const mediator = {
+      store: {
+        isFetching: {
+          status: true,
+        },
+        status: '',
       },
-      status: '',
-    },
-  };
+    };
 
-  const handleFormSubmissionMock = jest.fn();
+    handleDropdownClickMock = jest.fn();
 
-  const wrapper = shallowMount(SidebarStatus, {
-    propsData: {
-      mediator,
-    },
-    methods: {
-      handleFormSubmission: handleFormSubmissionMock,
-    },
+    wrapper = shallowMount(SidebarStatus, {
+      propsData: {
+        mediator,
+      },
+      methods: {
+        handleDropdownClick: handleDropdownClickMock,
+      },
+    });
   });
 
-  it('renders Status component', () => {
-    expect(wrapper.contains(Status)).toBe(true);
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+
+  describe('Status child component', () => {
+    beforeEach(() => {});
+
+    it('renders Status component', () => {
+      expect(wrapper.contains(Status)).toBe(true);
+    });
+
+    it('calls handleFormSubmission when receiving an onDropdownClick event from Status component', () => {
+      wrapper.find(Status).vm.$emit('onDropdownClick', 'onTrack');
+
+      expect(handleDropdownClickMock).toHaveBeenCalledWith('onTrack');
+    });
   });
 
   it('calls handleFormSubmission when receiving an onFormSubmit event from Status component', () => {
-    wrapper.find(Status).vm.$emit('onFormSubmit', 'onTrack');
+    wrapper.find(Status).vm.$emit('onDropdownClick', 'onTrack');
 
-    expect(handleFormSubmissionMock).toHaveBeenCalledWith('onTrack');
+    expect(handleDropdownClickMock).toHaveBeenCalledWith('onTrack');
   });
 });

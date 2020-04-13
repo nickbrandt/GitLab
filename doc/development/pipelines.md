@@ -38,11 +38,9 @@ The current stages are:
 
 ## Default image
 
-The default image is currently
-`registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.5-golang-1.12-git-2.24-lfs-2.9-chrome-73.0-node-12.x-yarn-1.21-postgresql-9.6-graphicsmagick-1.3.34`.
+The default image is defined in <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml>.
 
-It includes Ruby 2.6.5, Go 1.12, Git 2.24, Git LFS 2.9, Chrome 73, Node 12, Yarn 1.21,
-PostgreSQL 9.6, and Graphics Magick 1.3.34.
+It includes Ruby, Go, Git, Git LFS, Chrome, Node, Yarn, PostgreSQL, and Graphics Magick.
 
 The images used in our pipelines are configured in the
 [`gitlab-org/gitlab-build-images`](https://gitlab.com/gitlab-org/gitlab-build-images)
@@ -142,6 +140,27 @@ and included in `rules` definitions via [YAML anchors](../ci/yaml/README.md#anch
 | `code-qa-patterns`           | Combination of `code-patterns` and `qa-patterns`.                        |
 | `code-backstage-qa-patterns` | Combination of `code-patterns`, `backstage-patterns`, and `qa-patterns`. |
 
+## Interruptible jobs pipelines
+
+By default, all jobs are [interruptible](../ci/yaml/README.md#interruptible), except the
+`dont-interrupt-me` job which runs automatically on `master`, and is `manual`
+otherwise.
+
+If you want a running pipeline to finish even if you push new commits to a merge
+request, be sure to start the `dont-interrupt-me` job before pushing.
+
+## PostgreSQL versions testing
+
+We follow [the PostgreSQL versions Omnibus support policy](https://gitlab.com/groups/gitlab-org/-/epics/2184#proposal):
+
+|        | 12.10 (April 2020) | 13.0 (May 2020) | 13.1 (June 2020) | 13.2 (July 2020) | 13.3 (August 2020) | 13.4, 13.5   | 13.6 (November 2020) | 14.0 (May 2021?)     |
+| ------ | ------------------ | --------------- | ---------------- | ---------------- | ------------------ | ------------ | -------------------- | -------------------- |
+| PG9.6  | nightly            | -               | -                | -                | -                  | -            | -                    | -                    |
+| PG10   | `master`           | -               | -                | -                | -                  | -            | -                    | -                    |
+| PG11   | MRs/`master`       | MRs/`master`    | MRs/`master`     | MRs/`master`     | MRs/`master`       | MRs/`master` | nightly              | -                    |
+| PG12   | -                  | -               | -                | -                | `master`           | `master`     | MRs/`master`         | `master`             |
+| PG13   | -                  | -               | -                | -                | -                  | -            | -                    | MRs/`master`         |
+
 ## Directed acyclic graph
 
 We're using the [`needs:`](../ci/yaml/README.md#needs) keyword to
@@ -169,7 +188,7 @@ graph RL;
   O[coverage-frontend];
   N["pages (master only)"];
   Q[package-and-qa];
-  S["RSpec<br/>(e.g. rspec unit pg9)"]
+  S["RSpec<br/>(e.g. rspec unit pg10)"]
   T[retrieve-tests-metadata];
   QA["qa:internal, qa:selectors"];
   QA2["qa:internal-as-if-foss, qa:selectors-as-if-foss<br/>(EE default refs only)"];

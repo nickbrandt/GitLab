@@ -25,6 +25,7 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :on_status_page, -> { joins(project: :status_page_setting).where(status_page_settings: { enabled: true }).public_only }
       scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
 
       has_one :epic_issue
@@ -45,6 +46,7 @@ module EE
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+      validate :validate_confidential_epic
 
       after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
     end
@@ -222,6 +224,14 @@ module EE
       title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE &&
         project.alerts_service_activated? &&
         author == ::User.alert_bot
+    end
+
+    def validate_confidential_epic
+      return unless epic
+
+      if !confidential? && epic.confidential?
+        errors.add :issue, _('Cannot set confidential epic for not-confidential issue')
+      end
     end
   end
 end

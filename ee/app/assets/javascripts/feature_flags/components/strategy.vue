@@ -1,11 +1,13 @@
 <script>
+import Vue from 'vue';
+import { isNumber } from 'lodash';
 import {
   GlFormSelect,
   GlFormInput,
   GlFormTextarea,
   GlFormGroup,
   GlToken,
-  GlButton,
+  GlDeprecatedButton,
   GlIcon,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
@@ -25,7 +27,7 @@ export default {
     GlFormTextarea,
     GlFormSelect,
     GlToken,
-    GlButton,
+    GlDeprecatedButton,
     GlIcon,
     NewEnvironmentsDropdown,
   },
@@ -116,13 +118,24 @@ export default {
     isUserWithId() {
       return this.isStrategyType(ROLLOUT_STRATEGY_USER_ID);
     },
-    hasNoDefinedEnvironments() {
-      return this.environments.length === 0;
+    appliesToAllEnvironments() {
+      return (
+        this.filteredEnvironments.length === 0 ||
+        (this.filteredEnvironments.length === 1 &&
+          this.filteredEnvironments[0].environmentScope === '*')
+      );
+    },
+    filteredEnvironments() {
+      return this.environments.filter(e => !e.shouldBeDestroyed);
     },
   },
   methods: {
     addEnvironment(environment) {
-      this.environments.push(environment);
+      const allEnvironmentsScope = this.environments.find(scope => scope.environmentScope === '*');
+      if (allEnvironmentsScope) {
+        allEnvironmentsScope.shouldBeDestroyed = true;
+      }
+      this.environments.push({ environmentScope: environment });
       this.onStrategyChange();
     },
     onStrategyChange() {
@@ -145,7 +158,11 @@ export default {
       });
     },
     removeScope(environment) {
-      this.environments = this.environments.filter(e => e !== environment);
+      if (isNumber(environment.id)) {
+        Vue.set(environment, 'shouldBeDestroyed', true);
+      } else {
+        this.environments = this.environments.filter(e => e !== environment);
+      }
       this.onStrategyChange();
     },
     isStrategyType(type) {
@@ -155,7 +172,7 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div class="border-top py-4">
     <div class="flex flex-column flex-md-row flex-md-wrap">
       <div class="mr-5">
         <gl-form-group
@@ -207,12 +224,12 @@ export default {
       </div>
 
       <div class="align-self-end align-self-md-stretch order-first offset-md-0 order-md-0 ml-auto">
-        <gl-button v-if="canDelete" variant="danger">
+        <gl-deprecated-button v-if="canDelete" variant="danger" @click="$emit('delete')">
           <span class="d-md-none">
             {{ $options.translations.removeLabel }}
           </span>
           <gl-icon class="d-none d-md-inline-flex" name="remove" />
-        </gl-button>
+        </gl-deprecated-button>
       </div>
     </div>
     <div class="flex flex-column">
@@ -224,17 +241,17 @@ export default {
           class="mr-2"
           @add="addEnvironment"
         />
-        <span v-if="hasNoDefinedEnvironments" class="text-secondary mt-2 mt-md-0 ml-md-3">
+        <span v-if="appliesToAllEnvironments" class="text-secondary mt-2 mt-md-0 ml-md-3">
           {{ $options.translations.allEnvironments }}
         </span>
         <div v-else class="flex align-items-center">
           <gl-token
-            v-for="environment in environments"
-            :key="environment"
+            v-for="environment in filteredEnvironments"
+            :key="environment.id"
             class="mt-2 mr-2 mt-md-0 mr-md-0 ml-md-2 rounded-pill"
             @close="removeScope(environment)"
           >
-            {{ environment }}
+            {{ environment.environmentScope }}
           </gl-token>
         </div>
       </div>

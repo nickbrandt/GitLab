@@ -23,7 +23,7 @@ describe Admin::ApplicationSettingsController do
     it 'returns 404' do
       get :usage_data, format: :html
 
-      expect(response.status).to eq(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -37,7 +37,7 @@ describe Admin::ApplicationSettingsController do
       get :usage_data, format: :html
 
       expect(response.body).to start_with('<span')
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'returns JSON data' do
@@ -46,7 +46,7 @@ describe Admin::ApplicationSettingsController do
       body = json_response
       expect(body["version"]).to eq(Gitlab::VERSION)
       expect(body).to include('counts')
-      expect(response.status).to eq(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -104,6 +104,22 @@ describe Admin::ApplicationSettingsController do
       expect(ApplicationSetting.current.minimum_password_length).to eq(10)
     end
 
+    it 'updates namespace_storage_size_limit setting' do
+      put :update, params: { application_setting: { namespace_storage_size_limit: '100' } }
+
+      expect(response).to redirect_to(general_admin_application_settings_path)
+      expect(response).to set_flash[:notice].to('Application settings saved successfully')
+      expect(ApplicationSetting.current.namespace_storage_size_limit).to eq(100)
+    end
+
+    it 'does not accept an invalid namespace_storage_size_limit' do
+      put :update, params: { application_setting: { namespace_storage_size_limit: '-100' } }
+
+      expect(response).to render_template(:general)
+      expect(assigns(:application_setting).errors[:namespace_storage_size_limit]).to be_present
+      expect(ApplicationSetting.current.namespace_storage_size_limit).not_to eq(-100)
+    end
+
     context 'external policy classification settings' do
       let(:settings) do
         {
@@ -127,6 +143,10 @@ describe Admin::ApplicationSettingsController do
     end
 
     describe 'verify panel actions' do
+      before do
+        stub_feature_flags(instance_level_integrations: false)
+      end
+
       Admin::ApplicationSettingsController::VALID_SETTING_PANELS.each do |valid_action|
         it_behaves_like 'renders correct panels' do
           let(:action) { valid_action }

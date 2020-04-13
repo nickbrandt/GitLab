@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'Group navbar' do
   include NavbarStructureHelper
+  include WaitForRequests
 
   include_context 'group navbar structure'
 
@@ -45,6 +46,16 @@ describe 'Group navbar' do
     end
 
     it_behaves_like 'verified navigation bar'
+
+    it 'redirects to value stream when Analytics item is clicked' do
+      page.within('.sidebar-top-level-items') do
+        find('[data-qa-selector=analytics_anchor]').click
+      end
+
+      wait_for_requests
+
+      expect(page).to have_current_path(group_analytics_cycle_analytics_path(group))
+    end
   end
 
   context 'when epics are available' do
@@ -73,6 +84,31 @@ describe 'Group navbar' do
       group.add_owner(user)
 
       insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(_('Settings'), new_nav_item: administration_nav_item)
+
+      visit group_path(group)
+    end
+
+    it_behaves_like 'verified navigation bar'
+  end
+
+  context 'when SAML SSO is available' do
+    before do
+      stub_licensed_features(group_saml: true)
+
+      group.add_owner(user)
+
+      insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(
+        _('Settings'),
+        new_nav_item: {
+          nav_item: _('Administration'),
+          nav_sub_items: [
+            _('SAML SSO'),
+            s_('UsageQuota|Usage Quotas')
+          ]
+        }
+      )
 
       visit group_path(group)
     end
@@ -98,6 +134,7 @@ describe 'Group navbar' do
       )
 
       insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(_('Settings'), new_nav_item: administration_nav_item)
 
       visit group_path(group)
     end

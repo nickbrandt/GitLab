@@ -874,7 +874,7 @@ describe MergeRequest do
     subject(:merge_request) { build(:merge_request) }
 
     before do
-      expect(diff).to receive(:modified_paths).and_return(paths)
+      allow(diff).to receive(:modified_paths).and_return(paths)
     end
 
     context 'when past_merge_request_diff is specified' do
@@ -890,10 +890,29 @@ describe MergeRequest do
       let(:compare) { double(:compare) }
       let(:diff) { compare }
 
-      it 'returns affected file paths from compare' do
+      before do
         merge_request.compare = compare
 
-        expect(merge_request.modified_paths).to eq(paths)
+        expect(merge_request).to receive(:diff_stats).and_return(diff_stats)
+      end
+
+      context 'and diff_stats are not present' do
+        let(:diff_stats) { nil }
+
+        it 'returns affected file paths from compare' do
+          expect(merge_request.modified_paths).to eq(paths)
+        end
+      end
+
+      context 'and diff_stats are present' do
+        let(:diff_stats) { double(:diff_stats) }
+
+        it 'returns affected file paths from compare' do
+          diff_stats_path = double(:diff_stats_paths)
+          expect(diff_stats).to receive(:paths).and_return(diff_stats_path)
+
+          expect(merge_request.modified_paths).to eq(diff_stats_path)
+        end
       end
     end
 
@@ -3699,6 +3718,20 @@ describe MergeRequest do
       it 'returns false' do
         expect(subject.diffable_merge_ref?).to eq(false)
       end
+    end
+  end
+
+  describe '#predefined_variables' do
+    let(:merge_request) { create(:merge_request) }
+
+    it 'caches all SQL-sourced data on the first call' do
+      control = ActiveRecord::QueryRecorder.new { merge_request.predefined_variables }.count
+
+      expect(control).to be > 0
+
+      count = ActiveRecord::QueryRecorder.new { merge_request.predefined_variables }.count
+
+      expect(count).to eq(0)
     end
   end
 end

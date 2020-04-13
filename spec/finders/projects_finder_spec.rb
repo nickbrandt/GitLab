@@ -85,6 +85,24 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
         end
       end
 
+      describe 'regression: Combination of id_before/id_after and joins requires fully qualified column names' do
+        context 'only returns projects with a project id less than given and matching search' do
+          subject { finder.execute.joins(:route) }
+
+          let(:params) { { id_before: public_project.id }}
+
+          it { is_expected.to eq([internal_project]) }
+        end
+
+        context 'only returns projects with a project id greater than given and matching search' do
+          subject { finder.execute.joins(:route) }
+
+          let(:params) { { id_after: internal_project.id }}
+
+          it { is_expected.to eq([public_project]) }
+        end
+      end
+
       describe 'filter by visibility_level' do
         before do
           private_project.add_maintainer(user)
@@ -220,6 +238,28 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
         let!(:pending_delete_project) { create(:project, :public, pending_delete: true) }
 
         it { is_expected.to match_array([public_project, internal_project]) }
+      end
+
+      describe 'filter by last_activity_after' do
+        let(:params) { { last_activity_after: 60.minutes.ago } }
+
+        before do
+          internal_project.update(last_activity_at: Time.now)
+          public_project.update(last_activity_at: 61.minutes.ago)
+        end
+
+        it { is_expected.to match_array([internal_project]) }
+      end
+
+      describe 'filter by last_activity_before' do
+        let(:params) { { last_activity_before: 60.minutes.ago } }
+
+        before do
+          internal_project.update(last_activity_at: Time.now)
+          public_project.update(last_activity_at: 61.minutes.ago)
+        end
+
+        it { is_expected.to match_array([public_project]) }
       end
 
       describe 'sorting' do

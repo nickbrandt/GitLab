@@ -1,6 +1,7 @@
 <script>
 import { mapState } from 'vuex';
 import { GlEmptyState } from '@gitlab/ui';
+import { setUrlFragment } from '~/lib/utils/url_utility';
 import LoadingSkeleton from './loading_skeleton.vue';
 import StatisticsSummary from './statistics_summary.vue';
 import StatisticsHistory from './statistics_history.vue';
@@ -37,6 +38,10 @@ export default {
       type: String,
       required: true,
     },
+    chartEmptyStateTitle: {
+      type: String,
+      required: true,
+    },
     chartEmptyStateText: {
       type: String,
       required: true,
@@ -46,6 +51,10 @@ export default {
       required: true,
     },
     documentationPath: {
+      type: String,
+      required: true,
+    },
+    documentationAnchor: {
       type: String,
       required: true,
     },
@@ -83,18 +92,21 @@ export default {
         to: this.timeRange.to,
       };
     },
+    documentationFullPath() {
+      return setUrlFragment(this.documentationPath, this.documentationAnchor);
+    },
   },
 };
 </script>
 
 <template>
   <div class="my-3">
-    <h4 class="h4">{{ title }}</h4>
-    <h5 class="h5">{{ subtitle }}</h5>
+    <h4 ref="chartTitle" class="h4">{{ title }}</h4>
 
     <loading-skeleton v-if="isLoading" class="mt-3" />
 
     <template v-else-if="hasHistory">
+      <h5 ref="chartSubtitle" class="h5">{{ subtitle }}</h5>
       <statistics-summary class="mt-3" :data="summary" />
       <statistics-history class="mt-3" :data="chart" :y-legend="yLegend" />
     </template>
@@ -102,11 +114,12 @@ export default {
     <gl-empty-state
       v-else
       ref="chartEmptyState"
-      :title="s__('ThreatMonitoring|No traffic to display')"
+      :title="chartEmptyStateTitle"
       :description="chartEmptyStateText"
       :svg-path="chartEmptyStateSvgPath"
-      :primary-button-link="documentationPath"
+      :primary-button-link="documentationFullPath"
       :primary-button-text="__('Learn More')"
+      compact
     />
   </div>
 </template>

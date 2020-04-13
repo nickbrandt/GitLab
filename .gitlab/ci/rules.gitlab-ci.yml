@@ -16,6 +16,9 @@
 .if-master-refs: &if-master-refs
   if: '$CI_COMMIT_REF_NAME == "master"'
 
+.if-auto-deploy-branches: &if-auto-deploy-branches
+  if: '$CI_COMMIT_BRANCH =~ /^\d+-\d+-auto-deploy-\d+$/'
+
 .if-master-or-tag: &if-master-or-tag
   if: '$CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG'
 
@@ -284,6 +287,7 @@
 .frontend:rules:qa-frontend-node:
   rules:
     - <<: *if-master-refs
+      changes: *frontend-dependency-patterns
       when: on_success
     - <<: *if-merge-request
       changes: *frontend-dependency-patterns
@@ -357,6 +361,7 @@
     - <<: *if-master-refs
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:master-refs-code-backstage-ee-only:
   rules:
@@ -365,12 +370,23 @@
     - <<: *if-master-refs
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:nightly-master-refs-code-backstage:
   rules:
     - <<: *if-nightly-master-schedule
       changes: *code-backstage-patterns
       when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:nightly-master-refs-code-backstage-ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-nightly-master-schedule
+      changes: *code-backstage-patterns
+      when: on_success
+    - changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 .rails:rules:ee-only:
   rules:
@@ -493,6 +509,14 @@
     - <<: *if-dot-com-gitlab-org-schedule
       when: on_success
 
+.review:rules:review-gcp-cleanup:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+      when: manual
+    - <<: *if-dot-com-gitlab-org-schedule
+      when: on_success
+
 .review:rules:danger:
   rules:
     - if: '$DANGER_GITLAB_API_TOKEN && $CI_MERGE_REQUEST_IID'
@@ -508,6 +532,14 @@
     - <<: *if-master-or-tag
       changes: *code-backstage-qa-patterns
       when: on_success
+
+.setup:rules:dont-interrupt-me:
+  rules:
+    - <<: *if-master-or-tag
+      when: on_success
+    - <<: *if-auto-deploy-branches
+      when: on_success
+    - when: manual
 
 .setup:rules:gitlab_git_test:
   rules:

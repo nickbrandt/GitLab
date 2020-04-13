@@ -789,7 +789,7 @@ describe('ee merge request widget options', () => {
         enabled_reports: {
           license_management: true,
         },
-        license_management: {
+        license_scanning: {
           managed_licenses_path: licenseManagementApiUrl,
           can_manage_licenses: false,
         },
@@ -1114,7 +1114,7 @@ describe('ee merge request widget options', () => {
 
         if (noSecurityReportsEnabled?.license_management) {
           // Provide license report config if it's going to be rendered
-          gl.mrWidgetData.license_management = {
+          gl.mrWidgetData.license_scanning = {
             managed_licenses_path: `${TEST_HOST}/manage_license_api`,
             can_manage_licenses: false,
           };

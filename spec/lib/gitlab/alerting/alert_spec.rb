@@ -9,11 +9,14 @@ describe Gitlab::Alerting::Alert do
   let(:payload) { {} }
 
   shared_context 'gitlab alert' do
-    let(:gitlab_alert_id) { gitlab_alert.prometheus_metric_id.to_s }
     let!(:gitlab_alert) { create(:prometheus_alert, project: project) }
+    let(:gitlab_alert_id) { gitlab_alert.id }
 
     before do
-      payload['labels'] = { 'gitlab_alert_id' => gitlab_alert_id }
+      payload['labels'] = {
+        'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s,
+        'gitlab_prometheus_alert_id' => gitlab_alert_id
+      }
     end
   end
 
@@ -67,6 +70,41 @@ describe Gitlab::Alerting::Alert do
       end
 
       it { is_expected.to be_nil }
+    end
+
+    context 'when two alerts with the same metric exist' do
+      include_context 'gitlab alert'
+
+      let!(:second_gitlab_alert) do
+        create(:prometheus_alert,
+          project: project,
+          prometheus_metric_id: gitlab_alert.prometheus_metric_id
+        )
+      end
+
+      context 'alert id given in params' do
+        before do
+          payload['labels'] = {
+            'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s,
+            'gitlab_prometheus_alert_id' => second_gitlab_alert.id
+          }
+        end
+
+        it { is_expected.to eq(second_gitlab_alert) }
+      end
+
+      context 'metric id given in params' do
+        # This tests the case when two alerts are found, as metric id
+        # is not unique.
+
+        # Note the metric id was incorrectly named as 'gitlab_alert_id'
+        # in PrometheusAlert#to_param.
+        before do
+          payload['labels'] = { 'gitlab_alert_id' => gitlab_alert.prometheus_metric_id }
+        end
+
+        it { is_expected.to be_nil }
+      end
     end
   end
 
@@ -192,6 +230,16 @@ describe Gitlab::Alerting::Alert do
     end
   end
 
+  describe '#y_label' do
+    subject { alert.y_label }
+
+    it_behaves_like 'parse payload', 'annotations/gitlab_y_label'
+
+    context 'when y_label is not included in the payload' do
+      it_behaves_like 'parse payload', 'annotations/title'
+    end
+  end
+
   describe '#alert_markdown' do
     subject { alert.alert_markdown }
 
@@ -211,9 +259,7 @@ describe Gitlab::Alerting::Alert do
     it { is_expected.to be_valid }
 
     context 'without project' do
-      # Redefine to prevent:
-      # project is a NilClass - rspec-set works with ActiveRecord models only
-      let(:alert) { build(:alerting_alert, project: nil, payload: payload) }
+      let(:project) { nil }
 
       it { is_expected.not_to be_valid }
     end

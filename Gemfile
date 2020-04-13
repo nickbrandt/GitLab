@@ -301,7 +301,7 @@ gem 'sentry-raven', '~> 2.9'
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '0.11.0'
+gem 'gitlab-labkit', '0.12.0'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false
@@ -319,7 +319,7 @@ gem 'peek', '~> 1.1'
 gem 'snowplow-tracker', '~> 0.6.1'
 
 # Memory benchmarks
-gem 'gitlab-derailed_benchmarks', require: false
+gem 'derailed_benchmarks', require: false
 
 # Metrics
 group :metrics do
@@ -366,7 +366,7 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 3.1.0', require: false
+  gem 'gitlab-styles', '~> 3.2.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
   gem 'rubocop', '~> 0.74.0'
   gem 'rubocop-performance', '~> 1.4.1'
@@ -399,7 +399,6 @@ group :test do
   gem 'fuubar', '~> 2.2.0'
   gem 'rspec-retry', '~> 0.6.1'
   gem 'rspec_profiling', '~> 0.0.5'
-  gem 'rspec-set', '~> 0.1.3'
   gem 'rspec-parameterized', require: false
 
   gem 'capybara', '~> 3.22.0'
@@ -425,7 +424,7 @@ gem 'gitlab-mail_room', '~> 0.0.3', require: 'mail_room'
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
 
-gem 'ruby-prof', '~> 1.0.0'
+gem 'ruby-prof', '~> 1.3.0'
 gem 'stackprof', '~> 0.2.15', require: false
 gem 'rbtrace', '~> 0.4', require: false
 gem 'memory_profiler', '~> 0.9', require: false
@@ -493,3 +492,6 @@ gem 'erubi', '~> 1.9.0'
 # Monkey-patched in `config/initializers/mail_encoding_patch.rb`
 # See https://gitlab.com/gitlab-org/gitlab/issues/197386
 gem 'mail', '= 2.7.1'
+
+# File encryption
+gem 'lockbox', '~> 0.3.3'

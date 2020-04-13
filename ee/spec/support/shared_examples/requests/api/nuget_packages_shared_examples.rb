@@ -12,7 +12,7 @@ RSpec.shared_examples 'rejects nuget packages access' do |user_type, status, add
       it 'has the correct response header' do
         subject
 
-        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Nuget Package Registry'
+        expect(response.headers['Www-Authenticate: Basic realm']).to eq 'GitLab Packages Registry'
       end
     end
   end
@@ -35,6 +35,8 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
     end
 
     it_behaves_like 'returning response status', status
+
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'nuget_service_index'
 
     it 'returns a valid json response' do
       subject
@@ -280,6 +282,8 @@ RSpec.shared_examples 'process nuget download content request' do |user_type, st
 
     it_behaves_like 'returning response status', status
 
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
+
     it 'returns a valid package archive' do
       subject
 
@@ -327,6 +331,8 @@ RSpec.shared_examples 'process nuget search request' do |user_type, status, add_
     end
 
     it_behaves_like 'returns a valid json search response', status, 4, [1, 5, 5, 1]
+
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'search_package'
 
     context 'with skip set to 2' do
       let(:skip) { 2 }

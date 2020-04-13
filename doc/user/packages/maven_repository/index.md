@@ -34,6 +34,11 @@ using Maven and understand how to build your own packages, move onto the
 
 ### Installing Maven
 
+The required minimum versions are:
+
+- Java 11.0.5+
+- Maven 3.6+
+
 Follow the instructions at [maven.apache.org](https://maven.apache.org/install.html)
 to download and install Maven for your local development environment. Once
 installation is complete, verify you can use Maven in your terminal by running:
@@ -481,7 +486,7 @@ Docker container), and Maven will utilize the configured CI
 ### Useful Maven command line options
 
 There's some [maven command line options](https://maven.apache.org/ref/current/maven-embedder/cli.html)
-which maybe useful when doing tasks with GitLab CI.
+which maybe useful when doing tasks with GitLab CI/CD.
 
 - File transfer progress can make the CI logs hard to read.
   Option `-ntp,--no-transfer-progress` was added in

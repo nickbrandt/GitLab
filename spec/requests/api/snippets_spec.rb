@@ -266,6 +266,16 @@ describe API::Snippets do
 
     it_behaves_like 'snippet creation'
 
+    context 'with an external user' do
+      let(:user) { create(:user, :external) }
+
+      it 'does not create a new snippet' do
+        post api("/snippets/", user), params: params
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+
     it 'returns 400 for missing parameters' do
       params.delete(:title)
 
@@ -344,7 +354,7 @@ describe API::Snippets do
     it_behaves_like 'snippet updates'
 
     it 'returns 404 for invalid snippet id' do
-      update_snippet(snippet_id: '1234', params: { title: 'Foo' })
+      update_snippet(snippet_id: non_existing_record_id, params: { title: 'Foo' })
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Snippet Not Found')
@@ -431,7 +441,7 @@ describe API::Snippets do
     end
 
     it 'returns 404 for invalid snippet id' do
-      delete api("/snippets/1234", user)
+      delete api("/snippets/#{non_existing_record_id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
       expect(json_response['message']).to eq('404 Snippet Not Found')

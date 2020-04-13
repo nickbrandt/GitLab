@@ -13,7 +13,7 @@ There are several ways to import a project.
 The first option is to simply [import the Project tarball file via the GitLab UI](../user/project/settings/import_export.md#importing-the-project):
 
 1. Create the group `qa-perf-testing`
-1. Import the [GitLab FOSS project tarball](https://gitlab.com/gitlab-org/quality/performance-data/raw/master/gitlabhq_export.tar.gz) into the Group.
+1. Import the [GitLab FOSS project tarball](https://gitlab.com/gitlab-org/quality/performance-data/-/blob/master/projects_export/gitlabhq_export.tar.gz) into the Group.
 
 It should take up to 15 minutes for the project to fully import. You can head to the project's main page for the current status.
 
@@ -45,7 +45,7 @@ There is also an option to [import the project via GitHub](../user/project/impor
 
 This method will take longer to import than the other methods and will depend on several factors. It's recommended to use the other methods.
 
-### Importing via a rake task
+### Importing via a Rake task
 
 [`import.rake`](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/tasks/gitlab/import_export/import.rake) was introduced for importing large GitLab project exports.
 
@@ -132,7 +132,7 @@ For Performance testing, we should:
 - Count the number of executed SQL queries during the restore.
 - Observe the number of GC cycles happening.
 
-You can use this [snippet](https://gitlab.com/gitlab-org/gitlab/snippets/1924954), which will restore the project, and measure the execution time of `Project::TreeRestorer`, number of SQL queries and number of GC cycles happening.
+You can use this snippet: `https://gitlab.com/gitlab-org/gitlab/snippets/1924954` (must be logged in), which will restore the project, and measure the execution time of `Project::TreeRestorer`, number of SQL queries and number of GC cycles happening.
 
 You can execute the script from the `gdk/gitlab` directory like this:
 
@@ -148,7 +148,7 @@ In this section we'll detail any known issues we've seen when trying to import a
 
 If you're attempting to import a large project into a development environment, you may see Gitaly throw an error about too many calls or invocations, for example:
 
-```
+```plaintext
 Error importing repository into qa-perf-testing/gitlabhq - GitalyClient#call called 31 times from single request. Potential n+1?
 ```
 

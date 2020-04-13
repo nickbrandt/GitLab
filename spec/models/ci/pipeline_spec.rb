@@ -1924,7 +1924,7 @@ describe Ci::Pipeline, :mailer do
   describe '#update_status' do
     context 'when pipeline is empty' do
       it 'updates does not change pipeline status' do
-        expect(pipeline.statuses.latest.slow_composite_status).to be_nil
+        expect(pipeline.statuses.latest.slow_composite_status(project: project)).to be_nil
 
         expect { pipeline.update_legacy_status }
           .to change { pipeline.reload.status }
@@ -3061,20 +3061,6 @@ describe Ci::Pipeline, :mailer do
             expect(pipeline.source_bridge).to eq bridge
           end
         end
-
-        describe '#update_bridge_status!' do
-          it 'can update bridge status if it is running' do
-            pipeline.update_bridge_status!
-
-            expect(bridge.reload).to be_success
-          end
-
-          it 'can not update bridge status if is not active' do
-            bridge.success!
-
-            expect { pipeline.update_bridge_status! }.not_to change { bridge.status }
-          end
-        end
       end
 
       context 'when an upstream status is a build' do
@@ -3099,16 +3085,6 @@ describe Ci::Pipeline, :mailer do
         describe '#source_bridge' do
           it 'does not have a bridge source' do
             expect(pipeline.source_bridge).to be_nil
-          end
-        end
-
-        describe '#update_bridge_status!' do
-          it 'tracks an ArgumentError and does not update upstream job status' do
-            expect(Gitlab::ErrorTracking)
-              .to receive(:track_exception)
-              .with(instance_of(ArgumentError), pipeline_id: pipeline.id)
-
-            pipeline.update_bridge_status!
           end
         end
       end

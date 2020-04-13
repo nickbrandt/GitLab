@@ -104,21 +104,29 @@ describe Service do
 
   describe "Test Button" do
     describe '#can_test?' do
+      subject { service.can_test? }
+
       let(:service) { create(:service, project: project) }
 
       context 'when repository is not empty' do
         let(:project) { create(:project, :repository) }
 
-        it 'returns true' do
-          expect(service.can_test?).to be true
-        end
+        it { is_expected.to be true }
       end
 
       context 'when repository is empty' do
         let(:project) { create(:project) }
 
-        it 'returns true' do
-          expect(service.can_test?).to be true
+        it { is_expected.to be true }
+      end
+
+      context 'when instance-level service' do
+        Service.available_services_types.each do |service_type|
+          let(:service) do
+            service_type.constantize.new(instance: true)
+          end
+
+          it { is_expected.to be_falsey }
         end
       end
     end
@@ -149,6 +157,47 @@ describe Service do
     end
   end
 
+  describe '.find_or_initialize_instances' do
+    shared_examples 'service instances' do
+      it 'returns the available service instances' do
+        expect(Service.find_or_initialize_instances.pluck(:type)).to match_array(Service.available_services_types)
+      end
+
+      it 'does not create service instances' do
+        expect { Service.find_or_initialize_instances }.not_to change { Service.count }
+      end
+    end
+
+    it_behaves_like 'service instances'
+
+    context 'with all existing instances' do
+      before do
+        Service.insert_all(
+          Service.available_services_types.map { |type| { instance: true, type: type } }
+        )
+      end
+
+      it_behaves_like 'service instances'
+
+      context 'with a previous existing service (Previous) and a new service (Asana)' do
+        before do
+          Service.insert(type: 'PreviousService', instance: true)
+          Service.delete_by(type: 'AsanaService', instance: true)
+        end
+
+        it_behaves_like 'service instances'
+      end
+    end
+
+    context 'with a few existing instances' do
+      before do
+        create(:jira_service, :instance)
+      end
+
+      it_behaves_like 'service instances'
+    end
+  end
+
   describe 'template' do
     let(:project) { create(:project) }
 
@@ -173,7 +222,7 @@ describe Service do
         end
 
         it 'does not create service templates' do
-          expect { Service.find_or_create_templates }.to change { Service.count }.by(0)
+          expect { Service.find_or_create_templates }.not_to change { Service.count }
         end
 
         it_behaves_like 'retrieves service templates'

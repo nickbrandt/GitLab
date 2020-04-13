@@ -62,8 +62,44 @@ module ServicesHelper
     !current_controller?("admin/services") && service.deprecated?
   end
 
-  def edit_integration_path(integration)
-    edit_admin_application_settings_integration_path(integration)
+  def scoped_integrations_path
+    if @project.present?
+      project_settings_integrations_path(@project)
+    elsif @group.present?
+      group_settings_integrations_path(@group)
+    else
+      integrations_admin_application_settings_path
+    end
+  end
+
+  def scoped_integration_path(integration)
+    if @project.present?
+      project_settings_integration_path(@project, integration)
+    elsif @group.present?
+      group_settings_integration_path(@group, integration)
+    else
+      admin_application_settings_integration_path(integration)
+    end
+  end
+
+  def scoped_edit_integration_path(integration)
+    if @project.present?
+      edit_project_settings_integration_path(@project, integration)
+    elsif @group.present?
+      edit_group_settings_integration_path(@group, integration)
+    else
+      edit_admin_application_settings_integration_path(integration)
+    end
+  end
+
+  def scoped_test_integration_path(integration)
+    if @project.present?
+      test_project_settings_integration_path(@project, integration)
+    elsif @group.present?
+      test_group_settings_integration_path(@group, integration)
+    else
+      test_admin_application_settings_integration_path(integration)
+    end
   end
 
   extend self

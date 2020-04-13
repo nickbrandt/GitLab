@@ -8,7 +8,7 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
 
   describe 'constants' do
     it 'API_SCOPES contains all scopes for API access' do
-      expect(subject::API_SCOPES).to eq %i[api read_user]
+      expect(subject::API_SCOPES).to eq %i[api read_user read_api]
     end
 
     it 'ADMIN_SCOPES contains all scopes for ADMIN access' do
@@ -30,7 +30,7 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
     it 'optional_scopes contains all non-default scopes' do
       stub_container_registry_config(enabled: true)
 
-      expect(subject.optional_scopes).to eq %i[read_user read_repository write_repository read_registry sudo openid profile email]
+      expect(subject.optional_scopes).to eq %i[read_user read_api read_repository write_repository read_registry sudo openid profile email]
     end
   end
 
@@ -38,21 +38,21 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
     it 'contains all non-default scopes' do
       stub_container_registry_config(enabled: true)
 
-      expect(subject.all_available_scopes).to eq %i[api read_user read_repository write_repository read_registry sudo]
+      expect(subject.all_available_scopes).to eq %i[api read_user read_api read_repository write_repository read_registry sudo]
     end
 
     it 'contains for non-admin user all non-default scopes without ADMIN access' do
       stub_container_registry_config(enabled: true)
       user = create(:user, admin: false)
 
-      expect(subject.available_scopes_for(user)).to eq %i[api read_user read_repository write_repository read_registry]
+      expect(subject.available_scopes_for(user)).to eq %i[api read_user read_api read_repository write_repository read_registry]
     end
 
     it 'contains for admin user all non-default scopes with ADMIN access' do
       stub_container_registry_config(enabled: true)
       user = create(:user, admin: true)
 
-      expect(subject.available_scopes_for(user)).to eq %i[api read_user read_repository write_repository read_registry sudo]
+      expect(subject.available_scopes_for(user)).to eq %i[api read_user read_api read_repository write_repository read_registry sudo]
     end
 
     context 'registry_scopes' do
@@ -164,6 +164,12 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
 
           expect(subject).to eq(Gitlab::Auth::Result.new(build.user, build.project, :build, described_class.build_authentication_abilities))
         end
+
+        it 'fails with blocked user token' do
+          build.update(user: create(:user, :blocked))
+
+          expect(subject).to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
       end
 
       (HasStatus::AVAILABLE_STATUSES - ['running']).each do |build_status|
@@ -244,6 +250,13 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
       let(:token_w_api_scope) { Doorkeeper::AccessToken.create!(application_id: application.id, resource_owner_id: user.id, scopes: 'api') }
       let(:application) { Doorkeeper::Application.create!(name: 'MyApp', redirect_uri: 'https://app.com', owner: user) }
 
+      shared_examples 'an oauth failure' do
+        it 'fails' do
+          expect(gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip'))
+            .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
+      end
+
       it 'succeeds for OAuth tokens with the `api` scope' do
         expect(gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip')).to eq(Gitlab::Auth::Result.new(user, nil, :oauth, described_class.full_authentication_abilities))
       end
@@ -258,6 +271,20 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
         expect(gl_auth).not_to receive(:find_with_user_password)
 
         gl_auth.find_for_git_client("oauth2", token_w_api_scope.token, project: nil, ip: 'ip')
+      end
+
+      context 'blocked user' do
+        let(:user) { create(:user, :blocked) }
+
+        it_behaves_like 'an oauth failure'
+      end
+
+      context 'orphaned token' do
+        before do
+          user.destroy
+        end
+
+        it_behaves_like 'an oauth failure'
       end
     end
 
@@ -307,9 +334,35 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
       it 'fails if password is nil' do
         expect_results_with_abilities(nil, nil, false)
       end
+
+      context 'when user is blocked' do
+        let(:user) { create(:user, :blocked) }
+        let(:personal_access_token) { create(:personal_access_token, scopes: ['read_registry'], user: user) }
+
+        before do
+          stub_container_registry_config(enabled: true)
+        end
+
+        it 'fails if user is blocked' do
+          expect(gl_auth.find_for_git_client('', personal_access_token.token, project: nil, ip: 'ip'))
+          .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+        end
+      end
     end
 
     context 'while using regular user and password' do
+      it 'fails for a blocked user' do
+        user = create(
+          :user,
+          :blocked,
+          username: 'normal_user',
+          password: 'my-secret'
+        )
+
+        expect(gl_auth.find_for_git_client(user.username, user.password, project: nil, ip: 'ip'))
+          .to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
+      end
+
       it 'goes through lfs authentication' do
         user = create(
           :user,

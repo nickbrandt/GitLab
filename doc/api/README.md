@@ -82,7 +82,7 @@ There are four ways to authenticate with the GitLab API:
 1. [OAuth2 tokens](#oauth2-tokens)
 1. [Personal access tokens](#personal-access-tokens)
 1. [Session cookie](#session-cookie)
-1. [GitLab CI job token](#gitlab-ci-job-token) **(Specific endpoints only)**
+1. [GitLab CI/CD job token](#gitlab-ci-job-token) **(Specific endpoints only)**
 
 For admins who want to authenticate with the API as a specific user, or who want to build applications or scripts that do so, two options are available:
 
@@ -154,7 +154,7 @@ for example, without needing to explicitly pass an access token.
 
 ### GitLab CI job token
 
-With a few API endpoints you can use a [GitLab CI job token](../user/project/new_ci_build_permissions_model.md#job-token)
+With a few API endpoints you can use a [GitLab CI/CD job token](../user/project/new_ci_build_permissions_model.md#job-token)
 to authenticate with the API:
 
 - [Get job artifacts](jobs.md#get-job-artifacts)
@@ -435,6 +435,24 @@ Keyset-based pagination is only supported for selected resources and ordering op
 | Resource                  | Order                      |
 | ------------------------- | -------------------------- |
 | [Projects](projects.md)   | `order_by=id` only         |
+
+## Path parameters
+
+If an endpoint has path parameters, the documentation shows them with a preceding colon.
+
+For example:
+
+```plaintext
+DELETE /projects/:id/share/:group_id
+```
+
+The `:id` path parameter needs to be replaced with the project id, and the `:group_id` needs to be replaced with the id of the group. The colons `:` should not be included.
+
+The resulting cURL call for a project with id `5` and a group id of `17` is then:
+
+```shell
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/share/17
+```
 
 ## Namespaced path encoding
 

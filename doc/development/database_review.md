@@ -45,13 +45,6 @@ A database **reviewer**'s role is to:
   reassign MR to the database **maintainer** suggested by Reviewer
   Roulette.
 
-#### When there are no database maintainers available
-
-Currently we have a [critical shortage of database maintainers](https://gitlab.com/gitlab-org/gitlab/issues/29717). Until we are able to increase the number of database maintainers to support the volume of reviews, we have implemented this temporary solution. If the database **reviewer** cannot find an available database **maintainer** then:
-
-1. Assign the MR for a second review by a **database trainee maintainer** for further review.
-1. Once satisfied with the review process and if the database **maintainer** is still not available, skip the database maintainer approval step and assign the merge request to a backend maintainer for final review and approval.
-
 A database **maintainer**'s role is to:
 
 - Perform the final database review on the MR.
@@ -84,8 +77,12 @@ the following preparations into account.
 - Ensure `db/structure.sql` is updated.
 - Make migrations reversible by using the `change` method or include a `down` method when using `up`.
   - Include either a rollback procedure or describe how to rollback changes.
-- Add the output of the migration(s) to the MR description.
+- Add the output of both migrating and rolling back for all migrations into the MR description
+  - Ensure the down method reverts the changes in `db/structure.sql`
+  - Update the migration output whenever you modify the migrations during the review process
 - Add tests for the migration in `spec/migrations` if necessary. See [Testing Rails migrations at GitLab](testing_guide/testing_migrations_guide.md) for more details.
+- When [high-traffic](https://gitlab.com/gitlab-org/gitlab/-/blob/master/rubocop/migration_helpers.rb#L12) tables are involved in the migration, use the [`with_lock_retries`](migration_style_guide.md#retry-mechanism-when-acquiring-database-locks) helper method. Review the relevant [examples in our documentation](migration_style_guide.md#examples) for use cases and solutions.
+- Ensure RuboCop checks are not disabled unless there's a valid reason to.
 
 #### Preparation when adding or modifying queries
 

@@ -262,6 +262,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: cronjob:users_create_statistics
+  :feature_category: :users
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: deployment:deployments_finished
   :feature_category: :continuous_delivery
   :has_external_dependencies: 
@@ -550,6 +557,13 @@
   :weight: 2
   :idempotent: 
 - :name: jira_importer:jira_import_advance_stage
+  :feature_category: :importers
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
+- :name: jira_importer:jira_import_import_issue
   :feature_category: :importers
   :has_external_dependencies: 
   :urgency: :low
@@ -912,7 +926,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: 
+  :idempotent: true
 - :name: authorized_keys
   :feature_category: :source_code_management
   :has_external_dependencies: 
@@ -1014,7 +1028,7 @@
 - :name: emails_on_push
   :feature_category: :source_code_management
   :has_external_dependencies: 
-  :urgency: :high
+  :urgency: :low
   :resource_boundary: :cpu
   :weight: 2
   :idempotent: 
@@ -1224,7 +1238,7 @@
 - :name: project_export
   :feature_category: :importers
   :has_external_dependencies: 
-  :urgency: :low
+  :urgency: :throttled
   :resource_boundary: :memory
   :weight: 1
   :idempotent: 
@@ -1242,6 +1256,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: prometheus_create_default_alerts
+  :feature_category: :incident_management
+  :has_external_dependencies: 
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: propagate_service_template
   :feature_category: :source_code_management
   :has_external_dependencies: 
@@ -1333,6 +1354,13 @@
   :resource_boundary: :unknown
   :weight: 3
   :idempotent: 
+- :name: update_highest_role
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 2
+  :idempotent: true
 - :name: update_merge_requests
   :feature_category: :source_code_management
   :has_external_dependencies: 

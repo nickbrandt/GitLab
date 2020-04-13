@@ -120,7 +120,12 @@ describe 'CI shared runner limits' do
 
   def expect_quota_exceeded_alert(message = nil)
     expect(page).to have_selector('.shared-runner-quota-message', count: 1)
-    expect(page.find('.shared-runner-quota-message')).to have_content(message) unless message.nil?
+
+    if message
+      element = page.find('.shared-runner-quota-message')
+      expect(element).to have_content(message)
+      expect(element['data-scope']).to eq(project.full_path)
+    end
   end
 
   def expect_no_quota_exceeded_alert

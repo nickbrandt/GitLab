@@ -1,5 +1,5 @@
 <script>
-import { uniqueId } from 'underscore';
+import { uniqueId } from 'lodash';
 
 export default {
   created() {

@@ -58,9 +58,6 @@ export default {
     hasDiff() {
       return hasDiff(this.file);
     },
-    isActive() {
-      return this.currentDiffFileId === this.file.file_hash;
-    },
     isFileTooLarge() {
       return this.file.viewer.error === diffViewerErrors.too_large;
     },
@@ -146,8 +143,9 @@ export default {
   <div
     :id="file.file_hash"
     :class="{
-      'is-active': isActive,
+      'is-active': currentDiffFileId === file.file_hash,
     }"
+    :data-path="file.new_path"
     class="diff-file file-holder"
   >
     <diff-file-header
@@ -156,7 +154,6 @@ export default {
       :collapsible="true"
       :expanded="!isCollapsed"
       :add-merge-request-buttons="true"
-      :is-active="isActive"
       class="js-file-title file-title"
       @toggleFile="handleToggle"
       @showForkMessage="showForkMessage"

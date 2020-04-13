@@ -109,7 +109,7 @@ module Ci
     end
 
     def groups
-      @groups ||= Ci::Group.fabricate(self)
+      @groups ||= Ci::Group.fabricate(project, self)
     end
 
     def has_warnings?
@@ -138,7 +138,7 @@ module Ci
     end
 
     def latest_stage_status
-      statuses.latest.slow_composite_status || 'skipped'
+      statuses.latest.slow_composite_status(project: project) || 'skipped'
     end
   end
 end

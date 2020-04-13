@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :merge_request do
+  factory :merge_request, traits: [:has_internal_id] do
     title { generate(:title) }
     association :source_project, :repository, factory: :project
     target_project { source_project }
@@ -147,23 +147,13 @@ FactoryBot.define do
 
     trait :with_legacy_detached_merge_request_pipeline do
       after(:create) do |merge_request|
-        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
-          source: :merge_request_event,
-          merge_request: merge_request,
-          project: merge_request.source_project,
-          ref: merge_request.source_branch,
-          sha: merge_request.source_branch_sha)
+        create(:ci_pipeline, :legacy_detached_merge_request_pipeline, merge_request: merge_request)
       end
     end
 
     trait :with_detached_merge_request_pipeline do
       after(:create) do |merge_request|
-        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
-          source: :merge_request_event,
-          merge_request: merge_request,
-          project: merge_request.source_project,
-          ref: merge_request.ref_path,
-          sha: merge_request.source_branch_sha)
+        create(:ci_pipeline, :detached_merge_request_pipeline, merge_request: merge_request)
       end
     end
 
@@ -175,14 +165,12 @@ FactoryBot.define do
       end
 
       after(:create) do |merge_request, evaluator|
-        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
-          source: :merge_request_event,
+        create(:ci_pipeline, :merged_result_pipeline,
           merge_request: merge_request,
-          project: merge_request.source_project,
-          ref: merge_request.merge_ref_path,
           sha: evaluator.merge_sha,
           source_sha: evaluator.source_sha,
-          target_sha: evaluator.target_sha)
+          target_sha: evaluator.target_sha
+        )
       end
     end
 

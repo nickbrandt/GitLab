@@ -13,7 +13,7 @@ FactoryBot.modify do
     trait :for_design do
       transient do
         design { create(:design, issue: create(:issue, project: project)) }
-        note { create(:note, project: project, noteable: design) }
+        note { create(:note, author: author, project: project, noteable: design) }
       end
 
       action { Event::COMMENTED }

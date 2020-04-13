@@ -228,7 +228,7 @@ This file lives in `/var/log/gitlab/gitlab-rails/integrations_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/integrations_json.log` for
 installations from source.
 
-It contains information about [integrations](../user/project/integrations/project_services.md) activities such as Jira, Asana, and Irker services. It uses JSON format like the example below:
+It contains information about [integrations](../user/project/integrations/overview.md) activities such as Jira, Asana, and Irker services. It uses JSON format like the example below:
 
 ```json
 {
@@ -434,6 +434,10 @@ I, [2015-02-13T06:17:00.679433 #9291]  INFO -- : Moving existing hooks directory
 
 User clone/fetch activity using SSH transport appears in this log as `executing git command <gitaly-upload-pack...`.
 
+## `current`
+
+This file lives in `/var/log/gitlab/gitaly/current` and is produced by [runit](http://smarden.org/runit/). `runit` is packaged with Omnibus and a brief explanation of its purpose is available [in the omnibus documentation](https://docs.gitlab.com/omnibus/architecture/#runit). [Log files are rotated](http://smarden.org/runit/svlogd.8.html), renamed in unix timestamp format and `gzip`-compressed (e.g. `@1584057562.s`).
+
 ## `unicorn_stderr.log`
 
 This file lives in `/var/log/gitlab/unicorn/unicorn_stderr.log` for
@@ -629,6 +633,43 @@ Each line contains a JSON line that can be ingested by Elasticsearch. For exampl
     "lib/gitlab/import_export/relation_factory.rb:345:in `find_or_create_object!'"
   ]
 }
+```
+
+## `geo.log`
+
+> Introduced in 9.5.
+
+Geo stores structured log messages in a `geo.log` file. For Omnibus installations, this file is at `/var/log/gitlab/gitlab-rails/geo.log`.
+
+This file contains information about when Geo attempts to sync repositories and files. Each line in the file contains a separate JSON entry that can be ingested into. For example, Elasticsearch or Splunk.
+
+For example:
+
+```json
+{"severity":"INFO","time":"2017-08-06T05:40:16.104Z","message":"Repository update","project_id":1,"source":"repository","resync_repository":true,"resync_wiki":true,"class":"Gitlab::Geo::LogCursor::Daemon","cursor_delay_s":0.038}
+```
+
+This message shows that Geo detected that a repository update was needed for project `1`.
+
+## Registry Logs
+
+For Omnibus installations, Container Registry logs reside in `/var/log/gitlab/registry/current`.
+
+## NGINX Logs
+
+For Omnibus installations, NGINX logs reside in:
+
+- `/var/log/gitlab/nginx/gitlab_access.log` contains a log of requests made to GitLab.
+- `/var/log/gitlab/nginx/gitlab_error.log` contains a log of NGINX errors for GitLab.
+- `/var/log/gitlab/nginx/gitlab_pages_access.log` contains a log of requests made to Pages static sites.
+- `/var/log/gitlab/nginx/gitlab_pages_error.log` contains a log of NGINX errors for Pages static sites.
+- `/var/log/gitlab/nginx/gitlab_registry_access.log` contains a log of requests made to the Container Registry.
+- `/var/log/gitlab/nginx/gitlab_registry_error.log` contains a log of NGINX errors for the Container Regsitry.
+
+Below is the default GitLab NGINX access log format:
+
+```plaintext
+$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"
 ```
 
 [repocheck]: repository_checks.md

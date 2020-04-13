@@ -54,7 +54,7 @@ FactoryBot.define do
       repository_updated_event factory: :geo_design_repository_updated_event
     end
 
-    trait :event do
+    trait :geo_event do
       event factory: :geo_event
     end
   end

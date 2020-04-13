@@ -180,7 +180,7 @@ describe DesignManagement::Design do
   end
 
   describe '#visible_in?' do
-    set(:issue) { create(:issue) }
+    let_it_be(:issue) { create(:issue) }
 
     # It is expensive to re-create complex histories, so we do it once, and then
     # assert that we can establish visibility at any given version.
@@ -550,6 +550,25 @@ describe DesignManagement::Design do
 
       it 'matches base_64_encoded_name' do
         expect(Base64.decode64(match[:base_64_encoded_name])).to eq(filename)
+      end
+    end
+  end
+
+  describe '.by_issue_id_and_filename' do
+    let_it_be(:issue_a) { create(:issue) }
+    let_it_be(:issue_b) { create(:issue) }
+
+    let_it_be(:design_a) { create(:design, issue: issue_a) }
+    let_it_be(:design_b) { create(:design, issue: issue_a) }
+    let_it_be(:design_c) { create(:design, issue: issue_b, filename: design_a.filename) }
+    let_it_be(:design_d) { create(:design, issue: issue_b, filename: design_b.filename) }
+
+    it_behaves_like 'a where_composite scope', :by_issue_id_and_filename do
+      let(:all_results) { [design_a, design_b, design_c, design_d] }
+      let(:first_result) { design_a }
+
+      let(:composite_ids) do
+        all_results.map { |design| { issue_id: design.issue_id, filename: design.filename } }
       end
     end
   end

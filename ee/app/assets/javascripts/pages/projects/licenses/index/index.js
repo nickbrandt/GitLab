@@ -1,3 +1,3 @@
-import initProjectLicensesApp from 'ee/project_licenses';
+import initLicenseComplianceApp from 'ee/license_compliance';
 
-document.addEventListener('DOMContentLoaded', initProjectLicensesApp);
+document.addEventListener('DOMContentLoaded', initLicenseComplianceApp);

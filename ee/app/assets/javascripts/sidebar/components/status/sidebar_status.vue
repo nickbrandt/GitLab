@@ -17,7 +17,7 @@ export default {
     },
   },
   methods: {
-    handleFormSubmission(status) {
+    handleDropdownClick(status) {
       this.mediator.updateStatus(status).catch(() => {
         Flash(__('Error occurred while updating the issue status'));
       });
@@ -31,6 +31,6 @@ export default {
     :is-editable="mediator.store.editable"
     :is-fetching="mediator.store.isFetching.status"
     :status="mediator.store.status"
-    @onFormSubmit="handleFormSubmission"
+    @onDropdownClick="handleDropdownClick"
   />
 </template>

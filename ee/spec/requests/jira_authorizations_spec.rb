@@ -48,7 +48,7 @@ describe 'Jira authorization requests' do
 
       shared_examples 'an unauthorized request' do
         it 'returns 401' do
-          expect(response.status).to eq(401)
+          expect(response).to have_gitlab_http_status(:unauthorized)
         end
       end
 

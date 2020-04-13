@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
@@ -7,7 +7,7 @@ import LoadingButton from '~/vue_shared/components/loading_button.vue';
 export default {
   name: 'DismissButton',
   components: {
-    GlButton,
+    GlDeprecatedButton,
     Icon,
     LoadingButton,
   },
@@ -58,7 +58,7 @@ export default {
       container-class="js-dismiss-btn btn btn-close"
       @click="handleDismissClick"
     />
-    <gl-button
+    <gl-deprecated-button
       v-if="!isDismissed"
       v-gl-tooltip.hover
       v-gl-tooltip.focus
@@ -70,6 +70,6 @@ export default {
       @click="$emit('openDismissalCommentBox')"
     >
       <icon name="comment" />
-    </gl-button>
+    </gl-deprecated-button>
   </div>
 </template>
