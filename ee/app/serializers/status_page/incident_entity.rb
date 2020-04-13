@@ -6,14 +6,18 @@ module StatusPage
   class IncidentEntity < Grape::Entity
     expose :iid, as: :id
     expose :state, as: :status
-    expose(:title) { |entity| PostProcessor.process(entity.title_html, issue_iid: object.iid) }
-    expose(:description) { |entity| PostProcessor.process(entity.description_html, issue_iid: object.iid) }
+    expose :title_html, as: :title, format_with: :post_processed_html
+    expose :description_html, as: :description, format_with: :post_processed_html
     expose :updated_at
     expose :created_at
     expose :user_notes, as: :comments, using: IncidentCommentEntity
     expose :links
 
     private
+
+    format_with :post_processed_html do |object|
+      StatusPage::Renderer.post_process(object, issue_iid: options[:issue_iid])
+    end
 
     def links
       { details: StatusPage::Storage.details_path(object.iid) }

@@ -2,8 +2,11 @@
 
 module StatusPage
   class IncidentCommentEntity < Grape::Entity
-    # All published notables will be issues due to upstream logic
-    expose(:note) { |entity| PostProcessor.process(entity.note, issue_iid: entity.noteable.iid) }
+    expose :note_html, as: :note, format_with: :post_processed_html
     expose :created_at
+
+    format_with :post_processed_html do |object|
+      StatusPage::Renderer.post_process(object, issue_iid: options[:issue_iid])
+    end
   end
 end
