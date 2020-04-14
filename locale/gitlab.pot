@@ -3418,6 +3418,9 @@ msgstr ""
 msgid "Cannot have multiple Jira imports running at the same time"
 msgstr ""
 
+msgid "Cannot import because issues are not available in this project."
+msgstr ""
+
 msgid "Cannot make epic confidential if it contains not-confidential issues"
 msgstr ""
 
