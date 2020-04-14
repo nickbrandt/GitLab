@@ -9801,6 +9801,9 @@ msgstr ""
 msgid "GitLab.com import"
 msgstr ""
 
+msgid "GitLabPagesDomains|Retry"
+msgstr ""
+
 msgid "GitLabPages|%{domain} is not verified. To learn how to verify ownership, visit your %{link_start}domain details%{link_end}."
 msgstr ""
 
@@ -9867,7 +9870,7 @@ msgstr ""
 msgid "GitLabPages|Save"
 msgstr ""
 
-msgid "GitLabPages|Something went wrong while obtaining Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}."
+msgid "GitLabPages|Something went wrong while obtaining the Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}."
 msgstr ""
 
 msgid "GitLabPages|Support for domains and certificates is disabled.  Ask your system's administrator to enable it."
