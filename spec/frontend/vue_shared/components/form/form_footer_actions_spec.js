@@ -24,6 +24,6 @@ describe('Form Footer Actions', () => {
       append,
     });
 
-    expect(wrapper.text().replace(/\s+/g, '')).toBe(`${prepend}${defaultSlot}${append}`);
+    expect(wrapper.element).toMatchSnapshot();
   });
 });
