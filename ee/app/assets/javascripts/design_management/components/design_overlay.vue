@@ -203,6 +203,11 @@ export default {
       this.movingNoteStartPosition = null;
       this.movingNoteNewPosition = null;
     },
+    onAddCommentMouseup({ offsetX, offsetY }) {
+      if (!this.disableCommenting) return;
+
+      this.setNewNoteCoordinates({ x: offsetX, y: offsetY });
+    },
   },
 };
 </script>
@@ -219,7 +224,7 @@ export default {
       type="button"
       class="btn-transparent position-absolute image-diff-overlay-add-comment w-100 h-100 js-add-image-diff-note-button"
       data-qa-selector="design_image_button"
-      @mouseup="setNewNoteCoordinates({ x: $event.offsetX, y: $event.offsetY })"
+      @mouseup="onAddCommentMouseup"
     ></button>
     <design-note-pin
       v-for="(note, index) in notes"
