@@ -1,4 +1,5 @@
 - return unless Feature.enabled?(:requirements_management, project)
+- return unless can?(current_user, :read_requirement, project)
 
 - requirements_count = Hash.new(0).merge(project.requirements.counts_by_state)
 - total_count = requirements_count['opened'] + requirements_count['archived']

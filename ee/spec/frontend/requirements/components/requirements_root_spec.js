@@ -36,6 +36,10 @@ jest.mock('~/lib/utils/url_utility', () => ({
   visitUrl: jest.fn(),
 }));
 
+const $toast = {
+  show: jest.fn(),
+};
+
 const createComponent = ({
   projectPath = 'gitlab-org/gitlab-shell',
   filterBy = FilterState.opened,
@@ -67,6 +71,7 @@ const createComponent = ({
         },
         mutate: jest.fn(),
       },
+      $toast,
     },
   });
 
@@ -92,9 +97,22 @@ describe('RequirementsRoot', () => {
   });
 
   describe('computed', () => {
-    describe('totalRequirements', () => {
+    describe('totalRequirementsForCurrentTab', () => {
       it('returns number representing total requirements for current tab', () => {
-        expect(wrapper.vm.totalRequirements).toBe(mockRequirementsCount.OPENED);
+        expect(wrapper.vm.totalRequirementsForCurrentTab).toBe(mockRequirementsCount.OPENED);
+      });
+
+      it('returns 0 when `openedCount` is 0 and filterBy represents opened tab', () => {
+        wrapper.setProps({
+          filterBy: FilterState.opened,
+        });
+        wrapper.setData({
+          openedCount: 0,
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.totalRequirementsForCurrentTab).toBe(0);
+        });
       });
     });
 
@@ -323,6 +341,9 @@ describe('RequirementsRoot', () => {
         data: {
           createRequirement: {
             errors: [],
+            requirement: {
+              iid: '1',
+            },
           },
         },
       };
@@ -388,6 +409,14 @@ describe('RequirementsRoot', () => {
         });
       });
 
+      it('calls `$toast.show` with string "Requirement added successfully" when request is successful', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockMutationResult);
+
+        return wrapper.vm.handleNewRequirementSave('foo').then(() => {
+          expect(wrapper.vm.$toast.show).toHaveBeenCalledWith('Requirement REQ-1 has been added');
+        });
+      });
+
       it('sets `createRequirementRequestActive` prop to `false` and calls `createFlash` when `$apollo.mutate` request fails', () => {
         jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
 
@@ -439,6 +468,21 @@ describe('RequirementsRoot', () => {
           .then(() => {
             expect(wrapper.vm.showUpdateFormForRequirement).toBe(0);
             expect(wrapper.vm.createRequirementRequestActive).toBe(false);
+          });
+      });
+
+      it('calls `$toast.show` with string "Requirement updated successfully" when request is successful', () => {
+        jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
+
+        return wrapper.vm
+          .handleUpdateRequirementSave({
+            iid: '1',
+            title: 'foo',
+          })
+          .then(() => {
+            expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
+              'Requirement REQ-1 has been updated',
+            );
           });
       });
 
@@ -542,6 +586,19 @@ describe('RequirementsRoot', () => {
           });
       });
 
+      it('calls `$toast.show` with string "Requirement has been reopened" when `params.state` is "OPENED" and request is successful', () => {
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.opened,
+          })
+          .then(() => {
+            expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
+              'Requirement REQ-1 has been reopened',
+            );
+          });
+      });
+
       it('decrements `openedCount` by 1 and increments `archivedCount` by 1 when `params.state` is "ARCHIVED"', () => {
         wrapper.setData({
           openedCount: 1,
@@ -556,6 +613,19 @@ describe('RequirementsRoot', () => {
           .then(() => {
             expect(wrapper.vm.openedCount).toBe(0);
             expect(wrapper.vm.archivedCount).toBe(2);
+          });
+      });
+
+      it('calls `$toast.show` with string "Requirement has been archived" when `params.state` is "ARCHIVED" and request is successful', () => {
+        return wrapper.vm
+          .handleRequirementStateChange({
+            iid: '1',
+            state: FilterState.archived,
+          })
+          .then(() => {
+            expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
+              'Requirement REQ-1 has been archived',
+            );
           });
       });
     });

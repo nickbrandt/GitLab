@@ -1,7 +1,7 @@
 <script>
 import * as Sentry from '@sentry/browser';
 import { GlPagination } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { updateHistory, setUrlParams, visitUrl } from '~/lib/utils/url_utility';
@@ -149,18 +149,41 @@ export default {
     requirementsListEmpty() {
       return !this.$apollo.queries.requirements.loading && !this.requirements.list.length;
     },
-    totalRequirements() {
+    /**
+     * We want to ensure that count `0` is prioritized
+     * over `this.requirements.count` (GraphQL) or `this.requirementsCount` (HAML prop)
+     * as both of them are invalid once user does archive/reopen actions.
+     * this is a technical debt that we want to clean up once mutations support
+     * `requirementStatesCount` connection.
+     */
+    totalRequirementsForCurrentTab() {
+      if (this.filterBy === FilterState.opened) {
+        return this.openedCount === 0
+          ? 0
+          : this.requirements.count.OPENED || this.requirementsCount.OPENED;
+      } else if (this.filterBy === FilterState.archived) {
+        return this.archivedCount === 0
+          ? 0
+          : this.requirements.count.ARCHIVED || this.requirementsCount.ARCHIVED;
+      }
       return this.requirements.count[this.filterBy] || this.requirementsCount[this.filterBy];
     },
+    showEmptyState() {
+      return (
+        (this.requirementsListEmpty && !this.showCreateForm) || !this.totalRequirementsForCurrentTab
+      );
+    },
     showPaginationControls() {
-      return this.totalRequirements > DEFAULT_PAGE_SIZE && !this.requirementsListEmpty;
+      return this.totalRequirementsForCurrentTab > DEFAULT_PAGE_SIZE && !this.requirementsListEmpty;
     },
     prevPage() {
       return Math.max(this.currentPage - 1, 0);
     },
     nextPage() {
       const nextPage = this.currentPage + 1;
-      return nextPage > Math.ceil(this.totalRequirements / DEFAULT_PAGE_SIZE) ? null : nextPage;
+      return nextPage > Math.ceil(this.totalRequirementsForCurrentTab / DEFAULT_PAGE_SIZE)
+        ? null
+        : nextPage;
     },
   },
   watch: {
@@ -273,7 +296,7 @@ export default {
       this.showUpdateFormForRequirement = iid;
     },
     handleNewRequirementSave(title) {
-      const reloadPage = this.totalRequirements === 0;
+      const reloadPage = this.totalRequirementsForCurrentTab === 0;
       this.createRequirementRequestActive = true;
       return this.$apollo
         .mutate({
@@ -293,6 +316,11 @@ export default {
               this.showCreateForm = false;
               this.$apollo.queries.requirements.refetch();
               this.openedCount += 1;
+              this.$toast.show(
+                sprintf(__('Requirement %{reference} has been added'), {
+                  reference: `REQ-${data.createRequirement.requirement.iid}`,
+                }),
+              );
             }
           } else {
             throw new Error(`Error creating a requirement`);
@@ -318,6 +346,11 @@ export default {
         .then(({ data }) => {
           if (!data.updateRequirement.errors.length) {
             this.showUpdateFormForRequirement = 0;
+            this.$toast.show(
+              sprintf(__('Requirement %{reference} has been updated'), {
+                reference: `REQ-${data.updateRequirement.requirement.iid}`,
+              }),
+            );
           } else {
             throw new Error(`Error updating a requirement`);
           }
@@ -337,16 +370,23 @@ export default {
       }).then(({ data }) => {
         if (!data.updateRequirement.errors.length) {
           this.stateChangeRequestActiveFor = 0;
+          let toastMessage;
+          if (params.state === FilterState.opened) {
+            this.openedCount += 1;
+            this.archivedCount -= 1;
+            toastMessage = sprintf(__('Requirement %{reference} has been reopened'), {
+              reference: `REQ-${data.updateRequirement.requirement.iid}`,
+            });
+          } else {
+            this.openedCount -= 1;
+            this.archivedCount += 1;
+            toastMessage = sprintf(__('Requirement %{reference} has been archived'), {
+              reference: `REQ-${data.updateRequirement.requirement.iid}`,
+            });
+          }
+          this.$toast.show(toastMessage);
         } else {
           throw new Error(`Error archiving a requirement`);
-        }
-
-        if (params.state === FilterState.opened) {
-          this.openedCount += 1;
-          this.archivedCount -= 1;
-        } else {
-          this.openedCount -= 1;
-          this.archivedCount += 1;
         }
       });
     },
@@ -385,7 +425,7 @@ export default {
       @cancel="handleNewRequirementCancel"
     />
     <requirements-empty-state
-      v-if="requirementsListEmpty && !showCreateForm"
+      v-if="showEmptyState"
       :filter-by="filterBy"
       :empty-state-path="emptyStatePath"
       :requirements-count="requirementsCount"

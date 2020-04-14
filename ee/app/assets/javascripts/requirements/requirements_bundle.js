@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
+import { GlToast } from '@gitlab/ui';
 import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
 
@@ -8,6 +9,7 @@ import RequirementsRoot from './components/requirements_root.vue';
 import { FilterState } from './constants';
 
 Vue.use(VueApollo);
+Vue.use(GlToast);
 
 export default () => {
   const el = document.getElementById('js-requirements-app');
