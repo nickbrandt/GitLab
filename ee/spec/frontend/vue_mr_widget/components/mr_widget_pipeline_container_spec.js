@@ -1,4 +1,4 @@
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import MergeTrainPositionIndicator from 'ee/vue_merge_request_widget/components/merge_train_position_indicator.vue';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
 import { mockStore } from 'jest/vue_mr_widget/mock_data';
@@ -11,23 +11,27 @@ describe('MrWidgetPipelineContainer', () => {
   let wrapper;
   let mock;
 
-  const factory = (method = shallowMount, mrUpdates = {}, provide = {}) => {
-    const localVue = createLocalVue();
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet().reply(200, {});
+  });
 
-    wrapper = method.call(this, localVue.extend(MrWidgetPipelineContainer), {
+  const factory = (method = shallowMount, mrUpdates = {}, provide = {}) => {
+    wrapper = method.call(this, MrWidgetPipelineContainer, {
       propsData: {
         mr: Object.assign({}, mockStore, mrUpdates),
       },
       provide: {
         ...provide,
       },
-      localVue,
       attachToDocument: true,
     });
   };
 
   afterEach(() => {
+    mock.restore();
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('merge train indicator', () => {
@@ -61,9 +65,6 @@ describe('MrWidgetPipelineContainer', () => {
 
   describe('with anonymous visual review feedback feature flag enabled', () => {
     beforeEach(() => {
-      mock = new MockAdapter(axios);
-      mock.onGet().reply(200, {});
-
       factory(
         mount,
         {
@@ -101,9 +102,6 @@ describe('MrWidgetPipelineContainer', () => {
 
   describe('with anonymous visual review feedback feature flag disabled', () => {
     beforeEach(() => {
-      mock = new MockAdapter(axios);
-      mock.onGet().reply(200, {});
-
       factory(
         mount,
         {

@@ -6,6 +6,7 @@ import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_ke
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
+import { trimText } from 'helpers/text_helper';
 
 import mockData, {
   baseIssues,
@@ -38,13 +39,6 @@ describe('ee merge request widget options', () => {
   let vm;
   let mock;
   let Component;
-
-  function removeBreakLine(data) {
-    return data
-      .replace(/\r?\n|\r/g, '')
-      .replace(/\s\s+/g, ' ')
-      .trim();
-  }
 
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
@@ -114,7 +108,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -136,7 +130,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -157,9 +151,9 @@ describe('ee merge request widget options', () => {
 
       it('should render error indicator', done => {
         setImmediate(() => {
-          expect(
-            removeBreakLine(findSecurityWidget().querySelector(SAST_SELECTOR).textContent),
-          ).toContain('SAST: Loading resulted in an error');
+          expect(trimText(findSecurityWidget().querySelector(SAST_SELECTOR).textContent)).toContain(
+            'SAST: Loading resulted in an error',
+          );
           done();
         });
       });
@@ -188,9 +182,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(
-            findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
-          ),
+          trimText(findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
         ).toContain('Dependency scanning is loading');
       });
     });
@@ -206,7 +198,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -232,7 +224,7 @@ describe('ee merge request widget options', () => {
       it('renders no new vulnerabilities message', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -254,7 +246,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -275,9 +267,7 @@ describe('ee merge request widget options', () => {
       it('should render error indicator', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
-            ),
+            trimText(findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
           ).toContain('Dependency scanning: Loading resulted in an error');
           done();
         });
@@ -305,9 +295,9 @@ describe('ee merge request widget options', () => {
         };
 
         vm.$nextTick(() => {
-          expect(
-            removeBreakLine(vm.$el.querySelector('.js-codequality-widget').textContent),
-          ).toContain('Loading codeclimate report');
+          expect(trimText(vm.$el.querySelector('.js-codequality-widget').textContent)).toContain(
+            'Loading codeclimate report',
+          );
 
           done();
         });
@@ -328,20 +318,16 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
-        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockImplementation(() =>
-          Promise.resolve({
-            newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
-            resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
-          }),
-        );
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
+          newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
+          resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
+        });
       });
 
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('Code quality improved on 1 point and degraded on 1 point');
           done();
         });
@@ -354,9 +340,7 @@ describe('ee merge request widget options', () => {
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
               ).toEqual('Code quality improved on 1 point');
               done();
             });
@@ -368,9 +352,7 @@ describe('ee merge request widget options', () => {
             vm.mr.codeclimateMetrics.resolvedIssues = [];
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
               ).toEqual('Code quality degraded on 1 point');
               done();
             });
@@ -392,12 +374,10 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
-        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockImplementation(() =>
-          Promise.resolve({
-            newIssues: filterByKey([], [], 'fingerprint'),
-            resolvedIssues: filterByKey([], [], 'fingerprint'),
-          }),
-        );
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
+          newIssues: filterByKey([], [], 'fingerprint'),
+          resolvedIssues: filterByKey([], [], 'fingerprint'),
+        });
       });
 
       afterEach(() => {
@@ -407,9 +387,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('No changes to code quality');
           done();
         });
@@ -430,9 +408,7 @@ describe('ee merge request widget options', () => {
       it('should render error indicator', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toContain('Failed to load codeclimate report');
           done();
         });
@@ -460,17 +436,13 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker rejection
-        jest
-          .spyOn(MRWidgetStore, 'doCodeClimateComparison')
-          .mockImplementation(() => Promise.reject());
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockRejectedValue();
       });
 
       it('should render error indicator', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('Failed to load codeclimate report');
           done();
         });
@@ -493,9 +465,7 @@ describe('ee merge request widget options', () => {
       it('should render error indicator', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toContain('Failed to load codeclimate report');
           done();
         });
@@ -523,9 +493,9 @@ describe('ee merge request widget options', () => {
         };
 
         vm.$nextTick(() => {
-          expect(
-            removeBreakLine(vm.$el.querySelector('.js-performance-widget').textContent),
-          ).toContain('Loading performance report');
+          expect(trimText(vm.$el.querySelector('.js-performance-widget').textContent)).toContain(
+            'Loading performance report',
+          );
 
           done();
         });
@@ -548,9 +518,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
           ).toEqual('Performance metrics improved on 2 points and degraded on 1 point');
           done();
         });
@@ -563,9 +531,7 @@ describe('ee merge request widget options', () => {
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
               ).toEqual('Performance metrics improved on 2 points');
               done();
             });
@@ -578,9 +544,7 @@ describe('ee merge request widget options', () => {
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
               ).toEqual('Performance metrics degraded on 1 point');
               done();
             });
@@ -607,7 +571,7 @@ describe('ee merge request widget options', () => {
 
       it('should render provided data', () => {
         expect(
-          removeBreakLine(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
+          trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
         ).toEqual('No changes to performance metrics');
       });
 
@@ -640,9 +604,7 @@ describe('ee merge request widget options', () => {
       it('should render error indicator', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
           ).toContain('Failed to load performance report');
           done();
         });
@@ -672,9 +634,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(
-            findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent,
-          ),
+          trimText(findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent),
         ).toContain('Container scanning is loading');
       });
     });
@@ -690,7 +650,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
@@ -818,7 +778,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(findSecurityWidget().querySelector(SECRET_SCANNING_SELECTOR).textContent),
+          trimText(findSecurityWidget().querySelector(SECRET_SCANNING_SELECTOR).textContent),
         ).toContain('Secret scanning is loading');
       });
     });
@@ -832,16 +792,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SECRET_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Secret scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -854,14 +814,14 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             findSecurityWidget()
               .querySelector(SECRET_SCANNING_SELECTOR)
               .textContent.trim(),
           ).toContain('Secret scanning: Loading resulted in an error');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -1173,7 +1133,7 @@ describe('ee merge request widget options', () => {
         },
       });
 
-      expect(vm.service).toEqual(expect.objectContaining(convertObjectPropsToCamelCase(paths)));
+      expect(vm.service).toMatchObject(convertObjectPropsToCamelCase(paths));
     });
   });
 
