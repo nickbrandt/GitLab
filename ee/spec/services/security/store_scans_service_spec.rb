@@ -51,6 +51,7 @@ describe Security::StoreScansService do
     before do
       create(:ee_ci_job_artifact, :dast_with_missing_file, job: build)
     end
+
     it 'stores 0 scanned resources on the scan' do
       subject
 
