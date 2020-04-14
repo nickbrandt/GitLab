@@ -21,7 +21,7 @@ describe 'Slack slash commands' do
 
   it 'redirects to the integrations page after saving but not activating', :js do
     fill_in 'service_token', with: 'token'
-    find('input[name="service[active]"] + button').click
+    click_active_toggle
     click_on 'Save'
 
     expect(current_path).to eq(project_settings_integrations_path(project))

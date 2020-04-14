@@ -9,7 +9,7 @@ describe 'User activates Jira', :js do
   let(:test_url) { 'http://jira.example.com/rest/api/2/serverInfo' }
 
   def fill_form(disable: false)
-    find('input[name="service[active]"] + button').click if disable
+    click_active_toggle if disable
 
     fill_in 'service_url', with: url
     fill_in 'service_username', with: 'username'

@@ -8,7 +8,7 @@ describe 'User activates issue tracker', :js do
   let(:url) { 'http://tracker.example.com' }
 
   def fill_form(disable: false, skip_new_issue_url: false)
-    find('input[name="service[active]"] + button').click if disable
+    click_active_toggle if disable
 
     fill_in 'service_project_url', with: url
     fill_in 'service_issues_url', with: "#{url}/:id"
