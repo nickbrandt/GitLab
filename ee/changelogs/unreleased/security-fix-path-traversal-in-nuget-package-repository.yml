@@ -1,0 +1,5 @@
+---
+title: Ensure that NuGet package versions are SemVer compliant
+merge_request:
+author:
+type: security
