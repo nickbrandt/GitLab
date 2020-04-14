@@ -245,14 +245,68 @@ to integrate your job with [GitLab Merge Request API](../../api/merge_requests.m
 You can find the list of available variables in [the reference sheet](../variables/predefined_variables.md).
 The variable names begin with the `CI_MERGE_REQUEST_` prefix.
 
-<!-- ## Troubleshooting
+## Troubleshooting
 
-Include any troubleshooting steps that you can foresee. If you know beforehand what issues
-one might have when setting this up, or when something is changed, or on upgrading, it's
-important to describe those, too. Think of things that may go wrong and include them here.
-This is important to minimize requests for support, and to avoid doc comments with
-questions that you know someone might ask.
+### Two pipelines created when pushing to a merge request
 
-Each scenario can be a third-level heading, e.g. `### Getting error message X`.
-If you have none to add when creating a doc, leave this section in place
-but commented out to help encourage others to add to it in the future. -->
+If two pipelines are created when you push a new change to a merge request,
+check your CI configuration file.
+
+For example, with this `.gitlab-ci.yml` configuration:
+
+```yaml
+test:
+  script: ./test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID                      # Include this job in a pipeline for merge request
+    - if: $CI_COMMIT_BRANCH                         # Include this job in a branch pipeline
+  # Or, if you are using the `only:` keyword:
+  # only:
+  #  - merge_requests
+  #  - branches
+```
+
+Two pipelines are created.
+
+1. A branch pipeline that runs for the branch.
+1. A merge request pipeline that runs for the merge request.
+
+
+The branch pipeline runs for the changes pushed to the branch, and doesn't have a direct
+relationship with any merge request. It's mainly used for static branches like `master`,
+rather than feature branches that exist for a limited time. GitLab triggers this
+kind of pipeline **when you push a new commit to a branch**.
+
+The pipeline for merge requests runs on the changes in a specific merge request.
+It's mainly used for feature branches that are created with at least one merge request,
+rather than a static branch. GitLab triggers this kind of pipeline
+**when a merge request is created or updated**.
+
+There is overlap between these events. When you push a new commit to a feature branch,
+**GitLab tries to create both kinds of pipelines**.
+
+You must explicitly define which job should run for which purpose.
+
+To fix the example above, limit the job to only run on specific branches like `master`, and
+not feature branches that will have merge requests:
+
+```yaml
+test:
+  script: ./test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID                      # Include this job in a pipeline for merge request
+    - if: $CI_COMMIT_BRANCH == 'master'             # Include this job in a master pipeline
+```
+
+This effectively resolves the overlap by excluding the branch pipeline job from feature
+branches, and should be done for all jobs that could be added to both types of pipelines.
+
+To enable this globally, you can use the [`workflow:`](ci/yaml/README.md#exclude-jobs-with-rules-from-certain-pipelines)
+parameter to enable this for all jobs at once.
+
+### Two pipelines created when pushing an invalid CI configuration file
+
+As described above, pushing a commit to a merge request triggers the creation of two types of
+pipelines. In rare cases, duplicate pipelines can be created.
+
+See [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/201845) for details.
