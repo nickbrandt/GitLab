@@ -90,6 +90,38 @@ RSpec.shared_examples 'PyPi package creation' do |user_type, status, add_member 
   end
 end
 
+RSpec.shared_examples 'PyPi package versions' do |user_type, status, add_member = true|
+  context "for user type #{user_type}" do
+    before do
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it 'returns the package listing' do
+      subject
+
+      expect(response.body).to match(package.package_files.first.file_name)
+    end
+
+    it_behaves_like 'returning response status', status
+  end
+end
+
+RSpec.shared_examples 'PyPi package download' do |user_type, status, add_member = true|
+  context "for user type #{user_type}" do
+    before do
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it 'returns the package listing' do
+      subject
+
+      expect(response.body).to eq(File.open(package.package_files.first.file.path, "rb").read)
+    end
+
+    it_behaves_like 'returning response status', status
+  end
+end
+
 RSpec.shared_examples 'process PyPi api request' do |user_type, status, add_member = true|
   context "for user type #{user_type}" do
     before do
@@ -105,7 +137,7 @@ RSpec.shared_examples 'rejects PyPI access with unknown project id' do
     let(:project) { OpenStruct.new(id: 1234567890) }
 
     context 'as anonymous' do
-      it_behaves_like 'process PyPi api request', :anonymous, :unauthorized
+      it_behaves_like 'process PyPi api request', :anonymous, :not_found
     end
 
     context 'as authenticated user' do

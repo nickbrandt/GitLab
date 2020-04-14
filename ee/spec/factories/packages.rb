@@ -50,9 +50,15 @@ FactoryBot.define do
     end
 
     factory :pypi_package do
+      pypi_metadatum
+
       sequence(:name) { |n| "pypi-package-#{n}"}
       sequence(:version) { |n| "1.0.#{n}" }
       package_type { :pypi }
+
+      after :create do |package|
+        create :package_file, :pypi, package: package, file_name: "#{package.name}-#{package.version}.tar.gz"
+      end
     end
 
     factory :conan_package do
@@ -188,6 +194,16 @@ FactoryBot.define do
       size { 300.kilobytes }
     end
 
+    trait(:pypi) do
+      package
+      file { fixture_file_upload('ee/spec/fixtures/pypi/sample-project.tar.gz') }
+      file_name { 'sample-project-1.0.0.tar.gz' }
+      file_sha1 { '2c0cfbed075d3fae226f051f0cc771b533e01aff' }
+      file_md5 { '0a7392d24f42f83068fa3767c5310052' }
+      file_sha256 { '440e5e148a25331bbd7991575f7d54933c0ebf6cc735a18ee5066ac1381bb590' }
+      size { 1149.bytes }
+    end
+
     trait :object_storage do
       file_store { Packages::PackageFileUploader::Store::REMOTE }
     end
@@ -205,6 +221,11 @@ FactoryBot.define do
     association :package, factory: [:conan_package, :without_loaded_metadatum]
     package_username { 'username' }
     package_channel { 'stable' }
+  end
+
+  factory :pypi_metadatum, class: 'Packages::PypiMetadatum' do
+    association :package, package_type: :pypi
+    required_python { '>=2.7' }
   end
 
   factory :conan_file_metadatum, class: 'Packages::ConanFileMetadatum' do
