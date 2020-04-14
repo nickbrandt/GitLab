@@ -29,7 +29,7 @@ describe EE::Ci::Runner do
         context "with #{level_name}" do
           let(:visibility_level) {level_value}
 
-          it { is_expected.to be_nil }
+          it { is_expected.to eq(0.0) }
         end
       end
     end
@@ -41,7 +41,7 @@ describe EE::Ci::Runner do
         context "with #{level_name}" do
           let(:visibility_level) {level_value}
 
-          it { is_expected.to be_nil }
+          it { is_expected.to eq(0.0) }
         end
       end
     end
