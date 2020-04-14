@@ -9726,6 +9726,9 @@ msgstr ""
 msgid "Git version"
 msgstr ""
 
+msgid "GitHub API rate limit exceeded. Try again after %{reset_time}"
+msgstr ""
+
 msgid "GitHub import"
 msgstr ""
 
