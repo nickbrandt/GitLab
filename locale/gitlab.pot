@@ -8670,6 +8670,9 @@ msgstr ""
 msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
 msgstr ""
 
+msgid "Failed to find import label for jira import."
+msgstr ""
+
 msgid "Failed to get ref."
 msgstr ""
 
