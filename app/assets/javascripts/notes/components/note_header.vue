@@ -91,18 +91,23 @@ export default {
   mounted() {
     // Temporarily remove `title` attribute from emoji when tooltip is open
     // Prevents duplicate tooltips (Bootstrap tooltip and browser title tooltip)
-    const { authorStatus } = this.$refs;
-    if (authorStatus && authorStatus.querySelector('.has-tooltip')) {
+    if (this.hasAuthorStatusWithTooltip()) {
+      const { authorStatus } = this.$refs;
       const emoji = authorStatus.querySelector('gl-emoji');
       const emojiTitle = emoji.getAttribute('title');
 
-      $(this.$refs.authorStatus).on('show.bs.tooltip', () => {
-        emoji.removeAttribute('title');
-      });
+      this.handleAuthorStatusTooltipShow = () => emoji.removeAttribute('title');
+      this.handleAuthorStatusTooltipHidden = () => emoji.setAttribute('title', emojiTitle);
+      $(authorStatus).on('show.bs.tooltip', this.handleAuthorStatusTooltipShow);
+      $(authorStatus).on('hidden.bs.tooltip', this.handleAuthorStatusTooltipHidden);
+    }
+  },
+  beforeDestroy() {
+    if (this.hasAuthorStatusWithTooltip()) {
+      const { authorStatus } = this.$refs;
 
-      $(this.$refs.authorStatus).on('hidden.bs.tooltip', () => {
-        emoji.setAttribute('title', emojiTitle);
-      });
+      $(authorStatus).off('show.bs.tooltip', this.handleAuthorStatusTooltipShow);
+      $(authorStatus).off('hidden.bs.tooltip', this.handleAuthorStatusTooltipHidden);
     }
   },
   methods: {
@@ -124,6 +129,9 @@ export default {
       this.$refs.authorNameLink.dispatchEvent(new Event('mouseleave'));
 
       this.isUsernameLinkHovered = false;
+    },
+    hasAuthorStatusWithTooltip() {
+      return this.$refs.authorStatus?.querySelector('.user-status-emoji:not([title=""])');
     },
   },
 };
