@@ -27,7 +27,7 @@ describe('Insights config warning component', () => {
         .attributes('src'),
     ).toContain(image);
 
-    expect(wrapper.find('.content-title').text()).toEqual(title);
-    expect(wrapper.find('.content-summary').text()).toEqual(summary);
+    expect(wrapper.find('.content-title').text()).toBe(title);
+    expect(wrapper.find('.content-summary').text()).toBe(summary);
   });
 });

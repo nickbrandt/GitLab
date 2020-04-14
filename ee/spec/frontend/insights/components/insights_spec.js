@@ -1,8 +1,9 @@
 import Vue from 'vue';
+import { TEST_HOST } from 'helpers/test_constants';
 import Insights from 'ee/insights/components/insights.vue';
 import { createStore } from 'ee/insights/stores';
 import createRouter from 'ee/insights/insights_router';
-import { pageInfo } from '../mock_data';
+import { pageInfo } from 'ee_jest/insights/mock_data';
 
 describe('Insights component', () => {
   let vm;
@@ -13,14 +14,14 @@ describe('Insights component', () => {
 
   beforeEach(() => {
     store = createStore();
-    spyOn(store, 'dispatch').and.stub();
+    jest.spyOn(store, 'dispatch').mockImplementation(() => {});
 
     mountComponent = data => {
       const el = null;
 
       const props = data || {
-        endpoint: gl.TEST_HOST,
-        queryEndpoint: `${gl.TEST_HOST}/query`,
+        endpoint: TEST_HOST,
+        queryEndpoint: `${TEST_HOST}/query`,
       };
 
       return new Component({
@@ -34,22 +35,21 @@ describe('Insights component', () => {
   });
 
   afterEach(() => {
+    store.dispatch.mockReset();
     vm.$destroy();
   });
 
-  it('fetches config data when mounted', done => {
-    expect(store.dispatch).toHaveBeenCalledWith('insights/fetchConfigData', gl.TEST_HOST);
-    done();
+  it('fetches config data when mounted', () => {
+    expect(store.dispatch).toHaveBeenCalledWith('insights/fetchConfigData', TEST_HOST);
   });
 
   describe('when loading config', () => {
-    it('renders config loading state', done => {
+    it('renders config loading state', () => {
       vm.$store.state.insights.configLoading = true;
 
-      vm.$nextTick(() => {
+      return vm.$nextTick(() => {
         expect(vm.$el.querySelector('.insights-config-loading')).not.toBe(null);
         expect(vm.$el.querySelector('.insights-wrapper')).toBe(null);
-        done();
       });
     });
   });
@@ -68,13 +68,12 @@ describe('Insights component', () => {
       };
     });
 
-    it('has the correct nav tabs', done => {
-      vm.$nextTick(() => {
+    it('has the correct nav tabs', () => {
+      return vm.$nextTick(() => {
         expect(vm.$el.querySelector('.js-insights-dropdown')).not.toBe(null);
         expect(vm.$el.querySelector('.js-insights-dropdown .dropdown-item').innerText.trim()).toBe(
           title,
         );
-        done();
       });
     });
 
@@ -83,12 +82,11 @@ describe('Insights component', () => {
         vm.$store.state.insights.pageLoading = true;
       });
 
-      it('disables the tab selector', done => {
-        vm.$nextTick(() => {
+      it('disables the tab selector', () => {
+        return vm.$nextTick(() => {
           expect(
             vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
           ).toBe('disabled');
-          done();
         });
       });
     });
@@ -100,12 +98,11 @@ describe('Insights component', () => {
       vm.$store.state.insights.configData = null;
     });
 
-    it('it displays a warning', done => {
-      vm.$nextTick(() => {
+    it('it displays a warning', () => {
+      return vm.$nextTick(() => {
         expect(vm.$el.querySelector('.js-empty-state').innerText.trim()).toContain(
           'Invalid Insights config file detected',
         );
-        done();
       });
     });
   });
@@ -128,22 +125,24 @@ describe('Insights component', () => {
       window.location.hash = '';
     });
 
-    it('selects the first tab if invalid', done => {
+    it('selects the first tab if invalid', () => {
       window.location.hash = '#/invalid';
 
-      vm.$nextTick(() => {
+      jest.runOnlyPendingTimers();
+
+      return vm.$nextTick(() => {
         expect(store.dispatch).toHaveBeenCalledWith('insights/setActiveTab', defaultKey);
       });
-      done();
     });
 
-    it('selects the specified tab if valid', done => {
+    it('selects the specified tab if valid', () => {
       window.location.hash = `#/${selectedKey}`;
 
-      vm.$nextTick(() => {
+      jest.runOnlyPendingTimers();
+
+      return vm.$nextTick(() => {
         expect(store.dispatch).toHaveBeenCalledWith('insights/setActiveTab', selectedKey);
       });
-      done();
     });
   });
 });

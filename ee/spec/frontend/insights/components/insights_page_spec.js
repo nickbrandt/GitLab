@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import InsightsPage from 'ee/insights/components/insights_page.vue';
 import { createStore } from 'ee/insights/stores';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { chartInfo, pageInfo, pageInfoNoCharts } from '../mock_data';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { TEST_HOST } from 'helpers/test_constants';
+import { chartInfo, pageInfo, pageInfoNoCharts } from 'ee_jest/insights/mock_data';
 
 describe('Insights page component', () => {
   let component;
@@ -11,7 +12,7 @@ describe('Insights page component', () => {
 
   beforeEach(() => {
     store = createStore();
-    spyOn(store, 'dispatch').and.stub();
+    jest.spyOn(store, 'dispatch').mockImplementation(() => {});
     Component = Vue.extend(InsightsPage);
   });
 
@@ -20,17 +21,16 @@ describe('Insights page component', () => {
   });
 
   describe('no chart config available', () => {
-    it('shows an empty state', done => {
+    it('shows an empty state', () => {
       component = mountComponentWithStore(Component, {
         store,
         props: {
-          queryEndpoint: `${gl.TEST_HOST}/query`,
+          queryEndpoint: `${TEST_HOST}/query`,
           pageConfig: pageInfoNoCharts,
         },
       });
 
       expect(component.$el.querySelector('.js-empty-state')).not.toBe(null);
-      done();
     });
   });
 
@@ -39,18 +39,17 @@ describe('Insights page component', () => {
       component = mountComponentWithStore(Component, {
         store,
         props: {
-          queryEndpoint: `${gl.TEST_HOST}/query`,
+          queryEndpoint: `${TEST_HOST}/query`,
           pageConfig: pageInfo,
         },
       });
     });
 
-    it('fetches chart data when mounted', done => {
+    it('fetches chart data when mounted', () => {
       expect(store.dispatch).toHaveBeenCalledWith('insights/fetchChartData', {
-        endpoint: `${gl.TEST_HOST}/query`,
+        endpoint: `${TEST_HOST}/query`,
         chart: chartInfo,
       });
-      done();
     });
 
     describe('when charts loading', () => {
@@ -58,35 +57,29 @@ describe('Insights page component', () => {
         component.$store.state.insights.pageLoading = true;
       });
 
-      it('renders loading state', done => {
-        Vue.nextTick(() => {
+      it('renders loading state', () => {
+        return component.$nextTick(() => {
           expect(
             component.$el.querySelector('.js-insights-page-container .insights-chart-loading'),
           ).not.toBe(null);
-          done();
         });
       });
 
-      it('does not display chart area', done => {
-        Vue.nextTick(() => {
+      it('does not display chart area', () => {
+        return component.$nextTick(() => {
           expect(component.$el.querySelector('.js-insights-page-container .insights-charts')).toBe(
             null,
           );
-          done();
         });
       });
     });
 
     describe('pageConfig changes', () => {
-      it('reflects new state', done => {
-        // Establish rendered state
-        component.$nextTick();
-
+      it('reflects new state', () => {
         component.pageConfig = pageInfoNoCharts;
 
-        component.$nextTick(() => {
+        return component.$nextTick(() => {
           expect(component.$el.querySelector('.js-empty-state')).not.toBe(null);
-          done();
         });
       });
     });

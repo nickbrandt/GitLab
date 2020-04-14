@@ -11,7 +11,7 @@ describe('insights router', () => {
   it(`sets the activeTab when route changed`, () => {
     const route = 'route';
 
-    spyOn(store, 'dispatch').and.stub();
+    jest.spyOn(store, 'dispatch').mockImplementation(() => {});
 
     router.push(`/${route}`);
 
