@@ -46,8 +46,8 @@ export default {
         height: 0,
       },
       initialLoad: true,
-      startDragPosition: null,
       lastDragPosition: null,
+      isDraggingDesign: false,
     };
   },
   computed: {
@@ -61,9 +61,6 @@ export default {
       return {
         cursor: this.isDraggingDesign ? 'grabbing' : undefined,
       };
-    },
-    isDraggingDesign() {
-      return Boolean(this.lastDragPosition);
     },
   },
   beforeDestroy() {
@@ -219,15 +216,14 @@ export default {
     onPresentationMousedown({ clientX, clientY }) {
       if (!this.isDesignOverflowing()) return;
 
-      this.startDragPosition = {
+      this.lastDragPosition = {
         x: clientX,
         y: clientY,
       };
-
-      this.lastDragPosition = { ...this.startDragPosition };
     },
     onPresentationMousemove({ clientX, clientY }) {
       if (!this.lastDragPosition) return;
+      this.isDraggingDesign = true;
 
       const { presentationViewport } = this.$refs;
       if (!presentationViewport) return;
@@ -242,15 +238,9 @@ export default {
         y: clientY,
       };
     },
-    onPresentationMouseup({ offsetX, offsetY }) {
-      if (
-        this.startDragPosition?.x === this.lastDragPosition?.x &&
-        this.startDragPosition?.y === this.lastDragPosition?.y
-      ) {
-        this.openCommentForm({ x: offsetX, y: offsetY });
-      }
-
+    onPresentationMouseup() {
       this.lastDragPosition = null;
+      this.isDraggingDesign = false;
     },
     isDesignOverflowing() {
       const { presentationContainer } = this.$refs;

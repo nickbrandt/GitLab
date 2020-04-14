@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import DesignPresentation from 'ee/design_management/components/design_presentation.vue';
+import DesignOverlay from 'ee/design_management/components/design_overlay.vue';
 
 const mockOverlayData = {
   overlayDimensions: {
@@ -18,6 +19,7 @@ describe('Design management design presentation component', () => {
   function createComponent(
     { image, imageName, discussions = [], isAnnotating = false } = {},
     data = {},
+    stubs = {},
   ) {
     wrapper = shallowMount(DesignPresentation, {
       propsData: {
@@ -26,10 +28,14 @@ describe('Design management design presentation component', () => {
         discussions,
         isAnnotating,
       },
+      stubs,
     });
 
     wrapper.setData(data);
+    wrapper.element.scrollTo = jest.fn();
   }
+
+  const findOverlayCommentButton = () => wrapper.find('.image-diff-overlay-add-comment');
 
   /**
    * Spy on $refs and mock given values
@@ -70,12 +76,17 @@ describe('Design management design presentation component', () => {
           mouseup: 'mouseup',
         };
 
-    wrapper.trigger(event.mousedown, {
+    const addCommentOverlay = findOverlayCommentButton();
+
+    // triggering mouse events on this element best simulates
+    // reality, as it is the lowest-level node that needs to
+    // respond to mouse events
+    addCommentOverlay.trigger(event.mousedown, {
       clientX: startCoords.clientX,
       clientY: startCoords.clientY,
     });
     return wrapper.vm.$nextTick().then(() => {
-      wrapper.trigger(event.mousemove, {
+      addCommentOverlay.trigger(event.mousemove, {
         clientX: endCoords.clientX,
         clientY: endCoords.clientY,
       });
@@ -425,52 +436,20 @@ describe('Design management design presentation component', () => {
     });
   });
 
-  describe('onPresentationMouseUp when design is overflowing', () => {
-    it('does not open a comment form if design was dragged', () => {
-      const startDragPosition = { x: 1, y: 1 };
-      const lastDragPosition = { x: 2, y: 2 };
-      createComponent({}, { startDragPosition, lastDragPosition });
-
-      wrapper.vm.onPresentationMouseup({ offsetX: 2, offsetY: 2 });
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('openCommentForm')).toBeFalsy();
-      });
-    });
-
-    it('opens a comment form if design was not dragged', () => {
-      const startDragPosition = { x: 1, y: 1 };
-      const lastDragPosition = { x: 1, y: 1 };
-      createComponent(
-        {},
-        {
-          startDragPosition,
-          lastDragPosition,
-          ...mockOverlayData,
-        },
-      );
-
-      wrapper.vm.onPresentationMouseup({ offsetX: 2, offsetY: 2 });
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('openCommentForm')).toBeDefined();
-      });
-    });
-  });
-
-  describe('when clicking and dragging', () => {
-    it.each`
-      description               | useTouchEvents
-      ${'with touch events'}    | ${true}
-      ${'without touch events'} | ${false}
-    `('calls scrollTo with correct arguments $description', ({ useTouchEvents }) => {
+  describe('when design is overflowing', () => {
+    beforeEach(() => {
       createComponent(
         {
           image: 'test.jpg',
           imageName: 'test',
         },
         mockOverlayData,
+        {
+          'design-overlay': DesignOverlay,
+        },
       );
+
+      // mock a design that overflows
       mockRefDimensions(
         wrapper.vm.$refs.presentationContainer,
         { width: 10, height: 10 },
@@ -478,15 +457,53 @@ describe('Design management design presentation component', () => {
         0,
         0,
       );
+    });
 
-      wrapper.element.scrollTo = jest.fn();
-      return clickDragExplore(
-        { clientX: 0, clientY: 0 },
-        { clientX: 10, clientY: 10 },
-        { useTouchEvents },
-      ).then(() => {
-        expect(wrapper.element.scrollTo).toHaveBeenCalledTimes(1);
-        expect(wrapper.element.scrollTo).toHaveBeenCalledWith(-10, -10);
+    it('opens a comment form if design was not dragged', () => {
+      const addCommentOverlay = findOverlayCommentButton();
+      const startCoords = {
+        clientX: 1,
+        clientY: 1,
+      };
+
+      addCommentOverlay.trigger('mousedown', {
+        clientX: startCoords.clientX,
+        clientY: startCoords.clientY,
+      });
+
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          addCommentOverlay.trigger('mouseup');
+          return wrapper.vm.$nextTick();
+        })
+        .then(() => {
+          expect(wrapper.emitted('openCommentForm')).toBeDefined();
+        });
+    });
+
+    describe('when clicking and dragging', () => {
+      it.each`
+        description               | useTouchEvents
+        ${'with touch events'}    | ${true}
+        ${'without touch events'} | ${false}
+      `('calls scrollTo with correct arguments $description', ({ useTouchEvents }) => {
+        return clickDragExplore(
+          { clientX: 0, clientY: 0 },
+          { clientX: 10, clientY: 10 },
+          { useTouchEvents },
+        ).then(() => {
+          expect(wrapper.element.scrollTo).toHaveBeenCalledTimes(1);
+          expect(wrapper.element.scrollTo).toHaveBeenCalledWith(-10, -10);
+        });
+      });
+
+      it('does not open a comment form', () => {
+        return clickDragExplore({ clientX: 0, clientY: 0 }, { clientX: 10, clientY: 10 }).then(
+          () => {
+            expect(wrapper.emitted('openCommentForm')).toBeFalsy();
+          },
+        );
       });
     });
   });

@@ -61,7 +61,7 @@ describe('Design overlay component', () => {
 
     wrapper
       .find('.image-diff-overlay-add-comment')
-      .trigger('click', { offsetX: newCoordinates.x, offsetY: newCoordinates.y });
+      .trigger('mouseup', { offsetX: newCoordinates.x, offsetY: newCoordinates.y });
     return wrapper.vm.$nextTick().then(() => {
       expect(wrapper.emitted('openCommentForm')).toEqual([
         [{ x: newCoordinates.x, y: newCoordinates.y }],
