@@ -51,6 +51,21 @@ exports[`RecentActivityCard matches the snapshot 1`] = `
           Deploys
         </p>
       </div>
+      <div
+        class="js-metric-card-item flex-grow text-center"
+      >
+        <h3
+          class="my-2"
+        >
+          -
+        </h3>
+         
+        <p
+          class="text-secondary gl-font-size-small mb-2"
+        >
+          Deployment Frequency
+        </p>
+      </div>
     </div>
      
   </div>

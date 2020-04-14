@@ -239,10 +239,17 @@ describe 'Group Value Stream Analytics', :js do
     end
 
     it 'displays the number of deploys' do
-      deploys_count = page.all(card_metric_selector).last
+      deploys_count = page.all(card_metric_selector)[1]
 
       expect(deploys_count).to have_content('Deploys')
       expect(deploys_count).to have_content('-')
+    end
+
+    it 'displays the deployment frequency' do
+      deployment_frequency = page.all(card_metric_selector).last
+
+      expect(deployment_frequency).to have_content(_('Deployment Frequency'))
+      expect(deployment_frequency).to have_content('-')
     end
   end
 
