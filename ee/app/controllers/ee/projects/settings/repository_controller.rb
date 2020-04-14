@@ -45,6 +45,7 @@ module EE
         def render_show
           @deploy_tokens = @project.deploy_tokens.active
 
+          define_deploy_token_variables
           define_protected_refs
           push_rule
           remote_mirror

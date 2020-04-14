@@ -8,8 +8,8 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          before_action :assign_variables_to_gon, only: [:show, :create_deploy_token]
-          before_action :define_protected_env_variables, only: [:show, :create_deploy_token]
+          before_action :assign_variables_to_gon, only: [:show]
+          before_action :define_protected_env_variables, only: [:show]
         end
 
         # rubocop:disable Gitlab/ModuleWithInstanceVariables
