@@ -58,7 +58,12 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <gl-dropdown ref="dropdown" class="d-block mt-1" menu-class="dropdown-extended-height">
+    <gl-dropdown
+      ref="dropdown"
+      class="d-block mt-1"
+      menu-class="dropdown-extended-height"
+      toggle-class="d-flex w-100 justify-content-between align-items-center"
+    >
       <template slot="button-content">
         <span class="text-truncate" :data-qa-selector="qaSelector">
           {{ firstSelectedOption }}
@@ -125,12 +130,3 @@ export default {
     </gl-dropdown>
   </div>
 </template>
-
-<style>
-.dashboard-filter .dropdown-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-</style>
