@@ -267,13 +267,21 @@ describe GroupsController do
         sign_in(user)
       end
 
-      context 'when user is an admin' do
+      context 'when user is an admin with admin mode enabled', :enable_admin_mode do
         let(:user) { create(:admin) }
 
         it 'updates max_pages_size' do
           request
 
           expect(group.reload.max_pages_size).to eq(100)
+        end
+      end
+
+      context 'when user is an admin with admin mode disabled' do
+        it 'does not update max_pages_size' do
+          request
+
+          expect(group.reload.max_pages_size).to eq(nil)
         end
       end
 
