@@ -3,7 +3,6 @@ import BlobEmbeddable from '~/blob/components/blob_embeddable.vue';
 import { SNIPPET_VISIBILITY_PUBLIC } from '../constants';
 import BlobHeader from '~/blob/components/blob_header.vue';
 import BlobContent from '~/blob/components/blob_content.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 import CloneDropdownButton from '~/vue_shared/components/clone_dropdown.vue';
 
 import GetBlobContent from '../queries/snippet.blob.content.query.graphql';
@@ -15,7 +14,6 @@ export default {
     BlobEmbeddable,
     BlobHeader,
     BlobContent,
-    GlLoadingIcon,
     CloneDropdownButton,
   },
   apollo: {
@@ -82,18 +80,7 @@ export default {
           />
         </template>
       </blob-header>
-      <gl-loading-icon
-        v-if="isContentLoading"
-        :label="__('Loading blob')"
-        size="lg"
-        class="prepend-top-20 append-bottom-20"
-      />
-      <blob-content
-        v-else
-        :loading="isContentLoading"
-        :content="blobContent"
-        :active-viewer="viewer"
-      />
+      <blob-content :loading="isContentLoading" :content="blobContent" :active-viewer="viewer" />
     </article>
   </div>
 </template>

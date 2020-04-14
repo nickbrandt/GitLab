@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
 import SnippetBlobView from '~/snippets/components/snippet_blob_view.vue';
 import BlobHeader from '~/blob/components/blob_header.vue';
 import BlobEmbeddable from '~/blob/components/blob_embeddable.vue';
@@ -77,12 +76,6 @@ describe('Blob Embeddable', () => {
         visibilityLevel: SNIPPET_VISIBILITY_PUBLIC,
       });
       expect(wrapper.find(BlobEmbeddable).exists()).toBe(true);
-    });
-
-    it('shows loading icon while blob content data is in flight', () => {
-      createComponent({}, dataMock, true);
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
-      expect(wrapper.find(BlobContent).exists()).toBe(false);
     });
 
     it('sets simple viewer correctly', () => {
