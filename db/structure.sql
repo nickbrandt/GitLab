@@ -2138,6 +2138,30 @@ CREATE SEQUENCE public.design_user_mentions_id_seq
 
 ALTER SEQUENCE public.design_user_mentions_id_seq OWNED BY public.design_user_mentions.id;
 
+CREATE TABLE public.diff_note_positions (
+    id bigint NOT NULL,
+    note_id bigint NOT NULL,
+    old_line integer,
+    new_line integer,
+    diff_content_type smallint NOT NULL,
+    diff_type smallint NOT NULL,
+    line_code character varying(255) NOT NULL,
+    base_sha bytea NOT NULL,
+    start_sha bytea NOT NULL,
+    head_sha bytea NOT NULL,
+    old_path text NOT NULL,
+    new_path text NOT NULL
+);
+
+CREATE SEQUENCE public.diff_note_positions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.diff_note_positions_id_seq OWNED BY public.diff_note_positions.id;
+
 CREATE TABLE public.draft_notes (
     id bigint NOT NULL,
     merge_request_id integer NOT NULL,
@@ -7124,6 +7148,8 @@ ALTER TABLE ONLY public.design_management_versions ALTER COLUMN id SET DEFAULT n
 
 ALTER TABLE ONLY public.design_user_mentions ALTER COLUMN id SET DEFAULT nextval('public.design_user_mentions_id_seq'::regclass);
 
+ALTER TABLE ONLY public.diff_note_positions ALTER COLUMN id SET DEFAULT nextval('public.diff_note_positions_id_seq'::regclass);
+
 ALTER TABLE ONLY public.draft_notes ALTER COLUMN id SET DEFAULT nextval('public.draft_notes_id_seq'::regclass);
 
 ALTER TABLE ONLY public.emails ALTER COLUMN id SET DEFAULT nextval('public.emails_id_seq'::regclass);
@@ -7828,6 +7854,9 @@ ALTER TABLE ONLY public.design_management_versions
 
 ALTER TABLE ONLY public.design_user_mentions
     ADD CONSTRAINT design_user_mentions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.diff_note_positions
+    ADD CONSTRAINT diff_note_positions_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.draft_notes
     ADD CONSTRAINT draft_notes_pkey PRIMARY KEY (id);
@@ -9085,6 +9114,8 @@ CREATE INDEX index_design_management_versions_on_issue_id ON public.design_manag
 CREATE UNIQUE INDEX index_design_management_versions_on_sha_and_issue_id ON public.design_management_versions USING btree (sha, issue_id);
 
 CREATE UNIQUE INDEX index_design_user_mentions_on_note_id ON public.design_user_mentions USING btree (note_id);
+
+CREATE UNIQUE INDEX index_diff_note_positions_on_note_id_and_diff_type ON public.diff_note_positions USING btree (note_id, diff_type);
 
 CREATE INDEX index_draft_notes_on_author_id ON public.draft_notes USING btree (author_id);
 
@@ -11067,6 +11098,9 @@ ALTER TABLE ONLY public.project_statistics
 
 ALTER TABLE ONLY public.user_details
     ADD CONSTRAINT fk_rails_12e0b3043d FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.diff_note_positions
+    ADD CONSTRAINT fk_rails_13c7212859 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.users_security_dashboard_projects
     ADD CONSTRAINT fk_rails_150cd5682c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -13068,6 +13102,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200325160952
 20200325183636
 20200326114443
+20200326122700
 20200326124443
 20200326134443
 20200326135443
