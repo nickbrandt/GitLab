@@ -90,8 +90,7 @@ module EE
     end
 
     def show_group_activity_analytics?
-      ::Feature.enabled?(:group_activity_analytics, @group) &&
-        can?(current_user, :read_group_activity_analytics, @group)
+      can?(current_user, :read_group_activity_analytics, @group)
     end
 
     def show_usage_quotas_in_sidebar?
