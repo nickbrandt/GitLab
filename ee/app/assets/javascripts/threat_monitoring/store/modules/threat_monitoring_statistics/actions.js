@@ -3,7 +3,6 @@ import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import httpStatusCodes from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import * as types from './mutation_types';
-import createState from './state';
 import { getTimeWindowParams } from '../../utils';
 
 export const requestStatistics = ({ commit }, timeWindowParams) => {
@@ -40,7 +39,7 @@ export const fetchStatistics = ({ state, dispatch, rootState }) => {
       // no data, but we can't distinguish between them, yet. So, just render
       // no data.
       if (error.response.status === httpStatusCodes.NOT_FOUND) {
-        dispatch('receiveStatisticsSuccess', createState().statistics);
+        dispatch('receiveStatisticsSuccess', null);
       } else {
         dispatch('receiveStatisticsError');
       }
