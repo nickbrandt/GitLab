@@ -66,7 +66,7 @@ export default {
           <div v-if="isDenied" class="d-inline-block">
             <!-- This badge usage will be simplified in https://gitlab.com/gitlab-org/gitlab/-/issues/213789 -->
             <gl-badge variant="warning" class="gl-alert-warning d-flex align-items-center">
-              <gl-icon name="warning" :size="16" class="pr-1" style="padding-bottom: 1px" />
+              <gl-icon name="warning" :size="16" class="pr-1" />
               <span>{{ s__('Licenses|Policy violation: denied') }}</span>
             </gl-badge>
           </div>
