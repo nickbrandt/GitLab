@@ -16,6 +16,7 @@ module EE
         mount_mutation ::Mutations::Epics::AddIssue
         mount_mutation ::Mutations::Requirements::Create
         mount_mutation ::Mutations::Requirements::Update
+        mount_mutation ::Mutations::Vulnerabilities::Dismiss
       end
     end
   end
