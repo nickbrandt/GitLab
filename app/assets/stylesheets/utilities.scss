@@ -107,8 +107,13 @@
 .gl-text-green-700 { @include gl-text-green-700; }
 
 .gl-align-items-center { @include gl-align-items-center; }
+
 .d-sm-table-column {
   @include media-breakpoint-up(sm) {
     display: table-column !important;
   }
 }
+
+.gl-white-space-normal { @include gl-white-space-normal; }
+.gl-line-height-inherit { line-height: inherit; }
+.gl-text-align-inherit { text-align: inherit; }

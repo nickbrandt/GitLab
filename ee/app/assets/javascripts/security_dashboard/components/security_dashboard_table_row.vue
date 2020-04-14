@@ -96,13 +96,13 @@ export default {
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div
-        class="table-mobile-content vulnerability-info"
+        class="table-mobile-content gl-white-space-normal"
         data-qa-selector="vulnerability_info_content"
       >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-deprecated-button
-            class="vulnerability-title d-inline"
+            class="d-inline gl-line-height-inherit gl-text-align-inherit gl-white-space-normal"
             variant="blank"
             @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-deprecated-button
@@ -124,9 +124,9 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <span v-if="vulnerabilityNamepace" class="vulnerability-namespace">
+          <small v-if="vulnerabilityNamepace" class="gl-text-gray-700">
             {{ vulnerabilityNamepace }}
-          </span>
+          </small>
         </template>
       </div>
     </div>
@@ -148,10 +148,12 @@ export default {
 
 <style scoped>
 @media (min-width: 768px) {
+  /* NOTE: Can be removed: border are defined at: line 40, app/assets/stylesheets/framework/responsive_tables.scss*/
   .vulnerabilities-row:last-child {
     border-bottom: 1px solid transparent;
   }
 
+  /*this should be done by gitlab-ui table and using `.table-hover`*/
   .vulnerabilities-row:hover,
   .vulnerabilities-row:focus {
     background: #f6fafd;
@@ -170,19 +172,25 @@ export default {
   }
 }
 
-.vulnerability-info {
-  white-space: normal;
-}
+/*NOTE: replaced by gl-white-space-normal*/
+/*.vulnerability-info {*/
+/*  white-space: normal;*/
+/*}*/
 
-.vulnerability-title {
-  text-align: inherit;
-  white-space: normal;
-  line-height: inherit;
-}
+/*.vulnerability-title {*/
+/*NOTE: replaced by gl-text-align-inherit*/
+/*text-align: inherit;*/
+/*NOTE: replaced by gl-white-space-inherit*/
+/*white-space: normal;*/
+/*NOTE: replaced by gl-line-height-inherit*/
+/*line-height: inherit;*/
+/*}*/
 
 .vulnerability-namespace {
-  color: #707070;
-  font-size: 0.8em;
+  /*NOTE: using `.gl-text-gray-700` => $gray-700: #707070; for this instead*/
+  /*color: #707070;*/
+  /*Note: replaced with <small>, since it has 80% font size*/
+  /*font-size: 0.8em;*/
 }
 
 .dismissed .table-mobile-content:not(.action-buttons) {

@@ -61,7 +61,7 @@ export default {
 </script>
 
 <template>
-  <div class="ci-table js-security-dashboard-table" data-qa-selector="security_report_content">
+  <div class="ci-table js-security-dashboard-table table-hover" data-qa-selector="security_report_content">
     <selection-summary v-if="isSelectingVulnerabilities" />
     <div
       class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
@@ -127,13 +127,15 @@ export default {
 </template>
 
 <style>
-.vulnerabilities-row-header {
-  background-color: #fafafa;
-  font-size: 14px;
-}
+/*NOTE: when removed: font-size: 13px and background-color: #707070*/
+/*.vulnerabilities-row-header {*/
+/*  background-color: #fafafa;*/
+/*  font-size: 14px;*/
+/*}*/
 
-.vulnerabilities-row .section-10,
-.vulnerabilities-row-header .section-10 {
-  min-width: 120px;
-}
+/*NOTE: Can this just be removed? */
+/*.vulnerabilities-row .section-10,*/
+/*.vulnerabilities-row-header .section-10 {*/
+  /*min-width: 120px;*/
+/*}*/
 </style>
