@@ -5334,6 +5334,9 @@ msgstr ""
 msgid "Configure existing installation"
 msgstr ""
 
+msgid "Configure limit for issues created per minute by web and API requests."
+msgstr ""
+
 msgid "Configure limits for web and API requests."
 msgstr ""
 
@@ -11383,6 +11386,9 @@ msgid "Issues / Merge Requests"
 msgstr ""
 
 msgid "Issues Analytics"
+msgstr ""
+
+msgid "Issues Rate Limits"
 msgstr ""
 
 msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are searchable and filterable."
