@@ -53,7 +53,7 @@ module EE
 
         return unless merge_request.project.feature_available?(:code_review_analytics)
 
-        Analytics::RefreshReassignData.new(merge_request).execute_async
+        ::Analytics::RefreshReassignData.new(merge_request).execute_async
       end
     end
   end

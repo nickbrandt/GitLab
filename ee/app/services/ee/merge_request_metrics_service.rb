@@ -19,7 +19,7 @@ module EE
     private
 
     def metrics_calculator
-      @metrics_calculator ||= Analytics::MergeRequestMetricsCalculator.new(merge_request)
+      @metrics_calculator ||= ::Analytics::MergeRequestMetricsCalculator.new(merge_request)
     end
   end
 end
