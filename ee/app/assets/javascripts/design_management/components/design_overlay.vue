@@ -204,7 +204,7 @@ export default {
       this.movingNoteNewPosition = null;
     },
     onAddCommentMouseup({ offsetX, offsetY }) {
-      if (!this.disableCommenting) return;
+      if (this.disableCommenting) return;
 
       this.setNewNoteCoordinates({ x: offsetX, y: offsetY });
     },

@@ -3,6 +3,8 @@ import { throttle } from 'lodash';
 import DesignImage from './image.vue';
 import DesignOverlay from './design_overlay.vue';
 
+const CLICK_DRAG_BUFFER_PX = 2;
+
 export default {
   components: {
     DesignImage,
@@ -222,15 +224,23 @@ export default {
       };
     },
     onPresentationMousemove({ clientX, clientY }) {
-      if (!this.lastDragPosition) return;
-      this.isDraggingDesign = true;
-
       const { presentationViewport } = this.$refs;
-      if (!presentationViewport) return;
+      if (!this.lastDragPosition || !presentationViewport) return;
 
       const { scrollLeft, scrollTop } = presentationViewport;
       const deltaX = this.lastDragPosition.x - clientX;
       const deltaY = this.lastDragPosition.y - clientY;
+
+      // only respond to mousemove events after the
+      // mousemove's position exceeds the buffer amount
+      if (
+        !this.isDraggingDesign &&
+        Math.abs(deltaX) <= CLICK_DRAG_BUFFER_PX &&
+        Math.abs(deltaY) <= CLICK_DRAG_BUFFER_PX
+      )
+        return;
+
+      this.isDraggingDesign = true;
       presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
 
       this.lastDragPosition = {
