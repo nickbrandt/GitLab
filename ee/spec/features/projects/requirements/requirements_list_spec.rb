@@ -69,6 +69,13 @@ describe 'Requirements list', :js do
         end
       end
 
+      it 'disables new requirement button while create form is open' do
+        page.within('.nav-controls') do
+          find('button.js-new-requirement').click
+          expect(find('button.js-new-requirement')[:disabled]).to eq "true"
+        end
+      end
+
       it 'creates new requirement' do
         requirement_title = 'Foobar'
 

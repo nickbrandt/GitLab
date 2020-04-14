@@ -45,24 +45,28 @@ export default () => {
         emptyStatePath,
         opened,
         archived,
+        all,
+        requirementsWebUrl,
       } = el.dataset;
       const stateFilterBy = filterBy ? FilterState[filterBy] : FilterState.opened;
 
       const OPENED = parseInt(opened, 10);
       const ARCHIVED = parseInt(archived, 10);
+      const ALL = parseInt(all, 10);
 
       return {
         filterBy: stateFilterBy,
         requirementsCount: {
           OPENED,
           ARCHIVED,
-          ALL: OPENED + ARCHIVED,
+          ALL,
         },
         page,
         prev,
         next,
         emptyStatePath,
         projectPath,
+        requirementsWebUrl,
       };
     },
     render(createElement) {
@@ -75,6 +79,7 @@ export default () => {
           prev: this.prev,
           next: this.next,
           emptyStatePath: this.emptyStatePath,
+          requirementsWebUrl: this.requirementsWebUrl,
         },
       });
     },

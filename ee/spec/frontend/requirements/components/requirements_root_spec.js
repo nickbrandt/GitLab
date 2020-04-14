@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import { GlPagination } from '@gitlab/ui';
 import * as Sentry from '@sentry/browser';
 import createFlash from '~/flash';
+import { visitUrl } from '~/lib/utils/url_utility';
 
 import RequirementsRoot from 'ee/requirements/components/requirements_root.vue';
 import RequirementsLoading from 'ee/requirements/components/requirements_loading.vue';
@@ -30,6 +31,10 @@ jest.mock('ee/requirements/constants', () => ({
 }));
 
 jest.mock('~/flash');
+jest.mock('~/lib/utils/url_utility', () => ({
+  ...jest.requireActual('~/lib/utils/url_utility'),
+  visitUrl: jest.fn(),
+}));
 
 const createComponent = ({
   projectPath = 'gitlab-org/gitlab-shell',
@@ -38,6 +43,7 @@ const createComponent = ({
   showCreateRequirement = false,
   emptyStatePath = '/assets/illustrations/empty-state/requirements.svg',
   loading = false,
+  requirementsWebUrl = '/gitlab-org/gitlab-shell/-/requirements',
 } = {}) =>
   shallowMount(RequirementsRoot, {
     propsData: {
@@ -46,6 +52,7 @@ const createComponent = ({
       requirementsCount,
       showCreateRequirement,
       emptyStatePath,
+      requirementsWebUrl,
     },
     mocks: {
       $apollo: {
@@ -267,6 +274,34 @@ describe('RequirementsRoot', () => {
       });
     });
 
+    describe('enableOrDisableNewRequirement', () => {
+      it('disables new requirement button when called with param `{ disable: true }`', () => {
+        wrapper.vm.enableOrDisableNewRequirement({
+          disable: true,
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          const newReqButton = document.querySelector('.js-new-requirement');
+
+          expect(newReqButton.getAttribute('disabled')).toBe('disabled');
+          expect(newReqButton.classList.contains('disabled')).toBe(true);
+        });
+      });
+
+      it('enables new requirement button when called with param `{ disable: false }`', () => {
+        wrapper.vm.enableOrDisableNewRequirement({
+          disable: false,
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          const newReqButton = document.querySelector('.js-new-requirement');
+
+          expect(newReqButton.getAttribute('disabled')).toBeNull();
+          expect(newReqButton.classList.contains('disabled')).toBe(false);
+        });
+      });
+    });
+
     describe('handleNewRequirementClick', () => {
       it('sets `showCreateForm` prop to `true`', () => {
         wrapper.vm.handleNewRequirementClick();
@@ -320,6 +355,22 @@ describe('RequirementsRoot', () => {
             },
           }),
         );
+      });
+
+      it('calls `visitUrl` when project has no requirements and request is successful', () => {
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockMutationResult);
+
+        wrapper.setProps({
+          requirementsCount: {
+            OPENED: 0,
+            ARCHIVED: 0,
+            ALL: 0,
+          },
+        });
+
+        return wrapper.vm.handleNewRequirementSave('foo').then(() => {
+          expect(visitUrl).toHaveBeenCalledWith('/gitlab-org/gitlab-shell/-/requirements');
+        });
       });
 
       it('sets `showCreateForm` and `createRequirementRequestActive` props to `false` and calls `$apollo.queries.requirements.refetch()` when request is successful', () => {
@@ -584,6 +635,16 @@ describe('RequirementsRoot', () => {
 
       return wrapper.vm.$nextTick(() => {
         expect(wrapper.find(RequirementForm).exists()).toBe(true);
+      });
+    });
+
+    it('does not render requirement-empty-state component when `showCreateForm` prop is `true`', () => {
+      wrapper.setData({
+        showCreateForm: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(RequirementsEmptyState).exists()).toBe(false);
       });
     });
 

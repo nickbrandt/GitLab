@@ -4,7 +4,7 @@ import { GlPagination } from '@gitlab/ui';
 import { __ } from '~/locale';
 import createFlash from '~/flash';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
-import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
+import { updateHistory, setUrlParams, visitUrl } from '~/lib/utils/url_utility';
 
 import RequirementsLoading from './requirements_loading.vue';
 import RequirementsEmptyState from './requirements_empty_state.vue';
@@ -38,7 +38,8 @@ export default {
     requirementsCount: {
       type: Object,
       required: true,
-      validator: value => ['OPENED', 'ARCHIVED', 'ALL'].every(prop => value[prop]),
+      validator: value =>
+        ['OPENED', 'ARCHIVED', 'ALL'].every(prop => typeof value[prop] === 'number'),
     },
     page: {
       type: Number,
@@ -56,6 +57,10 @@ export default {
       default: '',
     },
     emptyStatePath: {
+      type: String,
+      required: true,
+    },
+    requirementsWebUrl: {
       type: String,
       required: true,
     },
@@ -108,6 +113,7 @@ export default {
     const tabsContainerEl = document.querySelector('.js-requirements-state-filters');
 
     return {
+      newRequirementEl: null,
       showCreateForm: false,
       showUpdateFormForRequirement: 0,
       createRequirementRequestActive: false,
@@ -158,6 +164,11 @@ export default {
     },
   },
   watch: {
+    showCreateForm(value) {
+      this.enableOrDisableNewRequirement({
+        disable: value,
+      });
+    },
     requirements() {
       const totalCount = this.requirements.count.ALL;
 
@@ -174,16 +185,14 @@ export default {
   },
   mounted() {
     if (this.filterBy === FilterState.opened) {
-      document
-        .querySelector('.js-new-requirement')
-        .addEventListener('click', this.handleNewRequirementClick);
+      this.newRequirementEl = document.querySelector('.js-new-requirement');
+
+      this.newRequirementEl.addEventListener('click', this.handleNewRequirementClick);
     }
   },
   beforeDestroy() {
     if (this.filterBy === FilterState.opened) {
-      document
-        .querySelector('.js-new-requirement')
-        .removeEventListener('click', this.handleNewRequirementClick);
+      this.newRequirementEl.removeEventListener('click', this.handleNewRequirementClick);
     }
   },
   methods: {
@@ -241,6 +250,22 @@ export default {
           Sentry.captureException(e);
         });
     },
+    /**
+     * This method is only needed until we move Requirements page
+     * tabs and button into this Vue app instead of rendering it
+     * using HAML.
+     */
+    enableOrDisableNewRequirement({ disable = true }) {
+      if (this.newRequirementEl) {
+        if (disable) {
+          this.newRequirementEl.setAttribute('disabled', 'disabled');
+          this.newRequirementEl.classList.add('disabled');
+        } else {
+          this.newRequirementEl.removeAttribute('disabled');
+          this.newRequirementEl.classList.remove('disabled');
+        }
+      }
+    },
     handleNewRequirementClick() {
       this.showCreateForm = true;
     },
@@ -248,6 +273,7 @@ export default {
       this.showUpdateFormForRequirement = iid;
     },
     handleNewRequirementSave(title) {
+      const reloadPage = this.totalRequirements === 0;
       this.createRequirementRequestActive = true;
       return this.$apollo
         .mutate({
@@ -261,9 +287,13 @@ export default {
         })
         .then(({ data }) => {
           if (!data.createRequirement.errors.length) {
-            this.showCreateForm = false;
-            this.$apollo.queries.requirements.refetch();
-            this.openedCount += 1;
+            if (reloadPage) {
+              visitUrl(this.requirementsWebUrl);
+            } else {
+              this.showCreateForm = false;
+              this.$apollo.queries.requirements.refetch();
+              this.openedCount += 1;
+            }
           } else {
             throw new Error(`Error creating a requirement`);
           }
@@ -348,22 +378,24 @@ export default {
 
 <template>
   <div class="requirements-list-container">
-    <requirements-empty-state
-      v-if="requirementsListEmpty"
-      :filter-by="filterBy"
-      :empty-state-path="emptyStatePath"
-    />
-    <requirements-loading
-      v-show="requirementsListLoading"
-      :filter-by="filterBy"
-      :current-tab-count="totalRequirements"
-      :current-page="currentPage"
-    />
     <requirement-form
       v-if="showCreateForm"
       :requirement-request-active="createRequirementRequestActive"
       @save="handleNewRequirementSave"
       @cancel="handleNewRequirementCancel"
+    />
+    <requirements-empty-state
+      v-if="requirementsListEmpty && !showCreateForm"
+      :filter-by="filterBy"
+      :empty-state-path="emptyStatePath"
+      :requirements-count="requirementsCount"
+      @clickNewRequirement="handleNewRequirementClick"
+    />
+    <requirements-loading
+      v-show="requirementsListLoading"
+      :filter-by="filterBy"
+      :current-page="currentPage"
+      :requirements-count="requirementsCount"
     />
     <ul
       v-if="!requirementsListLoading && !requirementsListEmpty"
