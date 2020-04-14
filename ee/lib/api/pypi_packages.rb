@@ -22,6 +22,33 @@ module API
       render_api_error!(e.message, 400)
     end
 
+    rescue_from ActiveRecord::RecordInvalid do |e|
+      render_api_error!(e.message, 400)
+    end
+
+    helpers do
+      def packages_finder(project = authorized_user_project)
+        project
+          .packages
+          .pypi
+          .has_version
+          .processed
+      end
+
+      def find_package_versions
+        packages = packages_finder
+          .with_name(params[:package_name])
+
+        not_found!('Package') if packages.empty?
+
+        packages
+      end
+
+      def unauthorized_user_project
+        @unauthorized_user_project ||= find_project(params[:id]) || not_found!
+      end
+    end
+
     before do
       require_packages_enabled!
     end
@@ -32,11 +59,11 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        unless ::Feature.enabled?(:pypi_packages, authorized_user_project)
+        unless ::Feature.enabled?(:pypi_packages, unauthorized_user_project)
           not_found!
         end
 
-        authorize_packages_feature!(authorized_user_project)
+        authorize_packages_feature!(unauthorized_user_project)
       end
 
       namespace ':id/packages/pypi' do
@@ -46,10 +73,17 @@ module API
 
         params do
           requires :file_identifier, type: String, desc: 'The PyPi package file identifier', file_path: true
+          requires :sha256, type: String, desc: 'The PyPi package sha256 check sum'
         end
 
-        get 'files/*file_identifier', :txt do
-          authorize_read_package!(authorized_user_project)
+        get 'files/:sha256/*file_identifier' do
+          project = unauthorized_user_project
+
+          filename = "#{params[:file_identifier]}.#{params[:format]}"
+          package = packages_finder(project).by_file_name_and_sha256(filename, params[:sha256])
+          package_file = ::Packages::PackageFileFinder.new(package, filename, with_file_name_like: false).execute
+
+          present_carrierwave_file!(package_file.file, supports_direct_download: true)
         end
 
         desc 'The PyPi Simple Endpoint' do
@@ -60,8 +94,20 @@ module API
           requires :package_name, type: String, file_path: true, desc: 'The PyPi package name'
         end
 
+        # An Api entry point but returns an HTML file instead of JSON.
+        # PyPi simple API returns the package descriptor as a simple HTML file.
         get 'simple/*package_name', format: :txt do
           authorize_read_package!(authorized_user_project)
+
+          packages = find_package_versions
+          presenter = ::Packages::Pypi::PackagePresenter.new(packages, authorized_user_project)
+
+          # Adjusts grape output format
+          # to be HTML
+          content_type "text/html; charset=utf-8"
+          env['api.format'] = :binary
+
+          body presenter.body
         end
 
         desc 'The PyPi Package upload endpoint' do

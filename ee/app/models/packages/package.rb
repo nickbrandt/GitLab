@@ -92,6 +92,11 @@ class Packages::Package < ApplicationRecord
       .where(packages_package_files: { file_name: file_name }).last!
   end
 
+  def self.by_file_name_and_sha256(file_name, sha256)
+    joins(:package_files)
+      .where(packages_package_files: { file_name: file_name, file_sha256: sha256 }).last!
+  end
+
   def self.pluck_names
     pluck(:name)
   end
