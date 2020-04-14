@@ -14263,9 +14263,6 @@ msgstr ""
 msgid "Package was removed"
 msgstr ""
 
-msgid "PackageRegistry|%{version} published by %{author}"
-msgstr ""
-
 msgid "PackageRegistry|Add Conan Remote"
 msgstr ""
 
@@ -14402,6 +14399,9 @@ msgid "PackageRegistry|You may also need to setup authentication using an auth t
 msgstr ""
 
 msgid "PackageRegistry|npm"
+msgstr ""
+
+msgid "PackageRegistry|published by %{author}"
 msgstr ""
 
 msgid "PackageRegistry|yarn"

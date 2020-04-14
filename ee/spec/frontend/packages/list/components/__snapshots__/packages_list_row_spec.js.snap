@@ -24,9 +24,11 @@ exports[`packages_list_row renders 1`] = `
     <div
       class="d-flex text-secondary text-truncate mt-md-2"
     >
-      <gl-sprintf-stub
-        message="%{version}"
-      />
+      <span>
+        1.0.0
+      </span>
+       
+      <!---->
        
       <div
         class="d-flex align-items-center"

@@ -2,7 +2,6 @@
 import PackageTags from '../../shared/components/package_tags.vue';
 import PublishMethod from './publish_method.vue';
 import { GlNewButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import { getPackageType } from '../../shared/utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { mapState } from 'vuex';
@@ -31,15 +30,11 @@ export default {
     ...mapState({
       isGroupPage: state => state.config.isGroupPage,
     }),
-    createdBy() {
-      if (this.packageEntity.pipeline) {
-        return s__('PackageRegistry|%{version} published by %{author}');
-      }
-
-      return '%{version}';
-    },
     packageType() {
       return getPackageType(this.packageEntity.package_type);
+    },
+    hasPipeline() {
+      return Boolean(this.packageEntity.pipeline);
     },
     hasProjectLink() {
       return Boolean(this.packageEntity.project_path);
@@ -68,14 +63,13 @@ export default {
       </div>
 
       <div class="d-flex text-secondary text-truncate mt-md-2">
-        <gl-sprintf :message="createdBy">
-          <template #version>
-            <gl-icon name="eye" class="text-secondary mr-1" />
-            {{ packageEntity.version }}
-          </template>
+        <span>{{ packageEntity.version }}</span>
 
-          <template #author>{{ packageEntity.pipeline.user.name }}</template>
-        </gl-sprintf>
+        <div v-if="hasPipeline" class="d-none d-md-inline-block ml-1">
+          <gl-sprintf :message="s__('PackageRegistry|published by %{author}')">
+            <template #author>{{ packageEntity.pipeline.user.name }}</template>
+          </gl-sprintf>
+        </div>
 
         <div v-if="hasProjectLink" class="d-flex align-items-center">
           <gl-icon name="review-list" class="text-secondary ml-2 mr-1" />
