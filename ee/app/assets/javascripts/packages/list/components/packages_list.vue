@@ -96,9 +96,9 @@ export default {
     <template v-else>
       <div data-qa-selector="packages-table">
         <packages-list-row
-          v-for="pk in list"
-          :key="pk.id"
-          :package-entity="pk"
+          v-for="packageEntity in list"
+          :key="packageEntity.id"
+          :package-entity="packageEntity"
           @packageToDelete="setItemToBeDeleted"
         />
       </div>

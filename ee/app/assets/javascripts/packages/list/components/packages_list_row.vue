@@ -50,9 +50,10 @@ export default {
   <div class="gl-responsive-table-row" data-qa-selector="packages-row">
     <div class="table-section section-50 d-flex flex-md-column justify-content-between flex-wrap">
       <div class="d-flex align-items-center mr-2">
-        <gl-link :href="packageEntity._links.web_path" class="text-dark font-weight-bold mb-md-1">{{
-          packageEntity.name
-        }}</gl-link>
+        <gl-link :href="packageEntity._links.web_path" class="text-dark font-weight-bold mb-md-1">
+          {{ packageEntity.name }}
+        </gl-link>
+
         <package-tags
           v-if="packageEntity.tags && packageEntity.tags.length"
           class="prepend-left-8"

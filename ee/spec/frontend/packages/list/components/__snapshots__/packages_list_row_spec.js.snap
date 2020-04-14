@@ -15,7 +15,9 @@ exports[`packages_list_row renders 1`] = `
         class="text-dark font-weight-bold mb-md-1"
         href="foo"
       >
+        
         Test package
+      
       </gl-link-stub>
        
       <!---->

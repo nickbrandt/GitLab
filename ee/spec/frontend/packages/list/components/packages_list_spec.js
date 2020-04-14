@@ -5,6 +5,7 @@ import Tracking from '~/tracking';
 import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
 import PackagesListLoader from 'ee/packages/list/components/packages_list_loader.vue';
+import PackagesListRow from 'ee/packages/list/components/packages_list_row.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import stubChildren from 'helpers/stub_children';
@@ -24,6 +25,7 @@ describe('packages_list', () => {
   const findPackageListPagination = () => wrapper.find(GlPagination);
   const findPackageListDeleteModal = () => wrapper.find(GlModal);
   const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
+  const findPackagesListRow = () => wrapper.find(PackagesListRow);
 
   const createStore = (isGroupPage, packages, isLoading) => {
     const state = {
@@ -66,6 +68,7 @@ describe('packages_list', () => {
         ...stubChildren(PackagesList),
         GlTable,
         GlSortingItem,
+        GlModal,
       },
       ...options,
     });
@@ -130,14 +133,14 @@ describe('packages_list', () => {
     });
 
     it('setItemToBeDeleted sets itemToBeDeleted and open the modal', () => {
-      wrapper.vm.$refs.packageListDeleteModal.show = jest.fn();
-
+      const mockModalShow = jest.spyOn(wrapper.vm.$refs.packageListDeleteModal, 'show');
       const item = last(wrapper.vm.list);
-      wrapper.vm.setItemToBeDeleted(item);
+
+      findPackagesListRow().vm.$emit('packageToDelete', item);
 
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.itemToBeDeleted).toEqual(item);
-        expect(wrapper.vm.$refs.packageListDeleteModal.show).toHaveBeenCalled();
+        expect(mockModalShow).toHaveBeenCalled();
       });
     });
 
