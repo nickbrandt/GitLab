@@ -45,7 +45,7 @@ module EE
               end
 
         def self.requirements_available?(project, user)
-          ::Feature.enabled?(:requirements_management, project) && Ability.allowed?(user, :read_requirement, project)
+          ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)
         end
       end
     end
