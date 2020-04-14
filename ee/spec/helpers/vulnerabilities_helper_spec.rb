@@ -5,6 +5,7 @@ require 'spec_helper'
 describe VulnerabilitiesHelper do
   let_it_be(:user) { build(:user) }
   let_it_be(:vulnerability) { create(:vulnerability, :with_findings, title: "My vulnerability") }
+  let_it_be(:project) { vulnerability.project }
   let_it_be(:finding) { vulnerability.finding }
   let(:vulnerability_serializer_hash) do
     vulnerability.slice(
@@ -57,7 +58,9 @@ describe VulnerabilitiesHelper do
       expect(subject).to include(
         vulnerability_json: kind_of(String),
         project_fingerprint: vulnerability.finding.project_fingerprint,
-        create_issue_url: kind_of(String),
+        create_issue_url: "/#{project.full_path}/-/vulnerability_feedback",
+        notes_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/notes",
+        discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
         has_mr: anything,
         vulnerability_feedback_help_path: kind_of(String),
         finding_json: kind_of(String),
