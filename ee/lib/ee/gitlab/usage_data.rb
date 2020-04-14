@@ -235,7 +235,7 @@ module EE
             merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required.where(time_period), :merge_request_id),
             projects_imported_from_github: distinct_count(::Project.github_imported.where(time_period), :creator_id),
             projects_with_repositories_enabled: distinct_count(::Project.with_repositories_enabled.where(time_period), :creator_id),
-            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id),
+            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: ::User.minimum(:id), finish: ::User.maximum(:id)),
             remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
             snippets: distinct_count(::Snippet.where(time_period), :author_id),
             suggestions: distinct_count(::Note.with_suggestions.where(time_period),
