@@ -6,6 +6,34 @@ describe Terraform::RemoteStateHandler do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
 
+  describe '#find_with_lock' do
+    context 'without a state name' do
+      subject { described_class.new(project, user) }
+
+      it 'raises an exception' do
+        expect { subject.find_with_lock }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'with a state name' do
+      subject { described_class.new(project, user, name: 'state') }
+
+      context 'with no matching state' do
+        it 'raises an exception' do
+          expect { subject.find_with_lock }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+
+      context 'with a matching state' do
+        let!(:state) { create(:terraform_state, project: project, name: 'state') }
+
+        it 'returns the state' do
+          expect(subject.find_with_lock).to eq(state)
+        end
+      end
+    end
+  end
+
   describe '#create_or_find!' do
     it 'requires passing a state name' do
       handler = described_class.new(project, user)
@@ -55,12 +83,6 @@ describe Terraform::RemoteStateHandler do
     describe '#lock!' do
       it 'raises an error' do
         expect { subject.lock! }.to raise_error(ArgumentError)
-      end
-    end
-
-    describe '#unlock!' do
-      it 'raises an error' do
-        expect { subject.unlock! }.to raise_error(ArgumentError)
       end
     end
   end
