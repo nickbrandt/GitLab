@@ -3,13 +3,10 @@
 require 'spec_helper'
 
 describe 'Slack slash commands' do
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  include_context 'project service activation'
 
   before do
-    project.add_maintainer(user)
-    sign_in(user)
-    visit edit_project_service_path(project, :slack_slash_commands)
+    visit_project_integration('Slack slash commands')
   end
 
   it 'shows a token placeholder' do
