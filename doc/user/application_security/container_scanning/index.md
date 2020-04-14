@@ -158,9 +158,9 @@ variables:
 The `CLAIR_OUTPUT` variable defined in the main `gitlab-ci.yml` will overwrite what's
 defined in `Container-Scanning.gitlab-ci.yml`, changing the Container Scanning behavior.
 
-[//]: # "NOTE: The container scanning tool references the following heading in the code, so if you"
-[//]: # "      make a change to this heading, make sure to update the documentation URLs used in the"
-[//]: # "      container scanning tool (https://gitlab.com/gitlab-org/security-products/analyzers/klar)"
+<!-- NOTE: The container scanning tool references the following heading in the code, so if you"
+     make a change to this heading, make sure to update the documentation URLs used in the"
+     container scanning tool (https://gitlab.com/gitlab-org/security-products/analyzers/klar)" -->
 
 #### Available variables
 
