@@ -6,7 +6,8 @@ describe Vulnerabilities::Export do
   it { is_expected.to define_enum_for(:format) }
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project).required }
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:group) }
     it { is_expected.to belong_to(:author).class_name('User').required }
   end
 
@@ -21,6 +22,16 @@ describe Vulnerabilities::Export do
       subject(:export) { build(:vulnerability_export, :finished) }
 
       it { is_expected.to validate_presence_of(:file) }
+    end
+
+    context 'when the group is not set' do
+      it { is_expected.to validate_presence_of(:project) }
+    end
+
+    context 'when the project is not set' do
+      subject { build(:vulnerability_export, :group) }
+
+      it { is_expected.to validate_presence_of(:group) }
     end
   end
 
