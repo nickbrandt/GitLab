@@ -1,5 +1,7 @@
 namespace :gitlab do
   namespace :db do
+    CUSTOM_DUMP_FILE = 'db/gitlab_structure.sql'.freeze
+
     desc 'GitLab | DB | Manually insert schema migration version'
     task :mark_migration_complete, [:version] => :environment do |_, args|
       unless args[:version]
@@ -92,9 +94,39 @@ namespace :gitlab do
       Rake::Task[task_name].reenable
     end
 
-    # Inform Rake that gitlab:schema:clean_structure_sql should be run every time rake db:structure:dump is run
+    desc 'This dumps GitLab specific database details - it runs after db:structure:dump'
+    task :dump_custom_structure do |task_name|
+      File.open(CUSTOM_DUMP_FILE, 'wb+') do |io|
+        Gitlab::Database::CustomStructure.new.dump(io)
+      end
+
+      # Allow this task to be called multiple times, as happens when running db:migrate:redo
+      Rake::Task[task_name].reenable
+    end
+
+    desc 'This loads Gitlab specific database details - runs after db:structure:dump'
+    task :load_custom_structure do
+      configuration = Rails.application.config_for(:database)
+
+      ENV['PGHOST']     = configuration['host']          if configuration['host']
+      ENV['PGPORT']     = configuration['port'].to_s     if configuration['port']
+      ENV['PGPASSWORD'] = configuration['password'].to_s if configuration['password']
+      ENV['PGUSER']     = configuration['username'].to_s if configuration['username']
+
+      args = ['-v', 'ON_ERROR_STOP=1', '-q', '-X', '-f', CUSTOM_DUMP_FILE]
+      args << configuration['database']
+      system('psql', *args)
+    end
+
+    # Inform Rake that custom tasks should be run every time rake db:structure:dump is run
     Rake::Task['db:structure:dump'].enhance do
       Rake::Task['gitlab:db:clean_structure_sql'].invoke
+      Rake::Task['gitlab:db:dump_custom_structure'].invoke
+    end
+
+    # Inform Rake that custom tasks should be run every time rake db:structure:load is run
+    Rake::Task['db:structure:load'].enhance do
+      Rake::Task['gitlab:db:load_custom_structure'].invoke
     end
   end
 end
