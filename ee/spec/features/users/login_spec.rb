@@ -77,6 +77,45 @@ describe 'Login' do
 
           expect(page).to have_selector('.nav-tabs a[href="#smartcard"]')
         end
+
+        describe 'with two-factor authentication required', :clean_gitlab_redis_shared_state do
+          let_it_be(:user) { create(:user) }
+          let_it_be(:smartcard_identity) { create(:smartcard_identity, user: user) }
+
+          before do
+            stub_application_setting(require_two_factor_authentication: true)
+          end
+
+          context 'with a smartcard session' do
+            let(:openssl_certificate_store) { instance_double(OpenSSL::X509::Store) }
+            let(:openssl_certificate) do
+              instance_double(OpenSSL::X509::Certificate, subject: smartcard_identity.subject, issuer: smartcard_identity.issuer)
+            end
+
+            it 'does not ask for Two-Factor Authentication' do
+              allow(Gitlab::Auth::Smartcard::Certificate).to receive(:store).and_return(openssl_certificate_store)
+              allow(OpenSSL::X509::Certificate).to receive(:new).and_return(openssl_certificate)
+              allow(openssl_certificate_store).to receive(:verify).and_return(true)
+
+              # Loging using smartcard
+              visit verify_certificate_smartcard_path(client_certificate: openssl_certificate)
+
+              visit profile_path
+
+              expect(page).not_to have_content('Two-Factor Authentication')
+            end
+          end
+
+          context 'without a smartcard session' do
+            it 'asks for Two-Factor Authentication' do
+              sign_in(user)
+
+              visit profile_path
+
+              expect(page).to have_content('Two-Factor Authentication')
+            end
+          end
+        end
       end
     end
   end
