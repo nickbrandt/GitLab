@@ -12085,6 +12085,9 @@ msgstr ""
 msgid "Licenses|Detected in Project"
 msgstr ""
 
+msgid "Licenses|Detected licenses that are out-of-compliance with the project's assigned policies"
+msgstr ""
+
 msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest successful%{linkEnd} scan"
 msgstr ""
 
@@ -12104,6 +12107,9 @@ msgid "Licenses|Policies"
 msgstr ""
 
 msgid "Licenses|Policy"
+msgstr ""
+
+msgid "Licenses|Policy violation: denied"
 msgstr ""
 
 msgid "Licenses|Specified policies in this project"

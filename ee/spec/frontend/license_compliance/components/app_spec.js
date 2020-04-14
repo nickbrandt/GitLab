@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import { REPORT_STATUS } from 'ee/license_compliance/store/modules/list/constants';
@@ -18,6 +18,8 @@ import {
   approvedLicense,
   blacklistedLicense,
 } from 'ee_jest/vue_shared/license_compliance/mock_data';
+
+import { LICENSE_APPROVAL_CLASSIFICATION } from 'ee/vue_shared/license_compliance/constants';
 
 Vue.use(Vuex);
 
@@ -160,6 +162,10 @@ describe('Project Licenses', () => {
       });
     });
 
+    it('does not render a policy violations alert', () => {
+      expect(wrapper.find(GlAlert).exists()).toBe(false);
+    });
+
     it('renders a "Detected in project" tab and a "Policies" tab', () => {
       expect(wrapper.find(GlTabs).exists()).toBe(true);
       expect(wrapper.find(GlTab).exists()).toBe(true);
@@ -176,6 +182,24 @@ describe('Project Licenses', () => {
 
     it('renders the pipeline info', () => {
       expect(wrapper.find(PipelineInfo).exists()).toBe(true);
+    });
+
+    describe('when there are policy violations', () => {
+      beforeEach(() => {
+        createComponent({
+          state: {
+            initialized: true,
+            licenses: [{ classification: LICENSE_APPROVAL_CLASSIFICATION.DENIED }],
+          },
+        });
+      });
+
+      it('renders a policy violations alert', () => {
+        expect(wrapper.find(GlAlert).exists()).toBe(true);
+        expect(wrapper.find(GlAlert).text()).toContain(
+          "Detected licenses that are out-of-compliance with the project's assigned policies",
+        );
+      });
     });
   });
 

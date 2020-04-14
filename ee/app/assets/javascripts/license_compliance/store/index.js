@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import mediator from './plugins/mediator';
+
 import listModule from './modules/list';
 import { licenseManagementModule } from 'ee/vue_shared/license_compliance/store/index';
 import { LICENSE_LIST } from './constants';
@@ -14,4 +16,5 @@ export default () =>
       [LICENSE_LIST]: listModule(),
       [LICENSE_MANAGEMENT]: licenseManagementModule(),
     },
+    plugins: [mediator],
   });
