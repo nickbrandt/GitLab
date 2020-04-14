@@ -1043,7 +1043,8 @@ CREATE TABLE public.ci_job_artifacts (
     file_store integer,
     file_sha256 bytea,
     file_format smallint,
-    file_location smallint
+    file_location smallint,
+    CONSTRAINT ci_job_artifacts_file_store_not_null CHECK ((file_store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.ci_job_artifacts_id_seq
@@ -3535,7 +3536,8 @@ CREATE TABLE public.lfs_objects (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     file character varying,
-    file_store integer
+    file_store integer,
+    CONSTRAINT lfs_objects_file_store_not_null CHECK ((file_store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.lfs_objects_id_seq
@@ -6231,7 +6233,8 @@ CREATE TABLE public.uploads (
     created_at timestamp without time zone NOT NULL,
     store integer,
     mount_point character varying,
-    secret character varying
+    secret character varying,
+    CONSTRAINT uploads_store_not_null CHECK ((store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.uploads_id_seq
@@ -7697,9 +7700,6 @@ ALTER TABLE ONLY public.ci_daily_report_results
 ALTER TABLE ONLY public.ci_group_variables
     ADD CONSTRAINT ci_group_variables_pkey PRIMARY KEY (id);
 
-ALTER TABLE public.ci_job_artifacts
-    ADD CONSTRAINT ci_job_artifacts_file_store_not_null CHECK ((file_store IS NOT NULL)) NOT VALID;
-
 ALTER TABLE ONLY public.ci_job_artifacts
     ADD CONSTRAINT ci_job_artifacts_pkey PRIMARY KEY (id);
 
@@ -8056,9 +8056,6 @@ ALTER TABLE ONLY public.ldap_group_links
 
 ALTER TABLE ONLY public.lfs_file_locks
     ADD CONSTRAINT lfs_file_locks_pkey PRIMARY KEY (id);
-
-ALTER TABLE public.lfs_objects
-    ADD CONSTRAINT lfs_objects_file_store_not_null CHECK ((file_store IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY public.lfs_objects
     ADD CONSTRAINT lfs_objects_pkey PRIMARY KEY (id);
@@ -8452,9 +8449,6 @@ ALTER TABLE ONLY public.u2f_registrations
 
 ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
-
-ALTER TABLE public.uploads
-    ADD CONSTRAINT uploads_store_not_null CHECK ((store IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY public.user_agent_details
     ADD CONSTRAINT user_agent_details_pkey PRIMARY KEY (id);
@@ -13154,5 +13148,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200414212638
 20200414213245
 20200414213549
+20200414214037
+20200414215355
+20200414215557
 \.
 
