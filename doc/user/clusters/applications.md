@@ -43,6 +43,7 @@ The following applications can be installed:
 - [Knative](#knative)
 - [Crossplane](#crossplane)
 - [Elastic Stack](#elastic-stack)
+- [Fluentd](#fluentd)
 
 With the exception of Knative, the applications will be installed in a dedicated
 namespace called `gitlab-managed-apps`.
@@ -522,6 +523,28 @@ kubectl port-forward svc/kibana 5601:443
 ```
 
 Then, you can visit Kibana at `http://localhost:5601`.
+
+### Fluentd
+
+> Introduced in GitLab 12.10 for project- and group-level clusters.
+
+[Fluentd](https://www.fluentd.org/) is an open source data collector, which enables
+you to unify the data collection and consumption to better use and understand
+your data. Fluentd sends logs in syslog format.
+
+To enable Fluentd:
+
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes** and click
+   **Applications**. You will be prompted to enter a host, port and protocol
+   where the WAF logs will be sent to via syslog.
+1. Provide the host domain name or URL in **SIEM URL or Host**.
+1. Provide the host port number in **SIEM Port**.
+1. Select a **SIEM Protocol**.
+1. Check **Send ModSecurity Logs**. If you do not select this checkbox, the **Install**
+   button is disabled.
+1. Click **Install**.
+
+![Fluentd input fields](img/fluentd_v12_10.png)
 
 ### Future apps
 
