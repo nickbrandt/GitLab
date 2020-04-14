@@ -34,7 +34,7 @@ module API
       end
       get ':id' do
         vulnerability = find_and_authorize_vulnerability!(:read_vulnerability)
-        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project, default_enabled: true)
 
         render_vulnerability(vulnerability)
       end
@@ -44,7 +44,7 @@ module API
       end
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project, default_enabled: true)
 
         not_modified! if vulnerability.resolved?
 
@@ -57,7 +57,7 @@ module API
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project, default_enabled: true)
 
         not_modified! if vulnerability.dismissed?
 
@@ -70,7 +70,7 @@ module API
       end
       post ':id/confirm' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project, default_enabled: true)
 
         not_modified! if vulnerability.confirmed?
 
@@ -87,7 +87,7 @@ module API
         success EE::API::Entities::Vulnerability
       end
       before do
-        not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project, default_enabled: true)
       end
       params do
         use :pagination

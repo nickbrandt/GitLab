@@ -9,7 +9,7 @@ module Projects
 
       before_action only: [:index] do
         push_frontend_feature_flag(:hide_dismissed_vulnerabilities)
-        push_frontend_feature_flag(:first_class_vulnerabilities, @project)
+        push_frontend_feature_flag(:first_class_vulnerabilities, @project, default_enabled: true)
       end
 
       def index
