@@ -15955,9 +15955,6 @@ msgstr ""
 msgid "ProjectSettings|Merge suggestions"
 msgstr ""
 
-msgid "ProjectSettings|Metrics Dashboard"
-msgstr ""
-
 msgid "ProjectSettings|No merge commits are created"
 msgstr ""
 

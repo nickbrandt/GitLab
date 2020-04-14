@@ -68,7 +68,7 @@ describe('Settings Panel', () => {
     wrapper = mountComponent();
 
     gon.features = gon.features || {};
-    gon.features.metricsVisibilityToggle = true;
+    gon.features.metricsDashboardVisibilitySwitchingAvailable = true;
   });
 
   afterEach(() => {
@@ -484,7 +484,7 @@ describe('Settings Panel', () => {
 
     it('should set the visibility level description based upon the selected visibility level', () => {
       wrapper
-        .find('[name="project[project_feature_attributes][metrics_access_level]"]')
+        .find('[name="project[project_feature_attributes][metrics_dashboard_access_level]"]')
         .setValue(visibilityOptions.PUBLIC);
 
       expect(wrapper.vm.metricsAccessLevel).toBe(visibilityOptions.PUBLIC);

@@ -193,8 +193,8 @@ export default {
       );
     },
 
-    metricVisibilityToggleAvailable() {
-      return gon.features?.metricsVisibilityToggle;
+    metricsDashboardVisibilitySwitchingAvailable() {
+      return gon.features?.metricsDashboardVisibilitySwitchingAvailable;
     },
   },
 
@@ -470,9 +470,9 @@ export default {
         />
       </project-setting-row>
       <project-setting-row
-        v-if="metricVisibilityToggleAvailable"
+        v-if="metricsDashboardVisibilitySwitchingAvailable"
         ref="metrics-visibility-settings"
-        :label="s__('ProjectSettings|Metrics Dashboard')"
+        :label="__('Metrics Dashboard')"
         :help-text="
           s__(
             'ProjectSettings|With Metrics Dashboard you can visualize this project performance metrics',
@@ -483,8 +483,7 @@ export default {
           <div class="select-wrapper">
             <select
               v-model="metricsAccessLevel"
-              :disabled="false"
-              name="project[project_feature_attributes][metrics_access_level]"
+              name="project[project_feature_attributes][metrics_dashboard_access_level]"
               class="form-control select-control"
             >
               <option

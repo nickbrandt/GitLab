@@ -37,7 +37,7 @@ class ProjectsController < Projects::ApplicationController
   layout :determine_layout
 
   before_action do
-    push_frontend_feature_flag(:metrics_visibility_toggle)
+    push_frontend_feature_flag(:metrics_dashboard_visibility_switching_available)
   end
 
   def index
