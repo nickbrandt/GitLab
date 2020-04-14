@@ -12941,7 +12941,13 @@ msgstr ""
 msgid "Metrics|There was an error creating the dashboard. %{error}"
 msgstr ""
 
+msgid "Metrics|There was an error fetching annotations. Please try again."
+msgstr ""
+
 msgid "Metrics|There was an error fetching the environments data, please try again"
+msgstr ""
+
+msgid "Metrics|There was an error getting annotations information."
 msgstr ""
 
 msgid "Metrics|There was an error getting deployment information."
