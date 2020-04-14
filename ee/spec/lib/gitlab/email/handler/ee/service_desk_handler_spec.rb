@@ -181,9 +181,9 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
           end
         end
 
-        context 'when service_desk_email feature is disabled' do
+        context 'when service_desk_custom_address feature is disabled' do
           before do
-            stub_feature_flags(service_desk_email: false)
+            stub_feature_flags(service_desk_custom_address: false)
           end
 
           it 'bounces the email' do

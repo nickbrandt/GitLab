@@ -11,7 +11,7 @@ module EE
       before_action :log_unarchive_audit_event, only: [:unarchive]
 
       before_action do
-        push_frontend_feature_flag(:service_desk_custom_address)
+        push_frontend_feature_flag(:service_desk_custom_address, @project)
       end
     end
 
