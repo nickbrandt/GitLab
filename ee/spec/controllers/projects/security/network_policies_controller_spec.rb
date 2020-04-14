@@ -40,7 +40,7 @@ describe Projects::Security::NetworkPoliciesController do
           Timecop.freeze do
             expect(adapter).to(
               receive(:query)
-                .with(:packet_flow, kubernetes_namespace, interval: "minute", from: 1.hour.ago, to: Time.now)
+                .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.now.to_s)
                 .and_return({ success: true, data: { ops_rate: [[Time.at(0).to_i, 10]], ops_total: 10 } })
             )
             subject
@@ -62,7 +62,7 @@ describe Projects::Security::NetworkPoliciesController do
           it 'queries with requested arguments' do
             expect(adapter).to(
               receive(:query)
-                .with(:packet_flow, kubernetes_namespace, interval: "day", from: Time.at(0), to: Time.at(100))
+                .with(:packet_flow, kubernetes_namespace, "day", Time.at(0).to_s, Time.at(100).to_s)
                 .and_return({ success: true, data: {} })
             )
             subject
@@ -81,7 +81,7 @@ describe Projects::Security::NetworkPoliciesController do
             Timecop.freeze do
               expect(adapter).to(
                 receive(:query)
-                  .with(:packet_flow, kubernetes_namespace, interval: "minute", from: 1.hour.ago, to: Time.now)
+                  .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.now.to_s)
                   .and_return({ success: true, data: {} })
               )
               subject
@@ -90,11 +90,11 @@ describe Projects::Security::NetworkPoliciesController do
         end
 
         context 'with nil results' do
-          it 'returns network policies summary' do
+          it 'responds with accepted' do
             allow(adapter).to receive(:query).and_return(nil)
             subject
 
-            expect(response).to have_gitlab_http_status(:bad_request)
+            expect(response).to have_gitlab_http_status(:accepted)
           end
         end
       end
