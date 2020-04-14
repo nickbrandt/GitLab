@@ -7,7 +7,7 @@ describe PipelineSerializer do
   let_it_be(:user) { create(:user) }
 
   let(:serializer) do
-    described_class.new(current_user: user)
+    described_class.new(current_user: user, project: project)
   end
 
   subject { serializer.represent(pipeline, details: true) }
