@@ -67,10 +67,10 @@ To enable Container Scanning in your pipeline, you need:
 
   ```yaml
   build:
-    image: docker:19.03.1
+    image: docker:19.03.8
     stage: build
     services:
-      - docker:19.03.1-dind
+      - docker:19.03.8-dind
     variables:
       IMAGE_TAG: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
     script:
@@ -118,7 +118,7 @@ variables:
   DOCKER_DRIVER: overlay2
 
 services:
-  - docker:19.03.5-dind
+  - docker:19.03.8-dind
 
 stages:
   - build
@@ -240,7 +240,7 @@ It may be worthwhile to set up a [scheduled pipeline](../../../ci/pipelines/sche
 image: docker:stable
 
 services:
-  - docker:19.03.5-dind
+  - docker:19.03.8-dind
 
 stages:
   - build
