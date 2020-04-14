@@ -30,10 +30,20 @@ describe Projects::PagesController do
         sign_in(admin)
       end
 
-      it 'updates max_pages_size' do
-        request
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it 'updates max_pages_size' do
+          request
 
-        expect(project.reload.max_pages_size).to eq(100)
+          expect(project.reload.max_pages_size).to eq(100)
+        end
+      end
+
+      context 'when admin mode is disabled' do
+        it 'does not update max_pages_size' do
+          request
+
+          expect(project.reload.max_pages_size).to eq(nil)
+        end
       end
     end
 
