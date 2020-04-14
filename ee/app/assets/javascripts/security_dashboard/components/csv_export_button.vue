@@ -10,6 +10,7 @@ import {
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
+import { formatDate } from '~/lib/utils/datetime_utility';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
 
 export const STORAGE_KEY = 'vulnerability_csv_export_popover_dismissed';
@@ -54,7 +55,7 @@ export default {
         .then(({ data }) => pollUntilComplete(data._links.self))
         .then(({ data }) => {
           const anchor = document.createElement('a');
-          anchor.download = '';
+          anchor.download = `csv-export-${formatDate(new Date(), 'isoDateTime')}.csv`;
           anchor.href = data._links.download;
           anchor.click();
         })
