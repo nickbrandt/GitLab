@@ -12,7 +12,7 @@ import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS } from '../constants';
 
 export default {
-  name: 'VulnerabilityManagementApp',
+  name: 'VulnerabilityHeader',
   components: {
     GlDeprecatedButton,
     GlLoadingIcon,

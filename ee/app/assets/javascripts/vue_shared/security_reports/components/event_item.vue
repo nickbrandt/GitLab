@@ -28,7 +28,7 @@ export default {
       required: false,
       default: 'plus',
     },
-    iconStyle: {
+    iconClass: {
       type: String,
       required: false,
       default: 'ci-status-icon-success',
@@ -54,16 +54,16 @@ export default {
 
 <template>
   <div class="d-flex align-items-center">
-    <div class="circle-icon-container" :class="iconStyle">
+    <div class="circle-icon-container" :class="iconClass">
       <icon :size="16" :name="iconName" />
     </div>
-    <div class="ml-3" data-qa-selector="event_item_content">
+    <div class="ml-3 flex-grow-1" data-qa-selector="event_item_content">
       <div class="note-header-info pb-0">
         <a
           :href="author.path"
           :data-user-id="author.id"
           :data-username="author.username"
-          class="js-author"
+          class="js-author js-user-link"
         >
           <strong class="note-header-author-name">{{ author.name }}</strong>
           <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
@@ -81,21 +81,18 @@ export default {
 
     <slot v-if="showRightSlot" name="right-content"></slot>
 
-    <div v-else class="d-flex flex-grow-1 align-self-start flex-row-reverse">
-      <div v-if="showActionButtons" class="action-buttons">
-        <gl-deprecated-button
-          v-for="button in actionButtons"
-          :key="button.title"
-          ref="button"
-          v-gl-tooltip
-          class="px-1"
-          variant="transparent"
-          :title="button.title"
-          @click="$emit(button.emit)"
-        >
-          <icon :name="button.iconName" class="link-highlight" />
-        </gl-deprecated-button>
-      </div>
+    <div v-else-if="showActionButtons" class="align-self-start">
+      <gl-deprecated-button
+        v-for="button in actionButtons"
+        :key="button.title"
+        v-gl-tooltip
+        class="px-1"
+        variant="transparent"
+        :title="button.title"
+        @click="button.onClick"
+      >
+        <icon :name="button.iconName" class="link-highlight" />
+      </gl-deprecated-button>
     </div>
   </div>
 </template>

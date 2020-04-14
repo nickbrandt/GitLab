@@ -6,7 +6,7 @@ import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import * as urlUtility from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
-import App from 'ee/vulnerabilities/components/app.vue';
+import Header from 'ee/vulnerabilities/components/header.vue';
 import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
@@ -16,7 +16,7 @@ const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
 
-describe('Vulnerability management app', () => {
+describe('Vulnerability Header', () => {
   let wrapper;
 
   const defaultVulnerability = {
@@ -69,7 +69,7 @@ describe('Vulnerability management app', () => {
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
   const createWrapper = (vulnerability = {}, finding = findingWithoutIssue) => {
-    wrapper = shallowMount(App, {
+    wrapper = shallowMount(Header, {
       propsData: {
         ...dataset,
         initialVulnerability: { ...defaultVulnerability, ...vulnerability },

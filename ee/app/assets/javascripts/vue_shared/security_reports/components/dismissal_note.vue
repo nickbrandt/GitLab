@@ -77,12 +77,12 @@ export default {
       return [
         {
           iconName: 'pencil',
-          emit: 'editVulnerabilityDismissalComment',
+          onClick: () => this.$emit('editVulnerabilityDismissalComment'),
           title: __('Edit Comment'),
         },
         {
           iconName: 'remove',
-          emit: 'showDismissalDeleteButtons',
+          onClick: () => this.$emit('showDismissalDeleteButtons'),
           title: __('Delete Comment'),
         },
       ];
@@ -97,7 +97,7 @@ export default {
       :author="feedback.author"
       :created-at="feedback.created_at"
       icon-name="cancel"
-      icon-style="ci-status-icon-pending"
+      icon-class="ci-status-icon-pending"
     >
       <div v-if="feedback.created_at" v-html="eventText"></div>
     </event-item>
@@ -110,15 +110,11 @@ export default {
         :show-right-slot="isShowingDeleteButtons"
         :show-action-buttons="showDismissalCommentActions"
         icon-name="comment"
-        icon-style="ci-status-icon-pending"
-        @editVulnerabilityDismissalComment="$emit('editVulnerabilityDismissalComment')"
-        @showDismissalDeleteButtons="$emit('showDismissalDeleteButtons')"
-        @hideDismissalDeleteButtons="$emit('hideDismissalDeleteButtons')"
-        @deleteDismissalComment="$emit('deleteDismissalComment')"
+        icon-class="ci-status-icon-pending"
       >
         {{ commentDetails.comment }}
 
-        <template v-slot:right-content>
+        <template #right-content>
           <div class="d-flex flex-grow-1 align-self-start flex-row-reverse">
             <loading-button
               :label="__('Delete comment')"
