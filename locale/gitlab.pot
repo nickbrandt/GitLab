@@ -17202,6 +17202,18 @@ msgstr ""
 msgid "Requirement"
 msgstr ""
 
+msgid "Requirement %{reference} has been added"
+msgstr ""
+
+msgid "Requirement %{reference} has been archived"
+msgstr ""
+
+msgid "Requirement %{reference} has been reopened"
+msgstr ""
+
+msgid "Requirement %{reference} has been updated"
+msgstr ""
+
 msgid "Requirement title cannot have more than %{limit} characters."
 msgstr ""
 

@@ -25,6 +25,7 @@ describe 'Requirements list', :js do
 
   before do
     stub_licensed_features(requirements: true)
+    stub_feature_flags(requirements_management: { enabled: true, thing: project })
     project.add_maintainer(user)
 
     sign_in(user)
