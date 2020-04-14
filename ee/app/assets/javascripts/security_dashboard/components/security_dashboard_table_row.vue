@@ -83,6 +83,7 @@ export default {
     <div class="table-section">
       <gl-form-checkbox
         :checked="isSelected"
+        :inline="true"
         class="my-0 ml-1 mr-3"
         @change="toggleVulnerability"
       />
