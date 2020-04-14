@@ -30,7 +30,7 @@ class Packages::Package < ApplicationRecord
   validate :valid_conan_package_recipe, if: :conan?
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
-  validates :version, format: { with: Gitlab::Regex.semver_regex }, if: :npm?
+  validates :version, format: { with: Gitlab::Regex.semver_regex }, if: -> { npm? || nuget? }
   validates :name, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
   validates :version, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
 
