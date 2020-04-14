@@ -26,11 +26,7 @@ module QA
         setup_jenkins
       end
 
-      quarantine = {
-        type: :flaky,
-        issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/213953'
-      }
-      it 'integrates and displays build status for MR pipeline in GitLab', quarantine: quarantine do
+      it 'integrates and displays build status for MR pipeline in GitLab' do
         login_to_gitlab
 
         setup_project_integration_with_jenkins
