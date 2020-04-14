@@ -50,7 +50,7 @@ exports[`SubscriptionTable component when created matches the snapshot 1`] = `
     class="prepend-top-10 append-bottom-10"
     color="orange"
     label="Loading subscriptions"
-    size="3"
+    size="lg"
   />
 </div>
 `;

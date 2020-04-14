@@ -48,7 +48,7 @@ export default {
 
 <template>
   <div class="js-approval-rules">
-    <gl-loading-icon v-if="!hasLoaded" :size="2" />
+    <gl-loading-icon v-if="!hasLoaded" size="lg" />
     <template v-else>
       <div class="border-bottom">
         <slot name="rules"></slot>

@@ -43,7 +43,7 @@ export default {
   <div class="text-center">
     <div v-if="illustrationPath" class="svg-content svg-130"><img :src="illustrationPath" /></div>
     <h4>{{ __('Web Terminal') }}</h4>
-    <gl-loading-icon v-if="isLoading" :size="2" class="prepend-top-default" />
+    <gl-loading-icon v-if="isLoading" size="lg" class="prepend-top-default" />
     <template v-else>
       <p>{{ __('Run tests against your code live using the Web Terminal') }}</p>
       <p>
