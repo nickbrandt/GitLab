@@ -27,6 +27,7 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
   end
 
   def self.drop_limited_ids_cache!
+    # To prevent stale cache we also drop ElasticsearchIndexedProject cache since it uses ElasticsearchIndexedNamespace
     ElasticsearchIndexedProject.drop_limited_ids_cache!
     super
   end
@@ -56,6 +57,8 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
       ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext, CodeReuse/Worker
     end
+
+    drop_limited_ids_cache!
   end
 
   def self.unindex_last_n_namespaces_of_plan(plan, number_of_namespaces)
@@ -73,6 +76,8 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
       ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext, CodeReuse/Worker
     end
+
+    drop_limited_ids_cache!
   end
 
   private
