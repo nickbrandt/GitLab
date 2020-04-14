@@ -1,0 +1,5 @@
+---
+title: Enforce not null values on file store columns
+merge_request: 29537
+author:
+type: fixed
