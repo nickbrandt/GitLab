@@ -575,6 +575,7 @@ Supported applications:
 - [JupyterHub](#install-jupyterhub-using-gitlab-cicd)
 - [Elastic Stack](#install-elastic-stack-using-gitlab-cicd)
 - [Crossplane](#install-crossplane-using-gitlab-cicd)
+- [Fluentd](#install-fluentd-using-gitlab-cicd)
 
 ### Usage
 
@@ -1058,6 +1059,30 @@ You can customize the installation of Crossplane by defining
 management project. Refer to the
 [chart](https://github.com/crossplane/crossplane/tree/master/cluster/charts/crossplane#configuration) for the
 available configuration options. Note that this link points to the docs for the current development release, which may differ from the version you have installed. You can check out a specific version in the branch/tag switcher.
+
+### Install Fluentd using GitLab CI/CD
+
+> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/76) in GitLab 12.10.
+
+To install Fluentd into the `gitlab-managed-apps` namespace of your cluster using GitLab CI/CD, define the following configuration in `.gitlab/managed-apps/config.yaml`:
+
+```yaml
+Fluentd:
+  installed: true
+```
+
+You can also review the default values set for this chart in the [values.yaml](https://github.com/helm/charts/blob/master/stable/fluentd/values.yaml) file.
+
+You can customize the installation of Fluentd by defining
+`.gitlab/managed-apps/fluentd/values.yaml` file in your cluster management
+project. Refer to the
+[configuration chart for the current development release of Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd#configuration)
+for the available configuration options.
+
+NOTE: **Note:**
+The configuration chart link points to the current development release, which
+may differ from the version you have installed. To ensure compatibility, switch
+to the specific branch or tag you are using.
 
 ## Upgrading applications
 
