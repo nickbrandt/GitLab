@@ -8,11 +8,7 @@ import {
   EPIC_DETAILS_CELL_WIDTH,
   TIMELINE_CELL_MIN_WIDTH,
 } from 'ee/roadmap/constants';
-import {
-  mockTimeframeInitialDate,
-  mockGroupId,
-  rawMilestones,
-} from '../../../javascripts/roadmap/mock_data';
+import { mockTimeframeInitialDate, mockGroupId, rawMilestones } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 const store = createStore();

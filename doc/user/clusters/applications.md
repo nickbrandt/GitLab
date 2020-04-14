@@ -52,7 +52,7 @@ Some applications are installable only for a project-level cluster.
 Support for installing these applications in a group-level cluster is
 planned for future releases.
 For updates, see [the issue tracking
-progress](https://gitlab.com/gitlab-org/gitlab-foss/issues/51989).
+progress](https://gitlab.com/gitlab-org/gitlab/-/issues/24411).
 
 CAUTION: **Caution:**
 If you have an existing Kubernetes cluster with Helm already installed,
@@ -295,7 +295,7 @@ from processing any requests for the given application or environment.
 1. Switching its respective toggle to the disabled position and applying changes through the **Save changes** button. This will reinstall
 Ingress with the recent changes.
 
-![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_9.png)
+![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_10.png)
 
 ##### Viewing Web Application Firewall traffic
 
@@ -312,7 +312,7 @@ From there, you can see tracked over time:
 
 If a significant percentage of traffic is anomalous, it should be investigated
 for potential threats, which can be done by
-[examining the application logs](#web-application-firewall-modsecurity).
+[examining the Web Application Firewall logs](#web-application-firewall-modsecurity).
 
 ![Threat Monitoring](img/threat_monitoring_v12_9.png)
 
@@ -754,7 +754,7 @@ available configuration options.
 [Cilium](https://cilium.io/) is a networking plugin for Kubernetes
 that you can use to implement support for
 [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-resources. For more information on [Network Policies](../../topics/autodevops/index.md#network-policy), see the documentation.
+resources. For more information on [Network Policies](../../topics/autodevops/stages.md#network-policy), see the documentation.
 
 Enable Cilium in the `.gitlab/managed-apps/config.yaml` file to install it:
 
@@ -823,6 +823,28 @@ You can disable the monitor log in `.gitlab/managed-apps/cilium/values.yaml`:
 agent:
   monitor:
     enabled: false
+```
+
+The [Hubble](https://github.com/cilium/hubble) monitoring daemon is
+enabled by default and it's set to collect per namespace flow
+metrics. This metrics are accessible on the [Threat Monitoring](../application_security/threat_monitoring/index.md)
+dashboard. You can disable Hubble by adding the following to
+`.gitlab/managed-apps/config.yaml`:
+
+```yaml
+cilium:
+  installed: true
+  hubble:
+    installed: false
+```
+
+You can also adjust Helm values for Hubble via
+`.gitlab/managed-apps/cilium/hubble-values.yaml`:
+
+```yaml
+metrics:
+  enabled:
+    - 'flow:sourceContext=namespace;destinationContext=namespace'
 ```
 
 ### Install Vault using GitLab CI/CD
@@ -1094,3 +1116,22 @@ To avoid installation errors:
   kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem
   diff a.pem b.pem
   ```
+
+### Error installing managed apps on EKS cluster
+
+If you're using a managed cluster on AWS EKS, and you are not able to install some of the managed
+apps, consider checking the logs.
+
+You can check the logs by running following commands:
+
+```shell
+kubectl get pods --all-namespaces
+kubectl get services --all-namespaces
+```
+
+If you are getting the `Failed to assign an IP address to container` error, it's probably due to the
+instance type you've specified in the AWS configuration.
+The number and size of nodes might not have enough IP addresses to run or install those pods.
+
+For reference, all the AWS instance IP limits are found
+[in this AWS repository on GitHub](https://github.com/aws/amazon-vpc-cni-k8s/blob/master/pkg/awsutils/vpc_ip_resource_limit.go) (search for `InstanceENIsAvailable`).

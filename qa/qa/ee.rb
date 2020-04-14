@@ -77,6 +77,12 @@ module QA
             autoload :Elasticsearch, 'qa/ee/page/admin/settings/component/elasticsearch'
           end
         end
+
+        module Overview
+          module Groups
+            autoload :Edit, 'qa/ee/page/admin/overview/groups/edit'
+          end
+        end
       end
 
       module Profile

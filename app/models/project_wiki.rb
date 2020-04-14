@@ -44,20 +44,20 @@ class ProjectWiki
   # @deprecated use full_path when you need it for an URL route or disk_path when you want to point to the filesystem
   alias_method :path_with_namespace, :full_path
 
-  def web_url
-    Gitlab::Routing.url_helpers.project_wiki_url(@project, :home)
+  def web_url(only_path: nil)
+    Gitlab::UrlBuilder.build(self, only_path: only_path)
   end
 
   def url_to_repo
-    Gitlab::Shell.url_to_repo(full_path)
+    ssh_url_to_repo
   end
 
   def ssh_url_to_repo
-    url_to_repo
+    Gitlab::RepositoryUrlBuilder.build(repository.full_path, protocol: :ssh)
   end
 
   def http_url_to_repo
-    @project.http_url_to_repo.sub(%r{git\z}, 'wiki.git')
+    Gitlab::RepositoryUrlBuilder.build(repository.full_path, protocol: :http)
   end
 
   def wiki_base_path

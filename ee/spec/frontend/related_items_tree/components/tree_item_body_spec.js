@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlDeprecatedButton, GlLink } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLink, GlIcon } from '@gitlab/ui';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 
@@ -14,7 +14,6 @@ import { PathIdSeparator } from 'ee/related_issues/constants';
 import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import ItemDueDate from '~/boards/components/issue_due_date.vue';
 import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 
 import { mockParentItem, mockInitialConfig, mockQueryResponse, mockIssue1 } from '../mock_data';
 
@@ -51,6 +50,22 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
       item,
     },
   });
+};
+
+const createEpicComponent = () => {
+  const mockEpicItem = {
+    ...mockItem,
+    type: ChildType.Epic,
+    healthStatus: mockParentItem.healthStatus,
+    descendantCounts: {
+      openedEpics: 0,
+      closedEpics: 0,
+      openedIssues: 0,
+      closedIssues: 0,
+    },
+  };
+
+  return createComponent(mockParentItem, mockEpicItem);
 };
 
 describe('RelatedItemsTree', () => {
@@ -169,18 +184,6 @@ describe('RelatedItemsTree', () => {
       });
 
       describe('stateIconName', () => {
-        it('returns string `epic` when `item.type` value is `epic`', () => {
-          wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              type: ChildType.Epic,
-            }),
-          });
-
-          return wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.stateIconName).toBe('epic');
-          });
-        });
-
         it('returns string `issues` when `item.type` value is `issue`', () => {
           wrapper.setProps({
             item: Object.assign({}, mockItem, {
@@ -191,6 +194,14 @@ describe('RelatedItemsTree', () => {
           return wrapper.vm.$nextTick(() => {
             expect(wrapper.vm.stateIconName).toBe('issues');
           });
+        });
+
+        it('returns string `epic` when `item.type` value is `epic`', () => {
+          const epicItemWrapper = createEpicComponent();
+
+          expect(epicItemWrapper.vm.stateIconName).toBe('epic');
+
+          epicItemWrapper.destroy();
         });
       });
 
@@ -220,12 +231,6 @@ describe('RelatedItemsTree', () => {
         });
       });
 
-      describe('itemPath', () => {
-        it('returns string containing item path', () => {
-          expect(wrapper.vm.itemPath).toBe('gitlab-org/gitlab-shell');
-        });
-      });
-
       describe('itemId', () => {
         it('returns string containing item id', () => {
           expect(wrapper.vm.itemId).toBe('8');
@@ -247,6 +252,20 @@ describe('RelatedItemsTree', () => {
           return wrapper.vm.$nextTick(() => {
             expect(wrapper.vm.computedPath).toBeNull();
           });
+        });
+      });
+
+      describe('isEpic', () => {
+        it('returns false when item type is issue', () => {
+          expect(wrapper.vm.isEpic).toBe(false);
+        });
+
+        it('returns true when item type is epic', () => {
+          const epicItemWrapper = createEpicComponent();
+
+          expect(epicItemWrapper.vm.isEpic).toBe(true);
+
+          epicItemWrapper.destroy();
         });
       });
     });
@@ -276,7 +295,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders item state icon for large screens', () => {
-        const statusIcon = wrapper.findAll(Icon).at(0);
+        const statusIcon = wrapper.findAll(GlIcon).at(0);
 
         expect(statusIcon.props('name')).toBe('issues');
       });
@@ -297,7 +316,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders confidential icon when `item.confidential` is true', () => {
-        const confidentialIcon = wrapper.findAll(Icon).at(1);
+        const confidentialIcon = wrapper.findAll(GlIcon).at(1);
 
         expect(confidentialIcon.isVisible()).toBe(true);
         expect(confidentialIcon.props('name')).toBe('eye-slash');
@@ -310,14 +329,8 @@ describe('RelatedItemsTree', () => {
         expect(link.text()).toBe(mockItem.title);
       });
 
-      it('renders item state icon for medium and small screens', () => {
-        const statusIcon = wrapper.findAll(Icon).at(2);
-
-        expect(statusIcon.props('name')).toBe('issues');
-      });
-
       it('renders item state tooltip for medium and small screens', () => {
-        const stateTooltip = wrapper.findAll(StateTooltip).at(1);
+        const stateTooltip = wrapper.findAll(StateTooltip).at(0);
 
         expect(stateTooltip.props('state')).toBe(mockItem.state);
       });
@@ -351,6 +364,18 @@ describe('RelatedItemsTree', () => {
 
         expect(removeButton.isVisible()).toBe(true);
         expect(removeButton.attributes('title')).toBe('Remove');
+      });
+
+      it('does not render issue count badge when item is issue', () => {
+        expect(wrapper.find('.issue-count-badge').exists()).toBe(false);
+      });
+
+      it('render issue count badge when item is epic', () => {
+        const epicWrapper = createEpicComponent();
+
+        expect(epicWrapper.find('.issue-count-badge').exists()).toBe(true);
+
+        epicWrapper.destroy();
       });
     });
   });

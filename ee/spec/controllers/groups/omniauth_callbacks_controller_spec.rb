@@ -68,6 +68,16 @@ describe Groups::OmniauthCallbacksController do
         expect(response).to redirect_to('/explore')
       end
 
+      it 'logs group audit event for authentication' do
+        audit_event_service = instance_double(AuditEventService)
+
+        expect(AuditEventService).to receive(:new).with(user, group, with: provider)
+          .and_return(audit_event_service)
+        expect(audit_event_service).to receive_message_chain(:for_authentication, :security_event)
+
+        post provider, params: { group_id: group }
+      end
+
       include_examples 'works with session enforcement'
     end
 

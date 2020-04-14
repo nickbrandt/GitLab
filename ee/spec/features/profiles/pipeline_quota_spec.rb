@@ -13,6 +13,7 @@ describe 'Profile > Pipeline Quota' do
 
   before do
     gitlab_sign_in(user)
+    stub_feature_flags(user_usage_quota: false)
   end
 
   it 'is linked within the profile page' do

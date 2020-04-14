@@ -180,21 +180,49 @@ describe API::Projects do
       end
     end
 
-    describe 'marked_for_deletion attribute' do
-      it 'exposed when the feature is available' do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+    context 'project soft-deletion' do
+      subject { get api("/projects/#{project.id}", user) }
 
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).to have_key 'marked_for_deletion_at'
+      let(:project) do
+        create(:project, :public, archived: true, marked_for_deletion_at: 1.day.ago, deleting_user: user)
       end
 
-      it 'not exposed when the feature is not available' do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      describe 'marked_for_deletion_at attribute' do
+        it 'exposed when the feature is available' do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
 
-        get api("/projects/#{project.id}", user)
+          subject
 
-        expect(json_response).not_to have_key 'marked_for_deletion_at'
+          expect(json_response).to have_key 'marked_for_deletion_at'
+          expect(Date.parse(json_response['marked_for_deletion_at'])).to eq(project.marked_for_deletion_at)
+        end
+
+        it 'not exposed when the feature is not available' do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+
+          subject
+
+          expect(json_response).not_to have_key 'marked_for_deletion_at'
+        end
+      end
+
+      describe 'marked_for_deletion_on attribute' do
+        it 'exposed when the feature is available' do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+
+          subject
+
+          expect(json_response).to have_key 'marked_for_deletion_on'
+          expect(Date.parse(json_response['marked_for_deletion_on'])).to eq(project.marked_for_deletion_at)
+        end
+
+        it 'not exposed when the feature is not available' do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+
+          subject
+
+          expect(json_response).not_to have_key 'marked_for_deletion_on'
+        end
       end
     end
   end
@@ -621,6 +649,7 @@ describe API::Projects do
         expect(response).to have_gitlab_http_status(:created)
         expect(json_response['archived']).to be_falsey
         expect(json_response['marked_for_deletion_at']).to be_falsey
+        expect(json_response['marked_for_deletion_on']).to be_falsey
       end
 
       it 'returns error if project is already being deleted' do

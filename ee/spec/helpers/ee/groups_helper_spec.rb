@@ -233,6 +233,16 @@ describe GroupsHelper do
 
         expect(helper.show_administration_nav?(subgroup)).to be false
       end
+
+      context 'when `group_administration_nav_item` feature flag is disabled for the group' do
+        before do
+          stub_feature_flags(group_administration_nav_item: { enabled: false, thing: group })
+        end
+
+        it 'returns false' do
+          expect(helper.show_administration_nav?(group)).to be false
+        end
+      end
     end
   end
 

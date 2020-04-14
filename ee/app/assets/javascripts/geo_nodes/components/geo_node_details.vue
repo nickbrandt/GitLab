@@ -79,7 +79,7 @@ export default {
       :node-removal-allowed="nodeRemovalAllowed"
       :version-mismatch="hasVersionMismatch"
     />
-    <node-details-section-sync v-if="!node.primary" :node-details="nodeDetails" />
+    <node-details-section-sync v-if="!node.primary" :node="node" :node-details="nodeDetails" />
     <node-details-section-verification
       v-if="nodeDetails.repositoryVerificationEnabled"
       :node-details="nodeDetails"

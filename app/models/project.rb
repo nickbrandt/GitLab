@@ -4,7 +4,6 @@ require 'carrierwave/orm/activerecord'
 
 class Project < ApplicationRecord
   include Gitlab::ConfigHelper
-  include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
   include AccessRequestable
   include Avatarable
@@ -787,6 +786,10 @@ class Project < ApplicationRecord
     Feature.enabled?(:context_commits, default_enabled: true)
   end
 
+  def jira_issues_import_feature_flag_enabled?
+    Feature.enabled?(:jira_issue_import, self, default_enabled: true)
+  end
+
   def team
     @team ||= ProjectTeam.new(self)
   end
@@ -860,9 +863,7 @@ class Project < ApplicationRecord
   end
 
   def jira_import_status
-    return import_status if jira_force_import?
-
-    import_data&.becomes(JiraImportData)&.projects.blank? ? 'none' : 'finished'
+    latest_jira_import&.status || 'initial'
   end
 
   def human_import_status_name
@@ -876,8 +877,6 @@ class Project < ApplicationRecord
       elsif gitlab_project_import?
         # Do not retry on Import/Export until https://gitlab.com/gitlab-org/gitlab-foss/issues/26189 is solved.
         RepositoryImportWorker.set(retry: false).perform_async(self.id)
-      elsif jira_import?
-        Gitlab::JiraImport::Stage::StartImportWorker.perform_async(self.id)
       else
         RepositoryImportWorker.perform_async(self.id)
       end
@@ -910,7 +909,7 @@ class Project < ApplicationRecord
 
   # This method is overridden in EE::Project model
   def remove_import_data
-    import_data&.destroy unless jira_import?
+    import_data&.destroy
   end
 
   def ci_config_path=(value)
@@ -973,11 +972,7 @@ class Project < ApplicationRecord
   end
 
   def jira_import?
-    import_type == 'jira' && Feature.enabled?(:jira_issue_import, self)
-  end
-
-  def jira_force_import?
-    jira_import? && import_data&.becomes(JiraImportData)&.force_import?
+    import_type == 'jira' && latest_jira_import.present? && jira_issues_import_feature_flag_enabled?
   end
 
   def gitlab_project_import?
@@ -1120,10 +1115,6 @@ class Project < ApplicationRecord
     elsif cross_project_reference?(from)
       name
     end
-  end
-
-  def web_url(only_path: nil)
-    Gitlab::Routing.url_helpers.project_url(self, only_path: only_path)
   end
 
   def readme_url

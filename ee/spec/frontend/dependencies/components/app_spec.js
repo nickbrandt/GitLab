@@ -25,7 +25,7 @@ describe('DependenciesApp component', () => {
     supportDocumentationPath: `${TEST_HOST}/dependency_scanning#supported-languages`,
   };
 
-  const factory = (props = basicAppProps) => {
+  const factory = ({ props = basicAppProps, ...options } = {}) => {
     store = createStore();
     addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
     jest.spyOn(store, 'dispatch').mockImplementation();
@@ -37,6 +37,7 @@ describe('DependenciesApp component', () => {
       store,
       propsData: { ...props },
       stubs,
+      ...options,
     });
   };
 
@@ -122,6 +123,12 @@ describe('DependenciesApp component', () => {
 
   const expectNoDependenciesTables = () => expect(findDependenciesTables()).toHaveLength(0);
   const expectNoHeader = () => expect(findHeader().exists()).toBe(false);
+
+  const expectDependenciesTable = () => {
+    const tables = findDependenciesTables();
+    expect(tables).toHaveLength(1);
+    expect(tables.at(0).props()).toEqual({ namespace: allNamespace });
+  };
 
   const expectDependenciesTables = () => {
     const tables = findDependenciesTables();
@@ -352,6 +359,159 @@ describe('DependenciesApp component', () => {
         expectComponentPropsToMatchSnapshot(GlEmptyState);
         expectNoHeader();
         expectNoDependenciesTables();
+      });
+    });
+  });
+
+  describe('given the dependencyListUi feature flag is enabled', () => {
+    describe('on creation', () => {
+      beforeEach(() => {
+        factory({ provide: { glFeatures: { dependencyListUi: true } } });
+      });
+
+      it('dispatches the correct initial actions', () => {
+        expect(store.dispatch.mock.calls).toEqual([
+          ['setDependenciesEndpoint', basicAppProps.endpoint],
+          ['fetchDependencies'],
+        ]);
+      });
+
+      it('shows only the loading icon', () => {
+        expectComponentWithProps(GlLoadingIcon);
+        expectNoHeader();
+        expectNoDependenciesTables();
+      });
+
+      describe('given the dependency list job has not yet run', () => {
+        beforeEach(() => {
+          setStateJobNotRun();
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('shows only the empty state', () => {
+          expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+          expectComponentPropsToMatchSnapshot(GlEmptyState);
+          expectNoHeader();
+          expectNoDependenciesTables();
+        });
+      });
+
+      describe('given a list of dependencies and ok report', () => {
+        beforeEach(() => {
+          setStateLoaded();
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('shows the dependencies table with the correct props', () => {
+          expectHeader();
+          expectDependenciesTable();
+        });
+
+        it('shows a link to the latest job', () => {
+          expect(findHeaderJobLink().attributes('href')).toBe('/jobs/foo/321');
+        });
+
+        it('shows when the last job ran', () => {
+          expect(findHeader().text()).toContain('1 week ago');
+        });
+
+        it('shows a link to the dependencies documentation page', () => {
+          expect(findHeaderHelpLink().attributes('href')).toBe(TEST_HOST);
+        });
+
+        it('passes the correct namespace to dependencies actions component', () => {
+          expectComponentWithProps(DependenciesActions, { namespace: allNamespace });
+        });
+
+        describe('given the user has public permissions', () => {
+          beforeEach(() => {
+            store.state[allNamespace].reportInfo.generatedAt = '';
+            store.state[allNamespace].reportInfo.jobPath = '';
+
+            return wrapper.vm.$nextTick();
+          });
+
+          it('shows the header', () => {
+            expectHeader();
+          });
+
+          it('does not show when the last job ran', () => {
+            expect(findHeader().text()).not.toContain('1 week ago');
+          });
+
+          it('does not show a link to the latest job', () => {
+            expect(findHeaderJobLink().exists()).toBe(false);
+          });
+        });
+      });
+
+      describe('given the dependency list job failed', () => {
+        beforeEach(() => {
+          setStateJobFailed();
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('passes the correct props to the job failure alert', () => {
+          expectComponentWithProps(DependencyListJobFailedAlert, {
+            jobPath: '/jobs/foo/321',
+          });
+        });
+
+        it('shows the dependencies table with the correct props', expectDependenciesTable);
+
+        describe('when the job failure alert emits the dismiss event', () => {
+          beforeEach(() => {
+            const alertWrapper = findJobFailedAlert();
+            alertWrapper.vm.$emit('dismiss');
+            return wrapper.vm.$nextTick();
+          });
+
+          it('does not render the job failure alert', () => {
+            expect(findJobFailedAlert().exists()).toBe(false);
+          });
+        });
+      });
+
+      describe('given a dependency list which is known to be incomplete', () => {
+        beforeEach(() => {
+          setStateListIncomplete();
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('passes the correct props to the incomplete-list alert', () => {
+          expectComponentWithProps(DependencyListIncompleteAlert);
+        });
+
+        it('shows the dependencies table with the correct props', expectDependenciesTable);
+
+        describe('when the incomplete-list alert emits the dismiss event', () => {
+          beforeEach(() => {
+            const alertWrapper = findIncompleteListAlert();
+            alertWrapper.vm.$emit('dismiss');
+            return wrapper.vm.$nextTick();
+          });
+
+          it('does not render the incomplete-list alert', () => {
+            expect(findIncompleteListAlert().exists()).toBe(false);
+          });
+        });
+      });
+
+      describe('given there are no dependencies detected', () => {
+        beforeEach(() => {
+          setStateNoDependencies();
+        });
+
+        it('shows only the empty state', () => {
+          expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+          expectComponentPropsToMatchSnapshot(GlEmptyState);
+          expectNoHeader();
+          expectNoDependenciesTables();
+        });
       });
     });
   });

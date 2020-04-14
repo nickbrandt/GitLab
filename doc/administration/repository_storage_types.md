@@ -100,7 +100,7 @@ The "Gitaly relative path" is shown there, for example:
 This is the path under `/var/opt/gitlab/git-data/repositories/` on a
 default Omnibus installation.
 
-In a [Rails console](troubleshooting/debug.md#starting-a-rails-console),
+In a [Rails console](troubleshooting/debug.md#starting-a-rails-console-session),
 get this information using either the numeric project ID or the full path:
 
 ```ruby
@@ -112,7 +112,7 @@ Project.find_by_full_path('group/project').disk_path
 
 To translate from a hashed storage path to a project name:
 
-1. Start a [Rails console](troubleshooting/debug.md#starting-a-rails-console).
+1. Start a [Rails console](troubleshooting/debug.md#starting-a-rails-console-session).
 1. Run the following:
 
 ```ruby
@@ -245,7 +245,7 @@ storage pattern using 2 chars, 2 level folders, following Git's own implementati
 "shared/lfs-objects/89/09/029eb962194cfb326259411b22ae3f4a814b5be4f80651735aeef9f3229c"
 ```
 
-LFS objects are also [S3 compatible](lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage).
+LFS objects are also [S3 compatible](lfs/index.md#storing-lfs-objects-in-remote-object-storage).
 
 [ce-2821]: https://gitlab.com/gitlab-com/infrastructure/issues/2821
 [ce-28283]: https://gitlab.com/gitlab-org/gitlab-foss/issues/28283

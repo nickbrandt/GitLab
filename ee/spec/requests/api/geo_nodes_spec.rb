@@ -199,7 +199,7 @@ describe API::GeoNodes, :request_store, :geo_fdw, :prometheus, api: true do
     end
 
     it 'returns 200 for the primary node' do
-      set_current_geo_node!(primary)
+      stub_current_geo_node(primary)
       create(:geo_node_status, :healthy, geo_node: primary)
 
       post api("/geo_nodes/#{primary.id}/repair", admin)

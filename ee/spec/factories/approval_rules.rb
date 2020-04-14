@@ -23,9 +23,9 @@ FactoryBot.define do
       approvals_required { rand(1..ApprovalProjectRule::APPROVALS_REQUIRED_MAX) }
     end
 
-    trait :license_management do
+    trait :license_scanning do
       name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
-      report_type { :license_management }
+      report_type { :license_scanning }
     end
   end
 
@@ -52,7 +52,7 @@ FactoryBot.define do
       security_report
     end
 
-    trait :license_management do
+    trait :license_scanning do
       name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
       rule_type { :report_approver }
     end

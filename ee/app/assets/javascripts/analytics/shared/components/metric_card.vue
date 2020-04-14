@@ -37,7 +37,7 @@ export default {
           v-for="metric in metrics"
           :key="metric.key"
           ref="metricItem"
-          class="flex-grow text-center"
+          class="js-metric-card-item flex-grow text-center"
         >
           <h3 class="my-2">
             <template v-if="metric.value === null"

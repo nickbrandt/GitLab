@@ -104,7 +104,10 @@ For this guide, we need to install Ingress. Ingress provides load balancing,
 SSL termination, and name-based virtual hosting, using NGINX behind
 the scenes. Make sure to switch the toogle to the enabled position before installing.
 
-![Cluster applications](./img/guide_waf_ingress_installation_v12_9.png)
+Both logging and blocking modes are available for WAF. While logging mode is useful for
+auditing anomalous traffic, blocking mode ensures the traffic doesn't reach past Ingress.
+
+![Cluster applications](./img/guide_waf_ingress_installation_v12_10.png)
 
 After Ingress is installed, wait a few seconds and copy the IP address that
 is displayed in order to add in your base **Domain** at the top of the page. For
@@ -150,12 +153,12 @@ The pipeline is split into a few stages, each running a couple of jobs.
 ![Pipeline stages](../autodevops/img/guide_pipeline_stages_v12_3.png)
 
 In the **build** stage, the application is built into a Docker image and then
-uploaded to your project's [Container Registry](../../user/packages/container_registry/index.md) ([Auto Build](../autodevops/index.md#auto-build)).
+uploaded to your project's [Container Registry](../../user/packages/container_registry/index.md) ([Auto Build](../autodevops/stages.md#auto-build)).
 
 In the **test** stage, GitLab runs various checks on the application.
 
 The **production** stage is run after the tests and checks finish, and it automatically
-deploys the application in Kubernetes ([Auto Deploy](../autodevops/index.md#auto-deploy)).
+deploys the application in Kubernetes ([Auto Deploy](../autodevops/stages.md#auto-deploy)).
 
 The **production** stage creates Kubernetes objects
 like a Deployment, Service, and Ingress resource. The

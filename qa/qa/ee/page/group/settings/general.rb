@@ -57,10 +57,16 @@ module QA
             end
 
             def set_ip_address_restriction(ip_address)
+              QA::Runtime::Logger.debug(%Q[Setting ip address restriction to: #{ip_address}])
               expand_section(:permission_lfs_2fa_section)
               find_element(:ip_restriction_field).send_keys([:command, 'a'], :backspace)
               find_element(:ip_restriction_field).set ip_address
               click_element :save_permissions_changes_button
+            end
+
+            def restricted_ip_address
+              expand_section(:permission_lfs_2fa_section)
+              find_element(:ip_restriction_field).value
             end
 
             def set_membership_lock_enabled

@@ -6,29 +6,27 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
-import Scatterplot from '../../shared/components/scatterplot.vue';
-import { LAST_ACTIVITY_AT, dateFormats, DATE_RANGE_LIMIT } from '../../shared/constants';
+import { LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
-import StageDropdownFilter from './stage_dropdown_filter.vue';
-import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
+import DurationChart from './duration_chart.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
 import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
 import { toYmd } from '../../shared/utils';
+import RecentActivityCard from './recent_activity_card.vue';
 
 export default {
   name: 'CycleAnalytics',
   components: {
     DateRange,
+    DurationChart,
     GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
-    SummaryTable,
     StageTable,
-    StageDropdownFilter,
-    Scatterplot,
     TasksByTypeChart,
+    RecentActivityCard,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -84,6 +82,7 @@ export default {
       'activeStages',
       'selectedProjectIds',
       'enableCustomOrdering',
+      'cycleAnalyticsRequestParams',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -213,7 +212,6 @@ export default {
     order_by: LAST_ACTIVITY_AT,
     include_subgroups: true,
   },
-  durationChartTooltipDateFormat: dateFormats.defaultDate,
   maxDateRange: DATE_RANGE_LIMIT,
 };
 </script>
@@ -281,11 +279,16 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
+        <div class="js-recent-activity mt-3">
+          <recent-activity-card
+            :group-path="currentGroupPath"
+            :additional-params="cycleAnalyticsRequestParams"
+          />
+        </div>
         <div v-if="isLoading">
           <gl-loading-icon class="mt-4" size="md" />
         </div>
         <div v-else>
-          <summary-table class="js-summary-table" :items="summary" />
           <stage-table
             v-if="selectedStage"
             :key="stageCount"
@@ -317,31 +320,15 @@ export default {
           />
         </div>
       </div>
-      <template v-if="shouldDisplayDurationChart">
-        <template v-if="isDurationChartLoaded">
-          <div class="mt-3 d-flex">
-            <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
-            <stage-dropdown-filter
-              v-if="activeStages.length"
-              class="ml-auto"
-              :stages="activeStages"
-              @selected="onDurationStageSelect"
-            />
-          </div>
-          <scatterplot
-            v-if="durationChartPlottableData"
-            :x-axis-title="s__('CycleAnalytics|Date')"
-            :y-axis-title="s__('CycleAnalytics|Total days to completion')"
-            :tooltip-date-format="$options.durationChartTooltipDateFormat"
-            :scatter-data="durationChartPlottableData"
-            :median-line-data="durationChartMedianData"
-          />
-          <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
-            {{ __('There is no data available. Please change your selection.') }}
-          </div>
-        </template>
-        <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
-      </template>
+      <div v-if="shouldDisplayDurationChart" class="mt-3">
+        <duration-chart
+          :is-loading="isLoading"
+          :stages="activeStages"
+          :scatter-data="durationChartPlottableData"
+          :median-line-data="durationChartMedianData"
+          @stageSelected="onDurationStageSelect"
+        />
+      </div>
       <template v-if="shouldDisplayTasksByTypeChart">
         <div class="js-tasks-by-type-chart">
           <div v-if="isTasksByTypeChartLoaded">

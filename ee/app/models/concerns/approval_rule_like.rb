@@ -7,7 +7,7 @@ module ApprovalRuleLike
   DEFAULT_NAME_FOR_LICENSE_REPORT = 'License-Check'
   DEFAULT_NAME_FOR_SECURITY_REPORT = 'Vulnerability-Check'
   REPORT_TYPES_BY_DEFAULT_NAME = {
-    DEFAULT_NAME_FOR_LICENSE_REPORT => :license_management,
+    DEFAULT_NAME_FOR_LICENSE_REPORT => :license_scanning,
     DEFAULT_NAME_FOR_SECURITY_REPORT => :security
   }.freeze
   APPROVALS_REQUIRED_MAX = 100
@@ -53,5 +53,14 @@ module ApprovalRuleLike
 
   def user_defined?
     regular? || any_approver?
+  end
+
+  def overridden?
+    return false unless source_rule.present?
+
+    source_rule.name != name ||
+      source_rule.approvals_required != approvals_required ||
+      source_rule.user_ids.to_set != user_ids.to_set ||
+      source_rule.group_ids.to_set != group_ids.to_set
   end
 end

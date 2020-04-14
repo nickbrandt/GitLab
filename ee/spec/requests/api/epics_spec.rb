@@ -527,7 +527,8 @@ describe API::Epics do
         labels: 'label1',
         due_date_fixed: '2018-07-17',
         due_date_is_fixed: true,
-        parent_id: parent_epic.id
+        parent_id: parent_epic.id,
+        confidential: true
       }
     end
 
@@ -573,6 +574,7 @@ describe API::Epics do
           expect(epic.labels.first.title).to eq('label1')
           expect(epic.parent).to eq(parent_epic)
           expect(epic.relative_position).not_to be_nil
+          expect(epic.confidential).to be_truthy
         end
 
         context 'when deprecated start_date and end_date params are present' do
@@ -586,6 +588,20 @@ describe API::Epics do
             expect(result.start_date_fixed).to eq(start_date)
             expect(result.due_date_fixed).to eq(due_date)
           end
+        end
+      end
+
+      context 'when confidential_epics flag is disabled' do
+        before do
+          stub_feature_flags(confidential_epics: false)
+
+          post api(url, user), params: params
+        end
+
+        it 'ignores confidential attribute' do
+          epic = Epic.last
+
+          expect(epic.confidential).to be_falsey
         end
       end
 
@@ -615,7 +631,8 @@ describe API::Epics do
         description: 'new description',
         labels: 'label2',
         start_date_fixed: "2018-07-17",
-        start_date_is_fixed: true
+        start_date_is_fixed: true,
+        confidential: true
       }
     end
 
@@ -673,6 +690,20 @@ describe API::Epics do
             expect(result.start_date_is_fixed).to eq(true)
             expect(result.due_date_fixed).to eq(nil)
             expect(result.due_date_is_fixed).to be_falsey
+            expect(result.confidential).to be_truthy
+          end
+        end
+
+        context 'when confidential_epics flag is disabled' do
+          before do
+            stub_feature_flags(confidential_epics: false)
+            stub_licensed_features(epics: true)
+
+            put api(url, user), params: params
+          end
+
+          it 'does not include confidential attribute' do
+            expect(epic.reload.confidential).to be_falsey
           end
         end
 

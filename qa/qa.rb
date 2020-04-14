@@ -168,6 +168,7 @@ module QA
       autoload :Menu, 'qa/page/main/menu'
       autoload :OAuth, 'qa/page/main/oauth'
       autoload :SignUp, 'qa/page/main/sign_up'
+      autoload :Terms, 'qa/page/main/terms'
     end
 
     module Settings
@@ -368,6 +369,12 @@ module QA
         module Users
           autoload :Index, 'qa/page/admin/overview/users/index'
           autoload :Show, 'qa/page/admin/overview/users/show'
+        end
+
+        module Groups
+          autoload :Index, 'qa/page/admin/overview/groups/index'
+          autoload :Show, 'qa/page/admin/overview/groups/show'
+          autoload :Edit, 'qa/page/admin/overview/groups/edit'
         end
       end
     end

@@ -1,8 +1,15 @@
 const createState = (initialState = {}) => ({
-  isLoadingContent: false,
-  isContentLoaded: false,
+  username: null,
+  projectId: null,
+  sourcePath: null,
 
+  isLoadingContent: false,
+  isSavingChanges: false,
+
+  originalContent: '',
   content: '',
+  title: '',
+
   ...initialState,
 });
 

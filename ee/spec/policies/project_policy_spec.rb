@@ -1281,4 +1281,37 @@ describe ProjectPolicy do
   it_behaves_like 'resource with requirement permissions' do
     let(:resource) { project }
   end
+
+  describe ':compliance_framework_available' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:policy) { :admin_compliance_framework }
+
+    where(:role, :feature_enabled, :allowed) do
+      :guest      | false | false
+      :guest      | true  | false
+      :reporter   | false | false
+      :reporter   | true  | false
+      :developer  | false | false
+      :developer  | true  | false
+      :maintainer | false | false
+      :maintainer | true  | true
+      :owner      | false | false
+      :owner      | true  | true
+      :admin      | false | false
+      :admin      | true  | true
+    end
+
+    with_them do
+      let(:current_user) { public_send(role) }
+
+      before do
+        stub_licensed_features(compliance_framework: feature_enabled)
+      end
+
+      it do
+        is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+      end
+    end
+  end
 end

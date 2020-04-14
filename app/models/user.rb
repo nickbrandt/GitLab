@@ -23,6 +23,7 @@ class User < ApplicationRecord
   include BatchDestroyDependentAssociations
   include HasUniqueInternalUsers
   include IgnorableColumns
+  include UpdateHighestRole
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -109,7 +110,6 @@ class User < ApplicationRecord
 
   # Groups
   has_many :members
-  has_one  :max_access_level_membership, -> { select(:id, :user_id, :access_level).order(access_level: :desc).readonly }, class_name: 'Member'
   has_many :group_members, -> { where(requested_at: nil) }, source: 'GroupMember'
   has_many :groups, through: :group_members
   has_many :owned_groups, -> { where(members: { access_level: Gitlab::Access::OWNER }) }, through: :group_members, source: :group
@@ -239,7 +239,6 @@ class User < ApplicationRecord
       end
     end
   end
-  after_commit :update_highest_role, on: [:create, :update]
 
   after_initialize :set_projects_limit
 
@@ -1080,7 +1079,7 @@ class User < ApplicationRecord
   end
 
   def highest_role
-    max_access_level_membership&.access_level || Gitlab::Access::NO_ACCESS
+    user_highest_role&.highest_access_level || Gitlab::Access::NO_ACCESS
   end
 
   def accessible_deploy_keys
@@ -1855,20 +1854,15 @@ class User < ApplicationRecord
     last_active_at.to_i <= MINIMUM_INACTIVE_DAYS.days.ago.to_i
   end
 
-  # Triggers the service to schedule a Sidekiq job to update the highest role
-  # for a User
-  #
-  # The job will be called outside of a transaction in order to ensure the changes
-  # for a Member to be commited before attempting to update the highest role.
-  # rubocop: disable CodeReuse/ServiceClass
-  def update_highest_role
-    return unless (previous_changes.keys & %w(state user_type ghost)).any?
+  def update_highest_role?
+    return false unless persisted?
 
-    run_after_commit_or_now do
-      Members::UpdateHighestRoleService.new(id).execute
-    end
+    (previous_changes.keys & %w(state user_type ghost)).any?
   end
-  # rubocop: enable CodeReuse/ServiceClass
+
+  def update_highest_role_attribute
+    id
+  end
 end
 
 User.prepend_if_ee('EE::User')

@@ -5,7 +5,7 @@ module VulnerabilitiesHelper
     return unless vulnerability
 
     {
-      vulnerability_json: vulnerability.to_json,
+      vulnerability_json: VulnerabilitySerializer.new.represent(vulnerability).to_json,
       project_fingerprint: vulnerability.finding.project_fingerprint,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       pipeline_json: vulnerability_pipeline_data(pipeline).to_json,
@@ -40,5 +40,16 @@ module VulnerabilitiesHelper
     ).merge(
       solution: remediation ? remediation['summary'] : occurrence[:solution]
     )
+  end
+
+  def vulnerability_file_link(vulnerability)
+    finding = vulnerability.finding
+    location = finding.location
+    branch = finding.pipelines&.last&.sha || vulnerability.project.default_branch
+    link_text = "#{location['file']}:#{location['start_line']}"
+    offset = location['start_line'] ? "#L#{location['start_line']}" : ''
+    link_path = project_blob_path(vulnerability.project, tree_join(branch, location['file'])) + offset
+
+    link_to link_text, link_path, target: '_blank', rel: 'noopener noreferrer'
   end
 end

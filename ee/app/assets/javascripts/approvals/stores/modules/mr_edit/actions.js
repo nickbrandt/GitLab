@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { memoize, uniqBy, uniqueId, flatten } from 'lodash';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
 import Api from '~/api';
@@ -7,15 +7,15 @@ import * as types from './mutation_types';
 import { RULE_TYPE_ANY_APPROVER } from '../../../constants';
 import { mapMRApprovalSettingsResponse } from '../../../mappers';
 
-const fetchGroupMembers = _.memoize(id => Api.groupMembers(id).then(response => response.data));
+const fetchGroupMembers = memoize(id => Api.groupMembers(id).then(response => response.data));
 
 const fetchApprovers = ({ userRecords, groups }) => {
   const groupUsersAsync = Promise.all(groups.map(fetchGroupMembers));
 
   return groupUsersAsync
-    .then(_.flatten)
+    .then(flatten)
     .then(groupUsers => groupUsers.concat(userRecords))
-    .then(users => _.uniq(users, false, x => x.id));
+    .then(users => uniqBy(users, x => x.id));
 };
 
 const seedApprovers = rule =>
@@ -44,7 +44,7 @@ const seedNewRule = rule => {
     ...rule,
     isNew: true,
     name,
-    id: _.uniqueId('new'),
+    id: uniqueId('new'),
   };
 };
 

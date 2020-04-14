@@ -18,15 +18,6 @@ module Gitlab
         @group = group
       end
 
-      def objects(scope, page = nil)
-        case scope
-        when 'users'
-          users.page(page).per(per_page)
-        else
-          super
-        end
-      end
-
       def generic_search_results
         @generic_search_results ||= Gitlab::GroupSearchResults.new(current_user, limit_projects, group, query, default_project_filter: default_project_filter)
       end

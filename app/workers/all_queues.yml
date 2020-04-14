@@ -262,6 +262,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: cronjob:users_create_statistics
+  :feature_category: :users
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: deployment:deployments_finished
   :feature_category: :continuous_delivery
   :has_external_dependencies: 
@@ -1021,7 +1028,7 @@
 - :name: emails_on_push
   :feature_category: :source_code_management
   :has_external_dependencies: 
-  :urgency: :high
+  :urgency: :low
   :resource_boundary: :cpu
   :weight: 2
   :idempotent: 
@@ -1249,6 +1256,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: prometheus_create_default_alerts
+  :feature_category: :incident_management
+  :has_external_dependencies: 
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: propagate_service_template
   :feature_category: :source_code_management
   :has_external_dependencies: 

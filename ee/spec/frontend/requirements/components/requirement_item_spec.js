@@ -1,9 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlLink, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
+import { GlLink, GlDeprecatedButton, GlIcon, GlLoadingIcon } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
+import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 
-import { requirement1, mockUserPermissions } from '../mock_data';
+import { requirement1, requirementArchived, mockUserPermissions } from '../mock_data';
 
 const createComponent = (requirement = requirement1) =>
   shallowMount(RequirementItem, {
@@ -14,13 +15,16 @@ const createComponent = (requirement = requirement1) =>
 
 describe('RequirementItem', () => {
   let wrapper;
+  let wrapperArchived;
 
   beforeEach(() => {
     wrapper = createComponent();
+    wrapperArchived = createComponent(requirementArchived);
   });
 
   afterEach(() => {
     wrapper.destroy();
+    wrapperArchived.destroy();
   });
 
   describe('computed', () => {
@@ -58,6 +62,16 @@ describe('RequirementItem', () => {
       });
     });
 
+    describe('isArchived', () => {
+      it('returns `true` when current requirement is archived', () => {
+        expect(wrapperArchived.vm.isArchived).toBe(true);
+      });
+
+      it('returns `false` when current requirement is archived', () => {
+        expect(wrapper.vm.isArchived).toBe(false);
+      });
+    });
+
     describe('author', () => {
       it('returns value of `requirement.author`', () => {
         expect(wrapper.vm.author).toBe(requirement1.author);
@@ -65,9 +79,74 @@ describe('RequirementItem', () => {
     });
   });
 
+  describe('methods', () => {
+    describe('handleUpdateRequirementSave', () => {
+      it('emits `updateSave` event on component with params passed as it is', () => {
+        wrapper.vm.handleUpdateRequirementSave('foo');
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.emitted('updateSave')).toBeTruthy();
+          expect(wrapper.emitted('updateSave')[0]).toEqual(['foo']);
+        });
+      });
+    });
+
+    describe('handleArchiveClick', () => {
+      it('emits `archiveClick` event on component with object containing `requirement.iid` & `state` as "ARCHIVED" as param', () => {
+        wrapper.vm.handleArchiveClick();
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.emitted('archiveClick')).toBeTruthy();
+          expect(wrapper.emitted('archiveClick')[0]).toEqual([
+            {
+              iid: requirement1.iid,
+              state: 'ARCHIVED',
+            },
+          ]);
+        });
+      });
+    });
+
+    describe('handleReopenClick', () => {
+      it('emits `reopenClick` event on component with object containing `requirement.iid` & `state` as "OPENED" as param', () => {
+        wrapperArchived.vm.handleReopenClick();
+
+        return wrapperArchived.vm.$nextTick(() => {
+          expect(wrapperArchived.emitted('reopenClick')).toBeTruthy();
+          expect(wrapperArchived.emitted('reopenClick')[0]).toEqual([
+            {
+              iid: requirementArchived.iid,
+              state: 'OPENED',
+            },
+          ]);
+        });
+      });
+    });
+  });
+
   describe('template', () => {
     it('renders component container element containing class `requirement`', () => {
       expect(wrapper.classes()).toContain('requirement');
+    });
+
+    it('renders component container element with class `disabled-content` when `stateChangeRequestActive` prop is true', () => {
+      wrapper.setProps({
+        stateChangeRequestActive: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.classes()).toContain('disabled-content');
+      });
+    });
+
+    it('renders requirement-form component', () => {
+      wrapper.setProps({
+        showUpdateForm: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(RequirementForm).exists()).toBe(true);
+      });
     });
 
     it('renders element containing requirement reference', () => {
@@ -139,6 +218,29 @@ describe('RequirementItem', () => {
       expect(wrapperNoArchive.find('.controls .requirement-archive').exists()).toBe(false);
 
       wrapperNoArchive.destroy();
+    });
+
+    it('renders loading icon within archive button when `stateChangeRequestActive` prop is true', () => {
+      wrapper.setProps({
+        stateChangeRequestActive: true,
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(
+          wrapper
+            .find('.requirement-archive')
+            .find(GlLoadingIcon)
+            .exists(),
+        ).toBe(true);
+      });
+    });
+
+    it('renders `Reopen` button when current requirement is archived', () => {
+      const reopenButton = wrapperArchived.find('.requirement-reopen').find(GlDeprecatedButton);
+
+      expect(reopenButton.exists()).toBe(true);
+      expect(reopenButton.props('loading')).toBe(false);
+      expect(reopenButton.text()).toBe('Reopen');
     });
 
     it('renders element containing requirement updated at', () => {

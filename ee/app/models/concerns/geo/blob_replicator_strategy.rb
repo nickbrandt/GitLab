@@ -27,6 +27,10 @@ module Geo
       download
     end
 
+    # Return the carrierwave uploader instance scoped to current model
+    #
+    # @abstract
+    # @return [Carrierwave::Uploader]
     def carrierwave_uploader
       raise NotImplementedError
     end
@@ -37,6 +41,14 @@ module Geo
     rescue => e
       log_error('Error calculating the checksum', e)
       update_verification_state!(failure: e.message)
+    end
+
+    # Check if given checksum matches known one
+    #
+    # @param [String] checksum
+    # @return [Boolean] whether checksum matches
+    def matches_checksum?(checksum)
+      model_record.verification_checksum == checksum
     end
 
     private

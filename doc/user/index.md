@@ -88,7 +88,7 @@ it all at once, from one single project.
 Use built-in [GitLab CI/CD](../ci/README.md) to test, build, and deploy your applications
 directly from GitLab. No third-party integrations needed.
 
-- [GitLab Auto Deploy](../topics/autodevops/index.md#auto-deploy): Deploy your application out-of-the-box with GitLab Auto Deploy.
+- [GitLab Auto Deploy](../topics/autodevops/stages.md#auto-deploy): Deploy your application out-of-the-box with GitLab Auto Deploy.
 - [Review Apps](../ci/review_apps/index.md): Live-preview the changes introduced by a merge request with Review Apps.
 - [GitLab Pages](project/pages/index.md): Publish your static site directly from
   GitLab with GitLab Pages. You can build, test, and deploy any Static Site Generator with Pages.
@@ -100,7 +100,7 @@ directly from GitLab. No third-party integrations needed.
 There is a lot you can customize and configure
 to enjoy the best of GitLab.
 
-- [Settings](profile/index.md): Manage your user settings to change your personal info,
+- [Settings](profile/index.md): Manage your user settings to change your personal information,
   personal access tokens, authorized applications, etc.
 - [Authentication](../topics/authentication/index.md): Read through the authentication
   methods available in GitLab.

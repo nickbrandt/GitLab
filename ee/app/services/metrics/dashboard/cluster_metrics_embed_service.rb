@@ -28,7 +28,8 @@ module Metrics
 
       def sequence
         [
-          STAGES::ClusterEndpointInserter
+          STAGES::ClusterEndpointInserter,
+          STAGES::PanelIdsInserter
         ]
       end
     end

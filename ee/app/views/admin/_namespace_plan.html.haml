@@ -8,4 +8,4 @@
     = f.fields_for :gitlab_subscription do |f|
       = f.select :hosted_plan_id, Plan.pluck(:title, :id),
         { include_blank: 'No plan' },
-        class: 'form-control'
+        class: 'form-control', data: { qa_selector: 'plan_dropdown' }

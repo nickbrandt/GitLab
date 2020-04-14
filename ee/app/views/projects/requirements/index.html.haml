@@ -3,28 +3,31 @@
 - page_context_word = type.to_s.humanize(capitalize: false)
 - @content_class = 'requirements-container'
 
+- ignore_page_params = ['next', 'prev', 'page']
 - requirements_count = Hash.new(0).merge(@project.requirements.counts_by_state)
+- is_open_tab = params[:state].nil? || params[:state] == 'opened'
 
 .top-area
-  %ul.nav-links.mobile-separator.requirements-state-filters
-    %li{ class: active_when(params[:state].nil? || params[:state] == 'opened') }>
-      = link_to page_filter_path(state: 'opened'), id: 'state-opened', title: (_("Filter by %{issuable_type} that are currently opened.") % { issuable_type: page_context_word }), data: { state: 'opened' } do
+  %ul.nav-links.mobile-separator.requirements-state-filters.js-requirements-state-filters
+    %li{ class: active_when(is_open_tab) }>
+      = link_to page_filter_path(state: 'opened', without: ignore_page_params), id: 'state-opened', title: (_("Filter by %{issuable_type} that are currently opened.") % { issuable_type: page_context_word }), data: { state: 'opened' } do
         = _('Open')
-        %span.badge.badge-pill= requirements_count['opened']
+        %span.badge.badge-pill.js-opened-count= requirements_count['opened']
 
     %li{ class: active_when(params[:state] == 'archived') }>
-      = link_to page_filter_path(state: 'archived'), id: 'state-archived', title: (_("Filter by %{issuable_type} that are currently archived.") % { issuable_type: page_context_word }), data: { state: 'archived' } do
+      = link_to page_filter_path(state: 'archived', without: ignore_page_params), id: 'state-archived', title: (_("Filter by %{issuable_type} that are currently archived.") % { issuable_type: page_context_word }), data: { state: 'archived' } do
         = _('Archived')
-        %span.badge.badge-pill= requirements_count['archived']
+        %span.badge.badge-pill.js-archived-count= requirements_count['archived']
 
     %li{ class: active_when(params[:state] == 'all') }>
-      = link_to page_filter_path(state: 'all'), id: 'state-all', title: (_("Show all %{issuable_type}.") % { issuable_type: page_context_word }), data: { state: 'all' } do
+      = link_to page_filter_path(state: 'all', without: ignore_page_params), id: 'state-all', title: (_("Show all %{issuable_type}.") % { issuable_type: page_context_word }), data: { state: 'all' } do
         = _('All')
-        %span.badge.badge-pill= requirements_count['opened'] + requirements_count['archived']
+        %span.badge.badge-pill.js-all-count= requirements_count['opened'] + requirements_count['archived']
 
   .nav-controls
-    %button.btn.btn-success.js-new-requirement.qa-new-requirement-button{ type: 'button' }
-      = _('New requirement')
+    - if is_open_tab
+      %button.btn.btn-success.js-new-requirement.qa-new-requirement-button{ type: 'button' }
+        = _('New requirement')
 
 #js-requirements-app{ data: { filter_by: params[:state],
   page: params[:page],

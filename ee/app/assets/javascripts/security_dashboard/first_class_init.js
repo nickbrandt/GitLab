@@ -3,6 +3,11 @@ import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
+import FirstClassGroupSecurityDashboard from './components/first_class_group_security_dashboard.vue';
+import createStore from './store';
+import createRouter from './store/router';
+import projectsPlugin from './store/plugins/projects';
+import syncWithRouter from './store/plugins/sync_with_router';
 
 const isRequired = message => {
   throw new Error(message);
@@ -19,24 +24,40 @@ export default (
   const apolloProvider = new VueApollo({
     defaultClient: createDefaultClient(),
   });
-  const { dashboardDocumentation, emptyStateSvgPath } = el.dataset;
+  const {
+    dashboardDocumentation,
+    emptyStateSvgPath,
+    hasPipelineData,
+    securityDashboardHelpPath,
+  } = el.dataset;
   const props = {
     emptyStateSvgPath,
     dashboardDocumentation,
+    hasPipelineData: Boolean(hasPipelineData),
+    securityDashboardHelpPath,
   };
-  let element;
+  let component;
 
-  // We'll add more of these for group and instance once we have the components
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
-    element = FirstClassProjectSecurityDashboard;
+    component = FirstClassProjectSecurityDashboard;
     props.projectFullPath = el.dataset.projectFullPath;
+    props.vulnerabilitiesExportEndpoint = el.dataset.vulnerabilitiesExportEndpoint;
+  } else if (dashboardType === DASHBOARD_TYPES.GROUP) {
+    component = FirstClassGroupSecurityDashboard;
+    props.groupFullPath = el.dataset.groupFullPath;
+    props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
   }
+
+  const router = createRouter();
+  const store = createStore({ dashboardType, plugins: [projectsPlugin, syncWithRouter(router)] });
 
   return new Vue({
     el,
+    store,
+    router,
     apolloProvider,
     render(createElement) {
-      return createElement(element, { props });
+      return createElement(component, { props });
     },
   });
 };

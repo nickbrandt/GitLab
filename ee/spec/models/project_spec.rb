@@ -23,6 +23,7 @@ describe Project do
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
     it { is_expected.to have_one(:status_page_setting).class_name('StatusPageSetting') }
+    it { is_expected.to have_one(:compliance_framework_setting).class_name('ComplianceManagement::ComplianceFramework::ProjectSettings') }
 
     it { is_expected.to have_many(:reviews).inverse_of(:project) }
     it { is_expected.to have_many(:path_locks) }
@@ -1760,35 +1761,20 @@ describe Project do
     end
 
     context 'when mirror true on a jira imported project' do
-      let(:user) { create(:user) }
-      let(:symbol_keys_project) do
-        { key: 'AA', scheduled_at: 2.days.ago.strftime('%Y-%m-%d %H:%M:%S'), scheduled_by: { 'user_id' => 1, 'name' => 'tester1' } }
-      end
-      let(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+      let_it_be(:user) { create(:user) }
+      let_it_be(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id) }
+      let_it_be(:jira_import) { create(:jira_import_state, project: project) }
 
-      context 'when jira import is forced' do
-        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project], JiraImportData::FORCE_IMPORT_KEY => true } }) }
-
-        it 'does not trigger mirror update' do
-          expect(RepositoryUpdateMirrorWorker).not_to receive(:perform_async)
-          expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async)
-          expect(project.mirror).to be true
-          expect(project.jira_import?).to be true
-          expect(project.jira_force_import?).to be true
-
-          project.add_import_job
+      context 'when jira import is in progress' do
+        before do
+          jira_import.start
         end
-      end
-
-      context 'when jira import is not forced' do
-        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project] } }) }
 
         it 'does trigger mirror update' do
           expect(RepositoryUpdateMirrorWorker).to receive(:perform_async)
           expect(Gitlab::JiraImport::Stage::StartImportWorker).not_to receive(:perform_async)
           expect(project.mirror).to be true
           expect(project.jira_import?).to be true
-          expect(project.jira_force_import?).to be false
 
           project.add_import_job
         end
@@ -2048,20 +2034,15 @@ describe Project do
   describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(:lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
-      false | false | false | false
-      false | true  | true  | false
-      false | true  | false | false
-      false | false | true  | false
-      true  | false | false | true
-      true  | true  | true  | true
-      true  | true  | false | true
-      true  | false | true  | false
+    where(:lfs_enabled, :hashed_storage_enabled, :expectation) do
+      false | false | false
+      true  | false | false
+      false | true  | false
+      true  | true  | true
     end
 
     with_them do
       before do
-        stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
         allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
@@ -2607,6 +2588,25 @@ describe Project do
         expect(project.jira_import?).to be false
         expect { project.remove_import_data }.not_to change { ProjectImportData.count }
       end
+    end
+  end
+
+  describe '#gitlab_subscription' do
+    subject { project.gitlab_subscription }
+
+    let(:project) { create(:project, namespace: namespace) }
+
+    context 'has a gitlab subscription' do
+      let(:namespace) { subscription.namespace }
+      let(:subscription) { create(:gitlab_subscription) }
+
+      it { is_expected.to eq(subscription) }
+    end
+
+    context 'does not have a gitlab subscription' do
+      let(:namespace) { create(:namespace) }
+
+      it { is_expected.to be_nil }
     end
   end
 end

@@ -48,6 +48,18 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
 
       it 'does not validate presence of api_url' do
         expect(service).not_to validate_presence_of(:api_url)
+        expect(service.valid?).to eq(true)
+      end
+
+      context 'local connections allowed' do
+        before do
+          stub_application_setting(allow_local_requests_from_web_hooks_and_services: true)
+        end
+
+        it 'does not validate presence of api_url' do
+          expect(service).not_to validate_presence_of(:api_url)
+          expect(service.valid?).to eq(true)
+        end
       end
     end
 
@@ -106,6 +118,34 @@ describe PrometheusService, :use_clean_rails_memory_store_caching do
               expect(service.can_query?).to be false
             end
           end
+        end
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    context 'after_create' do
+      let(:project) { create(:project) }
+      let(:service) { build(:prometheus_service, project: project) }
+
+      subject(:create_service) { service.save! }
+
+      it 'creates default alerts' do
+        expect(Prometheus::CreateDefaultAlertsWorker)
+          .to receive(:perform_async)
+          .with(project_id: project.id)
+
+        create_service
+      end
+
+      context 'no project exists' do
+        let(:service) { build(:prometheus_service, :instance) }
+
+        it 'does not create default alerts' do
+          expect(Prometheus::CreateDefaultAlertsWorker)
+            .not_to receive(:perform_async)
+
+          create_service
         end
       end
     end

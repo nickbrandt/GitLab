@@ -1,8 +1,8 @@
 # Prometheus integration
 
-> [Introduced][ce-8935] in GitLab 9.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8935) in GitLab 9.0.
 
-GitLab offers powerful integration with [Prometheus] for monitoring key metrics of your apps, directly within GitLab.
+GitLab offers powerful integration with [Prometheus](https://prometheus.io) for monitoring key metrics of your apps, directly within GitLab.
 Metrics for each environment are retrieved from Prometheus, and then displayed
 within the GitLab interface.
 
@@ -13,7 +13,7 @@ There are two ways to set up Prometheus integration, depending on where your app
 - For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes).
 - For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
 
-Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-cicd-environments). You are also able to [add your own metrics](#adding-additional-metrics-premium) as well.
+Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-cicd-environments). You can also [add your own metrics](#adding-custom-metrics).
 
 ## Enabling Prometheus Integration
 
@@ -76,7 +76,7 @@ The Prometheus server will [automatically detect and monitor](https://prometheus
 - `prometheus.io/port` to define the port of the metrics endpoint.
 - `prometheus.io/path` to define the path of the metrics endpoint. Defaults to `/metrics`.
 
-CPU and Memory consumption is monitored, but requires [naming conventions](prometheus_library/kubernetes.md#specifying-the-environment) in order to determine the environment. If you are using [Auto DevOps](../../../topics/autodevops/), this is handled automatically.
+CPU and Memory consumption is monitored, but requires [naming conventions](prometheus_library/kubernetes.md#specifying-the-environment) in order to determine the environment. If you are using [Auto DevOps](../../../topics/autodevops/index.md), this is handled automatically.
 
 The [NGINX Ingress](../clusters/index.md#installing-applications) that is deployed by GitLab to clusters, is automatically annotated for monitoring providing key response metrics: latency, throughput, and error rates.
 
@@ -132,9 +132,10 @@ GitLab will automatically scan the Prometheus server for metrics from known serv
 
 You can view the performance dashboard for an environment by [clicking on the monitoring button](../../../ci/environments.md#monitoring-environments).
 
-### Adding additional metrics **(PREMIUM)**
+### Adding custom metrics
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3799) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.6.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3799) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.6.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28527) to [GitLab Core](https://about.gitlab.com/pricing/) 12.10.
 
 Custom metrics can be monitored by adding them on the monitoring dashboard page. Once saved, they will be displayed on the environment performance dashboard provided that either:
 
@@ -191,8 +192,8 @@ You may create a new file from scratch or duplicate a GitLab-defined Prometheus
 dashboard.
 
 NOTE: **Note:**
-The custom metrics as defined below do not support alerts, unlike
-[additional metrics](#adding-additional-metrics-premium).
+The metrics as defined below do not support alerts, unlike
+[custom metrics](#adding-custom-metrics).
 
 #### Adding a new dashboard to your project
 
@@ -308,6 +309,7 @@ The following tables outline the details of expected properties.
 | `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. Can contain time series labels as interpolated variables. |
 | `query` | string | yes if `query_range` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
 | `query_range` | string | yes if `query` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query_range` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
+| `step` | number | no, value is calculated if not defined | Defines query resolution step width in float number of seconds. Metrics on the same panel should use the same `step` value. |
 
 ##### Dynamic labels
 
@@ -396,7 +398,7 @@ Starting in [version 12.8](https://gitlab.com/gitlab-org/gitlab/issues/202696), 
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16530) in GitLab 12.5.
 
-To add an anomaly chart panel type to a dashboard, add add a panel with *exactly* 3 metrics.
+To add an anomaly chart panel type to a dashboard, add a panel with *exactly* 3 metrics.
 
 The first metric represents the current state, and the second and third metrics represent the upper and lower limit respectively:
 
@@ -654,9 +656,9 @@ Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
 
 #### Managed Prometheus instances
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics-premium), and 11.3 for [library metrics](prometheus_library/metrics.md).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-custom-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
-For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-additional-metrics-premium) directly in the performance dashboard.
+For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-custom-metrics) directly in the performance dashboard.
 
 To set an alert:
 
@@ -727,7 +729,7 @@ If the metric exceeds the threshold of the alert for over 5 minutes, an email wi
 
 ## Determining the performance impact of a merge
 
-> - [Introduced][ce-10408] in GitLab 9.2.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/10408) in GitLab 9.2.
 > - GitLab 9.3 added the [numeric comparison](https://gitlab.com/gitlab-org/gitlab-foss/issues/27439) of the 30 minute averages.
 
 Developers can view the performance impact of their changes within the merge
@@ -755,7 +757,7 @@ Prometheus server.
 
 ### Embedding GitLab-managed Kubernetes metrics
 
-> [Introduced][ce-29691] in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/29691) in GitLab 12.2.
 
 It is possible to display metrics charts within [GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm) fields such as issue or merge request descriptions. The maximum number of embedded charts allowed in a GitLab Flavored Markdown field is 100.
 
@@ -774,7 +776,7 @@ GitLab unfurls the link as an embedded metrics panel:
 ![Embedded Metrics Rendered](img/embedded_metrics_rendered_v12_8.png)
 
 You can also embed a single chart. To get a link to a chart, click the
-**{ellipsis_v}** **More info** menu in the upper right corner of the chart,
+**{ellipsis_v}** **More actions** menu in the upper right corner of the chart,
 and select **Copy link to chart**, as shown in this example:
 
 ![Copy Link To Chart](img/copy_link_to_chart_v12_10.png)
@@ -800,6 +802,22 @@ Metric charts may also be hidden:
 It is also possible to embed either the default dashboard metrics or individual metrics in issue templates. For charts to render side-by-side, links to the entire metrics dashboard or individual metrics should be separated by either a comma or a space.
 
 ![Embedded Metrics in issue templates](img/embed_metrics_issue_template.png)
+
+### Embedding metrics based on alerts in incident issues
+
+For [GitLab-managed alerting rules](#setting-up-alerts-for-prometheus-metrics-ultimate), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
+
+For [manually configured Prometheus instances](#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
+
+- The alert corresponds to an environment managed through GitLab.
+- The alert corresponds to a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries).
+- The alert contains the required attributes listed in the chart below.
+
+| Attributes | Required | Description |
+| ---------- | -------- | ----------- |
+| `annotations/gitlab_environment_name` | Yes | Name of the GitLab-managed environment corresponding to the alert |
+| One of `annotations/title`, `annotations/summary`, `labels/alertname` | Yes | Will be used as the chart title |
+| `annotations/gitlab_y_label` | No | Will be used as the chart's y-axis label |
 
 ### Embedding Cluster Health Charts **(ULTIMATE)**
 
@@ -895,18 +913,3 @@ If the "No data found" screen continues to appear, it could be due to:
   [run a query](prometheus_library/kubernetes.md#metrics-supported), replacing `$CI_ENVIRONMENT_SLUG`
   with the name of your environment.
 - You may need to re-add the GitLab predefined common metrics. This can be done by running the [import common metrics Rake task](../../../administration/raketasks/maintenance.md#import-common-metrics).
-
-[autodeploy]: ../../../topics/autodevops/index.md#auto-deploy
-[kubernetes]: https://kubernetes.io
-[kube]: ./kubernetes.md
-[prometheus-k8s-sd]: https://prometheus.io/docs/operating/configuration/#<kubernetes_sd_config>
-[prometheus]: https://prometheus.io
-[gitlab-prometheus-k8s-monitor]: ../../../administration/monitoring/prometheus/index.md#configuring-prometheus-to-monitor-kubernetes
-[prometheus-docker-image]: https://hub.docker.com/r/prom/prometheus/
-[prometheus-yml]:samples/prometheus.yml
-[gitlab.com-ip-range]: https://gitlab.com/gitlab-com/infrastructure/issues/434
-[ci-environment-slug]: ../../../ci/variables/#predefined-environment-variables
-[ce-8935]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8935
-[ce-10408]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/10408
-[ce-29691]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/29691
-[promgldocs]: ../../../administration/monitoring/prometheus/index.md

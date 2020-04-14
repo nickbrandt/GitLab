@@ -31,4 +31,17 @@ describe Groups::DestroyService do
       end
     end
   end
+
+  context 'dependency_proxy_blobs' do
+    let_it_be(:blob) { create(:dependency_proxy_blob) }
+    let_it_be(:group) { blob.group }
+
+    before do
+      group.add_maintainer(user)
+    end
+
+    it 'destroys the dependency proxy blobs' do
+      expect { subject.execute }.to change { DependencyProxy::Blob.count }.by(-1)
+    end
+  end
 end

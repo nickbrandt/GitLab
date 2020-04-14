@@ -28,6 +28,7 @@ module API
                   ]
 
     allow_access_with_scope :api
+    allow_access_with_scope :read_api, if: -> (request) { request.get? }
     prefix :api
 
     version 'v3', using: :path do
@@ -105,7 +106,7 @@ module API
 
     namespace do
       after do
-        ::Users::ActivityService.new(@current_user).execute if Feature.enabled?(:api_activity_logging)
+        ::Users::ActivityService.new(@current_user).execute
       end
 
       # Keep in alphabetical order

@@ -24,7 +24,7 @@ for known vulnerabilities using Dynamic Application Security Testing (DAST).
 
 You can take advantage of DAST by either [including the CI job](#configuration) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto DAST](../../../topics/autodevops/index.md#auto-dast-ultimate)
+[Auto DAST](../../../topics/autodevops/stages.md#auto-dast-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the DAST report, compares the found vulnerabilities between the source and target
@@ -495,7 +495,7 @@ The DAST job can emit various reports.
 CAUTION: **Caution:**
 The JSON report artifacts are not a public API of DAST and their format is expected to change in the future.
 
-The DAST tool always emits a JSON report report file called `gl-dast-report.json` and sample reports can be found in the [DAST repository](https://gitlab.com/gitlab-org/security-products/dast/-/tree/master/test/end-to-end/expect).
+The DAST tool always emits a JSON report file called `gl-dast-report.json` and sample reports can be found in the [DAST repository](https://gitlab.com/gitlab-org/security-products/dast/-/tree/master/test/end-to-end/expect).
 
 There are two formats of data in the JSON report that are used side by side: the proprietary ZAP format which will be eventually deprecated, and a "common" format which will be the default in the future.
 

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
+import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
 
 import RequirementsRoot from './components/requirements_root.vue';
@@ -9,7 +10,6 @@ import { FilterState } from './constants';
 Vue.use(VueApollo);
 
 export default () => {
-  const btnNewRequirement = document.querySelector('.js-new-requirement');
   const el = document.getElementById('js-requirements-app');
 
   if (!el) {
@@ -17,7 +17,16 @@ export default () => {
   }
 
   const apolloProvider = new VueApollo({
-    defaultClient: createDefaultClient(),
+    defaultClient: createDefaultClient(
+      {},
+      {
+        cacheConfig: {
+          dataIdFromObject: object =>
+            // eslint-disable-next-line no-underscore-dangle, @gitlab/require-i18n-strings
+            object.__typename === 'Requirement' ? object.iid : defaultDataIdFromObject(object),
+        },
+      },
+    ),
   });
 
   return new Vue({
@@ -43,7 +52,6 @@ export default () => {
       const ARCHIVED = parseInt(archived, 10);
 
       return {
-        showCreateRequirement: false,
         filterBy: stateFilterBy,
         requirementsCount: {
           OPENED,
@@ -57,17 +65,6 @@ export default () => {
         projectPath,
       };
     },
-    mounted() {
-      btnNewRequirement.addEventListener('click', this.handleClickNewRequirement);
-    },
-    beforeDestroy() {
-      btnNewRequirement.removeEventListener('click', this.handleClickNewRequirement);
-    },
-    methods: {
-      handleClickNewRequirement() {
-        this.showCreateRequirement = !this.showCreateRequirement;
-      },
-    },
     render(createElement) {
       return createElement('requirements-root', {
         props: {
@@ -77,7 +74,6 @@ export default () => {
           page: parseInt(this.page, 10) || 1,
           prev: this.prev,
           next: this.next,
-          showCreateRequirement: this.showCreateRequirement,
           emptyStatePath: this.emptyStatePath,
         },
       });

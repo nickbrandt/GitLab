@@ -40,7 +40,7 @@ describe Projects::Security::DashboardController do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
-        expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
+        expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data]")
       end
     end
 
@@ -54,7 +54,7 @@ describe Projects::Security::DashboardController do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
-        expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
+        expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data]")
       end
     end
 
@@ -64,7 +64,7 @@ describe Projects::Security::DashboardController do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
-        expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=false]")
+        expect(response.body).not_to have_css("div#js-security-report-app[data-has-pipeline-data]")
       end
     end
   end

@@ -39,7 +39,8 @@ describe Epics::UpdateService do
           start_date_is_fixed: true,
           due_date_fixed: '2017-10-21',
           due_date_is_fixed: true,
-          state_event: 'close'
+          state_event: 'close',
+          confidential: true
         }
       end
 
@@ -50,13 +51,27 @@ describe Epics::UpdateService do
         expect(epic).to have_attributes(opts.except(:due_date_fixed, :start_date_fixed))
         expect(epic).to have_attributes(
           start_date_fixed: Date.strptime(opts[:start_date_fixed]),
-          due_date_fixed: Date.strptime(opts[:due_date_fixed])
+          due_date_fixed: Date.strptime(opts[:due_date_fixed]),
+          confidential: true
         )
         expect(epic).to be_closed
       end
 
       it 'updates the last_edited_at value' do
         expect { update_epic(opts) }.to change { epic.last_edited_at }
+      end
+
+      context 'when confidential_epics is disabled' do
+        before do
+          stub_feature_flags(confidential_epics: false)
+        end
+
+        it 'ignores confidential attribute on update' do
+          update_epic(opts)
+
+          expect(epic).to be_valid
+          expect(epic.confidential).to be_falsey
+        end
       end
     end
 

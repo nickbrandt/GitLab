@@ -153,4 +153,10 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
       sso_group_saml_providers_path(group)
     end
   end
+
+  override :log_audit_event
+  def log_audit_event(user, options = {})
+    AuditEventService.new(user, @unauthenticated_group, options)
+      .for_authentication.security_event
+  end
 end

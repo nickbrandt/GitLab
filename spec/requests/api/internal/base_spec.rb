@@ -325,13 +325,34 @@ describe API::Internal::Base do
 
       shared_examples 'snippets with disabled feature flag' do
         context 'when feature flag :version_snippets is disabled' do
-          it 'returns 404' do
+          it 'returns 401' do
             stub_feature_flags(version_snippets: false)
 
             subject
 
-            expect(response).to have_gitlab_http_status(:not_found)
+            expect(response).to have_gitlab_http_status(:unauthorized)
           end
+        end
+      end
+
+      shared_examples 'snippet success' do
+        it 'responds with success' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['status']).to be_truthy
+        end
+      end
+
+      shared_examples 'snippets with web protocol' do
+        it_behaves_like 'snippet success'
+
+        context 'with disabled version flag' do
+          before do
+            stub_feature_flags(version_snippets: false)
+          end
+
+          it_behaves_like 'snippet success'
         end
       end
 
@@ -349,14 +370,21 @@ describe API::Internal::Base do
         end
 
         it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { push(key, personal_snippet, 'web', env: env.to_json, changes: snippet_changes) }
+        end
+
         it_behaves_like 'sets hook env' do
           let(:gl_repository) { Gitlab::GlRepository::SNIPPET.identifier_for_container(personal_snippet) }
         end
       end
 
       context 'git pull with personal snippet' do
+        subject { pull(key, personal_snippet) }
+
         it 'responds with success' do
-          pull(key, personal_snippet)
+          subject
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response["status"]).to be_truthy
@@ -365,8 +393,10 @@ describe API::Internal::Base do
           expect(user.reload.last_activity_on).to eql(Date.today)
         end
 
-        it_behaves_like 'snippets with disabled feature flag' do
-          subject { pull(key, personal_snippet) }
+        it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { pull(key, personal_snippet, 'web') }
         end
       end
 
@@ -384,6 +414,11 @@ describe API::Internal::Base do
         end
 
         it_behaves_like 'snippets with disabled feature flag'
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { push(key, project_snippet, 'web', env: env.to_json, changes: snippet_changes) }
+        end
+
         it_behaves_like 'sets hook env' do
           let(:gl_repository) { Gitlab::GlRepository::SNIPPET.identifier_for_container(project_snippet) }
         end
@@ -402,6 +437,10 @@ describe API::Internal::Base do
 
         it_behaves_like 'snippets with disabled feature flag' do
           subject { pull(key, project_snippet) }
+        end
+
+        it_behaves_like 'snippets with web protocol' do
+          subject { pull(key, project_snippet, 'web') }
         end
       end
 
@@ -543,7 +582,7 @@ describe API::Internal::Base do
         {
           'action' => 'geo_proxy_to_primary',
           'data' => {
-            'api_endpoints' => %w{geo/proxy_git_push_ssh/info_refs geo/proxy_git_push_ssh/push},
+            'api_endpoints' => %w{geo/proxy_git_ssh/info_refs_receive_pack geo/proxy_git_ssh/receive_pack},
             'gl_username' => 'testuser',
             'primary_repo' => 'http://localhost:3000/testuser/repo.git'
           }
@@ -842,88 +881,6 @@ describe API::Internal::Base do
       end
     end
   end
-
-  # TODO: Uncomment when the end-point is reenabled
-  # describe 'POST /notify_post_receive' do
-  #   let(:valid_params) do
-  #     { project: project.repository.path, secret_token: secret_token }
-  #   end
-  #
-  #   let(:valid_wiki_params) do
-  #     { project: project.wiki.repository.path, secret_token: secret_token }
-  #   end
-  #
-  #   before do
-  #     allow(Gitlab.config.gitaly).to receive(:enabled).and_return(true)
-  #   end
-  #
-  #   it "calls the Gitaly client with the project's repository" do
-  #     expect(Gitlab::GitalyClient::NotificationService).
-  #       to receive(:new).with(gitlab_git_repository_with(path: project.repository.path)).
-  #       and_call_original
-  #     expect_any_instance_of(Gitlab::GitalyClient::NotificationService).
-  #       to receive(:post_receive)
-  #
-  #     post api("/internal/notify_post_receive"), valid_params
-  #
-  #     expect(response).to have_gitlab_http_status(:ok)
-  #   end
-  #
-  #   it "calls the Gitaly client with the wiki's repository if it's a wiki" do
-  #     expect(Gitlab::GitalyClient::NotificationService).
-  #       to receive(:new).with(gitlab_git_repository_with(path: project.wiki.repository.path)).
-  #       and_call_original
-  #     expect_any_instance_of(Gitlab::GitalyClient::NotificationService).
-  #       to receive(:post_receive)
-  #
-  #     post api("/internal/notify_post_receive"), valid_wiki_params
-  #
-  #     expect(response).to have_gitlab_http_status(:ok)
-  #   end
-  #
-  #   it "returns 500 if the gitaly call fails" do
-  #     expect_any_instance_of(Gitlab::GitalyClient::NotificationService).
-  #       to receive(:post_receive).and_raise(GRPC::Unavailable)
-  #
-  #     post api("/internal/notify_post_receive"), valid_params
-  #
-  #     expect(response).to have_gitlab_http_status(:internal_server_error)
-  #   end
-  #
-  #   context 'with a gl_repository parameter' do
-  #     let(:valid_params) do
-  #       { gl_repository: "project-#{project.id}", secret_token: secret_token }
-  #     end
-  #
-  #     let(:valid_wiki_params) do
-  #       { gl_repository: "wiki-#{project.id}", secret_token: secret_token }
-  #     end
-  #
-  #     it "calls the Gitaly client with the project's repository" do
-  #       expect(Gitlab::GitalyClient::NotificationService).
-  #         to receive(:new).with(gitlab_git_repository_with(path: project.repository.path)).
-  #         and_call_original
-  #       expect_any_instance_of(Gitlab::GitalyClient::NotificationService).
-  #         to receive(:post_receive)
-  #
-  #       post api("/internal/notify_post_receive"), valid_params
-  #
-  #       expect(response).to have_gitlab_http_status(:ok)
-  #     end
-  #
-  #     it "calls the Gitaly client with the wiki's repository if it's a wiki" do
-  #       expect(Gitlab::GitalyClient::NotificationService).
-  #         to receive(:new).with(gitlab_git_repository_with(path: project.wiki.repository.path)).
-  #         and_call_original
-  #       expect_any_instance_of(Gitlab::GitalyClient::NotificationService).
-  #         to receive(:post_receive)
-  #
-  #       post api("/internal/notify_post_receive"), valid_wiki_params
-  #
-  #       expect(response).to have_gitlab_http_status(:ok)
-  #     end
-  #   end
-  # end
 
   describe 'POST /internal/post_receive', :clean_gitlab_redis_shared_state do
     let(:identifier) { 'key-123' }

@@ -33,7 +33,7 @@ module Security
       return if report.empty? && !pipeline.complete?
       return if report.violates?(project.software_license_policies)
 
-      remove_required_approvals_for(ApprovalMergeRequestRule.report_approver.license_management)
+      remove_required_approvals_for(ApprovalMergeRequestRule.report_approver.license_scanning)
     end
 
     def sync_vulnerability_rules

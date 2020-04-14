@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# For hardening usage ping and make it easier to add measures there is in place alt_usage_data method
+# which handles StandardError and fallbacks into -1
+# this way not all measures fail if we encounter one exception
+#
+# Examples:
+#  alt_usage_data { Gitlab::VERSION }
+#  alt_usage_data { Gitlab::CurrentSettings.uuid }
 module Gitlab
   class UsageData
     BATCH_SIZE = 100
@@ -24,17 +31,15 @@ module Gitlab
       end
 
       def license_usage_data
-        usage_data = {
-          uuid: Gitlab::CurrentSettings.uuid,
-          hostname: Gitlab.config.gitlab.host,
-          version: Gitlab::VERSION,
-          installation_type: installation_type,
+        {
+          uuid: alt_usage_data { Gitlab::CurrentSettings.uuid },
+          hostname: alt_usage_data { Gitlab.config.gitlab.host },
+          version: alt_usage_data { Gitlab::VERSION },
+          installation_type: alt_usage_data { installation_type },
           active_user_count: count(User.active),
           recorded_at: Time.now,
           edition: 'CE'
         }
-
-        usage_data
       end
 
       # rubocop: disable Metrics/AbcSize
@@ -63,9 +68,11 @@ module Gitlab
             clusters_enabled: count(::Clusters::Cluster.enabled),
             project_clusters_enabled: count(::Clusters::Cluster.enabled.project_type),
             group_clusters_enabled: count(::Clusters::Cluster.enabled.group_type),
+            instance_clusters_enabled: count(::Clusters::Cluster.enabled.instance_type),
             clusters_disabled: count(::Clusters::Cluster.disabled),
             project_clusters_disabled: count(::Clusters::Cluster.disabled.project_type),
             group_clusters_disabled: count(::Clusters::Cluster.disabled.group_type),
+            instance_clusters_disabled: count(::Clusters::Cluster.disabled.instance_type),
             clusters_platforms_eks: count(::Clusters::Cluster.aws_installed.enabled),
             clusters_platforms_gke: count(::Clusters::Cluster.gcp_installed.enabled),
             clusters_platforms_user: count(::Clusters::Cluster.user_provided.enabled),
@@ -78,6 +85,7 @@ module Gitlab
             clusters_applications_knative: count(::Clusters::Applications::Knative.available),
             clusters_applications_elastic_stack: count(::Clusters::Applications::ElasticStack.available),
             clusters_applications_jupyter: count(::Clusters::Applications::Jupyter.available),
+            clusters_management_project: count(::Clusters::Cluster.with_management_project),
             in_review_folder: count(::Environment.in_review_folder),
             grafana_integrated_projects: count(GrafanaIntegration.enabled),
             groups: count(Group),
@@ -85,7 +93,7 @@ module Gitlab
             issues_created_from_gitlab_error_tracking_ui: count(SentryIssue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: distinct_count(ZoomMeeting, :issue_id),
-            issues_with_embedded_grafana_charts_approx: ::Gitlab::GrafanaEmbedUsageData.issue_count,
+            issues_with_embedded_grafana_charts_approx: grafana_embed_usage_data,
             incident_issues: count(::Issue.authored(::User.alert_bot)),
             keys: count(Key),
             label_lists: count(List.label),
@@ -128,27 +136,58 @@ module Gitlab
         { avg_cycle_analytics: {} }
       end
 
+      # rubocop:disable CodeReuse/ActiveRecord
+      def grafana_embed_usage_data
+        count(Issue.joins('JOIN grafana_integrations USING (project_id)')
+          .where("issues.description LIKE '%' || grafana_integrations.grafana_url || '%'")
+          .where(grafana_integrations: { enabled: true }))
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
       def features_usage_data
         features_usage_data_ce
       end
 
       def features_usage_data_ce
         {
-          container_registry_enabled: Gitlab.config.registry.enabled,
+          container_registry_enabled: alt_usage_data { Gitlab.config.registry.enabled },
           dependency_proxy_enabled: Gitlab.config.try(:dependency_proxy)&.enabled,
-          gitlab_shared_runners_enabled: Gitlab.config.gitlab_ci.shared_runners_enabled,
-          gravatar_enabled: Gitlab::CurrentSettings.gravatar_enabled?,
-          influxdb_metrics_enabled: Gitlab::Metrics.influx_metrics_enabled?,
-          ldap_enabled: Gitlab.config.ldap.enabled,
-          mattermost_enabled: Gitlab.config.mattermost.enabled,
-          omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
-          prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
-          reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
-          signup_enabled: Gitlab::CurrentSettings.allow_signup?,
-          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?,
+          gitlab_shared_runners_enabled: alt_usage_data { Gitlab.config.gitlab_ci.shared_runners_enabled },
+          gravatar_enabled: alt_usage_data { Gitlab::CurrentSettings.gravatar_enabled? },
+          influxdb_metrics_enabled: alt_usage_data { Gitlab::Metrics.influx_metrics_enabled? },
+          ldap_enabled: alt_usage_data { Gitlab.config.ldap.enabled },
+          mattermost_enabled: alt_usage_data { Gitlab.config.mattermost.enabled },
+          omniauth_enabled: alt_usage_data { Gitlab::Auth.omniauth_enabled? },
+          prometheus_metrics_enabled: alt_usage_data { Gitlab::Metrics.prometheus_metrics_enabled? },
+          reply_by_email_enabled: alt_usage_data { Gitlab::IncomingEmail.enabled? },
+          signup_enabled: alt_usage_data { Gitlab::CurrentSettings.allow_signup? },
+          web_ide_clientside_preview_enabled: alt_usage_data { Gitlab::CurrentSettings.web_ide_clientside_preview_enabled? },
           ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
-        }
+        }.merge(features_usage_data_container_expiration_policies)
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def features_usage_data_container_expiration_policies
+        results = {}
+        start = ::Project.minimum(:id)
+        finish = ::Project.maximum(:id)
+
+        results[:projects_with_expiration_policy_disabled] = distinct_count(::ContainerExpirationPolicy.where(enabled: false), :project_id, start: start, finish: finish)
+        base = ::ContainerExpirationPolicy.active
+        results[:projects_with_expiration_policy_enabled] = distinct_count(base, :project_id, start: start, finish: finish)
+
+        %i[keep_n cadence older_than].each do |option|
+          ::ContainerExpirationPolicy.public_send("#{option}_options").keys.each do |value| # rubocop: disable GitlabSecurity/PublicSend
+            results["projects_with_expiration_policy_enabled_with_#{option}_set_to_#{value}".to_sym] = distinct_count(base.where(option => value), :project_id, start: start, finish: finish)
+          end
+        end
+
+        results[:projects_with_expiration_policy_enabled_with_keep_n_unset] = distinct_count(base.where(keep_n: nil), :project_id, start: start, finish: finish)
+        results[:projects_with_expiration_policy_enabled_with_older_than_unset] = distinct_count(base.where(older_than: nil), :project_id, start: start, finish: finish)
+
+        results
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       # @return [Hash<Symbol, Integer>]
       def usage_counters
@@ -172,10 +211,20 @@ module Gitlab
 
       def components_usage_data
         {
-          git: { version: Gitlab::Git.version },
-          gitaly: { version: Gitaly::Server.all.first.server_version, servers: Gitaly::Server.count, filesystems: Gitaly::Server.filesystems },
-          gitlab_pages: { enabled: Gitlab.config.pages.enabled, version: Gitlab::Pages::VERSION },
-          database: { adapter: Gitlab::Database.adapter_name, version: Gitlab::Database.version },
+          git: { version: alt_usage_data { Gitlab::Git.version } },
+          gitaly: {
+            version: alt_usage_data { Gitaly::Server.all.first.server_version },
+            servers: alt_usage_data { Gitaly::Server.count },
+            filesystems: alt_usage_data { Gitaly::Server.filesystems }
+          },
+          gitlab_pages: {
+            enabled: alt_usage_data { Gitlab.config.pages.enabled },
+            version: alt_usage_data { Gitlab::Pages::VERSION }
+          },
+          database: {
+            adapter: alt_usage_data { Gitlab::Database.adapter_name },
+            version: alt_usage_data { Gitlab::Database.version }
+          },
           app_server: { type: app_server_type }
         }
       end
@@ -259,6 +308,18 @@ module Gitlab
       rescue ActiveRecord::StatementInvalid
         fallback
       end
+
+      def alt_usage_data(value = nil, fallback: -1, &block)
+        if block_given?
+          yield
+        else
+          value
+        end
+      rescue
+        fallback
+      end
+
+      private
 
       def installation_type
         if Rails.env.production?

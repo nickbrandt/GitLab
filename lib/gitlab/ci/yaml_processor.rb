@@ -172,7 +172,8 @@ module Gitlab
       def validate_dynamic_child_pipeline_dependencies!(name, job)
         return unless includes = job.dig(:trigger, :include)
 
-        includes.each do |included|
+        Array(includes).each do |included|
+          next unless included.is_a?(Hash)
           next unless dependency = included[:job]
 
           validate_job_dependency!(name, dependency)
@@ -183,8 +184,7 @@ module Gitlab
         return unless needs = job.dig(:needs, :job)
 
         needs.each do |need|
-          dependency = need[:name]
-          validate_job_dependency!(name, dependency, 'need')
+          validate_job_dependency!(name, need[:name], 'need')
         end
       end
 
@@ -204,10 +204,8 @@ module Gitlab
       end
 
       def stage_index(name)
-        job = @jobs[name.to_sym]
-        return unless job
-
-        @stages.index(job[:stage])
+        stage = @jobs.dig(name.to_sym, :stage)
+        @stages.index(stage)
       end
 
       def validate_job_environment!(name, job)

@@ -109,3 +109,18 @@ export const initialStateKeys = [...endpointKeys, 'currentEnvironmentName'];
  * Constant to indicate if a metric exists in the database
  */
 export const NOT_IN_DB_PREFIX = 'NO_DB';
+
+/**
+ * graphQL environments API value for active environments.
+ * Used as a value for the 'states' query filter
+ */
+export const ENVIRONMENT_AVAILABLE_STATE = 'available';
+
+/**
+ * Time series charts have different types of
+ * tooltip based on the hovered data point.
+ */
+export const tooltipTypes = {
+  deployments: 'deployments',
+  annotations: 'annotations',
+};

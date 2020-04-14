@@ -55,6 +55,8 @@ describe('ThreatMonitoringSection component', () => {
   const findStatisticsHistory = () => wrapper.find(StatisticsHistory);
   const findStatisticsSummary = () => wrapper.find(StatisticsSummary);
   const findChartEmptyState = () => wrapper.find({ ref: 'chartEmptyState' });
+  const findChartTitle = () => wrapper.find({ ref: 'chartTitle' });
+  const findChartSubtitle = () => wrapper.find({ ref: 'chartSubtitle' });
 
   beforeEach(() => {
     factory({});
@@ -96,6 +98,14 @@ describe('ThreatMonitoringSection component', () => {
     expect(chart.props('yLegend')).toEqual('Requests');
   });
 
+  it('shows the chart title', () => {
+    expect(findChartTitle().exists()).toBe(true);
+  });
+
+  it('shows the chart subtitle', () => {
+    expect(findChartSubtitle().exists()).toBe(true);
+  });
+
   it('does not show the chart empty state', () => {
     expect(findChartEmptyState().exists()).toBe(false);
   });
@@ -114,6 +124,14 @@ describe('ThreatMonitoringSection component', () => {
     it('does not show the summary or history statistics', () => {
       expect(findStatisticsSummary().exists()).toBe(false);
       expect(findStatisticsHistory().exists()).toBe(false);
+    });
+
+    it('shows the chart title', () => {
+      expect(findChartTitle().exists()).toBe(true);
+    });
+
+    it('does not show the chart subtitle', () => {
+      expect(findChartSubtitle().exists()).toBe(false);
     });
 
     it('does not show the chart empty state', () => {
@@ -141,6 +159,14 @@ describe('ThreatMonitoringSection component', () => {
     it('does not show the summary or history statistics', () => {
       expect(findStatisticsSummary().exists()).toBe(false);
       expect(findStatisticsHistory().exists()).toBe(false);
+    });
+
+    it('shows the chart title', () => {
+      expect(findChartTitle().exists()).toBe(true);
+    });
+
+    it('does not show the chart subtitle', () => {
+      expect(findChartSubtitle().exists()).toBe(false);
     });
 
     it('shows the chart empty state', () => {

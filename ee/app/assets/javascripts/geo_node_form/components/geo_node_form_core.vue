@@ -72,6 +72,7 @@ export default {
       <gl-form-input
         id="node-name-field"
         v-model="nodeData.name"
+        data-qa-selector="node_name_field"
         type="text"
         @blur="blur('name')"
       />
@@ -84,7 +85,13 @@ export default {
       :state="validUrl"
       :invalid-feedback="errors.url"
     >
-      <gl-form-input id="node-url-field" v-model="nodeData.url" type="text" @blur="blur('url')" />
+      <gl-form-input
+        id="node-url-field"
+        v-model="nodeData.url"
+        data-qa-selector="node_url_field"
+        type="text"
+        @blur="blur('url')"
+      />
     </gl-form-group>
   </section>
 </template>

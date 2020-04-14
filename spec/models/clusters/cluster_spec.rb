@@ -27,6 +27,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to have_many(:kubernetes_namespaces) }
   it { is_expected.to have_one(:cluster_project) }
   it { is_expected.to have_many(:deployment_clusters) }
+  it { is_expected.to have_many(:metrics_dashboard_annotations) }
 
   it { is_expected.to delegate_method(:status).to(:provider) }
   it { is_expected.to delegate_method(:status_reason).to(:provider) }
@@ -152,6 +153,22 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
       let!(:cluster) { create(:cluster) }
 
       it { is_expected.to include(cluster) }
+    end
+  end
+
+  describe '.with_management_project' do
+    subject { described_class.with_management_project }
+
+    context 'cluster has a management project' do
+      let!(:cluster) { create(:cluster, :management_project) }
+
+      it { is_expected.to include(cluster) }
+    end
+
+    context 'cluster does not have a management project' do
+      let!(:cluster) { create(:cluster) }
+
+      it { is_expected.not_to include(cluster) }
     end
   end
 

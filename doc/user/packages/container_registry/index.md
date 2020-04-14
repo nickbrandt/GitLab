@@ -7,6 +7,7 @@
 >   to pass a [personal access token](../../profile/personal_access_tokens.md) instead of your password in order to
 >   login to GitLab's Container Registry.
 > - Multiple level image names support was added in GitLab 9.1.
+> - The group level Container Registry was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/23315) in GitLab 12.10.
 
 NOTE: **Note:**
 This document is the user guide. To learn how to enable GitLab Container
@@ -47,11 +48,51 @@ project:
 
 ## Control Container Registry from within GitLab
 
-GitLab offers a simple Container Registry management panel. Go to your project
-and click **Packages > Container Registry** in the project menu.
+GitLab offers a simple Container Registry management panel. This management panel is available
+for both projects and groups.
 
-This view will show you all Docker images in your project and will easily allow you to
-delete them.
+### Control Container Registry for your project
+
+Navigate to your project's **{package}** **Packages > Container Registry**.
+
+![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v12_10.png)
+
+This view will:
+
+- Show all the image repositories that belong to the project.
+- Allow you to [delete](#delete-images-from-within-gitlab) one or more image repository.
+- Allow you to navigate to the image repository details page.
+- Show a **Quick start** dropdown with the most common commands to log in, build and push
+- Optionally, a banner will be visible if the [expiration policy](#expiration-policy) is enabled for this project.
+
+### Control Container Registry for your group
+
+Navigate to your groups's **{package}** **Packages > Container Registry**.
+
+![Container Registry group repositories](img/container_registry_group_repositories_v12_10.png)
+
+This view will:
+
+- Show all the image repositories of the projects that belong to this group.
+- Allow to [delete](#delete-images-from-within-gitlab) one or more image repositories.
+- Allow to navigate to a specific image repository details page.
+
+### Image Repository details page
+
+Clicking on the name of any image repository will navigate to the details.
+
+![Container Registry project repository details](img/container_registry_repository_details_v12.10.png)
+
+NOTE: **Note:**
+The following page has the same functionalities both in the **Group level container registry**
+and in the **Project level container registry**.
+
+This view:
+
+- Shows all the image repository details.
+- Shows all the tags of the image repository.
+- Allows you to quickly copy the tag path (by clicking on the clipboard button near the tag name).
+- Allows you to [delete one or more tags](#delete-images-from-within-gitlab).
 
 ## Use images from GitLab Container Registry
 
@@ -447,7 +488,9 @@ older tags and images are regularly removed from the Container Registry.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/15398) in GitLab 12.8.
 
 NOTE: **Note:**
-Expiration policies are only available for projects created in GitLab 12.8 and later.
+Expiration policies for projects created before GitLab 12.8 may be enabled by an
+admin in the [CI/CD Package Registry settings](./../../admin_area/settings/index.md#cicd).
+Note the inherant [risks involved](./index.md#use-with-external-container-registries).
 
 It is possible to create a per-project expiration policy, so that you can make sure that
 older tags and images are regularly removed from the Container Registry.
@@ -497,6 +540,15 @@ Examples:
   ```
 
 See the API documentation for further details: [Edit project](../../../api/projects.md#edit-project).
+
+### Use with external container registries
+
+When using an [external container registry](./../../../administration/packages/container_registry.md#use-an-external-container-registry-with-gitlab-as-an-auth-endpoint),
+running an experation policy on a project may have some performance risks. If a project is going to run
+a policy that will remove large quantities of tags (in the thousands), the GitLab background jobs that
+run the policy may get backed up or fail completely. It is recommended you only enable container expiration
+policies for projects that were created before GitLab 12.8 if you are confident the amount of tags
+being cleaned up will be minimal.
 
 ## Limitations
 

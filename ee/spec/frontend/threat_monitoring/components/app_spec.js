@@ -112,26 +112,8 @@ describe('ThreatMonitoringApp component', () => {
       expect(findWafSection().element).toMatchSnapshot();
     });
 
-    it('does not render the network policy section', () => {
-      expect(findNetworkPolicySection().exists()).toBe(false);
-    });
-
-    describe('given the networkPolicyUi feature flag is enabled', () => {
-      beforeEach(() => {
-        factory({
-          options: {
-            provide: {
-              glFeatures: {
-                networkPolicyUi: true,
-              },
-            },
-          },
-        });
-      });
-
-      it('renders the network policy section', () => {
-        expect(findNetworkPolicySection().element).toMatchSnapshot();
-      });
+    it('renders the network policy section', () => {
+      expect(findNetworkPolicySection().element).toMatchSnapshot();
     });
 
     describe('dismissing the alert', () => {

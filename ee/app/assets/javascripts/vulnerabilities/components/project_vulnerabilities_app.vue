@@ -110,7 +110,7 @@ export default {
         <gl-empty-state
           :title="s__(`No vulnerabilities found for this project`)"
           :svg-path="emptyStateSvgPath"
-          :description="$options.emptyStateDecription"
+          :description="$options.emptyStateDescription"
           :primary-button-link="dashboardDocumentation"
           :primary-button-text="s__('Security Reports|Learn more about setting up your dashboard')"
         />

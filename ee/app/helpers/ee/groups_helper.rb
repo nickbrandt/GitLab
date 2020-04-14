@@ -11,8 +11,20 @@ module EE
         .count
     end
 
-    def group_administration_nav_link_paths
+    def group_nav_link_paths
       %w[saml_providers#show usage_quotas#index billings#index]
+    end
+
+    def group_settings_nav_link_paths
+      if ::Feature.disabled?(:group_administration_nav_item, @group)
+        super + group_nav_link_paths
+      else
+        super
+      end
+    end
+
+    def group_administration_nav_link_paths
+      group_nav_link_paths
     end
 
     def size_limit_message_for_group(group)
@@ -78,7 +90,8 @@ module EE
     end
 
     def show_group_activity_analytics?
-      can?(current_user, :read_group_activity_analytics, @group)
+      ::Feature.enabled?(:group_activity_analytics, @group) &&
+        can?(current_user, :read_group_activity_analytics, @group)
     end
 
     def show_usage_quotas_in_sidebar?
@@ -90,7 +103,9 @@ module EE
     end
 
     def show_administration_nav?(group)
-      group.parent.nil? && can?(current_user, :admin_group, @group)
+      ::Feature.enabled?(:group_administration_nav_item, group) &&
+      group.parent.nil? &&
+      can?(current_user, :admin_group, group)
     end
 
     def administration_nav_path(group)

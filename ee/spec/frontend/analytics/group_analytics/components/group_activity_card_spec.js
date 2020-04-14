@@ -9,6 +9,7 @@ import waitForPromises from 'helpers/wait_for_promises';
 const TEST_GROUP_ID = 'gitlab-org';
 const TEST_MERGE_REQUESTS_COUNT = { data: { merge_requests_count: 10 } };
 const TEST_ISSUES_COUNT = { data: { issues_count: 20 } };
+const TEST_NEW_MEMBERS_COUNT = { data: { new_members_count: 30 } };
 
 describe('GroupActivity component', () => {
   let wrapper;
@@ -30,6 +31,10 @@ describe('GroupActivity component', () => {
       .mockReturnValue(Promise.resolve(TEST_MERGE_REQUESTS_COUNT));
 
     jest.spyOn(Api, 'groupActivityIssuesCount').mockReturnValue(Promise.resolve(TEST_ISSUES_COUNT));
+
+    jest
+      .spyOn(Api, 'groupActivityNewMembersCount')
+      .mockReturnValue(Promise.resolve(TEST_NEW_MEMBERS_COUNT));
   });
 
   afterEach(() => {
@@ -60,6 +65,7 @@ describe('GroupActivity component', () => {
       .then(() => {
         expect(Api.groupActivityMergeRequestsCount).toHaveBeenCalledWith(TEST_GROUP_ID);
         expect(Api.groupActivityIssuesCount).toHaveBeenCalledWith(TEST_GROUP_ID);
+        expect(Api.groupActivityNewMembersCount).toHaveBeenCalledWith(TEST_GROUP_ID);
 
         waitForPromises();
       })
@@ -67,6 +73,7 @@ describe('GroupActivity component', () => {
         expect(wrapper.vm.isLoading).toBe(false);
         expect(wrapper.vm.metrics.mergeRequests.value).toBe(10);
         expect(wrapper.vm.metrics.issues.value).toBe(20);
+        expect(wrapper.vm.metrics.newMembers.value).toBe(30);
       });
   });
 
@@ -80,6 +87,7 @@ describe('GroupActivity component', () => {
         expect(findMetricCard().props('metrics')).toEqual([
           { key: 'mergeRequests', value: 10, label: 'Merge Requests created' },
           { key: 'issues', value: 20, label: 'Issues created' },
+          { key: 'newMembers', value: 30, label: 'New Members created' },
         ]);
       });
   });

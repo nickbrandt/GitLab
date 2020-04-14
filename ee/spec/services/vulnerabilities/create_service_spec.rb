@@ -26,13 +26,23 @@ describe Vulnerabilities::CreateService do
         have_attributes(
           author: user,
           title: finding.name,
-          state: 'detected',
+          state: finding.state,
           severity: finding.severity,
           severity_overridden: false,
           confidence: finding.confidence,
           confidence_overridden: false,
           report_type: finding.report_type
         ))
+    end
+
+    context 'and finding is dismissed' do
+      let(:finding) { create(:vulnerabilities_occurrence, :dismissed, project: project) }
+
+      it 'creates a vulnerability in a dismissed state' do
+        expect { subject }.to change { project.vulnerabilities.count }.by(1)
+
+        expect(project.vulnerabilities.last.state).to eq('dismissed')
+      end
     end
 
     it 'starts a new transaction for the create sequence' do

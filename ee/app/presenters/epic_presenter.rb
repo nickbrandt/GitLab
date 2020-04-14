@@ -14,11 +14,11 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def group_epic_path
-    url_builder.group_epic_path(epic.group, epic)
+    url_builder.build(epic, only_path: true)
   end
 
   def group_epic_url
-    url_builder.group_epic_url(epic.group, epic)
+    url_builder.build(epic)
   end
 
   def group_epic_link_path
@@ -145,10 +145,5 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
         human_readable_timestamp: remaining_days_in_words(epic.end_date, epic.start_date)
       }
     end
-  end
-
-  # important for using routing helpers in GraphQL
-  def url_builder
-    @url_builder ||= Gitlab::UrlBuilder.new(epic)
   end
 end

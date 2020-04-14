@@ -3,11 +3,13 @@
 require 'spec_helper'
 
 describe Ci::Group do
-  subject do
-    described_class.new('test', name: 'rspec', jobs: jobs)
-  end
+  let_it_be(:project) { create(:project) }
 
-  let!(:jobs) { build_list(:ci_build, 1, :success) }
+  let!(:jobs) { build_list(:ci_build, 1, :success, project: project) }
+
+  subject do
+    described_class.new(project, 'test', name: 'rspec', jobs: jobs)
+  end
 
   it { is_expected.to include_module(StaticModel) }
 
@@ -53,7 +55,7 @@ describe Ci::Group do
       it 'calls the status from the object itself' do
         expect(jobs.first).to receive(:detailed_status)
 
-        expect(subject.detailed_status(double(:user)))
+        subject.detailed_status(double(:user))
       end
     end
 
