@@ -894,6 +894,9 @@ msgstr ""
 msgid "A user with write access to the source branch selected this option"
 msgstr ""
 
+msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
+msgstr ""
+
 msgid "API Help"
 msgstr ""
 
@@ -14912,6 +14915,12 @@ msgstr ""
 msgid "Please fill in a descriptive name for your group."
 msgstr ""
 
+msgid "Please follow the %{link_start}Let's Encrypt troubleshooting instructions%{link_end} to re-obtain your Let's Encrypt certificate."
+msgstr ""
+
+msgid "Please follow the Let's Encrypt troubleshooting instructions to re-obtain your Let's Encrypt certificate: %{docs_url}."
+msgstr ""
+
 msgid "Please migrate all existing projects to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
 msgstr ""
 
@@ -18949,6 +18958,9 @@ msgid "Something went wrong while merging this merge request. Please try again."
 msgstr ""
 
 msgid "Something went wrong while moving issues."
+msgstr ""
+
+msgid "Something went wrong while obtaining the Let's Encrypt certificate."
 msgstr ""
 
 msgid "Something went wrong while performing the action."
