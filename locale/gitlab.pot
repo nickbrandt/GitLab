@@ -12929,7 +12929,7 @@ msgstr ""
 msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
-msgid "Metrics|Reload this page"
+msgid "Metrics|Refresh dashboard"
 msgstr ""
 
 msgid "Metrics|Show last"
