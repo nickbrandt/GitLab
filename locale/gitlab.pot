@@ -12189,9 +12189,6 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
-msgid "Loading blob"
-msgstr ""
-
 msgid "Loading contribution stats for group members"
 msgstr ""
 
