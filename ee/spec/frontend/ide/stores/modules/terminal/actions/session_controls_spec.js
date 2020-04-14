@@ -1,11 +1,14 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { STARTING, PENDING, STOPPING, STOPPED } from 'ee/ide/constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
-import actionsModule, * as actions from 'ee/ide/stores/modules/terminal/actions/session_controls';
+import * as actions from 'ee/ide/stores/modules/terminal/actions/session_controls';
 import httpStatus from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+
+jest.mock('~/flash');
 
 const TEST_PROJECT_PATH = 'lorem/root';
 const TEST_BRANCH_ID = 'master';
@@ -25,11 +28,10 @@ describe('EE IDE store terminal session controls actions', () => {
   let dispatch;
   let rootState;
   let rootGetters;
-  let flashSpy;
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-    dispatch = jasmine.createSpy('dispatch');
+    dispatch = jest.fn().mockName('dispatch');
     rootState = {
       currentBranchId: TEST_BRANCH_ID,
     };
@@ -39,7 +41,6 @@ describe('EE IDE store terminal session controls actions', () => {
         path_with_namespace: TEST_PROJECT_PATH,
       },
     };
-    flashSpy = spyOnDependency(actionsModule, 'flash');
   });
 
   afterEach(() => {
@@ -47,21 +48,20 @@ describe('EE IDE store terminal session controls actions', () => {
   });
 
   describe('requestStartSession', () => {
-    it('sets session status', done => {
-      testAction(
+    it('sets session status', () => {
+      return testAction(
         actions.requestStartSession,
         null,
         {},
         [{ type: mutationTypes.SET_SESSION_STATUS, payload: STARTING }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveStartSessionSuccess', () => {
-    it('sets session and starts polling status', done => {
-      testAction(
+    it('sets session and starts polling status', () => {
+      return testAction(
         actions.receiveStartSessionSuccess,
         TEST_SESSION,
         {},
@@ -81,7 +81,6 @@ describe('EE IDE store terminal session controls actions', () => {
           },
         ],
         [{ type: 'pollSessionStatus' }],
-        done,
       );
     });
   });
@@ -90,11 +89,11 @@ describe('EE IDE store terminal session controls actions', () => {
     it('flashes message', () => {
       actions.receiveStartSessionError({ dispatch });
 
-      expect(flashSpy).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STARTING);
+      expect(createFlash).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STARTING);
     });
 
-    it('sets session status', done => {
-      testAction(actions.receiveStartSessionError, null, {}, [], [{ type: 'killSession' }], done);
+    it('sets session status', () => {
+      return testAction(actions.receiveStartSessionError, null, {}, [], [{ type: 'killSession' }]);
     });
   });
 
@@ -109,10 +108,10 @@ describe('EE IDE store terminal session controls actions', () => {
       expect(dispatch).not.toHaveBeenCalled();
     });
 
-    it('dispatches request and receive on success', done => {
+    it('dispatches request and receive on success', () => {
       mock.onPost(/.*\/ide_terminals/).reply(200, TEST_SESSION);
 
-      testAction(
+      return testAction(
         actions.startSession,
         null,
         { ...rootGetters, ...rootState },
@@ -121,14 +120,13 @@ describe('EE IDE store terminal session controls actions', () => {
           { type: 'requestStartSession' },
           { type: 'receiveStartSessionSuccess', payload: TEST_SESSION },
         ],
-        done,
       );
     });
 
-    it('dispatches request and receive on error', done => {
+    it('dispatches request and receive on error', () => {
       mock.onPost(/.*\/ide_terminals/).reply(400);
 
-      testAction(
+      return testAction(
         actions.startSession,
         null,
         { ...rootGetters, ...rootState },
@@ -137,27 +135,25 @@ describe('EE IDE store terminal session controls actions', () => {
           { type: 'requestStartSession' },
           { type: 'receiveStartSessionError', payload: jasmine.any(Error) },
         ],
-        done,
       );
     });
   });
 
   describe('requestStopSession', () => {
-    it('sets session status', done => {
-      testAction(
+    it('sets session status', () => {
+      return testAction(
         actions.requestStopSession,
         null,
         {},
         [{ type: mutationTypes.SET_SESSION_STATUS, payload: STOPPING }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveStopSessionSuccess', () => {
-    it('kills the session', done => {
-      testAction(actions.receiveStopSessionSuccess, null, {}, [], [{ type: 'killSession' }], done);
+    it('kills the session', () => {
+      return testAction(actions.receiveStopSessionSuccess, null, {}, [], [{ type: 'killSession' }]);
     });
   });
 
@@ -165,40 +161,39 @@ describe('EE IDE store terminal session controls actions', () => {
     it('flashes message', () => {
       actions.receiveStopSessionError({ dispatch });
 
-      expect(flashSpy).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STOPPING);
+      expect(createFlash).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STOPPING);
     });
 
-    it('kills the session', done => {
-      testAction(actions.receiveStopSessionError, null, {}, [], [{ type: 'killSession' }], done);
+    it('kills the session', () => {
+      return testAction(actions.receiveStopSessionError, null, {}, [], [{ type: 'killSession' }]);
     });
   });
 
   describe('stopSession', () => {
-    it('dispatches request and receive on success', done => {
+    it('dispatches request and receive on success', () => {
       mock.onPost(TEST_SESSION.cancel_path).reply(200, {});
 
       const state = {
         session: { cancelPath: TEST_SESSION.cancel_path },
       };
 
-      testAction(
+      return testAction(
         actions.stopSession,
         null,
         state,
         [],
         [{ type: 'requestStopSession' }, { type: 'receiveStopSessionSuccess' }],
-        done,
       );
     });
 
-    it('dispatches request and receive on error', done => {
+    it('dispatches request and receive on error', () => {
       mock.onPost(TEST_SESSION.cancel_path).reply(400);
 
       const state = {
         session: { cancelPath: TEST_SESSION.cancel_path },
       };
 
-      testAction(
+      return testAction(
         actions.stopSession,
         null,
         state,
@@ -207,20 +202,18 @@ describe('EE IDE store terminal session controls actions', () => {
           { type: 'requestStopSession' },
           { type: 'receiveStopSessionError', payload: jasmine.any(Error) },
         ],
-        done,
       );
     });
   });
 
   describe('killSession', () => {
-    it('stops polling and sets status', done => {
-      testAction(
+    it('stops polling and sets status', () => {
+      return testAction(
         actions.killSession,
         null,
         {},
         [{ type: mutationTypes.SET_SESSION_STATUS, payload: STOPPED }],
         [{ type: 'stopPollingSessionStatus' }],
-        done,
       );
     });
   });
@@ -242,25 +235,24 @@ describe('EE IDE store terminal session controls actions', () => {
       expect(dispatch).not.toHaveBeenCalled();
     });
 
-    it('dispatches startSession if retryPath is empty', done => {
+    it('dispatches startSession if retryPath is empty', () => {
       state.session.retryPath = '';
 
-      testAction(
+      return testAction(
         actions.restartSession,
         null,
         { ...state, ...rootState },
         [],
         [{ type: 'startSession' }],
-        done,
       );
     });
 
-    it('dispatches request and receive on success', done => {
+    it('dispatches request and receive on success', () => {
       mock
         .onPost(state.session.retryPath, { branch: rootState.currentBranchId, format: 'json' })
         .reply(200, TEST_SESSION);
 
-      testAction(
+      return testAction(
         actions.restartSession,
         null,
         { ...state, ...rootState },
@@ -269,16 +261,15 @@ describe('EE IDE store terminal session controls actions', () => {
           { type: 'requestStartSession' },
           { type: 'receiveStartSessionSuccess', payload: TEST_SESSION },
         ],
-        done,
       );
     });
 
-    it('dispatches request and receive on error', done => {
+    it('dispatches request and receive on error', () => {
       mock
         .onPost(state.session.retryPath, { branch: rootState.currentBranchId, format: 'json' })
         .reply(400);
 
-      testAction(
+      return testAction(
         actions.restartSession,
         null,
         { ...state, ...rootState },
@@ -287,23 +278,21 @@ describe('EE IDE store terminal session controls actions', () => {
           { type: 'requestStartSession' },
           { type: 'receiveStartSessionError', payload: jasmine.any(Error) },
         ],
-        done,
       );
     });
 
     [httpStatus.NOT_FOUND, httpStatus.UNPROCESSABLE_ENTITY].forEach(status => {
-      it(`dispatches request and startSession on ${status}`, done => {
+      it(`dispatches request and startSession on ${status}`, () => {
         mock
           .onPost(state.session.retryPath, { branch: rootState.currentBranchId, format: 'json' })
           .reply(status);
 
-        testAction(
+        return testAction(
           actions.restartSession,
           null,
           { ...state, ...rootState },
           [],
           [{ type: 'requestStartSession' }, { type: 'startSession' }],
-          done,
         );
       });
     });
