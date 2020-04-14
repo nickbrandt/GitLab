@@ -152,6 +152,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Allow users to be marked as service users. !202680
 
 
+## 12.8.9 (2020-04-14)
+
+### Security (1 change)
+
+- Fix filename bypass when uploading NuGet packages.
+
+
 ## 12.8.7 (2020-03-16)
 
 ### Fixed (1 change)
