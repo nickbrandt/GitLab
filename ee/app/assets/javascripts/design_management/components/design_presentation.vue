@@ -102,8 +102,8 @@ export default {
         this.overlayPosition = {};
       }
 
-      const { presentationContainer } = this.$refs;
-      if (!presentationContainer) return;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport) return;
 
       // default to center
       this.overlayPosition = {
@@ -112,10 +112,10 @@ export default {
       };
 
       // if the overlay overflows, then don't center
-      if (this.overlayDimensions.width > presentationContainer.offsetWidth) {
+      if (this.overlayDimensions.width > presentationViewport.offsetWidth) {
         this.overlayPosition.left = '0';
       }
-      if (this.overlayDimensions.height > presentationContainer.offsetHeight) {
+      if (this.overlayDimensions.height > presentationViewport.offsetHeight) {
         this.overlayPosition.top = '0';
       }
     },
@@ -243,12 +243,12 @@ export default {
       this.isDraggingDesign = false;
     },
     isDesignOverflowing() {
-      const { presentationContainer } = this.$refs;
-      if (!presentationContainer) return false;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport) return false;
 
       return (
-        presentationContainer.scrollWidth > presentationContainer.offsetWidth ||
-        presentationContainer.scrollHeight > presentationContainer.offsetHeight
+        presentationViewport.scrollWidth > presentationViewport.offsetWidth ||
+        presentationViewport.scrollHeight > presentationViewport.offsetHeight
       );
     },
   },
@@ -269,10 +269,7 @@ export default {
     @touchend="onPresentationMouseup"
     @touchcancel="onPresentationMouseup"
   >
-    <div
-      ref="presentationContainer"
-      class="h-100 w-100 d-flex align-items-center position-relative"
-    >
+    <div class="h-100 w-100 d-flex align-items-center position-relative">
       <design-image
         v-if="image"
         :image="image"
