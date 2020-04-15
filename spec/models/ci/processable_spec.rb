@@ -52,31 +52,33 @@ describe Ci::Processable do
   end
 
   describe 'validate presence of scheduling_type' do
-    context 'on create' do
-      using RSpec::Parameterized::TableSyntax
+    using RSpec::Parameterized::TableSyntax
 
-      subject { build(:ci_build, project: project, pipeline: pipeline, importing: importing) }
+    subject { build(:ci_build, project: project, pipeline: pipeline, importing: importing) }
 
-      where(:importing, :validate_scheduling_type_flag, :should_validate) do
-        false | true  | true
-        false | false | false
-        true  | true  | false
-        true  | false | false
+    where(:importing, :validate_scheduling_type_flag, :should_validate) do
+      false | true  | true
+      false | false | false
+      true  | true  | false
+      true  | false | false
+    end
+
+    with_them do
+      before do
+        stub_feature_flags(validate_scheduling_type_of_processables: validate_scheduling_type_flag)
       end
 
-      with_them do
-        before do
-          stub_feature_flags(validate_scheduling_type_of_processables: validate_scheduling_type_flag)
-        end
-
-        it 'validates on create' do
+      context 'on create' do
+        it 'validates presence' do
           if should_validate
             is_expected.to validate_presence_of(:scheduling_type).on(:create)
           else
             is_expected.not_to validate_presence_of(:scheduling_type).on(:create)
           end
         end
+      end
 
+      context 'on update' do
         it { is_expected.not_to validate_presence_of(:scheduling_type).on(:update) }
       end
     end
@@ -110,6 +112,8 @@ describe Ci::Processable do
   describe '#needs_attributes' do
     let(:build) { create(:ci_build, :created, project: project, pipeline: pipeline) }
 
+    subject { build.needs_attributes }
+
     context 'with needs' do
       before do
         create(:ci_build_need, build: build, name: 'test1')
@@ -117,7 +121,7 @@ describe Ci::Processable do
       end
 
       it 'returns all needs attributes' do
-        expect(build.needs_attributes).to contain_exactly(
+        is_expected.to contain_exactly(
           { 'artifacts' => true, 'name' => 'test1' },
           { 'artifacts' => true, 'name' => 'test2' }
         )
@@ -125,9 +129,7 @@ describe Ci::Processable do
     end
 
     context 'without needs' do
-      it 'returns all needs attributes' do
-        expect(build.needs_attributes).to be_empty
-      end
+      it { is_expected.to be_empty }
     end
   end
 
