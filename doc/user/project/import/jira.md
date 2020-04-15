@@ -1,45 +1,57 @@
-# Import your Jira project issues GitLab
+# Import your Jira project issues to GitLab
 
-Using the importer, you can import your Jira issues to GitLab.com or to
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2766) in GitLab 12.10.
+
+Using GitLab Jira importer, you can import your Jira issues to GitLab.com or to
 your self-managed GitLab instance.
 
-## Overview
-
-Jira issues import is a MVC feature introduced in 12.10 as a project level feature, meaning that issues from multiple
-Jira projects can be imported into a GitLab project. MVC version imports issue title and descriptio as well as some
-other issue metadata as a section in the issue description.
+Jira issues import is an MVC, project-level feature, meaning that issues from multiple
+Jira projects can be imported into a GitLab project. MVC version imports issue title and description
+as well as some other issue metadata as a section in the issue description.
 
 ## Prerequisites
 
 ### Permissions
 
-In order to be able to import issues from a Jira project users need to have read access on Jira issues as well as
-maintainer or owner role in GitLab project that you wish to import into or site admin role.
+In order to be able to import issues from a Jira project you need to have read access on Jira
+issues and a [Maintainer or higher](../../permissions.md#project-members-permissions) role in the
+GitLab project that you wish to import into.
 
-### Jira Integration
+### Jira integration
 
-Jira import feature makes use of an existing [Jira integration](../integrations/jira.md) feature within GitLab. Please
-esure you have the integration setup before trying to import Jira issues.
+This feature uses the existing GitLab [Jira integration](../integrations/jira.md).
 
-## How to import
+Make sure you have the integration set up before trying to import Jira issues.
 
-Jira issues import is being integrated into GitLab issues feature and can be triggered by clicking the `Import Issues` button
-and selecting `Import from Jira` option.
-![Import issues from Jira button](img/jira/import_issues_from_jira_button_v12_10.png)
+## Import Jira issues to GitLab
 
-Selecting the `Import from Jira` will bring you to the following form.
-![Import issues from Jira form](img/jira/import_issues_from_jira_form_v12_10.png)
-
-At this point if you have had the [Jira integration](../integrations/jira.md) setup, you should be able to see the Jira
-projects that you have access to in the dropdown and select the Jira project that you wish to import issues from.
-![Import issues from Jira form](img/jira/import_issues_from_jira_projects_v12_10.png)
-
-Next you click `Import Issues` and you should be presented with a confirmation that import has started. While import is
-running in the background you can navigate away from import status page to issues page and should be able to see new issues
-poping up in the issues list.
+To import Jira issues to a GitLab project, follow the steps below.
 
 NOTE: **Note:**
-While Jira issues import happens in real time, it is done in an asynchroneous background job, which may result in delays
-based on import queues load, system load or other factors. Importing large projects may take several minutes depending
-on the size of the import, you can check the status by navigating to the Jira import page
-![Import issues from Jira button](img/jira/import_issues_from_jira_button_v12_10.png)
+Importing Jira issues is done as an asynchronous background job, which
+may result in delays based on import queues load, system load, or other factors.
+Importing large projects may take several minutes depending on the size of the import.
+
+1. On the **{issues}** **Issues** page, click the **Import Issues** (**{import}**) button.
+1. Select **Import from Jira**.
+
+   ![Import issues from Jira button](img/jira/import_issues_from_jira_button_v12_10.png)
+
+   The following form appears.
+
+   ![Import issues from Jira form](img/jira/import_issues_from_jira_form_v12_10.png)
+
+   If you've previously set up the [Jira integration](../integrations/jira.md), you now see the Jira
+   projects that you have access to in the dropdown.
+
+1. Select the Jira project that you wish to import issues from.
+
+   ![Import issues from Jira form](img/jira/import_issues_from_jira_projects_v12_10.png)
+
+1. Click **Import Issues**. You're presented with a confirmation that import has started.
+   While the import is running in the background, you can navigate away from the import status page
+   to the issues page, and you'll see the new issues appearing in the issues list.
+
+1. To check the status of your import, go back to the Jira import page.
+
+   ![Import issues from Jira button](img/jira/import_issues_from_jira_button_v12_10.png)
