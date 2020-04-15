@@ -2,6 +2,7 @@ Akismet
 Alertmanager
 Algolia
 Ansible
+Anthos
 API
 approvers
 Artifactory
@@ -135,6 +136,7 @@ initializers
 interdependencies
 interdependency
 Irker
+Istio
 jasmine-jquery
 JavaScript
 Jaeger
