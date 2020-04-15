@@ -58,6 +58,7 @@ export default {
       tabindex="0"
       :css-class="itemValueStale ? 'flex-fill' : ''"
       :hide-tooltips="true"
+      :unavailable-label="__('Nothing to synchronize')"
       :success-count="itemValue.successCount"
       :failure-count="itemValue.failureCount"
       :total-count="itemValue.totalCount"
