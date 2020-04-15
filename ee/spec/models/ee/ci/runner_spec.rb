@@ -71,6 +71,14 @@ describe EE::Ci::Runner do
 
         it { is_expected.to eq(1.1) }
       end
+
+      context 'with invalid visibility level' do
+        let(:visibility_level) { 123 }
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(ArgumentError)
+        end
+      end
     end
   end
 

@@ -15,8 +15,10 @@ module EE
         case access_level
         when ::Gitlab::VisibilityLevel::PUBLIC
           public_projects_minutes_cost_factor
-        else # Gitlab::VisibilityLevel::PRIVATE/INTERNAL
+        when ::Gitlab::VisibilityLevel::PRIVATE, ::Gitlab::VisibilityLevel::INTERNAL
           private_projects_minutes_cost_factor
+        else
+          raise ArgumentError, 'Invalid visibility level'
         end
       end
 
