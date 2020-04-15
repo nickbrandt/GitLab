@@ -2,4 +2,4 @@
 title: Move deploy keys section back to repository settings
 merge_request: 29184
 author:
-type: removed
+type: changed
