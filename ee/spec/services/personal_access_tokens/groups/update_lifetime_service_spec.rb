@@ -2,17 +2,20 @@
 
 require 'spec_helper'
 
-describe PersonalAccessTokens::UpdateLifetimeService do
-  describe '#execute', :clean_gitlab_redis_shared_state do
-    include ExclusiveLeaseHelpers
+describe PersonalAccessTokens::Groups::UpdateLifetimeService do
+  include ExclusiveLeaseHelpers
 
-    let(:lease_key) { 'personal_access_tokens/update_lifetime_service' }
+  describe '#execute', :clean_gitlab_redis_shared_state do
+    let_it_be(:group) { create(:group_with_managed_accounts)}
+    subject { described_class.new(group) }
+
+    let(:lease_key) { "personal_access_tokens/groups/update_lifetime_service:group_id:#{group.id}" }
 
     context 'when we can obtain the lease' do
       it 'schedules the worker' do
         stub_exclusive_lease(lease_key, timeout: described_class::DEFAULT_LEASE_TIMEOUT)
 
-        expect(::PersonalAccessTokens::PolicyWorker).to receive(:perform_in).once
+        expect(::PersonalAccessTokens::Groups::PolicyWorker).to receive(:perform_in).once
 
         subject.execute
       end
@@ -22,7 +25,7 @@ describe PersonalAccessTokens::UpdateLifetimeService do
       it 'does not schedule the worker' do
         stub_exclusive_lease_taken(lease_key, timeout: described_class::DEFAULT_LEASE_TIMEOUT)
 
-        expect(::PersonalAccessTokens::PolicyWorker).not_to receive(:perform_in)
+        expect(::PersonalAccessTokens::Groups::PolicyWorker).not_to receive(:perform_in)
 
         subject.execute
       end

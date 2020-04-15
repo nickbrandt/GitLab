@@ -56,6 +56,10 @@ module EE
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
+      validates :max_personal_access_token_lifetime,
+                allow_blank: true,
+                numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 365 }
+
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
 
       scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
@@ -64,6 +68,17 @@ module EE
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
       end
+
+      scope :with_managed_accounts_enabled, -> {
+        joins(:saml_provider).where(saml_providers:
+          {
+            enabled: true,
+            enforced_sso: true,
+            enforced_group_managed_accounts: true
+          })
+      }
+
+      scope :with_no_pat_expiry_policy, -> { where(max_personal_access_token_lifetime: nil) }
 
       scope :with_project_templates, -> { where.not(custom_project_templates_group_id: nil) }
 
@@ -309,6 +324,24 @@ module EE
       ::Vulnerability.where(
         project: ::Project.for_group_and_its_subgroups(self).non_archived.without_deleted
       )
+    end
+
+    def max_personal_access_token_lifetime_from_now
+      if max_personal_access_token_lifetime.present?
+        max_personal_access_token_lifetime.days.from_now
+      else
+        ::Gitlab::CurrentSettings.max_personal_access_token_lifetime_from_now
+      end
+    end
+
+    def personal_access_token_expiration_policy_available?
+      enforced_group_managed_accounts? && License.feature_available?(:personal_access_token_expiration_policy)
+    end
+
+    def update_personal_access_tokens_lifetime
+      return unless max_personal_access_token_lifetime.present? && personal_access_token_expiration_policy_available?
+
+      ::PersonalAccessTokens::Groups::UpdateLifetimeService.new(self).execute
     end
 
     private

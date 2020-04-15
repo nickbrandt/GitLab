@@ -46,7 +46,8 @@ describe PersonalAccessToken do
   end
 
   describe 'validations' do
-    let(:personal_access_token) { build(:personal_access_token) }
+    let(:user) { build(:user) }
+    let(:personal_access_token) { build(:personal_access_token, user: user) }
 
     it 'allows to define expires_at' do
       personal_access_token.expires_at = 1.day.from_now
@@ -61,18 +62,28 @@ describe PersonalAccessToken do
     end
 
     context 'with expiration policy' do
-      let(:pat_expiration_policy) { 30 }
-      let(:max_expiration_date) { pat_expiration_policy.days.from_now }
+      let(:instance_level_pat_expiration_policy) { 30 }
+      let(:instance_level_max_expiration_date) { instance_level_pat_expiration_policy.days.from_now }
 
       before do
-        stub_ee_application_setting(max_personal_access_token_lifetime: pat_expiration_policy)
+        stub_ee_application_setting(max_personal_access_token_lifetime: instance_level_pat_expiration_policy)
       end
 
-      context 'when the feature is licensed' do
-        before do
-          stub_licensed_features(personal_access_token_expiration_policy: true)
+      shared_examples_for 'PAT expiry rules are not enforced' do
+        it 'allows expiry to be after the max_personal_access_token_lifetime' do
+          personal_access_token.expires_at = max_expiration_date + 1.day
+
+          expect(personal_access_token).to be_valid
         end
 
+        it 'can be blank' do
+          personal_access_token.expires_at = nil
+
+          expect(personal_access_token).to be_valid
+        end
+      end
+
+      shared_examples_for 'PAT expiry rules are enforced' do
         it 'requires to be less or equal than the max_personal_access_token_lifetime' do
           personal_access_token.expires_at = max_expiration_date + 1.day
 
@@ -88,15 +99,61 @@ describe PersonalAccessToken do
         end
       end
 
+      context 'when the feature is licensed' do
+        before do
+          stub_licensed_features(personal_access_token_expiration_policy: true)
+        end
+
+        context 'when the user does not belong to a managed group' do
+          it_behaves_like 'PAT expiry rules are enforced' do
+            let(:max_expiration_date) { instance_level_max_expiration_date }
+          end
+        end
+
+        context 'when the user belongs to a managed group' do
+          let(:group_level_pat_expiration_policy) { nil }
+          let(:group) do
+            build(:group_with_managed_accounts, max_personal_access_token_lifetime: group_level_pat_expiration_policy)
+          end
+
+          let(:user) { build(:user, managing_group: group) }
+
+          context 'when the group has enforced a PAT expiry rule' do
+            let(:group_level_pat_expiration_policy) { 20 }
+            let(:group_level_max_expiration_date) { group_level_pat_expiration_policy.days.from_now }
+
+            it_behaves_like 'PAT expiry rules are enforced' do
+              let(:max_expiration_date) { group_level_max_expiration_date }
+            end
+          end
+
+          context 'when the group has not enforced a PAT expiry setting' do
+            context 'when the instance has enforced a PAT expiry setting' do
+              it_behaves_like 'PAT expiry rules are enforced' do
+                let(:max_expiration_date) { instance_level_max_expiration_date }
+              end
+            end
+
+            context 'when the instance does not enforce a PAT expiry setting' do
+              before do
+                stub_ee_application_setting(max_personal_access_token_lifetime: nil)
+              end
+
+              it_behaves_like 'PAT expiry rules are not enforced' do
+                let(:max_expiration_date) { instance_level_max_expiration_date }
+              end
+            end
+          end
+        end
+      end
+
       context 'when the feature is not available' do
         before do
           stub_licensed_features(personal_access_token_expiration_policy: false)
         end
 
-        it 'allows to be after the max_personal_access_token_lifetime' do
-          personal_access_token.expires_at = max_expiration_date + 1.day
-
-          expect(personal_access_token).to be_valid
+        it_behaves_like 'PAT expiry rules are not enforced' do
+          let(:max_expiration_date) { instance_level_max_expiration_date }
         end
       end
     end

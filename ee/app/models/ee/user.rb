@@ -66,6 +66,8 @@ module EE
         scope
       }
 
+      scope :managed_by, ->(group) { where(managing_group: group) }
+
       scope :excluding_guests, -> { joins(:members).merge(::Member.non_guests).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }

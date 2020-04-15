@@ -385,6 +385,11 @@ msgstr ""
 msgid "%{name}'s avatar"
 msgstr ""
 
+msgid "%{no_of_days} day"
+msgid_plural "%{no_of_days} days"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{number_commits_behind} commits behind %{default_branch}, %{number_commits_ahead} commits ahead"
 msgstr ""
 
@@ -10838,6 +10843,9 @@ msgid "If any indexed field exceeds this limit it will be truncated to this numb
 msgstr ""
 
 msgid "If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like \"1 hour\". Values without specification represent seconds."
+msgstr ""
+
+msgid "If blank, set allowable lifetime to %{instance_level_policy_in_words}, as defined by the instance admin. Once set, existing tokens for users in this group may be revoked."
 msgstr ""
 
 msgid "If checked, group owners can manage LDAP group links and LDAP member overrides"
@@ -25028,6 +25036,9 @@ msgid "new merge request"
 msgstr ""
 
 msgid "no contributions"
+msgstr ""
+
+msgid "no expiration"
 msgstr ""
 
 msgid "no one can merge"
