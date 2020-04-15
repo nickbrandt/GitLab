@@ -49,6 +49,10 @@ module Vulnerabilities
       end
     end
 
+    def exportable
+      project || group
+    end
+
     def completed?
       finished? || failed?
     end

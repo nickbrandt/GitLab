@@ -77,6 +77,32 @@ describe Vulnerabilities::Export do
     end
   end
 
+  describe '#exportable' do
+    subject { vulnerability_export.exportable }
+
+    context 'when the export has project assigned' do
+      let(:project) { build(:project) }
+      let(:vulnerability_export) { build(:vulnerability_export, project: project) }
+
+      it { is_expected.to eql(project) }
+    end
+
+    context 'when the export does not have project assigned' do
+      context 'when the export has group assigned' do
+        let(:group) { build(:group) }
+        let(:vulnerability_export) { build(:vulnerability_export, :group, group: group) }
+
+        it { is_expected.to eql(group) }
+      end
+
+      context 'when the export does not have group assigned' do
+        let(:vulnerability_export) { build(:vulnerability_export, project: nil) }
+
+        it { is_expected.to be_nil }
+      end
+    end
+  end
+
   describe '#completed?' do
     context 'when status is created' do
       subject { build(:vulnerability_export, :created) }
