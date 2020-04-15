@@ -9509,7 +9509,10 @@ msgstr ""
 msgid "GeoNodes|Repository verification progress"
 msgstr ""
 
-msgid "GeoNodes|Selective"
+msgid "GeoNodes|Selective (%{syncLabel})"
+msgstr ""
+
+msgid "GeoNodes|Selective synchronization"
 msgstr ""
 
 msgid "GeoNodes|Something went wrong while changing node status"
@@ -10536,6 +10539,9 @@ msgid "Groups"
 msgstr ""
 
 msgid "Groups (%{count})"
+msgstr ""
+
+msgid "Groups (%{groups})"
 msgstr ""
 
 msgid "Groups can also be nested by creating %{subgroup_docs_link_start}subgroups%{subgroup_docs_link_end}."
@@ -18657,6 +18663,9 @@ msgstr ""
 msgid "Severity: %{severity}"
 msgstr ""
 
+msgid "Shards (%{shards})"
+msgstr ""
+
 msgid "Shards to synchronize"
 msgstr ""
 
@@ -24639,6 +24648,9 @@ msgid "geo_node_name"
 msgstr ""
 
 msgid "group"
+msgstr ""
+
+msgid "groups"
 msgstr ""
 
 msgid "has already been linked to another vulnerability"

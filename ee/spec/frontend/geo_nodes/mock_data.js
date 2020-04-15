@@ -19,6 +19,7 @@ export const mockNodes = [
     verification_max_capacity: 100,
     clone_protocol: 'http',
     web_edit_url: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
+    selective_sync_shards: [],
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/1',
       repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/repair',
@@ -39,6 +40,7 @@ export const mockNodes = [
     sync_object_storage: true,
     clone_protocol: 'http',
     web_edit_url: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
+    selective_sync_shards: [],
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/2',
       repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/2/repair',
@@ -61,6 +63,7 @@ export const mockNode = {
   repairPath: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/repair',
   statusPath: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/status',
   editPath: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
+  selective_sync_shards: [],
 };
 
 export const rawMockNodeDetails = {
@@ -239,5 +242,6 @@ export const mockNodeDetails = {
     timeStamp: 1511255200,
   },
   selectiveSyncType: 'namespaces',
+  namespaces: [],
   dbReplicationLag: 0,
 };
