@@ -14,13 +14,18 @@ import (
 	"os"
 	"testing"
 
+	jwt "github.com/dgrijalva/jwt-go"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
+
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -128,7 +133,18 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 	}
 	defer os.RemoveAll(tempPath)
 
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, nil)
+	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath},
+		func(w http.ResponseWriter, r *http.Request) {
+			jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), testhelper.ParseJWT)
+			require.NoError(t, err)
+
+			rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
+			require.Equal(t, 2, len(rewrittenFields))
+
+			require.Contains(t, rewrittenFields, "file")
+			require.Contains(t, rewrittenFields, "metadata")
+		},
+	)
 	defer ts.Close()
 
 	var buffer bytes.Buffer

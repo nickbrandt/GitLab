@@ -18,8 +18,9 @@ import (
 )
 
 type artifactsUploadProcessor struct {
-	opts   *filestore.SaveFileOpts
-	stored bool
+	opts *filestore.SaveFileOpts
+
+	upload.SavedFileTracker
 }
 
 func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, file *filestore.FileHandler) (*filestore.FileHandler, error) {
@@ -79,10 +80,10 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 	if formName != "file" {
 		return fmt.Errorf("invalid form field: %q", formName)
 	}
-	if a.stored {
+	if a.Count() > 0 {
 		return fmt.Errorf("artifacts request contains more than one file")
 	}
-	a.stored = true
+	a.Track(formName, file.LocalPath)
 
 	select {
 	case <-ctx.Done():
@@ -99,16 +100,10 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 			for k, v := range metadata.GitLabFinalizeFields("metadata") {
 				writer.WriteField(k, v)
 			}
+
+			a.Track("metadata", metadata.LocalPath)
 		}
 	}
-	return nil
-}
-
-func (a *artifactsUploadProcessor) ProcessField(ctx context.Context, formName string, writer *multipart.Writer) error {
-	return nil
-}
-
-func (a *artifactsUploadProcessor) Finalize(ctx context.Context) error {
 	return nil
 }
 
@@ -118,7 +113,7 @@ func (a *artifactsUploadProcessor) Name() string {
 
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		mg := &artifactsUploadProcessor{opts: filestore.GetOpts(a)}
+		mg := &artifactsUploadProcessor{opts: filestore.GetOpts(a), SavedFileTracker: upload.SavedFileTracker{Request: r}}
 
 		upload.HandleFileUploads(w, r, h, a, mg)
 	}, "/authorize")

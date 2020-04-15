@@ -63,7 +63,7 @@ func TestArtifactsUpload(t *testing.T) {
 func expectSignedRequest(t *testing.T, r *http.Request) {
 	t.Helper()
 
-	_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
+	_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), testhelper.ParseJWT)
 	require.NoError(t, err)
 }
 
@@ -109,21 +109,6 @@ func signedUploadTestServer(t *testing.T, extraTests func(r *http.Request)) *htt
 	})
 }
 
-func parseJWT(token *jwt.Token) (interface{}, error) {
-	// Don't forget to validate the alg is what you expect:
-	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-	}
-
-	testhelper.ConfigureSecret()
-	secretBytes, err := secret.Bytes()
-	if err != nil {
-		return nil, fmt.Errorf("read secret from file: %v", err)
-	}
-
-	return secretBytes, nil
-}
-
 func TestAcceleratedUpload(t *testing.T) {
 	tests := []struct {
 		method             string
@@ -150,7 +135,7 @@ func TestAcceleratedUpload(t *testing.T) {
 						expectSignedRequest(t, r)
 					}
 
-					jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), parseJWT)
+					jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), testhelper.ParseJWT)
 					require.NoError(t, err)
 
 					rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})

@@ -15,6 +15,8 @@ import (
 	"strings"
 	"testing"
 
+	jwt "github.com/dgrijalva/jwt-go"
+
 	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
@@ -173,4 +175,19 @@ func LoadFile(t *testing.T, filePath string) string {
 		t.Fatal(err)
 	}
 	return string(content)
+}
+
+func ParseJWT(token *jwt.Token) (interface{}, error) {
+	// Don't forget to validate the alg is what you expect:
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+	}
+
+	ConfigureSecret()
+	secretBytes, err := secret.Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("read secret from file: %v", err)
+	}
+
+	return secretBytes, nil
 }
