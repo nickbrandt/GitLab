@@ -7699,9 +7699,6 @@ ALTER TABLE ONLY public.ci_daily_report_results
 ALTER TABLE ONLY public.ci_group_variables
     ADD CONSTRAINT ci_group_variables_pkey PRIMARY KEY (id);
 
-ALTER TABLE public.ci_job_artifacts
-    ADD CONSTRAINT ci_job_artifacts_file_store_not_null CHECK ((file_store IS NOT NULL)) NOT VALID;
-
 ALTER TABLE ONLY public.ci_job_artifacts
     ADD CONSTRAINT ci_job_artifacts_pkey PRIMARY KEY (id);
 
@@ -8058,9 +8055,6 @@ ALTER TABLE ONLY public.ldap_group_links
 
 ALTER TABLE ONLY public.lfs_file_locks
     ADD CONSTRAINT lfs_file_locks_pkey PRIMARY KEY (id);
-
-ALTER TABLE public.lfs_objects
-    ADD CONSTRAINT lfs_objects_file_store_not_null CHECK ((file_store IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY public.lfs_objects
     ADD CONSTRAINT lfs_objects_pkey PRIMARY KEY (id);
@@ -8454,9 +8448,6 @@ ALTER TABLE ONLY public.u2f_registrations
 
 ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
-
-ALTER TABLE public.uploads
-    ADD CONSTRAINT uploads_store_not_null CHECK ((store IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY public.user_agent_details
     ADD CONSTRAINT user_agent_details_pkey PRIMARY KEY (id);
@@ -13160,9 +13151,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200406102111
 20200406102120
 20200406135648
-20200406165950
-20200406171857
-20200406172135
 20200406192059
 20200407094005
 20200407094923
@@ -13170,5 +13158,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408153842
 20200408175424
 20200409211607
+20200415160722
+20200415161021
+20200415161206
 \.
 
