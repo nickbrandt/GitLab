@@ -71,6 +71,15 @@ describe('Codequality report app', () => {
       expect(findStatus().text()).toBe(`Found ${expectedIssueTotal} code quality issues`);
       expect(wrapper.findAll('.report-block-list-issue').length).toBe(expectedIssueTotal);
     });
+
+    it('renders a link to the line where the issue was found', () => {
+      const issueLink = wrapper.find('.report-block-list-issue a');
+
+      expect(issueLink.text()).toBe('ee/spec/features/admin/geo/admin_geo_projects_spec.rb:152');
+      expect(issueLink.attributes('href')).toBe(
+        '/root/test-codequality/blob/feature-branch/ee/spec/features/admin/geo/admin_geo_projects_spec.rb#L152',
+      );
+    });
   });
 
   describe('when there are no codequality issues', () => {
