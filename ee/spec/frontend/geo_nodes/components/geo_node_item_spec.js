@@ -130,7 +130,7 @@ describe('GeoNodeItemComponent', () => {
 
   describe('created', () => {
     it('binds `nodeDetailsLoaded` event handler', () => {
-      expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoaded', expect.any(Function));
     });
   });
 
@@ -138,7 +138,7 @@ describe('GeoNodeItemComponent', () => {
     it('unbinds `nodeDetailsLoaded` event handler', () => {
       wrapper.destroy();
 
-      expect(eventHub.$off).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('nodeDetailsLoaded', expect.any(Function));
     });
   });
 

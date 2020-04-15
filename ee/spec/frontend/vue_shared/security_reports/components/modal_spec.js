@@ -391,7 +391,7 @@ describe('Security Reports modal', () => {
 
       it('submits the comment and dismisses the vulnerability if text has been entered', () => {
         const { vm } = wrapper;
-        vm.addCommentAndDismiss = jasmine.createSpy();
+        vm.addCommentAndDismiss = jest.fn();
         vm.localDismissalComment = comment;
         vm.handleDismissalCommentSubmission();
 
@@ -415,7 +415,7 @@ describe('Security Reports modal', () => {
 
       it('submits the comment if text is entered and the vulnerability is already dismissed', () => {
         const { vm } = wrapper;
-        vm.addDismissalComment = jasmine.createSpy();
+        vm.addDismissalComment = jest.fn();
         vm.localDismissalComment = comment;
         vm.handleDismissalCommentSubmission();
 

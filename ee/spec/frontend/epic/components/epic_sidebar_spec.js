@@ -39,7 +39,7 @@ describe('EpicSidebarComponent', () => {
         vm.getDateFromMilestonesTooltip(dateTypes.start);
 
         expect(epicUtils.getDateFromMilestonesTooltip).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateType: dateTypes.start,
           }),
         );
@@ -53,7 +53,7 @@ describe('EpicSidebarComponent', () => {
         vm.changeStartDateType(true, true);
 
         expect(vm.toggleStartDateType).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
           }),
         );
@@ -65,7 +65,7 @@ describe('EpicSidebarComponent', () => {
         vm.changeStartDateType(true, false);
 
         expect(vm.saveDate).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
             dateType: dateTypes.start,
             newDate: '2018-06-01',
@@ -81,7 +81,7 @@ describe('EpicSidebarComponent', () => {
         vm.saveStartDate('2018-1-1');
 
         expect(vm.saveDate).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
             dateType: dateTypes.start,
             newDate: '2018-1-1',
@@ -97,7 +97,7 @@ describe('EpicSidebarComponent', () => {
         vm.changeDueDateType(true, true);
 
         expect(vm.toggleDueDateType).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
           }),
         );
@@ -109,7 +109,7 @@ describe('EpicSidebarComponent', () => {
         vm.changeDueDateType(true, false);
 
         expect(vm.saveDate).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
             dateType: dateTypes.due,
             newDate: '2018-08-01',
@@ -125,7 +125,7 @@ describe('EpicSidebarComponent', () => {
         vm.saveDueDate('2018-1-1');
 
         expect(vm.saveDate).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             dateTypeIsFixed: true,
             dateType: dateTypes.due,
             newDate: '2018-1-1',

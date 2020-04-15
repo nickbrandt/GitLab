@@ -38,7 +38,7 @@ describe('IDE EERightPane', () => {
     factory();
 
     expect(wrapper.find(RightPane).props('extensionTabs')).toEqual([
-      jasmine.objectContaining({
+      expect.objectContaining({
         show: true,
         title: 'Terminal',
       }),
@@ -51,7 +51,7 @@ describe('IDE EERightPane', () => {
     factory();
 
     expect(wrapper.find(RightPane).props('extensionTabs')).toEqual([
-      jasmine.objectContaining({
+      expect.objectContaining({
         show: false,
         title: 'Terminal',
       }),

@@ -133,7 +133,7 @@ describe('EE IDE store terminal session controls actions', () => {
         [],
         [
           { type: 'requestStartSession' },
-          { type: 'receiveStartSessionError', payload: jasmine.any(Error) },
+          { type: 'receiveStartSessionError', payload: expect.any(Error) },
         ],
       );
     });
@@ -200,7 +200,7 @@ describe('EE IDE store terminal session controls actions', () => {
         [],
         [
           { type: 'requestStopSession' },
-          { type: 'receiveStopSessionError', payload: jasmine.any(Error) },
+          { type: 'receiveStopSessionError', payload: expect.any(Error) },
         ],
       );
     });
@@ -276,7 +276,7 @@ describe('EE IDE store terminal session controls actions', () => {
         [],
         [
           { type: 'requestStartSession' },
-          { type: 'receiveStartSessionError', payload: jasmine.any(Error) },
+          { type: 'receiveStartSessionError', payload: expect.any(Error) },
         ],
       );
     });
