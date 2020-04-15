@@ -53,68 +53,31 @@ describe Ci::Processable do
 
   describe 'validate presence of scheduling_type' do
     context 'on create' do
-      let(:processable) do
-        build(
-          :ci_build, :created, project: project, pipeline: pipeline,
-          importing: importing, scheduling_type: nil
-        )
+      using RSpec::Parameterized::TableSyntax
+
+      subject { build(:ci_build, project: project, pipeline: pipeline, importing: importing) }
+
+      where(:importing, :validate_scheduling_type_flag, :should_validate) do
+        false | true  | true
+        false | false | false
+        true  | true  | false
+        true  | false | false
       end
 
-      context 'when importing' do
-        let(:importing) { true }
+      with_them do
+        before do
+          stub_feature_flags(validate_scheduling_type_of_processables: validate_scheduling_type_flag)
+        end
 
-        context 'when validate_scheduling_type_of_processables is true' do
-          before do
-            stub_feature_flags(validate_scheduling_type_of_processables: true)
-          end
-
-          it 'does not validate' do
-            expect(processable).to be_valid
+        it 'validates on create' do
+          if should_validate
+            is_expected.to validate_presence_of(:scheduling_type).on(:create)
+          else
+            is_expected.not_to validate_presence_of(:scheduling_type).on(:create)
           end
         end
 
-        context 'when validate_scheduling_type_of_processables is false' do
-          before do
-            stub_feature_flags(validate_scheduling_type_of_processables: false)
-          end
-
-          it 'does not validate' do
-            expect(processable).to be_valid
-          end
-        end
-      end
-
-      context 'when not importing' do
-        let(:importing) { false }
-
-        context 'when validate_scheduling_type_of_processables is true' do
-          before do
-            stub_feature_flags(validate_scheduling_type_of_processables: true)
-          end
-
-          it 'validates' do
-            expect(processable).not_to be_valid
-          end
-        end
-
-        context 'when validate_scheduling_type_of_processables is false' do
-          before do
-            stub_feature_flags(validate_scheduling_type_of_processables: false)
-          end
-
-          it 'does not validate' do
-            expect(processable).to be_valid
-          end
-        end
-      end
-    end
-
-    context 'on update' do
-      let(:processable) { create(:ci_build, :created, project: project, pipeline: pipeline) }
-
-      it 'does not validate' do
-        processable.scheduling_type = nil
-        expect(processable).to be_valid
+        it { is_expected.not_to validate_presence_of(:scheduling_type).on(:update) }
       end
     end
   end
