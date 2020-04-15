@@ -12449,6 +12449,9 @@ msgstr ""
 msgid "Manage your license"
 msgstr ""
 
+msgid "Managed Account"
+msgstr ""
+
 msgid "Manifest"
 msgstr ""
 

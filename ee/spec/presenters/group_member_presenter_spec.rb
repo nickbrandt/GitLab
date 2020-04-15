@@ -19,6 +19,17 @@ describe GroupMemberPresenter do
     end
   end
 
+  describe '#group_managed_account?' do
+    let(:saml_provider) { double(:saml_provider) }
+    let(:group) { double(:group) }
+
+    it 'calls through to User#group_managed_account?' do
+      expect(user).to receive(:group_managed_account?).and_return(true)
+
+      expect(presenter.group_managed_account?).to eq true
+    end
+  end
+
   describe '#can_update?' do
     context 'when user cannot update_group_member but can override_group_member' do
       before do
