@@ -1,7 +1,7 @@
 <script>
 import PackageTags from '../../shared/components/package_tags.vue';
 import PublishMethod from './publish_method.vue';
-import { GlNewButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
 import { getPackageType } from '../../shared/utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { mapState } from 'vuex';
@@ -9,7 +9,7 @@ import { mapState } from 'vuex';
 export default {
   name: 'PackagesListRow',
   components: {
-    GlNewButton,
+    GlButton,
     GlIcon,
     GlLink,
     GlSprintf,
@@ -108,7 +108,7 @@ export default {
     </div>
 
     <div v-if="deleteAvailable" class="table-section section-10 d-flex justify-content-end">
-      <gl-new-button
+      <gl-button
         ref="action-delete"
         icon="remove"
         category="primary"
