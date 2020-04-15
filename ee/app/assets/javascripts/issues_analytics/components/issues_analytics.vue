@@ -142,7 +142,7 @@ export default {
 </script>
 <template>
   <div class="issues-analytics-wrapper" data-qa-selector="issues_analytics_wrapper">
-    <gl-loading-icon v-if="loading" :size="4" class="issues-analytics-loading" />
+    <gl-loading-icon v-if="loading" size="xl" class="issues-analytics-loading" />
 
     <div v-if="showChart" class="issues-analytics-chart">
       <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues created per month') }}</h4>
