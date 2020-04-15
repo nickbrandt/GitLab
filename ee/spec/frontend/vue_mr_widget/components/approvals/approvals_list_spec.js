@@ -124,7 +124,7 @@ describe('EE MRWidget approvals list', () => {
 
       expect(icon.exists()).toBe(true);
       expect(icon.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           isApproved: true,
         }),
       );
@@ -140,7 +140,7 @@ describe('EE MRWidget approvals list', () => {
 
       expect(approvers.exists()).toBe(true);
       expect(approvers.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           items: testApprovers(),
         }),
       );
@@ -158,7 +158,7 @@ describe('EE MRWidget approvals list', () => {
 
       expect(approvers.exists()).toBe(true);
       expect(approvers.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           items: rule.approved_by,
         }),
       );
@@ -184,7 +184,7 @@ describe('EE MRWidget approvals list', () => {
 
         expect(approvers.exists()).toBe(true);
         expect(approvers.props()).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             items: rule.approvers,
           }),
         );
@@ -195,7 +195,7 @@ describe('EE MRWidget approvals list', () => {
 
         expect(approvedBy.exists()).toBe(true);
         expect(approvedBy.props()).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             items: rule.approved_by,
           }),
         );
@@ -219,7 +219,7 @@ describe('EE MRWidget approvals list', () => {
 
       expect(icon.exists()).toBe(true);
       expect(icon.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           isApproved: false,
         }),
       );
@@ -242,7 +242,7 @@ describe('EE MRWidget approvals list', () => {
 
       expect(icon.exists()).toBe(true);
       expect(icon.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           isApproved: false,
         }),
       );

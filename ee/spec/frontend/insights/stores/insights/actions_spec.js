@@ -74,8 +74,8 @@ describe('Insights store actions', () => {
         actions.receiveConfigError,
         null,
         null,
-        jasmine.any(Array),
-        jasmine.any(Array),
+        expect.any(Array),
+        expect.any(Array),
         () => {
           expect(createFlash).toHaveBeenCalledWith(
             `There was an error fetching configuration for charts: Unknown Error`,
