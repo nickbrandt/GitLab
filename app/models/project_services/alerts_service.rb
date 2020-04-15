@@ -15,9 +15,7 @@ class AlertsService < Service
   before_validation :ensure_token, if: :activated?
 
   def url
-    if instance? || template?
-      return '<namespace / project>'
-    end
+    return if instance? || template?
 
     url_helpers.project_alerts_notify_url(project, format: :json)
   end
