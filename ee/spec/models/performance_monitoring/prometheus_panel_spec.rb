@@ -5,6 +5,7 @@ require 'spec_helper'
 describe PerformanceMonitoring::PrometheusPanel do
   let(:json_content) do
     {
+      "max_value" => 1,
       "type" => "area-chart",
       "title" => "Chart Title",
       "y_label" => "Y-Axis",
