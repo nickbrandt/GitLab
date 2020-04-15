@@ -16,10 +16,12 @@ export const createEmptyRule = () => ({
   ruleType: 'any_approver',
 });
 
-export const createMRRuleWithSource = () => ({
+export const createMRRuleWithSource = (rule = {}) => ({
   ...createEmptyRule(),
   ...createMRRule(),
   minApprovalsRequired: 1,
   hasSource: true,
   sourceId: 3,
+  overridden: true,
+  ...rule,
 });

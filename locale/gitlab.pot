@@ -1286,6 +1286,9 @@ msgstr ""
 msgid "Added at"
 msgstr ""
 
+msgid "Added for this merge request"
+msgstr ""
+
 msgid "Added in this version"
 msgstr ""
 
@@ -14160,6 +14163,9 @@ msgid "OutdatedBrowser|Please install a %{browser_link_start}supported web brows
 msgstr ""
 
 msgid "OutdatedBrowser|You can provide feedback %{feedback_link_start}on this issue%{feedback_link_end} or via your usual support channels."
+msgstr ""
+
+msgid "Overridden"
 msgstr ""
 
 msgid "Overview"

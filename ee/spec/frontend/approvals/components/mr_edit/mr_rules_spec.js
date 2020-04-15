@@ -31,7 +31,8 @@ describe('EE Approvals MRRules', () => {
   };
 
   const findHeaders = () => wrapper.findAll('thead th').wrappers.map(x => x.text());
-  const findRuleName = () => wrapper.find('td.js-name');
+  const findRuleName = () => wrapper.find('.js-name');
+  const findRuleIndicator = () => wrapper.find({ ref: 'indicator' });
   const findRuleMembers = () =>
     wrapper
       .find('td.js-members')
@@ -122,6 +123,22 @@ describe('EE Approvals MRRules', () => {
       factory();
       wrapper.destroy();
       expect(mockDisconnect).toHaveBeenCalled();
+    });
+
+    describe('rule indicator', () => {
+      const falseOverriddenRule = createMRRuleWithSource({ overridden: false });
+
+      it.each`
+        rules                       | indicator                         | desc
+        ${createMRRuleWithSource()} | ${'Overridden'}                   | ${'indicates "Overridden" for overridden rules'}
+        ${createMRRule()}           | ${'Added for this merge request'} | ${'indicates "Added for this merge request" for local rules'}
+        ${falseOverriddenRule}      | ${''}                             | ${'has no indicator for non-overridden rules'}
+      `('$desc', ({ rules, indicator }) => {
+        store.modules.approvals.state.rules = [rules];
+        factory();
+
+        expect(findRuleIndicator().text()).toBe(indicator);
+      });
     });
   });
 
