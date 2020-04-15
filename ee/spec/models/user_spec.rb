@@ -111,6 +111,15 @@ describe User do
         expect(non_internal.all?(&:internal?)).to eq(false)
       end
     end
+
+    describe '.managed_by' do
+      let!(:group) { create(:group_with_managed_accounts) }
+      let!(:managed_users) { create_list(:user, 2, managing_group: group) }
+
+      it 'returns users managed by the specified group' do
+        expect(described_class.managed_by(group)).to match_array(managed_users)
+      end
+    end
   end
 
   describe '.find_by_smartcard_identity' do
