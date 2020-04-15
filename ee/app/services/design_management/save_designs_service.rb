@@ -35,12 +35,24 @@ module DesignManagement
     attr_reader :files
 
     def upload_designs!
-      actions = build_actions
-      return [] if actions.empty?
+      # puts "Waiting [#{Thread.current.object_id}]"
+      actions = ::DesignManagement::Version.lock_for_creation(project.id) do
+        # puts ". Building [#{Thread.current.object_id}]"
+        actions = build_actions
+        # if actions.empty?
+        #   puts ".. Skipping [#{Thread.current.object_id}]"
+        # else
+        if actions.present?
+          # puts ".. Running [#{Thread.current.object_id}]"
+          version = run_actions(actions)
+          version.run_after_commit do
+            ::DesignManagement::NewVersionWorker.perform_async(version.id)
+          end
+        end
 
-      version = run_actions(actions)
-      ::DesignManagement::NewVersionWorker.perform_async(version.id)
-
+        actions
+      end
+      # puts "Done [#{Thread.current.object_id}]"
       actions.map(&:design)
     end
 

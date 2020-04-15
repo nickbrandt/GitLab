@@ -12,9 +12,39 @@ describe Mutations::DesignManagement::Upload do
     described_class.new(object: nil, context: { current_user: user }, field: nil)
   end
 
-  def run_mutation(fs = files)
+  def unique_file(upload)
+    ::Gitlab::FileUpload.new(upload).tap { |f| f.original_filename = generate(:jpeg_file) }
+  end
+
+  def run_mutation(files_to_upload = files, project_path = project.full_path, iid = issue.iid)
     mutation = described_class.new(object: nil, context: { current_user: user }, field: nil)
-    mutation.resolve(project_path: project.full_path, iid: issue.iid, files: fs)
+    mutation.resolve(project_path: project_path, iid: iid, files: files_to_upload)
+  end
+
+  def parallel(blocks)
+    thread_pool = Concurrent::FixedThreadPool.new(
+      [2, Concurrent.processor_count - 1].max, { max_queue: blocks.size }
+    )
+    opts = { executor: thread_pool }
+
+    error = Concurrent::MVar.new
+
+    blocks.map { |block| Concurrent::Future.execute(opts, &block) }.each do |future|
+      future.wait(20)
+
+      if future.complete?
+        error.put(future.reason) if future.reason && error.empty?
+      else
+        future.cancel
+        error.put(StandardError.new(:cancelled)) if error.empty?
+      end
+    end
+
+    raise error.take if error.full?
+  ensure
+    thread_pool.shutdown
+    thread_pool.wait_for_termination(10)
+    thread_pool.kill if thread_pool.running?
   end
 
   describe "#resolve" do
@@ -40,32 +70,54 @@ describe Mutations::DesignManagement::Upload do
       end
 
       describe 'contention in the design repo' do
+        before do
+          issue.design_collection.repository.create_if_not_exists
+        end
+
         let(:files) do
-          [
-            fixture_file_upload('spec/fixtures/dk.png'),
-            fixture_file_upload('spec/fixtures/rails_sample.jpg'),
-            fixture_file_upload('spec/fixtures/banana_sample.gif')
-          ].cycle(20).to_a
+          ['dk.png', 'rails_sample.jpg', 'banana_sample.gif']
+           .cycle
+           .take(Concurrent.processor_count * 2)
+           .map { |f| unique_file(fixture_file_upload("spec/fixtures/#{f}")) }
+        end
+
+        def creates_designs
+          prior_count = DesignManagement::Design.count
+
+          expect { yield }.not_to raise_error
+
+          expect(DesignManagement::Design.count).to eq(prior_count + files.size)
         end
 
         describe 'running requests in parallel' do
           it 'does not cause errors' do
-            expect do
-              threads = files.map do |f|
-                Thread.new { run_mutation([f]) }
+            creates_designs do
+              parallel(files.map { |f| -> { run_mutation([f]) } })
+            end
+          end
+        end
+
+        describe 'running requests in parallel on different issues' do
+          it 'does not cause errors' do
+            creates_designs do
+              issues = create_list(:issue, files.size, author: user)
+              issues.each { |i| i.project.add_developer(user) }
+              blocks = files.zip(issues).map do |(f, i)|
+                -> { run_mutation([f], i.project.full_path, i.iid) }
               end
-              threads.each(&:join)
-            end.not_to raise_error
+
+              parallel(blocks)
+            end
           end
         end
 
         describe 'running requests in serial' do
           it 'does not cause errors' do
-            expect do
+            creates_designs do
               files.each do |f|
                 run_mutation([f])
               end
-            end.not_to raise_error
+            end
           end
         end
       end

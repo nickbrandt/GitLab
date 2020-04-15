@@ -5,6 +5,7 @@ module DesignManagement
     include Importable
     include ShaAttribute
     include Gitlab::Utils::StrongMemoize
+    extend Gitlab::ExclusiveLeaseHelpers
 
     NotSameIssue = Class.new(StandardError)
 
@@ -91,6 +92,17 @@ module DesignManagement
       end
     rescue
       raise CouldNotCreateVersion.new(sha, issue_id, design_actions)
+    end
+
+    CREATION_TTL = 5.seconds
+    RETRY_DELAY = ->(num) { 0.2.seconds * num**2 }
+
+    def self.lock_for_creation(project_id, &block)
+      key = "lock_for_creation:#{name}:{#{project_id}}"
+
+      in_lock(key, ttl: CREATION_TTL, retries: 5, sleep_sec: RETRY_DELAY) do |_retried|
+        yield
+      end
     end
 
     def designs_by_event
