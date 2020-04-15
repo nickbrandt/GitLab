@@ -5,6 +5,12 @@ require 'spec_helper'
 describe Ci::JobArtifact do
   let(:artifact) { create(:ci_job_artifact, :archive) }
 
+  describe '#file_store' do
+    it 'sets the default value when nil' do
+      expect(subject.file_store).to eq(JobArtifactUploader::Store::LOCAL)
+    end
+  end
+
   describe "Associations" do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:job) }
@@ -229,7 +235,7 @@ describe Ci::JobArtifact do
             stub_artifacts_object_storage(background_upload: false)
           end
 
-          it 'schedules the model for migration' do
+          it 'does not schedule the migration' do
             expect(ObjectStorage::BackgroundMoveWorker).not_to receive(:perform_async)
 
             subject

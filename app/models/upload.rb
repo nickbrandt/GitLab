@@ -5,6 +5,8 @@ class Upload < ApplicationRecord
   # Upper limit for foreground checksum processing
   CHECKSUM_THRESHOLD = 100.megabytes
 
+  attribute :store, :integer, default: ObjectStorage::Store::LOCAL
+
   belongs_to :model, polymorphic: true # rubocop:disable Cop/PolymorphicAssociations
 
   validates :size, presence: true
@@ -133,6 +135,18 @@ class Upload < ApplicationRecord
   end
 
   private
+
+  def immediately_remote_stored?
+    object_storage_available? && direct_upload_enabled?
+  end
+
+  def object_storage_available?
+    uploader_class.ancestors.include?(ObjectStorage::Concern)
+  end
+
+  def direct_upload_enabled?
+    uploader_class.object_store_enabled? && uploader_class.direct_upload_enabled?
+  end
 
   def delete_file!
     retrieve_uploader.remove!

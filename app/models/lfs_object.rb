@@ -6,6 +6,8 @@ class LfsObject < ApplicationRecord
   include EachBatch
   include ObjectStorage::BackgroundMove
 
+  attribute :file_store, :integer, default: LfsObjectUploader::Store::LOCAL
+
   has_many :lfs_objects_projects, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :projects, -> { distinct }, through: :lfs_objects_projects
 
@@ -18,6 +20,18 @@ class LfsObject < ApplicationRecord
   mount_uploader :file, LfsObjectUploader
 
   after_save :update_file_store, if: :saved_change_to_file?
+
+  def self.calculate_oid(path)
+    self.hexdigest(path)
+  end
+
+  # rubocop: disable DestroyAll
+  def self.destroy_unreferenced
+    joins("LEFT JOIN lfs_objects_projects ON lfs_objects_projects.lfs_object_id = #{table_name}.id")
+        .where(lfs_objects_projects: { id: nil })
+        .destroy_all
+  end
+  # rubocop: enable DestroyAll
 
   def self.not_linked_to_project(project)
     where('NOT EXISTS (?)',
@@ -42,18 +56,6 @@ class LfsObject < ApplicationRecord
 
   def local_store?
     file_store == LfsObjectUploader::Store::LOCAL
-  end
-
-  # rubocop: disable DestroyAll
-  def self.destroy_unreferenced
-    joins("LEFT JOIN lfs_objects_projects ON lfs_objects_projects.lfs_object_id = #{table_name}.id")
-        .where(lfs_objects_projects: { id: nil })
-        .destroy_all
-  end
-  # rubocop: enable DestroyAll
-
-  def self.calculate_oid(path)
-    self.hexdigest(path)
   end
 end
 

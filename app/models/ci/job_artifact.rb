@@ -74,6 +74,8 @@ module Ci
     # https://gitlab.com/gitlab-org/gitlab/-/issues/215418
     attribute :locked, :boolean, default: false
 
+    attribute :file_store, :integer, default: JobArtifactUploader::Store::LOCAL
+
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
 
@@ -81,11 +83,12 @@ module Ci
 
     validates :file_format, presence: true, unless: :trace?, on: :create
     validate :valid_file_format?, unless: :trace?, on: :create
+
     before_save :set_size, if: :file_changed?
 
-    update_project_statistics project_statistics_name: :build_artifacts_size
-
     after_save :update_file_store, if: :saved_change_to_file?
+
+    update_project_statistics project_statistics_name: :build_artifacts_size
 
     scope :with_files_stored_locally, -> { where(file_store: [nil, ::JobArtifactUploader::Store::LOCAL]) }
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }

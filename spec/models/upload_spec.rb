@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 describe Upload do
+  describe '#store' do
+    it 'sets the default value when nil' do
+      expect(subject.store).to eq(ObjectStorage::Store::LOCAL)
+    end
+  end
+
   describe 'associations' do
     it { is_expected.to belong_to(:model) }
   end
