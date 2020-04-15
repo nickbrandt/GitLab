@@ -43,7 +43,7 @@ module Groups
       end
 
       def create_deploy_token
-        result = Projects::DeployTokens::CreateService.new(@group, current_user, deploy_token_params).execute
+        result = Groups::DeployTokens::CreateService.new(@group, current_user, deploy_token_params).execute
         @new_deploy_token = result[:deploy_token]
 
         if result[:status] == :success
