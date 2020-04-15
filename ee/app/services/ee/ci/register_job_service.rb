@@ -40,7 +40,7 @@ module EE
         visibility_relation = ::Ci::Build.where(
           projects: { visibility_level: runner.visibility_levels_without_minutes_quota })
 
-        enforce_limits_relation = ::Ci::Build.where("(#{builds_check_limit.to_sql})=1") # rubocop:disable GitlabSecurity/SqlInjection
+        enforce_limits_relation = ::Ci::Build.where('EXISTS (?)', builds_check_limit)
 
         relation.merge(visibility_relation.or(enforce_limits_relation))
       end
