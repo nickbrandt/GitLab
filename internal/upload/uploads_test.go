@@ -390,7 +390,7 @@ func TestInvalidFileNames(t *testing.T) {
 		httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 
 		response := httptest.NewRecorder()
-		HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &savedFileTracker{request: httpRequest})
+		HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &SavedFileTracker{Request: httpRequest})
 		testhelper.AssertResponseCode(t, response, testCase.code)
 	}
 }
