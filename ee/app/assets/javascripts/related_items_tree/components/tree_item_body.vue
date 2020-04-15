@@ -88,6 +88,9 @@ export default {
     itemId() {
       return this.itemReference.split(this.item.pathIdSeparator).pop();
     },
+    itemPath() {
+      return this.itemReference.split(this.item.pathIdSeparator)[0];
+    },
     itemHierarchy() {
       return this.itemPath + this.item.pathIdSeparator + this.itemId;
     },
