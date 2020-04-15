@@ -7,6 +7,9 @@ export const mockPipelineInfo = {
   id: 1,
   ref: 'branch-name',
   sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  user: {
+    name: 'foo',
+  },
 };
 
 export const mavenPackage = {

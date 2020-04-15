@@ -1,0 +1,5 @@
+---
+title: Updates the package registry list UI which also includes adding pipeline information
+merge_request: 28426
+author:
+type: added

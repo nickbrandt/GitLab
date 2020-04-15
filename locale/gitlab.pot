@@ -6082,6 +6082,9 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+msgid "Created %{timestamp}"
+msgstr ""
+
 msgid "Created At"
 msgstr ""
 
@@ -14353,6 +14356,9 @@ msgstr ""
 msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
 msgstr ""
 
+msgid "PackageRegistry|Manually Published"
+msgstr ""
+
 msgid "PackageRegistry|Maven"
 msgstr ""
 
@@ -14411,6 +14417,9 @@ msgid "PackageRegistry|You may also need to setup authentication using an auth t
 msgstr ""
 
 msgid "PackageRegistry|npm"
+msgstr ""
+
+msgid "PackageRegistry|published by %{author}"
 msgstr ""
 
 msgid "PackageRegistry|yarn"
