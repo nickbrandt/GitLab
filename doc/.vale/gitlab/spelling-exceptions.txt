@@ -118,6 +118,8 @@ hardcode
 hardcoded
 hardcodes
 Helm
+Heroku
+Herokuish
 HipChat
 hostname
 hostnames
@@ -180,6 +182,7 @@ misconfiguring
 mitigations
 mockup
 mockups
+ModSecurity
 nameserver
 nameservers
 namespace
@@ -326,6 +329,10 @@ unchecking
 unchecks
 uncomment
 uncommented
+unencode
+unencoded
+unencoder
+unencodes
 unencrypted
 Unicorn
 unindexed
