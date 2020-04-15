@@ -69,7 +69,7 @@ export default {
 };
 </script>
 <template>
-  <gl-new-dropdown>
+  <gl-new-dropdown class="js-new-environments-dropdown">
     <template #button-content>
       <span class="d-md-none mr-1">
         {{ $options.translations.addEnvironmentsLabel }}

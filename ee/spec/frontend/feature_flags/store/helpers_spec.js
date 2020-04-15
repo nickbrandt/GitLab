@@ -378,7 +378,23 @@ describe('feature flags helpers spec', () => {
         },
       ]);
     });
+
+    it('inserts spaces between user ids', () => {
+      const strategy = _.first(
+        mapStrategiesToViewModel([
+          {
+            id: '1',
+            name: 'userWithId',
+            parameters: { userIds: 'user1,user2,user3' },
+            scopes: [],
+          },
+        ]),
+      );
+
+      expect(strategy.parameters).toEqual({ userIds: 'user1, user2, user3' });
+    });
   });
+
   describe('mapStrategiesToRails', () => {
     it('should map rails casing to view model casing', () => {
       expect(
@@ -425,6 +441,7 @@ describe('feature flags helpers spec', () => {
         },
       });
     });
+
     it('should insert a default * scope if there are none', () => {
       expect(
         mapStrategiesToRails({
@@ -459,6 +476,25 @@ describe('feature flags helpers spec', () => {
           ],
         },
       });
+    });
+
+    it('removes white space between user ids', () => {
+      const result = mapStrategiesToRails({
+        name: 'test',
+        version: NEW_VERSION_FLAG,
+        strategies: [
+          {
+            id: '1',
+            name: 'userWithId',
+            parameters: { userIds: 'user1, user2, user3' },
+            scopes: [],
+          },
+        ],
+      });
+
+      const strategyAttrs = _.first(result.operations_feature_flag.strategies_attributes);
+
+      expect(strategyAttrs.parameters).toEqual({ userIds: 'user1,user2,user3' });
     });
   });
 });
