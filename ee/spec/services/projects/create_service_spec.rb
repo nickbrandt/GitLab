@@ -186,18 +186,24 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
-  context 'git hook sample' do
+  context 'push rules sample' do
     let!(:sample) { create(:push_rule_sample) }
 
     subject(:push_rule) { create_project(user, opts).push_rule }
 
-    it 'creates git hook from sample' do
+    it 'creates push rule from sample' do
       is_expected.to have_attributes(
         force_push_regex: sample.force_push_regex,
         deny_delete_tag: sample.deny_delete_tag,
         delete_branch_regex: sample.delete_branch_regex,
         commit_message_regex: sample.commit_message_regex
       )
+    end
+
+    it 'creates association between project settings and push rule' do
+      project_setting = subject.project.project_setting
+
+      expect(project_setting.push_rule_id).to eq(subject.id)
     end
 
     context 'push rules unlicensed' do
