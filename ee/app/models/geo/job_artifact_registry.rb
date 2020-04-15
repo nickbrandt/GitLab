@@ -31,6 +31,16 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
     false
   end
 
+  # TODO: remove once `success` column has a default value set
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/214407
+  def self.insert_for_model_ids(ids)
+    records = ids.map do |id|
+      new(artifact_id: id, success: false, created_at: Time.zone.now)
+    end
+
+    bulk_insert!(records, returns: :ids)
+  end
+
   def self.replication_enabled?
     JobArtifactUploader.object_store_enabled? ? Gitlab::Geo.current_node.sync_object_storage? : true
   end
