@@ -3,7 +3,7 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlEmptyState, GlFormCheckbox } from '@gitlab/ui';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
-import SelectionSummary from './selection_summary.vue';
+import SelectionSummary from './selection_summary_vuex.vue';
 
 export default {
   name: 'SecurityDashboardTable',
