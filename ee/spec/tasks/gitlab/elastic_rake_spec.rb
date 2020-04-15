@@ -10,7 +10,7 @@ describe 'gitlab:elastic namespace rake tasks', :elastic do
 
   describe 'index' do
     it 'calls all indexing tasks in order' do
-      expect(Rake::Task['gitlab:elastic:create_empty_index']).to receive(:invoke).ordered
+      expect(Rake::Task['gitlab:elastic:recreate_index']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:clear_index_status']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:index_projects']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:index_snippets']).to receive(:invoke).ordered
@@ -73,11 +73,12 @@ describe 'gitlab:elastic namespace rake tasks', :elastic do
     end
   end
 
-  describe 'reindex_to_another_cluster' do
-    it 'calls reindex_to_another_cluster' do
-      expect(Gitlab::Elastic::Helper).to receive(:reindex_to_another_cluster).with('http://oldcluster.example.com:9300/', 'http://newcluster.example.com:9300/')
+  describe 'recreate_index' do
+    it 'calls all related subtasks in order' do
+      expect(Rake::Task['gitlab:elastic:delete_index']).to receive(:invoke).ordered
+      expect(Rake::Task['gitlab:elastic:create_empty_index']).to receive(:invoke).ordered
 
-      run_rake_task 'gitlab:elastic:reindex_to_another_cluster', 'http://oldcluster.example.com:9300/', 'http://newcluster.example.com:9300/'
+      run_rake_task 'gitlab:elastic:recreate_index'
     end
   end
 end

@@ -46,7 +46,7 @@ module EE
       def prevent_elasticsearch_indexing_update?
         !application_setting.elasticsearch_indexing &&
           ::Gitlab::Utils.to_boolean(params[:elasticsearch_indexing]) &&
-          !::Gitlab::Elastic::Helper.index_exists?
+          !::Gitlab::Elastic::Helper.default.index_exists?
       end
     end
   end

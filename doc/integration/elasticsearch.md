@@ -174,7 +174,7 @@ If no namespaces or projects are selected, no Elasticsearch indexing will take p
 
 CAUTION: **Warning**:
 If you have already indexed your instance, you will have to regenerate the index in order to delete all existing data
-for filtering to work correctly. To do this run the Rake tasks `gitlab:elastic:create_empty_index` and
+for filtering to work correctly. To do this run the Rake tasks `gitlab:elastic:recreate_index` and
 `gitlab:elastic:clear_index_status`. Afterwards, removing a namespace or a project from the list will delete the data
 from the Elasticsearch index as expected.
 
@@ -406,7 +406,7 @@ There are several Rake tasks available to you via the command line:
 
 - [`sudo gitlab-rake gitlab:elastic:index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - This is a wrapper task. It does the following:
-    - `sudo gitlab-rake gitlab:elastic:create_empty_index`
+    - `sudo gitlab-rake gitlab:elastic:recreate_index`
     - `sudo gitlab-rake gitlab:elastic:clear_index_status`
     - `sudo gitlab-rake gitlab:elastic:index_projects`
     - `sudo gitlab-rake gitlab:elastic:index_snippets`
@@ -414,27 +414,24 @@ There are several Rake tasks available to you via the command line:
   - This iterates over all projects and queues Sidekiq jobs to index them in the background.
 - [`sudo gitlab-rake gitlab:elastic:index_projects_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - This determines the overall status of the indexing. It is done by counting the total number of indexed projects, dividing by a count of the total number of projects, then multiplying by 100.
-- [`sudo gitlab-rake gitlab:elastic:create_empty_index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This generates an empty index on the Elasticsearch side, deleting the existing one if present.
 - [`sudo gitlab-rake gitlab:elastic:clear_index_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - This deletes all instances of IndexStatus for all projects.
-- [`sudo gitlab-rake gitlab:elastic:delete_index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
+
+    NOTE: **Note:**
+    The `INDEX_NAME` parameter is optional and will use the default index name from the current `RAILS_ENV` if not set.
+
+- [`sudo gitlab-rake gitlab:elastic:create_empty_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
+  - This generates an empty index on the Elasticsearch side only if it doesn't already exists.
+- [`sudo gitlab-rake gitlab:elastic:delete_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - This removes the GitLab index on the Elasticsearch instance.
-- [`sudo gitlab-rake gitlab:elastic:recreate_index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - Does the same thing as `sudo gitlab-rake gitlab:elastic:create_empty_index`
+- [`sudo gitlab-rake gitlab:elastic:recreate_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
+  - This is a wrapper task. It does the following:
+    - `sudo gitlab-rake gitlab:elastic:delete_index[<INDEX_NAME>]`
+    - `sudo gitlab-rake gitlab:elastic:create_empty_index[<INDEX_NAME>]`
 - [`sudo gitlab-rake gitlab:elastic:index_snippets`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - Performs an Elasticsearch import that indexes the snippets data.
 - [`sudo gitlab-rake gitlab:elastic:projects_not_indexed`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
   - Displays which projects are not indexed.
-- [`sudo gitlab-rake gitlab:elastic:reindex_to_another_cluster[<SOURCE_CLUSTER_URL>,<DESTINATION_CLUSTER_URL>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - Creates a new index in the destination cluster from the source index using
-    Elasticsearch "reindex from remote", where the source index is copied to the
-    destination. This is useful when migrating to a new cluster because it should be
-    quicker than reindexing via GitLab.
-
-    NOTE: **Note:**
-    Your source cluster must be whitelisted in your destination cluster's Elasticsearch
-    settings. See [Reindex from remote](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html#reindex-from-remote).
 
 ### Environment Variables
 

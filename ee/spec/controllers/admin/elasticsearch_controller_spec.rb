@@ -11,7 +11,7 @@ describe Admin::ElasticsearchController do
     end
 
     it 'starts indexing' do
-      expect(Gitlab::Elastic::Helper).to(receive(:index_exists?)).and_return(true)
+      expect(Gitlab::Elastic::Helper.default).to(receive(:index_exists?)).and_return(true)
       expect_next_instance_of(::Elastic::IndexProjectsService) do |service|
         expect(service).to receive(:execute)
       end
@@ -24,7 +24,7 @@ describe Admin::ElasticsearchController do
 
     context 'without an index' do
       before do
-        allow(Gitlab::Elastic::Helper).to(receive(:index_exists?)).and_return(false)
+        allow(Gitlab::Elastic::Helper.default).to(receive(:index_exists?)).and_return(false)
       end
 
       it 'does nothing and returns 404' do
