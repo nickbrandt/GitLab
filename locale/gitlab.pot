@@ -23023,7 +23023,13 @@ msgstr ""
 msgid "VulnerabilityManagement|Resolved %{timeago} by %{user}"
 msgstr ""
 
+msgid "VulnerabilityManagement|Something went wrong while trying to delete the comment. Please try again later."
+msgstr ""
+
 msgid "VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later."
+msgstr ""
+
+msgid "VulnerabilityManagement|Something went wrong while trying to save the comment. Please try again later."
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong, could not create an issue."
@@ -25327,6 +25333,9 @@ msgid "view it on GitLab"
 msgstr ""
 
 msgid "view the blob"
+msgstr ""
+
+msgid "vulnerability|Add a comment"
 msgstr ""
 
 msgid "vulnerability|Add a comment or reason for dismissal"

@@ -65,7 +65,7 @@ export default {
     </div>
     <hr />
 
-    <ul v-if="discussions.length" ref="historyList" class="notes">
+    <ul v-if="discussions.length" ref="historyList" class="notes discussion-body">
       <history-entry
         v-for="discussion in discussions"
         :key="discussion.id"

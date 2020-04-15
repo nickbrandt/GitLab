@@ -1,17 +1,45 @@
 <script>
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
+import HistoryComment from './history_comment.vue';
 
 export default {
-  components: { EventItem },
+  components: { EventItem, HistoryComment },
   props: {
     discussion: {
       type: Object,
       required: true,
     },
   },
+  data() {
+    return {
+      notes: this.discussion.notes,
+    };
+  },
   computed: {
     systemNote() {
-      return this.discussion.notes.find(x => x.system === true);
+      return this.notes.find(x => x.system === true);
+    },
+    comments() {
+      return this.notes.filter(x => x !== this.systemNote);
+    },
+  },
+  methods: {
+    addComment(comment) {
+      this.notes.push(comment);
+    },
+    updateComment(data, comment) {
+      const index = this.notes.indexOf(comment);
+
+      if (index > -1) {
+        this.notes.splice(index, 1, Object.assign({}, comment, data));
+      }
+    },
+    removeComment(comment) {
+      const index = this.notes.indexOf(comment);
+
+      if (index > -1) {
+        this.notes.splice(index, 1);
+      }
     },
   },
 };
@@ -22,12 +50,32 @@ export default {
     <event-item
       :id="systemNote.id"
       :author="systemNote.author"
-      :created-at="systemNote.created_at"
+      :created-at="systemNote.updated_at"
       :icon-name="systemNote.system_note_icon_name"
       icon-class="timeline-icon m-0"
       class="m-3"
     >
       <template #header-message>{{ systemNote.note }}</template>
     </event-item>
+
+    <template v-if="comments.length" ref="existingComments">
+      <hr class="m-3" />
+      <history-comment
+        v-for="comment in comments"
+        :key="comment.id"
+        ref="existingComment"
+        :comment="comment"
+        :discussion-id="discussion.reply_id"
+        @onCommentUpdated="updateComment"
+        @onCommentDeleted="removeComment"
+      />
+    </template>
+
+    <history-comment
+      v-else
+      ref="newComment"
+      :discussion-id="discussion.reply_id"
+      @onCommentAdded="addComment"
+    />
   </li>
 </template>
