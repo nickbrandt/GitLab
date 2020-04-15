@@ -4,7 +4,7 @@ This document outlines the styleguide for GitLab's [GraphQL API](../api/graphql/
 
 ## How GitLab implements GraphQL
 
-We use the [graphql-ruby gem](https://graphql-ruby.org/) written by [Robert Mosolgo](https://github.com/rmosolgo/).
+We use the [GraphQL Ruby gem](https://graphql-ruby.org/) written by [Robert Mosolgo](https://github.com/rmosolgo/).
 
 All GraphQL queries are directed to a single endpoint
 ([`app/controllers/graphql_controller.rb#execute`](https://gitlab.com/gitlab-org/gitlab/blob/master/app%2Fcontrollers%2Fgraphql_controller.rb)),
@@ -84,7 +84,7 @@ the context.
 
 ### Nullable fields
 
-GraphQL allows fields to be be "nullable" or "non-nullable". The former means
+GraphQL allows fields to be "nullable" or "non-nullable". The former means
 that `null` may be returned instead of a value of the specified type. **In
 general**, you should prefer using nullable fields to non-nullable ones, for
 the following reasons:
@@ -150,7 +150,7 @@ query($project_path: ID!) {
 ```
 
 This would return the first 2 pipelines of a project and related
-pagination info., ordered by descending ID. The returned data would
+pagination information, ordered by descending ID. The returned data would
 look like this:
 
 ```json
@@ -210,6 +210,15 @@ query($project_path: ID!) {
 To ensure that we get consistent ordering, we will append an ordering on the primary
 key, in descending order. This is usually `id`, so basically we will add `order(id: :desc)`
 to the end of the relation. A primary key _must_ be available on the underlying table.
+
+#### Shortcut fields
+
+Sometimes it can seem easy to implement a "shortcut field", having the resolver return the first of a collection if no parameters are passed.
+These "shortcut fields" are discouraged because they create maintenance overhead.
+They need to be kept in sync with their canonical field, and deprecated or modified if their canonical field changes.
+Use the functionality the framework provides unless there is a compelling reason to do otherwise.
+
+For example, instead of `latest_pipeline`, use `pipelines(last: 1)`.
 
 ### Exposing permissions for a type
 
@@ -865,7 +874,7 @@ the analyzer, and the final value is also available to you.
 
 [Multiplex queries](https://graphql-ruby.org/queries/multiplex.html) enable
 multiple queries to be sent in a single request. This reduces the number of requests sent to the server.
-(there are custom Multiplex Query Analyzers and Multiplex Instrumentation provided by graphql-ruby).
+(there are custom Multiplex Query Analyzers and Multiplex Instrumentation provided by GraphQL Ruby).
 
 ### Query limits
 
@@ -888,7 +897,7 @@ end
 ```
 
 More about complexity:
-[graphql-ruby docs](https://graphql-ruby.org/queries/complexity_and_depth.html)
+[GraphQL Ruby documentation](https://graphql-ruby.org/queries/complexity_and_depth.html).
 
 ## Documentation and Schema
 

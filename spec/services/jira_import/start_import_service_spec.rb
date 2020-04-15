@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe JiraImport::StartImportService do
   let_it_be(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let_it_be(:project, reload: true) { create(:project) }
 
   subject { described_class.new(user, project, '').execute }
 
@@ -38,6 +38,12 @@ describe JiraImport::StartImportService do
         it_behaves_like 'responds with error', 'Jira integration not configured.'
       end
 
+      context 'when issues feature are disabled' do
+        let_it_be(:project, reload: true) { create(:project, :issues_disabled) }
+
+        it_behaves_like 'responds with error', 'Cannot import because issues are not available in this project.'
+      end
+
       context 'when Jira service exists' do
         let!(:jira_service) { create(:jira_service, project: project, active: true) }
 
@@ -46,10 +52,12 @@ describe JiraImport::StartImportService do
         end
 
         context 'when correct data provided' do
-          subject { described_class.new(user, project, 'some-key').execute }
+          let(:fake_key)  { 'some-key' }
+
+          subject { described_class.new(user, project, fake_key).execute }
 
           context 'when import is already running' do
-            let!(:import_state) { create(:import_state, project: project, status: :started) }
+            let_it_be(:jira_import_state) { create(:jira_import_state, :started, project: project) }
 
             it_behaves_like 'responds with error', 'Jira import is already running.'
           end
@@ -62,17 +70,38 @@ describe JiraImport::StartImportService do
           it 'schedules jira import' do
             subject
 
-            expect(project.import_state.status).to eq('scheduled')
+            expect(project.latest_jira_import).to be_scheduled
           end
 
           it 'creates jira import data' do
-            subject
+            jira_import = subject.payload[:import_data]
 
-            jira_import_data = project.import_data.becomes(JiraImportData)
-            expect(jira_import_data.force_import?).to be true
-            imported_project_data = jira_import_data.projects.last
-            expect(imported_project_data.key).to eq('some-key')
-            expect(imported_project_data.scheduled_by['user_id']).to eq(user.id)
+            expect(jira_import.jira_project_xid).to eq(0)
+            expect(jira_import.jira_project_name).to eq(fake_key)
+            expect(jira_import.jira_project_key).to eq(fake_key)
+            expect(jira_import.user).to eq(user)
+          end
+
+          it 'creates jira import label' do
+            expect { subject }.to change { Label.count }.by(1)
+          end
+
+          it 'creates jira label title with correct number' do
+            jira_import = subject.payload[:import_data]
+
+            label_title = "jira-import::#{jira_import.jira_project_key}-1"
+            expect(jira_import.label.title).to eq(label_title)
+          end
+
+          context 'when multiple jira imports for same jira project' do
+            let!(:jira_imports) { create_list(:jira_import_state, 3, :finished, project: project, jira_project_key: fake_key)}
+
+            it 'creates jira label title with correct number' do
+              jira_import = subject.payload[:import_data]
+
+              label_title = "jira-import::#{jira_import.jira_project_key}-4"
+              expect(jira_import.label.title).to eq(label_title)
+            end
           end
         end
       end

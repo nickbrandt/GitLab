@@ -125,6 +125,7 @@ export default {
     <section class="d-flex align-items-center mt-4">
       <gl-deprecated-button
         id="node-save-button"
+        data-qa-selector="add_node_button"
         variant="success"
         @click="saveGeoNode(nodeData)"
         >{{ saveButtonTitle }}</gl-deprecated-button

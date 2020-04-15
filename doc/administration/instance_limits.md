@@ -176,6 +176,26 @@ To set this limit on a self-managed installation, run the following in the
 Plan.default.limits.update!(ci_pipeline_schedules: 100)
 ```
 
+## Instance monitoring and metrics
+
+### Incident Management inbound alert limits
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14932) in GitLab 12.5.
+
+Limiting inbound alerts for an incident reduces the number of alerts (issues)
+that can be created within a period of time, which can help prevent overloading
+your incident responders with duplicate issues. You can reduce the volume of
+alerts in the following ways:
+
+- Max requests per period per project, 3600 seconds by default.
+- Rate limit period in seconds, 3600 seconds by default.
+
+### Prometheus Alert JSON payloads
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/14929) in GitLab 12.6.
+
+Prometheus alert payloads sent to the `notify.json` endpoint are limited to 1 MB in size.
+
 ## Environment data on Deploy Boards
 
 [Deploy Boards](../user/project/deploy_boards.md) load information from Kubernetes about

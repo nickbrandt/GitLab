@@ -64,7 +64,7 @@ describe('EpicCreateComponent', () => {
           vm.epicTitle = newEpicTitle;
 
           expect(vm.setEpicCreateTitle).toHaveBeenCalledWith(
-            jasmine.objectContaining({
+            expect.objectContaining({
               newEpicTitle,
             }),
           );

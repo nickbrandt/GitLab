@@ -3,17 +3,27 @@
 require 'spec_helper'
 
 describe EE::SystemHooksService do
-  let(:group_member) { create(:group_member) }
-  let(:user) { create(:user) }
-
   context 'when group member' do
+    let(:group) { create(:group) }
+    let(:group_member) { create(:group_member, group: group) }
+
     context 'event data' do
       it { expect(event_data(group_member, :create)).to include(:event_name, :created_at, :updated_at, :group_name, :group_path, :group_plan, :group_id, :user_name, :user_username, :user_email, :user_id, :group_access) }
       it { expect(event_data(group_member, :destroy)).to include(:event_name, :created_at, :updated_at, :group_name, :group_path, :group_plan, :group_id, :user_name, :user_username, :user_email, :user_id, :group_access) }
     end
+
+    context 'with a Gold plan' do
+      let(:group) { create(:group_with_plan, plan: :gold_plan) }
+
+      it 'returns correct group_plan' do
+        expect(event_data(group_member, :create)[:group_plan]).to eq('gold')
+      end
+    end
   end
 
   context 'when user' do
+    let_it_be(:user) { create(:user) }
+
     context 'event data' do
       context 'for GitLab.com' do
         before do

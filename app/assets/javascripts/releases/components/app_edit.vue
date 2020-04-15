@@ -1,6 +1,6 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import { GlDeprecatedButton, GlLink, GlFormInput, GlFormGroup } from '@gitlab/ui';
+import { mapState, mapActions, mapGetters } from 'vuex';
+import { GlButton, GlFormInput, GlFormGroup } from '@gitlab/ui';
 import { escape as esc } from 'lodash';
 import { __, sprintf } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
@@ -15,8 +15,7 @@ export default {
   components: {
     GlFormInput,
     GlFormGroup,
-    GlDeprecatedButton,
-    GlLink,
+    GlButton,
     MarkdownField,
     AssetLinksForm,
   },
@@ -27,19 +26,21 @@ export default {
   computed: {
     ...mapState('detail', [
       'isFetchingRelease',
+      'isUpdatingRelease',
       'fetchError',
       'markdownDocsPath',
       'markdownPreviewPath',
       'releasesPagePath',
       'updateReleaseApiDocsPath',
     ]),
+    ...mapGetters('detail', ['isValid']),
     showForm() {
       return !this.isFetchingRelease && !this.fetchError;
     },
     subtitleText() {
       return sprintf(
         __(
-          'Releases are based on Git tags. We recommend naming tags that fit within semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}.',
+          'Releases are based on Git tags. We recommend tags that use semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}.',
         ),
         {
           codeStart: '<code>',
@@ -86,6 +87,9 @@ export default {
     },
     showAssetLinksForm() {
       return this.glFeatures.releaseAssetLinkEditing;
+    },
+    isSaveChangesDisabled() {
+      return this.isUpdatingRelease || !this.isValid;
     },
   },
   created() {
@@ -163,17 +167,19 @@ export default {
       <asset-links-form v-if="showAssetLinksForm" />
 
       <div class="d-flex pt-3">
-        <gl-deprecated-button
-          class="mr-auto js-submit-button"
+        <gl-button
+          class="mr-auto js-no-auto-disable"
+          category="primary"
           variant="success"
           type="submit"
           :aria-label="__('Save changes')"
+          :disabled="isSaveChangesDisabled"
         >
           {{ __('Save changes') }}
-        </gl-deprecated-button>
-        <gl-link :href="cancelPath" class="js-cancel-button btn btn-default">
+        </gl-button>
+        <gl-button :href="cancelPath" class="js-cancel-button">
           {{ __('Cancel') }}
-        </gl-link>
+        </gl-button>
       </div>
     </form>
   </div>

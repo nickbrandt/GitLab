@@ -39,19 +39,6 @@ describe EE::Audit::GroupChangesAuditor do
         expect(event.details[:change]).to eq 'project_creation_level'
       end
 
-      it 'creates an event when the group plan changes' do
-        new_plan = create(:free_plan, name: 'plan-1')
-
-        group.update!(plan_id: new_plan.id)
-
-        expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
-
-        event = SecurityEvent.last
-        expect(event.details[:from]).to eq 'none'
-        expect(event.details[:to]).to eq 'plan-1'
-        expect(event.details[:change]).to eq 'plan'
-      end
-
       it 'creates an event when attributes change' do
         # Exclude special cases covered from above
         columns = described_class::COLUMNS - described_class::COLUMN_HUMAN_NAME.keys - [:project_creation_level]

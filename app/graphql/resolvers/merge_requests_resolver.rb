@@ -4,11 +4,11 @@ module Resolvers
   class MergeRequestsResolver < BaseResolver
     argument :iid, GraphQL::STRING_TYPE,
               required: false,
-              description: 'The IID of the merge request, e.g., "1"'
+              description: 'IID of the merge request, for example `1`'
 
     argument :iids, [GraphQL::STRING_TYPE],
               required: false,
-              description: 'The list of IIDs of issues, e.g., [1, 2]'
+              description: 'Array of IIDs of merge requests, for example `[1, 2]`'
 
     type Types::MergeRequestType, null: true
 
@@ -20,8 +20,17 @@ module Resolvers
 
       args[:iids] ||= [args[:iid]].compact
 
-      args[:iids].map { |iid| batch_load(iid) }
-        .select(&:itself) # .compact doesn't work on BatchLoader
+      if args[:iids].any?
+        batch_load_merge_requests(args[:iids])
+      else
+        args[:project_id] = project.id
+
+        MergeRequestsFinder.new(context[:current_user], args).execute
+      end
+    end
+
+    def batch_load_merge_requests(iids)
+      iids.map { |iid| batch_load(iid) }.select(&:itself) # .compact doesn't work on BatchLoader
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

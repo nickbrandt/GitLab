@@ -19,7 +19,7 @@ Code Quality:
   Quality](https://gitlab.com/gitlab-org/ci-cd/codequality) project using [default Code Climate configurations](https://gitlab.com/gitlab-org/ci-cd/codequality/-/tree/master/codeclimate_defaults).
 - Can make use of a [template](#example-configuration).
 - Is available with [Auto
-  DevOps](../../../topics/autodevops/index.md#auto-code-quality-starter).
+  DevOps](../../../topics/autodevops/stages.md#auto-code-quality-starter).
 - Can be extended through [Analysis Plugins](https://docs.codeclimate.com/docs/list-of-engines) or a [custom tool](#implementing-a-custom-tool).
 
 Going a step further, GitLab can show the Code Quality report right
@@ -53,8 +53,10 @@ also requires the GitLab Runner 11.5 or later. For earlier versions, use the
 
 This example shows how to run Code Quality on your code by using GitLab CI/CD and Docker.
 
-First, you need GitLab Runner with
-[docker-in-docker executor](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor).
+First, you need GitLab Runner with:
+
+- The [docker-in-docker executor](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor).
+- Enough disk space to handle generated Code Quality files. For example on the [GitLab project](https://gitlab.com/gitlab-org/gitlab) the files are approximately 7 GB.
 
 Once you set up the Runner, include the CodeQuality template in your CI config:
 

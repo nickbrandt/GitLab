@@ -9,7 +9,7 @@ import {
 } from '../../../../../spec/frontend/monitoring/mock_data';
 import { getJSONFixture } from '../../../../../spec/frontend/helpers/fixtures';
 import { propsData } from '../../../../../spec/frontend/monitoring/init_utils';
-import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import Tracking from '~/tracking';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
@@ -58,7 +58,7 @@ describe('Dashboard', () => {
 
   function setupComponentStore(component) {
     component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
       metricsDashboardPayload,
     );
 

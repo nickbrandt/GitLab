@@ -239,7 +239,7 @@ module Vulnerabilities
     end
 
     def solution
-      metadata.dig('solution')
+      metadata.dig('solution') || remediations&.first&.dig('summary')
     end
 
     def location

@@ -91,33 +91,57 @@ describe VulnerabilitiesHelper do
   end
 
   describe '#vulnerability_finding_data' do
+    let(:finding) { build(:vulnerabilities_occurrence) }
+
     subject { helper.vulnerability_finding_data(finding) }
 
-    it "returns finding information" do
-      expect(subject).to include(
+    it 'returns finding information' do
+      expect(subject).to match(
         description: finding.description,
-        identifiers: finding.identifiers,
+        identifiers: kind_of(Array),
+        issue_feedback: anything,
         links: finding.links,
         location: finding.location,
         name: finding.name,
-        issue_feedback: anything,
-        project: anything
+        project: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        solution: kind_of(String)
+      )
+    end
+  end
+
+  describe '#vulnerability_file_link' do
+    let(:project) { create(:project, :repository, :public) }
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+    let(:finding) { create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high) }
+    let(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
+
+    subject { helper.vulnerability_file_link(vulnerability) }
+
+    it 'returns a link to the vulnerability file location' do
+      expect(subject).to include(
+        vulnerability.finding.location['file'],
+        "#{vulnerability.finding.location['start_line']}",
+        vulnerability.finding.pipelines&.last&.sha
       )
     end
 
-    context "when finding has a remediations key" do
-      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("remediations") }.first }
+    context 'when vulnerability is not linked to a commit' do
+      it 'uses the default branch' do
+        vulnerability.finding.pipelines = []
+        vulnerability.finding.save
 
-      it "uses the first remediation summary" do
-        expect(subject[:solution]).to start_with "Use GCM mode"
+        expect(subject).to include(
+          vulnerability.project.default_branch
+        )
       end
     end
 
-    context "when finding has a solution key" do
-      let(:finding) { vulnerability.findings.select { |finding| finding.raw_metadata.include?("solution") }.first }
+    context 'when vulnerability is not on a specific line' do
+      it 'does not include a reference to the line number' do
+        vulnerability.finding.location['start_line'] = nil
+        vulnerability.finding.save
 
-      it "uses the solution key" do
-        expect(subject[:solution]).to start_with "GCM mode"
+        expect(subject).not_to include('#L')
       end
     end
   end

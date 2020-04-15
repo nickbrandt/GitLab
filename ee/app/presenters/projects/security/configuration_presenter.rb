@@ -20,8 +20,8 @@ module Projects
         container_scanning: 'user/application_security/container_scanning/index',
         dast: 'user/application_security/dast/index',
         dependency_scanning: 'user/application_security/dependency_scanning/index',
-        license_management: 'user/application_security/license_compliance/index',
-        license_scanning: 'user/application_security/license_compliance/index',
+        license_management: 'user/compliance/license_compliance/index',
+        license_scanning: 'user/compliance/license_compliance/index',
         sast: 'user/application_security/sast/index'
       }.freeze
 

@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'pushes wip limits to frontend' do
-  let(:plan_license) { :free_plan }
-  let(:group) { create(:group, plan: plan_license) }
-  let(:global_license) { create(:license) }
-
-  before do
-    allow(License).to receive(:current).and_return(global_license)
-  end
-
   context 'self-hosted with correct license' do
-    let(:plan_license) { :bronze_plan }
+    before do
+      stub_licensed_features(wip_limits: true)
+    end
 
     it 'is enabled for all groups if the license is correct' do
       expect(subject).to receive(:push_frontend_feature_flag).at_least(:once)
@@ -27,7 +21,7 @@ RSpec.shared_examples 'pushes wip limits to frontend' do
     context 'for group with correct plan' do
       before do
         namespace = parent.is_a?(Group) ? parent : parent.namespace
-        namespace.plan = create(:bronze_plan)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: create(:bronze_plan))
       end
 
       it 'is enabled' do

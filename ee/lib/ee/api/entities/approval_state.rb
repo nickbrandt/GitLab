@@ -5,7 +5,10 @@ module EE
     module Entities
       class ApprovalState < Grape::Entity
         expose :merge_request, merge: true, using: ::API::Entities::IssuableEntity
-        expose(:merge_status) { |approval_state| approval_state.merge_request.merge_status }
+
+        expose(:merge_status) do |approval_state|
+          approval_state.merge_request.public_merge_status
+        end
 
         expose :approved?, as: :approved
 

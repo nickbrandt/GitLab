@@ -5,6 +5,25 @@ FactoryBot.define do
     SecureRandom.uuid
   end
 
+  factory :vulnerabilities_occurrence_with_remediation, parent: :vulnerabilities_occurrence do
+    transient do
+      summary { nil }
+    end
+
+    after(:build) do |finding, evaluator|
+      if evaluator.summary
+        raw_metadata = JSON.parse(finding.raw_metadata)
+        raw_metadata.delete("solution")
+        raw_metadata["remediations"] = [
+          {
+            summary: evaluator.summary
+          }
+        ]
+        finding.raw_metadata = raw_metadata.to_json
+      end
+    end
+  end
+
   factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
     name { 'Cipher with no integrity' }
     project

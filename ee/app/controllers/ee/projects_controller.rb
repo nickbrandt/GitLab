@@ -9,6 +9,10 @@ module EE
       before_action :log_download_export_audit_event, only: [:download_export]
       before_action :log_archive_audit_event, only: [:archive]
       before_action :log_unarchive_audit_event, only: [:unarchive]
+
+      before_action do
+        push_frontend_feature_flag(:service_desk_custom_address)
+      end
     end
 
     def restore
@@ -89,6 +93,8 @@ module EE
 
       attrs += merge_request_rules_params
 
+      attrs += compliance_framework_params
+
       if allow_mirror_params?
         attrs + mirror_params
       else
@@ -132,6 +138,12 @@ module EE
 
     def allow_merge_pipelines_params?
       project&.feature_available?(:merge_pipelines)
+    end
+
+    def compliance_framework_params
+      return [] unless current_user.can?(:admin_compliance_framework, project)
+
+      [compliance_framework_setting_attributes: [:framework]]
     end
 
     def log_audit_event(message:)

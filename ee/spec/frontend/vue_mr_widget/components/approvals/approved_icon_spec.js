@@ -31,7 +31,7 @@ describe('EE MRWidget approved icon', () => {
 
       expect(icon.exists()).toBe(true);
       expect(icon.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           size: EXPECTED_SIZE,
           name: 'mobile-issue-close',
         }),

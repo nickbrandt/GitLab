@@ -1,0 +1,5 @@
+---
+title: Expose hasParent GraphQL field on epic
+merge_request: 29214
+author:
+type: added

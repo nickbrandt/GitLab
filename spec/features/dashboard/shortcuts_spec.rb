@@ -26,9 +26,17 @@ describe 'Dashboard shortcuts', :js do
 
       check_page_title('To-Do List')
 
+      find('body').send_keys([:shift, 'G'])
+
+      check_page_title('Groups')
+
       find('body').send_keys([:shift, 'P'])
 
       check_page_title('Projects')
+
+      find('body').send_keys([:shift, 'A'])
+
+      check_page_title('Activity')
     end
   end
 

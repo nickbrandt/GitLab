@@ -96,8 +96,10 @@ describe ProjectsHelper do
       subject { helper.project_security_dashboard_config(project, nil) }
 
       it 'returns simple config' do
-        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
-        expect(subject[:has_pipeline_data]).to eq 'false'
+        expect(subject).to match(
+          empty_state_svg_path: start_with('/assets/illustrations/security-dashboard_empty'),
+          security_dashboard_help_path: '/help/user/application_security/security_dashboard/index'
+        )
       end
     end
 

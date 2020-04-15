@@ -10,6 +10,7 @@ import {
   DEFAULT_PAGE_SIZE,
   MISSING_DELETE_PATH_ERROR,
 } from '../constants';
+import { getNewPaginationPage } from '../utils';
 
 export const setInitialState = ({ commit }, data) => commit(types.SET_INITIAL_STATE, data);
 export const setLoading = ({ commit }, data) => commit(types.SET_MAIN_LOADING, data);
@@ -48,7 +49,7 @@ export const requestPackagesList = ({ dispatch, state }, params = {}) => {
     });
 };
 
-export const requestDeletePackage = ({ dispatch }, { _links }) => {
+export const requestDeletePackage = ({ dispatch, state }, { _links }) => {
   if (!_links || !_links.delete_api_path) {
     createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
     const error = new Error(MISSING_DELETE_PATH_ERROR);
@@ -59,14 +60,15 @@ export const requestDeletePackage = ({ dispatch }, { _links }) => {
   return axios
     .delete(_links.delete_api_path)
     .then(() => {
-      dispatch('requestPackagesList');
+      const { page: currentPage, perPage, total } = state.pagination;
+      const page = getNewPaginationPage(currentPage, perPage, total - 1);
+
+      dispatch('requestPackagesList', { page });
       createFlash(DELETE_PACKAGE_SUCCESS_MESSAGE, 'success');
     })
     .catch(() => {
-      createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
-    })
-    .finally(() => {
       dispatch('setLoading', false);
+      createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
     });
 };
 

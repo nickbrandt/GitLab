@@ -402,7 +402,8 @@ below will make it easy to manage this, without unnecessary overhead.
 
 Every monthly release has a corresponding issue on the CE issue tracker to keep
 track of functionality broken by that release and any fixes that need to be
-included in a patch release (see [8.3 Regressions] as an example).
+included in a patch release (see
+[8.3 Regressions](https://gitlab.com/gitlab-org/gitlab-foss/issues/4127) as an example).
 
 As outlined in the issue description, the intended workflow is to post one note
 with a reference to an issue describing the regression, and then to update that
@@ -412,11 +413,9 @@ If you're a contributor who doesn't have the required permissions to update
 other users' notes, please post a new note with a reference to both the issue
 and the merge request.
 
-The release manager will [update the notes] in the regression issue as fixes are
-addressed.
-
-[8.3 Regressions]: https://gitlab.com/gitlab-org/gitlab-foss/issues/4127
-[update the notes]: https://gitlab.com/gitlab-org/release-tools/blob/master/doc/pro-tips.md#update-the-regression-issue
+The release manager will
+[update the notes](https://gitlab.com/gitlab-org/release-tools/blob/master/doc/pro-tips.md#update-the-regression-issue)
+in the regression issue as fixes are addressed.
 
 ## Technical and UX debt
 
@@ -449,7 +448,7 @@ It's common to discover technical debt during development of a new feature. In
 the spirit of "minimum viable change", resolution is often deferred to a
 follow-up issue. However, this cannot be used as an excuse to merge poor-quality
 code that would otherwise not pass review, or to overlook trivial matters that
-don't deserve the be scheduled independently, and would be best resolved in the
+don't deserve to be scheduled independently, and would be best resolved in the
 original merge request - or not tracked at all!
 
 The overheads of scheduling, and rate of change in the GitLab codebase, mean

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/213791
+# Deprecate this worker in GitLab 13.0 in favor of PersonalAccessTokens::Instance::PolicyWorker
+
 module PersonalAccessTokens
   class PolicyWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker

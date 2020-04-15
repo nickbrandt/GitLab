@@ -6,13 +6,13 @@ module Gitlab
     IpBlacklisted = Class.new(StandardError)
 
     # Scopes used for GitLab API access
-    API_SCOPES = [:api, :read_user].freeze
+    API_SCOPES = [:api, :read_user, :read_api].freeze
 
     # Scopes used for GitLab Repository access
     REPOSITORY_SCOPES = [:read_repository, :write_repository].freeze
 
     # Scopes used for GitLab Docker Registry access
-    REGISTRY_SCOPES = [:read_registry].freeze
+    REGISTRY_SCOPES = [:read_registry, :write_registry].freeze
 
     # Scopes used for GitLab as admin
     ADMIN_SCOPES = [:sudo].freeze
@@ -198,7 +198,9 @@ module Gitlab
       def abilities_for_scopes(scopes)
         abilities_by_scope = {
           api: full_authentication_abilities,
+          read_api: read_only_authentication_abilities,
           read_registry: [:read_container_image],
+          write_registry: [:create_container_image],
           read_repository: [:download_code],
           write_repository: [:download_code, :push_code]
         }

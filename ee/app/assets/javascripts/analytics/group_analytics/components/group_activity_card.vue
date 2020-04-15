@@ -21,6 +21,7 @@ export default {
       metrics: {
         mergeRequests: { value: null, label: s__('GroupActivyMetrics|Merge Requests created') },
         issues: { value: null, label: s__('GroupActivyMetrics|Issues created') },
+        newMembers: { value: null, label: s__('GroupActivityMetrics|New Members created') },
       },
     };
   },
@@ -46,10 +47,12 @@ export default {
       return Promise.all([
         Api.groupActivityMergeRequestsCount(groupPath),
         Api.groupActivityIssuesCount(groupPath),
+        Api.groupActivityNewMembersCount(groupPath),
       ])
-        .then(([mrResponse, issuesResponse]) => {
+        .then(([mrResponse, issuesResponse, newMembersResponse]) => {
           this.metrics.mergeRequests.value = mrResponse.data.merge_requests_count;
           this.metrics.issues.value = issuesResponse.data.issues_count;
+          this.metrics.newMembers.value = newMembersResponse.data.new_members_count;
           this.isLoading = false;
         })
         .catch(() => {

@@ -550,4 +550,22 @@ describe Vulnerabilities::Occurrence do
 
     it { is_expected.to eq(vulnerabilities_occurrence.scanner.name) }
   end
+
+  describe '#solution' do
+    subject { vulnerabilities_occurrence.solution }
+
+    context 'when solution metadata key is present' do
+      let(:vulnerabilities_occurrence) { build(:vulnerabilities_occurrence) }
+
+      it { is_expected.to eq(vulnerabilities_occurrence.metadata['solution']) }
+    end
+
+    context 'when remediations key is present' do
+      let(:vulnerabilities_occurrence) do
+        build(:vulnerabilities_occurrence_with_remediation, summary: "Test remediation")
+      end
+
+      it { is_expected.to eq(vulnerabilities_occurrence.remediations.dig(0, 'summary')) }
+    end
+  end
 end

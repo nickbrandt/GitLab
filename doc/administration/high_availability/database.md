@@ -24,7 +24,7 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 
 ## PostgreSQL in a Scaled and Highly Available Environment
 
-This section is relevant for [Scalable and Highly Available Setups](README.md).
+This section is relevant for [Scalable and Highly Available Setups](../scaling/index.md).
 
 ### Provide your own PostgreSQL instance **(CORE ONLY)**
 
@@ -199,7 +199,7 @@ Few notes on the service itself:
 - Passwords will be stored in the following locations:
   - `/etc/gitlab/gitlab.rb`: hashed
   - `/var/opt/gitlab/pgbouncer/pg_auth`: hashed
-  - `/var/opt/gitlab/gitlab-consul/.pgpass`: plaintext
+  - `/var/opt/gitlab/consul/.pgpass`: plaintext
 
 ##### PostgreSQL information
 

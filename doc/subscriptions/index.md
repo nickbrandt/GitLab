@@ -8,8 +8,8 @@ GitLab offers tiers of features. Your subscription determines which tier you hav
 
 GitLab provides special subscriptions to participants in the [GitLab Education Program](https://about.gitlab.com/solutions/education/) and [GitLab Open Source Program](https://about.gitlab.com/solutions/open-source/). For details on obtaining and renewing these subscriptions, see:
 
-- [GitLab Education Program subscriptions](#gitlab-education-program-subscriptions)
-- [GitLab Open Source Program subscriptions](#gitlab-open-source-program-subscriptions)
+- [GitLab for Education subscriptions](#gitlab-for-education-subscriptions)
+- [GitLab for Open Source subscriptions](#gitlab-for-open-source-subscriptions)
 
 ## Choosing a GitLab subscription
 
@@ -74,6 +74,10 @@ renewal of a subscription won't be counted as active users for the renewal subsc
 count as active users in the subscription period in which they were originally added.
 - Members with Guest permissions on an Ultimate subscription.
 - GitLab-created service accounts: `Ghost User` and `Support Bot`.
+
+##### User Statistics
+
+A breakdown of the users within your instance including active, billable and blocked can be found by navigating to **Admin Area > Overview > Dashboard** and selecting `Users Statistics` button within the `Users` widget..
 
 NOTE: **Note:**
 If you have LDAP integration enabled, anyone in the configured domain can sign up for a GitLab account. This can result in an unexpected bill at time of renewal. Consider [disabling new signups](../user/admin_area/settings/sign_up_restrictions.md) and managing new users manually instead.
@@ -173,7 +177,7 @@ To see the status of your GitLab.com subscription, log into GitLab.com and go to
   1. Go to **User Avatar > Settings**.
   1. Click **Billing**.
 - For groups:
-  1. From the group page (*not* from a project within the group), go to **Administration > Billing**.
+  1. From the group page (*not* from a project within the group), go to **Settings > Billing**.
 
 The following table describes details of your subscription for groups:
 
@@ -306,9 +310,12 @@ Sg0KU1hNMGExaE9SVGR2V2pKQlBUMWNiaUo5DQo=',
 
 #### Disable Seat Link
 
-Seat Link is enabled by default. To disable this feature, go to
-**{admin}** **Admin Area > Settings > Metrics and profiling** and
-clear the Seat Link checkbox.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/212375) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.10.
+
+Seat Link is enabled by default.
+
+To disable this feature, go to
+**{admin}** **Admin Area > Settings > Metrics and profiling** and clear the **Seat Link** checkbox.
 
 To disable Seat Link in an Omnibus GitLab installation, and prevent it from
 being configured in the future through the administration panel, set the following in
@@ -427,7 +434,7 @@ CI pipeline minutes are the execution time for your [pipelines](../ci/pipelines/
 
 Quotas apply to:
 
-- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Administration > Usage Quotas**.
+- Groups, where the minutes are shared across all members of the group, its subgroups, and nested projects. To view the group's usage, navigate to the group, then **{settings}** **Settings > Usage Quotas**.
 - Your personal account, where the minutes are available for your personal projects. To view and buy personal minutes, click your avatar, then **{settings}** **Settings > Pipeline quota**.
 
 Only pipeline minutes for GitLab shared runners are restricted. If you have a specific runner set up for your projects, there is no limit to your build time on GitLab.com.
@@ -441,17 +448,17 @@ of the group/namespace. You can [purchase additional CI minutes](#purchasing-add
 
 If you're using GitLab.com, you can purchase additional CI minutes so your
 pipelines won't be blocked after you have used all your CI minutes from your
-main quota. Additional minutes:
+main quota. You can find pricing for additional CI/CD minutes in the [GitLab Customers Portal](https://customers.gitlab.com/plans). Additional minutes:
 
 - Are only used once the shared quota included in your subscription runs out.
 - Roll over month to month.
 
 To purchase additional minutes for your group on GitLab.com:
 
-1. From your group, go to **{settings}** **Administration > Usage Quotas**.
+1. From your group, go to **{settings}** **Settings > Usage Quotas**.
 1. Locate the subscription card that's linked to your group on GitLab.com, click **Buy more CI minutes**, and complete the details about the transaction.
 1. Once we have processed your payment, the extra CI minutes will be synced to your group.
-1. To confirm the available CI minutes, go to your group, then **{settings}** **Administration > Usage Quotas**.
+1. To confirm the available CI minutes, go to your group, then **{settings}** **Settings > Usage Quotas**.
    The **Additional minutes** displayed now includes the purchased additional CI minutes, plus any minutes rolled over from last month.
 
 To purchase additional minutes for your personal namespace:
@@ -486,9 +493,9 @@ Learn more about:
 - The tiers of [GitLab Support](https://about.gitlab.com/support/).
 - [Submit a request via the Support Portal](https://support.gitlab.com/hc/en-us/requests/new).
 
-## GitLab Education Program subscriptions
+## GitLab for Education subscriptions
 
-To renew a [GitLab Education Program](https://about.gitlab.com/solutions/education/) subscription, send an email to `education@gitlab.com` with the following information:
+To renew a [GitLab for Education](https://about.gitlab.com/solutions/education/) subscription, send an email to `education@gitlab.com` with the following information:
 
 1. The number of seats for the renewal. You can add seats if needed.
 1. The use case for the license. Specifically, we need verification that the use meets the conditions of the [End User License Agreement](https://about.gitlab.com/terms/#edu-oss). Note that university infrastructure operations and information technology operations don't fall within the stated terms of the Education Program. For details, see the [Education FAQ](https://about.gitlab.com/solutions/education/#FAQ).
@@ -496,9 +503,9 @@ To renew a [GitLab Education Program](https://about.gitlab.com/solutions/educati
 
 After we receive the above information, we will process the request and return a renewal quote for signature. Please allow a minimum of 2 business days for return. Email us at `education@gitlab.com` with any questions.
 
-## GitLab Open Source Program subscriptions
+## GitLab for Open Source subscriptions
 
-All requests for our GitLab Open Source program, including subscription renewals, must be made by using the [Open Source Program](https://about.gitlab.com/solutions/open-source/program/) application process. If you have any questions, send an email to `opensource@gitlab.com` for assistance.
+All [GitLab for Open Source](https://about.gitlab.com/solutions/open-source/program/) requests, including subscription renewals, must be made by using the application process. If you have any questions, send an email to `opensource@gitlab.com` for assistance.
 
 <!-- ## Troubleshooting
 

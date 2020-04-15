@@ -4,7 +4,7 @@ GitLab provides a way to push update messages to an Irker server. When
 configured, pushes to a project will trigger the service to send data directly
 to the Irker server.
 
-See the project homepage for further info: <https://gitlab.com/esr/irker>
+See the project homepage for further information: <https://gitlab.com/esr/irker>
 
 ## Needed setup
 
@@ -28,7 +28,7 @@ need to follow the firsts steps of the next section.
 1. Navigate to the project you want to configure for notifications.
 1. Navigate to the [Integrations page](overview.md#accessing-integrations)
 1. Click "Irker".
-1. Select the "Active" checkbox.
+1. Ensure that the **Active** toggle is enabled.
 1. Enter the server host address where `irkerd` runs (defaults to `localhost`)
    in the `Server host` field on the Web page
 1. Enter the server port of `irkerd` (e.g. defaults to 6659) in the

@@ -1,6 +1,14 @@
 .dropdown {
   position: relative;
 
+  // Once the new design (https://gitlab.com/gitlab-org/gitlab-foss/-/issues/63499/designs)
+  // for Snippets is introduced and Clone button is relocated, we won't
+  // need this style.
+  // Issue for the refactoring: https://gitlab.com/gitlab-org/gitlab/-/issues/213327
+  &.gl-new-dropdown button.dropdown-toggle {
+    @include gl-display-inline-flex;
+  }
+
   .btn-link {
     &:hover {
       cursor: pointer;
@@ -309,7 +317,10 @@
     }
   }
 
-  .dropdown-item {
+  // Temporary fix to ensure tick is aligned
+  // Follow up Issue to remove after the GlNewDropdownItem component is fixed
+  // > https://gitlab.com/gitlab-org/gitlab/-/issues/213948
+  li:not(.gl-new-dropdown-item) .dropdown-item {
     @include dropdown-link;
   }
 

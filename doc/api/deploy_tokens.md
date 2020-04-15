@@ -92,7 +92,7 @@ POST /projects/:id/deploy_tokens
 | `name`            | string    | yes | New deploy token's name |
 | `expires_at`      | datetime  | no  | Expiration date for the deploy token. Does not expire if no value is provided. |
 | `username`        | string    | no  | Username for deploy token. Default is `gitlab+deploy-token-{n}` |
-| `scopes`   | array of strings | yes | Indicates the deploy token scopes. Must be at least one of `read_repository` or `read_registry`. |
+| `scopes`   | array of strings | yes | Indicates the deploy token scopes. Must be at least one of `read_repository`, `read_registry`, or `write_registry`. |
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" --data '{"name": "My deploy token", "expires_at": "2021-01-01", "username": "custom-user", "scopes": ["read_repository"]}' "https://gitlab.example.com/api/v4/projects/5/deploy_tokens/"
@@ -138,7 +138,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://git
 
 These endpoints require group maintainer access or higher.
 
-### List group deploy deploy tokens
+### List group deploy tokens
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/21811) in GitLab 12.9.
 
@@ -193,7 +193,7 @@ POST /groups/:id/deploy_tokens
 | `name`            | string    | yes | New deploy token's name |
 | `expires_at`      | datetime  | no  | Expiration date for the deploy token. Does not expire if no value is provided. |
 | `username`        | string    | no  | Username for deploy token. Default is `gitlab+deploy-token-{n}` |
-| `scopes`   | array of strings | yes | Indicates the deploy token scopes. Must be at least one of `read_repository` or `read_registry`. |
+| `scopes`   | array of strings | yes | Indicates the deploy token scopes. Must be at least one of `read_repository`, `read_registry`, or `write_registry`. |
 
 Example request:
 

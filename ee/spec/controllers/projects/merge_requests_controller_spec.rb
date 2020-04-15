@@ -698,8 +698,9 @@ describe Projects::MergeRequestsController do
     it_behaves_like 'authorize read pipeline'
   end
 
-  describe 'GET #license_management_reports' do
+  describe 'GET #license_scanning_reports' do
     let(:merge_request) { create(:ee_merge_request, :with_license_scanning_reports, source_project: project, author: create(:user)) }
+
     let(:params) do
       {
         namespace_id: project.namespace.to_param,
@@ -708,7 +709,7 @@ describe Projects::MergeRequestsController do
       }
     end
 
-    subject { get :license_management_reports, params: params, format: :json }
+    subject { get :license_scanning_reports, params: params, format: :json }
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)

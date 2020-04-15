@@ -45,7 +45,7 @@ describe('Api', () => {
     it('calls callback on completion', done => {
       const query = 'query';
       const provider = 'provider';
-      const callback = jasmine.createSpy();
+      const callback = jest.fn();
       const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/ldap/${provider}/groups.json`;
 
       mock.onGet(expectedUrl).reply(200, [
@@ -578,6 +578,22 @@ describe('Api', () => {
         mock.onGet(expectedUrl).replyOnce(200, response);
 
         return Api.groupActivityIssuesCount(groupId).then(({ data }) => {
+          expect(data).toEqual(response);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
+        });
+      });
+    });
+
+    describe('groupActivityNewMembersCount', () => {
+      it('fetches the number of new members created for a given group', () => {
+        const response = { new_members_count: 30 };
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/analytics/group_activity/new_members_count`;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).reply(200, response);
+
+        return Api.groupActivityNewMembersCount(groupId).then(({ data }) => {
           expect(data).toEqual(response);
           expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
         });

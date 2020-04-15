@@ -10,6 +10,7 @@ import { waitForMutation } from 'helpers/vue_test_utils_helper';
 import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
 import { mrStates } from '~/mr_popover/constants';
+import { TEST_HOST } from 'helpers/test_constants';
 
 import {
   sastDiffSuccessMock,
@@ -302,13 +303,22 @@ describe('Grouped security reports app', () => {
   });
 
   describe('dast reports', () => {
+    const scanUrl = `${TEST_HOST}/group/project/-/jobs/123546789`;
+
     beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.dast_comparison_path = DAST_DIFF_ENDPOINT;
 
-      mock
-        .onGet(DAST_DIFF_ENDPOINT)
-        .reply(200, { ...dastDiffSuccessMock, base_report_out_of_date: true });
+      mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {
+        ...dastDiffSuccessMock,
+        base_report_out_of_date: true,
+        scans: [
+          {
+            scanned_resources_count: 211,
+            job_path: scanUrl,
+          },
+        ],
+      });
 
       createWrapper({
         ...props,
@@ -328,6 +338,38 @@ describe('Grouped security reports app', () => {
       expect(wrapper.vm.$el.textContent).toContain(
         'DAST detected 1 new, and 2 fixed vulnerabilities',
       );
+    });
+
+    it('shows the scanned URLs count and a link to the CI job if available', () => {
+      const jobLink = wrapper.find('[data-qa-selector="dast-ci-job-link"]');
+
+      expect(wrapper.text()).toContain('211 URLs scanned');
+      expect(jobLink.exists()).toBe(true);
+      expect(jobLink.text()).toBe('View details');
+      expect(jobLink.attributes('href')).toBe(scanUrl);
+    });
+
+    it('does not show scanned resources info if there is 0 scanned URL', () => {
+      mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {
+        ...dastDiffSuccessMock,
+        base_report_out_of_date: true,
+        scans: [
+          {
+            scanned_resources_count: 0,
+            job_path: scanUrl,
+          },
+        ],
+      });
+      createWrapper({
+        ...props,
+        enabledReports: {
+          dast: true,
+        },
+      });
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
+        expect(wrapper.text()).not.toContain('0 URLs scanned');
+        expect(wrapper.contains('[data-qa-selector="dast-ci-job-link"]')).toBe(false);
+      });
     });
   });
 

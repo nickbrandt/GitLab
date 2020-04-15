@@ -1,4 +1,5 @@
 import * as types from './mutation_types';
+import createState from './state';
 
 export default transformFunc => ({
   [types.SET_ENDPOINT](state, endpoint) {
@@ -10,7 +11,8 @@ export default transformFunc => ({
     state.timeRange = timeRange;
   },
   [types.RECEIVE_STATISTICS_SUCCESS](state, payload) {
-    state.statistics = transformFunc(payload);
+    const stats = payload ? transformFunc(payload) : createState().statistics;
+    state.statistics = stats;
     state.isLoadingStatistics = false;
     state.errorLoadingStatistics = false;
   },

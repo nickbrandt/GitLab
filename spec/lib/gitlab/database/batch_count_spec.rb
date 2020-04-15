@@ -49,6 +49,12 @@ describe Gitlab::Database::BatchCount do
       [1, 2, 4, 5, 6].each { |i| expect(described_class.batch_count(model, batch_size: i)).to eq(5) }
     end
 
+    it 'will raise an error if distinct count is requested' do
+      expect do
+        described_class.batch_count(model.distinct(column))
+      end.to raise_error 'Use distinct count for optimized distinct counting'
+    end
+
     context 'in a transaction' do
       let(:in_transaction) { true }
 
@@ -80,10 +86,6 @@ describe Gitlab::Database::BatchCount do
   end
 
   describe '#batch_distinct_count' do
-    it 'counts with :id field' do
-      expect(described_class.batch_distinct_count(model, :id)).to eq(5)
-    end
-
     it 'counts with column field' do
       expect(described_class.batch_distinct_count(model, column)).to eq(2)
     end
@@ -130,6 +132,12 @@ describe Gitlab::Database::BatchCount do
 
       it 'returns fallback if batch size is less than min required' do
         expect(described_class.batch_distinct_count(model, column, batch_size: small_batch_size)).to eq(fallback)
+      end
+
+      it 'will raise an error if distinct count with the :id column is requested' do
+        expect do
+          described_class.batch_count(described_class.batch_distinct_count(model, :id))
+        end.to raise_error 'Use distinct count only with non id fields'
       end
     end
   end

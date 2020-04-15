@@ -20,46 +20,62 @@ module JiraImport
     private
 
     def create_and_schedule_import
-      import_data = project.create_or_update_import_data(data: {}).becomes(JiraImportData)
-      jira_project_details = JiraImportData::JiraProjectDetails.new(
-        jira_project_key,
-        Time.now.strftime('%Y-%m-%d %H:%M:%S'),
-        { user_id: user.id, name: user.name }
-      )
-      import_data << jira_project_details
-      import_data.force_import!
-
+      jira_import = build_jira_import
       project.import_type = 'jira'
-      project.import_state.schedule if project.save!
+      project.save! && jira_import.schedule!
 
-      ServiceResponse.success(payload: { import_data: import_data } )
+      ServiceResponse.success(payload: { import_data: jira_import } )
     rescue => ex
       # in case project.save! raises an erorr
       Gitlab::ErrorTracking.track_exception(ex, project_id: project.id)
       build_error_response(ex.message)
+      jira_import.do_fail!
+    end
+
+    def build_jira_import
+      label = create_import_label(project)
+      project.jira_imports.build(
+        user: user,
+        label: label,
+        jira_project_key: jira_project_key,
+        # we do not have the jira_project_name or jira_project_xid yet so just set a mock value,
+        # we will once https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28190
+        jira_project_name: jira_project_key,
+        jira_project_xid: 0
+      )
+    end
+
+    def create_import_label(project)
+      label = ::Labels::CreateService.new(build_label_attrs(project)).execute(project: project)
+      raise Projects::ImportService::Error, _('Failed to create import label for jira import.') if label.blank?
+
+      label
+    end
+
+    def build_label_attrs(project)
+      import_start_time = Time.zone.now
+      jira_imports_for_project = project.jira_imports.by_jira_project_key(jira_project_key).size + 1
+      title = "jira-import::#{jira_project_key}-#{jira_imports_for_project}"
+      description = "Label for issues that were imported from jira on #{import_start_time.strftime('%Y-%m-%d %H:%M:%S')}"
+      color = "#{Label.color_for(title)}"
+      { title: title, description: description, color: color }
     end
 
     def validate
-      return build_error_response(_('Jira import feature is disabled.')) unless Feature.enabled?(:jira_issue_import, project)
+      return build_error_response(_('Jira import feature is disabled.')) unless project.jira_issues_import_feature_flag_enabled?
       return build_error_response(_('You do not have permissions to run the import.')) unless user.can?(:admin_project, project)
+      return build_error_response(_('Cannot import because issues are not available in this project.')) unless project.feature_available?(:issues, user)
       return build_error_response(_('Jira integration not configured.')) unless project.jira_service&.active?
       return build_error_response(_('Unable to find Jira project to import data from.')) if jira_project_key.blank?
       return build_error_response(_('Jira import is already running.')) if import_in_progress?
     end
 
     def build_error_response(message)
-      import_data = JiraImportData.new(project: project)
-      import_data.errors.add(:base, message)
-      ServiceResponse.error(
-        message: import_data.errors.full_messages.to_sentence,
-        http_status: 400,
-        payload: { import_data: import_data }
-      )
+      ServiceResponse.error(message: message, http_status: 400)
     end
 
     def import_in_progress?
-      import_state = project.import_state || project.create_import_state
-      import_state.in_progress?
+      project.latest_jira_import&.in_progress?
     end
   end
 end

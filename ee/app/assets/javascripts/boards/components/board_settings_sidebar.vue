@@ -12,6 +12,7 @@ import { mapActions, mapState } from 'vuex';
 import { __, n__ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import boardsStoreEE from '../stores/boards_store_ee';
+import eventHub from '~/sidebar/event_hub';
 import flash from '~/flash';
 import { isScopedLabel } from '~/lib/utils/common_utils';
 
@@ -98,6 +99,12 @@ export default {
         }
       }
     },
+  },
+  created() {
+    eventHub.$on('sidebar.closeAll', this.closeSidebar);
+  },
+  beforeDestroy() {
+    eventHub.$off('sidebar.closeAll', this.closeSidebar);
   },
   methods: {
     ...mapActions(['setActiveListId', 'updateListWipLimit']),

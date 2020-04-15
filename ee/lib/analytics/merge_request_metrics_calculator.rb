@@ -18,6 +18,17 @@ module Analytics
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
+    def line_counts_data
+      return {} if Feature.disabled?(:store_merge_request_line_metrics, merge_request.target_project, default_enabled: true)
+
+      {
+        added_lines: raw_diff_files.sum(&:added_lines),
+        removed_lines: raw_diff_files.sum(&:removed_lines)
+      }
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    # rubocop: disable CodeReuse/ActiveRecord
     def first_comment_at
       merge_request.related_notes.by_humans
         .where.not(author_id: merge_request.author_id)
@@ -60,6 +71,10 @@ module Analytics
 
     def modified_paths_size
       merge_request.modified_paths.size
+    end
+
+    def raw_diff_files
+      @raw_diff_files ||= merge_request_diff.diffs.raw_diff_files
     end
   end
 end

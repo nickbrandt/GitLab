@@ -361,7 +361,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 1. Enable replication and refreshing again after indexing (only if you previously disabled it):
 
    ```shell
-   curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' ---data '{
+   curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' --data '{
        "index" : {
            "number_of_replicas" : 1,
            "refresh_interval" : "1s"
@@ -373,7 +373,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    For Elasticsearch 6.x, the index should be in read-only mode before proceeding with the force merge:
 
    ```shell
-   curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
+   curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' --data '{
      "settings": {
        "index.blocks.write": true
      } }'
@@ -388,7 +388,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    After this, if your index is in read-only mode, switch back to read-write:
 
    ```shell
-   curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
+   curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' --data '{
      "settings": {
        "index.blocks.write": false
      } }'
@@ -610,7 +610,7 @@ Here are some common pitfalls and how to overcome them:
 
 - **My single node Elasticsearch cluster status never goes from `yellow` to `green` even though everything seems to be running properly**
 
-  **For a single node Elasticsearch cluster the functional cluster health status will be yellow** (will never be green) because the primary shard is allocated but replicas can not be as there is no other node to which Elasticsearch can assign a replica. This also applies if you are using using the
+  **For a single node Elasticsearch cluster the functional cluster health status will be yellow** (will never be green) because the primary shard is allocated but replicas can not be as there is no other node to which Elasticsearch can assign a replica. This also applies if you are using the
 [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-handling-errors.html#aes-handling-errors-yellow-cluster-status) service.
 
   CAUTION: **Warning**: Setting the number of replicas to `0` is not something that we recommend (this is not allowed in the GitLab Elasticsearch Integration menu). If you are planning to add more Elasticsearch nodes (for a total of more than 1 Elasticsearch) the number of replicas will need to be set to an integer value larger than `0`. Failure to do so will result in lack of redundancy (losing one node will corrupt the index).
@@ -633,6 +633,14 @@ Here are some common pitfalls and how to overcome them:
 
    You probably have not used either `http://` or `https://` as part of your value in the **"URL"** field of the Elasticseach Integration Menu. Please make sure you are using either `http://` or `https://` in this field as the [Elasticsearch client for Go](https://github.com/olivere/elastic) that we are using [needs the prefix for the URL to be accepted as valid](https://github.com/olivere/elastic/commit/a80af35aa41856dc2c986204e2b64eab81ccac3a).
    Once you have corrected the formatting of the URL, delete the index (via the [dedicated Rake task](#gitlab-elasticsearch-rake-tasks)) and [reindex the content of your instance](#adding-gitlabs-data-to-the-elasticsearch-index).
+
+### Known Issues
+
+- **[Elasticsearch `code_analyzer` doesn't account for all code cases](https://gitlab.com/gitlab-org/gitlab/issues/10693)**
+
+   The `code_analyzer` pattern and filter configuration is being evaluated for improvement. We have noticed [several edge cases](https://gitlab.com/gitlab-org/gitlab/-/issues/10693#note_158382332) that are not returning expected search results due to our pattern and filter configuration.
+
+   An improved strategy for the `code_analyzer` pattern and filters are being discussed in [issue 29443](https://gitlab.com/gitlab-org/gitlab/-/issues/29443).
 
 ### Reverting to basic search
 

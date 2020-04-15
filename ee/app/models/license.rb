@@ -16,7 +16,6 @@ class License < ApplicationRecord
     contribution_analytics
     description_diffs
     elastic_search
-    export_issues
     group_activity_analytics
     group_bulk_edit
     group_burndown_charts
@@ -107,10 +106,12 @@ class License < ApplicationRecord
 
   EEU_FEATURES = EEP_FEATURES + %i[
     cluster_health
+    compliance_framework
     container_scanning
     credentials_inventory
     dast
     dependency_scanning
+    enterprise_templates
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management
@@ -145,7 +146,6 @@ class License < ApplicationRecord
     contribution_analytics
     cross_project_pipelines
     deploy_board
-    export_issues
     file_locks
     group_webhooks
     issuable_default_templates
@@ -202,6 +202,7 @@ class License < ApplicationRecord
     custom_project_templates
     db_load_balancing
     elastic_search
+    enterprise_templates
     extended_audit_events
     external_authorization_service_api_management
     geo
@@ -461,6 +462,10 @@ class License < ApplicationRecord
     return if settings.license_trial_ends_on.present?
 
     settings.update license_trial_ends_on: license.expires_at
+  end
+
+  def paid?
+    [License::STARTER_PLAN, License::PREMIUM_PLAN, License::ULTIMATE_PLAN].include?(plan)
   end
 
   private

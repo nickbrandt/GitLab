@@ -1,0 +1,5 @@
+---
+title: Move Clusters Application Knative to batch counting
+merge_request: 29003
+author:
+type: performance

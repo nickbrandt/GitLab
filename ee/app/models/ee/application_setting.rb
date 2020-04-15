@@ -274,7 +274,7 @@ module EE
     def update_personal_access_tokens_lifetime
       return unless max_personal_access_token_lifetime.present? && License.feature_available?(:personal_access_token_expiration_policy)
 
-      ::PersonalAccessTokens::UpdateLifetimeService.new.execute
+      ::PersonalAccessTokens::Instance::UpdateLifetimeService.new.execute
     end
 
     def mirror_max_delay_in_minutes

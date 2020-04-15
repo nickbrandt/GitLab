@@ -1,25 +1,24 @@
 <script>
-import { s__ } from '~/locale';
+import { GlIcon, GlPopover, GlLink } from '@gitlab/ui';
 import popover from '~/vue_shared/directives/popover';
-import tooltip from '~/vue_shared/directives/tooltip';
-import Icon from '~/vue_shared/components/icon.vue';
-import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 
-import { VALUE_TYPE, CUSTOM_TYPE } from '../constants';
+import { VALUE_TYPE, CUSTOM_TYPE, REPLICATION_HELP_URL } from '../constants';
 
 import GeoNodeSyncSettings from './geo_node_sync_settings.vue';
 import GeoNodeEventStatus from './geo_node_event_status.vue';
+import GeoNodeSyncProgress from './geo_node_sync_progress.vue';
 
 export default {
   components: {
-    Icon,
-    StackedProgressBar,
     GeoNodeSyncSettings,
     GeoNodeEventStatus,
+    GeoNodeSyncProgress,
+    GlIcon,
+    GlPopover,
+    GlLink,
   },
   directives: {
     popover,
-    tooltip,
   },
   props: {
     itemTitle: {
@@ -30,6 +29,11 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    itemEnabled: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     itemValue: {
       type: [Object, String, Number],
@@ -45,21 +49,6 @@ export default {
       required: false,
       default: '',
     },
-    successLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Synced'),
-    },
-    failureLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Failed'),
-    },
-    neutralLabel: {
-      type: String,
-      required: false,
-      default: s__('GeoNodes|Out of sync'),
-    },
     itemValueType: {
       type: String,
       required: true,
@@ -74,10 +63,10 @@ export default {
       required: false,
       default: false,
     },
-    featureDisabled: {
-      type: Boolean,
+    detailsPath: {
+      type: String,
       required: false,
-      default: false,
+      default: '',
     },
   },
   computed: {
@@ -97,50 +86,68 @@ export default {
       return this.customType === CUSTOM_TYPE.SYNC;
     },
   },
+  replicationHelpUrl: REPLICATION_HELP_URL,
 };
 </script>
 
 <template>
-  <div v-if="!featureDisabled" class="mt-2 ml-2 node-detail-item">
+  <div class="mt-2 ml-2 node-detail-item">
     <div class="d-flex align-items-center text-secondary-700">
       <span class="node-detail-title">{{ itemTitle }}</span>
     </div>
-    <div v-if="isValueTypePlain" :class="cssClass" class="mt-1 node-detail-value">
-      {{ itemValue }}
+    <div v-if="itemEnabled">
+      <div v-if="isValueTypePlain" :class="cssClass" class="mt-1 node-detail-value">
+        {{ itemValue }}
+      </div>
+      <geo-node-sync-progress
+        v-if="isValueTypeGraph"
+        :item-enabled="itemEnabled"
+        :item-title="itemTitle"
+        :item-value="itemValue"
+        :item-value-stale="itemValueStale"
+        :item-value-stale-tooltip="itemValueStaleTooltip"
+        :details-path="detailsPath"
+        :class="{ 'd-flex': itemValueStale }"
+        class="mt-1"
+      />
+      <template v-if="isValueTypeCustom">
+        <geo-node-sync-settings v-if="isCustomTypeSync" v-bind="itemValue" />
+        <geo-node-event-status
+          v-else
+          :event-id="itemValue.eventId"
+          :event-time-stamp="itemValue.eventTimeStamp"
+          :event-type-log-status="eventTypeLogStatus"
+        />
+      </template>
     </div>
-    <div v-if="isValueTypeGraph" :class="{ 'd-flex': itemValueStale }" class="mt-1">
-      <stacked-progress-bar
-        :css-class="itemValueStale ? 'flex-fill' : ''"
-        :success-label="successLabel"
-        :failure-label="failureLabel"
-        :neutral-label="neutralLabel"
-        :success-count="itemValue.successCount"
-        :failure-count="itemValue.failureCount"
-        :total-count="itemValue.totalCount"
-      />
-      <icon
-        v-show="itemValueStale"
-        v-tooltip
-        :title="itemValueStaleTooltip"
-        name="time-out"
-        class="ml-2 text-warning-500"
-        data-container="body"
-      />
+    <div v-else class="mt-1">
+      <div
+        :id="`syncDisabled-${itemTitle}`"
+        class="d-inline-flex align-items-center cursor-pointer"
+      >
+        <gl-icon name="canceled-circle" :size="14" class="mr-1 text-secondary-300" />
+        <span ref="disabledText" class="text-secondary-600 gl-font-size-small">{{
+          __('Synchronization disabled')
+        }}</span>
+      </div>
+      <gl-popover
+        :target="`syncDisabled-${itemTitle}`"
+        placement="right"
+        triggers="hover focus"
+        :css-classes="['w-100']"
+      >
+        <section>
+          <p>{{ __('Synchronization of container repositories is disabled.') }}</p>
+          <div class="mt-3">
+            <gl-link
+              class="gl-font-size-small"
+              :href="$options.replicationHelpUrl"
+              target="_blank"
+              >{{ __('Learn how to enable synchronization') }}</gl-link
+            >
+          </div>
+        </section>
+      </gl-popover>
     </div>
-    <template v-if="isValueTypeCustom">
-      <geo-node-sync-settings
-        v-if="isCustomTypeSync"
-        :sync-status-unavailable="itemValue.syncStatusUnavailable"
-        :selective-sync-type="itemValue.selectiveSyncType"
-        :last-event="itemValue.lastEvent"
-        :cursor-last-event="itemValue.cursorLastEvent"
-      />
-      <geo-node-event-status
-        v-else
-        :event-id="itemValue.eventId"
-        :event-time-stamp="itemValue.eventTimeStamp"
-        :event-type-log-status="eventTypeLogStatus"
-      />
-    </template>
   </div>
 </template>

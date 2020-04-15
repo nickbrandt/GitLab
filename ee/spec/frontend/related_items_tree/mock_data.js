@@ -26,6 +26,11 @@ export const mockParentItem = {
     openedIssues: 1,
     closedIssues: 1,
   },
+  healthStatus: {
+    issuesOnTrack: 1,
+    issuesAtRisk: 0,
+    issuesNeedingAttention: 1,
+  },
 };
 
 export const mockEpic1 = {
@@ -47,6 +52,11 @@ export const mockEpic1 = {
   group: {
     fullPath: 'gitlab-org',
   },
+  healthStatus: {
+    issuesAtRisk: 0,
+    issuesNeedingAttention: 0,
+    issuesOnTrack: 0,
+  },
 };
 
 export const mockEpic2 = {
@@ -67,6 +77,11 @@ export const mockEpic2 = {
   },
   group: {
     fullPath: 'gitlab-org',
+  },
+  healthStatus: {
+    issuesAtRisk: 0,
+    issuesNeedingAttention: 0,
+    issuesOnTrack: 0,
   },
 };
 
@@ -101,6 +116,7 @@ export const mockIssue1 = {
     startDate: '2019-02-01',
     dueDate: '2019-06-30',
   },
+  healthStatus: 'onTrack',
 };
 
 export const mockIssue2 = {
@@ -120,6 +136,7 @@ export const mockIssue2 = {
     edges: [],
   },
   milestone: null,
+  healthStatus: 'needsAttention',
 };
 
 export const mockIssue3 = {
@@ -139,6 +156,7 @@ export const mockIssue3 = {
     edges: [],
   },
   milestone: null,
+  healthStatus: 'atRisk',
 };
 
 export const mockEpics = [mockEpic1, mockEpic2];
@@ -189,6 +207,11 @@ export const mockQueryResponse = {
           },
         },
         descendantCounts: mockParentItem.descendantCounts,
+        healthStatus: {
+          atRisk: 1,
+          needsAttention: 1,
+          onTrack: 0,
+        },
       },
     },
   },

@@ -24,7 +24,7 @@ Note the following:
 
 ## Configuring your Identity Provider
 
-1. Navigate to the group and click **Administration > SAML SSO**.
+1. Navigate to the group and click **Settings > SAML SSO**.
 1. Configure your SAML server using the **Assertion consumer service URL** and **Identifier**. Alternatively GitLab provides [metadata XML configuration](#metadata-configuration). See [your identity provider's documentation](#providers) for more details.
 1. Configure the SAML response to include a NameID that uniquely identifies each user.
 1. Configure required assertions using the [table below](#assertions).
@@ -42,7 +42,8 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 - Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
 - Should not be an email address or username. We strongly recommend against these as it is hard to guarantee they will never change, for example when a person's name changes. Email addresses are also case-insensitive, which can result in users being unable to sign in.
 
-The recommended field for supported providers are in the [provider specific notes](#providers).
+The relevant field name and recommended value for supported providers are in the [provider specific notes](#providers).
+appropriate corresponding field.
 
 CAUTION: **Warning:**
 Once users have signed into GitLab using the SSO SAML setup, changing the `NameID` will break the configuration and potentially lock users out of the GitLab group.
@@ -111,12 +112,38 @@ To access the Credentials inventory of a group, navigate to **{shield}** **Secur
 
 This feature is similar to the [Credentials inventory for self-managed instances](../../admin_area/credentials_inventory.md).
 
+##### Limiting lifetime of personal access tokens of users in Group-managed accounts **(ULTIMATE)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/118893) in GitLab 12.10.
+
+Users in a group managed account can optionally specify an expiration date for
+[personal access tokens](../../profile/personal_access_tokens.md).
+This expiration date is not a requirement, and can be set to any arbitrary date.
+
+Since personal access tokens are the only token needed for programmatic access to GitLab, organizations with security requirements may want to enforce more protection to require regular rotation of these tokens.
+
+###### Setting a limit
+
+Only a GitLab administrator or an owner of a Group-managed account can set a limit. Leaving it empty means that the [instance level restrictions](../../admin_area/settings/account_and_limit_settings.md#limiting-lifetime-of-personal-access-tokens-ultimate-only) on the lifetime of personal access tokens will apply.
+
+To set a limit on how long personal access tokens are valid for users in a group managed account:
+
+1. Navigate to the **{settings}** **Settings > General** page in your group's sidebar.
+1. Expand the **Permissions, LFS, 2FA** section.
+1. Fill in the **Maximum allowable lifetime for personal access tokens (days)** field.
+1. Click **Save changes**.
+
+Once a lifetime for personal access tokens is set, GitLab will:
+
+- Apply the lifetime for new personal access tokens, and require users managed by the group to set an expiration date that is no later than the allowed lifetime.
+- After three hours, revoke old tokens with no expiration date or with a lifetime longer than the allowed lifetime. Three hours is given to allow administrators/group owner to change the allowed lifetime, or remove it, before revocation takes place.
+
 ##### Outer forks restriction for Group-managed accounts
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34648) in GitLab 12.9.
 
 Groups with group-managed accounts can disallow forking of projects to destinations outside the group.
-To do so, enable the "Prohibit outer forks" option in **Administration > SAML SSO**.
+To do so, enable the "Prohibit outer forks" option in **Settings > SAML SSO**.
 When enabled, projects within the group can only be forked to other destinations within the group (including its subgroups).
 
 ##### Other restrictions for Group-managed accounts
@@ -146,7 +173,7 @@ assertions to be able to create a user.
 
 GitLab provides metadata XML that can be used to configure your Identity Provider.
 
-1. Navigate to the group and click **Administration > SAML SSO**.
+1. Navigate to the group and click **Settings > SAML SSO**.
 1. Copy the provided **GitLab metadata URL**.
 1. Follow your Identity Provider's documentation and paste the metadata URL when it is requested.
 
@@ -154,7 +181,7 @@ GitLab provides metadata XML that can be used to configure your Identity Provide
 
 Once you've set up your identity provider to work with GitLab, you'll need to configure GitLab to use it for authentication:
 
-1. Navigate to the group's **Administration > SAML SSO**.
+1. Navigate to the group's **Settings > SAML SSO**.
 1. Find the SSO URL from your Identity Provider and enter it the **Identity provider single sign on URL** field.
 1. Find and enter the fingerprint for the SAML token signing certificate in the **Certificate** field.
 1. Click the **Enable SAML authentication for this group** toggle switch.
@@ -281,21 +308,21 @@ GitLab [isn't limited to the SAML providers listed above](#my-identity-provider-
 | Additional URLs | | You may need to use the `Identifier` or `Assertion consumer service URL` in other fields on some providers. |
 | Single Sign Out URL | | Not supported |
 
-If the information information you need isn't listed above you may wish to check our [troubleshooting docs below](#i-need-additional-information-to-configure-my-identity-provider).
+If the information you need isn't listed above you may wish to check our [troubleshooting docs below](#i-need-additional-information-to-configure-my-identity-provider).
 
 ## Linking SAML to your existing GitLab.com account
 
 To link SAML to your existing GitLab.com account:
 
 1. Sign in to your GitLab.com account.
-1. Locate the SSO URL for the group you are signing in to. A group Admin can find this on the group's **Administration > SAML SSO** page.
+1. Locate the SSO URL for the group you are signing in to. A group Admin can find this on the group's **Settings > SAML SSO** page.
 1. Visit the SSO URL and click **Authorize**.
 1. Enter your credentials on the Identity Provider if prompted.
 1. You will be redirected back to GitLab.com and should now have access to the group. In the future, you can use SAML to sign in to GitLab.com.
 
 ## Signing in to GitLab.com with SAML
 
-1. Locate the SSO URL for the group you are signing in to. A group Admin can find this on a group's **Administration > SAML SSO** page. If configured, it might also be possible to sign in to GitLab starting from your Identity Provider.
+1. Locate the SSO URL for the group you are signing in to. A group Admin can find this on a group's **Settings > SAML SSO** page. If configured, it might also be possible to sign in to GitLab starting from your Identity Provider.
 1. Visit the SSO URL and click the **Sign in with Single Sign-On** button.
 1. Enter your credentials on the Identity Provider if prompted.
 1. You will be signed in to GitLab.com and redirected to the group.
@@ -407,15 +434,19 @@ If you do not wish to use that GitLab user with the SAML login, you can [unlink 
 
 ### Message: "SAML authentication failed: User has already been taken"
 
-The user you are signed in with already has SAML linked to a different identity. This might mean you've attempted to link multiple SAML identities to the same user for a given Identity Provider. This could also be a symptom of the Identity Provider returning an inconsistent [NameID](#nameid).
+The user that you're signed in with already has SAML linked to a different identity.
+Here are possible causes and solutions:
 
-To change which identity you sign in with, you can [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account.
-
-Alternatively, an admin of your Identity Provider can use the [SCIM API](../../../api/scim.md) to update your `extern_uid` to match the current **NameID**.
+| Cause                                                                                          | Solution                                                                                                                                                                    |
+|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| You've tried to link multiple SAML identities to the same user, for a given Identity Provider. | Change the identity that you sign in with. To do so, [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account before attempting to sign in again. |
+| The Identity Provider might be returning an inconsistent [NameID](#nameid).                    | Ask an admin of your Identity Provider to use the [SCIM API](../../../api/scim.md) to update your `extern_uid` to match the current **NameID**.                             |
 
 ### Message: "SAML authentication failed: Email has already been taken"
 
-Same as ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken).
+| Cause                                                                                                                                    | Solution                                                                 |
+|------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| When a user account with the email address already exists in GitLab, but the user does not have the SAML identity tied to their account. | The user will need to [link their account](#user-access-and-management). |
 
 ### Message: "SAML authentication failed: Extern uid has already been taken, User has already been taken"
 
@@ -425,13 +456,13 @@ This can be prevented by configuring the [NameID](#nameid) to return a consisten
 
 ### The NameID has changed
 
-As mentioned in the [NameID](#nameid) section, if the NameID changes for any user, the user can be locked out. This is common for setups using an email address as the identifier.
-
-To fix the issue, follow the steps outlined in the ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken) section. We recommend using the API method if many users are affected so that the changes can be done in a scripted batch.
+| Cause                                                                                                                                                                                     | Solution                                                                                                                                                                                                                                           |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| As mentioned in the [NameID](#nameid) section, if the NameID changes for any user, the user can be locked out. This is a common problem when an email address is used as the identifier. | Follow the steps outlined in the ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken) section. If many users are affected, we recommend that you use the appropriate API. |
 
 ### I need to change my SAML app
 
-Users need to [unlink the previous SAML identity](#unlinking-accounts) and [link their identity](#user-access-and-management) using the new SAML app.
+Users will need to [unlink the current SAML identity](#unlinking-accounts) and [link their identity](#user-access-and-management) to the new SAML app.
 
 ### My identity provider isn't listed
 

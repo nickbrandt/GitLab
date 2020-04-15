@@ -318,25 +318,25 @@ For:
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:alias`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:entrypoint`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 #### `services:command`
 
 An [extended docker configuration option](../docker/using_docker_images.md#extended-docker-configuration-options).
 
-For more information, see see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
+For more information, see [Available settings for `services`](../docker/using_docker_images.md#available-settings-for-services).
 
 ### `before_script` and `after_script`
 
@@ -1264,7 +1264,9 @@ osx job:
 
 `allow_failure` allows a job to fail without impacting the rest of the CI
 suite.
-The default value is `false`, except for [manual](#whenmanual) jobs.
+The default value is `false`, except for [manual](#whenmanual) jobs using the
+`when: manual` syntax, unless using [`rules:`](#rules) syntax, where all jobs
+default to false, *including* `when: manual` jobs.
 
 When enabled and the job fails, the job will show an orange warning in the UI.
 However, the logical flow of the pipeline will consider the job a
@@ -1379,13 +1381,16 @@ manual action by clicking a _play_ button.
 
 When a pipeline is blocked, it will not be merged if Merge When Pipeline Succeeds
 is set. Blocked pipelines also do have a special status, called _manual_.
-Manual actions are non-blocking by default. If you want to make manual action
-blocking, it is necessary to add `allow_failure: false` to the job's definition
-in `.gitlab-ci.yml`.
+When the `when:manual` syntax is used, manual actions are non-blocking by
+default. If you want to make manual action blocking, it is necessary to add
+`allow_failure: false` to the job's definition in `.gitlab-ci.yml`.
 
 Optional manual actions have `allow_failure: true` set by default and their
 Statuses do not contribute to the overall pipeline status. So, if a manual
 action fails, the pipeline will eventually succeed.
+
+NOTE: **Note:**
+When using [`rules:`](#rules), `allow_failure` defaults to `false`, including for manual jobs.
 
 Manual actions are considered to be write actions, so permissions for
 [protected branches](../../user/project/protected_branches.md) are used when
@@ -1630,7 +1635,7 @@ The `stop_review_app` job is **required** to have the following keywords defined
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/20956) in GitLab 12.8.
 
 The `auto_stop_in` keyword is for specifying life period of the environment,
-that when expired, GitLab GitLab automatically stops them.
+that when expired, GitLab automatically stops them.
 
 For example,
 
@@ -2012,6 +2017,15 @@ release-job:
       - target/*.war
   only:
     - tags
+```
+
+You can use wildcards for directories too. For example, if you want to get all the files inside the directories that end with `xyz`:
+
+```yaml
+job:
+  artifacts:
+    paths:
+      - path/*xyz/*
 ```
 
 #### `artifacts:expose_as`
@@ -3588,8 +3602,8 @@ Floats are not legal and cannot be used.
 
 GitLab CI/CD allows you to define variables inside `.gitlab-ci.yml` that are
 then passed in the job environment. They can be set globally and per-job.
-When the `variables` keyword is used on a job level, it overrides the global
-YAML variables and predefined ones.
+When the `variables` keyword is used on a job level, it will override the global
+YAML variables and predefined ones of the same name.
 
 They are stored in the Git repository and are meant to store non-sensitive
 project configuration, for example:

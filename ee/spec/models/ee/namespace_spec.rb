@@ -14,7 +14,6 @@ describe Namespace do
 
   it { is_expected.to have_one(:namespace_statistics) }
   it { is_expected.to have_one(:gitlab_subscription).dependent(:destroy) }
-  it { is_expected.to belong_to(:plan) }
 
   it { is_expected.to delegate_method(:extra_shared_runners_minutes).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }
@@ -214,53 +213,19 @@ describe Namespace do
   end
 
   context 'scopes' do
-    describe '.with_plan' do
-      let!(:namespace) { create :namespace, plan: namespace_plan }
-
-      context 'plan is set' do
-        let(:namespace_plan) { :bronze_plan }
-
-        it 'returns namespaces with plan' do
-          expect(described_class.with_plan).to eq([namespace])
-        end
-      end
-
-      context 'plan is not set' do
-        context 'plan is empty string' do
-          let(:namespace_plan) { '' }
-
-          it 'returns no namespace' do
-            expect(described_class.with_plan).to be_empty
-          end
-        end
-
-        context 'plan is nil' do
-          let(:namespace_plan) { nil }
-
-          it 'returns no namespace' do
-            expect(described_class.with_plan).to be_empty
-          end
-        end
-      end
-    end
-
     describe '.with_feature_available_in_plan' do
-      let!(:namespace) { create :namespace, plan: namespace_plan }
+      let!(:namespace) { create(:namespace) }
 
       context 'plan is nil' do
-        let(:namespace_plan) { nil }
-
         it 'returns no namespace' do
           expect(described_class.with_feature_available_in_plan(:group_project_templates)).to be_empty
         end
       end
 
       context 'plan is set' do
-        let(:namespace_plan) { :bronze_plan }
-
         it 'returns namespaces with plan' do
           create(:gitlab_subscription, :bronze, namespace: namespace)
-          create(:gitlab_subscription, :free, namespace: create(:namespace))
+          create(:namespace_with_plan, plan: :free_plan)
 
           expect(described_class.with_feature_available_in_plan(:audit_events)).to eq([namespace])
         end
@@ -296,33 +261,6 @@ describe Namespace do
   end
 
   describe 'custom validations' do
-    describe '#validate_plan_name' do
-      let(:group) { build(:group) }
-
-      context 'with a valid plan name' do
-        it 'is valid' do
-          group.plan = create(:bronze_plan)
-
-          expect(group).to be_valid
-        end
-      end
-
-      context 'with an invalid plan name' do
-        it 'is invalid when `unknown`' do
-          group.plan = 'unknown'
-
-          expect(group).not_to be_valid
-          expect(group.errors[:plan]).to include('is not included in the list')
-        end
-
-        it 'is valid for blank strings' do
-          group.plan = ' '
-
-          expect(group).to be_valid
-        end
-      end
-    end
-
     describe '#validate_shared_runner_minutes_support' do
       context 'when changing :shared_runners_minutes_limit' do
         before do
@@ -1064,11 +1002,26 @@ describe Namespace do
               invited_group.add_guest(create(:user))
               invited_group.add_developer(create(:user, :blocked))
               invited_group.add_developer(developer)
-              create(:project_group_link, project: project, group: invited_group)
             end
 
-            it 'includes the only active users except guests of the invited groups' do
-              expect(group.billed_user_ids).to match_array([invited_group_developer.id, project_developer.id, developer.id])
+            context 'when group is invited as non guest' do
+              before do
+                create(:project_group_link, project: project, group: invited_group)
+              end
+
+              it 'includes the only active users except guests of the invited groups' do
+                expect(group.billed_user_ids).to match_array([invited_group_developer.id, project_developer.id, developer.id])
+              end
+            end
+
+            context 'when group is invited as a guest to the project' do
+              before do
+                create(:project_group_link, :guest, project: project, group: invited_group)
+              end
+
+              it 'does not include any members from the invited group' do
+                expect(group.billed_user_ids).to match_array([project_developer.id, developer.id])
+              end
             end
           end
         end
@@ -1082,8 +1035,8 @@ describe Namespace do
             shared_group.add_guest(create(:user))
             shared_group.add_developer(create(:user, :blocked))
 
-            create(:group_group_link, { shared_with_group: group,
-              shared_group: shared_group })
+            create(:group_group_link, { shared_with_group: shared_group,
+                                        shared_group: group })
           end
 
           context 'when feature is not enabled' do
@@ -1091,8 +1044,9 @@ describe Namespace do
               stub_feature_flags(share_group_with_group: false)
             end
 
-            it 'does not include users coming from the shared groups' do
+            it 'does not include users coming from the shared groups', :aggregate_failures do
               expect(group.billed_user_ids).to match_array([developer.id])
+              expect(shared_group.billed_user_ids).not_to include([developer.id])
             end
           end
 
@@ -1101,8 +1055,46 @@ describe Namespace do
               stub_feature_flags(share_group_with_group: true)
             end
 
-            it 'includes active users from the shared group to the billed members count' do
+            it 'includes active users from the shared group to the billed members', :aggregate_failures do
               expect(group.billed_user_ids).to match_array([shared_group_developer.id, developer.id])
+              expect(shared_group.billed_user_ids).not_to include([developer.id])
+            end
+
+            context 'when subgroup invited another group to collaborate' do
+              let(:another_shared_group) { create(:group) }
+              let(:another_shared_group_developer) { create(:user) }
+
+              before do
+                another_shared_group.add_developer(another_shared_group_developer)
+                another_shared_group.add_guest(create(:user))
+                another_shared_group.add_developer(create(:user, :blocked))
+              end
+
+              context 'when subgroup invites another group as non guest' do
+                before do
+                  subgroup = create(:group, parent: group)
+                  create(:group_group_link, { shared_with_group: another_shared_group,
+                                              shared_group: subgroup })
+                end
+
+                it 'includes all the active and non guest users from the shared group', :aggregate_failures do
+                  expect(group.billed_user_ids).to match_array([shared_group_developer.id, developer.id, another_shared_group_developer.id])
+                  expect(shared_group.billed_user_ids).not_to include([developer.id])
+                  expect(another_shared_group.billed_user_ids).not_to include([developer.id, shared_group_developer.id])
+                end
+              end
+
+              context 'when subgroup invites another group as guest' do
+                before do
+                  subgroup = create(:group, parent: group)
+                  create(:group_group_link, :guest, { shared_with_group: another_shared_group,
+                                                      shared_group: subgroup })
+                end
+
+                it 'does not includes any user from the shared group from the subgroup' do
+                  expect(group.billed_user_ids).to match_array([shared_group_developer.id, developer.id])
+                end
+              end
             end
           end
         end
@@ -1167,8 +1159,8 @@ describe Namespace do
               shared_group.add_guest(shared_group_guest)
               shared_group.add_developer(create(:user, :blocked))
 
-              create(:group_group_link, { shared_with_group: group,
-                shared_group: shared_group })
+              create(:group_group_link, { shared_with_group: shared_group,
+                                          shared_group: group })
             end
 
             context 'when feature is not enabled' do
@@ -1186,8 +1178,9 @@ describe Namespace do
                 stub_feature_flags(share_group_with_group: true)
               end
 
-              it 'includes active users from the shared group including guests' do
+              it 'includes active users from the shared group including guests', :aggregate_failures do
                 expect(group.billed_user_ids).to match_array([developer.id, guest.id, shared_group_developer.id, shared_group_guest.id])
+                expect(shared_group.billed_user_ids).to match_array([shared_group_developer.id, shared_group_guest.id])
               end
             end
           end
@@ -1263,8 +1256,8 @@ describe Namespace do
             shared_group.add_guest(create(:user))
             shared_group.add_developer(create(:user, :blocked))
 
-            create(:group_group_link, { shared_with_group: group,
-              shared_group: shared_group })
+            create(:group_group_link, { shared_with_group: shared_group,
+                                        shared_group: group })
           end
 
           context 'when feature is not enabled' do
@@ -1337,8 +1330,8 @@ describe Namespace do
               shared_group.add_guest(create(:user))
               shared_group.add_developer(create(:user, :blocked))
 
-              create(:group_group_link, { shared_with_group: group,
-                shared_group: shared_group })
+              create(:group_group_link, { shared_with_group: shared_group,
+                                          shared_group: group })
             end
 
             context 'when feature is not enabled' do

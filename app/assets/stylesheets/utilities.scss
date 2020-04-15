@@ -54,6 +54,11 @@
 
 .mh-50vh { max-height: 50vh; }
 
+.min-width-0 {
+  // By default flex items don't shrink below their minimum content size. To change this, set the item's min-width
+  min-width: 0;
+}
+
 .font-size-inherit { font-size: inherit; }
 .gl-w-8 { width: px-to-rem($grid-size); }
 .gl-w-16 { width: px-to-rem($grid-size * 2); }
@@ -61,6 +66,14 @@
 .gl-h-8 { height: px-to-rem($grid-size); }
 .gl-h-32 { height: px-to-rem($grid-size * 4); }
 .gl-h-64 { height: px-to-rem($grid-size * 8); }
+
+.gl-shim-h-2 {
+  height: px-to-rem(4px);
+}
+
+.gl-shim-w-5 {
+  width: px-to-rem(16px);
+}
 
 .gl-text-purple { color: $purple; }
 .gl-text-gray-800 { color: $gray-800; }

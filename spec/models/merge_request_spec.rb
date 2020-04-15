@@ -874,7 +874,7 @@ describe MergeRequest do
     subject(:merge_request) { build(:merge_request) }
 
     before do
-      expect(diff).to receive(:modified_paths).and_return(paths)
+      allow(diff).to receive(:modified_paths).and_return(paths)
     end
 
     context 'when past_merge_request_diff is specified' do
@@ -890,10 +890,29 @@ describe MergeRequest do
       let(:compare) { double(:compare) }
       let(:diff) { compare }
 
-      it 'returns affected file paths from compare' do
+      before do
         merge_request.compare = compare
 
-        expect(merge_request.modified_paths).to eq(paths)
+        expect(merge_request).to receive(:diff_stats).and_return(diff_stats)
+      end
+
+      context 'and diff_stats are not present' do
+        let(:diff_stats) { nil }
+
+        it 'returns affected file paths from compare' do
+          expect(merge_request.modified_paths).to eq(paths)
+        end
+      end
+
+      context 'and diff_stats are present' do
+        let(:diff_stats) { double(:diff_stats) }
+
+        it 'returns affected file paths from compare' do
+          diff_stats_path = double(:diff_stats_paths)
+          expect(diff_stats).to receive(:paths).and_return(diff_stats_path)
+
+          expect(merge_request.modified_paths).to eq(diff_stats_path)
+        end
       end
     end
 
@@ -2316,6 +2335,21 @@ describe MergeRequest do
     end
   end
 
+  describe "#public_merge_status" do
+    using RSpec::Parameterized::TableSyntax
+    subject { build(:merge_request, merge_status: status) }
+
+    where(:status, :public_status) do
+      'cannot_be_merged_rechecking' | 'checking'
+      'checking'                    | 'checking'
+      'cannot_be_merged'            | 'cannot_be_merged'
+    end
+
+    with_them do
+      it { expect(subject.public_merge_status).to eq(public_status) }
+    end
+  end
+
   describe "#head_pipeline_active? " do
     it do
       is_expected
@@ -3207,20 +3241,51 @@ describe MergeRequest do
             expect(notification_service).to receive(:merge_request_unmergeable).with(subject).once
             expect(todo_service).to receive(:merge_request_became_unmergeable).with(subject).once
 
-            subject.mark_as_unmergeable
-            subject.mark_as_unchecked
-            subject.mark_as_unmergeable
+            subject.mark_as_unmergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_unmergeable!
+          end
+
+          it 'notifies conflict, but does not notify again if rechecking still results in cannot_be_merged with async mergeability check' do
+            expect(notification_service).to receive(:merge_request_unmergeable).with(subject).once
+            expect(todo_service).to receive(:merge_request_became_unmergeable).with(subject).once
+
+            subject.mark_as_checking!
+            subject.mark_as_unmergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_checking!
+            subject.mark_as_unmergeable!
           end
 
           it 'notifies conflict, whenever newly unmergeable' do
             expect(notification_service).to receive(:merge_request_unmergeable).with(subject).twice
             expect(todo_service).to receive(:merge_request_became_unmergeable).with(subject).twice
 
-            subject.mark_as_unmergeable
-            subject.mark_as_unchecked
-            subject.mark_as_mergeable
-            subject.mark_as_unchecked
-            subject.mark_as_unmergeable
+            subject.mark_as_unmergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_mergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_unmergeable!
+          end
+
+          it 'notifies conflict, whenever newly unmergeable with async mergeability check' do
+            expect(notification_service).to receive(:merge_request_unmergeable).with(subject).twice
+            expect(todo_service).to receive(:merge_request_became_unmergeable).with(subject).twice
+
+            subject.mark_as_checking!
+            subject.mark_as_unmergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_checking!
+            subject.mark_as_mergeable!
+
+            subject.mark_as_unchecked!
+            subject.mark_as_checking!
+            subject.mark_as_unmergeable!
           end
 
           it 'does not notify whenever merge request is newly unmergeable due to other reasons' do
@@ -3229,7 +3294,7 @@ describe MergeRequest do
             expect(notification_service).not_to receive(:merge_request_unmergeable)
             expect(todo_service).not_to receive(:merge_request_became_unmergeable)
 
-            subject.mark_as_unmergeable
+            subject.mark_as_unmergeable!
           end
         end
       end
@@ -3242,7 +3307,7 @@ describe MergeRequest do
             expect(notification_service).not_to receive(:merge_request_unmergeable)
             expect(todo_service).not_to receive(:merge_request_became_unmergeable)
 
-            subject.mark_as_unmergeable
+            subject.mark_as_unmergeable!
           end
         end
       end

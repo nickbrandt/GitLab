@@ -81,7 +81,7 @@ export default {
           :img-src="user.avatar_url"
           :img-size="24"
           :username="user.name"
-          :data-user="user.id"
+          :data-user-id="user.id"
           class="font-weight-bold js-user-link"
           img-css-classes="avatar-inline"
         />

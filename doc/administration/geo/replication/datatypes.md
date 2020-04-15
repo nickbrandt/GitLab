@@ -73,7 +73,7 @@ for Wiki and Design Repository cases.
 GitLab stores files and blobs such as Issue attachments or LFS objects into either:
 
 - The filesystem in a specific location.
-- An Object Storage solution. Object Storage solutions can be:
+- An [Object Storage](../../object_storage.md) solution. Object Storage solutions can be:
   - Cloud based like Amazon S3 Google Cloud Storage.
   - Hosted by you (like MinIO).
   - A Storage Appliance that exposes an Object Storage-compatible API.
@@ -145,6 +145,7 @@ successfully, you must replicate their data using some other means.
 | [Maven Repository](../../../user/packages/maven_repository/index.md) | [No](https://gitlab.com/groups/gitlab-org/-/epics/2346)  | No                                                      |                                                                                                            |
 | [Conan Repository](../../../user/packages/conan_repository/index.md) | [No](https://gitlab.com/groups/gitlab-org/-/epics/2346)  | No                                                      |                                                                                                            |
 | [NuGet Repository](../../../user/packages/nuget_repository/index.md) | [No](https://gitlab.com/groups/gitlab-org/-/epics/2346)  | No                                                      |                                                                                                            |
+| [PyPi Repository](../../../user/packages/pypi_repository/index.md) | [No](https://gitlab.com/groups/gitlab-org/-/epics/2554)  | No                                                      |                                                                                                            |
 | [External merge request diffs](../../merge_request_diffs.md)         | [No](https://gitlab.com/gitlab-org/gitlab/issues/33817)  | No                                                      |                                                                                                            |
 | Content in object storage                                            | **Yes**                                                  | No                                                      |                                                                                                            |
 

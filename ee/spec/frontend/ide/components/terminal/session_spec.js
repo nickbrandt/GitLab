@@ -37,8 +37,8 @@ describe('EE IDE TerminalSession', () => {
       session: { status: RUNNING, terminalPath: TEST_TERMINAL_PATH },
     };
     actions = {
-      restartSession: jasmine.createSpy('restartSession'),
-      stopSession: jasmine.createSpy('stopSession'),
+      restartSession: jest.fn(),
+      stopSession: jest.fn(),
     };
   });
 

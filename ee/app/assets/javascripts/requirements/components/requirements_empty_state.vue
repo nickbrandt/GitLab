@@ -1,11 +1,13 @@
 <script>
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlDeprecatedButton } from '@gitlab/ui';
+import { __ } from '~/locale';
 
-import { FilterStateEmptyMessage } from '../constants';
+import { FilterState, FilterStateEmptyMessage } from '../constants';
 
 export default {
   components: {
     GlEmptyState,
+    GlDeprecatedButton,
   },
   props: {
     filterBy: {
@@ -16,10 +18,24 @@ export default {
       type: String,
       required: true,
     },
+    requirementsCount: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
     emptyStateTitle() {
-      return FilterStateEmptyMessage[this.filterBy];
+      return this.requirementsCount[FilterState.all]
+        ? FilterStateEmptyMessage[this.filterBy]
+        : __('Requirements allow you to create criteria to check your products against.');
+    },
+    emptyStateDescription() {
+      return !this.requirementsCount[FilterState.all]
+        ? __(
+            `Requirements can be based on users, stakeholders, system, software
+             or anything else you find important to capture.`,
+          )
+        : null;
     },
   },
 };
@@ -27,6 +43,19 @@ export default {
 
 <template>
   <div class="requirements-empty-state-container">
-    <gl-empty-state :title="emptyStateTitle" :svg-path="emptyStatePath" />
+    <gl-empty-state
+      :svg-path="emptyStatePath"
+      :title="emptyStateTitle"
+      :description="emptyStateDescription"
+    >
+      <template v-if="emptyStateDescription" #actions>
+        <gl-deprecated-button
+          category="primary"
+          variant="success"
+          @click="$emit('clickNewRequirement')"
+          >{{ __('New requirement') }}</gl-deprecated-button
+        >
+      </template>
+    </gl-empty-state>
   </div>
 </template>

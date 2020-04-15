@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Admin::PushRulesController do
+  include StubENV
+
   let(:admin) { create(:admin) }
 
   before do
@@ -18,6 +20,10 @@ describe Admin::PushRulesController do
       }
     end
 
+    before do
+      stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
+    end
+
     it 'updates sample push rule' do
       expect_next_instance_of(PushRule) do |instance|
         expect(instance).to receive(:update).with(ActionController::Parameters.new(params).permit!)
@@ -26,6 +32,12 @@ describe Admin::PushRulesController do
       patch :update, params: { push_rule: params }
 
       expect(response).to redirect_to(admin_push_rule_path)
+    end
+
+    it 'links push rule with application settings' do
+      patch :update, params: { push_rule: params }
+
+      expect(ApplicationSetting.current.push_rule_id).not_to be_nil
     end
 
     context 'push rules unlicensed' do

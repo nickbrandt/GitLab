@@ -53,6 +53,31 @@ describe('threatMonitoringStatistics mutations', () => {
     it('sets errorLoadingStatistics to false', () => {
       expect(state.errorLoadingStatistics).toBe(false);
     });
+
+    describe('with null payload', () => {
+      beforeEach(() => {
+        mutations[types.RECEIVE_STATISTICS_SUCCESS](state, null);
+      });
+
+      it('sets statistics to the empty state', () => {
+        expect(state.statistics).toEqual({
+          total: 0,
+          anomalous: 0,
+          history: {
+            nominal: [],
+            anomalous: [],
+          },
+        });
+      });
+
+      it('sets isLoadingStatistics to false', () => {
+        expect(state.isLoadingStatistics).toBe(false);
+      });
+
+      it('sets errorLoadingStatistics to false', () => {
+        expect(state.errorLoadingStatistics).toBe(false);
+      });
+    });
   });
 
   describe(types.RECEIVE_STATISTICS_ERROR, () => {

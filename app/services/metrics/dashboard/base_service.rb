@@ -11,7 +11,9 @@ module Metrics
       SEQUENCE = [
         STAGES::CommonMetricsInserter,
         STAGES::EndpointInserter,
-        STAGES::Sorter
+        STAGES::PanelIdsInserter,
+        STAGES::Sorter,
+        STAGES::AlertsInserter
       ].freeze
 
       def get_dashboard
@@ -116,5 +118,3 @@ module Metrics
     end
   end
 end
-
-Metrics::Dashboard::BaseService.prepend_if_ee('EE::Metrics::Dashboard::BaseService')

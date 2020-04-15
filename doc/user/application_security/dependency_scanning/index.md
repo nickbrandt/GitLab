@@ -16,9 +16,9 @@ If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your dep
 vulnerabilities using Dependency Scanning.
 All dependencies are scanned, including the transitive dependencies (also known as nested dependencies).
 
-You can take advantage of Dependency Scanning by either [including the CI job](#configuration)
+You can take advantage of Dependency Scanning by either [including the Dependency Scanning template](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning-ultimate)
+[Auto Dependency Scanning](../../../topics/autodevops/stages.md#auto-dependency-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the Dependency Scanning report, compares the found vulnerabilities
@@ -46,7 +46,7 @@ this is enabled by default.
 
 CAUTION: **Caution:**
 If you use your own Runners, make sure that the Docker version you have installed
-is **not** `19.03.00`. See [troubleshooting information](#error-response-from-daemon-error-processing-tar-file-docker-tar-relocation-error) for details.
+is **not** `19.03.0`. See [troubleshooting information](#error-response-from-daemon-error-processing-tar-file-docker-tar-relocation-error) for details.
 
 Privileged mode is not necessary if you've [disabled Docker in Docker for Dependency Scanning](#disabling-docker-in-docker-for-dependency-scanning)
 
@@ -137,19 +137,26 @@ using environment variables.
 
 The following variables allow configuration of global dependency scanning settings.
 
+| Environment variable                    | Description |
+| --------------------------------------- |------------ |
+| `DS_ANALYZER_IMAGE_PREFIX`              | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
+| `DS_DEFAULT_ANALYZERS`                  | Override the names of the official default images. Read more about [customizing analyzers](analyzers.md). |
+| `DS_DISABLE_DIND`                       | Disable Docker-in-Docker and run analyzers [individually](#disabling-docker-in-docker-for-dependency-scanning).|
+| `ADDITIONAL_CA_CERT_BUNDLE`             | Bundle of CA certs to trust. |
+| `DS_EXCLUDED_PATHS`                     | Exclude vulnerabilities from output based on the paths. A comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec`). Parent directories also match patterns. |
+
+#### Configuring Docker-in-Docker orchestrator
+
+The following variables configure the Docker-in-Docker orchestrator.
+
 | Environment variable                    | Default     | Description |
 | --------------------------------------- | ----------- | ----------- |
 | `DS_ANALYZER_IMAGES`                    |             | Comma separated list of custom images. The official default images are still enabled. Read more about [customizing analyzers](analyzers.md). |
-| `DS_ANALYZER_IMAGE_PREFIX`              |             | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
 | `DS_ANALYZER_IMAGE_TAG`                 |             | Override the Docker tag of the official default images. Read more about [customizing analyzers](analyzers.md). |
-| `DS_DEFAULT_ANALYZERS`                  |             | Override the names of the official default images. Read more about [customizing analyzers](analyzers.md). |
-| `DS_DISABLE_DIND`                       |             | Disable Docker in Docker and run analyzers [individually](#disabling-docker-in-docker-for-dependency-scanning).|
 | `DS_PULL_ANALYZER_IMAGES`               |             | Pull the images from the Docker registry (set to `0` to disable). |
-| `DS_EXCLUDED_PATHS`                     |             | Exclude vulnerabilities from output based on the paths. A comma-separated list of patterns. Patterns can be globs, file or folder paths (for example, `doc,spec`). Parent directories will also match patterns. |
 | `DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT`  | 2m          | Time limit for Docker client negotiation. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
 | `DS_PULL_ANALYZER_IMAGE_TIMEOUT`        | 5m          | Time limit when pulling an analyzer's image. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
 | `DS_RUN_ANALYZER_TIMEOUT`               | 20m         | Time limit when running an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
-| `ADDITIONAL_CA_CERT_BUNDLE`   |  | Bundle of CA certs that you want to trust. |
 
 #### Configuring specific analyzers used by Dependency Scanning
 
@@ -171,8 +178,9 @@ The following variables are used for configuring specific analyzers (used for a 
 | `BUNDLER_AUDIT_UPDATE_DISABLED`         | `bundler-audit`    | `"false"`                      | Disable automatic updates for the `bundler-audit` analyzer. Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
 | `BUNDLER_AUDIT_ADVISORY_DB_URL`         | `bundler-audit`    | `https://github.com/rubysec/ruby-advisory-db` | URL of the advisory database used by bundler-audit. |
 | `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME`    | `bundler-audit`    | `master`                     | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL`. |
-| `RETIREJS_JS_ADVISORY_DB`               | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json` | Path or URL to Retire.js js vulnerability data file. |
-| `RETIREJS_NODE_ADVISORY_DB`             | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/npmrepository.json` | Path or URL to Retire.js node vulnerability data file. |
+| `RETIREJS_JS_ADVISORY_DB`               | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json` | Path or URL to `retire.js` JS vulnerability data file. Note that if the URL hosting the data file uses a custom SSL certificate, for example in an offline installation, you can pass the certificate in the `ADDITIONAL_CA_CERT_BUNDLE` environment variable. |
+| `RETIREJS_NODE_ADVISORY_DB`             | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/npmrepository.json` | Path or URL to `retire.js` node vulnerability data file. Note that if the URL hosting the data file uses a custom SSL certificate, for example in an offline installation, you can pass the certificate in the `ADDITIONAL_CA_CERT_BUNDLE` environment variable. |
+| `RETIREJS_ADVISORY_DB_INSECURE`         | `retire.js`        | `false`                      | Enable fetching remote JS and Node vulnerability data files (defined by the `RETIREJS_JS_ADVISORY_DB` and `RETIREJS_NODE_ADVISORY_DB` variables) from hosts using an insecure or self-signed SSL (TLS) certificate. |
 
 ### Using private Maven repos
 
@@ -204,7 +212,11 @@ to start relevant analyzers depending on the detected repository language(s) ins
 are some differences in the way repository languages are detected between DIND and non-DIND. You can
 observe these differences by checking both Linguist and the common library. For instance, Linguist
 looks for `*.java` files to spin up the [gemnasium-maven](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven)
-image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`.
+image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`. GitLab uses
+Linguist to detect new file types in the default branch. This means that when introducing files or
+dependencies for a new language or package manager, the corresponding scans won't be triggered in
+the MR and will only run on the default branch once the MR is merged. This will be addressed by
+[#211702](https://gitlab.com/gitlab-org/gitlab/-/issues/211702).
 
 ## Interacting with the vulnerabilities
 
@@ -248,11 +260,11 @@ it highlighted:
   "version": "2.0",
   "vulnerabilities": [
     {
+      "id": "51e83874-0ff6-4677-a4c5-249060554eae",
       "category": "dependency_scanning",
       "name": "Regular Expression Denial of Service",
       "message": "Regular Expression Denial of Service in debug",
       "description": "The debug module is vulnerable to regular expression denial of service when untrusted user input is passed into the `o` formatter. It takes around 50k characters to block for 2 seconds making this a low severity issue.",
-      "cve": "yarn.lock:debug:gemnasium:37283ed4-0380-40d7-ada7-2d994afcc62a",
       "severity": "Unknown",
       "solution": "Upgrade to latest versions.",
       "scanner": {
@@ -289,11 +301,11 @@ it highlighted:
       ]
     },
     {
+      "id": "5d681b13-e8fa-4668-957e-8d88f932ddc7",
       "category": "dependency_scanning",
       "name": "Authentication bypass via incorrect DOM traversal and canonicalization",
       "message": "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js",
       "description": "Some XML DOM traversal and canonicalization APIs may be inconsistent in handling of comments within XML nodes. Incorrect use of these APIs by some SAML libraries results in incorrect parsing of the inner text of XML nodes such that any inner text after the comment is lost prior to cryptographically signing the SAML message. Text after the comment therefore has no impact on the signature on the SAML message.\r\n\r\nA remote attacker can modify SAML content for a SAML service provider without invalidating the cryptographic signature, which may allow attackers to bypass primary authentication for the affected SAML service provider.",
-      "cve": "yarn.lock:saml2-js:gemnasium:9952e574-7b5b-46fa-a270-aeb694198a98",
       "severity": "Unknown",
       "solution": "Upgrade to fixed version.\r\n",
       "scanner": {
@@ -340,7 +352,7 @@ it highlighted:
     {
       "fixes": [
         {
-          "cve": "yarn.lock:saml2-js:gemnasium:9952e574-7b5b-46fa-a270-aeb694198a98"
+          "id": "5d681b13-e8fa-4668-957e-8d88f932ddc7",
         }
       ],
       "summary": "Upgrade saml2-js",
@@ -360,13 +372,14 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 |------------------------------------------------------|-------------|
 | `version`                                            | Report syntax version used to generate this JSON. |
 | `vulnerabilities`                                    | Array of vulnerability objects. |
+| `vulnerabilities[].id`                               | Unique identifier of the vulnerability. |
 | `vulnerabilities[].category`                         | Where this vulnerability belongs (SAST, Dependency Scanning etc.). For Dependency Scanning, it will always be `dependency_scanning`. |
 | `vulnerabilities[].name`                             | Name of the vulnerability, this must not include the occurrence's specific information. Optional. |
 | `vulnerabilities[].message`                          | A short text that describes the vulnerability, it may include occurrence's specific information. Optional. |
 | `vulnerabilities[].description`                      | A long text that describes the vulnerability. Optional. |
-| `vulnerabilities[].cve`                              | A fingerprint string value that represents a concrete occurrence of the vulnerability. It's used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. **This is NOT a [CVE](https://cve.mitre.org/)**. |
-| `vulnerabilities[].severity`                         | How much the vulnerability impacts the software. Possible values: `Undefined` (an analyzer has not provided this info), `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`. |
-| `vulnerabilities[].confidence`                       | How reliable the vulnerability's assessment is. Possible values: `Undefined` (an analyzer has not provided this info), `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`. |
+| `vulnerabilities[].cve`                              | (**DEPRECATED - use `vulnerabilities[].id` instead**) A fingerprint string value that represents a concrete occurrence of the vulnerability. It's used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. **This is NOT a [CVE](https://cve.mitre.org/)**.                                                                                                                                      |
+| `vulnerabilities[].severity`                         | How much the vulnerability impacts the software. Possible values: `Undefined` (an analyzer has not provided this information), `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`. |
+| `vulnerabilities[].confidence`                       | How reliable the vulnerability's assessment is. Possible values: `Undefined` (an analyzer has not provided this information), `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`. |
 | `vulnerabilities[].solution`                         | Explanation of how to fix the vulnerability. Optional. |
 | `vulnerabilities[].scanner`                          | A node that describes the analyzer used to find this vulnerability. |
 | `vulnerabilities[].scanner.id`                       | Id of the scanner as a snake_case string. |
@@ -387,7 +400,8 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].links[].url`                      | URL of the vulnerability details document. Optional. |
 | `remediations`                                       | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. Empty if no remediations provided by an underlying analyzer. |
 | `remediations[].fixes`                               | An array of strings that represent references to vulnerabilities fixed by this particular remediation. |
-| `remediations[].fixes[].cve`                         | A string value that describes a fixed vulnerability occurrence in the same format as `vulnerabilities[].cve`. |
+| `remediations[].fixes[].id`                          | The id of a fixed vulnerability. |
+| `remediations[].fixes[].cve`                         | (**DEPRECATED - use `remediations[].fixes[].id` instead**) A string value that describes a fixed vulnerability in the same format as `vulnerabilities[].cve`. |
 | `remediations[].summary`                             | Overview of how the vulnerabilities have been fixed. |
 | `remediations[].diff`                                | base64-encoded remediation code diff, compatible with [`git apply`](https://git-scm.com/docs/git-format-patch#_discussion). |
 
@@ -405,7 +419,7 @@ You can also [submit new vulnerabilities](https://gitlab.com/gitlab-org/security
 
 ### Error response from daemon: error processing tar file: docker-tar: relocation error
 
-This error occurs when the Docker version used to run the SAST job is `19.03.00`.
-You are advised to update to Docker `19.03.01` or greater. Older versions are not
+This error occurs when the Docker version used to run the SAST job is `19.03.0`.
+You are advised to update to Docker `19.03.1` or greater. Older versions are not
 affected. Read more in
 [this issue](https://gitlab.com/gitlab-org/gitlab/issues/13830#note_211354992 "Current SAST container fails").

@@ -61,6 +61,11 @@ export default {
       required: false,
       default: '',
     },
+    configuredAlert: {
+      type: String,
+      required: false,
+      default: '',
+    },
     alertsToManage: {
       type: Object,
       required: false,
@@ -207,6 +212,7 @@ export default {
     :ok-disabled="formDisabled"
     @ok="handleSubmit"
     @hidden="handleHidden"
+    @shown="selectQuery(configuredAlert)"
   >
     <div v-if="errorMessage" class="alert-modal-message danger_message">{{ errorMessage }}</div>
     <div class="alert-form">

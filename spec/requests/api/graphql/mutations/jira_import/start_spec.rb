@@ -99,6 +99,12 @@ describe 'Starting a Jira Import' do
           it_behaves_like 'a mutation that returns errors in the response', errors: ['Jira integration not configured.']
         end
 
+        context 'when issues feature are disabled' do
+          let_it_be(:project, reload: true) { create(:project, :issues_disabled) }
+
+          it_behaves_like 'a mutation that returns errors in the response', errors: ['Cannot import because issues are not available in this project.']
+        end
+
         context 'when when project has Jira service' do
           let!(:service) { create(:jira_service, project: project) }
 
@@ -118,9 +124,8 @@ describe 'Starting a Jira Import' do
 
               expect(jira_import['jiraProjectKey']).to eq 'AA'
               expect(jira_import['scheduledBy']['username']).to eq current_user.username
-              expect(project.import_state).not_to be nil
-              expect(project.import_state.status).to eq 'scheduled'
-              expect(project.import_data.becomes(JiraImportData).projects.last.scheduled_by['user_id']).to eq current_user.id
+              expect(project.latest_jira_import).not_to be_nil
+              expect(project.latest_jira_import).to be_scheduled
             end
           end
         end

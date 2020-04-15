@@ -19,6 +19,7 @@ export default () => {
           incomingEmail: dataset.incomingEmail,
           selectedTemplate: dataset.selectedTemplate,
           outgoingName: dataset.outgoingName,
+          projectKey: dataset.projectKey,
           templates: JSON.parse(dataset.templates),
         };
       },
@@ -30,6 +31,7 @@ export default () => {
             initialIncomingEmail: this.incomingEmail,
             selectedTemplate: this.selectedTemplate,
             outgoingName: this.outgoingName,
+            projectKey: this.projectKey,
             templates: this.templates,
           },
         });

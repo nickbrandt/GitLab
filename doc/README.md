@@ -238,7 +238,7 @@ The following documentation relates to the DevOps **Verify** stage:
 | [GitLab CI/CD](ci/README.md)                                                      | Explore the features and capabilities of Continuous Integration with GitLab.                            |
 | [JUnit test reports](ci/junit_test_reports.md)                                    | Display JUnit test reports on merge requests.                                                           |
 | [Multi-project pipelines](ci/multi_project_pipelines.md) **(PREMIUM)**            | Visualize entire pipelines that span multiple projects, including all cross-project inter-dependencies. |
-| [Pipeline Graphs](ci/pipelines/index.md#visualizing-pipelines)                          | Visualize builds.                                                                                       |
+| [Pipeline Graphs](ci/pipelines/index.md#visualize-pipelines)                      | Visualize builds.                                                                                       |
 | [Review Apps](ci/review_apps/index.md)                                            | Preview changes to your application right from a merge request.                                         |
 
 <div align="right">
@@ -279,7 +279,7 @@ The following documentation relates to the DevOps **Release** stage:
 
 | Release Topics                                                                                                                      | Description                                                                                                                           |
 |:------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
-| [Auto Deploy](topics/autodevops/index.md#auto-deploy)                                                                               | Configure GitLab for the deployment of your application.                                                                              |
+| [Auto Deploy](topics/autodevops/stages.md#auto-deploy)                                                                               | Configure GitLab for the deployment of your application.                                                                              |
 | [Canary Deployments](user/project/canary_deployments.md) **(PREMIUM)**                                                              | Employ a popular CI strategy where a small portion of the fleet is updated to the new version first.                                  |
 | [Deploy Boards](user/project/deploy_boards.md) **(PREMIUM)**                                                                        | View the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment. |
 | [Environments and deployments](ci/environments.md)                                                                                  | With environments, you can control the continuous deployment of your software within GitLab.                                          |
@@ -367,7 +367,7 @@ The following documentation relates to the DevOps **Secure** stage:
 | [Group Security Dashboard](user/application_security/security_dashboard/index.md#group-security-dashboard) **(ULTIMATE)**      | View vulnerabilities in all the projects in a group and its subgroups. |
 | [Instance Security Dashboard](user/application_security/security_dashboard/index.md#instance-security-dashboard) **(ULTIMATE)**      | View vulnerabilities in all the projects you're interested in. |
 | [License Compliance](user/compliance/license_compliance/index.md) **(ULTIMATE)**            | Search your project's dependencies for their licenses.                 |
-| [Pipeline Security Dashboard](user/application_security/security_dashboard/index.md#pipeline-security-dashboard) **(ULTIMATE)**    | View the security reports for your project's pipelines.               |
+| [Pipeline Security](user/application_security/security_dashboard/index.md#pipeline-security) **(ULTIMATE)**    | View the security reports for your project's pipelines.               |
 | [Project Security Dashboard](user/application_security/security_dashboard/index.md#project-security-dashboard) **(ULTIMATE)**    | View the latest security reports for your project.                     |
 | [Static Application Security Testing (SAST)](user/application_security/sast/index.md) **(ULTIMATE)**  | Analyze source code for known vulnerabilities.                         |
 

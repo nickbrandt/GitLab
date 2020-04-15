@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :group_saml, :orchestrated, :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212378', type: :bug } do
+  context 'Manage', :group_saml, :orchestrated, :requires_admin do
     describe 'Group SAML SSO - Non enforced SSO' do
       include Support::Api
 
@@ -9,6 +9,8 @@ module QA
         @group = Resource::Sandbox.fabricate_via_api! do |sandbox_group|
           sandbox_group.path = "saml_sso_group_#{SecureRandom.hex(8)}"
         end
+
+        Runtime::Feature.enable_and_verify('group_administration_nav_item')
 
         @saml_idp_service = Flow::Saml.run_saml_idp_service(@group.path)
       end
@@ -72,6 +74,8 @@ module QA
 
       after(:all) do
         @group.remove_via_api!
+
+        Runtime::Feature.remove('group_administration_nav_item')
 
         page.visit Runtime::Scenario.gitlab_address
         Page::Main::Menu.perform(&:sign_out_if_signed_in)

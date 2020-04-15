@@ -21,6 +21,12 @@ describe Projects::Settings::RepositoryController do
         is_expected.to be_persisted
       end
 
+      it 'is connected to project_settings' do
+        get :show, params: { namespace_id: project.namespace, project_id: project }
+
+        expect(project.project_setting.push_rule).to eq(subject)
+      end
+
       context 'unlicensed' do
         before do
           stub_licensed_features(push_rules: false)

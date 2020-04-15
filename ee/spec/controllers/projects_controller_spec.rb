@@ -376,6 +376,47 @@ describe ProjectsController do
         end
       end
     end
+
+    context 'compliance framework settings' do
+      let(:framework) { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.sample }
+      let(:params) { { compliance_framework_setting_attributes: { framework: framework } } }
+
+      context 'when unlicensed' do
+        before do
+          stub_licensed_features(compliance_framework: false)
+        end
+
+        it 'ignores any compliance framework params' do
+          put :update,
+            params: {
+                namespace_id: project.namespace,
+                id: project,
+                project: params
+            }
+          project.reload
+
+          expect(project.compliance_framework_setting).to be_nil
+        end
+      end
+
+      context 'when licensed' do
+        before do
+          stub_licensed_features(compliance_framework: true)
+        end
+
+        it 'sets the compliance framework' do
+          put :update,
+              params: {
+                  namespace_id: project.namespace,
+                  id: project,
+                  project: params
+              }
+          project.reload
+
+          expect(project.compliance_framework_setting.framework).to eq(framework)
+        end
+      end
+    end
   end
 
   describe '#download_export' do

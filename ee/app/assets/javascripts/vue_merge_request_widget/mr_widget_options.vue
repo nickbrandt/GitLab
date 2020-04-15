@@ -47,7 +47,7 @@ export default {
       return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
-      return this.mr.enabledReports?.licenseManagement;
+      return this.mr.enabledReports?.licenseScanning;
     },
     hasCodequalityIssues() {
       return (
@@ -340,11 +340,15 @@ export default {
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />
+
       <grouped-test-reports-app
         v-if="mr.testResultsPath"
         class="js-reports-container"
         :endpoint="mr.testResultsPath"
       />
+
+      <terraform-plan v-if="mr.terraformReportsPath" :endpoint="mr.terraformReportsPath" />
+
       <div class="mr-widget-section">
         <component :is="componentName" :mr="mr" :service="service" />
 

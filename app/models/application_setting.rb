@@ -14,6 +14,7 @@ class ApplicationSetting < ApplicationRecord
   add_authentication_token_field :static_objects_external_storage_auth_token
 
   belongs_to :self_monitoring_project, class_name: "Project", foreign_key: 'instance_administration_project_id'
+  belongs_to :push_rule
   alias_attribute :self_monitoring_project_id, :instance_administration_project_id
 
   belongs_to :instance_administrators_group, class_name: "Group"
@@ -141,6 +142,9 @@ class ApplicationSetting < ApplicationRecord
                             less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
   validates :default_artifacts_expire_in, presence: true, duration: true
+
+  validates :container_expiration_policies_enable_historic_entries,
+             inclusion: { in: [true, false], message: 'must be a boolean value' }
 
   validates :container_registry_token_expire_delay,
             presence: true,

@@ -18,8 +18,8 @@ describe('EE IDE TerminalControls', () => {
     factory();
 
     expect(buttons.wrappers.map(x => x.props())).toEqual([
-      jasmine.objectContaining({ direction: 'up', disabled: true }),
-      jasmine.objectContaining({ direction: 'down', disabled: true }),
+      expect.objectContaining({ direction: 'up', disabled: true }),
+      expect.objectContaining({ direction: 'down', disabled: true }),
     ]);
   });
 
@@ -27,7 +27,7 @@ describe('EE IDE TerminalControls', () => {
     factory({ propsData: { canScrollUp: true } });
 
     expect(buttons.at(0).props()).toEqual(
-      jasmine.objectContaining({ direction: 'up', disabled: false }),
+      expect.objectContaining({ direction: 'up', disabled: false }),
     );
   });
 
@@ -35,7 +35,7 @@ describe('EE IDE TerminalControls', () => {
     factory({ propsData: { canScrollDown: true } });
 
     expect(buttons.at(1).props()).toEqual(
-      jasmine.objectContaining({ direction: 'down', disabled: false }),
+      expect.objectContaining({ direction: 'down', disabled: false }),
     );
   });
 

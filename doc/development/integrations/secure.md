@@ -37,7 +37,7 @@ For instance, it is common practice to use `before_script` to install system lib
 a particular project needs before performing SAST or Dependency Scanning.
 
 Similarly, [`after_script`](../../ci/yaml/README.md#before_script-and-after_script)
-should not not be used in the job definition, because it may be overridden by users.
+should not be used in the job definition, because it may be overridden by users.
 
 ### Stage
 
@@ -80,7 +80,7 @@ See [GitLab CI/CD predefined variables](../../ci/variables/predefined_variables.
 
 Also, scanning jobs should be skipped when the corresponding variable prefixed with `_DISABLED` is present.
 See `DEPENDENCY_SCANNING_DISABLED`, `CONTAINER_SCANNING_DISABLED`, `SAST_DISABLED`, and `DAST_DISABLED`
-in [Auto DevOps documentation](../../topics/autodevops/index.md#disable-jobs).
+in [Auto DevOps documentation](../../topics/autodevops/customize.md#disable-jobs).
 
 Finally, SAST and Dependency Scanning job definitions should use
 `CI_PROJECT_REPOSITORY_LANGUAGES` (comma-separated list of values)
@@ -232,6 +232,12 @@ describes the Secure report format version.
 ### Vulnerabilities
 
 The `vulnerabilities` field of the report is an array of vulnerability objects.
+
+#### ID
+
+The `id` field is the unique identifier of the vulnerability.
+It is used to reference a fixed vulnerability from a [remediation objects](#remediations).
+We recommend that you generate a UUID and use it as the `id` field's value.
 
 #### Category
 
@@ -403,7 +409,7 @@ It may also have an `end_line`, a `class`, and a `method`.
 
 For instance, here is the `location` object for a security flaw found
 at line `41` of `src/main/java/com/gitlab/example/App.java`,
-in the the `generateSecretToken` method of the `com.gitlab.security_products.tests.App` Java class:
+in the `generateSecretToken` method of the `com.gitlab.security_products.tests.App` Java class:
 
 ```json
 {
@@ -467,6 +473,15 @@ The `remediations` field of the report is an array of remediation objects.
 Each remediation describes a patch that can be applied to automatically fix
 a set of vulnerabilities.
 
-Currently, remediations rely on a deprecated field named `cve` to reference vulnerabilities,
-so it is recommended not to use them until a new format has been defined.
-See [issue #36777](https://gitlab.com/gitlab-org/gitlab/issues/36777).
+#### Summary
+
+The `summary` field is an overview of how the vulnerabilities can be fixed.
+
+#### Fixed vulnerabilities
+
+The `fixes` field is an array of objects that reference the vulnerabilities fixed by the
+remediation. `fixes[].id` contains a fixed vulnerability's unique identifier.
+
+#### Diff
+
+The `diff` field is a base64-encoded remediation code diff, compatible with [`git apply`](https://git-scm.com/docs/git-format-patch#_discussion).

@@ -62,8 +62,8 @@ puts Readline::HISTORY.to_a
 
 ## Using the Rails Runner
 
-If you need to run some Ruby code in thex context of your GitLab production
-environment, you can do so using the [Rails Runner](https://guides.rubyonrails.org/command_line.html#rails-runner).
+If you need to run some Ruby code in the context of your GitLab production
+environment, you can do so using the [Rails Runner](https://guides.rubyonrails.org/command_line.html#rails-runner). When executing a script file, the script must be accessible by the `git` user.
 
 **For Omnibus installations**
 
@@ -72,6 +72,9 @@ sudo gitlab-rails runner "RAILS_COMMAND"
 
 # Example with a two-line Ruby script
 sudo gitlab-rails runner "user = User.first; puts user.username"
+
+# Example with a ruby script file
+sudo gitlab-rails runner /path/to/script.rb
 ```
 
 **For installations from source**
@@ -81,6 +84,9 @@ sudo -u git -H bundle exec rails runner -e production "RAILS_COMMAND"
 
 # Example with a two-line Ruby script
 sudo -u git -H bundle exec rails runner -e production "user = User.first; puts user.username"
+
+# Example with a ruby script file
+sudo -u git -H bundle exec rails runner -e production /path/to/script.rb
 ```
 
 ## Mail not working
@@ -241,7 +247,7 @@ separate Rails process to debug the issue:
    app.get 'https://gitlab.com/gitlab-org/gitlab-foss/issues/1?private_token=123456'
    ```
 
-1. In a new window, run `top`. It should show this ruby process using 100% CPU. Write down the PID.
+1. In a new window, run `top`. It should show this Ruby process using 100% CPU. Write down the PID.
 1. Follow step 2 from the previous section on using gdb.
 
 ### GitLab: API is not accessible
@@ -275,4 +281,4 @@ The output in `/tmp/unicorn.txt` may help diagnose the root cause.
 ## More information
 
 - [Debugging Stuck Ruby Processes](https://blog.newrelic.com/engineering/debugging-stuck-ruby-processes-what-to-do-before-you-kill-9/)
-- [Cheatsheet of using gdb and ruby processes](gdb-stuck-ruby.txt)
+- [Cheatsheet of using gdb and Ruby processes](gdb-stuck-ruby.txt)

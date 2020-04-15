@@ -25,7 +25,6 @@
   "two_factor_grace_period": 48,
   "plan_id": null,
   "project_creation_level": 2,
-  "trial_ends_on": null,
   "file_template_project_id": null,
   "saml_discovery_token": "rBKx3ioz",
   "custom_project_templates_group_id": null,

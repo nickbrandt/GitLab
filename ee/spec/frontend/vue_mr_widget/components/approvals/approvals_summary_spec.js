@@ -47,7 +47,7 @@ describe('EE MRWidget approvals summary', () => {
 
       expect(avatars.exists()).toBe(true);
       expect(avatars.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           items: testApprovers(),
         }),
       );

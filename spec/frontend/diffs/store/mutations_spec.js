@@ -51,6 +51,24 @@ describe('DiffsStoreMutations', () => {
     });
   });
 
+  describe('SET_DIFF_FILES', () => {
+    it('should set diffFiles in state', () => {
+      const state = {};
+
+      mutations[types.SET_DIFF_FILES](state, ['file', 'another file']);
+
+      expect(state.diffFiles.length).toEqual(2);
+    });
+
+    it('should not set anything except diffFiles in state', () => {
+      const state = {};
+
+      mutations[types.SET_DIFF_FILES](state, ['file', 'another file']);
+
+      expect(Object.keys(state)).toEqual(['diffFiles']);
+    });
+  });
+
   describe('SET_DIFF_DATA', () => {
     it('should set diff data type properly', () => {
       const state = {
@@ -778,11 +796,13 @@ describe('DiffsStoreMutations', () => {
     it('sets showWhitespace', () => {
       const state = {
         showWhitespace: true,
+        diffFiles: ['test'],
       };
 
       mutations[types.SET_SHOW_WHITESPACE](state, false);
 
       expect(state.showWhitespace).toBe(false);
+      expect(state.diffFiles).toEqual([]);
     });
   });
 

@@ -8,6 +8,7 @@ import BoardSettingsSidebar from 'ee/boards/components/board_settings_sidebar.vu
 import boardsStore from 'ee_else_ce/boards/stores/boards_store_ee';
 import getters from 'ee_else_ce/boards/stores/getters';
 import bs from '~/boards/stores/boards_store';
+import sidebarEventHub from '~/sidebar/event_hub';
 import flash from '~/flash';
 import waitForPromises from 'helpers/wait_for_promises';
 
@@ -91,6 +92,20 @@ describe('BoardSettingsSideBar', () => {
         createComponent({ activeListId: 0 }, { setActiveListId: spy });
 
         wrapper.find(GlDrawer).vm.$emit('close');
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(storeActions.setActiveListId).toHaveBeenCalledWith(
+            expect.anything(),
+            0,
+            undefined,
+          );
+        });
+      });
+
+      it('calls closeSidebar on sidebar.closeAll event', () => {
+        createComponent({ activeListId: 0 }, { setActiveListId: jest.fn() });
+
+        sidebarEventHub.$emit('sidebar.closeAll');
 
         return wrapper.vm.$nextTick().then(() => {
           expect(storeActions.setActiveListId).toHaveBeenCalledWith(

@@ -177,12 +177,11 @@ describe('Actions Package list store', () => {
       testAction(
         actions.requestDeletePackage,
         payload,
-        null,
+        { pagination: { page: 1 } },
         [],
         [
           { type: 'setLoading', payload: true },
-          { type: 'requestPackagesList' },
-          { type: 'setLoading', payload: false },
+          { type: 'requestPackagesList', payload: { page: 1 } },
         ],
         done,
       );

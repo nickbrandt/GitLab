@@ -130,14 +130,20 @@
       &.selected {
         td {
           background: $white-normal;
-          border-top: 1px solid $border-gray-dark;
-          border-bottom: 1px solid $border-gray-dark;
+          border-top: 1px solid $border-white-normal;
+          border-bottom: 1px solid $border-white-normal;
         }
       }
     }
   }
 
   .tree-item {
+    .file-icon,
+    .folder-icon {
+      position: relative;
+      top: 2px;
+    }
+
     .link-container {
       padding: 0;
 

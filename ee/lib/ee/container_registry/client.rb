@@ -35,7 +35,7 @@ module EE
 
       # Pulls a blob from the Registry.
       # We currently use Faraday 0.12 which does not support streaming download yet
-      # Given that we aim to migrate to HTTP.rb client and that updating Faraday is potentialy
+      # Given that we aim to migrate to HTTP.rb client and that updating Faraday is potentially
       # dangerous, we use HTTP.rb here.
       #
       # @return {Object} Returns a Tempfile object or nil when no success
@@ -45,7 +45,10 @@ module EE
         blob_url = "/v2/#{name}/blobs/#{digest}"
 
         response = HTTP
-          .headers({ "Authorization" => "Bearer #{@options[:token]}" }) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          .headers({
+            'Authorization' => "Bearer #{@options[:token]}", # rubocop:disable Gitlab/ModuleWithInstanceVariables
+            'User-Agent' => "GitLab/#{::Gitlab::VERSION}"
+           })
           .get(::Gitlab::Utils.append_path(@base_uri, blob_url)) # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
         if response.status.redirect?
@@ -83,7 +86,7 @@ module EE
       # rubocop:disable Gitlab/ModuleWithInstanceVariables
       def faraday_raw
         strong_memoize(:faraday_raw) do
-          Faraday.new(@base_uri) do |conn|
+          faraday_base do |conn|
             initialize_connection(conn, @options, &method(:accept_raw_manifest))
           end
         end

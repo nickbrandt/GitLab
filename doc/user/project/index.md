@@ -63,14 +63,14 @@ When you create a project in GitLab, you'll have access to a large number of
 - [GitLab CI/CD](../../ci/README.md): GitLab's built-in [Continuous Integration, Delivery, and Deployment](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/) tool
   - [Container Registry](../packages/container_registry/index.md): Build and push Docker
   images out-of-the-box
-  - [Auto Deploy](../../topics/autodevops/index.md#auto-deploy): Configure GitLab CI/CD
+  - [Auto Deploy](../../topics/autodevops/stages.md#auto-deploy): Configure GitLab CI/CD
   to automatically set up your app's deployment
   - [Enable and disable GitLab CI/CD](../../ci/enable_or_disable_ci.md)
   - [Pipelines](../../ci/pipelines/index.md): Configure and visualize
     your GitLab CI/CD pipelines from the UI
     - [Scheduled Pipelines](../../ci/pipelines/schedules.md): Schedule a pipeline
       to start at a chosen time
-    - [Pipeline Graphs](../../ci/pipelines/index.md#visualizing-pipelines): View your
+    - [Pipeline Graphs](../../ci/pipelines/index.md#visualize-pipelines): View your
       entire pipeline from the UI
     - [Job artifacts](../../ci/pipelines/job_artifacts.md): Define,
       browse, and download job artifacts
@@ -102,6 +102,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Code owners](code_owners.md): specify code owners for certain files **(STARTER)**
 - [License Compliance](../compliance/license_compliance/index.md): approve and blacklist licenses for projects. **(ULTIMATE)**
 - [Dependency List](../application_security/dependency_list/index.md): view project dependencies. **(ULTIMATE)**
+- [Requirements](requirements/index.md): Requirements allow you to create criteria to check your products against. **(ULTIMATE)**
 
 ### Project integrations
 

@@ -19,6 +19,8 @@ module EE
       end
 
       def expose_security_dashboard?
+        return false unless can?(current_user, :read_vulnerability, pipeline.project)
+
         batch_lookup_report_artifact_for_file_type(:sast) ||
           batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
           batch_lookup_report_artifact_for_file_type(:dast) ||

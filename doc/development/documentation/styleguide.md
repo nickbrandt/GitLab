@@ -583,7 +583,7 @@ For other punctuation rules, please refer to the
 - [Avoid using symbols and special chars](https://gitlab.com/gitlab-org/gitlab-docs/issues/84)
   in headers. Whenever possible, they should be plain and short text.
 - Avoid adding things that show ephemeral statuses. For example, if a feature is
-  considered beta or experimental, put this info in a note, not in the heading.
+  considered beta or experimental, put this information in a note, not in the heading.
 - When introducing a new document, be careful for the headings to be
   grammatically and syntactically correct. Mention an [assigned technical writer (TW)](https://about.gitlab.com/handbook/product/categories/)
   for review.
@@ -757,10 +757,8 @@ To indicate the steps of navigation through the UI:
   the `.md` document that you're working on is located.
 - Images should have a specific, non-generic name that will
   differentiate and describe them properly.
-- Always add to the end of the file name the GitLab release version
-  corresponding to the version the screenshot was taken from, using the format
-  `image_name_vX_Y.png`.
-  ([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61027) in GitLab 12.1.)
+- For screenshots of GitLab software, append the GitLab version the screenshot was taken from to the
+  file name. Use the following format: `image_name_vX_Y.png`.
 - For example, for a screenshot taken from the pipelines page of
   GitLab 11.1, a valid name is `pipelines_v11_1.png`. If you're
   adding an illustration that does not include parts of the UI,
@@ -917,7 +915,7 @@ nicely on different mobile devices.
 - When providing a command without output, don't prefix the shell command with `$`.
 - If you need to include triple backticks inside a code block, use four backticks
   for the codeblock fences instead of three.
-- For regular code blocks, always use a highlighting class corresponding to the
+- For regular fenced code blocks, always use a highlighting class corresponding to the
   language for better readability. Examples:
 
   ````markdown
@@ -938,7 +936,7 @@ nicely on different mobile devices.
   ```
   ````
 
-Syntax highlighting is required for code blocks added to the GitLab documentation.
+Syntax highlighting is required for fenced code blocks added to the GitLab documentation.
 Refer to the table below for the most common language classes, or check the
 [complete list](https://github.com/rouge-ruby/rouge/wiki/List-of-supported-languages-and-lexers)
 of language classes available.
@@ -1235,6 +1233,14 @@ a helpful link back to how the feature was developed.
   > - Enabled by default in GitLab 11.4.
   ```
 
+- If a feature is moved to another tier:
+
+  ```md
+  > - [Introduced](<link-to-issue>) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.5.
+  > - [Moved](<link-to-issue>) to [GitLab Starter](https://about.gitlab.com/pricing/) in 11.8.
+  > - [Moved](<link-to-issue>) to GitLab Core in 12.0.
+  ```
+
 NOTE: **Note:**
 Version text must be on its own line and surounded by blank lines to render correctly.
 
@@ -1343,10 +1349,8 @@ Replace `reconfigure` with `restart` where appropriate.
 In [step 2 of the installation guide](../../install/installation.md#2-ruby),
 we install Ruby from source. Whenever there is a new version that needs to
 be updated, remember to change it throughout the codeblock and also replace
-the sha256sum (it can be found in the [downloads page][ruby-dl] of the Ruby
+the sha256sum (it can be found in the [downloads page](https://www.ruby-lang.org/en/downloads/) of the Ruby
 website).
-
-[ruby-dl]: https://www.ruby-lang.org/en/downloads/ "Ruby download website"
 
 ### Configuration documentation for source and Omnibus installations
 
@@ -1374,7 +1378,7 @@ the style below as a guide:
    external_url "https://gitlab.example.com"
    ```
 
-1. Save the file and [reconfigure] GitLab for the changes to take effect.
+1. Save the file and [reconfigure](path/to/administration/restart_gitlab.md#omnibus-gitlab-reconfigure) GitLab for the changes to take effect.
 
 ---
 
@@ -1387,10 +1391,7 @@ the style below as a guide:
      host: "gitlab.example.com"
    ```
 
-1. Save the file and [restart] GitLab for the changes to take effect.
-
-[reconfigure]: path/to/administration/restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart]: path/to/administration/restart_gitlab.md#installations-from-source
+1. Save the file and [restart](path/to/administration/restart_gitlab.md#installations-from-source) GitLab for the changes to take effect.
 ````
 
 In this case:

@@ -7,7 +7,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import { mount } from '@vue/test-utils';
-import { mockTimeframeInitialDate, mockMilestone2 } from '../../../javascripts/roadmap/mock_data';
+import { mockTimeframeInitialDate, mockMilestone2 } from 'ee_jest/roadmap/mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -45,29 +45,25 @@ describe('MilestoneItemComponent', () => {
   describe('computed', () => {
     describe('startDateValues', () => {
       it('returns object containing date parts from milestone.startDate', () => {
-        expect(wrapper.vm.startDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockMilestone2.startDate.getDay(),
-            date: mockMilestone2.startDate.getDate(),
-            month: mockMilestone2.startDate.getMonth(),
-            year: mockMilestone2.startDate.getFullYear(),
-            time: mockMilestone2.startDate.getTime(),
-          }),
-        );
+        expect(wrapper.vm.startDateValues).toMatchObject({
+          day: mockMilestone2.startDate.getDay(),
+          date: mockMilestone2.startDate.getDate(),
+          month: mockMilestone2.startDate.getMonth(),
+          year: mockMilestone2.startDate.getFullYear(),
+          time: mockMilestone2.startDate.getTime(),
+        });
       });
     });
 
     describe('endDateValues', () => {
       it('returns object containing date parts from milestone.endDate', () => {
-        expect(wrapper.vm.endDateValues).toEqual(
-          jasmine.objectContaining({
-            day: mockMilestone2.endDate.getDay(),
-            date: mockMilestone2.endDate.getDate(),
-            month: mockMilestone2.endDate.getMonth(),
-            year: mockMilestone2.endDate.getFullYear(),
-            time: mockMilestone2.endDate.getTime(),
-          }),
-        );
+        expect(wrapper.vm.endDateValues).toMatchObject({
+          day: mockMilestone2.endDate.getDay(),
+          date: mockMilestone2.endDate.getDate(),
+          month: mockMilestone2.endDate.getMonth(),
+          year: mockMilestone2.endDate.getFullYear(),
+          time: mockMilestone2.endDate.getTime(),
+        });
       });
     });
 

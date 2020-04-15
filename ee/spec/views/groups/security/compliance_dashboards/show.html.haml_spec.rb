@@ -23,6 +23,7 @@ describe 'groups/security/compliance_dashboards/show.html.haml' do
 
   context 'when there are merge requests' do
     let(:merge_request) { create(:merge_request, source_project: project, state: :merged) }
+    let(:current_user) { user }
 
     before do
       merge_request.metrics.update!(merged_at: 10.minutes.ago)
@@ -40,6 +41,45 @@ describe 'groups/security/compliance_dashboards/show.html.haml' do
       render
 
       expect(rendered).to have_css('time', class: 'js-timeago')
+    end
+
+    context 'with no pipeline' do
+      it 'renders no pipeline status icon' do
+        render
+
+        expect(rendered).not_to have_css('.ci-status-link')
+      end
+    end
+
+    context 'with a pipeline' do
+      context 'and the user is logged in' do
+        before do
+          sign_in(current_user)
+        end
+
+        ::Ci::Pipeline.bridgeable_statuses.each do |status|
+          context "and the status is #{status}" do
+            let!(:pipeline) { create(:ci_empty_pipeline, status: status, project: project, head_pipeline_of: merge_request) }
+
+            it "renders the pipeline status icon for #{status}" do
+              render
+
+              expect(rendered).to have_css(".ci-status-link.ci-status-icon-#{status}")
+            end
+          end
+        end
+      end
+
+      context 'and the user is not logged in' do
+        let(:status) { ::Ci::Pipeline.bridgeable_statuses.first }
+        let!(:pipeline) { create(:ci_empty_pipeline, status: status, project: project, head_pipeline_of: merge_request) }
+
+        it "does not render a pipeline status icon" do
+          render
+
+          expect(rendered).not_to have_css(".ci-status-link.ci-status-icon")
+        end
+      end
     end
 
     context 'with no approvers' do

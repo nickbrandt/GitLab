@@ -143,7 +143,11 @@ describe GroupsHelper do
 
   describe '#show_group_activity_analytics?' do
     before do
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics, group).and_return(false)
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics).and_return(true)
+
       stub_licensed_features(group_activity_analytics: feature_available)
+
       allow(helper).to receive(:current_user) { current_user }
       allow(helper).to receive(:can?) { |*args| Ability.allowed?(*args) }
     end
@@ -232,6 +236,16 @@ describe GroupsHelper do
         subgroup = create(:group, :private, parent: group)
 
         expect(helper.show_administration_nav?(subgroup)).to be false
+      end
+
+      context 'when `group_administration_nav_item` feature flag is disabled for the group' do
+        before do
+          stub_feature_flags(group_administration_nav_item: { enabled: false, thing: group })
+        end
+
+        it 'returns false' do
+          expect(helper.show_administration_nav?(group)).to be false
+        end
       end
     end
   end

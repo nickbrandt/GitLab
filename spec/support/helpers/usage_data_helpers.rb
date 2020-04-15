@@ -43,9 +43,11 @@ module UsageDataHelpers
       clusters_enabled
       project_clusters_enabled
       group_clusters_enabled
+      instance_clusters_enabled
       clusters_disabled
       project_clusters_disabled
       group_clusters_disabled
+      instance_clusters_disabled
       clusters_platforms_eks
       clusters_platforms_gke
       clusters_platforms_user
@@ -58,6 +60,7 @@ module UsageDataHelpers
       clusters_applications_knative
       clusters_applications_elastic_stack
       clusters_applications_jupyter
+      clusters_management_project
       in_review_folder
       grafana_integrated_projects
       groups
@@ -131,5 +134,24 @@ module UsageDataHelpers
       prometheus_metrics_enabled
       web_ide_clientside_preview_enabled
       ingress_modsecurity_enabled
+      projects_with_expiration_policy_disabled
+      projects_with_expiration_policy_enabled
+      projects_with_expiration_policy_enabled_with_keep_n_unset
+      projects_with_expiration_policy_enabled_with_older_than_unset
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_1
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_5
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_10
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_25
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_50
+      projects_with_expiration_policy_enabled_with_keep_n_set_to_100
+      projects_with_expiration_policy_enabled_with_cadence_set_to_1d
+      projects_with_expiration_policy_enabled_with_cadence_set_to_7d
+      projects_with_expiration_policy_enabled_with_cadence_set_to_14d
+      projects_with_expiration_policy_enabled_with_cadence_set_to_1month
+      projects_with_expiration_policy_enabled_with_cadence_set_to_3month
+      projects_with_expiration_policy_enabled_with_older_than_set_to_7d
+      projects_with_expiration_policy_enabled_with_older_than_set_to_14d
+      projects_with_expiration_policy_enabled_with_older_than_set_to_30d
+      projects_with_expiration_policy_enabled_with_older_than_set_to_90d
     ).freeze
 end

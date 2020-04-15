@@ -71,7 +71,7 @@ describe Projects::PushRulesController do
 
     PushRule::SETTINGS_WITH_GLOBAL_DEFAULT.each do |rule_attr|
       context "Updating #{rule_attr} rule" do
-        context 'as an admin' do
+        context 'as an admin in admin mode', :enable_admin_mode do
           let(:user) { create(:admin) }
 
           it_behaves_like 'a setting with global default', rule_attr, updates: true

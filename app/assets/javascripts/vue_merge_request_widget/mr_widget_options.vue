@@ -36,6 +36,7 @@ import CheckingState from './components/states/mr_widget_checking.vue';
 import eventHub from './event_hub';
 import notify from '~/lib/utils/notify';
 import SourceBranchRemovalStatus from './components/source_branch_removal_status.vue';
+import TerraformPlan from './components/mr_widget_terraform_plan.vue';
 import GroupedTestReportsApp from '../reports/components/grouped_test_reports_app.vue';
 import { setFaviconOverlay } from '../lib/utils/common_utils';
 
@@ -74,6 +75,7 @@ export default {
     'mr-widget-rebase': RebaseState,
     SourceBranchRemovalStatus,
     GroupedTestReportsApp,
+    TerraformPlan,
   },
   props: {
     mrData: {
@@ -212,8 +214,6 @@ export default {
       return new MRWidgetService(this.getServiceEndpoints(store));
     },
     checkStatus(cb, isRebased) {
-      if (document.visibilityState !== 'visible') return Promise.resolve();
-
       return this.service
         .checkStatus()
         .then(({ data }) => {
@@ -236,10 +236,10 @@ export default {
     initPolling() {
       this.pollingInterval = new SmartInterval({
         callback: this.checkStatus,
-        startingInterval: 10000,
-        maxInterval: 30000,
-        hiddenInterval: 120000,
-        incrementByFactorOf: 5000,
+        startingInterval: 10 * 1000,
+        maxInterval: 240 * 1000,
+        hiddenInterval: window.gon?.features?.widgetVisibilityPolling && 360 * 1000,
+        incrementByFactorOf: 2,
       });
     },
     initDeploymentsPolling() {
@@ -251,10 +251,9 @@ export default {
     deploymentsPoll(callback) {
       return new SmartInterval({
         callback,
-        startingInterval: 30000,
-        maxInterval: 120000,
-        hiddenInterval: 240000,
-        incrementByFactorOf: 15000,
+        startingInterval: 30 * 1000,
+        maxInterval: 240 * 1000,
+        incrementByFactorOf: 4,
         immediateExecution: true,
       });
     },
@@ -378,6 +377,8 @@ export default {
         class="js-reports-container"
         :endpoint="mr.testResultsPath"
       />
+
+      <terraform-plan v-if="mr.terraformReportsPath" :endpoint="mr.terraformReportsPath" />
 
       <div class="mr-widget-section">
         <component :is="componentName" :mr="mr" :service="service" />
