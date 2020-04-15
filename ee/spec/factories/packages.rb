@@ -61,6 +61,12 @@ FactoryBot.define do
       end
     end
 
+    factory :composer_package do
+      sequence(:name) { |n| "composer-package-#{n}"}
+      sequence(:version) { |n| "1.0.#{n}" }
+      package_type { :composer }
+    end
+
     factory :conan_package do
       conan_metadatum
 
