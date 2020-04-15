@@ -2,10 +2,10 @@
 
 module Vulnerabilities
   class ExportPolicy < BasePolicy
-    delegate { @subject.project }
+    delegate { @subject.exportable }
 
     condition(:is_author) { @user && @subject.author == @user }
-    condition(:exportable) { can?(:create_vulnerability_export, @subject.project) }
+    condition(:exportable) { can?(:create_vulnerability_export, @subject.exportable) }
 
     rule { exportable & is_author }.policy do
       enable :read_vulnerability_export
