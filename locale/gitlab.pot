@@ -19478,6 +19478,9 @@ msgstr ""
 msgid "StaticSiteEditor|Could not create merge request."
 msgstr ""
 
+msgid "StaticSiteEditor|Incompatible file content"
+msgstr ""
+
 msgid "StaticSiteEditor|Return to site"
 msgstr ""
 
@@ -19490,7 +19493,13 @@ msgstr ""
 msgid "StaticSiteEditor|Summary of changes"
 msgstr ""
 
+msgid "StaticSiteEditor|The Static Site Editor is currently configured to only edit Markdown content on pages generated from Middleman. Visit the documentation to learn more about configuring your site to use the Static Site Editor."
+msgstr ""
+
 msgid "StaticSiteEditor|Update %{sourcePath} file"
+msgstr ""
+
+msgid "StaticSiteEditor|View documentation"
 msgstr ""
 
 msgid "StaticSiteEditor|View merge request"
