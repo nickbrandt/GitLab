@@ -1,5 +1,5 @@
 <script>
-import { GlNewButton, GlTooltipDirective, GlCarousel, GlCarouselSlide } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective, GlCarousel, GlCarouselSlide } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import securityDependencyImageUrl from 'ee_images/promotions/security-dependencies.png';
@@ -11,7 +11,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   components: {
-    GlNewButton,
+    GlButton,
     GlCarousel,
     GlCarouselSlide,
   },
@@ -168,7 +168,7 @@ export default {
       <p class="gl-text-gray-900 text-left mb-5" v-html="$options.i18n.discoverPlanCaption"></p>
     </div>
     <div class="discover-buttons d-flex flex-nowrap flex-row justify-content-between mx-auto my-0">
-      <gl-new-button
+      <gl-button
         class="discover-button-upgrade"
         v-bind="discoverButtonProps"
         category="secondary"
@@ -177,8 +177,8 @@ export default {
         :href="linkSecondary"
       >
         {{ $options.i18n.discoverUpgradeLabel }}
-      </gl-new-button>
-      <gl-new-button
+      </gl-button>
+      <gl-button
         class="discover-button-trial"
         v-bind="discoverButtonProps"
         category="primary"
@@ -187,10 +187,10 @@ export default {
         :href="linkMain"
       >
         {{ $options.i18n.discoverTrialLabel }}
-      </gl-new-button>
+      </gl-button>
     </div>
     <div id="tooltipcontainer" class="discover-feedback w-30p position-fixed">
-      <gl-new-button
+      <gl-button
         v-gl-tooltip:tooltipcontainer.left
         :title="$options.i18n.discoverFeedbackLabel"
         icon="slight-smile"

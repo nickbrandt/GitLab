@@ -1,4 +1,4 @@
-import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import EpicItemDetails from 'ee/roadmap/components/epic_item_details.vue';
 import eventHub from 'ee/roadmap/event_hub';
@@ -27,7 +27,7 @@ const getTitle = wrapper => wrapper.find('.epic-title');
 
 const getGroupName = wrapper => wrapper.find('.epic-group');
 
-const getExpandIconButton = wrapper => wrapper.find(GlNewButton);
+const getExpandIconButton = wrapper => wrapper.find(GlButton);
 
 const getChildEpicsCount = wrapper => wrapper.find({ ref: 'childEpicsCount' });
 
