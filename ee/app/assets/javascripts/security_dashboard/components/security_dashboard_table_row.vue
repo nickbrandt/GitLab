@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlDeprecatedButton, GlSkeletonLoading, GlFormCheckbox } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormCheckbox, GlSkeletonLoading } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
@@ -29,6 +29,11 @@ export default {
       required: false,
       default: false,
     },
+  },
+  data() {
+    return {
+      shouldShowActionButtons: false,
+    };
   },
   computed: {
     ...mapState(['dashboardType']),
@@ -63,6 +68,10 @@ export default {
       return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
     },
   },
+  mounted() {
+    // this.$el.addEventListener('focusin', this.showActionButtons);
+    // this.$el.addEventListener('focusout', this.hideActionButtons);
+  },
   methods: {
     ...mapActions('vulnerabilities', ['openModal', 'selectVulnerability', 'deselectVulnerability']),
     toggleVulnerability() {
@@ -70,6 +79,12 @@ export default {
         return this.deselectVulnerability(this.vulnerability);
       }
       return this.selectVulnerability(this.vulnerability);
+    },
+    showActionButtons() {
+      this.shouldShowActionButtons = true;
+    },
+    hideActionButtons() {
+      this.shouldShowActionButtons = false;
     },
   },
 };
@@ -79,6 +94,10 @@ export default {
   <div
     class="gl-responsive-table-row vulnerabilities-row p-2"
     :class="{ dismissed: isDismissed, 'gl-bg-blue-50': isSelected }"
+    @focusin="showActionButtons"
+    @focusout="hideActionButtons"
+    @mouseenter="showActionButtons"
+    @mouseleave="hideActionButtons"
   >
     <div class="table-section">
       <gl-form-checkbox
@@ -91,13 +110,16 @@ export default {
 
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
+      <div class="table-mobile-content" :style="[isDismissed && { opacity: 0.5 }]">
+        <severity-badge :severity="severity" />
+      </div>
     </div>
 
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div
         class="table-mobile-content gl-white-space-normal"
+        :style="[isDismissed && { opacity: 0.5 }]"
         data-qa-selector="vulnerability_info_content"
       >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
@@ -134,7 +156,10 @@ export default {
 
     <div class="table-section section-20">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
-      <div class="table-mobile-content action-buttons d-flex justify-content-end">
+      <div
+        class="table-mobile-content action-buttons d-flex justify-content-end"
+        :style="[shouldShowActionButtons ? { opacity: 1 } : { opacity: 0 }]"
+      >
         <vulnerability-action-buttons
           v-if="!isLoading"
           :vulnerability="vulnerability"
@@ -150,9 +175,9 @@ export default {
 <style scoped>
 @media (min-width: 768px) {
   /* NOTE: Can be removed: border are defined at: line 40, app/assets/stylesheets/framework/responsive_tables.scss*/
-  .vulnerabilities-row:last-child {
-    border-bottom: 1px solid transparent;
-  }
+  /*.vulnerabilities-row:last-child {*/
+  /*  border-bottom: 1px solid transparent;*/
+  /*}*/
 
   /*this should be done by gitlab-ui table and using `.table-hover`*/
   .vulnerabilities-row:hover,
@@ -163,14 +188,14 @@ export default {
     margin-top: -1px;
   }
 
-  .vulnerabilities-row .action-buttons {
-    opacity: 0;
-  }
+  /*.vulnerabilities-row .action-buttons {*/
+  /*  opacity: 0;*/
+  /*}*/
 
-  .vulnerabilities-row:hover .action-buttons,
-  .vulnerabilities-row:focus-within .action-buttons {
-    opacity: 1;
-  }
+  /*.vulnerabilities-row:hover .action-buttons,*/
+  /*.vulnerabilities-row:focus-within .action-buttons {*/
+  /*  opacity: 1;*/
+  /*}*/
 }
 
 /*NOTE: replaced by gl-white-space-normal*/
@@ -194,7 +219,7 @@ export default {
   /*font-size: 0.8em;*/
 }
 
-.dismissed .table-mobile-content:not(.action-buttons) {
-  opacity: 0.5;
-}
+/*.dismissed .table-mobile-content:not(.action-buttons) {*/
+/*  opacity: 0.5;*/
+/*}*/
 </style>
