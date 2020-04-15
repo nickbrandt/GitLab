@@ -23023,6 +23023,9 @@ msgstr ""
 msgid "VulnerabilityManagement|Resolved %{timeago} by %{user}"
 msgstr ""
 
+msgid "VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later."
+msgstr ""
+
 msgid "VulnerabilityManagement|Something went wrong, could not create an issue."
 msgstr ""
 
