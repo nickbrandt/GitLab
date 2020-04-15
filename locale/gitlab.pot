@@ -18069,11 +18069,6 @@ msgid_plural "SearchResults|snippets"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "SearchResults|snippet result"
-msgid_plural "SearchResults|snippet results"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "SearchResults|user"
 msgid_plural "SearchResults|users"
 msgstr[0] ""
@@ -21714,7 +21709,7 @@ msgstr ""
 msgid "Title:"
 msgstr ""
 
-msgid "Titles and Filenames"
+msgid "Titles and Descriptions"
 msgstr ""
 
 msgid "To"
