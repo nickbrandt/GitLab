@@ -3,11 +3,14 @@
 module Gitlab
   module Pagination
     module Keyset
+      def self.available_for_type?(relation)
+        relation.klass == Project
+      end
+
       def self.available?(request_context, relation)
         order_by = request_context.page.order_by
 
-        # This is only available for Project and order-by id (asc/desc)
-        return false unless relation.klass == Project
+        return false unless available_for_type?(relation)
         return false unless order_by.size == 1 && order_by[:id]
 
         true
