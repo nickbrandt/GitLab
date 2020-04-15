@@ -47,7 +47,9 @@ The JWT's payload looks like this:
 }
 ```
 
-The JWT is encoded by using RS256 and signed with your GitLab instance's OpenID Connect private key. You can use this JWT and the existing JWKS endpoint (for example, `https://gitlab.example.com/oauth/discovery/keys`) to authenticate with a Vault server that is configured to allow the JWT Authentication method for authentication.
+The JWT is encoded by using RS256 and signed with your GitLab instance's OpenID Connect private key. The expire time for the token will be set to job's timeout, if specifed, or 5 minutes if it is not.
+
+You can use this JWT and the existing JWKS endpoint (for example, `https://gitlab.example.com/oauth/discovery/keys`) to authenticate with a Vault server that is configured to allow the JWT Authentication method for authentication.
 
 When configuring roles in Vault, you can use [bound_claims](https://www.vaultproject.io/docs/auth/jwt/#bound-claims) to match against the JWT's claims and restrict which secrets each CI job has access to.
 

@@ -118,7 +118,7 @@ describe Gitlab::Ci::Jwt do
       payload, _headers = JWT.decode(jwt, rsa_key.public_key, true, { algorithm: 'RS256' })
       ttl = payload["exp"] - payload["iat"]
 
-      expect(ttl).to eq(60)
+      expect(ttl).to eq(5.minutes.to_i)
     end
   end
 end

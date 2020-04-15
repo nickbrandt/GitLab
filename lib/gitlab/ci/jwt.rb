@@ -5,6 +5,8 @@ module Gitlab
     class Jwt < JSONWebToken::RSAToken
       include Gitlab::Utils::StrongMemoize
 
+      DEFAULT_EXPIRE_TIME = 5.minutes.to_i
+
       def self.for_build(build)
         self.new(build, ttl: build.metadata_timeout).encoded
       end
