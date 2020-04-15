@@ -8566,6 +8566,8 @@ CREATE UNIQUE INDEX design_management_designs_versions_uniqueness ON public.desi
 
 CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON public.design_user_mentions USING btree (design_id, note_id);
 
+CREATE INDEX dev_index_route_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
+
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.epic_user_mentions USING btree (epic_id, note_id);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON public.epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);
@@ -10115,6 +10117,8 @@ CREATE INDEX index_reviews_on_project_id ON public.reviews USING btree (project_
 CREATE UNIQUE INDEX index_routes_on_path ON public.routes USING btree (path);
 
 CREATE INDEX index_routes_on_path_text_pattern_ops ON public.routes USING btree (path varchar_pattern_ops);
+
+CREATE INDEX index_routes_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
 
 CREATE UNIQUE INDEX index_routes_on_source_type_and_source_id ON public.routes USING btree (source_type, source_id);
 
@@ -13158,6 +13162,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200407094005
 20200407094923
 20200408110856
+20200408133211
 20200408153842
 20200408175424
 20200409211607
