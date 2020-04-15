@@ -19,7 +19,7 @@ module Gitlab
         self.issuer = Settings.gitlab.host
         self.issued_at = Time.now
         self.expire_time = issued_at + (ttl || DEFAULT_EXPIRE_TIME)
-        self.subject = project.id.to_s
+        self.subject = "job_#{build.id}"
 
         # Custom claims
         self[:namespace_id] = namespace.id.to_s

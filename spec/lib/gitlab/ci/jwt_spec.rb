@@ -27,7 +27,7 @@ describe Gitlab::Ci::Jwt do
           expect(payload[:iss]).to eq(Settings.gitlab.host)
           expect(payload[:iat]).to eq(now)
           expect(payload[:exp]).to eq(now + 30)
-          expect(payload[:sub]).to eq(project.id.to_s)
+          expect(payload[:sub]).to eq("job_#{build.id}")
         end
       end
     end

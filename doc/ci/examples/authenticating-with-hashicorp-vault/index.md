@@ -31,7 +31,7 @@ The JWT's payload looks like this:
   "iat": 1585710286,                             # Issued at
   "nbf": 1585798372,                             # Not valid before
   "exp": 1585713886,                             # Expire at
-  "sub": "22",                                   # Subject (project id)
+  "sub": "job_1212",                             # Subject (job id)
   "namespace_id": "1",
   "namespace_path": "mygroup",
   "project_id": "22",
@@ -109,9 +109,9 @@ $ vault write auth/jwt/role/myproject-staging - <<EOF
   "role_type": "jwt",
   "policies": ["myproject-staging"],
   "token_explicit_max_ttl": 60,
-  "bound_subject": "22",
   "user_claim": "user_email",
   "bound_claims": {
+    "project_id": "22",
     "ref": "master",
     "ref_type": "branch"
   }
@@ -127,10 +127,10 @@ $ vault write auth/jwt/role/myproject-production - <<EOF
   "role_type": "jwt",
   "policies": ["myproject-production"],
   "token_explicit_max_ttl": 60,
-  "bound_subject": "22",
   "user_claim": "user_email",
   "bound_claims_type": "glob",
   "bound_claims": {
+    "project_id": "22",
     "ref_protected": "true",
     "ref_type": "branch",
     "ref": "auto-deploy-*"
@@ -139,7 +139,7 @@ $ vault write auth/jwt/role/myproject-production - <<EOF
 EOF
 ```
 
-This example uses [bound_subject](https://www.vaultproject.io/api/auth/jwt#bound_subject) and [bound_claims](https://www.vaultproject.io/api/auth/jwt#bound_claims) to specify that only a JWT with matching values for these claims will be allowed to authenticate.
+This example uses [bound_claims](https://www.vaultproject.io/api/auth/jwt#bound_claims) to specify that only a JWT with matching values for the specified claims will be allowed to authenticate.
 
 Combined with GitLab's [protected branches](../../../user/project/protected_branches.md), you can restrict who is able to authenticate and read the secrets.
 
