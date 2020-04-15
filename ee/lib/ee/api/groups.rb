@@ -50,9 +50,8 @@ module EE
             forbidden! unless group.feature_available?(:audit_events)
           end
 
-          def audit_log_finder_params(group)
-            audit_log_finder_params = params.slice(:created_after, :created_before)
-            audit_log_finder_params.merge(entity_type: group.class.name, entity_id: group.id)
+          def audit_log_finder_params
+            params.slice(:created_after, :created_before)
           end
 
           override :delete_group
@@ -102,7 +101,11 @@ module EE
               use :pagination
             end
             get '/' do
-              audit_events = AuditLogFinder.new(audit_log_finder_params(user_group)).execute
+              level = ::Gitlab::Audit::Levels::Group.new(group: user_group)
+              audit_events = AuditLogFinder.new(
+                level: level,
+                params: audit_log_finder_params
+              ).execute
 
               present paginate(audit_events), with: EE::API::Entities::AuditEvent
             end
@@ -114,9 +117,10 @@ module EE
               requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
             end
             get '/:audit_event_id' do
+              level = ::Gitlab::Audit::Levels::Group.new(group: user_group)
               # rubocop: disable CodeReuse/ActiveRecord
               # This is not `find_by!` from ActiveRecord
-              audit_event = AuditLogFinder.new(audit_log_finder_params(user_group))
+              audit_event = AuditLogFinder.new(level: level, params: audit_log_finder_params)
                 .find_by!(id: params[:audit_event_id])
               # rubocop: enable CodeReuse/ActiveRecord
 

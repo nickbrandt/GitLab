@@ -25,7 +25,8 @@ module API
         use :pagination
       end
       get do
-        audit_events = AuditLogFinder.new(params).execute
+        level = ::Gitlab::Audit::Levels::Instance.new
+        audit_events = AuditLogFinder.new(level: level, params: params).execute
 
         present paginate(audit_events), with: EE::API::Entities::AuditEvent
       end
@@ -37,9 +38,10 @@ module API
         requires :id, type: Integer, desc: 'The ID of audit event'
       end
       get ':id' do
+        level = ::Gitlab::Audit::Levels::Instance.new
         # rubocop: disable CodeReuse/ActiveRecord
         # This is not `find_by!` from ActiveRecord
-        audit_event = AuditLogFinder.new.find_by!(id: params[:id])
+        audit_event = AuditLogFinder.new(level: level).find_by!(id: params[:id])
         # rubocop: enable CodeReuse/ActiveRecord
 
         present audit_event, with: EE::API::Entities::AuditEvent
