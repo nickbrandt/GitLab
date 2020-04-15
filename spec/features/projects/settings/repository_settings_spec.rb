@@ -29,8 +29,6 @@ describe 'Projects > Settings > Repository settings' do
       let!(:deploy_token) { create(:deploy_token, projects: [project]) }
 
       before do
-        project.add_role(user, role)
-        sign_in(user)
         stub_container_registry_config(enabled: true)
         stub_feature_flags(ajax_new_deploy_token: { enabled: false, thing: project })
         visit project_settings_repository_path(project)

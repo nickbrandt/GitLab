@@ -4,7 +4,10 @@ module Projects
   module Settings
     class RepositoryController < Projects::ApplicationController
       before_action :authorize_admin_project!
-      before_action :remote_mirror, only: [:show]
+      before_action :define_variables, only: [:create_deploy_token]
+      before_action do
+        push_frontend_feature_flag(:ajax_new_deploy_token, @project)
+      end
 
       def show
         render_show
@@ -54,11 +57,15 @@ module Projects
       private
 
       def render_show
+        define_variables
+
+        render 'show'
+      end
+
+      def define_variables
         define_deploy_token_variables
         define_protected_refs
         remote_mirror
-
-        render 'show'
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
@@ -109,7 +116,7 @@ module Projects
       def define_deploy_token_variables
         @deploy_tokens = @project.deploy_tokens.active
 
-        @new_deploy_token = DeployToken.new
+        @new_deploy_token ||= DeployToken.new
       end
 
       def load_gon_index
