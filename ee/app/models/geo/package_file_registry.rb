@@ -78,6 +78,19 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
     STATE_VALUES[state_string]
   end
 
+  def self.find_unsynced_jobs(batch_size: batch_size, except_ids: [])
+    never
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
+  def self.find_failed_jobs(batch_size: batch_size, except_ids: [])
+    failed
+      .retry_due
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
   # Override state machine failed! event method to record a failure message at
   # the same time.
   #

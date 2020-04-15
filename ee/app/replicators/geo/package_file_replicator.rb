@@ -11,5 +11,9 @@ module Geo
     def self.model
       ::Packages::PackageFile
     end
+
+    def self.model_foreign_key
+      :package_file_id
+    end
   end
 end
