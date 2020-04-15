@@ -91,8 +91,8 @@ export default {
     </div>
 
     <div
-      class="table-section section-40 d-flex flex-md-column justify-content-between align-items-md-end"
-      :class="{ 'section-50': isGroupPage }"
+      class="table-section d-flex flex-md-column justify-content-between align-items-md-end"
+      :class="isGroupPage ? 'section-50' : 'section-40'"
     >
       <publish-method :package-entity="packageEntity" />
 

@@ -31,6 +31,7 @@ describe('Packages shared utils', () => {
       ${'maven'}  | ${'Maven'}
       ${'npm'}    | ${'NPM'}
       ${'nuget'}  | ${'NuGet'}
+      ${'foo'}    | ${null}
     `(`package type`, ({ packageType, expectedResult }) => {
       it(`${packageType} should show as ${expectedResult}`, () => {
         expect(getPackageType(packageType)).toBe(expectedResult);

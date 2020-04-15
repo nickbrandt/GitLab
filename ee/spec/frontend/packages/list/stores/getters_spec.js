@@ -4,7 +4,7 @@ import { packageList } from '../../mock_data';
 describe('Getters registry list store', () => {
   let state;
 
-  const setState = (isGroupPage = false) => {
+  const setState = ({ isGroupPage = false } = {}) => {
     state = {
       packages: packageList,
       config: {
@@ -42,7 +42,7 @@ describe('Getters registry list store', () => {
     });
 
     describe('when isGroupPage is true', () => {
-      beforeEach(() => setState(true));
+      beforeEach(() => setState({ isGroupPage: true }));
 
       it('returns an absolute link matching project path', () => {
         const mavenPackage = packageList[0];

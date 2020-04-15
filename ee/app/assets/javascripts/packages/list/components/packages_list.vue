@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { GlPagination, GlModal, GlTooltipDirective } from '@gitlab/ui';
+import { GlPagination, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { s__, sprintf } from '~/locale';
 import { TrackingActions } from '../../shared/constants';
@@ -15,7 +15,6 @@ export default {
     PackagesListLoader,
     PackagesListRow,
   },
-  directives: { GlTooltip: GlTooltipDirective },
   mixins: [Tracking.mixin()],
   data() {
     return {
