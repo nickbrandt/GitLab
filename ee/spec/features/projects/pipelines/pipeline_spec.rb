@@ -95,7 +95,7 @@ describe 'Pipeline', :js do
     let(:pipeline) { create(:ci_pipeline, project: project, ref: 'master', sha: project.commit.id) }
 
     before do
-      stub_licensed_features(sast: true)
+      stub_licensed_features(sast: true, security_dashboard: true)
     end
 
     context 'with a sast artifact' do
@@ -121,7 +121,7 @@ describe 'Pipeline', :js do
 
       it 'displays the pipeline graph' do
         expect(current_path).to eq(pipeline_path(pipeline))
-        expect(page).not_to have_content('Security')
+        expect(page).not_to have_css('#js-tab-security')
         expect(page).to have_selector('.pipeline-visualization')
       end
     end

@@ -21,7 +21,7 @@ describe Projects::PipelinesController do
 
       context 'with feature enabled' do
         before do
-          stub_licensed_features(sast: true)
+          stub_licensed_features(sast: true, security_dashboard: true)
 
           get :security, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
