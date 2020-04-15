@@ -4571,6 +4571,9 @@ msgstr ""
 msgid "ClusterIntegration|Cluster name is required."
 msgstr ""
 
+msgid "ClusterIntegration|Cluster_applications artifact too big. Maximum allowable size: %{human_size}"
+msgstr ""
+
 msgid "ClusterIntegration|Clusters are utilized by selecting the nearest ancestor with a matching environment scope. For example, project clusters will override group clusters."
 msgstr ""
 
@@ -4751,6 +4754,9 @@ msgstr ""
 msgid "ClusterIntegration|Helm Tiller"
 msgstr ""
 
+msgid "ClusterIntegration|Helm release failed to install"
+msgstr ""
+
 msgid "ClusterIntegration|Helm streamlines installing and managing Kubernetes applications. Tiller runs inside of your Kubernetes Cluster, and manages releases of your charts."
 msgstr ""
 
@@ -4911,6 +4917,9 @@ msgid "ClusterIntegration|No Key Pairs found"
 msgstr ""
 
 msgid "ClusterIntegration|No VPCs found"
+msgstr ""
+
+msgid "ClusterIntegration|No deployment cluster found for this job"
 msgstr ""
 
 msgid "ClusterIntegration|No instance type found"
