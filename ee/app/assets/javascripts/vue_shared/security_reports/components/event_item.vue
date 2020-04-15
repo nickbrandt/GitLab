@@ -1,19 +1,24 @@
 <script>
 import { GlTooltipDirective, GlDeprecatedButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import NoteHeader from '~/notes/components/note_header.vue';
 
 export default {
   name: 'EventItem',
   components: {
     Icon,
-    TimeAgoTooltip,
+    NoteHeader,
     GlDeprecatedButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
   props: {
+    id: {
+      type: [String, Number],
+      required: false,
+      default: undefined,
+    },
     author: {
       type: Object,
       required: true,
@@ -49,39 +54,36 @@ export default {
       default: true,
     },
   },
+  computed: {
+    noteId() {
+      return this.id ? `note_${this.id}` : undefined;
+    },
+  },
 };
 </script>
 
 <template>
-  <div class="d-flex align-items-center">
+  <div :id="noteId" class="d-flex align-items-center">
     <div class="circle-icon-container" :class="iconClass">
       <icon :size="16" :name="iconName" />
     </div>
     <div class="ml-3 flex-grow-1" data-qa-selector="event_item_content">
-      <div class="note-header-info pb-0">
-        <a
-          :href="author.path"
-          :data-user-id="author.id"
-          :data-username="author.username"
-          class="js-author js-user-link"
-        >
-          <strong class="note-header-author-name">{{ author.name }}</strong>
-          <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
-          <span class="note-headline-light">@{{ author.username }}</span>
-        </a>
-        <span class="note-headline-light note-headline-meta">
-          <template v-if="createdAt">
-            <span class="system-note-separator">·</span>
-            <time-ago-tooltip :time="createdAt" tooltip-placement="bottom" />
-          </template>
-        </span>
-      </div>
+      <note-header
+        :note-id="id"
+        :author="author"
+        :created-at="createdAt"
+        :show-spinner="false"
+        class="pb-0"
+      >
+        <slot name="header-message">&middot;</slot>
+      </note-header>
+
       <slot></slot>
     </div>
 
     <slot v-if="showRightSlot" name="right-content"></slot>
 
-    <div v-else-if="showActionButtons" class="align-self-start">
+    <div v-else-if="showActionButtons">
       <gl-deprecated-button
         v-for="button in actionButtons"
         :key="button.title"

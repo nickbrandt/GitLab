@@ -1,6 +1,7 @@
 import { GlDeprecatedButton } from '@gitlab/ui';
 import Component from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { shallowMount, mount } from '@vue/test-utils';
+import NoteHeader from '~/notes/components/note_header.vue';
 
 describe('Event Item', () => {
   let wrapper;
@@ -9,8 +10,13 @@ describe('Event Item', () => {
     wrapper = mountFn(Component, options);
   };
 
+  const noteHeader = () => wrapper.find(NoteHeader);
+
   describe('initial state', () => {
     const propsData = {
+      id: 123,
+      createdAt: 'createdAt',
+      headerMessage: 'header message',
       author: {
         name: 'Tanuki',
         username: 'gitlab',
@@ -25,12 +31,13 @@ describe('Event Item', () => {
       mountComponent({ propsData });
     });
 
-    it('uses the author name', () => {
-      expect(wrapper.find('.js-author').text()).toContain(propsData.author.name);
-    });
-
-    it('uses the author username', () => {
-      expect(wrapper.find('.js-author').text()).toContain(`@${propsData.author.username}`);
+    it('passes the expected values to the note header component', () => {
+      expect(noteHeader().props()).toMatchObject({
+        noteId: propsData.id,
+        author: propsData.author,
+        createdAt: propsData.createdAt,
+        showSpinner: false,
+      });
     });
 
     it('uses the fallback icon', () => {

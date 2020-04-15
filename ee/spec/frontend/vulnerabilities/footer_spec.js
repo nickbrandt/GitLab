@@ -96,7 +96,7 @@ describe('Vulnerability Footer', () => {
   });
 
   describe('state history', () => {
-    const discussionUrl = 'http://localhost/discussions';
+    const discussionUrl = '/discussions';
 
     const historyList = () => wrapper.find({ ref: 'historyList' });
     const historyEntries = () => wrapper.findAll(HistoryEntry);
@@ -107,7 +107,7 @@ describe('Vulnerability Footer', () => {
       expect(historyList().exists()).toBe(false);
     });
 
-    it('does render the history list if there are history items', () => {
+    it('renders the history list if there are history items', () => {
       // The shape of this object doesn't matter for this test, we just need to verify that it's passed to the history
       // entry.
       const historyItems = [{ id: 1, note: 'some note' }, { id: 2, note: 'another note' }];
