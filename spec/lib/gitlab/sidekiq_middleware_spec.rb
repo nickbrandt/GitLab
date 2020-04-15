@@ -68,7 +68,7 @@ describe Gitlab::SidekiqMiddleware do
       end
 
       disabled_sidekiq_middlewares.each do |middleware|
-        expect_any_instance_of(Gitlab::SidekiqMiddleware::ArgumentsLogger).not_to receive(:call)
+        expect_any_instance_of(middleware).not_to receive(:call)
       end
     end
 
