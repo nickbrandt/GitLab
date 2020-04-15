@@ -16,15 +16,19 @@ module Projects
 
         result = adapter.query(
           :packet_flow, environment.deployment_namespace,
-          interval: params[:interval] || "minute",
-          from:     (Time.parse(params[:from]) rescue 1.hour.ago),
-          to:       (Time.parse(params[:to]) rescue Time.now)
-        ) || {}
+          params[:interval] || "minute",
+          (Time.parse(params[:from]) rescue 1.hour.ago).to_s,
+          (Time.parse(params[:to]) rescue Time.now).to_s
+        )
 
         respond_to do |format|
           format.json do
-            status = result[:success] ? :ok : :bad_request
-            render status: status, json: result[:data]
+            if result
+              status = result[:success] ? :ok : :bad_request
+              render status: status, json: result[:data]
+            else
+              render status: :accepted, json: {}
+            end
           end
         end
       end
