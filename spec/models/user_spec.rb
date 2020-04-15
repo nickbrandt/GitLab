@@ -4354,31 +4354,31 @@ describe User, :do_not_mock_admin_mode do
     end
   end
 
-  describe 'internal methods' do
-    let_it_be(:user) { create(:user) }
-    let_it_be(:ghost) { described_class.ghost }
-    let_it_be(:alert_bot) { described_class.alert_bot }
-    let_it_be(:project_bot) { create(:user, :project_bot) }
-    let_it_be(:non_internal) { [user, project_bot] }
-    let_it_be(:internal) { [ghost, alert_bot] }
-
-    it 'returns internal users' do
-      expect(described_class.internal).to match_array(internal)
-      expect(internal.all?(&:internal?)).to eq(true)
-    end
+  describe '.non_internal' do
+    let!(:user) { create(:user) }
+    let!(:ghost) { described_class.ghost }
+    let!(:alert_bot) { described_class.alert_bot }
+    let!(:project_bot) { create(:user, :project_bot) }
+    let(:non_internal) { [user, project_bot] }
 
     it 'returns non internal users' do
-      expect(described_class.non_internal).to match_array(non_internal)
+      expect(described_class.non_internal).to eq(non_internal)
       expect(non_internal.all?(&:internal?)).to eq(false)
     end
+  end
 
-    describe '#bot?' do
-      it 'marks bot users' do
-        expect(user.bot?).to eq(false)
-        expect(ghost.bot?).to eq(false)
+  describe '#bot?' do
+    let!(:user) { create(:user) }
+    let!(:ghost) { described_class.ghost }
+    let!(:alert_bot) { described_class.alert_bot }
+    let!(:project_bot) { create(:user, :project_bot) }
 
-        expect(alert_bot.bot?).to eq(true)
-      end
+    it 'marks bot users' do
+      expect(user).not_to be_bot
+      expect(ghost).not_to be_bot
+
+      expect(alert_bot).to be_bot
+      expect(project_bot).to be_bot
     end
   end
 

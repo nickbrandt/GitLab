@@ -324,6 +324,7 @@ class User < ApplicationRecord
   scope :active, -> { with_state(:active).non_internal }
   scope :active_without_ghosts, -> { with_state(:active).without_ghosts }
   scope :without_ghosts, -> { humans.or(where.not(user_type: :ghost)) }
+  scope :non_internal, -> { without_ghosts.with_project_bots }
   scope :deactivated, -> { with_state(:deactivated).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
@@ -650,6 +651,10 @@ class User < ApplicationRecord
     end
   end
 
+  #
+  # Instance methods
+  #
+
   def full_path
     username
   end
@@ -663,25 +668,7 @@ class User < ApplicationRecord
   def internal?
     ghost? || (bot? && !project_bot?)
   end
-
-  def self.internal
-    where(user_type: :ghost).or(bots)
-  end
-
-  # The explicit check for project_bot will be removed with Bot Categorization
-  # Ref: https://gitlab.com/gitlab-org/gitlab/-/issues/213945
-  def self.non_internal
-    without_ghosts.with_project_bots
-  end
-
-  def human?
-    user_type.nil?
-  end
-
-  #
-  # Instance methods
-  #
-
+  
   def to_param
     username
   end
