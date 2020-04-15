@@ -8587,6 +8587,8 @@ CREATE UNIQUE INDEX idx_environment_merge_requests_unique_index ON public.deploy
 
 CREATE INDEX idx_geo_con_rep_updated_events_on_container_repository_id ON public.geo_container_repository_updated_events USING btree (container_repository_id);
 
+CREATE INDEX idx_issues_on_health_status_not_null ON public.issues USING btree (health_status) WHERE (health_status IS NOT NULL);
+
 CREATE INDEX idx_issues_on_project_id_and_created_at_and_id_and_state_id ON public.issues USING btree (project_id, created_at, id, state_id);
 
 CREATE INDEX idx_issues_on_project_id_and_due_date_and_id_and_state_id ON public.issues USING btree (project_id, due_date, id, state_id) WHERE (due_date IS NOT NULL);
@@ -13164,6 +13166,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200406171857
 20200406172135
 20200406192059
+20200406193427
 20200407094005
 20200407094923
 20200408110856
