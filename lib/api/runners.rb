@@ -81,14 +81,29 @@ module API
         optional :access_level, type: String, values: Ci::Runner.access_levels.keys,
                                 desc: 'The access_level of the runner'
         optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
-        at_least_one_of :description, :active, :tag_list, :run_untagged, :locked, :access_level, :maximum_timeout
+
+        if Gitlab.com?
+          optional :private_projects_minutes_cost_factor, type: Float, desc: 'Private projects Minutes cost factor'
+          optional :public_projects_minutes_cost_factor, type: Float, desc: 'Public projects Minutes cost factor'
+
+          at_least_one_of :description, :active, :tag_list, :run_untagged, :locked, :access_level, :maximum_timeout,
+            :private_projects_minutes_cost_factor, :public_projects_minutes_cost_factor
+        else
+          at_least_one_of :description, :active, :tag_list, :run_untagged, :locked, :access_level, :maximum_timeout
+        end
       end
       put ':id' do
         runner = get_runner(params.delete(:id))
         authenticate_update_runner!(runner)
         update_service = Ci::UpdateRunnerService.new(runner)
 
-        if update_service.update(declared_params(include_missing: false))
+        runner_params = declared_params(include_missing: false)
+
+        unless Gitlab.com? && runner.instance_type? && current_user.admin?
+          runner_params.except!(:private_projects_minutes_cost_factor, :public_projects_minutes_cost_factor)
+        end
+
+        if update_service.update(runner_params)
           present runner, with: Entities::RunnerDetails, current_user: current_user
         else
           render_validation_error!(runner)
