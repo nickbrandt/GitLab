@@ -13,7 +13,7 @@ import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
 import { createStore } from '~/monitoring/stores';
 import TimeSeries from '~/monitoring/components/charts/time_series.vue';
 import * as types from '~/monitoring/stores/mutation_types';
-import { deploymentData, mockProjectDir } from '../../mock_data';
+import { deploymentData, mockProjectDir, annotationsData } from '../../mock_data';
 import {
   metricsDashboardPayload,
   metricsDashboardViewModel,
@@ -278,6 +278,33 @@ describe('Time series component', () => {
           });
         });
 
+        describe('formatAnnotationsTooltipText', () => {
+          const annotationsMetadata = {
+            name: 'annotations',
+            xAxis: annotationsData[0].from,
+            yAxis: 0,
+            tooltipData: {
+              title: '2020/02/19 10:01:41',
+              content: annotationsData[0].description,
+            },
+          };
+
+          const mockMarkPoint = {
+            componentType: 'markPoint',
+            name: 'annotations',
+            value: undefined,
+            data: annotationsMetadata,
+          };
+
+          it('formats tooltip title and sets tooltip content', () => {
+            const formattedTooltipData = timeSeriesChart.vm.formatAnnotationsTooltipText(
+              mockMarkPoint,
+            );
+            expect(formattedTooltipData.title).toBe('19 Feb 2020, 10:01AM');
+            expect(formattedTooltipData.content).toBe(annotationsMetadata.tooltipData.content);
+          });
+        });
+
         describe('setSvg', () => {
           const mockSvgName = 'mockSvgName';
 
@@ -380,6 +407,8 @@ describe('Time series component', () => {
                   series: [
                     {
                       name: mockSeriesName,
+                      type: 'line',
+                      data: [],
                     },
                   ],
                 },
