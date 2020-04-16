@@ -55,7 +55,12 @@ describe('Settings Panel', () => {
       currentSettings: { ...defaultProps.currentSettings, ...currentSettings },
     };
 
-    return mountFn(settingsPanel, { propsData });
+    return mountFn(settingsPanel, {
+      propsData,
+      provide: {
+        glFeatures: { metricsDashboardVisibilitySwitchingAvailable: true },
+      },
+    });
   };
 
   const overrideCurrentSettings = (currentSettingsProps, extraProps = {}) => {
@@ -66,9 +71,6 @@ describe('Settings Panel', () => {
 
   beforeEach(() => {
     wrapper = mountComponent();
-
-    gon.features = gon.features || {};
-    gon.features.metricsDashboardVisibilitySwitchingAvailable = true;
   });
 
   afterEach(() => {

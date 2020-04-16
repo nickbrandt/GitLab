@@ -3,6 +3,7 @@ import { GlSprintf, GlLink } from '@gitlab/ui';
 
 import settingsMixin from 'ee_else_ce/pages/projects/shared/permissions/mixins/settings_pannel_mixin';
 import { s__ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import projectFeatureSetting from './project_feature_setting.vue';
 import projectFeatureToggle from '~/vue_shared/components/toggle_button.vue';
 import projectSettingRow from './project_setting_row.vue';
@@ -24,7 +25,7 @@ export default {
     GlSprintf,
     GlLink,
   },
-  mixins: [settingsMixin],
+  mixins: [settingsMixin, glFeatureFlagsMixin()],
 
   props: {
     currentSettings: {
@@ -116,6 +117,8 @@ export default {
     const defaults = {
       visibilityOptions,
       visibilityLevel: visibilityOptions.PUBLIC,
+      // TODO: Change all of these to use the visibilityOptions constants
+      // https://gitlab.com/gitlab-org/gitlab/-/issues/214667
       issuesAccessLevel: 20,
       repositoryAccessLevel: 20,
       forkingAccessLevel: 20,
@@ -194,7 +197,7 @@ export default {
     },
 
     metricsDashboardVisibilitySwitchingAvailable() {
-      return gon.features?.metricsDashboardVisibilitySwitchingAvailable;
+      return this.glFeatures.metricsDashboardVisibilitySwitchingAvailable;
     },
   },
 
