@@ -275,4 +275,26 @@ describe Repository do
       end
     end
   end
+
+  describe '#diverged_from_upstream?' do
+    subject { repository.diverged_from_upstream?(branch_name) }
+
+    # existence: master => Yes, upstream/master => No
+    context 'when `master` ref exists and `ref/remotes/upstream/master` ref does not' do
+      let(:branch_name) { 'master' }
+
+      it 'returns false' do
+        is_expected.to be(false)
+      end
+    end
+
+    # existence: non-existing-branch => No, upstream/non-existing-branch => No
+    context 'when the branch does not exist in the target repo or upstream' do
+      let(:branch_name) { 'non-existing-branch' }
+
+      it 'returns false' do
+        is_expected.to be(false)
+      end
+    end
+  end
 end
