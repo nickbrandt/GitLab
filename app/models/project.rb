@@ -866,6 +866,16 @@ class Project < ApplicationRecord
     latest_jira_import&.status || 'initial'
   end
 
+  def validate_jira_import_settings!(user: nil)
+    raise Projects::ImportService::Error, _('Jira import feature is disabled.') unless jira_issues_import_feature_flag_enabled?
+    raise Projects::ImportService::Error, _('Jira integration not configured.') unless jira_service&.active?
+
+    return unless user
+
+    raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
+    raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
+  end
+
   def human_import_status_name
     import_state&.human_status_name || 'none'
   end
