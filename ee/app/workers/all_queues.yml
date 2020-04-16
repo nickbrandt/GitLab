@@ -521,13 +521,6 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
-- :name: export_csv
-  :feature_category: :issue_tracking
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :cpu
-  :weight: 1
-  :idempotent: 
 - :name: ldap_group_sync
   :feature_category: :authentication_and_authorization
   :has_external_dependencies: true

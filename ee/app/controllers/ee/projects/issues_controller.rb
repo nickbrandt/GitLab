@@ -9,19 +9,13 @@ module EE
       prepended do
         include DescriptionDiffActions
 
-        # Specifying before_action :authenticate_user! multiple times
-        # doesn't work, since the last filter will override the previous
-        # ones.
-        alias_method :export_csv_authenticate_user!, :authenticate_user!
-
-        before_action :export_csv_authenticate_user!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
       end
 
       override :issue_except_actions
       def issue_except_actions
-        super + %i[export_csv service_desk]
+        super + %i[service_desk]
       end
 
       override :set_issuables_index_only_actions
@@ -32,13 +26,6 @@ module EE
       def service_desk
         @issues = @issuables # rubocop:disable Gitlab/ModuleWithInstanceVariables
         @users.push(::User.support_bot) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-      end
-
-      def export_csv
-        ExportCsvWorker.perform_async(current_user.id, project.id, finder_options.to_h)
-
-        index_path = project_issues_path(project)
-        redirect_to(index_path, notice: "Your CSV export has started. It will be emailed to #{current_user.notification_email} when complete.")
       end
 
       private

@@ -27,11 +27,15 @@ module Issues
     # rubocop: disable CodeReuse/ActiveRecord
     def csv_builder
       @csv_builder ||=
-        CsvBuilder.new(@issues.preload(:author, :assignees, :timelogs, :epic), header_to_value_hash)
+        CsvBuilder.new(@issues.preload(associations_to_preload), header_to_value_hash)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     private
+
+    def associations_to_preload
+      %i(author assignees timelogs)
+    end
 
     def header_to_value_hash
       {
@@ -55,12 +59,7 @@ module Issues
        'Labels' => -> (issue) { issue_labels(issue) },
        'Time Estimate' => ->(issue) { issue.time_estimate.to_s(:csv) },
        'Time Spent' => -> (issue) { issue_time_spent(issue) }
-      }.tap do |hash|
-        if project.group&.feature_available?(:epics)
-          hash['Epic ID'] = -> (issue) { issue.epic&.id }
-          hash['Epic Title'] = -> (issue) { issue.epic&.title }
-        end
-      end
+      }
     end
 
     def issue_labels(issue)
@@ -74,3 +73,5 @@ module Issues
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+Issues::ExportCsvService.prepend_if_ee('EE::Issues::ExportCsvService')

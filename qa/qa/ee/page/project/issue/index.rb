@@ -17,11 +17,11 @@ module QA
                   element :issuable_weight
                 end
 
-                view 'ee/app/views/projects/issues/export_csv/_button.html.haml' do
+                view 'app/views/projects/issues/export_csv/_button.html.haml' do
                   element :export_as_csv_button
                 end
 
-                view 'ee/app/views/projects/issues/export_csv/_modal.html.haml' do
+                view 'app/views/projects/issues/export_csv/_modal.html.haml' do
                   element :export_issues_button
                   element :export_issues_modal
                 end
