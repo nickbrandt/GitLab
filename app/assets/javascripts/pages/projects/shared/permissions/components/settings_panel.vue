@@ -212,6 +212,7 @@ export default {
         this.buildsAccessLevel = Math.min(10, this.buildsAccessLevel);
         this.wikiAccessLevel = Math.min(10, this.wikiAccessLevel);
         this.snippetsAccessLevel = Math.min(10, this.snippetsAccessLevel);
+        this.metricsAccessLevel = Math.min(10, this.metricsAccessLevel);
         if (this.pagesAccessLevel === 20) {
           // When from Internal->Private narrow access for only members
           this.pagesAccessLevel = 10;
@@ -491,12 +492,12 @@ export default {
               class="form-control select-control"
             >
               <option
-                :value="visibilityOptions.INTERNAL"
+                :value="featureAccessLevelMembers[0]"
                 :disabled="!visibilityAllowed(visibilityOptions.INTERNAL)"
                 >{{ featureAccessLevelMembers[1] }}</option
               >
               <option
-                :value="visibilityOptions.PUBLIC"
+                :value="featureAccessLevelEveryone[0]"
                 :disabled="!visibilityAllowed(visibilityOptions.PUBLIC)"
                 >{{ featureAccessLevelEveryone[1] }}</option
               >

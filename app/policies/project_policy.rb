@@ -255,7 +255,7 @@ class ProjectPolicy < BasePolicy
     enable :fork_project
   end
 
-  rule { metrics_dashboard_allowed }.policy do
+  rule { metrics_dashboard_allowed }.enable do
     enable :metrics_dashboard
     enable :read_prometheus
     enable :read_environment
