@@ -73,18 +73,6 @@ export default {
         'js-user-link': true,
       };
     },
-    authorPath() {
-      return this.author.path;
-    },
-    authorName() {
-      return this.author.name;
-    },
-    authorUsername() {
-      return this.author.username;
-    },
-    authorId() {
-      return this.author.id;
-    },
     authorStatus() {
       return this.author.status_tooltip_html;
     },
@@ -143,13 +131,13 @@ export default {
     <template v-if="hasAuthor">
       <a
         ref="authorNameLink"
-        :href="authorPath"
+        :href="author.path"
         :class="authorLinkClasses"
-        :data-user-id="authorId"
-        :data-username="authorUsername"
+        :data-user-id="author.id"
+        :data-username="author.username"
       >
         <slot name="note-header-info"></slot>
-        <span class="note-header-author-name bold">{{ authorName }}</span>
+        <span class="note-header-author-name bold">{{ author.name }}</span>
       </a>
       <span
         v-if="authorStatus"
@@ -163,10 +151,10 @@ export default {
         <a
           ref="authorUsernameLink"
           class="author-username-link"
-          :href="authorPath"
+          :href="author.path"
           @mouseenter="handleUsernameMouseEnter"
           @mouseleave="handleUsernameMouseLeave"
-          ><span class="note-headline-light">@{{ authorUsername }}</span>
+          ><span class="note-headline-light">@{{ author.username }}</span>
         </a>
         <gitlab-team-member-badge v-if="showGitlabTeamMemberBadge" />
       </span>
