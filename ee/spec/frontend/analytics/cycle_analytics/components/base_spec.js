@@ -1,6 +1,5 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import Vue from 'vue';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
 import { GlEmptyState } from '@gitlab/ui';
@@ -291,16 +290,15 @@ describe('Cycle Analytics component', () => {
             expect(second.classes('active')).toBe(false);
           });
 
-          it('can navigate to different stages', done => {
+          it('can navigate to different stages', () => {
             selectStageNavItem(2).trigger('click');
 
-            Vue.nextTick(() => {
+            return wrapper.vm.$nextTick().then(() => {
               const first = selectStageNavItem(0);
               const third = selectStageNavItem(2);
 
               expect(third.classes('active')).toBe(true);
               expect(first.classes('active')).toBe(false);
-              done();
             });
           });
         });

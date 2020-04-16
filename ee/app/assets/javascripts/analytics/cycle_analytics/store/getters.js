@@ -2,7 +2,6 @@ import dateFormat from 'dateformat';
 import { isNumber } from 'lodash';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
-import { getTasksByTypeData } from '../utils';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 

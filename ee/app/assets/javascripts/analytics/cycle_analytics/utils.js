@@ -1,6 +1,7 @@
 import { isNumber } from 'lodash';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import httpStatus from '~/lib/utils/http_status';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
 import { hideFlash } from '~/flash';
 import {
@@ -328,4 +329,11 @@ export const getTasksByTypeData = ({ data = [], startDate = null, endDate = null
     ...transformed,
     groupBy,
   };
+};
+
+export const handleErrorOrRethrow = ({ action, error }) => {
+  if (error?.response?.status === httpStatus.FORBIDDEN) {
+    throw error;
+  }
+  action();
 };

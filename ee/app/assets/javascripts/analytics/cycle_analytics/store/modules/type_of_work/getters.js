@@ -1,14 +1,14 @@
 import { getTasksByTypeData } from '../../../utils';
 
-export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
-  if (tasksByType && tasksByType.data.length) {
-    return getTasksByTypeData({
-      data: tasksByType.data,
-      startDate,
-      endDate,
-    });
-  }
-  return { groupBy: [], data: [], seriesNames: [] };
+export const tasksByTypeChartData = ({ data = [] } = {}, _, rootState = {}) => {
+  const { startDate = null, endDate = null } = rootState;
+  return data.length
+    ? getTasksByTypeData({
+        data,
+        startDate,
+        endDate,
+      })
+    : { groupBy: [], data: [], seriesNames: [] };
 };
 
-export default { tasksByTypeChartData };
+export default () => ({ tasksByTypeChartData });

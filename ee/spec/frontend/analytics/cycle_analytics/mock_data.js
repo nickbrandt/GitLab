@@ -10,7 +10,10 @@ import {
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { toYmd } from 'ee/analytics/shared/utils';
-import { transformRawTasksByTypeData } from 'ee/analytics/cycle_analytics/utils';
+import {
+  getTasksByTypeData,
+  transformRawTasksByTypeData,
+} from 'ee/analytics/cycle_analytics/utils';
 
 const fixtureEndpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint
@@ -145,7 +148,7 @@ export const customStageFormErrors = convertObjectPropsToCamelCase(rawCustomStag
 
 const dateRange = getDatesInRange(startDate, endDate, toYmd);
 
-export const rawTasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
+export const apiTasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
   labelData => {
     // add data points for our mock date range
     const maxValue = 10;
@@ -157,7 +160,8 @@ export const rawTasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_b
   },
 );
 
-export const transformedTasksByTypeData = transformRawTasksByTypeData(rawTasksByTypeData);
+export const rawTasksByTypeData = transformRawTasksByTypeData(apiTasksByTypeData);
+export const transformedTasksByTypeData = getTasksByTypeData(apiTasksByTypeData);
 
 export const tasksByTypeData = {
   seriesNames: ['Cool label', 'Normal label'],

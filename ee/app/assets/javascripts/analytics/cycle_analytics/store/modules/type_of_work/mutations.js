@@ -7,28 +7,17 @@ export default {
   [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
     state.isLoadingTasksByTypeChartTopLabels = true;
     state.topRankedLabels = [];
-    state.tasksByType = {
-      ...state.tasksByType,
-      selectedLabelIds: [],
-    };
+    state.selectedLabelIds = [];
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
-    const { tasksByType } = state;
     state.isLoadingTasksByTypeChartTopLabels = false;
     state.topRankedLabels = data.map(convertObjectPropsToCamelCase);
-    state.tasksByType = {
-      ...tasksByType,
-      selectedLabelIds: data.map(({ id }) => id),
-    };
+    state.selectedLabelIds = data.map(({ id }) => id);
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
-    const { tasksByType } = state;
     state.isLoadingTasksByTypeChartTopLabels = false;
     state.topRankedLabels = [];
-    state.tasksByType = {
-      ...tasksByType,
-      selectedLabelIds: [],
-    };
+    state.selectedLabelIds = [];
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
     state.isLoadingTasksByTypeChart = true;
@@ -38,28 +27,19 @@ export default {
   },
   [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data = []) {
     state.isLoadingTasksByTypeChart = false;
-    state.tasksByType = {
-      ...state.tasksByType,
-      data: transformRawTasksByTypeData(data),
-    };
+    state.data = transformRawTasksByTypeData(data);
   },
   [types.SET_TASKS_BY_TYPE_FILTERS](state, { filter, value }) {
-    const {
-      tasksByType: { selectedLabelIds, ...tasksByTypeRest },
-    } = state;
-    let updatedFilter = {};
+    const { selectedLabelIds } = state;
     switch (filter) {
       case TASKS_BY_TYPE_FILTERS.LABEL:
-        updatedFilter = {
-          selectedLabelIds: toggleSelectedLabel({ selectedLabelIds, value }),
-        };
+        state.selectedLabelIds = toggleSelectedLabel({ selectedLabelIds, value });
         break;
       case TASKS_BY_TYPE_FILTERS.SUBJECT:
-        updatedFilter = { subject: value };
+        state.subject = value;
         break;
       default:
         break;
     }
-    state.tasksByType = { ...tasksByTypeRest, selectedLabelIds, ...updatedFilter };
   },
 };

@@ -3,14 +3,7 @@ import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
-import { removeFlash } from '../utils';
-
-const handleErrorOrRethrow = ({ action, error }) => {
-  if (error?.response?.status === httpStatus.FORBIDDEN) {
-    throw error;
-  }
-  action();
-};
+import { removeFlash, handleErrorOrRethrow } from '../utils';
 
 const isStageNameExistsError = ({ status, errors }) => {
   const ERROR_NAME_RESERVED = 'is reserved';
@@ -105,8 +98,10 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ commit }) =>
+export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
+  dispatch('typeOfWork/fetchTopRankedGroupLabels');
+};
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
   const { status } = response;
