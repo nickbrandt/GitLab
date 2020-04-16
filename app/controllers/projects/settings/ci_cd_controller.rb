@@ -8,6 +8,7 @@ module Projects
       before_action do
         push_frontend_feature_flag(:new_variables_ui, @project)
         push_frontend_feature_flag(:ajax_new_deploy_token, @project)
+        push_frontend_feature_flag(:ci_key_autocomplete, default_enabled: true)
       end
 
       def show
