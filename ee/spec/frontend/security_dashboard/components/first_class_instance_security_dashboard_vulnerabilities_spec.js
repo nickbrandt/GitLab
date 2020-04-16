@@ -48,7 +48,9 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
       expect(findVulnerabilities().props()).toEqual({
         dashboardDocumentation,
         emptyStateSvgPath,
+        filters: null,
         isLoading: true,
+        shouldShowSelection: false,
         vulnerabilities: [],
       });
     });
@@ -127,7 +129,9 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
       expect(findVulnerabilities().props()).toEqual({
         dashboardDocumentation,
         emptyStateSvgPath,
+        filters: null,
         isLoading: false,
+        shouldShowSelection: false,
         vulnerabilities,
       });
     });
