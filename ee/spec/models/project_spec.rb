@@ -2635,4 +2635,23 @@ describe Project do
       end
     end
   end
+
+  describe '#gitlab_subscription' do
+    subject { project.gitlab_subscription }
+
+    let(:project) { create(:project, namespace: namespace) }
+
+    context 'has a gitlab subscription' do
+      let(:namespace) { subscription.namespace }
+      let(:subscription) { create(:gitlab_subscription) }
+
+      it { is_expected.to eq(subscription) }
+    end
+
+    context 'does not have a gitlab subscription' do
+      let(:namespace) { create(:namespace) }
+
+      it { is_expected.to be_nil }
+    end
+  end
 end
