@@ -1,0 +1,5 @@
+---
+title: When LDAP Lock is enable, admins can allow group owners to manage group members
+merge_request: 29682
+author:
+type: added
