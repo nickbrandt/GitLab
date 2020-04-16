@@ -2,45 +2,70 @@
 
 module Gitlab
   module Ci
-    class Jwt < JSONWebToken::RSAToken
-      include Gitlab::Utils::StrongMemoize
-
-      DEFAULT_EXPIRE_TIME = 5.minutes.to_i
+    class Jwt
+      NOT_BEFORE_TIME = 5
+      DEFAULT_EXPIRE_TIME = 60 * 5
 
       def self.for_build(build)
         self.new(build, ttl: build.metadata_timeout).encoded
       end
 
       def initialize(build, ttl: nil)
-        super(nil)
-
         @build = build
-        @key_data = Rails.application.secrets.openid_connect_signing_key
+        @ttl = ttl
+      end
 
-        # Reserved claims
-        self.issuer = Settings.gitlab.host
-        self.issued_at = Time.now
-        self.expire_time = issued_at + (ttl || DEFAULT_EXPIRE_TIME)
-        self.subject = "job_#{build.id}"
+      def payload
+        custom_claims.merge(reserved_claims)
+      end
 
-        # Custom claims
-        self[:namespace_id] = namespace.id.to_s
-        self[:namespace_path] = namespace.full_path
-        self[:project_id] = project.id.to_s
-        self[:project_path] = project.full_path
-        self[:user_id] = user&.id.to_s
-        self[:user_login] = user&.username
-        self[:user_email] = user&.email
-        self[:pipeline_id] = build.pipeline.id.to_s
-        self[:job_id] = build.id.to_s
-        self[:ref] = source_ref
-        self[:ref_type] = ref_type
-        self[:ref_protected] = build.protected.to_s
+      def encoded
+        headers = { kid: kid, typ: 'JWT' }
+
+        JWT.encode(payload, key, 'RS256', headers)
       end
 
       private
 
-      attr_reader :build, :key_data
+      attr_reader :build, :ttl, :key_data
+
+      def reserved_claims
+        now = Time.now.to_i
+
+        {
+          jti: SecureRandom.uuid,
+          iss: Settings.gitlab.host,
+          iat: now,
+          nbf: now - NOT_BEFORE_TIME,
+          exp: now + (ttl || DEFAULT_EXPIRE_TIME),
+          sub: "job_#{build.id}"
+        }
+      end
+
+      def custom_claims
+        {
+          namespace_id: namespace.id.to_s,
+          namespace_path: namespace.full_path,
+          project_id: project.id.to_s,
+          project_path: project.full_path,
+          user_id: user&.id.to_s,
+          user_login: user&.username,
+          user_email: user&.email,
+          pipeline_id: build.pipeline.id.to_s,
+          job_id: build.id.to_s,
+          ref: source_ref,
+          ref_type: ref_type,
+          ref_protected: build.protected.to_s
+        }
+      end
+
+      def key
+        @key ||= OpenSSL::PKey::RSA.new(Rails.application.secrets.openid_connect_signing_key)
+      end
+
+      def public_key
+        key.public_key
+      end
 
       def kid
         public_key.to_jwk[:kid]
