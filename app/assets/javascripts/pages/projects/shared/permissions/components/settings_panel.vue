@@ -175,6 +175,10 @@ export default {
       return options;
     },
 
+    metricsOptionsDropdownEnabled() {
+      return this.featureAccessLevelOptions.length < 2;
+    },
+
     repositoryEnabled() {
       return this.repositoryAccessLevel > 0;
     },
@@ -227,6 +231,7 @@ export default {
         if (this.wikiAccessLevel > 0) this.wikiAccessLevel = 20;
         if (this.snippetsAccessLevel > 0) this.snippetsAccessLevel = 20;
         if (this.pagesAccessLevel === 10) this.pagesAccessLevel = 20;
+        if (this.metricsAccessLevel === 10) this.metricsAccessLevel = 20;
         this.highlightChanges();
       }
     },
@@ -488,8 +493,9 @@ export default {
           <div class="select-wrapper">
             <select
               v-model="metricsAccessLevel"
+              :disabled="metricsOptionsDropdownEnabled"
               name="project[project_feature_attributes][metrics_dashboard_access_level]"
-              class="form-control select-control"
+              class="form-control project-repo-select select-control"
             >
               <option
                 :value="featureAccessLevelMembers[0]"
