@@ -45,13 +45,17 @@ Skip to the [Configure secondary application node](#configure-secondary-applicat
 The [geo_primary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
 configures the **primary** node's database to be replicated by making changes to
 `pg_hba.conf` and `postgresql.conf`. Make the following configuration changes
-manually to your external database configuration:
+manually to your external database configuration and ensure that you restart PostgreSQL
+afterwards for the changes to take effect:
 
 ```plaintext
 ##
 ## Geo Primary Role
 ## - pg_hba.conf
 ##
+host    all         all               <trusted primary IP>/32       md5
+host    replication gitlab_replicator <trusted primary IP>/32       md5
+host    all         all               <trusted secondary IP>/32     md5
 host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ```
 
