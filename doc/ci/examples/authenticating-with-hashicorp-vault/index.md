@@ -47,9 +47,9 @@ The JWT's payload looks like this:
 }
 ```
 
-The JWT is encoded by using RS256 and signed with your GitLab instance's OpenID Connect private key. The expire time for the token will be set to job's timeout, if specifed, or 5 minutes if it is not.
+The JWT is encoded by using RS256 and signed with your GitLab instance's OpenID Connect private key. The expire time for the token will be set to job's timeout, if specifed, or 5 minutes if it is not. The key used to sign this token may change without any notice. In such case retrying the job will generate new JWT using the current signing key.
 
-You can use this JWT and the existing JWKS endpoint (for example, `https://gitlab.example.com/oauth/discovery/keys`) to authenticate with a Vault server that is configured to allow the JWT Authentication method for authentication.
+You can use this JWT and your instance's JWKS endpoint (`https://gitlab.example.com/-/jwks`) to authenticate with a Vault server that is configured to allow the JWT Authentication method for authentication.
 
 When configuring roles in Vault, you can use [bound_claims](https://www.vaultproject.io/docs/auth/jwt/#bound-claims) to match against the JWT's claims and restrict which secrets each CI job has access to.
 
@@ -157,11 +157,11 @@ Now, configure the JWT Authentication method:
 
 ```shell
 $ vault write auth/jwt/config \
-    jwks_url="https://gitlab.example.com/oauth/discovery/keys" \
+    jwks_url="https://gitlab.example.com/-/jwks" \
     bound_issuer="gitlab.example.com"
 ```
 
-[bound_issuer](https://www.vaultproject.io/api/auth/jwt#inlinecode-bound_issuer) specifies that only a JWT with the issuer (that is, the `iss` claim) set to `gitlab.example.com` can use this method to authenticate, and that the JWKS endpoint (`https://gitlab.example.com/oauth/discovery/keys`) should be used to validate the token.
+[bound_issuer](https://www.vaultproject.io/api/auth/jwt#inlinecode-bound_issuer) specifies that only a JWT with the issuer (that is, the `iss` claim) set to `gitlab.example.com` can use this method to authenticate, and that the JWKS endpoint (`https://gitlab.example.com/-/jwks`) should be used to validate the token.
 
 For the full list of available configuration options, see Vault's [API documentation](https://www.vaultproject.io/api/auth/jwt#configure).
 
