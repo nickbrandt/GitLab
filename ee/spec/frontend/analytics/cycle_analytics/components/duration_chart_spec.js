@@ -1,27 +1,60 @@
-import { shallowMount, mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import $ from 'jquery';
 import 'bootstrap';
 import '~/gl_dropdown';
+import durationChartStore from 'ee/analytics/cycle_analytics/store/modules/duration_chart';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import StageDropdownFilter from 'ee/analytics/cycle_analytics/components/stage_dropdown_filter.vue';
 import {
   allowedStages as stages,
-  durationChartPlottableData as scatterData,
-  durationChartPlottableMedianData as medianLineData,
+  durationChartPlottableData as durationData,
+  durationChartPlottableMedianData as durationMedianData,
 } from '../mock_data';
 
-function createComponent({ mountFn = shallowMount, props = {}, stubs = {} } = {}) {
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+const actionSpies = {
+  fetchDurationData: jest.fn(),
+  updateSelectedDurationChartStages: jest.fn(),
+};
+
+const fakeStore = ({ initialGetters, initialState }) =>
+  new Vuex.Store({
+    modules: {
+      durationChart: {
+        ...durationChartStore,
+        getters: {
+          durationChartPlottableData: () => durationData,
+          durationChartMedianData: () => durationMedianData,
+          ...initialGetters,
+        },
+        state: {
+          isLoading: false,
+          ...initialState,
+        },
+      },
+    },
+  });
+
+function createComponent({
+  mountFn = shallowMount,
+  stubs = {},
+  initialState = {},
+  initialGetters = {},
+  props = {},
+} = {}) {
   return mountFn(DurationChart, {
+    localVue,
+    store: fakeStore({ initialState, initialGetters }),
     propsData: {
-      isLoading: false,
       stages,
-      scatterData,
-      medianLineData,
       ...props,
     },
-
+    methods: actionSpies,
     stubs: {
       GlLoadingIcon: true,
       Scatterplot: true,
@@ -82,25 +115,33 @@ describe('DurationChart', () => {
       return openStageDropdown(wrapper).then(() => selectStage(wrapper, selectedIndex));
     });
 
-    it('emits the stageSelected event', () => {
-      expect(wrapper.emitted().stageSelected).toBeTruthy();
+    it('calls the `updateSelectedDurationChartStages` action', () => {
+      expect(actionSpies.updateSelectedDurationChartStages).toHaveBeenCalledWith(selectedStages);
+    });
+  });
+
+  describe('with no stages', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        mountFn: mount,
+        props: { stages: [] },
+        stubs: { StageDropdownFilter: false },
+      });
     });
 
-    it('toggles the selected stage', () => {
-      expect(wrapper.emitted('stageSelected')[0]).toEqual([selectedStages]);
-
-      return selectStage(wrapper, selectedIndex).then(() => {
-        const [updatedStages] = wrapper.emitted('stageSelected')[1];
-        stages.forEach(stage => {
-          expect(updatedStages).toContain(stage);
-        });
-      });
+    it('does not render the stage dropdown', () => {
+      expect(findStageDropdown(wrapper).exists()).toBe(false);
     });
   });
 
   describe('with no chart data', () => {
     beforeEach(() => {
-      wrapper = createComponent({ props: { scatterData: [], medianLineData: [] } });
+      wrapper = createComponent({
+        initialGetters: {
+          durationChartPlottableData: () => [],
+          durationChartMedianData: () => [],
+        },
+      });
     });
 
     it('renders the no data available message', () => {
@@ -110,11 +151,12 @@ describe('DurationChart', () => {
     });
   });
 
-  describe('while loading', () => {
+  describe('when isLoading=true', () => {
     beforeEach(() => {
-      wrapper = createComponent({ props: { isLoading: true } });
+      wrapper = createComponent({ initialState: { isLoading: true } });
     });
-    it('renders loading icon', () => {
+
+    it('renders a loader', () => {
       expect(findLoader(wrapper).exists()).toBe(true);
     });
   });

@@ -1,4 +1,5 @@
 <script>
+import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { dateFormats } from '../../shared/constants';
 import Scatterplot from '../../shared/components/scatterplot.vue';
@@ -12,32 +13,25 @@ export default {
     StageDropdownFilter,
   },
   props: {
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     stages: {
-      type: Array,
-      required: true,
-    },
-    scatterData: {
-      type: Array,
-      required: true,
-    },
-    medianLineData: {
       type: Array,
       required: true,
     },
   },
   computed: {
+    ...mapState('durationChart', ['isLoading']),
+    ...mapGetters('durationChart', ['durationChartPlottableData', 'durationChartMedianData']),
     hasData() {
-      return Boolean(this.scatterData.length);
+      return Boolean(this.durationChartPlottableData.length);
     },
   },
+  mounted() {
+    this.fetchDurationData();
+  },
   methods: {
-    onSelectStage(selectedStages) {
-      this.$emit('stageSelected', selectedStages);
+    ...mapActions('durationChart', ['fetchDurationData', 'updateSelectedDurationChartStages']),
+    onDurationStageSelect(stages) {
+      this.updateSelectedDurationChartStages(stages);
     },
   },
   durationChartTooltipDateFormat: dateFormats.defaultDate,
@@ -53,7 +47,7 @@ export default {
         v-if="stages.length"
         class="ml-auto"
         :stages="stages"
-        @selected="onSelectStage"
+        @selected="onDurationStageSelect"
       />
     </div>
     <scatterplot
@@ -61,8 +55,8 @@ export default {
       :x-axis-title="s__('CycleAnalytics|Date')"
       :y-axis-title="s__('CycleAnalytics|Total days to completion')"
       :tooltip-date-format="$options.durationChartTooltipDateFormat"
-      :scatter-data="scatterData"
-      :median-line-data="medianLineData"
+      :scatter-data="durationChartPlottableData"
+      :median-line-data="durationChartMedianData"
     />
     <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
       {{ __('There is no data available. Please change your selection.') }}
