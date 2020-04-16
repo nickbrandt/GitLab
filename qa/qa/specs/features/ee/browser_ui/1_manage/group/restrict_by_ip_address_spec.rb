@@ -62,6 +62,26 @@ module QA
         end
       end
 
+      # TODO - Remove this block when the test is un-quarantined.
+      after do |example|
+        if example.exception
+          @group.sandbox.visit!
+          QA::Runtime::Logger.info "On failure - Revisiting: #{@group.sandbox.path}"
+          QA::Runtime::Logger.info page.save_screenshot(::File.join(QA::Runtime::Namespace.name, "group_sandbox_on_failure.png"), full: true)
+
+          Flow::Login.while_signed_in_as_admin do
+            @group.sandbox.visit!
+
+            Page::Group::Menu.perform(&:click_group_general_settings_item)
+
+            Page::Group::Settings::General.perform do |settings|
+              QA::Runtime::Logger.info "On failure - IP address restriction is set to: #{settings.restricted_ip_address}"
+              QA::Runtime::Logger.info page.save_screenshot(::File.join(QA::Runtime::Namespace.name, "ip_restriction_on_failure.png"), full: true)
+            end
+          end
+        end
+      end
+
       private
 
       def set_ip_address_restriction_to(ip_address)
