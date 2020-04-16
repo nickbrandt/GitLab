@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 import NoteHeader from '~/notes/components/note_header.vue';
 import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
@@ -199,6 +200,25 @@ describe('NoteHeader component', () => {
       wrapper.find({ ref: 'authorUsernameLink' }).trigger('mouseleave');
 
       expect(dispatchEvent).toHaveBeenCalledWith(new Event('mouseleave'));
+    });
+  });
+
+  describe('when author status tooltip is opened', () => {
+    it('removes `title` attribute from emoji to prevent duplicate tooltips', () => {
+      createComponent({
+        author: {
+          ...author,
+          status_tooltip_html:
+            '"<span class="user-status-emoji has-tooltip" title="foo bar" data-html="true" data-placement="top"><gl-emoji title="basketball and hoop" data-name="basketball" data-unicode-version="6.0">🏀</gl-emoji></span>"',
+        },
+      });
+
+      return Vue.nextTick().then(() => {
+        const authorStatus = wrapper.find({ ref: 'authorStatus' });
+        authorStatus.trigger('mouseenter');
+
+        expect(authorStatus.find('gl-emoji').attributes('title')).toBeUndefined();
+      });
     });
   });
 });
