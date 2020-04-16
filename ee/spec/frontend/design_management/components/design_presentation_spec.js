@@ -216,10 +216,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay is smaller than viewport', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(200);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get')
-        .mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(200);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -229,10 +227,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay width is larger than viewports', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(50);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get')
-        .mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(50);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(200);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -242,8 +238,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay height is larger than viewports', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(200);
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get').mockReturnValue(50);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(50);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -405,7 +401,7 @@ describe('Design management design presentation component', () => {
     `('sets lastDragPosition when design $scenario', ({ width, height }) => {
       createComponent();
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 100, height: 100 },
         { width, height },
       );
@@ -424,7 +420,7 @@ describe('Design management design presentation component', () => {
 
       createComponent({}, { lastDragPosition });
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 100, height: 100 },
         { width: 50, height: 50 },
       );
@@ -451,7 +447,7 @@ describe('Design management design presentation component', () => {
 
       // mock a design that overflows
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 10, height: 10 },
         { width: 20, height: 20 },
         0,
