@@ -63,7 +63,7 @@ describe('Design management design presentation component', () => {
       .mockReturnValue((childDimensions.height - viewportDimensions.height) * scrollTopPerc);
   }
 
-  function clickDragExplore(startCoords, endCoords, { useTouchEvents } = {}) {
+  function clickDragExplore(startCoords, endCoords, { useTouchEvents, mouseup } = {}) {
     const event = useTouchEvents
       ? {
           mousedown: 'touchstart',
@@ -85,13 +85,24 @@ describe('Design management design presentation component', () => {
       clientX: startCoords.clientX,
       clientY: startCoords.clientY,
     });
-    return wrapper.vm.$nextTick().then(() => {
-      addCommentOverlay.trigger(event.mousemove, {
-        clientX: endCoords.clientX,
-        clientY: endCoords.clientY,
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        addCommentOverlay.trigger(event.mousemove, {
+          clientX: endCoords.clientX,
+          clientY: endCoords.clientY,
+        });
+
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        if (mouseup) {
+          addCommentOverlay.trigger(event.mouseup);
+          return wrapper.vm.$nextTick();
+        }
+
+        return undefined;
       });
-      return wrapper.vm.$nextTick();
-    });
   }
 
   afterEach(() => {
@@ -494,12 +505,24 @@ describe('Design management design presentation component', () => {
         });
       });
 
-      it('does not open a comment form', () => {
-        return clickDragExplore({ clientX: 0, clientY: 0 }, { clientX: 10, clientY: 10 }).then(
-          () => {
-            expect(wrapper.emitted('openCommentForm')).toBeFalsy();
-          },
-        );
+      it('does not open a comment form when drag position exceeds buffer', () => {
+        return clickDragExplore(
+          { clientX: 0, clientY: 0 },
+          { clientX: 10, clientY: 10 },
+          { mouseup: true },
+        ).then(() => {
+          expect(wrapper.emitted('openCommentForm')).toBeFalsy();
+        });
+      });
+
+      it('opens a comment form when drag position is within buffer', () => {
+        return clickDragExplore(
+          { clientX: 0, clientY: 0 },
+          { clientX: 1, clientY: 0 },
+          { mouseup: true },
+        ).then(() => {
+          expect(wrapper.emitted('openCommentForm')).toBeDefined();
+        });
       });
     });
   });

@@ -3,6 +3,8 @@ import { throttle } from 'lodash';
 import DesignImage from './image.vue';
 import DesignOverlay from './design_overlay.vue';
 
+const CLICK_DRAG_BUFFER_PX = 2;
+
 export default {
   components: {
     DesignImage,
@@ -221,16 +223,31 @@ export default {
         y: clientY,
       };
     },
+    getDragDelta(clientX, clientY) {
+      return {
+        deltaX: this.lastDragPosition.x - clientX,
+        deltaY: this.lastDragPosition.y - clientY,
+      };
+    },
+    exceedsDragThreshold(clientX, clientY) {
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
+
+      return Math.abs(deltaX) > CLICK_DRAG_BUFFER_PX || Math.abs(deltaY) > CLICK_DRAG_BUFFER_PX;
+    },
+    shouldDragDesign(clientX, clientY) {
+      return (
+        this.lastDragPosition &&
+        (this.isDraggingDesign || this.exceedsDragThreshold(clientX, clientY))
+      );
+    },
     onPresentationMousemove({ clientX, clientY }) {
-      if (!this.lastDragPosition) return;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport || !this.shouldDragDesign(clientX, clientY)) return;
+
       this.isDraggingDesign = true;
 
-      const { presentationViewport } = this.$refs;
-      if (!presentationViewport) return;
-
       const { scrollLeft, scrollTop } = presentationViewport;
-      const deltaX = this.lastDragPosition.x - clientX;
-      const deltaY = this.lastDragPosition.y - clientY;
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
       presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
 
       this.lastDragPosition = {
