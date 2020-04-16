@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
 class UpdateBuildMinutesService < BaseService
+  TRACK_PUBLIC_PROJECTS_MINUTES_FOR_SIGNED_UP_AFTER = Date.parse('2020/03/18')
+
   def execute(build)
     return unless build.shared_runners_minutes_limit_enabled?
     return unless build.complete?
     return unless build.duration&.positive?
 
     if ::Feature.enabled?(:ci_minutes_track_for_public_projects, namespace)
+      # Keep unlimited pulic projects minutes for our users signed up before the policy change
+      return if project.public? && project.creator.created_at <= TRACK_PUBLIC_PROJECTS_MINUTES_FOR_SIGNED_UP_AFTER
+
       count_projects_based_on_cost_factors(build)
     else
       legacy_count_non_public_projects(build)
