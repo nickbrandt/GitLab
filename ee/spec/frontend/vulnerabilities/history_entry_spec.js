@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 
@@ -30,10 +30,9 @@ describe('History Entry', () => {
   const createWrapper = (...notes) => {
     const discussion = { notes };
 
-    wrapper = mount(HistoryEntry, {
-      propsData: {
-        discussion,
-      },
+    wrapper = shallowMount(HistoryEntry, {
+      propsData: { discussion },
+      stubs: { EventItem },
     });
   };
 
@@ -66,7 +65,7 @@ describe('History Entry', () => {
     createWrapper(systemNote);
 
     expect(newComment().exists()).toBe(true);
-    expect(existingComments().length).toBe(0);
+    expect(existingComments()).toHaveLength(0);
   });
 
   it('displays comments when there are comments', () => {
@@ -74,7 +73,7 @@ describe('History Entry', () => {
     createWrapper(systemNote, commentNote, commentNoteClone);
 
     expect(newComment().exists()).toBe(false);
-    expect(existingComments().length).toBe(2);
+    expect(existingComments()).toHaveLength(2);
     expect(commentAt(0).props('comment')).toEqual(commentNote);
     expect(commentAt(1).props('comment')).toEqual(commentNoteClone);
   });
@@ -85,7 +84,7 @@ describe('History Entry', () => {
 
     return wrapper.vm.$nextTick().then(() => {
       expect(newComment().exists()).toBe(false);
-      expect(existingComments().length).toBe(1);
+      expect(existingComments()).toHaveLength(1);
       expect(commentAt(0).props('comment')).toEqual(commentNote);
     });
   });
@@ -106,7 +105,7 @@ describe('History Entry', () => {
 
     return wrapper.vm.$nextTick().then(() => {
       expect(newComment().exists()).toBe(true);
-      expect(existingComments().length).toBe(0);
+      expect(existingComments()).toHaveLength(0);
     });
   });
 });

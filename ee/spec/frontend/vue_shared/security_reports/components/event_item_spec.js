@@ -48,7 +48,7 @@ describe('Event Item', () => {
       expect(wrapper.props().iconClass).toBe('ci-status-icon-success');
     });
 
-    it('renders the action buttons tontainer', () => {
+    it('renders the action buttons container', () => {
       expect(wrapper.find('.action-buttons')).toExist();
     });
   });
