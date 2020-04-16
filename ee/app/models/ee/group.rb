@@ -49,6 +49,8 @@ module EE
 
       belongs_to :file_template_project, class_name: "Project"
 
+      belongs_to :push_rule
+
       # Use +checked_file_template_project+ instead, which implements important
       # visibility checks
       private :file_template_project
@@ -342,6 +344,18 @@ module EE
       return unless max_personal_access_token_lifetime.present? && personal_access_token_expiration_policy_available?
 
       ::PersonalAccessTokens::Groups::UpdateLifetimeService.new(self).execute
+    end
+
+    def predefined_push_rule
+      strong_memoize(:predefined_push_rule) do
+        if push_rule.present?
+          push_rule
+        elsif has_parent?
+          parent.predefined_push_rule
+        else
+          PushRule.global
+        end
+      end
     end
 
     private
