@@ -8384,6 +8384,9 @@ msgstr ""
 msgid "Errors"
 msgstr ""
 
+msgid "Errors:"
+msgstr ""
+
 msgid "Estimated"
 msgstr ""
 
@@ -20774,7 +20777,7 @@ msgstr ""
 msgid "There was an error resetting user pipeline minutes."
 msgstr ""
 
-msgid "There was an error saving this Geo Node"
+msgid "There was an error saving this Geo Node."
 msgstr ""
 
 msgid "There was an error saving your changes."

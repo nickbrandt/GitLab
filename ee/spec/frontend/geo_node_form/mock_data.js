@@ -62,3 +62,8 @@ export const MOCK_NODE = {
   minimumReverificationInterval: 7,
   syncObjectStorage: false,
 };
+
+export const MOCK_ERROR_MESSAGE = {
+  name: ["can't be blank"],
+  url: ["can't be blank", 'must be a valid URL'],
+};
