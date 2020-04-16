@@ -65,6 +65,8 @@ module Security
           .find_or_create_by!(find_params)
       rescue ActiveRecord::RecordNotUnique
         project.vulnerability_findings.find_by!(find_params)
+      rescue ActiveRecord::RecordInvalid => e
+        Gitlab::ErrorTracking.track_and_raise_exception(e, create_params: create_params&.dig(:raw_metadata))
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
