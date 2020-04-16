@@ -31,13 +31,6 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: true
-- :name: cronjob:elastic_metrics_update
-  :feature_category: :global_search
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: true
 - :name: cronjob:geo_container_repository_sync_dispatch
   :feature_category: :geo_replication
   :has_external_dependencies: 
