@@ -7,8 +7,10 @@ export const {
   dockerReportParsed,
   parsedDast,
   sastParsedIssues,
+  secretScanningParsedIssues,
   sastDiffSuccessMock,
   dastDiffSuccessMock,
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
+  secretScanningDiffSuccessMock,
 } = mockData;

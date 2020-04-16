@@ -24191,6 +24191,9 @@ msgstr ""
 msgid "ciReport|%{linkStartTag}Learn more about SAST %{linkEndTag}"
 msgstr ""
 
+msgid "ciReport|%{linkStartTag}Learn more about Secret Scanning %{linkEndTag}"
+msgstr ""
+
 msgid "ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}"
 msgstr ""
 
@@ -24352,6 +24355,12 @@ msgid "ciReport|Resolve with merge request"
 msgstr ""
 
 msgid "ciReport|SAST"
+msgstr ""
+
+msgid "ciReport|Secret scanning"
+msgstr ""
+
+msgid "ciReport|Secret scanning detects secrets and credentials vulnerabilities in your source code."
 msgstr ""
 
 msgid "ciReport|Security scanning"

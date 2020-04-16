@@ -4,6 +4,7 @@ import {
   groupedContainerScanningText,
   groupedDastText,
   groupedDependencyText,
+  groupedSecretScanningText,
   groupedSummaryText,
   allReportsHaveError,
   noBaseInAllReports,
@@ -253,6 +254,81 @@ describe('Security reports getters', () => {
     });
   });
 
+  describe('groupedSecretScanningText', () => {
+    describe('with no issues', () => {
+      it('returns no issues text', () => {
+        state.secretScanning.paths.head = HEAD_PATH;
+        state.secretScanning.paths.base = BASE_PATH;
+
+        expect(groupedSecretScanningText(state)).toEqual(
+          'Secret scanning detected no vulnerabilities',
+        );
+      });
+    });
+
+    describe('with new issues and without base', () => {
+      it('returns unable to compare text', () => {
+        state.secretScanning.paths.head = HEAD_PATH;
+        state.secretScanning.newIssues = [{}];
+
+        expect(groupedSecretScanningText(state)).toEqual(
+          'Secret scanning detected 1 vulnerability for the source branch only',
+        );
+      });
+    });
+
+    describe('with base and head', () => {
+      describe('with only new issues', () => {
+        it('returns new issues text', () => {
+          state.secretScanning.paths.head = HEAD_PATH;
+          state.secretScanning.paths.base = BASE_PATH;
+          state.secretScanning.newIssues = [{}];
+
+          expect(groupedSecretScanningText(state)).toEqual(
+            'Secret scanning detected 1 new vulnerability',
+          );
+        });
+      });
+
+      describe('with only dismissed issues', () => {
+        it('returns dismissed issues text', () => {
+          state.secretScanning.paths.head = HEAD_PATH;
+          state.secretScanning.paths.base = BASE_PATH;
+          state.secretScanning.newIssues = [{ isDismissed: true }];
+
+          expect(groupedSecretScanningText(state)).toEqual(
+            'Secret scanning detected 1 dismissed vulnerability',
+          );
+        });
+      });
+
+      describe('with new and resolved issues', () => {
+        it('returns new and fixed issues text', () => {
+          state.secretScanning.paths.head = HEAD_PATH;
+          state.secretScanning.paths.base = BASE_PATH;
+          state.secretScanning.newIssues = [{}];
+          state.secretScanning.resolvedIssues = [{}];
+
+          expect(removeBreakLine(groupedSecretScanningText(state))).toEqual(
+            'Secret scanning detected 1 new, and 1 fixed vulnerabilities',
+          );
+        });
+      });
+
+      describe('with only resolved issues', () => {
+        it('returns fixed issues text', () => {
+          state.secretScanning.paths.head = HEAD_PATH;
+          state.secretScanning.paths.base = BASE_PATH;
+          state.secretScanning.resolvedIssues = [{}];
+
+          expect(groupedSecretScanningText(state)).toEqual(
+            'Secret scanning detected 1 fixed vulnerability',
+          );
+        });
+      });
+    });
+  });
+
   describe('summaryCounts', () => {
     it('returns 0 count for empty state', () => {
       expect(summaryCounts(state)).toEqual({
@@ -495,6 +571,7 @@ describe('Security reports getters', () => {
       state.dast.hasError = true;
       state.containerScanning.hasError = true;
       state.dependencyScanning.hasError = true;
+      state.secretScanning.hasError = true;
 
       expect(allReportsHaveError(state)).toEqual(true);
     });
@@ -507,6 +584,7 @@ describe('Security reports getters', () => {
       state.dast.hasError = false;
       state.containerScanning.hasError = true;
       state.dependencyScanning.hasError = true;
+      state.secretScanning.hasError = true;
 
       expect(allReportsHaveError(state)).toEqual(false);
     });
