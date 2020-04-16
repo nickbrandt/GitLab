@@ -20,29 +20,17 @@ describe('burndown_chart', () => {
     openIssuesWeight: [],
   };
 
-  const createComponent = (props = {}) => {
+  const createComponent = ({ props = {}, featureEnabled = false } = {}) => {
     wrapper = shallowMount(BurnCharts, {
       propsData: {
         ...defaultProps,
         ...props,
       },
+      provide: {
+        glFeatures: { burnupCharts: featureEnabled },
+      },
     });
   };
-
-  let origProp;
-
-  beforeEach(() => {
-    origProp = window.gon;
-    window.gon = {
-      features: {
-        burnupCharts: false,
-      },
-    };
-  });
-
-  afterEach(() => {
-    window.gon = origProp;
-  });
 
   it('includes Issues and Issue weight buttons', () => {
     createComponent();
@@ -80,9 +68,7 @@ describe('burndown_chart', () => {
 
   describe('feature disabled', () => {
     beforeEach(() => {
-      window.gon.features.burnupCharts = false;
-
-      createComponent();
+      createComponent({ featureEnabled: false });
     });
 
     it('does not reduce width of burndown chart', () => {
@@ -97,9 +83,7 @@ describe('burndown_chart', () => {
 
   describe('feature enabled', () => {
     beforeEach(() => {
-      window.gon.features.burnupCharts = true;
-
-      createComponent();
+      createComponent({ featureEnabled: true });
     });
 
     it('reduces width of burndown chart', () => {

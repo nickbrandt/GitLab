@@ -1,5 +1,6 @@
 <script>
 import { GlButton, GlButtonGroup } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __ } from '~/locale';
 import BurndownChart from './burndown_chart.vue';
 
@@ -9,6 +10,7 @@ export default {
     GlButtonGroup,
     BurndownChart,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     startDate: {
       type: String,
@@ -32,12 +34,11 @@ export default {
   data() {
     return {
       issuesSelected: true,
-      burnupChartsEnabled: gon.features.burnupCharts,
     };
   },
   computed: {
     title() {
-      return this.burnupChartsEnabled ? __('Charts') : __('Burndown chart');
+      return this.glFeatures.burnupCharts ? __('Charts') : __('Burndown chart');
     },
     issueButtonCategory() {
       return this.issuesSelected ? 'primary' : 'secondary';
@@ -47,11 +48,8 @@ export default {
     },
   },
   methods: {
-    showIssueCount() {
-      this.issuesSelected = true;
-    },
-    showIssueWeight() {
-      this.issuesSelected = false;
+    setIssueSelected(selected) {
+      this.issuesSelected = selected;
     },
   },
 };
@@ -67,7 +65,7 @@ export default {
           :category="issueButtonCategory"
           variant="info"
           size="small"
-          @click="showIssueCount"
+          @click="setIssueSelected(true)"
         >
           {{ __('Issues') }}
         </gl-button>
@@ -77,13 +75,13 @@ export default {
           variant="info"
           size="small"
           data-qa-selector="weight_button"
-          @click="showIssueWeight"
+          @click="setIssueSelected(false)"
         >
           {{ __('Issue weight') }}
         </gl-button>
       </gl-button-group>
     </div>
-    <div v-if="burnupChartsEnabled" class="row">
+    <div v-if="glFeatures.burnupCharts" class="row">
       <burndown-chart
         :start-date="startDate"
         :due-date="dueDate"
