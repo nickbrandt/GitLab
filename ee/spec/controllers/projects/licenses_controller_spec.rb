@@ -101,6 +101,12 @@ describe Projects::LicensesController do
               it { expect(response).to have_gitlab_http_status(:ok) }
               it { expect(json_response["licenses"].count).to be(4) }
 
+              it 'sorts by name by default' do
+                names = json_response['licenses'].map { |x| x['name'] }
+
+                expect(names).to eql(['BSD 3-Clause "New" or "Revised" License', 'MIT', other_license.name, 'unknown'])
+              end
+
               it 'includes a policy for an unclassified and known license that was detected in the scan report' do
                 expect(json_response.dig("licenses", 0)).to include({
                   "id" => nil,
@@ -232,6 +238,24 @@ describe Projects::LicensesController do
                   "classification" => other_license_policy.classification
                 })
               end
+            end
+
+            context "when loading policies ordered by `classification` in `ascending` order" do
+              before do
+                get :index, params: { namespace_id: project.namespace, project_id: project, sort_by: :classification, sort_direction: :asc }, format: :json
+              end
+
+              specify { expect(response).to have_gitlab_http_status(:ok) }
+              specify { expect(json_response['licenses'].map { |x| x['classification'] }).to eq(%w[allowed unclassified unclassified denied]) }
+            end
+
+            context "when loading policies ordered by `classification` in `descending` order" do
+              before do
+                get :index, params: { namespace_id: project.namespace, project_id: project, sort_by: :classification, sort_direction: :desc }, format: :json
+              end
+
+              specify { expect(response).to have_gitlab_http_status(:ok) }
+              specify { expect(json_response['licenses'].map { |x| x['classification'] }).to eq(%w[denied unclassified unclassified allowed]) }
             end
           end
 
