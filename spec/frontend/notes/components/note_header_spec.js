@@ -221,4 +221,29 @@ describe('NoteHeader component', () => {
       });
     });
   });
+
+  describe('when author username link is hovered', () => {
+    it('toggles hover specific CSS classes on author name link', done => {
+      createComponent({ author });
+
+      const authorUsernameLink = wrapper.find({ ref: 'authorUsernameLink' });
+      const authorNameLink = wrapper.find({ ref: 'authorNameLink' });
+
+      authorUsernameLink.trigger('mouseenter');
+
+      Vue.nextTick(() => {
+        expect(authorNameLink.classes()).toContain('hover');
+        expect(authorNameLink.classes()).toContain('text-underline');
+
+        authorUsernameLink.trigger('mouseleave');
+
+        Vue.nextTick(() => {
+          expect(authorNameLink.classes()).not.toContain('hover');
+          expect(authorNameLink.classes()).not.toContain('text-underline');
+
+          done();
+        });
+      });
+    });
+  });
 });
