@@ -61,6 +61,7 @@ module EE
 
     def render_account_recovery_regular_check
       return unless current_user &&
+          ::Gitlab.com? &&
           3.months.ago > current_user.created_at &&
           !user_dismissed?(ACCOUNT_RECOVERY_REGULAR_CHECK, 3.months.ago)
 
