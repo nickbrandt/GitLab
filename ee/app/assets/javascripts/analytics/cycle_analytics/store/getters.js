@@ -18,17 +18,6 @@ export const cycleAnalyticsRequestParams = ({ startDate = null, endDate = null }
   created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
 });
 
-export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
-  if (tasksByType && tasksByType.data.length) {
-    return getTasksByTypeData({
-      data: tasksByType.data,
-      startDate,
-      endDate,
-    });
-  }
-  return { groupBy: [], data: [], seriesNames: [] };
-};
-
 const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
   stages.filter(({ hidden = false }) => hidden === isHidden);
 
