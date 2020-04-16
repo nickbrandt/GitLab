@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'Requirements list', :js do
   let_it_be(:user) { create(:user) }
+  let_it_be(:user_guest) { create(:user) }
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:requirement1) { create(:requirement, project: project, title: 'Some requirement-1', author: user, created_at: 5.days.ago, updated_at: 2.days.ago) }
   let_it_be(:requirement2) { create(:requirement, project: project, title: 'Some requirement-2', author: user, created_at: 6.days.ago, updated_at: 2.days.ago) }
@@ -27,6 +28,7 @@ describe 'Requirements list', :js do
     stub_licensed_features(requirements: true)
     stub_feature_flags(requirements_management: { enabled: true, thing: project })
     project.add_maintainer(user)
+    project.add_guest(user_guest)
 
     sign_in(user)
   end
@@ -239,6 +241,21 @@ describe 'Requirements list', :js do
         page.within('.requirements-list-container .requirements-list') do
           expect(page).to have_selector('li.requirement', count: 4)
         end
+      end
+    end
+  end
+
+  context 'when accessing project as guest user' do
+    before do
+      sign_in(user_guest)
+      visit project_requirements_path(project)
+
+      wait_for_requests
+    end
+
+    it 'open tab does not show button "New requirement"' do
+      page.within('.nav-controls') do
+        expect(page).not_to have_selector('button.js-new-requirement')
       end
     end
   end

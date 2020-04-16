@@ -37,7 +37,7 @@
         %span.badge.badge-pill.js-all-count= total_requirements
 
   .nav-controls
-    - if is_open_tab
+    - if is_open_tab && can?(current_user, :create_requirement, @project)
       %button.btn.btn-success.js-new-requirement.qa-new-requirement-button{ type: 'button' }
         = _('New requirement')
 

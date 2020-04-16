@@ -170,7 +170,7 @@ export default {
                 <gl-loading-icon v-else />
               </gl-deprecated-button>
             </li>
-            <li v-if="isArchived" class="requirement-reopen d-sm-block">
+            <li v-if="canArchive && isArchived" class="requirement-reopen d-sm-block">
               <gl-deprecated-button
                 size="xs"
                 class="p-2"
