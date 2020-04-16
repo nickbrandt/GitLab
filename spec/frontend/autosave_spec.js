@@ -105,7 +105,7 @@ describe('Autosave', () => {
     });
   });
 
-  describe('getLockVersion', () => {
+  describe('getSavedLockVersion', () => {
     beforeEach(() => {
       autosave = {
         field,
@@ -118,7 +118,7 @@ describe('Autosave', () => {
       beforeEach(() => {
         autosave.isLocalStorageAvailable = false;
 
-        Autosave.prototype.getLockVersion.call(autosave);
+        Autosave.prototype.getSavedLockVersion.call(autosave);
       });
 
       it('should not call .getItem', () => {
@@ -132,7 +132,7 @@ describe('Autosave', () => {
       });
 
       it('should call .getItem', () => {
-        Autosave.prototype.getLockVersion.call(autosave);
+        Autosave.prototype.getSavedLockVersion.call(autosave);
 
         expect(window.localStorage.getItem).toHaveBeenCalledWith(lockVersionKey);
       });
@@ -178,8 +178,8 @@ describe('Autosave', () => {
         key,
         lockVersionKey,
         lockVersion,
+        isLocalStorageAvailable: true,
       };
-      autosave.isLocalStorageAvailable = true;
     });
 
     describe('lockVersion is valid', () => {
@@ -199,11 +199,14 @@ describe('Autosave', () => {
     });
 
     describe('lockVersion is invalid', () => {
-      it('should only call .setItem once', () => {
+      it('should not call .setItem with lockVersion', () => {
         delete autosave.lockVersion;
         Autosave.prototype.save.call(autosave);
 
-        expect(window.localStorage.setItem).toHaveBeenCalledTimes(1);
+        expect(window.localStorage.setItem).not.toHaveBeenCalledWith(
+          lockVersionKey,
+          autosave.lockVersion,
+        );
       });
     });
   });

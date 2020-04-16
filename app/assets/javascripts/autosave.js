@@ -42,7 +42,7 @@ export default class Autosave {
     }
   }
 
-  getLockVersion() {
+  getSavedLockVersion() {
     if (!this.isLocalStorageAvailable) return;
     return window.localStorage.getItem(this.lockVersionKey);
   }
