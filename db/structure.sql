@@ -4884,7 +4884,8 @@ CREATE TABLE public.project_features (
     updated_at timestamp without time zone,
     repository_access_level integer DEFAULT 20 NOT NULL,
     pages_access_level integer NOT NULL,
-    forking_access_level integer
+    forking_access_level integer,
+    metrics_dashboard_access_level integer
 );
 
 CREATE SEQUENCE public.project_features_id_seq
@@ -13176,6 +13177,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408154624
 20200408175424
 20200409211607
+20200410232012
 20200415160722
 20200415161021
 20200415161206
