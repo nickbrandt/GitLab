@@ -1,0 +1,5 @@
+---
+title: Split CI minutes resets into different workers
+merge_request: 29017
+author:
+type: fixed

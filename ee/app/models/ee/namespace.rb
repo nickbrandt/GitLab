@@ -85,8 +85,13 @@ module EE
 
       def reset_ci_minutes_in_batches!
         each_batch do |namespaces|
-          namespace_ids = namespaces.pluck(:id)
-          reset_ci_minutes!(namespace_ids)
+          reset_ci_minutes!(namespaces)
+        end
+      end
+
+      def reset_ci_minutes_for_batch!(from_id, to_id, batch_size: 1000)
+        where(id: from_id..to_id).each_batch(of: batch_size) do |namespaces|
+          reset_ci_minutes!(namespaces)
         end
       end
 
@@ -94,50 +99,49 @@ module EE
       # transaction as the reset of the namespace statistics. If the transaction fails
       # none of the changes apply but the numbers still remain consistent with each other.
       override :reset_ci_minutes!
-      def reset_ci_minutes!(namespace_ids)
+      def reset_ci_minutes!(namespaces)
         transaction do
-          recalculate_extra_shared_runners_minutes_limits!(namespace_ids)
-          reset_shared_runners_seconds!(namespace_ids)
-          reset_ci_minutes_notifications!(namespace_ids)
+          recalculate_extra_shared_runners_minutes_limits!(namespaces)
+          reset_shared_runners_seconds!(namespaces)
+          reset_ci_minutes_notifications!(namespaces)
         end
         true
       rescue ActiveRecord::ActiveRecordError
         # We don't need to print thousands of namespace_ids
         # in the message if all batches failed.
         # A small batch would be sufficient for investigation.
-        failed_namespace_ids = namespace_ids.first(10)
+        failed_namespace_ids = namespaces.first(10).pluck(:id)
 
         raise EE::Namespace::NamespaceStatisticsNotResetError,
-          "#{namespace_ids.count} namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: #{failed_namespace_ids}"
+          "#{namespaces.size} namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: #{failed_namespace_ids}"
       end
 
       def extra_minutes_left_sql
         "GREATEST((namespaces.shared_runners_minutes_limit + namespaces.extra_shared_runners_minutes_limit) - ROUND(namespace_statistics.shared_runners_seconds / 60.0), 0)"
       end
 
-      def recalculate_extra_shared_runners_minutes_limits!(namespace_ids)
-        where(id: namespace_ids)
+      def recalculate_extra_shared_runners_minutes_limits!(namespaces)
+        namespaces
           .with_shared_runners_minutes_limit
           .with_extra_shared_runners_minutes_limit
           .with_shared_runners_minutes_exceeding_default_limit
           .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
       end
 
-      def reset_shared_runners_seconds!(namespace_ids)
+      def reset_shared_runners_seconds!(namespaces)
         NamespaceStatistics
-          .where(namespace: namespace_ids)
+          .where(namespace: namespaces)
           .where.not(shared_runners_seconds: 0)
           .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
 
         ::ProjectStatistics
-          .where(namespace: namespace_ids)
+          .where(namespace: namespaces)
           .where.not(shared_runners_seconds: 0)
           .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
       end
 
-      def reset_ci_minutes_notifications!(namespace_ids)
-        where(id: namespace_ids)
-          .update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
+      def reset_ci_minutes_notifications!(namespaces)
+        namespaces.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
       end
     end
 

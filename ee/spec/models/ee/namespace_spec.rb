@@ -49,6 +49,33 @@ describe Namespace do
     end
   end
 
+  describe '.reset_ci_minutes_for_batch!' do
+    let(:batch_size) { 3 }
+
+    let!(:namespace_1) { create(:namespace, id: 1) }
+    let!(:namespace_2) { create(:namespace, id: 2) }
+    let!(:namespace_3) { create(:namespace, id: 3) }
+    let!(:namespace_4) { create(:namespace, id: 4) }
+    let!(:namespace_5) { create(:namespace, id: 5) }
+    let!(:namespace_6) { create(:namespace, id: 6) }
+    let!(:namespace_7) { create(:namespace, id: 7) }
+
+    it 'resets all ci minutes' do
+      expect(described_class).to receive(:reset_ci_minutes!).with([namespace_1, namespace_2, namespace_3])
+      expect(described_class).to receive(:reset_ci_minutes!).with([namespace_4, namespace_5, namespace_6])
+      expect(described_class).to receive(:reset_ci_minutes!).with([namespace_7])
+
+      described_class.reset_ci_minutes_for_batch!(1, 7, batch_size: batch_size)
+    end
+
+    it 'resets ci minutes for the ID range' do
+      expect(described_class).to receive(:reset_ci_minutes!).with([namespace_2, namespace_3, namespace_4])
+      expect(described_class).to receive(:reset_ci_minutes!).with([namespace_5, namespace_6])
+
+      described_class.reset_ci_minutes_for_batch!(2, 6, batch_size: batch_size)
+    end
+  end
+
   describe '.reset_ci_minutes_in_batches!' do
     it 'returns when there were no failures' do
       expect { described_class.reset_ci_minutes_in_batches! }.not_to raise_error
@@ -67,7 +94,7 @@ describe Namespace do
 
   describe '.reset_ci_minutes!' do
     it 'returns true if there were no exceptions to the db transaction' do
-      result = described_class.reset_ci_minutes!([])
+      result = described_class.reset_ci_minutes!(Namespace.none)
 
       expect(result).to be true
     end
@@ -77,7 +104,7 @@ describe Namespace do
 
       allow(described_class).to receive(:transaction).and_raise(ActiveRecord::ActiveRecordError)
 
-      expect { described_class.reset_ci_minutes!([namespace.id]) }.to raise_error(
+      expect { described_class.reset_ci_minutes!([namespace]) }.to raise_error(
         EE::Namespace::NamespaceStatisticsNotResetError,
         "1 namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: [#{namespace.id}]")
     end
@@ -86,12 +113,13 @@ describe Namespace do
   describe '.recalculate_extra_shared_runners_minutes_limits!' do
     context 'when the namespace had used runner minutes for the month' do
       let(:namespace) { create(:namespace, shared_runners_minutes_limit: 5000, extra_shared_runners_minutes_limit: 5000) }
+      let(:namespaces) { Namespace.where(id: namespace) }
 
       it 'updates the namespace extra_shared_runners_minutes_limit subtracting used minutes above the shared_runners_minutes_limit' do
         minutes_used = 6000
         create(:namespace_statistics, namespace: namespace, shared_runners_seconds: minutes_used * 60)
 
-        described_class.recalculate_extra_shared_runners_minutes_limits!([namespace.id])
+        described_class.recalculate_extra_shared_runners_minutes_limits!(namespaces)
 
         expect(namespace.reload.extra_shared_runners_minutes_limit).to eq(4000)
       end
@@ -106,7 +134,7 @@ describe Namespace do
     end
 
     subject do
-      described_class.reset_shared_runners_seconds!([namespace.id])
+      described_class.reset_shared_runners_seconds!(Namespace.where(id: namespace))
     end
 
     it 'resets NamespaceStatistics shared_runners_seconds and updates the timestamp' do
@@ -136,7 +164,7 @@ describe Namespace do
         last_ci_minutes_notification_at: Date.yesterday,
         last_ci_minutes_usage_notification_level: 50 )
 
-      subject = described_class.reset_ci_minutes_notifications!([namespace.id])
+      subject = described_class.reset_ci_minutes_notifications!(Namespace.where(id: namespace))
 
       expect { subject && namespace.reload }
         .to change { namespace.last_ci_minutes_notification_at }.to(nil)
