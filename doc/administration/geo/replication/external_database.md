@@ -159,6 +159,19 @@ outbound rules do not apply to RDS PostgreSQL databases. Therefore, you need to 
 rule to the read-replica's security group allowing any TCP traffic from
 the tracking database on port 5432.
 
+1. Ensure that your secondary node can communicate with your tracking database by
+   manually changing the `pg_hba.conf` that is associated with your tracking database.
+   Remember to restart PostgreSQL afterwards for the changes to take effect:
+
+    ```plaintext
+    ##
+    ## Geo Tracking Database Role
+    ## - pg_hba.conf
+    ##
+    host    all         all               <trusted tracking IP>/32      md5
+    host    all         all               <trusted secondary IP>/32     md5
+    ```
+
 1. SSH into a GitLab **secondary** server and login as root:
 
    ```shell
