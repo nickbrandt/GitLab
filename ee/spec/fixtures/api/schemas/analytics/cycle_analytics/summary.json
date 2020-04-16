@@ -7,7 +7,7 @@
     "required": ["value", "title"],
     "properties": {
       "value": {
-        "type": "number"
+        "type": "string"
       },
       "title": {
         "type": "string"
