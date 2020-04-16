@@ -175,6 +175,19 @@ class GeoNode < ApplicationRecord
     @internal_uri ||= URI.parse(internal_url) if internal_url.present?
   end
 
+  # Geo API endpoint for retrieving a replicable item
+  #
+  # @param [String] replicable_name
+  # @param [Integer] replicable_id
+  def geo_retrieve_url(replicable_name, replicable_id)
+    geo_api_url("retrieve/#{replicable_name}/#{replicable_id}")
+  end
+
+  # Geo API endpoint for retrieving a file based on Uploads
+  #
+  # @deprecated
+  # @param [String] file_type
+  # @param [Integer] file_id
   def geo_transfers_url(file_type, file_id)
     geo_api_url("transfers/#{file_type}/#{file_id}")
   end
