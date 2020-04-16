@@ -10,6 +10,9 @@ class Projects::WikisController < Projects::ApplicationController
   before_action :authorize_admin_wiki!, only: :destroy
   before_action :load_project_wiki
   before_action :load_page, only: [:show, :edit, :update, :history, :destroy]
+  before_action only: [:show, :edit, :update] do
+    @valid_encoding = valid_encoding?
+  end
   before_action only: [:edit, :update], unless: :valid_encoding? do
     redirect_to(project_wiki_path(@project, @page))
   end
