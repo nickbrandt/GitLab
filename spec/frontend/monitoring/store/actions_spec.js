@@ -34,7 +34,11 @@ import {
   dashboardGitResponse,
   mockDashboardsErrorResponse,
 } from '../mock_data';
-import { metricsDashboardResponse, metricsDashboardViewModel, metricsDashboardPanelCount } from '../fixture_data';
+import {
+  metricsDashboardResponse,
+  metricsDashboardViewModel,
+  metricsDashboardPanelCount,
+} from '../fixture_data';
 
 jest.mock('~/flash');
 
