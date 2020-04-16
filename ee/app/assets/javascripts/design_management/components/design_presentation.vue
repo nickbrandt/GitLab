@@ -223,24 +223,31 @@ export default {
         y: clientY,
       };
     },
+    getDragDelta(clientX, clientY) {
+      return {
+        deltaX: this.lastDragPosition.x - clientX,
+        deltaY: this.lastDragPosition.y - clientY,
+      };
+    },
+    exceedsDragThreshold(clientX, clientY) {
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
+
+      return Math.abs(deltaX) > CLICK_DRAG_BUFFER_PX || Math.abs(deltaY) > CLICK_DRAG_BUFFER_PX;
+    },
+    shouldDragDesign(clientX, clientY) {
+      return (
+        this.lastDragPosition &&
+        (this.isDraggingDesign || this.exceedsDragThreshold(clientX, clientY))
+      );
+    },
     onPresentationMousemove({ clientX, clientY }) {
       const { presentationViewport } = this.$refs;
-      if (!this.lastDragPosition || !presentationViewport) return;
-
-      const { scrollLeft, scrollTop } = presentationViewport;
-      const deltaX = this.lastDragPosition.x - clientX;
-      const deltaY = this.lastDragPosition.y - clientY;
-
-      // only respond to mousemove events after the
-      // mousemove's position exceeds the buffer amount
-      if (
-        !this.isDraggingDesign &&
-        Math.abs(deltaX) <= CLICK_DRAG_BUFFER_PX &&
-        Math.abs(deltaY) <= CLICK_DRAG_BUFFER_PX
-      )
-        return;
+      if (!presentationViewport || !this.shouldDragDesign(clientX, clientY)) return;
 
       this.isDraggingDesign = true;
+
+      const { scrollLeft, scrollTop } = presentationViewport;
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
       presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
 
       this.lastDragPosition = {
