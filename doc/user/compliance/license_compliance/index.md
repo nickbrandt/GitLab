@@ -307,7 +307,7 @@ process:
 1. Host the License Compliance image
    `registry.gitlab.com/gitlab-org/security-products/license-management:latest` in your local Docker
    container registry.
-1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace the value of `image` to refer
    to the License Compliance Docker image hosted on your local Docker container registry:
 
    ```yaml
