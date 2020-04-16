@@ -12,6 +12,7 @@ import {
   visibilityLevelDescriptions,
   featureAccessLevelMembers,
   featureAccessLevelEveryone,
+  featureAccessLevel,
 } from '../constants';
 import { toggleHiddenClassBySelector } from '../external';
 
@@ -127,7 +128,7 @@ export default {
       wikiAccessLevel: 20,
       snippetsAccessLevel: 20,
       pagesAccessLevel: 20,
-      metricsAccessLevel: visibilityOptions.PRIVATE,
+      metricsAccessLevel: featureAccessLevel.PROJECT_MEMBERS,
       containerRegistryEnabled: true,
       lfsEnabled: true,
       requestAccessEnabled: true,
@@ -490,8 +491,8 @@ export default {
               class="form-control select-control"
             >
               <option
-                :value="visibilityOptions.PRIVATE"
-                :disabled="!visibilityAllowed(visibilityOptions.PRIVATE)"
+                :value="visibilityOptions.INTERNAL"
+                :disabled="!visibilityAllowed(visibilityOptions.INTERNAL)"
                 >{{ featureAccessLevelMembers[1] }}</option
               >
               <option
