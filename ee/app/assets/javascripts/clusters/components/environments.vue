@@ -168,6 +168,6 @@ export default {
       </template>
     </gl-table>
 
-    <gl-loading-icon v-if="isFetching" :size="2" class="mt-3" />
+    <gl-loading-icon v-if="isFetching" size="lg" class="mt-3" />
   </div>
 </template>

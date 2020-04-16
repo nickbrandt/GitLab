@@ -34,6 +34,12 @@ CAUTION: **Caution:**
 In GitLab 12.6 and later, when project owners [reduce a project's visibility](../../../public_access/public_access.md#reducing-visibility),
 it **removes the relationship** between a project and all its forks.
 
+CAUTION: **Caution:**
+When a public project with the repository feature set to "Members
+only" is forked, the repository will be public in the fork. The owner
+of the fork will need to manually change the visibility. This is being
+fixed in [#36662](https://gitlab.com/gitlab-org/gitlab/-/issues/36662).
+
 ## Repository mirroring
 
 You can use [repository mirroring](repository_mirroring.md) to keep your fork synced with the original repository. You can also use `git remote add upstream` to achieve the same result.
@@ -53,6 +59,9 @@ Read more about [How to keep your fork up to date with its origin](https://about
 When you are ready to send your code back to the upstream project,
 [create a merge request](../merge_requests/creating_merge_requests.md). For **Source branch**,
 choose your forked project's branch. For **Target branch**, choose the original project's branch.
+
+NOTE: **Note:**
+When creating a merge request, if the forked project's visibility is more restrictive than the parent project (for example the fork is private, parent is public), the target branch will default to the forked project's default branch. This prevents potentially exposing private code of the forked project.
 
 ![Selecting branches](img/forking_workflow_branch_select.png)
 

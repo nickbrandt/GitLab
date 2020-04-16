@@ -70,7 +70,7 @@ describe Gitlab::Prometheus::Queries::PacketFlowQuery do
                   ' or on(source,destination,verdict) ' \
                   "rate(hubble_flows_processed_total{source=\"query-12345678-production\"}[#{value}]))"
           expect(client).to receive(:query_range).with(query, any_args)
-          subject.query(namespace, interval: interval)
+          subject.query(namespace, interval)
         end
       end
     end
@@ -83,7 +83,7 @@ describe Gitlab::Prometheus::Queries::PacketFlowQuery do
     context 'ops_rate query' do
       it 'sets query time range' do
         expect(client).to receive(:query_range).with(anything, start_time: from, end_time: to)
-        subject.query(namespace, from: from, to: to)
+        subject.query(namespace, 'hour', from.to_s, to.to_s)
       end
     end
 
@@ -94,7 +94,7 @@ describe Gitlab::Prometheus::Queries::PacketFlowQuery do
                 ' or on(source,destination,verdict) ' \
                 'increase(hubble_flows_processed_total{source="query-12345678-production"}[100s]))'
         expect(client).to receive(:query).with(query, time: to)
-        subject.query(namespace, from: from, to: to)
+        subject.query(namespace, 'hour', from.to_s, to.to_s)
       end
     end
   end

@@ -160,6 +160,7 @@ describe('ServiceDeskRoot', () => {
         selectedTemplate: 'Bug',
         outgoingName: 'GitLab Support Bot',
         templates: ['Bug', 'Documentation'],
+        projectKey: 'key',
       },
     });
 
@@ -169,6 +170,7 @@ describe('ServiceDeskRoot', () => {
       expect(spy).toHaveBeenCalledWith(endpoint, {
         issue_template_key: 'Bug',
         outgoing_name: 'GitLab Support Bot',
+        project_key: 'key',
         service_desk_enabled: true,
       });
     });

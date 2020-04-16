@@ -133,7 +133,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
   return Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
-    .then(() => dispatch('fetchSummaryData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -168,37 +167,6 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
   });
   dispatch('setSelectedStage', selectedStage);
   removeFlash();
-};
-
-export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
-
-export const receiveSummaryDataError = ({ commit }, error) => {
-  commit(types.RECEIVE_SUMMARY_DATA_ERROR, error);
-  createFlash(__('There was an error while fetching value stream analytics summary data.'));
-};
-
-export const receiveSummaryDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_SUMMARY_DATA_SUCCESS, data);
-
-export const fetchSummaryData = ({ state, dispatch, getters }) => {
-  const {
-    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
-  } = getters;
-  dispatch('requestSummaryData');
-
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
-  return Api.cycleAnalyticsSummaryData(fullPath, {
-    created_after,
-    created_before,
-    project_ids,
-  })
-    .then(({ data }) => dispatch('receiveSummaryDataSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({ error, action: () => dispatch('receiveSummaryDataError', error) }),
-    );
 };
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
@@ -294,7 +262,6 @@ export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { 
 
   return Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('fetchSummaryData'))
     .catch(() => {
       createFlash(__('There was a problem refreshing the data, please try again'));
     });

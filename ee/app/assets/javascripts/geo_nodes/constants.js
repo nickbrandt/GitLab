@@ -19,16 +19,16 @@ export const HEALTH_STATUS_ICON = {
   healthy: 'status_success',
   unhealthy: 'status_failed',
   disabled: 'status_canceled',
-  unknown: 'status_warning',
+  unknown: 'status_notfound',
   offline: 'status_canceled',
 };
 
 export const HEALTH_STATUS_CLASS = {
-  healthy: 'text-success-500',
-  unhealthy: 'text-danger-500',
-  disabled: 'text-secondary-950',
-  unknown: 'cdark',
-  offline: 'cdark',
+  healthy: 'text-success-600 bg-success-100',
+  unhealthy: 'text-danger-600 bg-danger-100',
+  disabled: 'text-secondary-800 bg-secondary-100',
+  unknown: 'text-secondary-800 bg-secondary-100',
+  offline: 'text-secondary-800 bg-secondary-100',
 };
 
 export const TIME_DIFF = {
@@ -40,3 +40,6 @@ export const STATUS_DELAY_THRESHOLD_MS = 60000;
 
 export const HELP_INFO_URL =
   'https://docs.gitlab.com/ee/administration/geo/disaster_recovery/background_verification.html#repository-verification';
+
+export const REPLICATION_HELP_URL =
+  'https://docs.gitlab.com/ee/administration/geo/replication/datatypes.html#limitations-on-replicationverification';

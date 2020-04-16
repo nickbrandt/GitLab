@@ -111,13 +111,9 @@ describe API::Namespaces do
   end
 
   describe 'PUT /namespaces/:id' do
-    before do
-      create(:silver_plan)
-    end
-
     context 'when authenticated as admin' do
       it 'updates namespace using full_path when full_path contains dots' do
-        put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{group1.full_path}", admin), params: { shared_runners_minutes_limit: 9001 }
 
         aggregate_failures do
           expect(response).to have_gitlab_http_status(:ok)
@@ -126,7 +122,7 @@ describe API::Namespaces do
       end
 
       it 'updates namespace using id' do
-        put api("/namespaces/#{group1.id}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{group1.id}", admin), params: { shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['shared_runners_minutes_limit']).to eq(9001)
@@ -135,7 +131,7 @@ describe API::Namespaces do
 
     context 'when not authenticated as admin' do
       it 'retuns 403' do
-        put api("/namespaces/#{group1.id}", user), params: { plan: 'silver' }
+        put api("/namespaces/#{group1.id}", user), params: { shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
@@ -143,7 +139,7 @@ describe API::Namespaces do
 
     context 'when namespace not found' do
       it 'returns 404' do
-        put api("/namespaces/#{non_existing_record_id}", admin), params: { plan: 'silver' }
+        put api("/namespaces/#{non_existing_record_id}", admin), params: { shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response).to eq('message' => '404 Namespace Not Found')
@@ -152,10 +148,9 @@ describe API::Namespaces do
 
     context 'when invalid params' do
       it 'returns validation error' do
-        put api("/namespaces/#{group1.id}", admin), params: { plan: 'unknown' }
+        put api("/namespaces/#{group1.id}", admin), params: { shared_runners_minutes_limit: 'unknown' }
 
         expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['message']).to eq('plan' => ['is not included in the list'])
       end
     end
 
@@ -167,7 +162,7 @@ describe API::Namespaces do
 
         it 'resets that value when assigning extra CI minutes' do
           expect do
-            put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
+            put api("/namespaces/#{group1.full_path}", admin), params: { extra_shared_runners_minutes_limit: 1000 }
           end.to change { group1.reload.send(attr) }.to(nil)
         end
       end
@@ -177,7 +172,7 @@ describe API::Namespaces do
       it "ticks instance runners" do
         runners = Ci::Runner.instance_type
 
-        put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
+        put api("/namespaces/#{group1.full_path}", admin), params: { extra_shared_runners_minutes_limit: 1000 }
 
         expect(runners).to all(receive(:tick_runner_queue))
       end

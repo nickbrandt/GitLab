@@ -42,7 +42,8 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 - Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
 - Should not be an email address or username. We strongly recommend against these as it is hard to guarantee they will never change, for example when a person's name changes. Email addresses are also case-insensitive, which can result in users being unable to sign in.
 
-The recommended field for supported providers are in the [provider specific notes](#providers).
+The relevant field name and recommended value for supported providers are in the [provider specific notes](#providers).
+appropriate corresponding field.
 
 CAUTION: **Warning:**
 Once users have signed into GitLab using the SSO SAML setup, changing the `NameID` will break the configuration and potentially lock users out of the GitLab group.
@@ -110,6 +111,32 @@ Owners who manage user accounts in a group can view the following details of per
 To access the Credentials inventory of a group, navigate to **{shield}** **Security & Compliance > Credentials** in your group's sidebar.
 
 This feature is similar to the [Credentials inventory for self-managed instances](../../admin_area/credentials_inventory.md).
+
+##### Limiting lifetime of personal access tokens of users in Group-managed accounts **(ULTIMATE)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/118893) in GitLab 12.10.
+
+Users in a group managed account can optionally specify an expiration date for
+[personal access tokens](../../profile/personal_access_tokens.md).
+This expiration date is not a requirement, and can be set to any arbitrary date.
+
+Since personal access tokens are the only token needed for programmatic access to GitLab, organizations with security requirements may want to enforce more protection to require regular rotation of these tokens.
+
+###### Setting a limit
+
+Only a GitLab administrator or an owner of a Group-managed account can set a limit. Leaving it empty means that the [instance level restrictions](../../admin_area/settings/account_and_limit_settings.md#limiting-lifetime-of-personal-access-tokens-ultimate-only) on the lifetime of personal access tokens will apply.
+
+To set a limit on how long personal access tokens are valid for users in a group managed account:
+
+1. Navigate to the **{settings}** **Settings > General** page in your group's sidebar.
+1. Expand the **Permissions, LFS, 2FA** section.
+1. Fill in the **Maximum allowable lifetime for personal access tokens (days)** field.
+1. Click **Save changes**.
+
+Once a lifetime for personal access tokens is set, GitLab will:
+
+- Apply the lifetime for new personal access tokens, and require users managed by the group to set an expiration date that is no later than the allowed lifetime.
+- After three hours, revoke old tokens with no expiration date or with a lifetime longer than the allowed lifetime. Three hours is given to allow administrators/group owner to change the allowed lifetime, or remove it, before revocation takes place.
 
 ##### Outer forks restriction for Group-managed accounts
 
@@ -407,11 +434,13 @@ If you do not wish to use that GitLab user with the SAML login, you can [unlink 
 
 ### Message: "SAML authentication failed: User has already been taken"
 
-The user you are signed in with already has SAML linked to a different identity. This might mean you've attempted to link multiple SAML identities to the same user for a given Identity Provider. This could also be a symptom of the Identity Provider returning an inconsistent [NameID](#nameid).
+The user that you're signed in with already has SAML linked to a different identity.
+Here are possible causes and solutions:
 
-To change which identity you sign in with, you can [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account.
-
-Alternatively, an admin of your Identity Provider can use the [SCIM API](../../../api/scim.md) to update your `extern_uid` to match the current **NameID**.
+| Cause                                                                                          | Solution                                                                                                                                                                    |
+|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| You've tried to link multiple SAML identities to the same user, for a given Identity Provider. | Change the identity that you sign in with. To do so, [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account before attempting to sign in again. |
+| The Identity Provider might be returning an inconsistent [NameID](#nameid).                    | Ask an admin of your Identity Provider to use the [SCIM API](../../../api/scim.md) to update your `extern_uid` to match the current **NameID**.                             |
 
 ### Message: "SAML authentication failed: Email has already been taken"
 
@@ -427,13 +456,13 @@ This can be prevented by configuring the [NameID](#nameid) to return a consisten
 
 ### The NameID has changed
 
-As mentioned in the [NameID](#nameid) section, if the NameID changes for any user, the user can be locked out. This is common for setups using an email address as the identifier.
-
-To fix the issue, follow the steps outlined in the ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken) section. We recommend using the API method if many users are affected so that the changes can be done in a scripted batch.
+| Cause                                                                                                                                                                                     | Solution                                                                                                                                                                                                                                           |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| As mentioned in the [NameID](#nameid) section, if the NameID changes for any user, the user can be locked out. This is a common problem when an email address is used as the identifier. | Follow the steps outlined in the ["SAML authentication failed: User has already been taken"](#message-saml-authentication-failed-user-has-already-been-taken) section. If many users are affected, we recommend that you use the appropriate API. |
 
 ### I need to change my SAML app
 
-Users need to [unlink the previous SAML identity](#unlinking-accounts) and [link their identity](#user-access-and-management) using the new SAML app.
+Users will need to [unlink the current SAML identity](#unlinking-accounts) and [link their identity](#user-access-and-management) to the new SAML app.
 
 ### My identity provider isn't listed
 

@@ -5,6 +5,7 @@ require 'spec_helper'
 describe PerformanceMonitoring::PrometheusPanel do
   let(:json_content) do
     {
+      "max_value" => 1,
       "type" => "area-chart",
       "title" => "Chart Title",
       "y_label" => "Y-Axis",
@@ -16,6 +17,16 @@ describe PerformanceMonitoring::PrometheusPanel do
         "query_range" => "http_requests_total"
       }]
     }
+  end
+
+  describe '#new' do
+    it 'accepts old schema format' do
+      expect { described_class.new(json_content) }.not_to raise_error
+    end
+
+    it 'accepts new schema format' do
+      expect { described_class.new(json_content.merge("y_axis" => { "precision" => 0 })) }.not_to raise_error
+    end
   end
 
   describe '.from_json' do
@@ -50,6 +61,17 @@ describe PerformanceMonitoring::PrometheusPanel do
 
         it { expect { subject }.to raise_error(ActiveModel::ValidationError) }
       end
+    end
+  end
+
+  describe '.id' do
+    it 'returns hexdigest of group_title, type and title as the panel id' do
+      group_title = 'Business Group'
+      panel_type  = 'area-chart'
+      panel_title = 'New feature requests made'
+
+      expect(Digest::SHA2).to receive(:hexdigest).with("#{group_title}#{panel_type}#{panel_title}").and_return('hexdigest')
+      expect(described_class.new(title: panel_title, type: panel_type).id(group_title)).to eql 'hexdigest'
     end
   end
 end

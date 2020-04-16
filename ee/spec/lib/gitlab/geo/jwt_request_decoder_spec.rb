@@ -6,7 +6,7 @@ describe Gitlab::Geo::JwtRequestDecoder do
   include EE::GeoHelpers
 
   let!(:primary_node) { FactoryBot.create(:geo_node, :primary) }
-  let(:data) { { input: 123 } }
+  let(:data) { { input: 123, other_input: 'string value' } }
   let(:request) { Gitlab::Geo::TransferRequest.new(data) }
 
   subject { described_class.new(request.headers['Authorization']) }
@@ -58,6 +58,20 @@ describe Gitlab::Geo::JwtRequestDecoder do
       end
 
       expect { subject.decode }.to raise_error(Gitlab::Geo::InvalidDecryptionKeyError)
+    end
+  end
+
+  describe '#valid_attributes?' do
+    it 'returns true when all given attributes and decoded data are all the same' do
+      expect(subject.valid_attributes?(input: 123, other_input: 'string value')).to be_truthy
+    end
+
+    it 'returns true when given attributes is a slice of decoded data' do
+      expect(subject.valid_attributes?(input: 123)).to be_truthy
+    end
+
+    it 'returns false when one given data doesnt match its corresponding decoded one' do
+      expect(subject.valid_attributes?(input: 123, other_input: 'wrong value')).to be_falsey
     end
   end
 end

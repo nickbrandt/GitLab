@@ -4,6 +4,7 @@ module Gitlab
   module Geo
     class JwtRequestDecoder
       include LogHelpers
+      include ::Gitlab::Utils::StrongMemoize
 
       IAT_LEEWAY = 60.seconds.to_i
 
@@ -18,8 +19,25 @@ module Gitlab
         @auth_header = auth_header
       end
 
+      # Return decoded attributes from given header
+      #
+      # @return [Hash] decoded attributes
       def decode
-        decode_geo_request
+        strong_memoize(:decoded_authorization) do
+          decode_geo_request
+        end
+      end
+
+      # Check if set of attributes match against attributes decoded from JWT
+      #
+      # @param [Hash] attributes to be matched against JWT
+      # @return bool true
+      def valid_attributes?(**attributes)
+        decoded_attributes = decode
+
+        return false if decoded_attributes.nil?
+
+        attributes.all? { |attribute, value| decoded_attributes[attribute] == value }
       end
 
       private
@@ -72,6 +90,7 @@ module Gitlab
                            geo_node&.secret_access_key
                          end
       end
+
       # rubocop: enable CodeReuse/ActiveRecord
 
       def decode_auth_header

@@ -24,6 +24,12 @@ class InstanceSecurityDashboard
     Project.where(id: visible_users_security_dashboard_projects)
   end
 
+  def vulnerabilities
+    return Vulnerability.none if projects.empty?
+
+    Vulnerability.for_projects(projects)
+  end
+
   private
 
   attr_reader :project_ids, :user

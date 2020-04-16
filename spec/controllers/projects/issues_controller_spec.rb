@@ -586,12 +586,23 @@ describe Projects::IssuesController do
         expect(assigns(:issues)).to include request_forgery_timing_attack
       end
 
-      it 'lists confidential issues for admin' do
-        sign_in(admin)
-        get_issues
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it 'lists confidential issues for admin' do
+          sign_in(admin)
+          get_issues
 
-        expect(assigns(:issues)).to include unescaped_parameter_value
-        expect(assigns(:issues)).to include request_forgery_timing_attack
+          expect(assigns(:issues)).to include unescaped_parameter_value
+          expect(assigns(:issues)).to include request_forgery_timing_attack
+        end
+      end
+
+      context 'when admin mode is disabled' do
+        it 'does not list confidential issues for admin' do
+          sign_in(admin)
+          get_issues
+
+          expect(assigns(:issues)).to eq [issue]
+        end
       end
 
       def get_issues
@@ -648,11 +659,22 @@ describe Projects::IssuesController do
         expect(response).to have_gitlab_http_status http_status[:success]
       end
 
-      it "returns #{http_status[:success]} for admin" do
-        sign_in(admin)
-        go(id: unescaped_parameter_value.to_param)
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it "returns #{http_status[:success]} for admin" do
+          sign_in(admin)
+          go(id: unescaped_parameter_value.to_param)
 
-        expect(response).to have_gitlab_http_status http_status[:success]
+          expect(response).to have_gitlab_http_status http_status[:success]
+        end
+      end
+
+      context 'when admin mode is disabled' do
+        xit 'returns 404 for admin' do
+          sign_in(admin)
+          go(id: unescaped_parameter_value.to_param)
+
+          expect(response).to have_gitlab_http_status :not_found
+        end
       end
     end
 
@@ -1083,6 +1105,48 @@ describe Projects::IssuesController do
 
       it 'creates a sentry issue' do
         expect { subject }.to change(SentryIssue, :count)
+      end
+    end
+
+    context 'when the endpoint receives requests above the limit' do
+      before do
+        stub_application_setting(issues_create_limit: 5)
+      end
+
+      it 'prevents from creating more issues', :request_store do
+        5.times { post_new_issue }
+
+        expect { post_new_issue }
+          .to change { Gitlab::GitalyClient.get_request_count }.by(1) # creates 1 projects and 0 issues
+
+        post_new_issue
+        expect(response.body).to eq(_('This endpoint has been requested too many times. Try again later.'))
+        expect(response).to have_gitlab_http_status(:too_many_requests)
+      end
+
+      it 'logs the event on auth.log' do
+        attributes = {
+          message: 'Application_Rate_Limiter_Request',
+          env: :issues_create_request_limit,
+          remote_ip: '0.0.0.0',
+          request_method: 'POST',
+          path: "/#{project.full_path}/-/issues",
+          user_id: user.id,
+          username: user.username
+        }
+
+        expect(Gitlab::AuthLogger).to receive(:error).with(attributes).once
+
+        project.add_developer(user)
+        sign_in(user)
+
+        6.times do
+          post :create, params: {
+            namespace_id: project.namespace.to_param,
+            project_id: project,
+            issue: { title: 'Title', description: 'Description' }
+          }
+        end
       end
     end
   end

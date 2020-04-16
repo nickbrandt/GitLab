@@ -15,15 +15,17 @@ module ImportExport
       export_path = [prefix, 'spec', 'fixtures', 'lib', 'gitlab', 'import_export', name].compact
       export_path = File.join(*export_path)
 
-      extract_archive(export_path, 'tree.tar.gz')
+      if File.exist?(File.join(export_path, 'tree.tar.gz'))
+        extract_archive(export_path, 'tree.tar.gz')
+      end
 
       allow_any_instance_of(Gitlab::ImportExport).to receive(:export_path) { export_path }
     end
 
     def extract_archive(path, archive)
-      if File.exist?(File.join(path, archive))
-        system("cd #{path}; tar xzvf #{archive} &> /dev/null")
-      end
+      output, exit_status = Gitlab::Popen.popen(["cd #{path}; tar xzf #{archive}"])
+
+      raise "Failed to extract archive. Output: #{output}" unless exit_status.zero?
     end
 
     def cleanup_artifacts_from_extract_archive(name, prefix = nil)
@@ -31,20 +33,17 @@ module ImportExport
       export_path = File.join(*export_path)
 
       if File.exist?(File.join(export_path, 'tree.tar.gz'))
-        system("cd #{export_path}; rm -fr tree &> /dev/null")
+        system("cd #{export_path}; rm -fr tree")
       end
     end
 
     def setup_reader(reader)
-      case reader
-      when :legacy_reader
-        allow_any_instance_of(Gitlab::ImportExport::JSON::LegacyReader::File).to receive(:exist?).and_return(true)
-        allow_any_instance_of(Gitlab::ImportExport::JSON::NdjsonReader).to receive(:exist?).and_return(false)
-      when :ndjson_reader
+      if reader == :ndjson_reader && Feature.enabled?(:project_import_ndjson)
         allow_any_instance_of(Gitlab::ImportExport::JSON::LegacyReader::File).to receive(:exist?).and_return(false)
         allow_any_instance_of(Gitlab::ImportExport::JSON::NdjsonReader).to receive(:exist?).and_return(true)
       else
-        raise "invalid reader #{reader}. Supported readers: :legacy_reader, :ndjson_reader"
+        allow_any_instance_of(Gitlab::ImportExport::JSON::LegacyReader::File).to receive(:exist?).and_return(true)
+        allow_any_instance_of(Gitlab::ImportExport::JSON::NdjsonReader).to receive(:exist?).and_return(false)
       end
     end
 

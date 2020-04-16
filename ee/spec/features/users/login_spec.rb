@@ -186,4 +186,35 @@ describe 'Login' do
       end
     end
   end
+
+  describe 'restricted visibility levels' do
+    context 'contains public level' do
+      before do
+        stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::PUBLIC])
+      end
+
+      it 'hides Explore link' do
+        visit new_user_session_path
+
+        expect(page).to have_no_link("Explore")
+      end
+
+      it 'hides help link' do
+        visit new_user_session_path
+
+        expect(page).to have_no_link("Help")
+      end
+    end
+
+    context 'does not contain public level' do
+      it 'displays Explore and Help links' do
+        visit new_user_session_path
+
+        href = find_link("Help")[:href]
+
+        expect(href).to eq("/help")
+        expect(page).to have_link("Explore")
+      end
+    end
+  end
 end

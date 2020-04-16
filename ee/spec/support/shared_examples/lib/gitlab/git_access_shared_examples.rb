@@ -32,7 +32,7 @@ RSpec.shared_examples 'a read-only GitLab instance' do
         {
           'action' => 'geo_proxy_to_primary',
           'data' => {
-            'api_endpoints' => %w{/api/v4/geo/proxy_git_push_ssh/info_refs /api/v4/geo/proxy_git_push_ssh/push},
+            'api_endpoints' => %w{/api/v4/geo/proxy_git_ssh/info_refs_receive_pack /api/v4/geo/proxy_git_ssh/receive_pack},
             'primary_repo' => primary_repo_url
           }
         }

@@ -398,7 +398,9 @@ CREATE TABLE public.application_settings (
     npm_package_requests_forwarding boolean DEFAULT true NOT NULL,
     namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
     seat_link_enabled boolean DEFAULT true NOT NULL,
-    container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL
+    container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
+    issues_create_limit integer DEFAULT 300 NOT NULL,
+    push_rule_id bigint
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -1997,7 +1999,8 @@ CREATE TABLE public.deploy_tokens (
     token character varying,
     username character varying,
     token_encrypted character varying(255),
-    deploy_token_type smallint DEFAULT 2 NOT NULL
+    deploy_token_type smallint DEFAULT 2 NOT NULL,
+    write_registry boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.deploy_tokens_id_seq
@@ -2136,6 +2139,30 @@ CREATE SEQUENCE public.design_user_mentions_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.design_user_mentions_id_seq OWNED BY public.design_user_mentions.id;
+
+CREATE TABLE public.diff_note_positions (
+    id bigint NOT NULL,
+    note_id bigint NOT NULL,
+    old_line integer,
+    new_line integer,
+    diff_content_type smallint NOT NULL,
+    diff_type smallint NOT NULL,
+    line_code character varying(255) NOT NULL,
+    base_sha bytea NOT NULL,
+    start_sha bytea NOT NULL,
+    head_sha bytea NOT NULL,
+    old_path text NOT NULL,
+    new_path text NOT NULL
+);
+
+CREATE SEQUENCE public.diff_note_positions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.diff_note_positions_id_seq OWNED BY public.diff_note_positions.id;
 
 CREATE TABLE public.draft_notes (
     id bigint NOT NULL,
@@ -2650,7 +2677,8 @@ CREATE TABLE public.geo_node_statuses (
     design_repositories_count integer,
     design_repositories_synced_count integer,
     design_repositories_failed_count integer,
-    design_repositories_registry_count integer
+    design_repositories_registry_count integer,
+    status jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE public.geo_node_statuses_id_seq
@@ -4493,6 +4521,11 @@ CREATE SEQUENCE public.packages_packages_id_seq
 
 ALTER SEQUENCE public.packages_packages_id_seq OWNED BY public.packages_packages.id;
 
+CREATE TABLE public.packages_pypi_metadata (
+    package_id bigint NOT NULL,
+    required_python character varying(50) NOT NULL
+);
+
 CREATE TABLE public.packages_tags (
     id bigint NOT NULL,
     package_id integer NOT NULL,
@@ -4993,7 +5026,8 @@ ALTER SEQUENCE public.project_repository_states_id_seq OWNED BY public.project_r
 CREATE TABLE public.project_settings (
     project_id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    push_rule_id bigint
 );
 
 CREATE TABLE public.project_statistics (
@@ -7117,6 +7151,8 @@ ALTER TABLE ONLY public.design_management_versions ALTER COLUMN id SET DEFAULT n
 
 ALTER TABLE ONLY public.design_user_mentions ALTER COLUMN id SET DEFAULT nextval('public.design_user_mentions_id_seq'::regclass);
 
+ALTER TABLE ONLY public.diff_note_positions ALTER COLUMN id SET DEFAULT nextval('public.diff_note_positions_id_seq'::regclass);
+
 ALTER TABLE ONLY public.draft_notes ALTER COLUMN id SET DEFAULT nextval('public.draft_notes_id_seq'::regclass);
 
 ALTER TABLE ONLY public.emails ALTER COLUMN id SET DEFAULT nextval('public.emails_id_seq'::regclass);
@@ -7822,6 +7858,9 @@ ALTER TABLE ONLY public.design_management_versions
 ALTER TABLE ONLY public.design_user_mentions
     ADD CONSTRAINT design_user_mentions_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.diff_note_positions
+    ADD CONSTRAINT diff_note_positions_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.draft_notes
     ADD CONSTRAINT draft_notes_pkey PRIMARY KEY (id);
 
@@ -8145,6 +8184,9 @@ ALTER TABLE ONLY public.packages_package_files
 
 ALTER TABLE ONLY public.packages_packages
     ADD CONSTRAINT packages_packages_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT packages_pypi_metadata_pkey PRIMARY KEY (package_id);
 
 ALTER TABLE ONLY public.packages_tags
     ADD CONSTRAINT packages_tags_pkey PRIMARY KEY (id);
@@ -8524,6 +8566,8 @@ CREATE UNIQUE INDEX design_management_designs_versions_uniqueness ON public.desi
 
 CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON public.design_user_mentions USING btree (design_id, note_id);
 
+CREATE INDEX dev_index_route_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
+
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.epic_user_mentions USING btree (epic_id, note_id);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON public.epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);
@@ -8535,6 +8579,8 @@ CREATE UNIQUE INDEX idx_deployment_merge_requests_unique_index ON public.deploym
 CREATE UNIQUE INDEX idx_environment_merge_requests_unique_index ON public.deployment_merge_requests USING btree (environment_id, merge_request_id);
 
 CREATE INDEX idx_geo_con_rep_updated_events_on_container_repository_id ON public.geo_container_repository_updated_events USING btree (container_repository_id);
+
+CREATE INDEX idx_issues_on_health_status_not_null ON public.issues USING btree (health_status) WHERE (health_status IS NOT NULL);
 
 CREATE INDEX idx_issues_on_project_id_and_created_at_and_id_and_state_id ON public.issues USING btree (project_id, created_at, id, state_id);
 
@@ -8627,6 +8673,8 @@ CREATE INDEX index_application_settings_on_custom_project_templates_group_id ON 
 CREATE INDEX index_application_settings_on_file_template_project_id ON public.application_settings USING btree (file_template_project_id);
 
 CREATE INDEX index_application_settings_on_instance_administrators_group_id ON public.application_settings USING btree (instance_administrators_group_id);
+
+CREATE UNIQUE INDEX index_application_settings_on_push_rule_id ON public.application_settings USING btree (push_rule_id);
 
 CREATE INDEX index_application_settings_on_usage_stats_set_by_user_id ON public.application_settings USING btree (usage_stats_set_by_user_id);
 
@@ -9038,6 +9086,8 @@ CREATE INDEX index_deployments_on_environment_id_and_status ON public.deployment
 
 CREATE INDEX index_deployments_on_id_and_status ON public.deployments USING btree (id, status);
 
+CREATE INDEX index_deployments_on_id_where_cluster_id_present ON public.deployments USING btree (id) WHERE (cluster_id IS NOT NULL);
+
 CREATE INDEX index_deployments_on_project_id_and_id ON public.deployments USING btree (project_id, id DESC);
 
 CREATE UNIQUE INDEX index_deployments_on_project_id_and_iid ON public.deployments USING btree (project_id, iid);
@@ -9075,6 +9125,8 @@ CREATE INDEX index_design_management_versions_on_issue_id ON public.design_manag
 CREATE UNIQUE INDEX index_design_management_versions_on_sha_and_issue_id ON public.design_management_versions USING btree (sha, issue_id);
 
 CREATE UNIQUE INDEX index_design_user_mentions_on_note_id ON public.design_user_mentions USING btree (note_id);
+
+CREATE UNIQUE INDEX index_diff_note_positions_on_note_id_and_diff_type ON public.diff_note_positions USING btree (note_id, diff_type);
 
 CREATE INDEX index_draft_notes_on_author_id ON public.draft_notes USING btree (author_id);
 
@@ -9838,6 +9890,8 @@ CREATE INDEX index_project_repositories_on_shard_id ON public.project_repositori
 
 CREATE UNIQUE INDEX index_project_repository_states_on_project_id ON public.project_repository_states USING btree (project_id);
 
+CREATE UNIQUE INDEX index_project_settings_on_push_rule_id ON public.project_settings USING btree (push_rule_id);
+
 CREATE INDEX index_project_statistics_on_namespace_id ON public.project_statistics USING btree (namespace_id);
 
 CREATE UNIQUE INDEX index_project_statistics_on_project_id ON public.project_statistics USING btree (project_id);
@@ -9873,6 +9927,10 @@ CREATE INDEX index_projects_api_vis20_updated_at ON public.projects USING btree 
 CREATE INDEX index_projects_on_created_at_and_id ON public.projects USING btree (created_at, id);
 
 CREATE INDEX index_projects_on_creator_id_and_created_at ON public.projects USING btree (creator_id, created_at);
+
+CREATE INDEX index_projects_on_creator_id_and_created_at_and_id ON public.projects USING btree (creator_id, created_at, id);
+
+CREATE INDEX index_projects_on_creator_id_and_id ON public.projects USING btree (creator_id, id);
 
 CREATE INDEX index_projects_on_description_trigram ON public.projects USING gin (description public.gin_trgm_ops);
 
@@ -10036,6 +10094,8 @@ CREATE INDEX index_resource_label_events_on_merge_request_id ON public.resource_
 
 CREATE INDEX index_resource_label_events_on_user_id ON public.resource_label_events USING btree (user_id);
 
+CREATE INDEX index_resource_milestone_events_created_at ON public.resource_milestone_events USING btree (created_at);
+
 CREATE INDEX index_resource_milestone_events_on_issue_id ON public.resource_milestone_events USING btree (issue_id);
 
 CREATE INDEX index_resource_milestone_events_on_merge_request_id ON public.resource_milestone_events USING btree (merge_request_id);
@@ -10057,6 +10117,8 @@ CREATE INDEX index_reviews_on_project_id ON public.reviews USING btree (project_
 CREATE UNIQUE INDEX index_routes_on_path ON public.routes USING btree (path);
 
 CREATE INDEX index_routes_on_path_text_pattern_ops ON public.routes USING btree (path varchar_pattern_ops);
+
+CREATE INDEX index_routes_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
 
 CREATE UNIQUE INDEX index_routes_on_source_type_and_source_id ON public.routes USING btree (source_type, source_id);
 
@@ -10577,6 +10639,9 @@ ALTER TABLE ONLY public.epics
 ALTER TABLE ONLY public.ci_pipelines
     ADD CONSTRAINT fk_3d34ab2e06 FOREIGN KEY (pipeline_schedule_id) REFERENCES public.ci_pipeline_schedules(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.project_settings
+    ADD CONSTRAINT fk_413a953e20 FOREIGN KEY (push_rule_id) REFERENCES public.push_rules(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.ci_pipeline_schedule_variables
     ADD CONSTRAINT fk_41c35fda51 FOREIGN KEY (pipeline_schedule_id) REFERENCES public.ci_pipeline_schedules(id) ON DELETE CASCADE;
 
@@ -10627,6 +10692,9 @@ ALTER TABLE ONLY public.merge_requests
 
 ALTER TABLE ONLY public.ci_builds
     ADD CONSTRAINT fk_6661f4f0e8 FOREIGN KEY (resource_group_id) REFERENCES public.ci_resource_groups(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.application_settings
+    ADD CONSTRAINT fk_693b8795e4 FOREIGN KEY (push_rule_id) REFERENCES public.push_rules(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.merge_requests
     ADD CONSTRAINT fk_6a5165a692 FOREIGN KEY (milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
@@ -11053,6 +11121,9 @@ ALTER TABLE ONLY public.project_statistics
 
 ALTER TABLE ONLY public.user_details
     ADD CONSTRAINT fk_rails_12e0b3043d FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.diff_note_positions
+    ADD CONSTRAINT fk_rails_13c7212859 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.users_security_dashboard_projects
     ADD CONSTRAINT fk_rails_150cd5682c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -11593,6 +11664,9 @@ ALTER TABLE ONLY public.board_labels
 
 ALTER TABLE ONLY public.scim_identities
     ADD CONSTRAINT fk_rails_9421a0bffb FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.packages_pypi_metadata
+    ADD CONSTRAINT fk_rails_9698717cdd FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.packages_dependency_links
     ADD CONSTRAINT fk_rails_96ef1c00d3 FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
@@ -12882,6 +12956,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200204070729
 20200204113223
 20200204113224
+20200204113225
 20200204131054
 20200204131831
 20200205143231
@@ -13030,6 +13105,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200318164448
 20200318165448
 20200318175008
+20200318183553
 20200319071702
 20200319123041
 20200319124127
@@ -13046,10 +13122,17 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200323134519
 20200324093258
 20200324115359
+20200325104755
+20200325104756
+20200325104833
+20200325104834
+20200325111432
 20200325152327
 20200325160952
+20200325162730
 20200325183636
 20200326114443
+20200326122700
 20200326124443
 20200326134443
 20200326135443
@@ -13062,6 +13145,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200331132103
 20200331195952
 20200331220930
+20200401095430
 20200401211005
 20200402123926
 20200402124802
@@ -13070,7 +13154,20 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200403184110
 20200403185127
 20200403185422
+20200406102111
+20200406102120
+20200406135648
+20200406192059
+20200406193427
 20200407094005
 20200407094923
+20200408110856
+20200408133211
+20200408153842
+20200408175424
+20200409211607
+20200415160722
+20200415161021
+20200415161206
 \.
 

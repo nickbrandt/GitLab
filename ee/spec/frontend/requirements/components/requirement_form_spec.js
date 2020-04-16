@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 
 import { GlFormGroup, GlFormTextarea } from '@gitlab/ui';
 import RequirementForm from 'ee/requirements/components/requirement_form.vue';
+import { MAX_TITLE_LENGTH } from 'ee/requirements/constants';
 
 import { mockRequirementsOpen } from '../mock_data';
 
@@ -47,6 +48,25 @@ describe('RequirementForm', () => {
 
       it('returns string "Save changes" when `requirement` prop is defined', () => {
         expect(wrapperWithRequirement.vm.saveButtonLabel).toBe('Save changes');
+      });
+    });
+
+    describe('titleInvalid', () => {
+      it('returns `false` when `title` length is less than max title limit', () => {
+        expect(wrapper.vm.titleInvalid).toBe(false);
+      });
+
+      it('returns `true` when `title` length is more than max title limit', () => {
+        wrapper.setData({
+          title: Array(MAX_TITLE_LENGTH + 1)
+            .fill()
+            .map(() => 'a')
+            .join(''),
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.titleInvalid).toBe(true);
+        });
       });
     });
 
@@ -113,6 +133,10 @@ describe('RequirementForm', () => {
       expect(glFormGroup.exists()).toBe(true);
       expect(glFormGroup.attributes('label')).toBe('New requirement');
       expect(glFormGroup.attributes('label-for')).toBe('requirementTitle');
+      expect(glFormGroup.attributes('invalid-feedback')).toBe(
+        `Requirement title cannot have more than ${MAX_TITLE_LENGTH} characters.`,
+      );
+      expect(glFormGroup.attributes('state')).toBe('true');
     });
 
     it('renders gl-form-textarea component', () => {

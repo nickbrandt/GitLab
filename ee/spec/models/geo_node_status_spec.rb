@@ -1268,5 +1268,31 @@ describe GeoNodeStatus, :geo, :geo_fdw do
         subject
       end
     end
+
+    context 'backward compatibility when counters stored in separate columns' do
+      describe '#projects_count' do
+        it 'counts the number of projects' do
+          subject.write_attribute(:projects_count, 10)
+          subject.status = {}
+
+          expect(subject.projects_count).to eq 10
+        end
+
+        it 'sets data in both ways, deprecated and the new one' do
+          subject.projects_count = 10
+
+          expect(subject.projects_count).to eq 10
+          expect(subject.read_attribute(:projects_count)).to eq 10
+        end
+
+        it 'uses column counters when calculates percents using attr_in_percentage' do
+          subject.write_attribute(:design_repositories_count, 10)
+          subject.write_attribute(:design_repositories_synced_count, 5)
+          subject.status = {}
+
+          expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+        end
+      end
+    end
   end
 end

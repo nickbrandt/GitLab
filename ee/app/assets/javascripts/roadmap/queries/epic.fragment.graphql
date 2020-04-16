@@ -1,0 +1,36 @@
+fragment BaseEpic on Epic {
+  id
+  iid
+  title
+  description
+  state
+  webUrl
+  startDate
+  dueDate
+  hasChildren
+  descendantCounts {
+    openedEpics
+    closedEpics
+    openedIssues
+    closedIssues
+  }
+  group {
+    name
+    fullName
+  }
+}
+
+fragment EpicNode on Epic {
+  ...BaseEpic
+  state
+  reference(full: true)
+  createdAt
+  closedAt
+  relationPath
+  createdAt
+  hasChildren
+  hasIssues
+  group {
+    fullPath
+  }
+}

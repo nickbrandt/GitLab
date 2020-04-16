@@ -6,6 +6,11 @@ module Vulnerabilities
 
     FindingsDismissResult = Struct.new(:ok?, :finding, :message)
 
+    def initialize(current_user, vulnerability, comment = nil)
+      super(current_user, vulnerability)
+      @comment = comment
+    end
+
     def execute
       raise Gitlab::Access::AccessDeniedError unless authorized?
 
@@ -33,7 +38,8 @@ module Vulnerabilities
       {
         category: finding.report_type,
         feedback_type: 'dismissal',
-        project_fingerprint: finding.project_fingerprint
+        project_fingerprint: finding.project_fingerprint,
+        comment: @comment
       }
     end
 

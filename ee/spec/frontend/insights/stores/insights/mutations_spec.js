@@ -3,7 +3,7 @@ import mutations from 'ee/insights/stores/modules/insights/mutations';
 import * as types from 'ee/insights/stores/modules/insights/mutation_types';
 import { CHART_TYPES } from 'ee/insights/constants';
 
-import { configData } from '../../../../javascripts/insights/mock_data';
+import { configData } from 'ee_jest/insights/mock_data';
 
 describe('Insights mutations', () => {
   let state;

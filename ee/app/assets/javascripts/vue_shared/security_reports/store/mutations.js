@@ -80,6 +80,7 @@ export default {
   [types.RECEIVE_DAST_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
     const baseReportOutofDate = diff.base_report_out_of_date || false;
+    const scans = diff.scans || [];
     const hasBaseReport = Boolean(diff.base_report_created_at);
 
     Vue.set(state.dast, 'isLoading', false);
@@ -88,6 +89,7 @@ export default {
     Vue.set(state.dast, 'allIssues', existing);
     Vue.set(state.dast, 'baseReportOutofDate', baseReportOutofDate);
     Vue.set(state.dast, 'hasBaseReport', hasBaseReport);
+    Vue.set(state.dast, 'scans', scans);
   },
 
   [types.RECEIVE_DAST_DIFF_ERROR](state) {

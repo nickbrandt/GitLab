@@ -780,14 +780,14 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('license management report', () => {
+  describe('license scanning report', () => {
     const licenseManagementApiUrl = `${TEST_HOST}/manage_license_api`;
 
-    it('should be rendered if license management data is set', () => {
+    it('should be rendered if license scanning data is set', () => {
       gl.mrWidgetData = {
         ...mockData,
         enabled_reports: {
-          license_management: true,
+          license_scanning: true,
         },
         license_scanning: {
           managed_licenses_path: licenseManagementApiUrl,
@@ -800,10 +800,10 @@ describe('ee merge request widget options', () => {
       expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
     });
 
-    it('should not be rendered if license management data is not set', () => {
+    it('should not be rendered if license scanning data is not set', () => {
       gl.mrWidgetData = {
         ...mockData,
-        license_management: {},
+        license_scanning: {},
       };
 
       vm = mountComponent(Component, { mrData: gl.mrWidgetData });
@@ -1096,7 +1096,7 @@ describe('ee merge request widget options', () => {
       undefined,
       {},
       { foo: true },
-      { license_management: true },
+      { license_scanning: true },
       {
         dast: false,
         sast: false,
@@ -1112,7 +1112,7 @@ describe('ee merge request widget options', () => {
           enabled_reports: noSecurityReportsEnabled,
         };
 
-        if (noSecurityReportsEnabled?.license_management) {
+        if (noSecurityReportsEnabled?.license_scanning) {
           // Provide license report config if it's going to be rendered
           gl.mrWidgetData.license_scanning = {
             managed_licenses_path: `${TEST_HOST}/manage_license_api`,

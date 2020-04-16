@@ -7,6 +7,8 @@ After [configuring the object storage](../../uploads.md#using-object-storage-cor
 >**Note:**
 All of the processing will be done in a background worker and requires **no downtime**.
 
+[Read more about using object storage with GitLab](../../object_storage.md).
+
 ### All-in-one Rake task
 
 GitLab provides a wrapper Rake task that migrates all uploaded files - avatars,
@@ -107,24 +109,6 @@ sudo -u git -H bundle exec rake "gitlab:uploads:migrate[FileUploader, MergeReque
 
 # Design Management design thumbnails (EE)
 sudo -u git -H bundle exec rake "gitlab:uploads:migrate[DesignManagement::DesignV432x230Uploader, DesignManagement::Action]"
-```
-
-## Migrate legacy uploads out of deprecated paths
-
-> Introduced in GitLab 12.3.
-
-To migrate all uploads created by legacy uploaders, run:
-
-**Omnibus Installation**
-
-```shell
-gitlab-rake gitlab:uploads:legacy:migrate
-```
-
-**Source Installation**
-
-```shell
-bundle exec rake gitlab:uploads:legacy:migrate
 ```
 
 ## Migrate from object storage to local storage

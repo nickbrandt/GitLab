@@ -76,7 +76,8 @@ module Geo
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_never_synced_registries(batch_size:, except_ids: [])
-      Geo::LfsObjectRegistry.never
+      Geo::LfsObjectRegistry
+        .never
         .model_id_not_in(except_ids)
         .limit(batch_size)
     end

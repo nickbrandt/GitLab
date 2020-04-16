@@ -45,7 +45,7 @@ describe('Api', () => {
     it('calls callback on completion', done => {
       const query = 'query';
       const provider = 'provider';
-      const callback = jasmine.createSpy();
+      const callback = jest.fn();
       const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/ldap/${provider}/groups.json`;
 
       mock.onGet(expectedUrl).reply(200, [

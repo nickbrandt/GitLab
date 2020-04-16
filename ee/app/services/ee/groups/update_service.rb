@@ -23,6 +23,15 @@ module EE
 
       private
 
+      override :after_update
+      def after_update
+        super
+
+        if group.saved_change_to_max_personal_access_token_lifetime?
+          group.update_personal_access_tokens_lifetime
+        end
+      end
+
       override :before_assignment_hook
       def before_assignment_hook(group, params)
         # Repository size limit comes as MB from the view

@@ -219,7 +219,7 @@ export default {
       type="button"
       class="btn-transparent position-absolute image-diff-overlay-add-comment w-100 h-100 js-add-image-diff-note-button"
       data-qa-selector="design_image_button"
-      @click="setNewNoteCoordinates({ x: $event.offsetX, y: $event.offsetY })"
+      @mouseup="setNewNoteCoordinates({ x: $event.offsetX, y: $event.offsetY })"
     ></button>
     <design-note-pin
       v-for="(note, index) in notes"

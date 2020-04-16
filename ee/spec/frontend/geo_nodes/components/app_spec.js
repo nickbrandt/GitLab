@@ -152,7 +152,7 @@ describe('AppComponent', () => {
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
-            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
+            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', expect.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
 
             expect(nodeDetails).toBeDefined();
@@ -169,7 +169,7 @@ describe('AppComponent', () => {
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
-            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
+            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', expect.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
 
             expect(nodeDetails).toBeDefined();
@@ -186,7 +186,7 @@ describe('AppComponent', () => {
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
-            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
+            expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', expect.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
 
             expect(nodeDetails).toBeDefined();
@@ -476,9 +476,9 @@ describe('AppComponent', () => {
     it('binds event handler for `pollNodeDetails`', () => {
       const vmX = createComponent();
 
-      expect(eventHub.$on).toHaveBeenCalledWith('pollNodeDetails', jasmine.any(Function));
-      expect(eventHub.$on).toHaveBeenCalledWith('showNodeActionModal', jasmine.any(Function));
-      expect(eventHub.$on).toHaveBeenCalledWith('repairNode', jasmine.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('pollNodeDetails', expect.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('showNodeActionModal', expect.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('repairNode', expect.any(Function));
       vmX.$destroy();
     });
   });
@@ -488,9 +488,9 @@ describe('AppComponent', () => {
       const vmX = createComponent();
       vmX.$destroy();
 
-      expect(eventHub.$off).toHaveBeenCalledWith('pollNodeDetails', jasmine.any(Function));
-      expect(eventHub.$off).toHaveBeenCalledWith('showNodeActionModal', jasmine.any(Function));
-      expect(eventHub.$off).toHaveBeenCalledWith('repairNode', jasmine.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('pollNodeDetails', expect.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('showNodeActionModal', expect.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('repairNode', expect.any(Function));
     });
   });
 

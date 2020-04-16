@@ -156,6 +156,22 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '.with_management_project' do
+    subject { described_class.with_management_project }
+
+    context 'cluster has a management project' do
+      let!(:cluster) { create(:cluster, :management_project) }
+
+      it { is_expected.to include(cluster) }
+    end
+
+    context 'cluster does not have a management project' do
+      let!(:cluster) { create(:cluster) }
+
+      it { is_expected.not_to include(cluster) }
+    end
+  end
+
   describe '.for_project_namespace' do
     subject { described_class.for_project_namespace(namespace_id) }
 
@@ -566,9 +582,10 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
       let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
       let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
       let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
+      let!(:fluentd) { create(:clusters_applications_fluentd, cluster: cluster) }
 
       it 'returns a list of created applications' do
-        is_expected.to contain_exactly(helm, ingress, cert_manager, crossplane, prometheus, runner, jupyter, knative, elastic_stack)
+        is_expected.to contain_exactly(helm, ingress, cert_manager, crossplane, prometheus, runner, jupyter, knative, elastic_stack, fluentd)
       end
     end
   end

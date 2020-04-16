@@ -140,17 +140,7 @@ describe('threatMonitoringStatistics actions', () => {
           [],
           [
             { type: 'requestStatistics', payload: expect.any(Object) },
-            {
-              type: 'receiveStatisticsSuccess',
-              payload: expect.objectContaining({
-                total: 0,
-                anomalous: 0,
-                history: {
-                  nominal: [],
-                  anomalous: [],
-                },
-              }),
-            },
+            { type: 'receiveStatisticsSuccess', payload: null },
           ],
         ));
     });

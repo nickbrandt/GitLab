@@ -9,6 +9,10 @@ module EE
       before_action :log_download_export_audit_event, only: [:download_export]
       before_action :log_archive_audit_event, only: [:archive]
       before_action :log_unarchive_audit_event, only: [:unarchive]
+
+      before_action do
+        push_frontend_feature_flag(:service_desk_custom_address)
+      end
     end
 
     def restore

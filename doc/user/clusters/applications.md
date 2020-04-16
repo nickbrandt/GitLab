@@ -43,6 +43,7 @@ The following applications can be installed:
 - [Knative](#knative)
 - [Crossplane](#crossplane)
 - [Elastic Stack](#elastic-stack)
+- [Fluentd](#fluentd)
 
 With the exception of Knative, the applications will be installed in a dedicated
 namespace called `gitlab-managed-apps`.
@@ -297,6 +298,22 @@ Ingress with the recent changes.
 
 ![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_10.png)
 
+##### Logging and blocking modes
+
+To help you tune your WAF rules, you can globally set your WAF to either
+**Logging** or **Blocking** mode:
+
+- **Logging mode** - Allows traffic matching the rule to pass, and logs the event.
+- **Blocking mode** - Prevents traffic matching the rule from passing, and logs the event.
+
+To change your WAF's mode:
+
+1. [Install ModSecurity](../../topics/web_application_firewall/quick_start_guide.md) if you have not already done so.
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
+1. In **Applications**, scroll to **Ingress**.
+1. Under **Global default**, select your desired mode.
+1. Click **Save changes**.
+
 ##### Viewing Web Application Firewall traffic
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/14707) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
@@ -312,7 +329,7 @@ From there, you can see tracked over time:
 
 If a significant percentage of traffic is anomalous, it should be investigated
 for potential threats, which can be done by
-[examining the application logs](#web-application-firewall-modsecurity).
+[examining the Web Application Firewall logs](#web-application-firewall-modsecurity).
 
 ![Threat Monitoring](img/threat_monitoring_v12_9.png)
 
@@ -523,6 +540,28 @@ kubectl port-forward svc/kibana 5601:443
 
 Then, you can visit Kibana at `http://localhost:5601`.
 
+### Fluentd
+
+> Introduced in GitLab 12.10 for project- and group-level clusters.
+
+[Fluentd](https://www.fluentd.org/) is an open source data collector, which enables
+you to unify the data collection and consumption to better use and understand
+your data. Fluentd sends logs in syslog format.
+
+To enable Fluentd:
+
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes** and click
+   **Applications**. You will be prompted to enter a host, port and protocol
+   where the WAF logs will be sent to via syslog.
+1. Provide the host domain name or URL in **SIEM Hostname**.
+1. Provide the host port number in **SIEM Port**.
+1. Select a **SIEM Protocol**.
+1. Check **Send ModSecurity Logs**. If you do not select this checkbox, the **Install**
+   button is disabled.
+1. Click **Save changes**.
+
+![Fluentd input fields](img/fluentd_v12_10.png)
+
 ### Future apps
 
 Interested in contributing a new GitLab managed app? Visit the
@@ -552,6 +591,7 @@ Supported applications:
 - [JupyterHub](#install-jupyterhub-using-gitlab-cicd)
 - [Elastic Stack](#install-elastic-stack-using-gitlab-cicd)
 - [Crossplane](#install-crossplane-using-gitlab-cicd)
+- [Fluentd](#install-fluentd-using-gitlab-cicd)
 
 ### Usage
 
@@ -1036,6 +1076,30 @@ management project. Refer to the
 [chart](https://github.com/crossplane/crossplane/tree/master/cluster/charts/crossplane#configuration) for the
 available configuration options. Note that this link points to the docs for the current development release, which may differ from the version you have installed. You can check out a specific version in the branch/tag switcher.
 
+### Install Fluentd using GitLab CI/CD
+
+> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/76) in GitLab 12.10.
+
+To install Fluentd into the `gitlab-managed-apps` namespace of your cluster using GitLab CI/CD, define the following configuration in `.gitlab/managed-apps/config.yaml`:
+
+```yaml
+Fluentd:
+  installed: true
+```
+
+You can also review the default values set for this chart in the [values.yaml](https://github.com/helm/charts/blob/master/stable/fluentd/values.yaml) file.
+
+You can customize the installation of Fluentd by defining
+`.gitlab/managed-apps/fluentd/values.yaml` file in your cluster management
+project. Refer to the
+[configuration chart for the current development release of Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd#configuration)
+for the available configuration options.
+
+NOTE: **Note:**
+The configuration chart link points to the current development release, which
+may differ from the version you have installed. To ensure compatibility, switch
+to the specific branch or tag you are using.
+
 ## Upgrading applications
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/24789) in GitLab 11.8.
@@ -1116,3 +1180,22 @@ To avoid installation errors:
   kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem
   diff a.pem b.pem
   ```
+
+### Error installing managed apps on EKS cluster
+
+If you're using a managed cluster on AWS EKS, and you are not able to install some of the managed
+apps, consider checking the logs.
+
+You can check the logs by running following commands:
+
+```shell
+kubectl get pods --all-namespaces
+kubectl get services --all-namespaces
+```
+
+If you are getting the `Failed to assign an IP address to container` error, it's probably due to the
+instance type you've specified in the AWS configuration.
+The number and size of nodes might not have enough IP addresses to run or install those pods.
+
+For reference, all the AWS instance IP limits are found
+[in this AWS repository on GitHub](https://github.com/aws/amazon-vpc-cni-k8s/blob/master/pkg/awsutils/vpc_ip_resource_limit.go) (search for `InstanceENIsAvailable`).

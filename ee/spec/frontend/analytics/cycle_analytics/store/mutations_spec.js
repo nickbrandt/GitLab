@@ -4,7 +4,6 @@ import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
-  summaryData,
   rawIssueEvents,
   issueEvents as transformedEvents,
   issueStage,
@@ -52,8 +51,6 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                        | ${true}
     ${types.REQUEST_TOP_RANKED_GROUP_LABELS}       | ${'topRankedLabels'}                  | ${[]}
     ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR} | ${'topRankedLabels'}                  | ${[]}
-    ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                          | ${[]}
-    ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                          | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                           | ${[]}
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                           | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}            | ${[]}
@@ -149,7 +146,6 @@ describe('Cycle analytics mutations', () => {
     it('will set isLoading=false and errorCode=null', () => {
       mutations[types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS](state, {
         stats: [],
-        summary: [],
         stages: [],
       });
 
@@ -172,20 +168,6 @@ describe('Cycle analytics mutations', () => {
           expect(state.stages).toContainEqual(stage);
         });
       });
-    });
-  });
-
-  describe(`${types.RECEIVE_SUMMARY_DATA_SUCCESS}`, () => {
-    beforeEach(() => {
-      state = { stages: [{ slug: 'plan' }, { slug: 'issue' }, { slug: 'test' }] };
-      mutations[types.RECEIVE_SUMMARY_DATA_SUCCESS](state, summaryData);
-    });
-
-    it('will set each summary item with a value of 0 to "-"', () => {
-      expect(state.summary).toEqual([
-        { value: 3, title: 'New Issues' },
-        { value: '-', title: 'Deploys' },
-      ]);
     });
   });
 

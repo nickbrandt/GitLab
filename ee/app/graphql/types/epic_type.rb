@@ -25,6 +25,8 @@ module Types
           description: 'Description of the epic'
     field :state, EpicStateEnum, null: false,
           description: 'State of the epic'
+    field :confidential, GraphQL::BOOLEAN_TYPE, null: true,
+          description: 'Indicates if the epic is confidential'
 
     field :group, GroupType, null: false,
           description: 'Group to which the epic belongs',
@@ -82,6 +84,9 @@ module Types
           description: 'Indicates if the epic has children'
     field :has_issues, GraphQL::BOOLEAN_TYPE, null: false,
           description: 'Indicates if the epic has direct issues'
+    field :has_parent, GraphQL::BOOLEAN_TYPE, null: false,
+          method: :has_parent?,
+          description: 'Indicates if the epic has a parent epic'
 
     field :web_path, GraphQL::STRING_TYPE, null: false,
           description: 'Web path of the epic',

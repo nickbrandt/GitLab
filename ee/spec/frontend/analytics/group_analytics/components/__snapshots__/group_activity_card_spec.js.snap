@@ -22,7 +22,7 @@ exports[`GroupActivity component matches the snapshot 1`] = `
       class="d-flex"
     >
       <div
-        class="flex-grow text-center"
+        class="js-metric-card-item flex-grow text-center"
       >
         <h3
           class="my-2"
@@ -37,7 +37,7 @@ exports[`GroupActivity component matches the snapshot 1`] = `
         </p>
       </div>
       <div
-        class="flex-grow text-center"
+        class="js-metric-card-item flex-grow text-center"
       >
         <h3
           class="my-2"
@@ -52,7 +52,7 @@ exports[`GroupActivity component matches the snapshot 1`] = `
         </p>
       </div>
       <div
-        class="flex-grow text-center"
+        class="js-metric-card-item flex-grow text-center"
       >
         <h3
           class="my-2"

@@ -8,6 +8,7 @@ module Packages
 
       MAX_PER_PAGE = 30
       MAX_VERSIONS_PER_PACKAGE = 10
+      PRE_RELEASE_VERSION_MATCHING_TERM = '%-%'
 
       DEFAULT_OPTIONS = {
         include_prerelease_versions: true,
@@ -38,18 +39,20 @@ module Packages
         # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24182#technical-notes
         # and https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
         subquery_name = :partition_subquery
+        arel_table = Arel::Table.new(:partition_subquery)
         column_names = Packages::Package.column_names.map do |cn|
           "#{subquery_name}.#{quote_column_name(cn)}"
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
-        Packages::Package.select(column_names.join(','))
-                         .from(package_names_partition, subquery_name)
-                         .where(
-                           "#{subquery_name}.row_number <= :max_versions_count",
-                           max_versions_count: MAX_VERSIONS_PER_PACKAGE
-                         )
-        # rubocop: enable CodeReuse/ActiveRecord
+        pkgs = Packages::Package.select(column_names.join(','))
+                                .from(package_names_partition, subquery_name)
+                                .where(arel_table[:row_number].lteq(MAX_VERSIONS_PER_PACKAGE))
+
+        return pkgs if include_prerelease_versions?
+
+        # we can't use pkgs.without_version_like since we have a custom from
+        pkgs.where.not(arel_table[:version].matches(PRE_RELEASE_VERSION_MATCHING_TERM))
       end
 
       def package_names_partition
@@ -74,7 +77,7 @@ module Packages
                          .without_nuget_temporary_name
                          .order_name
                          .select_distinct_name
-          pkgs = pkgs.without_version_like('%-%') unless include_prerelease_versions?
+          pkgs = pkgs.without_version_like(PRE_RELEASE_VERSION_MATCHING_TERM) unless include_prerelease_versions?
           pkgs = pkgs.search_by_name(@search_term) if @search_term.present?
           pkgs.page(0) # we're using a padding
               .per(per_page)

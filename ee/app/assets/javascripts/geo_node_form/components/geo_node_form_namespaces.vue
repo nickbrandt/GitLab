@@ -1,7 +1,7 @@
 <script>
 import { GlIcon, GlSearchBoxByType, GlDropdown, GlDeprecatedButton } from '@gitlab/ui';
 import { mapActions, mapState } from 'vuex';
-import { debounce } from 'underscore';
+import { debounce } from 'lodash';
 import { __, n__ } from '~/locale';
 import { SELECTIVE_SYNC_NAMESPACES } from '../constants';
 

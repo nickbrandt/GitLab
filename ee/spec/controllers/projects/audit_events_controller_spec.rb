@@ -21,19 +21,29 @@ describe Projects::AuditEventsController do
       end
 
       context 'when audit_events feature is available' do
-        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Project.name, entity_id: project.id, sort: '').permit! }
+        let(:level) { Gitlab::Audit::Levels::Project.new(project: project) }
+        let(:audit_logs_params) { ActionController::Parameters.new(sort: '').permit! }
 
         before do
           stub_licensed_features(audit_events: true)
+
+          allow(Gitlab::Audit::Levels::Project).to receive(:new).and_return(level)
+          allow(AuditLogFinder).to receive(:new).and_call_original
         end
 
         it 'renders index with 200 status code' do
-          expect(AuditLogFinder).to receive(:new).with(audit_logs_params).and_call_original
-
           request
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index)
+        end
+
+        it 'invokes AuditLogFinder with correct arguments' do
+          request
+
+          expect(AuditLogFinder).to have_received(:new).with(
+            level: level, params: audit_logs_params
+          )
         end
 
         context 'ordering' do

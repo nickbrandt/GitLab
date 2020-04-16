@@ -328,6 +328,69 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'updating `max_personal_access_token_lifetime` param' do
+    subject { update_group(group, user, attrs) }
+
+    let!(:group) do
+      create(:group_with_managed_accounts, :public, max_personal_access_token_lifetime: 1)
+    end
+
+    let(:limit) { 10 }
+    let(:attrs) { { max_personal_access_token_lifetime: limit } }
+
+    shared_examples_for 'it does not call the update lifetime service' do
+      it 'doesn not call the update lifetime service' do
+        expect(::PersonalAccessTokens::Groups::UpdateLifetimeService).not_to receive(:new)
+
+        subject
+      end
+    end
+
+    it 'updates the attribute' do
+      expect { subject }.to change { group.reload.max_personal_access_token_lifetime }.from(1).to(10)
+    end
+
+    context 'when the group does not enforce managed accounts' do
+      it_behaves_like 'it does not call the update lifetime service'
+    end
+
+    context 'when the group enforces managed accounts' do
+      before do
+        allow(group).to receive(:enforced_group_managed_accounts?).and_return(true)
+      end
+
+      context 'without `personal_access_token_expiration_policy` licensed' do
+        before do
+          stub_licensed_features(personal_access_token_expiration_policy: false)
+        end
+
+        it_behaves_like 'it does not call the update lifetime service'
+      end
+
+      context 'with personal_access_token_expiration_policy licensed' do
+        before do
+          stub_licensed_features(personal_access_token_expiration_policy: true)
+        end
+
+        context 'when `max_personal_access_token_lifetime` is updated to null value' do
+          let(:limit) { nil }
+
+          it_behaves_like 'it does not call the update lifetime service'
+        end
+
+        context 'when `max_personal_access_token_lifetime` is updated to a non-null value' do
+          it 'executes the update lifetime service' do
+            expect_next_instance_of(::PersonalAccessTokens::Groups::UpdateLifetimeService, group) do |service|
+              expect(service).to receive(:execute)
+            end
+
+            subject
+          end
+        end
+      end
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end

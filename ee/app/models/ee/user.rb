@@ -66,6 +66,8 @@ module EE
         scope
       }
 
+      scope :managed_by, ->(group) { where(managing_group: group) }
+
       scope :excluding_guests, -> { joins(:members).merge(::Member.non_guests).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
@@ -217,30 +219,31 @@ module EE
 
     def any_namespace_with_trial?
       ::Namespace
-        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
         .where('trial_ends_on > ?', Time.now.utc)
         .any?
     end
 
     def any_namespace_without_trial?
       ::Namespace
-        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
         .where(trial_ends_on: nil)
         .any?
     end
 
     def has_paid_namespace?
       ::Namespace
-        .from("(#{namespace_union_for_reporter_developer_maintainer_owned(:plan_id)}) #{::Namespace.table_name}")
-        .where(plan_id: Plan.where(name: Plan::PAID_HOSTED_PLANS).select(:id))
+        .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
-    def any_namespace_with_gold?
+    def owns_paid_namespace?
       ::Namespace
-        .includes(:plan)
-        .where("namespaces.id IN (#{namespace_union})") # rubocop:disable GitlabSecurity/SqlInjection
-        .where.not(plans: { id: nil })
+        .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
@@ -342,7 +345,7 @@ module EE
 
     private
 
-    def namespace_union(select = :id)
+    def namespace_union_for_owned(select = :id)
       ::Gitlab::SQL::Union.new([
         ::Namespace.select(select).where(type: nil, owner: self),
         owned_groups.select(select).where(parent_id: nil)

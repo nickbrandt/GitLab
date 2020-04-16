@@ -58,7 +58,7 @@ under which this application will be deployed.
 1. On the project's landing page, click **Add Kubernetes cluster**
    (note that this option is also available when you navigate to **Operations > Kubernetes**).
 
-   ![Project landing page](../autodevops/img/guide_project_landing_page_v12_3.png)
+   ![Project landing page](../autodevops/img/guide_project_landing_page_v12_10.png)
 
 1. On the **Create new cluster on GKE** tab, click **Sign in with Google**.
 
@@ -213,7 +213,7 @@ the WAF with OWASP CRS!
 ## Testing out the OWASP Core Rule Set
 
 Now let's send a potentially malicious request, as if we were a scanner,
-checking for vulnerabilities within our application and examine the modsecurity logs:
+checking for vulnerabilities within our application and examine the ModSecurity logs:
 
 ```shell
 $ curl --location --insecure fjdiaz-auto-devv-2.34.68.60.207.nip.io --header "User-Agent: absinthe" | grep 'Rails!' --after 2 --before 2

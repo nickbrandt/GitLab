@@ -32,6 +32,12 @@ module FeatureFlagHelpers
     end
   end
 
+  def within_strategy_row(index)
+    within ".feature-flags-form > fieldset > div:nth-child(#{index + 3})" do
+      yield
+    end
+  end
+
   def within_environment_spec
     within '.table-section:nth-child(1)' do
       yield
@@ -48,5 +54,12 @@ module FeatureFlagHelpers
     within '.table-section:nth-child(4)' do
       yield
     end
+  end
+
+  def expect_user_to_see_feature_flags_index_page
+    expect(page).to have_css('h3.page-title', text: 'Feature Flags')
+    expect(page).to have_text('All')
+    expect(page).to have_text('Enabled')
+    expect(page).to have_text('Disabled')
   end
 end

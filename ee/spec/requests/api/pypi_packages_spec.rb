@@ -10,7 +10,8 @@ describe API::PypiPackages do
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
 
   describe 'GET /api/v4/projects/:id/packages/pypi/simple/:package_name' do
-    let(:url) { "/projects/#{project.id}/packages/pypi/simple/sample-project" }
+    let_it_be(:package) { create(:pypi_package, project: project) }
+    let(:url) { "/projects/#{project.id}/packages/pypi/simple/#{package.name}" }
 
     subject { get api(url) }
 
@@ -23,16 +24,16 @@ describe API::PypiPackages do
         using RSpec::Parameterized::TableSyntax
 
         where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
-          'PUBLIC'  | :developer  | true  | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | true  | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | true  | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | true  | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | false | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | false | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | false | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | false | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :anonymous  | false | true  | 'process PyPi api request' | :success
-          'PRIVATE' | :developer  | true  | true  | 'process PyPi api request' | :success
+          'PUBLIC'  | :developer  | true  | true  | 'PyPi package versions' | :success
+          'PUBLIC'  | :guest      | true  | true  | 'PyPi package versions' | :success
+          'PUBLIC'  | :developer  | true  | false | 'PyPi package versions' | :success
+          'PUBLIC'  | :guest      | true  | false | 'PyPi package versions' | :success
+          'PUBLIC'  | :developer  | false | true  | 'PyPi package versions' | :success
+          'PUBLIC'  | :guest      | false | true  | 'PyPi package versions' | :success
+          'PUBLIC'  | :developer  | false | false | 'PyPi package versions' | :success
+          'PUBLIC'  | :guest      | false | false | 'PyPi package versions' | :success
+          'PUBLIC'  | :anonymous  | false | true  | 'PyPi package versions' | :success
+          'PRIVATE' | :developer  | true  | true  | 'PyPi package versions' | :success
           'PRIVATE' | :guest      | true  | true  | 'process PyPi api request' | :forbidden
           'PRIVATE' | :developer  | true  | false | 'process PyPi api request' | :unauthorized
           'PRIVATE' | :guest      | true  | false | 'process PyPi api request' | :unauthorized
@@ -125,7 +126,9 @@ describe API::PypiPackages do
     let_it_be(:file_name) { 'package.whl' }
     let(:url) { "/projects/#{project.id}/packages/pypi" }
     let(:headers) { {} }
-    let(:params) { { content: temp_file(file_name) } }
+    let(:base_params) { { requires_python: '>=3.7', version: '1.0.0', name: 'sample-project', sha256_digest: '123' } }
+    let(:params) { base_params.merge(content: temp_file(file_name)) }
+    let(:send_rewritten_field) { true }
 
     subject do
       workhorse_finalize(
@@ -133,7 +136,8 @@ describe API::PypiPackages do
         method: :post,
         file_key: :content,
         params: params,
-        headers: headers
+        headers: headers,
+        send_rewritten_field: send_rewritten_field
       )
     end
 
@@ -146,7 +150,7 @@ describe API::PypiPackages do
         using RSpec::Parameterized::TableSyntax
 
         where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
-          'PUBLIC'  | :developer  | true  | true  | 'process PyPi api request' | :created
+          'PUBLIC'  | :developer  | true  | true  | 'PyPi package creation'    | :created
           'PUBLIC'  | :guest      | true  | true  | 'process PyPi api request' | :forbidden
           'PUBLIC'  | :developer  | true  | false | 'process PyPi api request' | :unauthorized
           'PUBLIC'  | :guest      | true  | false | 'process PyPi api request' | :unauthorized
@@ -179,17 +183,30 @@ describe API::PypiPackages do
         end
       end
 
+      context 'with an invalid package' do
+        let(:token) { personal_access_token.token }
+        let(:user_headers) { build_basic_auth_header(user.username, token) }
+        let(:headers) { user_headers.merge(workhorse_header) }
+
+        before do
+          params[:name] = '.$/@!^*'
+          project.add_developer(user)
+        end
+
+        it_behaves_like 'returning response status', :bad_request
+      end
+
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
 
     it_behaves_like 'rejects PyPI packages access with packages features disabled'
   end
 
-  describe 'GET /api/v4/projects/:id/packages/pypi/files/*file_identifier' do
+  describe 'GET /api/v4/projects/:id/packages/pypi/files/:sha256/*file_identifier' do
     let_it_be(:package_name) { 'Dummy-Package' }
-    let_it_be(:package) { create(:pypi_package, project: project, name: package_name) }
+    let_it_be(:package) { create(:pypi_package, project: project, name: package_name, version: '1.0.0') }
 
-    let(:url) { "/projects/#{project.id}/packages/pypi/files/sample_project-1.0.0-py3-none-any.whl" }
+    let(:url) { "/projects/#{project.id}/packages/pypi/files/#{package.package_files.first.file_sha256}/#{package_name}-1.0.0.tar.gz" }
 
     subject { get api(url) }
 
@@ -202,24 +219,24 @@ describe API::PypiPackages do
         using RSpec::Parameterized::TableSyntax
 
         where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
-          'PUBLIC'  | :developer  | true  | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | true  | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | true  | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | true  | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | false | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | false | true  | 'process PyPi api request' | :success
-          'PUBLIC'  | :developer  | false | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :guest      | false | false | 'process PyPi api request' | :success
-          'PUBLIC'  | :anonymous  | false | true  | 'process PyPi api request' | :success
-          'PRIVATE' | :developer  | true  | true  | 'process PyPi api request' | :success
-          'PRIVATE' | :guest      | true  | true  | 'process PyPi api request' | :forbidden
-          'PRIVATE' | :developer  | true  | false | 'process PyPi api request' | :unauthorized
-          'PRIVATE' | :guest      | true  | false | 'process PyPi api request' | :unauthorized
-          'PRIVATE' | :developer  | false | true  | 'process PyPi api request' | :not_found
-          'PRIVATE' | :guest      | false | true  | 'process PyPi api request' | :not_found
-          'PRIVATE' | :developer  | false | false | 'process PyPi api request' | :unauthorized
-          'PRIVATE' | :guest      | false | false | 'process PyPi api request' | :unauthorized
-          'PRIVATE' | :anonymous  | false | true  | 'process PyPi api request' | :unauthorized
+          'PUBLIC'  | :developer  | true  | true  | 'PyPi package download' | :success
+          'PUBLIC'  | :guest      | true  | true  | 'PyPi package download' | :success
+          'PUBLIC'  | :developer  | true  | false | 'PyPi package download' | :success
+          'PUBLIC'  | :guest      | true  | false | 'PyPi package download' | :success
+          'PUBLIC'  | :developer  | false | true  | 'PyPi package download' | :success
+          'PUBLIC'  | :guest      | false | true  | 'PyPi package download' | :success
+          'PUBLIC'  | :developer  | false | false | 'PyPi package download' | :success
+          'PUBLIC'  | :guest      | false | false | 'PyPi package download' | :success
+          'PUBLIC'  | :anonymous  | false | true  | 'PyPi package download' | :success
+          'PRIVATE' | :developer  | true  | true  | 'PyPi package download' | :success
+          'PRIVATE' | :guest      | true  | true  | 'PyPi package download' | :success
+          'PRIVATE' | :developer  | true  | false | 'PyPi package download' | :success
+          'PRIVATE' | :guest      | true  | false | 'PyPi package download' | :success
+          'PRIVATE' | :developer  | false | true  | 'PyPi package download' | :success
+          'PRIVATE' | :guest      | false | true  | 'PyPi package download' | :success
+          'PRIVATE' | :developer  | false | false | 'PyPi package download' | :success
+          'PRIVATE' | :guest      | false | false | 'PyPi package download' | :success
+          'PRIVATE' | :anonymous  | false | true  | 'PyPi package download' | :success
         end
 
         with_them do

@@ -1,11 +1,11 @@
 <script>
-import { GlNewButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
 import eventHub from '../event_hub';
 
 export default {
   components: {
-    GlNewButton,
+    GlButton,
     GlIcon,
     GlTooltip,
   },
@@ -55,14 +55,14 @@ export default {
 
 <template>
   <div class="epic-details-cell d-flex align-items-start p-2" data-qa-selector="epic_details_cell">
-    <gl-new-button
+    <gl-button
       :class="{ invisible: isExpandIconHidden }"
       variant="link"
       :aria-label="expandIconLabel"
       @click="toggleIsEpicExpanded"
     >
       <gl-icon :name="expandIconName" class="text-secondary" aria-hidden="true" />
-    </gl-new-button>
+    </gl-button>
     <div class="overflow-hidden flex-grow-1" :class="[epic.isChildEpic ? 'ml-4 mr-2' : 'mx-2']">
       <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
         {{ epic.title }}

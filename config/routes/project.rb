@@ -26,6 +26,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       scope '-' do
         get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
 
+        scope controller: :static_site_editor do
+          get '/sse/*id', action: :show, as: :show_sse
+        end
+
         resources :artifacts, only: [:index, :destroy]
 
         resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
@@ -334,6 +338,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :domains, except: :index, controller: 'pages_domains', constraints: { id: %r{[^/]+} } do
           member do
             post :verify
+            post :retry_auto_ssl
             delete :clean_certificate
           end
         end

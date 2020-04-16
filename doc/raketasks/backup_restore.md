@@ -309,6 +309,8 @@ In the example below we use Amazon S3 for storage, but Fog also lets you use
 for AWS, Google, OpenStack Swift, Rackspace and Aliyun as well. A local driver is
 [also available](#uploading-to-locally-mounted-shares).
 
+[Read more about using object storage with GitLab](../administration/object_storage.md).
+
 #### Using Amazon S3
 
 For Omnibus GitLab packages:
@@ -945,7 +947,7 @@ backup beforehand.
    For installations from source:
 
    ```shell
-   sudo -u git -H bundle exec rails dbconsole RAILS_ENV=production
+   sudo -u git -H bundle exec rails dbconsole -e production
    ```
 
 1. Check the `ci_group_variables` and `ci_variables` tables:
@@ -980,7 +982,7 @@ backup beforehand.
    For installations from source:
 
    ```shell
-   sudo -u git -H bundle exec rails dbconsole RAILS_ENV=production
+   sudo -u git -H bundle exec rails dbconsole -e production
    ```
 
 1. Clear all the tokens for projects, groups, and the whole instance:
@@ -1013,7 +1015,7 @@ backup beforehand.
    For installations from source:
 
    ```shell
-   sudo -u git -H bundle exec rails dbconsole RAILS_ENV=production
+   sudo -u git -H bundle exec rails dbconsole -e production
    ```
 
 1. Clear all the tokens for pending jobs:

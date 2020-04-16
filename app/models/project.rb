@@ -591,7 +591,7 @@ class Project < ApplicationRecord
     #
     # query - The search query as a String.
     def search(query, include_namespace: false)
-      if include_namespace && Feature.enabled?(:project_search_by_full_path, default_enabled: true)
+      if include_namespace
         joins(:route).fuzzy_search(query, [Route.arel_table[:path], Route.arel_table[:name], :description])
       else
         fuzzy_search(query, [:path, :name, :description])
@@ -786,6 +786,10 @@ class Project < ApplicationRecord
     Feature.enabled?(:context_commits, default_enabled: true)
   end
 
+  def jira_issues_import_feature_flag_enabled?
+    Feature.enabled?(:jira_issue_import, self, default_enabled: true)
+  end
+
   def team
     @team ||= ProjectTeam.new(self)
   end
@@ -968,7 +972,7 @@ class Project < ApplicationRecord
   end
 
   def jira_import?
-    import_type == 'jira' && latest_jira_import.present? && Feature.enabled?(:jira_issue_import, self)
+    import_type == 'jira' && latest_jira_import.present? && jira_issues_import_feature_flag_enabled?
   end
 
   def gitlab_project_import?
@@ -1186,14 +1190,14 @@ class Project < ApplicationRecord
   end
 
   def external_issue_tracker
-    if has_external_issue_tracker.nil? # To populate existing projects
+    if has_external_issue_tracker.nil?
       cache_has_external_issue_tracker
     end
 
     if has_external_issue_tracker?
-      return @external_issue_tracker if defined?(@external_issue_tracker)
-
-      @external_issue_tracker = services.external_issue_trackers.first
+      strong_memoize(:external_issue_tracker) do
+        services.external_issue_trackers.first
+      end
     else
       nil
     end
@@ -1213,7 +1217,7 @@ class Project < ApplicationRecord
 
   def external_wiki
     if has_external_wiki.nil?
-      cache_has_external_wiki # Populate
+      cache_has_external_wiki
     end
 
     if has_external_wiki

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Gitlab::Seeder::Packages
   attr_reader :project
 
@@ -12,7 +13,7 @@ class Gitlab::Seeder::Packages
 
   def seed_npm_packages
     5.times do |i|
-      name = "@#{@project.root_namespace.path}/npm_package_#{i}"
+      name = "@#{@project.root_namespace.path}/npm_package_#{SecureRandom.hex}"
       version = "1.12.#{i}"
 
       params = JSON.parse(

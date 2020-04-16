@@ -71,7 +71,7 @@ describe Projects::MirrorsController do
         stub_application_setting(mirror_available: false)
       end
 
-      context 'when user is admin' do
+      context 'when user is admin', :enable_admin_mode do
         let(:admin) { create(:user, :admin) }
 
         it 'creates a new mirror' do
