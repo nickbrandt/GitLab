@@ -52,6 +52,9 @@ manually to your external database configuration:
 ## Geo Primary Role
 ## - pg_hba.conf
 ##
+host    all         all               <trusted primary IP>/32       md5
+host    replication gitlab_replicator <trusted primary IP>/32       md5
+host    all         all               <trusted secondary IP>/32     md5
 host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ```
 
