@@ -45,12 +45,11 @@ module AutoMerge
     end
 
     def available_for?(merge_request)
-      return false unless merge_request.project.merge_trains_enabled?
-      return false if merge_request.for_fork?
-      return false unless merge_request.actual_head_pipeline&.complete?
-      return false unless merge_request.mergeable_state?(skip_ci_check: true)
-
-      true
+      super do
+        merge_request.project.merge_trains_enabled? &&
+          !merge_request.for_fork? &&
+          merge_request.actual_head_pipeline&.complete?
+      end
     end
   end
 end
