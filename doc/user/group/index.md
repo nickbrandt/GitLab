@@ -248,12 +248,13 @@ These Group Activity Analytics can be enabled with the `group_activity_analytics
 
 A group's **Activity** page displays the most recent actions taken in a group, including:
 
-- **Push events**: Recent pushes to branches
-- **Merge events**: Recent merges
-- **Issue events**: Issues opened or closed
-- **Epic events**: Epics opened or closed
-- **Comments**: Comments opened or closed
-- **Team**: Team members who have joined or left the group
+- **Push events**: Recent pushes to branches.
+- **Merge events**: Recent merges.
+- **Issue events**: Issues opened or closed.
+- **Epic events**: Epics opened or closed.
+- **Comments**: Comments opened or closed.
+- **Team**: Team members who have joined or left the group.
+- **Wiki**: Wikis created, deleted, or updated.
 
 The entire activity feed is also available in Atom format by clicking the
 **RSS** icon.
