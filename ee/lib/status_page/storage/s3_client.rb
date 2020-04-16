@@ -36,9 +36,34 @@ module StatusPage
         true
       end
 
+      # Delete all keys with a given prefix
+      def recursive_delete(prefix)
+        wrap_errors(prefix: prefix) do
+          # Aws::S3::Types::ListObjectsV2Output is paginated and Enumerable
+          list_objects(prefix).each do |response|
+            objects = response.contents.map { |obj| { key: obj.key } }
+            # Batch delete in sets determined by default max_key argument that can be passed to list_objects_v2
+            client.delete_objects({ bucket: bucket_name, delete: { objects: objects } })
+          end
+        end
+
+        true
+      end
+
+      # Return a Set of all keys with a given prefix
+      def list_object_keys(prefix)
+        list_objects(prefix).reduce(Set.new) do |objects, response|
+          objects | response.contents.map(&:key)
+        end
+      end
+
       private
 
       attr_reader :client, :bucket_name
+
+      def list_objects(prefix)
+        client.list_objects_v2(bucket: bucket_name, prefix: prefix)
+      end
 
       def wrap_errors(**args)
         yield

@@ -13,12 +13,18 @@ module StatusPage
     private
 
     def process(issue)
-      key = object_key(issue)
+      json_key = json_object_key(issue)
+      delete_object(json_key)
 
-      delete(key)
+      image_key_prefix = images_objects_key_prefix(issue)
+      delete_objects_recursive(key_prefix: image_key_prefix)
     end
 
-    def object_key(issue)
+    def images_objects_key_prefix(issue)
+      StatusPage::Storage.uploads_path(issue.iid)
+    end
+
+    def json_object_key(issue)
       StatusPage::Storage.details_path(issue.iid)
     end
   end

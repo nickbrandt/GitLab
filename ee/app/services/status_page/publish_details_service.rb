@@ -16,7 +16,7 @@ module StatusPage
 
       image_object_keys = publish_images(issue, user_notes)
 
-      success_payload = publish_json_response.payload.merge!({ image_object_keys: image_object_keys })
+      success_payload = publish_json_response.payload.merge({ image_object_keys: image_object_keys })
 
       success(success_payload)
     end
@@ -46,20 +46,31 @@ module StatusPage
 
     def publish_images(issue, user_notes)
       upload_keys = []
-      upload_keys += publish_image_uploads(markdown_field: issue.description, issue_iid: issue.iid)
+      existing_image_keys = storage_client.list_object_keys(StatusPage::Storage.uploads_path(issue.iid))
+
+      upload_keys += publish_markdown_uploads(
+        markdown_field: issue.description,
+        issue_iid: issue.iid,
+        existing_image_keys: existing_image_keys
+      )
       user_notes.each do |user_note|
-        upload_keys += publish_image_uploads(markdown_field: user_note.note, issue_iid: issue.iid)
+        upload_keys += publish_markdown_uploads(
+          markdown_field: user_note.note,
+          issue_iid: issue.iid,
+          existing_image_keys: existing_image_keys
+        )
       end
 
       upload_keys
     end
 
-    def publish_image_uploads(markdown_field:, issue_iid:)
+    def publish_markdown_uploads(markdown_field:, issue_iid:, existing_image_keys:)
       upload_keys = []
-
       markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |md|
-        file = find_upload($~[:secret], $~[:file]).file.file
         key = StatusPage::Storage.upload_path(issue_iid, $~[:secret], $~[:file])
+        next if existing_image_keys.include? key
+
+        file = find_upload($~[:secret], $~[:file]).file.file
         upload_image(file, key)
         upload_keys << key
       end
@@ -76,7 +87,6 @@ module StatusPage
     def find_upload(secret, file_path)
       uploader = FileUploader.new(@project, secret: secret)
       uploader.retrieve_from_store!(file_path)
-      uploader
     end
   end
 end

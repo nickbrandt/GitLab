@@ -147,8 +147,10 @@ module Banzai
     def self.post_process(html, context)
       context = Pipeline[context[:pipeline]].transform_context(context)
 
-      # Use :'::EE::_banzai::_status_page::_post_process' if passed otherwise default to Pipeline[:post_process]
-      pipeline = context[:post_process_pipeline] ? Pipeline[context[:post_process_pipeline]] : Pipeline[:post_process]
+      # Use a passed class or class otherwise default to Pipeline[:post_process]
+      pipeline_name = context.delete(:post_process_pipeline) || :post_process
+      pipeline = Pipeline[pipeline_name]
+
       if context[:xhtml]
         pipeline.to_document(html, context).to_html(save_with: Nokogiri::XML::Node::SaveOptions::AS_XHTML)
       else

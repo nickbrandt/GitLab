@@ -53,10 +53,16 @@ module StatusPage
       success(json_object_key: key)
     end
 
-    def delete(key)
+    def delete_object(key)
       storage_client.delete_object(key)
 
       success(json_object_key: key)
+    end
+
+    def delete_objects_recursive(key_prefix:)
+      storage_client.recursive_delete(key_prefix)
+
+      success
     end
 
     def limit_exceeded?(json)
