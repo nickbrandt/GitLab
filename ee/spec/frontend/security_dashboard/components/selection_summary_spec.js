@@ -102,7 +102,6 @@ describe('Selection Summary component', () => {
       it('should show toast with the right message if all calls were successful', () => {
         dismissButton().trigger('submit');
         setImmediate(() => {
-          // return wrapper.vm.$nextTick().then(() => {
           expect(toast).toHaveBeenCalledWith('2 vulnerabilities dismissed');
         });
       });
