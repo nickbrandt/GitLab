@@ -27,6 +27,10 @@ FactoryBot.define do
       user_type { :alert_bot }
     end
 
+    trait :project_bot do
+      user_type { :project_bot }
+    end
+
     trait :external do
       external { true }
     end
