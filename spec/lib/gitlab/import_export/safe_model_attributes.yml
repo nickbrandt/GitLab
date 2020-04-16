@@ -812,6 +812,7 @@ ContainerExpirationPolicy:
 - next_run_at
 - project_id
 - name_regex
+- name_regex_keep
 - cadence
 - older_than
 - keep_n
