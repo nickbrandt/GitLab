@@ -6,10 +6,6 @@ describe DesignManagement::NewVersionWorker do
   describe '#perform' do
     let(:worker) { described_class.new }
 
-    before do
-      stub_feature_flags(design_management_resize_images: true)
-    end
-
     context 'the id is wrong or out-of-date' do
       let(:version_id) { -1 }
 
@@ -52,18 +48,6 @@ describe DesignManagement::NewVersionWorker do
         expect(Sidekiq.logger).not_to receive(:warn)
 
         worker.perform(version.id)
-      end
-
-      context 'when the `design_management_resize_images` flag is disabled' do
-        before do
-          stub_feature_flags(design_management_resize_images: false)
-        end
-
-        it 'does not invoke GenerateImageVersionsService' do
-          expect(DesignManagement::GenerateImageVersionsService).not_to receive(:new)
-
-          worker.perform(version.id)
-        end
       end
     end
 
