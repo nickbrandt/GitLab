@@ -170,8 +170,6 @@ describe FeatureFlags::UpdateService do
       end
 
       context 'when scope can not be deleted' do
-        RSpec::Matchers.define_negated_matcher :not_change, :change
-
         before do
           allow(deleted_scope).to receive(:destroy).and_return(false)
         end
