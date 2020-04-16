@@ -12,7 +12,7 @@ describe 'layouts/application' do
     allow(view).to receive(:user_signed_in?).and_return(true)
     allow(view).to receive(:current_user).and_return(user)
     allow(view).to receive(:current_user_mode).and_return(Gitlab::Auth::CurrentUserMode.new(user))
-    allow(view).to receive(:show_user_notification_dot?).and_return(show_notification_dot)
+    allow(view).to receive(:show_ci_minutes_notification_dot?).and_return(show_notification_dot)
   end
 
   describe 'layouts/_user_notification_dot' do

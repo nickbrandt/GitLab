@@ -3,7 +3,11 @@
 require "spec_helper"
 
 describe EE::RunnersHelper do
-  let_it_be(:user) { create(:user) }
+  let_it_be(:user, reload: true) { create(:user) }
+
+  before do
+    allow(helper).to receive(:current_user).and_return(user)
+  end
 
   describe '.ci_usage_warning_message' do
     let(:project) { create(:project, namespace: namespace) }
@@ -140,43 +144,23 @@ describe EE::RunnersHelper do
     end
   end
 
-  describe '.show_buy_ci_minutes?' do
-    subject { helper.show_buy_ci_minutes? }
-
-    context 'when experiment is disabled' do
-      before do
-        allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(false)
-      end
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when experiment is enabled' do
-      before do
-        allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(true)
-      end
-
-      it { is_expected.to be_truthy }
-    end
-  end
-
-  describe '.show_user_notification_dot?' do
-    let(:experiment_status) { true }
-    let(:ci_minutes_show) { true }
-    let!(:user_pipelines) { create(:ci_pipeline, user: user, project: nil) }
-
-    subject { helper.show_user_notification_dot?(project, namespace) }
+  shared_examples_for 'minutes notification' do
+    let_it_be(:namespace) { create(:namespace, owner: user) }
+    let_it_be(:project) { create(:project, namespace: namespace) }
+    let(:injected_project) { project }
+    let(:injected_namespace) { namespace }
+    let(:show_warning) { true }
+    let(:context_level) { project }
+    let(:context) { double('Ci::Minutes::Context', level: context_level, namespace: namespace) }
+    let(:threshold) { double('Ci::Minutes::Threshold', warning_reached?: show_warning) }
+    let!(:user_pipeline) { create(:ci_pipeline, user: user, project: project) }
 
     before do
-      allow(helper).to receive(:current_user).and_return(user)
-      allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
-      allow(::Ci::MinutesNotificationService).to receive_message_chain(:call, :show_notification?).and_return(ci_minutes_show)
+      allow(::Ci::Minutes::Context).to receive(:new).and_return(context)
+      allow(::Ci::Minutes::Threshold).to receive(:new).and_return(threshold)
     end
 
     context 'with a project and namespace' do
-      let_it_be(:project) { create(:project) }
-      let_it_be(:namespace) { create(:namespace) }
-
       context 'when experiment is disabled' do
         let(:experiment_status) { false }
 
@@ -186,37 +170,96 @@ describe EE::RunnersHelper do
       context 'when experiment is enabled with user pipelines' do
         it { is_expected.to be_truthy }
 
-        context 'without a project' do
-          let(:project) { build(:project) }
+        context 'without a persisted project passed' do
+          let(:injected_project) { build(:project) }
+          let(:context_level) { namespace }
 
           it { is_expected.to be_truthy }
         end
 
-        context 'without a namespace' do
-          let(:namespace) { build(:namespace) }
+        context 'without a persisted namespace passed' do
+          let(:injected_namespace) { build(:namespace) }
 
           it { is_expected.to be_truthy }
         end
 
         context 'with neither a project nor a namespace' do
-          let(:project) { build(:project) }
-          let(:namespace) { build(:namespace) }
+          let(:injected_project) { build(:project) }
+          let(:injected_namespace) { build(:namespace) }
 
           it { is_expected.to be_falsey }
+
+          context 'when show_ci_minutes_notification_dot? has been called before' do
+            it 'does not do all the notification and query work again' do
+              expect(threshold).not_to receive(:warning_reached?)
+              expect(injected_project).to receive(:persisted?).once
+
+              helper.show_ci_minutes_notification_dot?(injected_project, injected_namespace)
+
+              expect(subject).to be_falsey
+            end
+          end
         end
 
         context 'when show notification is falsey' do
-          let(:ci_minutes_show) { false }
+          let(:show_warning) { false }
 
           it { is_expected.to be_falsey }
         end
 
         context 'without user pipelines' do
           before do
-            user.pipelines.clear
+            user.pipelines.clear # this forces us to reload user for let_it_be
           end
 
           it { is_expected.to be_falsey }
+        end
+
+        context 'when show_ci_minutes_notification_dot? has been called before' do
+          it 'does not do all the notification and query work again' do
+            expect(threshold).to receive(:warning_reached?).once
+            expect(project).to receive(:persisted?).once
+
+            helper.show_ci_minutes_notification_dot?(project, namespace)
+
+            expect(subject).to be_truthy
+          end
+        end
+      end
+    end
+  end
+
+  context 'with pipelines' do
+    let(:experiment_status) { true }
+
+    describe '.show_buy_ci_minutes?' do
+      subject { helper.show_buy_ci_minutes?(injected_project, injected_namespace) }
+
+      context 'when experiment is "ci_notification_dot"' do
+        it_behaves_like 'minutes notification' do
+          before do
+            allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
+            allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(false)
+          end
+        end
+      end
+
+      context 'when experiment is "ci_minutes_version_a"' do
+        it_behaves_like 'minutes notification' do
+          before do
+            allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(false)
+            allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(experiment_status)
+          end
+        end
+      end
+    end
+
+    describe '.show_ci_minutes_notification_dot?' do
+      subject { helper.show_ci_minutes_notification_dot?(injected_project, injected_namespace) }
+
+      it_behaves_like 'minutes notification' do
+        before do
+          allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
         end
       end
     end

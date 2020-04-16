@@ -155,7 +155,8 @@ module EE
         to: :statistics, allow_nil: true
 
       delegate :actual_shared_runners_minutes_limit,
-        :shared_runners_minutes_used?, to: :shared_runners_limit_namespace
+               :shared_runners_minutes_used?,
+               :shared_runners_remaining_minutes_below_threshold?, to: :shared_runners_limit_namespace
 
       delegate :last_update_succeeded?, :last_update_failed?,
         :ever_updated_successfully?, :hard_failed?,
