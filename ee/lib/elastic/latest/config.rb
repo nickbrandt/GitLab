@@ -32,11 +32,6 @@ module Elastic
                 tokenizer: 'path_tokenizer',
                 filter: %w(lowercase asciifolding)
               },
-              sha_analyzer: {
-                type: 'custom',
-                tokenizer: 'sha_tokenizer',
-                filter: %w(lowercase asciifolding)
-              },
               code_analyzer: {
                 type: 'custom',
                 tokenizer: 'whitespace',
@@ -79,15 +74,15 @@ module Elastic
                 max_gram: 3,
                 token_chars: %w(letter digit)
               },
-              sha_tokenizer: {
-                type: "edgeNGram",
-                min_gram: 5,
-                max_gram: 40,
-                token_chars: %w(letter digit)
-              },
               path_tokenizer: {
                 type: 'path_hierarchy',
                 reverse: true
+              }
+            },
+            normalizer: {
+              sha_normalizer: {
+                type: "custom",
+                filter: ["lowercase"]
               }
             }
           }
@@ -122,7 +117,7 @@ module Elastic
         indexes :iid, type: :integer
 
         indexes :title, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :description, type: :text,
           index_options: 'positions'
         indexes :state, type: :text
@@ -168,11 +163,11 @@ module Elastic
 
         ### PROJECTS
         indexes :name, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :path, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :name_with_namespace, type: :text,
-          index_options: 'docs',
+          index_options: 'positions',
           analyzer: :my_ngram_analyzer
         indexes :path_with_namespace, type: :text,
           index_options: 'positions'
@@ -190,7 +185,7 @@ module Elastic
 
         ### SNIPPETS
         indexes :file_name, type: :text,
-          index_options: 'docs'
+          index_options: 'positions'
         indexes :content, type: :text,
           index_options: 'positions'
 
@@ -198,16 +193,16 @@ module Elastic
         indexes :blob do
           indexes :type, type: :keyword
 
-          indexes :id, type: :text,
+          indexes :id, type: :keyword,
             index_options: 'docs',
-            analyzer: :sha_analyzer
+            normalizer: :sha_normalizer
           indexes :rid, type: :keyword
-          indexes :oid, type: :text,
+          indexes :oid, type: :keyword,
             index_options: 'docs',
-            analyzer: :sha_analyzer
-          indexes :commit_sha, type: :text,
+            normalizer: :sha_normalizer
+          indexes :commit_sha, type: :keyword,
             index_options: 'docs',
-            analyzer: :sha_analyzer
+            normalizer: :sha_normalizer
           indexes :path, type: :text,
             analyzer: :path_analyzer
           indexes :file_name, type: :text,
@@ -223,23 +218,23 @@ module Elastic
         indexes :commit do
           indexes :type, type: :keyword
 
-          indexes :id, type: :text,
+          indexes :id, type: :keyword,
             index_options: 'docs',
-            analyzer: :sha_analyzer
+            normalizer: :sha_normalizer
           indexes :rid, type: :keyword
-          indexes :sha, type: :text,
+          indexes :sha, type: :keyword,
             index_options: 'docs',
-            analyzer: :sha_analyzer
+            normalizer: :sha_normalizer
 
           indexes :author do
-            indexes :name, type: :text, index_options: 'docs'
-            indexes :email, type: :text, index_options: 'docs'
+            indexes :name, type: :text, index_options: 'positions'
+            indexes :email, type: :text, index_options: 'positions'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
           indexes :committer do
-            indexes :name, type: :text, index_options: 'docs'
-            indexes :email, type: :text, index_options: 'docs'
+            indexes :name, type: :text, index_options: 'positions'
+            indexes :email, type: :text, index_options: 'positions'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
