@@ -20,30 +20,30 @@ module ElasticsearchIndexedContainer
       pluck(target_attr_name)
     end
 
-    def limited_ids_last_updated_cache_key
-      [:elasticsearch_indexed_container_limited_ids_last_updated, self.name.underscore.to_sym]
+    def limited_ids_checksum_cache_key
+      [:elasticsearch_indexed_container_limited_ids_checksum, self.name.underscore.to_sym]
     end
 
-    def limited_ids_last_updated
-      Rails.cache.fetch(limited_ids_last_updated_cache_key, expires_in: CACHE_EXPIRES_IN) do
+    def limited_ids_checksum
+      Rails.cache.fetch(limited_ids_checksum_cache_key, expires_in: CACHE_EXPIRES_IN) do
         Time.now
       end
     end
 
     def limited_ids_cache_valid?
       return false unless Feature.enabled?(:elasticsearch_indexed_container_limited_ids_cache, default_enabled: true)
-      return false unless @limited_ids_loaded_at && @limited_ids
+      return false unless @limited_ids_checksum && @limited_ids
 
-      @limited_ids_loaded_at >= limited_ids_last_updated
+      @limited_ids_checksum == limited_ids_checksum
     end
 
     def limited_ids_cached
-      if limited_ids_cache_valid?
-        @limited_ids
-      else
-        @limited_ids_loaded_at = Time.now
+      unless limited_ids_cache_valid?
         @limited_ids = limited_ids
+        @limited_ids_checksum = @limited_ids.hash
       end
+
+      @limited_ids
     end
 
     def limited_ids
@@ -51,7 +51,7 @@ module ElasticsearchIndexedContainer
     end
 
     def invalidate_limited_ids_cache!
-      Rails.cache.write(limited_ids_last_updated_cache_key, Time.now)
+      Rails.cache.write(limited_ids_checksum_cache_key, limited_ids.hash)
     end
 
     def limited_include?(namespace_id)
