@@ -3056,6 +3056,9 @@ There can be multiple `resource_group`s defined per environment. A good use case
 is when deploying to physical devices. You may have more than one physical device, and each
 one can be deployed to, but there can be only one deployment per device at any given time.
 
+NOTE: **Note:**
+This key can only contain letters, digits, `-`, `_`, `/`, `$`, `{`, `}`, `.`, and spaces, but it cannot start or end with `/`.
+
 ### `include`
 
 > - Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 10.5.
