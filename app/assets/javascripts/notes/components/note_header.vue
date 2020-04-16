@@ -2,7 +2,6 @@
 import { mapActions } from 'vuex';
 import timeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
-import $ from 'jquery';
 
 export default {
   components: {
@@ -49,6 +48,8 @@ export default {
   data() {
     return {
       isUsernameLinkHovered: false,
+      emojiTitle: '',
+      authorStatusHasTooltip: false,
     };
   },
   computed: {
@@ -87,28 +88,17 @@ export default {
     authorStatus() {
       return this.author.status_tooltip_html;
     },
+    emojiElement() {
+      return this.$refs?.authorStatus?.querySelector('gl-emoji');
+    },
   },
   mounted() {
-    // Temporarily remove `title` attribute from emoji when tooltip is open
-    // Prevents duplicate tooltips (Bootstrap tooltip and browser title tooltip)
-    if (this.hasAuthorStatusWithTooltip()) {
-      const { authorStatus } = this.$refs;
-      const emoji = authorStatus.querySelector('gl-emoji');
-      const emojiTitle = emoji.getAttribute('title');
+    this.emojiTitle = this.emojiElement ? this.emojiElement.getAttribute('title') : '';
 
-      this.handleAuthorStatusTooltipShow = () => emoji.removeAttribute('title');
-      this.handleAuthorStatusTooltipHidden = () => emoji.setAttribute('title', emojiTitle);
-      $(authorStatus).on('show.bs.tooltip', this.handleAuthorStatusTooltipShow);
-      $(authorStatus).on('hidden.bs.tooltip', this.handleAuthorStatusTooltipHidden);
-    }
-  },
-  beforeDestroy() {
-    if (this.hasAuthorStatusWithTooltip()) {
-      const { authorStatus } = this.$refs;
-
-      $(authorStatus).off('show.bs.tooltip', this.handleAuthorStatusTooltipShow);
-      $(authorStatus).off('hidden.bs.tooltip', this.handleAuthorStatusTooltipHidden);
-    }
+    const authorStatusTitle = this.$refs?.authorStatus
+      ?.querySelector('.user-status-emoji')
+      ?.getAttribute('title');
+    this.authorStatusHasTooltip = authorStatusTitle && authorStatusTitle !== '';
   },
   methods: {
     ...mapActions(['setTargetNoteHash']),
@@ -120,18 +110,19 @@ export default {
         this.setTargetNoteHash(this.noteTimestampLink);
       }
     },
+    removeEmojiTitle() {
+      this.emojiElement.removeAttribute('title');
+    },
+    addEmojiTitle() {
+      this.emojiElement.setAttribute('title', this.emojiTitle);
+    },
     handleUsernameMouseEnter() {
       this.$refs.authorNameLink.dispatchEvent(new Event('mouseenter'));
-
       this.isUsernameLinkHovered = true;
     },
     handleUsernameMouseLeave() {
       this.$refs.authorNameLink.dispatchEvent(new Event('mouseleave'));
-
       this.isUsernameLinkHovered = false;
-    },
-    hasAuthorStatusWithTooltip() {
-      return this.$refs.authorStatus?.querySelector('.user-status-emoji:not([title=""])');
     },
   },
 };
@@ -160,7 +151,14 @@ export default {
         <slot name="note-header-info"></slot>
         <span class="note-header-author-name bold">{{ authorName }}</span>
       </a>
-      <span v-if="authorStatus" ref="authorStatus" v-html="authorStatus"></span>
+      <span
+        v-if="authorStatus"
+        ref="authorStatus"
+        v-on="
+          authorStatusHasTooltip ? { mouseenter: removeEmojiTitle, mouseleave: addEmojiTitle } : {}
+        "
+        v-html="authorStatus"
+      ></span>
       <span class="text-nowrap author-username">
         <a
           ref="authorUsernameLink"
