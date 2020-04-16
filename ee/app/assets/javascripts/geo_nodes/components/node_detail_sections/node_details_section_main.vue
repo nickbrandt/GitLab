@@ -100,7 +100,10 @@ export default {
           {{ selectiveSyncronization }}
         </span>
       </div>
-      <geo-node-health-status :status="nodeHealthStatus" />
+      <geo-node-health-status
+        :status="nodeHealthStatus"
+        :status-check-timestamp="nodeDetails.statusCheckTimestamp"
+      />
     </div>
   </div>
 </template>

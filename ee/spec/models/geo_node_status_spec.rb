@@ -70,7 +70,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     context 'takes outdated? into consideration' do
       it 'return false' do
         subject.status_message = GeoNodeStatus::HEALTHY_STATUS
-        subject.updated_at = 10.minutes.ago
+        subject.updated_at = 11.minutes.ago
 
         expect(subject.healthy?).to be false
       end
@@ -86,7 +86,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
   describe '#outdated?' do
     it 'return true' do
-      subject.updated_at = 10.minutes.ago
+      subject.updated_at = 11.minutes.ago
 
       expect(subject.outdated?).to be true
     end
@@ -107,20 +107,11 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   end
 
   describe '#health' do
-    context 'takes outdated? into consideration' do
-      it 'returns expiration error' do
-        subject.status_message = GeoNodeStatus::HEALTHY_STATUS
-        subject.updated_at = 10.minutes.ago
+    it 'returns status message' do
+      subject.status_message = 'something went wrong'
+      subject.updated_at = 11.minutes.ago
 
-        expect(subject.health).to eq "Status has not been updated in the past #{described_class::EXPIRATION_IN_MINUTES} minutes"
-      end
-
-      it 'returns original message' do
-        subject.status_message = 'something went wrong'
-        subject.updated_at = 1.minute.ago
-
-        expect(subject.health).to eq 'something went wrong'
-      end
+      expect(subject.health).to eq 'something went wrong'
     end
   end
 

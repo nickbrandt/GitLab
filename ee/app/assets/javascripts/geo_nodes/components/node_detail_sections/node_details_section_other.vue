@@ -4,8 +4,6 @@ import { numberToHumanSize } from '~/lib/utils/number_utils';
 
 import { VALUE_TYPE } from '../../constants';
 
-import DetailsSectionMixin from '../../mixins/details_section_mixin';
-
 import GeoNodeDetailItem from '../geo_node_detail_item.vue';
 import SectionRevealButton from './section_reveal_button.vue';
 
@@ -15,7 +13,6 @@ export default {
     SectionRevealButton,
     GeoNodeDetailItem,
   },
-  mixins: [DetailsSectionMixin],
   props: {
     node: {
       type: Object,
@@ -116,8 +113,6 @@ export default {
         :item-title="nodeDetailItem.itemTitle"
         :item-value="nodeDetailItem.itemValue"
         :item-value-type="nodeDetailItem.itemValueType"
-        :item-value-stale="statusInfoStale"
-        :item-value-stale-tooltip="statusInfoStaleMessage"
       />
     </div>
   </div>
