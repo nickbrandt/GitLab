@@ -1,10 +1,3 @@
 - return unless @project.feature_available?(:status_page, current_user) && @project.beta_feature_available?(:status_page)
 
-- setting = status_page_settings_data(@project.status_page_setting)
-
-.js-status-page-settings{ data: { operations_settings_endpoint: project_settings_operations_path(@project),
-    enabled: setting['setting-enabled'],
-    bucket_name: setting['setting-aws-s3-bucket-name'],
-    region: setting['setting-aws-region'],
-    aws_access_key: setting['setting-aws-access-key'],
-    aws_secret_key: setting['setting-masked-aws-secret-key'] } }
+.js-status-page-settings{ data: status_page_settings_data }
