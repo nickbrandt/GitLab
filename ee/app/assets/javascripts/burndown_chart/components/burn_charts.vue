@@ -1,11 +1,11 @@
 <script>
-import { GlDeprecatedButton, GlButtonGroup } from '@gitlab/ui';
+import { GlButton, GlButtonGroup } from '@gitlab/ui';
 import { __ } from '~/locale';
 import BurndownChart from './burndown_chart.vue';
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlButtonGroup,
     BurndownChart,
   },
@@ -39,6 +39,12 @@ export default {
     title() {
       return this.burnupChartsEnabled ? __('Charts') : __('Burndown chart');
     },
+    issueButtonCategory() {
+      return this.issuesSelected ? 'primary' : 'secondary';
+    },
+    weightButtonCategory() {
+      return this.issuesSelected ? 'secondary' : 'primary';
+    },
   },
   methods: {
     showIssueCount() {
@@ -54,25 +60,27 @@ export default {
 <template>
   <div data-qa-selector="burndown_chart">
     <div class="burndown-header d-flex align-items-center">
-      <h3>{{ title }}</h3>
+      <h3 ref="chartsTitle">{{ title }}</h3>
       <gl-button-group class="ml-3 js-burndown-data-selector">
-        <gl-deprecated-button
+        <gl-button
           ref="totalIssuesButton"
-          :variant="issuesSelected ? 'primary' : 'inverted-primary'"
-          size="sm"
+          :category="issueButtonCategory"
+          variant="info"
+          size="small"
           @click="showIssueCount"
         >
           {{ __('Issues') }}
-        </gl-deprecated-button>
-        <gl-deprecated-button
+        </gl-button>
+        <gl-button
           ref="totalWeightButton"
-          :variant="issuesSelected ? 'inverted-primary' : 'primary'"
-          size="sm"
+          :category="weightButtonCategory"
+          variant="info"
+          size="small"
           data-qa-selector="weight_button"
           @click="showIssueWeight"
         >
           {{ __('Issue weight') }}
-        </gl-deprecated-button>
+        </gl-button>
       </gl-button-group>
     </div>
     <div v-if="burnupChartsEnabled" class="row">
