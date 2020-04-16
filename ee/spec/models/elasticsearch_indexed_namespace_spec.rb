@@ -30,8 +30,8 @@ describe ElasticsearchIndexedNamespace do
 
   context 'caching' do
     it 'invalidates indexed project cache' do
-      expect(ElasticsearchIndexedProject).to receive(:drop_limited_ids_cache!).and_call_original.twice
-      expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.twice
+      expect(ElasticsearchIndexedProject).to receive(:invalidate_limited_ids_cache!).and_call_original.twice
+      expect(ElasticsearchIndexedNamespace).to receive(:invalidate_limited_ids_cache!).and_call_original.twice
 
       n = create(:elasticsearch_indexed_namespace)
 
@@ -69,7 +69,7 @@ describe ElasticsearchIndexedNamespace do
 
     describe '.index_first_n_namespaces_of_plan' do
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.exactly(3).times
+        expect(ElasticsearchIndexedNamespace).to receive(:invalidate_limited_ids_cache!).and_call_original.exactly(3).times
 
         ids = namespaces.map(&:id)
 
@@ -97,7 +97,7 @@ describe ElasticsearchIndexedNamespace do
       end
 
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.exactly(3).times
+        expect(ElasticsearchIndexedNamespace).to receive(:invalidate_limited_ids_cache!).and_call_original.exactly(3).times
 
         ids = namespaces.map(&:id)
 

@@ -45,7 +45,7 @@ RSpec.shared_examples 'an elasticsearch indexed container' do
       end
 
       it 'invalidates limited_ids cache' do
-        is_expected.to receive(:drop_limited_ids_cache!)
+        is_expected.to receive(:invalidate_limited_ids_cache!)
 
         subject.save!
       end
@@ -67,7 +67,7 @@ RSpec.shared_examples 'an elasticsearch indexed container' do
       end
 
       it 'invalidates limited_ids cache' do
-        is_expected.to receive(:drop_limited_ids_cache!)
+        is_expected.to receive(:invalidate_limited_ids_cache!)
 
         subject.destroy!
       end
