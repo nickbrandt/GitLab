@@ -21864,6 +21864,9 @@ msgstr ""
 msgid "Try all GitLab has to offer for 30 days."
 msgstr ""
 
+msgid "Try changing or removing filters."
+msgstr ""
+
 msgid "Try to fork again"
 msgstr ""
 
@@ -24115,6 +24118,9 @@ msgid "Your projects"
 msgstr ""
 
 msgid "Your request for access has been queued for review."
+msgstr ""
+
+msgid "Your search didn't match any commits."
 msgstr ""
 
 msgid "Your subscription expired!"
