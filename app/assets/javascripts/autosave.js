@@ -56,7 +56,7 @@ export default class Autosave {
       if (this.fallbackKey) {
         window.localStorage.setItem(this.fallbackKey, text);
       }
-      if (this.lockVersion > -1) {
+      if (this.lockVersion !== undefined) {
         window.localStorage.setItem(this.lockVersionKey, this.lockVersion);
       }
       return window.localStorage.setItem(this.key, text);
