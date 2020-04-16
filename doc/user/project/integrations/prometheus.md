@@ -305,7 +305,7 @@ The following tables outline the details of expected properties.
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
-| `id` | string | no | Used for associating dashboard metrics with database records. Must be unique across dashboard configuration files. Required for [alerting](#setting-up-alerts-for-prometheus-metrics-ultimate) (support not yet enabled, see [relevant issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/60319)). |
+| `id` | string | no | Used for associating dashboard metrics with database records. Must be unique across dashboard configuration files. Required for [alerting](#setting-up-alerts-for-prometheus-metrics) (support not yet enabled, see [relevant issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/60319)). |
 | `unit` | string | yes | Defines the unit of the query's return data. |
 | `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. Can contain time series labels as interpolated variables. |
 | `query` | string | yes if `query_range` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
@@ -628,7 +628,7 @@ The options are:
 - [View logs](#view-logs-ultimate)
 - [Download CSV](#downloading-data-as-csv)
 - [Copy link to chart](#embedding-gitlab-managed-kubernetes-metrics)
-- [Alerts](#setting-up-alerts-for-prometheus-metrics-ultimate)
+- [Alerts](#setting-up-alerts-for-prometheus-metrics)
 
 ### View Logs **(ULTIMATE)**
 
@@ -653,7 +653,7 @@ and end times to the URL, enabling you to share specific timeframes more easily.
 
 Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
 
-### Setting up alerts for Prometheus metrics **(ULTIMATE)**
+### Setting up alerts for Prometheus metrics
 
 #### Managed Prometheus instances
 
@@ -806,7 +806,7 @@ It is also possible to embed either the default dashboard metrics or individual 
 
 ### Embedding metrics based on alerts in incident issues
 
-For [GitLab-managed alerting rules](#setting-up-alerts-for-prometheus-metrics-ultimate), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
+For [GitLab-managed alerting rules](#setting-up-alerts-for-prometheus-metrics), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
 
 For [manually configured Prometheus instances](#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
 
