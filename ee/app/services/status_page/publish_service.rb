@@ -24,33 +24,33 @@ module StatusPage
       return error_permission_denied unless can_publish?
       return error_issue_not_found unless issue
 
-      response = process_incident
+      response = process_details
       return response if response.error?
 
-      process_incident_list
+      process_list
     end
 
     private
 
     attr_reader :user, :project, :issue_id
 
-    def process_incident
+    def process_details
       if issue.confidential?
-        unpublish_incident
+        unpublish_details
       else
-        publish_incident
+        publish_details
       end
     end
 
-    def process_incident_list
+    def process_list
       PublishListService.new(project: project).execute(issues)
     end
 
-    def publish_incident
+    def publish_details
       PublishDetailsService.new(project: project).execute(issue, user_notes)
     end
 
-    def unpublish_incident
+    def unpublish_details
       UnpublishDetailsService.new(project: project).execute(issue)
     end
 

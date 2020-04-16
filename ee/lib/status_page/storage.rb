@@ -14,7 +14,7 @@ module StatusPage
     end
 
     def self.upload_path(issue_iid, secret, file_name)
-      File.join('data', issue_iid.to_s, secret, file_name)
+      File.join('data', 'incident', issue_iid.to_s, secret, file_name)
     end
 
     def self.list_path
