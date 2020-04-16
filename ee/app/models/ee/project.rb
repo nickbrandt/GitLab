@@ -95,7 +95,13 @@ module EE
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Project', foreign_key: :source_project_id
 
-      scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
+      scope :with_shared_runners_limit_enabled, -> do
+        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+          with_shared_runners
+        else
+          with_shared_runners.non_public_only
+        end
+      end
 
       scope :mirror, -> { where(mirror: true) }
 
@@ -271,6 +277,15 @@ module EE
     end
 
     def shared_runners_minutes_limit_enabled?
+      if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+        shared_runners_enabled? &&
+          shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
+      else
+        legacy_shared_runners_minutes_limit_enabled?
+      end
+    end
+
+    def legacy_shared_runners_minutes_limit_enabled?
       !public? && shared_runners_enabled? &&
         shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
     end

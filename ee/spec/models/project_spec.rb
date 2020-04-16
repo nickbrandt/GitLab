@@ -182,6 +182,42 @@ describe Project do
         expect(Project.find_by_service_desk_project_key('some_key')).to be_nil
       end
     end
+
+    describe '.with_shared_runners_limit_enabled' do
+      it 'does not return projects without shared runners' do
+        project_with_shared_runners = create(:project, shared_runners_enabled: true)
+        project_without_shared_runners = create(:project, shared_runners_enabled: false)
+
+        expect(described_class.with_shared_runners_limit_enabled).to include(project_with_shared_runners)
+        expect(described_class.with_shared_runners_limit_enabled).not_to include(project_without_shared_runners)
+      end
+
+      it 'return projects with shared runners with any visibility levels' do
+        public_project_with_shared_runners = create(:project, :public, shared_runners_enabled: true)
+        internal_project_with_shared_runners = create(:project, :internal, shared_runners_enabled: true)
+        private_project_with_shared_runners = create(:project, :private, shared_runners_enabled: true)
+
+        expect(described_class.with_shared_runners_limit_enabled).to include(public_project_with_shared_runners)
+        expect(described_class.with_shared_runners_limit_enabled).to include(internal_project_with_shared_runners)
+        expect(described_class.with_shared_runners_limit_enabled).to include(private_project_with_shared_runners)
+      end
+
+      context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
+        before do
+          stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
+        end
+
+        it 'does not return public projects' do
+          public_project_with_shared_runners = create(:project, :public, shared_runners_enabled: true)
+          internal_project_with_shared_runners = create(:project, :internal, shared_runners_enabled: true)
+          private_project_with_shared_runners = create(:project, :private, shared_runners_enabled: true)
+
+          expect(described_class.with_shared_runners_limit_enabled).not_to include(public_project_with_shared_runners)
+          expect(described_class.with_shared_runners_limit_enabled).to include(internal_project_with_shared_runners)
+          expect(described_class.with_shared_runners_limit_enabled).to include(private_project_with_shared_runners)
+        end
+      end
+    end
   end
 
   describe 'validations' do
@@ -941,7 +977,15 @@ describe Project do
           project.visibility_level = Project::PUBLIC
         end
 
-        it { is_expected.to be_falsey }
+        it { is_expected.to be_truthy }
+
+        context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
+          before do
+            stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
+          end
+
+          it { is_expected.to be_falsey }
+        end
       end
 
       context 'for internal project' do
