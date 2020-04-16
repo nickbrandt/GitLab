@@ -25,6 +25,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     push_frontend_feature_flag(:suggest_pipeline) if experiment_enabled?(:suggest_pipeline)
     push_frontend_feature_flag(:code_navigation, @project)
     push_frontend_feature_flag(:widget_visibility_polling, @project, default_enabled: true)
+    push_frontend_feature_flag(:merge_ref_head_comments, @project)
   end
 
   before_action do
