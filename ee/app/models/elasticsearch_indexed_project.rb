@@ -14,9 +14,7 @@ class ElasticsearchIndexedProject < ApplicationRecord
     :project_id
   end
 
-  def self.limited(ignore_namespaces: false)
-    return Project.inc_routes.where(id: target_ids) if ignore_namespaces
-
+  def self.limited
     Project.inc_routes.from_union(
       [
         Project.where(namespace_id: ElasticsearchIndexedNamespace.limited.select(:id)),

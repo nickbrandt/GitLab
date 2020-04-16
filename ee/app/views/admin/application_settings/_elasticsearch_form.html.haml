@@ -87,19 +87,21 @@
               = f.label :elasticsearch_limit_indexing, class: 'form-check-label' do
                 = _('Limit namespaces and projects that can be indexed')
 
-          .form-group.js-limit-namespaces{ class: ('hidden' unless @application_setting.elasticsearch_limit_indexing) }
+          .form-group.js-limit-namespaces{ class: ('hidden' unless @application_setting.elasticsearch_limit_indexing?) }
             = f.label :elasticsearch_namespace_ids, _('Namespaces to index'), class: 'label-bold'
             - if elasticsearch_too_many_namespaces?
               %p= _('Too many namespaces enabled. You will need to manage them via the console or the API.')
             - else
-              = f.text_field :elasticsearch_namespace_ids, class: 'js-elasticsearch-namespaces', value: elasticsearch_namespace_ids, data: { selected: elasticsearch_objects_options(@application_setting.elasticsearch_limited_namespaces(ignore_descendants: true)).to_json }
+              - indexed_namespaces = Namespace.where(id: ElasticsearchIndexedNamespace.select(:namespace_id))
+              = f.text_field :elasticsearch_namespace_ids, class: 'js-elasticsearch-namespaces', value: elasticsearch_namespace_ids, data: { selected: elasticsearch_objects_options(indexed_namespaces).to_json }
 
-          .form-group.js-limit-projects{ class: ('hidden' unless @application_setting.elasticsearch_limit_indexing) }
+          .form-group.js-limit-projects{ class: ('hidden' unless @application_setting.elasticsearch_limit_indexing?) }
             = f.label :elasticsearch_project_ids, _('Projects to index'), class: 'label-bold'
             - if elasticsearch_too_many_projects?
               %p= _('Too many projects enabled. You will need to manage them via the console or the API.')
             - else
-              = f.text_field :elasticsearch_project_ids, class: 'js-elasticsearch-projects', value: elasticsearch_project_ids, data: { selected: elasticsearch_objects_options(@application_setting.elasticsearch_limited_projects(ignore_namespaces: true)).to_json }
+              - indexed_projects = Project.where(id: ElasticsearchIndexedProject.select(:project_id))
+              = f.text_field :elasticsearch_project_ids, class: 'js-elasticsearch-projects', value: elasticsearch_project_ids, data: { selected: elasticsearch_objects_options(indexed_projects).to_json }
 
         .sub-section
           %h4= _('Elasticsearch AWS IAM credentials')

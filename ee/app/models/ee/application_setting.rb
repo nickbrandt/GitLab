@@ -131,14 +131,6 @@ module EE
       ElasticsearchIndexedProject.target_ids
     end
 
-    def elasticsearch_limited_namespaces(ignore_descendants: false)
-      ElasticsearchIndexedNamespace.limited(ignore_descendants: ignore_descendants)
-    end
-
-    def elasticsearch_limited_projects(ignore_namespaces: false)
-      ElasticsearchIndexedProject.limited(ignore_namespaces: ignore_namespaces)
-    end
-
     def elasticsearch_indexes_project?(project)
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?

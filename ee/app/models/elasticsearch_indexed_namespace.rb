@@ -18,10 +18,8 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
     :namespace_id
   end
 
-  def self.limited(ignore_descendants: false)
+  def self.limited
     namespaces = Namespace.with_route.where(id: target_ids)
-
-    return namespaces if ignore_descendants
 
     Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
   end
