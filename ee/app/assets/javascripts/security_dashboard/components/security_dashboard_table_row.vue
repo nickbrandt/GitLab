@@ -68,10 +68,6 @@ export default {
       return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
     },
   },
-  mounted() {
-    // this.$el.addEventListener('focusin', this.showActionButtons);
-    // this.$el.addEventListener('focusout', this.hideActionButtons);
-  },
   methods: {
     ...mapActions('vulnerabilities', ['openModal', 'selectVulnerability', 'deselectVulnerability']),
     toggleVulnerability() {
@@ -125,6 +121,7 @@ export default {
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-deprecated-button
+            ref="vulnerability-title"
             class="d-inline gl-line-height-inherit gl-text-align-inherit gl-white-space-normal"
             variant="blank"
             @click="openModal({ vulnerability })"
@@ -174,12 +171,6 @@ export default {
 
 <style scoped>
 @media (min-width: 768px) {
-  /* NOTE: Can be removed: border are defined at: line 40, app/assets/stylesheets/framework/responsive_tables.scss*/
-  /*.vulnerabilities-row:last-child {*/
-  /*  border-bottom: 1px solid transparent;*/
-  /*}*/
-
-  /*this should be done by gitlab-ui table and using `.table-hover`*/
   .vulnerabilities-row:hover,
   .vulnerabilities-row:focus {
     background: #f6fafd;
@@ -187,39 +178,5 @@ export default {
     border-top: 1px solid #c1daf4;
     margin-top: -1px;
   }
-
-  /*.vulnerabilities-row .action-buttons {*/
-  /*  opacity: 0;*/
-  /*}*/
-
-  /*.vulnerabilities-row:hover .action-buttons,*/
-  /*.vulnerabilities-row:focus-within .action-buttons {*/
-  /*  opacity: 1;*/
-  /*}*/
 }
-
-/*NOTE: replaced by gl-white-space-normal*/
-/*.vulnerability-info {*/
-/*  white-space: normal;*/
-/*}*/
-
-/*.vulnerability-title {*/
-/*NOTE: replaced by gl-text-align-inherit*/
-/*text-align: inherit;*/
-/*NOTE: replaced by gl-white-space-inherit*/
-/*white-space: normal;*/
-/*NOTE: replaced by gl-line-height-inherit*/
-/*line-height: inherit;*/
-/*}*/
-
-.vulnerability-namespace {
-  /*NOTE: using `.gl-text-gray-700` => $gray-700: #707070; for this instead*/
-  /*color: #707070;*/
-  /*Note: replaced with <small>, since it has 80% font size*/
-  /*font-size: 0.8em;*/
-}
-
-/*.dismissed .table-mobile-content:not(.action-buttons) {*/
-/*  opacity: 0.5;*/
-/*}*/
 </style>
