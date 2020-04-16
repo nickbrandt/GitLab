@@ -60,7 +60,6 @@ host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ## Geo Primary Role
 ## - postgresql.conf
 ##
-sql_replication_user = gitlab_replicator
 wal_level = hot_standby
 max_wal_senders = 10
 wal_keep_segments = 50
