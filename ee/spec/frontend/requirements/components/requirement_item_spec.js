@@ -235,12 +235,28 @@ describe('RequirementItem', () => {
       });
     });
 
-    it('renders `Reopen` button when current requirement is archived', () => {
+    it('renders `Reopen` button when current requirement is archived and `requirement.userPermissions.adminRequirement` is true', () => {
       const reopenButton = wrapperArchived.find('.requirement-reopen').find(GlDeprecatedButton);
 
       expect(reopenButton.exists()).toBe(true);
       expect(reopenButton.props('loading')).toBe(false);
       expect(reopenButton.text()).toBe('Reopen');
+    });
+
+    it('does not render `Reopen` button when current requirement is archived and `requirement.userPermissions.adminRequirement` is false', () => {
+      wrapperArchived.setProps({
+        requirement: {
+          ...requirementArchived,
+          userPermissions: {
+            ...mockUserPermissions,
+            adminRequirement: false,
+          },
+        },
+      });
+
+      return wrapperArchived.vm.$nextTick(() => {
+        expect(wrapperArchived.contains('.controls .requirement-reopen')).toBe(false);
+      });
     });
 
     it('renders element containing requirement updated at', () => {

@@ -9,110 +9,23 @@ describe LicenseHelper do
   end
 
   describe '#license_message' do
-    subject { license_message(signed_in: signed_in, is_admin: is_admin) }
+    let(:license) { double(:license) }
+    let(:message_mock) { double(:message_mock) }
 
-    context 'license installed' do
-      let(:license) { double(:license) }
-      let(:expired_date) { Time.utc(2020, 3, 9, 10) }
-      let(:today) { Time.utc(2020, 3, 7, 10) }
-
-      before do
-        allow(License).to receive(:current).and_return(license)
-        allow(license).to receive(:plan).and_return('ultimate')
-        allow(license).to receive(:expires_at).and_return(expired_date)
-      end
-
-      context 'license is notify admins' do
-        before do
-          allow(license).to receive(:notify_admins?).and_return(true)
-        end
-
-        context 'admin signed in' do
-          let(:signed_in) { true }
-          let(:is_admin) { true }
-
-          context 'license expired' do
-            let(:expired_date) { Time.utc(2020, 3, 9).to_date }
-
-            before do
-              allow(license).to receive(:expired?).and_return(true)
-              allow(license).to receive(:expires_at).and_return(expired_date)
-            end
-
-            context 'and it will block changes when it expires' do
-              before do
-                allow(license).to receive(:will_block_changes?).and_return(true)
-              end
-
-              context 'and its currently blocking changes' do
-                before do
-                  allow(license).to receive(:block_changes?).and_return(true)
-                  allow(license).to receive(:block_changes_at).and_return(expired_date)
-                end
-
-                it 'has a nice subject' do
-                  allow(license).to receive(:will_block_changes?).and_return(false)
-
-                  expect(subject).to have_text('Your subscription has been downgraded')
-                end
-
-                it 'has an expiration blocking message' do
-                  Timecop.freeze(today) do
-                    expect(subject).to have_text("You didn't renew your Ultimate subscription so it was downgraded to the GitLab Core Plan")
-                  end
-                end
-              end
-
-              context 'and its NOT currently blocking changes' do
-                before do
-                  allow(license).to receive(:block_changes?).and_return(false)
-                end
-
-                it 'has a nice subject' do
-                  allow(license).to receive(:will_block_changes?).and_return(false)
-
-                  expect(subject).to have_text('Your subscription expired!')
-                end
-
-                it 'has an expiration blocking message' do
-                  allow(license).to receive(:block_changes_at).and_return(expired_date)
-
-                  Timecop.freeze(today) do
-                    expect(subject).to have_text('No worries, you can still use all the Ultimate features for now. You have 2 days to renew your subscription.')
-                  end
-                end
-              end
-            end
-          end
-
-          context 'license NOT expired' do
-            before do
-              allow(license).to receive(:expired?).and_return(false)
-              allow(license).to receive(:remaining_days).and_return(4)
-              allow(license).to receive(:will_block_changes?).and_return(true)
-              allow(license).to receive(:block_changes_at).and_return(expired_date)
-            end
-
-            it 'has a nice subject' do
-              expect(subject).to have_text('Your subscription will expire in 4 days')
-            end
-
-            it 'has an expiration blocking message' do
-              Timecop.freeze(today) do
-                expect(subject).to have_text('Your Ultimate subscription will expire on 2020-03-09. After that, you will not to be able to create issues or merge requests as well as many other features.')
-              end
-            end
-          end
-        end
-      end
+    before do
+      allow(License).to receive(:current).and_return(license)
     end
 
-    context 'no license installed' do
-      let(:license) { nil }
-      let(:signed_in) { true }
-      let(:is_admin) { true }
+    it 'calls Gitlab::ExpiringSubscriptionMessage to get expiring message' do
+      expect(Gitlab::ExpiringSubscriptionMessage).to receive(:new).with(
+        subscribable: license,
+        signed_in: true,
+        is_admin: false
+      ).and_return(message_mock)
 
-      it { is_expected.to be_blank }
+      expect(message_mock).to receive(:message)
+
+      license_message(signed_in: true, is_admin: false)
     end
   end
 
@@ -174,6 +87,65 @@ describe LicenseHelper do
         allow(License).to receive(:current).and_return(nil)
 
         expect(maximum_user_count).to eq(0)
+      end
+    end
+  end
+
+  describe '#current_license_title' do
+    context 'when there is a current license' do
+      it 'returns the plan titleized if it has a plan associated to it' do
+        custom_plan = 'custom plan'
+        license = double('License', plan: custom_plan)
+        allow(License).to receive(:current).and_return(license)
+
+        expect(current_license_title).to eq(custom_plan.titleize)
+      end
+
+      it 'returns the default title if it does not have a plan associated to it' do
+        license = double('License', plan: nil)
+        allow(License).to receive(:current).and_return(license)
+
+        expect(current_license_title).to eq('Core')
+      end
+    end
+
+    context 'when there is NOT a current license' do
+      it 'returns the default title' do
+        allow(License).to receive(:current).and_return(nil)
+
+        expect(current_license_title).to eq('Core')
+      end
+    end
+  end
+
+  describe '#seats_calculation_message' do
+    subject { seats_calculation_message(license) }
+
+    context 'with a license' do
+      let(:license) { double("License", 'exclude_guests_from_active_count?' => exclude_guests) }
+
+      context 'and guest are excluded from the active count' do
+        let(:exclude_guests) { true }
+
+        it 'returns a tag with the message' do
+          expect(subject).to eq("<p>Users with a Guest role or those who don&#39;t belong to a Project or Group will not use a seat from your license.</p>")
+        end
+      end
+
+      context 'and guest are NOT excluded from the active count' do
+        let(:exclude_guests) { false }
+
+        it 'returns nil' do
+          expect(subject).to be_blank
+        end
+      end
+    end
+
+    context 'when the license is blank' do
+      let(:license) { nil }
+
+      it 'returns nil' do
+        expect(subject).to be_blank
       end
     end
   end

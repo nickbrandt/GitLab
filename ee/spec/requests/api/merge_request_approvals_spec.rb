@@ -312,8 +312,6 @@ describe API::MergeRequestApprovals do
   end
 
   describe 'PUT :id/merge_requests/:merge_request_iid/approvers' do
-    RSpec::Matchers.define_negated_matcher :not_change, :change
-
     shared_examples_for 'user allowed to change approvers' do
       context 'when disable_overriding_approvers_per_merge_request is true on the project' do
         before do

@@ -3,7 +3,8 @@
 - if Gitlab::CurrentSettings.should_check_namespace_plan?
   - namespace = @project&.namespace || @group
   - if can?(current_user, :admin_namespace, namespace)
-    = link_to _('Upgrade your plan'), upgrade_plan_url, class: 'btn btn-primary', target: target_blank ? '_blank' : '_self'
+    - current_group = @project&.group || @group
+    = link_to _('Upgrade your plan'), upgrade_plan_path(current_group), class: 'btn btn-primary', target: target_blank ? '_blank' : '_self'
   - elsif namespace.is_a?(Group)
     %p= _('Contact an owner of group %{namespace_name} to upgrade the plan.') % { namespace_name: namespace.name }
   - else

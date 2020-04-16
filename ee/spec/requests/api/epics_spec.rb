@@ -41,8 +41,6 @@ describe API::Epics do
     let(:extra_date_fields) { %w[start_date_is_fixed start_date_fixed due_date_is_fixed due_date_fixed] }
 
     context 'when permission is absent' do
-      RSpec::Matchers.define_negated_matcher :exclude, :include
-
       it 'returns epic with extra date fields' do
         get api(url, user), params: params
 

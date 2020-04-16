@@ -58,6 +58,31 @@ export const parseEnvironmentsResponse = (response = [], projectPath) =>
   });
 
 /**
+ * Annotation API returns time in UTC. This method
+ * converts time to local time.
+ *
+ * startingAt always exists but endingAt does not.
+ * If endingAt does not exist, a threshold line is
+ * drawn.
+ *
+ * If endingAt exists, a threshold range is drawn.
+ * But this is not supported as of %12.10
+ *
+ * @param {Array} response annotations response
+ * @returns {Array} parsed responses
+ */
+export const parseAnnotationsResponse = response => {
+  if (!response) {
+    return [];
+  }
+  return response.map(annotation => ({
+    ...annotation,
+    startingAt: new Date(annotation.startingAt),
+    endingAt: annotation.endingAt ? new Date(annotation.endingAt) : null,
+  }));
+};
+
+/**
  * Maps metrics to its view model
  *
  * This function difers from other in that is maps all

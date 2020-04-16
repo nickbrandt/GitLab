@@ -45,9 +45,9 @@ export const annotationsYAxis = {
  * Fetched list of annotations are parsed into a
  * format the eCharts accepts to draw markLines
  *
- * If Annotation is a single line, the `starting_at` property
- * has a value and the `ending_at` is null. Because annotations
- * only supports lines the `ending_at` value does not exist yet.
+ * If Annotation is a single line, the `startingAt` property
+ * has a value and the `endingAt` is null. Because annotations
+ * only supports lines the `endingAt` value does not exist yet.
  *
  * @param {Object} annotation object
  * @returns {Object} markLine object
@@ -56,7 +56,7 @@ export const parseAnnotations = annotations =>
   annotations.reduce(
     (acc, annotation) => {
       acc.lines.push({
-        xAxis: annotation.starting_at,
+        xAxis: annotation.startingAt,
         lineStyle: {
           color: colorValues.primaryColor,
         },
@@ -64,10 +64,10 @@ export const parseAnnotations = annotations =>
 
       acc.points.push({
         name: 'annotations',
-        xAxis: annotation.starting_at,
+        xAxis: annotation.startingAt,
         yAxis: annotationsYAxisCoords.min,
         tooltipData: {
-          title: annotation.starting_at,
+          title: annotation.startingAt,
           content: annotation.description,
         },
       });

@@ -774,10 +774,6 @@ class Project < ApplicationRecord
     { scope: :project, status: auto_devops&.enabled || Feature.enabled?(:force_autodevops_on_by_default, self) }
   end
 
-  def daily_statistics_enabled?
-    Feature.enabled?(:project_daily_statistics, self, default_enabled: true)
-  end
-
   def unlink_forks_upon_visibility_decrease_enabled?
     Feature.enabled?(:unlink_fork_network_upon_visibility_decrease, self, default_enabled: true)
   end

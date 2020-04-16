@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWorker
-  LEASE_TIMEOUT = 3600
-
   include ApplicationWorker
   # rubocop:disable Scalability/CronWorkerContext
   # This worker does not perform work scoped to a context
@@ -11,10 +9,23 @@ class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWo
   # rubocop:enable Scalability/CronWorkerContext
   feature_category :continuous_integration
 
-  def perform
-    return unless try_obtain_lease
+  LEASE_TIMEOUT = 3600
+  BATCH_SIZE = 100_000
 
-    Namespace.reset_ci_minutes_in_batches!
+  def perform
+    if Feature.enabled?(:ci_parallel_minutes_reset, default_enabled: true)
+      start_id = Namespace.minimum(:id)
+      last_id = Namespace.maximum(:id)
+
+      (start_id..last_id).step(BATCH_SIZE) do |batch_start_id|
+        batch_end_id = batch_start_id + BATCH_SIZE - 1
+        Ci::BatchResetMinutesWorker.perform_async(batch_start_id, batch_end_id)
+      end
+    else
+      return unless try_obtain_lease
+
+      Namespace.reset_ci_minutes_in_batches!
+    end
   end
 
   private

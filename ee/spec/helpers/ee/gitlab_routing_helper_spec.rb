@@ -114,4 +114,24 @@ describe EE::GitlabRoutingHelper do
       expect(subject).to start_with 'http://localhost/users/auth/group_saml/metadata?group_path=foo&token='
     end
   end
+
+  describe '#upgrade_plan_path' do
+    subject { upgrade_plan_path(group) }
+
+    context 'when the group is present' do
+      let(:group) { build_stubbed(:group) }
+
+      it "returns the group billing path" do
+        expect(subject).to eq(group_billings_path(group))
+      end
+    end
+
+    context 'when the group is blank' do
+      let(:group) { nil }
+
+      it "returns the profile billing path" do
+        expect(subject).to eq(profile_billings_path)
+      end
+    end
+  end
 end

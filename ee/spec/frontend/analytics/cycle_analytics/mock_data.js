@@ -40,6 +40,8 @@ export const group = {
   avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
 };
 
+export const selectedGroup = convertObjectPropsToCamelCase(group, { deep: true });
+
 const getStageByTitle = (stages, title) =>
   stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
