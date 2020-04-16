@@ -16,10 +16,6 @@ module DesignManagement
 
       version = delete_designs!
 
-      version.run_after_commit do
-        ::DesignManagement::NewVersionWorker.perform_async(version.id)
-      end
-
       # Create a Geo event so changes will be replicated to secondary node(s)
       repository.log_geo_updated_event
 

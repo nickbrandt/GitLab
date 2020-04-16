@@ -19,13 +19,13 @@ module DesignManagement
 
       repository.create_if_not_exists
 
-      uploaded_designs = upload_designs!
+      uploaded_designs, version = upload_designs!
       skipped_designs = designs - uploaded_designs
 
       # Create a Geo event so changes will be replicated to secondary node(s)
       repository.log_geo_updated_event
 
-      success({ designs: uploaded_designs, skipped_designs: skipped_designs })
+      success({ designs: uploaded_designs, version: version, skipped_designs: skipped_designs })
     rescue ::ActiveRecord::RecordInvalid => e
       error(e.message)
     end
@@ -35,25 +35,11 @@ module DesignManagement
     attr_reader :files
 
     def upload_designs!
-      # puts "Waiting [#{Thread.current.object_id}]"
-      actions = ::DesignManagement::Version.lock_for_creation(project.id) do
-        # puts ". Building [#{Thread.current.object_id}]"
+      ::DesignManagement::Version.lock_for_creation(project.id) do
         actions = build_actions
-        # if actions.empty?
-        #   puts ".. Skipping [#{Thread.current.object_id}]"
-        # else
-        if actions.present?
-          # puts ".. Running [#{Thread.current.object_id}]"
-          version = run_actions(actions)
-          version.run_after_commit do
-            ::DesignManagement::NewVersionWorker.perform_async(version.id)
-          end
-        end
 
-        actions
+        [actions.map(&:design), actions.presence && run_actions(actions)]
       end
-      # puts "Done [#{Thread.current.object_id}]"
-      actions.map(&:design)
     end
 
     # Returns `Design` instances that correspond with `files`.

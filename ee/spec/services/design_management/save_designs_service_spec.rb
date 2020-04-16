@@ -20,18 +20,7 @@ describe DesignManagement::SaveDesignsService do
 
   before do
     project.add_developer(developer)
-
-    allow(::DesignManagement::NewVersionWorker).to receive(:perform_async)
-  end
-
-  RSpec::Matchers.define :enqueue_worker do
-    match do |action|
-      expect(::DesignManagement::NewVersionWorker)
-        .to receive(:perform_async).once.with(Integer)
-      action.call
-    end
-
-    supports_block_expectations
+    # allow(::DesignManagement::NewVersionWorker).to receive(:perform_async)
   end
 
   def run_service(files_to_upload = nil)
@@ -237,7 +226,10 @@ describe DesignManagement::SaveDesignsService do
         end
 
         it 'enqueues just one new version worker' do
-          expect { run_service }.to enqueue_worker
+          expect(::DesignManagement::NewVersionWorker)
+            .to receive(:perform_async).once.with(Integer)
+
+          run_service
         end
       end
 
@@ -260,7 +252,10 @@ describe DesignManagement::SaveDesignsService do
         end
 
         it 'enqueues a new version worker' do
-          expect { run_service }.to enqueue_worker
+          expect(::DesignManagement::NewVersionWorker)
+            .to receive(:perform_async).once.with(Integer)
+
+          run_service
         end
 
         it 'creates a single commit' do
@@ -272,7 +267,8 @@ describe DesignManagement::SaveDesignsService do
           expect { run_service }.to change { commit_count.call }.by(1)
         end
 
-        it 'only does 4 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
+        it 'only does 5 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
+          allow(::DesignManagement::NewVersionWorker).to receive(:perform_async).with(Integer)
           service = described_class.new(project, user, issue: issue, files: files)
           # Some unrelated calls that are usually cached or happen only once
           service.__send__(:repository).create_if_not_exists

@@ -17,7 +17,17 @@ module DesignManagement
                                     message: commit_message,
                                     actions: actions.map(&:gitaly_action))
 
-      ::DesignManagement::Version.create_for_designs(actions, sha, current_user)
+      ::DesignManagement::Version
+        .create_for_designs(actions, sha, current_user)
+        .tap { |version| post_process(version) }
+    end
+
+    private
+
+    def post_process(version)
+      version.run_after_commit_or_now do
+        ::DesignManagement::NewVersionWorker.perform_async(id)
+      end
     end
   end
 end

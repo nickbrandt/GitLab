@@ -4,6 +4,7 @@ module DesignManagement
   class Version < ApplicationRecord
     include Importable
     include ShaAttribute
+    include AfterCommitQueue
     include Gitlab::Utils::StrongMemoize
     extend Gitlab::ExclusiveLeaseHelpers
 
