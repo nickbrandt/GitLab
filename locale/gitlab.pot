@@ -12982,9 +12982,6 @@ msgid_plural "Metrics|Edit metrics"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Metrics|Environment"
-msgstr ""
-
 msgid "Metrics|For grouping similar metrics"
 msgstr ""
 
@@ -13016,9 +13013,6 @@ msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
 msgid "Metrics|Refresh dashboard"
-msgstr ""
-
-msgid "Metrics|Show last"
 msgstr ""
 
 msgid "Metrics|There was an error creating the dashboard."
