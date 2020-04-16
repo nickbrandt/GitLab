@@ -4,10 +4,10 @@ import { TEST_HOST } from 'jest/helpers/test_constants';
 import {
   mockProjectDir,
   graphDataPrometheusQuery,
-  graphDataPrometheusQueryRange,
   anomalyMockGraphData,
   barMockData,
 } from './mock_data';
+import { graphData } from './fixture_data';
 
 jest.mock('~/lib/utils/url_utility');
 
@@ -101,10 +101,7 @@ describe('monitoring/utils', () => {
      * the validator will look for the `values` key instead of `value`
      */
     it('validates data with the query_range format', () => {
-      const validGraphData = monitoringUtils.graphDataValidatorForValues(
-        false,
-        graphDataPrometheusQueryRange,
-      );
+      const validGraphData = monitoringUtils.graphDataValidatorForValues(false, graphData);
 
       expect(validGraphData).toBe(true);
     });
