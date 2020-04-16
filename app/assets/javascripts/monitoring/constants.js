@@ -131,3 +131,15 @@ export const ENVIRONMENT_AVAILABLE_STATE = 'available';
  * https://gitlab.com/gitlab-org/gitlab/-/issues/214540
  */
 export const annotationsSymbolIcon = 'path://m5 229 5 8h-10z';
+
+/**
+ * As of %12.10, dashboard path is required to create annotation.
+ * The FE gets the dashboard name from the URL params. It is not
+ * ideal to store the path this way but there is no other way to
+ * get this path unless annotations fetch is delayed. This could
+ * potentially be removed and have the backend send this to the FE.
+ *
+ * This technical debt is being tracked here
+ * https://gitlab.com/gitlab-org/gitlab/-/issues/214671
+ */
+export const DEFAULT_DASHBOARD_PATH = 'config/prometheus/common_metrics.yml';

@@ -247,23 +247,23 @@ export const deploymentData = [
 export const annotationsData = [
   {
     id: 'gid://gitlab/Metrics::Dashboard::Annotation/1',
-    starting_at: '2020-04-01T12:51:58.373Z',
-    ending_at: null,
+    startingAt: '2020-04-12 12:51:53 UTC',
+    endingAt: null,
     panelId: null,
     description: 'This is a test annotation',
   },
   {
     id: 'gid://gitlab/Metrics::Dashboard::Annotation/2',
     description: 'test annotation 2',
-    starting_at: '2020-04-02T12:51:58.373Z',
-    ending_at: null,
+    startingAt: '2020-04-13 12:51:53 UTC',
+    endingAt: null,
     panelId: null,
   },
   {
     id: 'gid://gitlab/Metrics::Dashboard::Annotation/3',
     description: 'test annotation 3',
-    starting_at: '2020-04-04T12:51:58.373Z',
-    ending_at: null,
+    startingAt: '2020-04-16 12:51:53 UTC',
+    endingAt: null,
     panelId: null,
   },
 ];
