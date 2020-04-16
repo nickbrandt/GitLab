@@ -2398,6 +2398,14 @@ class Project < ApplicationRecord
   def after_wiki_activity
     touch(:last_activity_at, :last_repository_updated_at)
   end
+  
+  def metrics_dashboard_allowed?(user)
+    if (public? && metrics_dashboard_access_level >= 20) || feature_available?(:metrics_dashboard, user)
+      true
+    else
+      false
+    end
+  end
 
   private
 

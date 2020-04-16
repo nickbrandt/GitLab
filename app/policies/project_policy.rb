@@ -88,6 +88,11 @@ class ProjectPolicy < BasePolicy
     @subject.feature_available?(:forking, @user)
   end
 
+  with_scope :subject
+  condition(:metrics_dashboard_allowed) do
+    @subject.metrics_dashboard_allowed?(@user)
+  end
+
   with_scope :global
   condition(:mirror_available, score: 0) do
     ::Gitlab::CurrentSettings.current_application_settings.mirror_available
@@ -134,6 +139,7 @@ class ProjectPolicy < BasePolicy
     wiki
     builds
     pages
+    metrics_dashboard
   ]
 
   features.each do |f|
@@ -247,6 +253,13 @@ class ProjectPolicy < BasePolicy
 
   rule { (can?(:public_user_access) | can?(:reporter_access)) & forking_allowed }.policy do
     enable :fork_project
+  end
+
+  rule { metrics_dashboard_allowed }.policy do
+    enable :metrics_dashboard
+    enable :read_prometheus
+    enable :read_environment
+    enable :read_deployment
   end
 
   rule { owner | admin | guest | group_member }.prevent :request_access
