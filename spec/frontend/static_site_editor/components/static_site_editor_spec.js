@@ -96,10 +96,10 @@ describe('StaticSiteEditor', () => {
     buildWrapper();
 
     expect(findSavedChangesMessage().exists()).toBe(true);
-    expect(findSavedChangesMessage().props('returnUrl')).toBe(returnUrl);
-    expect(findSavedChangesMessage().props('commit')).toBe(savedContentMeta.commit);
-    expect(findSavedChangesMessage().props('branch')).toBe(savedContentMeta.branch);
-    expect(findSavedChangesMessage().props('mergeRequest')).toBe(savedContentMeta.mergeRequest);
+    expect(findSavedChangesMessage().props()).toEqual({
+      returnUrl,
+      ...savedContentMeta,
+    });
   });
 
   describe('when content is not loaded', () => {
