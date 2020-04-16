@@ -72,8 +72,18 @@ hot_standby = on
 
 ### Manually configure the replica database
 
-Make the following configuration changes manually to your `postgresql.conf`
-of external replica database:
+Make the following configuration changes manually to your `pg_hba.conf` and `postgresql.conf`
+of your external replica database:
+
+```plaintext
+##
+## Geo Secondary Role
+## - pg_hba.conf
+##
+host    all         all               <trusted secondary IP>/32     md5
+host    replication gitlab_replicator <trusted secondary IP>/32     md5
+host    all         all               <trusted primary IP>/24       md5
+```
 
 ```plaintext
 ##
