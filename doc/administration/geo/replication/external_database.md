@@ -73,7 +73,8 @@ hot_standby = on
 ### Manually configure the replica database
 
 Make the following configuration changes manually to your `pg_hba.conf` and `postgresql.conf`
-of your external replica database:
+of your external replica database. Ensure that you restart PostgreSQL afterwards
+for the changes to take effect:
 
 ```plaintext
 ##
