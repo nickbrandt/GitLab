@@ -227,7 +227,12 @@ export default {
       return !this.showEmptyState && this.rearrangePanelsAvailable;
     },
     addingMetricsAvailable() {
-      return IS_EE && this.canAddMetrics && !this.showEmptyState;
+      return (
+        IS_EE &&
+        this.canAddMetrics &&
+        !this.showEmptyState &&
+        this.firstDashboard === this.selectedDashboard
+      );
     },
     hasHeaderButtons() {
       return (
