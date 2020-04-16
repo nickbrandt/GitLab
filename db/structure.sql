@@ -9927,8 +9927,6 @@ CREATE INDEX index_projects_api_vis20_updated_at ON public.projects USING btree 
 
 CREATE INDEX index_projects_on_created_at_and_id ON public.projects USING btree (created_at, id);
 
-CREATE INDEX index_projects_on_creator_id_and_created_at ON public.projects USING btree (creator_id, created_at);
-
 CREATE INDEX index_projects_on_creator_id_and_created_at_and_id ON public.projects USING btree (creator_id, created_at, id);
 
 CREATE INDEX index_projects_on_creator_id_and_id ON public.projects USING btree (creator_id, id);
@@ -13178,6 +13176,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408175424
 20200409211607
 20200410232012
+20200414144547
 20200415160722
 20200415161021
 20200415161206
