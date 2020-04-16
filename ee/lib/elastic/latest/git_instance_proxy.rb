@@ -15,7 +15,7 @@ module Elastic
         "project_#{project_id}"
       end
 
-      def elastic_search(query, type: :all, page: 1, per: 20, options: {})
+      def elastic_search(query, type: 'all', page: 1, per: 20, options: {})
         options = repository_specific_options(options)
 
         self.class.elastic_search(query, type: type, page: page, per: per, options: options)

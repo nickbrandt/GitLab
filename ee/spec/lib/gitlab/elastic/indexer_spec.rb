@@ -82,7 +82,7 @@ describe Gitlab::Elastic::Indexer do
       def indexed_wiki_paths_for(term)
         blobs = ProjectWiki.elastic_search(
           term,
-          type: :wiki_blob
+          type: 'wiki_blob'
         )[:wiki_blobs][:results].response
 
         blobs.map do |blob|
@@ -216,7 +216,7 @@ describe Gitlab::Elastic::Indexer do
     def indexed_file_paths_for(term)
       blobs = Repository.elastic_search(
         term,
-        type: :blob
+        type: 'blob'
       )[:blobs][:results].response
 
       blobs.map do |blob|
