@@ -260,10 +260,7 @@ describe('Monitoring store actions', () => {
         null,
         state,
         [],
-        [
-          { type: 'requestAnnotations' },
-          { type: 'receiveAnnotationsSuccess', payload: annotationsData },
-        ],
+        [{ type: 'receiveAnnotationsSuccess', payload: annotationsData }],
         () => {
           expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
         },
@@ -288,7 +285,7 @@ describe('Monitoring store actions', () => {
         null,
         state,
         [],
-        [{ type: 'requestAnnotations' }, { type: 'receiveAnnotationsFailure' }],
+        [{ type: 'receiveAnnotationsFailure' }],
         () => {
           expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
         },
