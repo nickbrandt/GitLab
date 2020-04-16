@@ -167,7 +167,11 @@ class Projects::WikisController < Projects::ApplicationController
   end
 
   def load_page
-    @page ||= @project_wiki.find_page(*page_params)
+    @page ||= find_page
+  end
+
+  def find_page
+    @project_wiki.find_page(*page_params)
   end
 
   def page_params
