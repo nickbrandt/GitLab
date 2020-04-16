@@ -916,6 +916,12 @@ msgstr ""
 msgid "A secure token that identifies an external storage request."
 msgstr ""
 
+msgid "A sign-in to your account has been made from the following IP address: %{ip}"
+msgstr ""
+
+msgid "A sign-in to your account has been made from the following IP address: %{ip}."
+msgstr ""
+
 msgid "A subscription will trigger a new pipeline on the default branch of this project when a pipeline successfully completes for a new tag on the %{default_branch_docs} of the subscribed project."
 msgstr ""
 
@@ -11151,10 +11157,19 @@ msgstr ""
 msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commits and pull requests. %{more_info_link}"
 msgstr ""
 
+msgid "If you did not recently sign in, you should immediately %{password_link_start}change your password%{password_link_end}."
+msgstr ""
+
+msgid "If you did not recently sign in, you should immediately change your password: %{password_link}."
+msgstr ""
+
 msgid "If you lose your recovery codes you can generate new ones, invalidating all previous codes."
 msgstr ""
 
 msgid "If you reach 100%% storage capacity, you will not be able to: %{base_message}"
+msgstr ""
+
+msgid "If you recently signed in and recognize the IP address, you may disregard this email."
 msgstr ""
 
 msgid "If your HTTP repository is not publicly accessible, add your credentials."
@@ -14882,6 +14897,9 @@ msgid "Password successfully changed"
 msgstr ""
 
 msgid "Password was successfully updated. Please login with it"
+msgstr ""
+
+msgid "Passwords should be unique and not used for any other sites or services."
 msgstr ""
 
 msgid "Past due"
@@ -22083,6 +22101,12 @@ msgstr ""
 msgid "To enable it and see User Cohorts, visit %{application_settings_link_start}application settings%{application_settings_link_end}."
 msgstr ""
 
+msgid "To further protect your account, consider configuring a %{mfa_link_start}two-factor authentication%{mfa_link_end} method."
+msgstr ""
+
+msgid "To further protect your account, consider configuring a two-factor authentication method: %{mfa_link}."
+msgstr ""
+
 msgid "To get started you enter your FogBugz URL and login information below. In the next steps, you'll be able to map users and select the projects you want to import."
 msgstr ""
 
@@ -22603,6 +22627,9 @@ msgid "Unknown format"
 msgstr ""
 
 msgid "Unknown response text"
+msgstr ""
+
+msgid "Unknown sign-in from new location"
 msgstr ""
 
 msgid "Unlimited"
