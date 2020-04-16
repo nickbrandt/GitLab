@@ -5,6 +5,7 @@ import SidebarMediator from '~/sidebar/sidebar_mediator';
 import glRegexp from './lib/utils/regexp';
 import AjaxCache from './lib/utils/ajax_cache';
 import { spriteIcon } from './lib/utils/common_utils';
+import _ from 'underscore';
 
 function sanitize(str) {
   return str.replace(/<(?:.|\n)*?>/gm, '');
@@ -137,7 +138,7 @@ class GfmAutoComplete {
             tpl += '<%- referencePrefix %>';
           }
         }
-        return template(tpl)({ referencePrefix });
+        return _.template(tpl)({ referencePrefix });
       },
       suffix: '',
       callbacks: {
