@@ -2,8 +2,18 @@
 
 module Gitlab
   module Geo
+    # Geo Replicators are objects that knows to to replicator a replicable resource
+    #
+    # A replicator is responsible for:
+    # - firing events (producer)
+    # - consuming events (consumer)
+    #
+    # Each replicator is tied to a specific replicable resource
     class Replicator
       include ::Gitlab::Geo::LogHelpers
+
+      attr_reader :model_record_id
+      delegate :model, to: :class
 
       # Declare supported event
       #
@@ -29,22 +39,34 @@ module Gitlab
 
       # Check if the replicator supports a specific event
       #
-      # @param [Boolean] event_name
+      # @param [Symbol] event_name
+      # @return [Boolean] whether event support was registered in the replicator
       def self.event_supported?(event_name)
         @events.include?(event_name.to_sym)
       end
 
       # Return the name of the replicator
       #
-      # @return [String] name
+      # This can be used to retrieve the replicator class again
+      # by using the `.for_replicable_name` method
+      #
+      # @see .for_replicable_name
+      # @return [String] slug that identifies this replicator
       def self.replicable_name
         self.name.demodulize.sub('Replicator', '').underscore
       end
 
+      # Return the registry related to the replicable resource
+      #
+      # @return [Class<Geo::BaseRegistry>] registry class
       def self.registry_class
         const_get("::Geo::#{replicable_name.camelize}Registry", false)
       end
 
+      # Given a `replicable_name`, return the corresponding replicator
+      #
+      # @param [String] replicable_name the replicable slug
+      # @return [Class<Geo::Replicator>] replicator implementation
       def self.for_replicable_name(replicable_name)
         replicator_class_name = "::Geo::#{replicable_name.camelize}Replicator"
 
@@ -67,15 +89,17 @@ module Gitlab
         model.count
       end
 
-      attr_reader :model_record_id
-
-      delegate :model, to: :class
-
+      # @param [ActiveRecord::Base] model_record
+      # @param [Integer] model_record_id
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
         @model_record_id = model_record_id
       end
 
+      # Instance of the replicable model
+      #
+      # @return [ActiveRecord::Base, nil]
+      # @raise ActiveRecord::RecordNotFound when a model with specified model_record_id can't be found
       def model_record
         if defined?(@model_record) && @model_record
           return @model_record
@@ -86,6 +110,10 @@ module Gitlab
         end
       end
 
+      # Publish an event with its related data
+      #
+      # @param [Symbol] event_name
+      # @param [Hash] event_data
       def publish(event_name, **event_data)
         return unless Feature.enabled?(:geo_self_service_framework)
 
@@ -119,18 +147,30 @@ module Gitlab
         send(consume_method, **params) # rubocop:disable GitlabSecurity/PublicSend
       end
 
+      # Return the name of the replicator
+      #
+      # @return [String] slug that identifies this replicator
       def replicable_name
         self.class.replicable_name
       end
 
+      # Return the registry related to the replicable resource
+      #
+      # @return [Class<Geo::BaseRegistry>] registry class
       def registry_class
         self.class.registry_class
       end
 
+      # Return registry instance scoped to current model
+      #
+      # @return [Geo::BaseRegistry] registry instance
       def registry
         registry_class.for_model_record_id(model_record.id)
       end
 
+      # Checksum value from the main database
+      #
+      # @abstract
       def primary_checksum
         nil
       end

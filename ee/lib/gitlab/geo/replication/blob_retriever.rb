@@ -3,6 +3,8 @@
 module Gitlab
   module Geo
     module Replication
+      # Handles retrieval of a blob to be returned via the Geo API request
+      #
       class BlobRetriever < BaseRetriever
         attr_reader :replicator, :checksum
 
