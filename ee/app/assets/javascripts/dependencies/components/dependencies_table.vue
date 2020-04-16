@@ -93,6 +93,8 @@ export default {
 </script>
 
 <template>
+  <!-- tbody- and thead-class props can be removed when
+    https://gitlab.com/gitlab-org/gitlab/-/issues/213324 is fixed -->
   <gl-table
     v-if="glFeatures.dependencyListUi"
     :fields="$options.fields"
@@ -100,6 +102,8 @@ export default {
     :busy="isLoading"
     details-td-class="pt-0"
     stacked="md"
+    thead-class="gl-text-gray-900"
+    tbody-class="gl-text-gray-900"
   >
     <!-- toggleDetails and detailsShowing are scoped slot props provided by
       GlTable; they mutate/read the item's _showDetails property, which GlTable
@@ -134,10 +138,13 @@ export default {
     </template>
 
     <template #cell(isVulnerable)="{ item, toggleDetails }">
+      <!-- This badge usage will be simplified by
+        https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28356 -->
       <gl-badge
         v-if="item.vulnerabilities.length"
         variant="warning"
         href="#"
+        class="d-inline-flex align-items-center bg-warning-100 text-warning-700 bold"
         @click.native="toggleDetails"
       >
         <gl-icon name="warning" class="text-warning-500 mr-1" />
