@@ -3576,6 +3576,9 @@ msgstr ""
 msgid "Changing group path can have unintended side effects."
 msgstr ""
 
+msgid "Charts"
+msgstr ""
+
 msgid "Charts can't be displayed as the request for data has timed out. %{documentationLink}"
 msgstr ""
 
@@ -5468,6 +5471,9 @@ msgstr ""
 msgid "ContainerRegistry|%{imageName} tags"
 msgstr ""
 
+msgid "ContainerRegistry|%{title} was successfully scheduled for deletion"
+msgstr ""
+
 msgid "ContainerRegistry|Automatically remove extra images that aren't designed to be kept."
 msgstr ""
 
@@ -5522,9 +5528,6 @@ msgstr ""
 msgid "ContainerRegistry|Image ID"
 msgstr ""
 
-msgid "ContainerRegistry|Image deleted successfully"
-msgstr ""
-
 msgid "ContainerRegistry|Keep and protect the images that matter most."
 msgstr ""
 
@@ -5563,9 +5566,6 @@ msgstr[1] ""
 msgid "ContainerRegistry|Retention policy has been Enabled"
 msgstr ""
 
-msgid "ContainerRegistry|Something went wrong while deleting the image."
-msgstr ""
-
 msgid "ContainerRegistry|Something went wrong while deleting the tag."
 msgstr ""
 
@@ -5575,10 +5575,13 @@ msgstr ""
 msgid "ContainerRegistry|Something went wrong while fetching the expiration policy."
 msgstr ""
 
-msgid "ContainerRegistry|Something went wrong while fetching the packages list."
+msgid "ContainerRegistry|Something went wrong while fetching the repository list."
 msgstr ""
 
 msgid "ContainerRegistry|Something went wrong while fetching the tags list."
+msgstr ""
+
+msgid "ContainerRegistry|Something went wrong while scheduling %{title} for deletion. Please try again."
 msgstr ""
 
 msgid "ContainerRegistry|Something went wrong while updating the expiration policy."
@@ -5620,10 +5623,16 @@ msgstr ""
 msgid "ContainerRegistry|There are no container images stored for this project"
 msgstr ""
 
+msgid "ContainerRegistry|There was an error during the deletion of this image repository, please try again."
+msgstr ""
+
 msgid "ContainerRegistry|This Registry contains deleted image tag data. Remember to run  %{docLinkStart}garbage collection%{docLinkEnd} to remove the stale data from storage."
 msgstr ""
 
 msgid "ContainerRegistry|This image has no active tags"
+msgstr ""
+
+msgid "ContainerRegistry|This image repository is scheduled for deletion"
 msgstr ""
 
 msgid "ContainerRegistry|We are having trouble connecting to Docker, which could be due to an issue with your project name or path. %{docLinkStart}More Information%{docLinkEnd}"
@@ -8222,6 +8231,9 @@ msgstr ""
 msgid "Error fetching network graph."
 msgstr ""
 
+msgid "Error fetching payload data."
+msgstr ""
+
 msgid "Error fetching projects"
 msgstr ""
 
@@ -8229,9 +8241,6 @@ msgid "Error fetching refs"
 msgstr ""
 
 msgid "Error fetching the dependency list. Please check your network connection and try again."
-msgstr ""
-
-msgid "Error fetching usage ping data."
 msgstr ""
 
 msgid "Error loading branch data. Please try again."
@@ -12704,6 +12713,9 @@ msgstr ""
 msgid "Merge Requests in Review"
 msgstr ""
 
+msgid "Merge automatically (%{strategy})"
+msgstr ""
+
 msgid "Merge commit message"
 msgstr ""
 
@@ -12857,6 +12869,12 @@ msgstr ""
 msgid "Merged branches are being deleted. This can take some time depending on the number of branches. Please refresh the page to see changes."
 msgstr ""
 
+msgid "Merged this merge request."
+msgstr ""
+
+msgid "Merges this merge request immediately."
+msgstr ""
+
 msgid "Merges this merge request when the pipeline succeeds."
 msgstr ""
 
@@ -12964,9 +12982,6 @@ msgid_plural "Metrics|Edit metrics"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Metrics|Environment"
-msgstr ""
-
 msgid "Metrics|For grouping similar metrics"
 msgstr ""
 
@@ -12998,9 +13013,6 @@ msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
 msgid "Metrics|Refresh dashboard"
-msgstr ""
-
-msgid "Metrics|Show last"
 msgstr ""
 
 msgid "Metrics|There was an error creating the dashboard."
@@ -15232,6 +15244,9 @@ msgstr ""
 msgid "Private profile"
 msgstr ""
 
+msgid "Private projects Minutes cost factor"
+msgstr ""
+
 msgid "Private projects can be created in your personal namespace with:"
 msgstr ""
 
@@ -16060,6 +16075,9 @@ msgstr ""
 msgid "ProjectSettings|With GitLab Pages you can host your static websites on GitLab"
 msgstr ""
 
+msgid "ProjectSettings|With Metrics Dashboard you can visualize this project performance metrics"
+msgstr ""
+
 msgid "ProjectTemplates|.NET Core"
 msgstr ""
 
@@ -16342,13 +16360,13 @@ msgstr ""
 msgid "PrometheusService|Prometheus is being automatically managed on your clusters"
 msgstr ""
 
+msgid "PrometheusService|Select the Active checkbox to override the Auto Configuration with custom settings. If unchecked, Auto Configuration settings are used."
+msgstr ""
+
 msgid "PrometheusService|These metrics will only be monitored after your first deployment to an environment"
 msgstr ""
 
 msgid "PrometheusService|Time-series monitoring service"
-msgstr ""
-
-msgid "PrometheusService|To enable manual configuration, uninstall Prometheus from your clusters"
 msgstr ""
 
 msgid "PrometheusService|To enable the installation of Prometheus on your clusters, deactivate the manual configuration below"
@@ -16556,6 +16574,9 @@ msgid "Public deploy keys (%{deploy_keys_count})"
 msgstr ""
 
 msgid "Public pipelines"
+msgstr ""
+
+msgid "Public projects Minutes cost factor"
 msgstr ""
 
 msgid "Pull"
@@ -17681,10 +17702,16 @@ msgstr ""
 msgid "Scheduled"
 msgstr ""
 
+msgid "Scheduled to merge this merge request (%{strategy})."
+msgstr ""
+
 msgid "Scheduled to merge this merge request when the pipeline succeeds."
 msgstr ""
 
 msgid "Schedules"
+msgstr ""
+
+msgid "Schedules to merge this merge request (%{strategy})."
 msgstr ""
 
 msgid "Scheduling"
@@ -18075,10 +18102,19 @@ msgstr ""
 msgid "SecurityDashboard|Add projects"
 msgstr ""
 
+msgid "SecurityDashboard|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans."
+msgstr ""
+
 msgid "SecurityDashboard|Edit dashboard"
 msgstr ""
 
 msgid "SecurityDashboard|Hide dismissed"
+msgstr ""
+
+msgid "SecurityDashboard|Introducing standalone vulnerabilities"
+msgstr ""
+
+msgid "SecurityDashboard|Learn More"
 msgstr ""
 
 msgid "SecurityDashboard|Monitor vulnerabilities in your code"
@@ -19494,6 +19530,9 @@ msgid "State your message to activate"
 msgstr ""
 
 msgid "Static Application Security Testing (SAST)"
+msgstr ""
+
+msgid "StaticSiteEditor|An error occurred while submitting your changes."
 msgstr ""
 
 msgid "StaticSiteEditor|Branch could not be created."
@@ -21173,7 +21212,10 @@ msgstr ""
 msgid "This user will be the author of all events in the activity feed that are the result of an update, like new branches being created or new commits being pushed to existing branches. Upon creation or when reassigning you can only assign yourself to be the mirror user."
 msgstr ""
 
-msgid "This variable can not be masked"
+msgid "This variable can not be masked."
+msgstr ""
+
+msgid "This variable does not match the expected pattern."
 msgstr ""
 
 msgid "This will help us personalize your onboarding experience."
@@ -21859,6 +21901,9 @@ msgid "Try again?"
 msgstr ""
 
 msgid "Try all GitLab has to offer for 30 days."
+msgstr ""
+
+msgid "Try changing or removing filters."
 msgstr ""
 
 msgid "Try to fork again"
@@ -24114,6 +24159,9 @@ msgstr ""
 msgid "Your request for access has been queued for review."
 msgstr ""
 
+msgid "Your search didn't match any commits."
+msgstr ""
+
 msgid "Your subscription expired!"
 msgstr ""
 
@@ -24234,6 +24282,9 @@ msgid "ciReport|%{linkStartTag}Learn more about Dependency Scanning %{linkEndTag
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about SAST %{linkEndTag}"
+msgstr ""
+
+msgid "ciReport|%{linkStartTag}Learn more about Secret Scanning %{linkEndTag}"
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}"
@@ -24397,6 +24448,12 @@ msgid "ciReport|Resolve with merge request"
 msgstr ""
 
 msgid "ciReport|SAST"
+msgstr ""
+
+msgid "ciReport|Secret scanning"
+msgstr ""
+
+msgid "ciReport|Secret scanning detects secrets and credentials vulnerabilities in your source code."
 msgstr ""
 
 msgid "ciReport|Security scanning"

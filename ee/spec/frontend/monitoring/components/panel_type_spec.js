@@ -1,14 +1,10 @@
 import Vuex from 'vuex';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
 import { monitoringDashboard } from '~/monitoring/stores';
 import PanelType from 'ee/monitoring/components/panel_type.vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
-import { graphDataPrometheusQueryRange } from 'jest/monitoring/mock_data';
-
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
+import { graphData } from 'jest/monitoring/fixture_data';
 
 global.URL.createObjectURL = jest.fn();
 
@@ -23,7 +19,7 @@ describe('Panel Type', () => {
     wrapper.findAll(GlDropdownItem).filter(i => i.text() === 'Alerts');
 
   const mockPropsData = {
-    graphData: graphDataPrometheusQueryRange,
+    graphData,
     clipboardText: 'example_text',
     alertsEndpoint: '/endpoint',
     prometheusAlertsAvailable: true,
@@ -36,7 +32,6 @@ describe('Panel Type', () => {
         ...propsData,
       },
       store,
-      localVue,
     });
   };
 
@@ -52,11 +47,11 @@ describe('Panel Type', () => {
 
   describe('panel type alerts', () => {
     describe.each`
-      desc                                           | metricsSavedToDb                                       | propsData                               | isShown
-      ${'with license and no metrics in db'}         | ${[]}                                                  | ${{}}                                   | ${false}
-      ${'with license and related metrics in db'}    | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{}}                                   | ${true}
-      ${'without license and related metrics in db'} | ${[graphDataPrometheusQueryRange.metrics[0].metricId]} | ${{ prometheusAlertsAvailable: false }} | ${false}
-      ${'with license and unrelated metrics in db'}  | ${['another_metric_id']}                               | ${{}}                                   | ${false}
+      desc                                           | metricsSavedToDb                   | propsData                               | isShown
+      ${'with license and no metrics in db'}         | ${[]}                              | ${{}}                                   | ${false}
+      ${'with license and related metrics in db'}    | ${[graphData.metrics[0].metricId]} | ${{}}                                   | ${true}
+      ${'without license and related metrics in db'} | ${[graphData.metrics[0].metricId]} | ${{ prometheusAlertsAvailable: false }} | ${false}
+      ${'with license and unrelated metrics in db'}  | ${['another_metric_id']}           | ${{}}                                   | ${false}
     `('$desc', ({ metricsSavedToDb, isShown, propsData }) => {
       const showsDesc = isShown ? 'shows' : 'does not show';
 

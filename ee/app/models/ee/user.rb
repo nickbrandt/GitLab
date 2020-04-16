@@ -262,6 +262,7 @@ module EE
     def using_license_seat?
       active? &&
       !internal? &&
+      !project_bot? &&
       has_current_license? &&
       paid_in_current_license?
     end

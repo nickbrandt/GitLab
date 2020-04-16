@@ -74,6 +74,20 @@ describe StatusPageSetting do
     end
   end
 
+  describe '#masked_aws_secret_key' do
+    let(:status_page_setting) { build(:status_page_setting) }
+
+    subject { status_page_setting.masked_aws_secret_key }
+
+    it { is_expected.to eq('*' * 40) }
+
+    context 'when no secret saved' do
+      let(:status_page_setting) { build(:status_page_setting, aws_secret_key: nil) }
+
+      it { is_expected.to eq(nil) }
+    end
+  end
+
   describe '#enabled?' do
     let(:status_page_setting) { build(:status_page_setting, :enabled) }
 

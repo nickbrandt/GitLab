@@ -1,6 +1,7 @@
 <script>
-import { GlAlert, GlButton, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
+import { GlAlert, GlButton, GlEmptyState, GlIntersectionObserver, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import { fetchPolicies } from '~/lib/graphql';
 import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/instance_vulnerabilities.graphql';
 import { VULNERABILITIES_PER_PAGE } from 'ee/vulnerabilities/constants';
@@ -11,6 +12,7 @@ export default {
     GlButton,
     GlEmptyState,
     GlIntersectionObserver,
+    GlLoadingIcon,
     VulnerabilityList,
   },
   props: {
@@ -31,13 +33,20 @@ export default {
   data() {
     return {
       pageInfo: {},
+      isFirstResultLoading: true,
       vulnerabilities: [],
       errorLoadingVulnerabilities: false,
     };
   },
+  computed: {
+    isQueryLoading() {
+      return this.$apollo.queries.vulnerabilities.loading;
+    },
+  },
   apollo: {
     vulnerabilities: {
       query: vulnerabilitiesQuery,
+      fetchPolicy: fetchPolicies.NETWORK_ONLY,
       variables() {
         return {
           first: VULNERABILITIES_PER_PAGE,
@@ -45,20 +54,13 @@ export default {
         };
       },
       update: ({ vulnerabilities }) => vulnerabilities.nodes,
-      result({ data }) {
+      result({ data, loading }) {
+        this.isFirstResultLoading = loading;
         this.pageInfo = data.vulnerabilities.pageInfo;
       },
       error() {
         this.errorLoadingVulnerabilities = true;
       },
-    },
-  },
-  computed: {
-    isLoadingQuery() {
-      return this.$apollo.queries.vulnerabilities.loading;
-    },
-    isLoadingFirstResult() {
-      return this.isLoadingQuery && this.vulnerabilities.length === 0;
     },
   },
   methods: {
@@ -99,7 +101,7 @@ export default {
     </gl-alert>
     <vulnerability-list
       v-else
-      :is-loading="isLoadingFirstResult"
+      :is-loading="isFirstResultLoading"
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
       :vulnerabilities="vulnerabilities"
@@ -119,9 +121,10 @@ export default {
       class="text-center"
       @appear="fetchNextPage"
     >
-      <gl-button :loading="isLoadingQuery" :disabled="isLoadingQuery" @click="fetchNextPage">{{
-        __('Load more vulnerabilities')
-      }}</gl-button>
+      <gl-button :disabled="isFirstResultLoading" @click="fetchNextPage">
+        <gl-loading-icon v-if="isQueryLoading" size="md" />
+        <template v-else>{{ __('Load more vulnerabilities') }}</template>
+      </gl-button>
     </gl-intersection-observer>
   </div>
 </template>

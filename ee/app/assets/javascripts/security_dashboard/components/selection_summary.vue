@@ -1,6 +1,6 @@
 <script>
 import { s__, n__ } from '~/locale';
-import { GlNewButton, GlFormSelect } from '@gitlab/ui';
+import { GlButton, GlFormSelect } from '@gitlab/ui';
 import toast from '~/vue_shared/plugins/global_toast';
 import createFlash from '~/flash';
 import dismissVulnerability from '../graphql/dismissVulnerability.graphql';
@@ -12,7 +12,7 @@ const REASON_FALSE_POSITIVE = s__('Security Reports|False positive');
 export default {
   name: 'SelectionSummary',
   components: {
-    GlNewButton,
+    GlButton,
     GlFormSelect,
   },
   props: {
@@ -95,7 +95,7 @@ export default {
         class="mx-3 w-auto"
         :options="$options.dismissalReasons"
       />
-      <gl-new-button
+      <gl-button
         type="submit"
         class="js-no-auto-disable"
         category="secondary"
@@ -103,7 +103,7 @@ export default {
         :disabled="!canDismissVulnerability"
       >
         {{ s__('Security Reports|Dismiss Selected') }}
-      </gl-new-button>
+      </gl-button>
     </form>
   </div>
 </template>

@@ -70,5 +70,20 @@ export default {
         ),
       };
     },
+    secretScanningPopover() {
+      return {
+        title: s__(
+          'ciReport|Secret scanning detects secrets and credentials vulnerabilities in your source code.',
+        ),
+        content: sprintf(
+          s__('ciReport|%{linkStartTag}Learn more about Secret Scanning %{linkEndTag}'),
+          {
+            linkStartTag: getLinkStartTag(this.secretScanningHelpPath),
+            linkEndTag,
+          },
+          false,
+        ),
+      };
+    },
   },
 };

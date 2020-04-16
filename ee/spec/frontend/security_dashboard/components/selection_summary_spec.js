@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import SelectionSummary from 'ee/security_dashboard/components/selection_summary.vue';
-import { GlFormSelect, GlNewButton } from '@gitlab/ui';
+import { GlFormSelect, GlButton } from '@gitlab/ui';
 import createFlash from '~/flash';
 import toast from '~/vue_shared/plugins/global_toast';
 
@@ -21,7 +21,7 @@ describe('Selection Summary component', () => {
     },
   };
 
-  const dismissButton = () => wrapper.find(GlNewButton);
+  const dismissButton = () => wrapper.find(GlButton);
   const dismissMessage = () => wrapper.find({ ref: 'dismiss-message' });
   const formSelect = () => wrapper.find(GlFormSelect);
 
@@ -102,7 +102,6 @@ describe('Selection Summary component', () => {
       it('should show toast with the right message if all calls were successful', () => {
         dismissButton().trigger('submit');
         setImmediate(() => {
-          // return wrapper.vm.$nextTick().then(() => {
           expect(toast).toHaveBeenCalledWith('2 vulnerabilities dismissed');
         });
       });

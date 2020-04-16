@@ -171,6 +171,13 @@ Read through the documentation on [CI/CD for external repositories](../../ci/ci_
 
 Learn how to [add members to your projects](members/index.md).
 
+## Project activity
+
+To view the activity of a project, navigate to **Project overview > Activity**.
+From there, you can click on the tabs to see **All** the activity, or see it
+filtered by **Push events**, **Merge events**, **Issue events**, **Comments**,
+**Team**, and **Wiki**.
+
 ### Leave a project
 
 **Leave project** will only display on the project's dashboard

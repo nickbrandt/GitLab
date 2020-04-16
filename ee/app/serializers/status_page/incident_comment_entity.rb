@@ -2,7 +2,7 @@
 
 module StatusPage
   class IncidentCommentEntity < Grape::Entity
-    expose :note_html, as: :note
+    expose(:note) { |entity| StatusPage::Renderer.markdown(entity, :note) }
     expose :created_at
   end
 end

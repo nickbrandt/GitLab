@@ -69,6 +69,11 @@ export default {
       required: false,
       default: '',
     },
+    secretScanningHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     vulnerabilityFeedbackPath: {
       type: String,
       required: false,
@@ -132,6 +137,7 @@ export default {
       'containerScanning',
       'dast',
       'dependencyScanning',
+      'secretScanning',
       'summaryCounts',
       'modal',
       'isCreatingIssue',
@@ -144,9 +150,11 @@ export default {
       'groupedContainerScanningText',
       'groupedDastText',
       'groupedDependencyText',
+      'groupedSecretScanningText',
       'containerScanningStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
+      'secretScanningStatusIcon',
       'isBaseSecurityReportOutOfDate',
       'canCreateIssue',
       'canCreateMergeRequest',
@@ -167,6 +175,9 @@ export default {
     },
     hasSastReports() {
       return this.enabledReports.sast;
+    },
+    hasSecretScanningReports() {
+      return this.enabledReports.secretScanning;
     },
     isMRActive() {
       return this.mrState !== mrStates.merged && this.mrState !== mrStates.closed;
@@ -220,6 +231,12 @@ export default {
       this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
       this.fetchDependencyScanningDiff();
     }
+
+    const secretScanningDiffEndpoint = gl?.mrWidgetData?.secret_scanning_comparison_path;
+    if (secretScanningDiffEndpoint && this.hasSecretScanningReports) {
+      this.setSecretScanningDiffEndpoint(secretScanningDiffEndpoint);
+      this.fetchSecretScanningDiff();
+    }
   },
   methods: {
     ...mapActions([
@@ -250,6 +267,8 @@ export default {
       'setDependencyScanningDiffEndpoint',
       'fetchDastDiff',
       'setDastDiffEndpoint',
+      'fetchSecretScanningDiff',
+      'setSecretScanningDiffEndpoint',
     ]),
     ...mapActions('sast', {
       setSastDiffEndpoint: 'setDiffEndpoint',
@@ -400,6 +419,24 @@ export default {
             :unresolved-issues="dast.newIssues"
             :resolved-issues="dast.resolvedIssues"
             :component="$options.componentNames.DastIssueBody"
+            class="report-block-group-list"
+          />
+        </template>
+
+        <template v-if="hasSecretScanningReports">
+          <summary-row
+            :summary="groupedSecretScanningText"
+            :status-icon="secretScanningStatusIcon"
+            :popover-options="secretScanningPopover"
+            class="js-secret-scanning"
+            data-qa-selector="secret_scan_report"
+          />
+
+          <issues-list
+            v-if="secretScanning.newIssues.length || secretScanning.resolvedIssues.length"
+            :unresolved-issues="secretScanning.newIssues"
+            :resolved-issues="secretScanning.resolvedIssues"
+            :component="$options.componentNames.SecretScanningIssueBody"
             class="report-block-group-list"
           />
         </template>

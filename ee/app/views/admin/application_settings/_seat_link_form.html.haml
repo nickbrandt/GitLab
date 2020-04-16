@@ -16,6 +16,10 @@
             - link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: link_path }
             %p.mb-2= s_('%{link_start}Learn more%{link_end} about what information is shared with GitLab Inc.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
 
+            %button.btn.js-seat-link-payload-trigger{ type: 'button' }
+              .spinner.js-spinner.d-none
+              .js-text.d-inline= _('Preview payload')
+            %pre.usage-data.js-seat-link-payload.js-syntax-highlight.code.highlight.mt-2.d-none{ data: { endpoint: seat_link_payload_admin_application_settings_path(format: :html) } }
           - else
             = _('Seat Link is disabled, and cannot be configured through this form.')
             - link_path = help_page_path('subscriptions/index', anchor: 'disable-seat-link')

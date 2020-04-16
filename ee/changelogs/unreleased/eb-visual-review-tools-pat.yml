@@ -1,0 +1,5 @@
+---
+title: Support visual reviews on private and internal projects through PAT authentication
+merge_request: 29336
+author:
+type: fixed

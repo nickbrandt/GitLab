@@ -133,7 +133,7 @@ module EE
             override :events
             def events
               strong_memoize(:events) do
-                super + EE_EVENTS
+                (super + EE_EVENTS).uniq
               end
             end
 

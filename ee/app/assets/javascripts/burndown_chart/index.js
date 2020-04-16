@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import $ from 'jquery';
 import Cookies from 'js-cookie';
-import BurndownChart from './components/burndown_chart.vue';
+import BurnCharts from './components/burn_charts.vue';
 import BurndownChartData from './burndown_chart_data';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
@@ -36,10 +36,10 @@ export default () => {
         return new Vue({
           el: container,
           components: {
-            BurndownChart,
+            BurnCharts,
           },
           render(createElement) {
-            return createElement('burndown-chart', {
+            return createElement('burn-charts', {
               props: {
                 startDate,
                 dueDate,

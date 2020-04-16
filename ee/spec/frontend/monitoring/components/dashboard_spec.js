@@ -1,29 +1,16 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlModal, GlDeprecatedButton } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
-import {
-  mockApiEndpoint,
-  mockedQueryResultFixture,
-  environmentData,
-} from '../../../../../spec/frontend/monitoring/mock_data';
-import { getJSONFixture } from '../../../../../spec/frontend/helpers/fixtures';
-import { propsData } from '../../../../../spec/frontend/monitoring/init_utils';
+import { mockApiEndpoint, propsData } from 'jest/monitoring/mock_data';
+import { metricsDashboardResponse } from 'jest/monitoring/fixture_data';
+import { setupStoreWithData } from 'jest/monitoring/store_utils';
 import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import Tracking from '~/tracking';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
-import * as types from '~/monitoring/stores/mutation_types';
-
-const localVue = createLocalVue();
-
-const metricsDashboardFixture = getJSONFixture(
-  'metrics_dashboard/environment_metrics_dashboard.json',
-);
-const metricsDashboardPayload = metricsDashboardFixture.dashboard;
 
 describe('Dashboard', () => {
-  let Component;
   let mock;
   let store;
   let wrapper;
@@ -31,13 +18,12 @@ describe('Dashboard', () => {
   const findAddMetricButton = () => wrapper.vm.$refs.addMetricBtn;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(Component), {
+    wrapper = shallowMount(Dashboard, {
       propsData: { ...propsData, ...props },
       stubs: {
         GlDeprecatedButton,
       },
       store,
-      localVue,
     });
   };
 
@@ -49,28 +35,12 @@ describe('Dashboard', () => {
     window.gon = { ...window.gon, ee: true };
     store = createStore();
     mock = new MockAdapter(axios);
-    mock.onGet(mockApiEndpoint).reply(200, metricsDashboardPayload);
-    Component = localVue.extend(Dashboard);
+    mock.onGet(mockApiEndpoint).reply(200, metricsDashboardResponse);
   });
+
   afterEach(() => {
     mock.restore();
   });
-
-  function setupComponentStore(component) {
-    component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
-      metricsDashboardPayload,
-    );
-
-    component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
-      mockedQueryResultFixture,
-    );
-    component.vm.$store.commit(
-      `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-      environmentData,
-    );
-  }
 
   describe('add custom metrics', () => {
     describe('when not available', () => {
@@ -93,7 +63,7 @@ describe('Dashboard', () => {
           customMetricsPath: '/endpoint',
           customMetricsAvailable: true,
         });
-        setupComponentStore(wrapper);
+        setupStoreWithData(wrapper.vm.$store);
 
         origPage = document.body.dataset.page;
         document.body.dataset.page = 'projects:environments:metrics';
@@ -133,6 +103,7 @@ describe('Dashboard', () => {
           });
         });
       });
+
       it('renders custom metrics form fields', () => {
         expect(wrapper.find(CustomMetricsFormFields).exists()).toBe(true);
       });

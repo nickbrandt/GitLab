@@ -340,7 +340,7 @@ class Project < ApplicationRecord
     :pages_enabled?, :public_pages?, :private_pages?,
     :merge_requests_access_level, :forking_access_level, :issues_access_level,
     :wiki_access_level, :snippets_access_level, :builds_access_level,
-    :repository_access_level, :pages_access_level,
+    :repository_access_level, :pages_access_level, :metrics_dashboard_access_level,
     to: :project_feature, allow_nil: true
   delegate :scheduled?, :started?, :in_progress?, :failed?, :finished?,
     prefix: :import, to: :import_state, allow_nil: true
@@ -591,7 +591,7 @@ class Project < ApplicationRecord
     #
     # query - The search query as a String.
     def search(query, include_namespace: false)
-      if include_namespace && Feature.enabled?(:project_search_by_full_path, default_enabled: true)
+      if include_namespace
         joins(:route).fuzzy_search(query, [Route.arel_table[:path], Route.arel_table[:name], :description])
       else
         fuzzy_search(query, [:path, :name, :description])
@@ -864,6 +864,16 @@ class Project < ApplicationRecord
 
   def jira_import_status
     latest_jira_import&.status || 'initial'
+  end
+
+  def validate_jira_import_settings!(user: nil)
+    raise Projects::ImportService::Error, _('Jira import feature is disabled.') unless jira_issues_import_feature_flag_enabled?
+    raise Projects::ImportService::Error, _('Jira integration not configured.') unless jira_service&.active?
+
+    return unless user
+
+    raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
+    raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
   end
 
   def human_import_status_name

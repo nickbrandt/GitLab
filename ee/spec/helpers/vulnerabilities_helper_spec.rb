@@ -49,6 +49,10 @@ describe VulnerabilitiesHelper do
       expect(occurrence_serializer_stub).to receive(:represent).with(finding).and_return(occurrence_serializer_hash)
     end
 
+    around do |example|
+      Timecop.freeze { example.run }
+    end
+
     it 'has expected vulnerability properties' do
       expect(subject).to include(
         vulnerability_json: kind_of(String),
@@ -56,7 +60,8 @@ describe VulnerabilitiesHelper do
         create_issue_url: kind_of(String),
         has_mr: anything,
         vulnerability_feedback_help_path: kind_of(String),
-        finding_json: kind_of(String)
+        finding_json: kind_of(String),
+        timestamp: Time.now.to_i
       )
     end
   end

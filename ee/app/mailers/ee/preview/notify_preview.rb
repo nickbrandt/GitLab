@@ -12,10 +12,6 @@ module EE
           ::Notify.add_merge_request_approver_email(user.id, merge_request.id, user.id).message
         end
 
-        def issues_csv_email
-          ::Notify.issues_csv_email(user, project, '1997,Ford,E350', { truncated: false, rows_expected: 3, rows_written: 3 }).message
-        end
-
         def approved_merge_request_email
           ::Notify.approved_merge_request_email(user.id, merge_request.id, approver.id).message
         end
