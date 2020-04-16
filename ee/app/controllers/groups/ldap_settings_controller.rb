@@ -17,7 +17,6 @@ class Groups::LdapSettingsController < Groups::ApplicationController
   private
 
   def authorize_manage_ldap_settings!
-    render_404 unless Feature.enabled?(:ldap_settings_unlock_groups_by_owners)
     render_404 unless can?(current_user, :admin_ldap_group_settings, group)
   end
 

@@ -8,7 +8,6 @@ RSpec.describe 'Edit group settings', :js do
 
   before do
     stub_licensed_features(ldap_group_sync_filter: true)
-    stub_feature_flags(ldap_settings_unlock_groups_by_owners: true)
     allow(Gitlab.config.ldap).to receive(:enabled).and_return(true)
 
     group.add_owner(user)

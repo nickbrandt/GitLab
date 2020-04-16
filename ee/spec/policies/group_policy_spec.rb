@@ -489,22 +489,11 @@ RSpec.describe GroupPolicy do
         context 'Group Owner disable membership lock' do
           before do
             group.update!(unlock_membership_to_ldap: true)
-            stub_feature_flags(ldap_settings_unlock_groups_by_owners: true)
           end
 
           it { is_expected.to be_allowed(:admin_group_member) }
           it { is_expected.to be_allowed(:override_group_member) }
           it { is_expected.to be_allowed(:update_group_member) }
-
-          context 'ldap_settings_unlock_groups_by_owners is disabled' do
-            before do
-              stub_feature_flags(ldap_settings_unlock_groups_by_owners: false)
-            end
-
-            it { is_expected.to be_disallowed(:admin_group_member) }
-            it { is_expected.to be_disallowed(:override_group_member) }
-            it { is_expected.to be_disallowed(:update_group_member) }
-          end
         end
 
         context 'Group Owner keeps the membership lock' do

@@ -277,7 +277,6 @@ module EE
     end
 
     def ldap_lock_bypassable?
-      return false unless ::Feature.enabled?(:ldap_settings_unlock_groups_by_owners)
       return false unless ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
 
       !!subject.unlock_membership_to_ldap? && subject.owned_by?(user)

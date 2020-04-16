@@ -10,7 +10,6 @@ RSpec.describe Groups::LdapSettingsController do
 
   before do
     stub_ldap_setting(enabled: true)
-    stub_feature_flags(ldap_settings_unlock_groups_by_owners: true)
 
     sign_in(user)
   end
@@ -30,18 +29,6 @@ RSpec.describe Groups::LdapSettingsController do
           expect do
             put :update, params: { group_id: group.to_param, group: { unlock_membership_to_ldap: true } }
           end.to change { group.reload.unlock_membership_to_ldap }
-        end
-
-        describe 'ldap_settings_unlock_groups_by_owners is disabled' do
-          before do
-            stub_feature_flags(ldap_settings_unlock_groups_by_owners: false)
-          end
-
-          it 'does not change the value of the unlock_membership_to_ldap' do
-            expect do
-              put :update, params: { group_id: group.to_param, group: { unlock_membership_to_ldap: true } }
-            end.not_to change { group.reload.unlock_membership_to_ldap }
-          end
         end
       end
 

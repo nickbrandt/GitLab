@@ -1,4 +1,4 @@
-- if Feature.enabled?(:ldap_settings_unlock_groups_by_owners) && ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap
+- if ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap
   %section.ldap-group-settings
     = form_for(group, url: group_ldap_settings_url(group), method: :put) do |f|
       .form-holder
