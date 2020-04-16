@@ -1,0 +1,5 @@
+---
+title: Bump the default max search depth for tslint analyzer from 2 to 4
+merge_request: 29695
+author:
+type: fixed

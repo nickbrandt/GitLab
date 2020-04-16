@@ -10,6 +10,7 @@ variables:
   SAST_ANALYZER_IMAGE_TAG: 2
   SAST_DISABLE_DIND: "false"
   SCAN_KUBERNETES_MANIFESTS: "false"
+  SEARCH_MAX_DEPTH: 4
 
 sast:
   stage: test
