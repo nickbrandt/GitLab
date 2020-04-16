@@ -1,11 +1,16 @@
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlAlert, GlTable, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
 import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
 import { generateVulnerabilities } from '../../vulnerabilities/mock_data';
 
-describe('First Class Group Dashboard Vulnerabilities Component', () => {
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+describe('First Class Instance Dashboard Vulnerabilities Component', () => {
   let wrapper;
+  let store;
 
   const dashboardDocumentation = 'dashboard-documentation';
   const emptyStateSvgPath = 'empty-state-path';
@@ -17,12 +22,32 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
   const findEmptyState = () => wrapper.find(GlEmptyState);
   const findAlert = () => wrapper.find(GlAlert);
 
-  const createWrapper = ({ stubs, loading = false } = {}) => {
+  const createWrapper = ({ stubs, loading = false, isUpdatingProjects, data } = {}) => {
+    store = new Vuex.Store({
+      modules: {
+        projectSelector: {
+          namespaced: true,
+          actions: {
+            fetchProjects() {},
+            setProjectEndpoints() {},
+          },
+          getters: {
+            isUpdatingProjects: jest.fn().mockReturnValue(isUpdatingProjects),
+          },
+          state: {
+            projects: [],
+          },
+        },
+      },
+    });
+
     return shallowMount(FirstClassInstanceVulnerabilities, {
+      localVue,
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,
       },
+      store,
       stubs,
       mocks: {
         $apollo: {
@@ -30,11 +55,13 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         },
         fetchNextPage: () => {},
       },
+      data,
     });
   };
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('when the query is loading', () => {
@@ -62,10 +89,10 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         stubs: {
           GlAlert,
         },
-      });
-
-      wrapper.setData({
-        errorLoadingVulnerabilities: true,
+        data: () => ({
+          isFirstResultLoading: false,
+          errorLoadingVulnerabilities: true,
+        }),
       });
     });
 
@@ -114,10 +141,10 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
           GlTable,
           GlEmptyState,
         },
-      });
-
-      wrapper.setData({
-        vulnerabilities,
+        data: () => ({
+          vulnerabilities,
+          isFirstResultLoading: false,
+        }),
       });
     });
 
@@ -141,13 +168,13 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     const vulnerabilities = generateVulnerabilities();
 
     beforeEach(() => {
-      wrapper = createWrapper();
-
-      wrapper.setData({
-        vulnerabilities,
-        pageInfo: {
-          hasNextPage: true,
-        },
+      wrapper = createWrapper({
+        data: () => ({
+          vulnerabilities,
+          pageInfo: {
+            hasNextPage: true,
+          },
+        }),
       });
     });
 
