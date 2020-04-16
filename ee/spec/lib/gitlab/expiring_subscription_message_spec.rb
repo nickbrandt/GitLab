@@ -66,8 +66,6 @@ describe Gitlab::ExpiringSubscriptionMessage do
                 end
 
                 it 'has a nice subject' do
-                  allow(subscribable).to receive(:will_block_changes?).and_return(false)
-
                   Timecop.freeze(today) do
                     expect(subject).to include('Your subscription has been downgraded')
                   end
@@ -87,6 +85,24 @@ describe Gitlab::ExpiringSubscriptionMessage do
                   it 'has an expiration blocking message' do
                     Timecop.freeze(today) do
                       expect(subject).to include("You didn't renew your Ultimate subscription for No Limit Records so it was downgraded to the free plan")
+                    end
+                  end
+
+                  context 'is auto_renew' do
+                    before do
+                      allow(subscribable).to receive(:auto_renew?).and_return(true)
+                    end
+
+                    it 'has a nice subject' do
+                      Timecop.freeze(today) do
+                        expect(subject).to include('Something went wrong with your automatic subscription renewal')
+                      end
+                    end
+
+                    it 'has an expiration blocking message' do
+                      Timecop.freeze(today) do
+                        expect(subject).to include("We tried to automatically renew your Ultimate subscription for No Limit Records on 2020-03-01 but something went wrong so your subscription was downgraded to the free plan. Don't worry, your data is safe. We suggest you check your payment method and get in touch with our support team (support@gitlab.com). They'll gladly help with your subscription renewal.")
+                      end
                     end
                   end
                 end
@@ -144,6 +160,22 @@ describe Gitlab::ExpiringSubscriptionMessage do
               it 'has an expiration blocking message' do
                 Timecop.freeze(today) do
                   expect(subject).to include('Your Ultimate subscription for No Limit Records will expire on 2020-03-09. After that, you will not to be able to create issues or merge requests as well as many other features.')
+                end
+              end
+
+              context 'is auto_renew' do
+                before do
+                  allow(subscribable).to receive(:auto_renew?).and_return(true)
+                end
+
+                it 'has a nice subject' do
+                  expect(subject).to include('Your subscription will automatically renew in 4 days')
+                end
+
+                it 'has an expiration blocking message' do
+                  Timecop.freeze(today) do
+                    expect(subject).to include("We will automatically renew your Ultimate subscription for No Limit Records on 2020-03-09. There's nothing that you need to do, we'll let you know when the renewal is complete. Need more seats, a higher plan or just want to review your payment method?")
+                  end
                 end
               end
             end
