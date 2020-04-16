@@ -8,6 +8,18 @@ describe ProjectMemberPresenter do
   let(:project_member) { double(:project_member, source: project) }
   let(:presenter) { described_class.new(project_member, current_user: user) }
 
+  describe '#group_sso?' do
+    it 'returns `false`' do
+      expect(presenter.group_sso?).to eq(false)
+    end
+  end
+
+  describe '#group_managed_account?' do
+    it 'returns `false`' do
+      expect(presenter.group_managed_account?).to eq(false)
+    end
+  end
+
   describe '#can_update?' do
     context 'when user cannot update_project_member but can override_project_member' do
       before do
