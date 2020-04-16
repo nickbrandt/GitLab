@@ -268,38 +268,6 @@ export const annotationsData = [
   },
 ];
 
-export const metricsNewGroupsAPIResponse = [
-  {
-    group: 'System metrics (Kubernetes)',
-    priority: 5,
-    panels: [
-      {
-        title: 'Memory Usage (Pod average)',
-        type: 'area-chart',
-        y_label: 'Memory Used per Pod',
-        weight: 2,
-        metrics: [
-          {
-            id: 'system_metrics_kubernetes_container_memory_average',
-            query_range:
-              'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-([^c].*|c([^a]|a([^n]|n([^a]|a([^r]|r[^y])))).*|)-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job) / count(avg(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-([^c].*|c([^a]|a([^n]|n([^a]|a([^r]|r[^y])))).*|)-(.*)",namespace="%{kube_namespace}"}) without (job)) /1024/1024',
-            label: 'Pod average',
-            unit: 'MB',
-            metric_id: 17,
-            prometheus_endpoint_path:
-              '/root/autodevops-deploy/environments/32/prometheus/api/v1/query_range?query=avg%28sum%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+by+%28job%29%29+without+%28job%29+%2F+count%28avg%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+without+%28job%29%29+%2F1024%2F1024',
-            appearance: {
-              line: {
-                width: 2,
-              },
-            },
-          },
-        ],
-      },
-    ],
-  },
-];
-
 const extraEnvironmentData = new Array(15).fill(null).map((_, idx) => ({
   id: `gid://gitlab/Environments/${150 + idx}`,
   name: `no-deployment/noop-branch-${idx}`,
@@ -369,34 +337,6 @@ export const metricsResult = [
       [1563272125.589, '10.333984375'],
       [1563272185.589, '10.333984375'],
       [1563272245.589, '10.333984375'],
-      [1563272305.589, '10.333984375'],
-      [1563272365.589, '10.333984375'],
-      [1563272425.589, '10.38671875'],
-      [1563272485.589, '10.333984375'],
-      [1563272545.589, '10.333984375'],
-      [1563272605.589, '10.333984375'],
-      [1563272665.589, '10.333984375'],
-      [1563272725.589, '10.333984375'],
-      [1563272785.589, '10.396484375'],
-      [1563272845.589, '10.333984375'],
-      [1563272905.589, '10.333984375'],
-      [1563272965.589, '10.3984375'],
-      [1563273025.589, '10.337890625'],
-      [1563273085.589, '10.34765625'],
-      [1563273145.589, '10.337890625'],
-      [1563273205.589, '10.337890625'],
-      [1563273265.589, '10.337890625'],
-      [1563273325.589, '10.337890625'],
-      [1563273385.589, '10.337890625'],
-      [1563273445.589, '10.337890625'],
-      [1563273505.589, '10.337890625'],
-      [1563273565.589, '10.337890625'],
-      [1563273625.589, '10.337890625'],
-      [1563273685.589, '10.337890625'],
-      [1563273745.589, '10.337890625'],
-      [1563273805.589, '10.337890625'],
-      [1563273865.589, '10.390625'],
-      [1563273925.589, '10.390625'],
     ],
   },
 ];
@@ -419,29 +359,6 @@ export const graphDataPrometheusQuery = {
         {
           metric: { job: 'prometheus' },
           value: ['2019-06-26T21:03:20.881Z', 91],
-        },
-      ],
-    },
-  ],
-};
-
-export const graphDataPrometheusQueryRange = {
-  title: 'Super Chart A1',
-  type: 'area-chart',
-  weight: 2,
-  metrics: [
-    {
-      metricId: '2_metric_a',
-      query_range:
-        'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job)  /1024/1024/1024',
-      unit: 'MB',
-      label: 'Total Consumption',
-      prometheus_endpoint_path:
-        '/root/kubernetes-gke-project/environments/35/prometheus/api/v1/query?query=max%28go_memstats_alloc_bytes%7Bjob%3D%22prometheus%22%7D%29+by+%28job%29+%2F1024%2F1024',
-      result: [
-        {
-          metric: {},
-          values: [[1495700554.925, '8.0390625'], [1495700614.925, '8.0390625']],
         },
       ],
     },
