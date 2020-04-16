@@ -2,9 +2,11 @@ import { SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
 import {
   uniqMetricsId,
   parseEnvironmentsResponse,
+  parseAnnotationsResponse,
   removeLeadingSlash,
   mapToDashboardViewModel,
 } from '~/monitoring/stores/utils';
+import { annotationsData } from '../mock_data';
 import { NOT_IN_DB_PREFIX } from '~/monitoring/constants';
 
 const projectPath = 'gitlab-org/gitlab-test';
@@ -373,6 +375,27 @@ describe('parseEnvironmentsResponse', () => {
     )}`, () => {
       expect(parseEnvironmentsResponse(input, projectPath)).toEqual(output);
     });
+  });
+});
+
+describe('parseAnnotationsResponse', () => {
+  const parsedAnnotationResponse = [
+    {
+      description: 'This is a test annotation',
+      endingAt: null,
+      id: 'gid://gitlab/Metrics::Dashboard::Annotation/1',
+      panelId: null,
+      startingAt: new Date('2020-04-12T12:51:53.000Z'),
+    },
+  ];
+  it.each`
+    case                                               | input                   | expected
+    ${'Returns empty array for null input'}            | ${null}                 | ${[]}
+    ${'Returns empty array for undefined input'}       | ${undefined}            | ${[]}
+    ${'Returns empty array for empty input'}           | ${[]}                   | ${[]}
+    ${'Returns parsed responses for annotations data'} | ${[annotationsData[0]]} | ${parsedAnnotationResponse}
+  `('$case', ({ input, expected }) => {
+    expect(parseAnnotationsResponse(input)).toEqual(expected);
   });
 });
 
