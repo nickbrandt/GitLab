@@ -18102,10 +18102,19 @@ msgstr ""
 msgid "SecurityDashboard|Add projects"
 msgstr ""
 
+msgid "SecurityDashboard|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans."
+msgstr ""
+
 msgid "SecurityDashboard|Edit dashboard"
 msgstr ""
 
 msgid "SecurityDashboard|Hide dismissed"
+msgstr ""
+
+msgid "SecurityDashboard|Introducing standalone vulnerabilities"
+msgstr ""
+
+msgid "SecurityDashboard|Learn More"
 msgstr ""
 
 msgid "SecurityDashboard|Monitor vulnerabilities in your code"
