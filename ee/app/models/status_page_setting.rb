@@ -38,9 +38,7 @@ class StatusPageSetting < ApplicationRecord
   end
 
   def enabled?
-    super &&
-      project&.feature_available?(:status_page) &&
-      project&.beta_feature_available?(:status_page)
+    super && project&.feature_available?(:status_page)
   end
 
   def storage_client

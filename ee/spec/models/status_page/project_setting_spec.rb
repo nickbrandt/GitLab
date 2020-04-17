@@ -126,7 +126,7 @@ describe StatusPage::ProjectSetting do
 
     it { is_expected.to eq(true) }
 
-    context 'when status page setting is diabled' do
+    context 'when status page setting is disabled' do
       before do
         status_page_setting.enabled = false
       end
@@ -137,14 +137,6 @@ describe StatusPage::ProjectSetting do
     context 'when license is not available' do
       before do
         stub_licensed_features(status_page: false)
-      end
-
-      it { is_expected.to eq(false) }
-    end
-
-    context 'when feature flag is disabled' do
-      before do
-        stub_feature_flags(status_page: false)
       end
 
       it { is_expected.to eq(false) }

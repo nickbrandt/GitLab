@@ -296,14 +296,6 @@ describe Projects::Settings::OperationsController do
         end
 
         it { is_expected.to be_a(StatusPage::ProjectSetting) }
-
-        context 'when feature flag is disabled' do
-          before do
-            stub_feature_flags(status_page: false)
-          end
-
-          it { is_expected.to be_nil }
-        end
       end
 
       context 'with existing status page setting' do
