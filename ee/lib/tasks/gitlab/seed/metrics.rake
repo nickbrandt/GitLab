@@ -27,6 +27,26 @@ namespace :gitlab do
         query: 'sum(kube_pod_container_resource_requests_memory_bytes{kubernetes_namespace="gitlab-managed-apps"})/2^30',
         legend: 'Requested (GiB)'
       )
+
+      project = Project.find(args.project_id)
+      content = File.read(Rails.root.join('spec', 'fixtures', 'metrics', 'dashboard', 'development_metrics.yml'))
+      project_attributes = [
+          project.creator,
+          '.gitlab/dashboards/development_metrics.yml',
+          content,
+          {
+            message: 'Seeded development metrics',
+            branch_name: 'master'
+          }
+      ]
+
+      begin
+        project.repository.create_file(*project_attributes)
+      rescue Gitlab::Git::Index::IndexError => error
+        raise error unless error.message == 'A file with this name already exists'
+
+        project.repository.update_file(*project_attributes)
+      end
     end
   end
 end
