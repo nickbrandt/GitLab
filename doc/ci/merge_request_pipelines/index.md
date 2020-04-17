@@ -258,55 +258,55 @@ For example, with this `.gitlab-ci.yml` configuration:
 test:
   script: ./test
   rules:
-    - if: $CI_MERGE_REQUEST_ID                      # Include this job in a pipeline for merge request
-    - if: $CI_COMMIT_BRANCH                         # Include this job in a branch pipeline
+    - if: $CI_MERGE_REQUEST_ID                      # Include this job in pipelines for merge request
+    - if: $CI_COMMIT_BRANCH                         # Include this job in all branch pipelines
   # Or, if you are using the `only:` keyword:
   # only:
   #  - merge_requests
   #  - branches
 ```
 
-Two pipelines are created.
+Two pipelines are created when you push a commit to a branch that also has a pending
+merge request:
 
-1. A branch pipeline that runs for the branch.
-1. A merge request pipeline that runs for the merge request.
+- A merge request pipeline that runs for the changes in the merge request. In
+  **CI/CD > Pipelines**, the merge request icon (**{merge-request}**)
+  and the merge request ID are displayed. If you hover over the ID, the merge request name is displayed.
 
+  ![MR pipeline icon example](img/merge_request_pipelines_doubled_MR_v12_09.png)
 
-The branch pipeline runs for the changes pushed to the branch, and doesn't have a direct
-relationship with any merge request. It's mainly used for static branches like `master`,
-rather than feature branches that exist for a limited time. GitLab triggers this
-kind of pipeline **when you push a new commit to a branch**.
+- A "branch" pipeline that runs for the commit pushed to the branch. In **CI/CD > Pipelines**,
+  the branch icon (**{branch}**) and branch name are displayed. This pipeline is
+  created even if no merge request exists.
 
-The pipeline for merge requests runs on the changes in a specific merge request.
-It's mainly used for feature branches that are created with at least one merge request,
-rather than a static branch. GitLab triggers this kind of pipeline
-**when a merge request is created or updated**.
+  ![branch pipeline icon example](img/merge_request_pipelines_doubled_branch_v12_09.png)
 
-There is overlap between these events. When you push a new commit to a feature branch,
-**GitLab tries to create both kinds of pipelines**.
+With the example configuration above, there is overlap between these two events.
+When you push a commit to a branch that also has an open merge request pending,
+both types of pipelines are created.
 
-You must explicitly define which job should run for which purpose.
-
-To fix the example above, limit the job to only run on specific branches like `master`, and
-not feature branches that will have merge requests:
+To fix this overlap, you must explicitly define which job should run for which
+purpose, for example:
 
 ```yaml
 test:
   script: ./test
   rules:
-    - if: $CI_MERGE_REQUEST_ID                      # Include this job in a pipeline for merge request
-    - if: $CI_COMMIT_BRANCH == 'master'             # Include this job in a master pipeline
+    - if: $CI_MERGE_REQUEST_ID                      # Include this job in pipelines for merge request
+    - if: $CI_COMMIT_BRANCH == 'master'             # Include this job in master branch pipelines
 ```
 
-This effectively resolves the overlap by excluding the branch pipeline job from feature
-branches, and should be done for all jobs that could be added to both types of pipelines.
-
-To enable this globally, you can use the [`workflow:`](ci/yaml/README.md#exclude-jobs-with-rules-from-certain-pipelines)
-parameter to enable this for all jobs at once.
+These `rules:` must be added to jobs that could be added to both types of pipelines. Alternatively,
+you can use the [`workflow:`](../yaml/README.md#exclude-jobs-with-rules-from-certain-pipelines)
+parameter to add the rules all jobs globally.
 
 ### Two pipelines created when pushing an invalid CI configuration file
 
-As described above, pushing a commit to a merge request triggers the creation of two types of
-pipelines. In rare cases, duplicate pipelines can be created.
+Similar to above, pushing to a branch with an invalid CI configuration file can trigger
+the creation of two types of failed pipelines. One pipeline is a failed merge request
+pipeline, and the other is a failed branch pipeline, but both are caused by the same
+invalid configuration.
+
+In rare cases, duplicate pipelines are created.
 
 See [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/201845) for details.
