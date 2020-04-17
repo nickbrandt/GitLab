@@ -91,5 +91,9 @@ FactoryBot.modify do
         create_list(:vulnerability, 2, :detected, project: project)
       end
     end
+
+    trait :with_compliance_framework do
+      association :compliance_framework_setting, factory: :compliance_framework_project_setting
+    end
   end
 end
