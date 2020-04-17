@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { GlDropdownItem, GlSegmentedControl } from '@gitlab/ui';
-import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type_filters.vue';
+import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
 import LabelsSelector from 'ee/analytics/cycle_analytics/components/labels_selector.vue';
 import {
   TASKS_BY_TYPE_SUBJECT_ISSUE,
@@ -11,8 +11,8 @@ import {
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
 import waitForPromises from 'helpers/wait_for_promises';
-import { shouldFlashAMessage } from '../helpers';
-import { groupLabels } from '../mock_data';
+import { shouldFlashAMessage } from '../../helpers';
+import { groupLabels } from '../../mock_data';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 

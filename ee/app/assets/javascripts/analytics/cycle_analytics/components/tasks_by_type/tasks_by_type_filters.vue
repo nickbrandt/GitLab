@@ -2,14 +2,14 @@
 import { GlDropdownDivider, GlSegmentedControl, GlIcon } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
-import { removeFlash } from '../utils';
+import { removeFlash } from '../../utils';
 import {
   TASKS_BY_TYPE_FILTERS,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS,
   TASKS_BY_TYPE_MAX_LABELS,
-} from '../constants';
-import LabelsSelector from './labels_selector.vue';
+} from '../../constants';
+import LabelsSelector from '../labels_selector.vue';
 
 export default {
   name: 'TasksByTypeFilters',

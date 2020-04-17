@@ -14,7 +14,7 @@ import 'bootstrap';
 import '~/gl_dropdown';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
-import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
+import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as commonUtils from '~/lib/utils/common_utils';
@@ -132,8 +132,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(DurationChart).exists()).toBe(flag);
   };
 
-  const displaysTasksByType = flag => {
-    expect(wrapper.find(TasksByTypeChart).exists()).toBe(flag);
+  const displaysTypeOfWork = flag => {
+    expect(wrapper.find(TypeOfWorkCharts).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -343,7 +343,7 @@ describe('Cycle Analytics component', () => {
         });
 
         it('does not display the tasks by type chart', () => {
-          displaysTasksByType(false);
+          displaysTypeOfWork(false);
         });
 
         it('does not display the duration chart', () => {

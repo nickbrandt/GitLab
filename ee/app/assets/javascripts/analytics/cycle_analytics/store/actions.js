@@ -295,18 +295,12 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     });
 };
 
-export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {
-  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
-};
-
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
   createFlash(__('There was an error fetching data for the tasks by type chart'));
 };
 
-export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
-
-export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
+export const fetchTasksByTypeData = ({ dispatch, commit, state, getters }) => {
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
@@ -315,6 +309,9 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const {
     tasksByType: { subject, selectedLabelIds },
   } = state;
+
+  // ensure we clear any chart data currently in state
+  commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
   // dont request if we have no labels selected...for now
   if (selectedLabelIds.length) {
@@ -326,13 +323,11 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
       label_ids: selectedLabelIds,
     };
 
-    dispatch('requestTasksByTypeData');
-
     return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
-      .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
+      .then(({ data }) => commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
-  return Promise.resolve();
+  return commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, []);
 };
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
@@ -403,7 +398,7 @@ export const removeStage = ({ dispatch, state }, stageId) => {
 
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
-  dispatch('fetchTasksByTypeData');
+  dispatch('fetchTopRankedGroupLabels');
 };
 
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
