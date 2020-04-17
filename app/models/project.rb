@@ -415,7 +415,6 @@ class Project < ApplicationRecord
   scope :sorted_by_activity, -> { reorder(Arel.sql("GREATEST(COALESCE(last_activity_at, '1970-01-01'), COALESCE(last_repository_updated_at, '1970-01-01')) DESC")) }
   scope :sorted_by_stars_desc, -> { reorder(self.arel_table['star_count'].desc) }
   scope :sorted_by_stars_asc, -> { reorder(self.arel_table['star_count'].asc) }
-  scope :sorted_by_name_asc_limited, ->(limit) { reorder(name: :asc).limit(limit) }
   # Sometimes queries (e.g. using CTEs) require explicit disambiguation with table name
   scope :projects_order_id_desc, -> { reorder(self.arel_table['id'].desc) }
 
