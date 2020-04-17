@@ -3866,6 +3866,48 @@ describe Ci::Build do
     end
   end
 
+  describe '#collect_terraform_reports!' do
+    let(:terraform_reports) { Gitlab::Ci::Reports::TerraformReports.new }
+
+    it 'returns an empty hash' do
+      expect(build.collect_terraform_reports!(terraform_reports).plans).to eq({})
+    end
+
+    context 'when build has a terraform report' do
+      context 'when there is a valid tfplan.json' do
+        before do
+          create(:ci_job_artifact, :terraform, job: build, project: build.project)
+        end
+
+        it 'parses blobs and add the results to the terraform report' do
+          expect { build.collect_terraform_reports!(terraform_reports) }.not_to raise_error
+
+          expect(terraform_reports.plans).to match(
+            a_hash_including(
+              'tfplan.json' => a_hash_including(
+                'create' => 0,
+                'update' => 1,
+                'delete' => 0
+              )
+            )
+          )
+        end
+      end
+
+      context 'when there is an invalid tfplan.json' do
+        before do
+          create(:ci_job_artifact, :terraform_with_corrupted_data, job: build, project: build.project)
+        end
+
+        it 'raises an error' do
+          expect { build.collect_terraform_reports!(terraform_reports) }.to raise_error(
+            Gitlab::Ci::Parsers::Terraform::Tfplan::TfplanParserError
+          )
+        end
+      end
+    end
+  end
+
   describe '#report_artifacts' do
     subject { build.report_artifacts }
 

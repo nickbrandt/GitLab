@@ -1959,6 +1959,9 @@ msgstr ""
 msgid "An error occurred while fetching sidebar data"
 msgstr ""
 
+msgid "An error occurred while fetching terraform reports."
+msgstr ""
+
 msgid "An error occurred while fetching the Service Desk address."
 msgstr ""
 

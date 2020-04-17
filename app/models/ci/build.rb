@@ -878,6 +878,14 @@ module Ci
       coverage_report
     end
 
+    def collect_terraform_reports!(terraform_reports)
+      each_report(::Ci::JobArtifact::TERRAFORM_REPORT_FILE_TYPES) do |file_type, blob, report_artifact|
+        ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, terraform_reports, artifact: report_artifact)
+      end
+
+      terraform_reports
+    end
+
     def report_artifacts
       job_artifacts.with_reports
     end
