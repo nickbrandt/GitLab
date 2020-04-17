@@ -58,7 +58,7 @@ describe('mapToDashboardViewModel', () => {
               y_label: 'Y Label A',
               yAxis: {
                 name: 'Y Label A',
-                format: 'number',
+                format: 'engineering',
                 precision: 2,
               },
               metrics: [],
@@ -140,7 +140,7 @@ describe('mapToDashboardViewModel', () => {
         y_label: '',
         yAxis: {
           name: '',
-          format: SUPPORTED_FORMATS.number,
+          format: SUPPORTED_FORMATS.engineering,
           precision: 2,
         },
         metrics: [],
@@ -161,7 +161,7 @@ describe('mapToDashboardViewModel', () => {
         },
         yAxis: {
           name: '',
-          format: SUPPORTED_FORMATS.number,
+          format: SUPPORTED_FORMATS.engineering,
           precision: 2,
         },
         metrics: [],
@@ -221,7 +221,7 @@ describe('mapToDashboardViewModel', () => {
         },
       });
 
-      expect(getMappedPanel().yAxis.format).toBe(SUPPORTED_FORMATS.number);
+      expect(getMappedPanel().yAxis.format).toBe(SUPPORTED_FORMATS.engineering);
     });
 
     // This property allows single_stat panels to render percentile values

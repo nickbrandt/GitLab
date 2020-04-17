@@ -120,15 +120,19 @@ const mapXAxisToViewModel = ({ name = '' }) => ({ name });
 /**
  * Maps Y-axis view model
  *
- * Defaults to a 2 digit precision and `number` format. It only allows
+ * Defaults to a 2 digit precision and `engineering` format. It only allows
  * formats in the SUPPORTED_FORMATS array.
  *
  * @param {Object} axis
  */
-const mapYAxisToViewModel = ({ name = '', format = SUPPORTED_FORMATS.number, precision = 2 }) => {
+const mapYAxisToViewModel = ({
+  name = '',
+  format = SUPPORTED_FORMATS.engineering,
+  precision = 2,
+}) => {
   return {
     name,
-    format: SUPPORTED_FORMATS[format] || SUPPORTED_FORMATS.number,
+    format: SUPPORTED_FORMATS[format] || SUPPORTED_FORMATS.engineering,
     precision,
   };
 };
