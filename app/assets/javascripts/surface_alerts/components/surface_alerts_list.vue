@@ -1,48 +1,40 @@
 <script>
-  import {
+import { GlEmptyState, GlButton, GlLoadingIcon } from '@gitlab/ui';
+
+export default {
+  components: {
     GlEmptyState,
     GlButton,
-    GlLoadingIcon
-  } from '@gitlab/ui';
-
-
-  export default {
-    components: {
-      GlEmptyState,
-      GlButton,
-      GlLoadingIcon
+    GlLoadingIcon,
+  },
+  props: {
+    indexPath: {
+      type: String,
+      required: true,
     },
-    props: {
-      indexPath: {
-        type: String,
-        required: true,
-      },
-      enableSurfaceAlertsLink: {
-        type: String,
-        required: true,
-      },
-      surfaceAlertsEnabled: {
-        type: Boolean,
-        required: true,
-      },
-      illustrationPath: {
-        type: String,
-        required: true,
-      },
+    enableSurfaceAlertsLink: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        alerts: [],
-      };
+    illustrationPath: {
+      type: String,
+      required: true,
     },
-    computed: {},
-    methods: {},
-  };
+  },
+  data() {
+    return {
+      alerts: [],
+      loading: false,
+    };
+  },
+  computed: {},
+  methods: {},
+};
 </script>
 
 <template>
   <div>
-    <div v-if="surfaceAlertsEnabled" class="surface-alerts-list">
+    <div v-if="alerts.length > 0" class="surface-alerts-list">
       <div v-if="loading" class="py-3">
         <gl-loading-icon size="md" />
       </div>
@@ -50,12 +42,20 @@
     <div v-else>
       <gl-empty-state :title="__('Surface alerts in GitLab')" :svg-path="illustrationPath">
         <template #description>
-          <div>
-            <span>{{ __('Display alerts from all your monitoring tools directly withing GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.') }}</span>
+          <div class="d-block">
+            <span>{{
+              __(
+                'Display alerts from all your monitoring tools directly withing GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
+              )
+            }}</span>
             <a href="/help/user/project/operations/surface_alerts.html">
               {{ __('More information') }}
             </a>
-            <gl-button category="primary" variant="success">{{ __('Authorize external service') }}</gl-button>
+          </div>
+          <div class="d-block center">
+            <gl-button category="primary" variant="success" :href="enableSurfaceAlertsLink">{{
+              __('Authorize external service')
+            }}</gl-button>
           </div>
         </template>
       </gl-empty-state>
