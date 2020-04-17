@@ -400,7 +400,8 @@ CREATE TABLE public.application_settings (
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
     issues_create_limit integer DEFAULT 300 NOT NULL,
-    push_rule_id bigint
+    push_rule_id bigint,
+    group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -13201,6 +13202,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200409085956
 20200409211607
 20200410232012
+20200413072059
 20200414144547
 20200415160722
 20200415161021
