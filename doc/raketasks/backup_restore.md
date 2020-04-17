@@ -333,7 +333,7 @@ For Omnibus GitLab packages:
    gitlab_rails['backup_upload_remote_directory'] = 'my.s3.bucket'
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect
+1. [Reconfigure GitLab](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect
 
 #### Digital Ocean Spaces
 
@@ -352,7 +352,7 @@ This example can be used for a bucket in Amsterdam (AMS3).
    gitlab_rails['backup_upload_remote_directory'] = 'my.s3.bucket'
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect
+1. [Reconfigure GitLab](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect
 
 NOTE: **Note:**
 If you see `400 Bad Request` by using Digital Ocean Spaces, the cause may be the
@@ -397,7 +397,7 @@ For installations from source:
          # storage_class: 'STANDARD'
    ```
 
-1. [Restart GitLab] for the changes to take effect
+1. [Restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes to take effect
 
 If you are uploading your backups to S3 you will probably want to create a new
 IAM user with restricted access rights. To give the upload user access only for
@@ -476,7 +476,7 @@ For Omnibus GitLab packages:
    gitlab_rails['backup_upload_remote_directory'] = 'my.google.bucket'
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect
+1. [Reconfigure GitLab](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect
 
 For installations from source:
 
@@ -492,7 +492,7 @@ For installations from source:
          remote_directory: 'my.google.bucket'
    ```
 
-1. [Restart GitLab] for the changes to take effect
+1. [Restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes to take effect
 
 #### Specifying a custom directory for backups
 
@@ -539,7 +539,7 @@ For Omnibus GitLab packages:
    gitlab_rails['backup_upload_remote_directory'] = 'gitlab_backups'
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 For installations from source:
 
@@ -557,7 +557,7 @@ For installations from source:
        remote_directory: 'gitlab_backups'
    ```
 
-1. [Restart GitLab] for the changes to take effect.
+1. [Restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ### Backup archive permissions
 
@@ -574,7 +574,7 @@ For Omnibus GitLab packages:
    gitlab_rails['backup_archive_permissions'] = 0644 # Makes the backup archives world-readable
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 For installations from source:
 
@@ -585,7 +585,7 @@ For installations from source:
      archive_permissions: 0644 # Makes the backup archives world-readable
    ```
 
-1. [Restart GitLab] for the changes to take effect.
+1. [Restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ### Configuring cron to make daily backups
 
@@ -669,7 +669,7 @@ For installations from source:
      keep_time: 604800
    ```
 
-1. [Restart GitLab] for the changes to take effect.
+1. [Restart GitLab](../administration/restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ## Restore
 
@@ -1078,9 +1078,6 @@ NOTE: **Note:**
 If you have changed the default filesystem location for the registry, you will
 want to run the `chown` against your custom location instead of
 `/var/opt/gitlab/gitlab-rails/shared/registry/docker`.
-
-[reconfigure GitLab]: ../administration/restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart GitLab]: ../administration/restart_gitlab.md#installations-from-source
 
 ### Backup fails to complete with Gzip error
 
