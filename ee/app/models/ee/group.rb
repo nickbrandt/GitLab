@@ -49,12 +49,18 @@ module EE
 
       belongs_to :file_template_project, class_name: "Project"
 
+      belongs_to :push_rule
+
       # Use +checked_file_template_project+ instead, which implements important
       # visibility checks
       private :file_template_project
 
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+
+      validates :max_personal_access_token_lifetime,
+                allow_blank: true,
+                numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 365 }
 
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
 
@@ -64,6 +70,17 @@ module EE
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
       end
+
+      scope :with_managed_accounts_enabled, -> {
+        joins(:saml_provider).where(saml_providers:
+          {
+            enabled: true,
+            enforced_sso: true,
+            enforced_group_managed_accounts: true
+          })
+      }
+
+      scope :with_no_pat_expiry_policy, -> { where(max_personal_access_token_lifetime: nil) }
 
       scope :with_project_templates, -> { where.not(custom_project_templates_group_id: nil) }
 
@@ -309,6 +326,36 @@ module EE
       ::Vulnerability.where(
         project: ::Project.for_group_and_its_subgroups(self).non_archived.without_deleted
       )
+    end
+
+    def max_personal_access_token_lifetime_from_now
+      if max_personal_access_token_lifetime.present?
+        max_personal_access_token_lifetime.days.from_now
+      else
+        ::Gitlab::CurrentSettings.max_personal_access_token_lifetime_from_now
+      end
+    end
+
+    def personal_access_token_expiration_policy_available?
+      enforced_group_managed_accounts? && License.feature_available?(:personal_access_token_expiration_policy)
+    end
+
+    def update_personal_access_tokens_lifetime
+      return unless max_personal_access_token_lifetime.present? && personal_access_token_expiration_policy_available?
+
+      ::PersonalAccessTokens::Groups::UpdateLifetimeService.new(self).execute
+    end
+
+    def predefined_push_rule
+      strong_memoize(:predefined_push_rule) do
+        if push_rule.present?
+          push_rule
+        elsif has_parent?
+          parent.predefined_push_rule
+        else
+          PushRule.global
+        end
+      end
     end
 
     private

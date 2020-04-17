@@ -1,6 +1,6 @@
 <script>
 import { s__ } from '~/locale';
-import { GlAlert, GlNewButton, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
+import { GlAlert, GlButton, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
 import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/group_vulnerabilities.graphql';
 import { VULNERABILITIES_PER_PAGE } from 'ee/vulnerabilities/constants';
@@ -8,7 +8,7 @@ import { VULNERABILITIES_PER_PAGE } from 'ee/vulnerabilities/constants';
 export default {
   components: {
     GlAlert,
-    GlNewButton,
+    GlButton,
     GlEmptyState,
     GlIntersectionObserver,
     VulnerabilityList,
@@ -126,9 +126,9 @@ export default {
       class="text-center"
       @appear="fetchNextPage"
     >
-      <gl-new-button :loading="isLoadingQuery" :disabled="isLoadingQuery" @click="fetchNextPage">{{
+      <gl-button :loading="isLoadingQuery" :disabled="isLoadingQuery" @click="fetchNextPage">{{
         __('Load more vulnerabilities')
-      }}</gl-new-button>
+      }}</gl-button>
     </gl-intersection-observer>
   </div>
 </template>

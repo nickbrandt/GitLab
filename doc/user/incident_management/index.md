@@ -45,7 +45,7 @@ The emails will be sent to [owners and maintainers](../permissions.md) of the pr
 
 Prometheus alerts can be set up in both:
 
-- [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics-ultimate) and
+- [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics) and
 - [Self-managed Prometheus](../project/integrations/prometheus.md#external-prometheus-instances) installations.
 
 ### Alert endpoint
@@ -138,6 +138,4 @@ Incident Management features can be easily enabled & disabled via the Project se
 
 #### Auto-creation
 
-GitLab Issues can automatically be created as a result of an Alert notification. An Issue created this way will contain error information to help you further debug the error.
-
-For [GitLab-managed alerting rules](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics-ultimate), the issue will include an embedded chart for the query corresponding to the alert. The chart will show an hour of data surrounding the starting point of the incident, 30 minutes before and after.
+You can automatically create GitLab issues from an Alert notification. Issues created this way contain error information to help you debug the error. Appropriately configured alerts include an [embedded chart](../project/integrations/prometheus.md#embedding-metrics-based-on-alerts-in-incident-issues) for the query corresponding to the alert.

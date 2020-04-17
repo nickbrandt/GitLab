@@ -32,7 +32,7 @@ describe('EE approvals base module mutations', () => {
 
       mutations[types.SET_APPROVAL_SETTINGS](state, settings);
 
-      expect(state).toEqual(jasmine.objectContaining(settings));
+      expect(state).toEqual(expect.objectContaining(settings));
     });
   });
 });

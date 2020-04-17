@@ -163,7 +163,7 @@ describe 'admin Geo Nodes', :js, :geo do
         wait_for_requests
         expect(current_path).to eq new_admin_geo_node_path
 
-        expect(page).to have_content('There was an error saving this Geo Node')
+        expect(page).to have_content(/There was an error saving this Geo Node.*primary node already exists/)
       end
     end
   end

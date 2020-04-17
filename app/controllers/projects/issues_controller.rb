@@ -11,7 +11,7 @@ class Projects::IssuesController < Projects::ApplicationController
   include RecordUserLastActivity
 
   def issue_except_actions
-    %i[index calendar new create bulk_update import_csv]
+    %i[index calendar new create bulk_update import_csv export_csv]
   end
 
   def set_issuables_index_only_actions
@@ -20,7 +20,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   prepend_before_action(only: [:index]) { authenticate_sessionless_user!(:rss) }
   prepend_before_action(only: [:calendar]) { authenticate_sessionless_user!(:ics) }
-  prepend_before_action :authenticate_user!, only: [:new]
+  prepend_before_action :authenticate_user!, only: [:new, :export_csv]
   # designs is only applicable to EE, but defining a prepend_before_action in EE code would overwrite this
   prepend_before_action :store_uri, only: [:new, :show, :designs]
 
@@ -42,13 +42,12 @@ class Projects::IssuesController < Projects::ApplicationController
   before_action :authorize_import_issues!, only: [:import_csv]
   before_action :authorize_download_code!, only: [:related_branches]
 
+  # Limit the amount of issues created per minute
+  before_action :create_rate_limit, only: [:create]
+
   before_action do
     push_frontend_feature_flag(:vue_issuable_sidebar, project.group)
     push_frontend_feature_flag(:save_issuable_health_status, project.group, default_enabled: true)
-  end
-
-  before_action only: :show do
-    push_frontend_feature_flag(:sort_discussions, @project)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:discussions]
@@ -190,6 +189,13 @@ class Projects::IssuesController < Projects::ApplicationController
     end
   end
 
+  def export_csv
+    ExportCsvWorker.perform_async(current_user.id, project.id, finder_options.to_h) # rubocop:disable CodeReuse/Worker
+
+    index_path = project_issues_path(project)
+    redirect_to(index_path, notice: "Your CSV export has started. It will be emailed to #{current_user.notification_email} when complete.")
+  end
+
   def import_csv
     if uploader = UploadService.new(project, params[:file]).execute
       ImportIssuesCsvWorker.perform_async(current_user.id, project.id, uploader.upload.id) # rubocop:disable CodeReuse/Worker
@@ -295,6 +301,22 @@ class Projects::IssuesController < Projects::ApplicationController
     # 2. https://gitlab.com/gitlab-org/gitlab-foss/issues/42424
     # 3. https://gitlab.com/gitlab-org/gitlab-foss/issues/42426
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42422')
+  end
+
+  private
+
+  def create_rate_limit
+    key = :issues_create
+
+    if rate_limiter.throttled?(key, scope: [@project, @current_user])
+      rate_limiter.log_request(request, "#{key}_request_limit".to_sym, current_user)
+
+      render plain: _('This endpoint has been requested too many times. Try again later.'), status: :too_many_requests
+    end
+  end
+
+  def rate_limiter
+    ::Gitlab::ApplicationRateLimiter
   end
 end
 

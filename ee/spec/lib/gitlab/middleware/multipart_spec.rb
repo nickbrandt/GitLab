@@ -27,12 +27,18 @@ describe Gitlab::Middleware::Multipart do
         end
       end
 
-      RSpec.shared_examples 'not allowing the multipart upload' do
+      RSpec.shared_examples 'not allowing the multipart upload when package upload path is used' do
         it 'does not allow files to be uploaded' do
           with_tmp_dir('tmp/uploads', storage_path) do |dir, env|
-            allow(Packages::PackageFileUploader).to receive(:root).and_return(File.join(dir, storage_path))
+            # with_tmp_dir set the same workhorse_upload_path for all Uploaders,
+            # so we have to prevent JobArtifactUploader to allow the tested path
+            allow(JobArtifactUploader).to receive(:workhorse_upload_path).and_return(Dir.tmpdir)
 
-            expect { middleware.call(env) }.to raise_error(UploadedFile::InvalidPathError)
+            status, headers, body = middleware.call(env)
+
+            expect(status).to eq(400)
+            expect(headers).to eq({ 'Content-Type' => 'text/plain' })
+            expect(body).to start_with('insecure path used')
           end
         end
       end
@@ -50,7 +56,7 @@ describe Gitlab::Middleware::Multipart do
           expect(::Packages::PackageFileUploader).not_to receive(:workhorse_upload_path)
         end
 
-        it_behaves_like 'not allowing the multipart upload'
+        it_behaves_like 'not allowing the multipart upload when package upload path is used'
       end
 
       where(:object_storage_enabled, :direct_upload_enabled, :example_name) do

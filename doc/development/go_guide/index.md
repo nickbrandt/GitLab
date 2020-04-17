@@ -130,23 +130,8 @@ projects, and makes merge requests easier to review.
 In some cases, such as building a Go project for it to act as a dependency of a
 CI run for another project, removing the `vendor/` directory means the code must
 be downloaded repeatedly, which can lead to intermittent problems due to rate
-limiting or network failures. In these circumstances, you should cache the
-downloaded code between runs with a `.gitlab-ci.yml` snippet like this:
-
-```yaml
-.go-cache:
-  variables:
-    GOPATH: $CI_PROJECT_DIR/.go
-  before_script:
-    - mkdir -p .go
-  cache:
-    paths:
-      - .go/pkg/mod/
-
-test:
-  extends: .go-cache
-  # ...
-```
+limiting or network failures. In these circumstances, you should [cache the
+downloaded code between](../../ci/caching/index.md#caching-go-dependencies).
 
 There was a [bug on modules
 checksums](https://github.com/golang/go/issues/29278) in Go < v1.11.4, so make
@@ -393,6 +378,24 @@ are:
 
 To reduce unnecessary differences between two distribution methods, Omnibus and
 CNG **should always use the same Go version**.
+
+## Secure Team standards and style guidelines
+
+The following are some style guidelines that are specific to the Secure Team.
+
+### Code style and format
+
+Use `goimports -local gitlab.com/gitlab-org` before committing.
+[goimports](https://godoc.org/golang.org/x/tools/cmd/goimports)
+is a tool that automatically formats Go source code using
+[Gofmt](https://golang.org/cmd/gofmt/), in addition to formatting import lines,
+adding missing ones and removing unreferenced ones.
+By using the `-local gitlab.com/gitlab-org` option, `goimports` will group locally referenced
+packages separately from external ones. See
+[the imports section](https://github.com/golang/go/wiki/CodeReviewComments#imports)
+of the Code Review Comments page on the Go wiki for more details.
+Most editors/IDEs will allow you to run commands before/after saving a file, you can set it
+up to run `goimports -local gitlab.com/gitlab-org` so that it's applied to every file when saving.
 
 ---
 

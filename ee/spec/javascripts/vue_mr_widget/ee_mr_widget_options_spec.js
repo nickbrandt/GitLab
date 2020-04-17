@@ -24,12 +24,14 @@ import {
   dastDiffSuccessMock,
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
+  secretScanningDiffSuccessMock,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
 
 const SAST_SELECTOR = '.js-sast-widget';
 const DAST_SELECTOR = '.js-dast-widget';
 const DEPENDENCY_SCANNING_SELECTOR = '.js-dependency-scanning-widget';
 const CONTAINER_SCANNING_SELECTOR = '.js-container-scanning';
+const SECRET_SCANNING_SELECTOR = '.js-secret-scanning';
 
 describe('ee merge request widget options', () => {
   let vm;
@@ -780,14 +782,88 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('license management report', () => {
-    const licenseManagementApiUrl = `${TEST_HOST}/manage_license_api`;
+  describe('Secret Scanning', () => {
+    const SECRET_SCANNING_ENDPOINT = 'secret_scanning';
 
-    it('should be rendered if license management data is set', () => {
+    beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
         enabled_reports: {
-          license_management: true,
+          secret_scanning: true,
+          // The below property needs to exist until
+          // secret scanning is implemented in backend
+          // Or for some other reason I'm yet to find
+          dast: true,
+        },
+        secret_scanning_comparison_path: SECRET_SCANNING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
+      };
+    });
+
+    describe('when it is loading', () => {
+      it('should render loading indicator', () => {
+        mock.onGet(SECRET_SCANNING_ENDPOINT).reply(200, secretScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        expect(
+          removeBreakLine(findSecurityWidget().querySelector(SECRET_SCANNING_SELECTOR).textContent),
+        ).toContain('Secret scanning is loading');
+      });
+    });
+
+    describe('with successful request', () => {
+      beforeEach(() => {
+        mock.onGet(SECRET_SCANNING_ENDPOINT).reply(200, secretScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+      });
+
+      it('should render provided data', done => {
+        setTimeout(() => {
+          expect(
+            removeBreakLine(
+              findSecurityWidget().querySelector(
+                `${SECRET_SCANNING_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
+            ),
+          ).toEqual('Secret scanning detected 2 new, and 1 fixed vulnerabilities');
+          done();
+        }, 0);
+      });
+    });
+
+    describe('with failed request', () => {
+      beforeEach(() => {
+        mock.onGet(SECRET_SCANNING_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, []);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+      });
+
+      it('should render error indicator', done => {
+        setTimeout(() => {
+          expect(
+            findSecurityWidget()
+              .querySelector(SECRET_SCANNING_SELECTOR)
+              .textContent.trim(),
+          ).toContain('Secret scanning: Loading resulted in an error');
+          done();
+        }, 0);
+      });
+    });
+  });
+
+  describe('license scanning report', () => {
+    const licenseManagementApiUrl = `${TEST_HOST}/manage_license_api`;
+
+    it('should be rendered if license scanning data is set', () => {
+      gl.mrWidgetData = {
+        ...mockData,
+        enabled_reports: {
+          license_scanning: true,
         },
         license_scanning: {
           managed_licenses_path: licenseManagementApiUrl,
@@ -800,10 +876,10 @@ describe('ee merge request widget options', () => {
       expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
     });
 
-    it('should not be rendered if license management data is not set', () => {
+    it('should not be rendered if license scanning data is not set', () => {
       gl.mrWidgetData = {
         ...mockData,
-        license_management: {},
+        license_scanning: {},
       };
 
       vm = mountComponent(Component, { mrData: gl.mrWidgetData });
@@ -1096,12 +1172,13 @@ describe('ee merge request widget options', () => {
       undefined,
       {},
       { foo: true },
-      { license_management: true },
+      { license_scanning: true },
       {
         dast: false,
         sast: false,
         container_scanning: false,
         dependency_scanning: false,
+        secret_scanning: false,
       },
     ];
 
@@ -1112,7 +1189,7 @@ describe('ee merge request widget options', () => {
           enabled_reports: noSecurityReportsEnabled,
         };
 
-        if (noSecurityReportsEnabled?.license_management) {
+        if (noSecurityReportsEnabled?.license_scanning) {
           // Provide license report config if it's going to be rendered
           gl.mrWidgetData.license_scanning = {
             managed_licenses_path: `${TEST_HOST}/manage_license_api`,

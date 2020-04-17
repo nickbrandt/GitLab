@@ -43,6 +43,7 @@ The following applications can be installed:
 - [Knative](#knative)
 - [Crossplane](#crossplane)
 - [Elastic Stack](#elastic-stack)
+- [Fluentd](#fluentd)
 
 With the exception of Knative, the applications will be installed in a dedicated
 namespace called `gitlab-managed-apps`.
@@ -297,6 +298,22 @@ Ingress with the recent changes.
 
 ![Disabling WAF](../../topics/web_application_firewall/img/guide_waf_ingress_save_changes_v12_10.png)
 
+##### Logging and blocking modes
+
+To help you tune your WAF rules, you can globally set your WAF to either
+**Logging** or **Blocking** mode:
+
+- **Logging mode** - Allows traffic matching the rule to pass, and logs the event.
+- **Blocking mode** - Prevents traffic matching the rule from passing, and logs the event.
+
+To change your WAF's mode:
+
+1. [Install ModSecurity](../../topics/web_application_firewall/quick_start_guide.md) if you have not already done so.
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
+1. In **Applications**, scroll to **Ingress**.
+1. Under **Global default**, select your desired mode.
+1. Click **Save changes**.
+
 ##### Viewing Web Application Firewall traffic
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/14707) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
@@ -312,7 +329,7 @@ From there, you can see tracked over time:
 
 If a significant percentage of traffic is anomalous, it should be investigated
 for potential threats, which can be done by
-[examining the application logs](#web-application-firewall-modsecurity).
+[examining the Web Application Firewall logs](#web-application-firewall-modsecurity).
 
 ![Threat Monitoring](img/threat_monitoring_v12_9.png)
 
@@ -523,6 +540,28 @@ kubectl port-forward svc/kibana 5601:443
 
 Then, you can visit Kibana at `http://localhost:5601`.
 
+### Fluentd
+
+> Introduced in GitLab 12.10 for project- and group-level clusters.
+
+[Fluentd](https://www.fluentd.org/) is an open source data collector, which enables
+you to unify the data collection and consumption to better use and understand
+your data. Fluentd sends logs in syslog format.
+
+To enable Fluentd:
+
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes** and click
+   **Applications**. You will be prompted to enter a host, port and protocol
+   where the WAF logs will be sent to via syslog.
+1. Provide the host domain name or URL in **SIEM Hostname**.
+1. Provide the host port number in **SIEM Port**.
+1. Select a **SIEM Protocol**.
+1. Check **Send ModSecurity Logs**. If you do not select this checkbox, the **Install**
+   button is disabled.
+1. Click **Save changes**.
+
+![Fluentd input fields](img/fluentd_v12_10.png)
+
 ### Future apps
 
 Interested in contributing a new GitLab managed app? Visit the
@@ -552,6 +591,8 @@ Supported applications:
 - [JupyterHub](#install-jupyterhub-using-gitlab-cicd)
 - [Elastic Stack](#install-elastic-stack-using-gitlab-cicd)
 - [Crossplane](#install-crossplane-using-gitlab-cicd)
+- [Fluentd](#install-fluentd-using-gitlab-cicd)
+- [Knative](#install-knative-using-gitlab-cicd)
 
 ### Usage
 
@@ -612,7 +653,7 @@ ingress:
 Ingress will then be installed into the `gitlab-managed-apps` namespace
 of your cluster.
 
-You can customize the installation of Ingress by defining
+You can customize the installation of Ingress by defining a
 `.gitlab/managed-apps/ingress/values.yaml` file in your cluster
 management project. Refer to the
 [chart](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
@@ -649,7 +690,7 @@ certManager:
     installed: false
 ```
 
-You can customize the installation of cert-manager by defining
+You can customize the installation of cert-manager by defining a
 `.gitlab/managed-apps/cert-manager/values.yaml` file in your cluster
 management project. Refer to the
 [chart](https://hub.helm.sh/charts/jetstack/cert-manager) for the
@@ -1014,7 +1055,7 @@ In this alpha implementation of installing Elastic Stack through CI, reading the
 
 ### Install Crossplane using GitLab CI/CD
 
-> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/68) in GitLab 12.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/35675) in GitLab 12.9.
 
 Crossplane is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
@@ -1028,13 +1069,81 @@ Crossplane:
 
 Crossplane is installed into the `gitlab-managed-apps` namespace of your cluster.
 
-You can check the default [values.yaml](https://github.com/crossplane/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl) we set for this chart.
+You can check the default
+[values.yaml](https://github.com/crossplane/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
+we set for this chart.
 
 You can customize the installation of Crossplane by defining
 `.gitlab/managed-apps/crossplane/values.yaml` file in your cluster
 management project. Refer to the
 [chart](https://github.com/crossplane/crossplane/tree/master/cluster/charts/crossplane#configuration) for the
-available configuration options. Note that this link points to the docs for the current development release, which may differ from the version you have installed. You can check out a specific version in the branch/tag switcher.
+available configuration options. Note that this link points to the documentation for the current development release, which may differ from the version you have installed.
+
+### Install Fluentd using GitLab CI/CD
+
+> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/76) in GitLab 12.10.
+
+To install Fluentd into the `gitlab-managed-apps` namespace of your cluster using GitLab CI/CD, define the following configuration in `.gitlab/managed-apps/config.yaml`:
+
+```yaml
+Fluentd:
+  installed: true
+```
+
+You can also review the default values set for this chart in the [values.yaml](https://github.com/helm/charts/blob/master/stable/fluentd/values.yaml) file.
+
+You can customize the installation of Fluentd by defining
+`.gitlab/managed-apps/fluentd/values.yaml` file in your cluster management
+project. Refer to the
+[configuration chart for the current development release of Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd#configuration)
+for the available configuration options.
+
+NOTE: **Note:**
+The configuration chart link points to the current development release, which
+may differ from the version you have installed. To ensure compatibility, switch
+to the specific branch or tag you are using.
+
+### Install Knative using GitLab CI/CD
+
+To install Knative, define the `.gitlab/managed-apps/config.yaml` file
+with:
+
+```yaml
+knative:
+  installed: true
+```
+
+You can customize the installation of Knative by defining `.gitlab/managed-apps/knative/values.yaml`
+file in your cluster management project. Refer to the [chart](https://gitlab.com/gitlab-org/charts/knative)
+for the available configuration options.
+
+Here is an example configuration for Knative:
+
+```yaml
+domain: 'my.wildcard.A.record.dns'
+```
+
+If you plan to use GitLab Serverless capabilities, be sure to set an A record wildcard domain on your custom configuration.
+
+#### Knative Metrics
+
+GitLab provides [Invocation Metrics](../project/clusters/serverless/index.md#invocation-metrics) for your functions. To collect these metrics, you must have:
+
+1. Knative and Prometheus managed applications installed on your cluster.
+1. Manually applied the custom metrics on your cluster by running the following command:
+
+   ```bash
+   kubectl apply -f https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/raw/02c8231e30ef5b6725e6ba368bc63863ceb3c07d/src/default-data/knative/istio-metrics.yaml
+   ```
+
+#### Uninstall Knative
+
+To uninstall Knative, you must first manually remove any custom metrics you have added
+by running the following command:
+
+```bash
+kubectl delete -f https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/raw/02c8231e30ef5b6725e6ba368bc63863ceb3c07d/src/default-data/knative/istio-metrics.yaml
+```
 
 ## Upgrading applications
 

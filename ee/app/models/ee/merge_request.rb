@@ -168,7 +168,6 @@ module EE
         container_scanning: report_type_enabled?(:container_scanning),
         dast: report_type_enabled?(:dast),
         dependency_scanning: report_type_enabled?(:dependency_scanning),
-        license_management: report_type_enabled?(:license_scanning),
         license_scanning: report_type_enabled?(:license_scanning)
       }
     end

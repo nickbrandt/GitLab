@@ -1,0 +1,5 @@
+---
+title: Fix duplicated events on Value Stream Analytics stage form
+merge_request: 29030
+author:
+type: fixed

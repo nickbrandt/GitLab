@@ -8,10 +8,15 @@ type: reference
 
 The following are the requirements for providing your own Redis instance:
 
-- GitLab 12.0 and later requires Redis version 3.2 or higher. Version 3.2 or higher is recommend as this is
-  what ships with the GitLab Omnibus package. Older Redis versions do not
-  support an optional count argument to SPOP which is now required for
-  [Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
+- Redis version 5.0 or higher is recommended, as this is what ships with
+  Omnibus GitLab packages starting with GitLab 12.7.
+- Support for Redis 3.2 is deprecated with GitLab 12.10 and will be completely
+  removed in GitLab 13.0.
+- GitLab 12.0 and later requires Redis version 3.2 or higher. Older Redis
+  versions do not support an optional count argument to SPOP which is now
+  required for [Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
+- In addition, if Redis 4 or later is available, GitLab makes use of certain
+  commands like `UNLINK` and `USAGE` which were introduced only in Redis 4.
 - Standalone Redis or Redis high availability with Sentinel are supported. Redis
   Cluster is not supported.
 - Managed Redis from cloud providers such as AWS ElastiCache will work. If these
@@ -22,7 +27,7 @@ These will be necessary when configuring the GitLab application servers later.
 
 ## Redis in a Scaled and Highly Available Environment
 
-This section is relevant for [Scalable and Highly Available Setups](README.md).
+This section is relevant for [Scalable and Highly Available Setups](../scaling/index.md).
 
 ### Provide your own Redis instance **(CORE ONLY)**
 
@@ -38,7 +43,7 @@ In this configuration Redis is not highly available, and represents a single
 point of failure. However, in a scaled environment the objective is to allow
 the environment to handle more users or to increase throughput. Redis itself
 is generally stable and can handle many requests so it is an acceptable
-trade off to have only a single instance. See [Scaling and High Availability](README.md)
+trade off to have only a single instance. See [High Availability](../availability/index.md)
 for an overview of GitLab scaling and high availability options.
 
 The steps below are the minimum necessary to configure a Redis server with
@@ -84,7 +89,7 @@ Advanced configuration options are supported and can be added if
 needed.
 
 Continue configuration of other components by going back to the
-[Scaling and High Availability](README.md#gitlab-components-and-configuration-instructions) page.
+[High Availability](../availability/index.md#gitlab-components-and-configuration-instructions) page.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 

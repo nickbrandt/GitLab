@@ -26,17 +26,19 @@ describe StatusPage::IncidentEntity do
     )
   end
 
-  describe 'cross project references' do
-    let(:object) { issue }
-
-    it_behaves_like 'redacts HTML attributes' do
+  describe 'field #title' do
+    it_behaves_like 'reference links for status page' do
+      let(:object) { issue }
       let(:field) { :title }
-      let(:redacted_value) { json[:title] }
+      let(:value) { json[:title] }
     end
+  end
 
-    it_behaves_like 'redacts HTML attributes' do
+  describe 'field #description' do
+    it_behaves_like 'reference links for status page' do
+      let(:object) { issue }
       let(:field) { :description }
-      let(:redacted_value) { json[:description] }
+      let(:value) { json[:description] }
     end
   end
 

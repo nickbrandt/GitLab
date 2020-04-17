@@ -64,7 +64,7 @@ describe Projects::DeployKeysController do
     let(:deploy_key) { create(:deploy_key) }
     let!(:deploy_key_project) { create(:deploy_keys_project, project: project, deploy_key: deploy_key) }
 
-    context 'with admin' do
+    context 'with admin', :enable_admin_mode do
       before do
         sign_in(create(:admin))
       end

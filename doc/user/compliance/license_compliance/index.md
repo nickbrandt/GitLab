@@ -307,7 +307,7 @@ process:
 1. Host the License Compliance image
    `registry.gitlab.com/gitlab-org/security-products/license-management:latest` in your local Docker
    container registry.
-1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace `image` to refer
+1. Add the following configuration to your `.gitlab-ci.yml` file. You must replace the value of `image` to refer
    to the License Compliance Docker image hosted on your local Docker container registry:
 
    ```yaml
@@ -323,6 +323,9 @@ process:
 
 Additional [configuration](#using-private-maven-repos) may be needed for connecting to private Maven
 repositories.
+
+Exact name matches are required for [project policies](#project-policies-for-license-compliance)
+when running in an offline environment ([see related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/212388)).
 
 ## Project policies for License Compliance
 

@@ -16,7 +16,7 @@ describe LicenseHelper do
       allow(License).to receive(:current).and_return(license)
     end
 
-    it 'calls another class with args' do
+    it 'calls Gitlab::ExpiringSubscriptionMessage to get expiring message' do
       expect(Gitlab::ExpiringSubscriptionMessage).to receive(:new).with(
         subscribable: license,
         signed_in: true,
@@ -87,6 +87,65 @@ describe LicenseHelper do
         allow(License).to receive(:current).and_return(nil)
 
         expect(maximum_user_count).to eq(0)
+      end
+    end
+  end
+
+  describe '#current_license_title' do
+    context 'when there is a current license' do
+      it 'returns the plan titleized if it has a plan associated to it' do
+        custom_plan = 'custom plan'
+        license = double('License', plan: custom_plan)
+        allow(License).to receive(:current).and_return(license)
+
+        expect(current_license_title).to eq(custom_plan.titleize)
+      end
+
+      it 'returns the default title if it does not have a plan associated to it' do
+        license = double('License', plan: nil)
+        allow(License).to receive(:current).and_return(license)
+
+        expect(current_license_title).to eq('Core')
+      end
+    end
+
+    context 'when there is NOT a current license' do
+      it 'returns the default title' do
+        allow(License).to receive(:current).and_return(nil)
+
+        expect(current_license_title).to eq('Core')
+      end
+    end
+  end
+
+  describe '#seats_calculation_message' do
+    subject { seats_calculation_message(license) }
+
+    context 'with a license' do
+      let(:license) { double("License", 'exclude_guests_from_active_count?' => exclude_guests) }
+
+      context 'and guest are excluded from the active count' do
+        let(:exclude_guests) { true }
+
+        it 'returns a tag with the message' do
+          expect(subject).to eq("<p>Users with a Guest role or those who don&#39;t belong to a Project or Group will not use a seat from your license.</p>")
+        end
+      end
+
+      context 'and guest are NOT excluded from the active count' do
+        let(:exclude_guests) { false }
+
+        it 'returns nil' do
+          expect(subject).to be_blank
+        end
+      end
+    end
+
+    context 'when the license is blank' do
+      let(:license) { nil }
+
+      it 'returns nil' do
+        expect(subject).to be_blank
       end
     end
   end

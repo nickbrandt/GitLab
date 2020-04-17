@@ -3,15 +3,18 @@
 module Projects
   module Import
     class JiraController < Projects::ApplicationController
+      before_action :authenticate_user!
+      before_action :check_issues_available!
+      before_action :authorize_read_project!
       before_action :jira_import_enabled?
       before_action :jira_integration_configured?
+      before_action :authorize_admin_project!, only: [:import]
 
       def show
-        @is_jira_configured = @project.jira_service.present?
-        return if Feature.enabled?(:jira_issue_import_vue, @project)
+        jira_service = @project.jira_service
 
-        unless @project.latest_jira_import&.in_progress?
-          jira_client = @project.jira_service.client
+        if jira_service.present? && !@project.latest_jira_import&.in_progress? && current_user&.can?(:admin_project, @project)
+          jira_client = jira_service.client
           jira_projects = jira_client.Project.all
 
           if jira_projects.present?
@@ -21,7 +24,9 @@ module Projects
           end
         end
 
-        flash[:notice] = _("Import %{status}") % { status: @project.jira_import_status } unless @project.latest_jira_import&.initial?
+        unless Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
+          flash[:notice] = _("Import %{status}") % { status: @project.jira_import_status } unless @project.latest_jira_import&.initial?
+        end
       end
 
       def import
@@ -46,7 +51,7 @@ module Projects
       end
 
       def jira_integration_configured?
-        return if Feature.enabled?(:jira_issue_import_vue, @project)
+        return if Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
         return if @project.jira_service
 
         flash[:notice] = _("Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page." %

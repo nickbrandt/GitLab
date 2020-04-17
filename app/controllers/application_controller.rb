@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
       payload[:username] = logged_user.try(:username)
     end
 
-    payload[:queue_duration] = request.env[::Gitlab::Middleware::RailsQueueDuration::GITLAB_RAILS_QUEUE_DURATION_KEY]
+    payload[:queue_duration_s] = request.env[::Gitlab::Middleware::RailsQueueDuration::GITLAB_RAILS_QUEUE_DURATION_KEY]
   end
 
   ##
@@ -494,6 +494,10 @@ class ApplicationController < ActionController::Base
     return false unless Gitlab::CurrentSettings.current_application_settings.enforce_terms
 
     html_request? && !devise_controller?
+  end
+
+  def public_visibility_restricted?
+    Gitlab::CurrentSettings.restricted_visibility_levels.include? Gitlab::VisibilityLevel::PUBLIC
   end
 
   def set_usage_stats_consent_flag

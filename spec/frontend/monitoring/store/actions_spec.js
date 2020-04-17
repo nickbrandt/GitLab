@@ -15,24 +15,34 @@ import {
   receiveMetricsDashboardSuccess,
   fetchDeploymentsData,
   fetchEnvironmentsData,
-  fetchPrometheusMetrics,
+  fetchDashboardData,
+  fetchAnnotations,
   fetchPrometheusMetric,
   setInitialState,
   filterEnvironments,
   setGettingStartedEmptyState,
   duplicateSystemDashboard,
 } from '~/monitoring/stores/actions';
-import { gqClient, parseEnvironmentsResponse } from '~/monitoring/stores/utils';
+import {
+  gqClient,
+  parseEnvironmentsResponse,
+  parseAnnotationsResponse,
+} from '~/monitoring/stores/utils';
 import getEnvironments from '~/monitoring/queries/getEnvironments.query.graphql';
+import getAnnotations from '~/monitoring/queries/getAnnotations.query.graphql';
 import storeState from '~/monitoring/stores/state';
 import {
   deploymentData,
   environmentData,
-  metricsDashboardResponse,
-  metricsDashboardViewModel,
+  annotationsData,
   dashboardGitResponse,
   mockDashboardsErrorResponse,
 } from '../mock_data';
+import {
+  metricsDashboardResponse,
+  metricsDashboardViewModel,
+  metricsDashboardPanelCount,
+} from '../fixture_data';
 
 jest.mock('~/flash');
 
@@ -120,17 +130,15 @@ describe('Monitoring store actions', () => {
     });
 
     it('setting SET_ENVIRONMENTS_FILTER should dispatch fetchEnvironmentsData', () => {
-      jest.spyOn(gqClient, 'mutate').mockReturnValue(
-        Promise.resolve({
-          data: {
-            project: {
-              data: {
-                environments: [],
-              },
+      jest.spyOn(gqClient, 'mutate').mockReturnValue({
+        data: {
+          project: {
+            data: {
+              environments: [],
             },
           },
-        }),
-      );
+        },
+      });
 
       return testAction(
         filterEnvironments,
@@ -180,17 +188,15 @@ describe('Monitoring store actions', () => {
     });
 
     it('dispatches receiveEnvironmentsDataSuccess on success', () => {
-      jest.spyOn(gqClient, 'mutate').mockReturnValue(
-        Promise.resolve({
-          data: {
-            project: {
-              data: {
-                environments: environmentData,
-              },
+      jest.spyOn(gqClient, 'mutate').mockResolvedValue({
+        data: {
+          project: {
+            data: {
+              environments: environmentData,
             },
           },
-        }),
-      );
+        },
+      });
 
       return testAction(
         fetchEnvironmentsData,
@@ -208,7 +214,7 @@ describe('Monitoring store actions', () => {
     });
 
     it('dispatches receiveEnvironmentsDataFailure on error', () => {
-      jest.spyOn(gqClient, 'mutate').mockReturnValue(Promise.reject());
+      jest.spyOn(gqClient, 'mutate').mockRejectedValue({});
 
       return testAction(
         fetchEnvironmentsData,
@@ -216,6 +222,90 @@ describe('Monitoring store actions', () => {
         state,
         [],
         [{ type: 'requestEnvironmentsData' }, { type: 'receiveEnvironmentsDataFailure' }],
+      );
+    });
+  });
+
+  describe('fetchAnnotations', () => {
+    const { state } = store;
+    state.timeRange = {
+      start: '2020-04-15T12:54:32.137Z',
+      end: '2020-08-15T12:54:32.137Z',
+    };
+    state.projectPath = 'gitlab-org/gitlab-test';
+    state.currentEnvironmentName = 'production';
+    state.currentDashboard = '.gitlab/dashboards/custom_dashboard.yml';
+
+    afterEach(() => {
+      resetStore(store);
+    });
+
+    it('fetches annotations data and dispatches receiveAnnotationsSuccess', () => {
+      const mockMutate = jest.spyOn(gqClient, 'mutate');
+      const mutationVariables = {
+        mutation: getAnnotations,
+        variables: {
+          projectPath: state.projectPath,
+          environmentName: state.currentEnvironmentName,
+          dashboardPath: state.currentDashboard,
+          startingFrom: state.timeRange.start,
+        },
+      };
+      const parsedResponse = parseAnnotationsResponse(annotationsData);
+
+      mockMutate.mockResolvedValue({
+        data: {
+          project: {
+            environments: {
+              nodes: [
+                {
+                  metricsDashboard: {
+                    annotations: {
+                      nodes: parsedResponse,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      return testAction(
+        fetchAnnotations,
+        null,
+        state,
+        [],
+        [{ type: 'receiveAnnotationsSuccess', payload: parsedResponse }],
+        () => {
+          expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
+        },
+      );
+    });
+
+    it('dispatches receiveAnnotationsFailure if the annotations API call fails', () => {
+      const mockMutate = jest.spyOn(gqClient, 'mutate');
+      const mutationVariables = {
+        mutation: getAnnotations,
+        variables: {
+          projectPath: state.projectPath,
+          environmentName: state.currentEnvironmentName,
+          dashboardPath: state.currentDashboard,
+          startingFrom: state.timeRange.start,
+        },
+      };
+
+      mockMutate.mockRejectedValue({});
+
+      return testAction(
+        fetchAnnotations,
+        null,
+        state,
+        [],
+        [{ type: 'receiveAnnotationsFailure' }],
+        () => {
+          expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
+        },
       );
     });
   });
@@ -375,7 +465,7 @@ describe('Monitoring store actions', () => {
 
         metricsDashboardResponse.dashboard,
       );
-      expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetrics');
+      expect(dispatch).toHaveBeenCalledWith('fetchDashboardData');
     });
     it('sets the dashboards loaded from the repository', () => {
       const params = {};
@@ -395,7 +485,7 @@ describe('Monitoring store actions', () => {
       expect(commit).toHaveBeenCalledWith(types.SET_ALL_DASHBOARDS, dashboardGitResponse);
     });
   });
-  describe('fetchPrometheusMetrics', () => {
+  describe('fetchDashboardData', () => {
     let commit;
     let dispatch;
     let state;
@@ -413,7 +503,7 @@ describe('Monitoring store actions', () => {
       const getters = {
         metricsWithData: () => [],
       };
-      fetchPrometheusMetrics({ state, commit, dispatch, getters })
+      fetchDashboardData({ state, commit, dispatch, getters })
         .then(() => {
           expect(Tracking.event).toHaveBeenCalledWith(
             document.body.dataset.page,
@@ -442,7 +532,7 @@ describe('Monitoring store actions', () => {
         metricsWithData: () => [metric.id],
       };
 
-      fetchPrometheusMetrics({ state, commit, dispatch, getters })
+      fetchDashboardData({ state, commit, dispatch, getters })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetric', {
             metric,
@@ -478,9 +568,9 @@ describe('Monitoring store actions', () => {
       dispatch.mockRejectedValueOnce(new Error('Error fetching this metric'));
       dispatch.mockResolvedValue();
 
-      fetchPrometheusMetrics({ state, commit, dispatch })
+      fetchDashboardData({ state, commit, dispatch })
         .then(() => {
-          expect(dispatch).toHaveBeenCalledTimes(10); // one per metric plus 1 for deployments
+          expect(dispatch).toHaveBeenCalledTimes(metricsDashboardPanelCount + 1); // plus 1 for deployments
           expect(dispatch).toHaveBeenCalledWith('fetchDeploymentsData');
           expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetric', {
             metric,
@@ -508,11 +598,13 @@ describe('Monitoring store actions', () => {
     let metric;
     let state;
     let data;
+    let prometheusEndpointPath;
 
     beforeEach(() => {
       state = storeState();
-      [metric] = metricsDashboardResponse.dashboard.panel_groups[0].panels[0].metrics;
-      metric = convertObjectPropsToCamelCase(metric, { deep: true });
+      [metric] = metricsDashboardViewModel.panelGroups[0].panels[0].metrics;
+
+      prometheusEndpointPath = metric.prometheusEndpointPath;
 
       data = {
         metricId: metric.metricId,
@@ -521,7 +613,7 @@ describe('Monitoring store actions', () => {
     });
 
     it('commits result', done => {
-      mock.onGet('http://test').reply(200, { data }); // One attempt
+      mock.onGet(prometheusEndpointPath).reply(200, { data }); // One attempt
 
       testAction(
         fetchPrometheusMetric,
@@ -558,7 +650,7 @@ describe('Monitoring store actions', () => {
       };
 
       it('uses calculated step', done => {
-        mock.onGet('http://test').reply(200, { data }); // One attempt
+        mock.onGet(prometheusEndpointPath).reply(200, { data }); // One attempt
 
         testAction(
           fetchPrometheusMetric,
@@ -600,7 +692,7 @@ describe('Monitoring store actions', () => {
       };
 
       it('uses metric step', done => {
-        mock.onGet('http://test').reply(200, { data }); // One attempt
+        mock.onGet(prometheusEndpointPath).reply(200, { data }); // One attempt
 
         testAction(
           fetchPrometheusMetric,
@@ -632,10 +724,10 @@ describe('Monitoring store actions', () => {
 
     it('commits result, when waiting for results', done => {
       // Mock multiple attempts while the cache is filling up
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').reply(200, { data }); // 4th attempt
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).reply(200, { data }); // 4th attempt
 
       testAction(
         fetchPrometheusMetric,
@@ -666,10 +758,10 @@ describe('Monitoring store actions', () => {
 
     it('commits failure, when waiting for results and getting a server error', done => {
       // Mock multiple attempts while the cache is filling up and fails
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').replyOnce(statusCodes.NO_CONTENT);
-      mock.onGet('http://test').reply(500); // 4th attempt
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).replyOnce(statusCodes.NO_CONTENT);
+      mock.onGet(prometheusEndpointPath).reply(500); // 4th attempt
 
       const error = new Error('Request failed with status code 500');
 

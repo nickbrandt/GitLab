@@ -45,13 +45,17 @@ Skip to the [Configure secondary application node](#configure-secondary-applicat
 The [geo_primary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
 configures the **primary** node's database to be replicated by making changes to
 `pg_hba.conf` and `postgresql.conf`. Make the following configuration changes
-manually to your external database configuration:
+manually to your external database configuration and ensure that you restart PostgreSQL
+afterwards for the changes to take effect:
 
 ```plaintext
 ##
 ## Geo Primary Role
 ## - pg_hba.conf
 ##
+host    all         all               <trusted primary IP>/32       md5
+host    replication gitlab_replicator <trusted primary IP>/32       md5
+host    all         all               <trusted secondary IP>/32     md5
 host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ```
 
@@ -60,7 +64,6 @@ host    replication gitlab_replicator <trusted secondary IP>/32     md5
 ## Geo Primary Role
 ## - postgresql.conf
 ##
-sql_replication_user = gitlab_replicator
 wal_level = hot_standby
 max_wal_senders = 10
 wal_keep_segments = 50
@@ -72,8 +75,19 @@ hot_standby = on
 
 ### Manually configure the replica database
 
-Make the following configuration changes manually to your `postgresql.conf`
-of external replica database:
+Make the following configuration changes manually to your `pg_hba.conf` and `postgresql.conf`
+of your external replica database and ensure that you restart PostgreSQL afterwards
+for the changes to take effect:
+
+```plaintext
+##
+## Geo Secondary Role
+## - pg_hba.conf
+##
+host    all         all               <trusted secondary IP>/32     md5
+host    replication gitlab_replicator <trusted secondary IP>/32     md5
+host    all         all               <trusted primary IP>/24       md5
+```
 
 ```plaintext
 ##
@@ -129,7 +143,7 @@ To configure the connection to the external read-replica database and enable Log
 database to keep track of replication status and automatically recover from
 potential replication issues. Omnibus automatically configures a tracking database
 when `roles ['geo_secondary_role']` is set. For high availability,
-refer to [Geo High Availability](../../high_availability/README.md).
+refer to [Geo High Availability](../../availability/index.md).
 If you want to run this database external to Omnibus, please follow the instructions below.
 
 The tracking database requires an [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html)
@@ -144,6 +158,19 @@ the secondary database. Unfortunately, just assigning the same security group is
 outbound rules do not apply to RDS PostgreSQL databases. Therefore, you need to explicitly add an inbound
 rule to the read-replica's security group allowing any TCP traffic from
 the tracking database on port 5432.
+
+1. Ensure that your secondary node can communicate with your tracking database by
+   manually changing the `pg_hba.conf` that is associated with your tracking database.
+   Remember to restart PostgreSQL afterwards for the changes to take effect:
+
+    ```plaintext
+    ##
+    ## Geo Tracking Database Role
+    ## - pg_hba.conf
+    ##
+    host    all         all               <trusted tracking IP>/32      md5
+    host    all         all               <trusted secondary IP>/32     md5
+    ```
 
 1. SSH into a GitLab **secondary** server and login as root:
 

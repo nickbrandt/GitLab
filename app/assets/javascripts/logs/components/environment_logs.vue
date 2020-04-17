@@ -70,9 +70,10 @@ export default {
       return this.logs.isLoading;
     },
     shouldShowElasticStackCallout() {
-      return (
-        !this.isElasticStackCalloutDismissed &&
-        (this.environments.isLoading || !this.showAdvancedFilters)
+      return !(
+        this.environments.isLoading ||
+        this.isElasticStackCalloutDismissed ||
+        this.showAdvancedFilters
       );
     },
   },
@@ -88,10 +89,9 @@ export default {
   methods: {
     ...mapActions('environmentLogs', [
       'setInitData',
-      'setSearch',
-      'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
+      'fetchLogs',
       'fetchMoreLogsPrepend',
       'dismissRequestEnvironmentsError',
       'dismissInvalidTimeRangeWarning',
@@ -120,7 +120,8 @@ export default {
   <div class="environment-logs-viewer d-flex flex-column py-3">
     <gl-alert
       v-if="shouldShowElasticStackCallout"
-      class="mb-3 js-elasticsearch-alert"
+      ref="elasticsearchNotice"
+      class="mb-3"
       @dismiss="isElasticStackCalloutDismissed = true"
     >
       {{
@@ -189,13 +190,13 @@ export default {
       <log-advanced-filters
         v-if="showAdvancedFilters"
         ref="log-advanced-filters"
-        class="d-md-flex flex-grow-1"
+        class="d-md-flex flex-grow-1 min-width-0"
         :disabled="environments.isLoading"
       />
       <log-simple-filters
         v-else
         ref="log-simple-filters"
-        class="d-md-flex flex-grow-1"
+        class="d-md-flex flex-grow-1 min-width-0"
         :disabled="environments.isLoading"
       />
 
@@ -203,7 +204,7 @@ export default {
         ref="scrollButtons"
         class="flex-grow-0 pr-2 mb-2 controllers"
         :scroll-down-button-disabled="scrollDownButtonDisabled"
-        @refresh="showPodLogs(pods.current)"
+        @refresh="fetchLogs()"
         @scrollDown="scrollDown"
       />
     </div>

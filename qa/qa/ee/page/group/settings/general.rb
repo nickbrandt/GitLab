@@ -66,6 +66,7 @@ module QA
 
             def restricted_ip_address
               expand_section(:permission_lfs_2fa_section)
+              scroll_to_element(:ip_restriction_field)
               find_element(:ip_restriction_field).value
             end
 

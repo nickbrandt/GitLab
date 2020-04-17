@@ -19,6 +19,7 @@ function withDefaultEmptyRule(rules = []) {
       groups: [],
       ruleType: RULE_TYPE_ANY_APPROVER,
       protectedBranches: [],
+      overridden: false,
     },
   ];
 }
@@ -48,6 +49,7 @@ export const mapApprovalRuleResponse = res => ({
   groups: res.groups,
   ruleType: res.rule_type,
   protectedBranches: res.protected_branches,
+  overridden: res.overridden,
 });
 
 export const mapApprovalSettingsResponse = res => ({

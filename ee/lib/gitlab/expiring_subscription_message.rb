@@ -17,10 +17,10 @@ module Gitlab
       return unless notifiable?
 
       message = []
-      message << license_message_subject
-      message << expiration_blocking_message
+      message << license_message_subject if license_message_subject.present?
+      message << expiration_blocking_message if expiration_blocking_message.present?
 
-      message.reject { |string| string.blank? }.join(' ').html_safe
+      message.join(' ').html_safe
     end
 
     private
@@ -96,11 +96,11 @@ module Gitlab
     end
 
     def strong
-      "<strong>".html_safe
+      '<strong>'.html_safe
     end
 
     def strong_close
-      "</strong>".html_safe
+      '</strong>'.html_safe
     end
   end
 end

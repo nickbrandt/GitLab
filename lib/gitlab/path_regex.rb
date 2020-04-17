@@ -57,6 +57,10 @@ module Gitlab
       v2
     ].freeze
 
+    # NOTE: Do not add new items to this list unless necessary as this will
+    # cause conflicts with existing namespaced routes for groups or projects.
+    # See https://docs.gitlab.com/ee/development/routing.html#project-routes
+    #
     # This list should contain all words following `/*namespace_id/:project_id` in
     # routes that contain a second wildcard.
     #
@@ -98,12 +102,15 @@ module Gitlab
       preview
       raw
       refs
-      sse
       tree
       update
       wikis
     ].freeze
 
+    # NOTE: Do not add new items to this list unless necessary as this will
+    # cause conflicts with existing namespaced routes for groups or projects.
+    # See https://docs.gitlab.com/ee/development/routing.html#group-routes
+    #
     # These are all the paths that follow `/groups/*id/ or `/groups/*group_id`
     # We need to reject these because we have a `/groups/*id` page that is the same
     # as the `/*id`.

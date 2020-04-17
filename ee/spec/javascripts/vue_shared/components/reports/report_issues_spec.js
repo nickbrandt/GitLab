@@ -7,6 +7,7 @@ import {
   sastParsedIssues,
   dockerReportParsed,
   parsedDast,
+  secretScanningParsedIssues,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
 import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import reportIssues from '~/reports/components/report_item.vue';
@@ -121,6 +122,26 @@ describe('Report issues', () => {
     it('renders severity and title', () => {
       expect(vm.$el.textContent).toContain(parsedDast[0].title);
       expect(vm.$el.textContent).toContain(`${parsedDast[0].severity}`);
+    });
+  });
+
+  describe('for secret scanning issues', () => {
+    beforeEach(() => {
+      vm = mountComponent(ReportIssues, {
+        issue: secretScanningParsedIssues[0],
+        component: componentNames.SecretScanningIssueBody,
+        status: STATUS_FAILED,
+      });
+    });
+
+    it('renders severity', () => {
+      expect(vm.$el.textContent.trim()).toContain(secretScanningParsedIssues[0].severity);
+    });
+
+    it('renders CVE name', () => {
+      expect(vm.$el.querySelector('.report-block-list-issue button').textContent.trim()).toEqual(
+        secretScanningParsedIssues[0].title,
+      );
     });
   });
 });

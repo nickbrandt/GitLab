@@ -143,7 +143,11 @@ describe GroupsHelper do
 
   describe '#show_group_activity_analytics?' do
     before do
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics, group).and_return(false)
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics).and_return(true)
+
       stub_licensed_features(group_activity_analytics: feature_available)
+
       allow(helper).to receive(:current_user) { current_user }
       allow(helper).to receive(:can?) { |*args| Ability.allowed?(*args) }
     end

@@ -474,7 +474,7 @@ To enable ModSecurity with Auto Deploy, you need to create a `.gitlab/auto-deplo
 
 |Attribute | Description | Default |
 -----------|-------------|---------|
-|`enabled` | Enables custom configuration for modsecurity, defaulting to the [Core Rule Set](https://coreruleset.org/) | `false` |
+|`enabled` | Enables custom configuration for ModSecurity, defaulting to the [Core Rule Set](https://coreruleset.org/) | `false` |
 |`secRuleEngine` | Configures the [rules engine](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)#secruleengine) | `DetectionOnly` |
 |`secRules` | Creates one or more additional [rule](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)#SecRule) | `nil` |
 
@@ -532,6 +532,11 @@ The metrics include:
 
 - **Response Metrics:** latency, throughput, error rate
 - **System Metrics:** CPU utilization, memory utilization
+
+GitLab provides some initial alerts for you after you install Prometheus:
+
+- Ingress status code `500` > 0.1%
+- NGINX status code `500` > 0.1%
 
 To make use of Auto Monitoring:
 

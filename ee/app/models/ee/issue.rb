@@ -27,6 +27,7 @@ module EE
       end
       scope :on_status_page, -> { joins(project: :status_page_setting).where(status_page_settings: { enabled: true }).public_only }
       scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
+      scope :with_health_status, -> { where.not(health_status: nil) }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue

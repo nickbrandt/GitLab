@@ -117,7 +117,7 @@ export default {
     <gl-loading-icon
       v-else-if="isLoading && !hasError"
       :label="s__('SubscriptionTable|Loading subscriptions')"
-      :size="3"
+      size="lg"
       class="prepend-top-10 append-bottom-10"
     />
   </div>

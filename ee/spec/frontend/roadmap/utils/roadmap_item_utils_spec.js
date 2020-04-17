@@ -121,7 +121,7 @@ describe('extractGroupMilestones', () => {
 
     expect(extractedMilestones.length).toBe(edges.length);
     expect(extractedMilestones[0]).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         ...edges[0].node,
       }),
     );

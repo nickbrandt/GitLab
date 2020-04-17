@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
+import { GlToast } from '@gitlab/ui';
 import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
 
@@ -8,6 +9,7 @@ import RequirementsRoot from './components/requirements_root.vue';
 import { FilterState } from './constants';
 
 Vue.use(VueApollo);
+Vue.use(GlToast);
 
 export default () => {
   const el = document.getElementById('js-requirements-app');
@@ -45,24 +47,28 @@ export default () => {
         emptyStatePath,
         opened,
         archived,
+        all,
+        requirementsWebUrl,
       } = el.dataset;
       const stateFilterBy = filterBy ? FilterState[filterBy] : FilterState.opened;
 
       const OPENED = parseInt(opened, 10);
       const ARCHIVED = parseInt(archived, 10);
+      const ALL = parseInt(all, 10);
 
       return {
         filterBy: stateFilterBy,
         requirementsCount: {
           OPENED,
           ARCHIVED,
-          ALL: OPENED + ARCHIVED,
+          ALL,
         },
         page,
         prev,
         next,
         emptyStatePath,
         projectPath,
+        requirementsWebUrl,
       };
     },
     render(createElement) {
@@ -75,6 +81,7 @@ export default () => {
           prev: this.prev,
           next: this.next,
           emptyStatePath: this.emptyStatePath,
+          requirementsWebUrl: this.requirementsWebUrl,
         },
       });
     },

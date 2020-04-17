@@ -3,14 +3,28 @@ import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
-import { gqClient, parseEnvironmentsResponse, removeLeadingSlash } from './utils';
+import {
+  gqClient,
+  parseEnvironmentsResponse,
+  parseAnnotationsResponse,
+  removeLeadingSlash,
+} from './utils';
 import trackDashboardLoad from '../monitoring_tracking_helper';
 import getEnvironments from '../queries/getEnvironments.query.graphql';
+import getAnnotations from '../queries/getAnnotations.query.graphql';
 import statusCodes from '../../lib/utils/http_status';
-import { backOff, convertObjectPropsToCamelCase } from '../../lib/utils/common_utils';
+import {
+  backOff,
+  convertObjectPropsToCamelCase,
+  isFeatureFlagEnabled,
+} from '../../lib/utils/common_utils';
 import { s__, sprintf } from '../../locale';
 
-import { PROMETHEUS_TIMEOUT, ENVIRONMENT_AVAILABLE_STATE } from '../constants';
+import {
+  PROMETHEUS_TIMEOUT,
+  ENVIRONMENT_AVAILABLE_STATE,
+  DEFAULT_DASHBOARD_PATH,
+} from '../constants';
 
 function prometheusMetricQueryParams(timeRange) {
   const { start, end } = convertToFixedRange(timeRange);
@@ -80,6 +94,14 @@ export const setShowErrorBanner = ({ commit }, enabled) => {
 export const fetchData = ({ dispatch }) => {
   dispatch('fetchEnvironmentsData');
   dispatch('fetchDashboard');
+  /**
+   * Annotations data is not yet fetched. This will be
+   * ready after the BE piece is implemented.
+   * https://gitlab.com/gitlab-org/gitlab/-/issues/211330
+   */
+  if (isFeatureFlagEnabled('metricsDashboardAnnotations')) {
+    dispatch('fetchAnnotations');
+  }
 };
 
 // Metrics dashboard
@@ -128,7 +150,7 @@ export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response 
   commit(types.RECEIVE_METRICS_DASHBOARD_SUCCESS, dashboard);
   commit(types.SET_ENDPOINTS, convertObjectPropsToCamelCase(metrics_data));
 
-  return dispatch('fetchPrometheusMetrics');
+  return dispatch('fetchDashboardData');
 };
 export const receiveMetricsDashboardFailure = ({ commit }, error) => {
   commit(types.RECEIVE_METRICS_DASHBOARD_FAILURE, error);
@@ -140,7 +162,7 @@ export const receiveMetricsDashboardFailure = ({ commit }, error) => {
  * Loads timeseries data: Prometheus data points and deployment data from the project
  * @param {Object} Vuex store
  */
-export const fetchPrometheusMetrics = ({ state, dispatch, getters }) => {
+export const fetchDashboardData = ({ state, dispatch, getters }) => {
   dispatch('fetchDeploymentsData');
 
   if (!state.timeRange) {
@@ -268,6 +290,40 @@ export const receiveEnvironmentsDataSuccess = ({ commit }, data) => {
 export const receiveEnvironmentsDataFailure = ({ commit }) => {
   commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
 };
+
+export const fetchAnnotations = ({ state, dispatch }) => {
+  const { start } = convertToFixedRange(state.timeRange);
+  const dashboardPath =
+    state.currentDashboard === '' ? DEFAULT_DASHBOARD_PATH : state.currentDashboard;
+  return gqClient
+    .mutate({
+      mutation: getAnnotations,
+      variables: {
+        projectPath: removeLeadingSlash(state.projectPath),
+        environmentName: state.currentEnvironmentName,
+        dashboardPath,
+        startingFrom: start,
+      },
+    })
+    .then(resp => resp.data?.project?.environments?.nodes?.[0].metricsDashboard?.annotations.nodes)
+    .then(parseAnnotationsResponse)
+    .then(annotations => {
+      if (!annotations) {
+        createFlash(s__('Metrics|There was an error fetching annotations. Please try again.'));
+      }
+
+      dispatch('receiveAnnotationsSuccess', annotations);
+    })
+    .catch(err => {
+      Sentry.captureException(err);
+      dispatch('receiveAnnotationsFailure');
+      createFlash(s__('Metrics|There was an error getting annotations information.'));
+    });
+};
+
+export const receiveAnnotationsSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_ANNOTATIONS_SUCCESS, data);
+export const receiveAnnotationsFailure = ({ commit }) => commit(types.RECEIVE_ANNOTATIONS_FAILURE);
 
 // Dashboard manipulation
 

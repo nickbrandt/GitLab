@@ -171,7 +171,7 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
       end
 
       context 'without a file from workhorse' do
-        let(:params) { { package: nil } }
+        let(:send_rewritten_field) { false }
 
         it_behaves_like 'returning response status', :bad_request
       end
@@ -211,6 +211,19 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
 
             it_behaves_like 'returning response status', :forbidden
           end
+        end
+
+        context 'with crafted package.path param' do
+          let(:crafted_file) { Tempfile.new('nuget.crafted.package.path') }
+          let(:url) { "/projects/#{project.id}/packages/nuget?package.path=#{crafted_file.path}" }
+          let(:params) { { file: temp_file(file_name) } }
+          let(:file_key) { :file }
+
+          it 'does not create a package file' do
+            expect { subject }.to change { ::Packages::PackageFile.count }.by(0)
+          end
+
+          it_behaves_like 'returning response status', :bad_request
         end
       end
 

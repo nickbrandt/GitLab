@@ -72,7 +72,7 @@ class Group < Namespace
   validates :two_factor_grace_period, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :name,
     format: { with: Gitlab::Regex.group_name_regex,
-              message: Gitlab::Regex.group_name_regex_message }
+              message: Gitlab::Regex.group_name_regex_message }, if: :name_changed?
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:groups_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -473,6 +473,16 @@ class Group < Namespace
 
   def adjourned_deletion?
     false
+  end
+
+  def wiki_access_level
+    # TODO: Remove this method once we implement group-level features.
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/208412
+    if Feature.enabled?(:group_wiki, self)
+      ProjectFeature::ENABLED
+    else
+      ProjectFeature::DISABLED
+    end
   end
 
   private

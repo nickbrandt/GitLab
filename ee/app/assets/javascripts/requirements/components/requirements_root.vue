@@ -1,10 +1,10 @@
 <script>
 import * as Sentry from '@sentry/browser';
 import { GlPagination } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
-import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
+import { updateHistory, setUrlParams, visitUrl } from '~/lib/utils/url_utility';
 
 import RequirementsLoading from './requirements_loading.vue';
 import RequirementsEmptyState from './requirements_empty_state.vue';
@@ -38,7 +38,8 @@ export default {
     requirementsCount: {
       type: Object,
       required: true,
-      validator: value => ['OPENED', 'ARCHIVED', 'ALL'].every(prop => value[prop]),
+      validator: value =>
+        ['OPENED', 'ARCHIVED', 'ALL'].every(prop => typeof value[prop] === 'number'),
     },
     page: {
       type: Number,
@@ -56,6 +57,10 @@ export default {
       default: '',
     },
     emptyStatePath: {
+      type: String,
+      required: true,
+    },
+    requirementsWebUrl: {
       type: String,
       required: true,
     },
@@ -86,15 +91,15 @@ export default {
       },
       update(data) {
         const requirementsRoot = data.project?.requirements;
-        const count = data.project?.requirementStatesCount;
+        const { opened = 0, archived = 0 } = data.project?.requirementStatesCount;
 
         return {
           list: requirementsRoot?.nodes || [],
           pageInfo: requirementsRoot?.pageInfo || {},
           count: {
-            OPENED: count.opened,
-            ARCHIVED: count.archived,
-            ALL: count.opened + count.archived,
+            OPENED: opened,
+            ARCHIVED: archived,
+            ALL: opened + archived,
           },
         };
       },
@@ -105,10 +110,14 @@ export default {
     },
   },
   data() {
+    const tabsContainerEl = document.querySelector('.js-requirements-state-filters');
+
     return {
+      newRequirementEl: null,
       showCreateForm: false,
       showUpdateFormForRequirement: 0,
       createRequirementRequestActive: false,
+      stateChangeRequestActiveFor: 0,
       currentPage: this.page,
       prevPageCursor: this.prev,
       nextPageCursor: this.next,
@@ -117,38 +126,97 @@ export default {
         count: {},
         pageInfo: {},
       },
+      openedCount: this.requirementsCount[FilterState.opened],
+      archivedCount: this.requirementsCount[FilterState.archived],
+      countEls: {
+        opened: tabsContainerEl.querySelector('.js-opened-count'),
+        archived: tabsContainerEl.querySelector('.js-archived-count'),
+        all: tabsContainerEl.querySelector('.js-all-count'),
+        nav: document.querySelector('.js-nav-requirements-count'),
+        navFlyOut: document.querySelector('.js-nav-requirements-count-fly-out'),
+      },
     };
   },
   computed: {
+    requirementsList() {
+      return this.filterBy !== FilterState.all
+        ? this.requirements.list.filter(({ state }) => state === this.filterBy)
+        : this.requirements.list;
+    },
     requirementsListLoading() {
       return this.$apollo.queries.requirements.loading;
     },
     requirementsListEmpty() {
       return !this.$apollo.queries.requirements.loading && !this.requirements.list.length;
     },
-    totalRequirements() {
+    /**
+     * We want to ensure that count `0` is prioritized
+     * over `this.requirements.count` (GraphQL) or `this.requirementsCount` (HAML prop)
+     * as both of them are invalid once user does archive/reopen actions.
+     * this is a technical debt that we want to clean up once mutations support
+     * `requirementStatesCount` connection.
+     */
+    totalRequirementsForCurrentTab() {
+      if (this.filterBy === FilterState.opened) {
+        return this.openedCount === 0
+          ? 0
+          : this.requirements.count.OPENED || this.requirementsCount.OPENED;
+      } else if (this.filterBy === FilterState.archived) {
+        return this.archivedCount === 0
+          ? 0
+          : this.requirements.count.ARCHIVED || this.requirementsCount.ARCHIVED;
+      }
       return this.requirements.count[this.filterBy] || this.requirementsCount[this.filterBy];
     },
+    showEmptyState() {
+      return (
+        (this.requirementsListEmpty && !this.showCreateForm) || !this.totalRequirementsForCurrentTab
+      );
+    },
     showPaginationControls() {
-      return this.totalRequirements > DEFAULT_PAGE_SIZE && !this.requirementsListEmpty;
+      return this.totalRequirementsForCurrentTab > DEFAULT_PAGE_SIZE && !this.requirementsListEmpty;
     },
     prevPage() {
       return Math.max(this.currentPage - 1, 0);
     },
     nextPage() {
       const nextPage = this.currentPage + 1;
-      return nextPage > Math.ceil(this.totalRequirements / DEFAULT_PAGE_SIZE) ? null : nextPage;
+      return nextPage > Math.ceil(this.totalRequirementsForCurrentTab / DEFAULT_PAGE_SIZE)
+        ? null
+        : nextPage;
+    },
+  },
+  watch: {
+    showCreateForm(value) {
+      this.enableOrDisableNewRequirement({
+        disable: value,
+      });
+    },
+    requirements() {
+      const totalCount = this.requirements.count.ALL;
+
+      this.countEls.all.innerText = totalCount;
+      this.countEls.nav.innerText = totalCount;
+      this.countEls.navFlyOut.innerText = totalCount;
+    },
+    openedCount(value) {
+      this.countEls.opened.innerText = value;
+    },
+    archivedCount(value) {
+      this.countEls.archived.innerText = value;
     },
   },
   mounted() {
-    document
-      .querySelector('.js-new-requirement')
-      .addEventListener('click', this.handleNewRequirementClick);
+    if (this.filterBy === FilterState.opened) {
+      this.newRequirementEl = document.querySelector('.js-new-requirement');
+
+      this.newRequirementEl.addEventListener('click', this.handleNewRequirementClick);
+    }
   },
   beforeDestroy() {
-    document
-      .querySelector('.js-new-requirement')
-      .removeEventListener('click', this.handleNewRequirementClick);
+    if (this.filterBy === FilterState.opened) {
+      this.newRequirementEl.removeEventListener('click', this.handleNewRequirementClick);
+    }
   },
   methods: {
     /**
@@ -180,6 +248,47 @@ export default {
         replace: true,
       });
     },
+    updateRequirement({ iid, title, state, errorFlashMessage }) {
+      const updateRequirementInput = {
+        projectPath: this.projectPath,
+        iid,
+      };
+
+      if (title) {
+        updateRequirementInput.title = title;
+      }
+      if (state) {
+        updateRequirementInput.state = state;
+      }
+
+      return this.$apollo
+        .mutate({
+          mutation: updateRequirement,
+          variables: {
+            updateRequirementInput,
+          },
+        })
+        .catch(e => {
+          createFlash(errorFlashMessage);
+          Sentry.captureException(e);
+        });
+    },
+    /**
+     * This method is only needed until we move Requirements page
+     * tabs and button into this Vue app instead of rendering it
+     * using HAML.
+     */
+    enableOrDisableNewRequirement({ disable = true }) {
+      if (this.newRequirementEl) {
+        if (disable) {
+          this.newRequirementEl.setAttribute('disabled', 'disabled');
+          this.newRequirementEl.classList.add('disabled');
+        } else {
+          this.newRequirementEl.removeAttribute('disabled');
+          this.newRequirementEl.classList.remove('disabled');
+        }
+      }
+    },
     handleNewRequirementClick() {
       this.showCreateForm = true;
     },
@@ -187,6 +296,7 @@ export default {
       this.showUpdateFormForRequirement = iid;
     },
     handleNewRequirementSave(title) {
+      const reloadPage = this.totalRequirementsForCurrentTab === 0;
       this.createRequirementRequestActive = true;
       return this.$apollo
         .mutate({
@@ -200,8 +310,18 @@ export default {
         })
         .then(({ data }) => {
           if (!data.createRequirement.errors.length) {
-            this.showCreateForm = false;
-            this.$apollo.queries.requirements.refetch();
+            if (reloadPage) {
+              visitUrl(this.requirementsWebUrl);
+            } else {
+              this.showCreateForm = false;
+              this.$apollo.queries.requirements.refetch();
+              this.openedCount += 1;
+              this.$toast.show(
+                sprintf(__('Requirement %{reference} has been added'), {
+                  reference: `REQ-${data.createRequirement.requirement.iid}`,
+                }),
+              );
+            }
           } else {
             throw new Error(`Error creating a requirement`);
           }
@@ -217,33 +337,58 @@ export default {
     handleNewRequirementCancel() {
       this.showCreateForm = false;
     },
-    handleUpdateRequirementSave({ iid, title }) {
+    handleUpdateRequirementSave(params) {
       this.createRequirementRequestActive = true;
-      return this.$apollo
-        .mutate({
-          mutation: updateRequirement,
-          variables: {
-            updateRequirementInput: {
-              projectPath: this.projectPath,
-              iid,
-              title,
-            },
-          },
-        })
+      return this.updateRequirement({
+        ...params,
+        errorFlashMessage: __('Something went wrong while updating a requirement.'),
+      })
         .then(({ data }) => {
           if (!data.updateRequirement.errors.length) {
             this.showUpdateFormForRequirement = 0;
+            this.$toast.show(
+              sprintf(__('Requirement %{reference} has been updated'), {
+                reference: `REQ-${data.updateRequirement.requirement.iid}`,
+              }),
+            );
           } else {
             throw new Error(`Error updating a requirement`);
           }
         })
-        .catch(e => {
-          createFlash(__('Something went wrong while updating a requirement.'));
-          Sentry.captureException(e);
-        })
         .finally(() => {
           this.createRequirementRequestActive = false;
         });
+    },
+    handleRequirementStateChange(params) {
+      this.stateChangeRequestActiveFor = params.iid;
+      return this.updateRequirement({
+        ...params,
+        errorFlashMessage:
+          params.state === FilterState.opened
+            ? __('Something went wrong while reopening a requirement.')
+            : __('Something went wrong while archiving a requirement.'),
+      }).then(({ data }) => {
+        if (!data.updateRequirement.errors.length) {
+          this.stateChangeRequestActiveFor = 0;
+          let toastMessage;
+          if (params.state === FilterState.opened) {
+            this.openedCount += 1;
+            this.archivedCount -= 1;
+            toastMessage = sprintf(__('Requirement %{reference} has been reopened'), {
+              reference: `REQ-${data.updateRequirement.requirement.iid}`,
+            });
+          } else {
+            this.openedCount -= 1;
+            this.archivedCount += 1;
+            toastMessage = sprintf(__('Requirement %{reference} has been archived'), {
+              reference: `REQ-${data.updateRequirement.requirement.iid}`,
+            });
+          }
+          this.$toast.show(toastMessage);
+        } else {
+          throw new Error(`Error archiving a requirement`);
+        }
+      });
     },
     handleUpdateRequirementCancel() {
       this.showUpdateFormForRequirement = 0;
@@ -273,36 +418,41 @@ export default {
 
 <template>
   <div class="requirements-list-container">
-    <requirements-empty-state
-      v-if="requirementsListEmpty"
-      :filter-by="filterBy"
-      :empty-state-path="emptyStatePath"
-    />
-    <requirements-loading
-      v-show="requirementsListLoading"
-      :filter-by="filterBy"
-      :current-tab-count="totalRequirements"
-      :current-page="currentPage"
-    />
     <requirement-form
       v-if="showCreateForm"
       :requirement-request-active="createRequirementRequestActive"
       @save="handleNewRequirementSave"
       @cancel="handleNewRequirementCancel"
     />
+    <requirements-empty-state
+      v-if="showEmptyState"
+      :filter-by="filterBy"
+      :empty-state-path="emptyStatePath"
+      :requirements-count="requirementsCount"
+      @clickNewRequirement="handleNewRequirementClick"
+    />
+    <requirements-loading
+      v-show="requirementsListLoading"
+      :filter-by="filterBy"
+      :current-page="currentPage"
+      :requirements-count="requirementsCount"
+    />
     <ul
       v-if="!requirementsListLoading && !requirementsListEmpty"
       class="content-list issuable-list issues-list requirements-list"
     >
       <requirement-item
-        v-for="requirement in requirements.list"
+        v-for="requirement in requirementsList"
         :key="requirement.iid"
         :requirement="requirement"
         :show-update-form="showUpdateFormForRequirement === requirement.iid"
         :update-requirement-request-active="createRequirementRequestActive"
+        :state-change-request-active="stateChangeRequestActiveFor === requirement.iid"
         @updateSave="handleUpdateRequirementSave"
         @updateCancel="handleUpdateRequirementCancel"
         @editClick="handleEditRequirementClick"
+        @archiveClick="handleRequirementStateChange"
+        @reopenClick="handleRequirementStateChange"
       />
     </ul>
     <gl-pagination

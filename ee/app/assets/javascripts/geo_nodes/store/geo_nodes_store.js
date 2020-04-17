@@ -81,11 +81,13 @@ export default class GeoNodesStore {
         failureCount: 0,
       },
       repositories: {
+        enabled: rawNodeDetails.repositories_replication_enabled,
         totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.repositories_synced_count || 0,
         failureCount: rawNodeDetails.repositories_failed_count || 0,
       },
       wikis: {
+        enabled: rawNodeDetails.repositories_replication_enabled,
         totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.wikis_synced_count || 0,
         failureCount: rawNodeDetails.wikis_failed_count || 0,
@@ -111,26 +113,31 @@ export default class GeoNodesStore {
         failureCount: rawNodeDetails.wikis_verification_failed_count || 0,
       },
       lfs: {
+        enabled: rawNodeDetails.lfs_objects_replication_enabled,
         totalCount: rawNodeDetails.lfs_objects_count || 0,
         successCount: rawNodeDetails.lfs_objects_synced_count || 0,
         failureCount: rawNodeDetails.lfs_objects_failed_count || 0,
       },
       jobArtifacts: {
+        enabled: rawNodeDetails.job_artifacts_replication_enabled,
         totalCount: rawNodeDetails.job_artifacts_count || 0,
         successCount: rawNodeDetails.job_artifacts_synced_count || 0,
         failureCount: rawNodeDetails.job_artifacts_failed_count || 0,
       },
       containerRepositories: {
+        enabled: rawNodeDetails.container_repositories_replication_enabled,
         totalCount: rawNodeDetails.container_repositories_count || 0,
         successCount: rawNodeDetails.container_repositories_synced_count || 0,
         failureCount: rawNodeDetails.container_repositories_failed_count || 0,
       },
       designRepositories: {
+        enabled: rawNodeDetails.design_repositories_replication_enabled,
         totalCount: rawNodeDetails.design_repositories_count || 0,
         successCount: rawNodeDetails.design_repositories_synced_count || 0,
         failureCount: rawNodeDetails.design_repositories_failed_count || 0,
       },
       attachments: {
+        enabled: rawNodeDetails.attachments_replication_enabled,
         totalCount: rawNodeDetails.attachments_count || 0,
         successCount: rawNodeDetails.attachments_synced_count || 0,
         failureCount: rawNodeDetails.attachments_failed_count || 0,

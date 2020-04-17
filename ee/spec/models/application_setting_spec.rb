@@ -514,7 +514,7 @@ describe ApplicationSetting do
       end
 
       it "doesn't call the update lifetime service" do
-        expect(::PersonalAccessTokens::UpdateLifetimeService).not_to receive(:new)
+        expect(::PersonalAccessTokens::Instance::UpdateLifetimeService).not_to receive(:new)
 
         setting.save
       end
@@ -527,7 +527,7 @@ describe ApplicationSetting do
       end
 
       it 'executes the update lifetime service' do
-        expect_next_instance_of(::PersonalAccessTokens::UpdateLifetimeService) do |service|
+        expect_next_instance_of(::PersonalAccessTokens::Instance::UpdateLifetimeService) do |service|
           expect(service).to receive(:execute)
         end
 

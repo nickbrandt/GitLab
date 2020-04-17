@@ -6,12 +6,7 @@ import state from '~/monitoring/stores/state';
 import { metricStates } from '~/monitoring/constants';
 
 import { deploymentData, dashboardGitResponse } from '../mock_data';
-import { getJSONFixture } from '../../helpers/fixtures';
-
-const metricsDashboardFixture = getJSONFixture(
-  'metrics_dashboard/environment_metrics_dashboard.json',
-);
-const metricsDashboardPayload = metricsDashboardFixture.dashboard;
+import { metricsDashboardPayload } from '../fixture_data';
 
 describe('Monitoring mutations', () => {
   let stateCopy;
@@ -202,15 +197,12 @@ describe('Monitoring mutations', () => {
 
         mutations[types.REQUEST_METRIC_RESULT](stateCopy, {
           metricId,
-          result,
         });
 
         expect(stateCopy.showEmptyState).toBe(true);
         expect(getMetric()).toEqual(
           expect.objectContaining({
             loading: true,
-            result: null,
-            state: metricStates.LOADING,
           }),
         );
       });
@@ -232,7 +224,7 @@ describe('Monitoring mutations', () => {
       });
 
       it('adds results to the store', () => {
-        expect(getMetric().result).toBe(undefined);
+        expect(getMetric().result).toBe(null);
 
         mutations[types.RECEIVE_METRIC_RESULT_SUCCESS](stateCopy, {
           metricId,

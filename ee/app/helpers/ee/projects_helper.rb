@@ -186,13 +186,17 @@ module EE
       ::Gitlab::ExpiringSubscriptionMessage.new(
         subscribable: decorated_subscription,
         signed_in: signed_in?,
-        is_admin: can?(current_user, :developer_access, @project),
+        is_admin: can?(current_user, :owner_access, @project),
         namespace: @project.namespace
       ).message
     end
 
     def decorated_subscription
-      SubscriptionPresenter.new(@project.gitlab_subscription)
+      subscription = @project.gitlab_subscription
+
+      return unless subscription
+
+      SubscriptionPresenter.new(subscription)
     end
 
     override :membership_locked?

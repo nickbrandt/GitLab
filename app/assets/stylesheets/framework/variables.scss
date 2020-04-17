@@ -329,7 +329,6 @@ $border-white-normal: darken($white-normal, $darken-border-factor);
 $border-gray-light: darken($gray-light, $darken-border-factor);
 $border-gray-normal: darken($gray-normal, $darken-border-factor);
 $border-gray-normal-dashed: darken($gray-normal, $darken-border-dashed-factor);
-$border-gray-dark: darken($white-normal, $darken-border-factor);
 
 /*
  * UI elements
@@ -350,13 +349,13 @@ $gl-font-size-small: 12px;
 $gl-font-size-large: 16px;
 $gl-font-weight-normal: 400;
 $gl-font-weight-bold: 600;
-$gl-text-color: #2e2e2e;
-$gl-text-color-secondary: #707070;
-$gl-text-color-tertiary: #919191;
+$gl-text-color: $gray-900;
+$gl-text-color-secondary: $gray-700;
+$gl-text-color-tertiary: $gray-600;
 $gl-text-color-quaternary: #d6d6d6;
-$gl-text-color-inverted: rgba(255, 255, 255, 1);
+$gl-text-color-inverted: $white;
 $gl-text-color-secondary-inverted: rgba(255, 255, 255, 0.85);
-$gl-text-color-disabled: #919191;
+$gl-text-color-disabled: $gray-600;
 $gl-grayish-blue: #7f8fa4;
 $gl-gray-dark: #313236;
 $gl-gray-light: #5c5c5c;
@@ -485,7 +484,7 @@ $line-removed-dark: #fac5cd;
 $line-number-old: #f9d7dc;
 $line-number-new: #ddfbe6;
 $line-number-select: #fbf2da;
-$line-target-blue: #f6faff;
+$line-target-blue: $blue-50;
 $line-select-yellow: #fcf8e7;
 $line-select-yellow-dark: #f0e2bd;
 $dark-diff-match-bg: rgba(255, 255, 255, 0.3);
@@ -698,7 +697,7 @@ $logs-p-color: #333;
 */
 $input-height: 34px;
 $input-danger-bg: #f2dede;
-$input-group-addon-bg: #f7f8fa;
+$input-group-addon-bg: $gray-50;
 $gl-field-focus-shadow: rgba(0, 0, 0, 0.075);
 $gl-field-focus-shadow-error: rgba($red-500, 0.6);
 $input-short-width: 200px;
@@ -774,9 +773,6 @@ $select2-drop-shadow2: rgba(31, 37, 50, 0.317647);
 /*
 * Typography
 */
-$kdb-bg: #fcfcfc;
-$kdb-border-bottom: #bbb;
-$kdb-shadow: #bbb;
 $body-text-shadow: rgba(255, 255, 255, 0.01);
 
 /*
@@ -799,20 +795,6 @@ $pipelines-table-header-height: 40px;
 CI variable lists
 */
 $ci-variable-remove-button-width: calc(1em + #{2 * $gl-padding});
-
-/*
-Filtered Search
-*/
-$filter-name-resting-color: #f8f8f8;
-$filter-name-text-color: rgba(0, 0, 0, 0.55);
-$filter-value-text-color: rgba(0, 0, 0, 0.85);
-$filter-name-selected-color: #ebebeb;
-$filter-value-selected-color: #d7d7d7;
-
-/*
-Animation Functions
-*/
-$dropdown-animation-timing: cubic-bezier(0.23, 1, 0.32, 1);
 
 /*
 GitLab Plans

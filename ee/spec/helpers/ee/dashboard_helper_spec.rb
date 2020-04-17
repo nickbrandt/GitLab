@@ -208,7 +208,7 @@ describe DashboardHelper, type: :helper do
 
       before do
         allow(helper).to receive(:current_user).and_return(user)
-        allow(helper).to receive(:current_license).and_return(license)
+        allow(License).to receive(:current).and_return(license)
       end
 
       it { is_expected.to eq(output) }

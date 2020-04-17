@@ -79,6 +79,14 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe('REQUEST_SECRET_SCANNING_DIFF', () => {
+    it('should set secret scanning loading flag to true', () => {
+      mutations[types.REQUEST_SECRET_SCANNING_DIFF](stateCopy);
+
+      expect(stateCopy.secretScanning.isLoading).toEqual(true);
+    });
+  });
+
   describe('SET_ISSUE_MODAL_DATA', () => {
     it('has default data', () => {
       expect(stateCopy.modal.vulnerability.isDismissed).toEqual(false);
@@ -468,6 +476,34 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe('UPDATE_SECRET_SCANNING_ISSUE', () => {
+    it('updates issue in the new issues list', () => {
+      stateCopy.secretScanning.newIssues = mockFindings;
+      stateCopy.secretScanning.resolvedIssues = [];
+      const updatedIssue = {
+        ...mockFindings[0],
+        foo: 'bar',
+      };
+
+      mutations[types.UPDATE_SECRET_SCANNING_ISSUE](stateCopy, updatedIssue);
+
+      expect(stateCopy.secretScanning.newIssues[0]).toEqual(updatedIssue);
+    });
+
+    it('updates issue in the resolved issues list', () => {
+      stateCopy.secretScanning.newIssues = [];
+      stateCopy.secretScanning.resolvedIssues = mockFindings;
+      const updatedIssue = {
+        ...mockFindings[0],
+        foo: 'bar',
+      };
+
+      mutations[types.UPDATE_SECRET_SCANNING_ISSUE](stateCopy, updatedIssue);
+
+      expect(stateCopy.secretScanning.resolvedIssues[0]).toEqual(updatedIssue);
+    });
+  });
+
   describe('SET_CONTAINER_SCANNING_DIFF_ENDPOINT', () => {
     const endpoint = 'container_scanning_diff_endpoint.json';
 
@@ -624,6 +660,16 @@ describe('security reports mutations', () => {
 
   describe('RECEIVE_DAST_DIFF_SUCCESS', () => {
     let reports = {};
+    const scans = [
+      {
+        scanned_resources_count: 123,
+        job_path: '/group/project/-/jobs/123546789',
+      },
+      {
+        scanned_resources_count: 321,
+        job_path: '/group/project/-/jobs/987654321',
+      },
+    ];
 
     beforeEach(() => {
       reports = {
@@ -635,6 +681,7 @@ describe('security reports mutations', () => {
           fixed: [{ name: 'fixed vuln 1', report_type: 'dast' }],
           existing: [{ name: 'existing vuln 1', report_type: 'dast' }],
           base_report_out_of_date: true,
+          scans,
         },
       };
       mutations[types.RECEIVE_DAST_DIFF_SUCCESS](stateCopy, reports);
@@ -642,6 +689,10 @@ describe('security reports mutations', () => {
 
     it('should set isLoading to false', () => {
       expect(stateCopy.dast.isLoading).toBe(false);
+    });
+
+    it('should set scans', () => {
+      expect(stateCopy.dast.scans).toEqual(scans);
     });
 
     it('should set baseReportOutofDate to true', () => {
@@ -679,6 +730,72 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.dast.isLoading).toEqual(false);
       expect(stateCopy.dast.hasError).toEqual(true);
+    });
+  });
+
+  describe('SET_SECRET_SCANNING_DIFF_ENDPOINT', () => {
+    const endpoint = 'secret_scanning_diff_endpoint.json';
+
+    beforeEach(() => {
+      mutations[types.SET_SECRET_SCANNING_DIFF_ENDPOINT](stateCopy, endpoint);
+    });
+
+    it('should set the correct endpoint', () => {
+      expect(stateCopy.secretScanning.paths.diffEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('RECEIVE_SECRET_SCANNING_DIFF_SUCCESS', () => {
+    const reports = {
+      diff: {
+        added: [
+          { name: 'added vuln 1', report_type: 'secret_scanning' },
+          { name: 'added vuln 2', report_type: 'secret_scanning' },
+        ],
+        fixed: [{ name: 'fixed vuln 1', report_type: 'secret_scanning' }],
+        base_report_out_of_date: true,
+      },
+    };
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS](stateCopy, reports);
+    });
+
+    it('should set isLoading to false', () => {
+      expect(stateCopy.secretScanning.isLoading).toBe(false);
+    });
+
+    it('should set baseReportOutofDate to true', () => {
+      expect(stateCopy.secretScanning.baseReportOutofDate).toBe(true);
+    });
+
+    it('should parse and set the added vulnerabilities', () => {
+      reports.diff.added.forEach((vuln, i) => {
+        expect(stateCopy.secretScanning.newIssues[i]).toMatchObject({
+          name: vuln.name,
+          title: vuln.name,
+          category: vuln.report_type,
+        });
+      });
+    });
+
+    it('should parse and set the fixed vulnerabilities', () => {
+      reports.diff.fixed.forEach((vuln, i) => {
+        expect(stateCopy.secretScanning.resolvedIssues[i]).toMatchObject({
+          name: vuln.name,
+          title: vuln.name,
+          category: vuln.report_type,
+        });
+      });
+    });
+  });
+
+  describe('RECEIVE_SECRET_SCANNING_DIFF_ERROR', () => {
+    it('should set secret scanning loading flag to false and error flag to true', () => {
+      mutations[types.RECEIVE_SECRET_SCANNING_DIFF_ERROR](stateCopy);
+
+      expect(stateCopy.secretScanning.isLoading).toEqual(false);
+      expect(stateCopy.secretScanning.hasError).toEqual(true);
     });
   });
 });

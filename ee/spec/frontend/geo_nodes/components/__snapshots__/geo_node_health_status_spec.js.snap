@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GeoNodeHealthStatusComponent computed properties renders Icon correctly 1`] = `"<icon-stub name=\\"status_success\\" size=\\"16\\"></icon-stub>"`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders Icon correctly 2`] = `"<icon-stub name=\\"status_failed\\" size=\\"16\\"></icon-stub>"`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders Icon correctly 3`] = `"<icon-stub name=\\"status_canceled\\" size=\\"16\\"></icon-stub>"`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders Icon correctly 4`] = `"<icon-stub name=\\"status_notfound\\" size=\\"16\\"></icon-stub>"`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders Icon correctly 5`] = `"<icon-stub name=\\"status_canceled\\" size=\\"16\\"></icon-stub>"`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders StatusPill correctly 1`] = `
+"<div class=\\"rounded-pill d-inline-flex align-items-center px-2 py-1 mt-1 text-success-600 bg-success-100\\">
+  <icon-stub name=\\"status_success\\" size=\\"16\\"></icon-stub> <span class=\\"status-text ml-1 bold\\"> Healthy </span>
+</div>"
+`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders StatusPill correctly 2`] = `
+"<div class=\\"rounded-pill d-inline-flex align-items-center px-2 py-1 mt-1 text-danger-600 bg-danger-100\\">
+  <icon-stub name=\\"status_failed\\" size=\\"16\\"></icon-stub> <span class=\\"status-text ml-1 bold\\"> Unhealthy </span>
+</div>"
+`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders StatusPill correctly 3`] = `
+"<div class=\\"rounded-pill d-inline-flex align-items-center px-2 py-1 mt-1 text-secondary-800 bg-secondary-100\\">
+  <icon-stub name=\\"status_canceled\\" size=\\"16\\"></icon-stub> <span class=\\"status-text ml-1 bold\\"> Disabled </span>
+</div>"
+`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders StatusPill correctly 4`] = `
+"<div class=\\"rounded-pill d-inline-flex align-items-center px-2 py-1 mt-1 text-secondary-800 bg-secondary-100\\">
+  <icon-stub name=\\"status_notfound\\" size=\\"16\\"></icon-stub> <span class=\\"status-text ml-1 bold\\"> Unknown </span>
+</div>"
+`;
+
+exports[`GeoNodeHealthStatusComponent computed properties renders StatusPill correctly 5`] = `
+"<div class=\\"rounded-pill d-inline-flex align-items-center px-2 py-1 mt-1 text-secondary-800 bg-secondary-100\\">
+  <icon-stub name=\\"status_canceled\\" size=\\"16\\"></icon-stub> <span class=\\"status-text ml-1 bold\\"> Offline </span>
+</div>"
+`;

@@ -35,6 +35,11 @@ export default {
       required: false,
       default: '',
     },
+    projectKey: {
+      type: String,
+      required: false,
+      default: '',
+    },
     templates: {
       type: Array,
       required: false,
@@ -109,10 +114,10 @@ export default {
         });
     },
 
-    onSaveTemplate({ selectedTemplate, outgoingName }) {
+    onSaveTemplate({ selectedTemplate, outgoingName, projectKey }) {
       this.isTemplateSaving = true;
       this.service
-        .updateTemplate({ selectedTemplate, outgoingName }, this.isEnabled)
+        .updateTemplate({ selectedTemplate, outgoingName, projectKey }, this.isEnabled)
         .then(() => this.showAlert(__('Template was successfully saved.'), 'success'))
         .catch(() =>
           this.showAlert(
@@ -139,14 +144,15 @@ export default {
 
 <template>
   <div>
-    <gl-alert v-if="isAlertShowing" class="mb-3" :variant="alertVariant" @dismiss="onDismiss">{{
-      alertMessage
-    }}</gl-alert>
+    <gl-alert v-if="isAlertShowing" class="mb-3" :variant="alertVariant" @dismiss="onDismiss">
+      {{ alertMessage }}
+    </gl-alert>
     <service-desk-setting
       :is-enabled="isEnabled"
       :incoming-email="incomingEmail"
       :initial-selected-template="selectedTemplate"
       :initial-outgoing-name="outgoingName"
+      :initial-project-key="projectKey"
       :templates="templates"
       :is-template-saving="isTemplateSaving"
     />

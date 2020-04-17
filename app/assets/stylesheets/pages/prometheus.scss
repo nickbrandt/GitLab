@@ -64,6 +64,12 @@
       padding: $gl-padding-8 $gl-padding-12;
     }
   }
+
+  .show-last-dropdown {
+    // same as in .dropdown-menu-toggle
+    // see app/assets/stylesheets/framework/dropdowns.scss
+    width: 160px;
+  }
 }
 
 .prometheus-panel {
@@ -82,13 +88,6 @@
 .prometheus-graph-embed {
   border: 1px solid $border-color;
   border-radius: $border-radius-default;
-}
-
-.prometheus-graph-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $gl-padding-8;
 }
 
 .alert-current-setting {

@@ -67,10 +67,10 @@ To enable Container Scanning in your pipeline, you need:
 
   ```yaml
   build:
-    image: docker:19.03.1
+    image: docker:19.03.8
     stage: build
     services:
-      - docker:19.03.1-dind
+      - docker:19.03.8-dind
     variables:
       IMAGE_TAG: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
     script:
@@ -118,7 +118,7 @@ variables:
   DOCKER_DRIVER: overlay2
 
 services:
-  - docker:19.03.5-dind
+  - docker:19.03.8-dind
 
 stages:
   - build
@@ -158,9 +158,9 @@ variables:
 The `CLAIR_OUTPUT` variable defined in the main `gitlab-ci.yml` will overwrite what's
 defined in `Container-Scanning.gitlab-ci.yml`, changing the Container Scanning behavior.
 
-[//]: # "NOTE: The container scanning tool references the following heading in the code, so if you"
-[//]: # "      make a change to this heading, make sure to update the documentation URLs used in the"
-[//]: # "      container scanning tool (https://gitlab.com/gitlab-org/security-products/analyzers/klar)"
+<!-- NOTE: The container scanning tool references the following heading in the code, so if you"
+     make a change to this heading, make sure to update the documentation URLs used in the"
+     container scanning tool (https://gitlab.com/gitlab-org/security-products/analyzers/klar)" -->
 
 #### Available variables
 
@@ -212,11 +212,46 @@ If you want to whitelist specific vulnerabilities, you'll need to:
 
 ### Running Container Scanning in an offline environment
 
-Container Scanning can be executed on an offline GitLab Ultimate installation by using the following process:
+For self-managed GitLab instances in an environment with limited, restricted, or intermittent access
+to external resources through the internet, some adjustments are required for the Container Scanning job to
+successfully run. For more information, see [Offline environments](../offline_deployments/index.md).
 
-1. Host the following Docker images on a [local Docker container registry](../../packages/container_registry/index.md):
-   - [arminc/clair-db vulnerabilities database](https://hub.docker.com/r/arminc/clair-db)
-   - GitLab klar analyzer: `registry.gitlab.com/gitlab-org/security-products/analyzers/klar`
+#### Requirements for offline Container Scanning
+
+To use Container Scanning in an offline environment, you need:
+
+- GitLab Runner with the [`docker` or `kubernetes` executor](#requirements).
+- To configure a local Docker Container Registry with copies of the Container Scanning [analyzer](https://gitlab.com/gitlab-org/security-products/analyzers/klar) images, found in the [Container Scanning container registry](https://gitlab.com/gitlab-org/security-products/analyzers/klar/container_registry).
+
+NOTE: **Note:**
+GitLab Runner has a [default `pull policy` of `always`](https://docs.gitlab.com/runner/executors/docker.html#using-the-always-pull-policy),
+meaning the runner may try to pull remote images even if a local copy is available. Set GitLab
+Runner's [`pull_policy` to `if-not-present`](https://docs.gitlab.com/runner/executors/docker.html#using-the-if-not-present-pull-policy)
+in an offline environment if you prefer using only locally available Docker images.
+
+#### Make GitLab Container Scanning analyzer images available inside your Docker registry
+
+For Container Scanning, import and host the following images from `registry.gitlab.com` to your
+offline [local Docker container registry](../../packages/container_registry/index.md):
+
+- [arminc/clair-db vulnerabilities database](https://hub.docker.com/r/arminc/clair-db)
+- GitLab klar analyzer: `registry.gitlab.com/gitlab-org/security-products/analyzers/klar`
+
+The process for importing Docker images into a local offline Docker registry depends on
+**your network security policy**. Please consult your IT staff to find an accepted and approved
+process by which external resources can be imported or temporarily accessed.
+
+Note that these scanners are [updated periodically](../index.md#maintenance-and-update-of-the-vulnerabilities-database)
+with new definitions, so consider if you are able to make periodic updates yourself.
+You can read more specific steps on how to do this [below](#automating-container-scanning-vulnerability-database-updates-with-a-pipeline).
+
+For details on saving and transporting Docker images as a file, see Docker's documentation on
+[`docker save`](https://docs.docker.com/engine/reference/commandline/save/), [`docker load`](https://docs.docker.com/engine/reference/commandline/load/),
+[`docker export`](https://docs.docker.com/engine/reference/commandline/export/), and [`docker import`](https://docs.docker.com/engine/reference/commandline/import/).
+
+#### Set Container Scanning CI job variables to use local Container Scanner analyzers
+
+Container Scanning can be executed on an offline GitLab Ultimate installation using the following process:
 
 1. [Override the container scanning template](#overriding-the-container-scanning-template) in your `.gitlab-ci.yml` file to refer to the Docker images hosted on your local Docker container registry:
 
@@ -234,13 +269,18 @@ Container Scanning can be executed on an offline GitLab Ultimate installation by
    self-signed certificate, then you must set `DOCKER_INSECURE: "true"` in the above
    `container_scanning` section of your `.gitlab-ci.yml`.
 
-It may be worthwhile to set up a [scheduled pipeline](../../../ci/pipelines/schedules.md) to automatically build a new version of the vulnerabilities database on a preset schedule. You can use the following `.gitlab-yml.ci` as a template:
+#### Automating Container Scanning vulnerability database updates with a pipeline
+
+It can be worthwhile to set up a [scheduled pipeline](../../../ci/pipelines/schedules.md) to
+automatically build a new version of the vulnerabilities database on a preset schedule. Automating
+this with a pipeline means you won't have to do it manually each time. You can use the following
+`.gitlab-yml.ci` as a template:
 
 ```yaml
 image: docker:stable
 
 services:
-  - docker:19.03.5-dind
+  - docker:19.03.8-dind
 
 stages:
   - build
@@ -303,10 +343,10 @@ it highlighted:
   "version": "2.3",
   "vulnerabilities": [
     {
+      "id": "ac0997ad-1006-4c81-81fb-ee2bbe6e78e3",
       "category": "container_scanning",
       "message": "CVE-2019-3462 in apt",
       "description": "Incorrect sanitation of the 302 redirect field in HTTP transport method of apt versions 1.4.8 and earlier can lead to content injection by a MITM attacker, potentially leading to remote code execution on the target machine.",
-      "cve": "debian:9:apt:CVE-2019-3462",
       "severity": "High",
       "confidence": "Unknown",
       "solution": "Upgrade apt from 1.4.8 to 1.4.9",
@@ -343,7 +383,7 @@ it highlighted:
     {
       "fixes": [
         {
-          "cve": "debian:9:apt:CVE-2019-3462"
+          "id": "c0997ad-1006-4c81-81fb-ee2bbe6e78e3"
         }
       ],
       "summary": "Upgrade apt from 1.4.8 to 1.4.9",
@@ -363,10 +403,11 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 |------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `version`                                            | Report syntax version used to generate this JSON.                                                                                                                                                                                                                                                                                                                                          |
 | `vulnerabilities`                                    | Array of vulnerability objects.                                                                                                                                                                                                                                                                                                                                                            |
+| `vulnerabilities[].id`                               | Unique identifier of the vulnerability. |
 | `vulnerabilities[].category`                         | Where this vulnerability belongs (for example, SAST or Container Scanning). For Container Scanning, it will always be `container_scanning`.                                                                                                                                                                                                                                                          |
 | `vulnerabilities[].message`                          | A short text that describes the vulnerability, it may include occurrence's specific information. Optional.                                                                                                                                                                                                                                                                                 |
 | `vulnerabilities[].description`                      | A long text that describes the vulnerability. Optional.                                                                                                                                                                                                                                                                                                                                    |
-| `vulnerabilities[].cve`                              | A fingerprint string value that represents a concrete occurrence of the vulnerability. It's used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. **This is NOT a [CVE](https://cve.mitre.org/)**.                                                                                                                                      |
+| `vulnerabilities[].cve`                              | (**DEPRECATED - use `vulnerabilities[].id` instead**) A fingerprint string value that represents a concrete occurrence of the vulnerability. It's used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. **This is NOT a [CVE](https://cve.mitre.org/)**.                                                                                                                                      |
 | `vulnerabilities[].severity`                         | How much the vulnerability impacts the software. Possible values: `Undefined` (an analyzer has not provided this information), `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`.  **Note:** Our current container scanning tool based on [klar](https://github.com/optiopay/klar) only provides the following levels: `Unknown`, `Low`, `Medium`, `High`, `Critical`.                       |
 | `vulnerabilities[].confidence`                       | How reliable the vulnerability's assessment is. Possible values: `Undefined` (an analyzer has not provided this information), `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`.  **Note:** Our current container scanning tool based on [klar](https://github.com/optiopay/klar) does not provide a confidence level, so this value is currently hardcoded to `Unknown`. |
 | `vulnerabilities[].solution`                         | Explanation of how to fix the vulnerability. Optional.                                                                                                                                                                                                                                                                                                                                     |
@@ -390,7 +431,8 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].links[].url`                      | URL of the vulnerability details document. Optional.                                                                                                                                                                                                                                                                                                                                       |
 | `remediations`                                       | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. Empty if no remediations provided by an underlying analyzer.                                                                                                                                                                                                                          |
 | `remediations[].fixes`                               | An array of strings that represent references to vulnerabilities fixed by this particular remediation.                                                                                                                                                                                                                                                                                     |
-| `remediations[].fixes[].cve`                         | A string value that describes a fixed vulnerability occurrence in the same format as `vulnerabilities[].cve`.                                                                                                                                                                                                                                                                              |
+| `remediations[].fixes[].id`                          | The id of a fixed vulnerability. |
+| `remediations[].fixes[].cve`                         | (**DEPRECATED - use `remediations[].fixes[].id` instead**) A string value that describes a fixed vulnerability in the same format as `vulnerabilities[].cve`. |
 | `remediations[].summary`                             | Overview of how the vulnerabilities have been fixed.                                                                                                                                                                                                                                                                                                                                       |
 | `remediations[].diff`                                | base64-encoded remediation code diff, compatible with [`git apply`](https://git-scm.com/docs/git-format-patch#_discussion).                                                                                                                                                                                                                                                                |
 
@@ -414,7 +456,8 @@ Some vulnerabilities can be fixed by applying the solution that GitLab
 automatically generates.
 
 To enable remediation support, the scanning tool _must_ have access to the `Dockerfile` specified by
-the `DOCKERFILE_PATH` environment variable. To ensure that the scanning tool has access to this
+the [`DOCKERFILE_PATH`](#available-variables) environment variable. To ensure that the scanning tool
+has access to this
 file, it's necessary to set [`GIT_STRATEGY: fetch`](../../../ci/yaml/README.md#git-strategy) in
 your `.gitlab-ci.yml` file by following the instructions described in this document's
 [overriding the Container Scanning template](#overriding-the-container-scanning-template) section.

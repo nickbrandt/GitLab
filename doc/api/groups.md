@@ -240,6 +240,10 @@ Example response:
 ]
 ```
 
+NOTE: **Note:**
+
+To distinguish between a project in the group and a project shared to the group, the `namespace` attribute can be used. When a project has been shared to the group, its `namespace` will be different from the group the request is being made for.
+
 ## Details of a group
 
 Get all details of a group. This endpoint can be accessed without authentication
@@ -255,7 +259,7 @@ Parameters:
 | ------------------------ | -------------- | -------- | ----------- |
 | `id`                     | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `with_custom_attributes` | boolean        | no       | Include [custom attributes](custom_attributes.md) in response (admins only). |
-| `with_projects`          | boolean        | no       | Include details from projects that belong to the specified group (defaults to `true`). |
+| `with_projects`          | boolean        | no       | Include details from projects that belong to the specified group (defaults to `true`). (Deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects).)  |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4
@@ -578,6 +582,10 @@ This endpoint returns:
   and later. To get the details of all projects within a group, use the
   [list a group's projects endpoint](#list-a-groups-projects) instead.
 
+NOTE: **Note:**
+
+The `projects` and `shared_projects` attributes [will be deprecated in GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects) instead.
+
 Example response:
 
 ```json
@@ -854,49 +862,71 @@ Lists LDAP group links.
 GET /groups/:id/ldap_group_links
 ```
 
-Parameters:
+| Attribute | Type           | Required | Description |
+| --------- | -------------- | -------- | ----------- |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
 
-- `id` (required) - The ID of a group
+### Add LDAP group link with CN or filter **(STARTER)**
 
-### Add LDAP group link **(STARTER)**
-
-Adds an LDAP group link.
+Adds an LDAP group link using a CN or filter. Adding a group link by filter is only supported in the Premium tier and above.
 
 ```plaintext
 POST /groups/:id/ldap_group_links
 ```
 
-Parameters:
+| Attribute | Type           | Required | Description |
+| --------- | -------------- | -------- | ----------- |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `cn`      | string         | no       | The CN of an LDAP group |
+| `filter`  | string         | no       | The LDAP filter for the group |
+| `group_access` | integer   | yes      | Minimum access level for members of the LDAP group |
+| `provider` | string        | yes      | LDAP provider for the LDAP group link |
 
-- `id` (required) - The ID of a group
-- `cn` (required) - The CN of a LDAP group
-- `group_access` (required) - Minimum access level for members of the LDAP group
-- `provider` (required) - LDAP provider for the LDAP group
+NOTE: **Note:**
+To define the LDAP group link, provide either a `cn` or a `filter`, but not both.
 
 ### Delete LDAP group link **(STARTER)**
 
-Deletes an LDAP group link.
+Deletes an LDAP group link. Deprecated. Will be removed in a future release.
 
 ```plaintext
 DELETE /groups/:id/ldap_group_links/:cn
 ```
 
-Parameters:
+| Attribute | Type           | Required | Description |
+| --------- | -------------- | -------- | ----------- |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `cn`      | string         | yes      | The CN of an LDAP group |
 
-- `id` (required) - The ID of a group
-- `cn` (required) - The CN of a LDAP group
-
-Deletes a LDAP group link for a specific LDAP provider
+Deletes an LDAP group link for a specific LDAP provider. Deprecated. Will be removed in a future release.
 
 ```plaintext
 DELETE /groups/:id/ldap_group_links/:provider/:cn
 ```
 
-Parameters:
+| Attribute | Type           | Required | Description |
+| --------- | -------------- | -------- | ----------- |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `cn`      | string         | yes      | The CN of an LDAP group |
+| `provider` | string        | yes      | LDAP provider for the LDAP group link |
 
-- `id` (required) - The ID of a group
-- `cn` (required) - The CN of a LDAP group
-- `provider` (required) - Name of a LDAP provider
+### Delete LDAP group link with CN or filter **(STARTER)**
+
+Deletes an LDAP group link using a CN or filter. Deleting by filter is only supported in the Premium tier and above.
+
+```plaintext
+DELETE /groups/:id/ldap_group_links
+```
+
+| Attribute | Type           | Required | Description |
+| --------- | -------------- | -------- | ----------- |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `cn`      | string         | no       | The CN of an LDAP group |
+| `filter`  | string         | no       | The LDAP filter for the group |
+| `provider` | string        | yes       | LDAP provider for the LDAP group link |
+
+NOTE: **Note:**
+To delete the LDAP group link, provide either a `cn` or a `filter`, but not both.
 
 ## Namespaces in groups
 

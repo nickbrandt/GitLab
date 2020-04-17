@@ -36,10 +36,6 @@ class PrometheusService < MonitoringService
     false
   end
 
-  def editable?
-    manual_configuration? || !prometheus_available?
-  end
-
   def title
     'Prometheus'
   end
@@ -53,8 +49,6 @@ class PrometheusService < MonitoringService
   end
 
   def fields
-    return [] unless editable?
-
     [
       {
         type: 'checkbox',
@@ -153,6 +147,6 @@ class PrometheusService < MonitoringService
   def create_default_alerts
     return unless project_id
 
-    Prometheus::CreateDefaultAlertsWorker.perform_async(project_id: project_id)
+    Prometheus::CreateDefaultAlertsWorker.perform_async(project_id)
   end
 end

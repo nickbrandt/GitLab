@@ -8,7 +8,7 @@ import {
   GlSearchBoxByType,
   GlLoadingIcon,
 } from '@gitlab/ui';
-import { debounce } from 'underscore';
+import { debounce } from 'lodash';
 
 import { __ } from '~/locale';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';

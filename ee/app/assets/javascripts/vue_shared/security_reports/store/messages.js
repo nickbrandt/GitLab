@@ -7,12 +7,14 @@ const SAST = s__('ciReport|SAST');
 const DAST = s__('ciReport|DAST');
 const CONTAINER_SCANNING = s__('ciReport|Container scanning');
 const DEPENDENCY_SCANNING = s__('ciReport|Dependency scanning');
+const SECRET_SCANNING = s__('ciReport|Secret scanning');
 
 export default {
   SAST,
   DAST,
   CONTAINER_SCANNING,
   DEPENDENCY_SCANNING,
+  SECRET_SCANNING,
   TRANSLATION_IS_LOADING,
   TRANSLATION_HAS_ERROR,
   SAST_IS_LOADING: sprintf(TRANSLATION_IS_LOADING, { reportType: SAST }),
@@ -29,4 +31,8 @@ export default {
   DEPENDENCY_SCANNING_HAS_ERROR: sprintf(TRANSLATION_HAS_ERROR, {
     reportType: DEPENDENCY_SCANNING,
   }),
+  SECRET_SCANNING_IS_LOADING: sprintf(TRANSLATION_IS_LOADING, {
+    reportType: SECRET_SCANNING,
+  }),
+  SECRET_SCANNING_HAS_ERROR: sprintf(TRANSLATION_HAS_ERROR, { reportType: SECRET_SCANNING }),
 };

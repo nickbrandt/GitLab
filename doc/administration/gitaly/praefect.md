@@ -60,12 +60,18 @@ GitLab](https://about.gitlab.com/install/).
 
 - 1 Praefect node (minimal storage required)
 - 3 Gitaly nodes (high CPU, high memory, fast storage)
+- 1 GitLab server
 
 You will need the IP/host address for each node.
 
 1. `POSTGRESQL_SERVER_ADDRESS`: the IP/host address of the PostgreSQL server
-1. `PRAEFECT_SERVER_ADDRESS`: the IP/host address of the Praefect server
-1. `GITALY_SERVER_ADDRESS`: the IP/host address of each Gitaly node
+1. `PRAEFECT_HOST`: the IP/host address of the Praefect server
+1. `GITALY_HOST`: the IP/host address of each Gitaly server
+1. `GITLAB_HOST`: the IP/host address of the GitLab server
+
+If you are using a cloud provider, you can look up the addresses for each server through your cloud provider's management console.
+
+If you are using Google Cloud Platform, SoftLayer, or any other vendor that provides a virtual private cloud (VPC) you can use the private addresses for each cloud instance (corresponds to “internal address” for Google Cloud Platform) for `PRAEFECT_HOST`, `GITALY_HOST`, and `GITLAB_HOST`.
 
 #### Secrets
 
@@ -183,14 +189,16 @@ application server, or a Gitaly node.
 1. Configure **Praefect** to listen on network interfaces by editing
    `/etc/gitlab/gitlab.rb`:
 
+   You will need to replace:
+
+   - `PRAEFECT_HOST` with the IP address or hostname of the Praefect node
+
    ```ruby
-   # Make Praefect accept connections on all network interfaces.
-   # Use firewalls to restrict access to this address/port.
-   praefect['listen_addr'] = '0.0.0.0:2305'
+   praefect['listen_addr'] = 'PRAEFECT_HOST:2305'
 
    # Enable Prometheus metrics access to Praefect. You must use firewalls
    # to restrict access to this address/port.
-   praefect['prometheus_listen_addr'] = '0.0.0.0:9652'
+   praefect['prometheus_listen_addr'] = 'PRAEFECT_HOST:9652'
    ```
 
 1. Configure a strong `auth_token` for **Praefect** by editing
@@ -292,6 +300,60 @@ application server, or a Gitaly node.
    edit `/etc/gitlab/gitlab.rb`, remember to run `sudo gitlab-ctl reconfigure`
    again before trying the `sql-ping` command.
 
+#### Automatic failover
+
+When automatic failover is enabled, Praefect will do automatic detection of the health of internal Gitaly nodes. If the
+primary has a certain amount of health checks fail, it will decide to promote one of the secondaries to be primary, and
+demote the primary to be a secondary.
+
+1. To enable automatic failover, edit `/etc/gitlab/gitlab.rb`:
+
+   ```ruby
+   # failover_enabled turns on automatic failover
+   praefect['failover_enabled'] = true
+   praefect['virtual_storages'] = {
+     'praefect' => {
+       'gitaly-1' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN',
+         'primary' => true
+       },
+       'gitaly-2' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN'
+       },
+       'gitaly-3' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN'
+       }
+     }
+   }
+   ```
+
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
+Below is the picture when Praefect starts up with the config.toml above:
+
+```mermaid
+graph TD
+  A[Praefect] -->|Mutator RPC| B(internal_storage_0)
+  B --> |Replication|C[internal_storage_1]
+```
+
+Let's say suddenly `internal_storage_0` goes down. Praefect will detect this and
+automatically switch over to `internal_storage_1`, and `internal_storage_0` will serve as a secondary:
+
+```mermaid
+graph TD
+  A[Praefect] -->|Mutator RPC| B(internal_storage_1)
+  B --> |Replication|C[internal_storage_0]
+```
+
+NOTE: **Note:**: Currently this feature is supported for setups that only have 1 Praefect instance. Praefect instances running,
+for example behind a load balancer, `failover_enabled` should be disabled. The reason is The reason is because there
+is no coordination that currently happens across different Praefect instances, so there could be a situation where
+two Praefect instances think two different Gitaly nodes are the primary.
+
 ### Gitaly
 
 NOTE: **Note:** Complete these steps for **each** Gitaly node.
@@ -357,14 +419,18 @@ documentation](index.md#3-gitaly-server-configuration).
 1. Configure **Gitaly** to listen on network interfaces by editing
    `/etc/gitlab/gitlab.rb`:
 
+   You will need to replace:
+
+   - `GITALY_HOST` with the IP address or hostname of the Gitaly node
+
    ```ruby
    # Make Gitaly accept connections on all network interfaces.
    # Use firewalls to restrict access to this address/port.
-   gitaly['listen_addr'] = '0.0.0.0:8075'
+   gitaly['listen_addr'] = 'GITALY_HOST:8075'
 
    # Enable Prometheus metrics access to Gitaly. You must use firewalls
    # to restrict access to this address/port.
-   gitaly['prometheus_listen_addr'] = '0.0.0.0:9236'
+   gitaly['prometheus_listen_addr'] = 'GITALY_HOST:9236'
    ```
 
 1. Configure a strong `auth_token` for **Gitaly** by editing
@@ -387,7 +453,7 @@ documentation](index.md#3-gitaly-server-configuration).
    # Configure the gitlab-shell API callback URL. Without this, `git push` will
    # fail. This can be your front door GitLab URL or an internal load balancer.
    # Examples: 'https://example.gitlab.com', 'http://1.2.3.4'
-   gitlab_rails['internal_api_url'] = 'GITLAB_SERVER_URL'
+   gitlab_rails['internal_api_url'] = 'http://GITLAB_HOST'
    ```
 
 1. Configure the storage location for Git data by setting `git_data_dirs` in
@@ -456,12 +522,16 @@ config.
    Manual failover is possible by updating `praefect['virtual_storages']` and
    nominating a new primary node.
 
-   NOTE: **Note:**: Automatic failover is not yet supported for setups with
-   multiple Praefect nodes. There is currently no coordination between Praefect
-   nodes, which could result in two Praefect instances thinking two different
-   Gitaly nodes are the primary. Follow issue
-   [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for
-   updates.
+1. By default, Praefect will nominate a primary Gitaly node for each
+   shard and store the state of the primary in local memory. This state
+   does not persist across restarts and will cause a split brain
+   if multiple Praefect nodes are used for redundancy.
+
+   To avoid this limitation, enable the SQL election strategy:
+
+    ```ruby
+    praefect['failover_election_strategy'] = 'sql'
+    ```
 
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
    Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
@@ -499,18 +569,26 @@ Particular attention should be shown to:
    You will need to replace:
 
    - `PRAEFECT_HOST` with the IP address or hostname of the Praefect node
+   - `GITLAB_HOST` with the IP address or hostname of the GitLab server
    - `PRAEFECT_EXTERNAL_TOKEN` with the real secret
 
    ```ruby
    git_data_dirs({
      "default" => {
-       "path" => "/var/opt/gitlab/git-data"
+       "gitaly_address" => "tcp://GITLAB_HOST:8075"
      },
      "praefect" => {
        "gitaly_address" => "tcp://PRAEFECT_HOST:2305",
        "gitaly_token" => 'PRAEFECT_EXTERNAL_TOKEN'
      }
    })
+   ```
+
+1. Allow Gitaly to listen on a tcp port by editing
+   `/etc/gitlab/gitlab.rb`
+
+   ```ruby
+   gitaly['listen_addr'] = 'GITLAB_HOST:8075'
    ```
 
 1. Configure the `gitlab_shell['secret_token']` so that callbacks from Gitaly
@@ -526,7 +604,7 @@ Particular attention should be shown to:
 1. Configure the `external_url` so that files could be served by GitLab
    by proper endpoint access by editing `/etc/gitlab/gitlab.rb`:
 
-   You will need to replace `GITLAB_SERVER_URL` with the real URL on which
+   You will need to replace `GITLAB_SERVER_URL` with the real external facing URL on which
    current GitLab instance is serving:
 
    ```ruby
@@ -657,11 +735,46 @@ current primary node is found to be unhealthy.
   checks fail for the current primary backend Gitaly node, and new primary will
   be elected. **Do not use with multiple Praefect nodes!** Using with multiple
   Praefect nodes is likely to result in a split brain.
-- **PostgreSQL:** Coming soon. See isse
-  [#2547](https://gitlab.com/gitlab-org/gitaly/-/issues/2547) for updates.
+- **PostgreSQL:** Enabled by setting
+  `praefect['failover_election_strategy'] = sql`. This configuration
+  option will allow multiple Praefect nodes to coordinate via the
+  PostgreSQL database to elect a primary Gitaly node. This configuration
+  will cause Praefect nodes to elect a new primary, monitor its health,
+  and elect a new primary if the current one has not been reachable in
+  10 seconds by a majority of the Praefect nodes.
+
+NOTE: **Note:**: Praefect does not yet account for replication lag on
+the secondaries during the election process, so data loss can occur
+during a failover. Follow issue
+[#2642](https://gitlab.com/gitlab-org/gitaly/-/issues/2642) for updates.
 
 It is likely that we will implement support for Consul, and a cloud native
 strategy in the future.
+
+## Identifying Impact of a Primary Node Failure
+
+When a primary Gitaly node fails, there is a chance of dataloss. Dataloss can occur if there were outstanding replication jobs the secondaries did not manage to process before the failure. The Praefect `dataloss` subcommand helps identify these cases by counting the number of dead replication jobs for each repository within a given timeframe.
+
+```shell
+sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dataloss -from <rfc3339-time> -to <rfc3339-time>
+```
+
+If the timeframe is not specified, dead replication jobs from the last six hours are counted:
+
+```shell
+sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dataloss
+
+Failed replication jobs between [2020-01-02 00:00:00 +0000 UTC, 2020-01-02 06:00:00 +0000 UTC):
+example/repository-1: 1 jobs
+example/repository-2: 4 jobs
+example/repository-3: 2 jobs
+```
+
+To specify a timeframe in UTC, run:
+
+```shell
+sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dataloss -from 2020-01-02T00:00:00+00:00 -to 2020-01-02T00:02:00+00:00
+```
 
 ## Backend Node Recovery
 

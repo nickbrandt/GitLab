@@ -15,12 +15,11 @@ describe StatusPage::IncidentCommentEntity do
     )
   end
 
-  describe 'cross project references' do
-    let(:object) { note }
-
-    it_behaves_like 'redacts HTML attributes' do
+  describe 'field #note' do
+    it_behaves_like 'reference links for status page' do
+      let(:object) { note }
       let(:field) { :note }
-      let(:redacted_value) { json[:note] }
+      let(:value) { json[:note] }
     end
   end
 end

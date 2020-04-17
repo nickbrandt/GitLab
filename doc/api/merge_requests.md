@@ -668,6 +668,7 @@ dependent on the `merge_status`. It'll return `false` unless `merge_status` is
   },
   "diverged_commits_count": 2,
   "rebase_in_progress": false,
+  "first_contribution": false,
   "task_completion_status":{
     "count":0,
     "completed_count":0
@@ -904,7 +905,7 @@ The new pipeline can be:
 
 - A detached merge request pipeline.
 - A [pipeline for merged results](../ci/merge_request_pipelines/pipelines_for_merged_results/index.md)
-  if the [project setting is enabled](../ci/merge_request_pipelines/pipelines_for_merged_results/index.md#enabling-pipelines-for-merged-results).
+  if the [project setting is enabled](../ci/merge_request_pipelines/pipelines_for_merged_results/index.md#enable-pipelines-for-merged-results).
 
 ```plaintext
 POST /projects/:id/merge_requests/:merge_request_iid/pipelines

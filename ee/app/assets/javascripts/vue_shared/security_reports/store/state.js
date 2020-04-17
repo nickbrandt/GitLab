@@ -41,9 +41,26 @@ export default () => ({
     resolvedIssues: [],
     baseReportOutofDate: false,
     hasBaseReport: false,
+    scans: [],
   },
 
   dependencyScanning: {
+    paths: {
+      head: null,
+      base: null,
+      diffEndpoint: null,
+    },
+
+    isLoading: false,
+    hasError: false,
+
+    newIssues: [],
+    resolvedIssues: [],
+    allIssues: [],
+    baseReportOutofDate: false,
+    hasBaseReport: false,
+  },
+  secretScanning: {
     paths: {
       head: null,
       base: null,

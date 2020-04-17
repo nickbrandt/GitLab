@@ -14,7 +14,7 @@ import 'bootstrap';
 import '~/gl_dropdown';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
-import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
+import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as commonUtils from '~/lib/utils/common_utils';
@@ -132,8 +132,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(DurationChart).exists()).toBe(flag);
   };
 
-  const displaysTasksByType = flag => {
-    expect(wrapper.find(TasksByTypeChart).exists()).toBe(flag);
+  const displaysTypeOfWork = flag => {
+    expect(wrapper.find(TypeOfWorkCharts).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -176,7 +176,7 @@ describe('Cycle Analytics component', () => {
         displaysDateRangePicker(false);
       });
 
-      it('does not display the summary table', () => {
+      it('does not display the recent activity table', () => {
         displaysRecentActivityCard(false);
       });
 
@@ -233,7 +233,7 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(true);
         });
 
-        it('displays the summary table', () => {
+        it('displays the recent activity table', () => {
           displaysRecentActivityCard(true);
         });
 
@@ -259,10 +259,6 @@ describe('Cycle Analytics component', () => {
               startDate: mockData.startDate,
               endDate: mockData.endDate,
             });
-            wrapper.vm.$store.dispatch(
-              'receiveDurationDataSuccess',
-              mockData.transformedDurationData,
-            );
           });
 
           it('displays the duration chart', () => {
@@ -277,7 +273,6 @@ describe('Cycle Analytics component', () => {
               opts: {
                 stubs: {
                   'stage-event-list': true,
-                  'summary-table': true,
                   'add-stage-button': true,
                   'stage-table-header': true,
                 },
@@ -335,7 +330,7 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(false);
         });
 
-        it('does not display the summary table', () => {
+        it('does not display the recent activity table', () => {
           displaysRecentActivityCard(false);
         });
 
@@ -348,7 +343,7 @@ describe('Cycle Analytics component', () => {
         });
 
         it('does not display the tasks by type chart', () => {
-          displaysTasksByType(false);
+          displaysTypeOfWork(false);
         });
 
         it('does not display the duration chart', () => {
@@ -424,7 +419,6 @@ describe('Cycle Analytics component', () => {
       overrides = {},
       mockFetchStageData = true,
       mockFetchStageMedian = true,
-      mockFetchDurationData = true,
       mockFetchTasksByTypeData = true,
       mockFetchTopRankedGroupLabels = true,
     }) => {
@@ -448,12 +442,6 @@ describe('Cycle Analytics component', () => {
         mock
           .onGet(mockData.endpoints.tasksByTypeData)
           .reply(defaultStatus, { ...mockData.tasksByTypeData });
-      }
-
-      if (mockFetchDurationData) {
-        mock
-          .onGet(mockData.endpoints.durationData)
-          .reply(defaultStatus, [...mockData.rawDurationData]);
       }
 
       if (mockFetchStageMedian) {
@@ -536,22 +524,6 @@ describe('Cycle Analytics component', () => {
       );
     });
 
-    it('will display an error if the fetchDurationData request fails', () => {
-      expect(findFlashError()).toBeNull();
-
-      mockRequestCycleAnalyticsData({
-        mockFetchDurationData: false,
-      });
-
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().catch(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching value stream analytics duration data.',
-        );
-      });
-    });
-
     it('will display an error if the fetchStageMedian request fails', () => {
       expect(findFlashError()).toBeNull();
 
@@ -563,7 +535,7 @@ describe('Cycle Analytics component', () => {
 
       return waitForPromises().catch(() => {
         expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching value stream analytics duration data.',
+          'There was an error while fetching value stream analytics data.',
         );
       });
     });

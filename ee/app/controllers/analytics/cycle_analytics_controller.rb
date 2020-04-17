@@ -10,7 +10,7 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
     push_frontend_feature_flag(:customizable_cycle_analytics, default_enabled: true)
     push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled, default_enabled: true)
     push_frontend_feature_flag(:cycle_analytics_scatterplot_median_enabled, default_enabled: true)
-    push_frontend_feature_flag(:tasks_by_type_chart)
+    push_frontend_feature_flag(:tasks_by_type_chart, default_enabled: true)
   end
 
   before_action :load_group, only: :show

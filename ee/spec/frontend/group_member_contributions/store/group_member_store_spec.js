@@ -79,7 +79,7 @@ describe('GroupMemberStore', () => {
         .fetchContributedMembers()
         .then(() => {
           expect(store.isLoading).toBe(false);
-          expect(store.setColumns).toHaveBeenCalledWith(jasmine.any(Object));
+          expect(store.setColumns).toHaveBeenCalledWith(expect.any(Object));
           expect(store.setMembers).toHaveBeenCalledWith(rawMembers);
           done();
         })

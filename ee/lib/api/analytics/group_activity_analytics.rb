@@ -34,9 +34,6 @@ module API
           end
 
           get 'issues_count' do
-            not_found! unless
-              Feature.enabled?(:group_activity_analytics, group)
-
             authorize! :read_group_activity_analytics, group
 
             present(
@@ -55,9 +52,6 @@ module API
           end
 
           get 'merge_requests_count' do
-            not_found! unless
-              Feature.enabled?(:group_activity_analytics, group)
-
             authorize! :read_group_activity_analytics, group
 
             present(
@@ -76,9 +70,6 @@ module API
           end
 
           get 'new_members_count' do
-            not_found! unless
-              Feature.enabled?(:group_activity_analytics, group)
-
             authorize! :read_group_activity_analytics, group
 
             present(

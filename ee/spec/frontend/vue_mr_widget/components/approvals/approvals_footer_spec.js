@@ -46,7 +46,7 @@ describe('EE MRWidget approvals footer', () => {
 
         expect(list.exists()).toBe(true);
         expect(list.props()).toEqual(
-          jasmine.objectContaining({
+          expect.objectContaining({
             approvalRules: testApprovalRules(),
           }),
         );
@@ -69,7 +69,7 @@ describe('EE MRWidget approvals footer', () => {
 
           expect(icon.exists()).toBe(true);
           expect(icon.props()).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               name: 'chevron-down',
             }),
           );
@@ -153,7 +153,7 @@ describe('EE MRWidget approvals footer', () => {
 
       expect(avatars.exists()).toBe(true);
       expect(avatars.props()).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           items: testSuggestedApprovers().filter((x, idx) => idx < 5),
           breakpoint: 0,
           emptyText: '',

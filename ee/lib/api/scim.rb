@@ -132,7 +132,7 @@ module API
           check_group_saml_configured
         end
 
-        desc 'Get SAML users' do
+        desc 'Get SCIM users' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
         get do
@@ -149,7 +149,7 @@ module API
           scim_error!(message: 'Unsupported Filter')
         end
 
-        desc 'Get a SAML user' do
+        desc 'Get a SCIM user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
         get ':id', requirements: USER_ID_REQUIREMENTS do
@@ -164,7 +164,7 @@ module API
           present identity, with: ::EE::API::Entities::Scim::User
         end
 
-        desc 'Create a SAML user' do
+        desc 'Create a SCIM user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
         post do
@@ -184,7 +184,7 @@ module API
           end
         end
 
-        desc 'Updates a SAML user' do
+        desc 'Updates a SCIM user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
         patch ':id', requirements: USER_ID_REQUIREMENTS do
@@ -204,7 +204,7 @@ module API
           end
         end
 
-        desc 'Removes a SAML user' do
+        desc 'Removes a SCIM user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
         delete ':id', requirements: USER_ID_REQUIREMENTS do

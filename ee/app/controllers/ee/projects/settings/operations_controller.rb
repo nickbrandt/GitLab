@@ -8,12 +8,16 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          helper_method :tracing_setting
+          helper_method :tracing_setting, :status_page_setting
 
           private
 
           def tracing_setting
             @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
+          end
+
+          def status_page_setting
+            @status_page_setting ||= project.status_page_setting || project.build_status_page_setting
           end
 
           def has_tracing_license?

@@ -97,6 +97,12 @@ describe Packages::Nuget::SearchService do
         let(:include_prerelease_versions) { false }
 
         it { expect_search_results 3, package_a, packages_b, packages_c }
+
+        context 'when mixed with release versions' do
+          let_it_be(:package_e_release) { create(:nuget_package, project: project, name: 'DummyPackageE', version: '3.2.1') }
+
+          it { expect_search_results 4, package_a, packages_b, packages_c, package_e_release }
+        end
       end
     end
 

@@ -18,11 +18,14 @@ module QA
           group.sandbox = @sandbox_group
         end
 
-        enable_plan_on_group(@group.name, "Gold") if Runtime::Env.dot_com?
+        enable_plan_on_group(@sandbox_group.path, "Gold") if Runtime::Env.dot_com?
       end
 
       after(:all) do
         @sandbox_group.remove_via_api!
+
+        page.visit Runtime::Scenario.gitlab_address
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       before do
@@ -56,6 +59,26 @@ module QA
 
           @group.visit!
           expect(page).to have_text(@group.path)
+        end
+      end
+
+      # TODO - Remove this block when the test is un-quarantined.
+      after do |example|
+        if example.exception
+          @group.sandbox.visit!
+          QA::Runtime::Logger.info "On failure - Revisiting: #{@group.sandbox.path}"
+          QA::Runtime::Logger.info page.save_screenshot(::File.join(QA::Runtime::Namespace.name, "group_sandbox_on_failure.png"), full: true)
+
+          Flow::Login.while_signed_in_as_admin do
+            @group.sandbox.visit!
+
+            Page::Group::Menu.perform(&:click_group_general_settings_item)
+
+            Page::Group::Settings::General.perform do |settings|
+              QA::Runtime::Logger.info "On failure - IP address restriction is set to: #{settings.restricted_ip_address}"
+              QA::Runtime::Logger.info page.save_screenshot(::File.join(QA::Runtime::Namespace.name, "ip_restriction_on_failure.png"), full: true)
+            end
+          end
         end
       end
 

@@ -1,10 +1,12 @@
 <script>
 import { mapActions } from 'vuex';
-import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
+import timeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 export default {
   components: {
     timeAgoTooltip,
+    GitlabTeamMemberBadge,
   },
   props: {
     author: {
@@ -37,16 +39,24 @@ export default {
       required: false,
       default: true,
     },
+    showSpinner: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     toggleChevronClass() {
       return this.expanded ? 'fa-chevron-up' : 'fa-chevron-down';
     },
     noteTimestampLink() {
-      return `#note_${this.noteId}`;
+      return this.noteId ? `#note_${this.noteId}` : undefined;
     },
     hasAuthor() {
       return this.author && Object.keys(this.author).length;
+    },
+    showGitlabTeamMemberBadge() {
+      return this.author?.is_gitlab_employee;
     },
   },
   methods: {
@@ -55,7 +65,9 @@ export default {
       this.$emit('toggleHandler');
     },
     updateTargetNoteHash() {
-      this.setTargetNoteHash(this.noteTimestampLink);
+      if (this.$store) {
+        this.setTargetNoteHash(this.noteTimestampLink);
+      }
     },
   },
 };
@@ -73,19 +85,21 @@ export default {
         {{ __('Toggle thread') }}
       </button>
     </div>
-    <a
-      v-if="hasAuthor"
-      v-once
-      :href="author.path"
-      class="js-user-link"
-      :data-user-id="author.id"
-      :data-username="author.username"
-    >
-      <slot name="note-header-info"></slot>
-      <span class="note-header-author-name bold">{{ author.name }}</span>
-      <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
-      <span class="note-headline-light">@{{ author.username }}</span>
-    </a>
+    <template v-if="hasAuthor">
+      <a
+        v-once
+        :href="author.path"
+        class="js-user-link"
+        :data-user-id="author.id"
+        :data-username="author.username"
+      >
+        <slot name="note-header-info"></slot>
+        <span class="note-header-author-name bold">{{ author.name }}</span>
+        <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
+        <span class="note-headline-light">@{{ author.username }}</span>
+      </a>
+      <gitlab-team-member-badge v-if="showGitlabTeamMemberBadge" />
+    </template>
     <span v-else>{{ __('A deleted user') }}</span>
     <span class="note-headline-light note-headline-meta">
       <span class="system-note-message"> <slot></slot> </span>
@@ -94,16 +108,20 @@ export default {
           <template v-if="actionText">{{ actionText }}</template>
         </span>
         <a
-          ref="noteTimestamp"
+          v-if="noteTimestampLink"
+          ref="noteTimestampLink"
           :href="noteTimestampLink"
           class="note-timestamp system-note-separator"
           @click="updateTargetNoteHash"
         >
           <time-ago-tooltip :time="createdAt" tooltip-placement="bottom" />
         </a>
+        <time-ago-tooltip v-else ref="noteTimestamp" :time="createdAt" tooltip-placement="bottom" />
       </template>
       <slot name="extra-controls"></slot>
       <i
+        v-if="showSpinner"
+        ref="spinner"
         class="fa fa-spinner fa-spin editing-spinner"
         :aria-label="__('Comment is being updated')"
         aria-hidden="true"

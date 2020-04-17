@@ -175,6 +175,7 @@ describe('ServiceDeskSetting', () => {
           isEnabled: true,
           initialSelectedTemplate: 'Bug',
           initialOutgoingName: 'GitLab Support Bot',
+          initialProjectKey: 'key',
         },
       });
 
@@ -183,6 +184,7 @@ describe('ServiceDeskSetting', () => {
       expect(eventSpy).toHaveBeenCalledWith({
         selectedTemplate: 'Bug',
         outgoingName: 'GitLab Support Bot',
+        projectKey: 'key',
       });
 
       eventHub.$off('serviceDeskTemplateSave', eventSpy);

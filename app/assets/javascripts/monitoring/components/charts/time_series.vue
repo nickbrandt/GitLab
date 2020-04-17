@@ -6,7 +6,7 @@ import dateFormat from 'dateformat';
 import { s__, __ } from '~/locale';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
-import { chartHeight, lineTypes, lineWidths, dateFormats, tooltipTypes } from '../../constants';
+import { chartHeight, lineTypes, lineWidths, dateFormats } from '../../constants';
 import { getYAxisOptions, getChartGrid, getTooltipFormatter } from './options';
 import { annotationsYAxis, generateAnnotationsSeries } from './annotations';
 import { makeDataSeries } from '~/helpers/monitor_helper';
@@ -20,7 +20,6 @@ const events = {
 };
 
 export default {
-  tooltipTypes,
   components: {
     GlAreaChart,
     GlLineChart,
@@ -51,6 +50,11 @@ export default {
       default: () => ({}),
     },
     deploymentData: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    annotations: {
       type: Array,
       required: false,
       default: () => [],
@@ -143,6 +147,7 @@ export default {
       return (this.option.series || []).concat(
         generateAnnotationsSeries({
           deployments: this.recentDeployments,
+          annotations: this.annotations,
         }),
       );
     },
@@ -256,25 +261,33 @@ export default {
     isTooltipOfType(tooltipType, defaultType) {
       return tooltipType === defaultType;
     },
+    /**
+     * This method is triggered when hovered over a single markPoint.
+     *
+     * The annotations title timestamp should match the data tooltip
+     * title.
+     *
+     * @params {Object} params markPoint object
+     * @returns {Object}
+     */
+    formatAnnotationsTooltipText(params) {
+      return {
+        title: dateFormat(params.data?.tooltipData?.title, dateFormats.default),
+        content: params.data?.tooltipData?.content,
+      };
+    },
     formatTooltipText(params) {
       this.tooltip.title = dateFormat(params.value, dateFormats.default);
       this.tooltip.content = [];
 
       params.seriesData.forEach(dataPoint => {
         if (dataPoint.value) {
-          const [xVal, yVal] = dataPoint.value;
+          const [, yVal] = dataPoint.value;
           this.tooltip.type = dataPoint.name;
-          if (this.isTooltipOfType(this.tooltip.type, this.$options.tooltipTypes.deployments)) {
-            const [deploy] = this.recentDeployments.filter(
-              deployment => deployment.createdAt === xVal,
-            );
-            this.tooltip.sha = deploy.sha.substring(0, 8);
-            this.tooltip.commitUrl = deploy.commitUrl;
-          } else if (
-            this.isTooltipOfType(this.tooltip.type, this.$options.tooltipTypes.annotations)
-          ) {
-            const { data } = dataPoint;
-            this.tooltip.content.push(data?.description);
+          if (this.tooltip.type === 'deployments') {
+            const { data = {} } = dataPoint;
+            this.tooltip.sha = data?.tooltipData?.sha;
+            this.tooltip.commitUrl = data?.tooltipData?.commitUrl;
           } else {
             const { seriesName, color, dataIndex } = dataPoint;
 
@@ -352,6 +365,7 @@ export default {
       :data="chartData"
       :option="chartOptions"
       :format-tooltip-text="formatTooltipText"
+      :format-annotations-tooltip-text="formatAnnotationsTooltipText"
       :thresholds="thresholds"
       :width="width"
       :height="height"
@@ -360,23 +374,13 @@ export default {
       @created="onChartCreated"
       @updated="onChartUpdated"
     >
-      <template v-if="isTooltipOfType(tooltip.type, this.$options.tooltipTypes.deployments)">
+      <template v-if="tooltip.type === 'deployments'">
         <template slot="tooltipTitle">
           {{ __('Deployed') }}
         </template>
         <div slot="tooltipContent" class="d-flex align-items-center">
           <icon name="commit" class="mr-2" />
           <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
-        </div>
-      </template>
-      <template v-else-if="isTooltipOfType(tooltip.type, this.$options.tooltipTypes.annotations)">
-        <template slot="tooltipTitle">
-          <div class="text-nowrap">
-            {{ tooltip.title }}
-          </div>
-        </template>
-        <div slot="tooltipContent" class="d-flex align-items-center">
-          {{ tooltip.content.join('\n') }}
         </div>
       </template>
       <template v-else>

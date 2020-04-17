@@ -54,7 +54,7 @@ describe('SidebarLabelsComponent', () => {
         wrapper.vm.toggleSidebarRevealLabelsDropdown();
 
         expect(wrapper.vm.toggleSidebar).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             sidebarCollapsed: false,
           }),
         );
@@ -73,7 +73,7 @@ describe('SidebarLabelsComponent', () => {
 
         expect(wrapper.vm.sidebarExpandedOnClick).toBe(false);
         expect(wrapper.vm.toggleSidebar).toHaveBeenCalledWith(
-          jasmine.objectContaining({
+          expect.objectContaining({
             sidebarCollapsed: false,
           }),
         );

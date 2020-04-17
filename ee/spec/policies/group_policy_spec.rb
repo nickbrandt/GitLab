@@ -92,6 +92,8 @@ describe GroupPolicy do
     let(:current_user) { developer }
 
     before do
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics, group).and_return(false)
+
       stub_licensed_features(group_activity_analytics: true)
     end
 
@@ -102,6 +104,9 @@ describe GroupPolicy do
     let(:current_user) { developer }
 
     before do
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics, group).and_return(false)
+      allow(Feature).to receive(:enabled?).with(:group_activity_analytics).and_return(true)
+
       stub_licensed_features(group_activity_analytics: false)
     end
 

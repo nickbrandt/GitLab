@@ -1055,8 +1055,8 @@ describe('Epic Store Actions', () => {
           ],
           () => {
             expect(epicUtils.gqClient.mutate).toHaveBeenCalledWith(
-              jasmine.objectContaining({
-                variables: jasmine.objectContaining({
+              expect.objectContaining({
+                variables: expect.objectContaining({
                   epicSetSubscriptionInput: {
                     iid: `${state.epicIid}`,
                     groupPath: state.fullPath,

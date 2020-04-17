@@ -13,7 +13,9 @@ module Metrics
         STAGES::CustomMetricsInserter,
         STAGES::CustomMetricsDetailsInserter,
         STAGES::EndpointInserter,
-        STAGES::Sorter
+        STAGES::PanelIdsInserter,
+        STAGES::Sorter,
+        STAGES::AlertsInserter
       ].freeze
 
       class << self
@@ -29,5 +31,3 @@ module Metrics
     end
   end
 end
-
-Metrics::Dashboard::SystemDashboardService.prepend_if_ee('EE::Metrics::Dashboard::SystemDashboardService')

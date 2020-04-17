@@ -6,18 +6,12 @@ describe 'shared/billings/_trial_status.html.haml' do
   include ApplicationHelper
 
   let_it_be(:group) { create(:group) }
-  let_it_be(:gitlab_subscription) { create(:gitlab_subscription, namespace: group) }
   let(:plan) { nil }
   let(:trial_ends_on) { nil }
   let(:trial) { false }
 
   before do
-    gitlab_subscription.update(
-      hosted_plan: plan,
-      trial_ends_on: trial_ends_on,
-      trial: trial
-    )
-    group.update(plan: plan)
+    create(:gitlab_subscription, namespace: group, hosted_plan: plan, trial_ends_on: trial_ends_on, trial: trial)
   end
 
   context 'when not eligible for trial' do

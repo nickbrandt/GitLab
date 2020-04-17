@@ -19,7 +19,7 @@ module EE
       end
 
       condition(:group_activity_analytics_available) do
-        @subject.feature_available?(:group_activity_analytics)
+        @subject.beta_feature_available?(:group_activity_analytics)
       end
 
       condition(:can_owners_manage_ldap, scope: :global) do
