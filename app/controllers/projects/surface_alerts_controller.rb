@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::SurfaceAlertsController < Projects::ApplicationController
-
   def index
     respond_to do |format|
       format.html
@@ -13,11 +12,11 @@ class Projects::SurfaceAlertsController < Projects::ApplicationController
 
   private
 
-    def render_index_json
-      result = []
+  def render_index_json
+    result = []
 
-      render json: {
-        alerts: result
-      }
-    end
+    render json: {
+      alerts: result
+    }
+  end
 end
