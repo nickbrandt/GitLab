@@ -24,7 +24,7 @@ module Projects
           end
         end
 
-        unless Feature.enabled?(:jira_issue_import_vue, @project)
+        unless Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
           flash[:notice] = _("Import %{status}") % { status: @project.jira_import_status } unless @project.latest_jira_import&.initial?
         end
       end
@@ -51,7 +51,7 @@ module Projects
       end
 
       def jira_integration_configured?
-        return if Feature.enabled?(:jira_issue_import_vue, @project)
+        return if Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
         return if @project.jira_service
 
         flash[:notice] = _("Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page." %
