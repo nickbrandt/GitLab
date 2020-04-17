@@ -19,7 +19,7 @@ module DeployTokenMethods
     if deploy_token.persisted?
       success(deploy_token: deploy_token, http_status: :created)
     else
-      error(deploy_token.errors.full_messages.to_sentence, :bad_request).merge(deploy_token: deploy_token)
+      error(deploy_token.errors.full_messages.to_sentence, :bad_request, pass_back: { deploy_token: deploy_token })
     end
   end
 end
