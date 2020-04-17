@@ -3,7 +3,7 @@ import { queryToObject, mergeUrlParams, removeParams } from '~/lib/utils/url_uti
 import { TEST_HOST } from 'jest/helpers/test_constants';
 import {
   mockProjectDir,
-  graphDataPrometheusQuery,
+  singleStatMetricsResult,
   anomalyMockGraphData,
   barMockData,
 } from './mock_data';
@@ -89,7 +89,7 @@ describe('monitoring/utils', () => {
     it('validates data with the query format', () => {
       const validGraphData = monitoringUtils.graphDataValidatorForValues(
         true,
-        graphDataPrometheusQuery,
+        singleStatMetricsResult,
       );
 
       expect(validGraphData).toBe(true);
@@ -112,7 +112,7 @@ describe('monitoring/utils', () => {
     let threeMetrics;
     let fourMetrics;
     beforeEach(() => {
-      oneMetric = graphDataPrometheusQuery;
+      oneMetric = singleStatMetricsResult;
       threeMetrics = anomalyMockGraphData;
 
       const metrics = [...threeMetrics.metrics];
