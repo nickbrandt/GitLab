@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Projects::SurfaceAlertsHelper do
   include Gitlab::Routing.url_helpers
 
-  set(:project) { create(:project) }
+  let(:project) { create(:project) }
 
   describe '#surface_alerts_data' do
     let(:setting_path) { project_settings_operations_path(project) }
