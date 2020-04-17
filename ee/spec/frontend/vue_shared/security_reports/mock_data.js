@@ -7,6 +7,23 @@ export const sastParsedIssues = [
     line: 12,
     severity: 'High',
     urlPath: 'foo/Gemfile.lock',
+    report_type: 'sast',
+  },
+];
+
+export const dependencyScanningIssues = [
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name: 'Cross-site Scripting in serialize-javascript',
+    description:
+      'The serialize-javascript npm package is vulnerable to Cross-site Scripting (XSS). It does not properly mitigate against unsafe characters in serialized regular expressions. If serialized data of regular expression objects are used in an environment other than Node.js, it is affected by this vulnerability.',
+    links: [{ url: 'https://nvd.nist.gov/vuln/detail/CVE-2019-16769' }],
+    location: {
+      file: 'yarn.lock',
+      dependency: { package: { name: 'serialize-javascript' }, version: '1.7.0' },
+    },
+    path: 'yarn.lock',
   },
 ];
 
