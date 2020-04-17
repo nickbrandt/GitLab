@@ -1,6 +1,6 @@
 # GitLab Go Proxy **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27376) in [GitLab Premium](https://about.gitlab.com/pricing/) ??.??.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27376) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.0.
 
 The GitLab Go Proxy implements the Go proxy protocol.
 
@@ -9,7 +9,7 @@ GitLab does not (yet) display Go modules in the **Packages** section of a
 project. Only the Go proxy protocol is supported at this time, and only for
 modules on GitLab.
 
-## Enabling the Go proxy
+## Enable the Go proxy
 
 NOTE: **Note:**
 This option is available only if your GitLab administrator has
@@ -25,7 +25,7 @@ by default. To enable it for existing projects, or if you want to disable it:
 You should then be able to see the **Packages** section on the left sidebar.
 Next, you must configure your development environment to use the Go proxy.
 
-## Adding GitLab as a Go proxy
+## Add GitLab as a Go proxy
 
 NOTE: **Note:**
 To use a Go proxy, you must be using Go 1.13 or later.
@@ -51,7 +51,40 @@ first go through GitLab. This can help avoid making requests for private
 packages to the public proxy, but `GOPRIVATE` is a much safer way of achieving
 that.
 
-## Releasing a module
+For example, with the following configuration, Go will attempt to fetch modules
+from 1) GitLab project 1234's Go module proxy, 2) `proxy.golang.org`, and
+finally 3) directly via VCS.
+
+```shell
+go env -w GOPROXY=https://gitlab.com/api/v4/projects/1234/packages/go,https://proxy.golang.org,direct
+```
+
+## Fetch modules from private projects
+
+NOTE: **Note:**
+`go` does not support transmitting credentials over insecure connections. The
+steps below will only work if GitLab is configured for HTTPS.
+
+GitLab's Go proxy implementation supports HTTP Basic authentication for personal
+access tokens, in addition to the usual authentication mechanisms. To configure
+Go to use HTTP Basic authentication, you must create a [personal access
+token](../../profile/personal_access_tokens.md) with the `api` or `read_api`
+scope and add it to [`~/.netrc`](https://ec.haxx.se/usingcurl/usingcurl-netrc):
+
+```netrc
+machine my-server
+login my-user
+password my-token
+```
+
+Replace `my-user` with your username and `my-token` with your personal access
+token. The value of `my-server` should be `gitlab.com` or the URL of your GitLab
+instance. You can optionally append a path to `my-server`, which will restrict
+the scope that the credentials will be used for. For example, `machine
+gitlab.com/my-group` will restrict the credentials to URLs starting with
+`gitlab.com/my-group`.
+
+## Release a module
 
 NOTE: **Note:**
 For a complete understanding of Go modules and versioning, see [this series of
@@ -84,6 +117,6 @@ Tags that match the pseudo-version pattern are ignored, as otherwise they could
 interfere with fetching specific commits using a pseudo-version. Pseudo-versions
 follow one of three formats:
 
-- `vX.0.0-yyyymmddhhmmss-abcdefabcdef`, when no earlier tagged commit exists for X
-- `vX.Y.Z-pre.0.yyyymmddhhmmss-abcdefabcdef`, when most recent prior tag is vX.Y.Z-pre
-- `vX.Y.(Z+1)-0.yyyymmddhhmmss-abcdefabcdef`, when most recent prior tag is vX.Y.Z
+- `vX.0.0-yyyymmddhhmmss-abcdefabcdef`, when no earlier tagged commit exists for X.
+- `vX.Y.Z-pre.0.yyyymmddhhmmss-abcdefabcdef`, when most recent prior tag is vX.Y.Z-pre.
+- `vX.Y.(Z+1)-0.yyyymmddhhmmss-abcdefabcdef`, when most recent prior tag is vX.Y.Z.

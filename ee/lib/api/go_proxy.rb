@@ -114,7 +114,6 @@ module API
           header['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: 'attachment', filename: ver.name + '.zip')
           header['Content-Transfer-Encoding'] = 'binary'
           content_type 'text/plain'
-          # content_type 'application/zip'
           status :ok
           body ver.archive.string
         end

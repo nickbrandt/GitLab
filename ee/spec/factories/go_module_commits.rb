@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-def get_result(op, ret)
-  raise "#{op} failed: #{ret}" unless ret[:status] == :success
-
-  ret[:result]
-end
-
 FactoryBot.define do
   factory :go_module_commit, class: 'Commit' do
     skip_create
