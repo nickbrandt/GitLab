@@ -448,6 +448,7 @@ module ProjectsHelper
       clusters:         :read_cluster,
       serverless:       :read_cluster,
       error_tracking:   :read_sentry_issue,
+      surface_alerts:   :read_sentry_issue,
       labels:           :read_label,
       issues:           :read_issue,
       project_members:  :read_project_member,
@@ -707,6 +708,7 @@ module ProjectsHelper
       clusters
       functions
       error_tracking
+      surface_alerts
       user
       gcp
       logs
