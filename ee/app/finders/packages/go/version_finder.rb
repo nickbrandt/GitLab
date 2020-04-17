@@ -51,7 +51,7 @@ module Packages
 
       def find_pseudo_version(str)
         semver = parse_semver(str)
-        raise ArgumentError.new 'target is not a pseudo-version' unless semver && PSEUDO_VERSION_REGEX.match?(str)
+        raise ArgumentError.new 'target is not a pseudo-version' unless pseudo_version?(semver)
 
         # valid pseudo-versions are
         #   vX.0.0-yyyymmddhhmmss-sha1337beef0, when no earlier tagged commit exists for X

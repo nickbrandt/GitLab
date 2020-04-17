@@ -39,19 +39,19 @@ describe Packages::Go::VersionFinder do
     end
 
     context 'for the package' do
-      let(:mod) { create :go_module, project: project, path: '/pkg' }
+      let(:mod) { create :go_module, project: project, path: 'pkg' }
 
       it_behaves_like '#execute'
     end
 
     context 'for the submodule' do
-      let(:mod) { create :go_module, project: project, path: '/mod' }
+      let(:mod) { create :go_module, project: project, path: 'mod' }
 
       it_behaves_like '#execute', 'v1.0.3'
     end
 
     context 'for the root module v2' do
-      let(:mod) { create :go_module, project: project, path: '/v2' }
+      let(:mod) { create :go_module, project: project, path: 'v2' }
 
       it_behaves_like '#execute', 'v2.0.0'
     end

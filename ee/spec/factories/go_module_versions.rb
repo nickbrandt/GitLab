@@ -19,7 +19,7 @@ FactoryBot.define do
       new(p.mod, p.type, p.commit, name: p.name, semver: s, ref: p.ref)
     end
 
-    mod { go_module }
+    mod { create :go_module }
     type { :commit }
     commit { raise ArgumentError.new("commit is required") }
     name { nil }

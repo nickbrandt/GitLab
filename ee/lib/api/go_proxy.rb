@@ -66,7 +66,7 @@ module API
 
       namespace ':id/packages/go/*module_name/@v' do
         desc 'Get all tagged versions for a given Go module' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/list'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/list. This feature was introduced in GitLab 13.0.'
         end
         get 'list' do
           mod = find_module
@@ -76,7 +76,7 @@ module API
         end
 
         desc 'Get information about the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.info'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.info. This feature was introduced in GitLab 13.0.'
           success EE::API::Entities::GoModuleVersion
         end
         params do
@@ -89,7 +89,7 @@ module API
         end
 
         desc 'Get the module file of the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.mod'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.mod. This feature was introduced in GitLab 13.0.'
         end
         params do
           requires :module_version, type: String, desc: 'Module version'
@@ -102,7 +102,7 @@ module API
         end
 
         desc 'Get a zip of the source of the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.zip'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.zip. This feature was introduced in GitLab 13.0.'
         end
         params do
           requires :module_version, type: String, desc: 'Module version'
@@ -110,21 +110,13 @@ module API
         get ':module_version.zip', requirements: MODULE_VERSION_REQUIREMENTS do
           ver = find_version
 
-          suffix_len = ver.mod.path == '' ? 0 : ver.mod.path.length + 1
-
-          s = Zip::OutputStream.write_buffer do |zip|
-            ver.files.each do |file|
-              zip.put_next_entry "#{ver.mod.name}@#{ver.name}/#{file.path[suffix_len...]}"
-              zip.write ver.blob_at(file.path)
-            end
-          end
-
+          # TODO: Content-Type should be application/zip, see #214876
           header['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: 'attachment', filename: ver.name + '.zip')
           header['Content-Transfer-Encoding'] = 'binary'
           content_type 'text/plain'
           # content_type 'application/zip'
           status :ok
-          body s.string
+          body ver.archive.string
         end
       end
     end

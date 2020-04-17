@@ -7,6 +7,6 @@ FactoryBot.define do
 
     project
     path { '' }
-    name { "#{Settings.build_gitlab_go_url}/#{project.full_path}#{path.empty? ? '' : path}" }
+    name { "#{Settings.build_gitlab_go_url}/#{project.full_path}#{path.empty? ? '' : '/'}#{path}" }
   end
 end

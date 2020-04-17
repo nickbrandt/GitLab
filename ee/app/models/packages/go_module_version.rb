@@ -37,8 +37,23 @@ class Packages::GoModuleVersion
     @name || @ref&.name
   end
 
+  def full_name
+    "#{mod.name}@#{name || commit.sha}"
+  end
+
   def gomod
     @gomod ||= blob_at(@mod.path + '/go.mod')
+  end
+
+  def archive
+    suffix_len = @mod.path == '' ? 0 : @mod.path.length + 1
+
+    Zip::OutputStream.write_buffer do |zip|
+      files.each do |file|
+        zip.put_next_entry "#{full_name}/#{file.path[suffix_len...]}"
+        zip.write blob_at(file.path)
+      end
+    end
   end
 
   def files
@@ -51,10 +66,22 @@ class Packages::GoModuleVersion
   end
 
   def blob_at(path)
-    @mod.project.repository.blob_at(@commit.sha, path)&.data
+    return if path.nil? || path.empty?
+
+    path = path[1..] if path.start_with? '/'
+
+    blobs.find { |x| x.path == path }&.data
   end
 
   def valid?
     @mod.path_valid?(major) && @mod.gomod_valid?(gomod)
+  end
+
+  private
+
+  def blobs
+    return @blobs if defined?(@blobs)
+
+    @blobs = @mod.project.repository.batch_blobs(files.map { |x| [@commit.sha, x.path] })
   end
 end

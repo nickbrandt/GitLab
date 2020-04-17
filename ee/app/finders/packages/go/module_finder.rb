@@ -10,6 +10,7 @@ module Packages
       attr_reader :project, :module_name
 
       def initialize(project, module_name)
+        module_name = CGI.unescape(module_name)
         module_name = Pathname.new(module_name).cleanpath.to_s
 
         @project = project
