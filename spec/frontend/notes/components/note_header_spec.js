@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vue from 'vue';
+import { nextTick } from 'vue';
 import Vuex from 'vuex';
 import NoteHeader from '~/notes/components/note_header.vue';
 import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
@@ -213,7 +213,7 @@ describe('NoteHeader component', () => {
         },
       });
 
-      return Vue.nextTick().then(() => {
+      return nextTick().then(() => {
         const authorStatus = wrapper.find({ ref: 'authorStatus' });
         authorStatus.trigger('mouseenter');
 
@@ -231,13 +231,13 @@ describe('NoteHeader component', () => {
 
       authorUsernameLink.trigger('mouseenter');
 
-      Vue.nextTick(() => {
+      nextTick(() => {
         expect(authorNameLink.classes()).toContain('hover');
         expect(authorNameLink.classes()).toContain('text-underline');
 
         authorUsernameLink.trigger('mouseleave');
 
-        Vue.nextTick(() => {
+        nextTick(() => {
           expect(authorNameLink.classes()).not.toContain('hover');
           expect(authorNameLink.classes()).not.toContain('text-underline');
 
