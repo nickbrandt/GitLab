@@ -39,8 +39,10 @@ export default {
         {{ healthStatus.issuesOnTrack }}
       </span></span
     >
-    <span class="ml-1 mr-2 text-secondary health-label-long">{{ __('issues on track') }}</span>
-    <span class="ml-1 mr-2 text-secondary text-truncate health-label-short">{{
+    <span class="ml-1 mr-1 mr-md-2 text-secondary health-label-long">{{
+      __('issues on track')
+    }}</span>
+    <span class="ml-1 mr-1 mr-md-2 text-secondary text-truncate health-label-short">{{
       __('on track')
     }}</span>
 
@@ -49,10 +51,10 @@ export default {
         {{ healthStatus.issuesNeedingAttention }}
       </span></span
     >
-    <span class="ml-1 mr-2 text-secondary health-label-long">{{
+    <span class="ml-1 mr-1 mr-md-2 text-secondary health-label-long">{{
       __('issues need attention')
     }}</span>
-    <span class="ml-1 mr-2 text-secondary text-truncate health-label-short">{{
+    <span class="ml-1 mr-1 mr-md-2 text-secondary text-truncate health-label-short">{{
       __('need attention')
     }}</span>
 
