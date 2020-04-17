@@ -556,8 +556,6 @@ To enable Fluentd:
 1. Provide the host domain name or URL in **SIEM Hostname**.
 1. Provide the host port number in **SIEM Port**.
 1. Select a **SIEM Protocol**.
-1. Check **Send ModSecurity Logs**. If you do not select this checkbox, the **Install**
-   button is disabled.
 1. Click **Save changes**.
 
 ![Fluentd input fields](img/fluentd_v12_10.png)
