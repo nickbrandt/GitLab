@@ -205,7 +205,7 @@ The Ruby interpreter is required to run GitLab.
 **Note:** The current supported Ruby (MRI) version is 2.6.x. GitLab 12.2
   dropped support for Ruby 2.5.x.
 
-The use of Ruby version managers such as [RVM], [rbenv](https://github.com/rbenv/rbenv) or [chruby] with GitLab
+The use of Ruby version managers such as [RVM](https://rvm.io/), [rbenv](https://github.com/rbenv/rbenv) or [chruby](https://github.com/postmodern/chruby) with GitLab
 in production, frequently leads to hard to diagnose problems. For example,
 GitLab Shell is called from OpenSSH, and having a version manager can prevent
 pushing and pulling over SSH. Version managers are not supported and we strongly
@@ -1035,6 +1035,3 @@ On RedHat/CentOS:
 ```shell
 sudo yum groupinstall 'Development Tools'
 ```
-
-[RVM]: https://rvm.io/ "RVM Homepage"
-[chruby]: https://github.com/postmodern/chruby "chruby on GitHub"
