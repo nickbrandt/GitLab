@@ -12,6 +12,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   before_action :authorize_update_pipeline!, only: [:retry, :cancel]
   before_action do
     push_frontend_feature_flag(:junit_pipeline_view)
+    push_frontend_feature_flag(:filter_pipelines_search)
   end
   before_action :ensure_pipeline, only: [:show]
 
