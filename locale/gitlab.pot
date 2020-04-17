@@ -11031,6 +11031,9 @@ msgstr ""
 msgid "Import repository"
 msgstr ""
 
+msgid "Import started by: %{importInitiator}"
+msgstr ""
+
 msgid "Import tasks"
 msgstr ""
 
@@ -11529,6 +11532,9 @@ msgid "Jira import is already running."
 msgstr ""
 
 msgid "Jira integration not configured."
+msgstr ""
+
+msgid "Jira project: %{importProject}"
 msgstr ""
 
 msgid "JiraService|Events for %{noteable_model_name} are disabled."
@@ -15029,6 +15035,9 @@ msgid "Please retype the email address."
 msgstr ""
 
 msgid "Please select"
+msgstr ""
+
+msgid "Please select a Jira project"
 msgstr ""
 
 msgid "Please select a country"
@@ -18591,9 +18600,6 @@ msgstr ""
 msgid "Set up Jira Integration"
 msgstr ""
 
-msgid "Set up Jira Integration illustration"
-msgstr ""
-
 msgid "Set up a %{type} Runner automatically"
 msgstr ""
 
@@ -20768,6 +20774,9 @@ msgstr ""
 msgid "There was an error getting the epic participants."
 msgstr ""
 
+msgid "There was an error importing the Jira project."
+msgstr ""
+
 msgid "There was an error loading users activity calendar."
 msgstr ""
 
@@ -21357,6 +21366,9 @@ msgid "Time from last commit to merge"
 msgstr ""
 
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
+msgstr ""
+
+msgid "Time of import: %{importTime}"
 msgstr ""
 
 msgid "Time remaining"
@@ -22949,6 +22961,9 @@ msgid "View incident issues."
 msgstr ""
 
 msgid "View issue"
+msgstr ""
+
+msgid "View issues"
 msgstr ""
 
 msgid "View it on GitLab"
