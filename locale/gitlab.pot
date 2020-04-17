@@ -7520,9 +7520,6 @@ msgstr ""
 msgid "Edit environment"
 msgstr ""
 
-msgid "Edit epic description"
-msgstr ""
-
 msgid "Edit file"
 msgstr ""
 
@@ -8144,9 +8141,6 @@ msgstr ""
 msgid "Epics"
 msgstr ""
 
-msgid "Epics (Ultimate / Gold license only)"
-msgstr ""
-
 msgid "Epics Roadmap"
 msgstr ""
 
@@ -8154,6 +8148,9 @@ msgid "Epics and Issues"
 msgstr ""
 
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
+msgstr ""
+
+msgid "Epics, Issues, and Merge Requests"
 msgstr ""
 
 msgid "Epics|Add an epic"
@@ -10046,9 +10043,6 @@ msgstr ""
 msgid "Go to file"
 msgstr ""
 
-msgid "Go to file (MRs only)"
-msgstr ""
-
 msgid "Go to file permalink (while viewing a file)"
 msgstr ""
 
@@ -11477,13 +11471,13 @@ msgstr ""
 msgid "Issues"
 msgstr ""
 
-msgid "Issues / Merge Requests"
-msgstr ""
-
 msgid "Issues Analytics"
 msgstr ""
 
 msgid "Issues Rate Limits"
+msgstr ""
+
+msgid "Issues and Merge Requests"
 msgstr ""
 
 msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are searchable and filterable."
@@ -13580,10 +13574,10 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "Next file in diff (MRs only)"
+msgid "Next file in diff"
 msgstr ""
 
-msgid "Next unresolved discussion (MRs only)"
+msgid "Next unresolved discussion"
 msgstr ""
 
 msgid "Nickname"
@@ -15253,10 +15247,10 @@ msgstr ""
 msgid "Previous Artifacts"
 msgstr ""
 
-msgid "Previous file in diff (MRs only)"
+msgid "Previous file in diff"
 msgstr ""
 
-msgid "Previous unresolved discussion (MRs only)"
+msgid "Previous unresolved discussion"
 msgstr ""
 
 msgid "Primary"
@@ -23443,9 +23437,6 @@ msgid "Who will be using this GitLab trial?"
 msgstr ""
 
 msgid "Wiki"
-msgstr ""
-
-msgid "Wiki pages"
 msgstr ""
 
 msgid "Wiki was successfully updated."
