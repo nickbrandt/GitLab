@@ -226,7 +226,7 @@ To change this setting for a specific group:
 
 To change this setting globally, see [Default project creation protection](../admin_area/settings/visibility_and_access_controls.md#default-project-creation-protection).
 
-## Viewing group details
+## View group details
 
 A group's **Details** page includes tabs for:
 
@@ -234,7 +234,12 @@ A group's **Details** page includes tabs for:
 - Shared projects.
 - Archived projects.
 
-As [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/207164) in GitLab [Starter](https://about.gitlab.com/pricing/) 12.10 as a [beta feature](https://about.gitlab.com/handbook/product/#beta), it also shows the number of the following items created in the last 90 days: **(STARTER)**
+### Group activity analytics overview
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/207164) in GitLab [Starter](https://about.gitlab.com/pricing/) 12.10 as
+a [beta feature](https://about.gitlab.com/handbook/product/#beta)
+
+The group details view also shows the number of the following items created in the last 90 days: **(STARTER)**
 
 - Merge requests.
 - Issues.
@@ -244,7 +249,9 @@ These Group Activity Analytics can be enabled with the `group_activity_analytics
 
 ![Recent Group Activity](img/group_activity_analytics_v12_10.png)
 
-## Viewing group activity
+For details, see the section on how you can [View group activity](#view-group-activity).
+
+## View group activity
 
 A group's **Activity** page displays the most recent actions taken in a group, including:
 

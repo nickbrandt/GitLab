@@ -149,14 +149,14 @@ number.
 
 Wiki events (creation, deletion, and updates) are tracked by GitLab and
 displayed on the [user profile](../../profile/index.md#user-profile),
-[group](../../group/index.md#viewing-group-activity),
+[group](../../group/index.md#view-group-activity),
 and [project](../index.md#project-activity) activity pages.
 
 ### Limitations
 
 Only edits made in the browser or through the API have their activity recorded.
 Edits made and pushed through Git are not currently listed in the activity list.
-  
+
 ### Enable or disable Wiki Events **(CORE ONLY)**
 
 Wiki event activity is under development and not ready for production use. It is
