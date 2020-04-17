@@ -515,10 +515,12 @@ BUNDLER_AUDIT_ADVISORY_DB_URL: "gitlab.example.com/ruby-advisory-db.git"
 
 #### Java (Maven) projects
 
-When using a self-signed certificates, add the following to the variables section of`.gitlab-ci.yml`:
+When using self-signed certificates, add the following job section to the `.gitlab-ci.yml`:
 
 ```yaml
-MAVEN_CLI_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"`
+gemnasium-maven-dependency_scanning:
+  variables:
+    MAVEN_CLI_OPTS: "-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
 ```
 
 #### Java (Gradle) projects
@@ -527,10 +529,9 @@ When using self-signed certificates, add the following job section to the `.gitl
 
 ```yaml
 gemnasium-maven-dependency_scanning:
-  variables:
-    before_script:
-      - echo -n | openssl s_client -connect maven-repo.example.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/internal.crt
-      - keytool -importcert -file /tmp/internal.crt -cacerts -storepass changeit -noprompt
+  before_script:
+    - echo -n | openssl s_client -connect maven-repo.example.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/internal.crt
+    - keytool -importcert -file /tmp/internal.crt -cacerts -storepass changeit -noprompt
 ```
 
 This adds the self-signed certificates of your maven repository to the Java Key Store of the analyzer's docker image.
@@ -541,10 +542,9 @@ When using self-signed certificates, add the following job section to the `.gitl
 
 ```yaml
 gemnasium-maven-dependency_scanning:
-  variables:
-    before_script:
-      - echo -n | openssl s_client -connect gitlab-airgap-test.us-west1-b.c.group-secure-a89fe7.internal:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/internal.crt
-      - keytool -importcert -file /tmp/internal.crt -cacerts -storepass changeit -noprompt
+  before_script:
+    - echo -n | openssl s_client -connect maven-repo.example.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/internal.crt
+    - keytool -importcert -file /tmp/internal.crt -cacerts -storepass changeit -noprompt
 ```
 
 This adds the self-signed certificates of your maven repository to the Java Key Store of the analyzer's docker image.
