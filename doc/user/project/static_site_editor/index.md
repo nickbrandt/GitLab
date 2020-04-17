@@ -82,3 +82,8 @@ company and a new feature has been added to the company product.
 1. The file is opened in the Static Site Editor.
 1. You edit the file right there and click **Submit changes**.
 1. A new merge request is automatically created and you assign it to your colleague for review.
+
+## Limitations
+
+- Currently, the Static Site Editor only works for files ending in `.md`. For example, it will not work for a file `index.html.md.erb` while it works for `index.html.md`.
+- The Static Site Editor still cannot be quickly added to existing Middleman sites. Follow this [epic](https://gitlab.com/groups/gitlab-org/-/epics/2784) for updates.
