@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
-import AlertWidgetForm from 'ee/monitoring/components/alert_widget_form.vue';
+import AlertWidgetForm from '~/monitoring/components/alert_widget_form.vue';
 import ModalStub from '../stubs/modal_stub';
 
 describe('AlertWidgetForm', () => {

@@ -26,8 +26,6 @@ describe EnvironmentsHelper do
 
       it 'returns additional configuration' do
         expect(subject).to include(
-          'alerts-endpoint' => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
-          'prometheus-alerts-available' => 'true',
           'logs_path' => project_logs_path(project, environment_name: environment.name)
         )
       end

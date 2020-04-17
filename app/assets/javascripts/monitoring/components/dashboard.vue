@@ -14,7 +14,7 @@ import {
   GlModalDirective,
   GlTooltipDirective,
 } from '@gitlab/ui';
-import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+import PanelType from './panel_type_with_alerts.vue';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
