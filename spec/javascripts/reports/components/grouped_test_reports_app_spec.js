@@ -10,6 +10,7 @@ import newErrorsTestReports from '../mock_data/new_errors_report.json';
 import successTestReports from '../mock_data/no_failures_report.json';
 import mixedResultsTestReports from '../mock_data/new_and_fixed_failures_report.json';
 import resolvedFailures from '../mock_data/resolved_failures.json';
+import { TEST_HOST } from 'spec/test_constants';
 
 describe('Grouped Test Reports App', () => {
   let vm;
@@ -70,6 +71,58 @@ describe('Grouped Test Reports App', () => {
 
         done();
       }, 0);
+    });
+  });
+
+  describe('`View full report` button with enabled junit pipeline view', () => {
+    const selector = '.js-full-report';
+    const pipelinePath = '/path/to/the/pipeline';
+    const testTabPath = `${pipelinePath}/test_report`;
+    const testTabUrl = `${TEST_HOST}/${testTabPath}`;
+
+    beforeEach(() => {
+      mock.onGet('test_results.json').reply(200, {}, {});
+      vm = mountComponentWithProvide(Component, {
+        props: {
+          endpoint: 'test_results.json',
+        },
+        provide: {
+          glFeatures: { junitPipelineView: true },
+        },
+      });
+    });
+
+    it('should be rendered when junitPipelineView is enabled', () => {
+      expect(vm.$el.querySelector(selector).textContent.trim()).toEqual('View full report');
+      expect(vm.$el.querySelector(selector).attributes('href')).toEqual(testTabUrl);
+    });
+  });
+
+  describe('With disabled junit pipeline view', () => {
+    beforeEach(() => {
+      mock.onGet('test_results.json').reply(200, {}, {});
+      vm = mountComponentWithProvide(Component, {
+        props: {
+          endpoint: 'test_results.json',
+        },
+        provide: {
+          glFeatures: { junitPipelineView: true },
+        },
+      });
+    });
+    it('should not be rendered when junitPipelineView is disabled', () => {
+      beforeEach(() => {
+        mock.onGet('test_results.json').reply(200, {}, {});
+        vm = mountComponentWithProvide(Component, {
+          props: {
+            endpoint: 'test_results.json',
+          },
+          provide: {
+            glFeatures: { junitPipelineView: false },
+          },
+        });
+      });
+      expect(vm.$el.querySelector(selector)).toBe(false);
     });
   });
 

@@ -5,6 +5,16 @@ const mountComponent = (Component, props = {}, el = null) =>
     propsData: props,
   }).$mount(el);
 
+const mountComponentWithProvide = (Component, { props, provide }) => {
+    const component = new Component({
+      propsData: props || {},
+    });
+  
+    component.$provide = provide;
+  
+    return component.$mount();
+};
+
 export const createComponentWithStore = (Component, store, propsData = {}) =>
   new Component({
     store,
@@ -27,6 +37,7 @@ export const mountComponentWithSlots = (Component, { props, slots }) => {
   return component.$mount();
 };
 
+
 /**
  * Mount a component with the given render method.
  *
@@ -35,4 +46,7 @@ export const mountComponentWithSlots = (Component, { props, slots }) => {
 export const mountComponentWithRender = (render, el = null) =>
   mountComponent(Vue.extend({ render }), {}, el);
 
-export default mountComponent;
+export default {
+  mountComponent,
+  mountComponentWithProvide
+}

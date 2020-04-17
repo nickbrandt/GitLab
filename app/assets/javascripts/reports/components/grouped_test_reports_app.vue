@@ -5,8 +5,10 @@ import { componentNames } from './issue_body';
 import ReportSection from './report_section.vue';
 import SummaryRow from './summary_row.vue';
 import IssuesList from './issues_list.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 import Modal from './modal.vue';
 import createStore from '../store';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { summaryTextBuilder, reportTextBuilder, statusIcon } from '../store/utils';
 
 export default {
@@ -16,12 +18,19 @@ export default {
     ReportSection,
     SummaryRow,
     IssuesList,
+    Icon,
     Modal,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     endpoint: {
       type: String,
       required: true,
+    },
+    pipelinePath: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   componentNames,
@@ -42,6 +51,12 @@ export default {
       }
 
       return summaryTextBuilder(s__('Reports|Test summary'), this.summary);
+    },
+    testTab() {
+      return `${this.pipelinePath}/test_report`;
+    },
+    showViewFullReport() {
+      return this.glFeatures.junitPipelineView;
     },
   },
   created() {
@@ -98,6 +113,19 @@ export default {
     :has-issues="reports.length > 0"
     class="mr-widget-section grouped-security-reports mr-report"
   >
+    <template v-if="showViewFullReport" #actionButtons>
+      <div>
+        <a
+          :href="testTab"
+          target="_blank"
+          class="btn btn-default btn-sm float-right append-right-default"
+        >
+          <span>{{ s__('ciReport|View full report') }}</span>
+          <icon :size="16" name="external-link" />
+        </a>
+      </div>
+    </template>
+
     <div slot="body" class="mr-widget-grouped-section report-block">
       <template v-for="(report, i) in reports">
         <summary-row
