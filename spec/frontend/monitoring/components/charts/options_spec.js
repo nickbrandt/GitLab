@@ -35,7 +35,7 @@ describe('options spec', () => {
       const options = getYAxisOptions();
 
       expect(options.axisLabel.formatter).toEqual(expect.any(Function));
-      expect(options.axisLabel.formatter('3,002.10')).toBe('3k');
+      expect(options.axisLabel.formatter(3002.1)).toBe('3k');
     });
 
     it('formatter options allows for precision to be set explicitly', () => {
