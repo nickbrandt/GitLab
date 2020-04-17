@@ -48,47 +48,24 @@ describe('GeoNodeHeader', () => {
       });
     });
 
-    describe('showNodeStatusIcon', () => {
-      it('returns `false` when Node details are still loading', done => {
-        vm.nodeDetailsLoading = true;
-        Vue.nextTick()
-          .then(() => {
-            expect(vm.showNodeStatusIcon).toBe(false);
-          })
-          .then(done)
-          .catch(done.fail);
+    describe.each`
+      nodeDetailsLoading | url                         | showWarning
+      ${false}           | ${'https://127.0.0.1:3001'} | ${false}
+      ${false}           | ${'http://127.0.0.1:3001'}  | ${true}
+      ${true}            | ${'https://127.0.0.1:3001'} | ${false}
+      ${true}            | ${'http://127.0.0.1:3001'}  | ${false}
+    `(`showNodeWarningIcon`, ({ nodeDetailsLoading, url, showWarning }) => {
+      beforeEach(() => {
+        vm.nodeDetailsLoading = nodeDetailsLoading;
+        vm.node.url = url;
       });
 
-      it('returns `true` when Node details failed to load', done => {
-        vm.nodeDetailsFailed = true;
-        Vue.nextTick()
-          .then(() => {
-            expect(vm.showNodeStatusIcon).toBe(true);
-          })
-          .then(done)
-          .catch(done.fail);
+      it(`should return ${showWarning}`, () => {
+        expect(vm.showNodeWarningIcon).toBe(showWarning);
       });
 
-      it('returns `true` when Node details loaded and Node URL is non-HTTPS', done => {
-        vm.nodeDetailsLoading = false;
-        vm.nodeDetailsFailed = false;
-        vm.node.url = mockNode.url;
-        Vue.nextTick()
-          .then(() => {
-            expect(vm.showNodeStatusIcon).toBe(true);
-          })
-          .then(done)
-          .catch(done.fail);
-      });
-
-      it('returns `false` when Node details loaded and Node URL is HTTPS', done => {
-        vm.node.url = 'https://127.0.0.1:3001/';
-        Vue.nextTick()
-          .then(() => {
-            expect(vm.showNodeStatusIcon).toBe(false);
-          })
-          .then(done)
-          .catch(done.fail);
+      it(`should ${showWarning ? 'render' : 'not render'} the status icon`, () => {
+        expect(Boolean(vm.$el.querySelector('.ic-warning'))).toBe(showWarning);
       });
     });
   });

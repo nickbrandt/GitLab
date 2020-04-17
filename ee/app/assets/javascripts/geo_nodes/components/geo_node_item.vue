@@ -1,6 +1,4 @@
 <script>
-import { GlLink } from '@gitlab/ui';
-
 import eventHub from '../event_hub';
 
 import GeoNodeHeader from './geo_node_header.vue';
@@ -8,7 +6,6 @@ import GeoNodeDetails from './geo_node_details.vue';
 
 export default {
   components: {
-    GlLink,
     GeoNodeHeader,
     GeoNodeDetails,
   },
@@ -41,19 +38,9 @@ export default {
   data() {
     return {
       isNodeDetailsLoading: true,
-      isNodeDetailsFailed: false,
       nodeHealthStatus: '',
-      errorMessage: '',
       nodeDetails: {},
     };
-  },
-  computed: {
-    showNodeDetails() {
-      if (!this.isNodeDetailsLoading) {
-        return !this.isNodeDetailsFailed;
-      }
-      return false;
-    },
   },
   created() {
     eventHub.$on('nodeDetailsLoaded', this.handleNodeDetails);
@@ -68,8 +55,6 @@ export default {
     handleNodeDetails(nodeDetails) {
       if (this.node.id === nodeDetails.id) {
         this.isNodeDetailsLoading = false;
-        this.isNodeDetailsFailed = false;
-        this.errorMessage = '';
         this.nodeDetails = nodeDetails;
         this.nodeHealthStatus = nodeDetails.health;
       }
@@ -83,14 +68,9 @@ export default {
 
 <template>
   <div :class="{ 'node-action-active': node.nodeActionActive }" class="card">
-    <geo-node-header
-      :node="node"
-      :node-details="nodeDetails"
-      :node-details-loading="isNodeDetailsLoading"
-      :node-details-failed="isNodeDetailsFailed"
-    />
+    <geo-node-header :node="node" :node-details-loading="isNodeDetailsLoading" />
     <geo-node-details
-      v-if="showNodeDetails"
+      v-if="!isNodeDetailsLoading"
       :node="node"
       :node-details="nodeDetails"
       :node-edit-allowed="nodeEditAllowed"
@@ -98,13 +78,5 @@ export default {
       :node-removal-allowed="nodeRemovalAllowed"
       :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
-    <div v-if="isNodeDetailsFailed">
-      <p class="p-3 mb-0 bg-danger-100 text-danger-500">
-        {{ errorMessage
-        }}<gl-link :href="geoTroubleshootingHelpPath">{{
-          s__('Geo|Please refer to Geo Troubleshooting.')
-        }}</gl-link>
-      </p>
-    </div>
   </div>
 </template>
