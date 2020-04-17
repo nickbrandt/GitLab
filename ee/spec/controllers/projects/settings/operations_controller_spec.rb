@@ -334,7 +334,8 @@ describe Projects::Settings::OperationsController do
             status_page_params: status_page_attributes.merge(aws_access_key: '',
                                                               aws_secret_key: '',
                                                               aws_s3_bucket_name: '',
-                                                              aws_region: '')
+                                                              aws_region: '',
+                                                              status_page_url: '')
           )
           expect(project.status_page_setting).to be_nil
         end

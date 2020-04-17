@@ -6003,7 +6003,9 @@ CREATE TABLE public.status_page_settings (
     aws_region character varying(255) NOT NULL,
     aws_access_key character varying(255) NOT NULL,
     encrypted_aws_secret_key character varying(255) NOT NULL,
-    encrypted_aws_secret_key_iv character varying(255) NOT NULL
+    encrypted_aws_secret_key_iv character varying(255) NOT NULL,
+    status_page_url text,
+    CONSTRAINT check_75a79cd992 CHECK ((char_length(status_page_url) <= 1024))
 );
 
 CREATE SEQUENCE public.status_page_settings_project_id_seq
@@ -13199,6 +13201,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408154604
 20200408154624
 20200408175424
+20200408212219
 20200409085956
 20200409211607
 20200410232012

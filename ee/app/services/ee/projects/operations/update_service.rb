@@ -36,7 +36,8 @@ module EE
           destroy = attrs[:aws_s3_bucket_name].blank? &&
                     attrs[:aws_region].blank? &&
                     attrs[:aws_access_key].blank? &&
-                    attrs[:aws_secret_key].blank?
+                    attrs[:aws_secret_key].blank? &&
+                    attrs[:status_page_url].blank?
 
           { status_page_setting_attributes: attrs.merge(_destroy: destroy) }
         end

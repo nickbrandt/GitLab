@@ -54,7 +54,7 @@ module EE
         end
 
         def status_page_setting_params
-          { status_page_setting_attributes: [:aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
+          { status_page_setting_attributes: [:status_page_url, :aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
         end
 
         override :track_events
