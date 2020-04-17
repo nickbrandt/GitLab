@@ -352,10 +352,11 @@ For example, this assumes a local Docker registry repository of `localhost:5000/
 
 ```yaml
 include:
-    - template: License-Scanning.gitlab-ci.yml
+  - template: License-Scanning.gitlab-ci.yml
 
-    license_scanning:
-    image: localhost:5000/analyzers/license-management:latest
+license_scanning:
+  image:
+    name: localhost:5000/analyzers/license-management:latest
 ```
 
 The License Compliance job should now use local copies of the License Compliance analyzers to scan
