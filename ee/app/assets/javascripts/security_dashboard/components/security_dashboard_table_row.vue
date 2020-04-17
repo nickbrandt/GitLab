@@ -30,11 +30,6 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      shouldShowActionButtons: false,
-    };
-  },
   computed: {
     ...mapState(['dashboardType']),
     ...mapState('vulnerabilities', ['selectedVulnerabilities']),
@@ -76,12 +71,6 @@ export default {
       }
       return this.selectVulnerability(this.vulnerability);
     },
-    showActionButtons() {
-      this.shouldShowActionButtons = true;
-    },
-    hideActionButtons() {
-      this.shouldShowActionButtons = false;
-    },
   },
 };
 </script>
@@ -90,10 +79,6 @@ export default {
   <div
     class="gl-responsive-table-row vulnerabilities-row p-2"
     :class="{ dismissed: isDismissed, 'gl-bg-blue-50': isSelected }"
-    @focusin="showActionButtons"
-    @focusout="hideActionButtons"
-    @mouseenter="showActionButtons"
-    @mouseleave="hideActionButtons"
   >
     <div class="table-section">
       <gl-form-checkbox
@@ -106,7 +91,7 @@ export default {
 
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-mobile-content" :style="[isDismissed && { opacity: 0.5 }]">
+      <div class="table-mobile-content">
         <severity-badge :severity="severity" />
       </div>
     </div>
@@ -115,7 +100,6 @@ export default {
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div
         class="table-mobile-content gl-white-space-normal"
-        :style="[isDismissed && { opacity: 0.5 }]"
         data-qa-selector="vulnerability_info_content"
       >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
@@ -153,10 +137,7 @@ export default {
 
     <div class="table-section section-20">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
-      <div
-        class="table-mobile-content action-buttons d-flex justify-content-end"
-        :style="[shouldShowActionButtons ? { opacity: 1 } : { opacity: 0 }]"
-      >
+      <div class="table-mobile-content action-buttons d-flex justify-content-end">
         <vulnerability-action-buttons
           v-if="!isLoading"
           :vulnerability="vulnerability"
@@ -168,15 +149,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-@media (min-width: 768px) {
-  .vulnerabilities-row:hover,
-  .vulnerabilities-row:focus {
-    background: #f6fafd;
-    border-bottom: 1px solid #c1daf4;
-    border-top: 1px solid #c1daf4;
-    margin-top: -1px;
-  }
-}
-</style>
