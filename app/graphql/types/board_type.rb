@@ -11,6 +11,8 @@ module Types
           description: 'ID (global ID) of the board'
     field :name, type: GraphQL::STRING_TYPE, null: true,
           description: 'Name of the board'
+    field :lists, type: [ListType], null: true,
+          description: 'Lists within the board'
   end
 end
 
