@@ -83,6 +83,14 @@ FactoryBot.define do
         end
       end
 
+      trait :with_terraform_reports do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :terraform_reports, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
       trait :with_exposed_artifacts do
         status { :success }
 
