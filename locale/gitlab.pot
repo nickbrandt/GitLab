@@ -13096,6 +13096,9 @@ msgstr ""
 msgid "Microsoft Azure"
 msgstr ""
 
+msgid "Middleman project with Static Site Editor support"
+msgstr ""
+
 msgid "Migrated %{success_count}/%{total_count} files."
 msgstr ""
 
@@ -16142,6 +16145,9 @@ msgid "ProjectTemplates|Serverless Framework/JS"
 msgstr ""
 
 msgid "ProjectTemplates|Spring"
+msgstr ""
+
+msgid "ProjectTemplates|Static Site Editor/Middleman"
 msgstr ""
 
 msgid "ProjectTemplates|iOS (Swift)"
