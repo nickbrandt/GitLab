@@ -23,21 +23,31 @@ RSpec.shared_examples 'update with repository actions' do
   context 'when the repository does not exist' do
     let(:snippet) { snippet_without_repo }
 
-    it 'creates the repository' do
-      update_snippet(snippet_id: snippet.id, params: { title: 'foo' })
+    context 'when update attributes does not include file_name or content' do
+      it 'does not create the repository' do
+        update_snippet(snippet_id: snippet.id, params: { title: 'foo' })
 
-      expect(snippet.repository).to exist
+        expect(snippet.repository).not_to exist
+      end
     end
 
-    it 'commits the file to the repository' do
-      content = 'New Content'
-      file_name = 'file_name.rb'
+    context 'when update attributes include file_name or content' do
+      it 'creates the repository' do
+        update_snippet(snippet_id: snippet.id, params: { title: 'foo', file_name: 'foo' })
 
-      update_snippet(snippet_id: snippet.id, params: { content: content, file_name: file_name })
+        expect(snippet.repository).to exist
+      end
 
-      blob = snippet.repository.blob_at('master', file_name)
-      expect(blob).not_to be_nil
-      expect(blob.data).to eq content
+      it 'commits the file to the repository' do
+        content = 'New Content'
+        file_name = 'file_name.rb'
+
+        update_snippet(snippet_id: snippet.id, params: { content: content, file_name: file_name })
+
+        blob = snippet.repository.blob_at('master', file_name)
+        expect(blob).not_to be_nil
+        expect(blob.data).to eq content
+      end
     end
   end
 end
