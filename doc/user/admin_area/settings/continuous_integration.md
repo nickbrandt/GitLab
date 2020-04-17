@@ -125,8 +125,12 @@ a group in the **Usage Quotas** page available to the group page settings list.
 
 ### Shared Runners minutes accumulation
 
-- Build minutes of [Public](../../../public_access/public_access.md#public-projects) projects are not counted towards the quota.
-- Builds minutes of [Internal](../../../public_access/public_access.md#internal-projects) and [Private](../../../public_access/public_access.md#private-projects) projects are tracked.
+Shared runner usage in [Public](../../../public_access/public_access.md#public-projects)
+projects does *not* count towards the quota.
+
+Shared runner usage in [Internal](../../../public_access/public_access.md#internal-projects)
+or [Private](../../../public_access/public_access.md#private-projects) projects
+*does* count towards the quota.
 
 ## Archive jobs **(CORE ONLY)**
 
