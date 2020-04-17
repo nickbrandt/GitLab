@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon, GlTooltip, GlSprintf, GlBadge } from '@gitlab/ui';
-import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
+import AlertWidget from '~/monitoring/components/alert_widget.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 
@@ -11,7 +11,7 @@ const mockDeleteAlert = jest.fn();
 
 jest.mock('~/flash');
 jest.mock(
-  'ee/monitoring/services/alerts_service',
+  '~/monitoring/services/alerts_service',
   () =>
     function AlertsServiceMock() {
       return {

@@ -6,13 +6,13 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import statusCodes from '~/lib/utils/http_status';
 import { metricStates } from '~/monitoring/constants';
-import Dashboard from '~/monitoring/components/dashboard.vue';
+import Dashboard from '~/monitoring/components/dashboard_with_alerts.vue';
 
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
 import GroupEmptyState from '~/monitoring/components/group_empty_state.vue';
-import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+import PanelType from '~/monitoring/components/panel_type_with_alerts.vue';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import { setupStoreWithDashboard, setMetricResult, setupStoreWithData } from '../store_utils';

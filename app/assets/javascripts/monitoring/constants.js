@@ -143,3 +143,9 @@ export const annotationsSymbolIcon = 'path://m5 229 5 8h-10z';
  * https://gitlab.com/gitlab-org/gitlab/-/issues/214671
  */
 export const DEFAULT_DASHBOARD_PATH = 'config/prometheus/common_metrics.yml';
+
+export const OPERATORS = {
+  greaterThan: '>',
+  equalTo: '==',
+  lessThan: '<',
+};

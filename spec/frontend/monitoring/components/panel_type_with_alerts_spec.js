@@ -2,8 +2,8 @@ import Vuex from 'vuex';
 import { shallowMount } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
 import { monitoringDashboard } from '~/monitoring/stores';
-import PanelType from 'ee/monitoring/components/panel_type.vue';
-import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
+import PanelType from '~/monitoring/components/panel_type_with_alerts.vue';
+import AlertWidget from '~/monitoring/components/alert_widget.vue';
 import { graphData } from 'jest/monitoring/fixture_data';
 
 global.URL.createObjectURL = jest.fn();

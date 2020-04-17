@@ -1,4 +1,4 @@
-import { alertsValidator, queriesValidator } from 'ee/monitoring/validators';
+import { alertsValidator, queriesValidator } from '~/monitoring/validators';
 
 describe('alertsValidator', () => {
   const validAlert = {
