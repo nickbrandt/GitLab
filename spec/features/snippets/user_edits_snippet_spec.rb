@@ -92,6 +92,7 @@ describe 'User edits snippet', :js do
       end
 
       fill_in 'personal_snippet_title', with: 'New Snippet Title'
+      fill_in 'personal_snippet_file_name', with: 'new_file_name'
 
       click_button('Save changes')
     end
