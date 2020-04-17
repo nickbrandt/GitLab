@@ -20382,7 +20382,7 @@
             },
             {
               "name": "tagList",
-              "description": "List of project tags",
+              "description": "List of project topics (not Git tags)",
               "args": [
 
               ],

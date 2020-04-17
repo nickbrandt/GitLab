@@ -995,7 +995,7 @@ Information about pagination in a connection.
 | `starCount` | Int! | Number of times the project has been starred |
 | `statistics` | ProjectStatistics | Statistics of the project |
 | `suggestionCommitMessage` | String | The commit message used to apply merge request suggestions |
-| `tagList` | String | List of project tags |
+| `tagList` | String | List of project topics (not Git tags) |
 | `userPermissions` | ProjectPermissions! | Permissions for the current user on the resource |
 | `visibility` | String | Visibility of the project |
 | `vulnerabilitySeveritiesCount` | VulnerabilitySeveritiesCount | Counts for each severity of vulnerability of the project. Available only when feature flag `first_class_vulnerabilities` is enabled |

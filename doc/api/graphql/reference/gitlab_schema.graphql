@@ -6842,7 +6842,7 @@ type Project {
   suggestionCommitMessage: String
 
   """
-  List of project tags
+  List of project topics (not Git tags)
   """
   tagList: String
 
