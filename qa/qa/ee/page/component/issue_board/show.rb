@@ -53,7 +53,7 @@ module QA
               element :boards_config_button
             end
 
-            view 'ee/app/assets/javascripts/boards/toggle_focus.js' do
+            view 'app/assets/javascripts/boards/toggle_focus.js' do
               element :focus_mode_button
             end
 
