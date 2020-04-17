@@ -1,11 +1,7 @@
-import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { shallowMount } from '@vue/test-utils';
 import JobGroupDropdown from '~/pipelines/components/graph/job_group_dropdown.vue';
 
 describe('job group dropdown component', () => {
-  const Component = Vue.extend(JobGroupDropdown);
-  let vm;
-
   const group = {
     jobs: [
       {
@@ -66,20 +62,23 @@ describe('job group dropdown component', () => {
     },
   };
 
+  let wrapper;
+  const findButton = () => wrapper.find('button');
+
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   beforeEach(() => {
-    vm = mountComponent(Component, { group });
+    wrapper = shallowMount(JobGroupDropdown, { propsData: { group } });
   });
 
   it('renders button with group name and size', () => {
-    expect(vm.$el.querySelector('button').textContent).toContain(group.name);
-    expect(vm.$el.querySelector('button').textContent).toContain(group.size);
+    expect(findButton().text()).toContain(group.name);
+    expect(findButton().text()).toContain(group.size);
   });
 
   it('renders dropdown with jobs', () => {
-    expect(vm.$el.querySelectorAll('.scrollable-menu>ul>li').length).toEqual(group.jobs.length);
+    expect(wrapper.findAll('.scrollable-menu>ul>li').length).toBe(group.jobs.length);
   });
 });
