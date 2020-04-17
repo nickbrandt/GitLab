@@ -86,8 +86,8 @@ The following table depicts the various user permission levels in a project.
 | View Error Tracking list                          |         | ✓          | ✓           | ✓        | ✓      |
 | Create new merge request                          |         | ✓          | ✓           | ✓        | ✓      |
 | View requirements **(ULTIMATE)**                  |         | ✓          | ✓           | ✓        | ✓      |
-| Pull from [Conan repository](packages/conan_repository/index.md), [Maven repository](packages/maven_repository/index.md), or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         | ✓          | ✓           | ✓        | ✓      |
-| Publish to [Conan repository](packages/conan_repository/index.md), [Maven repository](packages/maven_repository/index.md), or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         |            | ✓           | ✓        | ✓      |
+| Pull [packages](packages/index.md)                |         | ✓          | ✓           | ✓        | ✓      |
+| Publish [packages](packages/index.md)             |         |            | ✓           | ✓        | ✓      |
 | Upload [Design Management](project/issues/design_management.md) files |  |  | ✓        | ✓        | ✓      |
 | Create/edit/delete [Releases](project/releases/index.md)|   |            | ✓           | ✓        | ✓      |
 | Create new branches                               |         |            | ✓           | ✓        | ✓      |
