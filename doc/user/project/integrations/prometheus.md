@@ -630,6 +630,20 @@ The options are:
 - [Copy link to chart](#embedding-gitlab-managed-kubernetes-metrics)
 - [Alerts](#setting-up-alerts-for-prometheus-metrics)
 
+### Dashboard Annotations
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/211330) in GitLab 12.10 (enabled by feature flag `metrics_dashboard_annotations`).
+
+You can use **Metrics Dashboard Annotations** to mark any important events on
+every metrics dashboard by adding annotations to it. While viewing a dashboard,
+annotation entries assigned to the selected time range will be automatically
+fetched and displayed on every chart within that dashboard. On mouse hover, each
+annotation presents additional details, including the exact time of an event and
+its description.
+
+You can create annotations by making requests to the
+[Metrics dashboard annotations API](../../../api/metrics_dashboard_annotations.md)
+
 ### View Logs **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/122013) in GitLab 12.8.
