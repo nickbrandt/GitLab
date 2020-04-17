@@ -1,5 +1,10 @@
 import { difference, intersection } from 'lodash';
-import { STATUS_FAILED, STATUS_SUCCESS } from '../../constants';
+import {
+  STATUS_FAILED,
+  STATUS_SUCCESS,
+  ACCESSIBILITY_ISSUE_ERROR,
+  ACCESSIBILITY_ISSUE_WARNING,
+} from '../../constants';
 
 export const parseAccessibilityReport = data => {
   // Combine all issues into one array
@@ -39,56 +44,33 @@ export const compareAccessibilityReports = reports => {
   // resolved issues are those that exist in only the base report
   const resolvedIssues = difference(baseReport.issues, headReport.issues);
 
-  existingIssues.forEach(issue => {
+  const parseIssues = (issue, issueType, shouldCount) => {
     const parsedIssue = JSON.parse(issue);
     switch (parsedIssue.type) {
-      case 'error':
-        result.existing_errors.push(parsedIssue);
-        result.summary.errors += 1;
+      case ACCESSIBILITY_ISSUE_ERROR:
+        result[`${issueType}_errors`].push(parsedIssue);
+        if (shouldCount) {
+          result.summary.errors += 1;
+        }
         break;
-      case 'warning':
-        result.existing_warnings.push(parsedIssue);
-        result.summary.warnings += 1;
+      case ACCESSIBILITY_ISSUE_WARNING:
+        result[`${issueType}_warnings`].push(parsedIssue);
+        if (shouldCount) {
+          result.summary.warnings += 1;
+        }
         break;
       default:
-        result.existing_notes.push(parsedIssue);
-        result.summary.notes += 1;
+        result[`${issueType}_notes`].push(parsedIssue);
+        if (shouldCount) {
+          result.summary.notes += 1;
+        }
         break;
     }
-  });
+  };
 
-  newIssues.forEach(issue => {
-    const parsedIssue = JSON.parse(issue);
-    switch (parsedIssue.type) {
-      case 'error':
-        result.new_errors.push(parsedIssue);
-        result.summary.errors += 1;
-        break;
-      case 'warning':
-        result.new_warnings.push(parsedIssue);
-        result.summary.warnings += 1;
-        break;
-      default:
-        result.new_notes.push(parsedIssue);
-        result.summary.notes += 1;
-        break;
-    }
-  });
-
-  resolvedIssues.forEach(issue => {
-    const parsedIssue = JSON.parse(issue);
-    switch (parsedIssue.type) {
-      case 'error':
-        result.resolved_errors.push(parsedIssue);
-        break;
-      case 'warning':
-        result.resolved_warnings.push(parsedIssue);
-        break;
-      default:
-        result.resolved_notes.push(parsedIssue);
-        break;
-    }
-  });
+  existingIssues.forEach(issue => parseIssues(issue, 'existing', true));
+  newIssues.forEach(issue => parseIssues(issue, 'new', true));
+  resolvedIssues.forEach(issue => parseIssues(issue, 'resolved', false));
 
   result.summary.total = result.summary.errors + result.summary.warnings + result.summary.notes;
   const hasErrorsOrWarnings = result.summary.errors > 0 || result.summary.warnings > 0;
