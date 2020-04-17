@@ -177,7 +177,7 @@ describe EE::UserCalloutsHelper do
     let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
 
-    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
+    where(:any_namespace_without_trial?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
       true  | true  | true  | true  | true
       true  | true  | true  | false | false
       true  | true  | false | true  | false
@@ -200,7 +200,7 @@ describe EE::UserCalloutsHelper do
       before do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
-        allow(helper).to receive(:has_some_namespaces_with_no_trials?) { has_some_namespaces_with_no_trials? }
+        allow(user).to receive(:any_namespace_without_trial?) { any_namespace_without_trial? }
 
         unless has_no_trial_or_paid_plan?
           create(:gitlab_subscription, hosted_plan: gold_plan, namespace: namespace)

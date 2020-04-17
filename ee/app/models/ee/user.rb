@@ -227,20 +227,18 @@ module EE
       super || DEFAULT_GROUP_VIEW
     end
 
-    def any_namespace_with_trial?
-      ::Namespace
-        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
-        .where('trial_ends_on > ?', Time.now.utc)
-        .any?
-    end
-
+    # Returns true if the user is a Reporter or higher on any namespace
+    # that has never had a trial (now or in the past)
     def any_namespace_without_trial?
       ::Namespace
-        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
-        .where(trial_ends_on: nil)
+        .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { trial_ends_on: nil })
         .any?
     end
 
+    # Returns true if the user is a Reporter or higher on any namespace
+    # currently on a paid plan
     def has_paid_namespace?
       ::Namespace
         .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
@@ -249,6 +247,8 @@ module EE
         .any?
     end
 
+    # Returns true if the user is an Owner on any namespace currently on
+    # a paid plan
     def owns_paid_namespace?
       ::Namespace
         .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
