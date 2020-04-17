@@ -286,7 +286,7 @@ describe ApplicationSetting do
 
           expect(setting.elasticsearch_limited_namespaces).to match_array(
             [namespaces.last, child_namespace, child_namespace_indexed_through_parent])
-          expect(setting.elasticsearch_limited_namespaces(ignore_descendants: true)).to match_array(
+          expect(setting.elasticsearch_limited_namespaces(true)).to match_array(
             [namespaces.last, child_namespace])
         end
       end

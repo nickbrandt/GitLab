@@ -18,19 +18,6 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
     :namespace_id
   end
 
-  def self.limited(ignore_descendants: false)
-    namespaces = Namespace.with_route.where(id: target_ids)
-
-    return namespaces if ignore_descendants
-
-    Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
-  end
-
-  def self.drop_limited_ids_cache!
-    ElasticsearchIndexedProject.drop_limited_ids_cache!
-    super
-  end
-
   def self.index_first_n_namespaces_of_plan(plan, number_of_namespaces)
     indexed_namespaces = self.select(:namespace_id)
     now = Time.now
