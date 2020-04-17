@@ -8,6 +8,7 @@ module API
     before { authenticate! }
 
     resource :snippets do
+      helpers Helpers::SnippetsHelpers
       helpers do
         def snippets_for_current_user
           SnippetsFinder.new(current_user, author: current_user).execute
@@ -159,7 +160,7 @@ module API
         env['api.format'] = :txt
         content_type 'text/plain'
         header['Content-Disposition'] = 'attachment'
-        present snippet.content
+        present content_for(snippet)
       end
 
       desc 'Get the user agent details for a snippet' do

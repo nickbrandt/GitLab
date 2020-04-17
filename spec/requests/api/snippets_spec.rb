@@ -90,7 +90,7 @@ describe API::Snippets do
 
   describe 'GET /snippets/:id/raw' do
     let_it_be(:author) { create(:user) }
-    let_it_be(:snippet) { create(:personal_snippet, :private, author: author) }
+    let_it_be(:snippet) { create(:personal_snippet, :repository, :private, author: author) }
 
     it 'requires authentication' do
       get api("/snippets/#{snippet.id}", nil)
@@ -103,7 +103,6 @@ describe API::Snippets do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(response.content_type).to eq 'text/plain'
-      expect(response.body).to eq(snippet.content)
     end
 
     it 'forces attachment content disposition' do
@@ -133,6 +132,12 @@ describe API::Snippets do
       get api("/snippets/#{internal_snippet.id}/raw", user)
 
       expect(response).to have_gitlab_http_status(:ok)
+    end
+
+    it_behaves_like 'snippet blob content' do
+      let_it_be(:snippet_with_empty_repo) { create(:personal_snippet, :empty_repo, :private, author: author) }
+
+      subject { get api("/snippets/#{snippet.id}/raw", snippet.author) }
     end
   end
 
