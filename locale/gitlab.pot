@@ -14731,9 +14731,6 @@ msgstr ""
 msgid "Pipeline minutes quota"
 msgstr ""
 
-msgid "Pipeline quota"
-msgstr ""
-
 msgid "Pipeline subscriptions"
 msgstr ""
 
