@@ -4600,6 +4600,28 @@ CREATE SEQUENCE public.pages_domains_id_seq
 
 ALTER SEQUENCE public.pages_domains_id_seq OWNED BY public.pages_domains.id;
 
+CREATE TABLE public.partitioned_foreign_keys (
+    id bigint NOT NULL,
+    cascade_delete boolean DEFAULT true NOT NULL,
+    from_table text NOT NULL,
+    from_column text NOT NULL,
+    to_table text NOT NULL,
+    to_column text NOT NULL,
+    CONSTRAINT check_2c2e02a62b CHECK ((char_length(from_column) <= 63)),
+    CONSTRAINT check_40738efb57 CHECK ((char_length(to_table) <= 63)),
+    CONSTRAINT check_741676d405 CHECK ((char_length(from_table) <= 63)),
+    CONSTRAINT check_7e98be694f CHECK ((char_length(to_column) <= 63))
+);
+
+CREATE SEQUENCE public.partitioned_foreign_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.partitioned_foreign_keys_id_seq OWNED BY public.partitioned_foreign_keys.id;
+
 CREATE TABLE public.path_locks (
     id integer NOT NULL,
     path character varying NOT NULL,
@@ -7379,6 +7401,8 @@ ALTER TABLE ONLY public.pages_domain_acme_orders ALTER COLUMN id SET DEFAULT nex
 
 ALTER TABLE ONLY public.pages_domains ALTER COLUMN id SET DEFAULT nextval('public.pages_domains_id_seq'::regclass);
 
+ALTER TABLE ONLY public.partitioned_foreign_keys ALTER COLUMN id SET DEFAULT nextval('public.partitioned_foreign_keys_id_seq'::regclass);
+
 ALTER TABLE ONLY public.path_locks ALTER COLUMN id SET DEFAULT nextval('public.path_locks_id_seq'::regclass);
 
 ALTER TABLE ONLY public.personal_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.personal_access_tokens_id_seq'::regclass);
@@ -8206,6 +8230,9 @@ ALTER TABLE ONLY public.pages_domain_acme_orders
 
 ALTER TABLE ONLY public.pages_domains
     ADD CONSTRAINT pages_domains_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.partitioned_foreign_keys
+    ADD CONSTRAINT partitioned_foreign_keys_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.path_locks
     ADD CONSTRAINT path_locks_pkey PRIMARY KEY (id);
@@ -9813,6 +9840,8 @@ CREATE INDEX index_pages_domains_on_verified_at ON public.pages_domains USING bt
 CREATE INDEX index_pages_domains_on_verified_at_and_enabled_until ON public.pages_domains USING btree (verified_at, enabled_until);
 
 CREATE INDEX index_pages_domains_on_wildcard ON public.pages_domains USING btree (wildcard);
+
+CREATE UNIQUE INDEX index_partitioned_foreign_keys_unique_index ON public.partitioned_foreign_keys USING btree (to_table, from_table, from_column);
 
 CREATE INDEX index_pat_on_user_id_and_expires_at ON public.personal_access_tokens USING btree (user_id, expires_at);
 
@@ -13187,6 +13216,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200407121321
 20200407171133
 20200407171417
+20200407182205
 20200408110856
 20200408133211
 20200408153842
