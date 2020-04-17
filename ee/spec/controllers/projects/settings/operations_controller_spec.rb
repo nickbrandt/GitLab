@@ -295,7 +295,7 @@ describe Projects::Settings::OperationsController do
           project.status_page_setting
         end
 
-        it { is_expected.to be_a(StatusPageSetting) }
+        it { is_expected.to be_a(StatusPage::ProjectSetting) }
 
         context 'when feature flag is disabled' do
           before do

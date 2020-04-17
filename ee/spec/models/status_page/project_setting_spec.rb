@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPageSetting do
+describe StatusPage::ProjectSetting do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
   end
@@ -63,7 +63,7 @@ describe StatusPageSetting do
   end
 
   describe 'attribute encryption' do
-    let(:new_secret) { FFaker::String.from_regexp(StatusPageSetting::AWS_SECRET_KEY_REGEXP) }
+    let(:new_secret) { FFaker::String.from_regexp(StatusPage::ProjectSetting::AWS_SECRET_KEY_REGEXP) }
 
     subject(:status_page_setting) { create(:status_page_setting, aws_secret_key: new_secret) }
 

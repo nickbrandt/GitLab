@@ -9,6 +9,7 @@ RSpec.shared_context 'status page enabled' do
 
     unless project.status_page_setting
       create(:status_page_setting, :enabled, project: project)
+      project.reload
     end
   end
 end
