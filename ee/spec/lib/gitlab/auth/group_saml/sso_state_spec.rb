@@ -27,4 +27,34 @@ describe Gitlab::Auth::GroupSaml::SsoState do
       end
     end
   end
+
+  describe '#active_since?' do
+    let(:cutoff) { 1.week.ago }
+
+    it 'is always active in a sessionless request' do
+      is_expected.to be_active_since(cutoff)
+    end
+
+    it 'is inactive if never signed in' do
+      Gitlab::Session.with_session({}) do
+        is_expected.not_to be_active_since(cutoff)
+      end
+    end
+
+    it 'is active if signed in since the cut off' do
+      time_after_cut_off = cutoff + 2.days
+
+      Gitlab::Session.with_session(active_group_sso_sign_ins: { saml_provider_id => time_after_cut_off }) do
+        is_expected.to be_active_since(cutoff)
+      end
+    end
+
+    it 'is inactive if signed in before the cut off' do
+      time_before_cut_off = cutoff - 2.days
+
+      Gitlab::Session.with_session(active_group_sso_sign_ins: { saml_provider_id => time_before_cut_off }) do
+        is_expected.not_to be_active_since(cutoff)
+      end
+    end
+  end
 end
