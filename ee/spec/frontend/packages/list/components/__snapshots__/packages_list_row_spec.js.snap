@@ -13,6 +13,7 @@ exports[`packages_list_row renders 1`] = `
     >
       <gl-link-stub
         class="text-dark font-weight-bold mb-md-1"
+        data-qa-selector="package_link"
         href="foo"
       >
         
