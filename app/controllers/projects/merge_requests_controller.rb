@@ -340,11 +340,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def serialize_widget(merge_request)
-    serializer.represent(merge_request, serializer: 'widget')
+    cached_data = serializer.represent(merge_request, serializer: 'poll_cached_widget')
+    widget_data = serializer.represent(merge_request, serializer: 'poll_widget')
+    cached_data.merge!(widget_data)
   end
 
   def serializer
-    MergeRequestSerializer.new(current_user: current_user, project: merge_request.project)
+    @serializer ||= MergeRequestSerializer.new(current_user: current_user, project: merge_request.project)
   end
 
   def define_edit_vars
