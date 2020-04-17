@@ -38,6 +38,7 @@ module MergeRequests
       authorization_check!
       error_check!
       updated_check!
+      squash_consistency_check!
     end
 
     def authorization_check!
@@ -64,7 +65,17 @@ module MergeRequests
     def updated_check!
       unless source_matches?
         raise_error('Branch has been updated since the merge was requested. '\
-                    'Please review the changes.')
+          'Please review the changes.')
+      end
+    end
+
+    def squash_consistency_check
+      if @merge_request.squash_option == :always
+        raise_error('This repository now requires squashing for merge requests. '\
+          'Please review the changes.')
+      elsif @merge_request.squash_option == :never
+        raise_error('This repository now prohibits squashing for merge requests. '\
+          'Please review the changes.')
       end
     end
 
