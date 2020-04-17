@@ -3408,6 +3408,9 @@ msgstr ""
 msgid "Can't scan the code?"
 msgstr ""
 
+msgid "Can't update snippet: %{err}"
+msgstr ""
+
 msgid "Canary"
 msgstr ""
 
@@ -6068,6 +6071,9 @@ msgid "Create project label"
 msgstr ""
 
 msgid "Create requirement"
+msgstr ""
+
+msgid "Create snippet"
 msgstr ""
 
 msgid "Create wildcard: %{searchTerm}"
