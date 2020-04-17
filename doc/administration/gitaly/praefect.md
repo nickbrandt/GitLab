@@ -300,6 +300,60 @@ application server, or a Gitaly node.
    edit `/etc/gitlab/gitlab.rb`, remember to run `sudo gitlab-ctl reconfigure`
    again before trying the `sql-ping` command.
 
+#### Automatic failover
+
+When automatic failover is enabled, Praefect will do automatic detection of the health of internal Gitaly nodes. If the
+primary has a certain amount of health checks fail, it will decide to promote one of the secondaries to be primary, and
+demote the primary to be a secondary.
+
+1. To enable automatic failover, edit `/etc/gitlab/gitlab.rb`:
+
+   ```ruby
+   # failover_enabled turns on automatic failover
+   praefect['failover_enabled'] = true
+   praefect['virtual_storages'] = {
+     'praefect' => {
+       'gitaly-1' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN',
+         'primary' => true
+       },
+       'gitaly-2' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN'
+       },
+       'gitaly-3' => {
+         'address' => 'tcp://GITALY_HOST:8075',
+         'token'   => 'PRAEFECT_INTERNAL_TOKEN'
+       }
+     }
+   }
+   ```
+
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
+Below is the picture when Praefect starts up with the config.toml above:
+
+```mermaid
+graph TD
+  A[Praefect] -->|Mutator RPC| B(internal_storage_0)
+  B --> |Replication|C[internal_storage_1]
+```
+
+Let's say suddenly `internal_storage_0` goes down. Praefect will detect this and
+automatically switch over to `internal_storage_1`, and `internal_storage_0` will serve as a secondary:
+
+```mermaid
+graph TD
+  A[Praefect] -->|Mutator RPC| B(internal_storage_1)
+  B --> |Replication|C[internal_storage_0]
+```
+
+NOTE: **Note:**: Currently this feature is supported for setups that only have 1 Praefect instance. Praefect instances running,
+for example behind a load balancer, `failover_enabled` should be disabled. The reason is The reason is because there
+is no coordination that currently happens across different Praefect instances, so there could be a situation where
+two Praefect instances think two different Gitaly nodes are the primary.
+
 ### Gitaly
 
 NOTE: **Note:** Complete these steps for **each** Gitaly node.
