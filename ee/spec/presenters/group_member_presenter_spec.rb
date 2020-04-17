@@ -20,13 +20,24 @@ describe GroupMemberPresenter do
   end
 
   describe '#group_managed_account?' do
-    let(:saml_provider) { double(:saml_provider) }
-    let(:group) { double(:group) }
+    context 'when user is part of the group managed account' do
+      before do
+        expect(user).to receive(:group_managed_account?).and_return(true)
+      end
 
-    it 'calls through to User#group_managed_account?' do
-      expect(user).to receive(:group_managed_account?).and_return(true)
+      it 'returns `true`' do
+        expect(presenter.group_managed_account?).to eq true
+      end
+    end
 
-      expect(presenter.group_managed_account?).to eq true
+    context 'when user is not part of the group managed account' do
+      before do
+        expect(user).to receive(:group_managed_account?).and_return(false)
+      end
+
+      it 'returns `false`' do
+        expect(presenter.group_managed_account?).to eq false
+      end
     end
   end
 
