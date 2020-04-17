@@ -1,37 +1,36 @@
 <script>
-import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
+import { GlLoadingIcon } from '@gitlab/ui';
+import TasksByTypeChart from './tasks_by_type/tasks_by_type_chart.vue';
+import TasksByTypeFilters from './tasks_by_type/tasks_by_type_filters.vue';
 import { s__, sprintf } from '~/locale';
 import { formattedDate } from '../../shared/utils';
 import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
-import TasksByTypeFilters from './tasks_by_type_filters.vue';
 
 export default {
-  name: 'TasksByTypeChart',
-  components: {
-    GlStackedColumnChart,
-    TasksByTypeFilters,
-  },
+  name: 'TypeOfWorkCharts',
+  components: { GlLoadingIcon, TasksByTypeChart, TasksByTypeFilters },
   props: {
-    filters: {
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
+    tasksByTypeChartData: {
       type: Object,
       required: true,
     },
-    chartData: {
+    selectedTasksByTypeFilters: {
       type: Object,
       required: true,
     },
   },
   computed: {
-    hasData() {
-      return Boolean(this.chartData?.data?.length);
-    },
     summaryDescription() {
       const {
         startDate,
         endDate,
         selectedProjectIds,
         selectedGroup: { name: groupName },
-      } = this.filters;
+      } = this.selectedTasksByTypeFilters;
 
       const selectedProjectCount = selectedProjectIds.length;
       const str =
@@ -51,7 +50,7 @@ export default {
     },
     selectedSubjectFilter() {
       const {
-        filters: { subject },
+        selectedTasksByTypeFilters: { subject },
       } = this;
       return subject || TASKS_BY_TYPE_SUBJECT_ISSUE;
     },
@@ -59,29 +58,21 @@ export default {
 };
 </script>
 <template>
-  <div class="row">
-    <div class="col-12">
+  <div class="js-tasks-by-type-chart row">
+    <gl-loading-icon v-if="isLoading" size="md" class="col-12 my-4 py-4" />
+    <div v-else class="col-12">
       <h3>{{ s__('CycleAnalytics|Type of work') }}</h3>
-      <div v-if="hasData">
-        <p>{{ summaryDescription }}</p>
-        <tasks-by-type-filters
-          :selected-label-ids="filters.selectedLabelIds"
-          :subject-filter="selectedSubjectFilter"
-          @updateFilter="$emit('updateFilter', $event)"
-        />
-        <gl-stacked-column-chart
-          :data="chartData.data"
-          :group-by="chartData.groupBy"
-          x-axis-type="category"
-          y-axis-type="value"
-          :x-axis-title="__('Date')"
-          :y-axis-title="s__('CycleAnalytics|Number of tasks')"
-          :series-names="chartData.seriesNames"
-        />
-      </div>
-      <div v-else class="bs-callout bs-callout-info">
-        <p>{{ __('There is no data available. Please change your selection.') }}</p>
-      </div>
+      <p>{{ summaryDescription }}</p>
+      <tasks-by-type-filters
+        :selected-label-ids="selectedTasksByTypeFilters.selectedLabelIds"
+        :subject-filter="selectedSubjectFilter"
+        @updateFilter="$emit('updateFilter', $event)"
+      />
+      <tasks-by-type-chart
+        :data="tasksByTypeChartData.data"
+        :group-by="tasksByTypeChartData.groupBy"
+        :series-names="tasksByTypeChartData.seriesNames"
+      />
     </div>
   </div>
 </template>

@@ -3,7 +3,10 @@ import { TEST_HOST } from 'helpers/test_constants';
 import { getJSONFixture } from 'helpers/fixtures';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
+import {
+  DEFAULT_DAYS_IN_PAST,
+  TASKS_BY_TYPE_SUBJECT_ISSUE,
+} from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { toYmd } from 'ee/analytics/shared/utils';
@@ -142,7 +145,7 @@ export const customStageFormErrors = convertObjectPropsToCamelCase(rawCustomStag
 
 const dateRange = getDatesInRange(startDate, endDate, toYmd);
 
-export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
+export const rawTasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
   labelData => {
     // add data points for our mock date range
     const maxValue = 10;
@@ -154,7 +157,27 @@ export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_t
   },
 );
 
-export const transformedTasksByTypeData = transformRawTasksByTypeData(tasksByTypeData);
+export const transformedTasksByTypeData = transformRawTasksByTypeData(rawTasksByTypeData);
+
+export const tasksByTypeData = {
+  seriesNames: ['Cool label', 'Normal label'],
+  data: [[0, 1, 2], [5, 2, 3], [2, 4, 1]],
+  groupBy: ['Group 1', 'Group 2', 'Group 3'],
+};
+
+export const taskByTypeFilters = {
+  selectedGroup: {
+    id: 22,
+    name: 'Gitlab Org',
+    fullName: 'Gitlab Org',
+    fullPath: 'gitlab-org',
+  },
+  selectedProjectIds: [],
+  startDate: new Date('2019-12-11'),
+  endDate: new Date('2020-01-10'),
+  subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
+  selectedLabelIds: [1, 2, 3],
+};
 
 export const rawDurationData = [
   {
