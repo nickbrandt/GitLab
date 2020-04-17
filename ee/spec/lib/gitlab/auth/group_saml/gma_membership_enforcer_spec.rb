@@ -50,6 +50,29 @@ describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
     end
   end
 
+  context 'when the project is forked from deleted project' do
+    let!(:forked_project) { fork_project(project, managed_user_for_project) }
+
+    before do
+      project.add_developer(managed_user_for_project)
+      project.delete
+    end
+
+    context 'when user is group-managed' do
+      it 'allows adding user to project' do
+        subject = described_class.new(forked_project)
+        expect(subject.can_add_user?(managed_user)).to be_truthy
+      end
+    end
+
+    context 'when user is not group-managed' do
+      it 'does not allow adding user to project' do
+        subject = described_class.new(forked_project)
+        expect(subject.can_add_user?(create(:user))).to be_truthy
+      end
+    end
+  end
+
   context 'when project is forked from namespace to group' do
     let(:project) { create(:project) }
     let(:forked_project) { create(:project, namespace: group) }
