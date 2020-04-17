@@ -17,8 +17,6 @@ module DesignManagement
       return error("Not allowed!") unless can_create_designs?
       return error("Only #{MAX_FILES} files are allowed simultaneously") if files.size > MAX_FILES
 
-      repository.create_if_not_exists
-
       uploaded_designs, version = upload_designs!
       skipped_designs = designs - uploaded_designs
 
@@ -36,6 +34,8 @@ module DesignManagement
 
     def upload_designs!
       ::DesignManagement::Version.lock_for_creation(project.id) do
+        repository.create_if_not_exists
+
         actions = build_actions
 
         [actions.map(&:design), actions.presence && run_actions(actions)]

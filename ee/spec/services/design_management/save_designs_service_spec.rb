@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe DesignManagement::SaveDesignsService do
   include DesignManagementTestHelpers
+  include ConcurrentHelpers
 
   let_it_be(:developer) { create(:user) }
   let(:project) { issue.project }
@@ -96,6 +97,17 @@ describe DesignManagement::SaveDesignsService do
           author: user,
           message: include(rails_sample_name)
         )
+      end
+
+      it 'can run the same command in parallel' do
+        blocks = Array.new(10).map do
+          wrapped_files = files.map { |f| Gitlab::FileUpload.new(f) }
+          wrapped_files.each { |f| f.original_filename = generate(:jpeg_file) }
+
+          -> { run_service(wrapped_files) }
+        end
+
+        expect { run_parallel(blocks) }.to change(DesignManagement::Version, :count).by(10)
       end
 
       it 'causes diff_refs not to be nil' do

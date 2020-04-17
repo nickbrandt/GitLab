@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe Mutations::DesignManagement::Upload do
   include DesignManagementTestHelpers
+  include ConcurrentHelpers
 
   let(:issue) { create(:issue) }
   let(:user) { issue.author }
@@ -19,32 +20,6 @@ describe Mutations::DesignManagement::Upload do
   def run_mutation(files_to_upload = files, project_path = project.full_path, iid = issue.iid)
     mutation = described_class.new(object: nil, context: { current_user: user }, field: nil)
     mutation.resolve(project_path: project_path, iid: iid, files: files_to_upload)
-  end
-
-  def parallel(blocks)
-    thread_pool = Concurrent::FixedThreadPool.new(
-      [2, Concurrent.processor_count - 1].max, { max_queue: blocks.size }
-    )
-    opts = { executor: thread_pool }
-
-    error = Concurrent::MVar.new
-
-    blocks.map { |block| Concurrent::Future.execute(opts, &block) }.each do |future|
-      future.wait(20)
-
-      if future.complete?
-        error.put(future.reason) if future.reason && error.empty?
-      else
-        future.cancel
-        error.put(StandardError.new(:cancelled)) if error.empty?
-      end
-    end
-
-    raise error.take if error.full?
-  ensure
-    thread_pool.shutdown
-    thread_pool.wait_for_termination(10)
-    thread_pool.kill if thread_pool.running?
   end
 
   describe "#resolve" do
@@ -92,7 +67,7 @@ describe Mutations::DesignManagement::Upload do
         describe 'running requests in parallel' do
           it 'does not cause errors' do
             creates_designs do
-              parallel(files.map { |f| -> { run_mutation([f]) } })
+              run_parallel(files.map { |f| -> { run_mutation([f]) } })
             end
           end
         end
@@ -106,7 +81,7 @@ describe Mutations::DesignManagement::Upload do
                 -> { run_mutation([f], i.project.full_path, i.iid) }
               end
 
-              parallel(blocks)
+              run_parallel(blocks)
             end
           end
         end
