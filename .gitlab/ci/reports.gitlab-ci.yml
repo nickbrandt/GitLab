@@ -82,11 +82,6 @@ eslint-sast:
   image:
     name: "$SAST_ANALYZER_IMAGE_PREFIX/eslint:$SAST_ANALYZER_IMAGE_TAG"
 
-kubesec-sast:
-  extends: .sast
-  image:
-    name: "$SAST_ANALYZER_IMAGE_PREFIX/kubesec:$SAST_ANALYZER_IMAGE_TAG"
-
 nodejs-scan-sast:
   extends: .sast
   image:
