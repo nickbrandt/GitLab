@@ -8716,6 +8716,16 @@
                 }
               },
               "defaultValue": null
+            },
+            {
+              "name": "newParentId",
+              "description": "ID of the new parent epic",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,

@@ -3009,6 +3009,11 @@ input EpicTreeNodeFieldsInputType {
   id: ID!
 
   """
+  ID of the new parent epic
+  """
+  newParentId: ID
+
+  """
   The type of the switch, after or before allowed
   """
   relativePosition: MoveType!
