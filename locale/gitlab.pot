@@ -4488,6 +4488,12 @@ msgstr ""
 msgid "ClusterIntegration|Fetching zones"
 msgstr ""
 
+msgid "ClusterIntegration|Fluentd"
+msgstr ""
+
+msgid "ClusterIntegration|Fluentd is an open source data collector, which lets you unify the data collection and consumption for a better use and understanding of data. Export Web Application Firewall logs to your favorite SIEM."
+msgstr ""
+
 msgid "ClusterIntegration|GitLab Integration"
 msgstr ""
 
@@ -4792,6 +4798,15 @@ msgid "ClusterIntegration|Request to begin installing failed"
 msgstr ""
 
 msgid "ClusterIntegration|Request to begin uninstalling failed"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Hostname"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Port"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Protocol"
 msgstr ""
 
 msgid "ClusterIntegration|Save changes"
@@ -16592,6 +16607,9 @@ msgid "ProtectedEnvironment|Your environment has been unprotected"
 msgstr ""
 
 msgid "Protip:"
+msgstr ""
+
+msgid "Protocol"
 msgstr ""
 
 msgid "Provider"
