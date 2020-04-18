@@ -211,8 +211,8 @@ There are two different ways to add a new project to a group:
 
 ### Default project-creation level
 
-> - [Introduced][ee-2534] in [GitLab Premium][ee] 10.5.
-> - Brought to [GitLab Starter][ee] in 10.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2534) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.5.
+> - Brought to [GitLab Starter](https://about.gitlab.com/pricing/) in 10.7.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25975) to [GitLab Core](https://about.gitlab.com/pricing/) in 11.10.
 
 By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group.
@@ -308,7 +308,7 @@ See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for
 
 ## Epics **(ULTIMATE)**
 
-> Introduced in [GitLab Ultimate][ee] 10.2.
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.2.
 
 Epics let you manage your portfolio of projects more efficiently and with less
 effort by tracking groups of issues that share a theme, across projects and
@@ -623,6 +623,3 @@ questions that you know someone might ask.
 Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
-
-[ee]: https://about.gitlab.com/pricing/
-[ee-2534]: https://gitlab.com/gitlab-org/gitlab/issues/2534
