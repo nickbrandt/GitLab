@@ -18,9 +18,9 @@ RSpec.shared_examples 'group and project milestone burnups' do |route_definition
       expect(json_response).to match_schema('burnup_events', dir: 'ee')
 
       expected_events = [
-          { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => '2020-04-16T23:00:00.000Z' },
-          { 'issue_id' => issue2.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => '2020-04-17T01:00:00.000Z' },
-          { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'remove', 'created_at' => '2020-04-17T02:00:00.000Z' }
+        { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event1.created_at.iso8601(3) },
+        { 'issue_id' => issue2.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event2.created_at.iso8601(3) },
+        { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'remove', 'created_at' => event3.created_at.iso8601(3) }
       ]
 
       expect(json_response).to eq(expected_events)
