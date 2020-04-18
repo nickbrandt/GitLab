@@ -2,7 +2,7 @@
 
 module Gitlab
   module Geo
-    # Geo Replicators are objects that knows to to replicator a replicable resource
+    # Geo Replicators are objects that know how to replicate a replicable resource
     #
     # A replicator is responsible for:
     # - firing events (producer)
@@ -45,7 +45,7 @@ module Gitlab
         @events.include?(event_name.to_sym)
       end
 
-      # Return the name of the replicator
+      # Return the name of the replicable, e.g. "package_file"
       #
       # This can be used to retrieve the replicator class again
       # by using the `.for_replicable_name` method
@@ -132,19 +132,19 @@ module Gitlab
       # This method is called by the GeoLogCursor when reading the event from the queue
       #
       # @param [Symbol] event_name
-      # @param [Hash] params contextual data published with the event
-      def consume(event_name, **params)
+      # @param [Hash] event_data contextual data published with the event
+      def consume(event_name, **event_data)
         raise ArgumentError, "Unsupported event: '#{event_name}'" unless self.class.event_supported?(event_name)
 
-        consume_method = "consume_#{event_name}".to_sym
-        raise NotImplementedError, "Consume method not implemented: '#{consume_method}'" unless instance_method_defined?(consume_method)
+        consume_method = "consume_event_#{event_name}".to_sym
+        raise NotImplementedError, "Consume method not implemented: '#{consume_method}'" unless self.methods.include?(consume_method)
 
         # Inject model_record based on included class
         if model_record
-          params[:model_record] = model_record
+          event_data[:model_record] = model_record
         end
 
-        send(consume_method, **params) # rubocop:disable GitlabSecurity/PublicSend
+        send(consume_method, **event_data) # rubocop:disable GitlabSecurity/PublicSend
       end
 
       # Return the name of the replicator
@@ -198,16 +198,6 @@ module Gitlab
         event
       rescue ActiveRecord::RecordInvalid, NoMethodError => e
         log_error("#{class_name} could not be created", e, params)
-      end
-
-      private
-
-      # Checks if method is implemented by current class (ignoring inherited methods)
-      #
-      # @param [Symbol] method_name
-      # @return [Boolean] whether method is implemented
-      def instance_method_defined?(method_name)
-        self.class.instance_methods(false).include?(method_name)
       end
     end
   end

@@ -10,19 +10,19 @@ module Geo
 
     def initialize(replicable_name, event_name, payload)
       @replicable_name = replicable_name
-      @event_name = event_name
-      @payload = payload
+      @event_name = event_name.to_sym
+      @payload = payload.symbolize_keys
     end
 
     def execute
-      replicator.consume(event_name, payload)
+      replicator.consume(event_name, **payload)
     end
 
     private
 
     def replicator
       strong_memoize(:replicator) do
-        model_record_id = payload['model_record_id']
+        model_record_id = payload[:model_record_id]
 
         replicator_class = ::Gitlab::Geo::Replicator.for_replicable_name(replicable_name)
         replicator_class.new(model_record_id: model_record_id)

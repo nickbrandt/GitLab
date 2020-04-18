@@ -64,7 +64,7 @@ module Gitlab
         def request_headers
           request_data = {
             replicable_name: replicable_name,
-            model_record_id: model_record.id
+            id: model_record.id
           }
 
           TransferRequest.new(request_data).headers

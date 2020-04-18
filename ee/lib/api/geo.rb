@@ -33,9 +33,9 @@ module API
         authorize_geo_transfer!(replicable_name: params[:replicable_name], id: params[:id])
 
         decoded_params = jwt_decoder.decode
-        service = Geo::BlobUploadService.new(replicable_name: params[:replicable_name],
-                                             blob_id: params[:id],
-                                             decoded_params: decoded_params)
+        service = ::Geo::BlobUploadService.new(replicable_name: params[:replicable_name],
+                                               blob_id: params[:id],
+                                               decoded_params: decoded_params)
         service.execute
       end
 

@@ -4,6 +4,7 @@ module Geo
   class EventWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include GeoQueue
+    include ::Gitlab::Geo::LogHelpers
 
     sidekiq_options retry: 3, dead: false
 

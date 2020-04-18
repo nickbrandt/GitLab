@@ -25,8 +25,8 @@ describe Gitlab::Geo::LogCursor::Events::Event, :clean_gitlab_redis_shared_state
     it "eventually calls Replicator#consume", :sidekiq_inline do
       expect_next_instance_of(::Geo::PackageFileReplicator) do |replicator|
         expect(replicator).to receive(:consume).with(
-          "created",
-          { "model_record_id" => replicable.id }
+          :created,
+          { model_record_id: replicable.id }
         )
       end
 
