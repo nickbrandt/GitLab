@@ -91,7 +91,7 @@ describe API::ProjectMilestones do
       end
     end
 
-    context 'when no such resources' do
+    context 'when no such resource' do
       before do
         group.add_developer(user)
       end
