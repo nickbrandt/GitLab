@@ -2,13 +2,13 @@ import Vuex from 'vuex';
 import { shallowMount } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
 import { monitoringDashboard } from '~/monitoring/stores';
-import PanelType from '~/monitoring/components/panel_type_with_alerts.vue';
+import DashboardPanel from '~/monitoring/components/dashboard_panel_with_alerts.vue';
 import AlertWidget from '~/monitoring/components/alert_widget.vue';
 import { graphData } from 'jest/monitoring/fixture_data';
 
 global.URL.createObjectURL = jest.fn();
 
-describe('Panel Type', () => {
+describe('Dashboard Panel', () => {
   let store;
   let wrapper;
 
@@ -26,7 +26,7 @@ describe('Panel Type', () => {
   };
 
   const createWrapper = propsData => {
-    wrapper = shallowMount(PanelType, {
+    wrapper = shallowMount(DashboardPanel, {
       propsData: {
         ...mockPropsData,
         ...propsData,
@@ -45,7 +45,7 @@ describe('Panel Type', () => {
     });
   });
 
-  describe('panel type alerts', () => {
+  describe('panel alerts', () => {
     describe.each`
       desc                                           | metricsSavedToDb                   | propsData                               | isShown
       ${'with license and no metrics in db'}         | ${[]}                              | ${{}}                                   | ${false}
