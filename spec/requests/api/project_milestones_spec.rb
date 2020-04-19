@@ -44,7 +44,7 @@ describe API::ProjectMilestones do
   end
 
   describe 'PUT /projects/:id/milestones/:milestone_id to test observer on close' do
-    it 'creates an activity event when an milestone is closed' do
+    it 'creates an activity event when a milestone is closed' do
       expect(Event).to receive(:create!)
 
       put api("/projects/#{project.id}/milestones/#{milestone.id}", user),
@@ -91,7 +91,7 @@ describe API::ProjectMilestones do
       end
     end
 
-    context 'when no such resources' do
+    context 'when no such resource' do
       before do
         group.add_developer(user)
       end
