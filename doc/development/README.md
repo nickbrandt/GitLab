@@ -190,8 +190,7 @@ Complementary reads:
 ## Telemetry guides
 
 - [Introduction](../telemetry/index.md)
-- [Frontend tracking guide](../telemetry/frontend.md)
-- [Backend tracking guide](../telemetry/backend.md)
+- [Snowplow tracking guide](../telemetry/snowplow.md)
 
 ## Experiment Guide
 
