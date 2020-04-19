@@ -24,13 +24,13 @@ describe API::ProjectMilestones do
       project.add_reporter(reporter)
     end
 
-    it 'returns 404 response when the project does not exists' do
+    it 'returns 404 response when the project does not exist' do
       delete api("/projects/0/milestones/#{milestone.id}", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
-    it 'returns 404 response when the milestone does not exists' do
+    it 'returns 404 response when the milestone does not exist' do
       delete api("/projects/#{project.id}/milestones/0", user)
 
       expect(response).to have_gitlab_http_status(:not_found)
