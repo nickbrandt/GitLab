@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 
 export default {
-  getSurfaceAlertsList({ endpoint }) {
+  getAlertManagementList({ endpoint }) {
     return axios.get(endpoint);
   },
 };

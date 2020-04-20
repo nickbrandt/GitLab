@@ -277,7 +277,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :surface_alerts, only: [:index], controller: :surface_alerts
+        resources :alert_management, only: [:index], controller: :alert_management
 
         namespace :error_tracking do
           resources :projects, only: :index
@@ -505,7 +505,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                                             :labels, :milestones, :services, :boards, :releases,
                                             :forks, :group_links, :import, :avatar, :mirror,
                                             :cycle_analytics, :mattermost, :variables, :triggers,
-                                            :environments, :protected_environments, :error_tracking, :surface_alerts,
+                                            :environments, :protected_environments, :error_tracking, :alert_management,
                                             :serverless, :clusters, :audit_events, :wikis, :merge_requests,
                                             :vulnerability_feedback, :security, :dependencies)
     end

@@ -222,9 +222,9 @@
                   %span
                     = _('Metrics')
 
-            - if project_nav_tab?(:surface_alerts)
-              = nav_link(controller: :surface_alerts) do
-                = link_to project_surface_alerts_path(@project), title: _('Alerts'), class: 'shortcuts-tracking qa-operations-tracking-link' do
+            - if project_nav_tab?(:alert_management)
+              = nav_link(controller: :alert_management) do
+                = link_to project_alert_management_index_path(@project), title: _('Alerts'), class: 'shortcuts-tracking qa-operations-tracking-link' do
                   %span
                     = _('Alerts')
 

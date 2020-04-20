@@ -12,7 +12,7 @@ export default {
       type: String,
       required: true,
     },
-    enableSurfaceAlertsPath: {
+    enableAlertManagementPath: {
       type: String,
       required: true,
     },
@@ -34,7 +34,7 @@ export default {
 
 <template>
   <div>
-    <div v-if="alerts.length > 0" class="surface-alerts-list">
+    <div v-if="alerts.length > 0" class="alert-management-list">
       <div v-if="loading" class="py-3">
         <gl-loading-icon size="md" />
       </div>
@@ -48,12 +48,12 @@ export default {
                 'Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
               )
             }}</span>
-            <a href="/help/user/project/operations/surface_alerts.html">
+            <a href="/help/user/project/operations/alert_management.html">
               {{ __('More information') }}
             </a>
           </div>
           <div class="d-block center pt-4">
-            <gl-button category="primary" variant="success" :href="enableSurfaceAlertsPath">{{
+            <gl-button category="primary" variant="success" :href="enableAlertManagementPath">{{
               __('Authorize external service')
             }}</gl-button>
           </div>
