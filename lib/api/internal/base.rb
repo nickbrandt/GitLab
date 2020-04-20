@@ -77,7 +77,7 @@ module API
             if receive_max_input_size > 0
               payload[:git_config_options] << "receive.maxInputSize=#{receive_max_input_size.megabytes}"
 
-              if Feature.enabled?(:gitaly_upload_pack_filter, project)
+              if Feature.enabled?(:gitaly_upload_pack_filter, project, default_enabled: true)
                 payload[:git_config_options] << "uploadpack.allowFilter=true" << "uploadpack.allowAnySHA1InWant=true"
               end
             end
