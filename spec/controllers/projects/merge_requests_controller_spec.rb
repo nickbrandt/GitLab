@@ -935,34 +935,6 @@ describe Projects::MergeRequestsController do
           }])
         end
       end
-
-      context 'when feature flag :ci_expose_arbitrary_artifacts_in_mr is disabled' do
-        let(:job_options) do
-          {
-            artifacts: {
-              paths: ['ci_artifacts.txt'],
-              expose_as: 'Exposed artifact'
-            }
-          }
-        end
-        let(:report) { double }
-
-        before do
-          stub_feature_flags(ci_expose_arbitrary_artifacts_in_mr: false)
-        end
-
-        it 'does not send polling interval' do
-          expect(Gitlab::PollingInterval).not_to receive(:set_header)
-
-          subject
-        end
-
-        it 'returns 204 HTTP status' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:no_content)
-        end
-      end
     end
 
     context 'when pipeline does not have jobs with exposed artifacts' do
