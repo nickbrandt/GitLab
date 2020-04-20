@@ -89,7 +89,7 @@ You can also optionally configure GitLab to use an [external PostgreSQL service]
 
 For 1,000 to 1,999 users, defining a reference architecture for this scale is [being worked on](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
 
-#### 2,000 users
+### 2,000 users
 
 - **Supported users (approximate):** 2,000
 - **Test RPS rates:** API: 40 RPS, Web: 4 RPS, Git: 4 RPS
@@ -110,7 +110,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 
-#### 5,000 users
+### 5,000 users
 
 - **Supported users (approximate):** 5,000
 - **Test RPS rates:** API: 100 RPS, Web: 10 RPS, Git: 10 RPS
@@ -131,7 +131,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 
-#### 10,000 users
+### 10,000 users
 
 - **Supported users (approximate):** 10,000
 - **Test RPS rates:** API: 200 RPS, Web: 20 RPS, Git: 20 RPS
@@ -155,7 +155,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 
-#### 25,000 users
+### 25,000 users
 
 - **Supported users (approximate):** 25,000
 - **Test RPS rates:** API: 500 RPS, Web: 50 RPS, Git: 50 RPS
@@ -179,7 +179,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 4 vCPU, 3.6GB Memory  | n1-highcpu-4   | c5.xlarge    |
 
-#### 50,000 users
+### 50,000 users
 
 - **Supported users (approximate):** 50,000
 - **Test RPS rates:** API: 1000 RPS, Web: 100 RPS, Git: 100 RPS
