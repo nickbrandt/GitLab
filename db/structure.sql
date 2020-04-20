@@ -4008,6 +4008,25 @@ CREATE SEQUENCE public.metrics_dashboard_annotations_id_seq
 
 ALTER SEQUENCE public.metrics_dashboard_annotations_id_seq OWNED BY public.metrics_dashboard_annotations.id;
 
+CREATE TABLE public.metrics_users_starred_dashboards (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    project_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    dashboard_path text NOT NULL,
+    CONSTRAINT check_79a84a0f57 CHECK ((char_length(dashboard_path) <= 255))
+);
+
+CREATE SEQUENCE public.metrics_users_starred_dashboards_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.metrics_users_starred_dashboards_id_seq OWNED BY public.metrics_users_starred_dashboards.id;
+
 CREATE TABLE public.milestone_releases (
     milestone_id bigint NOT NULL,
     release_id bigint NOT NULL
@@ -7490,6 +7509,8 @@ ALTER TABLE ONLY public.merge_trains ALTER COLUMN id SET DEFAULT nextval('public
 
 ALTER TABLE ONLY public.metrics_dashboard_annotations ALTER COLUMN id SET DEFAULT nextval('public.metrics_dashboard_annotations_id_seq'::regclass);
 
+ALTER TABLE ONLY public.metrics_users_starred_dashboards ALTER COLUMN id SET DEFAULT nextval('public.metrics_users_starred_dashboards_id_seq'::regclass);
+
 ALTER TABLE ONLY public.milestones ALTER COLUMN id SET DEFAULT nextval('public.milestones_id_seq'::regclass);
 
 ALTER TABLE ONLY public.namespace_statistics ALTER COLUMN id SET DEFAULT nextval('public.namespace_statistics_id_seq'::regclass);
@@ -8297,6 +8318,9 @@ ALTER TABLE ONLY public.merge_trains
 ALTER TABLE ONLY public.metrics_dashboard_annotations
     ADD CONSTRAINT metrics_dashboard_annotations_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.metrics_users_starred_dashboards
+    ADD CONSTRAINT metrics_users_starred_dashboards_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.milestones
     ADD CONSTRAINT milestones_pkey PRIMARY KEY (id);
 
@@ -8811,6 +8835,8 @@ CREATE INDEX idx_merge_requests_on_source_project_and_branch_state_opened ON pub
 CREATE INDEX idx_merge_requests_on_state_id_and_merge_status ON public.merge_requests USING btree (state_id, merge_status) WHERE ((state_id = 1) AND ((merge_status)::text = 'can_be_merged'::text));
 
 CREATE INDEX idx_merge_requests_on_target_project_id_and_iid_opened ON public.merge_requests USING btree (target_project_id, iid) WHERE (state_id = 1);
+
+CREATE UNIQUE INDEX idx_metrics_users_starred_dashboard_on_user_project_dashboard ON public.metrics_users_starred_dashboards USING btree (user_id, project_id, dashboard_path);
 
 CREATE INDEX idx_mr_cc_diff_files_on_mr_cc_id_and_sha ON public.merge_request_context_commit_diff_files USING btree (merge_request_context_commit_id, sha);
 
@@ -9839,6 +9865,8 @@ CREATE INDEX index_merge_trains_on_user_id ON public.merge_trains USING btree (u
 CREATE INDEX index_metrics_dashboard_annotations_on_cluster_id_and_3_columns ON public.metrics_dashboard_annotations USING btree (cluster_id, dashboard_path, starting_at, ending_at) WHERE (cluster_id IS NOT NULL);
 
 CREATE INDEX index_metrics_dashboard_annotations_on_environment_id_and_3_col ON public.metrics_dashboard_annotations USING btree (environment_id, dashboard_path, starting_at, ending_at) WHERE (environment_id IS NOT NULL);
+
+CREATE INDEX index_metrics_users_starred_dashboards_on_project_id ON public.metrics_users_starred_dashboards USING btree (project_id);
 
 CREATE INDEX index_milestone_releases_on_release_id ON public.milestone_releases USING btree (release_id);
 
@@ -11188,6 +11216,9 @@ ALTER TABLE ONLY public.deployments
 ALTER TABLE ONLY public.gitlab_subscriptions
     ADD CONSTRAINT fk_bd0c4019c3 FOREIGN KEY (hosted_plan_id) REFERENCES public.plans(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.metrics_users_starred_dashboards
+    ADD CONSTRAINT fk_bd6ae32fac FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.snippets
     ADD CONSTRAINT fk_be41fd4bb7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -11241,6 +11272,9 @@ ALTER TABLE ONLY public.geo_event_log
 
 ALTER TABLE ONLY public.lists
     ADD CONSTRAINT fk_d6cf4279f7 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.metrics_users_starred_dashboards
+    ADD CONSTRAINT fk_d76a2b9a8c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.system_note_metadata
     ADD CONSTRAINT fk_d83a918cb1 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
@@ -13542,6 +13576,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200417145946
 20200420104303
 20200420104323
+20200420115948
 20200420162730
 20200420172113
 20200420172752
@@ -13554,8 +13589,11 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200423080334
 20200423080607
 20200423081409
+20200423081441
+20200423081519
 20200423101529
 20200424050250
+20200424101920
 20200427064130
 \.
 
