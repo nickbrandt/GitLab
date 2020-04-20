@@ -198,14 +198,6 @@ milestones, or release date, use the [Releases
 API](../../../api/releases/index.md#update-a-release). Editing this information
 through the **Edit Release** page is planned for a future version of GitLab.
 
-Please note that the ability to edit asset links is currently behind a feature
-flag which is disabled by default. For self-managed instances, it can be enabled
-through the Rails console by a GitLab administrator with the following command:
-
-```ruby
-Feature.enable(:release_asset_link_editing)
-```
-
 ## Notification for Releases
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/26001) in GitLab 12.4.
