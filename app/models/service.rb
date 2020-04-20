@@ -345,10 +345,6 @@ class Service < ApplicationRecord
     service
   end
 
-  def deprecated?
-    false
-  end
-
   # override if needed
   def supports_data_fields?
     false

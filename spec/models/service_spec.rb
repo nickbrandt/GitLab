@@ -523,15 +523,6 @@ describe Service do
     end
   end
 
-  describe "#deprecated?" do
-    let(:project) { create(:project, :repository) }
-
-    it 'returns false by default' do
-      service = create(:service, project: project)
-      expect(service.deprecated?).to be_falsy
-    end
-  end
-
   describe '#api_field_names' do
     let(:fake_service) do
       Class.new(Service) do
