@@ -93,6 +93,12 @@ From this page, you can repeat delivery with the same data by clicking **Resend 
 
 ![Recent deliveries](img/webhook_logs.png)
 
+### Uninitialized repositories
+
+Some integrations will fail with an error `Test Failed. Save Anyway` when you attempt to set them up on uninitialized repositories. This is because the default service test uses push data to build the payload for the test request and it fails because there are no push events for the project. 
+
+To resolve this error, initialize the repository by pushing a test file to the project and set up the integration again.
+
 ## Contributing to integrations
 
 Because GitLab is open source we can ship with the code and tests for all
