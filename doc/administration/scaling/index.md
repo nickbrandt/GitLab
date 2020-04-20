@@ -42,51 +42,30 @@ needs.
 
 ## Reference architectures
 
-- 1 - 1000 Users: A single-node [Omnibus](https://docs.gitlab.com/omnibus/) setup with frequent backups. Refer to the [Single-node Omnibus installation](#single-node-installation) section below.
-- 1000 to 50000+ Users: A [Scaled-out Omnibus installation with multiple servers](#multi-node-installation-scaled-out-for-availability), it can be with or without high-availability components applied.
-  - To decide the level of Availability please refer to our [Availability](../availability/index.md) page.
+GitLab can be setup on a single machine or scaled out to handle large number of users. In this section we'll detail the Reference Architectures that were built and verified by our Quality and Support teams.
+Testing was done with our GitLab Performance Tool at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data. 
 
-### Single-node installation
+We test each endpoint type with the following number of requests per second (RPS)
+per 1000 users:
+- API: 20 RPS
+- Web: 2 RPS
+- Git: 2 RPS
 
-This solution is appropriate for many teams that have a single server at their disposal. With automatic backup of the GitLab repositories, configuration, and the database, this can be an optimal solution if you don't have strict availability requirements.
+For up to 2,000 users we recommend going with a simple setup. Going above 2,000 users, we recommend scaling GitLab components to multiple machines.
+The machines are grouped by application type, we call them application nodes. The addition of these nodes adds limited fault tolerance to your GitLab instance.
+As long as one application node is online and capable of handling the instance's usage load, your team's productivity will not be interrupted. 
+Having multiple application nodes also enables [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
 
-You can also optionally configure GitLab to use an [external PostgreSQL service](../external_database.md)
-or an [external object storage service](../high_availability/object_storage.md) for added
-performance and reliability at a relatively low complexity cost.
-
-References:
-
-- [Installation Docs](../../install/README.md)
-- [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
-
-### Multi-node installation (scaled out for availability)
-
-This solution is appropriate for teams that are starting to scale out when
-scaling up is no longer meeting their needs. In this configuration, additional application nodes will handle frontend traffic, with a load balancer in front to distribute traffic across those nodes. Meanwhile, each application node connects to a shared file server and PostgreSQL and Redis services on the back end.
-
-The additional application servers adds limited fault tolerance to your GitLab
-instance. As long as one application node is online and capable of handling the
-instance's usage load, your team's productivity will not be interrupted. Having
-multiple application nodes also enables [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
+Scaling GitLab factors in multiple things. 
+- Multiple application nodes to handle frontend traffic. 
+- A load balancer is added in front to distribute traffic across the application nodes.
+- The application nodes connects to a shared file server and PostgreSQL and Redis services on the backend.
 
 References:
-
 - [Configure your load balancer for GitLab](../high_availability/load_balancer.md)
 - [Configure your NFS server to work with GitLab](../high_availability/nfs.md)
 - [Configure packaged PostgreSQL server to listen on TCP/IP](https://docs.gitlab.com/omnibus/settings/database.html#configure-packaged-postgresql-server-to-listen-on-tcpip)
 - [Setting up a Redis-only server](https://docs.gitlab.com/omnibus/settings/redis.html#setting-up-a-redis-only-server)
-
-In this section we'll detail the Reference Architectures that can support large numbers
-of users. These were built, tested and verified by our Quality and Support teams.
-
-Testing was done with our GitLab Performance Tool at specific coded workloads, and the
-throughputs used for testing were calculated based on sample customer data. We
-test each endpoint type with the following number of requests per second (RPS)
-per 1000 users:
-
-- API: 20 RPS
-- Web: 2 RPS
-- Git: 2 RPS
 
 NOTE: **Note:** Note that depending on your workflow the below recommended
 reference architectures may need to be adapted accordingly. Your workload
@@ -95,7 +74,23 @@ how much automation you use, mirroring, and repo/change size. Additionally the
 shown memory values are given directly by [GCP machine types](https://cloud.google.com/compute/docs/machine-types).
 On different cloud vendors a best effort like for like can be used.
 
-#### 2,000 user configuration
+### Under 1,000 users
+
+From 1 to 1,000 users, a single-node [Omnibus](https://docs.gitlab.com/omnibus/) setup with frequent backups is adequate.
+
+This solution is appropriate for many teams that have a single server at their disposal. With automatic backup of the GitLab repositories, configuration, and the database, this can be an optimal solution if you don't have strict availability requirements.
+
+You can also optionally configure GitLab to use an [external PostgreSQL service](../external_database.md) or an [external object storage service](../high_availability/object_storage.md) for added performance and reliability at a relatively low complexity cost.
+
+References:
+- [Installation Docs](../../install/README.md)
+- [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
+
+### 1,000 to 1,800 users
+
+For 1,000 to 1,800 users, the team is currently working on additional more details on the reference architecture. Work can be tracked in this [issue](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
+
+#### 2,000 users
 
 - **Supported users (approximate):** 2,000
 - **Test RPS rates:** API: 40 RPS, Web: 4 RPS, Git: 4 RPS
@@ -116,7 +111,7 @@ On different cloud vendors a best effort like for like can be used.
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 
-#### 5,000 user configuration
+#### 5,000 users
 
 - **Supported users (approximate):** 5,000
 - **Test RPS rates:** API: 100 RPS, Web: 10 RPS, Git: 10 RPS
@@ -137,7 +132,7 @@ On different cloud vendors a best effort like for like can be used.
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 
-#### 10,000 user configuration
+#### 10,000 users
 
 - **Supported users (approximate):** 10,000
 - **Test RPS rates:** API: 200 RPS, Web: 20 RPS, Git: 20 RPS
@@ -161,7 +156,7 @@ On different cloud vendors a best effort like for like can be used.
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 
-#### 25,000 user configuration
+#### 25,000 users
 
 - **Supported users (approximate):** 25,000
 - **Test RPS rates:** API: 500 RPS, Web: 50 RPS, Git: 50 RPS
@@ -185,7 +180,7 @@ On different cloud vendors a best effort like for like can be used.
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 4 vCPU, 3.6GB Memory  | n1-highcpu-4   | c5.xlarge    |
 
-#### 50,000 user configuration
+#### 50,000 users
 
 - **Supported users (approximate):** 50,000
 - **Test RPS rates:** API: 1000 RPS, Web: 100 RPS, Git: 100 RPS
