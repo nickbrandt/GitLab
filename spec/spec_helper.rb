@@ -286,12 +286,7 @@ RSpec.configure do |config|
   end
 
   config.around(:example, :request_store) do |example|
-    RequestStore.begin!
-
-    example.run
-
-    RequestStore.end!
-    RequestStore.clear!
+    Gitlab::WithRequestStore.with_request_store { example.run }
   end
 
   config.around do |example|
