@@ -72,19 +72,5 @@ module EE
 
       link_to label, '#', html_options
     end
-
-    def render_lock_icon(path)
-      return unless @project.root_ref?(@ref)
-
-      if file_lock = @project.find_path_lock(path, exact_match: true)
-        content_tag(
-          :i,
-          nil,
-          class: "fa fa-lock prepend-left-5 append-right-5",
-          title: text_label_for_lock(file_lock, path),
-          'data-toggle' => 'tooltip'
-        )
-      end
-    end
   end
 end
