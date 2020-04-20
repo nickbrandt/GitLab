@@ -36,7 +36,7 @@ export default {
     severity() {
       return this.vulnerability.severity || ' ';
     },
-    vulnerabilityNamepace() {
+    vulnerabilityNamespace() {
       const { project, location } = this.vulnerability;
       if (this.dashboardType === DASHBOARD_TYPES.GROUP) {
         return project && project.full_name;
@@ -128,8 +128,8 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <small v-if="vulnerabilityNamepace" class="gl-text-gray-700 gl-word-break-all">
-            {{ vulnerabilityNamepace }}
+          <small v-if="vulnerabilityNamespace" class="gl-text-gray-700 gl-word-break-all">
+            {{ vulnerabilityNamespace }}
           </small>
         </template>
       </div>

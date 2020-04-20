@@ -63,10 +63,7 @@ export default {
 <template>
   <div class="ci-table js-security-dashboard-table" data-qa-selector="security_report_content">
     <selection-summary v-if="isSelectingVulnerabilities" />
-    <div
-      class="gl-responsive-table-row table-row-header vulnerabilities-row-header gl-bg-gray-50 text-2 px-2"
-      role="row"
-    >
+    <div class="gl-responsive-table-row table-row-header gl-bg-gray-50 text-2 px-2" role="row">
       <div class="table-section">
         <gl-form-checkbox
           :checked="hasSelectedAllVulnerabilities"
