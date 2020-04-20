@@ -29,8 +29,8 @@ namespace :gitlab do
       )
 
       project = Project.find(args.project_id)
-      content = File.read(Rails.root.join('spec', 'fixtures', 'metrics', 'dashboard', 'development_metrics.yml'))
-      project_attributes = [
+      content = File.read(Rails.root.join('spec', 'fixtures', 'lib', 'gitlab', 'metrics', 'dashboard', 'development_metrics.yml'))
+      file_attributes = [
           project.creator,
           '.gitlab/dashboards/development_metrics.yml',
           content,
@@ -41,11 +41,11 @@ namespace :gitlab do
       ]
 
       begin
-        project.repository.create_file(*project_attributes)
+        project.repository.create_file(*file_attributes)
       rescue Gitlab::Git::Index::IndexError => error
         raise error unless error.message == 'A file with this name already exists'
 
-        project.repository.update_file(*project_attributes)
+        project.repository.update_file(*file_attributes)
       end
     end
   end
