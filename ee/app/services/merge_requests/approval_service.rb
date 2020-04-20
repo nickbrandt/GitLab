@@ -51,7 +51,7 @@ module MergeRequests
     def calculate_approvals_metrics(merge_request)
       return unless merge_request.project.feature_available?(:code_review_analytics)
 
-      Analytics::RefreshApprovalsData.new(merge_request).execute_async
+      ::Analytics::RefreshApprovalsData.new(merge_request).execute_async
     end
   end
 end

@@ -9,7 +9,7 @@ module EE
       def execute(note)
         super
 
-        Analytics::RefreshCommentsData.for_note(note)&.execute(force: true)
+        ::Analytics::RefreshCommentsData.for_note(note)&.execute(force: true)
         StatusPage.trigger_publish(project, current_user, note)
       end
     end
