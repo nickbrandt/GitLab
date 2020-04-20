@@ -7,8 +7,6 @@ class Projects::AlertManagementController < Projects::ApplicationController
       format.json do
         render_index_json
       end
-
-
     end
   end
 
