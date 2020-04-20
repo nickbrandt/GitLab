@@ -18,8 +18,8 @@ describe Projects::SurfaceAlertsHelper do
       it 'returns frontend configuration' do
         expect(surface_alerts_data(project)).to eq(
           'index-path' => index_path,
-          'enable-surface-alerts-link' => setting_path,
-          "illustration-path" => "/images/illustrations/alert-management-empty-state.svg"
+          'enable-surface-alerts-path' => setting_path,
+          "empty-alert-svg-path" => "/images/illustrations/alert-management-empty-state.svg"
         )
       end
     end

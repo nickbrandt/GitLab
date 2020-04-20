@@ -10,8 +10,8 @@ describe('SurfaceAlertsList', () => {
     wrapper = mount(SurfaceAlertsList, {
       propsData: {
         indexPath: '/path',
-        enableSurfaceAlertsLink: '/link',
-        illustrationPath: 'illustration/path',
+        enableSurfaceAlertsPath: '/link',
+        emptyAlertSvgPath: 'illustration/path',
       },
       stubs: {
         ...stubChildren(SurfaceAlertsList),
