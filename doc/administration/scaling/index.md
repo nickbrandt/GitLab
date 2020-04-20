@@ -87,7 +87,7 @@ You can also optionally configure GitLab to use an [external PostgreSQL service]
 
 ### 1,000 to 1,999 users
 
-For 1,000 to 1,999 users, the team is currently working on defining a reference architecture for this scale. Work can be tracked in this [issue](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
+For 1,000 to 1,999 users, defining a reference architecture for this scale is [being worked on](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
 
 #### 2,000 users
 
