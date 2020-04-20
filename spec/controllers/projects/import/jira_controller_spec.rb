@@ -152,7 +152,7 @@ describe Projects::Import::JiraController do
                 post :import, params: { namespace_id: project.namespace, project_id: project, jira_project_key: '' }
 
                 expect(response).to redirect_to(project_import_jira_path(project))
-                expect(flash[:alert]).to eq('No jira project key has been provided.')
+                expect(flash[:alert]).to eq('No Jira project key has been provided.')
               end
             end
 
