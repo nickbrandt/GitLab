@@ -1049,6 +1049,12 @@ msgstr ""
 msgid "AccessTokens|reset it"
 msgstr ""
 
+msgid "AccessibilityReport|Accessibility report artifact not found"
+msgstr ""
+
+msgid "AccessibilityReport|Failed to retrieve accessibility report"
+msgstr ""
+
 msgid "AccessibilityReport|Learn More"
 msgstr ""
 
@@ -1951,6 +1957,9 @@ msgid "An error occurred while fetching projects autocomplete."
 msgstr ""
 
 msgid "An error occurred while fetching sidebar data"
+msgstr ""
+
+msgid "An error occurred while fetching terraform reports."
 msgstr ""
 
 msgid "An error occurred while fetching the Service Desk address."
@@ -4482,6 +4491,12 @@ msgstr ""
 msgid "ClusterIntegration|Fetching zones"
 msgstr ""
 
+msgid "ClusterIntegration|Fluentd"
+msgstr ""
+
+msgid "ClusterIntegration|Fluentd is an open source data collector, which lets you unify the data collection and consumption for a better use and understanding of data. Export Web Application Firewall logs to your favorite SIEM."
+msgstr ""
+
 msgid "ClusterIntegration|GitLab Integration"
 msgstr ""
 
@@ -4786,6 +4801,15 @@ msgid "ClusterIntegration|Request to begin installing failed"
 msgstr ""
 
 msgid "ClusterIntegration|Request to begin uninstalling failed"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Hostname"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Port"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Protocol"
 msgstr ""
 
 msgid "ClusterIntegration|Save changes"
@@ -5312,16 +5336,31 @@ msgstr ""
 msgid "Compliance framework (optional)"
 msgstr ""
 
+msgid "ComplianceFramework|GDPR"
+msgstr ""
+
 msgid "ComplianceFramework|GDPR - General Data Protection Regulation"
+msgstr ""
+
+msgid "ComplianceFramework|HIPAA"
 msgstr ""
 
 msgid "ComplianceFramework|HIPAA - Health Insurance Portability and Accountability Act"
 msgstr ""
 
+msgid "ComplianceFramework|PCI-DSS"
+msgstr ""
+
 msgid "ComplianceFramework|PCI-DSS - Payment Card Industry-Data Security Standard"
 msgstr ""
 
+msgid "ComplianceFramework|SOC 2"
+msgstr ""
+
 msgid "ComplianceFramework|SOC 2 - Service Organization Control 2"
+msgstr ""
+
+msgid "ComplianceFramework|SOX"
 msgstr ""
 
 msgid "ComplianceFramework|SOX - Sarbanes-Oxley"
@@ -7298,7 +7337,7 @@ msgstr ""
 msgid "Dismissed on pipeline %{pipelineLink} at %{projectLink}"
 msgstr ""
 
-msgid "Display alerts from all your monitoring tools directly withing GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents."
+msgid "Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents."
 msgstr ""
 
 msgid "Display name"
@@ -7500,9 +7539,6 @@ msgid "Edit description"
 msgstr ""
 
 msgid "Edit environment"
-msgstr ""
-
-msgid "Edit epic description"
 msgstr ""
 
 msgid "Edit file"
@@ -8126,9 +8162,6 @@ msgstr ""
 msgid "Epics"
 msgstr ""
 
-msgid "Epics (Ultimate / Gold license only)"
-msgstr ""
-
 msgid "Epics Roadmap"
 msgstr ""
 
@@ -8136,6 +8169,9 @@ msgid "Epics and Issues"
 msgstr ""
 
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
+msgstr ""
+
+msgid "Epics, Issues, and Merge Requests"
 msgstr ""
 
 msgid "Epics|Add an epic"
@@ -8729,7 +8765,7 @@ msgstr ""
 msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
 msgstr ""
 
-msgid "Failed to find import label for jira import."
+msgid "Failed to find import label for Jira import."
 msgstr ""
 
 msgid "Failed to get ref."
@@ -10026,9 +10062,6 @@ msgid "Go to environments"
 msgstr ""
 
 msgid "Go to file"
-msgstr ""
-
-msgid "Go to file (MRs only)"
 msgstr ""
 
 msgid "Go to file permalink (while viewing a file)"
@@ -11459,13 +11492,13 @@ msgstr ""
 msgid "Issues"
 msgstr ""
 
-msgid "Issues / Merge Requests"
-msgstr ""
-
 msgid "Issues Analytics"
 msgstr ""
 
 msgid "Issues Rate Limits"
+msgstr ""
+
+msgid "Issues and Merge Requests"
 msgstr ""
 
 msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are searchable and filterable."
@@ -13562,10 +13595,10 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "Next file in diff (MRs only)"
+msgid "Next file in diff"
 msgstr ""
 
-msgid "Next unresolved discussion (MRs only)"
+msgid "Next unresolved discussion"
 msgstr ""
 
 msgid "Nickname"
@@ -15235,10 +15268,10 @@ msgstr ""
 msgid "Previous Artifacts"
 msgstr ""
 
-msgid "Previous file in diff (MRs only)"
+msgid "Previous file in diff"
 msgstr ""
 
-msgid "Previous unresolved discussion (MRs only)"
+msgid "Previous unresolved discussion"
 msgstr ""
 
 msgid "Primary"
@@ -16580,6 +16613,9 @@ msgid "ProtectedEnvironment|Your environment has been unprotected"
 msgstr ""
 
 msgid "Protip:"
+msgstr ""
+
+msgid "Protocol"
 msgstr ""
 
 msgid "Provider"
@@ -23428,9 +23464,6 @@ msgid "Who will be using this GitLab trial?"
 msgstr ""
 
 msgid "Wiki"
-msgstr ""
-
-msgid "Wiki pages"
 msgstr ""
 
 msgid "Wiki was successfully updated."

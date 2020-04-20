@@ -284,6 +284,12 @@ application server, or a Gitaly node.
    }
    ```
 
+1. Enable the replication queue:
+
+    ```ruby
+    praefect['postgres_queue_enabled'] = true
+    ```
+
 1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell

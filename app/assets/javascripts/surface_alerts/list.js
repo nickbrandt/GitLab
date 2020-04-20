@@ -5,7 +5,7 @@ export default () => {
   const selector = '#js-surface_alerts';
 
   const domEl = document.querySelector(selector);
-  const { indexPath, enableSurfaceAlertsLink, illustrationPath } = domEl.dataset;
+  const { indexPath, enableSurfaceAlertsPath, emptyAlertSvgPath } = domEl.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
@@ -17,8 +17,8 @@ export default () => {
       return createElement('surface-alerts-list', {
         props: {
           indexPath,
-          enableSurfaceAlertsLink,
-          illustrationPath,
+          enableSurfaceAlertsPath,
+          emptyAlertSvgPath,
         },
       });
     },

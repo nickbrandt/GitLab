@@ -448,7 +448,7 @@ module ProjectsHelper
       clusters:         :read_cluster,
       serverless:       :read_cluster,
       error_tracking:   :read_sentry_issue,
-      surface_alerts:   :read_sentry_issue,
+      surface_alerts:   :read_surface_alerts,
       labels:           :read_label,
       issues:           :read_issue,
       project_members:  :read_project_member,
@@ -739,3 +739,5 @@ module ProjectsHelper
       can?(current_user, :destroy_container_image, project)
   end
 end
+
+ProjectsHelper.prepend_if_ee('EE::ProjectsHelper')

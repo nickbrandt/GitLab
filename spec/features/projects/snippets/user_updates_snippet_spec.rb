@@ -61,6 +61,7 @@ describe 'Projects > Snippets > User updates a snippet', :js do
       end
 
       fill_in('project_snippet_title', with: 'Snippet new title')
+      fill_in('project_snippet_file_name', with: 'new_file_name')
 
       click_button('Save')
     end

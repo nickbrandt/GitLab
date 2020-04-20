@@ -356,7 +356,7 @@ possible).
 
 | Tests path | Testing engine | Notes |
 | ---------- | -------------- | ----- |
-| `spec/features/` | [Capybara] + [RSpec] | If your test has the `:js` metadata, the browser driver will be [Poltergeist], otherwise it's using [RackTest]. |
+| `spec/features/` | [Capybara](https://github.com/teamcapybara/capybara) + [RSpec](https://github.com/rspec/rspec-rails#feature-specs) | If your test has the `:js` metadata, the browser driver will be [Poltergeist], otherwise it's using [RackTest]. |
 
 ### Frontend feature tests
 
@@ -487,7 +487,7 @@ Every new feature should come with a [test plan].
 
 | Tests path | Testing engine | Notes |
 | ---------- | -------------- | ----- |
-| `qa/qa/specs/features/` | [Capybara] + [RSpec] + Custom QA framework | Tests should be placed under their corresponding [Product category] |
+| `qa/qa/specs/features/` | [Capybara](https://github.com/teamcapybara/capybara) + [RSpec](https://github.com/rspec/rspec-rails#feature-specs) + Custom QA framework | Tests should be placed under their corresponding [Product category] |
 
 > See [end-to-end tests](end_to_end/index.md) for more information.
 
@@ -517,14 +517,11 @@ These tests run against the UI and ensure that basic functionality is working.
 
 ### GitLab QA orchestrator
 
-[GitLab QA orchestrator] is a tool that allows to test that all these pieces
+[GitLab QA orchestrator](https://gitlab.com/gitlab-org/gitlab-qa) is a tool that allows to test that all these pieces
 integrate well together by building a Docker image for a given version of GitLab
 Rails and running end-to-end tests (i.e. using Capybara) against it.
 
-Learn more in the [GitLab QA orchestrator README][gitlab-qa-readme].
-
-[GitLab QA orchestrator]: https://gitlab.com/gitlab-org/gitlab-qa
-[gitlab-qa-readme]: https://gitlab.com/gitlab-org/gitlab-qa/tree/master/README.md
+Learn more in the [GitLab QA orchestrator README](https://gitlab.com/gitlab-org/gitlab-qa/tree/master/README.md).
 
 ## EE-specific tests
 
@@ -538,7 +535,9 @@ trade-off:
 - Unit tests are usually cheap, and you should consider them like the basement
   of your house: you need them to be confident that your code is behaving
   correctly. However if you run only unit tests without integration / system
-  tests, you might [miss] the [big] / [picture] !
+  tests, you might [miss](https://twitter.com/ThePracticalDev/status/850748070698651649) the
+  [big](https://twitter.com/timbray/status/822470746773409794) /
+  [picture](https://twitter.com/withzombies/status/829716565834752000) !
 - Integration tests are a bit more expensive, but don't abuse them. A system test
   is often better than an integration test that is stubbing a lot of internals.
 - System tests are expensive (compared to unit tests), even more if they require
@@ -546,8 +545,8 @@ trade-off:
   section.
 
 Another way to see it is to think about the "cost of tests", this is well
-explained [in this article][tests-cost] and the basic idea is that the cost of a
-test includes:
+explained [in this article](https://medium.com/table-xi/high-cost-tests-and-high-value-tests-a86e27a54df#.2ulyh3a4e)
+and the basic idea is that the cost of a test includes:
 
 - The time it takes to write the test
 - The time it takes to run the test every time the suite runs
@@ -561,13 +560,6 @@ There are cases where the behaviour you are testing is not worth the time spent
 running the full application, for example, if you are testing styling, animation,
 edge cases or small actions that don't involve the backend,
 you should write an integration test using Jasmine.
-
-[miss]: https://twitter.com/ThePracticalDev/status/850748070698651649
-[big]: https://twitter.com/timbray/status/822470746773409794
-[picture]: https://twitter.com/withzombies/status/829716565834752000
-[tests-cost]: https://medium.com/table-xi/high-cost-tests-and-high-value-tests-a86e27a54df#.2ulyh3a4e
-[RSpec]: https://github.com/rspec/rspec-rails#feature-specs
-[Capybara]: https://github.com/teamcapybara/capybara
 
 ---
 

@@ -400,7 +400,8 @@ CREATE TABLE public.application_settings (
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
     issues_create_limit integer DEFAULT 300 NOT NULL,
-    push_rule_id bigint
+    push_rule_id bigint,
+    group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -4599,6 +4600,28 @@ CREATE SEQUENCE public.pages_domains_id_seq
 
 ALTER SEQUENCE public.pages_domains_id_seq OWNED BY public.pages_domains.id;
 
+CREATE TABLE public.partitioned_foreign_keys (
+    id bigint NOT NULL,
+    cascade_delete boolean DEFAULT true NOT NULL,
+    from_table text NOT NULL,
+    from_column text NOT NULL,
+    to_table text NOT NULL,
+    to_column text NOT NULL,
+    CONSTRAINT check_2c2e02a62b CHECK ((char_length(from_column) <= 63)),
+    CONSTRAINT check_40738efb57 CHECK ((char_length(to_table) <= 63)),
+    CONSTRAINT check_741676d405 CHECK ((char_length(from_table) <= 63)),
+    CONSTRAINT check_7e98be694f CHECK ((char_length(to_column) <= 63))
+);
+
+CREATE SEQUENCE public.partitioned_foreign_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.partitioned_foreign_keys_id_seq OWNED BY public.partitioned_foreign_keys.id;
+
 CREATE TABLE public.path_locks (
     id integer NOT NULL,
     path character varying NOT NULL,
@@ -6002,7 +6025,9 @@ CREATE TABLE public.status_page_settings (
     aws_region character varying(255) NOT NULL,
     aws_access_key character varying(255) NOT NULL,
     encrypted_aws_secret_key character varying(255) NOT NULL,
-    encrypted_aws_secret_key_iv character varying(255) NOT NULL
+    encrypted_aws_secret_key_iv character varying(255) NOT NULL,
+    status_page_url text,
+    CONSTRAINT check_75a79cd992 CHECK ((char_length(status_page_url) <= 1024))
 );
 
 CREATE SEQUENCE public.status_page_settings_project_id_seq
@@ -7378,6 +7403,8 @@ ALTER TABLE ONLY public.pages_domain_acme_orders ALTER COLUMN id SET DEFAULT nex
 
 ALTER TABLE ONLY public.pages_domains ALTER COLUMN id SET DEFAULT nextval('public.pages_domains_id_seq'::regclass);
 
+ALTER TABLE ONLY public.partitioned_foreign_keys ALTER COLUMN id SET DEFAULT nextval('public.partitioned_foreign_keys_id_seq'::regclass);
+
 ALTER TABLE ONLY public.path_locks ALTER COLUMN id SET DEFAULT nextval('public.path_locks_id_seq'::regclass);
 
 ALTER TABLE ONLY public.personal_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.personal_access_tokens_id_seq'::regclass);
@@ -8205,6 +8232,9 @@ ALTER TABLE ONLY public.pages_domain_acme_orders
 
 ALTER TABLE ONLY public.pages_domains
     ADD CONSTRAINT pages_domains_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.partitioned_foreign_keys
+    ADD CONSTRAINT partitioned_foreign_keys_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.path_locks
     ADD CONSTRAINT path_locks_pkey PRIMARY KEY (id);
@@ -9373,6 +9403,8 @@ CREATE INDEX index_import_failures_on_correlation_id_value ON public.import_fail
 
 CREATE INDEX index_import_failures_on_group_id_not_null ON public.import_failures USING btree (group_id) WHERE (group_id IS NOT NULL);
 
+CREATE INDEX index_import_failures_on_project_id_and_correlation_id_value ON public.import_failures USING btree (project_id, correlation_id_value) WHERE (retry_count = 0);
+
 CREATE INDEX index_import_failures_on_project_id_not_null ON public.import_failures USING btree (project_id) WHERE (project_id IS NOT NULL);
 
 CREATE UNIQUE INDEX index_index_statuses_on_project_id ON public.index_statuses USING btree (project_id);
@@ -9810,6 +9842,8 @@ CREATE INDEX index_pages_domains_on_verified_at ON public.pages_domains USING bt
 CREATE INDEX index_pages_domains_on_verified_at_and_enabled_until ON public.pages_domains USING btree (verified_at, enabled_until);
 
 CREATE INDEX index_pages_domains_on_wildcard ON public.pages_domains USING btree (wildcard);
+
+CREATE UNIQUE INDEX index_partitioned_foreign_keys_unique_index ON public.partitioned_foreign_keys USING btree (to_table, from_table, from_column);
 
 CREATE INDEX index_pat_on_user_id_and_expires_at ON public.personal_access_tokens USING btree (user_id, expires_at);
 
@@ -13184,6 +13218,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200407121321
 20200407171133
 20200407171417
+20200407182205
 20200408110856
 20200408133211
 20200408153842
@@ -13196,8 +13231,11 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408154604
 20200408154624
 20200408175424
+20200408212219
+20200409085956
 20200409211607
 20200410232012
+20200413072059
 20200414144547
 20200415160722
 20200415161021

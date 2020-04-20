@@ -24,7 +24,7 @@ module Projects
           end
         end
 
-        unless Feature.enabled?(:jira_issue_import_vue, @project)
+        unless Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
           flash[:notice] = _("Import %{status}") % { status: @project.jira_import_status } unless @project.latest_jira_import&.initial?
         end
       end
@@ -36,7 +36,7 @@ module Projects
           response = ::JiraImport::StartImportService.new(current_user, @project, jira_project_key).execute
           flash[:notice] = response.message if response.message.present?
         else
-          flash[:alert] = 'No jira project key has been provided.'
+          flash[:alert] = 'No Jira project key has been provided.'
         end
 
         redirect_to project_import_jira_path(@project)
@@ -51,7 +51,7 @@ module Projects
       end
 
       def jira_integration_configured?
-        return if Feature.enabled?(:jira_issue_import_vue, @project)
+        return if Feature.enabled?(:jira_issue_import_vue, @project, default_enabled: true)
         return if @project.jira_service
 
         flash[:notice] = _("Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page." %

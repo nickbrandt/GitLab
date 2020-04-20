@@ -12,11 +12,11 @@ export default {
       type: String,
       required: true,
     },
-    enableSurfaceAlertsLink: {
+    enableSurfaceAlertsPath: {
       type: String,
       required: true,
     },
-    illustrationPath: {
+    emptyAlertSvgPath: {
       type: String,
       required: true,
     },
@@ -40,20 +40,20 @@ export default {
       </div>
     </div>
     <div v-else>
-      <gl-empty-state :title="__('Surface alerts in GitLab')" :svg-path="illustrationPath">
+      <gl-empty-state :title="__('Surface alerts in GitLab')" :svg-path="emptyAlertSvgPath">
         <template #description>
           <div class="d-block">
             <span>{{
               __(
-                'Display alerts from all your monitoring tools directly withing GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
+                'Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
               )
             }}</span>
             <a href="/help/user/project/operations/surface_alerts.html">
               {{ __('More information') }}
             </a>
           </div>
-          <div class="d-block center">
-            <gl-button category="primary" variant="success" :href="enableSurfaceAlertsLink">{{
+          <div class="d-block center pt-4">
+            <gl-button category="primary" variant="success" :href="enableSurfaceAlertsPath">{{
               __('Authorize external service')
             }}</gl-button>
           </div>

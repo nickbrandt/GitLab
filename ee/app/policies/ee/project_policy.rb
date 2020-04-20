@@ -123,8 +123,7 @@ module EE
       end
 
       condition(:status_page_available) do
-        @subject.feature_available?(:status_page, @user) &&
-          @subject.beta_feature_available?(:status_page)
+        @subject.feature_available?(:status_page, @user)
       end
 
       condition(:group_timelogs_available) do
@@ -182,6 +181,7 @@ module EE
         enable :update_feature_flag
         enable :destroy_feature_flag
         enable :admin_feature_flag
+        enable :admin_feature_flags_user_lists
         enable :create_design
         enable :destroy_design
       end
@@ -218,6 +218,7 @@ module EE
 
       rule { feature_flags_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:feature_flag))
+        prevent(:admin_feature_flags_user_lists)
       end
 
       rule { can?(:maintainer_access) }.policy do

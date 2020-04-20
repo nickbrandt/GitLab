@@ -5,8 +5,8 @@ module Projects::SurfaceAlertsHelper
     {
       'index-path' => project_surface_alerts_path(project,
                                                         format: :json),
-      'enable-surface-alerts-link' => project_settings_operations_path(project),
-      'illustration-path' => image_path('illustrations/alert-management-empty-state.svg')
+      'enable-surface-alerts-path' => project_settings_operations_path(project),
+      'empty-alert-svg-path' => image_path('illustrations/alert-management-empty-state.svg')
     }
   end
 end

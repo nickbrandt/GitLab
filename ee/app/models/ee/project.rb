@@ -47,7 +47,7 @@ module EE
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
-      has_one :status_page_setting, inverse_of: :project
+      has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
       has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
 
       has_many :reviews, inverse_of: :project
@@ -85,6 +85,7 @@ module EE
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
+      has_many :operations_feature_flags_user_lists, class_name: 'Operations::FeatureFlags::UserList'
 
       has_many :project_aliases
 
@@ -150,6 +151,7 @@ module EE
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
       scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
       scope :with_deleting_user, -> { includes(:deleting_user) }
+      scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true

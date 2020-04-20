@@ -27,10 +27,7 @@ module EE
     end
 
     def metrics_data(project, environment)
-      ee_metrics_data = {
-        "alerts-endpoint" => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
-        "prometheus-alerts-available" => "#{can?(current_user, :read_prometheus_alerts, project)}"
-      }
+      ee_metrics_data = {}
       ee_metrics_data["logs_path"] = project_logs_path(project, environment_name: environment.name) if can?(current_user, :read_pod_logs, project)
 
       super.merge(ee_metrics_data)

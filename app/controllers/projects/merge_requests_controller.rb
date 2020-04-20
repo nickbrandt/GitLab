@@ -14,7 +14,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
   before_action :authorize_update_issuable!, only: [:close, :edit, :update, :remove_wip, :sort]
-  before_action :authorize_read_actual_head_pipeline!, only: [:test_reports, :exposed_artifacts, :coverage_reports]
+  before_action :authorize_read_actual_head_pipeline!, only: [:test_reports, :exposed_artifacts, :coverage_reports, :terraform_reports]
   before_action :set_issuables_index, only: [:index]
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
@@ -141,6 +141,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     else
       head :no_content
     end
+  end
+
+  def terraform_reports
+    reports_response(@merge_request.find_terraform_reports)
   end
 
   def exposed_artifacts

@@ -228,8 +228,11 @@ are listed in the descriptions of the relevant settings.
 | `elasticsearch_aws`                      | boolean          | no                                   | **(PREMIUM)** Enable the use of AWS hosted Elasticsearch |
 | `elasticsearch_aws_region`               | string           | no                                   | **(PREMIUM)** The AWS region the Elasticsearch domain is configured |
 | `elasticsearch_aws_secret_access_key`    | string           | no                                   | **(PREMIUM)** AWS IAM secret access key |
+| `elasticsearch_indexed_field_length_limit` | integer          | no                                   | **(PREMIUM)**  Maximum size of text fields that will be indexed by Elasticsearch. 0 value means no limit. This does not apply to repository and wiki indexing. |
 | `elasticsearch_indexing`                 | boolean          | no                                   | **(PREMIUM)** Enable Elasticsearch indexing |
 | `elasticsearch_limit_indexing`           | boolean          | no                                   | **(PREMIUM)** Limit Elasticsearch to index certain namespaces and projects |
+| `elasticsearch_max_bulk_concurrency`     | integer          | no                                   | **(PREMIUM)**  Maximum concurrency of Elasticsearch bulk requests per indexing operation. This only applies to repository indexing operations. |
+| `elasticsearch_max_bulk_size_mb`         | integer          | no                                   | **(PREMIUM)**  Maximum size of Elasticsearch bulk indexing requests in MB. This only applies to repository indexing operations. |
 | `elasticsearch_namespace_ids`            | array of integers | no                                  | **(PREMIUM)** The namespaces to index via Elasticsearch if `elasticsearch_limit_indexing` is enabled. |
 | `elasticsearch_project_ids`              | array of integers | no                                  | **(PREMIUM)** The projects to index via Elasticsearch if `elasticsearch_limit_indexing` is enabled. |
 | `elasticsearch_search`                   | boolean          | no                                   | **(PREMIUM)** Enable Elasticsearch search |

@@ -299,5 +299,9 @@ module EE
     def can_import_members?
       super && !membership_locked?
     end
+
+    def show_compliance_framework_badge?(project)
+      project&.compliance_framework_setting&.present?
+    end
   end
 end

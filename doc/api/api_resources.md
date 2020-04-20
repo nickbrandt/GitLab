@@ -31,6 +31,8 @@ The following API resources are available in the project context:
 | [Environments](environments.md)                                     | `/projects/:id/environments`                                                                                                                                                                          |
 | [Error Tracking](error_tracking.md)                        | `/projects/:id/error_tracking/settings`                                                                                                                                                |
 | [Events](events.md)                                                 | `/projects/:id/events` (also available for users and standalone)                                                                                                                                      |
+| [Feature Flags](feature_flags.md)                                   | `/projects/:id/feature_flags`                                                                                                                                                                         |
+| [Feature Flag User Lists](feature_flag_user_lists.md)               | `/projects/:id/feature_flags_user_lists`                                                                                                                                                              |
 | [Issues](issues.md)                                                 | `/projects/:id/issues` (also available for groups and standalone)                                                                                                                                     |
 | [Issues Statistics](issues_statistics.md)                           | `/projects/:id/issues_statistics` (also available for groups and standalone)                                                                                                                          |
 | [Issue boards](boards.md)                                           | `/projects/:id/boards`                                                                                                                                                                                |
@@ -130,6 +132,7 @@ The following API resources are available outside of project and group contexts 
 | [License](license.md) **(CORE ONLY)**              | `/license`                                                              |
 | [Markdown](markdown.md)                            | `/markdown`                                                             |
 | [Merge requests](merge_requests.md)                | `/merge_requests` (also available for groups and projects)              |
+| [Metrics dashboard annotations](metrics_dashboard_annotations.md)    | `/environments/:id/metrics_dashboard/annotations`     |
 | [Namespaces](namespaces.md)                        | `/namespaces`                                                           |
 | [Notification settings](notification_settings.md)  | `/notification_settings` (also available for groups and projects)       |
 | [Pages domains](pages_domains.md)                  | `/pages/domains` (also available for projects)                          |
