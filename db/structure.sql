@@ -10429,6 +10429,8 @@ CREATE UNIQUE INDEX index_packages_build_infos_on_package_id ON public.packages_
 
 CREATE INDEX index_packages_build_infos_on_pipeline_id ON public.packages_build_infos USING btree (pipeline_id);
 
+CREATE UNIQUE INDEX index_packages_composer_metadata_on_package_id_and_target_sha ON public.packages_composer_metadata USING btree (package_id, target_sha);
+
 CREATE UNIQUE INDEX index_packages_conan_file_metadata_on_package_file_id ON public.packages_conan_file_metadata USING btree (package_file_id);
 
 CREATE UNIQUE INDEX index_packages_conan_metadata_on_package_id_username_channel ON public.packages_conan_metadata USING btree (package_id, package_username, package_channel);
@@ -13993,5 +13995,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200615083635
 20200615121217
 20200615123055
+20200615232735
 \.
 

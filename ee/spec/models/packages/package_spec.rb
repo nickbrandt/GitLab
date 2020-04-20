@@ -14,6 +14,20 @@ RSpec.describe Packages::Package, type: :model do
     it { is_expected.to have_one(:nuget_metadatum).inverse_of(:package) }
   end
 
+  describe '.with_composer_target' do
+    let!(:package1) { create(:composer_package, :with_metadatum, sha: '123') }
+    let!(:package2) { create(:composer_package, :with_metadatum, sha: '123') }
+    let!(:package3) { create(:composer_package, :with_metadatum, sha: '234') }
+
+    subject { described_class.with_composer_target('123').to_a }
+
+    it 'selects packages with the specified sha' do
+      expect(subject).to include(package1)
+      expect(subject).to include(package2)
+      expect(subject).not_to include(package3)
+    end
+  end
+
   describe '.sort_by_attribute' do
     let_it_be(:group) { create(:group, :public) }
     let_it_be(:project) { create(:project, :public, namespace: group, name: 'project A') }

@@ -71,6 +71,17 @@ FactoryBot.define do
       sequence(:name) { |n| "composer-package-#{n}"}
       sequence(:version) { |n| "1.0.#{n}" }
       package_type { :composer }
+
+      transient do
+        sha { project.repository.find_branch('master').target }
+        json { { name: name, version: version } }
+      end
+
+      trait(:with_metadatum) do
+        after :create do |package, evaluator|
+          create :composer_metadatum, package: package, target_sha: evaluator.sha, composer_json: evaluator.json
+        end
+      end
     end
 
     factory :conan_package do
@@ -104,6 +115,9 @@ FactoryBot.define do
         conan_metadatum { build(:conan_metadatum, package: nil) }
       end
     end
+  end
+
+  factory :composer_metadatum, class: 'Packages::Composer::Metadatum' do
   end
 
   factory :package_build_info, class: 'Packages::BuildInfo' do
