@@ -358,6 +358,15 @@ describe Projects::FeatureFlagsController do
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
+
+      it 'returns strategies ordered by id' do
+        first_strategy = create(:operations_strategy, feature_flag: new_version_feature_flag)
+        second_strategy = create(:operations_strategy, feature_flag: new_version_feature_flag)
+
+        subject
+
+        expect(json_response['strategies'].map { |s| s['id'] }).to eq([first_strategy.id, second_strategy.id])
+      end
     end
   end
 

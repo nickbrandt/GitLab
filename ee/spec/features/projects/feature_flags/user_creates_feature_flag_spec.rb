@@ -31,6 +31,25 @@ describe 'User creates feature flag', :js do
     expect(page).to have_text('test_feature')
   end
 
+  it 'user creates a flag with default environment scopes' do
+    visit(new_project_feature_flag_path(project))
+    set_feature_flag_info('test_flag', 'Test flag')
+    within_strategy_row(1) do
+      select 'All users', from: 'Type'
+    end
+    click_button 'Create feature flag'
+
+    expect_user_to_see_feature_flags_index_page
+    expect(page).to have_text('test_flag')
+
+    edit_feature_flag_button.click
+
+    within_strategy_row(1) do
+      expect(page).to have_text('All users')
+      expect(page).to have_text('All environments')
+    end
+  end
+
   context 'with new version flags disabled' do
     before do
       stub_feature_flags(feature_flags_new_version: false)
