@@ -132,7 +132,7 @@ export default {
           aria-controls="token-suggestions"
           aria-haspopup="listbox"
           :aria-expanded="showSuggestions"
-          data-qa-selector="variable_key"
+          data-qa-selector="ci_variable_key_field"
           @input="onEntry"
           @keydown.down="onArrowDown"
           @keydown.up="onArrowUp"
