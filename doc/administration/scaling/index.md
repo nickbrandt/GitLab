@@ -43,7 +43,7 @@ needs.
 ## Reference architectures
 
 GitLab can be set up on a single machine or scaled out to handle large number of users. In this section we'll detail the Reference Architectures that were built and verified by our Quality and Support teams.
-Testing was done with our [GitLab Performance Tool(https://gitlab.com/gitlab-org/quality/performance) at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data.
+Testing was done with our [GitLab Performance Tool](https://gitlab.com/gitlab-org/quality/performance) at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data.
 
 We test each endpoint type with the following number of requests per second (RPS) per 1000 users:
 
@@ -52,8 +52,8 @@ We test each endpoint type with the following number of requests per second (RPS
 - Git: 2 RPS
 
 For up to 2,000 users we recommend going with a simple setup. Going above 2,000 users, we recommend scaling GitLab components to multiple machine nodes.
-The machine nodes are grouped by component(s). The addition of these nodes adds limited fault tolerance to your GitLab instance. 
-As long as there is at least one of each component online and capable of handling the instance's usage load, your team's productivity will not be interrupted. 
+The machine nodes are grouped by component(s). The addition of these nodes adds limited fault tolerance to your GitLab instance.
+As long as there is at least one of each component online and capable of handling the instance's usage load, your team's productivity will not be interrupted.
 The same is true if you are looking to perform [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
 
 When scaling GitLab there's a few factors to consider:
