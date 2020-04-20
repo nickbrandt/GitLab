@@ -1433,7 +1433,7 @@ describe Project do
         let(:plan_license) { :bronze }
 
         it 'filters for bronze features' do
-          is_expected.to contain_exactly(:audit_events, :geo)
+          is_expected.to contain_exactly(:audit_events, :geo, :service_desk)
         end
       end
 
