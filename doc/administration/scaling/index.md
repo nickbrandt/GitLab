@@ -43,7 +43,7 @@ needs.
 ## Reference architectures
 
 GitLab can be setup on a single machine or scaled out to handle large number of users. In this section we'll detail the Reference Architectures that were built and verified by our Quality and Support teams.
-Testing was done with our GitLab Performance Tool at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data. 
+Testing was done with our [GitLab Performance Tool(https://gitlab.com/gitlab-org/quality/performance) at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data.
 
 We test each endpoint type with the following number of requests per second (RPS) per 1000 users:
 
