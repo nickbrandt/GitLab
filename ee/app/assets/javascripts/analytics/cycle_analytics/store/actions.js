@@ -1,11 +1,8 @@
-import dateFormat from 'dateformat';
 import Api from 'ee/api';
-import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
-import { dateFormats } from '../../shared/constants';
 import { removeFlash } from '../utils';
 
 const handleErrorOrRethrow = ({ action, error }) => {
@@ -111,9 +108,8 @@ export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CY
 export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
 
-  const { featureFlags: { hasDurationChart = false, hasTasksByTypeChart = false } = {} } = state;
+  const { featureFlags: { hasTasksByTypeChart = false } = {} } = state;
   const promises = [];
-  if (hasDurationChart) promises.push('fetchDurationData');
   if (hasTasksByTypeChart) promises.push('fetchTopRankedGroupLabels');
   return Promise.all(promises.map(func => dispatch(func)));
 };
@@ -299,18 +295,12 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     });
 };
 
-export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {
-  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
-};
-
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
   createFlash(__('There was an error fetching data for the tasks by type chart'));
 };
 
-export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
-
-export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
+export const fetchTasksByTypeData = ({ dispatch, commit, state, getters }) => {
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
@@ -319,6 +309,9 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const {
     tasksByType: { subject, selectedLabelIds },
   } = state;
+
+  // ensure we clear any chart data currently in state
+  commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
   // dont request if we have no labels selected...for now
   if (selectedLabelIds.length) {
@@ -330,13 +323,11 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
       label_ids: selectedLabelIds,
     };
 
-    dispatch('requestTasksByTypeData');
-
     return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
-      .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
+      .then(({ data }) => commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
-  return Promise.resolve();
+  return commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, []);
 };
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
@@ -405,128 +396,9 @@ export const removeStage = ({ dispatch, state }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
-export const requestDurationData = ({ commit }) => commit(types.REQUEST_DURATION_DATA);
-
-export const receiveDurationDataSuccess = ({ commit, state, dispatch }, data) => {
-  commit(types.RECEIVE_DURATION_DATA_SUCCESS, data);
-
-  const { featureFlags: { hasDurationChartMedian = false } = {} } = state;
-  if (hasDurationChartMedian) dispatch('fetchDurationMedianData');
-};
-
-export const receiveDurationDataError = ({ commit }) => {
-  commit(types.RECEIVE_DURATION_DATA_ERROR);
-  createFlash(__('There was an error while fetching value stream analytics duration data.'));
-};
-
-export const fetchDurationData = ({ state, dispatch, getters }) => {
-  dispatch('requestDurationData');
-
-  const {
-    stages,
-    selectedGroup: { fullPath },
-  } = state;
-
-  const {
-    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
-  } = getters;
-
-  return Promise.all(
-    stages.map(stage => {
-      const { slug } = stage;
-
-      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
-        created_after,
-        created_before,
-        project_ids,
-      }).then(({ data }) => ({
-        slug,
-        selected: true,
-        data,
-      }));
-    }),
-  )
-    .then(data => {
-      dispatch('receiveDurationDataSuccess', data);
-    })
-    .catch(() => dispatch('receiveDurationDataError'));
-};
-
-export const requestDurationMedianData = ({ commit }) => commit(types.REQUEST_DURATION_MEDIAN_DATA);
-
-export const receiveDurationMedianDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_DURATION_MEDIAN_DATA_SUCCESS, data);
-
-export const receiveDurationMedianDataError = ({ commit }) => {
-  commit(types.RECEIVE_DURATION_MEDIAN_DATA_ERROR);
-  createFlash(__('There was an error while fetching value stream analytics duration median data.'));
-};
-
-export const fetchDurationMedianData = ({ state, dispatch, getters }) => {
-  dispatch('requestDurationMedianData');
-
-  const {
-    stages,
-    selectedGroup: { fullPath },
-    startDate,
-    endDate,
-  } = state;
-  const {
-    cycleAnalyticsRequestParams: { project_ids },
-  } = getters;
-
-  const offsetValue = getDayDifference(new Date(startDate), new Date(endDate));
-  const offsetCreatedAfter = getDateInPast(new Date(startDate), offsetValue);
-  const offsetCreatedBefore = getDateInPast(new Date(endDate), offsetValue);
-
-  return Promise.all(
-    stages.map(stage => {
-      const { slug } = stage;
-
-      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
-        created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
-        created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
-        project_ids,
-      }).then(({ data }) => ({
-        slug,
-        selected: true,
-        data,
-      }));
-    }),
-  )
-    .then(data => {
-      dispatch('receiveDurationMedianDataSuccess', data);
-    })
-    .catch(() => dispatch('receiveDurationMedianDataError'));
-};
-
-export const updateSelectedDurationChartStages = ({ state, commit }, stages) => {
-  const setSelectedPropertyOnStages = data =>
-    data.map(stage => {
-      const selected = stages.reduce((result, object) => {
-        if (object.slug === stage.slug) return true;
-        return result;
-      }, false);
-
-      return {
-        ...stage,
-        selected,
-      };
-    });
-
-  const { durationData, durationMedianData } = state;
-  const updatedDurationStageData = setSelectedPropertyOnStages(durationData);
-  const updatedDurationStageMedianData = setSelectedPropertyOnStages(durationMedianData);
-
-  commit(types.UPDATE_SELECTED_DURATION_CHART_STAGES, {
-    updatedDurationStageData,
-    updatedDurationStageMedianData,
-  });
-};
-
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
-  dispatch('fetchTasksByTypeData');
+  dispatch('fetchTopRankedGroupLabels');
 };
 
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>

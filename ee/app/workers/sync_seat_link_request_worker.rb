@@ -29,12 +29,12 @@ class SyncSeatLinkRequestWorker
   private
 
   def request_body(date, license_key, max_historical_user_count, active_users)
-    {
+    Gitlab::SeatLinkData.new(
       date: date,
-      license_key: license_key,
-      max_historical_user_count: max_historical_user_count,
+      key: license_key,
+      max_users: max_historical_user_count,
       active_users: active_users
-    }.to_json
+    ).to_json
   end
 
   def request_headers

@@ -7,6 +7,7 @@ import {
   sastParsedIssues,
   dockerReportParsed,
   parsedDast,
+  secretScanningParsedIssues,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
 import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import reportIssue from '~/reports/components/report_item.vue';
@@ -60,7 +61,7 @@ describe('Report issue', () => {
     it('should render location', () => {
       vm = mountComponent(ReportIssue, {
         issue: sastParsedIssues[0],
-        component: componentNames.SastIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
 
@@ -77,7 +78,7 @@ describe('Report issue', () => {
         issue: {
           title: 'foo',
         },
-        component: componentNames.SastIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_SUCCESS,
       });
 
@@ -90,7 +91,7 @@ describe('Report issue', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssue, {
         issue: dockerReportParsed.unapproved[0],
-        component: componentNames.ContainerScanningIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
     });
@@ -112,7 +113,7 @@ describe('Report issue', () => {
         store,
         props: {
           issue: parsedDast[0],
-          component: componentNames.DastIssueBody,
+          component: componentNames.SecurityIssueBody,
           status: STATUS_FAILED,
         },
       });
@@ -124,13 +125,33 @@ describe('Report issue', () => {
     });
   });
 
+  describe('for secret scanning issue', () => {
+    beforeEach(() => {
+      vm = mountComponent(ReportIssue, {
+        issue: secretScanningParsedIssues[0],
+        component: componentNames.SecurityIssueBody,
+        status: STATUS_FAILED,
+      });
+    });
+
+    it('renders severity', () => {
+      expect(vm.$el.textContent.trim()).toContain(secretScanningParsedIssues[0].severity);
+    });
+
+    it('renders CVE name', () => {
+      expect(vm.$el.querySelector('button').textContent.trim()).toEqual(
+        secretScanningParsedIssues[0].title,
+      );
+    });
+  });
+
   describe('showReportSectionStatusIcon', () => {
     it('does not render CI Status Icon when showReportSectionStatusIcon is false', () => {
       vm = mountComponentWithStore(ReportIssue, {
         store,
         props: {
           issue: parsedDast[0],
-          component: componentNames.DastIssueBody,
+          component: componentNames.SecurityIssueBody,
           status: STATUS_SUCCESS,
           showReportSectionStatusIcon: false,
         },
@@ -144,7 +165,7 @@ describe('Report issue', () => {
         store,
         props: {
           issue: parsedDast[0],
-          component: componentNames.DastIssueBody,
+          component: componentNames.SecurityIssueBody,
           status: STATUS_SUCCESS,
         },
       });

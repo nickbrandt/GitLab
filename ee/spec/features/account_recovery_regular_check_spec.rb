@@ -8,6 +8,7 @@ describe 'Account recovery regular check callout' do
     let(:message) { "Please ensure your account's recovery settings are up to date." }
 
     before do
+      allow(Gitlab).to receive(:com?) { true }
       gitlab_sign_in(user)
     end
 

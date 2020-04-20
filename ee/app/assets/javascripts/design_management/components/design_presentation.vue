@@ -3,6 +3,8 @@ import { throttle } from 'lodash';
 import DesignImage from './image.vue';
 import DesignOverlay from './design_overlay.vue';
 
+const CLICK_DRAG_BUFFER_PX = 2;
+
 export default {
   components: {
     DesignImage,
@@ -102,8 +104,8 @@ export default {
         this.overlayPosition = {};
       }
 
-      const { presentationContainer } = this.$refs;
-      if (!presentationContainer) return;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport) return;
 
       // default to center
       this.overlayPosition = {
@@ -112,10 +114,10 @@ export default {
       };
 
       // if the overlay overflows, then don't center
-      if (this.overlayDimensions.width > presentationContainer.offsetWidth) {
+      if (this.overlayDimensions.width > presentationViewport.offsetWidth) {
         this.overlayPosition.left = '0';
       }
-      if (this.overlayDimensions.height > presentationContainer.offsetHeight) {
+      if (this.overlayDimensions.height > presentationViewport.offsetHeight) {
         this.overlayPosition.top = '0';
       }
     },
@@ -199,10 +201,10 @@ export default {
       const { x, y } = coordinates;
       const { width, height } = this.overlayDimensions;
       return {
-        x,
-        y,
-        width,
-        height,
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width),
+        height: Math.round(height),
       };
     },
     openCommentForm(coordinates) {
@@ -221,16 +223,31 @@ export default {
         y: clientY,
       };
     },
+    getDragDelta(clientX, clientY) {
+      return {
+        deltaX: this.lastDragPosition.x - clientX,
+        deltaY: this.lastDragPosition.y - clientY,
+      };
+    },
+    exceedsDragThreshold(clientX, clientY) {
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
+
+      return Math.abs(deltaX) > CLICK_DRAG_BUFFER_PX || Math.abs(deltaY) > CLICK_DRAG_BUFFER_PX;
+    },
+    shouldDragDesign(clientX, clientY) {
+      return (
+        this.lastDragPosition &&
+        (this.isDraggingDesign || this.exceedsDragThreshold(clientX, clientY))
+      );
+    },
     onPresentationMousemove({ clientX, clientY }) {
-      if (!this.lastDragPosition) return;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport || !this.shouldDragDesign(clientX, clientY)) return;
+
       this.isDraggingDesign = true;
 
-      const { presentationViewport } = this.$refs;
-      if (!presentationViewport) return;
-
       const { scrollLeft, scrollTop } = presentationViewport;
-      const deltaX = this.lastDragPosition.x - clientX;
-      const deltaY = this.lastDragPosition.y - clientY;
+      const { deltaX, deltaY } = this.getDragDelta(clientX, clientY);
       presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
 
       this.lastDragPosition = {
@@ -243,12 +260,12 @@ export default {
       this.isDraggingDesign = false;
     },
     isDesignOverflowing() {
-      const { presentationContainer } = this.$refs;
-      if (!presentationContainer) return false;
+      const { presentationViewport } = this.$refs;
+      if (!presentationViewport) return false;
 
       return (
-        presentationContainer.scrollWidth > presentationContainer.offsetWidth ||
-        presentationContainer.scrollHeight > presentationContainer.offsetHeight
+        presentationViewport.scrollWidth > presentationViewport.offsetWidth ||
+        presentationViewport.scrollHeight > presentationViewport.offsetHeight
       );
     },
   },
@@ -269,10 +286,7 @@ export default {
     @touchend="onPresentationMouseup"
     @touchcancel="onPresentationMouseup"
   >
-    <div
-      ref="presentationContainer"
-      class="h-100 w-100 d-flex align-items-center position-relative"
-    >
+    <div class="h-100 w-100 d-flex align-items-center position-relative">
       <design-image
         v-if="image"
         :image="image"

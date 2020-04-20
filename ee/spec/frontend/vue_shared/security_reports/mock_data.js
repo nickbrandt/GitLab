@@ -7,6 +7,23 @@ export const sastParsedIssues = [
     line: 12,
     severity: 'High',
     urlPath: 'foo/Gemfile.lock',
+    report_type: 'sast',
+  },
+];
+
+export const dependencyScanningIssues = [
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name: 'Cross-site Scripting in serialize-javascript',
+    description:
+      'The serialize-javascript npm package is vulnerable to Cross-site Scripting (XSS). It does not properly mitigate against unsafe characters in serialized regular expressions. If serialized data of regular expression objects are used in an environment other than Node.js, it is affected by this vulnerability.',
+    links: [{ url: 'https://nvd.nist.gov/vuln/detail/CVE-2019-16769' }],
+    location: {
+      file: 'yarn.lock',
+      dependency: { package: { name: 'serialize-javascript' }, version: '1.7.0' },
+    },
+    path: 'yarn.lock',
   },
 ];
 
@@ -175,6 +192,16 @@ export const parsedDast = [
   },
 ];
 
+export const secretScanningParsedIssues = [
+  {
+    title: 'AWS SecretKey detected',
+    path: 'Gemfile.lock',
+    line: 12,
+    severity: 'Critical',
+    urlPath: 'foo/Gemfile.lock',
+  },
+];
+
 export const dependencyScanningFeedbacks = [
   {
     id: 3,
@@ -246,6 +273,31 @@ export const containerScanningFeedbacks = [
     category: 'container_scanning',
     feedback_type: 'issue',
     branch: 'try_new_container_scanning',
+    project_fingerprint: libTiffCveFingerprint2,
+  },
+];
+
+export const secretScanningFeedbacks = [
+  {
+    id: 3,
+    project_id: 17,
+    author_id: 1,
+    issue_iid: null,
+    pipeline_id: 132,
+    category: 'secret_scanning',
+    feedback_type: 'dismissal',
+    branch: 'try_new_secret_scanning',
+    project_fingerprint: libTiffCveFingerprint2,
+  },
+  {
+    id: 4,
+    project_id: 17,
+    author_id: 1,
+    issue_iid: 123,
+    pipeline_id: 132,
+    category: 'secret_scanning',
+    feedback_type: 'issue',
+    branch: 'try_new_secret_scanning',
     project_fingerprint: libTiffCveFingerprint2,
   },
 ];
@@ -573,6 +625,14 @@ export const containerScanningDiffSuccessMock = {
 };
 
 export const dependencyScanningDiffSuccessMock = {
+  added: [mockFindings[0], mockFindings[1]],
+  fixed: [mockFindings[2]],
+  base_report_created_at: '2020-01-01T10:00:00.000Z',
+  base_report_out_of_date: false,
+  head_report_created_at: '2020-01-10T10:00:00.000Z',
+};
+
+export const secretScanningDiffSuccessMock = {
   added: [mockFindings[0], mockFindings[1]],
   fixed: [mockFindings[2]],
   base_report_created_at: '2020-01-01T10:00:00.000Z',

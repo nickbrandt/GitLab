@@ -262,6 +262,12 @@ describe AutoMerge::MergeTrainService do
 
     it { is_expected.to be_truthy }
 
+    it 'memoizes the result' do
+      expect(merge_request).to receive(:can_be_merged_by?).once.and_call_original
+
+      2.times { is_expected.to be_truthy }
+    end
+
     context 'when merge trains project option is disabled' do
       before do
         stub_feature_flags(disable_merge_trains: true)
@@ -273,6 +279,14 @@ describe AutoMerge::MergeTrainService do
     context 'when merge request is not mergeable' do
       before do
         allow(merge_request).to receive(:mergeable_state?) { false }
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when the user does not have permission to merge' do
+      before do
+        allow(merge_request).to receive(:can_be_merged_by?) { false }
       end
 
       it { is_expected.to be_falsy }

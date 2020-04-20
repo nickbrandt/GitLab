@@ -1,4 +1,4 @@
-- return unless Feature.enabled?(:requirements_management, project)
+- return unless Feature.enabled?(:requirements_management, project, default_enabled: true)
 - return unless can?(current_user, :read_requirement, project)
 
 - requirements_count = Hash.new(0).merge(project.requirements.counts_by_state)

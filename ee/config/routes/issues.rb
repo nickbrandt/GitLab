@@ -8,7 +8,6 @@ resources :issues, only: [], constraints: { id: /\d+/ } do
   end
 
   collection do
-    post :export_csv
     get :service_desk
   end
 

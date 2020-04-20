@@ -7,7 +7,7 @@ RSpec.describe SCA::LicenseCompliance do
 
   let(:project) { create(:project, :repository, :private) }
   let(:mit) { create(:software_license, :mit) }
-  let(:other_license) { create(:software_license, spdx_identifier: "Other-Id") }
+  let(:other_license) { create(:software_license, name: "SOFTWARE-LICENSE", spdx_identifier: "Other-Id") }
 
   before do
     stub_licensed_features(license_scanning: true)
@@ -253,6 +253,39 @@ RSpec.describe SCA::LicenseCompliance do
           classification: "denied",
           spdx_identifier: mit_policy.software_license.spdx_identifier
         )
+      end
+    end
+
+    context 'when sorting policies' do
+      let(:sorted_by_name_asc) { ['BSD 3-Clause "New" or "Revised" License', 'MIT', 'SOFTWARE-LICENSE', 'unknown'] }
+
+      where(:attribute, :direction, :expected) do
+        sorted_by_name_asc = ['BSD 3-Clause "New" or "Revised" License', 'MIT', 'SOFTWARE-LICENSE', 'unknown']
+        sorted_by_classification_asc = ['SOFTWARE-LICENSE', 'BSD 3-Clause "New" or "Revised" License', 'unknown', 'MIT']
+        [
+          [:classification, :asc, sorted_by_classification_asc],
+          [:classification, :desc, sorted_by_classification_asc.reverse],
+          [:name, :desc, sorted_by_name_asc.reverse],
+          [:invalid, :asc, sorted_by_name_asc],
+          [:name, :invalid, sorted_by_name_asc],
+          [:name, nil, sorted_by_name_asc],
+          [nil, :asc, sorted_by_name_asc],
+          [nil, nil, sorted_by_name_asc]
+        ]
+      end
+
+      with_them do
+        let(:results) { subject.find_policies(sort: { by: attribute, direction: direction }) }
+
+        it { expect(results.map(&:name)).to eq(expected) }
+      end
+
+      context 'when using the default sort options' do
+        it { expect(subject.find_policies.map(&:name)).to eq(sorted_by_name_asc) }
+      end
+
+      context 'when `nil` sort options are provided' do
+        it { expect(subject.find_policies(sort: nil).map(&:name)).to eq(sorted_by_name_asc) }
       end
     end
   end

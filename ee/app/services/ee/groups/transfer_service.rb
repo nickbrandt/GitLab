@@ -5,9 +5,11 @@ module EE
     module TransferService
       extend ::Gitlab::Utils::Override
 
-      EE_ERROR_MESSAGES = {
-        group_contains_npm_packages: s_('TransferGroup|Group contains projects with NPM packages.')
-      }.freeze
+      def localized_ee_error_messages
+        {
+          group_contains_npm_packages: s_('TransferGroup|Group contains projects with NPM packages.')
+        }.freeze
+      end
 
       def update_group_attributes
         ::Epic.nullify_lost_group_parents(group.self_and_descendants, lost_groups)
@@ -36,7 +38,7 @@ module EE
       end
 
       def raise_ee_transfer_error(message)
-        raise ::Groups::TransferService::TransferError, EE_ERROR_MESSAGES[message]
+        raise ::Groups::TransferService::TransferError, localized_ee_error_messages[message]
       end
 
       def different_root_ancestor?

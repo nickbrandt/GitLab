@@ -137,6 +137,17 @@ describe API::MergeRequestApprovals do
         expect(json_response['message']).to eq(nil)
       end
     end
+
+    context 'when merge_status is cannot_be_merged_rechecking' do
+      before do
+        merge_request.update!(merge_status: 'cannot_be_merged_rechecking')
+        get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", user)
+      end
+
+      it 'returns `checking`' do
+        expect(json_response['merge_status']).to eq 'checking'
+      end
+    end
   end
 
   describe 'GET :id/merge_requests/:merge_request_iid/approval_settings' do
@@ -301,8 +312,6 @@ describe API::MergeRequestApprovals do
   end
 
   describe 'PUT :id/merge_requests/:merge_request_iid/approvers' do
-    RSpec::Matchers.define_negated_matcher :not_change, :change
-
     shared_examples_for 'user allowed to change approvers' do
       context 'when disable_overriding_approvers_per_merge_request is true on the project' do
         before do

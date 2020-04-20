@@ -2,7 +2,7 @@
 import Tracking from '~/tracking';
 import {
   GlIcon,
-  GlNewButton,
+  GlButton,
   GlLoadingIcon,
   GlTooltip,
   GlDropdownItem,
@@ -15,7 +15,7 @@ import { healthStatusTextMap } from '../../constants';
 export default {
   components: {
     GlIcon,
-    GlNewButton,
+    GlButton,
     GlLoadingIcon,
     GlTooltip,
     GlDropdown,
@@ -148,7 +148,7 @@ export default {
         >
           <div class="dropdown-title">
             <span class="health-title">{{ s__('Sidebar|Assign health status') }}</span>
-            <gl-new-button
+            <gl-button
               :aria-label="__('Close')"
               variant="link"
               class="dropdown-title-button dropdown-menu-close"
@@ -159,13 +159,13 @@ export default {
 
           <div class="dropdown-content dropdown-body">
             <gl-dropdown-item @click="handleDropdownClick(null)">
-              <gl-new-button
+              <gl-button
                 variant="link"
                 class="dropdown-item health-dropdown-item"
                 :class="{ 'is-active': isSelected(null) }"
               >
                 {{ s__('Sidebar|No status') }}
-              </gl-new-button>
+              </gl-button>
             </gl-dropdown-item>
 
             <gl-dropdown-divider class="divider health-divider" />
@@ -175,13 +175,13 @@ export default {
               :key="option.key"
               @click="handleDropdownClick(option.key)"
             >
-              <gl-new-button
+              <gl-button
                 variant="link"
                 class="dropdown-item health-dropdown-item"
                 :class="{ 'is-active': isSelected(option.key) }"
               >
                 {{ option.value }}
-              </gl-new-button>
+              </gl-button>
             </gl-dropdown-item>
           </div>
         </gl-dropdown>

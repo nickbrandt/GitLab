@@ -2,9 +2,7 @@ import PerformanceIssueBody from 'ee/vue_merge_request_widget/components/perform
 import CodequalityIssueBody from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
 import BlockingMergeRequestsBody from 'ee/vue_merge_request_widget/components/blocking_merge_requests/blocking_merge_request_body.vue';
 import LicenseIssueBody from 'ee/vue_shared/license_compliance/components/license_issue_body.vue';
-import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
-import ContainerScanningIssueBody from 'ee/vue_shared/security_reports/components/container_scanning_issue_body.vue';
-import DastIssueBody from 'ee/vue_shared/security_reports/components/dast_issue_body.vue';
+import SecurityIssueBody from 'ee/vue_shared/security_reports/components/security_issue_body.vue';
 import MetricsReportsIssueBody from 'ee/vue_shared/metrics_reports/components/metrics_reports_issue_body.vue';
 import {
   components as componentsCE,
@@ -16,9 +14,7 @@ export const components = {
   PerformanceIssueBody,
   CodequalityIssueBody,
   LicenseIssueBody,
-  ContainerScanningIssueBody,
-  SastIssueBody,
-  DastIssueBody,
+  SecurityIssueBody,
   MetricsReportsIssueBody,
   BlockingMergeRequestsBody,
 };
@@ -28,9 +24,7 @@ export const componentNames = {
   PerformanceIssueBody: PerformanceIssueBody.name,
   CodequalityIssueBody: CodequalityIssueBody.name,
   LicenseIssueBody: LicenseIssueBody.name,
-  ContainerScanningIssueBody: ContainerScanningIssueBody.name,
-  SastIssueBody: SastIssueBody.name,
-  DastIssueBody: DastIssueBody.name,
+  SecurityIssueBody: SecurityIssueBody.name,
   MetricsReportsIssueBody: MetricsReportsIssueBody.name,
   BlockingMergeRequestsBody: BlockingMergeRequestsBody.name,
 };

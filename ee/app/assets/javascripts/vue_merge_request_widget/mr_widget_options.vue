@@ -314,6 +314,7 @@ export default {
         :dast-help-path="mr.dastHelp"
         :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
+        :secret-scanning-help-path="mr.secretScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
         :create-vulnerability-feedback-issue-path="mr.createVulnerabilityFeedbackIssuePath"

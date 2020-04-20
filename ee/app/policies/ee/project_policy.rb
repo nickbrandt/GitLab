@@ -123,8 +123,7 @@ module EE
       end
 
       condition(:status_page_available) do
-        @subject.feature_available?(:status_page, @user) &&
-          @subject.beta_feature_available?(:status_page)
+        @subject.feature_available?(:status_page, @user)
       end
 
       condition(:group_timelogs_available) do

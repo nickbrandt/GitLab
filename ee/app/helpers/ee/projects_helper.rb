@@ -180,6 +180,25 @@ module EE
       "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
     end
 
+    def subscription_message
+      return unless ::Gitlab.com?
+
+      ::Gitlab::ExpiringSubscriptionMessage.new(
+        subscribable: decorated_subscription,
+        signed_in: signed_in?,
+        is_admin: can?(current_user, :owner_access, @project),
+        namespace: @project.namespace
+      ).message
+    end
+
+    def decorated_subscription
+      subscription = @project.gitlab_subscription
+
+      return unless subscription
+
+      SubscriptionPresenter.new(subscription)
+    end
+
     override :membership_locked?
     def membership_locked?
       group = @project.group
@@ -279,6 +298,10 @@ module EE
     override :can_import_members?
     def can_import_members?
       super && !membership_locked?
+    end
+
+    def show_compliance_framework_badge?(project)
+      project&.compliance_framework_setting&.present?
     end
   end
 end

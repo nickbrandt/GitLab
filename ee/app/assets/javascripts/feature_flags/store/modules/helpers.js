@@ -161,15 +161,29 @@ const mapStrategyScopesToView = scopes =>
     environmentScope: s.environment_scope,
   }));
 
+const mapStrategiesParametersToViewModel = params => {
+  if (params.userIds) {
+    return { ...params, userIds: params.userIds.split(',').join(', ') };
+  }
+  return params;
+};
+
 export const mapStrategiesToViewModel = strategiesFromRails =>
   (strategiesFromRails || []).map(s => ({
     id: s.id,
     name: s.name,
-    parameters: s.parameters,
+    parameters: mapStrategiesParametersToViewModel(s.parameters),
     // eslint-disable-next-line no-underscore-dangle
     shouldBeDestroyed: Boolean(s._destroy),
     scopes: mapStrategyScopesToView(s.scopes),
   }));
+
+const mapStrategiesParametersToRails = params => {
+  if (params.userIds) {
+    return { ...params, userIds: params.userIds.split(', ').join(',') };
+  }
+  return params;
+};
 
 export const mapStrategiesToRails = params => ({
   operations_feature_flag: {
@@ -179,7 +193,7 @@ export const mapStrategiesToRails = params => ({
     strategies_attributes: (params.strategies || []).map(s => ({
       id: s.id,
       name: s.name,
-      parameters: s.parameters,
+      parameters: mapStrategiesParametersToRails(s.parameters),
       _destroy: s.shouldBeDestroyed,
       scopes_attributes: mapStrategyScopesToRails(s.scopes || []),
     })),

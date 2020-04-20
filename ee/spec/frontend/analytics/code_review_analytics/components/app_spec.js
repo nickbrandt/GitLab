@@ -5,6 +5,12 @@ import CodeReviewAnalyticsApp from 'ee/analytics/code_review_analytics/component
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
 import createState from 'ee/analytics/code_review_analytics/store/state';
 
+jest.mock('ee/analytics/code_review_analytics/filtered_search_code_review_analytics', () =>
+  jest.fn().mockImplementation(() => ({
+    setup: jest.fn(),
+  })),
+);
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
@@ -46,6 +52,11 @@ describe('CodeReviewAnalyticsApp component', () => {
         projectId: 1,
         newMergeRequestUrl: 'new_merge_request',
         emptyStateSvgPath: 'svg',
+      },
+      provide: {
+        glFeatures: {
+          codeReviewAnalyticsHasNewSearch: false,
+        },
       },
     });
 

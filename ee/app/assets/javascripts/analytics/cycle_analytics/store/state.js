@@ -9,8 +9,7 @@ export default () => ({
   isLoading: false,
   isLoadingStage: false,
   isLoadingTasksByTypeChart: false,
-  isLoadingDurationChart: false,
-  isLoadingDurationChartMedianData: false,
+  isLoadingTasksByTypeChartTopLabels: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -41,7 +40,4 @@ export default () => ({
     selectedLabelIds: [],
     data: [],
   },
-
-  durationData: [],
-  durationMedianData: [],
 });

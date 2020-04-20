@@ -4,13 +4,6 @@ require 'spec_helper'
 
 describe SyncSeatLinkWorker, type: :worker do
   describe '#perform' do
-    def create_current_license(options = {})
-      License.current.destroy!
-
-      gl_license = create(:gitlab_license, options)
-      create(:license, data: gl_license.export)
-    end
-
     context 'when current, paid license is active' do
       let(:utc_time) { Time.utc(2020, 3, 12, 12, 00) }
 

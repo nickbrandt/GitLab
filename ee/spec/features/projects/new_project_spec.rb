@@ -451,7 +451,7 @@ describe 'New project' do
   end
 
   context 'Built-in project templates' do
-    let(:enterprise_templates) { EE::Gitlab::ProjectTemplate::ENTERPRISE_TEMPLATES_TABLE }
+    let(:enterprise_templates) { Gitlab::ProjectTemplate.localized_ee_templates_table }
 
     context 'when `enterprise_templates` is licensed' do
       before do

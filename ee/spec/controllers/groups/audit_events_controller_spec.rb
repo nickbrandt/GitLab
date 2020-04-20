@@ -21,19 +21,29 @@ describe Groups::AuditEventsController do
       end
 
       context 'when audit_events feature is available' do
-        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Group.name, entity_id: group.id, sort: '').permit! }
+        let(:level) { Gitlab::Audit::Levels::Group.new(group: group) }
+        let(:audit_logs_params) { ActionController::Parameters.new(sort: '').permit! }
 
         before do
           stub_licensed_features(audit_events: true)
+
+          allow(Gitlab::Audit::Levels::Group).to receive(:new).and_return(level)
+          allow(AuditLogFinder).to receive(:new).and_call_original
         end
 
         it 'renders index with 200 status code' do
-          expect(AuditLogFinder).to receive(:new).with(audit_logs_params).and_call_original
-
           request
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index)
+        end
+
+        it 'invokes AuditLogFinder with correct arguments' do
+          request
+
+          expect(AuditLogFinder).to have_received(:new).with(
+            level: level, params: audit_logs_params
+          )
         end
 
         context 'ordering' do
@@ -73,6 +83,14 @@ describe Groups::AuditEventsController do
             let(:sort) { 'FOO' }
 
             it_behaves_like 'orders by id descending'
+          end
+        end
+
+        context 'pagination' do
+          it 'paginates audit events, without casting a count query' do
+            request
+
+            expect(assigns(:events)).to be_kind_of(Kaminari::PaginatableWithoutCount)
           end
         end
       end

@@ -17,6 +17,7 @@ import {
   dastDiffSuccessMock,
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
+  secretScanningDiffSuccessMock,
   mockFindings,
 } from './mock_data';
 
@@ -24,6 +25,7 @@ const CONTAINER_SCANNING_DIFF_ENDPOINT = 'container_scanning.json';
 const DEPENDENCY_SCANNING_DIFF_ENDPOINT = 'dependency_scanning.json';
 const DAST_DIFF_ENDPOINT = 'dast.json';
 const SAST_DIFF_ENDPOINT = 'sast.json';
+const SECRET_SCANNING_DIFF_ENDPOINT = 'secret_scanning.json';
 
 describe('Grouped security reports app', () => {
   let wrapper;
@@ -36,6 +38,7 @@ describe('Grouped security reports app', () => {
     containerScanningHelpPath: 'path',
     dastHelpPath: 'path',
     dependencyScanningHelpPath: 'path',
+    secretScanningHelpPath: 'path',
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
@@ -70,6 +73,7 @@ describe('Grouped security reports app', () => {
         dast: true,
         containerScanning: true,
         dependencyScanning: true,
+        secretScanning: true,
       },
     };
 
@@ -79,6 +83,7 @@ describe('Grouped security reports app', () => {
       gl.mrWidgetData.dependency_scanning_comparison_path = DEPENDENCY_SCANNING_DIFF_ENDPOINT;
       gl.mrWidgetData.dast_comparison_path = DAST_DIFF_ENDPOINT;
       gl.mrWidgetData.sast_comparison_path = SAST_DIFF_ENDPOINT;
+      gl.mrWidgetData.secret_scanning_comparison_path = SECRET_SCANNING_DIFF_ENDPOINT;
     });
 
     describe('with error', () => {
@@ -87,6 +92,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(500);
         mock.onGet(DAST_DIFF_ENDPOINT).reply(500);
         mock.onGet(SAST_DIFF_ENDPOINT).reply(500);
+        mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(500);
 
         createWrapper(allReportProps);
 
@@ -95,6 +101,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_ERROR),
         ]);
       });
 
@@ -121,6 +128,8 @@ describe('Grouped security reports app', () => {
         );
 
         expect(wrapper.vm.$el.textContent).toContain('DAST: Loading resulted in an error');
+
+        expect(wrapper.text()).toContain('Secret scanning: Loading resulted in an error');
       });
     });
 
@@ -130,6 +139,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(200, {});
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {});
         mock.onGet(SAST_DIFF_ENDPOINT).reply(200, {});
+        mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, {});
 
         createWrapper(allReportProps);
       });
@@ -157,6 +167,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, dastDiffSuccessMock);
         mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
+        mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, secretScanningDiffSuccessMock);
 
         createWrapper(allReportProps);
 
@@ -165,6 +176,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
         ]);
       });
 
@@ -174,7 +186,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 6 new, and 6 fixed vulnerabilities',
+          'Security scanning detected 8 new, and 7 fixed vulnerabilities',
         );
 
         // Renders the expand button
@@ -266,7 +278,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain(
+      expect(wrapper.text()).toContain(
         'Container scanning detected 2 new, and 1 fixed vulnerabilities',
       );
     });
@@ -369,6 +381,54 @@ describe('Grouped security reports app', () => {
       return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
         expect(wrapper.text()).not.toContain('0 URLs scanned');
         expect(wrapper.contains('[data-qa-selector="dast-ci-job-link"]')).toBe(false);
+      });
+    });
+  });
+
+  describe('secret scanning reports', () => {
+    const initSecretScan = (isEnabled = true) => {
+      gl.mrWidgetData = gl.mrWidgetData || {};
+      gl.mrWidgetData.secret_scanning_comparison_path = SECRET_SCANNING_DIFF_ENDPOINT;
+
+      mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, secretScanningDiffSuccessMock);
+
+      createWrapper({
+        ...props,
+        enabledReports: {
+          secretScanning: isEnabled,
+        },
+      });
+
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS);
+    };
+
+    describe('enabled', () => {
+      beforeEach(() => {
+        return initSecretScan();
+      });
+
+      it('should render the component', () => {
+        expect(wrapper.contains('[data-qa-selector="secret_scan_report"]')).toBe(true);
+      });
+
+      it('should set setSecretScanningDiffEndpoint', () => {
+        expect(wrapper.vm.secretScanning.paths.diffEndpoint).toEqual(SECRET_SCANNING_DIFF_ENDPOINT);
+      });
+
+      it('should display the correct numbers of vulnerabilities', () => {
+        expect(wrapper.text()).toContain(
+          'Secret scanning detected 2 new, and 1 fixed vulnerabilities',
+        );
+      });
+    });
+
+    describe('disabled', () => {
+      beforeEach(() => {
+        initSecretScan(false);
+      });
+
+      it('should not render the component', () => {
+        expect(wrapper.contains('[data-qa-selector="secret_scan_report"]')).toBe(false);
       });
     });
   });

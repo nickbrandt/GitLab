@@ -56,7 +56,7 @@ module EE
     end
 
     def elasticsearch_objects_options(objects)
-      objects.map { |g| { id: g.id, text: g.full_name } }
+      objects.map { |g| { id: g.id, text: g.full_path } }
     end
 
     # The admin UI cannot handle so many namespaces so we just hide it. We

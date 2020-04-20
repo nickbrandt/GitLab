@@ -295,18 +295,22 @@ describe EE::UserCalloutsHelper do
     let(:old_user) { create(:user, created_at: 4.months.ago )}
     let(:anonymous) { nil }
 
-    where(:kind_of_user, :dismissed_callout?, :should_render?) do
-      :anonymous | false | false
-      :new_user  | false | false
-      :old_user  | false | true
-      :old_user  | true  | false
+    where(:kind_of_user, :is_gitlab_com?, :dismissed_callout?, :should_render?) do
+      :anonymous | false | false | false
+      :anonymous | true  | false | false
+      :new_user  | false | false | false
+      :new_user  | true  | false | false
+      :old_user  | false | false | false
+      :old_user  | true  | false | true
+      :old_user  | false | true  | false
+      :old_user  | true  | true  | false
     end
 
     with_them do
       before do
         user = send(kind_of_user)
-
         allow(helper).to receive(:current_user).and_return(user)
+        allow(Gitlab).to receive(:com?).and_return(is_gitlab_com?)
         allow(user).to receive(:dismissed_callout?).and_return(dismissed_callout?) if user
       end
 

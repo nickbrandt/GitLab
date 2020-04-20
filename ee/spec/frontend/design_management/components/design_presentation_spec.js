@@ -63,7 +63,7 @@ describe('Design management design presentation component', () => {
       .mockReturnValue((childDimensions.height - viewportDimensions.height) * scrollTopPerc);
   }
 
-  function clickDragExplore(startCoords, endCoords, { useTouchEvents } = {}) {
+  function clickDragExplore(startCoords, endCoords, { useTouchEvents, mouseup } = {}) {
     const event = useTouchEvents
       ? {
           mousedown: 'touchstart',
@@ -85,13 +85,24 @@ describe('Design management design presentation component', () => {
       clientX: startCoords.clientX,
       clientY: startCoords.clientY,
     });
-    return wrapper.vm.$nextTick().then(() => {
-      addCommentOverlay.trigger(event.mousemove, {
-        clientX: endCoords.clientX,
-        clientY: endCoords.clientY,
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        addCommentOverlay.trigger(event.mousemove, {
+          clientX: endCoords.clientX,
+          clientY: endCoords.clientY,
+        });
+
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        if (mouseup) {
+          addCommentOverlay.trigger(event.mouseup);
+          return wrapper.vm.$nextTick();
+        }
+
+        return undefined;
       });
-      return wrapper.vm.$nextTick();
-    });
   }
 
   afterEach(() => {
@@ -216,10 +227,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay is smaller than viewport', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(200);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get')
-        .mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(200);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -229,10 +238,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay width is larger than viewports', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(50);
-      jest
-        .spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get')
-        .mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(50);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(200);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -242,8 +249,8 @@ describe('Design management design presentation component', () => {
     });
 
     it('sets overlay position correctly when overlay height is larger than viewports', () => {
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetWidth', 'get').mockReturnValue(200);
-      jest.spyOn(wrapper.vm.$refs.presentationContainer, 'offsetHeight', 'get').mockReturnValue(50);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetWidth', 'get').mockReturnValue(200);
+      jest.spyOn(wrapper.vm.$refs.presentationViewport, 'offsetHeight', 'get').mockReturnValue(50);
 
       wrapper.vm.setOverlayPosition();
       expect(wrapper.vm.overlayPosition).toEqual({
@@ -405,7 +412,7 @@ describe('Design management design presentation component', () => {
     `('sets lastDragPosition when design $scenario', ({ width, height }) => {
       createComponent();
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 100, height: 100 },
         { width, height },
       );
@@ -424,7 +431,7 @@ describe('Design management design presentation component', () => {
 
       createComponent({}, { lastDragPosition });
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 100, height: 100 },
         { width: 50, height: 50 },
       );
@@ -433,6 +440,23 @@ describe('Design management design presentation component', () => {
 
       // check lastDragPosition is unchanged
       expect(wrapper.vm.lastDragPosition).toStrictEqual(lastDragPosition);
+    });
+  });
+
+  describe('getAnnotationPositon', () => {
+    it.each`
+      coordinates               | overlayDimensions                | position
+      ${{ x: 100, y: 100 }}     | ${{ width: 50, height: 50 }}     | ${{ x: 100, y: 100, width: 50, height: 50 }}
+      ${{ x: 100.2, y: 100.5 }} | ${{ width: 50.6, height: 50.0 }} | ${{ x: 100, y: 101, width: 51, height: 50 }}
+    `('returns correct annotation position', ({ coordinates, overlayDimensions, position }) => {
+      createComponent(undefined, {
+        overlayDimensions: {
+          width: overlayDimensions.width,
+          height: overlayDimensions.height,
+        },
+      });
+
+      expect(wrapper.vm.getAnnotationPositon(coordinates)).toStrictEqual(position);
     });
   });
 
@@ -451,7 +475,7 @@ describe('Design management design presentation component', () => {
 
       // mock a design that overflows
       mockRefDimensions(
-        wrapper.vm.$refs.presentationContainer,
+        wrapper.vm.$refs.presentationViewport,
         { width: 10, height: 10 },
         { width: 20, height: 20 },
         0,
@@ -498,12 +522,24 @@ describe('Design management design presentation component', () => {
         });
       });
 
-      it('does not open a comment form', () => {
-        return clickDragExplore({ clientX: 0, clientY: 0 }, { clientX: 10, clientY: 10 }).then(
-          () => {
-            expect(wrapper.emitted('openCommentForm')).toBeFalsy();
-          },
-        );
+      it('does not open a comment form when drag position exceeds buffer', () => {
+        return clickDragExplore(
+          { clientX: 0, clientY: 0 },
+          { clientX: 10, clientY: 10 },
+          { mouseup: true },
+        ).then(() => {
+          expect(wrapper.emitted('openCommentForm')).toBeFalsy();
+        });
+      });
+
+      it('opens a comment form when drag position is within buffer', () => {
+        return clickDragExplore(
+          { clientX: 0, clientY: 0 },
+          { clientX: 1, clientY: 0 },
+          { mouseup: true },
+        ).then(() => {
+          expect(wrapper.emitted('openCommentForm')).toBeDefined();
+        });
       });
     });
   });

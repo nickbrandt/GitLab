@@ -1,8 +1,8 @@
 <script>
-import { GlFormTextarea, GlNewButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlFormTextarea, GlButton, GlLoadingIcon } from '@gitlab/ui';
 
 export default {
-  components: { GlFormTextarea, GlNewButton, GlLoadingIcon },
+  components: { GlFormTextarea, GlButton, GlLoadingIcon },
   props: {
     initialComment: {
       type: String,
@@ -39,7 +39,7 @@ export default {
       autofocus
     />
     <div class="mt-3">
-      <gl-new-button
+      <gl-button
         ref="saveButton"
         variant="success"
         :disabled="isSaveButtonDisabled"
@@ -47,15 +47,10 @@ export default {
       >
         <gl-loading-icon v-if="isSaving" class="mr-1" />
         {{ __('Save comment') }}
-      </gl-new-button>
-      <gl-new-button
-        ref="cancelButton"
-        class="ml-1"
-        :disabled="isSaving"
-        @click="$emit('onCancel')"
-      >
+      </gl-button>
+      <gl-button ref="cancelButton" class="ml-1" :disabled="isSaving" @click="$emit('onCancel')">
         {{ __('Cancel') }}
-      </gl-new-button>
+      </gl-button>
     </div>
   </div>
 </template>

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module EE
   module RunnersHelper
+    include ::Gitlab::Utils::StrongMemoize
+
     def ci_usage_warning_message(namespace, project)
       message = [ci_usage_base_message(namespace)]
 
@@ -15,19 +17,29 @@ module EE
       message.join(' ').html_safe
     end
 
-    def show_buy_ci_minutes?
-      experiment_enabled?(:buy_ci_minutes_version_a)
+    def show_buy_ci_minutes?(project, namespace)
+      return false unless experiment_enabled?(:ci_notification_dot) || experiment_enabled?(:buy_ci_minutes_version_a)
+
+      show_out_of_ci_minutes_notification?(project, namespace)
     end
 
-    def show_user_notification_dot?(project, namespace)
+    def show_ci_minutes_notification_dot?(project, namespace)
       return false unless experiment_enabled?(:ci_notification_dot)
-      return false unless project&.persisted? || namespace&.persisted?
 
-      ::Ci::MinutesNotificationService.call(current_user, project, namespace).show_notification? &&
-        current_user.pipelines.any?
+      show_out_of_ci_minutes_notification?(project, namespace)
     end
 
     private
+
+    def show_out_of_ci_minutes_notification?(project, namespace)
+      strong_memoize(:show_out_of_ci_minutes_notification) do
+        next unless project&.persisted? || namespace&.persisted?
+
+        context = ::Ci::Minutes::Context.new(project, namespace)
+        threshold = ::Ci::Minutes::Threshold.new(current_user, context.level)
+        threshold.warning_reached? && context.namespace.all_pipelines.for_user(current_user).any?
+      end
+    end
 
     def purchase_shared_runner_minutes_link
       link = link_to(_("Click here"), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', rel: 'noopener')

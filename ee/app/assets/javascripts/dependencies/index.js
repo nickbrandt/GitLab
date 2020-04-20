@@ -9,7 +9,10 @@ export default () => {
   const { endpoint, emptyStateSvgPath, documentationPath, supportDocumentationPath } = el.dataset;
 
   const store = createStore();
-  addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
+
+  if (!gon.features?.dependencyListUi) {
+    addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
+  }
 
   return new Vue({
     el,

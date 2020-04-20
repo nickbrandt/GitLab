@@ -3,18 +3,84 @@
 require 'spec_helper'
 
 describe AuditLogFinder do
+  let_it_be(:group) { create(:group) }
+  let_it_be(:subgroup) { create(:group, parent: group) }
+  let_it_be(:project) { create(:project, namespace: group) }
+  let_it_be(:subproject) { create(:project, namespace: subgroup) }
+
   let_it_be(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
-  let_it_be(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
-  let_it_be(:group_audit_event) { create(:group_audit_event, created_at: 1.day.ago) }
+  let_it_be(:project_audit_event) { create(:project_audit_event, entity_id: project.id, created_at: 2.days.ago) }
+  let_it_be(:subproject_audit_event) { create(:project_audit_event, entity_id: subproject.id, created_at: 2.days.ago) }
+  let_it_be(:group_audit_event) { create(:group_audit_event, entity_id: group.id, created_at: 1.day.ago) }
+
+  let(:level) { Gitlab::Audit::Levels::Instance.new }
+  let(:params) { {} }
+
+  subject(:finder) { described_class.new(level: level, params: params) }
 
   describe '#execute' do
-    subject { described_class.new(params).execute }
+    subject { finder.execute }
 
-    context 'no filtering' do
-      let(:params) { {} }
-
+    shared_examples 'no filtering' do
       it 'finds all the events' do
-        expect(subject.count).to eq(3)
+        expect(subject.count).to eq(4)
+      end
+    end
+
+    context 'filtering by level' do
+      context 'when project level' do
+        let(:level) { Gitlab::Audit::Levels::Project.new(project: project) }
+
+        it 'finds all project events' do
+          expect(subject).to contain_exactly(project_audit_event)
+        end
+      end
+
+      context 'when group level' do
+        context 'when audit_log_group_level feature enabled' do
+          before do
+            stub_feature_flags(audit_log_group_level: true)
+          end
+
+          let(:level) { Gitlab::Audit::Levels::Group.new(group: group) }
+
+          it 'finds all group and project events' do
+            expect(subject).to contain_exactly(project_audit_event, subproject_audit_event, group_audit_event)
+          end
+        end
+
+        context 'when audit_log_group_level feature disabled' do
+          before do
+            stub_feature_flags(audit_log_group_level: false)
+          end
+
+          let(:level) { Gitlab::Audit::Levels::Group.new(group: group) }
+
+          it 'finds all group events' do
+            expect(subject).to contain_exactly(group_audit_event)
+          end
+        end
+      end
+
+      context 'when instance level' do
+        let(:level) { Gitlab::Audit::Levels::Instance.new }
+
+        it 'finds all instance level events' do
+          expect(subject).to contain_exactly(
+            project_audit_event,
+            subproject_audit_event,
+            group_audit_event,
+            user_audit_event
+          )
+        end
+      end
+
+      context 'when invalid level' do
+        let(:level) { 'an invalid level' }
+
+        it 'raises exception' do
+          expect { subject }.to raise_error(described_class::InvalidLevelTypeError)
+        end
       end
     end
 
@@ -22,9 +88,7 @@ describe AuditLogFinder do
       context 'no entity_type provided' do
         let(:params) { { entity_id: 1 } }
 
-        it 'ignores entity_id and returns all events' do
-          expect(subject.count).to eq(3)
-        end
+        it_behaves_like 'no filtering'
       end
 
       context 'invalid entity_id' do
@@ -105,17 +169,13 @@ describe AuditLogFinder do
         context 'blank entity_type' do
           let(:params) { { entity_type: '' } }
 
-          it 'finds all the events with blank entity_type' do
-            expect(subject.count).to eq(3)
-          end
+          it_behaves_like 'no filtering'
         end
 
         context 'invalid entity_type' do
           let(:params) { { entity_type: 'Invalid Entity Type' } }
 
-          it 'finds all the events with invalid entity_type' do
-            expect(subject.count).to eq(3)
-          end
+          it_behaves_like 'no filtering'
         end
       end
     end
@@ -148,10 +208,9 @@ describe AuditLogFinder do
   end
 
   describe '#find_by!' do
-    let(:params) { {} }
     let(:id) { user_audit_event.id }
 
-    subject { described_class.new(params).find_by!(id: id) }
+    subject { finder.find_by!(id: id) }
 
     it { is_expected.to eq(user_audit_event) }
 

@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlNewButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import createFlash from '~/flash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { __, s__ } from '~/locale';
@@ -10,7 +10,7 @@ import HistoryCommentEditor from './history_comment_editor.vue';
 export default {
   components: {
     GlDeprecatedButton,
-    GlNewButton,
+    GlButton,
     EventItem,
     HistoryCommentEditor,
     GlLoadingIcon,
@@ -156,7 +156,7 @@ export default {
     <div v-html="comment.note"></div>
 
     <template #right-content>
-      <gl-new-button
+      <gl-button
         ref="confirmDeleteButton"
         variant="danger"
         :disabled="isDeletingComment"
@@ -164,15 +164,15 @@ export default {
       >
         <gl-loading-icon v-if="isDeletingComment" class="mr-1" />
         {{ __('Delete') }}
-      </gl-new-button>
-      <gl-new-button
+      </gl-button>
+      <gl-button
         ref="cancelDeleteButton"
         class="ml-2"
         :disabled="isDeletingComment"
         @click="cancelDeleteConfirmation"
       >
         {{ __('Cancel') }}
-      </gl-new-button>
+      </gl-button>
     </template>
   </event-item>
 

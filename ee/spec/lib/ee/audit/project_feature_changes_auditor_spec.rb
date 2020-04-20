@@ -17,12 +17,15 @@ describe EE::Audit::ProjectFeatureChangesAuditor do
       columns = project.project_feature.attributes.keys.select { |attr| attr.end_with?('level') }
 
       columns.each do |column|
-        features.update_attribute(column, 0)
+        previous_value = features.method(column).call
+        new_value = ProjectFeature::DISABLED
+
+        features.update_attribute(column, new_value)
         expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
 
         event = SecurityEvent.last
-        expect(event.details[:from]).to eq 'Public'
-        expect(event.details[:to]).to eq 'Private'
+        expect(event.details[:from]).to eq ::Gitlab::VisibilityLevel.level_name(previous_value)
+        expect(event.details[:to]).to eq ::Gitlab::VisibilityLevel.level_name(new_value)
         expect(event.details[:change]).to eq column
       end
     end

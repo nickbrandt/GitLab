@@ -202,7 +202,18 @@ describe SubscriptionsController do
           group.save
           subject
 
-          expect(response.body).to include({ name: ["can't be blank", Gitlab::Regex.group_name_regex_message] }.to_json)
+          expect(response.body).to include({ name: ["can't be blank"] }.to_json)
+        end
+
+        context 'when invalid name is passed' do
+          let(:group) { Group.new(path: 'foo', name: '<script>alert("attack")</script>') }
+
+          it 'returns the errors in json format' do
+            group.save
+            subject
+
+            expect(response.body).to include({ name: [Gitlab::Regex.group_name_regex_message] }.to_json)
+          end
         end
       end
 

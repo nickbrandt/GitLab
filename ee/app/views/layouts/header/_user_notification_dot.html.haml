@@ -1,4 +1,4 @@
-- return unless show_user_notification_dot?(project, namespace)
+- return unless show_ci_minutes_notification_dot?(project, namespace)
 
 -# Tracking events from the template is not ideal and we are moving this to the client in https://gitlab.com/gitlab-org/gitlab/-/issues/213712
 - track_event('show_buy_ci_minutes_notification', label: current_user.namespace.actual_plan_name, property: 'user_dropdown')

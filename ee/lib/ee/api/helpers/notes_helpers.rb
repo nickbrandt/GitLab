@@ -23,22 +23,14 @@ module EE
           end
         end
 
-        # Used only for anonymous Visual Review Tools feedback
-        def find_merge_request_without_permissions_check(noteable_id)
-          params = finder_params_by_noteable_type_and_id(::MergeRequest, noteable_id)
+        # This is mainly used finding the target MR of the Visual Review note.
+        # If current_user is nil (PAT is not passed), only public merge requests can be found
+        # If current_user is present (PAT is passed), private projects can be found as long as user is a project member.
+        # If current_user is present (PAT is passed), internal projects can be found by any authenticated user.
+        def find_merge_request(merge_request_iid)
+          params = finder_params_by_noteable_type_and_id(::MergeRequest, merge_request_iid)
 
-          ::NotesFinder.new(current_user, params).target || not_found!(noteable_type)
-        end
-
-        def create_visual_review_note(noteable, opts)
-          unless ::Feature.enabled?(:anonymous_visual_review_feedback)
-            forbidden!('Anonymous visual review feedback is disabled')
-          end
-
-          parent  = noteable_parent(noteable)
-          project = parent if parent.is_a?(Project)
-
-          ::Notes::CreateService.new(project, ::User.visual_review_bot, opts).execute
+          ::NotesFinder.new(current_user, params).target || not_found!(::MergeRequest)
         end
       end
     end

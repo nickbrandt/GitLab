@@ -147,9 +147,9 @@ describe Projects::Security::ConfigurationPresenter do
   def security_scan(type, configured:)
     {
       "configured" => configured,
-      "description" => described_class::SCAN_DESCRIPTIONS[type],
+      "description" => described_class.localized_scan_descriptions[type],
       "link" => help_page_path(described_class::SCAN_DOCS[type]),
-      "name" => described_class::SCAN_NAMES[type]
+      "name" => described_class.localized_scan_names[type]
     }
   end
 end

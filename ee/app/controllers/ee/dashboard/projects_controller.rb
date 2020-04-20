@@ -16,6 +16,11 @@ module EE
         super
       end
 
+      override :preload_associations
+      def preload_associations(projects)
+        super.with_compliance_framework_settings
+      end
+
       def show_onboarding_welcome_page?
         return false if onboarding_cookie_set?
         return false unless allow_access_to_onboarding?

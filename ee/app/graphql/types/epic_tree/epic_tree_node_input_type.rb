@@ -21,6 +21,11 @@ module Types
                MoveTypeEnum,
                required: true,
                description: 'The type of the switch, after or before allowed'
+
+      argument :new_parent_id,
+               GraphQL::ID_TYPE,
+               required: false,
+               description: 'ID of the new parent epic'
     end
     # rubocop: enable Graphql/AuthorizeTypes
   end

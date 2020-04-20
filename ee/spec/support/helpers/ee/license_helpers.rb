@@ -35,6 +35,13 @@ module EE
         stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
         ::Gitlab::CurrentSettings.update!(check_namespace_plan: true)
       end
+
+      def create_current_license(options = {})
+        License.current.destroy!
+
+        gl_license = create(:gitlab_license, options)
+        create(:license, data: gl_license.export)
+      end
     end
   end
 end

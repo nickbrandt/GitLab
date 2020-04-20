@@ -47,7 +47,7 @@ module EE
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
-      has_one :status_page_setting, inverse_of: :project
+      has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
       has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
 
       has_many :reviews, inverse_of: :project
@@ -95,7 +95,13 @@ module EE
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Project', foreign_key: :source_project_id
 
-      scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
+      scope :with_shared_runners_limit_enabled, -> do
+        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+          with_shared_runners
+        else
+          with_shared_runners.non_public_only
+        end
+      end
 
       scope :mirror, -> { where(mirror: true) }
 
@@ -144,12 +150,14 @@ module EE
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
       scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
       scope :with_deleting_user, -> { includes(:deleting_user) }
+      scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
 
       delegate :actual_shared_runners_minutes_limit,
-        :shared_runners_minutes_used?, to: :shared_runners_limit_namespace
+               :shared_runners_minutes_used?,
+               :shared_runners_remaining_minutes_below_threshold?, to: :shared_runners_limit_namespace
 
       delegate :last_update_succeeded?, :last_update_failed?,
         :ever_updated_successfully?, :hard_failed?,
@@ -160,6 +168,7 @@ module EE
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled?, to: :ci_cd_settings
       delegate :actual_limits, :actual_plan_name, to: :namespace, allow_nil: true
+      delegate :gitlab_subscription, to: :namespace
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
@@ -271,6 +280,15 @@ module EE
     end
 
     def shared_runners_minutes_limit_enabled?
+      if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+        shared_runners_enabled? &&
+          shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
+      else
+        legacy_shared_runners_minutes_limit_enabled?
+      end
+    end
+
+    def legacy_shared_runners_minutes_limit_enabled?
       !public? && shared_runners_enabled? &&
         shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
     end

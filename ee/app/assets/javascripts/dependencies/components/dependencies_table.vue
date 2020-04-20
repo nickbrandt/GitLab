@@ -1,6 +1,6 @@
 <script>
 import { cloneDeep } from 'lodash';
-import { GlBadge, GlIcon, GlLink, GlNewButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
+import { GlBadge, GlIcon, GlLink, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import DependenciesTableRow from './dependencies_table_row.vue';
@@ -32,7 +32,7 @@ export default {
     GlBadge,
     GlIcon,
     GlLink,
-    GlNewButton,
+    GlButton,
     GlSkeletonLoading,
     GlTable,
   },
@@ -93,6 +93,8 @@ export default {
 </script>
 
 <template>
+  <!-- tbody- and thead-class props can be removed when
+    https://gitlab.com/gitlab-org/gitlab/-/issues/213324 is fixed -->
   <gl-table
     v-if="glFeatures.dependencyListUi"
     :fields="$options.fields"
@@ -100,12 +102,14 @@ export default {
     :busy="isLoading"
     details-td-class="pt-0"
     stacked="md"
+    thead-class="gl-text-gray-900"
+    tbody-class="gl-text-gray-900"
   >
     <!-- toggleDetails and detailsShowing are scoped slot props provided by
       GlTable; they mutate/read the item's _showDetails property, which GlTable
       uses to show/hide the row-details slot -->
     <template #cell(component)="{ item, toggleDetails, detailsShowing }">
-      <gl-new-button
+      <gl-button
         v-if="anyDependencyHasVulnerabilities"
         class="d-none d-md-inline"
         :class="{ invisible: !item.vulnerabilities.length }"
@@ -117,7 +121,7 @@ export default {
           :name="detailsShowing ? 'chevron-up' : 'chevron-down'"
           class="text-secondary-900"
         />
-      </gl-new-button>
+      </gl-button>
       <span class="bold">{{ item.name }}</span
       >&nbsp;{{ item.version }}
     </template>
@@ -134,10 +138,13 @@ export default {
     </template>
 
     <template #cell(isVulnerable)="{ item, toggleDetails }">
+      <!-- This badge usage will be simplified by
+        https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28356 -->
       <gl-badge
         v-if="item.vulnerabilities.length"
         variant="warning"
         href="#"
+        class="d-inline-flex align-items-center bg-warning-100 text-warning-700 bold"
         @click.native="toggleDetails"
       >
         <gl-icon name="warning" class="text-warning-500 mr-1" />

@@ -25,8 +25,6 @@ module DesignManagement
     end
 
     def generate_image_versions(version)
-      return unless ::Feature.enabled?(:design_management_resize_images, version.project)
-
       DesignManagement::GenerateImageVersionsService.new(version).execute
     end
   end

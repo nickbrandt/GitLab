@@ -13,6 +13,21 @@ RSpec.describe AuditEvent, type: :model do
     it { is_expected.to validate_presence_of(:entity_type) }
   end
 
+  describe '.by_entity' do
+    let_it_be(:project_event_1) { create(:project_audit_event) }
+    let_it_be(:project_event_2) { create(:project_audit_event) }
+    let_it_be(:user_event) { create(:user_audit_event) }
+
+    let(:entity_type) { 'Project' }
+    let(:entity_id) { project_event_1.entity_id }
+
+    subject(:event) { described_class.by_entity(entity_type, entity_id) }
+
+    it 'returns the correct audit events' do
+      expect(event).to contain_exactly(project_event_1)
+    end
+  end
+
   describe '.order_by' do
     let_it_be(:event_1) { create(:audit_event) }
     let_it_be(:event_2) { create(:audit_event) }
