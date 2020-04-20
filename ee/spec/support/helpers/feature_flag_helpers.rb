@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module FeatureFlagHelpers
-  def create_flag(project, name, active = true, description: nil)
-    create(:operations_feature_flag, name: name, active: active,
+  def create_flag(project, name, active = true, description: nil, version: Operations::FeatureFlag.versions['legacy_flag'])
+    create(:operations_feature_flag, name: name, active: active, version: version,
                                      description: description, project: project)
   end
 
@@ -54,6 +54,10 @@ module FeatureFlagHelpers
     within '.table-section:nth-child(4)' do
       yield
     end
+  end
+
+  def edit_feature_flag_button
+    find('.js-feature-flag-edit-button')
   end
 
   def expect_user_to_see_feature_flags_index_page
