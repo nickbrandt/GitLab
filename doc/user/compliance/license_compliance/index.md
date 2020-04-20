@@ -268,6 +268,12 @@ The [`pip.conf`](https://pip.pypa.io/en/stable/reference/pip/) allows you to spe
 trusted-host = pypi.example.com
 ```
 
+#### Using private Python repos
+
+If you have a private Python repository you can use the `PIP_INDEX_URL` [environment variable](#available-variables)
+to specify its location. It's also possible to provide a custom `pip.conf` for
+[additional configuration](#custom-root-certificates-for-python).
+
 ### Migration from `license_management` to `license_scanning`
 
 In GitLab 12.8 a new name for `license_management` job was introduced. This change was made to improve clarity around the purpose of the scan, which is to scan and collect the types of licenses present in a projects dependencies.
@@ -362,8 +368,8 @@ license_scanning:
 The License Compliance job should now use local copies of the License Compliance analyzers to scan
 your code and generate security reports, without requiring internet access.
 
-Additional [configuration](#using-private-maven-repos) may be needed for connecting to private Maven
-repositories.
+Additional configuration may be needed for connecting to [private Maven repositories](#using-private-maven-repos)
+and [private Python repositories](#using-private-python-repos).
 
 Exact name matches are required for [project policies](#project-policies-for-license-compliance)
 when running in an offline environment ([see related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/212388)).
