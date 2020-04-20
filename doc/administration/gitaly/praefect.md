@@ -98,8 +98,10 @@ We will note in the instructions below where these secrets are required.
 
 ### PostgreSQL
 
-NOTE: **Note:** don't reuse the GitLab application database for the Praefect
-database.
+NOTE: **Note:** do not store the GitLab application database and the Praefect
+database on the same PostgreSQL server if using
+[Geo](../geo/replication/index.md). The replication state is internal to each instance
+of GitLab and should not be replicated.
 
 To complete this section you will need:
 
