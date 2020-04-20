@@ -37,7 +37,7 @@ module DesignManagement
     attr_reader :designs
 
     def delete_designs!
-      DesignManagement::Version.lock_for_creation(project.id) do
+      DesignManagement::Version.lock_for_creation(project.id, repository) do
         run_actions(build_actions)
       end
     end

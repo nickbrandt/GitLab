@@ -7,11 +7,13 @@ module DesignManagement
     # this concern requires the following methods to be implemented:
     #   current_user, target_branch, repository, commit_message
     #
+    # Before calling `run_actions`, you should ensure the repository exists, by
+    # calling `repository.create_if_not_exists`.
+    #
     # @raise [NoActions] if actions are empty
     def run_actions(actions)
       raise NoActions if actions.empty?
 
-      repository.create_if_not_exists
       sha = repository.multi_action(current_user,
                                     branch_name: target_branch,
                                     message: commit_message,

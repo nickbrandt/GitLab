@@ -33,9 +33,7 @@ module DesignManagement
     attr_reader :files
 
     def upload_designs!
-      ::DesignManagement::Version.lock_for_creation(project.id) do
-        repository.create_if_not_exists
-
+      ::DesignManagement::Version.lock_for_creation(project.id, repository) do
         actions = build_actions
 
         [actions.map(&:design), actions.presence && run_actions(actions)]
