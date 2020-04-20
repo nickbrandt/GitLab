@@ -16,8 +16,6 @@ module Vulnerabilities
       csv: 0
     }
 
-    validates :project, presence: true, unless: :group
-    validates :group, presence: true, unless: :project
     validates :status, presence: true
     validates :format, presence: true
     validates :file, presence: true, if: :finished?
@@ -46,6 +44,22 @@ module Vulnerabilities
 
       before_transition any => [:finished, :failed] do |export|
         export.finished_at = Time.now
+      end
+    end
+
+    def exportable
+      project || author
+    end
+
+    def exportable=(value)
+      case value
+      when Project
+        self.project = value
+      when User
+        self.project = nil
+        self.author = value
+      else
+        raise "Can not assign #{value.class} as exportable"
       end
     end
 
