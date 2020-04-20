@@ -16,7 +16,7 @@ export default {
       type: String,
       required: true,
     },
-      emptyAlertSvgPath: {
+    emptyAlertSvgPath: {
       type: String,
       required: true,
     },
