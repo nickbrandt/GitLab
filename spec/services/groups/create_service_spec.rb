@@ -24,6 +24,32 @@ describe Groups::CreateService, '#execute' do
     end
   end
 
+  context 'creating a group with `default_branch_protection` attribute' do
+    let(:params) { group_params.merge(default_branch_protection: Gitlab::Access::PROTECTION_NONE) }
+    let(:service) { described_class.new(user, params) }
+    let(:created_group) { service.execute }
+
+    before do
+    end
+
+    context 'for users who have the ability to create a group with `default_branch_protection`' do
+      it 'creates group with the specified branch protection level' do
+        expect(created_group.default_branch_protection).to eq(Gitlab::Access::PROTECTION_NONE)
+      end
+    end
+
+    context 'for users who do not have the ability to create a group with `default_branch_protection`' do
+      before do
+        allow(Ability).to receive(:allowed?).and_call_original
+        allow(Ability).to receive(:allowed?).with(user, :create_group_with_default_branch_protection) { false }
+      end
+
+      it 'does not create the group with the specified branch protection level' do
+        expect(created_group.default_branch_protection).not_to eq(Gitlab::Access::PROTECTION_NONE)
+      end
+    end
+  end
+
   describe 'creating a top level group' do
     let(:service) { described_class.new(user, group_params) }
 
