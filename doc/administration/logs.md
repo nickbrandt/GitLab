@@ -430,15 +430,85 @@ you've configured this for Sidekiq as mentioned above.
 
 ## `gitlab-shell.log`
 
-This file lives in `/var/log/gitlab/gitaly/gitlab-shell.log` for
-Omnibus GitLab packages or in `/home/git/gitaly/gitlab-shell.log` for
-installations from source.
+GitLab Shell is used by GitLab for executing Git commands and provide SSH access to Git repositories.
 
-NOTE: **Note:**
+### For GitLab versions 12.10 and up
+
+For GitLab version 12.10 and later, there are 2 `gitlab-shell.log` files. Information containing `git-{upload-pack,receive-pack}` requests lives in `/var/log/gitlab/gitlab-shell/gitlab-shell.log`. Information about hooks to GitLab Shell from Gitaly lives in `/var/log/gitlab/gitaly/gitlab-shell.log`.
+
+Example log entries for `/var/log/gitlab/gitlab-shell/gitlab-shell.log`:
+
+```json
+{
+  "duration_ms": 74.104,
+  "level": "info",
+  "method": "POST",
+  "msg": "Finished HTTP request",
+  "time": "2020-04-17T20:28:46Z",
+  "url": "http://127.0.0.1:8080/api/v4/internal/allowed"
+}
+{
+  "command": "git-upload-pack",
+  "git_protocol": "",
+  "gl_project_path": "root/example",
+  "gl_repository": "project-1",
+  "level": "info",
+  "msg": "executing git command",
+  "time": "2020-04-17T20:28:46Z",
+  "user_id": "user-1",
+  "username": "root"
+}
+```
+
+Example log entries for `/var/log/gitlab/gitaly/gitlab-shell.log`:
+
+```json
+{
+  "method": "POST",
+  "url": "http://127.0.0.1:8080/api/v4/internal/allowed",
+  "duration": 0.058012959,
+  "gitaly_embedded": true,
+  "pid": 16636,
+  "level": "info",
+  "msg": "finished HTTP request",
+  "time": "2020-04-17T20:29:08+00:00"
+}
+{
+  "method": "POST",
+  "url": "http://127.0.0.1:8080/api/v4/internal/pre_receive",
+  "duration": 0.031022552,
+  "gitaly_embedded": true,
+  "pid": 16636,
+  "level": "info",
+  "msg": "finished HTTP request",
+  "time": "2020-04-17T20:29:08+00:00"
+}
+```
+
+### For GitLab versions 12.5 through 12.9
+
+For GitLab 12.5 to 12.9, this file lives in `/var/log/gitlab/gitaly/gitlab-shell.log` for Omnibus GitLab packages or in `/home/git/gitaly/gitlab-shell.log` for installations from source.
+
+Example log entries:
+
+```json
+{
+  "method": "POST",
+  "url": "http://127.0.0.1:8080/api/v4/internal/post_receive",
+  "duration": 0.031809164,
+  "gitaly_embedded": true,
+  "pid": 27056,
+  "level": "info",
+  "msg": "finished HTTP request",
+  "time": "2020-04-17T16:24:38+00:00"
+}
+```
+
+### For GitLab 12.5 and earlier
+
 For GitLab 12.5 and earlier, the file lives in `/var/log/gitlab/gitlab-shell/gitlab-shell.log`.
 
-GitLab Shell is used by GitLab for executing Git commands and provide
-SSH access to Git repositories. For example:
+Example log entries:
 
 ```plaintext
 I, [2015-02-13T06:17:00.671315 #9291]  INFO -- : Adding project root/example.git at </var/opt/gitlab/git-data/repositories/root/dcdcdcdcd.git>.
