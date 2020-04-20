@@ -45,23 +45,25 @@ needs.
 GitLab can be setup on a single machine or scaled out to handle large number of users. In this section we'll detail the Reference Architectures that were built and verified by our Quality and Support teams.
 Testing was done with our GitLab Performance Tool at specific coded workloads, and the throughputs used for testing were calculated based on sample customer data. 
 
-We test each endpoint type with the following number of requests per second (RPS)
-per 1000 users:
+We test each endpoint type with the following number of requests per second (RPS) per 1000 users:
+
 - API: 20 RPS
 - Web: 2 RPS
 - Git: 2 RPS
 
 For up to 2,000 users we recommend going with a simple setup. Going above 2,000 users, we recommend scaling GitLab components to multiple machines.
 The machines are grouped by application type, we call them application nodes. The addition of these nodes adds limited fault tolerance to your GitLab instance.
-As long as one application node is online and capable of handling the instance's usage load, your team's productivity will not be interrupted. 
+As long as one application node is online and capable of handling the instance's usage load, your team's productivity will not be interrupted.
 Having multiple application nodes also enables [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
 
-Scaling GitLab factors in multiple things. 
-- Multiple application nodes to handle frontend traffic. 
+Scaling GitLab factors in multiple things.
+
+- Multiple application nodes to handle frontend traffic.
 - A load balancer is added in front to distribute traffic across the application nodes.
 - The application nodes connects to a shared file server and PostgreSQL and Redis services on the backend.
 
 References:
+
 - [Configure your load balancer for GitLab](../high_availability/load_balancer.md)
 - [Configure your NFS server to work with GitLab](../high_availability/nfs.md)
 - [Configure packaged PostgreSQL server to listen on TCP/IP](https://docs.gitlab.com/omnibus/settings/database.html#configure-packaged-postgresql-server-to-listen-on-tcpip)
@@ -77,14 +79,11 @@ On different cloud vendors a best effort like for like can be used.
 ### Under 1,000 users
 
 From 1 to 1,000 users, a single-node [Omnibus](https://docs.gitlab.com/omnibus/) setup with frequent backups is adequate.
+Please refer to the [installation documentation](../../install/README.md) and [backup/restore documentation](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration).
 
 This solution is appropriate for many teams that have a single server at their disposal. With automatic backup of the GitLab repositories, configuration, and the database, this can be an optimal solution if you don't have strict availability requirements.
 
 You can also optionally configure GitLab to use an [external PostgreSQL service](../external_database.md) or an [external object storage service](../high_availability/object_storage.md) for added performance and reliability at a relatively low complexity cost.
-
-References:
-- [Installation Docs](../../install/README.md)
-- [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
 
 ### 1,000 to 1,800 users
 
