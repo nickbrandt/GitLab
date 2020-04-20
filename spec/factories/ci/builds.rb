@@ -314,6 +314,12 @@ FactoryBot.define do
       end
     end
 
+    trait :broken_test_reports do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :junit_with_corrupted_data, job: build)
+      end
+    end
+
     trait :coverage_reports do
       after(:build) do |build|
         build.job_artifacts << create(:ci_job_artifact, :cobertura, job: build)

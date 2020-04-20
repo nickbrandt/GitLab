@@ -17183,6 +17183,12 @@ msgstr ""
 msgid "Reports|Actions"
 msgstr ""
 
+msgid "Reports|An error occured while loading report"
+msgstr ""
+
+msgid "Reports|An error occurred while loading %{name} results"
+msgstr ""
+
 msgid "Reports|Class"
 msgstr ""
 
