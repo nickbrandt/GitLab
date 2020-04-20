@@ -2,23 +2,23 @@
 
 require 'spec_helper'
 
-describe Projects::SurfaceAlertsHelper do
+describe Projects::AlertManagementHelper do
   include Gitlab::Routing.url_helpers
 
   let(:project) { create(:project) }
 
-  describe '#surface_alerts_data' do
+  describe '#alert_management_data' do
     let(:setting_path) { project_settings_operations_path(project) }
 
     let(:index_path) do
-      project_surface_alerts_path(project, format: :json)
+      project_alert_management_index_path(project, format: :json)
     end
 
-    context 'without surface_alerts_setting' do
+    context 'without alert_managements_setting' do
       it 'returns frontend configuration' do
-        expect(surface_alerts_data(project)).to eq(
+        expect(alert_management_data(project)).to eq(
           'index-path' => index_path,
-          'enable-surface-alerts-path' => setting_path,
+          'enable-alert-management-path' => setting_path,
           "empty-alert-svg-path" => "/images/illustrations/alert-management-empty-state.svg"
         )
       end

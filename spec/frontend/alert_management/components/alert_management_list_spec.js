@@ -1,20 +1,20 @@
 import { mount } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
 import stubChildren from 'helpers/stub_children';
-import SurfaceAlertsList from '~/surface_alerts/components/surface_alerts_list.vue';
+import AlertManagementList from '~/alert_management/components/alert_management_list.vue';
 
-describe('SurfaceAlertsList', () => {
+describe('AlertManagementList', () => {
   let wrapper;
 
   function mountComponent({ stubs = {} } = {}) {
-    wrapper = mount(SurfaceAlertsList, {
+    wrapper = mount(AlertManagementList, {
       propsData: {
         indexPath: '/path',
-        enableSurfaceAlertsPath: '/link',
+        enableAlertManagementPath: '/link',
         emptyAlertSvgPath: 'illustration/path',
       },
       stubs: {
-        ...stubChildren(SurfaceAlertsList),
+        ...stubChildren(AlertManagementList),
         ...stubs,
       },
     });

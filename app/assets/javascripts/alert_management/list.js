@@ -1,23 +1,23 @@
 import Vue from 'vue';
-import SurfaceAlertsList from './components/surface_alerts_list.vue';
+import AlertManagementList from './components/alert_management_list.vue';
 
 export default () => {
-  const selector = '#js-surface_alerts';
+  const selector = '#js-alert_management';
 
   const domEl = document.querySelector(selector);
-  const { indexPath, enableSurfaceAlertsPath, emptyAlertSvgPath } = domEl.dataset;
+  const { indexPath, enableAlertManagementPath, emptyAlertSvgPath } = domEl.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
     el: selector,
     components: {
-      SurfaceAlertsList,
+      AlertManagementList,
     },
     render(createElement) {
-      return createElement('surface-alerts-list', {
+      return createElement('alert-management-list', {
         props: {
           indexPath,
-          enableSurfaceAlertsPath,
+          enableAlertManagementPath,
           emptyAlertSvgPath,
         },
       });
