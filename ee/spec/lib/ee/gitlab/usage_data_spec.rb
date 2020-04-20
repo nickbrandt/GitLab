@@ -119,6 +119,8 @@ RSpec.describe Gitlab::UsageData do
         user_preferences_group_overview_details
         user_preferences_group_overview_security_dashboard
         template_repositories
+        network_policy_forwards
+        network_policy_drops
       ))
 
       expect(count_data[:projects_jenkins_active]).to eq(1)
