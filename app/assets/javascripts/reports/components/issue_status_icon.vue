@@ -8,7 +8,6 @@ export default {
     Icon,
   },
   props: {
-    // failed || success
     status: {
       type: String,
       required: true,
