@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlDeprecatedButton, GlSkeletonLoading, GlFormCheckbox } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormCheckbox, GlSkeletonLoading } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
@@ -36,7 +36,7 @@ export default {
     severity() {
       return this.vulnerability.severity || ' ';
     },
-    vulnerabilityNamepace() {
+    vulnerabilityNamespace() {
       const { project, location } = this.vulnerability;
       if (this.dashboardType === DASHBOARD_TYPES.GROUP) {
         return project && project.full_name;
@@ -83,6 +83,7 @@ export default {
     <div class="table-section">
       <gl-form-checkbox
         :checked="isSelected"
+        :inline="true"
         class="my-0 ml-1 mr-3"
         @change="toggleVulnerability"
       />
@@ -90,19 +91,22 @@ export default {
 
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
+      <div class="table-mobile-content">
+        <severity-badge :severity="severity" />
+      </div>
     </div>
 
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div
-        class="table-mobile-content vulnerability-info"
+        class="table-mobile-content gl-white-space-normal"
         data-qa-selector="vulnerability_info_content"
       >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-deprecated-button
-            class="vulnerability-title d-inline"
+            ref="vulnerability-title"
+            class="d-inline gl-line-height-inherit gl-text-align-inherit gl-white-space-normal"
             variant="blank"
             @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-deprecated-button
@@ -124,9 +128,9 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <span v-if="vulnerabilityNamepace" class="vulnerability-namespace">
-            {{ vulnerabilityNamepace }}
-          </span>
+          <small v-if="vulnerabilityNamespace" class="gl-text-gray-700 gl-word-break-all">
+            {{ vulnerabilityNamespace }}
+          </small>
         </template>
       </div>
     </div>
@@ -145,47 +149,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-@media (min-width: 768px) {
-  .vulnerabilities-row:last-child {
-    border-bottom: 1px solid transparent;
-  }
-
-  .vulnerabilities-row:hover,
-  .vulnerabilities-row:focus {
-    background: #f6fafd;
-    border-bottom: 1px solid #c1daf4;
-    border-top: 1px solid #c1daf4;
-    margin-top: -1px;
-  }
-
-  .vulnerabilities-row .action-buttons {
-    opacity: 0;
-  }
-
-  .vulnerabilities-row:hover .action-buttons,
-  .vulnerabilities-row:focus-within .action-buttons {
-    opacity: 1;
-  }
-}
-
-.vulnerability-info {
-  white-space: normal;
-}
-
-.vulnerability-title {
-  text-align: inherit;
-  white-space: normal;
-  line-height: inherit;
-}
-
-.vulnerability-namespace {
-  color: #707070;
-  font-size: 0.8em;
-}
-
-.dismissed .table-mobile-content:not(.action-buttons) {
-  opacity: 0.5;
-}
-</style>
