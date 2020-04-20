@@ -21,7 +21,6 @@ describe DesignManagement::SaveDesignsService do
 
   before do
     project.add_developer(developer)
-    # allow(::DesignManagement::NewVersionWorker).to receive(:perform_async)
   end
 
   def run_service(files_to_upload = nil)
@@ -101,10 +100,10 @@ describe DesignManagement::SaveDesignsService do
 
       it 'can run the same command in parallel' do
         blocks = Array.new(10).map do
-          wrapped_files = files.map { |f| Gitlab::FileUpload.new(f) }
-          wrapped_files.each { |f| f.original_filename = generate(:jpeg_file) }
+          unique_files = %w(rails_sample.jpg dk.png)
+                          .map { |name| RenameableUpload.unique_file(name) }
 
-          -> { run_service(wrapped_files) }
+          -> { run_service(unique_files) }
         end
 
         expect { run_parallel(blocks) }.to change(DesignManagement::Version, :count).by(10)

@@ -13,10 +13,6 @@ describe Mutations::DesignManagement::Upload do
     described_class.new(object: nil, context: { current_user: user }, field: nil)
   end
 
-  def unique_file(upload)
-    ::Gitlab::FileUpload.new(upload).tap { |f| f.original_filename = generate(:jpeg_file) }
-  end
-
   def run_mutation(files_to_upload = files, project_path = project.full_path, iid = issue.iid)
     mutation = described_class.new(object: nil, context: { current_user: user }, field: nil)
     mutation.resolve(project_path: project_path, iid: iid, files: files_to_upload)
@@ -53,7 +49,7 @@ describe Mutations::DesignManagement::Upload do
           ['dk.png', 'rails_sample.jpg', 'banana_sample.gif']
            .cycle
            .take(Concurrent.processor_count * 2)
-           .map { |f| unique_file(fixture_file_upload("spec/fixtures/#{f}")) }
+           .map { |f| RenameableUpload.unique_file(f) }
         end
 
         def creates_designs
