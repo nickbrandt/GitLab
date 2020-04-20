@@ -305,10 +305,7 @@ RSpec.configure do |config|
       Gitlab::SidekiqMiddleware.server_configurator(
         metrics: false, # The metrics don't go anywhere in tests
         arguments_logger: false, # We're not logging the regular messages for inline jobs
-        memory_killer: false, # This is not a thing we want to do inline in tests
-        # Don't enable this if the request store is active in the spec itself
-        # This needs to run within the `request_store` around block defined above
-        request_store: !RequestStore.active?
+        memory_killer: false # This is not a thing we want to do inline in tests
       ).call(chain)
       chain.add DisableQueryLimit
 
