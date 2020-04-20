@@ -1179,11 +1179,7 @@ class Project < ApplicationRecord
   end
 
   def issues_tracker
-    if external_issue_tracker
-      external_issue_tracker
-    else
-      default_issue_tracker
-    end
+    external_issue_tracker || default_issue_tracker
   end
 
   def external_issue_reference_pattern
@@ -1328,11 +1324,7 @@ class Project < ApplicationRecord
   # rubocop: enable CodeReuse/ServiceClass
 
   def owner
-    if group
-      group
-    else
-      namespace.try(:owner)
-    end
+    group || namespace.try(:owner)
   end
 
   def to_ability_name
