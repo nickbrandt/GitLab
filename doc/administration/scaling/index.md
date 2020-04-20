@@ -50,8 +50,11 @@ We test each endpoint type with the following number of requests per second (RPS
 - API: 20 RPS
 - Web: 2 RPS
 - Git: 2 RPS
+
 For up to 2,000 users we recommend going with a simple setup. Going above 2,000 users, we recommend scaling GitLab components to multiple machine nodes.
-The machine nodes are grouped by component(s). The addition of these nodes adds limited fault tolerance to your GitLab instance.
+The machine nodes are grouped by component(s). The addition of these nodes adds limited fault tolerance to your GitLab instance. 
+As long as there is at least one of each component online and capable of handling the instance's usage load, your team's productivity will not be interrupted. 
+The same is true if you are looking to perform [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
 
 When scaling GitLab there's a few factors to consider:
 
