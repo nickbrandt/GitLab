@@ -69,4 +69,13 @@ describe PathLock do
       expect(path_lock.exact?("app")).to be_falsey
     end
   end
+
+  describe '.for_paths' do
+    let!(:another_path_lock) { create(:path_lock, path: 'app') }
+
+    it 'filters path locks by passed' do
+      expect(described_class.for_paths(['app'])).to eq([another_path_lock])
+      expect(described_class.for_paths(['app/models'])).to eq([path_lock])
+    end
+  end
 end
