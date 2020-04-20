@@ -45,14 +45,14 @@ export default {
           <div class="d-block">
             <span>{{
               __(
-                'Display alerts from all your monitoring tools directly withing GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
+                'Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
               )
             }}</span>
             <a href="/help/user/project/operations/surface_alerts.html">
               {{ __('More information') }}
             </a>
           </div>
-          <div class="d-block center">
+          <div class="d-block center pt-4">
             <gl-button category="primary" variant="success" :href="enableSurfaceAlertsLink">{{
               __('Authorize external service')
             }}</gl-button>
