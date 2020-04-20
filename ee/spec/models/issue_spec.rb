@@ -178,6 +178,7 @@ describe Issue do
     it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
     it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
     it { is_expected.to have_many(:resource_weight_events) }
+    it { is_expected.to have_one(:status_page_published_incident) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do

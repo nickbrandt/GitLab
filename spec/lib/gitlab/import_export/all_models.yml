@@ -41,6 +41,7 @@ issues:
 - user_mentions
 - system_note_metadata
 - alert_management_alert
+- status_page_published_incident
 events:
 - author
 - project
@@ -636,3 +637,5 @@ epic_issue:
 system_note_metadata:
 - note
 - description_version
+status_page_published_incident:
+- issue
