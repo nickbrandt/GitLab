@@ -34,6 +34,7 @@ module EE
         mount ::API::ProjectPushRule
         mount ::API::NugetPackages
         mount ::API::PypiPackages
+        mount ::API::ComposerPackages
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
