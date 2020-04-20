@@ -85,7 +85,7 @@ This solution is appropriate for many teams that have a single server at their d
 
 You can also optionally configure GitLab to use an [external PostgreSQL service](../external_database.md) or an [external object storage service](../high_availability/object_storage.md) for added performance and reliability at a relatively low complexity cost.
 
-### 1,000 to 1,800 users
+### 1,000 to 1,999 users
 
 For 1,000 to 1,800 users, the team is currently working on additional more details on the reference architecture. Work can be tracked in this [issue](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
 
