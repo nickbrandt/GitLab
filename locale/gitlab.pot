@@ -11519,10 +11519,10 @@ msgstr ""
 msgid "IssuesAnalytics|Avg/Month:"
 msgstr ""
 
-msgid "IssuesAnalytics|Issues created"
+msgid "IssuesAnalytics|Issues opened"
 msgstr ""
 
-msgid "IssuesAnalytics|Issues created per month"
+msgid "IssuesAnalytics|Issues opened per month"
 msgstr ""
 
 msgid "IssuesAnalytics|Last 12 months"
