@@ -499,11 +499,16 @@ value you set for this specific pipeline:
 
 ## Environment variables expressions
 
-> Introduced in GitLab 10.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/37397) in GitLab 10.7 for [the `only` and `except` CI keywords](../yaml/README.md#onlyexcept-advanced)
+> - [Expanded](https://gitlab.com/gitlab-org/gitlab/issues/27863) in GitLab 12.3 with [the `rules` keyword](../yaml/README.md#rules)
 
-It is possible to use variables expressions with only / except policies in
-`.gitlab-ci.yml`. By using this approach you can limit what jobs are going to
-be created within a pipeline after pushing a code to GitLab.
+Variable expressions can be used to limit what jobs are going to be created
+within a pipeline after pushing changes to GitLab.
+
+In `.gitlab-ci.yml`, they work with both
+
+- [`rules`](../yaml/README.md#rules), which is the recommended approach, and
+- [`only` and `except`](../yaml/README.md#onlyexcept-basic), which are candidates for deprecation.
 
 This is particularly useful in combination with variables and triggered
 pipeline variables.
@@ -590,8 +595,8 @@ Below you can find supported syntax reference:
 
    Examples:
 
-   - `$VARIABLE =~ /^content.*/`
-   - `$VARIABLE_1 !~ /^content.*/` (introduced in GitLab 11.11)
+   - `=~`: True if pattern is matched. Ex: `$VARIABLE =~ /^content.*/`
+   - `!~`: True if pattern is not matched. Ex: `$VARIABLE_1 !~ /^content.*/` ([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61900) in GitLab 11.11)
 
    Variable pattern matching with regular expressions uses the
    [RE2 regular expression syntax](https://github.com/google/re2/wiki/Syntax).
@@ -613,8 +618,48 @@ Below you can find supported syntax reference:
 
    It is possible to join multiple conditions using `&&` or `||`. Any of the otherwise
    supported syntax may be used in a conjunctive or disjunctive statement.
-   Precedence of operators follows standard Ruby 2.5 operation
-   [precedence](https://ruby-doc.org/core-2.5.0/doc/syntax/precedence_rdoc.html).
+   Precedence of operators follows the
+   [Ruby 2.5 standard](https://ruby-doc.org/core-2.5.0/doc/syntax/precedence_rdoc.html),
+   so `&&` is evaluated before `||`.
+
+### Storing regular expressions in variables
+
+It is possible to store a regular expression in a variable, to be used for pattern matching:
+
+```yaml
+variables:
+  STAGINGRELS: '/staging0|staging1/'
+
+deploy_staging:
+  script: do.sh deploy staging
+  environment: staging
+  rules:
+    - if: '$RELEASE =~ $STAGINGRELS'
+```
+
+NOTE: **Note:**
+The available regular expression syntax is limited. See [related issue](https://gitlab.com/gitlab-org/gitlab/issues/35438)
+for more details.
+
+If needed, you can use a test pipeline to determine whether a regular expression will
+work in a variable. The example below tests the `^mast.*` regular expression directly,
+as well as from within a variable:
+
+```yaml
+variables:
+  MYSTRING: 'master'
+  MYREGEX: '/^mast.*/'
+
+testdirect:
+  script: /bin/true
+  rules:
+    - if: '$MYSTRING =~ /^mast.*/'
+
+testvariable:
+  script: /bin/true
+  rules:
+    - if: '$MYSTRING =~ $MYREGEX'
+```
 
 ## Debug logging
 

@@ -364,6 +364,126 @@ describe API::Geo do
       stub_current_geo_node(secondary_node)
     end
 
+    describe 'POST /geo/proxy_git_ssh/info_refs_upload_pack' do
+      context 'with all required params missing' do
+        it 'responds with 400' do
+          post api('/geo/proxy_git_ssh/info_refs_upload_pack'), params: nil
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing')
+        end
+      end
+
+      context 'with all required params' do
+        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitSSHProxy) }
+
+        before do
+          allow(Gitlab::Geo::GitSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
+        end
+
+        context 'with an invalid secret_token' do
+          it 'responds with 401' do
+            post(api('/geo/proxy_git_ssh/info_refs_upload_pack'), params: { secret_token: 'invalid', data: data })
+
+            expect(response).to have_gitlab_http_status(:unauthorized)
+            expect(json_response['error']).to be_nil
+          end
+        end
+
+        context 'where an exception occurs' do
+          it 'responds with 500' do
+            expect(git_push_ssh_proxy).to receive(:info_refs_upload_pack).and_raise('deliberate exception raised')
+
+            post api('/geo/proxy_git_ssh/info_refs_upload_pack'), params: { secret_token: secret_token, data: data }
+
+            expect(response).to have_gitlab_http_status(:internal_server_error)
+            expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
+            expect(json_response['result']).to be_nil
+          end
+        end
+
+        context 'with a valid secret token' do
+          let(:http_response) { double(Net::HTTPOK, code: 200, body: 'something here') }
+          let(:api_response) { Gitlab::Geo::GitSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
+
+          before do
+            # Mocking a real Net::HTTPSuccess is very difficult as it's not
+            # easy to instantiate the class due to the way it sets the body
+            expect(http_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(true)
+          end
+
+          it 'responds with 200' do
+            expect(git_push_ssh_proxy).to receive(:info_refs_upload_pack).and_return(api_response)
+
+            post api('/geo/proxy_git_ssh/info_refs_upload_pack'), params: { secret_token: secret_token, data: data }
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(Base64.decode64(json_response['result'])).to eql('something here')
+          end
+        end
+      end
+    end
+
+    describe 'POST /geo/proxy_git_ssh/upload_pack' do
+      context 'with all required params missing' do
+        it 'responds with 400' do
+          post api('/geo/proxy_git_ssh/upload_pack'), params: nil
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing, output is missing')
+        end
+      end
+
+      context 'with all required params' do
+        let(:output) { Base64.encode64('info_refs content') }
+        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitSSHProxy) }
+
+        before do
+          allow(Gitlab::Geo::GitSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
+        end
+
+        context 'with an invalid secret_token' do
+          it 'responds with 401' do
+            post(api('/geo/proxy_git_ssh/upload_pack'), params: { secret_token: 'invalid', data: data, output: output })
+
+            expect(response).to have_gitlab_http_status(:unauthorized)
+            expect(json_response['error']).to be_nil
+          end
+        end
+
+        context 'where an exception occurs' do
+          it 'responds with 500' do
+            expect(git_push_ssh_proxy).to receive(:upload_pack).and_raise('deliberate exception raised')
+            post api('/geo/proxy_git_ssh/upload_pack'), params: { secret_token: secret_token, data: data, output: output }
+
+            expect(response).to have_gitlab_http_status(:internal_server_error)
+            expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
+            expect(json_response['result']).to be_nil
+          end
+        end
+
+        context 'with a valid secret token' do
+          let(:http_response) { double(Net::HTTPCreated, code: 201, body: 'something here', class: Net::HTTPCreated) }
+          let(:api_response) { Gitlab::Geo::GitSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
+
+          before do
+            # Mocking a real Net::HTTPSuccess is very difficult as it's not
+            # easy to instantiate the class due to the way it sets the body
+            expect(http_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(true)
+          end
+
+          it 'responds with 201' do
+            expect(git_push_ssh_proxy).to receive(:upload_pack).with(output).and_return(api_response)
+
+            post api('/geo/proxy_git_ssh/upload_pack'), params: { secret_token: secret_token, data: data, output: output }
+
+            expect(response).to have_gitlab_http_status(:created)
+            expect(Base64.decode64(json_response['result'])).to eql('something here')
+          end
+        end
+      end
+    end
+
     describe 'POST /geo/proxy_git_ssh/info_refs_receive_pack' do
       context 'with all required params missing' do
         it 'responds with 400' do

@@ -40,16 +40,14 @@ export default {
     },
   },
   data() {
-    const milestonesInRoadmap = gon.features && gon.features.milestonesInRoadmap;
     return {
       timeframeStartOffset: 0,
-      milestonesInRoadmap,
     };
   },
   computed: {
     ...mapState(['defaultInnerHeight']),
     displayMilestones() {
-      return this.milestonesInRoadmap && this.milestones.length !== 0;
+      return Boolean(this.milestones.length);
     },
   },
   mounted() {

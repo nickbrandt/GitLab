@@ -15,7 +15,7 @@ import {
   startDate,
   endDate,
   customizableStagesAndEvents,
-  tasksByTypeData,
+  rawTasksByTypeData,
   transformedTasksByTypeData,
   selectedProjects,
 } from '../mock_data';
@@ -185,7 +185,7 @@ describe('Cycle analytics mutations', () => {
 
     it('sets tasksByType.data to the raw returned chart data', () => {
       state = { tasksByType: { data: null } };
-      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, tasksByTypeData);
+      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, rawTasksByTypeData);
 
       expect(state.tasksByType.data).toEqual(transformedTasksByTypeData);
     });

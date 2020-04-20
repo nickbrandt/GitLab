@@ -1,11 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import _ from 'underscore';
 import { APPROVED_MESSAGE } from 'ee/vue_merge_request_widget/components/approvals/messages';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import { toNounSeriesText } from '~/lib/utils/grammar';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 
-const testApprovers = () => _.range(1, 5).map(id => ({ id }));
+const testApprovers = () => Array.from({ length: 5 }, (_, i) => i).map(id => ({ id }));
 const testRulesLeft = () => ['Lorem', 'Ipsum', 'dolar sit'];
 const TEST_APPROVALS_LEFT = 3;
 

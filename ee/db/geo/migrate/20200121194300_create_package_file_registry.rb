@@ -8,7 +8,7 @@ class CreatePackageFileRegistry < ActiveRecord::Migration[5.2]
       t.integer :package_file_id, null: false
       t.integer :state, default: 0, null: false
       t.integer :retry_count, default: 0
-      t.string :last_sync_failure, limit: 255
+      t.string :last_sync_failure, limit: 255 # rubocop:disable Migration/PreventStrings
       t.datetime_with_timezone :retry_at
       t.datetime_with_timezone :last_synced_at
       t.datetime_with_timezone :created_at, null: false

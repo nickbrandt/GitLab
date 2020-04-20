@@ -54,10 +54,10 @@ describe Repository, :elastic do
     blobs, commits = results.partition { |result| result['_source']['blob'].present? }
 
     case type
-    when :blob
+    when 'blob'
       expect(blobs).not_to be_empty
       expect(commits).to be_empty
-    when :commit
+    when 'commit'
       expect(blobs).to be_empty
       expect(commits).not_to be_empty
     else
@@ -71,10 +71,10 @@ describe Repository, :elastic do
     project = create :project, :repository
     index!(project)
 
-    search_and_check!(Repository, '-foo', type: :blob)
-    search_and_check!(Repository, '-foo', type: :commit)
-    search_and_check!(project.repository, '-foo', type: :blob)
-    search_and_check!(project.repository, '-foo', type: :commit)
+    search_and_check!(Repository, '-foo', type: 'blob')
+    search_and_check!(Repository, '-foo', type: 'commit')
+    search_and_check!(project.repository, '-foo', type: 'blob')
+    search_and_check!(project.repository, '-foo', type: 'commit')
   end
 
   describe 'class method find_commits_by_message_with_elastic', :sidekiq_might_not_need_inline do

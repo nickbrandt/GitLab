@@ -23,7 +23,7 @@ module GroupSaml
 
           if updated && saml_provider.enforced_group_managed_accounts? && !group_managed_accounts_was_enforced
             require_linked_saml_to_enable_group_managed!
-            cleanup_members!
+            cleanup_members! if ::Feature.enabled?(:gma_member_cleanup)
           end
         end
       end

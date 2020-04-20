@@ -109,7 +109,7 @@ GET /groups?custom_attributes[key]=value&custom_attributes[other_key]=other_valu
 
 ## List a group's subgroups
 
-> [Introduced][ce-15142] in GitLab 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15142) in GitLab 10.3.
 
 Get a list of visible direct subgroups in this group.
 When accessed without authentication, only public groups are returned.
@@ -943,8 +943,6 @@ And to switch pages add:
 ```plaintext
 /groups?per_page=100&page=2
 ```
-
-[ce-15142]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15142
 
 ## Group badges
 

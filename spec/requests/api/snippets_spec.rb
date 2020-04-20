@@ -424,6 +424,32 @@ describe API::Snippets do
       end
     end
 
+    context "when admin" do
+      let(:admin) { create(:admin) }
+      let(:token) { create(:personal_access_token, user: admin, scopes: [:sudo]) }
+
+      subject do
+        put api("/snippets/#{snippet.id}", admin, personal_access_token: token), params: { visibility: 'private', sudo: user.id }
+      end
+
+      context 'when sudo is defined' do
+        it 'returns 200 and updates snippet visibility' do
+          expect(snippet.visibility).not_to eq('private')
+
+          subject
+
+          expect(response).to have_gitlab_http_status(:success)
+          expect(json_response["visibility"]).to eq 'private'
+        end
+
+        it 'does not commit data' do
+          expect_any_instance_of(SnippetRepository).not_to receive(:multi_files_action)
+
+          subject
+        end
+      end
+    end
+
     def update_snippet(snippet_id: snippet.id, params: {}, requester: user)
       put api("/snippets/#{snippet_id}", requester), params: params
     end

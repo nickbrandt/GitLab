@@ -12,7 +12,7 @@ module QA
 
               def self.prepended(page)
                 page.module_eval do
-                  view 'ee/app/assets/javascripts/monitoring/components/alert_widget_form.vue' do
+                  view 'app/assets/javascripts/monitoring/components/alert_widget_form.vue' do
                     element :alert_query_dropdown
                     element :alert_query_option
                     element :alert_threshold_field

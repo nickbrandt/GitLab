@@ -7,7 +7,7 @@ class MigrateCiJobArtifactsToSeparateRegistry < ActiveRecord::Migration[4.2]
       t.integer "artifact_id", unique: true
       t.integer "retry_count"
       t.boolean "success"
-      t.string "sha256" # rubocop:disable Migration/AddLimitToStringColumns
+      t.string "sha256" # rubocop:disable Migration/PreventStrings
     end
 
     Geo::TrackingBase.transaction do

@@ -61,7 +61,7 @@ describe('Report issues', () => {
     it('should render location', () => {
       vm = mountComponent(ReportIssues, {
         issue: sastParsedIssues[0],
-        component: componentNames.SastIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
 
@@ -78,7 +78,7 @@ describe('Report issues', () => {
         issue: {
           title: 'foo',
         },
-        component: componentNames.SastIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_SUCCESS,
       });
 
@@ -91,7 +91,7 @@ describe('Report issues', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssues, {
         issue: dockerReportParsed.unapproved[0],
-        component: componentNames.ContainerScanningIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
     });
@@ -113,7 +113,7 @@ describe('Report issues', () => {
         store,
         props: {
           issue: parsedDast[0],
-          component: componentNames.DastIssueBody,
+          component: componentNames.SecurityIssueBody,
           status: STATUS_FAILED,
         },
       });
@@ -129,7 +129,7 @@ describe('Report issues', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssues, {
         issue: secretScanningParsedIssues[0],
-        component: componentNames.SecretScanningIssueBody,
+        component: componentNames.SecurityIssueBody,
         status: STATUS_FAILED,
       });
     });

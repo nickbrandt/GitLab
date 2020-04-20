@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import epicItemComponent from 'ee/roadmap/components/epic_item.vue';
 
@@ -10,6 +10,14 @@ import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockTimeframeInitialDate, mockEpic, mockGroupId } from 'ee_jest/roadmap/mock_data';
+
+jest.mock('lodash/delay', () =>
+  jest.fn(func => {
+    // eslint-disable-next-line no-param-reassign
+    func.delay = jest.fn();
+    return func;
+  }),
+);
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -111,8 +119,6 @@ describe('EpicItemComponent', () => {
   describe('methods', () => {
     describe('removeHighlight', () => {
       it('should call _.delay after 3 seconds with a callback function which would set `epic.newEpic` to false when it is true already', done => {
-        jest.spyOn(_, 'delay').mockImplementation(() => {});
-
         vm.epic.newEpic = true;
 
         vm.removeHighlight();

@@ -1,4 +1,4 @@
-import { isNumber } from 'underscore';
+import { isNumber } from 'lodash';
 import { getDatesInRange } from '~/lib/utils/datetime_utility';
 import {
   isStartEvent,

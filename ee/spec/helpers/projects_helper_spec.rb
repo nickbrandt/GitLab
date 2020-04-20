@@ -38,6 +38,20 @@ describe ProjectsHelper do
     end
   end
 
+  describe '#show_compliance_framework_badge?' do
+    it 'returns false if compliance framework setting is not present' do
+      project = build(:project)
+
+      expect(helper.show_compliance_framework_badge?(project)).to be_falsey
+    end
+
+    it 'returns true if compliance framework setting is present' do
+      project = build(:project, :with_compliance_framework)
+
+      expect(helper.show_compliance_framework_badge?(project)).to be_truthy
+    end
+  end
+
   describe '#membership_locked?' do
     let(:project) { build_stubbed(:project, group: group) }
     let(:group) { nil }

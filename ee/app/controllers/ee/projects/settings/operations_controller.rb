@@ -25,8 +25,7 @@ module EE
           end
 
           def has_status_page_license?
-            project.feature_available?(:status_page, current_user) &&
-            project.beta_feature_available?(:status_page)
+            project.feature_available?(:status_page, current_user)
           end
 
           def track_tracing_external_url
@@ -54,7 +53,7 @@ module EE
         end
 
         def status_page_setting_params
-          { status_page_setting_attributes: [:aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
+          { status_page_setting_attributes: [:status_page_url, :aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
         end
 
         override :track_events

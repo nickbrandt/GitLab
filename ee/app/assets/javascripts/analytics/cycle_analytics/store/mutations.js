@@ -50,6 +50,7 @@ export default {
     state.isLoadingStage = false;
   },
   [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
+    state.isLoadingTasksByTypeChartTopLabels = true;
     state.topRankedLabels = [];
     state.tasksByType = {
       ...state.tasksByType,
@@ -58,6 +59,7 @@ export default {
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
     const { tasksByType } = state;
+    state.isLoadingTasksByTypeChartTopLabels = false;
     state.topRankedLabels = data.map(convertObjectPropsToCamelCase);
     state.tasksByType = {
       ...tasksByType,
@@ -66,6 +68,7 @@ export default {
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
     const { tasksByType } = state;
+    state.isLoadingTasksByTypeChartTopLabels = false;
     state.topRankedLabels = [];
     state.tasksByType = {
       ...tasksByType,
@@ -130,7 +133,7 @@ export default {
   [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
     state.isLoadingTasksByTypeChart = false;
   },
-  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data) {
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data = []) {
     state.isLoadingTasksByTypeChart = false;
     state.tasksByType = {
       ...state.tasksByType,

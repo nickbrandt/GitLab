@@ -1,0 +1,5 @@
+---
+title: Default the :tasks_by_type_chart feature flag on
+merge_request: 28486
+author:
+type: changed

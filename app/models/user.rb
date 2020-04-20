@@ -1727,7 +1727,7 @@ class User < ApplicationRecord
 
   # override, from Devise::Validatable
   def password_required?
-    return false if internal?
+    return false if internal? || project_bot?
 
     super
   end

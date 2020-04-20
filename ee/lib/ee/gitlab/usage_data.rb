@@ -158,7 +158,7 @@ module EE
                 projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
                 projects_with_packages: distinct_count(::Packages::Package, :project_id),
                 projects_with_tracing_enabled: count(ProjectTracingSetting),
-                status_page_projects: count(::StatusPageSetting.enabled),
+                status_page_projects: count(::StatusPage::ProjectSetting.enabled),
                 status_page_issues: count(::Issue.on_status_page),
                 template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
               },

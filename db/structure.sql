@@ -400,7 +400,8 @@ CREATE TABLE public.application_settings (
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
     issues_create_limit integer DEFAULT 300 NOT NULL,
-    push_rule_id bigint
+    push_rule_id bigint,
+    group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -1662,7 +1663,9 @@ CREATE TABLE public.clusters_applications_fluentd (
     updated_at timestamp with time zone NOT NULL,
     version character varying(255) NOT NULL,
     host character varying(255) NOT NULL,
-    status_reason text
+    status_reason text,
+    waf_log_enabled boolean DEFAULT true NOT NULL,
+    cilium_log_enabled boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.clusters_applications_fluentd_id_seq
@@ -4599,6 +4602,28 @@ CREATE SEQUENCE public.pages_domains_id_seq
 
 ALTER SEQUENCE public.pages_domains_id_seq OWNED BY public.pages_domains.id;
 
+CREATE TABLE public.partitioned_foreign_keys (
+    id bigint NOT NULL,
+    cascade_delete boolean DEFAULT true NOT NULL,
+    from_table text NOT NULL,
+    from_column text NOT NULL,
+    to_table text NOT NULL,
+    to_column text NOT NULL,
+    CONSTRAINT check_2c2e02a62b CHECK ((char_length(from_column) <= 63)),
+    CONSTRAINT check_40738efb57 CHECK ((char_length(to_table) <= 63)),
+    CONSTRAINT check_741676d405 CHECK ((char_length(from_table) <= 63)),
+    CONSTRAINT check_7e98be694f CHECK ((char_length(to_column) <= 63))
+);
+
+CREATE SEQUENCE public.partitioned_foreign_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.partitioned_foreign_keys_id_seq OWNED BY public.partitioned_foreign_keys.id;
+
 CREATE TABLE public.path_locks (
     id integer NOT NULL,
     path character varying NOT NULL,
@@ -6002,7 +6027,9 @@ CREATE TABLE public.status_page_settings (
     aws_region character varying(255) NOT NULL,
     aws_access_key character varying(255) NOT NULL,
     encrypted_aws_secret_key character varying(255) NOT NULL,
-    encrypted_aws_secret_key_iv character varying(255) NOT NULL
+    encrypted_aws_secret_key_iv character varying(255) NOT NULL,
+    status_page_url text,
+    CONSTRAINT check_75a79cd992 CHECK ((char_length(status_page_url) <= 1024))
 );
 
 CREATE SEQUENCE public.status_page_settings_project_id_seq
@@ -6134,7 +6161,12 @@ CREATE TABLE public.terraform_states (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     file_store smallint,
-    file character varying(255)
+    file character varying(255),
+    lock_xid character varying(255),
+    locked_at timestamp with time zone,
+    locked_by_user_id bigint,
+    uuid character varying(32) NOT NULL,
+    name character varying(255)
 );
 
 CREATE SEQUENCE public.terraform_states_id_seq
@@ -7373,6 +7405,8 @@ ALTER TABLE ONLY public.pages_domain_acme_orders ALTER COLUMN id SET DEFAULT nex
 
 ALTER TABLE ONLY public.pages_domains ALTER COLUMN id SET DEFAULT nextval('public.pages_domains_id_seq'::regclass);
 
+ALTER TABLE ONLY public.partitioned_foreign_keys ALTER COLUMN id SET DEFAULT nextval('public.partitioned_foreign_keys_id_seq'::regclass);
+
 ALTER TABLE ONLY public.path_locks ALTER COLUMN id SET DEFAULT nextval('public.path_locks_id_seq'::regclass);
 
 ALTER TABLE ONLY public.personal_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.personal_access_tokens_id_seq'::regclass);
@@ -8201,6 +8235,9 @@ ALTER TABLE ONLY public.pages_domain_acme_orders
 ALTER TABLE ONLY public.pages_domains
     ADD CONSTRAINT pages_domains_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.partitioned_foreign_keys
+    ADD CONSTRAINT partitioned_foreign_keys_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.path_locks
     ADD CONSTRAINT path_locks_pkey PRIMARY KEY (id);
 
@@ -8822,6 +8859,8 @@ CREATE INDEX index_ci_builds_on_commit_id_and_type_and_name_and_ref ON public.ci
 
 CREATE INDEX index_ci_builds_on_commit_id_and_type_and_ref ON public.ci_builds USING btree (commit_id, type, ref);
 
+CREATE INDEX index_ci_builds_on_lock_version ON public.ci_builds USING btree (lock_version) WHERE (lock_version IS NULL);
+
 CREATE INDEX index_ci_builds_on_name_and_security_type_eq_ci_build ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
 
 CREATE INDEX index_ci_builds_on_project_id_and_id ON public.ci_builds USING btree (project_id, id);
@@ -8898,6 +8937,8 @@ CREATE INDEX index_ci_pipelines_on_auto_canceled_by_id ON public.ci_pipelines US
 
 CREATE INDEX index_ci_pipelines_on_external_pull_request_id ON public.ci_pipelines USING btree (external_pull_request_id) WHERE (external_pull_request_id IS NOT NULL);
 
+CREATE INDEX index_ci_pipelines_on_lock_version ON public.ci_pipelines USING btree (lock_version) WHERE (lock_version IS NULL);
+
 CREATE INDEX index_ci_pipelines_on_merge_request_id ON public.ci_pipelines USING btree (merge_request_id) WHERE (merge_request_id IS NOT NULL);
 
 CREATE INDEX index_ci_pipelines_on_pipeline_schedule_id ON public.ci_pipelines USING btree (pipeline_schedule_id);
@@ -8965,6 +9006,8 @@ CREATE INDEX index_ci_sources_pipelines_on_source_project_id ON public.ci_source
 CREATE INDEX index_ci_sources_projects_on_pipeline_id ON public.ci_sources_projects USING btree (pipeline_id);
 
 CREATE UNIQUE INDEX index_ci_sources_projects_on_source_project_id_and_pipeline_id ON public.ci_sources_projects USING btree (source_project_id, pipeline_id);
+
+CREATE INDEX index_ci_stages_on_lock_version ON public.ci_stages USING btree (lock_version) WHERE (lock_version IS NULL);
 
 CREATE INDEX index_ci_stages_on_pipeline_id ON public.ci_stages USING btree (pipeline_id);
 
@@ -9367,6 +9410,8 @@ CREATE INDEX index_import_export_uploads_on_updated_at ON public.import_export_u
 CREATE INDEX index_import_failures_on_correlation_id_value ON public.import_failures USING btree (correlation_id_value);
 
 CREATE INDEX index_import_failures_on_group_id_not_null ON public.import_failures USING btree (group_id) WHERE (group_id IS NOT NULL);
+
+CREATE INDEX index_import_failures_on_project_id_and_correlation_id_value ON public.import_failures USING btree (project_id, correlation_id_value) WHERE (retry_count = 0);
 
 CREATE INDEX index_import_failures_on_project_id_not_null ON public.import_failures USING btree (project_id) WHERE (project_id IS NOT NULL);
 
@@ -9806,6 +9851,8 @@ CREATE INDEX index_pages_domains_on_verified_at_and_enabled_until ON public.page
 
 CREATE INDEX index_pages_domains_on_wildcard ON public.pages_domains USING btree (wildcard);
 
+CREATE UNIQUE INDEX index_partitioned_foreign_keys_unique_index ON public.partitioned_foreign_keys USING btree (to_table, from_table, from_column);
+
 CREATE INDEX index_pat_on_user_id_and_expires_at ON public.personal_access_tokens USING btree (user_id, expires_at);
 
 CREATE INDEX index_path_locks_on_path ON public.path_locks USING btree (path);
@@ -10232,7 +10279,11 @@ CREATE INDEX index_term_agreements_on_term_id ON public.term_agreements USING bt
 
 CREATE INDEX index_term_agreements_on_user_id ON public.term_agreements USING btree (user_id);
 
-CREATE INDEX index_terraform_states_on_project_id ON public.terraform_states USING btree (project_id);
+CREATE INDEX index_terraform_states_on_locked_by_user_id ON public.terraform_states USING btree (locked_by_user_id);
+
+CREATE UNIQUE INDEX index_terraform_states_on_project_id_and_name ON public.terraform_states USING btree (project_id, name);
+
+CREATE UNIQUE INDEX index_terraform_states_on_uuid ON public.terraform_states USING btree (uuid);
 
 CREATE INDEX index_timelogs_on_issue_id ON public.timelogs USING btree (issue_id);
 
@@ -11410,6 +11461,9 @@ ALTER TABLE ONLY public.geo_node_namespace_links
 
 ALTER TABLE ONLY public.clusters_applications_knative
     ADD CONSTRAINT fk_rails_54fc91e0a0 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT fk_rails_558901b030 FOREIGN KEY (locked_by_user_id) REFERENCES public.users(id);
 
 ALTER TABLE ONLY public.issue_user_mentions
     ADD CONSTRAINT fk_rails_57581fda73 FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
@@ -13005,6 +13059,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200214214934
 20200215222507
 20200215225103
+20200217210353
 20200217223651
 20200217225719
 20200219105209
@@ -13172,6 +13227,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200407121321
 20200407171133
 20200407171417
+20200407182205
 20200408110856
 20200408133211
 20200408153842
@@ -13184,12 +13240,18 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408154604
 20200408154624
 20200408175424
+20200408212219
+20200409085956
 20200409211607
 20200410232012
+20200413072059
+20200413230056
 20200414144547
 20200415160722
 20200415161021
 20200415161206
 20200415192656
+20200416120128
+20200416120354
 \.
 

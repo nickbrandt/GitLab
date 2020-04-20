@@ -87,11 +87,16 @@ FactoryBot.define do
 
     transient do
       developer_projects { [] }
+      maintainer_projects { [] }
     end
 
     after(:create) do |user, evaluator|
       evaluator.developer_projects.each do |project|
         project.add_developer(user)
+      end
+
+      evaluator.maintainer_projects.each do |project|
+        project.add_maintainer(user)
       end
     end
 

@@ -93,17 +93,6 @@ downtime_check:
     reports:
       junit: junit_rspec.xml
 
-.rspec-base-quarantine-pg11:
-  extends:
-    - .rspec-base
-    - .use-pg11
-  variables:
-    RSPEC_OPTS: "--tag quarantine -- spec/"
-  script:
-    - source scripts/rspec_helpers.sh
-    - rspec_simple_job "${RSPEC_OPTS}"
-  allow_failure: true
-
 .rspec-base-pg11:
   extends:
     - .rspec-base
@@ -247,11 +236,6 @@ rspec:coverage:
 
 ####################
 # master-only jobs #
-rspec quarantine pg11:
-  extends:
-    - .rspec-base-quarantine-pg11
-    - .rails:rules:master-refs-code-backstage
-
 .rspec-base-pg10:
   extends:
     - .rspec-base
@@ -310,13 +294,6 @@ rspec system pg9:
 
 #######################
 # EE master-only jobs #
-rspec-ee quarantine pg11:
-  extends:
-    - .rspec-base-quarantine-pg11
-    - .rails:rules:master-refs-code-backstage-ee-only
-  variables:
-    RSPEC_OPTS: "--tag quarantine -- ee/spec/"
-
 .rspec-ee-base-pg10:
   extends:
     - .rspec-base-ee

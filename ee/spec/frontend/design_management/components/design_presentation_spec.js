@@ -443,6 +443,23 @@ describe('Design management design presentation component', () => {
     });
   });
 
+  describe('getAnnotationPositon', () => {
+    it.each`
+      coordinates               | overlayDimensions                | position
+      ${{ x: 100, y: 100 }}     | ${{ width: 50, height: 50 }}     | ${{ x: 100, y: 100, width: 50, height: 50 }}
+      ${{ x: 100.2, y: 100.5 }} | ${{ width: 50.6, height: 50.0 }} | ${{ x: 100, y: 101, width: 51, height: 50 }}
+    `('returns correct annotation position', ({ coordinates, overlayDimensions, position }) => {
+      createComponent(undefined, {
+        overlayDimensions: {
+          width: overlayDimensions.width,
+          height: overlayDimensions.height,
+        },
+      });
+
+      expect(wrapper.vm.getAnnotationPositon(coordinates)).toStrictEqual(position);
+    });
+  });
+
   describe('when design is overflowing', () => {
     beforeEach(() => {
       createComponent(

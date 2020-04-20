@@ -17,7 +17,7 @@ our test design. We can find some helpful heuristics documented in the Handbook 
 
 ## Test speed
 
-GitLab has a massive test suite that, without [parallelization], can take hours
+GitLab has a massive test suite that, without [parallelization](ci.md#test-suite-parallelization-on-the-ci), can take hours
 to run. It's important that we make an effort to write tests that are accurate
 and effective _as well as_ fast.
 
@@ -29,8 +29,6 @@ Here are some things to keep in mind regarding test performance:
   `spy`, or `double` will do. Database persistence is slow!
 - Don't mark a feature as requiring JavaScript (through `:js` in RSpec) unless it's _actually_ required for the test
   to be valid. Headless browser testing is slow!
-
-[parallelization]: ci.md#test-suite-parallelization-on-the-ci
 
 ## RSpec
 
@@ -651,7 +649,7 @@ end
 
 ### Factories
 
-GitLab uses [factory_bot] as a test fixture replacement.
+GitLab uses [factory_bot](https://github.com/thoughtbot/factory_bot) as a test fixture replacement.
 
 - Factory definitions live in `spec/factories/`, named using the pluralization
   of their corresponding model (`User` factories are defined in `users.rb`).
@@ -665,8 +663,6 @@ GitLab uses [factory_bot] as a test fixture replacement.
   required by the test.
 - Factories don't have to be limited to `ActiveRecord` objects.
   [See example](https://gitlab.com/gitlab-org/gitlab-foss/commit/0b8cefd3b2385a21cfed779bd659978c0402766d).
-
-[factory_bot]: https://github.com/thoughtbot/factory_bot
 
 ### Fixtures
 

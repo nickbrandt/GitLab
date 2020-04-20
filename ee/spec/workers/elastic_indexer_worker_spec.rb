@@ -121,7 +121,7 @@ describe ElasticIndexerWorker, :elastic do
 
     expect do
       subject.perform("index", 'Project', object.id, object.es_id)
-    end.to raise_error
+    end.to raise_error(Elastic::IndexRecordService::ImportError)
   end
 
   it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound error' do

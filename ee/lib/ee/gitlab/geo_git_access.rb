@@ -12,25 +12,29 @@ module EE
 
       private
 
-      def custom_action_for?(cmd)
-        return unless receive_pack?(cmd) # git push
-        return unless ::Gitlab::Database.read_only?
-
-        ::Gitlab::Geo.secondary_with_primary?
-      end
-
       def custom_action_for(cmd)
         return unless custom_action_for?(cmd)
 
         payload = {
           'action' => 'geo_proxy_to_primary',
           'data' => {
-            'api_endpoints' => custom_action_api_endpoints,
+            'api_endpoints' => custom_action_api_endpoints_for(cmd),
             'primary_repo' => primary_http_repo_url
           }
         }
 
         ::Gitlab::GitAccessResult::CustomAction.new(payload, messages)
+      end
+
+      def custom_action_for?(cmd)
+        return unless ::Gitlab::Database.read_only?
+        return unless ::Gitlab::Geo.secondary_with_primary?
+
+        receive_pack?(cmd) || upload_pack_and_not_replicated?(cmd)
+      end
+
+      def upload_pack_and_not_replicated?(cmd)
+        upload_pack?(cmd) && !::Geo::ProjectRegistry.repository_replicated_for?(project.id)
       end
 
       def messages
@@ -79,7 +83,18 @@ module EE
         @current_replication_lag ||= ::Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
       end
 
-      def custom_action_api_endpoints
+      def custom_action_api_endpoints_for(cmd)
+        receive_pack?(cmd) ? custom_action_push_api_endpoints : custom_action_pull_api_endpoints
+      end
+
+      def custom_action_pull_api_endpoints
+        [
+         api_v4_geo_proxy_git_ssh_info_refs_upload_pack_path,
+         api_v4_geo_proxy_git_ssh_upload_pack_path
+        ]
+      end
+
+      def custom_action_push_api_endpoints
         [
           api_v4_geo_proxy_git_ssh_info_refs_receive_pack_path,
           api_v4_geo_proxy_git_ssh_receive_pack_path

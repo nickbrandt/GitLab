@@ -27,7 +27,7 @@ module Gitlab
 
         case scope
         when 'projects'
-          eager_load(projects, page, eager: [:route, :namespace])
+          eager_load(projects, page, eager: [:route, :namespace, :compliance_framework_setting])
         when 'issues'
           eager_load(issues, page, eager: { project: [:route, :namespace] })
         when 'merge_requests'

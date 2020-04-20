@@ -39,7 +39,7 @@ export default {
       seriesInfo: [
         {
           type: 'solid',
-          name: s__('IssuesAnalytics|Issues created'),
+          name: s__('IssuesAnalytics|Issues opened'),
           color: '#1F78D1',
         },
       ],
@@ -145,13 +145,13 @@ export default {
     <gl-loading-icon v-if="loading" size="xl" class="issues-analytics-loading" />
 
     <div v-if="showChart" class="issues-analytics-chart">
-      <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues created per month') }}</h4>
+      <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues opened per month') }}</h4>
 
       <gl-column-chart
         data-qa-selector="issues_analytics_graph"
         :data="{ Full: data }"
         :option="chartOptions"
-        :y-axis-title="s__('IssuesAnalytics|Issues created')"
+        :y-axis-title="s__('IssuesAnalytics|Issues opened')"
         :x-axis-title="s__('IssuesAnalytics|Last 12 months') + ' (' + chartDateRange + ')'"
         x-axis-type="category"
         @created="onCreated"

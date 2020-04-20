@@ -12,5 +12,7 @@ swap:
   param: parameter
   params: parameters
   postgres: PostgreSQL
+  raketask: Rake task
+  raketasks: Rake tasks
   self hosted: self-managed
   self-hosted: self-managed

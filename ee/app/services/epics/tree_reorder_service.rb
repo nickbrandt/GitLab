@@ -12,7 +12,9 @@ module Epics
 
     def execute
       error_message = validate_objects
+      return error(error_message) if error_message.present?
 
+      error_message = set_new_parent
       return error(error_message) if error_message.present?
 
       move!
@@ -20,6 +22,24 @@ module Epics
     end
 
     private
+
+    def set_new_parent
+      return unless new_parent && new_parent_different?
+
+      moving_object.parent = new_parent
+      validate_new_parent
+    end
+
+    def new_parent_different?
+      params[:new_parent_id] != GitlabSchema.id_from_object(moving_object.parent)
+    end
+
+    def validate_new_parent
+      return unless moving_object.respond_to?(:valid_parent?)
+      return if moving_object.valid_parent?
+
+      moving_object.errors[:parent]&.first
+    end
 
     def move!
       moving_object.move_between(before_object, after_object)
@@ -46,15 +66,22 @@ module Epics
       end
 
       return 'You don\'t have permissions to move the objects.' unless authorized?
-      return 'Both objects have to belong to the same parent epic.' unless same_parent?
+
+      if different_epic_parent?
+        return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
+      end
     end
 
     def valid_relative_position?
       %w(before after).include?(params[:relative_position])
     end
 
-    def same_parent?
-      moving_object.parent == adjacent_reference.parent
+    def different_epic_parent?
+      if new_parent
+        new_parent != adjacent_reference.parent
+      else
+        moving_object.parent != adjacent_reference.parent
+      end
     end
 
     def supported_type?(object)
@@ -64,6 +91,11 @@ module Epics
     def authorized?
       return false unless can?(current_user, :admin_epic, base_epic.group)
       return false unless can?(current_user, :admin_epic, adjacent_reference_group)
+
+      if new_parent
+        return false unless can?(current_user, :admin_epic, new_parent.group)
+        return false unless moving_object.parent && can?(current_user, :admin_epic, moving_object.parent.group)
+      end
 
       true
     end
@@ -85,6 +117,12 @@ module Epics
 
     def adjacent_reference
       @adjacent_reference ||= find_object(params[:adjacent_reference_id])&.sync
+    end
+
+    def new_parent
+      return unless params[:new_parent_id]
+
+      @new_parent ||= find_object(params[:new_parent_id])&.sync
     end
 
     def find_object(id)

@@ -201,10 +201,10 @@ export default {
       const { x, y } = coordinates;
       const { width, height } = this.overlayDimensions;
       return {
-        x,
-        y,
-        width,
-        height,
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width),
+        height: Math.round(height),
       };
     },
     openCommentForm(coordinates) {

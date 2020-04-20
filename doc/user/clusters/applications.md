@@ -556,8 +556,6 @@ To enable Fluentd:
 1. Provide the host domain name or URL in **SIEM Hostname**.
 1. Provide the host port number in **SIEM Port**.
 1. Select a **SIEM Protocol**.
-1. Check **Send ModSecurity Logs**. If you do not select this checkbox, the **Install**
-   button is disabled.
 1. Click **Save changes**.
 
 ![Fluentd input fields](img/fluentd_v12_10.png)
@@ -1055,7 +1053,7 @@ In this alpha implementation of installing Elastic Stack through CI, reading the
 
 ### Install Crossplane using GitLab CI/CD
 
-> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/68) in GitLab 12.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/35675) in GitLab 12.9.
 
 Crossplane is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
@@ -1069,13 +1067,15 @@ Crossplane:
 
 Crossplane is installed into the `gitlab-managed-apps` namespace of your cluster.
 
-You can check the default [values.yaml](https://github.com/crossplane/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl) we set for this chart.
+You can check the default
+[values.yaml](https://github.com/crossplane/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
+we set for this chart.
 
 You can customize the installation of Crossplane by defining
 `.gitlab/managed-apps/crossplane/values.yaml` file in your cluster
 management project. Refer to the
 [chart](https://github.com/crossplane/crossplane/tree/master/cluster/charts/crossplane#configuration) for the
-available configuration options. Note that this link points to the docs for the current development release, which may differ from the version you have installed. You can check out a specific version in the branch/tag switcher.
+available configuration options. Note that this link points to the documentation for the current development release, which may differ from the version you have installed.
 
 ### Install Fluentd using GitLab CI/CD
 

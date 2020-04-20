@@ -48,8 +48,8 @@ export default {
 </script>
 
 <template>
-  <div class="card-header d-flex px-2">
-    <div class="d-inline-flex flex-grow-1 lh-100 align-middle">
+  <div class="card-header d-flex px-2 flex-column flex-sm-row">
+    <div class="d-inline-flex flex-grow-1 lh-100 align-middle mb-2 mb-sm-0">
       <gl-tooltip :target="() => $refs.countBadge">
         <p v-if="allowSubEpics" class="font-weight-bold m-0">
           {{ __('Epics') }} &#8226;
@@ -74,7 +74,7 @@ export default {
           </span>
         </p>
       </gl-tooltip>
-      <div ref="countBadge" class="issue-count-badge text-secondary">
+      <div ref="countBadge" class="issue-count-badge text-secondary p-0 pr-2">
         <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
           <gl-icon name="epic" class="mr-1" />
           {{ totalEpicsCount }}
@@ -88,11 +88,11 @@ export default {
       </div>
       <epic-health-status v-if="healthStatus" :health-status="healthStatus" />
     </div>
-    <div class="d-inline-flex js-button-container">
+    <div class="d-inline-flex flex-column flex-sm-row js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">
         <epic-actions-split-button
           v-if="allowSubEpics"
-          class="qa-add-epics-button"
+          class="qa-add-epics-button mb-2 mb-sm-0"
           @showAddEpicForm="showAddEpicForm"
           @showCreateEpicForm="showCreateEpicForm"
         />

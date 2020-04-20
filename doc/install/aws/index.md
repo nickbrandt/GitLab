@@ -68,12 +68,12 @@ NOTE: **Note:** Please note that while we will be using EBS for storage, we do n
 To minimize the permissions of the user, we'll create a new [IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
 role with limited access:
 
-1. Navigate to the IAM dashboard <https://console.aws.amazon.com/iam/home> and
+1. Navigate to the IAM dashboard <https://console.aws.amazon.com/iam/home>, click on **Roles** in the left menu, and
    click **Create role**.
 1. Create a new role by selecting **AWS service > EC2**, then click
    **Next: Permissions**.
-1. Choose **AmazonEC2FullAccess** and **AmazonS3FullAccess**, then click **Next: Review**.
-1. Give the role the name `GitLabAdmin` and click **Create role**.
+1. Choose **AmazonEC2FullAccess** and **AmazonS3FullAccess**, click **Tags** and add tags if needed.
+1. Click **Review**, give your role the name (we'll use `GitLabAdmin`), and click **Create role**.
 
 ## Configuring the network
 
@@ -648,8 +648,8 @@ Read more on configuring an
 
 ## Backup and restore
 
-GitLab provides [a tool to backup](../../raketasks/backup_restore.md#creating-a-backup-of-the-gitlab-system)
-and restore its Git data, database, attachments, LFS objects, etc.
+GitLab provides [a tool to back up](../../raketasks/backup_restore.md#back-up-gitlab)
+and restore its Git data, database, attachments, LFS objects, and so on.
 
 Some important things to know:
 
@@ -675,7 +675,7 @@ For GitLab 12.1 and earlier, use `gitlab-rake gitlab:backup:create`.
 
 ### Restoring GitLab from a backup
 
-To restore GitLab, first review the [restore documentation](../../raketasks/backup_restore.md#restore),
+To restore GitLab, first review the [restore documentation](../../raketasks/backup_restore.md#restore-gitlab),
 and primarily the restore prerequisites. Then, follow the steps under the
 [Omnibus installations section](../../raketasks/backup_restore.md#restore-for-omnibus-gitlab-installations).
 

@@ -22,6 +22,7 @@ module Gitlab
 
         def check_source_project_membership(user)
           return true unless project.forked?
+          return true unless project.forked_from_project
 
           check_group_managed_account(project.forked_from_project.root_ancestor, user)
         end

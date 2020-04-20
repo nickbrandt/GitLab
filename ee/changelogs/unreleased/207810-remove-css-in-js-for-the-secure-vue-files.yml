@@ -1,0 +1,5 @@
+---
+title: Fix checkbox alignment and responsive word-break for secure table rows
+merge_request: 29659
+author:
+type: changed

@@ -4659,4 +4659,30 @@ describe User, :do_not_mock_admin_mode do
       it { is_expected.to be :locked }
     end
   end
+
+  describe '#password_required?' do
+    let_it_be(:user) { create(:user) }
+
+    shared_examples 'does not require password to be present' do
+      it { expect(user).not_to validate_presence_of(:password) }
+
+      it { expect(user).not_to validate_presence_of(:password_confirmation) }
+    end
+
+    context 'when user is an internal user' do
+      before do
+        user.update(user_type: 'alert_bot')
+      end
+
+      it_behaves_like 'does not require password to be present'
+    end
+
+    context 'when user is a project bot user' do
+      before do
+        user.update(user_type: 'project_bot')
+      end
+
+      it_behaves_like 'does not require password to be present'
+    end
+  end
 end

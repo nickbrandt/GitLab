@@ -23,6 +23,7 @@ describe OperationsHelper do
         expect(subject).to eq(
           'operations-settings-endpoint' => project_settings_operations_path(project),
           'enabled' => 'false',
+          'url' => nil,
           'aws-access-key' => nil,
           'aws-secret-key' => nil,
           'region' => nil,
@@ -40,6 +41,7 @@ describe OperationsHelper do
           expect(subject).to eq(
             'operations-settings-endpoint' => project_settings_operations_path(project),
             'enabled' => 'false',
+            'url' => nil,
             'aws-access-key' => nil,
             'aws-secret-key' => nil,
             'region' => nil,
@@ -56,6 +58,7 @@ describe OperationsHelper do
         expect(subject).to eq(
           'operations-settings-endpoint' => project_settings_operations_path(project),
           'enabled' => status_page_setting.enabled.to_s,
+          'url' => status_page_setting.status_page_url,
           'aws-access-key' => status_page_setting.aws_access_key,
           'aws-secret-key' => status_page_setting.masked_aws_secret_key,
           'region' => status_page_setting.aws_region,

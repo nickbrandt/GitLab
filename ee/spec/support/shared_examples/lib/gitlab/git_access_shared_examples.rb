@@ -28,15 +28,6 @@ RSpec.shared_examples 'a read-only GitLab instance' do
 
     context 'that is correctly set up' do
       let(:secondary_with_primary) { true }
-      let(:payload) do
-        {
-          'action' => 'geo_proxy_to_primary',
-          'data' => {
-            'api_endpoints' => %w{/api/v4/geo/proxy_git_ssh/info_refs_receive_pack /api/v4/geo/proxy_git_ssh/receive_pack},
-            'primary_repo' => primary_repo_url
-          }
-        }
-      end
       let(:console_messages) do
         [
           "This request to a Geo secondary node will be forwarded to the",
@@ -46,12 +37,44 @@ RSpec.shared_examples 'a read-only GitLab instance' do
         ]
       end
 
-      it 'attempts to proxy to the primary' do
-        project.add_maintainer(user)
+      context 'for a git clone/pull' do
+        let(:payload) do
+          {
+            'action' => 'geo_proxy_to_primary',
+            'data' => {
+              'api_endpoints' => %w{/api/v4/geo/proxy_git_ssh/info_refs_upload_pack /api/v4/geo/proxy_git_ssh/upload_pack},
+              'primary_repo' => primary_repo_url
+            }
+          }
+        end
 
-        expect(push_changes).to be_a(Gitlab::GitAccessResult::CustomAction)
-        expect(push_changes.payload).to eql(payload)
-        expect(push_changes.console_messages).to include(*console_messages)
+        it 'attempts to proxy to the primary' do
+          project.add_maintainer(user)
+
+          expect(pull_changes).to be_a(Gitlab::GitAccessResult::CustomAction)
+          expect(pull_changes.payload).to eql(payload)
+          expect(pull_changes.console_messages).to include(*console_messages)
+        end
+      end
+
+      context 'for a git push' do
+        let(:payload) do
+          {
+            'action' => 'geo_proxy_to_primary',
+            'data' => {
+              'api_endpoints' => %w{/api/v4/geo/proxy_git_ssh/info_refs_receive_pack /api/v4/geo/proxy_git_ssh/receive_pack},
+              'primary_repo' => primary_repo_url
+            }
+          }
+        end
+
+        it 'attempts to proxy to the primary' do
+          project.add_maintainer(user)
+
+          expect(push_changes).to be_a(Gitlab::GitAccessResult::CustomAction)
+          expect(push_changes.payload).to eql(payload)
+          expect(push_changes.console_messages).to include(*console_messages)
+        end
       end
     end
   end

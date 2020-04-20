@@ -373,6 +373,9 @@ msgstr ""
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
+msgid "%{namespace_name} is now read-only. You cannot: %{base_message}"
+msgstr ""
+
 msgid "%{name} contained %{resultsString}"
 msgstr ""
 
@@ -1047,6 +1050,12 @@ msgid "AccessTokens|Your static object token is used to authenticate you when re
 msgstr ""
 
 msgid "AccessTokens|reset it"
+msgstr ""
+
+msgid "AccessibilityReport|Accessibility report artifact not found"
+msgstr ""
+
+msgid "AccessibilityReport|Failed to retrieve accessibility report"
 msgstr ""
 
 msgid "AccessibilityReport|Learn More"
@@ -1953,6 +1962,9 @@ msgstr ""
 msgid "An error occurred while fetching sidebar data"
 msgstr ""
 
+msgid "An error occurred while fetching terraform reports."
+msgstr ""
+
 msgid "An error occurred while fetching the Service Desk address."
 msgstr ""
 
@@ -2412,6 +2424,9 @@ msgid "Are you sure you want to cancel creating this comment?"
 msgstr ""
 
 msgid "Are you sure you want to cancel editing this comment?"
+msgstr ""
+
+msgid "Are you sure you want to close this blocked issue?"
 msgstr ""
 
 msgid "Are you sure you want to delete %{name}?"
@@ -3406,6 +3421,9 @@ msgid "Can't remove group members without group managed account"
 msgstr ""
 
 msgid "Can't scan the code?"
+msgstr ""
+
+msgid "Can't update snippet: %{err}"
 msgstr ""
 
 msgid "Canary"
@@ -4476,6 +4494,12 @@ msgstr ""
 msgid "ClusterIntegration|Fetching zones"
 msgstr ""
 
+msgid "ClusterIntegration|Fluentd"
+msgstr ""
+
+msgid "ClusterIntegration|Fluentd is an open source data collector, which lets you unify the data collection and consumption for a better use and understanding of data. Export Web Application Firewall logs to your favorite SIEM."
+msgstr ""
+
 msgid "ClusterIntegration|GitLab Integration"
 msgstr ""
 
@@ -4780,6 +4804,15 @@ msgid "ClusterIntegration|Request to begin installing failed"
 msgstr ""
 
 msgid "ClusterIntegration|Request to begin uninstalling failed"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Hostname"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Port"
+msgstr ""
+
+msgid "ClusterIntegration|SIEM Protocol"
 msgstr ""
 
 msgid "ClusterIntegration|Save changes"
@@ -5306,16 +5339,31 @@ msgstr ""
 msgid "Compliance framework (optional)"
 msgstr ""
 
+msgid "ComplianceFramework|GDPR"
+msgstr ""
+
 msgid "ComplianceFramework|GDPR - General Data Protection Regulation"
+msgstr ""
+
+msgid "ComplianceFramework|HIPAA"
 msgstr ""
 
 msgid "ComplianceFramework|HIPAA - Health Insurance Portability and Accountability Act"
 msgstr ""
 
+msgid "ComplianceFramework|PCI-DSS"
+msgstr ""
+
 msgid "ComplianceFramework|PCI-DSS - Payment Card Industry-Data Security Standard"
 msgstr ""
 
+msgid "ComplianceFramework|SOC 2"
+msgstr ""
+
 msgid "ComplianceFramework|SOC 2 - Service Organization Control 2"
+msgstr ""
+
+msgid "ComplianceFramework|SOX"
 msgstr ""
 
 msgid "ComplianceFramework|SOX - Sarbanes-Oxley"
@@ -6068,6 +6116,9 @@ msgid "Create project label"
 msgstr ""
 
 msgid "Create requirement"
+msgstr ""
+
+msgid "Create snippet"
 msgstr ""
 
 msgid "Create wildcard: %{searchTerm}"
@@ -7490,9 +7541,6 @@ msgstr ""
 msgid "Edit environment"
 msgstr ""
 
-msgid "Edit epic description"
-msgstr ""
-
 msgid "Edit file"
 msgstr ""
 
@@ -8114,9 +8162,6 @@ msgstr ""
 msgid "Epics"
 msgstr ""
 
-msgid "Epics (Ultimate / Gold license only)"
-msgstr ""
-
 msgid "Epics Roadmap"
 msgstr ""
 
@@ -8124,6 +8169,9 @@ msgid "Epics and Issues"
 msgstr ""
 
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
+msgstr ""
+
+msgid "Epics, Issues, and Merge Requests"
 msgstr ""
 
 msgid "Epics|Add an epic"
@@ -8717,7 +8765,7 @@ msgstr ""
 msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
 msgstr ""
 
-msgid "Failed to find import label for jira import."
+msgid "Failed to find import label for Jira import."
 msgstr ""
 
 msgid "Failed to get ref."
@@ -10016,9 +10064,6 @@ msgstr ""
 msgid "Go to file"
 msgstr ""
 
-msgid "Go to file (MRs only)"
-msgstr ""
-
 msgid "Go to file permalink (while viewing a file)"
 msgstr ""
 
@@ -10920,6 +10965,9 @@ msgstr ""
 msgid "If you lose your recovery codes you can generate new ones, invalidating all previous codes."
 msgstr ""
 
+msgid "If you reach 100%% storage capacity, you will not be able to: %{base_message}"
+msgstr ""
+
 msgid "If your HTTP repository is not publicly accessible, add your credentials."
 msgstr ""
 
@@ -11029,6 +11077,9 @@ msgid "Import repositories from GitHub"
 msgstr ""
 
 msgid "Import repository"
+msgstr ""
+
+msgid "Import started by: %{importInitiator}"
 msgstr ""
 
 msgid "Import tasks"
@@ -11444,13 +11495,13 @@ msgstr ""
 msgid "Issues"
 msgstr ""
 
-msgid "Issues / Merge Requests"
-msgstr ""
-
 msgid "Issues Analytics"
 msgstr ""
 
 msgid "Issues Rate Limits"
+msgstr ""
+
+msgid "Issues and Merge Requests"
 msgstr ""
 
 msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are searchable and filterable."
@@ -11474,10 +11525,10 @@ msgstr ""
 msgid "IssuesAnalytics|Avg/Month:"
 msgstr ""
 
-msgid "IssuesAnalytics|Issues created"
+msgid "IssuesAnalytics|Issues opened"
 msgstr ""
 
-msgid "IssuesAnalytics|Issues created per month"
+msgid "IssuesAnalytics|Issues opened per month"
 msgstr ""
 
 msgid "IssuesAnalytics|Last 12 months"
@@ -11529,6 +11580,9 @@ msgid "Jira import is already running."
 msgstr ""
 
 msgid "Jira integration not configured."
+msgstr ""
+
+msgid "Jira project: %{importProject}"
 msgstr ""
 
 msgid "JiraService|Events for %{noteable_model_name} are disabled."
@@ -13096,6 +13150,9 @@ msgstr ""
 msgid "Microsoft Azure"
 msgstr ""
 
+msgid "Middleman project with Static Site Editor support"
+msgstr ""
+
 msgid "Migrated %{success_count}/%{total_count} files."
 msgstr ""
 
@@ -13541,10 +13598,10 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "Next file in diff (MRs only)"
+msgid "Next file in diff"
 msgstr ""
 
-msgid "Next unresolved discussion (MRs only)"
+msgid "Next unresolved discussion"
 msgstr ""
 
 msgid "Nickname"
@@ -15028,6 +15085,9 @@ msgstr ""
 msgid "Please select"
 msgstr ""
 
+msgid "Please select a Jira project"
+msgstr ""
+
 msgid "Please select a country"
 msgstr ""
 
@@ -15211,10 +15271,10 @@ msgstr ""
 msgid "Previous Artifacts"
 msgstr ""
 
-msgid "Previous file in diff (MRs only)"
+msgid "Previous file in diff"
 msgstr ""
 
-msgid "Previous unresolved discussion (MRs only)"
+msgid "Previous unresolved discussion"
 msgstr ""
 
 msgid "Primary"
@@ -16144,6 +16204,9 @@ msgstr ""
 msgid "ProjectTemplates|Spring"
 msgstr ""
 
+msgid "ProjectTemplates|Static Site Editor/Middleman"
+msgstr ""
+
 msgid "ProjectTemplates|iOS (Swift)"
 msgstr ""
 
@@ -16553,6 +16616,9 @@ msgid "ProtectedEnvironment|Your environment has been unprotected"
 msgstr ""
 
 msgid "Protip:"
+msgstr ""
+
+msgid "Protocol"
 msgstr ""
 
 msgid "Provider"
@@ -17160,6 +17226,12 @@ msgid "Reports|%{combinedString} and %{resolvedString}"
 msgstr ""
 
 msgid "Reports|Actions"
+msgstr ""
+
+msgid "Reports|An error occured while loading report"
+msgstr ""
+
+msgid "Reports|An error occurred while loading %{name} results"
 msgstr ""
 
 msgid "Reports|Class"
@@ -18583,9 +18655,6 @@ msgid "Set up CI/CD"
 msgstr ""
 
 msgid "Set up Jira Integration"
-msgstr ""
-
-msgid "Set up Jira Integration illustration"
 msgstr ""
 
 msgid "Set up a %{type} Runner automatically"
@@ -20762,6 +20831,9 @@ msgstr ""
 msgid "There was an error getting the epic participants."
 msgstr ""
 
+msgid "There was an error importing the Jira project."
+msgstr ""
+
 msgid "There was an error loading users activity calendar."
 msgstr ""
 
@@ -21015,6 +21087,9 @@ msgid "This issue is %{confidentialLinkStart}confidential%{linkEnd} and %{locked
 msgstr ""
 
 msgid "This issue is confidential"
+msgstr ""
+
+msgid "This issue is currently blocked by the following issues: %{issues}."
 msgstr ""
 
 msgid "This issue is locked."
@@ -21351,6 +21426,9 @@ msgid "Time from last commit to merge"
 msgstr ""
 
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
+msgstr ""
+
+msgid "Time of import: %{importTime}"
 msgstr ""
 
 msgid "Time remaining"
@@ -22945,6 +23023,9 @@ msgstr ""
 msgid "View issue"
 msgstr ""
 
+msgid "View issues"
+msgstr ""
+
 msgid "View it on GitLab"
 msgstr ""
 
@@ -23394,9 +23475,6 @@ msgstr ""
 msgid "Wiki"
 msgstr ""
 
-msgid "Wiki pages"
-msgstr ""
-
 msgid "Wiki was successfully updated."
 msgstr ""
 
@@ -23578,6 +23656,9 @@ msgid "Yes or No"
 msgstr ""
 
 msgid "Yes, add it"
+msgstr ""
+
+msgid "Yes, close issue"
 msgstr ""
 
 msgid "Yes, let me map Google Code users to full names or GitLab users."
@@ -23923,6 +24004,9 @@ msgid "You need to upload a GitLab project export archive (ending in .gz)."
 msgstr ""
 
 msgid "You need to upload a Google Takeout archive."
+msgstr ""
+
+msgid "You reached %{usage_in_percent} of %{namespace_name}'s capacity (%{used_storage} of %{storage_limit})"
 msgstr ""
 
 msgid "You tried to fork %{link_to_the_project} but it failed for the following reason:"
@@ -25248,6 +25332,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "project avatar"
+msgstr ""
+
+msgid "push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines."
 msgstr ""
 
 msgid "quick actions"

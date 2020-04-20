@@ -24,6 +24,7 @@ module OperationsHelper
     {
       'operations-settings-endpoint' => project_settings_operations_path(@project),
       'enabled' => status_page_setting.enabled?.to_s,
+      'url' => status_page_setting&.status_page_url,
       'bucket-name' => status_page_setting.aws_s3_bucket_name,
       'region' => status_page_setting.aws_region,
       'aws-access-key' => status_page_setting.aws_access_key,

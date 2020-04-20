@@ -38,14 +38,9 @@ module EE
           end
 
           def geo_proxy_git_ssh_route?
-            routes = ::Gitlab::Middleware::ReadOnly::API_VERSIONS.map do |version|
-              %W(
-                /api/v#{version}/geo/proxy_git_ssh/info_refs_receive_pack
-                /api/v#{version}/geo/proxy_git_ssh/receive_pack
-              )
+            ::Gitlab::Middleware::ReadOnly::API_VERSIONS.any? do |version|
+              request.path.start_with?("/api/v#{version}/geo/proxy_git_ssh")
             end
-
-            routes.flatten.include?(request.path)
           end
 
           def geo_api_route?

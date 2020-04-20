@@ -149,7 +149,7 @@ export default {
     >
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="d-flex flex-column flex-grow-1 item-title-wrapper">
-          <div class="item-title d-flex align-items-center mb-1 mb-xl-0">
+          <div class="item-title d-flex align-items-center mb-2 mb-xl-0">
             <gl-icon
               ref="stateIconMd"
               :class="stateIconClass"
@@ -172,7 +172,14 @@ export default {
               name="eye-slash"
               class="confidential-icon append-right-4 align-self-baseline align-self-md-auto mt-xl-0"
             />
-            <gl-link :href="computedPath" class="sortable-link">{{ item.title }}</gl-link>
+            <gl-link
+              v-gl-tooltip.hover
+              :aria-label="item.title"
+              :title="item.title"
+              :href="computedPath"
+              class="sortable-link"
+              >{{ item.title }}</gl-link
+            >
           </div>
         </div>
 
@@ -222,9 +229,7 @@ export default {
             <issue-health-status v-else-if="isIssue" :health-status="item.healthStatus" />
           </div>
 
-          <div
-            class="item-meta-child d-flex align-items-center order-0 flex-wrap mt-2 mt-md-0 flex-xl-nowrap"
-          >
+          <div class="item-meta-child d-flex align-items-center order-0 flex-wrap flex-xl-nowrap">
             <!-- This bullet is for Milestone -->
             <span v-if="item.healthStatus && hasMilestone" class="bullet-separator mr-2"
               >&bull;</span
@@ -276,7 +281,7 @@ export default {
           <item-assignees
             v-if="hasAssignees"
             :assignees="item.assignees"
-            class="item-assignees d-inline-flex align-items-center align-self-end mr-2 mt-2 mt-md-0 mt-xl-0 mr-xl-1 mb-md-0 order-2 flex-xl-grow-0"
+            class="item-assignees d-inline-flex align-items-center align-self-end mr-2 mr-xl-1 mb-md-0 order-2 flex-xl-grow-0"
           />
         </div>
         <gl-deprecated-button

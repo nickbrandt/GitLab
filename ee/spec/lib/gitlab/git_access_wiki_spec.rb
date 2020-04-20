@@ -39,6 +39,10 @@ describe Gitlab::GitAccessWiki do
 
   private
 
+  def pull_changes(changes = Gitlab::GitAccess::ANY)
+    access.check('git-upload-pack', changes)
+  end
+
   def push_changes(changes = Gitlab::GitAccess::ANY)
     access.check('git-receive-pack', changes)
   end

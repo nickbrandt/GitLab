@@ -19,5 +19,9 @@ module EE
 
       resource_parent&.feature_available?(feature_name) && supports_weight?
     end
+
+    def burnup_charts_available?
+      ::Feature.enabled?(:burnup_charts, resource_parent)
+    end
   end
 end

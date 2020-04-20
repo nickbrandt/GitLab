@@ -5,18 +5,18 @@ module Elastic
     module GitClassProxy
       SHA_REGEX = /\A[0-9a-f]{5,40}\z/i.freeze
 
-      def elastic_search(query, type: :all, page: 1, per: 20, options: {})
+      def elastic_search(query, type: 'all', page: 1, per: 20, options: {})
         results = { blobs: [], commits: [] }
 
-        case type.to_sym
-        when :all
+        case type
+        when 'all'
           results[:blobs] = search_blob(query, page: page, per: per, options: options)
           results[:commits] = search_commit(query, page: page, per: per, options: options)
-          results[:wiki_blobs] = search_blob(query, type: :wiki_blob, page: page, per: per, options: options)
-        when :commit
+          results[:wiki_blobs] = search_blob(query, type: 'wiki_blob', page: page, per: per, options: options)
+        when 'commit'
           results[:commits] = search_commit(query, page: page, per: per, options: options)
-        when :blob, :wiki_blob
-          results[type.to_s.pluralize.to_sym] = search_blob(query, type: type, page: page, per: per, options: options)
+        when 'blob', 'wiki_blob'
+          results[type.pluralize.to_sym] = search_blob(query, type: type, page: page, per: per, options: options)
         end
 
         results
@@ -103,7 +103,7 @@ module Elastic
         }
       end
 
-      def search_blob(query, type: :blob, page: 1, per: 20, options: {})
+      def search_blob(query, type: 'blob', page: 1, per: 20, options: {})
         page ||= 1
 
         query = ::Gitlab::Search::Query.new(query) do
@@ -170,7 +170,7 @@ module Elastic
           }
         end
 
-        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type.to_sym == :wiki_blob && repository_ids.any?
+        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type == 'wiki_blob' && repository_ids.any?
 
         res = search(query_hash, options)
 
@@ -184,8 +184,6 @@ module Elastic
       #
       # @return [Kaminari::PaginatableArray]
       def elastic_search_and_wrap(query, type:, page: 1, per: 20, options: {}, &blk)
-        type = type.to_s
-
         response = elastic_search(
           query,
           type: type,

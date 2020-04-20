@@ -57,6 +57,18 @@ RSpec.shared_examples 'SamlProvider service toggles Group Managed Accounts' do
       expect(cleanup_members_service_spy).to have_received(:execute)
     end
 
+    context 'when member cleanup flag is turned off' do
+      before do
+        stub_feature_flags(gma_member_cleanup: false)
+      end
+
+      it 'does not invoke cleaning up of group members' do
+        service.execute
+
+        expect(cleanup_members_service_spy).not_to have_received(:execute)
+      end
+    end
+
     context 'when save fails' do
       let(:params) do
         super().merge(sso_url: 'NOTANURL<>&*^')

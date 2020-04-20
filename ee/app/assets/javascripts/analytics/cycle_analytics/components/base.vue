@@ -10,7 +10,7 @@ import { LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
 import StageTable from './stage_table.vue';
 import DurationChart from './duration_chart.vue';
-import TasksByTypeChart from './tasks_by_type_chart.vue';
+import TypeOfWorkCharts from './type_of_work_charts.vue';
 import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
 import { toYmd } from '../../shared/utils';
 import RecentActivityCard from './recent_activity_card.vue';
@@ -25,7 +25,7 @@ export default {
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     StageTable,
-    TasksByTypeChart,
+    TypeOfWorkCharts,
     RecentActivityCard,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
@@ -53,6 +53,7 @@ export default {
       'isLoading',
       'isLoadingStage',
       'isLoadingTasksByTypeChart',
+      'isLoadingTasksByTypeChartTopLabels',
       'isEmptyStage',
       'isSavingCustomStage',
       'isCreatingCustomStage',
@@ -93,11 +94,13 @@ export default {
     shouldDisplayDurationChart() {
       return this.featureFlags.hasDurationChart && !this.hasNoAccessError && !this.isLoading;
     },
-    shouldDisplayTasksByTypeChart() {
+    shouldDisplayTypeOfWorkCharts() {
       return this.featureFlags.hasTasksByTypeChart && !this.hasNoAccessError;
     },
-    isTasksByTypeChartLoaded() {
-      return !this.isLoading && !this.isLoadingTasksByTypeChart;
+    isLoadingTypeOfWork() {
+      return (
+        this.isLoading || this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart
+      );
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -310,21 +313,14 @@ export default {
           />
         </div>
       </div>
-      <div v-if="shouldDisplayDurationChart" class="mt-3">
-        <duration-chart :stages="activeStages" />
-      </div>
-      <template v-if="shouldDisplayTasksByTypeChart">
-        <div class="js-tasks-by-type-chart">
-          <div v-if="isTasksByTypeChartLoaded">
-            <tasks-by-type-chart
-              :chart-data="tasksByTypeChartData"
-              :filters="selectedTasksByTypeFilters"
-              @updateFilter="setTasksByTypeFilters"
-            />
-          </div>
-          <gl-loading-icon v-else size="md" class="my-4 py-4" />
-        </div>
-      </template>
+      <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
+      <type-of-work-charts
+        v-if="shouldDisplayTypeOfWorkCharts"
+        :is-loading="isLoadingTypeOfWork"
+        :tasks-by-type-chart-data="tasksByTypeChartData"
+        :selected-tasks-by-type-filters="selectedTasksByTypeFilters"
+        @updateFilter="setTasksByTypeFilters"
+      />
     </div>
   </div>
 </template>

@@ -20,9 +20,9 @@ describe 'Group overview', :js, :aggregate_failures do
       visit_page
 
       page.within(find('.content')) do
-        expect(page).to have_content 'Subgroups and projects'
-        expect(page).to have_content 'Shared projects'
-        expect(page).to have_content 'Archived projects'
+        expect(page).to have_content _('Subgroups and projects')
+        expect(page).to have_content _('Shared projects')
+        expect(page).to have_content _('Archived projects')
       end
     end
   end
@@ -50,16 +50,16 @@ describe 'Group overview', :js, :aggregate_failures do
           expect(page).to have_selector('.js-security-dashboard-table')
 
           page.within(find('aside')) do
-            expect(page).to have_content 'Vulnerabilities over time'
+            expect(page).to have_content _('Vulnerabilities over time')
             expect(page).to have_selector('.js-vulnerabilities-chart-time-info')
             expect(page).to have_selector('.js-vulnerabilities-chart-severity-level-breakdown')
 
-            expect(page).to have_content 'Project security status'
+            expect(page).to have_content _('Project security status')
             expect(page).to have_selector('.js-projects-security-status')
           end
 
           page.within(all('div.row')[1]) do
-            expect(page).not_to have_content 'Detected'
+            expect(page).not_to have_content s_('VulnerabilityStatusTypes|Detected')
           end
         end
       end
@@ -73,8 +73,8 @@ describe 'Group overview', :js, :aggregate_failures do
           visit_page
 
           page.within(all('div.row')[1]) do
-            expect(page).to have_content 'Detected'
-            expect(page).to have_content 'Severity'
+            expect(page).to have_content s_('VulnerabilityStatusTypes|Detected')
+            expect(page).to have_content s_('Vulnerability|Severity')
           end
         end
       end
@@ -87,9 +87,9 @@ describe 'Group overview', :js, :aggregate_failures do
         visit_page
 
         page.within(find('.content')) do
-          expect(page).to have_content "Either you don't have permission to view this dashboard or "\
+          expect(page).to have_content s_("Security Reports|Either you don't have permission to view this dashboard or "\
                                        'the dashboard has not been setup. Please check your permission settings '\
-                                       'with your administrator or check your dashboard configurations to proceed.'
+                                       'with your administrator or check your dashboard configurations to proceed.')
         end
       end
     end

@@ -351,7 +351,7 @@ export default {
             :unresolved-issues="sast.newIssues"
             :resolved-issues="sast.resolvedIssues"
             :all-issues="sast.allIssues"
-            :component="$options.componentNames.SastIssueBody"
+            :component="$options.componentNames.SecurityIssueBody"
             class="js-sast-issue-list report-block-group-list"
           />
         </template>
@@ -369,7 +369,7 @@ export default {
             v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
             :unresolved-issues="dependencyScanning.newIssues"
             :resolved-issues="dependencyScanning.resolvedIssues"
-            :component="$options.componentNames.SastIssueBody"
+            :component="$options.componentNames.SecurityIssueBody"
             class="js-dss-issue-list report-block-group-list"
           />
         </template>
@@ -387,7 +387,7 @@ export default {
             v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
             :unresolved-issues="containerScanning.newIssues"
             :resolved-issues="containerScanning.resolvedIssues"
-            :component="$options.componentNames.ContainerScanningIssueBody"
+            :component="$options.componentNames.SecurityIssueBody"
             class="report-block-group-list"
           />
         </template>
@@ -418,7 +418,7 @@ export default {
             v-if="dast.newIssues.length || dast.resolvedIssues.length"
             :unresolved-issues="dast.newIssues"
             :resolved-issues="dast.resolvedIssues"
-            :component="$options.componentNames.DastIssueBody"
+            :component="$options.componentNames.SecurityIssueBody"
             class="report-block-group-list"
           />
         </template>
@@ -436,7 +436,7 @@ export default {
             v-if="secretScanning.newIssues.length || secretScanning.resolvedIssues.length"
             :unresolved-issues="secretScanning.newIssues"
             :resolved-issues="secretScanning.resolvedIssues"
-            :component="$options.componentNames.SecretScanningIssueBody"
+            :component="$options.componentNames.SecurityIssueBody"
             class="report-block-group-list"
           />
         </template>

@@ -5,6 +5,9 @@ module Gitlab
     class GitSSHProxy
       HTTP_READ_TIMEOUT = 60
 
+      UPLOAD_PACK_REQUEST_CONTENT_TYPE = 'application/x-git-upload-pack-request'.freeze
+      UPLOAD_PACK_RESULT_CONTENT_TYPE = 'application/x-git-upload-pack-result'.freeze
+
       RECEIVE_PACK_REQUEST_CONTENT_TYPE = 'application/x-git-receive-pack-request'.freeze
       RECEIVE_PACK_RESULT_CONTENT_TYPE = 'application/x-git-receive-pack-result'.freeze
 
@@ -49,7 +52,38 @@ module Gitlab
         @data = data
       end
 
+      # For git clone/pull
+
+      def info_refs_upload_pack
+        ensure_secondary!
+
+        url = "#{primary_repo}/info/refs?service=git-upload-pack"
+
+        resp = get(url)
+        resp.body = remove_upload_pack_http_service_fragment_from(resp.body) if resp.is_a?(Net::HTTPSuccess)
+
+        APIResponse.from_http_response(resp, primary_repo)
+      rescue => e
+        handle_exception(e)
+      end
+
+      def upload_pack(encoded_response)
+        ensure_secondary!
+
+        url = "#{primary_repo}/git-upload-pack"
+        headers = { 'Content-Type' => UPLOAD_PACK_REQUEST_CONTENT_TYPE, 'Accept' => UPLOAD_PACK_RESULT_CONTENT_TYPE }
+        decoded_response = Base64.decode64(encoded_response)
+        decoded_response = convert_upload_pack_from_http_to_ssh(decoded_response)
+
+        resp = post(url, decoded_response, headers)
+
+        APIResponse.from_http_response(resp, primary_repo)
+      rescue => e
+        handle_exception(e)
+      end
+
       # For git push
+
       def info_refs_receive_pack
         ensure_secondary!
 
@@ -63,14 +97,14 @@ module Gitlab
         handle_exception(e)
       end
 
-      # For git push
-      def receive_pack(encoded_info_refs_response)
+      def receive_pack(encoded_response)
         ensure_secondary!
 
         url = "#{primary_repo}/git-receive-pack"
         headers = { 'Content-Type' => RECEIVE_PACK_REQUEST_CONTENT_TYPE, 'Accept' => RECEIVE_PACK_RESULT_CONTENT_TYPE }
-        info_refs_response = Base64.decode64(encoded_info_refs_response)
-        resp = post(url, info_refs_response, headers)
+        decoded_response = Base64.decode64(encoded_response)
+
+        resp = post(url, decoded_response, headers)
 
         APIResponse.from_http_response(resp, primary_repo)
       rescue => e
@@ -130,16 +164,38 @@ module Gitlab
         http.start { http.request(req) }
       end
 
+      # HTTP(S) and SSH responses are very similar, except for the fragment below.
+      # As we're performing a git HTTP(S) request here, we'll get a HTTP(s)
+      # suitable git response.  However, we're executing in the context of an
+      # SSH session so we need to make the response suitable for what git over
+      # SSH expects.
+
+      # See Uploading Data > HTTP(S) section at:
+      # https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+      #
+      def remove_upload_pack_http_service_fragment_from(body)
+        body.gsub(/\A001e# service=git-upload-pack\n0000/, '')
+      end
+
+      # See Uploading Data > HTTP(S) section at:
+      # https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+      #
+      def convert_upload_pack_from_http_to_ssh(body)
+        clone_operation = /\n0032want \w{40}/
+
+        if body.match?(clone_operation)
+          # git clone
+          body.gsub(clone_operation, '') + "\n0000"
+        else
+          # git pull
+          body.gsub(/\n0000$/, "\n0009done\n0000")
+        end
+      end
+
+      # See Downloading Data > HTTP(S) section at:
+      # https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+      #
       def remove_receive_pack_http_service_fragment_from(body)
-        # HTTP(S) and SSH responses are very similar, except for the fragment below.
-        # As we're performing a git HTTP(S) request here, we'll get a HTTP(s)
-        # suitable git response.  However, we're executing in the context of an
-        # SSH session so we need to make the response suitable for what git over
-        # SSH expects.
-        #
-        # See Downloading Data > HTTP(S) section at:
-        # https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
-        #
         body.gsub(/\A001f# service=git-receive-pack\n0000/, '')
       end
 

@@ -11,7 +11,7 @@ module EE
 
         expose :blocked_by_issues do |issue|
           issues = issue.blocked_by_issues(request.current_user)
-          serializer_options = options.merge(only: [:id, :web_url])
+          serializer_options = options.merge(only: [:iid, :web_url])
 
           ::IssueEntity.represent(issues, serializer_options)
         end

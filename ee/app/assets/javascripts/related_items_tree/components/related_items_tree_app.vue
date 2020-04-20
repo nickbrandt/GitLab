@@ -159,7 +159,7 @@ export default {
       <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
         <issue-actions-split-button
           slot="issueActions"
-          class="ml-1"
+          class="ml-0 ml-sm-1"
           @showAddIssueForm="handleShowAddIssueForm"
           @showCreateIssueForm="handleShowCreateIssueForm"
         />
