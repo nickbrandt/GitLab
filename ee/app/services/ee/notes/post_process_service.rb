@@ -10,7 +10,7 @@ module EE
       def execute
         super
 
-        Analytics::RefreshCommentsData.for_note(note)&.execute
+        ::Analytics::RefreshCommentsData.for_note(note)&.execute
 
         ::SystemNoteService.design_discussion_added(note) if create_design_discussion_system_note?
       end
