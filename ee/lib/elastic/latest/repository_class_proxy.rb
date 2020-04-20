@@ -11,7 +11,7 @@ module Elastic
 
       # @return [Kaminari::PaginatableArray]
       def find_commits_by_message_with_elastic(query, page: 1, per_page: 20, options: {})
-        elastic_search_and_wrap(query, type: :commit, page: page, per: per_page, options: options) do |result, project|
+        elastic_search_and_wrap(query, type: 'commit', page: page, per: per_page, options: options) do |result, project|
           raw_commit = Gitlab::Git::Commit.new(
             project.repository.raw,
             prepare_commit(result['_source']['commit']),
