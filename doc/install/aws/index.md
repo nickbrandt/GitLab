@@ -648,8 +648,8 @@ Read more on configuring an
 
 ## Backup and restore
 
-GitLab provides [a tool to backup](../../raketasks/backup_restore.md#creating-a-backup-of-the-gitlab-system)
-and restore its Git data, database, attachments, LFS objects, etc.
+GitLab provides [a tool to back up](../../raketasks/backup_restore.md#back-up-gitlab)
+and restore its Git data, database, attachments, LFS objects, and so on.
 
 Some important things to know:
 
@@ -675,7 +675,7 @@ For GitLab 12.1 and earlier, use `gitlab-rake gitlab:backup:create`.
 
 ### Restoring GitLab from a backup
 
-To restore GitLab, first review the [restore documentation](../../raketasks/backup_restore.md#restore),
+To restore GitLab, first review the [restore documentation](../../raketasks/backup_restore.md#restore-gitlab),
 and primarily the restore prerequisites. Then, follow the steps under the
 [Omnibus installations section](../../raketasks/backup_restore.md#restore-for-omnibus-gitlab-installations).
 

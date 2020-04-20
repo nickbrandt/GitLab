@@ -20,7 +20,7 @@ The following tools are used:
 
 1. [`gettext_i18n_rails`](https://github.com/grosser/gettext_i18n_rails): this
    gem allow us to translate content from models, views and controllers. Also
-   it gives us access to the following raketasks:
+   it gives us access to the following Rake tasks:
    - `rake gettext:find`: Parses almost all the files from the
      Rails application looking for content that has been marked for
      translation. Finally, it updates the PO files with the new content that
@@ -30,7 +30,7 @@ The following tools are used:
 
 1. [`gettext_i18n_rails_js`](https://github.com/webhippie/gettext_i18n_rails_js):
    this gem is useful to make the translations available in JavaScript. It
-   provides the following raketask:
+   provides the following Rake task:
    - `rake gettext:po_to_json`: Reads the contents from the PO files and
      generates JSON files containing all the available translations.
 
