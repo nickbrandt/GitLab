@@ -5,6 +5,18 @@ This guide demonstrates basic usage of GitLab's GraphQL API.
 See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) for implementation details
 aimed at developers who wish to work on developing the API itself.
 
+## Why GraphQL
+speed/access/bandwidth/tailored responses regardless of the DM/passing data to other systems/reduced coding time
+
+### Why GraphQL vs REST
+For over 20 years, REST has been the standard, object-based, programmatic access for data access from remote servers. TODO: challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
+
+-performance
+-value
+- cheaper than joins from tabulated data
+- reduce bandwith
+
+
 ## Running examples
 
 The examples documented here can be run using:
