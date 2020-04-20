@@ -1350,8 +1350,6 @@ class MergeRequest < ApplicationRecord
   end
 
   def has_exposed_artifacts?
-    return false unless Feature.enabled?(:ci_expose_arbitrary_artifacts_in_mr, default_enabled: true)
-
     actual_head_pipeline&.has_exposed_artifacts?
   end
 
