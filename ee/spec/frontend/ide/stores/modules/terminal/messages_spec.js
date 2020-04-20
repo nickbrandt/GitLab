@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { TEST_HOST } from 'spec/test_constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import { sprintf } from '~/locale';
@@ -15,7 +15,7 @@ describe('EE IDE store terminal messages', () => {
         sprintf(
           messages.ERROR_CONFIG,
           {
-            helpStart: `<a href="${_.escape(TEST_HELP_URL)}" target="_blank">`,
+            helpStart: `<a href="${esc(TEST_HELP_URL)}" target="_blank">`,
             helpEnd: '</a>',
           },
           false,

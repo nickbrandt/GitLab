@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { uniqueId } from 'lodash';
 import {
   mapToScopesViewModel,
   mapFromScopesViewModel,
@@ -214,7 +214,7 @@ describe('feature flags helpers spec', () => {
 
     it('should strip out internal IDs', () => {
       const input = {
-        scopes: [{ id: 3 }, { id: _.uniqueId(INTERNAL_ID_PREFIX) }],
+        scopes: [{ id: 3 }, { id: uniqueId(INTERNAL_ID_PREFIX) }],
       };
 
       const result = mapFromScopesViewModel(input);
@@ -380,16 +380,14 @@ describe('feature flags helpers spec', () => {
     });
 
     it('inserts spaces between user ids', () => {
-      const strategy = _.first(
-        mapStrategiesToViewModel([
-          {
-            id: '1',
-            name: 'userWithId',
-            parameters: { userIds: 'user1,user2,user3' },
-            scopes: [],
-          },
-        ]),
-      );
+      const strategy = mapStrategiesToViewModel([
+        {
+          id: '1',
+          name: 'userWithId',
+          parameters: { userIds: 'user1,user2,user3' },
+          scopes: [],
+        },
+      ])[0];
 
       expect(strategy.parameters).toEqual({ userIds: 'user1, user2, user3' });
     });
@@ -492,7 +490,7 @@ describe('feature flags helpers spec', () => {
         ],
       });
 
-      const strategyAttrs = _.first(result.operations_feature_flag.strategies_attributes);
+      const strategyAttrs = result.operations_feature_flag.strategies_attributes[0];
 
       expect(strategyAttrs.parameters).toEqual({ userIds: 'user1,user2,user3' });
     });

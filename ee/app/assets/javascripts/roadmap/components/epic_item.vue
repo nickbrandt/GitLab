@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { delay } from 'lodash';
 
 import epicItemDetails from './epic_item_details.vue';
 import epicItemTimeline from './epic_item_timeline.vue';
@@ -78,7 +78,7 @@ export default {
     removeHighlight() {
       if (this.epic.newEpic) {
         this.$nextTick(() => {
-          _.delay(() => {
+          delay(() => {
             this.epic.newEpic = false;
           }, EPIC_HIGHLIGHT_REMOVE_AFTER);
         });

@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
-
+import { uniqueId } from 'lodash';
 import { AccordionItem } from 'ee/vue_shared/components/accordion';
 import accordionEventBus from 'ee/vue_shared/components/accordion/accordion_event_bus';
-import { uniqueId } from 'lodash';
 
 jest.mock('ee/vue_shared/components/accordion/accordion_event_bus', () => ({
   $on: jest.fn(),
