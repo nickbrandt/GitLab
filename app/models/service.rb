@@ -349,10 +349,6 @@ class Service < ApplicationRecord
     false
   end
 
-  def deprecation_message
-    nil
-  end
-
   # override if needed
   def supports_data_fields?
     false
