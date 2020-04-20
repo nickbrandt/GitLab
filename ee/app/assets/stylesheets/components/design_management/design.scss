@@ -26,7 +26,7 @@
 
 .image-notes {
   overflow-y: scroll;
-  padding: 0 $gl-padding;
+  padding: $gl-padding;
   padding-top: 50px;
   background-color: $white;
   flex-shrink: 0;
