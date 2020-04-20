@@ -26,13 +26,14 @@ export const receiveReplicableItemsError = ({ state, commit }) => {
 export const fetchReplicableItems = ({ state, dispatch }) => {
   dispatch('requestReplicableItems');
 
-  const statusFilterName = state.filterOptions[state.currentFilterIndex]
-    ? state.filterOptions[state.currentFilterIndex]
-    : state.filterOptions[0];
+  const { filterOptions, currentFilterIndex, currentPage, searchFilter } = state;
+
+  const statusFilter = currentFilterIndex ? filterOptions[currentFilterIndex] : filterOptions[0];
+
   const query = {
-    page: state.currentPage,
-    search: state.searchFilter ? state.searchFilter : null,
-    sync_status: statusFilterName === FILTER_STATES.ALL ? null : statusFilterName,
+    page: currentPage,
+    search: searchFilter || null,
+    sync_status: statusFilter.value === FILTER_STATES.ALL.value ? null : statusFilter.value,
   };
 
   Api.getGeoReplicableItems(state.replicableType, query)

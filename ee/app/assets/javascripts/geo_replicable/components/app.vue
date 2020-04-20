@@ -44,7 +44,7 @@ export default {
 
 <template>
   <article class="geo-replicable-container">
-    <geo-replicable-filter-bar />
+    <geo-replicable-filter-bar class="mb-3" />
     <gl-loading-icon v-if="isLoading" size="xl" />
     <template v-else>
       <geo-replicable v-if="hasReplicableItems" />

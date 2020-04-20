@@ -1,23 +1,37 @@
+import { __ } from '~/locale';
+
 export const FILTER_STATES = {
-  ALL: 'all',
-  SYNCED: 'synced',
-  PENDING: 'pending',
-  FAILED: 'failed',
+  ALL: {
+    label: __('All'),
+    value: '',
+  },
+  PENDING: {
+    label: __('In progress'),
+    value: 'pending',
+  },
+  FAILED: {
+    label: __('Failed'),
+    value: 'failed',
+  },
+  SYNCED: {
+    label: __('Synced'),
+    value: 'synced',
+  },
 };
 
 export const DEFAULT_STATUS = 'never';
 
 export const STATUS_ICON_NAMES = {
-  [FILTER_STATES.SYNCED]: 'status_closed',
-  [FILTER_STATES.PENDING]: 'status_scheduled',
-  [FILTER_STATES.FAILED]: 'status_failed',
+  [FILTER_STATES.SYNCED.value]: 'status_closed',
+  [FILTER_STATES.PENDING.value]: 'status_scheduled',
+  [FILTER_STATES.FAILED.value]: 'status_failed',
   [DEFAULT_STATUS]: 'status_notfound',
 };
 
 export const STATUS_ICON_CLASS = {
-  [FILTER_STATES.SYNCED]: 'text-success',
-  [FILTER_STATES.PENDING]: 'text-warning',
-  [FILTER_STATES.FAILED]: 'text-danger',
+  [FILTER_STATES.SYNCED.value]: 'text-success',
+  [FILTER_STATES.PENDING.value]: 'text-warning',
+  [FILTER_STATES.FAILED.value]: 'text-danger',
   [DEFAULT_STATUS]: 'text-muted',
 };
 
