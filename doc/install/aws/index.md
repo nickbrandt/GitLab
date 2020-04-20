@@ -635,7 +635,7 @@ GitLab provides its own integrated monitoring solution based on Prometheus.
 For more information on how to set it up, visit the
 [GitLab Prometheus documentation](../../administration/monitoring/prometheus/index.md)
 
-GitLab also has various [health check endpoints](../..//user/admin_area/monitoring/health_check.md)
+GitLab also has various [health check endpoints](../../user/admin_area/monitoring/health_check.md)
 that you can ping and get reports.
 
 ## GitLab Runners
