@@ -2423,6 +2423,9 @@ msgstr ""
 msgid "Are you sure you want to cancel editing this comment?"
 msgstr ""
 
+msgid "Are you sure you want to close this blocked issue?"
+msgstr ""
+
 msgid "Are you sure you want to delete %{name}?"
 msgstr ""
 
@@ -21074,6 +21077,9 @@ msgstr ""
 msgid "This issue is confidential"
 msgstr ""
 
+msgid "This issue is currently blocked by the following issues: %{issues}."
+msgstr ""
+
 msgid "This issue is locked."
 msgstr ""
 
@@ -23638,6 +23644,9 @@ msgid "Yes or No"
 msgstr ""
 
 msgid "Yes, add it"
+msgstr ""
+
+msgid "Yes, close issue"
 msgstr ""
 
 msgid "Yes, let me map Google Code users to full names or GitLab users."
