@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import DashboardPanel from '~/monitoring/components/dashboard_panel_with_alerts.vue';
+import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
 import { defaultTimeRange } from '~/vue_shared/constants';
 import { timeRangeFromUrl, removeTimeRangeParams } from '../../utils';

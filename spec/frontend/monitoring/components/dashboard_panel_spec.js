@@ -1,8 +1,11 @@
+import Vuex from 'vuex';
 import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { setTestTimeout } from 'helpers/timeout';
 import invalidUrl from '~/lib/utils/invalid_url';
 import axios from '~/lib/utils/axios_utils';
+import { GlDropdownItem } from '@gitlab/ui';
+import AlertWidget from '~/monitoring/components/alert_widget.vue';
 
 import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
 import {
@@ -430,6 +433,54 @@ describe('Dashboard Panel', () => {
     it('it renders a time series chart with no errors', () => {
       expect(wrapper.find(MonitorTimeSeriesChart).isVueInstance()).toBe(true);
       expect(wrapper.find(MonitorTimeSeriesChart).exists()).toBe(true);
+    });
+  });
+
+  describe('panel alerts', () => {
+    const setMetricsSavedToDb = val =>
+      monitoringDashboard.getters.metricsSavedToDb.mockReturnValue(val);
+    const findAlertsWidget = () => wrapper.find(AlertWidget);
+    const findMenuItemAlert = () =>
+      wrapper.findAll(GlDropdownItem).filter(i => i.text() === 'Alerts');
+
+    beforeEach(() => {
+      jest.spyOn(monitoringDashboard.getters, 'metricsSavedToDb').mockReturnValue([]);
+
+      store = new Vuex.Store({
+        modules: {
+          monitoringDashboard,
+        },
+      });
+
+      createWrapper();
+    });
+
+    describe.each`
+      desc                                              | metricsSavedToDb                   | propsData                               | isShown
+      ${'with permission and no metrics in db'}         | ${[]}                              | ${{}}                                   | ${false}
+      ${'with permission and related metrics in db'}    | ${[graphData.metrics[0].metricId]} | ${{}}                                   | ${true}
+      ${'without permission and related metrics in db'} | ${[graphData.metrics[0].metricId]} | ${{ prometheusAlertsAvailable: false }} | ${false}
+      ${'with permission and unrelated metrics in db'}  | ${['another_metric_id']}           | ${{}}                                   | ${false}
+    `('$desc', ({ metricsSavedToDb, isShown, propsData }) => {
+      const showsDesc = isShown ? 'shows' : 'does not show';
+
+      beforeEach(() => {
+        setMetricsSavedToDb(metricsSavedToDb);
+        createWrapper({
+          alertsEndpoint: '/endpoint',
+          prometheusAlertsAvailable: true,
+          ...propsData,
+        });
+        return wrapper.vm.$nextTick();
+      });
+
+      it(`${showsDesc} alert widget`, () => {
+        expect(findAlertsWidget().exists()).toBe(isShown);
+      });
+
+      it(`${showsDesc} alert configuration`, () => {
+        expect(findMenuItemAlert().exists()).toBe(isShown);
+      });
     });
   });
 });

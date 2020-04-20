@@ -12,7 +12,7 @@ import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_p
 import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
 import GroupEmptyState from '~/monitoring/components/group_empty_state.vue';
-import DashboardPanel from '~/monitoring/components/dashboard_panel_with_alerts.vue';
+import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import { setupStoreWithDashboard, setMetricResult, setupStoreWithData } from '../store_utils';
