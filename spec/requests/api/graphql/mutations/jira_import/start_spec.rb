@@ -118,7 +118,7 @@ describe 'Starting a Jira Import' do
             it_behaves_like 'a mutation that returns errors in the response', errors: ['Unable to find Jira project to import data from.']
           end
 
-          context 'when jira import successfully scheduled' do
+          context 'when Jira import successfully scheduled' do
             it 'schedules a Jira import' do
               post_graphql_mutation(mutation, current_user: current_user)
 
