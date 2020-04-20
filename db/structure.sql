@@ -1663,7 +1663,9 @@ CREATE TABLE public.clusters_applications_fluentd (
     updated_at timestamp with time zone NOT NULL,
     version character varying(255) NOT NULL,
     host character varying(255) NOT NULL,
-    status_reason text
+    status_reason text,
+    waf_log_enabled boolean DEFAULT true NOT NULL,
+    cilium_log_enabled boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.clusters_applications_fluentd_id_seq
@@ -13243,6 +13245,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200409211607
 20200410232012
 20200413072059
+20200413230056
 20200414144547
 20200415160722
 20200415161021
