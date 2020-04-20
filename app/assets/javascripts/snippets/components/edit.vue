@@ -81,7 +81,10 @@ export default {
       return this.isUpdating ? __('Saving') : __('Save changes');
     },
     cancelButtonHref() {
-      return this.projectPath ? `/${this.projectPath}/snippets` : `/snippets`;
+      if (this.newSnippet) {
+        return this.projectPath ? `/${this.projectPath}/snippets` : `/snippets`;
+      }
+      return this.snippet.webUrl;
     },
     titleFieldId() {
       return `${this.isProjectSnippet ? 'project' : 'personal'}_snippet_title`;
@@ -203,7 +206,9 @@ export default {
           >
         </template>
         <template #append>
-          <gl-button :href="cancelButtonHref">{{ __('Cancel') }}</gl-button>
+          <gl-button class="js-snippet-cancel-btn" :href="cancelButtonHref">{{
+            __('Cancel')
+          }}</gl-button>
         </template>
       </form-footer-actions>
     </template>
