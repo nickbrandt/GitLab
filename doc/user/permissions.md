@@ -50,7 +50,6 @@ The following table depicts the various user permission levels in a project.
 |---------------------------------------------------|---------|------------|-------------|----------|--------|
 | Download project                                  | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | Leave comments                                    | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
-| View Insights charts **(ULTIMATE)**               | ✓       | ✓          | ✓           | ✓        | ✓      |
 | View approved/blacklisted licenses **(ULTIMATE)** | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View License Compliance reports **(ULTIMATE)**    | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View Security reports **(ULTIMATE)**              | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
@@ -156,6 +155,12 @@ The following table depicts the various user permission levels in a project.
 | Disable notification emails                       |         |            |             |          | ✓      |
 | Force push to protected branches (*4*)            |         |            |             |          |        |
 | Remove protected branches (*4*)                   |         |            |             |          |        |
+| View CI\CD analytics                              |         | ✓          | ✓           | ✓        | ✓      |
+| View Code Review analytics **(STARTER)**          |         | ✓          | ✓           | ✓        | ✓      |
+| View Insights **(ULTIMATE)**                      | ✓       | ✓          | ✓           | ✓        | ✓      |
+| View Issues analytics **(PREMIUM)**               | ✓       | ✓          | ✓           | ✓        | ✓      |
+| View Repository analytics                         |         | ✓          | ✓           | ✓        | ✓      |
+| View Value Stream analytics                       | ✓       | ✓          | ✓           | ✓        | ✓      |
 
 \* Owner permission is only available at the group or personal namespace level (and for instance admins) and is inherited by its projects.
 
@@ -244,6 +249,11 @@ group.
 | Delete group epic **(ULTIMATE)**                       |       |          |           |            | ✓     |
 | View group Audit Events                                |       |          |           |            | ✓     |
 | Disable notification emails                            |       |          |           |            | ✓     |
+| View Contribution analytics                            | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View Insights **(ULTIMATE)**                           | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View Issues analytics **(PREMIUM)**                    | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View Productivity analytics **(PREMIUM)**              |       | ✓        | ✓         | ✓          | ✓     |
+| View Value Stream analytics                            | ✓     | ✓        | ✓         | ✓          | ✓     |
 
 1. Groups can be set to [allow either Owners or Owners and
   Maintainers to create subgroups](group/subgroups/index.md#creating-a-subgroup)
