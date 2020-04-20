@@ -56,7 +56,7 @@ The machines are grouped by application type, we call them application nodes. Th
 As long as one application node is online and capable of handling the instance's usage load, your team's productivity will not be interrupted.
 Having multiple application nodes also enables [zero-downtime updates](https://docs.gitlab.com/omnibus/update/#zero-downtime-updates).
 
-Scaling GitLab factors in multiple things.
+When scaling GitLab there's a few factors to consider:
 
 - Multiple application nodes to handle frontend traffic.
 - A load balancer is added in front to distribute traffic across the application nodes.
