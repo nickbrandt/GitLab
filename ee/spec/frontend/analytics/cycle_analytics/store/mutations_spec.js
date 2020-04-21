@@ -1,6 +1,5 @@
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
@@ -15,8 +14,6 @@ import {
   startDate,
   endDate,
   customizableStagesAndEvents,
-  rawTasksByTypeData,
-  transformedTasksByTypeData,
   selectedProjects,
 } from '../mock_data';
 
@@ -47,8 +44,6 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}               | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}             | ${false}
     ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                  | ${true}
-    ${types.REQUEST_TOP_RANKED_GROUP_LABELS}       | ${'topRankedLabels'}            | ${[]}
-    ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR} | ${'topRankedLabels'}            | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                     | ${[]}
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                     | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}      | ${[]}
@@ -57,8 +52,6 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS}   | ${'isSavingCustomStage'}        | ${false}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'isSavingCustomStage'}        | ${false}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'customStageFormErrors'}      | ${{}}
-    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'}  | ${true}
-    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'}  | ${false}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                  | ${true}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isSavingCustomStage'}        | ${true}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'customStageFormErrors'}      | ${null}
@@ -176,21 +169,6 @@ describe('Cycle analytics mutations', () => {
     });
   });
 
-  describe(`${types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS}`, () => {
-    it('sets isLoadingTasksByTypeChart to false', () => {
-      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, {});
-
-      expect(state.isLoadingTasksByTypeChart).toEqual(false);
-    });
-
-    it('sets tasksByType.data to the raw returned chart data', () => {
-      state = { tasksByType: { data: null } };
-      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, rawTasksByTypeData);
-
-      expect(state.tasksByType.data).toEqual(transformedTasksByTypeData);
-    });
-  });
-
   describe(`${types.RECEIVE_STAGE_MEDIANS_SUCCESS}`, () => {
     it('sets each id as a key in the median object with the corresponding value', () => {
       const stateWithData = {
@@ -203,29 +181,6 @@ describe('Cycle analytics mutations', () => {
       ]);
 
       expect(stateWithData.medians).toEqual({ '1': 20, '2': 10 });
-    });
-  });
-
-  describe(`${types.SET_TASKS_BY_TYPE_FILTERS}`, () => {
-    it('will update the tasksByType state key', () => {
-      state = { tasksByType: {} };
-      const subjectFilter = { filter: TASKS_BY_TYPE_FILTERS.SUBJECT, value: 'cool-subject' };
-      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, subjectFilter);
-
-      expect(state.tasksByType).toEqual({ subject: 'cool-subject' });
-    });
-
-    it('will toggle the specified label id in the tasksByType.selectedLabelIds state key', () => {
-      state = {
-        tasksByType: { selectedLabelIds: [10, 20, 30] },
-      };
-      const labelFilter = { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: 20 };
-      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
-
-      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30] });
-
-      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
-      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30, 20] });
     });
   });
 

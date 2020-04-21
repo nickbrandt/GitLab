@@ -3,14 +3,7 @@ import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
-import { removeFlash } from '../utils';
-
-const handleErrorOrRethrow = ({ action, error }) => {
-  if (error?.response?.status === httpStatus.FORBIDDEN) {
-    throw error;
-  }
-  action();
-};
+import { removeFlash, handleErrorOrRethrow } from '../utils';
 
 const isStageNameExistsError = ({ status, errors }) => {
   const ERROR_NAME_RESERVED = 'is reserved';
@@ -105,13 +98,9 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }) => {
+export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
-
-  const { featureFlags: { hasTasksByTypeChart = false } = {} } = state;
-  const promises = [];
-  if (hasTasksByTypeChart) promises.push('fetchTopRankedGroupLabels');
-  return Promise.all(promises.map(func => dispatch(func)));
+  dispatch('typeOfWork/fetchTopRankedGroupLabels');
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
@@ -167,44 +156,6 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
-
-export const receiveTopRankedGroupLabelsSuccess = ({ commit, dispatch }, data) => {
-  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
-  dispatch('fetchTasksByTypeData');
-};
-
-export const receiveTopRankedGroupLabelsError = ({ commit }, error) => {
-  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR, error);
-  createFlash(__('There was an error fetching the top labels for the selected group'));
-};
-
-export const requestTopRankedGroupLabels = ({ commit }) =>
-  commit(types.REQUEST_TOP_RANKED_GROUP_LABELS);
-
-export const fetchTopRankedGroupLabels = ({
-  dispatch,
-  state,
-  getters: {
-    currentGroupPath,
-    cycleAnalyticsRequestParams: { created_after, created_before },
-  },
-}) => {
-  dispatch('requestTopRankedGroupLabels');
-  const { subject } = state.tasksByType;
-
-  return Api.cycleAnalyticsTopLabels(currentGroupPath, {
-    subject,
-    created_after,
-    created_before,
-  })
-    .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
-    .catch(error =>
-      handleErrorOrRethrow({
-        error,
-        action: () => dispatch('receiveTopRankedGroupLabelsError', error),
-      }),
-    );
-};
 
 export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
   commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR, error);
@@ -295,41 +246,6 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     });
 };
 
-export const receiveTasksByTypeDataError = ({ commit }, error) => {
-  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
-  createFlash(__('There was an error fetching data for the tasks by type chart'));
-};
-
-export const fetchTasksByTypeData = ({ dispatch, commit, state, getters }) => {
-  const {
-    currentGroupPath,
-    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
-  } = getters;
-
-  const {
-    tasksByType: { subject, selectedLabelIds },
-  } = state;
-
-  // ensure we clear any chart data currently in state
-  commit(types.REQUEST_TASKS_BY_TYPE_DATA);
-
-  // dont request if we have no labels selected...for now
-  if (selectedLabelIds.length) {
-    const params = {
-      created_after,
-      created_before,
-      project_ids,
-      subject,
-      label_ids: selectedLabelIds,
-    };
-
-    return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
-      .then(({ data }) => commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data))
-      .catch(error => dispatch('receiveTasksByTypeDataError', error));
-  }
-  return commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, []);
-};
-
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
 export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
   commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
@@ -394,11 +310,6 @@ export const removeStage = ({ dispatch, state }, stageId) => {
   return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
     .then(() => dispatch('receiveRemoveStageSuccess'))
     .catch(error => dispatch('receiveRemoveStageError', error));
-};
-
-export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
-  commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
-  dispatch('fetchTopRankedGroupLabels');
 };
 
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
