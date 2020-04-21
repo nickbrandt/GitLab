@@ -78,7 +78,7 @@ describe API::Internal::Base do
 
     context "for design repositories" do
       let_it_be(:project) { create(:project) }
-      let(:gl_repository) { EE::Gitlab::GlRepository::DESIGN.identifier_for_container(project) }
+      let(:gl_repository) { ::Gitlab::GlRepository::DESIGN.identifier_for_container(project) }
 
       it "does not allow access" do
         post(api("/internal/allowed"),

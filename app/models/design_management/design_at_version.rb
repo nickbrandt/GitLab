@@ -11,8 +11,8 @@ module DesignManagement
     attr_reader :version
     attr_reader :design
 
-    validates_presence_of :version
-    validates_presence_of :design
+    validates :version, presence: true
+    validates :design, presence: true
 
     validate :design_and_version_belong_to_the_same_issue
     validate :design_and_version_have_issue_id

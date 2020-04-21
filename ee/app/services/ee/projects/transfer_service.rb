@@ -52,11 +52,11 @@ module EE
       end
 
       def old_design_repo_path
-        "#{old_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}"
+        "#{old_path}#{::Gitlab::GlRepository::DESIGN.path_suffix}"
       end
 
       def new_design_repo_path
-        "#{new_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}"
+        "#{new_path}#{::Gitlab::GlRepository::DESIGN.path_suffix}"
       end
     end
   end

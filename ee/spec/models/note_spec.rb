@@ -171,14 +171,6 @@ describe Note do
     end
   end
 
-  describe '#for_design' do
-    it 'is true when the noteable is a design' do
-      note = build(:note, noteable: build(:design))
-
-      expect(note).to be_for_design
-    end
-  end
-
   describe '.by_humans' do
     it 'excludes notes by bots and service users' do
       user_note = create(:note)
