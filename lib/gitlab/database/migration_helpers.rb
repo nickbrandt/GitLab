@@ -1090,7 +1090,7 @@ into similar problems in the future (e.g. when new tables are created).
           delay_interval = BackgroundMigrationWorker.minimum_interval
         end
 
-        final_delay = nil
+        final_delay = 0
 
         model_class.each_batch(of: batch_size) do |relation, index|
           start_id, end_id = relation.pluck(Arel.sql('MIN(id), MAX(id)')).first

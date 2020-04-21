@@ -1373,6 +1373,14 @@ describe Gitlab::Database::MigrationHelpers do
         end
       end
 
+      it 'returns zero when nothing gets queued' do
+        Sidekiq::Testing.fake! do
+          final_delay = model.queue_background_migration_jobs_by_range_at_intervals(User.none, 'FooJob', 10.minutes)
+
+          expect(final_delay).to eq(0)
+        end
+      end
+
       context 'with batch_size option' do
         it 'queues jobs correctly' do
           Sidekiq::Testing.fake! do
