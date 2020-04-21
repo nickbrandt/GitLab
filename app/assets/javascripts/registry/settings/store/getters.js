@@ -15,7 +15,7 @@ export const getSettings = (state, getters) => ({
   cadence: getters.getCadence,
   older_than: getters.getOlderThan,
   keep_n: getters.getKeepN,
-  name_regex: state.settings.name_regex,
+  name_regex_delete: state.settings.name_regex_delete,
 });
 
 export const getIsEdited = state => !isEqual(state.original, state.settings);

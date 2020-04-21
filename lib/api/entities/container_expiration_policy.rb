@@ -7,7 +7,7 @@ module API
       expose :enabled
       expose :keep_n
       expose :older_than
-      expose :name_regex
+      expose :name_regex_delete
       expose :name_regex_keep
       expose :next_run_at
     end

@@ -234,7 +234,6 @@ DELETE /projects/:id/registry/repositories/:repository_id/tags
 | --------- | ---- | -------- | ----------- |
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `repository_id` | integer | yes | The ID of registry repository. |
-| `name_regex` | string | no | The [re2](https://github.com/google/re2/wiki/Syntax) regex of the name to delete. To delete all tags specify `.*`. **Note:** `name_regex` is deprecated in favor of `name_regex_delete`.|
 | `name_regex_delete` | string | yes | The [re2](https://github.com/google/re2/wiki/Syntax) regex of the name to delete. To delete all tags specify `.*`.|
 | `name_regex_keep` | string | no | The [re2](https://github.com/google/re2/wiki/Syntax) regex of the name to keep. This value will override any matches from `name_regex_delete`. Note: setting to `.*` will result in a no-op. |
 | `keep_n` | integer | no | The amount of latest tags of given name to keep. |
@@ -244,7 +243,7 @@ This API call performs the following operations:
 
 1. It orders all tags by creation date. The creation date is the time of the
    manifest creation, not the time of tag push.
-1. It removes only the tags matching the given `name_regex_delete` (or deprecated `name_regex`), keeping any that match `name_regex_keep`.
+1. It removes only the tags matching the given `name_regex_delete`, keeping any that match `name_regex_keep`.
 1. It never removes the tag named `latest`.
 1. It keeps N latest matching tags (if `keep_n` is specified).
 1. It only removes tags that are older than X amount of time (if `older_than` is specified).

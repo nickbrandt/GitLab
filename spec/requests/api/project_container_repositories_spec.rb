@@ -130,7 +130,7 @@ describe API::ProjectContainerRepositories do
         end
       end
 
-      context 'without name_regex' do
+      context 'without name_regex_delete' do
         let(:params) do
           { keep_n: 100,
             older_than: '1 day',
@@ -154,8 +154,7 @@ describe API::ProjectContainerRepositories do
         end
 
         let(:worker_params) do
-          { name_regex: nil,
-            name_regex_delete: 'v10.*',
+          { name_regex_delete: 'v10.*',
             name_regex_keep: 'v10.1.*',
             keep_n: 100,
             older_than: '1 day',
@@ -189,38 +188,6 @@ describe API::ProjectContainerRepositories do
 
             2.times { subject }
           end
-        end
-      end
-
-      context 'with deprecated name_regex param' do
-        let(:params) do
-          { name_regex: 'v10.*',
-            name_regex_keep: 'v10.1.*',
-            keep_n: 100,
-            older_than: '1 day',
-            other: 'some value' }
-        end
-
-        let(:worker_params) do
-          { name_regex: 'v10.*',
-            name_regex_delete: nil,
-            name_regex_keep: 'v10.1.*',
-            keep_n: 100,
-            older_than: '1 day',
-            container_expiration_policy: false }
-        end
-
-        let(:lease_key) { "container_repository:cleanup_tags:#{root_repository.id}" }
-
-        it 'schedules cleanup of tags repository' do
-          stub_last_activity_update
-          stub_exclusive_lease(lease_key, timeout: 1.hour)
-          expect(CleanupContainerRepositoryWorker).to receive(:perform_async)
-            .with(maintainer.id, root_repository.id, worker_params)
-
-          subject
-
-          expect(response).to have_gitlab_http_status(:accepted)
         end
       end
     end

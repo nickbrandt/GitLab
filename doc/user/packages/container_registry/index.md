@@ -500,7 +500,7 @@ then goes through a process of excluding tags from it until only the ones to be 
 
 1. Collect all the tags for a given repository in a list.
 1. Excludes the tag named `latest` from the list.
-1. Evaluates the `name_regex`, excluding non-matching names from the list.
+1. Evaluates the `name_regex_delete`, excluding non-matching names from the list.
 1. Excludes any tags that do not have a manifest (not part of the options).
 1. Orders the remaining tags by `created_date`.
 1. Excludes from the list the N tags based on the `keep_n` value (Expiration latest).
@@ -530,13 +530,13 @@ Examples:
 - Select all tags, keep at least 1 tag per image, expire any tag older than 14 days, run once a month, and the policy is enabled:
 
   ```shell
-  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1month","enabled":true,"keep_n":1,"older_than":"14d","name_regex":".*"}}' 'https://gitlab.example.com/api/v4/projects/2'
+  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1month","enabled":true,"keep_n":1,"older_than":"14d","name_regex_delete":".*"}}' 'https://gitlab.example.com/api/v4/projects/2'
   ```
 
 - Select only tags with a name that contains `stable`, keep at least 50 tag per image, expire any tag older than 7 days, run every day, and the policy is enabled:
 
   ```shell
-  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1day","enabled":true,"keep_n":50"older_than":"7d","name_regex":"*stable"}}' 'https://gitlab.example.com/api/v4/projects/2'
+  curl --request PUT --header 'Content-Type: application/json;charset=UTF-8' --header "PRIVATE-TOKEN: <your_access_token>" --data-binary '{"container_expiration_policy_attributes":{"cadence":"1day","enabled":true,"keep_n":50"older_than":"7d","name_regex_delete":"*stable"}}' 'https://gitlab.example.com/api/v4/projects/2'
   ```
 
 See the API documentation for further details: [Edit project](../../../api/projects.md#edit-project).

@@ -27,7 +27,7 @@ export default () => ({
    *  cadence: String,
    *  older_than: String,
    *  keep_n: String,
-   *  name_regex: String
+   *  name_regex_delete: String
    * }
    */
   settings: {},

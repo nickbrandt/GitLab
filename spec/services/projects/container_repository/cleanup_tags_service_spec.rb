@@ -62,14 +62,6 @@ describe Projects::ContainerRepository::CleanupTagsService do
       end
 
       it_behaves_like 'removes all matches'
-
-      context 'with deprecated name_regex param' do
-        let(:params) do
-          { 'name_regex' => '.*' }
-        end
-
-        it_behaves_like 'removes all matches'
-      end
     end
 
     context 'when delete regex matching specific tags is used' do
@@ -95,19 +87,6 @@ describe Projects::ContainerRepository::CleanupTagsService do
           is_expected.to include(status: :success, deleted: %w(D))
         end
       end
-
-      context 'with name_regex_delete overriding deprecated name_regex' do
-        let(:params) do
-          { 'name_regex' => 'C|D',
-            'name_regex_delete' => 'D' }
-        end
-
-        it 'does not remove C' do
-          expect_delete(%w(D))
-
-          is_expected.to include(status: :success, deleted: %w(D))
-        end
-      end
     end
 
     context 'with allow regex value' do
@@ -125,7 +104,7 @@ describe Projects::ContainerRepository::CleanupTagsService do
 
     context 'when keeping only N tags' do
       let(:params) do
-        { 'name_regex' => 'A|B.*|C',
+        { 'name_regex_delete' => 'A|B.*|C',
           'keep_n' => 1 }
       end
 
@@ -140,7 +119,7 @@ describe Projects::ContainerRepository::CleanupTagsService do
 
     context 'when not keeping N tags' do
       let(:params) do
-        { 'name_regex' => 'A|B.*|C' }
+        { 'name_regex_delete' => 'A|B.*|C' }
       end
 
       it 'does not sort tags by date' do

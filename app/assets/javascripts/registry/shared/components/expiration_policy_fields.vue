@@ -67,12 +67,15 @@ export default {
     };
   },
   computed: {
-    ...mapComputedToEvent(['enabled', 'cadence', 'older_than', 'keep_n', 'name_regex'], 'value'),
+    ...mapComputedToEvent(
+      ['enabled', 'cadence', 'older_than', 'keep_n', 'name_regex_delete'],
+      'value',
+    ),
     policyEnabledText() {
       return this.enabled ? __('enabled') : __('disabled');
     },
     nameRegexState() {
-      return this.name_regex ? this.name_regex.length <= NAME_REGEX_LENGTH : null;
+      return this.name_regex_delete ? this.name_regex_delete.length <= NAME_REGEX_LENGTH : null;
     },
     fieldsValidity() {
       return this.nameRegexState !== false;
@@ -171,7 +174,7 @@ export default {
     >
       <gl-form-textarea
         :id="idGenerator('expiration-policy-name-matching')"
-        v-model="name_regex"
+        v-model="name_regex_delete"
         :placeholder="$options.nameRegexPlaceholder"
         :state="nameRegexState"
         :disabled="isFormElementDisabled"
