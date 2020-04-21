@@ -2727,6 +2727,9 @@ msgstr ""
 msgid "Authorize %{link_to_client} to use your account?"
 msgstr ""
 
+msgid "Authorize external service"
+msgstr ""
+
 msgid "Authorized %{new_chat_name}"
 msgstr ""
 
@@ -7338,6 +7341,9 @@ msgid "Dismissed on pipeline %{pipelineLink}"
 msgstr ""
 
 msgid "Dismissed on pipeline %{pipelineLink} at %{projectLink}"
+msgstr ""
+
+msgid "Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents."
 msgstr ""
 
 msgid "Display name"
@@ -20031,6 +20037,9 @@ msgid "Support for custom certificates is disabled. Ask your system's administra
 msgstr ""
 
 msgid "Support page URL"
+msgstr ""
+
+msgid "Surface alerts in GitLab"
 msgstr ""
 
 msgid "Switch branch/tag"
