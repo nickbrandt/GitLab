@@ -1,35 +1,42 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import MergeTrainPositionIndicator from 'ee/vue_merge_request_widget/components/merge_train_position_indicator.vue';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
-import { mockStore } from 'spec/vue_mr_widget/mock_data';
+import { mockStore } from 'jest/vue_mr_widget/mock_data';
 import MrWidgetPipelineContainer from '~/vue_merge_request_widget/components/mr_widget_pipeline_container.vue';
 import { MT_MERGE_STRATEGY, MWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 
 describe('MrWidgetPipelineContainer', () => {
   let wrapper;
+  let mock;
 
-  const factory = (mrUpdates = {}, provide = {}) => {
-    const localVue = createLocalVue();
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet().reply(200, {});
+  });
 
-    wrapper = mount(localVue.extend(MrWidgetPipelineContainer), {
+  const factory = (method = shallowMount, mrUpdates = {}, provide = {}) => {
+    wrapper = method.call(this, MrWidgetPipelineContainer, {
       propsData: {
         mr: Object.assign({}, mockStore, mrUpdates),
       },
       provide: {
         ...provide,
       },
-      localVue,
       attachToDocument: true,
     });
   };
 
   afterEach(() => {
+    mock.restore();
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('merge train indicator', () => {
     it('should render the merge train indicator if the MR is open and is on the merge train', () => {
-      factory({
+      factory(shallowMount, {
         isOpen: true,
         autoMergeStrategy: MT_MERGE_STRATEGY,
       });
@@ -38,7 +45,7 @@ describe('MrWidgetPipelineContainer', () => {
     });
 
     it('should not render the merge train indicator if the MR is closed', () => {
-      factory({
+      factory(shallowMount, {
         isOpen: false,
         autoMergeStrategy: MT_MERGE_STRATEGY,
       });
@@ -47,7 +54,7 @@ describe('MrWidgetPipelineContainer', () => {
     });
 
     it('should not render the merge train indicator if the MR is not on the merge train', () => {
-      factory({
+      factory(shallowMount, {
         isOpen: true,
         autoMergeStrategy: MWPS_MERGE_STRATEGY,
       });
@@ -59,6 +66,7 @@ describe('MrWidgetPipelineContainer', () => {
   describe('with anonymous visual review feedback feature flag enabled', () => {
     beforeEach(() => {
       factory(
+        mount,
         {
           visualReviewAppAvailable: true,
           appUrl: 'http://gitlab.example.com',
@@ -95,6 +103,7 @@ describe('MrWidgetPipelineContainer', () => {
   describe('with anonymous visual review feedback feature flag disabled', () => {
     beforeEach(() => {
       factory(
+        mount,
         {
           visualReviewAppAvailable: true,
           appUrl: 'http://gitlab.example.com',

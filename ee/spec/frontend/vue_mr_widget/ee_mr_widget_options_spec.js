@@ -3,8 +3,10 @@ import MockAdapter from 'axios-mock-adapter';
 import mrWidgetOptions from 'ee/vue_merge_request_widget/mr_widget_options.vue';
 import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { TEST_HOST } from 'spec/test_constants';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { TEST_HOST } from 'helpers/test_constants';
+import waitForPromises from 'helpers/wait_for_promises';
+import { trimText } from 'helpers/text_helper';
 
 import mockData, {
   baseIssues,
@@ -13,7 +15,7 @@ import mockData, {
   headPerformance,
   parsedBaseIssues,
   parsedHeadIssues,
-} from 'ee_spec/vue_mr_widget/mock_data';
+} from './mock_data';
 
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -25,7 +27,7 @@ import {
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
   secretScanningDiffSuccessMock,
-} from 'ee_spec/vue_shared/security_reports/mock_data';
+} from 'ee_jest/vue_shared/security_reports/mock_data';
 
 const SAST_SELECTOR = '.js-sast-widget';
 const DAST_SELECTOR = '.js-dast-widget';
@@ -37,13 +39,6 @@ describe('ee merge request widget options', () => {
   let vm;
   let mock;
   let Component;
-
-  function removeBreakLine(data) {
-    return data
-      .replace(/\r?\n|\r/g, '')
-      .replace(/\s\s+/g, ' ')
-      .trim();
-  }
 
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
@@ -58,9 +53,16 @@ describe('ee merge request widget options', () => {
   });
 
   afterEach(() => {
-    vm.$destroy();
-    mock.restore();
-    gon.features = {};
+    // This is needed because the `fetchInitialData` is triggered while
+    // the `mock.restore` is trying to clean up, causing a bunch of
+    // unmocked requests...
+    // This is not ideal and will be cleaned up in
+    // https://gitlab.com/gitlab-org/gitlab/-/issues/214032
+    return waitForPromises().then(() => {
+      vm.$destroy();
+      mock.restore();
+      gon.features = {};
+    });
   });
 
   const findSecurityWidget = () => vm.$el.querySelector('.js-security-widget');
@@ -104,16 +106,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('SAST detected 1 new, and 2 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -126,16 +128,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ).trim(),
           ).toEqual('SAST detected no vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -148,12 +150,12 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
-          expect(
-            removeBreakLine(findSecurityWidget().querySelector(SAST_SELECTOR).textContent),
-          ).toContain('SAST: Loading resulted in an error');
+        setImmediate(() => {
+          expect(trimText(findSecurityWidget().querySelector(SAST_SELECTOR).textContent)).toContain(
+            'SAST: Loading resulted in an error',
+          );
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -180,9 +182,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(
-            findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
-          ),
+          trimText(findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
         ).toContain('Dependency scanning is loading');
       });
     });
@@ -196,16 +196,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -222,16 +222,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('renders no new vulnerabilities message', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected no new vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -244,16 +244,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Dependency scanning detected no vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -265,14 +265,12 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
-            ),
+            trimText(findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
           ).toContain('Dependency scanning: Loading resulted in an error');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -297,9 +295,9 @@ describe('ee merge request widget options', () => {
         };
 
         vm.$nextTick(() => {
-          expect(
-            removeBreakLine(vm.$el.querySelector('.js-codequality-widget').textContent),
-          ).toContain('Loading codeclimate report');
+          expect(trimText(vm.$el.querySelector('.js-codequality-widget').textContent)).toContain(
+            'Loading codeclimate report',
+          );
 
           done();
         });
@@ -320,53 +318,45 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
-        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
-          Promise.resolve({
-            newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
-            resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
-          }),
-        );
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
+          newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
+          resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
+        });
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('Code quality improved on 1 point and degraded on 1 point');
           done();
-        }, 0);
+        });
       });
 
       describe('text connector', () => {
         it('should only render information about fixed issues', done => {
-          setTimeout(() => {
+          setImmediate(() => {
             vm.mr.codeclimateMetrics.newIssues = [];
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
               ).toEqual('Code quality improved on 1 point');
               done();
             });
-          }, 0);
+          });
         });
 
         it('should only render information about added issues', done => {
-          setTimeout(() => {
+          setImmediate(() => {
             vm.mr.codeclimateMetrics.resolvedIssues = [];
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
               ).toEqual('Code quality degraded on 1 point');
               done();
             });
-          }, 0);
+          });
         });
       });
     });
@@ -384,12 +374,10 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker response
-        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
-          Promise.resolve({
-            newIssues: filterByKey([], [], 'fingerprint'),
-            resolvedIssues: filterByKey([], [], 'fingerprint'),
-          }),
-        );
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
+          newIssues: filterByKey([], [], 'fingerprint'),
+          resolvedIssues: filterByKey([], [], 'fingerprint'),
+        });
       });
 
       afterEach(() => {
@@ -397,14 +385,12 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('No changes to code quality');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -420,22 +406,20 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toContain('Failed to load codeclimate report');
           done();
-        }, 0);
+        });
       });
 
       it('should render a help icon with more information', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.$el.querySelector('.js-codequality-widget .btn-help')).not.toBeNull();
           expect(vm.codequalityPopover.title).toBe('Base pipeline codequality artifact not found');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -452,18 +436,16 @@ describe('ee merge request widget options', () => {
         vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
 
         // mock worker rejection
-        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() => Promise.reject());
+        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockRejectedValue();
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toEqual('Failed to load codeclimate report');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -481,14 +463,12 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
           ).toContain('Failed to load codeclimate report');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -513,9 +493,9 @@ describe('ee merge request widget options', () => {
         };
 
         vm.$nextTick(() => {
-          expect(
-            removeBreakLine(vm.$el.querySelector('.js-performance-widget').textContent),
-          ).toContain('Loading performance report');
+          expect(trimText(vm.$el.querySelector('.js-performance-widget').textContent)).toContain(
+            'Loading performance report',
+          );
 
           done();
         });
@@ -536,45 +516,39 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
           ).toEqual('Performance metrics improved on 2 points and degraded on 1 point');
           done();
-        }, 0);
+        });
       });
 
       describe('text connector', () => {
         it('should only render information about fixed issues', done => {
-          setTimeout(() => {
+          setImmediate(() => {
             vm.mr.performanceMetrics.degraded = [];
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
               ).toEqual('Performance metrics improved on 2 points');
               done();
             });
-          }, 0);
+          });
         });
 
         it('should only render information about added issues', done => {
-          setTimeout(() => {
+          setImmediate(() => {
             vm.mr.performanceMetrics.improved = [];
 
             Vue.nextTick(() => {
               expect(
-                removeBreakLine(
-                  vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-                ),
+                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
               ).toEqual('Performance metrics degraded on 1 point');
               done();
             });
-          }, 0);
+          });
         });
       });
     });
@@ -592,12 +566,12 @@ describe('ee merge request widget options', () => {
         vm.mr.performance = gl.mrWidgetData.performance;
 
         // wait for network request from component watch update method
-        setTimeout(done, 0);
+        setImmediate(done);
       });
 
       it('should render provided data', () => {
         expect(
-          removeBreakLine(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
+          trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
         ).toEqual('No changes to performance metrics');
       });
 
@@ -628,14 +602,12 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-            ),
+            trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
           ).toContain('Failed to load performance report');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -662,9 +634,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(
-            findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent,
-          ),
+          trimText(findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent),
         ).toContain('Container scanning is loading');
       });
     });
@@ -678,16 +648,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Container scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -700,14 +670,14 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             findSecurityWidget()
               .querySelector(CONTAINER_SCANNING_SELECTOR)
               .textContent.trim(),
           ).toContain('Container scanning: Loading resulted in an error');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -750,14 +720,14 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             findSecurityWidget()
               .querySelector(`${DAST_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
           ).toEqual('DAST detected 1 new, and 2 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -770,14 +740,14 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             findSecurityWidget()
               .querySelector(DAST_SELECTOR)
               .textContent.trim(),
           ).toContain('DAST: Loading resulted in an error');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -808,7 +778,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(findSecurityWidget().querySelector(SECRET_SCANNING_SELECTOR).textContent),
+          trimText(findSecurityWidget().querySelector(SECRET_SCANNING_SELECTOR).textContent),
         ).toContain('Secret scanning is loading');
       });
     });
@@ -822,16 +792,16 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render provided data', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
-            removeBreakLine(
+            trimText(
               findSecurityWidget().querySelector(
                 `${SECRET_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
           ).toEqual('Secret scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
-        }, 0);
+        });
       });
     });
 
@@ -844,14 +814,14 @@ describe('ee merge request widget options', () => {
       });
 
       it('should render error indicator', done => {
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             findSecurityWidget()
               .querySelector(SECRET_SCANNING_SELECTOR)
               .textContent.trim(),
           ).toContain('Secret scanning: Loading resulted in an error');
           done();
-        }, 0);
+        });
       });
     });
   });
@@ -1024,7 +994,7 @@ describe('ee merge request widget options', () => {
 
   describe('CI widget', () => {
     it('renders the branch in the pipeline widget', () => {
-      const sourceBranchLink = '<a href="https://www.zelda.com/">Link</a>';
+      const sourceBranchLink = '<a href="/to/the/past">Link</a>';
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
@@ -1034,7 +1004,7 @@ describe('ee merge request widget options', () => {
 
       const ciWidget = vm.$el.querySelector('.mr-state-widget .label-branch');
 
-      expect(ciWidget).toContainHtml(sourceBranchLink);
+      expect(ciWidget.innerHTML).toBe(sourceBranchLink);
     });
   });
 
@@ -1076,7 +1046,7 @@ describe('ee merge request widget options', () => {
       const helperText = getHelperTextElement();
 
       expect(helperText).toExist();
-      expect(helperText).toContainText(
+      expect(helperText.textContent).toContain(
         'This merge request will be added to the merge train when pipeline #123 succeeds.',
       );
     });
@@ -1099,7 +1069,7 @@ describe('ee merge request widget options', () => {
       const helperText = getHelperTextElement();
 
       expect(helperText).toExist();
-      expect(helperText).toContainText(
+      expect(helperText.textContent).toContain(
         'This merge request will start a merge train when pipeline #123 succeeds.',
       );
     });
@@ -1122,7 +1092,7 @@ describe('ee merge request widget options', () => {
       const pipelineLink = getHelperTextElement().querySelector('.js-pipeline-link');
 
       expect(pipelineLink).toExist();
-      expect(pipelineLink).toContainText('#123');
+      expect(pipelineLink.textContent).toContain('#123');
       expect(pipelineLink).toHaveAttr('href', 'path/to/pipeline');
     });
 
@@ -1142,7 +1112,7 @@ describe('ee merge request widget options', () => {
       const pipelineLink = getHelperTextElement().querySelector('.js-documentation-link');
 
       expect(pipelineLink).toExist();
-      expect(pipelineLink).toContainText('More information');
+      expect(pipelineLink.textContent).toContain('More information');
       expect(pipelineLink).toHaveAttr('href', 'path/to/help');
     });
   });
@@ -1163,7 +1133,7 @@ describe('ee merge request widget options', () => {
         },
       });
 
-      expect(vm.service).toEqual(jasmine.objectContaining(convertObjectPropsToCamelCase(paths)));
+      expect(vm.service).toMatchObject(convertObjectPropsToCamelCase(paths));
     });
   });
 
