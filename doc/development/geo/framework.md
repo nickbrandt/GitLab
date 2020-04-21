@@ -180,8 +180,8 @@ For example, to add support for files referenced by a `Widget` model with a
    end
    ```
 
-1. Add a partial index on `verification_failure` to ensure re-verification can
-   be performed efficiently:
+1. Add a partial index on `verification_failure` and `verification_checksum` to ensure
+   re-verification can be performed efficiently:
 
    ```ruby
    # frozen_string_literal: true
@@ -195,10 +195,12 @@ For example, to add support for files referenced by a `Widget` model with a
 
      def up
        add_concurrent_index :widgets, :verification_failure, where: "(verification_failure IS NOT NULL)", name: "widgets_verification_failure_partial"
+       add_concurrent_index :widgets, :verification_checksum, where: "(verification_checksum IS NOT NULL)", name: "widgets_verification_checksum_partial"
      end
 
      def down
        remove_concurrent_index :widgets, :verification_failure
+       remove_concurrent_index :widgets, :verification_checksum
      end
    end
    ```
