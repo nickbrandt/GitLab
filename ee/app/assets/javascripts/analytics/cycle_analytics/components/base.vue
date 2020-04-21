@@ -52,8 +52,6 @@ export default {
       'featureFlags',
       'isLoading',
       'isLoadingStage',
-      'isLoadingTasksByTypeChart',
-      'isLoadingTasksByTypeChartTopLabels',
       'isEmptyStage',
       'isSavingCustomStage',
       'isCreatingCustomStage',
@@ -63,25 +61,30 @@ export default {
       'selectedStage',
       'stages',
       'summary',
-      'topRankedLabels',
       'currentStageEvents',
       'customStageFormEvents',
       'errorCode',
       'startDate',
       'endDate',
-      'tasksByType',
       'medians',
       'customStageFormErrors',
+    ]),
+    ...mapState('typeOfWork', [
+      'isLoadingTasksByTypeChart',
+      'isLoadingTasksByTypeChartTopLabels',
+      'topRankedLabels',
+      'subject',
+      'selectedLabelIds',
     ]),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',
-      'tasksByTypeChartData',
       'activeStages',
       'selectedProjectIds',
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
     ]),
+    ...mapGetters('typeOfWork', ['tasksByTypeChartData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -95,12 +98,10 @@ export default {
       return this.featureFlags.hasDurationChart && !this.hasNoAccessError && !this.isLoading;
     },
     shouldDisplayTypeOfWorkCharts() {
-      return this.featureFlags.hasTasksByTypeChart && !this.hasNoAccessError;
+      return this.featureFlags.hasTasksByTypeChart && !this.hasNoAccessError && !this.isLoading;
     },
     isLoadingTypeOfWork() {
-      return (
-        this.isLoading || this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart
-      );
+      return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -111,7 +112,8 @@ export default {
         startDate,
         endDate,
         selectedProjectIds,
-        tasksByType: { subject, selectedLabelIds },
+        subject,
+        selectedLabelIds,
       } = this;
       return {
         selectedGroup,
@@ -152,16 +154,15 @@ export default {
       'showCustomStageForm',
       'showEditCustomStageForm',
       'setDateRange',
-      'fetchTasksByTypeData',
       'createCustomStage',
       'updateStage',
       'removeStage',
       'setFeatureFlags',
       'clearCustomStageFormErrors',
       'updateStage',
-      'setTasksByTypeFilters',
       'reorderStage',
     ]),
+    ...mapActions('typeOfWork', ['setTasksByTypeFilters']),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();

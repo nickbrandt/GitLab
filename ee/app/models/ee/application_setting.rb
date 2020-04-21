@@ -131,26 +131,37 @@ module EE
       ElasticsearchIndexedProject.target_ids
     end
 
-    def elasticsearch_limited_namespaces(ignore_descendants: false)
-      ElasticsearchIndexedNamespace.limited(ignore_descendants: ignore_descendants)
-    end
-
-    def elasticsearch_limited_projects(ignore_namespaces: false)
-      ElasticsearchIndexedProject.limited(ignore_namespaces: ignore_namespaces)
-    end
-
     def elasticsearch_indexes_project?(project)
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      ElasticsearchIndexedProject.limited_include?(project.id)
+      elasticsearch_limited_projects.exists?(project.id)
     end
 
     def elasticsearch_indexes_namespace?(namespace)
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      ElasticsearchIndexedNamespace.limited_include?(namespace.id)
+      elasticsearch_limited_namespaces.exists?(namespace.id)
+    end
+
+    def elasticsearch_limited_projects(ignore_namespaces = false)
+      return ::Project.where(id: ElasticsearchIndexedProject.select(:project_id)) if ignore_namespaces
+
+      union = ::Gitlab::SQL::Union.new([
+                                         ::Project.where(namespace_id: elasticsearch_limited_namespaces.select(:id)),
+                                         ::Project.where(id: ElasticsearchIndexedProject.select(:project_id))
+                                       ]).to_sql
+
+      ::Project.from("(#{union}) projects")
+    end
+
+    def elasticsearch_limited_namespaces(ignore_descendants = false)
+      namespaces = ::Namespace.where(id: ElasticsearchIndexedNamespace.select(:namespace_id))
+
+      return namespaces if ignore_descendants
+
+      ::Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
     end
 
     def pseudonymizer_available?

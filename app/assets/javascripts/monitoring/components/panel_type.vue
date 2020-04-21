@@ -14,6 +14,9 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
+import { panelTypes } from '../constants';
+
+import MonitorEmptyChart from './charts/empty_chart.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorAnomalyChart from './charts/anomaly.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
@@ -21,7 +24,7 @@ import MonitorHeatmapChart from './charts/heatmap.vue';
 import MonitorColumnChart from './charts/column.vue';
 import MonitorBarChart from './charts/bar.vue';
 import MonitorStackedColumnChart from './charts/stacked_column.vue';
-import MonitorEmptyChart from './charts/empty_chart.vue';
+
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
@@ -31,12 +34,12 @@ const events = {
 
 export default {
   components: {
+    MonitorEmptyChart,
     MonitorSingleStatChart,
+    MonitorHeatmapChart,
     MonitorColumnChart,
     MonitorBarChart,
-    MonitorHeatmapChart,
     MonitorStackedColumnChart,
-    MonitorEmptyChart,
     GlIcon,
     GlLoadingIcon,
     GlTooltip,
@@ -68,7 +71,7 @@ export default {
     groupId: {
       type: String,
       required: false,
-      default: 'panel-type-chart',
+      default: 'dashboard-panel',
     },
     namespace: {
       type: String,
@@ -142,7 +145,7 @@ export default {
       return window.URL.createObjectURL(data);
     },
     timeChartComponent() {
-      if (this.isPanelType('anomaly-chart')) {
+      if (this.isPanelType(panelTypes.ANOMALY_CHART)) {
         return MonitorAnomalyChart;
       }
       return MonitorTimeSeriesChart;
@@ -150,10 +153,10 @@ export default {
     isContextualMenuShown() {
       return (
         this.graphDataHasResult &&
-        !this.isPanelType('single-stat') &&
-        !this.isPanelType('heatmap') &&
-        !this.isPanelType('column') &&
-        !this.isPanelType('stacked-column')
+        !this.isPanelType(panelTypes.SINGLE_STAT) &&
+        !this.isPanelType(panelTypes.HEATMAP) &&
+        !this.isPanelType(panelTypes.COLUMN) &&
+        !this.isPanelType(panelTypes.STACKED_COLUMN)
       );
     },
     editCustomMetricLink() {
@@ -198,6 +201,7 @@ export default {
       this.$emit(events.timeRangeZoom, { start, end });
     },
   },
+  panelTypes,
 };
 </script>
 <template>
@@ -288,23 +292,23 @@ export default {
     </div>
 
     <monitor-single-stat-chart
-      v-if="isPanelType('single-stat') && graphDataHasResult"
+      v-if="isPanelType($options.panelTypes.SINGLE_STAT) && graphDataHasResult"
       :graph-data="graphData"
     />
     <monitor-heatmap-chart
-      v-else-if="isPanelType('heatmap') && graphDataHasResult"
+      v-else-if="isPanelType($options.panelTypes.HEATMAP) && graphDataHasResult"
       :graph-data="graphData"
     />
     <monitor-bar-chart
-      v-else-if="isPanelType('bar') && graphDataHasResult"
+      v-else-if="isPanelType($options.panelTypes.BAR) && graphDataHasResult"
       :graph-data="graphData"
     />
     <monitor-column-chart
-      v-else-if="isPanelType('column') && graphDataHasResult"
+      v-else-if="isPanelType($options.panelTypes.COLUMN) && graphDataHasResult"
       :graph-data="graphData"
     />
     <monitor-stacked-column-chart
-      v-else-if="isPanelType('stacked-column') && graphDataHasResult"
+      v-else-if="isPanelType($options.panelTypes.STACKED_COLUMN) && graphDataHasResult"
       :graph-data="graphData"
     />
     <component

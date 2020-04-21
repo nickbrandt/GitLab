@@ -48,6 +48,55 @@ export const metricStates = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
+/**
+ * Supported panel types in dashboards, values of `panel.type`.
+ *
+ * Values should not be changed as they correspond to
+ * values in users the `.yml` dashboard definition.
+ */
+export const panelTypes = {
+  /**
+   * Area Chart
+   *
+   * Time Series chart with an area
+   */
+  AREA_CHART: 'area-chart',
+  /**
+   * Line Chart
+   *
+   * Time Series chart with a line
+   */
+  LINE_CHART: 'line-chart',
+  /**
+   * Anomaly Chart
+   *
+   * Time Series chart with 3 metrics
+   */
+  ANOMALY_CHART: 'anomaly-chart',
+  /**
+   * Single Stat
+   *
+   * Single data point visualization
+   */
+  SINGLE_STAT: 'single-stat',
+  /**
+   * Heatmap
+   */
+  HEATMAP: 'heatmap',
+  /**
+   * Bar chart
+   */
+  BAR: 'bar',
+  /**
+   * Column chart
+   */
+  COLUMN: 'column',
+  /**
+   * Stacked column chart
+   */
+  STACKED_COLUMN: 'stacked-column',
+};
+
 export const sidebarAnimationDuration = 300; // milliseconds.
 export const chartHeight = 300;
 

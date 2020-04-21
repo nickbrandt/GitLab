@@ -32,7 +32,7 @@ import {
   endDate,
   issueStage,
   rawCustomStage,
-  transformedTasksByTypeData,
+  rawTasksByTypeData,
 } from './mock_data';
 
 const labelEventIds = labelEvents.map(ev => ev.identifier);
@@ -239,9 +239,9 @@ describe('Cycle analytics utils', () => {
     const groupBy = getDatesInRange(startDate, endDate, toYmd);
     // only return the values, drop the date which is the first paramater
     const extractSeriesValues = ({ series }) => series.map(kv => kv[1]);
-    const data = transformedTasksByTypeData.map(extractSeriesValues);
+    const data = rawTasksByTypeData.map(extractSeriesValues);
 
-    const labels = transformedTasksByTypeData.map(d => {
+    const labels = rawTasksByTypeData.map(d => {
       const { label } = d;
       return label.title;
     });
@@ -257,7 +257,7 @@ describe('Cycle analytics utils', () => {
 
     describe('with data', () => {
       beforeEach(() => {
-        transformed = getTasksByTypeData({ data: transformedTasksByTypeData, startDate, endDate });
+        transformed = getTasksByTypeData({ data: rawTasksByTypeData, startDate, endDate });
       });
 
       it('will return an object with the properties needed for the chart', () => {

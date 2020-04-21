@@ -54,6 +54,7 @@ module Gitlab
 
       mrd_to_check_for_overflow.overflow?
     end
+    private_class_method :oversized_merge_request?
 
     def self.slow_path_lookup(merge_request, merge_request_diff)
       merge_request_diff ||= merge_request.merge_request_diff

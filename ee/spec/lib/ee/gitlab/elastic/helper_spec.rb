@@ -1,63 +1,83 @@
 # frozen_string_literal: true
 
-require 'fast_spec_helper'
-require 'webmock/rspec'
+require 'spec_helper'
 
 describe Gitlab::Elastic::Helper do
-  describe '.index_exists' do
-    it 'returns correct values' do
-      described_class.create_empty_index
+  subject(:helper) { described_class.default }
 
-      expect(described_class.index_exists?).to eq(true)
-
-      described_class.delete_index
-
-      expect(described_class.index_exists?).to eq(false)
+  shared_context 'with an existing index' do
+    before do
+      helper.create_empty_index
     end
   end
 
-  describe 'reindex_to_another_cluster' do
-    it 'creates an empty index and triggers a reindex' do
-      _version_check_request = stub_request(:get, 'http://newcluster.example.com:9200/')
-        .to_return(status: 200, body: { version: { number: '7.5.1' } }.to_json)
+  after do
+    helper.delete_index
+  end
 
-      _index_exists_check = stub_request(:head, 'http://newcluster.example.com:9200/gitlab-test')
-        .to_return(status: 404, body: +'')
+  describe '.new' do
+    it 'has the proper default values' do
+      expect(helper).to have_attributes(
+        version: ::Elastic::MultiVersionUtil::TARGET_VERSION,
+        index_name: ::Elastic::Latest::Config.index_name)
+    end
 
-      create_cluster_request = stub_request(:put, 'http://newcluster.example.com:9200/gitlab-test')
-        .to_return(status: 200, body: +'')
+    context 'with a custom `index_name`' do
+      let(:index_name) { 'custom-index-name' }
 
-      optimize_settings_for_write_request = stub_request(:put, 'http://newcluster.example.com:9200/gitlab-test/_settings')
-        .with(body: { index: { number_of_replicas: 0, refresh_interval: "-1" } })
-        .to_return(status: 200, body: +'')
+      subject(:helper) { described_class.new(index_name: index_name) }
 
-      reindex_request = stub_request(:post, 'http://newcluster.example.com:9200/_reindex?wait_for_completion=false')
-        .with(
-          body: {
-            source: {
-              remote: {
-                host: 'http://oldcluster.example.com:9200/',
-                username: 'olduser',
-                password: 'oldpass'
-              },
-              index: 'gitlab-test'
-            },
-            dest: {
-              index: 'gitlab-test'
-            }
-          }).to_return(status: 200,
-                       headers: { "Content-Type" => "application/json" },
-                       body: { task: 'abc123' }.to_json)
+      it 'has the proper `index_name`' do
+        expect(helper).to have_attributes(index_name: index_name)
+      end
+    end
+  end
 
-      source_url = 'http://olduser:oldpass@oldcluster.example.com:9200/'
-      dest_url = 'http://newcluster.example.com:9200/'
+  describe '#create_empty_index' do
+    context 'without an existing index' do
+      it 'creates the index' do
+        helper.create_empty_index
 
-      task = Gitlab::Elastic::Helper.reindex_to_another_cluster(source_url, dest_url)
-      expect(task).to eq('abc123')
+        expect(helper.index_exists?).to eq(true)
+      end
+    end
 
-      assert_requested create_cluster_request
-      assert_requested optimize_settings_for_write_request
-      assert_requested reindex_request
+    context 'when there is an index' do
+      include_context 'with an existing index'
+
+      it 'raises an error' do
+        expect { helper.create_empty_index }.to raise_error
+      end
+    end
+  end
+
+  describe '#delete_index' do
+    subject { helper.delete_index }
+
+    context 'without an existing index' do
+      it 'fails gracefully' do
+        is_expected.to be_falsy
+      end
+    end
+
+    context 'when there is an index' do
+      include_context 'with an existing index'
+
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#index_exists?' do
+    subject { helper.index_exists? }
+
+    context 'without an existing index' do
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when there is an index' do
+      include_context 'with an existing index'
+
+      it { is_expected.to be_truthy }
     end
   end
 end

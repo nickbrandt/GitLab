@@ -2,7 +2,6 @@ import dateFormat from 'dateformat';
 import { isNumber } from 'lodash';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
-import { getTasksByTypeData } from '../utils';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
@@ -17,17 +16,6 @@ export const cycleAnalyticsRequestParams = ({ startDate = null, endDate = null }
   created_after: startDate ? dateFormat(startDate, dateFormats.isoDate) : null,
   created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
 });
-
-export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
-  if (tasksByType && tasksByType.data.length) {
-    return getTasksByTypeData({
-      data: tasksByType.data,
-      startDate,
-      endDate,
-    });
-  }
-  return { groupBy: [], data: [], seriesNames: [] };
-};
 
 const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
   stages.filter(({ hidden = false }) => hidden === isHidden);

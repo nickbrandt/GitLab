@@ -127,6 +127,7 @@ instance, ensure you're purchasing enough seats to
 With the [Customers Portal](https://customers.gitlab.com/) you can:
 
 - [Change billing information](#change-billing-information)
+- [Change the payment method](#change-payment-method)
 - [Change the linked account](#change-the-linked-account)
 - [Change the associated namespace](#change-the-associated-namespace)
 
@@ -143,6 +144,15 @@ NOTE: **Note:**
 Future purchases will use the information in this section.
 The email listed in this section is used for the Customers Portal
 login and for license-related email communication.
+
+### Change payment method
+
+To change payment method or update credit card information:
+
+1. Log in to the [Customers Portal](https://customers.gitlab.com/customers/sign_in).
+1. Select the **My account** drop-down and click on **Payment methods**.
+1. **Edit** the existing payment method information or **Add new payment method**.
+1. Save changes.
 
 ### Change the linked account
 

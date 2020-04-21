@@ -10,6 +10,6 @@ module ElasticsearchHelpers
   end
 
   def refresh_index!
-    ::Gitlab::Elastic::Helper.refresh_index
+    ::Gitlab::Elastic::Helper.default.refresh_index
   end
 end

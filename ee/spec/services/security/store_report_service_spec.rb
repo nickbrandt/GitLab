@@ -54,6 +54,28 @@ describe Security::StoreReportService, '#execute' do
         expect { subject }.to change { Vulnerability.count }.by(occurrences)
       end
     end
+
+    context 'invalid data' do
+      let(:artifact) { create(:ee_ci_job_artifact, :sast) }
+      let(:occurrence_without_name) { build(:ci_reports_security_occurrence, name: nil) }
+      let(:report) { Gitlab::Ci::Reports::Security::Report.new('container_scanning', nil, nil) }
+
+      before do
+        allow(Gitlab::ErrorTracking).to receive(:track_and_raise_exception).and_call_original
+        report.add_occurrence(occurrence_without_name)
+      end
+
+      it 'raises invalid record error' do
+        expect { subject.execute }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it 'reports the error correctly' do
+        expected_params = occurrence_without_name.to_hash.dig(:raw_metadata)
+        expect { subject.execute }.to raise_error { |error|
+          expect(Gitlab::ErrorTracking).to have_received(:track_and_raise_exception).with(error, create_params: expected_params)
+        }
+      end
+    end
   end
 
   context 'with existing data from previous pipeline' do

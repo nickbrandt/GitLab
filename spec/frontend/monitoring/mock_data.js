@@ -341,7 +341,7 @@ export const metricsResult = [
   },
 ];
 
-export const graphDataPrometheusQuery = {
+export const singleStatMetricsResult = {
   title: 'Super Chart A2',
   type: 'single-stat',
   weight: 2,
@@ -489,7 +489,7 @@ export const stackedColumnMockedData = {
 
 export const barMockData = {
   title: 'SLA Trends - Primary Services',
-  type: 'bar-chart',
+  type: 'bar',
   xLabel: 'service',
   y_label: 'percentile',
   metrics: [

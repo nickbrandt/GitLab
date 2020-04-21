@@ -28,18 +28,7 @@ describe ElasticsearchIndexedNamespace do
     end
   end
 
-  context 'caching' do
-    it 'invalidates indexed project cache' do
-      expect(ElasticsearchIndexedProject).to receive(:drop_limited_ids_cache!).and_call_original.twice
-      expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.twice
-
-      n = create(:elasticsearch_indexed_namespace)
-
-      n.destroy
-    end
-  end
-
-  context 'with plans', :use_clean_rails_redis_caching do
+  context 'with plans' do
     Plan::PAID_HOSTED_PLANS.each do |plan|
       plan_factory = "#{plan}_plan"
       let_it_be(plan_factory) { create(plan_factory) }
@@ -54,11 +43,8 @@ describe ElasticsearchIndexedNamespace do
       stub_ee_application_setting(elasticsearch_indexing: false)
     end
 
-    def expect_indexed_namespaces_to_match(array)
-      ids = described_class.order(:created_at).pluck(:namespace_id)
-
-      expect(ids).to eq(array)
-      expect(ids).to match_array(described_class.limited_ids_cached)
+    def get_indexed_namespaces
+      described_class.order(:created_at).pluck(:namespace_id)
     end
 
     def expect_queue_to_contain(*args)
@@ -69,23 +55,21 @@ describe ElasticsearchIndexedNamespace do
 
     describe '.index_first_n_namespaces_of_plan' do
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.exactly(3).times
-
         ids = namespaces.map(&:id)
 
         described_class.index_first_n_namespaces_of_plan('gold', 1)
 
-        expect_indexed_namespaces_to_match([ids[0]])
+        expect(get_indexed_namespaces).to eq([ids[0]])
         expect_queue_to_contain(ids[0], "index")
 
         described_class.index_first_n_namespaces_of_plan('gold', 2)
 
-        expect_indexed_namespaces_to_match([ids[0], ids[2]])
+        expect(get_indexed_namespaces).to eq([ids[0], ids[2]])
         expect_queue_to_contain(ids[2], "index")
 
         described_class.index_first_n_namespaces_of_plan('silver', 1)
 
-        expect_indexed_namespaces_to_match([ids[0], ids[2], ids[1]])
+        expect(get_indexed_namespaces).to eq([ids[0], ids[2], ids[1]])
         expect_queue_to_contain(ids[1], "index")
       end
     end
@@ -97,26 +81,23 @@ describe ElasticsearchIndexedNamespace do
       end
 
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.exactly(3).times
-
         ids = namespaces.map(&:id)
 
-        expect_indexed_namespaces_to_match([ids[0], ids[2], ids[1]])
+        expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[2], ids[1])
 
         described_class.unindex_last_n_namespaces_of_plan('gold', 1)
 
-        expect_indexed_namespaces_to_match([ids[0], ids[1]])
+        expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[1])
         expect_queue_to_contain(ids[2], "delete")
 
         described_class.unindex_last_n_namespaces_of_plan('silver', 1)
 
-        expect_indexed_namespaces_to_match([ids[0]])
-
+        expect(get_indexed_namespaces).to contain_exactly(ids[0])
         expect_queue_to_contain(ids[1], "delete")
 
         described_class.unindex_last_n_namespaces_of_plan('gold', 1)
 
-        expect_indexed_namespaces_to_match([])
+        expect(get_indexed_namespaces).to be_empty
         expect_queue_to_contain(ids[0], "delete")
       end
     end

@@ -4,16 +4,11 @@ import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import {
-  TASKS_BY_TYPE_FILTERS,
-  TASKS_BY_TYPE_SUBJECT_ISSUE,
-} from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import {
   selectedGroup,
   allowedStages as stages,
-  groupLabels,
   startDate,
   endDate,
   customizableStagesAndEvents,
@@ -177,87 +172,6 @@ describe('Cycle analytics actions', () => {
       });
 
       shouldFlashAMessage('There was an error fetching data for the selected stage');
-    });
-  });
-
-  describe('fetchTopRankedGroupLabels', () => {
-    beforeEach(() => {
-      gon.api_version = 'v4';
-      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE }, ...getters };
-    });
-
-    describe('succeeds', () => {
-      beforeEach(() => {
-        mock.onGet(endpoints.tasksByTypeTopLabelsData).replyOnce(200, groupLabels);
-      });
-
-      it('dispatches receiveTopRankedGroupLabelsSuccess if the request succeeds', () => {
-        return testAction(
-          actions.fetchTopRankedGroupLabels,
-          null,
-          state,
-          [],
-          [
-            { type: 'requestTopRankedGroupLabels' },
-            { type: 'receiveTopRankedGroupLabelsSuccess', payload: groupLabels },
-          ],
-        );
-      });
-
-      describe('receiveTopRankedGroupLabelsSuccess', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it(`commits the ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS} mutation and dispatches the 'fetchTasksByTypeData' action`, done => {
-          testAction(
-            actions.receiveTopRankedGroupLabelsSuccess,
-            null,
-            state,
-            [
-              {
-                type: types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS,
-                payload: null,
-              },
-            ],
-            [{ type: 'fetchTasksByTypeData' }],
-            done,
-          );
-        });
-      });
-    });
-
-    describe('with an error', () => {
-      beforeEach(() => {
-        mock.onGet(endpoints.fetchTopRankedGroupLabels).replyOnce(404);
-      });
-
-      it('dispatches receiveTopRankedGroupLabelsError if the request fails', () => {
-        return testAction(
-          actions.fetchTopRankedGroupLabels,
-          null,
-          state,
-          [],
-          [
-            { type: 'requestTopRankedGroupLabels' },
-            { type: 'receiveTopRankedGroupLabelsError', payload: error },
-          ],
-        );
-      });
-    });
-
-    describe('receiveTopRankedGroupLabelsError', () => {
-      beforeEach(() => {
-        setFixtures('<div class="flash-container"></div>');
-      });
-
-      it('flashes an error message if the request fails', () => {
-        actions.receiveTopRankedGroupLabelsError({
-          commit: () => {},
-        });
-
-        shouldFlashAMessage('There was an error fetching the top labels for the selected group');
-      });
     });
   });
 
@@ -840,31 +754,6 @@ describe('Cycle analytics actions', () => {
         state,
         [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload: { events: [] } }],
         [],
-        done,
-      );
-    });
-  });
-
-  describe('setTasksByTypeFilters', () => {
-    const filter = TASKS_BY_TYPE_FILTERS.SUBJECT;
-    const value = 'issue';
-
-    it(`commits the ${types.SET_TASKS_BY_TYPE_FILTERS} mutation and dispatches 'fetchTopRankedGroupLabels'`, done => {
-      testAction(
-        actions.setTasksByTypeFilters,
-        { filter, value },
-        {},
-        [
-          {
-            type: types.SET_TASKS_BY_TYPE_FILTERS,
-            payload: { filter, value },
-          },
-        ],
-        [
-          {
-            type: 'fetchTopRankedGroupLabels',
-          },
-        ],
         done,
       );
     });

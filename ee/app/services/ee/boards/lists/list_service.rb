@@ -11,7 +11,7 @@ module EE
         LICENSED_LIST_TYPES = %i[assignee milestone].freeze
 
         override :execute
-        def execute(board)
+        def execute(board, create_default_lists: true)
           not_available_lists = list_type_features_availability(board)
             .select { |_, available| !available }
 

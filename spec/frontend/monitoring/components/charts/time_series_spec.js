@@ -11,6 +11,7 @@ import {
 import { cloneDeep } from 'lodash';
 import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
 import { createStore } from '~/monitoring/stores';
+import { panelTypes } from '~/monitoring/constants';
 import TimeSeries from '~/monitoring/components/charts/time_series.vue';
 import * as types from '~/monitoring/stores/mutation_types';
 import { deploymentData, mockProjectDir, annotationsData } from '../../mock_data';
@@ -535,11 +536,11 @@ describe('Time series component', () => {
     describe('wrapped components', () => {
       const glChartComponents = [
         {
-          chartType: 'area-chart',
+          chartType: panelTypes.AREA_CHART,
           component: GlAreaChart,
         },
         {
-          chartType: 'line-chart',
+          chartType: panelTypes.LINE_CHART,
           component: GlLineChart,
         },
       ];
