@@ -46,7 +46,7 @@ module QA
 
             job_console.visit!
 
-            Support::Waiter.wait_until(sleep_interval: 1, reload_page: page) do
+            Support::Waiter.wait_until(sleep_interval: 2, reload_page: page) do
               job_console.has_successful_build? && job_console.no_failed_status_update?
             end
           end
@@ -91,6 +91,7 @@ module QA
         end
 
         Vendor::Jenkins::Page::ConfigureJob.perform do |configure_job|
+          configure_job.job_name = project_name
           configure_job.configure(scm_url: patch_host_name(project.repository_http_location.git_uri, 'gitlab'))
         end
       end
