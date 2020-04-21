@@ -102,6 +102,25 @@ describe 'get board lists' do
           end
         end
       end
+
+      describe 'limit metric settings' do
+        let(:limit_metric_params) { { limit_metric: 'issue_count', max_issue_count: 10, max_issue_weight: 4 } }
+        let!(:list_with_limit_metrics) { create(:list, board: board, **limit_metric_params) }
+
+        before do
+          post_graphql(query, current_user: user)
+        end
+
+        it 'returns the expected limit metric settings' do
+          lists = grab_list_data(response.body).map { |item| item['node'] }
+
+          list = lists.find { |l| l['id'] == list_with_limit_metrics.to_global_id.to_s }
+
+          expect(list['limitMetric']).to eq('issue_count')
+          expect(list['maxIssueCount']).to eq(10)
+          expect(list['maxIssueWeight']).to eq(4)
+        end
+      end
     end
   end
 
