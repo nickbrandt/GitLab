@@ -30,7 +30,7 @@ describe RegistrationsController do
       end
     end
 
-    context 'when recaptcha experiment enabled' do
+    context 'when reCAPTCHA experiment enabled' do
       it "logs a 'User Created' message including the experiment state" do
         user_params = { user: attributes_for(:user) }
         allow_any_instance_of(EE::RecaptchaExperimentHelper).to receive(:show_recaptcha_sign_up?).and_return(true)
