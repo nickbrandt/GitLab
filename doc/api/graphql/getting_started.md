@@ -6,13 +6,14 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
-GraphQL is a programatic language for easily accessing and manipulating complex data with an intuitive and flexible syntax.  With a single request, you can access a  tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
+GraphQL is a programatic language for easily accessing and manipulating complex data in a single request mwith an intuitive and flexible syntax.  With your single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
 
 TODO (Sameer): pub-sub notifications with realtime updates?
 
 ### Why GraphQL vs REST
 For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
-TODO: challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
+
+TODO (mike): challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
 TODO (Mike)
 -performance
@@ -56,7 +57,7 @@ Example:
 GRAPHQL_TOKEN=<your-token>
 curl 'https://gitlab.com/api/graphql' --header "Authorization: Bearer $GRAPHQL_TOKEN" --header "Content-Type: application/json" --request POST --data "{\"query\": \"query {currentUser {name}}\"}"
 ```
-TODO
+TODO (jr/mike/dt/sameer)
 #1 current helloworld
 #2 consuming a datafile with a lengthy query e.g. from GiQL
 #3 filtering and analyzing the the output from the CLI
