@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 
 import { GlModal } from '@gitlab/ui';
 
@@ -30,13 +30,13 @@ export default {
 
         if (this.removeItemType === ChildType.Epic) {
           Object.assign(sprintfParams, {
-            targetEpicTitle: esc(this.removeItemModalProps.item.title),
-            parentEpicTitle: esc(this.parentItem.title),
+            targetEpicTitle: escape(this.removeItemModalProps.item.title),
+            parentEpicTitle: escape(this.parentItem.title),
           });
         } else {
           Object.assign(sprintfParams, {
-            targetIssueTitle: esc(this.removeItemModalProps.item.title),
-            parentEpicTitle: esc(this.parentItem.title),
+            targetIssueTitle: escape(this.removeItemModalProps.item.title),
+            parentEpicTitle: escape(this.parentItem.title),
           });
         }
 

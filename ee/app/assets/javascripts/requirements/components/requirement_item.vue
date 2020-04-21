@@ -1,5 +1,5 @@
 <script>
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import {
   GlPopover,
   GlLink,
@@ -68,12 +68,12 @@ export default {
     },
     createdAt() {
       return sprintf(__('created %{timeAgo}'), {
-        timeAgo: esc(getTimeago().format(this.requirement.createdAt)),
+        timeAgo: escape(getTimeago().format(this.requirement.createdAt)),
       });
     },
     updatedAt() {
       return sprintf(__('updated %{timeAgo}'), {
-        timeAgo: esc(getTimeago().format(this.requirement.updatedAt)),
+        timeAgo: escape(getTimeago().format(this.requirement.updatedAt)),
       });
     },
     isArchived() {

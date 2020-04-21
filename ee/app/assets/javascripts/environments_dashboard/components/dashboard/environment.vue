@@ -1,5 +1,5 @@
 <script>
-import { escape as esc, isEmpty } from 'lodash';
+import { escape, isEmpty } from 'lodash';
 import { GlTooltipDirective, GlLink, GlBadge } from '@gitlab/ui';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
@@ -95,7 +95,7 @@ export default {
       return (
         this.commit.author || {
           avatar_url: this.commit.author_gravatar_url,
-          path: `mailto:${esc(this.commit.author_email)}`,
+          path: `mailto:${escape(this.commit.author_email)}`,
           username: this.commit.author_name,
         }
       );

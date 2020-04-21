@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import { GlLoadingIcon, GlDeprecatedButton, GlAvatar } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { s__, __ } from '~/locale';
@@ -99,7 +99,7 @@ export default {
       const lastPart = parts.length - 1;
       return parts
         .map((part, idx) =>
-          idx === lastPart ? `<strong>${esc(part.trim())}</strong>` : esc(part.trim()),
+          idx === lastPart ? `<strong>${escape(part.trim())}</strong>` : escape(part.trim()),
         )
         .join(' / ');
     },

@@ -1,5 +1,5 @@
 <script>
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { GlDeprecatedButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
@@ -54,7 +54,7 @@ export default {
 
       const projectLink =
         project && project.url && project.value
-          ? `<a href="${esc(project.url)}">${esc(project.value)}</a>`
+          ? `<a href="${escape(project.url)}">${escape(project.value)}</a>`
           : null;
 
       if (pipelineLink && projectLink) {

@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this */
-import { escape as esc, find, countBy } from 'lodash';
+import { escape, find, countBy } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
 import { n__, s__, __ } from '~/locale';
@@ -471,7 +471,7 @@ export default class AccessDropdown {
       <li>
         <a href="#" class="${isActiveClass}">
           <img src="${user.avatar_url}" class="avatar avatar-inline" width="30">
-          <strong class="dropdown-menu-user-full-name">${esc(user.name)}</strong>
+          <strong class="dropdown-menu-user-full-name">${escape(user.name)}</strong>
           <span class="dropdown-menu-user-username">${user.username}</span>
         </a>
       </li>
