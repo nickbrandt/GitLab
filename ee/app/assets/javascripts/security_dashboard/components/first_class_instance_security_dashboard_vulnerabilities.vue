@@ -105,6 +105,7 @@ export default {
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
       :vulnerabilities="vulnerabilities"
+      should-show-project-namespace
     >
       <template #emptyState>
         <gl-empty-state
