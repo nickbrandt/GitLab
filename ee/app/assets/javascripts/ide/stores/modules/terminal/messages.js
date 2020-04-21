@@ -1,4 +1,4 @@
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 
@@ -32,7 +32,7 @@ export const configCheckError = (status, helpUrl) => {
     return sprintf(
       ERROR_CONFIG,
       {
-        helpStart: `<a href="${esc(helpUrl)}" target="_blank">`,
+        helpStart: `<a href="${escape(helpUrl)}" target="_blank">`,
         helpEnd: '</a>',
       },
       false,
@@ -48,7 +48,7 @@ export const runnersCheckEmpty = helpUrl =>
   sprintf(
     EMPTY_RUNNERS,
     {
-      helpStart: `<a href="${esc(helpUrl)}" target="_blank">`,
+      helpStart: `<a href="${escape(helpUrl)}" target="_blank">`,
       helpEnd: '</a>',
     },
     false,

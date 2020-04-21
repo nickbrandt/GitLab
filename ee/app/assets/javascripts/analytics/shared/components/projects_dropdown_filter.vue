@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import { GlLoadingIcon, GlDeprecatedButton, GlAvatar } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { n__, s__, __ } from '~/locale';
@@ -120,7 +120,7 @@ export default {
           <li>
             <a href='#' class='dropdown-menu-link ${isActiveClass}'>
               ${this.avatarTemplate(project)}
-              <div class="align-middle">${esc(project.name)}</div>
+              <div class="align-middle">${escape(project.name)}</div>
             </a>
           </li>
         `;

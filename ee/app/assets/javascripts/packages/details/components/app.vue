@@ -9,7 +9,7 @@ import {
   GlEmptyState,
   GlTable,
 } from '@gitlab/ui';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import Tracking from '~/tracking';
 import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
@@ -83,8 +83,8 @@ export default {
           `PackageRegistry|You are about to delete version %{boldStart}%{version}%{boldEnd} of %{boldStart}%{name}%{boldEnd}. Are you sure?`,
         ),
         {
-          version: esc(this.packageEntity.version),
-          name: esc(this.packageEntity.name),
+          version: escape(this.packageEntity.version),
+          name: escape(this.packageEntity.name),
           boldStart: '<b>',
           boldEnd: '</b>',
         },

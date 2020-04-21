@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 import { GlDeprecatedButton } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -74,7 +74,7 @@ export default {
       return `
           <li>
             <a href='#' class='dropdown-menu-link is-active'>
-              ${esc(stage.title)}
+              ${escape(stage.title)}
             </a>
           </li>
         `;

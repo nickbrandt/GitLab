@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import 'select2/select2';
-import { escape as esc, debounce } from 'lodash';
+import { escape, debounce } from 'lodash';
 import Api from 'ee/api';
 import { __ } from '~/locale';
 import { TYPE_USER, TYPE_GROUP } from '../constants';
@@ -12,7 +12,7 @@ function addType(type) {
 }
 
 function formatSelection(group) {
-  return esc(group.full_name || group.name);
+  return escape(group.full_name || group.name);
 }
 
 function formatResultUser(result) {
@@ -25,8 +25,8 @@ function formatResultUser(result) {
         ${avatar}
       </div>
       <div class="user-info">
-        <div class="user-name">${esc(name)}</div>
-        <div class="user-username">@${esc(username)}</div>
+        <div class="user-name">${escape(name)}</div>
+        <div class="user-username">@${escape(username)}</div>
       </div>
     </div>
   `;
@@ -42,8 +42,8 @@ function formatResultGroup(result) {
         ${avatar}
       </div>
       <div class="group-info">
-        <div class="group-name">${esc(fullName)}</div>
-        <div class="group-path">${esc(fullPath)}</div>
+        <div class="group-name">${escape(fullName)}</div>
+        <div class="group-path">${escape(fullPath)}</div>
       </div>
     </div>
   `;

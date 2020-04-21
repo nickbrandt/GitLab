@@ -1,6 +1,6 @@
 <script>
 import { GlLoadingIcon, GlLink, GlTooltip } from '@gitlab/ui';
-import { escape as esc } from 'lodash';
+import { escape } from 'lodash';
 
 import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -39,7 +39,7 @@ export default {
       // Fallback to None if immediate parent is unavailable.
 
       let { title } = immediateParent;
-      title = esc(title);
+      title = escape(title);
 
       const { humanReadableEndDate, humanReadableTimestamp } = immediateParent;
 
