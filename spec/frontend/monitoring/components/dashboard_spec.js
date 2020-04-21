@@ -48,6 +48,7 @@ describe('Dashboard', () => {
         fetchData: jest.fn(),
       },
       store,
+      stubs: ['graph-group', 'dashboard-panel'],
       ...options,
     });
   };
@@ -126,10 +127,7 @@ describe('Dashboard', () => {
     });
 
     it('hides the group panels when showPanels is false', () => {
-      createMountedWrapper(
-        { hasMetrics: true, showPanels: false },
-        { stubs: ['graph-group', 'dashboard-panel'] },
-      );
+      createMountedWrapper({ hasMetrics: true, showPanels: false });
 
       setupStoreWithData(wrapper.vm.$store);
 
@@ -142,7 +140,7 @@ describe('Dashboard', () => {
     it('fetches the metrics data with proper time window', () => {
       jest.spyOn(store, 'dispatch');
 
-      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+      createMountedWrapper({ hasMetrics: true });
 
       wrapper.vm.$store.commit(
         `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
@@ -157,7 +155,7 @@ describe('Dashboard', () => {
 
   describe('when all requests have been commited by the store', () => {
     beforeEach(() => {
-      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+      createMountedWrapper({ hasMetrics: true });
 
       setupStoreWithData(wrapper.vm.$store);
 
@@ -186,7 +184,7 @@ describe('Dashboard', () => {
   });
 
   it('hides the environments dropdown list when there is no environments', () => {
-    createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+    createMountedWrapper({ hasMetrics: true });
 
     setupStoreWithDashboard(wrapper.vm.$store);
 
@@ -196,7 +194,7 @@ describe('Dashboard', () => {
   });
 
   it('renders the datetimepicker dropdown', () => {
-    createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+    createMountedWrapper({ hasMetrics: true });
 
     setupStoreWithData(wrapper.vm.$store);
 
@@ -206,7 +204,7 @@ describe('Dashboard', () => {
   });
 
   it('renders the refresh dashboard button', () => {
-    createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+    createMountedWrapper({ hasMetrics: true });
 
     setupStoreWithData(wrapper.vm.$store);
 
@@ -249,13 +247,7 @@ describe('Dashboard', () => {
 
   describe('searchable environments dropdown', () => {
     beforeEach(() => {
-      createMountedWrapper(
-        { hasMetrics: true },
-        {
-          attachToDocument: true,
-          stubs: ['graph-group', 'dashboard-panel'],
-        },
-      );
+      createMountedWrapper({ hasMetrics: true }, { attachToDocument: true });
 
       setupStoreWithData(wrapper.vm.$store);
 
@@ -465,7 +457,7 @@ describe('Dashboard', () => {
 
   describe('Dashboard dropdown', () => {
     beforeEach(() => {
-      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'dashboard-panel'] });
+      createMountedWrapper({ hasMetrics: true });
 
       wrapper.vm.$store.commit(
         `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
@@ -484,15 +476,12 @@ describe('Dashboard', () => {
 
   describe('external dashboard link', () => {
     beforeEach(() => {
-      createMountedWrapper(
-        {
-          hasMetrics: true,
-          showPanels: false,
-          showTimeWindowDropdown: false,
-          externalDashboardUrl: '/mockUrl',
-        },
-        { stubs: ['graph-group', 'dashboard-panel'] },
-      );
+      createMountedWrapper({
+        hasMetrics: true,
+        showPanels: false,
+        showTimeWindowDropdown: false,
+        externalDashboardUrl: '/mockUrl',
+      });
 
       return wrapper.vm.$nextTick();
     });
