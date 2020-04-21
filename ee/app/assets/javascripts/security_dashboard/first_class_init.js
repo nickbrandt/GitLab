@@ -64,6 +64,7 @@ export default (
   } else if (dashboardType === DASHBOARD_TYPES.INSTANCE) {
     component = FirstClassInstanceSecurityDashboard;
     props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
+    props.vulnerabilitiesExportEndpoint = el.dataset.vulnerabilitiesExportEndpoint;
   }
 
   const router = createRouter();
