@@ -68,7 +68,6 @@ describe('Grouped Test Reports App', () => {
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
           'Test summary results are being parsed',
         );
-
         done();
       }, 0);
     });
@@ -92,9 +91,12 @@ describe('Grouped Test Reports App', () => {
       });
     });
 
-    it('should be rendered when junitPipelineView is enabled', () => {
-      expect(vm.$el.querySelector(selector).textContent.trim()).toEqual('View full report');
-      expect(vm.$el.querySelector(selector).attributes('href')).toEqual(testTabUrl);
+    it('should be rendered when junitPipelineView is enabled', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector(selector).textContent.trim()).toEqual('View full report');
+        expect(vm.$el.querySelector(selector).attributes('href')).toEqual(testTabUrl);
+        done();
+      }, 0);  
     });
   });
 
@@ -106,24 +108,17 @@ describe('Grouped Test Reports App', () => {
           endpoint: 'test_results.json',
         },
         provide: {
-          glFeatures: { junitPipelineView: true },
+          glFeatures: { junitPipelineView: false },
         },
       });
     });
-    it('should not be rendered when junitPipelineView is disabled', () => {
-      beforeEach(() => {
-        mock.onGet('test_results.json').reply(200, {}, {});
-        vm = mountComponentWithProvide(Component, {
-          props: {
-            endpoint: 'test_results.json',
-          },
-          provide: {
-            glFeatures: { junitPipelineView: false },
-          },
-        });
-      });
-      expect(vm.$el.querySelector(selector)).toBe(false);
-    });
+
+    it('should not be rendered when junitPipelineView is disabled', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector(selector)).toBe(false);
+        done();
+      }, 0);
+    });  
   });
 
   describe('with new failed result', () => {
