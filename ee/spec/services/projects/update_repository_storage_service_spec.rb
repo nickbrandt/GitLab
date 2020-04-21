@@ -7,6 +7,10 @@ describe Projects::UpdateRepositoryStorageService do
 
   subject { described_class.new(project) }
 
+  before do
+    allow(Gitlab.config.repositories.storages).to receive(:keys).and_return(%w[default test_second_storage])
+  end
+
   describe "#execute" do
     context 'with design repository' do
       include_examples 'moves repository to another storage', 'design' do
