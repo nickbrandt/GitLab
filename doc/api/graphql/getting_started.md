@@ -25,7 +25,7 @@ TODO (Mike)
 TODO: show 3 real _anonymized_ examples that show the frustration/performance impact of client-side processing
 
 TODO (jr): anonymized telecom example
-TODO (dt): anonymized service management example
+TODO (dt): A Service Management customer needed to aggregate test cases, for individual piplelines, across various projects.  
 
 ## Examples
 
@@ -56,6 +56,11 @@ Example:
 GRAPHQL_TOKEN=<your-token>
 curl 'https://gitlab.com/api/graphql' --header "Authorization: Bearer $GRAPHQL_TOKEN" --header "Content-Type: application/json" --request POST --data "{\"query\": \"query {currentUser {name}}\"}"
 ```
+TODO
+#1 current helloworld
+#2 consuming a datafile with a lengthy query e.g. from GiQL
+#3 filtering and analyzing the the output from the CLI
+#4 adding this to automation e.g.  gitlab-ci.yml
 
 TODO: shell examples
 
