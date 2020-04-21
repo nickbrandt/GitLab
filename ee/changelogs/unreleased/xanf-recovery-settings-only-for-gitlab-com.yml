@@ -1,5 +1,0 @@
----
-title: Restrict prompt to check user account settings only to Gitlab.com
-merge_request: 29672
-author:
-type: changed
