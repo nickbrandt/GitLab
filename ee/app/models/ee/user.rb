@@ -300,6 +300,10 @@ module EE
       managing_group.present?
     end
 
+    def managed_by?(user)
+      self.group_managed_account? && self.managing_group.owned_by?(user)
+    end
+
     override :ldap_sync_time
     def ldap_sync_time
       ::Gitlab.config.ldap['sync_time']
