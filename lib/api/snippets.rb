@@ -24,13 +24,13 @@ module API
 
       desc 'Get a snippets list for authenticated user' do
         detail 'This feature was introduced in GitLab 8.15.'
-        success Entities::PersonalSnippet
+        success Entities::Snippet
       end
       params do
         use :pagination
       end
       get do
-        present paginate(snippets_for_current_user), with: Entities::PersonalSnippet
+        present paginate(snippets_for_current_user), with: Entities::Snippet
       end
 
       desc 'List all public personal snippets current_user has access to' do
