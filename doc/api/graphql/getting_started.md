@@ -6,23 +6,33 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
+TODO: formalize a value statment
 speed/access/bandwidth/tailored responses regardless of the DM/passing data to other systems/reduced coding time
+pub-sub notifications with realtime updates?
 
 ### Why GraphQL vs REST
-For over 20 years, REST has been the standard, object-based, programmatic access for data access from remote servers. TODO: challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
+For over 20 years, REST has been the standard, object-based, programmatic access for data access from remote servers. 
+TODO: challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
 -performance
 -value
 - cheaper than joins from tabulated data
 - reduce bandwith
 
+### Proof Point
+3 level deep queries; anonymized customer example
+TODO: show 3 real _anonymized_ examples that show the frustration/performance impact of client-side processing
 
-## Running examples
+
+## Examples
 
 The examples documented here can be run using:
 
 - The command line.
 - GraphiQL.
+
+### Using GraphiQL
+TODO: highlight graphiQL; how to get the data back into reality :)  Take something from GiQL (curl) and paste it
 
 ### Command line
 
@@ -37,6 +47,8 @@ Example:
 GRAPHQL_TOKEN=<your-token>
 curl 'https://gitlab.com/api/graphql' --header "Authorization: Bearer $GRAPHQL_TOKEN" --header "Content-Type: application/json" --request POST --data "{\"query\": \"query {currentUser {name}}\"}"
 ```
+
+TODO: shell examples
 
 ### GraphiQL
 
