@@ -16,7 +16,8 @@ module EE
           'settings-path': '',
           'project-path': '',
           'tags-path': '',
-          'alerts-endpoint': alerts_endpoint
+          'alerts-endpoint': alerts_endpoint,
+          'prometheus-alerts-available': prometheus_alerts_available
         }
       end
 
@@ -28,6 +29,10 @@ module EE
 
       def alerts_endpoint
         '/' if ::Feature.enabled?(:prometheus_computed_alerts)
+      end
+
+      def prometheus_alerts_available
+        'true' if ::Feature.enabled?(:prometheus_computed_alerts)
       end
     end
   end

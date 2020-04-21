@@ -29,7 +29,8 @@ describe Clusters::ClusterPresenter do
           'settings-path': '',
           'project-path': '',
           'tags-path': '',
-          'alerts-endpoint': '/'
+          'alerts-endpoint': '/',
+          'prometheus-alerts-available': 'true'
         )
       end
 
@@ -40,6 +41,10 @@ describe Clusters::ClusterPresenter do
 
         it 'alerts-endpoint is nil' do
           expect(subject['alerts-endpoint']).to be_nil
+        end
+
+        it 'prometheus-alerts-available is nil' do
+          expect(subject['prometheus-alerts-available']).to be_nil
         end
       end
     end
