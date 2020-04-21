@@ -8,11 +8,9 @@ fragment BaseEpic on Epic {
   startDate
   dueDate
   hasChildren
-  descendantCounts {
-    openedEpics
-    closedEpics
-    openedIssues
+  descendantWeightSum {
     closedIssues
+    openedIssues
   }
   group {
     name
