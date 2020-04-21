@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe Gitlab::SnippetSearchResults do
-  let!(:snippet) { create(:snippet, content: 'foo', file_name: 'foo') }
+  let_it_be(:snippet) { create(:snippet, title: 'foo', description: 'foo') }
   let(:user) { snippet.author }
   let(:com_value) { true }
   let(:flag_enabled) { true }

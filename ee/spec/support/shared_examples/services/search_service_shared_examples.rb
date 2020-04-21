@@ -59,7 +59,6 @@ RSpec.shared_examples 'EE search service shared examples' do |normal_results, el
       scopes = if elasticsearch_results == ::Gitlab::Elastic::SnippetSearchResults
                  %w[
                    snippet_titles
-                   snippet_blobs
                  ]
                else
                  %w[
