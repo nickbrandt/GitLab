@@ -150,7 +150,12 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		}
 	}
 
-	for key, value := range fh.GitLabFinalizeFields(name) {
+	fields, err := fh.GitLabFinalizeFields(name)
+	if err != nil {
+		return fmt.Errorf("failed to finalize fields: %v", err)
+	}
+
+	for key, value := range fields {
 		rew.writer.WriteField(key, value)
 		rew.finalizedFields[key] = true
 	}

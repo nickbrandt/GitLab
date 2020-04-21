@@ -1,0 +1,5 @@
+---
+title: Add a signed field on upload requests containing all the workhorse parameters
+merge_request: 490
+author:
+type: added
