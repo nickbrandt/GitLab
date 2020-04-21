@@ -12071,9 +12071,6 @@ msgstr ""
 msgid "Makes this issue confidential."
 msgstr ""
 
-msgid "Malformed string"
-msgstr ""
-
 msgid "Manage"
 msgstr ""
 
