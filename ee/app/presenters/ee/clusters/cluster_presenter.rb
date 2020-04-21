@@ -15,7 +15,8 @@ module EE
           'empty-unable-to-connect-svg-path': image_path('illustrations/monitoring/unable_to_connect.svg'),
           'settings-path': '',
           'project-path': '',
-          'tags-path': ''
+          'tags-path': '',
+          'alerts-endpoint': alerts_endpoint
         }
       end
 
@@ -23,6 +24,10 @@ module EE
 
       def image_path(path)
         ActionController::Base.helpers.image_path(path)
+      end
+
+      def alerts_endpoint
+        '/' if ::Feature.enabled?(:prometheus_computed_alerts)
       end
     end
   end
