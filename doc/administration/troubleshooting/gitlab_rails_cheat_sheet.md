@@ -897,4 +897,3 @@ project = Project.find_by_full_path 'group/project'
 content = project.repository.gitlab_ci_yml_for(project.repository.root_ref_sha)
 Gitlab::Ci::YamlProcessor.validation_message(content,  user: User.first)
 ```
-
