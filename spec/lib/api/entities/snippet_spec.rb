@@ -19,8 +19,29 @@ describe ::API::Entities::Snippet do
     it { expect(subject[:created_at]).to eq snippet.created_at }
     it { expect(subject[:project_id]).to eq snippet.project_id }
     it { expect(subject[:visibility]).to eq snippet.visibility }
-    it { expect(subject[:file_name]).to eq snippet.file_name }
     it { expect(subject).to include(:author) }
+
+    describe 'file_name' do
+      it 'returns attribute from repository' do
+        expect(subject[:file_name]).to eq snippet.blobs.first.path
+      end
+
+      context 'when feature flag :version_snippets is disabled' do
+        it 'returns attribute from db' do
+          stub_feature_flags(version_snippets: false)
+
+          expect(subject[:file_name]).to eq snippet.file_name
+        end
+      end
+
+      context 'when repository is empty' do
+        it 'returns attribute from db' do
+          allow(snippet.repository).to receive(:empty?).and_return(true)
+
+          expect(subject[:file_name]).to eq snippet.file_name
+        end
+      end
+    end
 
     describe 'ssh_url_to_repo' do
       it 'returns attribute' do
