@@ -37,9 +37,6 @@ describe 'Group Value Stream Analytics', :js do
   before do
     stub_licensed_features(cycle_analytics_for_groups: true)
 
-    # chart returns an error since theres no data
-    stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => false)
-
     group.add_owner(user)
     project.add_maintainer(user)
 
@@ -355,7 +352,6 @@ describe 'Group Value Stream Analytics', :js do
     context 'enabled' do
       before do
         stub_licensed_features(cycle_analytics_for_groups: true, type_of_work_analytics: true)
-        stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
 
         sign_in(user)
       end
@@ -398,21 +394,6 @@ describe 'Group Value Stream Analytics', :js do
 
           expect(page).to have_text('There is no data available. Please change your selection.')
         end
-      end
-    end
-
-    context 'not enabled' do
-      before do
-        stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => false)
-        visit analytics_cycle_analytics_path
-
-        select_group
-      end
-
-      it 'will not display the tasks by type chart' do
-        expect(page).not_to have_selector('.js-tasks-by-type-chart')
-
-        expect(page).not_to have_text('Tasks by type')
       end
     end
   end

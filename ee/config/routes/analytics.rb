@@ -18,11 +18,9 @@ namespace :analytics do
     get '/cycle_analytics', to: redirect('-/analytics/value_stream_analytics')
   end
 
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG)) do
-    scope :type_of_work do
-      resource :tasks_by_type, controller: :tasks_by_type, only: :show do
-        get :top_labels
-      end
+  scope :type_of_work do
+    resource :tasks_by_type, controller: :tasks_by_type, only: :show do
+      get :top_labels
     end
   end
 end

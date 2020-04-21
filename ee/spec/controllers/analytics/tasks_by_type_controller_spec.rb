@@ -13,7 +13,6 @@ describe Analytics::TasksByTypeController do
 
   before do
     stub_licensed_features(type_of_work_analytics: true)
-    stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
 
     group.add_reporter(user)
     sign_in(user)
@@ -49,18 +48,6 @@ describe Analytics::TasksByTypeController do
         subject
 
         expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    context 'when feature flag is disabled' do
-      before do
-        stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => false)
-      end
-
-      it 'returns not_found as response' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
