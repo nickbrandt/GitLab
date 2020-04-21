@@ -6,14 +6,15 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
-TODO: formalize a value statment
-speed/access/bandwidth/tailored responses regardless of the DM/passing data to other systems/reduced coding time
-pub-sub notifications with realtime updates?
+GraphQL is a programatic language for easily accessing and manipulating complex data with an intuitive and flexible syntax.  With a single request, you can access a  tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
+
+TODO (Sameer): pub-sub notifications with realtime updates?
 
 ### Why GraphQL vs REST
-For over 20 years, REST has been the standard, object-based, programmatic access for data access from remote servers. 
+For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
 TODO: challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
+TODO (Mike)
 -performance
 -value
 - cheaper than joins from tabulated data
@@ -23,6 +24,8 @@ TODO: challenges with multiple  queries.  GraphQL is a new framework/standard fo
 3 level deep queries; anonymized customer example
 TODO: show 3 real _anonymized_ examples that show the frustration/performance impact of client-side processing
 
+TODO (jr): anonymized telecom example
+TODO (dt): anonymized service management example
 
 ## Examples
 
@@ -30,6 +33,12 @@ The examples documented here can be run using:
 
 - The command line.
 - GraphiQL.
+
+TODO:  
+*  current helloworld
+* consuming a datafile with a lengthy query e.g. from GiQL
+* filtering and analyzing the the output from the CLI
+* adding this to automation e.g.  gitlab-ci.yml
 
 ### Using GraphiQL
 TODO: highlight graphiQL; how to get the data back into reality :)  Take something from GiQL (curl) and paste it
