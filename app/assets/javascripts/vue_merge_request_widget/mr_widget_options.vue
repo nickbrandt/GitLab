@@ -376,6 +376,7 @@ export default {
         v-if="mr.testResultsPath"
         class="js-reports-container"
         :endpoint="mr.testResultsPath"
+        :pipeline-path="mr.pipeline.path"
       />
 
       <terraform-plan v-if="mr.terraformReportsPath" :endpoint="mr.terraformReportsPath" />
@@ -419,7 +420,7 @@ export default {
     </div>
     <mr-widget-pipeline-container
       v-if="shouldRenderMergedPipeline"
-      class="js-post-merge-pipeline mr-widget-workflow"
+      class="js-post-merge-pipeline mr-widget-workflow test-class"
       :mr="mr"
       :is-post-merge="true"
     />
