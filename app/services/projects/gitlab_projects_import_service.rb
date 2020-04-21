@@ -14,31 +14,57 @@ module Projects
       @current_user, @params, @override_params = user, import_params.dup, override_params
     end
 
-    def execute
-      prepare_template_environment(template_file)
+    def execute(options = {})
+      measurement_enabled = !!options[:measurement_enabled]
+      measurement_logger = options[:measurement_logger]
 
-      prepare_import_params
+      ::Gitlab::Utils::Measuring.execute_with(measurement_enabled, measurement_logger, base_data) do
+        prepare_template_environment(template_file)
 
-      ::Projects::CreateService.new(current_user, params).execute
+        prepare_import_params
+
+        ::Projects::CreateService.new(current_user, params).execute
+      end
     end
 
     private
+
+    def base_data
+      base_data = {
+        class: self.class.name,
+        current_user: current_user.name,
+        project_full_path: project_path
+      }
+
+      if template_file
+        base_data[:import_type] = 'gitlab_project'
+        base_data[:file_path] = template_file.path
+      end
+
+      base_data
+    end
 
     def overwrite_project?
       overwrite? && project_with_same_full_path?
     end
 
     def project_with_same_full_path?
-      Project.find_by_full_path("#{current_namespace.full_path}/#{params[:path]}").present?
+      Project.find_by_full_path(project_path).present?
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
     def current_namespace
       strong_memoize(:current_namespace) do
-        Namespace.find_by(id: params[:namespace_id])
+        Namespace.find_by(id: params[:namespace_id]) || current_user.namespace
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def project_path
+      strong_memoize(:project_path) do
+        "#{current_namespace.full_path}/#{params[:path]}"
+      end
+    end
 
     def overwrite?
       strong_memoize(:overwrite) do
