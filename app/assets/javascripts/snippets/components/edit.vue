@@ -206,7 +206,7 @@ export default {
           >
         </template>
         <template #append>
-          <gl-button class="js-snippet-cancel-btn" :href="cancelButtonHref">{{
+          <gl-button data-testid="snippet-cancel-btn" :href="cancelButtonHref">{{
             __('Cancel')
           }}</gl-button>
         </template>

@@ -100,7 +100,7 @@ describe('Snippet Edit app', () => {
   });
 
   const findSubmitButton = () => wrapper.find('[type=submit]');
-  const findCancellButton = () => wrapper.find('.js-snippet-cancel-btn');
+  const findCancellButton = () => wrapper.find('[data-testid="snippet-cancel-btn"]');
 
   describe('rendering', () => {
     it('renders loader while the query is in flight', () => {
