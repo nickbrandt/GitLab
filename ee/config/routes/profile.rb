@@ -8,7 +8,6 @@ resource :profile, only: [] do
       end
     end
 
-    resources :pipeline_quota, only: [:index]
     resources :usage_quotas, only: [:index]
     resources :billings, only: [:index]
   end
