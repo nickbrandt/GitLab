@@ -58,10 +58,6 @@ module ServicesHelper
     end
   end
 
-  def disable_fields_service?(service)
-    !current_controller?('admin/services')
-  end
-
   def scoped_integrations_path
     if @project.present?
       project_settings_integrations_path(@project)
