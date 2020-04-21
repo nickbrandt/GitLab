@@ -2,7 +2,13 @@
 require 'spec_helper'
 
 describe Gitlab::CodeOwners::Entry do
-  subject(:entry) { described_class.new('/**/file', '@user jane@gitlab.org @group @group/nested-group') }
+  subject(:entry) do
+    described_class.new(
+      "/**/file",
+      "@user jane@gitlab.org @group @group/nested-group",
+      "Documentation"
+    )
+  end
 
   let(:user) { build(:user, username: 'user') }
   let(:group_user) { create(:user) }
@@ -13,7 +19,7 @@ describe Gitlab::CodeOwners::Entry do
   end
 
   it 'is uniq by the pattern and owner line' do
-    equal_entry = described_class.new('/**/file', '@user jane@gitlab.org @group @group/nested-group')
+    equal_entry = entry.clone
     other_entry = described_class.new('/**/other_file', '@user jane@gitlab.org @group')
 
     expect(equal_entry).to eq(entry)
