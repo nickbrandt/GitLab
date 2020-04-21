@@ -26,7 +26,7 @@ describe('AlertManagementList', () => {
     }
   });
 
-  describe('surface alert feature renders empty state', () => {
+  describe('alert management feature renders empty state', () => {
     beforeEach(() => {
       mountComponent();
     });
