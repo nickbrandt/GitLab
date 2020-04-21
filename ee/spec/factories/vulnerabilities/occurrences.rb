@@ -54,7 +54,10 @@ FactoryBot.define do
             name: "Cipher does not check for integrity first?",
             url: "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
           }
-        ]
+        ],
+        evidence: {
+          summary: 'Credit card detected'
+        }
       }.to_json
     end
 

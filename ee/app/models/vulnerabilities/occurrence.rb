@@ -254,6 +254,10 @@ module Vulnerabilities
       metadata.dig('remediations')
     end
 
+    def evidence
+      metadata.dig('evidence', 'summary')
+    end
+
     alias_method :==, :eql? # eql? is necessary in some cases like array intersection
 
     def eql?(other)
