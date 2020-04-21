@@ -4,11 +4,6 @@ export default {
   [types.SET_PROJECT_ID](state, projectId) {
     state.projectId = projectId;
   },
-  [types.SET_FILTERS](state, { labelName, milestoneTitle }) {
-    state.filters.labelName = labelName;
-    state.filters.milestoneTitle = milestoneTitle;
-    state.pageInfo.page = 1;
-  },
   [types.REQUEST_MERGE_REQUESTS](state) {
     state.isLoading = true;
   },

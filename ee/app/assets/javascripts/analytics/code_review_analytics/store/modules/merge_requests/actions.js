@@ -6,23 +6,16 @@ import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
 
 export const setProjectId = ({ commit }, projectId) => commit(types.SET_PROJECT_ID, projectId);
 
-export const setFilters = ({ commit, dispatch }, { label_name, milestone_title }) => {
-  commit(types.SET_FILTERS, { labelName: label_name, milestoneTitle: milestone_title });
-
-  dispatch('fetchMergeRequests');
-};
-
-export const fetchMergeRequests = ({ dispatch, state }) => {
+export const fetchMergeRequests = ({ dispatch, state, rootState }) => {
   dispatch('requestMergeRequests');
 
-  const {
-    projectId,
-    filters: { milestoneTitle, labelName },
-    pageInfo,
-  } = state;
+  const { projectId, pageInfo } = state;
+
+  const { milestoneTitle, labelName } = rootState.filters;
+
   const params = {
     project_id: projectId,
-    milestone_title: milestoneTitle,
+    milestone_title: Array.isArray(milestoneTitle) ? milestoneTitle.join('') : milestoneTitle,
     label_name: labelName,
     page: pageInfo.page,
   };
