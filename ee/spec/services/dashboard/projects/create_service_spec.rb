@@ -57,15 +57,6 @@ describe Dashboard::Projects::CreateService do
         end
       end
     end
-
-    context 'with invalid project ids' do
-      let(:input) { [nil, -1, '-1', :symbol] }
-      let(:output) { [] }
-
-      it 'does not add invalid project ids' do
-        expect(result).to eq(expected_result(invalid_project_ids: input.map(&:to_s)))
-      end
-    end
   end
 
   private

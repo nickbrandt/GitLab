@@ -722,7 +722,7 @@ describe OperationsController do
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
         expect(json_response['added']).to be_empty
         expect(json_response['duplicate']).to be_empty
-        expect(json_response['invalid']).to contain_exactly('', '-1', '-2')
+        expect(json_response['invalid']).to contain_exactly(0, -1, -2)
 
         user.reload
         expect(user.ops_dashboard_projects).to be_empty
