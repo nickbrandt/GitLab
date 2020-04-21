@@ -14,5 +14,7 @@ swap:
   postgres: PostgreSQL
   raketask: Rake task
   raketasks: Rake tasks
+  rspec: RSpec
   self hosted: self-managed
   self-hosted: self-managed
+  yaml: YAML

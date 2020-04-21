@@ -235,6 +235,8 @@ To index via the Admin Area:
 
 ### Indexing through Rake tasks
 
+Indexing can be performed using Rake tasks.
+
 #### Indexing small instances
 
 CAUTION: **Warning**:
@@ -400,40 +402,32 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 
 For repository and snippet files, GitLab will only index up to 1 MiB of content, in order to avoid indexing timeouts.
 
-## GitLab Elasticsearch Rake Tasks
+## GitLab Elasticsearch Rake tasks
 
-There are several Rake tasks available to you via the command line:
+Rake tasks are available to:
 
-- [`sudo gitlab-rake gitlab:elastic:index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This is a wrapper task. It does the following:
-    - `sudo gitlab-rake gitlab:elastic:recreate_index`
-    - `sudo gitlab-rake gitlab:elastic:clear_index_status`
-    - `sudo gitlab-rake gitlab:elastic:index_projects`
-    - `sudo gitlab-rake gitlab:elastic:index_snippets`
-- [`sudo gitlab-rake gitlab:elastic:index_projects`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This iterates over all projects and queues Sidekiq jobs to index them in the background.
-- [`sudo gitlab-rake gitlab:elastic:index_projects_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This determines the overall status of the indexing. It is done by counting the total number of indexed projects, dividing by a count of the total number of projects, then multiplying by 100.
-- [`sudo gitlab-rake gitlab:elastic:clear_index_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This deletes all instances of IndexStatus for all projects.
+- [Build and install](#building-and-installing) the indexer.
+- Delete indexes when [disabling Elasticsearch](#disabling-elasticsearch).
+- [Add GitLab data](#adding-gitlabs-data-to-the-elasticsearch-index) to an index.
 
-    NOTE: **Note:**
-    The `INDEX_NAME` parameter is optional and will use the default index name from the current `RAILS_ENV` if not set.
+The following are some available Rake tasks:
 
-- [`sudo gitlab-rake gitlab:elastic:create_empty_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This generates an empty index on the Elasticsearch side only if it doesn't already exists.
-- [`sudo gitlab-rake gitlab:elastic:delete_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This removes the GitLab index on the Elasticsearch instance.
-- [`sudo gitlab-rake gitlab:elastic:recreate_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - This is a wrapper task. It does the following:
-    - `sudo gitlab-rake gitlab:elastic:delete_index[<INDEX_NAME>]`
-    - `sudo gitlab-rake gitlab:elastic:create_empty_index[<INDEX_NAME>]`
-- [`sudo gitlab-rake gitlab:elastic:index_snippets`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - Performs an Elasticsearch import that indexes the snippets data.
-- [`sudo gitlab-rake gitlab:elastic:projects_not_indexed`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)
-  - Displays which projects are not indexed.
+| Task                                                                                                                                                    | Description                                                                                                                                                                               |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`sudo gitlab-rake gitlab:elastic:index`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)                            | Wrapper task for `gitlab:elastic:create_empty_index`, `gitlab:elastic:clear_index_status`, `gitlab:elastic:index_projects`, and `gitlab:elastic:index_snippets`.                          |
+| [`sudo gitlab-rake gitlab:elastic:index_projects`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)                   | Iterates over all projects and queues Sidekiq jobs to index them in the background.                                                                                                       |
+| [`sudo gitlab-rake gitlab:elastic:index_projects_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)            | Determines the overall status of the indexing. It is done by counting the total number of indexed projects, dividing by a count of the total number of projects, then multiplying by 100. |
+| [`sudo gitlab-rake gitlab:elastic:clear_index_status`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)               | Deletes all instances of IndexStatus for all projects.                                                                                                                                    |
+| [`sudo gitlab-rake gitlab:elastic:create_empty_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake) | Generates an empty index on the Elasticsearch side only if it doesn't already exist.                                                                                                      |
+| [`sudo gitlab-rake gitlab:elastic:delete_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)       | Removes the GitLab index on the Elasticsearch instance.                                                                                                                                   |
+| [`sudo gitlab-rake gitlab:elastic:recreate_index[<INDEX_NAME>]`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)     | Wrapper task for `gitlab:elastic:delete_index[<INDEX_NAME>]` and `gitlab:elastic:create_empty_index[<INDEX_NAME>]`.                                                                       |
+| [`sudo gitlab-rake gitlab:elastic:index_snippets`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)                   | Performs an Elasticsearch import that indexes the snippets data.                                                                                                                          |
+| [`sudo gitlab-rake gitlab:elastic:projects_not_indexed`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/tasks/gitlab/elastic.rake)             | Displays which projects are not indexed.                                                                                                                                                  |
 
-### Environment Variables
+NOTE: **Note:**
+The `INDEX_NAME` parameter is optional and will use the default index name from the current `RAILS_ENV` if not set.
+
+### Environment variables
 
 In addition to the Rake tasks, there are some environment variables that can be used to modify the process:
 
@@ -453,7 +447,7 @@ Indexing project repositories...I, [2019-03-04T21:27:03.083410 #3384]  INFO -- :
 I, [2019-03-04T21:27:05.215266 #3384]  INFO -- : Indexing GitLab User / test (ID=33) is done!
 ```
 
-## Elasticsearch Index Scopes
+## Elasticsearch index scopes
 
 When performing a search, the GitLab index will use the following scopes:
 
