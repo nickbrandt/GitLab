@@ -12,6 +12,8 @@ build-qa-image:
     - .default-retry
     - .review:rules:mr-and-schedule-auto
   stage: prepare
+  variables:
+    GITLAB_EDITION: "ce"
   script:
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
     - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
