@@ -5845,7 +5845,8 @@ CREATE TABLE public.services (
     description character varying(500),
     comment_on_event_enabled boolean DEFAULT true NOT NULL,
     template boolean DEFAULT false,
-    instance boolean DEFAULT false NOT NULL
+    instance boolean DEFAULT false NOT NULL,
+    comment_detail smallint
 );
 
 CREATE SEQUENCE public.services_id_seq
@@ -13243,6 +13244,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200408212219
 20200409085956
 20200409211607
+20200410104828
 20200410232012
 20200413072059
 20200413230056
