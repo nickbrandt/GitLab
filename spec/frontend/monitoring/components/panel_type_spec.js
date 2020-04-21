@@ -5,9 +5,6 @@ import invalidUrl from '~/lib/utils/invalid_url';
 import axios from '~/lib/utils/axios_utils';
 
 import PanelType from '~/monitoring/components/panel_type.vue';
-import EmptyChart from '~/monitoring/components/charts/empty_chart.vue';
-import TimeSeriesChart from '~/monitoring/components/charts/time_series.vue';
-import AnomalyChart from '~/monitoring/components/charts/anomaly.vue';
 import {
   anomalyMockGraphData,
   mockLogsHref,
@@ -15,7 +12,21 @@ import {
   mockNamespace,
   mockNamespacedData,
   mockTimeRange,
+  singleStatMetricsResult,
+  graphDataPrometheusQueryRangeMultiTrack,
+  barMockData,
 } from '../mock_data';
+
+import { panelTypes } from '~/monitoring/constants';
+
+import MonitorEmptyChart from '~/monitoring/components/charts/empty_chart.vue';
+import MonitorTimeSeriesChart from '~/monitoring/components/charts/time_series.vue';
+import MonitorAnomalyChart from '~/monitoring/components/charts/anomaly.vue';
+import MonitorSingleStatChart from '~/monitoring/components/charts/single_stat.vue';
+import MonitorHeatmapChart from '~/monitoring/components/charts/heatmap.vue';
+import MonitorColumnChart from '~/monitoring/components/charts/column.vue';
+import MonitorBarChart from '~/monitoring/components/charts/bar.vue';
+import MonitorStackedColumnChart from '~/monitoring/components/charts/stacked_column.vue';
 
 import { graphData, graphDataEmpty } from '../fixture_data';
 import { createStore, monitoringDashboard } from '~/monitoring/stores';
@@ -91,8 +102,8 @@ describe('Panel Type component', () => {
       });
 
       it('is a Vue instance', () => {
-        expect(wrapper.find(EmptyChart).exists()).toBe(true);
-        expect(wrapper.find(EmptyChart).isVueInstance()).toBe(true);
+        expect(wrapper.find(MonitorEmptyChart).exists()).toBe(true);
+        expect(wrapper.find(MonitorEmptyChart).isVueInstance()).toBe(true);
       });
     });
   });
@@ -134,28 +145,44 @@ describe('Panel Type component', () => {
       });
     });
 
-    describe('Time Series Chart panel type', () => {
-      it('is rendered', () => {
-        expect(wrapper.find(TimeSeriesChart).isVueInstance()).toBe(true);
-        expect(wrapper.find(TimeSeriesChart).exists()).toBe(true);
-      });
-
-      it('includes a default group id', () => {
-        expect(wrapper.vm.groupId).toBe('panel-type-chart');
-      });
+    it('includes a default group id', () => {
+      expect(wrapper.vm.groupId).toBe('dashboard-panel');
     });
 
-    describe('Anomaly Chart panel type', () => {
-      beforeEach(() => {
-        wrapper.setProps({
-          graphData: anomalyMockGraphData,
-        });
-        return wrapper.vm.$nextTick();
+    describe('Supports different panel types', () => {
+      const dataWithType = type => {
+        return {
+          ...graphData,
+          type,
+        };
+      };
+
+      it('empty chart is rendered for empty results', () => {
+        createWrapper({ graphData: graphDataEmpty });
+        expect(wrapper.find(MonitorEmptyChart).exists()).toBe(true);
+        expect(wrapper.find(MonitorEmptyChart).isVueInstance()).toBe(true);
       });
 
-      it('is rendered with an anomaly chart', () => {
-        expect(wrapper.find(AnomalyChart).isVueInstance()).toBe(true);
-        expect(wrapper.find(AnomalyChart).exists()).toBe(true);
+      it('area chart is rendered by default', () => {
+        createWrapper();
+        expect(wrapper.find(MonitorTimeSeriesChart).exists()).toBe(true);
+        expect(wrapper.find(MonitorTimeSeriesChart).isVueInstance()).toBe(true);
+      });
+
+      it.each`
+        data                                       | component
+        ${dataWithType(panelTypes.AREA_CHART)}     | ${MonitorTimeSeriesChart}
+        ${dataWithType(panelTypes.LINE_CHART)}     | ${MonitorTimeSeriesChart}
+        ${anomalyMockGraphData}                    | ${MonitorAnomalyChart}
+        ${dataWithType(panelTypes.COLUMN)}         | ${MonitorColumnChart}
+        ${dataWithType(panelTypes.STACKED_COLUMN)} | ${MonitorStackedColumnChart}
+        ${singleStatMetricsResult}                 | ${MonitorSingleStatChart}
+        ${graphDataPrometheusQueryRangeMultiTrack} | ${MonitorHeatmapChart}
+        ${barMockData}                             | ${MonitorBarChart}
+      `('type $data.type renders the expected component', ({ data, component }) => {
+        createWrapper({ graphData: data });
+        expect(wrapper.find(component).exists()).toBe(true);
+        expect(wrapper.find(component).isVueInstance()).toBe(true);
       });
     });
   });
@@ -401,8 +428,8 @@ describe('Panel Type component', () => {
     });
 
     it('it renders a time series chart with no errors', () => {
-      expect(wrapper.find(TimeSeriesChart).isVueInstance()).toBe(true);
-      expect(wrapper.find(TimeSeriesChart).exists()).toBe(true);
+      expect(wrapper.find(MonitorTimeSeriesChart).isVueInstance()).toBe(true);
+      expect(wrapper.find(MonitorTimeSeriesChart).exists()).toBe(true);
     });
   });
 });
