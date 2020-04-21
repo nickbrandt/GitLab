@@ -7,7 +7,7 @@ namespace :gitlab do
       # to use this configuration during a full re-index anyways.
       ENV['UPDATE_INDEX'] = nil
 
-      Rake::Task["gitlab:elastic:create_empty_index"].invoke
+      Rake::Task["gitlab:elastic:recreate_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
       Rake::Task["gitlab:elastic:index_projects"].invoke
       Rake::Task["gitlab:elastic:index_snippets"].invoke
@@ -56,27 +56,34 @@ namespace :gitlab do
     end
 
     desc "GitLab | Elasticsearch | Create empty index"
-    task create_empty_index: :environment do
-      Gitlab::Elastic::Helper.create_empty_index
-      puts "Index created".color(:green)
+    task :create_empty_index, [:index_name] => [:environment] do |t, args|
+      helper = Gitlab::Elastic::Helper.new(index_name: args[:index_name])
+      helper.create_empty_index
+
+      puts "Index '#{helper.index_name}' has been created.".color(:green)
+    end
+
+    desc "GitLab | Elasticsearch | Delete index"
+    task :delete_index, [:index_name] => [:environment] do |t, args|
+      helper = Gitlab::Elastic::Helper.new(index_name: args[:index_name])
+
+      if helper.delete_index
+        puts "Index '#{helper.index_name}' has been deleted".color(:green)
+      else
+        puts "Index '#{helper.index_name}' was not found".color(:green)
+      end
+    end
+
+    desc "GitLab | Elasticsearch | Recreate index"
+    task :recreate_index, [:index_name] => [:environment] do |t, args|
+      Rake::Task["gitlab:elastic:delete_index"].invoke(*args)
+      Rake::Task["gitlab:elastic:create_empty_index"].invoke(*args)
     end
 
     desc "GitLab | Elasticsearch | Clear indexing status"
     task clear_index_status: :environment do
       IndexStatus.delete_all
       puts "Index status has been reset".color(:green)
-    end
-
-    desc "GitLab | Elasticsearch | Delete index"
-    task delete_index: :environment do
-      Gitlab::Elastic::Helper.delete_index
-      puts "Index deleted".color(:green)
-    end
-
-    desc "GitLab | Elasticsearch | Recreate index"
-    task recreate_index: :environment do
-      Gitlab::Elastic::Helper.create_empty_index
-      puts "Index recreated".color(:green)
     end
 
     desc "GitLab | Elasticsearch | Display which projects are not indexed"
@@ -88,12 +95,6 @@ namespace :gitlab do
       else
         display_unindexed(not_indexed)
       end
-    end
-
-    desc "GitLab | Elasticsearch | Reindex to another cluster"
-    task :reindex_to_another_cluster, [:source_cluster_url, :dest_cluster_url] => :environment do |_, args|
-      task_id = Gitlab::Elastic::Helper.reindex_to_another_cluster(args.source_cluster_url, args.dest_cluster_url)
-      puts "Reindexing to another cluster started with task id: #{task_id}".color(:green)
     end
 
     def project_id_batches(&blk)

@@ -10,7 +10,7 @@ class Admin::ElasticsearchController < Admin::ApplicationController
   # POST
   # Scheduling indexing jobs
   def enqueue_index
-    if Gitlab::Elastic::Helper.index_exists?
+    if Gitlab::Elastic::Helper.default.index_exists?
       ::Elastic::IndexProjectsService.new.execute
 
       notice = _('Elasticsearch indexing started')

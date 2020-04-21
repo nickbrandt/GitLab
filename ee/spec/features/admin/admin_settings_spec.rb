@@ -10,7 +10,7 @@ describe 'Admin updates EE-only settings' do
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     sign_in(create(:admin))
     allow(License).to receive(:feature_available?).and_return(true)
-    allow(Gitlab::Elastic::Helper).to receive(:index_exists?).and_return(true)
+    allow(Gitlab::Elastic::Helper.default).to receive(:index_exists?).and_return(true)
   end
 
   context 'Geo settings' do
