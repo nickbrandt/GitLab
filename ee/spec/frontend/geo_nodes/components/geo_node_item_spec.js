@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLink } from '@gitlab/ui';
 
 import geoNodeItemComponent from 'ee/geo_nodes/components/geo_node_item.vue';
+import GeoNodeDetails from 'ee/geo_nodes/components/geo_node_details.vue';
 import eventHub from 'ee/geo_nodes/event_hub';
 import { mockNode, mockNodeDetails } from '../mock_data';
 
@@ -32,6 +32,8 @@ describe('GeoNodeItemComponent', () => {
     createComponent();
   });
 
+  const findGeoNodeDetails = () => wrapper.find(GeoNodeDetails);
+
   afterEach(() => {
     wrapper.destroy();
   });
@@ -39,47 +41,8 @@ describe('GeoNodeItemComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       expect(wrapper.vm.isNodeDetailsLoading).toBe(true);
-      expect(wrapper.vm.isNodeDetailsFailed).toBe(false);
       expect(wrapper.vm.nodeHealthStatus).toBe('');
-      expect(wrapper.vm.errorMessage).toBe('');
       expect(typeof wrapper.vm.nodeDetails).toBe('object');
-    });
-  });
-
-  describe('computed', () => {
-    let httpsNode;
-
-    beforeEach(() => {
-      // Altered mock data for secure URL
-      httpsNode = Object.assign({}, mockNode, {
-        id: mockNodeDetails.id,
-        url: 'https://127.0.0.1:3001/',
-      });
-
-      createComponent({ node: httpsNode });
-    });
-
-    describe('showNodeDetails', () => {
-      it('returns `false` if Node details are still loading', () => {
-        wrapper.vm.isNodeDetailsLoading = true;
-
-        expect(wrapper.vm.showNodeDetails).toBeFalsy();
-      });
-
-      it('returns `false` if Node details failed to load', () => {
-        wrapper.vm.isNodeDetailsLoading = false;
-        wrapper.vm.isNodeDetailsFailed = true;
-
-        expect(wrapper.vm.showNodeDetails).toBeFalsy();
-      });
-
-      it('returns `true` if Node details loaded', () => {
-        wrapper.vm.handleNodeDetails(mockNodeDetails);
-        wrapper.vm.isNodeDetailsLoading = false;
-        wrapper.vm.isNodeDetailsFailed = false;
-
-        expect(wrapper.vm.showNodeDetails).toBeTruthy();
-      });
     });
   });
 
@@ -100,8 +63,6 @@ describe('GeoNodeItemComponent', () => {
           wrapper.vm.handleNodeDetails(mockNodeDetails);
 
           expect(wrapper.vm.isNodeDetailsLoading).toBeFalsy();
-          expect(wrapper.vm.isNodeDetailsFailed).toBeFalsy();
-          expect(wrapper.vm.errorMessage).toBe('');
           expect(wrapper.vm.nodeDetails).toBe(mockNodeDetails);
           expect(wrapper.vm.nodeHealthStatus).toBe(mockNodeDetails.health);
         });
@@ -144,27 +105,26 @@ describe('GeoNodeItemComponent', () => {
 
   describe('template', () => {
     it('renders container element', () => {
-      expect(wrapper.vm.$el.classList.contains('card', 'geo-node-item')).toBe(true);
+      expect(wrapper.classes('card')).toBeTruthy();
     });
 
-    describe('with error', () => {
-      let err;
-
+    describe('when isNodeDetailsLoading is true', () => {
       beforeEach(() => {
-        err = 'Something error message';
-        wrapper.setData({ errorMessage: err, isNodeDetailsFailed: true });
+        wrapper.setData({ isNodeDetailsLoading: true });
       });
 
-      it('renders node error message', () => {
-        const findErrorMessage = () => wrapper.find('.bg-danger-100');
+      it('does not render details section', () => {
+        expect(findGeoNodeDetails().exists()).toBeFalsy();
+      });
+    });
 
-        expect(findErrorMessage().exists()).toBeTruthy();
-        expect(findErrorMessage().text()).toContain(err);
-        expect(
-          findErrorMessage()
-            .find(GlLink)
-            .attributes('href'),
-        ).toBe('/foo/bar');
+    describe('when isNodeDetailsLoading is false', () => {
+      beforeEach(() => {
+        wrapper.setData({ isNodeDetailsLoading: false });
+      });
+
+      it('renders details section', () => {
+        expect(findGeoNodeDetails().exists()).toBeTruthy();
       });
     });
   });
