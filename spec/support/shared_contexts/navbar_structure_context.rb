@@ -62,6 +62,7 @@ RSpec.shared_context 'project navbar structure' do
         nav_item: _('Operations'),
         nav_sub_items: [
           _('Metrics'),
+          _('Alerts'),
           _('Environments'),
           _('Error Tracking'),
           _('Serverless'),
