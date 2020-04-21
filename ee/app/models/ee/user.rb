@@ -335,6 +335,20 @@ module EE
       filter == UserPreference::FEATURE_FILTER_EXPERIMENT
     end
 
+    def gitlab_employee?
+      strong_memoize(:gitlab_employee) do
+        if ::Gitlab.com? && ::Feature.enabled?(:gitlab_employee_badge)
+          confirmed? && human? && Mail::Address.new(email).domain == "gitlab.com"
+        else
+          false
+        end
+      end
+    end
+
+    def organization
+      gitlab_employee? ? 'GitLab' : super
+    end
+
     protected
 
     override :password_required?
