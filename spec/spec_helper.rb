@@ -303,6 +303,7 @@ RSpec.configure do |config|
         memory_killer: false # This is not a thing we want to do inline in tests
       ).call(chain)
       chain.add DisableQueryLimit
+      chain.insert_after ::Gitlab::SidekiqMiddleware::RequestStoreMiddleware, IsolatedRequestStore
 
       example.run
     end
