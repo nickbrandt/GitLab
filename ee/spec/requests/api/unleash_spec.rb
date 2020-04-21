@@ -277,20 +277,6 @@ describe API::Unleash do
       end
 
       context 'with version 2 feature flags' do
-        it 'does not return any flags when the feature flag is disabled' do
-          stub_feature_flags(feature_flags_new_version: false)
-          feature_flag = create(:operations_feature_flag, project: project,
-                                name: 'feature1', active: true, version: 2)
-          strategy = create(:operations_strategy, feature_flag: feature_flag,
-                            name: 'default', parameters: {})
-          create(:operations_scope, strategy: strategy, environment_scope: 'production')
-
-          get api(features_url), headers: { 'UNLEASH-INSTANCEID' => client.token, 'UNLEASH-APPNAME' => 'production' }
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['features']).to eq([])
-        end
-
         it 'does not return a flag without any strategies' do
           create(:operations_feature_flag, project: project,
                  name: 'feature1', active: true, version: 2)
@@ -511,31 +497,6 @@ describe API::Unleash do
       end
 
       context 'when mixing version 1 and version 2 feature flags' do
-        it 'returns only version 1 flags when the new flags are disabled' do
-          stub_feature_flags(feature_flags_new_version: false)
-          feature_flag_a = create(:operations_feature_flag, project: project,
-                                  name: 'feature_a', active: true, version: 2)
-          strategy = create(:operations_strategy, feature_flag: feature_flag_a,
-                            name: 'userWithId', parameters: { userIds: 'user8' })
-          create(:operations_scope, strategy: strategy, environment_scope: 'staging')
-          feature_flag_b = create(:operations_feature_flag, project: project,
-                                  name: 'feature_b', active: true, version: 1)
-          create(:operations_feature_flag_scope, feature_flag: feature_flag_b,
-                 active: true, strategies: [{ name: 'default', parameters: {} }], environment_scope: 'staging')
-
-          get api(features_url), headers: { 'UNLEASH-INSTANCEID' => client.token, 'UNLEASH-APPNAME' => 'staging' }
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['features'].sort_by {|f| f['name']}).to eq([{
-            'name' => 'feature_b',
-            'enabled' => true,
-            'strategies' => [{
-              'name' => 'default',
-              'parameters' => {}
-            }]
-          }])
-        end
-
         it 'returns both types of flags when both match' do
           feature_flag_a = create(:operations_feature_flag, project: project,
                                   name: 'feature_a', active: true, version: 2)
