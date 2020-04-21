@@ -53,6 +53,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         filters: null,
         isLoading: true,
         shouldShowSelection: false,
+        shouldShowProjectNamespace: true,
         vulnerabilities: [],
       });
     });
@@ -143,6 +144,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         filters: null,
         isLoading: false,
         shouldShowSelection: false,
+        shouldShowProjectNamespace: true,
         vulnerabilities,
       });
     });
