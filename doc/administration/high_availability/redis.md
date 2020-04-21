@@ -89,7 +89,7 @@ Advanced configuration options are supported and can be added if
 needed.
 
 Continue configuration of other components by going back to the
-[High Availability](../availability/index.md#gitlab-components-and-configuration-instructions) page.
+[Scaling](../scaling/index.md#components-provided-by-omnibus-gitlab) page.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 

@@ -5,40 +5,17 @@ type: reference, concepts
 # Scaling
 
 GitLab supports a number of scaling options to ensure that your self-managed
-instance is able to scale out to meet your organization's needs when scaling up
-a single-box GitLab installation is no longer practical or feasible.
+instance is able to scale to meet your organization's needs.
 
-Please consult our [high availability documentation](../availability/index.md)
-if your organization requires fault tolerance and redundancy features, such as
-automatic database system failover.
+On this page, we present examples of self-managed instances which demonstrate
+how GitLab can be scaled up, scaled out or made highly available. These
+examples progress from simple to complex as scaling or highly-available
+components are added.
 
-## GitLab components and scaling instructions
-
-Here's a list of components directly provided by Omnibus GitLab or installed as
-part of a source installation and their configuration instructions for scaling.
-
-| Component | Description | Configuration instructions |
-|-----------|-------------|----------------------------|
-| [PostgreSQL](../../development/architecture.md#postgresql) | Database | [PostgreSQL configuration](https://docs.gitlab.com/omnibus/settings/database.html) |
-| [Redis](../../development/architecture.md#redis)  | Key/value store for fast data lookup and caching | [Redis configuration](../high_availability/redis.md) |
-| [GitLab application services](../../development/architecture.md#unicorn) | Unicorn/Puma, Workhorse, GitLab Shell - serves front-end requests (UI, API, Git over HTTP/SSH) | [GitLab app scaling configuration](../high_availability/gitlab.md) |
-| [PgBouncer](../../development/architecture.md#pgbouncer) | Database connection pooler | [PgBouncer configuration](../high_availability/pgbouncer.md#running-pgbouncer-as-part-of-a-non-ha-gitlab-installation) **(PREMIUM ONLY)** |
-| [Sidekiq](../../development/architecture.md#sidekiq) | Asynchronous/background jobs | [Sidekiq configuration](../high_availability/sidekiq.md) |
-| [Gitaly](../../development/architecture.md#gitaly) | Provides access to Git repositories | [Gitaly configuration](../gitaly/index.md#running-gitaly-on-its-own-server) |
-| [Prometheus](../../development/architecture.md#prometheus) and [Grafana](../../development/architecture.md#grafana) | GitLab environment monitoring | [Monitoring node for scaling](../high_availability/monitoring_node.md) |
-
-## Third-party services used for scaling
-
-Here's a list of third-party services you may require as part of scaling GitLab.
-The services can be provided by numerous applications or vendors and further
-advice is given on how best to select the right choice for your organization's
-needs.
-
-| Component | Description | Configuration instructions |
-|-----------|-------------|----------------------------|
-| Load balancer(s) | Handles load balancing, typically when you have multiple GitLab application services nodes | [Load balancer configuration](../high_availability/load_balancer.md)      |
-| Object storage service | Recommended store for shared data objects | [Cloud Object Storage configuration](../high_availability/object_storage.md) |
-| NFS | Shared disk storage service. Can be used as an alternative for Gitaly or Object Storage. Required for GitLab Pages | [NFS configuration](../high_availability/nfs.md) |
+For detailed insight into how GitLab scales and configures GitLab.com, you can
+watch [this 1 hour Q&A](https://www.youtube.com/watch?v=uCU8jdYzpac)
+with [John Northrup](https://gitlab.com/northrup), and live questions coming
+in from some of our customers.
 
 ## Reference architectures
 
@@ -76,7 +53,7 @@ how much automation you use, mirroring, and repo/change size. Additionally the
 shown memory values are given directly by [GCP machine types](https://cloud.google.com/compute/docs/machine-types).
 On different cloud vendors a best effort like for like can be used.
 
-### Under 1,000 users
+### Up to 1,000 users
 
 From 1 to 1,000 users, a single-node [Omnibus](https://docs.gitlab.com/omnibus/) setup with frequent backups is adequate.
 Please refer to the [installation documentation](../../install/README.md) and [backup/restore documentation](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration).
@@ -85,11 +62,15 @@ This solution is appropriate for many teams that have a single server at their d
 
 You can also optionally configure GitLab to use an [external PostgreSQL service](../external_database.md) or an [external object storage service](../high_availability/object_storage.md) for added performance and reliability at a relatively low complexity cost.
 
-### 1,000 to 1,999 users
+### Up to 2,000 users
 
-For 1,000 to 1,999 users, defining a reference architecture for this scale is [being worked on](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
-
-### 2,000 users
+NOTE: **Note:** The 2,000-user reference architecture documented below is
+designed to help your organization achieve a highly-available GitLab deployment.
+If you do not have the expertise or need to maintain a highly-available
+environment, you can have a simpler and less costly-to-operate environment by
+deploying two or more GitLab Rails servers, external load balancing, an NFS
+server, a PostgreSQL server and a Redis server. A reference architecture with
+this alternative in mind is [being worked on](https://gitlab.com/gitlab-org/quality/performance/-/issues/223).
 
 - **Supported users (approximate):** 2,000
 - **Test RPS rates:** API: 40 RPS, Web: 4 RPS, Git: 4 RPS
@@ -110,7 +91,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  | c5.large     |
 
-### 5,000 users
+### Up to 5,000 users
 
 - **Supported users (approximate):** 5,000
 - **Test RPS rates:** API: 100 RPS, Web: 10 RPS, Git: 10 RPS
@@ -131,7 +112,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  | c5.large     |
 
-### 10,000 users
+### Up to 10,000 users
 
 - **Supported users (approximate):** 10,000
 - **Test RPS rates:** API: 200 RPS, Web: 20 RPS, Git: 20 RPS
@@ -155,7 +136,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 
-### 25,000 users
+### Up to 25,000 users
 
 - **Supported users (approximate):** 25,000
 - **Test RPS rates:** API: 500 RPS, Web: 50 RPS, Git: 50 RPS
@@ -179,7 +160,7 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 4 vCPU, 3.6GB Memory  | n1-highcpu-4   | c5.xlarge    |
 
-### 50,000 users
+### Up to 50,000 users
 
 - **Supported users (approximate):** 50,000
 - **Test RPS rates:** API: 1000 RPS, Web: 100 RPS, Git: 100 RPS
@@ -202,6 +183,43 @@ For 1,000 to 1,999 users, defining a reference architecture for this scale is [b
 | Monitoring node             | 1     | 4 vCPU, 3.6GB Memory   | n1-highcpu-4   | c5.xlarge    |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory  | n1-highcpu-2   | c5.large     |
 | Internal load balancing node[^6] | 1 | 8 vCPU, 7.2GB Memory  | n1-highcpu-8   | c5.2xlarge   |
+
+## Configuring GitLab to scale
+
+### Components not provided by Omnibus GitLab
+
+Depending on your system architecture, you may require some components which are
+not provided in Omnibus GitLab. If required, these should be configured before
+setting up components provided by GitLab. Advice on how to select the right
+solution for your organization is provided in the configuration instructions
+listed below.
+
+| Component | Description | Configuration instructions |
+|-----------|-------------|----------------------------|
+| Load balancer(s)[^6] | Handles load balancing, typically when you have multiple GitLab application services nodes | [Load balancer configuration](../high_availability/load_balancer.md)[^6]      |
+| Object storage service[^4] | Recommended store for shared data objects | [Cloud Object Storage configuration](../object_storage.md) |
+| NFS[^5] [^7] | Shared disk storage service. Can be used as an alternative for Gitaly or Object Storage. Required for GitLab Pages | [NFS configuration](../high_availability/nfs.md) |
+
+### Components provided by Omnibus GitLab
+
+The following components are provided by Omnibus GitLab. They are listed in the
+order you'll typically configure them if they are required by your
+[reference architecture](#reference-architectures) of choice.
+
+| Component | Description | Configuration instructions |
+|-----------|-------------|----------------------------|
+| [Consul](../../development/architecture.md#consul)[^3] | Service discovery and health checks/failover | [Consul HA configuration](../high_availability/consul.md) **(PREMIUM ONLY)** |
+| [PostgreSQL](../../development/architecture.md#postgresql) | Database | [PostgreSQL configuration](https://docs.gitlab.com/omnibus/settings/database.html) |
+| [PgBouncer](../../development/architecture.md#pgbouncer) | Database connection pooler | [PgBouncer configuration](../high_availability/pgbouncer.md#running-pgbouncer-as-part-of-a-non-ha-gitlab-installation) **(PREMIUM ONLY)** |
+| Repmgr | PostgreSQL cluster management and failover | [PostgreSQL and Repmgr configuration](../high_availability/database.md) |
+| [Redis](../../development/architecture.md#redis)[^3]  | Key/value store for fast data lookup and caching | [Redis configuration](../high_availability/redis.md) |
+| Redis Sentinel | High availability for Redis | [Redis Sentinel configuration](../high_availability/redis.md) |
+| [Gitaly](../../development/architecture.md#gitaly)[^2] [^5] [^7]  | Provides access to Git repositories | [Gitaly configuration](../gitaly/index.md#running-gitaly-on-its-own-server) |
+| [Sidekiq](../../development/architecture.md#sidekiq) | Asynchronous/background jobs | [Sidekiq configuration](../high_availability/sidekiq.md) |
+| [GitLab application services](../../development/architecture.md#unicorn)[^1] | Unicorn/Puma, Workhorse, GitLab Shell - serves front-end requests (UI, API, Git over HTTP/SSH) | [GitLab app scaling configuration](../high_availability/gitlab.md) |
+| [Prometheus](../../development/architecture.md#prometheus) and [Grafana](../../development/architecture.md#grafana) | GitLab environment monitoring | [Monitoring node for scaling](../high_availability/monitoring_node.md) |
+
+## Footnotes
 
 [^1]: In our architectures we run each GitLab Rails node using the Puma webserver
       and have its number of workers set to 90% of available CPUs along with 4 threads.
