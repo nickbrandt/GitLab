@@ -93,7 +93,7 @@ RSpec.shared_examples 'gitlab projects import validations' do
     context 'when measurement is disabled' do
       let(:measurable_options) do
         {
-          measurement_enabled: false,
+          measurement_enabled: false
         }
       end
 
