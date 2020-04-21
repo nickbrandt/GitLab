@@ -6,14 +6,14 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
-GraphQL is a programatic language for easily accessing and manipulating complex data in a single request mwith an intuitive and flexible syntax.  With your single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
+GraphQL is a programatic language for easily accessing and manipulating complex data in a single request mwith an intuitive and flexible syntax.  With a single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
 
 TODO (Sameer): pub-sub notifications with realtime updates?
 
 ### Why GraphQL vs REST
 For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
 
-TODO (mike): challenges with multiple  queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
+TODO (mike): proof point examples & challenges with multiple queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
 TODO (Mike)
 -performance
@@ -26,7 +26,8 @@ TODO (Mike)
 TODO: show 3 real _anonymized_ examples that show the frustration/performance impact of client-side processing
 
 TODO (jr): anonymized telecom example
-TODO (dt): A Service Management customer needed to aggregate test cases, for individual piplelines, across various projects.  
+
+TODO (dt): A Customer in Service Management needs to aggregate test case results, for individual piplelines, across various projects.   TODO: example?
 
 ## Examples
 
