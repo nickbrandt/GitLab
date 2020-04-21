@@ -215,6 +215,7 @@ describe('Autosave', () => {
     beforeEach(() => {
       autosave = {
         key,
+        lockVersionKey,
       };
     });
 
@@ -239,6 +240,7 @@ describe('Autosave', () => {
 
       it('should call .removeItem', () => {
         expect(window.localStorage.removeItem).toHaveBeenCalledWith(key);
+        expect(window.localStorage.removeItem).toHaveBeenCalledWith(lockVersionKey);
       });
     });
   });
@@ -249,8 +251,8 @@ describe('Autosave', () => {
         field,
         key,
         fallbackKey,
+        isLocalStorageAvailable: true,
       };
-      autosave.isLocalStorageAvailable = true;
     });
 
     it('should call .getItem', () => {
