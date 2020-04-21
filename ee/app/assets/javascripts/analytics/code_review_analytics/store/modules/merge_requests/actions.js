@@ -15,11 +15,15 @@ export const setFilters = ({ commit, dispatch }, { label_name, milestone_title }
 export const fetchMergeRequests = ({ dispatch, state }) => {
   dispatch('requestMergeRequests');
 
-  const { projectId, filters, pageInfo } = state;
+  const {
+    projectId,
+    filters: { milestoneTitle, labelName },
+    pageInfo,
+  } = state;
   const params = {
     project_id: projectId,
-    milestone_title: filters.milestoneTitle,
-    label_name: filters.labelName,
+    milestone_title: milestoneTitle,
+    label_name: labelName,
     page: pageInfo.page,
   };
 

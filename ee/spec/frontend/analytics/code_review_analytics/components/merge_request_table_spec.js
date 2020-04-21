@@ -2,7 +2,7 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlTable } from '@gitlab/ui';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
-import createState from 'ee/analytics/code_review_analytics/store/state';
+import createState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
 import mergeRequests from '../mock_data';
 
 const localVue = createLocalVue();
@@ -14,9 +14,14 @@ describe('MergeRequestTable component', () => {
 
   const createStore = (initialState = {}) =>
     new Vuex.Store({
-      state: {
-        ...createState(),
-        ...initialState,
+      modules: {
+        mergeRequests: {
+          namespaced: true,
+          state: {
+            ...createState(),
+            ...initialState,
+          },
+        },
       },
     });
 

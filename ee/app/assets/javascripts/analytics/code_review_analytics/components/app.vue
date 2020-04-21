@@ -29,7 +29,7 @@ export default {
     },
   },
   computed: {
-    ...mapState({
+    ...mapState('mergeRequests', {
       isLoading: 'isLoading',
       perPage: state => state.pageInfo.perPage,
       totalItems: state => state.pageInfo.total,
@@ -58,7 +58,7 @@ export default {
     this.fetchMergeRequests();
   },
   methods: {
-    ...mapActions(['setProjectId', 'fetchMergeRequests', 'setPage']),
+    ...mapActions('mergeRequests', ['setProjectId', 'fetchMergeRequests', 'setPage']),
   },
 };
 </script>
