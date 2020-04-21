@@ -296,9 +296,9 @@ test:
     - if: $CI_COMMIT_BRANCH == 'master'             # Include this job in master branch pipelines
 ```
 
-These `rules:` must be added to jobs that could be added to both types of pipelines. Alternatively,
+Similar `rules:` should be added to all jobs to avoid any overlapping pipelines. Alternatively,
 you can use the [`workflow:`](../yaml/README.md#exclude-jobs-with-rules-from-certain-pipelines)
-parameter to add the rules all jobs globally.
+parameter to add the same rules to all jobs globally.
 
 ### Two pipelines created when pushing an invalid CI configuration file
 
