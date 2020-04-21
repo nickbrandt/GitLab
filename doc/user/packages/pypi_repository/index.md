@@ -176,8 +176,6 @@ When uploading packages, note that:
 - The maximum allowed size is 50 Megabytes.
 - If you upload the same package with the same version multiple times, each consecutive upload
   is saved as a separate file. When installing a package, GitLab will serve the most recent file.
-- When uploading packages to GitLab, they will not be displayed in the packages UI of your project
-  immediately. It can take up to 10 minutes to process a package.
 
 ### Upload packages with Twine
 
