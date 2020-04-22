@@ -16,6 +16,7 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.now))) }
+  scope :ordered, -> { order(:id) }
 
   state_machine :state, initial: :pending do
     state :pending, value: STATE_VALUES[:pending]
