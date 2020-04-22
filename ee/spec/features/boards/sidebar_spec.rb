@@ -331,4 +331,30 @@ describe 'Issue Boards', :js do
       end
     end
   end
+
+  context 'when opening sidebars' do
+    let(:settings_button) { find('.js-board-settings-button') }
+
+    it 'closes card sidebar when opening settings sidebar' do
+      click_card(card1)
+
+      expect(page).to have_selector('.right-sidebar')
+
+      settings_button.click
+
+      expect(page).to have_selector('.js-board-settings-sidebar')
+      expect(page).not_to have_selector('.right-sidebar')
+    end
+
+    it 'closes settings sidebar when opening card sidebar' do
+      settings_button.click
+
+      expect(page).to have_selector('.js-board-settings-sidebar')
+
+      click_card(card1)
+
+      expect(page).to have_selector('.right-sidebar')
+      expect(page).not_to have_selector('.js-board-settings-sidebar')
+    end
+  end
 end

@@ -1,11 +1,13 @@
 import Vue from 'vue';
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 
 import Board from 'ee/boards/components/board_column.vue';
 import List from '~/boards/models/list';
-import { ListType } from '~/boards/constants';
+import { ListType, inactiveListId } from '~/boards/constants';
 import axios from '~/lib/utils/axios_utils';
+import sidebarEventHub from '~/sidebar/event_hub';
 
 import { TEST_HOST } from 'helpers/test_constants';
 import { listObj } from 'jest/boards/mock_data';
@@ -14,7 +16,12 @@ import { listObj } from 'jest/boards/mock_data';
 // so we are mocking it in this test
 jest.mock('ee/boards/components/board_promotion_state', () => ({}));
 
+const localVue = createLocalVue();
+
+localVue.use(Vuex);
+
 describe('Board Column Component', () => {
+  let store;
   let wrapper;
   let axiosMock;
 
@@ -22,6 +29,8 @@ describe('Board Column Component', () => {
     window.gon = {};
     axiosMock = new AxiosMockAdapter(axios);
     axiosMock.onGet(`${TEST_HOST}/lists/1/issues`).reply(200, { issues: [] });
+    store = new Vuex.Store({ state: { activeListId: inactiveListId } });
+    jest.spyOn(store, 'dispatch').mockImplementation();
   });
 
   afterEach(() => {
@@ -61,6 +70,8 @@ describe('Board Column Component', () => {
     }
 
     wrapper = shallowMount(Board, {
+      store,
+      localVue,
       propsData: {
         boardId,
         disabled: false,
@@ -115,6 +126,28 @@ describe('Board Column Component', () => {
       it('has a test for each list type', () => {
         Object.values(ListType).forEach(value => {
           expect([...hasSettings, ...hasNoSettings]).toContain(value);
+        });
+      });
+
+      describe('emits sidebar.closeAll event on openSidebarSettings', () => {
+        beforeEach(() => {
+          jest.spyOn(sidebarEventHub, '$emit');
+        });
+
+        it('emits event if no active List', () => {
+          // Shares the same behavior for any settings-enabled List type
+          createComponent({ listType: hasSettings[0] });
+          wrapper.vm.openSidebarSettings();
+
+          expect(sidebarEventHub.$emit).toHaveBeenCalledWith('sidebar.closeAll');
+        });
+
+        it('does not emits event when there is an active List', () => {
+          store.state.activeListId = listObj.id;
+          createComponent({ listType: hasSettings[0] });
+          wrapper.vm.openSidebarSettings();
+
+          expect(sidebarEventHub.$emit).not.toHaveBeenCalled();
         });
       });
     });

@@ -1,9 +1,11 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import BoardColumnFoss from '~/boards/components/board_column.vue';
 import { __, sprintf, s__ } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
+import { inactiveListId } from '~/boards/constants';
 import BoardPromotionState from 'ee/boards/components/board_promotion_state';
+import eventHub from '~/sidebar/event_hub';
 
 export default {
   components: {
@@ -16,6 +18,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['activeListId']),
     issuesTooltip() {
       const { issuesSize, maxIssueCount } = this.list;
 
@@ -42,6 +45,10 @@ export default {
   methods: {
     ...mapActions(['setActiveListId']),
     openSidebarSettings() {
+      if (this.activeListId === inactiveListId) {
+        eventHub.$emit('sidebar.closeAll');
+      }
+
       this.setActiveListId(this.list.id);
     },
   },
