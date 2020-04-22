@@ -18,8 +18,8 @@ module Gitlab
       end
 
       def initialize(logger: nil, base_log_data: {})
-        self.logger = logger || Logger.new($stdout)
-        self.base_log_data = base_log_data
+        @logger = logger || Logger.new($stdout)
+        @base_log_data = base_log_data
       end
 
       def with_measuring
@@ -44,13 +44,13 @@ module Gitlab
 
       private
 
-      attr_accessor :gc_stats, :time_to_finish, :sql_calls_count, :logger, :base_log_data
+      attr_reader :gc_stats, :time_to_finish, :sql_calls_count, :logger, :base_log_data
 
       def with_count_queries(&block)
-        self.sql_calls_count = 0
+        @sql_calls_count = 0
 
         counter_f = ->(_name, _started, _finished, _unique_id, payload) {
-          self.sql_calls_count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
+          @sql_calls_count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
         }
 
         ActiveSupport::Notifications.subscribed(counter_f, "sql.active_record", &block)
@@ -67,7 +67,7 @@ module Gitlab
         stats_before = GC.stat
         result = yield
         stats_after = GC.stat
-        self.gc_stats = stats_after.map do |key, after_value|
+        @gc_stats = stats_after.map do |key, after_value|
           before_value = stats_before[key]
           [key, before: before_value, after: after_value, diff: after_value - before_value]
         end.to_h
@@ -76,7 +76,7 @@ module Gitlab
 
       def with_measure_time
         result = nil
-        self.time_to_finish = Benchmark.realtime do
+        @time_to_finish = Benchmark.realtime do
           result = yield
         end
 

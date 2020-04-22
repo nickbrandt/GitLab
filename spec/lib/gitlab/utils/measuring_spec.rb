@@ -23,7 +23,7 @@ describe Gitlab::Utils::Measuring do
       end
 
       it 'measure execution with Gitlab::Utils::Measuring instance', :aggregate_failure do
-        expect(described_class).to receive(:new).with(logger: measurement_logger, base_log_data: base_log_data){ measurement }
+        expect(described_class).to receive(:new).with(logger: measurement_logger, base_log_data: base_log_data) { measurement }
         expect(measurement).to receive(:with_measuring)
 
         subject
