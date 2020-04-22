@@ -69,6 +69,10 @@ module Gitlab
         const_get("::Geo::#{replicable_name.camelize}RegistryFinder", false)
       end
 
+      def self.graphql_registry_type
+        const_get("::Types::Geo::#{replicable_name.camelize}RegistryType", false)
+      end
+
       # Given a `replicable_name`, return the corresponding replicator
       #
       # @param [String] replicable_name the replicable slug
