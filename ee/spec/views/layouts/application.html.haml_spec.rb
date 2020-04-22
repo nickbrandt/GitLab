@@ -24,11 +24,10 @@ describe 'layouts/application' do
       end
 
       it 'has the notification dot' do
-        expect(view).to receive(:track_event).with('show_buy_ci_minutes_notification', label: 'free', property: 'user_dropdown')
-
         render
 
         expect(rendered).to have_css('span', class: 'header-user-notification-dot')
+        expect(rendered).to have_selector('[data-track-event="render"]')
       end
     end
 
@@ -37,6 +36,7 @@ describe 'layouts/application' do
         render
 
         expect(rendered).not_to have_css('span', class: 'header-user-notification-dot')
+        expect(rendered).not_to have_selector('[data-track-event="render"]')
       end
     end
   end
