@@ -6661,10 +6661,11 @@ CREATE TABLE public.vulnerability_exports (
     finished_at timestamp with time zone,
     status character varying(255) NOT NULL,
     file character varying(255),
-    project_id bigint NOT NULL,
+    project_id bigint,
     author_id bigint NOT NULL,
     file_store integer,
-    format smallint DEFAULT 0 NOT NULL
+    format smallint DEFAULT 0 NOT NULL,
+    group_id integer
 );
 
 CREATE SEQUENCE public.vulnerability_exports_id_seq
@@ -10446,7 +10447,9 @@ CREATE INDEX index_vulnerabilities_on_updated_by_id ON public.vulnerabilities US
 
 CREATE INDEX index_vulnerability_exports_on_author_id ON public.vulnerability_exports USING btree (author_id);
 
-CREATE UNIQUE INDEX index_vulnerability_exports_on_project_id_and_id ON public.vulnerability_exports USING btree (project_id, id);
+CREATE INDEX index_vulnerability_exports_on_group_id_not_null ON public.vulnerability_exports USING btree (group_id) WHERE (group_id IS NOT NULL);
+
+CREATE INDEX index_vulnerability_exports_on_project_id_not_null ON public.vulnerability_exports USING btree (project_id) WHERE (project_id IS NOT NULL);
 
 CREATE INDEX index_vulnerability_feedback_on_author_id ON public.vulnerability_feedback USING btree (author_id);
 
@@ -10978,6 +10981,9 @@ ALTER TABLE ONLY public.design_management_versions
 
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_c1f241c70d FOREIGN KEY (upload_deleted_event_id) REFERENCES public.geo_upload_deleted_events(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.vulnerability_exports
+    ADD CONSTRAINT fk_c3d3cb5d0f FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_c4b1c1f66e FOREIGN KEY (repository_deleted_event_id) REFERENCES public.geo_repository_deleted_events(id) ON DELETE CASCADE;
@@ -13261,6 +13267,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200411125656
 20200413072059
 20200413230056
+20200414112444
+20200414114611
+20200414115801
 20200414144547
 20200415160722
 20200415161021
