@@ -5631,9 +5631,6 @@ CREATE TABLE public.resource_milestone_events (
     milestone_id bigint,
     action smallint NOT NULL,
     state smallint NOT NULL,
-    cached_markdown_version integer,
-    reference text,
-    reference_html text,
     created_at timestamp with time zone NOT NULL
 );
 
@@ -13269,6 +13266,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200331132103
 20200331195952
 20200331220930
+20200401091051
 20200401095430
 20200401211005
 20200402123926
