@@ -255,6 +255,8 @@ class Project < ApplicationRecord
   has_many :prometheus_alert_events, inverse_of: :project
   has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
+  has_many :alert_management_alerts, class_name: 'AlertManagement::Alert', inverse_of: :project
+
   # Container repositories need to remove data from the container registry,
   # which is not managed by the DB. Hence we're still using dependent: :destroy
   # here.
