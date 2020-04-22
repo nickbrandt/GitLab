@@ -35,7 +35,28 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def cluster_group
-    render json: { started: 'insert clusters here'}
+    finder = ClusterAncestorsFinder.new(clusterable.subject, current_user)
+    clusters = finder.execute
+
+    # Note: We are paginating through an array here but this should OK as:
+    #
+    # In CE, we can have a maximum group nesting depth of 21, so including
+    # project cluster, we can have max 22 clusters for a group hierarchy.
+    # In EE (Premium) we can have any number, as multiple clusters are
+    # supported, but the number of clusters are fairly low currently.
+    #
+    # See https://gitlab.com/gitlab-org/gitlab-foss/issues/55260 also.
+    @clusters = Kaminari.paginate_array(clusters).page(params[:page]).per(20)
+
+    @has_ancestor_clusters = finder.has_ancestor_clusters?
+
+    respond_to do |format|
+      format.json do
+        serializer = ClusterSerializer.new(current_user: @current_user)
+
+        render json: serializer.with_pagination(request, response).represent_group(@clusters)
+      end
+    end
   end
 
   def new
