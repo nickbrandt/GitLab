@@ -335,6 +335,12 @@
       changes: *frontend-dependency-patterns
       allow_failure: true
 
+.frontend:rules:bundle-size-review:
+  rules:
+    - if: '$DANGER_GITLAB_API_TOKEN && $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      changes: *frontend-patterns
+      allow_failure: true
+
 ################
 # Memory rules #
 ################
