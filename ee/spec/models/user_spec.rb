@@ -1143,4 +1143,21 @@ describe User do
       it { is_expected.to eql(expected_result) }
     end
   end
+
+  describe '#vulnerabilities' do
+    let(:user) { create(:user) }
+    let(:vulnerability_collection) { instance_double(ActiveRecord::Relation) }
+    let(:mock_security_dashboard) { instance_double(InstanceSecurityDashboard, vulnerabilities: vulnerability_collection) }
+
+    subject(:vulnerabilities) { user.vulnerabilities }
+
+    before do
+      allow(InstanceSecurityDashboard).to receive(:new).and_return(mock_security_dashboard)
+    end
+
+    it 'delegates the call to an instance of `InstanceSecurityDashboard`' do
+      expect(vulnerabilities).to eql(vulnerability_collection)
+      expect(InstanceSecurityDashboard).to have_received(:new).with(user)
+    end
+  end
 end
