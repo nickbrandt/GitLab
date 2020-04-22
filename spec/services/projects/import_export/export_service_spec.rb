@@ -179,7 +179,7 @@ describe Projects::ImportExport::ExportService do
     end
 
     context 'when measurable params are provided' do
-      let(:base_data) do
+      let(:base_log_data) do
         {
           class: described_class.name,
           current_user: user.name,
@@ -204,7 +204,7 @@ describe Projects::ImportExport::ExportService do
         end
 
         it 'measure service execution with Gitlab::Utils::Measuring' do
-          expect(Gitlab::Utils::Measuring).to receive(:execute_with).with(true, logger, base_data).and_call_original
+          expect(Gitlab::Utils::Measuring).to receive(:execute_with).with(true, logger, base_log_data).and_call_original
           expect_next_instance_of(Gitlab::Utils::Measuring) do |measuring|
             expect(measuring).to receive(:with_measuring).and_call_original
           end
@@ -221,7 +221,7 @@ describe Projects::ImportExport::ExportService do
         end
 
         it 'does not measure service execution' do
-          expect(Gitlab::Utils::Measuring).to receive(:execute_with).with(false, nil, base_data).and_call_original
+          expect(Gitlab::Utils::Measuring).to receive(:execute_with).with(false, nil, base_log_data).and_call_original
           expect(Gitlab::Utils::Measuring).not_to receive(:new)
 
           service.execute(after_export_strategy, measurable_options)

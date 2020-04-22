@@ -13,7 +13,7 @@ module Projects
         measurement_enabled = !!options[:measurement_enabled]
         measurement_logger = options[:measurement_logger]
 
-        ::Gitlab::Utils::Measuring.execute_with(measurement_enabled, measurement_logger, base_data) do
+        ::Gitlab::Utils::Measuring.execute_with(measurement_enabled, measurement_logger, base_log_data) do
           save_all!
           execute_after_export_action(after_export_strategy)
         end
@@ -25,12 +25,12 @@ module Projects
 
       attr_accessor :shared
 
-      def base_data
+      def base_log_data
         {
           class: self.class.name,
           current_user: current_user.name,
           project_full_path: project.full_path,
-          file_path: @shared.export_path
+          file_path: shared.export_path
         }
       end
 
