@@ -3,6 +3,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import { registryUrl as mavenPath } from '../mock_data';
 import { mavenPackage as packageEntity } from '../../mock_data';
+import { GlTabs } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -26,6 +27,7 @@ describe('MavenInstallation', () => {
     },
   });
 
+  const findTabs = () => wrapper.find(GlTabs);
   const xmlCode = () => wrapper.find('.js-maven-xml > pre');
   const mavenCommand = () => wrapper.find('.js-maven-command > input');
   const xmlSetup = () => wrapper.find('.js-maven-setup-xml > pre');
@@ -43,6 +45,12 @@ describe('MavenInstallation', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
+  });
+
+  describe('it renders', () => {
+    it('with GlTabs', () => {
+      expect(findTabs().exists()).toBe(true);
+    });
   });
 
   describe('installation commands', () => {

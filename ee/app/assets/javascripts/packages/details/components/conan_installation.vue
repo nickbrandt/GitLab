@@ -34,34 +34,30 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <div class="prepend-left-default append-right-default">
-        <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
-        <code-instruction
-          :instruction="conanInstallationCommand"
-          :copy-text="s__('PackageRegistry|Copy Conan Command')"
-          class="js-conan-command"
-          :tracking-action="$options.trackingActions.COPY_CONAN_COMMAND"
-        />
-      </div>
+      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
+      <code-instruction
+        :instruction="conanInstallationCommand"
+        :copy-text="s__('PackageRegistry|Copy Conan Command')"
+        class="js-conan-command"
+        :tracking-action="$options.trackingActions.COPY_CONAN_COMMAND"
+      />
     </template>
 
     <template #setup>
-      <div class="prepend-left-default append-right-default">
-        <p class="prepend-top-8 font-weight-bold">
-          {{ s__('PackageRegistry|Add Conan Remote') }}
-        </p>
-        <code-instruction
-          :instruction="conanSetupCommand"
-          :copy-text="s__('PackageRegistry|Copy Conan Setup Command')"
-          class="js-conan-setup"
-          :tracking-action="$options.trackingActions.COPY_CONAN_SETUP_COMMAND"
-        />
-        <gl-sprintf :message="$options.i18n.helpText">
-          <template #link="{ content }">
-            <gl-link :href="conanHelpPath" target="_blank">{{ content }}</gl-link>
-          </template>
-        </gl-sprintf>
-      </div>
+      <p class="prepend-top-8 font-weight-bold">
+        {{ s__('PackageRegistry|Add Conan Remote') }}
+      </p>
+      <code-instruction
+        :instruction="conanSetupCommand"
+        :copy-text="s__('PackageRegistry|Copy Conan Setup Command')"
+        class="js-conan-setup"
+        :tracking-action="$options.trackingActions.COPY_CONAN_SETUP_COMMAND"
+      />
+      <gl-sprintf :message="$options.i18n.helpText">
+        <template #link="{ content }">
+          <gl-link :href="conanHelpPath" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
     </template>
   </installation-tabs>
 </template>

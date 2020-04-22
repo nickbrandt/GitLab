@@ -34,34 +34,30 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <div class="prepend-left-default append-right-default">
-        <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|NuGet Command') }}</p>
-        <code-instruction
-          :instruction="nugetInstallationCommand"
-          :copy-text="s__('PackageRegistry|Copy NuGet Command')"
-          class="js-nuget-command"
-          :tracking-action="$options.trackingActions.COPY_NUGET_INSTALL_COMMAND"
-        />
-      </div>
+      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|NuGet Command') }}</p>
+      <code-instruction
+        :instruction="nugetInstallationCommand"
+        :copy-text="s__('PackageRegistry|Copy NuGet Command')"
+        class="js-nuget-command"
+        :tracking-action="$options.trackingActions.COPY_NUGET_INSTALL_COMMAND"
+      />
     </template>
 
     <template #setup>
-      <div class="prepend-left-default append-right-default">
-        <p class="prepend-top-8 font-weight-bold">
-          {{ s__('PackageRegistry|Add NuGet Source') }}
-        </p>
-        <code-instruction
-          :instruction="nugetSetupCommand"
-          :copy-text="s__('PackageRegistry|Copy NuGet Setup Command')"
-          class="js-nuget-setup"
-          :tracking-action="$options.trackingActions.COPY_NUGET_SETUP_COMMAND"
-        />
-        <gl-sprintf :message="$options.i18n.helpText">
-          <template #link="{ content }">
-            <gl-link :href="nugetHelpPath" target="_blank">{{ content }}</gl-link>
-          </template>
-        </gl-sprintf>
-      </div>
+      <p class="prepend-top-8 font-weight-bold">
+        {{ s__('PackageRegistry|Add NuGet Source') }}
+      </p>
+      <code-instruction
+        :instruction="nugetSetupCommand"
+        :copy-text="s__('PackageRegistry|Copy NuGet Setup Command')"
+        class="js-nuget-setup"
+        :tracking-action="$options.trackingActions.COPY_NUGET_SETUP_COMMAND"
+      />
+      <gl-sprintf :message="$options.i18n.helpText">
+        <template #link="{ content }">
+          <gl-link :href="nugetHelpPath" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
     </template>
   </installation-tabs>
 </template>

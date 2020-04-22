@@ -37,57 +37,53 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <div class="prepend-left-default append-right-default">
-        <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Maven XML') }}</p>
-        <p>
-          <gl-sprintf :message="$options.i18n.xmlText">
-            <template #code="{ content }">
-              <code>{{ content }}</code>
-            </template>
-          </gl-sprintf>
-        </p>
-        <code-instruction
-          :instruction="mavenInstallationXml"
-          :copy-text="s__('PackageRegistry|Copy Maven XML')"
-          class="js-maven-xml"
-          multiline
-          :tracking-action="$options.trackingActions.COPY_MAVEN_XML"
-        />
+      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Maven XML') }}</p>
+      <p>
+        <gl-sprintf :message="$options.i18n.xmlText">
+          <template #code="{ content }">
+            <code>{{ content }}</code>
+          </template>
+        </gl-sprintf>
+      </p>
+      <code-instruction
+        :instruction="mavenInstallationXml"
+        :copy-text="s__('PackageRegistry|Copy Maven XML')"
+        class="js-maven-xml"
+        multiline
+        :tracking-action="$options.trackingActions.COPY_MAVEN_XML"
+      />
 
-        <p class="prepend-top-default font-weight-bold">
-          {{ s__('PackageRegistry|Maven Command') }}
-        </p>
-        <code-instruction
-          :instruction="mavenInstallationCommand"
-          :copy-text="s__('PackageRegistry|Copy Maven command')"
-          class="js-maven-command"
-          :tracking-action="$options.trackingActions.COPY_MAVEN_COMMAND"
-        />
-      </div>
+      <p class="prepend-top-default font-weight-bold">
+        {{ s__('PackageRegistry|Maven Command') }}
+      </p>
+      <code-instruction
+        :instruction="mavenInstallationCommand"
+        :copy-text="s__('PackageRegistry|Copy Maven command')"
+        class="js-maven-command"
+        :tracking-action="$options.trackingActions.COPY_MAVEN_COMMAND"
+      />
     </template>
 
     <template #setup>
-      <div class="prepend-left-default append-right-default">
-        <p>
-          <gl-sprintf :message="$options.i18n.setupText">
-            <template #code="{ content }">
-              <code>{{ content }}</code>
-            </template>
-          </gl-sprintf>
-        </p>
-        <code-instruction
-          :instruction="mavenSetupXml"
-          :copy-text="s__('PackageRegistry|Copy Maven registry XML')"
-          class="js-maven-setup-xml"
-          multiline
-          :tracking-action="$options.trackingActions.COPY_MAVEN_SETUP"
-        />
-        <gl-sprintf :message="$options.i18n.helpText">
-          <template #link="{ content }">
-            <gl-link :href="mavenHelpPath" target="_blank">{{ content }}</gl-link>
+      <p>
+        <gl-sprintf :message="$options.i18n.setupText">
+          <template #code="{ content }">
+            <code>{{ content }}</code>
           </template>
         </gl-sprintf>
-      </div>
+      </p>
+      <code-instruction
+        :instruction="mavenSetupXml"
+        :copy-text="s__('PackageRegistry|Copy Maven registry XML')"
+        class="js-maven-setup-xml"
+        multiline
+        :tracking-action="$options.trackingActions.COPY_MAVEN_SETUP"
+      />
+      <gl-sprintf :message="$options.i18n.helpText">
+        <template #link="{ content }">
+          <gl-link :href="mavenHelpPath" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
     </template>
   </installation-tabs>
 </template>

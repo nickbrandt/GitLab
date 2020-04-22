@@ -3,6 +3,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
 import { nugetPackage as packageEntity } from '../../mock_data';
 import { registryUrl as nugetPath } from '../mock_data';
+import { GlTabs } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -24,6 +25,7 @@ describe('NugetInstallation', () => {
     },
   });
 
+  const findTabs = () => wrapper.find(GlTabs);
   const nugetInstallationCommand = () => wrapper.find('.js-nuget-command > input');
   const nugetSetupCommand = () => wrapper.find('.js-nuget-setup > input');
 
@@ -40,6 +42,12 @@ describe('NugetInstallation', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
+  });
+
+  describe('it renders', () => {
+    it('with GlTabs', () => {
+      expect(findTabs().exists()).toBe(true);
+    });
   });
 
   describe('installation commands', () => {

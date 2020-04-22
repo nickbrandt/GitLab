@@ -3,6 +3,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
 import { conanPackage as packageEntity } from '../../mock_data';
 import { registryUrl as conanPath } from '../mock_data';
+import { GlTabs } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -24,6 +25,7 @@ describe('ConanInstallation', () => {
     },
   });
 
+  const findTabs = () => wrapper.find(GlTabs);
   const conanInstallationCommand = () => wrapper.find('.js-conan-command > input');
   const conanSetupCommand = () => wrapper.find('.js-conan-setup > input');
 
@@ -40,6 +42,12 @@ describe('ConanInstallation', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
+  });
+
+  describe('it renders', () => {
+    it('with GlTabs', () => {
+      expect(findTabs().exists()).toBe(true);
+    });
   });
 
   describe('installation commands', () => {

@@ -3,6 +3,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import { npmPackage as packageEntity } from '../../mock_data';
 import { registryUrl as nugetPath } from '../mock_data';
+import { GlTabs } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -15,6 +16,7 @@ describe('NpmInstallation', () => {
   const yarnCommandStr = 'npm install';
   const yarnSetupStr = 'npm setup';
 
+  const findTabs = () => wrapper.find(GlTabs);
   const npmInstallationCommand = () => wrapper.find('.js-npm-install > input');
   const npmSetupCommand = () => wrapper.find('.js-npm-setup > input');
   const yarnInstallationCommand = () => wrapper.find('.js-yarn-install > input');
@@ -44,6 +46,12 @@ describe('NpmInstallation', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
+  });
+
+  describe('it renders', () => {
+    it('with GlTabs', () => {
+      expect(findTabs().exists()).toBe(true);
+    });
   });
 
   describe('npm commands', () => {
