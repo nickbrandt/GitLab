@@ -10160,6 +10160,8 @@ CREATE INDEX index_resource_milestone_events_on_milestone_id ON public.resource_
 
 CREATE INDEX index_resource_milestone_events_on_user_id ON public.resource_milestone_events USING btree (user_id);
 
+CREATE INDEX index_resource_weight_events_on_issue_id_and_created_at ON public.resource_weight_events USING btree (issue_id, created_at);
+
 CREATE INDEX index_resource_weight_events_on_issue_id_and_weight ON public.resource_weight_events USING btree (issue_id, weight);
 
 CREATE INDEX index_resource_weight_events_on_user_id ON public.resource_weight_events USING btree (user_id);
@@ -13232,6 +13234,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200406102111
 20200406102120
 20200406135648
+20200406141452
 20200406192059
 20200406193427
 20200407094005
