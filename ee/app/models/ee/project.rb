@@ -281,7 +281,7 @@ module EE
     end
 
     def shared_runners_minutes_limit_enabled?
-      if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+      if ::Feature.enabled?(:ci_minutes_track_for_public_projects, shared_runners_limit_namespace)
         shared_runners_enabled? &&
           shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
       else
