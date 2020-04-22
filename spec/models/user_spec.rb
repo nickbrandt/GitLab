@@ -4354,31 +4354,15 @@ describe User, :do_not_mock_admin_mode do
     end
   end
 
-  describe '.non_internal' do
-    let!(:user) { create(:user) }
-    let!(:ghost) { described_class.ghost }
-    let!(:alert_bot) { described_class.alert_bot }
-    let!(:project_bot) { create(:user, :project_bot) }
-    let(:non_internal) { [user, project_bot] }
+  describe '.active_without_ghosts' do
+    let_it_be(:user1) { create(:user, :external) }
+    let_it_be(:user2) { create(:user, state: 'blocked') }
+    let_it_be(:user3) { create(:user, :ghost) }
+    let_it_be(:user4) { create(:user, user_type: :support_bot) }
+    let_it_be(:user5) { create(:user, state: 'blocked', user_type: :support_bot) }
 
-    it 'returns non internal users' do
-      expect(described_class.non_internal).to eq(non_internal)
-      expect(non_internal.all?(&:internal?)).to eq(false)
-    end
-  end
-
-  describe '#bot?' do
-    let!(:user) { create(:user) }
-    let!(:ghost) { described_class.ghost }
-    let!(:alert_bot) { described_class.alert_bot }
-    let!(:project_bot) { create(:user, :project_bot) }
-
-    it 'marks bot users' do
-      expect(user).not_to be_bot
-      expect(ghost).not_to be_bot
-
-      expect(alert_bot).to be_bot
-      expect(project_bot).to be_bot
+    it 'returns all active users including active bots but ghost users' do
+      expect(described_class.active_without_ghosts).to match_array([user1, user4])
     end
   end
 
@@ -4413,19 +4397,6 @@ describe User, :do_not_mock_admin_mode do
       it 'returns false when ignore_dismissal_earlier_than is later than dismissed_at' do
         expect(user.dismissed_callout?(feature_name: feature_name, ignore_dismissal_earlier_than: 3.months.ago)).to eq false
       end
-    end
-  end
-
-  describe 'bots & humans' do
-    it 'returns corresponding users' do
-      human = create(:user)
-      bot = create(:user, :bot)
-      project_bot = create(:user, :project_bot)
-
-      expect(described_class.humans).to match_array([human])
-      expect(described_class.bots).to match_array([bot, project_bot])
-      expect(described_class.bots_without_project_bot).to match_array([bot])
-      expect(described_class.with_project_bots).to match_array([human, project_bot])
     end
   end
 
@@ -4622,28 +4593,6 @@ describe User, :do_not_mock_admin_mode do
       end
 
       it_behaves_like 'does not require password to be present'
-    end
-  end
-
-  describe '#human?' do
-    subject { user.human? }
-
-    let_it_be(:user) { create(:user) }
-
-    context 'when user is a human' do
-      before do
-        user.update(user_type: nil)
-      end
-
-      it { is_expected.to be true }
-    end
-
-    context 'when user is not a human' do
-      before do
-        user.update(user_type: 'alert_bot')
-      end
-
-      it { is_expected.to be false }
     end
   end
 end

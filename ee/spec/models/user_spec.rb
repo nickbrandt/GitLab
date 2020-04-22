@@ -87,31 +87,6 @@ describe User do
       end
     end
 
-    describe '.active_without_ghosts' do
-      let_it_be(:user1) { create(:user, :external) }
-      let_it_be(:user2) { create(:user, state: 'blocked') }
-      let_it_be(:user3) { create(:user, :ghost) }
-      let_it_be(:user4) { create(:user, user_type: :support_bot) }
-      let_it_be(:user5) { create(:user, state: 'blocked', user_type: :support_bot) }
-
-      it 'returns all active users including active bots but ghost users' do
-        expect(described_class.active_without_ghosts).to match_array([user1, user4])
-      end
-    end
-
-    describe '.non_internal' do
-      let!(:user) { create(:user) }
-      let!(:service_user) { create(:user, user_type: :service_user) }
-      let!(:ghost) { described_class.ghost }
-      let!(:alert_bot) { described_class.alert_bot }
-      let!(:non_internal) { [user, service_user] }
-
-      it 'returns users without ghosts and bots' do
-        expect(described_class.non_internal).to match_array(non_internal)
-        expect(non_internal.all?(&:internal?)).to eq(false)
-      end
-    end
-
     describe '.managed_by' do
       let!(:group) { create(:group_with_managed_accounts) }
       let!(:managed_users) { create_list(:user, 2, managing_group: group) }
@@ -622,25 +597,17 @@ describe User do
       context 'when user is internal' do
         using RSpec::Parameterized::TableSyntax
 
-        where(:bot_user_type) do
-          UserTypeEnums.bots.keys
+        where(:internal_user_type) do
+          described_class::INTERNAL_USER_TYPES
         end
 
         with_them do
-          context 'when user is a bot' do
-            let(:user) { create(:user, user_type: bot_user_type) }
+          context 'when user has internal user type' do
+            let(:user) { create(:user, user_type: internal_user_type) }
 
             it 'returns false' do
               expect(user.using_license_seat?).to eq false
             end
-          end
-        end
-
-        context 'when user is a ghost' do
-          let(:user) { create(:user, :ghost) }
-
-          it 'returns false' do
-            expect(user.using_license_seat?).to eq false
           end
         end
       end
@@ -1140,7 +1107,7 @@ describe User do
     end
 
     context 'when user is ghost' do
-      let(:user) { build(:user, email: 'test@gitlab.com', ghost: true) }
+      let(:user) { build(:user, :ghost, email: 'test@gitlab.com') }
 
       it { is_expected.to be false }
     end
