@@ -41,6 +41,19 @@ module ClustersHelper
     end
   end
 
+  def cluster_list_data(clusters)
+    {
+      endpoint: 'todo/add/endpoint',
+      clusters: clusters.map do |cluster|
+        {
+          cluster_type_description: cluster_type_label(cluster.cluster_type),
+          environment_scope: cluster.environment_scope,
+          name: cluster.name
+        }
+      end
+    }
+  end
+
   def cluster_type_label(cluster_type)
     case cluster_type
     when 'project_type'
