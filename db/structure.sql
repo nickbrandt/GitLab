@@ -3509,7 +3509,8 @@ CREATE TABLE public.keys (
     public boolean DEFAULT false NOT NULL,
     last_used_at timestamp without time zone,
     fingerprint_sha256 bytea,
-    expires_at timestamp with time zone
+    expires_at timestamp with time zone,
+    deploy_key_type smallint
 );
 
 CREATE SEQUENCE public.keys_id_seq
@@ -13586,6 +13587,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200421092907
 20200421233150
 20200422091541
+20200422204503
 20200422213749
 20200423075720
 20200423080334

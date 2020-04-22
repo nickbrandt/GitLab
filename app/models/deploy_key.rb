@@ -11,6 +11,11 @@ class DeployKey < Key
   scope :are_public,  -> { where(public: true) }
   scope :with_projects, -> { includes(deploy_keys_projects: { project: [:route, namespace: :route] }) }
 
+  enum deploy_key_type: {
+    group_type: 1,
+    project_type: 2
+  }
+
   ignore_column :can_push, remove_after: '2019-12-15', remove_with: '12.6'
 
   accepts_nested_attributes_for :deploy_keys_projects
