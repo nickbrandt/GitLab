@@ -808,4 +808,24 @@ describe License do
       end
     end
   end
+
+  describe '#started?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:starts_at, :result) do
+      Date.current - 1.month | true
+      Date.current           | true
+      Date.current + 1.month | false
+    end
+
+    with_them do
+      let(:gl_license) { build(:gitlab_license, starts_at: starts_at) }
+
+      subject { license.started? }
+
+      it do
+        is_expected.to eq(result)
+      end
+    end
+  end
 end
