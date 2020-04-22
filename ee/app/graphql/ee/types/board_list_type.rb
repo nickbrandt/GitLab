@@ -14,6 +14,8 @@ module EE
               description: 'Maximum weight of issues in the list'
         field :assignee, ::Types::UserType, null: true,
               description: 'Assignee in the list'
+        field :limit_metric, ::EE::Types::ListLimitMetricEnum, null: true,
+              description: 'The current limit metric for the list'
 
         def milestone
           ::Gitlab::Graphql::Loaders::BatchModelLoader.new(::Milestone, object.milestone_id).find
