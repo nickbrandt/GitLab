@@ -235,7 +235,7 @@ module EE
       ::Namespace
         .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
@@ -243,14 +243,14 @@ module EE
       ::Namespace
         .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
     def managed_free_namespaces
       manageable_groups
         .left_joins(:gitlab_subscription)
-        .merge(GitlabSubscription.left_joins(:hosted_plan).where(plans: { name: [nil, *Plan::DEFAULT_PLANS] }))
+        .merge(GitlabSubscription.left_joins(:hosted_plan).where(plans: { name: [nil, *::Plan.default_plans] }))
         .order(:name)
     end
 

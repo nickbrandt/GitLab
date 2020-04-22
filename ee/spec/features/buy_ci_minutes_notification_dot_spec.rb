@@ -17,6 +17,8 @@ describe 'User notification dot', :aggregate_failures do
 
   context 'when ci minutes are below threshold' do
     before do
+      allow(Gitlab).to receive(:com?) { true }
+
       group.update(last_ci_minutes_usage_notification_level: 30, shared_runners_minutes_limit: 10)
       allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(2)
     end

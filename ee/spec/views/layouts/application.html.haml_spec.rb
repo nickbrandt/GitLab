@@ -19,6 +19,10 @@ describe 'layouts/application' do
     context 'when we show the notification dot' do
       let(:show_notification_dot) { true }
 
+      before do
+        allow(Gitlab).to receive(:com?) { true }
+      end
+
       it 'has the notification dot' do
         expect(view).to receive(:track_event).with('show_buy_ci_minutes_notification', label: 'free', property: 'user_dropdown')
 

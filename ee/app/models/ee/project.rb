@@ -168,7 +168,6 @@ module EE
 
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled?, to: :ci_cd_settings
-      delegate :actual_limits, :actual_plan_name, to: :namespace, allow_nil: true
       delegate :gitlab_subscription, to: :namespace
 
       validates :repository_size_limit,
