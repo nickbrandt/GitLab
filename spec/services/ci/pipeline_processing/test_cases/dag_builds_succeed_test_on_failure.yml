@@ -34,27 +34,13 @@ transitions:
   - event: success
     jobs: [build_1, build_2]
     expect:
-      pipeline: running
-      stages:
-        build: success
-        test: skipped
-        deploy: pending
-      jobs:
-        build_1: success
-        build_2: success
-        test: skipped
-        deploy: pending # TODO: expected?
-
-  - event: success
-    jobs: [deploy]
-    expect:
       pipeline: success
       stages:
         build: success
         test: skipped
-        deploy: success
+        deploy: skipped
       jobs:
         build_1: success
         build_2: success
         test: skipped
-        deploy: success
+        deploy: skipped

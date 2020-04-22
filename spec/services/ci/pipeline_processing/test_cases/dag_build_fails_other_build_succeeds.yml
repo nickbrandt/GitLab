@@ -47,13 +47,13 @@ transitions:
   - event: drop
     jobs: [build_2]
     expect:
-      pipeline: running # TODO: expected => failed
+      pipeline: failed
       stages:
         build: failed
         test: skipped
-        deploy: pending # TODO: expected => skipped
+        deploy: skipped
       jobs:
         build_1: success
         build_2: failed
         test: skipped
-        deploy: pending # TODO: expected => skipped
+        deploy: skipped

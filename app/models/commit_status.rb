@@ -182,8 +182,8 @@ class CommitStatus < ApplicationRecord
     before_stage(index).latest.slow_composite_status(project: project) || 'success'
   end
 
-  def self.status_for_names(names, project:)
-    where(name: names).latest.slow_composite_status(project: project) || 'success'
+  def self.status_for_names(names, project:, strict_mode: false)
+    where(name: names).latest.slow_composite_status(project: project, strict_mode: strict_mode) || 'success'
   end
 
   def self.update_as_processed!

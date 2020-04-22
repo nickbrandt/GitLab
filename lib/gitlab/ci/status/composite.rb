@@ -7,7 +7,7 @@ module Gitlab
         include Gitlab::Utils::StrongMemoize
 
         # This class accepts an array of arrays/hashes/or objects
-        def initialize(all_statuses, with_allow_failure: true)
+        def initialize(all_statuses, with_allow_failure: true, strict_mode: false)
           unless all_statuses.respond_to?(:pluck)
             raise ArgumentError, "all_statuses needs to respond to `.pluck`"
           end
@@ -15,6 +15,7 @@ module Gitlab
           @status_set = Set.new
           @status_key = 0
           @allow_failure_key = 1 if with_allow_failure
+          @strict_mode = strict_mode
 
           consume_all_statuses(all_statuses)
         end
@@ -31,7 +32,9 @@ module Gitlab
           return if none?
 
           strong_memoize(:status) do
-            if only_of?(:skipped, :ignored)
+            if @strict_mode && any_of?(:skipped)
+              'skipped'
+            elsif only_of?(:skipped, :ignored)
               'skipped'
             elsif only_of?(:success, :skipped, :success_with_warnings, :ignored)
               'success'

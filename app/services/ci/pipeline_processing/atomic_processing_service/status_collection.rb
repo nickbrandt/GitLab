@@ -36,10 +36,10 @@ module Ci
         end
 
         # This methods gets composite status for processables with given names
-        def status_for_names(names)
+        def status_for_names(names, strict_mode: false)
           name_statuses = all_statuses_by_name.slice(*names)
 
-          status_for_array(name_statuses.values)
+          status_for_array(name_statuses.values, strict_mode: strict_mode)
         end
 
         # This methods gets composite status for processables before given stage
@@ -76,9 +76,9 @@ module Ci
 
         private
 
-        def status_for_array(statuses)
+        def status_for_array(statuses, strict_mode: false)
           result = Gitlab::Ci::Status::Composite
-            .new(statuses)
+            .new(statuses, strict_mode: strict_mode)
             .status
           result || 'success'
         end

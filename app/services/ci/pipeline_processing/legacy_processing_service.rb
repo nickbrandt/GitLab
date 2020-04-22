@@ -58,7 +58,7 @@ module Ci
 
         # 2. does not have builds that not yet complete
         incomplete_build_names = pipeline.processables.latest
-          .incomplete.names
+          .incomplete_or_not_manual.names
 
         # Each found processable is guaranteed here to have completed status
         created_processables
@@ -90,7 +90,7 @@ module Ci
       end
 
       def status_for_build_needs(needs)
-        pipeline.processables.status_for_names(needs, project: pipeline.project)
+        pipeline.processables.status_for_names(needs, project: pipeline.project, strict_mode: true)
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

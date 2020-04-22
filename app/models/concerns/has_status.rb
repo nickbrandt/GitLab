@@ -19,7 +19,7 @@ module HasStatus
   UnknownStatusError = Class.new(StandardError)
 
   class_methods do
-    def legacy_status_sql
+    def legacy_status_sql(strict_mode: false)
       scope_relevant = respond_to?(:exclude_ignored) ? exclude_ignored : all
       scope_warnings = respond_to?(:failed_but_allowed) ? failed_but_allowed : none
 
@@ -38,6 +38,7 @@ module HasStatus
 
       Arel.sql(
         "(CASE
+          WHEN (#{strict_mode} IS TRUE) AND ((#{skipped}) > 0) THEN 'skipped'
           WHEN (#{builds})=(#{skipped}) AND (#{warnings}) THEN 'success'
           WHEN (#{builds})=(#{skipped}) THEN 'skipped'
           WHEN (#{builds})=(#{success}) THEN 'success'
@@ -57,21 +58,21 @@ module HasStatus
       )
     end
 
-    def legacy_status
-      all.pluck(legacy_status_sql).first
+    def legacy_status(strict_mode: false)
+      all.pluck(legacy_status_sql(strict_mode: strict_mode)).first
     end
 
     # This method should not be used.
     # This method performs expensive calculation of status:
     # 1. By plucking all related objects,
     # 2. Or executes expensive SQL query
-    def slow_composite_status(project:)
+    def slow_composite_status(project:, strict_mode: false)
       if Feature.enabled?(:ci_composite_status, project, default_enabled: false)
         Gitlab::Ci::Status::Composite
-          .new(all, with_allow_failure: columns_hash.key?('allow_failure'))
+          .new(all, with_allow_failure: columns_hash.key?('allow_failure'), strict_mode: strict_mode)
           .status
       else
-        legacy_status
+        legacy_status(strict_mode: strict_mode)
       end
     end
 
@@ -128,6 +129,7 @@ module HasStatus
     scope :finished, -> { with_status(:success, :failed, :canceled) }
     scope :failed_or_canceled, -> { with_status(:failed, :canceled) }
     scope :incomplete, -> { without_statuses(completed_statuses) }
+    scope :incomplete_or_not_manual, -> { without_statuses(completed_statuses + [:manual]) }
 
     scope :cancelable, -> do
       where(status: [:running, :waiting_for_resource, :preparing, :pending, :created, :scheduled])
