@@ -2,7 +2,7 @@
 
 module API
   module Analytics
-    class CodeReviewAnalytics < Grape::API
+    class CodeReviewAnalytics < Grape::API::Instance
       include PaginationParams
 
       helpers ::Gitlab::IssuableMetadata

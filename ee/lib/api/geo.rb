@@ -3,7 +3,7 @@
 require 'base64'
 
 module API
-  class Geo < Grape::API
+  class Geo < Grape::API::Instance
     resource :geo do
       helpers do
         def sanitized_node_status_params

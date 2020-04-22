@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class MergeRequestApprovalRules < ::Grape::API
+  class MergeRequestApprovalRules < ::Grape::API::Instance
     before { authenticate_non_get! }
 
     ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }

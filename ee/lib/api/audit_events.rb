@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class AuditEvents < ::Grape::API
+  class AuditEvents < ::Grape::API::Instance
     include ::API::PaginationParams
 
     before do

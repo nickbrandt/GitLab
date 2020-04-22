@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module API
-  class MavenPackages < Grape::API
+  class MavenPackages < Grape::API::Instance
     MAVEN_ENDPOINT_REQUIREMENTS = {
       file_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
