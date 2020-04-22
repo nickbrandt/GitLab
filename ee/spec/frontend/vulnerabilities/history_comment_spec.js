@@ -110,7 +110,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.post.length).toBe(1);
+          expect(mockAxios.history.post).toHaveLength(1);
           expect(wrapper.emitted().onCommentAdded).toBeTruthy();
           expect(wrapper.emitted().onCommentAdded[0][0]).toEqual(comment);
         });
@@ -125,7 +125,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.post.length).toBe(1);
+          expect(mockAxios.history.post).toHaveLength(1);
           expect(createFlash).toHaveBeenCalledTimes(1);
           expect(commentEditor().exists()).toBe(true);
         });
@@ -198,7 +198,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.delete.length).toBe(1);
+          expect(mockAxios.history.delete).toHaveLength(1);
           expect(wrapper.emitted().onCommentDeleted).toBeTruthy();
           expect(wrapper.emitted().onCommentDeleted[0][0]).toEqual(comment);
         });
@@ -215,7 +215,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.delete.length).toBe(1);
+          expect(mockAxios.history.delete).toHaveLength(1);
           expect(createFlash).toHaveBeenCalledTimes(1);
         });
     });
@@ -234,7 +234,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.put.length).toBe(1);
+          expect(mockAxios.history.put).toHaveLength(1);
           expect(wrapper.emitted().onCommentUpdated).toBeTruthy();
           expect(wrapper.emitted().onCommentUpdated[0][0]).toEqual(responseData);
           expect(wrapper.emitted().onCommentUpdated[0][1]).toEqual(comment);
@@ -250,7 +250,7 @@ describe('History Comment', () => {
           return axios.waitForAll();
         })
         .then(() => {
-          expect(mockAxios.history.put.length).toBe(1);
+          expect(mockAxios.history.put).toHaveLength(1);
           expect(createFlash).toHaveBeenCalledTimes(1);
         });
     });
