@@ -1224,6 +1224,53 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#package_files_checksummed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of checksummed package files' do
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksum_failure)
+
+      expect(subject.package_files_checksummed_count).to eq(2)
+    end
+  end
+
+  describe '#package_files_checksum_failed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of failed package files' do
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksum_failure)
+      create(:package_file, :jar, :checksum_failure)
+
+      expect(subject.package_files_checksum_failed_count).to eq(2)
+    end
+  end
+
+  describe '#package_files_checksummed_in_percentage' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns 0 when no package files available' do
+      expect(subject.package_files_checksummed_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage' do
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksummed)
+      create(:package_file, :jar, :checksum_failure)
+
+      expect(subject.package_files_checksummed_in_percentage).to be_within(0.0001).of(75)
+    end
+  end
+
   describe '#load_data_from_current_node' do
     context 'on the primary' do
       before do

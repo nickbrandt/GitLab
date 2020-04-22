@@ -71,6 +71,9 @@ class GeoNodeStatus < ApplicationRecord
     design_repositories_count
     design_repositories_synced_count
     design_repositories_failed_count
+    package_files_count
+    package_files_checksummed_count
+    package_files_checksum_failed_count
   ).freeze
 
   # Be sure to keep this consistent with Prometheus naming conventions
@@ -142,7 +145,10 @@ class GeoNodeStatus < ApplicationRecord
     design_repositories_count: 'Total number of syncable design repositories available on primary',
     design_repositories_synced_count: 'Number of syncable design repositories synced on secondary',
     design_repositories_failed_count: 'Number of syncable design repositories failed to sync on secondary',
-    design_repositories_registry_count: 'Number of design repositories in the registry'
+    design_repositories_registry_count: 'Number of design repositories in the registry',
+    package_files_count: 'Number of package files on primary',
+    package_files_checksummed_count: 'Number of package files checksummed on primary',
+    package_files_checksum_failed_count: 'Number of package files failed to checksum on primary'
   }.freeze
 
   EXPIRATION_IN_MINUTES = 5
@@ -157,6 +163,9 @@ class GeoNodeStatus < ApplicationRecord
 
       define_method("#{attr_name}=") do |val|
         status[attr_name] = val.nil? ? nil : val.to_i
+
+        return unless self.class.column_names.include?(attr_name)
+
         write_attribute(attr_name, val)
       end
     end
@@ -327,6 +336,7 @@ class GeoNodeStatus < ApplicationRecord
   attr_in_percentage :replication_slots_used,        :replication_slots_used_count,        :replication_slots_count
   attr_in_percentage :container_repositories_synced, :container_repositories_synced_count, :container_repositories_count
   attr_in_percentage :design_repositories_synced,    :design_repositories_synced_count,    :design_repositories_count
+  attr_in_percentage :package_files_checksummed,     :package_files_checksummed_count,     :package_files_count
 
   def storage_shards_match?
     return true if geo_node.primary?
@@ -459,6 +469,9 @@ class GeoNodeStatus < ApplicationRecord
       self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
       self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
       self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
+      self.package_files_count = Geo::PackageFileReplicator.primary_total_count
+      self.package_files_checksummed_count = Geo::PackageFileReplicator.checksummed_count
+      self.package_files_checksum_failed_count = Geo::PackageFileReplicator.checksum_failed_count
     elsif Gitlab::Geo.secondary?
       self.repositories_verified_count = registries_for_verified_projects(:repository).count
       self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count

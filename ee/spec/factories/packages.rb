@@ -210,8 +210,16 @@ FactoryBot.define do
       size { 1149.bytes }
     end
 
-    trait :object_storage do
+    trait(:object_storage) do
       file_store { Packages::PackageFileUploader::Store::REMOTE }
+    end
+
+    trait(:checksummed) do
+      verification_checksum { 'abc' }
+    end
+
+    trait(:checksum_failure) do
+      verification_failure { 'Could not calculate the checksum' }
     end
   end
 

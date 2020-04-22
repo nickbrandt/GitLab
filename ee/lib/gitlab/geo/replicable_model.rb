@@ -9,6 +9,9 @@ module Gitlab
       included do
         # If this hook turns out not to apply to all Models, perhaps we should extract a `ReplicableBlobModel`
         after_create_commit -> { replicator.handle_after_create_commit if replicator.respond_to?(:handle_after_create_commit) }
+
+        scope :checksummed, -> { where('verification_checksum IS NOT NULL') }
+        scope :checksum_failed, -> { where('verification_failure IS NOT NULL') }
       end
 
       class_methods do

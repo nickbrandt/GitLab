@@ -8,9 +8,7 @@ module Geo
       model_record.file
     end
 
-    private
-
-    def model
+    def self.model
       ::Packages::PackageFile
     end
   end

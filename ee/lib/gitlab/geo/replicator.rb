@@ -51,7 +51,25 @@ module Gitlab
         const_get(replicator_class_name, false)
       end
 
+      def self.checksummed
+        model.checksummed
+      end
+
+      def self.checksummed_count
+        model.checksummed.count
+      end
+
+      def self.checksum_failed_count
+        model.checksum_failed.count
+      end
+
+      def self.primary_total_count
+        model.count
+      end
+
       attr_reader :model_record_id
+
+      delegate :model, to: :class
 
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
