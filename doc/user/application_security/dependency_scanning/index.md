@@ -565,7 +565,7 @@ Add the following job section to `.gitlab-ci.yml`:
 ```yaml
 gemnasium-python-dependency_scanning:
   before_script:
-    - mkdir ~/.config/pip
+    - mkdir -p ~/.config/pip
     - cp pip.conf ~/.config/pip/pip.conf
 ```
 
