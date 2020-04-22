@@ -250,7 +250,7 @@ describe Projects::FeatureFlagsController do
       {
         namespace_id: project.namespace,
         project_id: project,
-        id: feature_flag.id
+        iid: feature_flag.iid
       }
     end
 
@@ -266,6 +266,41 @@ describe Projects::FeatureFlagsController do
       is_expected.to match_response_schema('feature_flag', dir: 'ee')
     end
 
+    it 'routes based on iid' do
+      other_project = create(:project)
+      other_project.add_developer(user)
+      other_feature_flag = create(:operations_feature_flag, project: other_project,
+                                  name: 'other_flag')
+      params = {
+        namespace_id: other_project.namespace,
+        project_id: other_project,
+        iid: other_feature_flag.iid
+      }
+
+      get(:show, params: params, format: :json)
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response['name']).to eq(other_feature_flag.name)
+    end
+
+    it 'routes based on iid when new version flags are disabled' do
+      stub_feature_flags(feature_flags_new_version: false)
+      other_project = create(:project)
+      other_project.add_developer(user)
+      other_feature_flag = create(:operations_feature_flag, project: other_project,
+                                  name: 'other_flag')
+      params = {
+        namespace_id: other_project.namespace,
+        project_id: other_project,
+        iid: other_feature_flag.iid
+      }
+
+      get(:show, params: params, format: :json)
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response['name']).to eq(other_feature_flag.name)
+    end
+
     context 'when feature flag is not found' do
       let!(:feature_flag) { }
 
@@ -273,7 +308,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: 1
+          iid: 1
         }
       end
 
@@ -339,7 +374,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_feature_flag.id
+          iid: new_version_feature_flag.iid
         }
       end
 
@@ -738,7 +773,7 @@ describe Projects::FeatureFlagsController do
       {
         namespace_id: project.namespace,
         project_id: project,
-        id: feature_flag.id
+        iid: feature_flag.iid
       }
     end
 
@@ -771,7 +806,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: 0
+          iid: 0
         }
       end
 
@@ -794,7 +829,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id
+          iid: new_version_flag.iid
         }
       end
 
@@ -827,7 +862,7 @@ describe Projects::FeatureFlagsController do
       {
         namespace_id: project.namespace,
         project_id: project,
-        id: feature_flag.id,
+        iid: feature_flag.iid,
         operations_feature_flag: {
           name: 'ci_new_live_trace'
         }
@@ -853,7 +888,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             active: false
           }
@@ -877,7 +912,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: { active: true }
         }
         put(:update, params: params, format: :json)
@@ -903,7 +938,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [{ environment_scope: 'production', active: false }]
           }
@@ -923,7 +958,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [{ environment_scope: '*', active: false }]
           }
@@ -940,7 +975,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [
               {
@@ -966,7 +1001,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [
               {
@@ -988,7 +1023,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [
               {
@@ -1011,7 +1046,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [
               {
@@ -1037,7 +1072,7 @@ describe Projects::FeatureFlagsController do
         {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [
               {
@@ -1163,7 +1198,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [{ id: scope.id }]
           }
@@ -1187,7 +1222,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: feature_flag.id,
+          iid: feature_flag.iid,
           operations_feature_flag: {
             scopes_attributes: [{ id: scope.id }]
           }
@@ -1229,7 +1264,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               name: 'userWithId',
@@ -1259,7 +1294,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               name: 'gradualRolloutUserId',
@@ -1286,7 +1321,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               id: strategy.id,
@@ -1313,7 +1348,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               id: strategy.id,
@@ -1339,7 +1374,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               id: strategy.id,
@@ -1360,7 +1395,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             strategies_attributes: [{
               id: strategy.id,
@@ -1383,7 +1418,7 @@ describe Projects::FeatureFlagsController do
         params = {
           namespace_id: project.namespace,
           project_id: project,
-          id: new_version_flag.id,
+          iid: new_version_flag.iid,
           operations_feature_flag: {
             name: 'some-other-name'
           }
