@@ -130,7 +130,7 @@ module EE
                   rule = approval_rules.code_owner.first
                   rule ||= ApprovalMergeRequestRule.find_or_create_code_owner_rule(
                     self,
-                    'Code Owner'
+                    Struct.new(:pattern, :owner_line).new("Code Owner")
                   )
 
                   rule.users = owners.uniq

@@ -65,8 +65,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
   scope :open_merge_requests, -> { merge(MergeRequest.opened) }
   scope :for_checks_that_can_be_refreshed, -> { license_compliance.open_merge_requests.with_head_pipeline }
 
-  def self.find_or_create_code_owner_rule(merge_request, pattern)
-    merge_request.approval_rules.code_owner.where(name: pattern).first_or_create do |rule|
+  def self.find_or_create_code_owner_rule(merge_request, entry)
+    merge_request.approval_rules.code_owner.where(name: entry.pattern).first_or_create do |rule|
       rule.rule_type = :code_owner
       rule.code_owner = true # deprecated, replaced with `rule_type: :code_owner`
     end
