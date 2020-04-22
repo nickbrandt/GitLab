@@ -5,15 +5,15 @@ module Gitlab
     class Entry
       include ::Gitlab::Utils::StrongMemoize
 
-      Data = Struct.new(:pattern, :owner_line)
+      Data = Struct.new(:pattern, :owner_line, :section)
 
       attr_reader :data
       protected :data
 
-      delegate :pattern, :hash, :owner_line, to: :data
+      delegate :pattern, :hash, :owner_line, :section, to: :data
 
-      def initialize(pattern, owner_line)
-        @data = Data.new(pattern, owner_line)
+      def initialize(pattern, owner_line, section = "CODEOWNERS")
+        @data = Data.new(pattern, owner_line, section)
       end
 
       def all_users
