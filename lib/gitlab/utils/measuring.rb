@@ -6,20 +6,20 @@ module Gitlab
   module Utils
     class Measuring
       class << self
-        def execute_with(measurement_enabled, logger, base_data)
-          measurement_enabled ? measuring(logger, base_data).with_measuring { yield } : yield
+        def execute_with(measurement_enabled, logger, base_log_data)
+          measurement_enabled ? measuring(logger, base_log_data).with_measuring { yield } : yield
         end
 
         private
 
-        def measuring(logger, base_data)
-          Gitlab::Utils::Measuring.new(logger: logger, base_data: base_data)
+        def measuring(logger, base_log_data)
+          Gitlab::Utils::Measuring.new(logger: logger, base_log_data: base_log_data)
         end
       end
 
-      def initialize(logger: nil, base_data: {})
-        @logger = logger || Logger.new($stdout)
-        @base_data = base_data
+      def initialize(logger: nil, base_log_data: {})
+        self.logger = logger || Logger.new($stdout)
+        self.base_log_data = base_log_data
       end
 
       def with_measuring
@@ -32,9 +32,9 @@ module Gitlab
         end
 
         log_info(
-          gc_stats: @gc_stats,
-          time_to_finish: @time_to_finish,
-          number_of_sql_calls: @count,
+          gc_stats: gc_stats,
+          time_to_finish: time_to_finish,
+          number_of_sql_calls: sql_calls_count,
           memory_usage: "#{Gitlab::Metrics::System.memory_usage.to_f / 1024 / 1024} MiB",
           label: ::Prometheus::PidProvider.worker_id
         )
@@ -44,20 +44,20 @@ module Gitlab
 
       private
 
-      attr_reader :logger, :base_data
+      attr_accessor :gc_stats, :time_to_finish, :sql_calls_count, :logger, :base_log_data
 
       def with_count_queries(&block)
-        @count = 0
+        self.sql_calls_count = 0
 
         counter_f = ->(_name, _started, _finished, _unique_id, payload) {
-          @count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
+          self.sql_calls_count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
         }
 
         ActiveSupport::Notifications.subscribed(counter_f, "sql.active_record", &block)
       end
 
       def log_info(details)
-        details = base_data.merge(details)
+        details = base_log_data.merge(details)
         details = details.to_yaml if ActiveSupport::Logger.logger_outputs_to?(logger, STDOUT)
         logger.info(details)
       end
@@ -67,7 +67,7 @@ module Gitlab
         stats_before = GC.stat
         result = yield
         stats_after = GC.stat
-        @gc_stats = stats_after.map do |key, after_value|
+        self.gc_stats = stats_after.map do |key, after_value|
           before_value = stats_before[key]
           [key, before: before_value, after: after_value, diff: after_value - before_value]
         end.to_h
@@ -75,8 +75,8 @@ module Gitlab
       end
 
       def with_measure_time
-        result = 0
-        @time_to_finish = Benchmark.realtime do
+        result = nil
+        self.time_to_finish = Benchmark.realtime do
           result = yield
         end
 

@@ -18,7 +18,7 @@ module Projects
       measurement_enabled = !!options[:measurement_enabled]
       measurement_logger = options[:measurement_logger]
 
-      ::Gitlab::Utils::Measuring.execute_with(measurement_enabled, measurement_logger, base_data) do
+      ::Gitlab::Utils::Measuring.execute_with(measurement_enabled, measurement_logger, base_log_data) do
         prepare_template_environment(template_file)
 
         prepare_import_params
@@ -29,19 +29,19 @@ module Projects
 
     private
 
-    def base_data
-      base_data = {
+    def base_log_data
+      base_log_data = {
         class: self.class.name,
         current_user: current_user.name,
         project_full_path: project_path
       }
 
       if template_file
-        base_data[:import_type] = 'gitlab_project'
-        base_data[:file_path] = template_file.path
+        base_log_data[:import_type] = 'gitlab_project'
+        base_log_data[:file_path] = template_file.path
       end
 
-      base_data
+      base_log_data
     end
 
     def overwrite_project?
@@ -61,9 +61,7 @@ module Projects
     # rubocop: enable CodeReuse/ActiveRecord
 
     def project_path
-      strong_memoize(:project_path) do
-        "#{current_namespace.full_path}/#{params[:path]}"
-      end
+      "#{current_namespace.full_path}/#{params[:path]}"
     end
 
     def overwrite?
