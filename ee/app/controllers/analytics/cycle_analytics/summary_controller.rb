@@ -13,7 +13,7 @@ module Analytics
       def show
         return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
 
-        group_level = ::CycleAnalytics::GroupLevel.new(group: @group, options: options(group_params))
+        group_level = GroupLevel.new(group: @group, options: options(group_params))
 
         render json: group_level.summary
       end
