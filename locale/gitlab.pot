@@ -1111,7 +1111,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-msgid "Active %{type} Tokens (%{token_length})"
+msgid "Active %{type} tokens (%{token_length})"
 msgstr ""
 
 msgid "Active Sessions"
@@ -1213,6 +1213,9 @@ msgid "Add an SSH key"
 msgstr ""
 
 msgid "Add an existing issue"
+msgstr ""
+
+msgid "Add an impersonation token"
 msgstr ""
 
 msgid "Add an issue"
@@ -2644,7 +2647,7 @@ msgstr ""
 msgid "Are you sure you want to reset the health check token?"
 msgstr ""
 
-msgid "Are you sure you want to revoke this %{type} Token? This action cannot be undone."
+msgid "Are you sure you want to revoke this %{type} token? This action cannot be undone."
 msgstr ""
 
 msgid "Are you sure you want to revoke this nickname?"
@@ -6000,6 +6003,9 @@ msgstr ""
 msgid "Copy %{proxy_url}"
 msgstr ""
 
+msgid "Copy %{type} token"
+msgstr ""
+
 msgid "Copy Account ID to clipboard"
 msgstr ""
 
@@ -6045,9 +6051,6 @@ msgstr ""
 msgid "Copy file path"
 msgstr ""
 
-msgid "Copy impersonation token"
-msgstr ""
-
 msgid "Copy key"
 msgstr ""
 
@@ -6061,9 +6064,6 @@ msgid "Copy link"
 msgstr ""
 
 msgid "Copy link to chart"
-msgstr ""
-
-msgid "Copy personal access token"
 msgstr ""
 
 msgid "Copy reference"
@@ -15895,9 +15895,6 @@ msgstr ""
 msgid "Profiles|Give your individual key a title"
 msgstr ""
 
-msgid "Profiles|Impersonation"
-msgstr ""
-
 msgid "Profiles|Include private contributions on my profile"
 msgstr ""
 
@@ -15941,9 +15938,6 @@ msgid "Profiles|Organization"
 msgstr ""
 
 msgid "Profiles|Path"
-msgstr ""
-
-msgid "Profiles|Personal Access"
 msgstr ""
 
 msgid "Profiles|Position and size your new avatar"
@@ -16145,6 +16139,9 @@ msgid "Project '%{project_name}' was successfully updated."
 msgstr ""
 
 msgid "Project '%{project_name}' will be deleted on %{date}"
+msgstr ""
+
+msgid "Project Access Tokens"
 msgstr ""
 
 msgid "Project Audit Events"
@@ -21830,6 +21827,9 @@ msgstr ""
 msgid "This project does not have billing enabled. To create a cluster, <a href=%{linkToBilling} target=\"_blank\" rel=\"noopener noreferrer\">enable billing <i class=\"fa fa-external-link\" aria-hidden=\"true\"></i></a> and try again."
 msgstr ""
 
+msgid "This project has no active access tokens."
+msgstr ""
+
 msgid "This project is archived and cannot be commented on."
 msgstr ""
 
@@ -21875,7 +21875,7 @@ msgstr ""
 msgid "This user cannot be unlocked manually from GitLab"
 msgstr ""
 
-msgid "This user has no active %{type} Tokens."
+msgid "This user has no active %{type} tokens."
 msgstr ""
 
 msgid "This user has no identities"
@@ -24327,6 +24327,9 @@ msgstr ""
 msgid "You can also upload existing files from your computer using the instructions below."
 msgstr ""
 
+msgid "You can also use project access tokens to authenticate against Git over HTTP."
+msgstr ""
+
 msgid "You can always edit this later"
 msgstr ""
 
@@ -24352,6 +24355,9 @@ msgid "You can easily install a Runner on a Kubernetes cluster. %{link_to_help_p
 msgstr ""
 
 msgid "You can filter by 'days to merge' by clicking on the columns in the chart."
+msgstr ""
+
+msgid "You can generate an access token scoped to this project for each application that needs access to the GitLab API."
 msgstr ""
 
 msgid "You can get started by cloning the repository or start adding files to it with one of the following options."
@@ -24726,9 +24732,6 @@ msgstr ""
 msgid "Your Groups"
 msgstr ""
 
-msgid "Your New Personal Access Token"
-msgstr ""
-
 msgid "Your Personal Access Tokens will expire in %{days_to_expire} days or less"
 msgstr ""
 
@@ -24835,6 +24838,9 @@ msgid "Your message here"
 msgstr ""
 
 msgid "Your name"
+msgstr ""
+
+msgid "Your new %{type} token"
 msgstr ""
 
 msgid "Your new SCIM token"
@@ -25960,6 +25966,9 @@ msgid "project"
 msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "project access"
+msgstr ""
 
 msgid "project avatar"
 msgstr ""
