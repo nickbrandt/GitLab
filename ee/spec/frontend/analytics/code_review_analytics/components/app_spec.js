@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { GlLoadingIcon, GlEmptyState, GlBadge, GlPagination } from '@gitlab/ui';
 import CodeReviewAnalyticsApp from 'ee/analytics/code_review_analytics/components/app.vue';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
-import createState from 'ee/analytics/code_review_analytics/store/state';
+import createState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
 
 jest.mock('ee/analytics/code_review_analytics/filtered_search_code_review_analytics', () =>
   jest.fn().mockImplementation(() => ({
@@ -29,18 +29,23 @@ describe('CodeReviewAnalyticsApp component', () => {
 
   const createStore = (initialState = {}, getters = {}) =>
     new Vuex.Store({
-      state: {
-        ...createState(),
-        ...initialState,
-      },
-      actions: {
-        setProjectId: jest.fn(),
-        setPage,
-        fetchMergeRequests,
-      },
-      getters: {
-        showMrCount: () => false,
-        ...getters,
+      modules: {
+        mergeRequests: {
+          namespaced: true,
+          state: {
+            ...createState(),
+            ...initialState,
+          },
+          actions: {
+            setProjectId: jest.fn(),
+            setPage,
+            fetchMergeRequests,
+          },
+          getters: {
+            showMrCount: () => false,
+            ...getters,
+          },
+        },
       },
     });
 

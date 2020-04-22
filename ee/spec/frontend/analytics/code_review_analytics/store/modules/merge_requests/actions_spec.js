@@ -1,11 +1,11 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import * as actions from 'ee/analytics/code_review_analytics/store/actions';
-import * as types from 'ee/analytics/code_review_analytics/store/mutation_types';
-import getInitialState from 'ee/analytics/code_review_analytics/store/state';
+import * as actions from 'ee/analytics/code_review_analytics/store/modules/merge_requests/actions';
+import * as types from 'ee/analytics/code_review_analytics/store/modules/merge_requests/mutation_types';
+import getInitialState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
 import createFlash from '~/flash';
-import mockMergeRequests from '../mock_data';
+import mockMergeRequests from '../../../mock_data';
 
 jest.mock('~/flash', () => jest.fn());
 

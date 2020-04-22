@@ -1,7 +1,7 @@
-import * as types from 'ee/analytics/code_review_analytics/store/mutation_types';
-import mutations from 'ee/analytics/code_review_analytics/store/mutations';
-import getInitialState from 'ee/analytics/code_review_analytics/store/state';
-import { mockMergeRequests } from '../../productivity_analytics/mock_data';
+import * as types from 'ee/analytics/code_review_analytics/store/modules/merge_requests/mutation_types';
+import mutations from 'ee/analytics/code_review_analytics/store/modules/merge_requests/mutations';
+import getInitialState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
+import mockMergeRequests from '../../../mock_data';
 
 describe('Code review analytics mutations', () => {
   let state;

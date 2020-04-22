@@ -20,7 +20,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   computed: {
-    ...mapState(['mergeRequests']),
+    ...mapState('mergeRequests', ['mergeRequests']),
   },
   methods: {
     getTimeAgoString(createdAt) {

@@ -21,6 +21,6 @@ export default class FilteredSearchCodeReviewAnalytics extends FilteredSearchMan
    */
   updateObject = path => {
     const filters = urlParamsToObject(path);
-    store.dispatch('setFilters', filters);
+    store.dispatch('mergeRequests/setFilters', filters);
   };
 }
