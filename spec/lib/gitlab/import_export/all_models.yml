@@ -344,6 +344,7 @@ project:
 - labels
 - events
 - milestones
+- sprints
 - notes
 - snippets
 - hooks
