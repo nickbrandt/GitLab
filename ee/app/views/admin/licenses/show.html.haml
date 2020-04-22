@@ -87,9 +87,9 @@
             - @license.licensee.keys.each do |label|
               %th= label
             %th Plan
-            %th Uploaded at
-            %th Started at
-            %th Expired at
+            %th Uploaded on
+            %th Valid from
+            %th Expires on
             %th Active users
         %tbody
           - @previous_licenses.each do |license|
@@ -111,6 +111,6 @@
               %td
                 %span
                   - if license.restricted?(:active_user_count)
-                    #{license.restrictions[:active_user_count]} users
+                    = license.restrictions[:active_user_count]
                   - else
                     Unlimited
