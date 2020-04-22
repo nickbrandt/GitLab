@@ -219,6 +219,29 @@ describe Repository do
     end
   end
 
+  describe '#lfs_enabled? (design repositories)' do
+    let(:project) { create(:project, :design_repo, lfs_enabled: lfs_enabled) }
+    let(:repository) { project.design_repository }
+
+    before do
+      stub_lfs_setting(enabled: true)
+    end
+
+    subject { repository.lfs_enabled? }
+
+    context 'project has LFS disabled' do
+      let(:lfs_enabled) { false }
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'project has LFS enabled' do
+      let(:lfs_enabled) { true }
+
+      it { is_expected.to be_truthy }
+    end
+  end
+
   describe '#upstream_branch_name' do
     let(:pull_mirror_branch_prefix) { 'upstream/' }
     let(:branch_name) { 'upstream/master' }
