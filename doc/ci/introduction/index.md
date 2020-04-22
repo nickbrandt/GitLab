@@ -76,6 +76,9 @@ to apply all the continuous methods (Continuous Integration,
 Delivery, and Deployment) to your software with no third-party
 application or integration needed.
 
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For an overview, see [Introduction to GitLab CI](https://www.youtube.com/watch?v=l5705U8s_nQ) from a recent GitLab meetup.
+
 ### How GitLab CI/CD works
 
 To use GitLab CI/CD, all you need is an application codebase hosted in a
