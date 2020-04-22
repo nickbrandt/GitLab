@@ -26,7 +26,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :feature_flags
+        resources :feature_flags, param: :iid
         resource :feature_flags_client, only: [] do
           post :reset_token
         end

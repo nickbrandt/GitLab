@@ -96,9 +96,9 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   def feature_flag
     @feature_flag ||= if new_version_feature_flags_enabled?
-                        project.operations_feature_flags.find(params[:id])
+                        project.operations_feature_flags.find_by_iid!(params[:iid])
                       else
-                        project.operations_feature_flags.legacy_flag.find(params[:id])
+                        project.operations_feature_flags.legacy_flag.find_by_iid!(params[:iid])
                       end
   end
 

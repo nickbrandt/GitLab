@@ -3,6 +3,7 @@
 module Operations
   class FeatureFlag < ApplicationRecord
     include AtomicInternalId
+    include IidRoutes
 
     self.table_name = 'operations_feature_flags'
 
