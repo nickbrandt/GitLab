@@ -2,13 +2,11 @@
   %h2.related-branches-title
     = pluralize(@related_branches.size, 'Related Branch')
   %ul.unstyled-list.related-merge-requests
-    - @related_branches.each do |branch|
+    - @branch_info.each do |branch|
       %li
-        - target = @project.repository.find_branch(branch).dereferenced_target
-        - pipeline = @project.pipeline_for(branch, target.sha) if target
-        - if can?(current_user, :read_pipeline, pipeline)
+        - if can?(current_user, :read_pipeline, branch[:pipeline])
           %span.related-branch-ci-status
-            = render 'ci/status/icon', status: pipeline.detailed_status(current_user)
+            = render 'ci/status/icon', status: branch[:pipeline].detailed_status(current_user)
         %span.related-branch-info
           %strong
-            = link_to branch, project_compare_path(@project, from: @project.default_branch, to: branch), class: "ref-name"
+            = link_to branch[:name], project_compare_path(@project, from: @project.default_branch, to: branch[:name]), class: "ref-name"

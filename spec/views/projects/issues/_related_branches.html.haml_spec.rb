@@ -12,7 +12,8 @@ describe 'projects/issues/_related_branches' do
 
   before do
     assign(:project, project)
-    assign(:related_branches, ['feature'])
+    assign(:related_branches, %w(other feature))
+    assign(:branch_info, [{ name: 'other', pipeline: nil }, { name: 'feature', pipeline: pipeline }])
 
     project.add_developer(user)
     allow(view).to receive(:current_user).and_return(user)
@@ -22,6 +23,7 @@ describe 'projects/issues/_related_branches' do
 
   it 'shows the related branches with their build status' do
     expect(rendered).to match('feature')
+    expect(rendered).to match('other')
     expect(rendered).to have_css('.related-branch-ci-status')
   end
 end

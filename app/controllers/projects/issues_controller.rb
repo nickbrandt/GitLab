@@ -155,6 +155,12 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def related_branches
     @related_branches = Issues::RelatedBranchesService.new(project, current_user).execute(issue)
+    @branch_info = @related_branches.map do |branch_name|
+      branch = @project.repository.find_branch(branch_name)
+      target = branch&.dereferenced_target
+      pipeline = @project.pipeline_for(branch_name, target.sha) if target
+      { name: branch_name, pipeline: pipeline }
+    end
 
     respond_to do |format|
       format.json do
