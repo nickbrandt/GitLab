@@ -230,7 +230,6 @@ class License < ApplicationRecord
   after_create :reset_current
   after_destroy :reset_current
 
-  scope :previous, -> { order(created_at: :desc).offset(1) }
   scope :recent, -> { reorder(id: :desc) }
 
   class << self
@@ -290,6 +289,10 @@ class License < ApplicationRecord
       return false unless ::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
 
       ANY_PLAN_FEATURES.include?(feature)
+    end
+
+    def history
+      all.sort_by { |license| [license.starts_at, license.created_at, license.expires_at] }.reverse
     end
   end
 
