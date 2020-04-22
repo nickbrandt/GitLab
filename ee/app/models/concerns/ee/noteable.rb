@@ -11,10 +11,6 @@ module EE
       def replyable_types
         super + %w[Epic Vulnerability]
       end
-
-      def resolvable_types
-        super + %w(DesignManagement::Design)
-      end
     end
 
     override :note_etag_key
@@ -24,8 +20,6 @@ module EE
         ::Gitlab::Routing.url_helpers.group_epic_notes_path(group, self)
       when Vulnerability
         ::Gitlab::Routing.url_helpers.project_security_vulnerability_notes_path(project, self)
-      when DesignManagement::Design
-        ::Gitlab::Routing.url_helpers.designs_project_issue_path(project, issue, { vueroute: filename })
       else
         super
       end
