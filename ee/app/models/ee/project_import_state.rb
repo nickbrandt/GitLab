@@ -97,6 +97,7 @@ module EE
 
     def mirror_update_due?
       return false unless project.mirror_with_content?
+      return false unless next_execution_timestamp?
       return false if project.archived?
       return false if hard_failed?
       return false if updating_mirror?

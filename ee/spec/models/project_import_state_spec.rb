@@ -271,6 +271,15 @@ describe ProjectImportState, type: :model do
         expect(import_state.mirror_update_due?).to be false
       end
     end
+
+    context 'when next_execution_timestamp is nil' do
+      it 'returns false' do
+        import_state = create(:import_state, :finished, :mirror, :repository)
+        import_state.next_execution_timestamp = nil
+
+        expect(import_state.mirror_update_due?).to be false
+      end
+    end
   end
 
   describe '#last_update_status' do
