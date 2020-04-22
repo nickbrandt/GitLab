@@ -1,39 +1,30 @@
 - page_title 'Geo Projects'
 - params[:sync_status] ||= []
 
-.top-area.scrolling-tabs-container.inner-page-scroll-tabs
-  %ul.nav-links.nav.nav-tabs
-    - opts = params[:sync_status].present? ? {} : { page: admin_geo_projects_path }
-    = nav_link(opts) do
-      = link_to admin_geo_projects_path do
-        = s_('Geo|All')
-    = nav_link(html_options: { class: active_when(params[:sync_status] == 'synced') }) do
-      = link_to admin_geo_projects_path(sync_status: 'synced') do
-        = s_('Geo|Synced')
-    = nav_link(html_options: { class: active_when(params[:sync_status] == 'pending') }) do
-      = link_to admin_geo_projects_path(sync_status: 'pending') do
-        = s_('Geo|Pending')
-    = nav_link(html_options: { class: active_when(params[:sync_status] == 'failed') }) do
-      = link_to admin_geo_projects_path(sync_status: 'failed') do
-        = s_('Geo|Failed')
-    = nav_link(html_options: { class: active_when(params[:sync_status] == 'never') }) do
-      = link_to admin_geo_projects_path(sync_status: 'never') do
-        = s_('Geo|Never')
-  .nav-controls
-    = render(partial: 'shared/projects/search_form', autofocus: true)
-    .dropdown
-      %a.btn.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, 'aria-haspopup' => 'true', 'aria-expanded' => 'false' }
-        = icon('gears')
-        = s_('Geo|Batch operations')
-        = icon("caret-down")
-      %ul.dropdown-menu.dropdown-menu-right
-        %li.dropdown-header= s_('Geo|Batch operations')
-        %li= link_to s_('Geo|Resync all projects'), resync_all_admin_geo_projects_path, method: :post
-        %li= link_to s_('Geo|Reverify all projects'), reverify_all_admin_geo_projects_path, method: :post
-
+%nav.row.d-flex.flex-column.flex-sm-row.align-items-center.bg-secondary.border-bottom.border-secondary-100.p-3
+  .dropdown.col.px-1.my-1.my-sm-0.w-100
+    %a.btn.d-flex.align-items-center.justify-content-between.w-100{ href: '#', data: { toggle: 'dropdown' }, 'aria-haspopup' => 'true', 'aria-expanded' => 'false' }
+      = s_('Geo|Filter by status')
+      = sprite_icon("chevron-down", size: 16)
+    %ul.dropdown-menu
+      = nav_link(html_options: { class: ('bg-secondary-100' if !params[:sync_status].present?) }) do
+        = link_to admin_geo_projects_path do
+          = s_('Geo|All projects')
+      = nav_link(html_options: { class: ('bg-secondary-100' if params[:sync_status] == 'pending') }) do
+        = link_to admin_geo_projects_path(sync_status: 'pending') do
+          = s_('Geo|In progress')
+      = nav_link(html_options: { class: ('bg-secondary-100' if params[:sync_status] == 'failed') }) do
+        = link_to admin_geo_projects_path(sync_status: 'failed') do
+          = s_('Geo|Failed')
+      = nav_link(html_options: { class: ('bg-secondary-100' if params[:sync_status] == 'synced') }) do
+        = link_to admin_geo_projects_path(sync_status: 'synced') do
+          = s_('Geo|Synced')
+  .col.project-search.px-1.my-1.my-sm-0.w-100
+    = render 'shared/projects/search_form', autofocus: true, search_form_placeholder: _("Filter by name"), icon: true
+  .col.col-sm-6.d-flex.justify-content-end.my-1.my-sm-0.w-100
+    = button_to s_('Geo|Resync all'), resync_all_admin_geo_projects_path, method: :post, :class => "btn btn-default mr-2"
+    = button_to s_('Geo|Reverify all'), reverify_all_admin_geo_projects_path, method: :post, :class => "btn btn-default"
 - case params[:sync_status]
-- when 'never'
-  = render(partial: 'never')
 - when 'failed'
   = render(partial: 'failed')
 - when 'pending'

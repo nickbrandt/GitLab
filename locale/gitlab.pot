@@ -9689,9 +9689,6 @@ msgstr ""
 msgid "Geo|All projects are being scheduled for re-verify"
 msgstr ""
 
-msgid "Geo|Batch operations"
-msgstr ""
-
 msgid "Geo|Could not remove tracking entry for an existing project."
 msgstr ""
 
@@ -9701,7 +9698,13 @@ msgstr ""
 msgid "Geo|Failed"
 msgstr ""
 
+msgid "Geo|Filter by status"
+msgstr ""
+
 msgid "Geo|Geo Status"
+msgstr ""
+
+msgid "Geo|In progress"
 msgstr ""
 
 msgid "Geo|In sync"
@@ -9726,9 +9729,6 @@ msgid "Geo|Next sync scheduled at"
 msgstr ""
 
 msgid "Geo|Not synced yet"
-msgstr ""
-
-msgid "Geo|Pending"
 msgstr ""
 
 msgid "Geo|Pending synchronization"
@@ -9767,7 +9767,7 @@ msgstr ""
 msgid "Geo|Resync"
 msgstr ""
 
-msgid "Geo|Resync all projects"
+msgid "Geo|Resync all"
 msgstr ""
 
 msgid "Geo|Retry count"
@@ -9776,7 +9776,7 @@ msgstr ""
 msgid "Geo|Reverify"
 msgstr ""
 
-msgid "Geo|Reverify all projects"
+msgid "Geo|Reverify all"
 msgstr ""
 
 msgid "Geo|Status"
