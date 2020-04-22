@@ -5,8 +5,8 @@ require 'spec_helper'
 describe 'Prometheus custom metrics', :js do
   include PrometheusHelpers
 
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
+  include_context 'project service activation'
+
   let!(:prometheus_metric) { create(:prometheus_metric, project: project) }
 
   around do |example|
@@ -14,29 +14,17 @@ describe 'Prometheus custom metrics', :js do
   end
 
   before do
-    project.add_maintainer(user)
-    sign_in(user)
-
-    visit(project_settings_integrations_path(project))
-
-    click_link('Prometheus')
-
     stub_request(:get, prometheus_query_with_time_url('avg(metric)', Time.now.utc))
-
     create(:prometheus_service, project: project, api_url: 'http://prometheus.example.com', manual_configuration: '1', active: true)
 
-    click_link('Prometheus')
+    visit_project_integration('Prometheus')
   end
 
-  it 'Deletes a custom metric' do
-    wait_for_requests
-
+  it 'deletes a custom metric' do
     first('.custom-metric-link-bold').click
 
     click_button('Delete')
     click_button('Delete metric')
-
-    wait_for_requests
 
     expect(all('.custom-metric-link-bold').count).to eq(0)
   end
