@@ -10,6 +10,7 @@ import Header from 'ee/vulnerabilities/components/header.vue';
 import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
+import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 
 const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
@@ -80,6 +81,7 @@ describe('Vulnerability Header', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
     mockAxios.reset();
     createFlash.mockReset();
   });
@@ -99,6 +101,36 @@ describe('Vulnerability Header', () => {
 
       return waitForPromises().then(() => {
         expect(mockAxios.history.post).toHaveLength(1); // Check that a POST request was made.
+      });
+    });
+
+    it('when the vulnerability state dropdown emits a change event, the state badge updates', () => {
+      const newState = 'dismiss';
+      mockAxios.onPost().reply(201, { state: newState });
+      expect(findBadge().text()).not.toBe(newState);
+
+      const dropdown = wrapper.find(VulnerabilityStateDropdown);
+
+      dropdown.vm.$emit('change');
+
+      return waitForPromises().then(() => {
+        expect(findBadge().text()).toBe(newState);
+      });
+    });
+
+    it('when the vulnerability state dropdown emits a change event, the vulnerabilities event bus event is emitted with the proper event', () => {
+      const newState = 'dismiss';
+      jest.spyOn(VulnerabilitiesEventBus, '$emit');
+      mockAxios.onPost().reply(201, { state: newState });
+      expect(findBadge().text()).not.toBe(newState);
+
+      const dropdown = wrapper.find(VulnerabilityStateDropdown);
+
+      dropdown.vm.$emit('change');
+
+      return waitForPromises().then(() => {
+        expect(VulnerabilitiesEventBus.$emit).toHaveBeenCalledTimes(1);
+        expect(VulnerabilitiesEventBus.$emit).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGE');
       });
     });
 

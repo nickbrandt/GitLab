@@ -2,15 +2,19 @@
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import { joinPaths } from '~/lib/utils/url_utility';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import HistoryEntry from './history_entry.vue';
+import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
   name: 'VulnerabilityFooter',
   components: { IssueNote, SolutionCard, HistoryEntry },
   props: {
+    discussionsUrl: {
+      type: String,
+      required: true,
+    },
     feedback: {
       type: Object,
       required: false,
@@ -40,20 +44,26 @@ export default {
   },
 
   created() {
-    // window.location.pathname is the URL without the protocol or hash/querystring
-    // i.e. http://server/url?query=string#note_123 -> /server/url
-    axios
-      .get(joinPaths(window.location.pathname, 'discussions'))
-      .then(({ data }) => {
-        this.discussions = data;
-      })
-      .catch(() => {
-        createFlash(
-          s__(
-            'VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later.',
-          ),
-        );
-      });
+    this.fetchDiscussions();
+
+    VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGE', this.fetchDiscussions);
+  },
+
+  methods: {
+    fetchDiscussions() {
+      axios
+        .get(this.discussionsUrl)
+        .then(({ data }) => {
+          this.discussions = data;
+        })
+        .catch(() => {
+          createFlash(
+            s__(
+              'VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later.',
+            ),
+          );
+        });
+    },
   },
 };
 </script>
