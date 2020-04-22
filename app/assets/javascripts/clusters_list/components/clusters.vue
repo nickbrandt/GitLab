@@ -70,29 +70,5 @@ export default {
     variant="light"
     class="qa-clusters-table"
   >
-    <template #cell(name)="{ item }">
-      <div class="d-flex flex-row-reverse flex-md-row js-status">
-        {{ item.name }}
-        <gl-loading-icon
-          v-if="item.status === 'deleting'"
-          v-tooltip
-          :title="statusTitle(item.status)"
-          size="sm"
-          class="mr-2 ml-md-2"
-        />
-        <div
-          v-else
-          v-tooltip
-          class="cluster-status-indicator rounded-circle align-self-center gl-w-8 gl-h-8 mr-2 ml-md-2"
-          :class="statusClass(item.status)"
-          :title="statusTitle(item.status)"
-        ></div>
-      </div>
-    </template>
-    <template #cell(clusterType)="{value}">
-      <gl-badge variant="light">
-        {{ value }}
-      </gl-badge>
-    </template>
   </gl-table>
 </template>

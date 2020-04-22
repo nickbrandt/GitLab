@@ -7,6 +7,8 @@ import { __ } from '~/locale';
 import * as types from './mutation_types';
 
 export const fetchClusters = ({ state, commit }) => {
+  commit(types.SET_LOADING_STATE, true);
+
   const poll = new Poll({
     resource: {
       fetchClusters: endpoint => axios.get(endpoint),
@@ -17,7 +19,10 @@ export const fetchClusters = ({ state, commit }) => {
       commit(types.SET_CLUSTERS_DATA, convertObjectPropsToCamelCase(data, { deep: true }));
       commit(types.SET_LOADING_STATE, false);
     },
-    errorCallback: () => flash(__('An error occurred while loading clusters')),
+    errorCallback: () => {
+      commit(types.SET_LOADING_STATE, false);
+      flash(__('An error occurred while loading clusters'))
+    }
   });
 
   if (!Visibility.hidden()) {
