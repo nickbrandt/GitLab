@@ -52,6 +52,11 @@ class InstanceClusterablePresenter < ClusterablePresenter
     create_user_admin_clusters_path
   end
 
+  override :cluster_group_clusters_path
+  def cluster_group_clusters_path
+    cluster_group_admin_clusters_path
+  end
+
   override :create_gcp_clusters_path
   def create_gcp_clusters_path
     create_gcp_admin_clusters_path

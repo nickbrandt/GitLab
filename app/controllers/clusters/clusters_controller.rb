@@ -34,6 +34,10 @@ class Clusters::ClustersController < Clusters::BaseController
     @has_ancestor_clusters = finder.has_ancestor_clusters?
   end
 
+  def cluster_group
+    render json: { started: 'insert clusters here'}
+  end
+
   def new
     if params[:provider] == 'aws'
       @aws_role = current_user.aws_role || Aws::Role.new

@@ -45,8 +45,7 @@ export default {
     ...mapState(['clusters', 'loading']),
   },
   mounted() {
-    // TODO - uncomment this once integrated with BE
-    // this.fetchClusters();
+    this.fetchClusters();
   },
   methods: {
     ...mapActions(['fetchClusters']),

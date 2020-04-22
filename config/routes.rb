@@ -170,6 +170,7 @@ Rails.application.routes.draw do
   concern :clusterable do
     resources :clusters, only: [:index, :new, :show, :update, :destroy] do
       collection do
+        get :cluster_group, format: :json
         post :create_user
         post :create_gcp
         post :create_aws
