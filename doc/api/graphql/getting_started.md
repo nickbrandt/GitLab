@@ -6,12 +6,22 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
-GraphQL is a programatic language for easily accessing and manipulating complex data in a single request mwith an intuitive and flexible syntax.  With a single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
+GraphQL is a programatic language for easily accessing and manipulating complex data in a single request with an intuitive and flexible syntax.  With a single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
 
-TODO (Sameer): pub-sub notifications with realtime updates?
+Additional benefits include:
+1. Representing data as a Graph for easier traversal
+2. Single endpoint with a machine readable schema file reducing versioning complexity
+3. Allow the client to request for only the data it needs and nothing more
+4. (Future) capability to offer `Subscriptions` for clients to get realtime updates as mutations occur 
+5. Facilitate investigative querying of data
 
 ### Why GraphQL vs REST
 For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
+
+REST is widely used and has many benefits.  It provides fixed interaction interface with specific operations such as POST, GET, DELETE, etc.  But the basic premise is to expose the object structure to make it Object Oriented.  Relationships are represented as Identifiers that can be used to get more information.
+Each retrieval requires creation of a new query to retrieve more information. So it performs well when attempting to tie complex objects with step by step data retrieval.  But with modern approaches to retrieve more than single object retrieval requires modification of the object interface or multiple calls.  
+
+For example, when attempting to present data on a Single Page Application (SPA) that may have information sourced from multiple objects can increase the complexity of the front end code. 
 
 TODO (mike): proof point examples & challenges with multiple queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
@@ -22,6 +32,66 @@ TODO (Mike)
 - reduce bandwith
 
 ### Proof Point
+Let's assume the following situation:
+
+You have just found out that a bug has surfaced in the production system.  All the logs indicate that an issue that you worked on and closed during the Winter break in 2019 caused it.  But the work you did was fine.  It is in the interaction between what you and others did that is causing it to surface in the way it does.
+
+The resultion is that you need to identify all the issues that were in the same epic that yours was in, and you want a list (including the titles) of each of these issues and who they are assigned to so that you can collaborate with them and put the right kind of fix in.
+
+Attempting this through REST would require multiple calls.  In this example, this would entail:
+a. Identify the project ID that you want to start with
+```shell
+curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id' 
+```
+b. Query all issues for a given project closed prior to January 1, 2020
+```shell
+curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id/issues?state=closed&created_before=2020-01-01&assignee_id=any' 
+```
+c. Get the Epic that those issues belong to.  This will require parsing the Epic Ids
+
+d. Find the issues in that epic (this query will require knowledge of the group the epic is in)
+```shell
+curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/groups/:id/epics/:epic_iid/issues'
+```
+
+Compare this to the single GraphQL query  
+```shell
+curl --location --request POST 'https://gitlab.example.com/api/graphql' \
+--header 'Authorization: Bearer $PERSONAL_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{"query":"{
+                project(fullPath: \"group/subgroup/project\") {
+                issues(state: closed, createdBefore: \"2020-01-01\", sort: created_asc, assigneeId: \"any\") {      
+                  nodes {
+                    iid
+                    state
+                    createdAt
+                    closedAt
+                    title
+                    epic {
+                      id
+                      title
+                      issues{
+                          nodes{
+                            id
+                            state
+                            title
+                          }
+                      }
+                    }
+                    assignees {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+           }","variables":{}}'
+```
+
+
+
 3 level deep queries; anonymized customer example
 TODO: show 3 real _anonymized_ examples that show the frustration/performance impact of client-side processing
 
