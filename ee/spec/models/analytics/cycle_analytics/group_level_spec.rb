@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe CycleAnalytics::GroupLevel do
+describe Analytics::CycleAnalytics::GroupLevel do
   let_it_be(:group) { create(:group)}
   let_it_be(:project) { create(:project, :repository, namespace: group) }
   let_it_be(:from_date) { 10.days.ago }

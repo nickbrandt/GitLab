@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Gitlab::CycleAnalytics::GroupStageSummary do
+describe Gitlab::Analytics::CycleAnalytics::GroupStageSummary do
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, namespace: group) }
   let(:project_2) { create(:project, :repository, namespace: group) }
