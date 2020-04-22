@@ -27,6 +27,17 @@ describe Approvable do
     end
   end
 
+  describe "#approvals_given" do
+    subject { merge_request.approvals_given }
+
+    it "returns the correct number of approvals given" do
+      approval_state = double("approval_state", approvals_required: 5, approvals_left: 3)
+      allow(merge_request).to receive(:approval_state).and_return(approval_state)
+
+      expect(subject).to eq(approval_state.approvals_required - approval_state.approvals_left)
+    end
+  end
+
   described_class::FORWARDABLE_METHODS.each do |method|
     it { is_expected.to delegate_method(method).to(:approval_state) }
   end

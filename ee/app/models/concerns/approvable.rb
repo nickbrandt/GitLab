@@ -42,7 +42,7 @@ module Approvable
   end
 
   def approvals_given
-    approvals.size
+    approvals_required - approvals_left
   end
 
   def approvals_before_merge
