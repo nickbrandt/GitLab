@@ -36,7 +36,7 @@ module EE
       end
 
       def shared_runners_minutes_limit_enabled?
-        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+        if ::Feature.enabled?(:ci_minutes_track_for_public_projects, project.shared_runners_limit_namespace)
           project.shared_runners_minutes_limit_enabled? && runner&.minutes_cost_factor(project.visibility_level)&.positive?
         else
           legacy_shared_runners_minutes_limit_enabled?
