@@ -19,6 +19,28 @@ describe GroupMemberPresenter do
     end
   end
 
+  describe '#group_managed_account?' do
+    context 'when user is part of the group managed account' do
+      before do
+        expect(user).to receive(:group_managed_account?).and_return(true)
+      end
+
+      it 'returns `true`' do
+        expect(presenter.group_managed_account?).to eq true
+      end
+    end
+
+    context 'when user is not part of the group managed account' do
+      before do
+        expect(user).to receive(:group_managed_account?).and_return(false)
+      end
+
+      it 'returns `false`' do
+        expect(presenter.group_managed_account?).to eq false
+      end
+    end
+  end
+
   describe '#can_update?' do
     context 'when user cannot update_group_member but can override_group_member' do
       before do

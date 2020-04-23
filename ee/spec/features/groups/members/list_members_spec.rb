@@ -27,7 +27,25 @@ describe 'Groups > Members > List members' do
       visit group_group_members_path(group)
 
       member = GroupMember.find_by(user: user2, group: group)
+
       expect(find("#group_member_#{member.id}").find('.badge-info')).to have_content('SAML')
+    end
+  end
+
+  context 'when user has a "Group Managed Account"' do
+    let(:managed_group) { create(:group_with_managed_accounts) }
+    let(:managed_user) { create(:user, :group_managed, managing_group: managed_group) }
+
+    before do
+      managed_group.add_guest(managed_user)
+    end
+
+    it 'shows user with "Managed Account" badge' do
+      visit group_group_members_path(managed_group)
+
+      member = GroupMember.find_by(user: managed_user, group: managed_group)
+
+      expect(page).to have_selector("#group_member_#{member.id} .badge-info", text: 'Managed Account')
     end
   end
 end
