@@ -122,7 +122,7 @@ The following documentation relates to the DevOps **Plan** stage:
 | [Service Desk](user/project/service_desk.md) **(PREMIUM)**                                                                                                                                                                                                         | A simple way to allow people to create issues in your GitLab instance without needing their own user account.                                    |
 | [Time Tracking](user/project/time_tracking.md)                                                                                                                                                                                                                         | Track time spent on issues and merge requests.                                                                                                   |
 | [Todos](user/todos.md)                                                                                                                                                                                                                                         | Keep track of work requiring attention with a chronological list displayed on a simple dashboard.                                                |
-| [Requirements Management](user/project/requirements/index.md) | Check your products against a set of criteira |
+| [Requirements Management](user/project/requirements/index.md) | Check your products against a set of criteria. |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">
