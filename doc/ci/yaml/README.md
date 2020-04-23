@@ -366,6 +366,15 @@ include:
   - local: '/templates/.gitlab-ci-template.yml'
 ```
 
+TIP: **Tip:**
+Local includes can be used as a replacement for symbolic links which are not followed.
+
+This can be defined as a short local include:
+
+```yaml
+include: '.gitlab-ci-production.yml'
+```
+
 #### `include:file`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/53903) in GitLab 11.7.
