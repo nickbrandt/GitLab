@@ -13,11 +13,11 @@ response coming from multiple data sources. This approach minimizes the traditio
 client-side coding against multiple APIs, reduces bandwidth, and improves response times.
 
 Additional benefits include:
-1. Representing data as a Graph for easier traversal
-2. Single endpoint with a machine readable schema file reducing versioning complexity
-3. Allow the client to request for only the data it needs and nothing more
-4. (Future) capability to offer `Subscriptions` for clients to get realtime updates as mutations occur 
-5. Facilitate investigative querying of data
+
+1. Representing data as a graph for easier traversal.
+1. Single endpoint with a machine-readable schema file reduces versioning complexity.
+1. Allow the client to request only the data it needs and nothing more.
+1. Facilitate investigative querying of data.
 
 ### Why GraphQL vs REST
 For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
