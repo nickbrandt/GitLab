@@ -19,8 +19,10 @@ Additional benefits include:
 1. Allow the client to request only the data it needs and nothing more.
 1. Facilitate investigative querying of data.
 
-### Why GraphQL vs REST
-For over 15 years, [REST has been a standard](https://en.wikipedia.org/wiki/Representational_state_transfer), object-based, programmatic access for data access from remote servers. 
+### GraphQL vs REST
+
+For over 15 years, [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) has been a
+standard, object-based way to programmatically access data on remote servers.
 
 REST is widely used and has many benefits.  It provides fixed interaction interface with specific operations such as POST, GET, DELETE, etc.  But the basic premise is to expose the object structure to make it Object Oriented.  Relationships are represented as Identifiers that can be used to get more information.
 Each retrieval requires creation of a new query to retrieve more information. So it performs well when attempting to tie complex objects with step by step data retrieval.  But with modern approaches to retrieve more than single object retrieval requires modification of the object interface or multiple calls.  
