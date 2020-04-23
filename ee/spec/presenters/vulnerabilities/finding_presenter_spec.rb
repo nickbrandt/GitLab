@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::OccurrencePresenter do
-  let(:presenter) { described_class.new(occurrence) }
-  let(:occurrence) { build_stubbed(:vulnerabilities_occurrence) }
+describe Vulnerabilities::FindingPresenter do
+  let(:presenter) { described_class.new(finding) }
+  let(:finding) { build_stubbed(:vulnerabilities_occurrence) }
 
   describe '#blob_path' do
     subject { presenter.blob_path }
@@ -15,10 +15,10 @@ describe Vulnerabilities::OccurrencePresenter do
 
     context 'with a sha' do
       before do
-        occurrence.sha = 'abc'
+        finding.sha = 'abc'
       end
 
-      it { is_expected.to include(occurrence.sha) }
+      it { is_expected.to include(finding.sha) }
 
       context 'without start_line or end_line' do
         before do

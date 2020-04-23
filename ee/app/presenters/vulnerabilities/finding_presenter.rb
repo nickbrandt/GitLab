@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class OccurrencePresenter < Gitlab::View::Presenter::Delegated
+  class FindingPresenter < Gitlab::View::Presenter::Delegated
     presents :occurrence
 
     def blob_path
