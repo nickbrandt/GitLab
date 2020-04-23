@@ -136,6 +136,9 @@ your own script to generate a YAML file, which is then [used to trigger a child 
 This technique can be very powerful in generating pipelines targeting content that changed or to
 build a matrix of targets and architectures.
 
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For an overview, see [Create child pipelines using dynamically generated configurations](https://youtu.be/nMdfus2JWHM).
+
 In GitLab 12.9, the child pipeline could fail to be created in certain cases, causing the parent pipeline to fail.
 This is [resolved in GitLab 12.10](https://gitlab.com/gitlab-org/gitlab/-/issues/209070).
 
