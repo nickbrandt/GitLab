@@ -290,12 +290,10 @@ describe GroupsController do
       end
 
       context 'for users who do not have the ability to create a group with `default_branch_protection`' do
-        before do
+        it 'does not create the group with the specified branch protection level' do
           allow(Ability).to receive(:allowed?).and_call_original
           allow(Ability).to receive(:allowed?).with(user, :create_group_with_default_branch_protection) { false }
-        end
 
-        it 'does not create the group with the specified branch protection level' do
           subject
 
           expect(response).to have_gitlab_http_status(:found)
@@ -471,12 +469,10 @@ describe GroupsController do
       end
 
       context 'for users who do not have the ability to update default_branch_protection' do
-        before do
+        it 'does not update the attribute' do
           allow(Ability).to receive(:allowed?).and_call_original
           allow(Ability).to receive(:allowed?).with(user, :update_default_branch_protection, group) { false }
-        end
 
-        it 'does not update the attribute' do
           subject
 
           expect(response).to have_gitlab_http_status(:found)

@@ -154,11 +154,9 @@ describe Groups::UpdateService do
     end
 
     context 'for users who have the ability to update default_branch_protection' do
-      before do
-        internal_group.add_owner(user)
-      end
-
       it 'updates the attribute' do
+        internal_group.add_owner(user)
+
         expect { service.execute }.to change { internal_group.default_branch_protection }.to(Gitlab::Access::PROTECTION_NONE)
       end
     end
