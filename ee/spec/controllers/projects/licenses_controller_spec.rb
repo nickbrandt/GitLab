@@ -73,6 +73,10 @@ describe Projects::LicensesController do
               expect(json_response['report']['status']).to eq('ok')
             end
 
+            it 'includes the pagination headers' do
+              expect(response).to include_pagination_headers
+            end
+
             context 'with pagination params' do
               let(:params) { { namespace_id: project.namespace, project_id: project, per_page: 3, page: 2 } }
 
