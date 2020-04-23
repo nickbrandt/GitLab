@@ -251,5 +251,5 @@ danger-review:
   script:
     - git version
     - node --version
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+    - yarn install --frozen-lockfile
     - danger --fail-on-errors=true --verbose

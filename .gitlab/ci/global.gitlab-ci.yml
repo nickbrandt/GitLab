@@ -21,12 +21,26 @@
 # Jobs that only need to pull cache
 .default-cache:
   cache:
-    key: "debian-stretch-ruby-2.6.5-pg11-node-12.x"
+    key:
+      files:
+        - yarn.lock
+        - Gemfile.lock
+      prefix: "v2"
     paths:
       - .go/pkg/mod
       - vendor/ruby
-      - .yarn-cache/
+      - node_modules
       - vendor/gitaly-ruby
+    policy: pull
+
+.frontend-cache:
+  cache:
+    key:
+      files:
+        - yarn.lock
+      prefix: "v2"
+    paths:
+      - node_modules
     policy: pull
 
 .use-pg9:

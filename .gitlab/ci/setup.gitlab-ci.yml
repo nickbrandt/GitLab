@@ -16,6 +16,18 @@ cache gems:
     paths:
       - vendor/cache
 
+cache node:
+  extends:
+    - .default-retry
+    - .frontend-cache
+    - .setup:rules:cache-node
+  stage: test
+  needs: []
+  script:
+    - yarn install --frozen-lockfile
+  cache:
+    policy: pull-push
+
 .minimal-job:
   extends:
     - .default-retry

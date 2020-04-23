@@ -524,6 +524,15 @@
       changes: *code-backstage-qa-patterns
       when: on_success
 
+.setup:rules:cache-node:
+  rules:
+    - <<: *if-not-canonical-namespace
+      when: never
+    - <<: *if-master-or-tag
+      changes:
+        - yarn.lock
+      when: on_success
+
 .setup:rules:dont-interrupt-me:
   rules:
     - <<: *if-master-or-tag

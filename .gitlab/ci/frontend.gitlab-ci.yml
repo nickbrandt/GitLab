@@ -4,7 +4,6 @@
       - vendor/ruby/
       - public/assets/webpack/
       - assets-hash.txt
-      - .yarn-cache/
       - tmp/cache/assets/sprockets
       - tmp/cache/babel-loader
       - tmp/cache/vue-loader
@@ -41,7 +40,7 @@
     when: always
   script:
     - node --version
-    - retry yarn install --frozen-lockfile --production --cache-folder .yarn-cache --prefer-offline
+    - retry yarn install --frozen-lockfile --production
     - free -m
     - time bin/rake gitlab:assets:compile > assets-compile.log 2>&1
     # TODO: Change the image tag to be the MD5 of assets files and skip image building if the image exists
@@ -73,7 +72,7 @@ gitlab:assets:compile pull-cache:
   stage: prepare
   script:
     - node --version
-    - retry yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+    - retry yarn install --frozen-lockfile
     - free -m
     - time bin/rake gitlab:assets:compile > assets-compile.log 2>&1
     - scripts/clean-old-cached-assets
@@ -87,7 +86,6 @@ gitlab:assets:compile pull-cache:
   artifacts:
     expire_in: 7d
     paths:
-      - node_modules
       - public/assets
       - assets-compile.log
     when: always
@@ -127,8 +125,8 @@ compile-assets pull-cache as-if-foss:
 .frontend-fixtures-base:
   extends:
     - .default-retry
-    - .default-cache
     - .default-before_script
+    - .frontend-cache
     - .use-pg11
   stage: fixtures
   needs: ["setup-test-env pg11", "compile-assets pull-cache"]
@@ -142,7 +140,6 @@ compile-assets pull-cache as-if-foss:
     expire_in: 31d
     when: always
     paths:
-      - node_modules
       - public/assets
       - tmp/tests/frontend/
 
@@ -241,11 +238,12 @@ jest-as-if-foss:
 coverage-frontend:
   extends:
     - .default-retry
+    - .frontend-cache
     - .frontend:rules:default-frontend-jobs-no-foss
   needs: ["jest"]
   stage: post-test
   before_script:
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+    - yarn install --frozen-lockfile
   script:
     - yarn node scripts/frontend/merge_coverage_frontend.js
   artifacts:
@@ -253,24 +251,17 @@ coverage-frontend:
     expire_in: 31d
     paths:
       - coverage-frontend/
-  cache:
-    paths:
-      - .yarn-cache/
 
 .qa-frontend-node:
   extends:
     - .default-retry
+    - .frontend-cache
     - .frontend:rules:qa-frontend-node
   stage: test
   dependencies: []
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - .yarn-cache/
-    policy: pull-push
   script:
     - date
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+    - yarn install --frozen-lockfile
     - date
     - yarn run webpack-prod
 
