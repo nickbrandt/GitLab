@@ -10,6 +10,10 @@ export const mockPipelineInfo = {
   user: {
     name: 'foo',
   },
+  project: {
+    name: 'foo-project',
+    web_url: 'foo-project-link',
+  },
 };
 
 export const mavenPackage = {

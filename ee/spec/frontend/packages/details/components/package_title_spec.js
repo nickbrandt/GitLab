@@ -39,6 +39,7 @@ describe('PackageTitle', () => {
 
   const packageType = () => wrapper.find({ ref: 'package-type' });
   const packageSize = () => wrapper.find({ ref: 'package-size' });
+  const pipelineProject = () => wrapper.find({ ref: 'pipeline-project' });
   const packageRef = () => wrapper.find({ ref: 'package-ref' });
   const packageTags = () => wrapper.find(PackageTags);
 
@@ -117,6 +118,21 @@ describe('PackageTitle', () => {
 
       expect(packageRef().contains('gl-icon-stub')).toBe(true);
       expect(packageRef().text()).toBe(npmPackage.pipeline.ref);
+    });
+  });
+
+  describe('pipeline project', () => {
+    it('does not display the project if missing', () => {
+      createComponent();
+
+      expect(pipelineProject().exists()).toBe(false);
+    });
+
+    it('correctly shows the pipeline project if there is one', () => {
+      createComponent(npmPackage);
+
+      expect(pipelineProject().text()).toBe(npmPackage.pipeline.project.name);
+      expect(pipelineProject().attributes('href')).toBe(npmPackage.pipeline.project.web_url);
     });
   });
 });

@@ -26,7 +26,11 @@ describe ::Packages::Detail::PackagePresenter do
       sha: pipeline.sha,
       ref: pipeline.ref,
       git_commit_message: pipeline.git_commit_message,
-      user: user_info
+      user: user_info,
+      project: {
+        name: pipeline.project.name,
+        web_url: pipeline.project.web_url
+      }
     }
   end
   let!(:expected_package_details) do

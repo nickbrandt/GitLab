@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { GlIcon, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
+import { GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
 import PackageTags from '../../shared/components/package_tags.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -9,6 +9,7 @@ export default {
   name: 'PackageTitle',
   components: {
     GlIcon,
+    GlLink,
     GlSprintf,
     PackageTags,
   },
@@ -58,6 +59,17 @@ export default {
 
       <div v-if="hasTagsToDisplay" class="d-flex align-items-center append-right-default">
         <package-tags :tag-display-limit="1" :tags="packageEntity.tags" />
+      </div>
+
+      <div v-if="packagePipeline" class="d-flex align-items-center append-right-default">
+        <gl-icon name="review-list" class="text-secondary append-right-8" />
+        <gl-link
+          ref="pipeline-project"
+          :href="packagePipeline.project.web_url"
+          class="text-primary font-weight-bold text-truncate"
+        >
+          {{ packagePipeline.project.name }}
+        </gl-link>
       </div>
 
       <div
