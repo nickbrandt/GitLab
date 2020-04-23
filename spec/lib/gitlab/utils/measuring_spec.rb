@@ -5,7 +5,6 @@ require 'fast_spec_helper'
 describe Gitlab::Utils::Measuring do
   describe '#execute_with' do
     let(:measurement_logger) { double(:logger) }
-    let(:measurement_enabled) { true }
     let(:base_log_data) do
       {
         class: described_class.name
@@ -16,6 +15,7 @@ describe Gitlab::Utils::Measuring do
     subject { described_class.execute_with(measurement_enabled, measurement_logger, base_log_data) { result_block } }
 
     context 'when measurement is enabled' do
+      let(:measurement_enabled) { true }
       let!(:measurement) { described_class.new(logger: measurement_logger, base_log_data: base_log_data) }
 
       before do
@@ -33,6 +33,7 @@ describe Gitlab::Utils::Measuring do
         is_expected.to eq(result_block)
       end
     end
+
     context 'when measurement is disabled' do
       let(:measurement_enabled) { false }
 

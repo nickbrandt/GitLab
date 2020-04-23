@@ -5,7 +5,7 @@ RSpec.shared_examples 'measurable' do
     let(:measurement_enabled) { true }
 
     it 'prints measurement results' do
-      expect { subject }.to output(including("time_to_finish")).to_stdout
+      expect { subject }.to output(including('time_to_finish')).to_stdout
     end
   end
 
