@@ -54,6 +54,8 @@ module Elastic
     private
 
     def execute_with_redis(redis)
+      start_time = Time.now
+
       specs = redis.zrangebyscore(REDIS_SET_KEY, '-inf', '+inf', limit: [0, LIMIT], with_scores: true)
       return if specs.empty?
 
@@ -82,7 +84,8 @@ module Elastic
         records_count: specs.count,
         failures_count: failures.count,
         first_score: first_score,
-        last_score: last_score
+        last_score: last_score,
+        bulk_execution_duration_s: Time.now - start_time
       )
     end
 
