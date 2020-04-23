@@ -43,11 +43,14 @@ TODO (Mike)
 - reduce bandwith
 
 ### Proof Point
-Let's assume the following situation:
 
-You have just found out that a bug has surfaced in the production system.  All the logs indicate that an issue that you worked on and closed during the Winter break in 2019 caused it.  But the work you did was fine.  It is in the interaction between what you and others did that is causing it to surface in the way it does.
+As an example, consider the following situation:
 
-The resultion is that you need to identify all the issues that were in the same epic that yours was in, and you want a list (including the titles) of each of these issues and who they are assigned to so that you can collaborate with them and put the right kind of fix in.
+You just discovered a bug in the production system. All logs indicate that an issue you worked on
+and closed during the 2019 winter break caused it. Viewed alone, your work seems fine. However, the
+bug surfaces due to the interaction between what you and others did. To resolve this, you must
+identify all the issues that were in the same epic, find out who they were assigned to, and then
+collaborate with those developers to fix the problem.
 
 Attempting this through REST would require multiple calls.  In this example, this would entail:
 a. Identify the project ID that you want to start with
