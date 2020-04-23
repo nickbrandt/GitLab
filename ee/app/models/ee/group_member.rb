@@ -20,6 +20,7 @@ module EE
       end
 
       scope :non_owners, -> { where("members.access_level < ?", ::Gitlab::Access::OWNER) }
+      scope :by_user_id, ->(user_id) { where(user_id: user_id) }
     end
 
     class_methods do

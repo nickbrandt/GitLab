@@ -45,6 +45,21 @@ module EE
           member
         end
 
+        def find_member(params)
+          source = find_source(:group, params.delete(:id))
+          authorize! :override_group_member, source
+
+          source.members.by_user_id(params[:user_id]).first
+        end
+
+        def present_member(updated_member)
+          if updated_member.valid?
+            present updated_member, with: ::API::Entities::Member
+          else
+            render_validation_error!(updated_member)
+          end
+        end
+
         def log_audit_event(member)
           ::AuditEventService.new(
             current_user,
