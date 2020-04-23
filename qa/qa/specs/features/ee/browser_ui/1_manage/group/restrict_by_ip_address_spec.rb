@@ -69,6 +69,9 @@ module QA
           QA::Runtime::Logger.info "On failure - Revisiting: #{@group.sandbox.path}"
           QA::Runtime::Logger.info page.save_screenshot(::File.join(QA::Runtime::Namespace.name, "group_sandbox_on_failure.png"), full: true)
 
+          page.visit Runtime::Scenario.gitlab_address
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
+
           Flow::Login.while_signed_in_as_admin do
             @group.sandbox.visit!
 
