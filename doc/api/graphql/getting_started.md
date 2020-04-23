@@ -24,10 +24,15 @@ Additional benefits include:
 For over 15 years, [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) has been a
 standard, object-based way to programmatically access data on remote servers.
 
-REST is widely used and has many benefits.  It provides fixed interaction interface with specific operations such as POST, GET, DELETE, etc.  But the basic premise is to expose the object structure to make it Object Oriented.  Relationships are represented as Identifiers that can be used to get more information.
-Each retrieval requires creation of a new query to retrieve more information. So it performs well when attempting to tie complex objects with step by step data retrieval.  But with modern approaches to retrieve more than single object retrieval requires modification of the object interface or multiple calls.  
-
-For example, when attempting to present data on a Single Page Application (SPA) that may have information sourced from multiple objects can increase the complexity of the front end code. 
+REST is widely used and has many benefits. It provides a fixed-interaction interface with specific
+operations such as `POST`, `GET`, `DELETE`, and others. But the basic premise is to expose the
+object structure to make it object oriented. Relationships are represented as identifiers that can
+be used to get more information. Each retrieval requires a new query. REST therefore performs well
+when attempting to tie complex objects together with step-by-step data retrieval. But with modern
+approaches to retrieve more than a single object, retrieval requires modification of the object
+interface or multiple calls. For example, attempting to present data on a single-page application
+(SPA) that may have information sourced from multiple objects can increase the complexity of the
+front-end code.
 
 TODO (mike): proof point examples & challenges with multiple queries.  GraphQL is a new framework/standard for single query, server-side access to multiple data sources.
 
