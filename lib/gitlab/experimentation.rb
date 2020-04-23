@@ -57,7 +57,6 @@ module Gitlab
 
         cookies.permanent.signed[:experimentation_subject_id] = {
           value: SecureRandom.uuid,
-          domain: :all,
           secure: ::Gitlab.config.gitlab.https,
           httponly: true
         }
