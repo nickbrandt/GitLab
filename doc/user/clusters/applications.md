@@ -487,7 +487,11 @@ and you will have access to more advanced querying capabilities.
 
 Log data is automatically deleted after 30 days using [Curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/5.5/about.html).
 
-To enable log shipping, install Elastic Stack into the cluster with the **Install** button.
+To enable log shipping:
+
+1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
+1. In **Kubernetes Cluster**, select a cluster.
+1. In the **Applications** section, find **Elastic Stack** and click **Install**.
 
 NOTE: **Note:**
 The [`stable/elastic-stack`](https://github.com/helm/charts/tree/master/stable/elastic-stack)
