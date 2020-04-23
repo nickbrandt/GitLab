@@ -20,9 +20,9 @@ export const UPLOAD_DESIGN_INVALID_FILETYPE_ERROR = __(
   'Could not upload your designs as one or more files uploaded are not supported.',
 );
 
-export const DESIGN_NOT_FOUND_ERROR = __('Could not find design');
+export const DESIGN_NOT_FOUND_ERROR = __('Could not find design.');
 
-export const DESIGN_NOT_EXIST_ERROR = __('Requested design version does not exist');
+export const DESIGN_VERSION_NOT_EXIST_ERROR = __('Requested design version does not exist.');
 
 const DESIGN_UPLOAD_SKIPPED_MESSAGE = s__('DesignManagement|Upload skipped.');
 

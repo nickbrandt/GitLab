@@ -31,7 +31,7 @@ import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
   UPDATE_IMAGE_DIFF_NOTE_ERROR,
   DESIGN_NOT_FOUND_ERROR,
-  DESIGN_NOT_EXIST_ERROR,
+  DESIGN_VERSION_NOT_EXIST_ERROR,
   designDeletionError,
 } from '../../utils/error_messages';
 import { DESIGNS_ROUTE_NAME } from '../../router/constants';
@@ -84,18 +84,8 @@ export default {
         return this.designVariables;
       },
       update: data => extractDesign(data),
-      result({ data, loading }) {
-        // On the initial load with cache-and-network policy data is undefined while loading is true
-        // To prevent throwing an error, we don't perform any logic until loading is false
-        if (loading) {
-          return;
-        }
-        if (!data) {
-          this.onQueryError(DESIGN_NOT_FOUND_ERROR);
-        }
-        if (this.$route.query.version && !this.hasValidVersion) {
-          this.onQueryError(DESIGN_NOT_EXIST_ERROR);
-        }
+      result(res) {
+        this.onDesignQueryResult(res);
       },
       error() {
         this.onQueryError(DESIGN_NOT_FOUND_ERROR);
@@ -214,6 +204,19 @@ export default {
       };
 
       return this.$apollo.mutate(mutationPayload).catch(e => this.onUpdateImageDiffNoteError(e));
+    },
+    onDesignQueryResult({ data, loading }) {
+      // On the initial load with cache-and-network policy data is undefined while loading is true
+      // To prevent throwing an error, we don't perform any logic until loading is false
+      if (loading) {
+        return;
+      }
+
+      if (!data || !extractDesign(data)) {
+        this.onQueryError(DESIGN_NOT_FOUND_ERROR);
+      } else if (this.$route.query.version && !this.hasValidVersion) {
+        this.onQueryError(DESIGN_VERSION_NOT_EXIST_ERROR);
+      }
     },
     onQueryError(message) {
       // because we redirect user to /designs (the issue page),
