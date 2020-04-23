@@ -33,13 +33,20 @@ describe Gitlab::Regex do
   describe '.conan_recipe_component_regex' do
     subject { described_class.conan_recipe_component_regex }
 
+    let(:fifty_one_characters) { 'f_a' * 17}
+
     it { is_expected.to match('foobar') }
     it { is_expected.to match('foo_bar') }
     it { is_expected.to match('foo+bar') }
+    it { is_expected.to match('_foo+bar-baz+1.0') }
     it { is_expected.to match('1.0.0') }
+    it { is_expected.not_to match('-foo_bar') }
+    it { is_expected.not_to match('+foo_bar') }
+    it { is_expected.not_to match('.foo_bar') }
     it { is_expected.not_to match('foo@bar') }
     it { is_expected.not_to match('foo/bar') }
     it { is_expected.not_to match('!!()()') }
+    it { is_expected.not_to match(fifty_one_characters) }
   end
 
   describe '.feature_flag_regex' do
