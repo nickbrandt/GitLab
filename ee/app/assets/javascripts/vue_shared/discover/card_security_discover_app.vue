@@ -77,7 +77,7 @@ export default {
     onSlideStart(slide) {
       this.track('click_button', {
         label: 'security-discover-carousel',
-        value: `sliding${this.slide}-${slide}`,
+        property: `sliding${this.slide}-${slide}`,
       });
       this.textSlide = slide;
     },
