@@ -790,10 +790,12 @@ available configuration options.
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/22) in GitLab 12.8.
 
-[Cilium](https://cilium.io/) is a networking plugin for Kubernetes
-that you can use to implement support for
-[NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-resources. For more information on [Network Policies](../../topics/autodevops/stages.md#network-policy), see the documentation.
+[Cilium](https://cilium.io/) is a networking plugin for Kubernetes that you can use to implement
+support for [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+resources. For more information, see [Network Policies](../../topics/autodevops/stages.md#network-policy).
+
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For an overview, see the [Container Network Security Demo for GitLab 12.8](https://www.youtube.com/watch?v=pgUEdhdhoUI).
 
 Enable Cilium in the `.gitlab/managed-apps/config.yaml` file to install it:
 
