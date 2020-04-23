@@ -1,9 +1,9 @@
-- context = ::Ci::Minutes::Context.new(local_assigns.dig(:project), local_assigns.dig(:namespace))
-- threshold = ::Ci::Minutes::Threshold.new(current_user, context.level)
+- context = ::Ci::Minutes::Context.new(current_user, local_assigns.dig(:project), local_assigns.dig(:namespace))
+- threshold = ::Ci::Minutes::Threshold.new(context)
 
 - if threshold.warning_reached? || threshold.alert_reached?
   %div{ class: ["pt-2", (classes if defined? classes)] }
-    .bs-callout.shared-runner-quota-message.d-none.d-sm-block.bs-callout-danger{ data: { scope: context.full_path } }
+    .bs-callout.shared-runner-quota-message.d-none.d-sm-block.bs-callout-danger
       %p
         = ci_usage_warning_message(context.namespace, project)
       = link_to _('Purchase more minutes'), ::EE::SUBSCRIPTIONS_MORE_MINUTES_URL, class: "btn btn-danger btn-inverted"
