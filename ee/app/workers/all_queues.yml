@@ -165,7 +165,7 @@
   :weight: 1
   :idempotent: 
 - :name: cronjob:sync_seat_link
-  :feature_category: :analysis
+  :feature_category: :billing
   :has_external_dependencies: 
   :urgency: :low
   :resource_boundary: :unknown
@@ -585,7 +585,7 @@
   :weight: 1
   :idempotent: true
 - :name: sync_seat_link_request
-  :feature_category: :analysis
+  :feature_category: :billing
   :has_external_dependencies: true
   :urgency: :low
   :resource_boundary: :unknown

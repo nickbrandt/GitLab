@@ -3,7 +3,7 @@
 class SyncSeatLinkRequestWorker
   include ApplicationWorker
 
-  feature_category :analysis
+  feature_category :billing
 
   idempotent!
   worker_has_external_dependencies!
