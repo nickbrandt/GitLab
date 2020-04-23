@@ -14,6 +14,10 @@ describe Gitlab::CodeOwners::File do
 
   subject(:file) { described_class.new(blob) }
 
+  before do
+    stub_feature_flags(sectional_codeowners: false)
+  end
+
   describe '#parsed_data' do
     def owner_line(pattern)
       file.parsed_data[pattern].owner_line
@@ -31,6 +35,18 @@ describe Gitlab::CodeOwners::File do
 
     it 'allows usernames and emails' do
       expect(owner_line('/**/LICENSE')).to include('legal', 'janedoe@gitlab.com')
+    end
+
+    context "when feature flag `:sectional_codeowners` is enabled" do
+      before do
+        stub_feature_flags(sectional_codeowners: true)
+      end
+
+      it "passes the call to #get_parsed_sectional_data" do
+        expect(file).to receive(:get_parsed_sectional_data).and_return({})
+
+        expect(file.parsed_data).to be_empty
+      end
     end
   end
 

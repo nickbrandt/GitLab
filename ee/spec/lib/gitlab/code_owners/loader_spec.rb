@@ -39,6 +39,10 @@ describe Gitlab::CodeOwners::Loader do
     let(:expected_entry) { Gitlab::CodeOwners::Entry.new('docs/CODEOWNERS', '@owner-1 owner2@gitlab.org @owner-3 @documentation-owner') }
     let(:first_entry) { loader.entries.first }
 
+    before do
+      stub_feature_flags(sectional_codeowners: false)
+    end
+
     it 'returns entries for the matched line' do
       expect(loader.entries).to contain_exactly(expected_entry)
     end
@@ -121,6 +125,10 @@ describe Gitlab::CodeOwners::Loader do
   end
 
   describe '#members' do
+    before do
+      stub_feature_flags(sectional_codeowners: false)
+    end
+
     it 'returns users mentioned for the passed path' do
       expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
     end
@@ -143,6 +151,10 @@ describe Gitlab::CodeOwners::Loader do
   end
 
   describe '#empty_code_owners?' do
+    before do
+      stub_feature_flags(sectional_codeowners: false)
+    end
+
     context 'when file does not exist' do
       let(:codeowner_blob) { nil }
 

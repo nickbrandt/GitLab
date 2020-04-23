@@ -40,6 +40,10 @@ module Gitlab
       end
 
       def get_parsed_data
+        if Feature.enabled?(:sectional_codeowners, default_enabled: false)
+          return get_parsed_sectional_data
+        end
+
         parsed = {}
 
         data.lines.each do |line|
@@ -55,6 +59,10 @@ module Gitlab
         end
 
         parsed
+      end
+
+      def get_parsed_sectional_data
+        {}
       end
 
       def normalize_pattern(pattern)

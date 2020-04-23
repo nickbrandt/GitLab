@@ -22,6 +22,7 @@ describe 'File blob > Code owners', :js do
     context 'when the feature is available' do
       before do
         stub_licensed_features(code_owners: true)
+        stub_feature_flags(sectional_codeowners: false)
       end
 
       it 'shows the code owners related to a file' do
