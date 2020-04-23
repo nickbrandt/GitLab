@@ -64,7 +64,7 @@
           %p Still, we recommend keeping a backup saved somewhere. Otherwise, if you ever need it and have lost it, you will need to request GitLab Inc. to send it to you again.
           %br
           = link_to 'Download license', download_admin_license_path, class: "btn btn-info"
-
+          = link_to 'Customer Portal', 'https://customers.gitlab.com', class: 'btn btn-info btn-inverted', data: { track_event: 'click_text', track_label: 'license_dashboard', track_property: 'customer_portal' }, target: '_blank', rel: 'noopener noreferrer'
 
       .card.border-danger
         .card-header.bg-danger.text-white
