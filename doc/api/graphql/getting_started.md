@@ -6,7 +6,11 @@ See the [GraphQL API StyleGuide](../../development/api_graphql_styleguide.md) fo
 aimed at developers who wish to work on developing the API itself.
 
 ## Why GraphQL
-GraphQL is a programatic language for easily accessing and manipulating complex data in a single request with an intuitive and flexible syntax.  With a single request, you can receive a tailored response coming from multiple data sources.  This approach minimizes the traditional effort of client-side coding against multiple APIs, reduces bandwith, and improves response times. 
+
+GraphQL is a programmatic language for easily accessing and manipulating complex data in a single
+request with an intuitive and flexible syntax. With a single request, you can receive a tailored
+response coming from multiple data sources. This approach minimizes the traditional effort of
+client-side coding against multiple APIs, reduces bandwidth, and improves response times.
 
 Additional benefits include:
 1. Representing data as a Graph for easier traversal
