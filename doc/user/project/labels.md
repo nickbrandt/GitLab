@@ -2,10 +2,10 @@
 
 ## Overview
 
-As your count of issues, MRs and Epics grow within GitLab it becomes more and more challenging 
-to keep track of those items. Espeically as your organization grows from just a few people to 
-hundreds or thousands. This is where labels come in. They help you organize and tag your work 
-so you can easily track and find the work items you're interested in. 
+As your count of issues, MRs and Epics grow within GitLab it becomes more and more challenging
+to keep track of those items. Espeically as your organization grows from just a few people to
+hundreds or thousands. This is where labels come in. They help you organize and tag your work
+so you can easily track and find the work items you're interested in.
 
 Labels allow you to categorize epics, issues, and merge requests using descriptive titles like
 `bug`, `feature request`, or `docs`, as well as customizable colors. They allow you to quickly
