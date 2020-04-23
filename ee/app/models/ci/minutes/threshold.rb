@@ -3,31 +3,28 @@
 module Ci
   module Minutes
     class Threshold
-      include Gitlab::Allowable
+      include ::Gitlab::Utils::StrongMemoize
 
-      def initialize(user, context_level)
-        @context_level = context_level
-        @user = user
+      def initialize(context)
+        @context = context
       end
 
       def warning_reached?
-        show_limit? && context_level.shared_runners_remaining_minutes_below_threshold?
+        show_limit? && context.shared_runners_remaining_minutes_below_threshold?
       end
 
       def alert_reached?
-        show_limit? && context_level.shared_runners_minutes_used?
+        show_limit? && context.shared_runners_minutes_used?
       end
 
       private
 
-      attr_reader :user, :context_level
+      attr_reader :context
 
       def show_limit?
-        context_level.shared_runners_minutes_limit_enabled? && can_see_status?
-      end
-
-      def can_see_status?
-        context_level.is_a?(Namespace) || can?(user, :create_pipeline, context_level)
+        strong_memoize(:show_limit) do
+          context.shared_runners_minutes_limit_enabled? && context.can_see_status?
+        end
       end
     end
   end

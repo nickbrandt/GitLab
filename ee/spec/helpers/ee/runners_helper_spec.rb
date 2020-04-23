@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe EE::RunnersHelper do
-  let_it_be(:user, reload: true) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   before do
     allow(helper).to receive(:current_user).and_return(user)
@@ -147,13 +147,10 @@ describe EE::RunnersHelper do
   shared_examples_for 'minutes notification' do
     let_it_be(:namespace) { create(:namespace, owner: user) }
     let_it_be(:project) { create(:project, namespace: namespace) }
-    let(:injected_project) { project }
-    let(:injected_namespace) { namespace }
     let(:show_warning) { true }
     let(:context_level) { project }
-    let(:context) { double('Ci::Minutes::Context', level: context_level, namespace: namespace) }
+    let(:context) { double('Ci::Minutes::Context', namespace: namespace) }
     let(:threshold) { double('Ci::Minutes::Threshold', warning_reached?: show_warning) }
-    let!(:user_pipeline) { create(:ci_pipeline, user: user, project: project) }
 
     before do
       allow(::Ci::Minutes::Context).to receive(:new).and_return(context)
@@ -167,34 +164,34 @@ describe EE::RunnersHelper do
         it { is_expected.to be_falsey }
       end
 
-      context 'when experiment is enabled with user pipelines' do
+      context 'when experiment is enabled' do
         it { is_expected.to be_truthy }
 
         context 'without a persisted project passed' do
-          let(:injected_project) { build(:project) }
+          let(:project) { build(:project) }
           let(:context_level) { namespace }
 
           it { is_expected.to be_truthy }
         end
 
         context 'without a persisted namespace passed' do
-          let(:injected_namespace) { build(:namespace) }
+          let(:namespace) { build(:namespace) }
 
           it { is_expected.to be_truthy }
         end
 
         context 'with neither a project nor a namespace' do
-          let(:injected_project) { build(:project) }
-          let(:injected_namespace) { build(:namespace) }
+          let(:project) { build(:project) }
+          let(:namespace) { build(:namespace) }
 
           it { is_expected.to be_falsey }
 
           context 'when show_ci_minutes_notification_dot? has been called before' do
             it 'does not do all the notification and query work again' do
               expect(threshold).not_to receive(:warning_reached?)
-              expect(injected_project).to receive(:persisted?).once
+              expect(project).to receive(:persisted?).once
 
-              helper.show_ci_minutes_notification_dot?(injected_project, injected_namespace)
+              helper.show_ci_minutes_notification_dot?(project, namespace)
 
               expect(subject).to be_falsey
             end
@@ -203,14 +200,6 @@ describe EE::RunnersHelper do
 
         context 'when show notification is falsey' do
           let(:show_warning) { false }
-
-          it { is_expected.to be_falsey }
-        end
-
-        context 'without user pipelines' do
-          before do
-            user.pipelines.clear # this forces us to reload user for let_it_be
-          end
 
           it { is_expected.to be_falsey }
         end
@@ -229,11 +218,11 @@ describe EE::RunnersHelper do
     end
   end
 
-  context 'with pipelines' do
+  context 'with notifications' do
     let(:experiment_status) { true }
 
     describe '.show_buy_ci_minutes?' do
-      subject { helper.show_buy_ci_minutes?(injected_project, injected_namespace) }
+      subject { helper.show_buy_ci_minutes?(project, namespace) }
 
       context 'when experiment is "ci_notification_dot"' do
         it_behaves_like 'minutes notification' do
@@ -255,7 +244,7 @@ describe EE::RunnersHelper do
     end
 
     describe '.show_ci_minutes_notification_dot?' do
-      subject { helper.show_ci_minutes_notification_dot?(injected_project, injected_namespace) }
+      subject { helper.show_ci_minutes_notification_dot?(project, namespace) }
 
       it_behaves_like 'minutes notification' do
         before do

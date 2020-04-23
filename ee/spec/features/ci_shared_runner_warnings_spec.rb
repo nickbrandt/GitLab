@@ -124,7 +124,6 @@ describe 'CI shared runner limits' do
     if message
       element = page.find('.shared-runner-quota-message')
       expect(element).to have_content(message)
-      expect(element['data-scope']).to eq(project.full_path)
     end
   end
 
