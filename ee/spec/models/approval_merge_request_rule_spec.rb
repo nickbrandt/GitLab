@@ -158,12 +158,16 @@ describe ApprovalMergeRequestRule do
     let!(:existing_code_owner_rule) { create(:code_owner_rule, name: '*.rb', merge_request: merge_request) }
 
     it 'finds an existing rule' do
-      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.rb'))
+      entry = Gitlab::CodeOwners::Entry.new("*.rb", "@user")
+
+      expect(described_class.find_or_create_code_owner_rule(merge_request, entry))
         .to eq(existing_code_owner_rule)
     end
 
     it 'creates a new rule if it does not exist' do
-      expect { described_class.find_or_create_code_owner_rule(merge_request, '*.js') }
+      entry = Gitlab::CodeOwners::Entry.new("*.js", "@user")
+
+      expect { described_class.find_or_create_code_owner_rule(merge_request, entry) }
         .to change { merge_request.approval_rules.matching_pattern('*.js').count }.by(1)
     end
 
@@ -171,7 +175,9 @@ describe ApprovalMergeRequestRule do
       deprecated_code_owner_rule = create(:code_owner_rule, name: '*.md', merge_request: merge_request)
       deprecated_code_owner_rule.update_column(:rule_type, described_class.rule_types[:regular])
 
-      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.md'))
+      entry = Gitlab::CodeOwners::Entry.new("*.md", "@user")
+
+      expect(described_class.find_or_create_code_owner_rule(merge_request, entry))
         .to eq(deprecated_code_owner_rule)
     end
 
@@ -179,7 +185,9 @@ describe ApprovalMergeRequestRule do
       expect(described_class).to receive(:code_owner).and_raise(ActiveRecord::RecordNotUnique)
       allow(described_class).to receive(:code_owner).and_call_original
 
-      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.js')).not_to be_nil
+      entry = Gitlab::CodeOwners::Entry.new("*.js", "@user")
+
+      expect(described_class.find_or_create_code_owner_rule(merge_request, entry)).not_to be_nil
     end
   end
 

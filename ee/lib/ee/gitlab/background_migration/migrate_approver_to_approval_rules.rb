@@ -44,10 +44,10 @@ module EE
             merge_request.target_project
           end
 
-          def self.find_or_create_code_owner_rule(merge_request, pattern)
+          def self.find_or_create_code_owner_rule(merge_request, entry)
             merge_request.approval_rules.safe_find_or_create_by(
               code_owner: true,
-              name: pattern
+              name: entry.pattern
             )
           end
 
@@ -130,7 +130,7 @@ module EE
                   rule = approval_rules.code_owner.first
                   rule ||= ApprovalMergeRequestRule.find_or_create_code_owner_rule(
                     self,
-                    'Code Owner'
+                    ::Gitlab::CodeOwners::Entry.new("Code Owner", owners)
                   )
 
                   rule.users = owners.uniq
