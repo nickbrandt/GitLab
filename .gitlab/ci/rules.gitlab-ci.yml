@@ -500,14 +500,6 @@
     - <<: *if-dot-com-gitlab-org-schedule
       when: on_success
 
-.review:rules:review-gcp-cleanup:
-  rules:
-    - <<: *if-dot-com-gitlab-org-merge-request
-      changes: *code-qa-patterns
-      when: manual
-    - <<: *if-dot-com-gitlab-org-schedule
-      when: on_success
-
 .review:rules:danger:
   rules:
     - if: '$DANGER_GITLAB_API_TOKEN && $CI_MERGE_REQUEST_IID'
