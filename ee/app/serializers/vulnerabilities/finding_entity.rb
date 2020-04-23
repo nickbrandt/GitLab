@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Vulnerabilities::OccurrenceEntity < Grape::Entity
+class Vulnerabilities::FindingEntity < Grape::Entity
   include ::EE::ProjectsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
   include RequestAwareEntity
 
