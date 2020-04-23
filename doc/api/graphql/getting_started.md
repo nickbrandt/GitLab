@@ -52,21 +52,27 @@ bug surfaces due to the interaction between what you and others did. To resolve 
 identify all the issues that were in the same epic, find out who they were assigned to, and then
 collaborate with those developers to fix the problem.
 
-Attempting this through REST would require multiple calls.  In this example, this would entail:
-a. Identify the project ID that you want to start with
-```shell
-curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id' 
-```
-b. Query all issues for a given project closed prior to January 1, 2020
-```shell
-curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id/issues?state=closed&created_before=2020-01-01&assignee_id=any' 
-```
-c. Get the Epic that those issues belong to.  This will require parsing the Epic Ids
+Attempting this through REST requires multiple calls:
 
-d. Find the issues in that epic (this query will require knowledge of the group the epic is in)
-```shell
-curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/groups/:id/epics/:epic_iid/issues'
-```
+1. Identify the project ID to start with:
+
+   ```shell
+   curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id'
+   ```
+
+1. Query all issues for a given project closed prior to January 1, 2020:
+
+   ```shell
+   curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/projects/:id/issues?state=closed&created_before=2020-01-01&assignee_id=any' 
+   ```
+
+1. Get the epic that those issues belong to. This requires parsing the epic IDs.
+
+1. Find the issues in that epic. This query requires knowledge of the group the epic is in:
+
+   ```shell
+   curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/groups/:id/epics/:epic_iid/issues'
+   ```
 
 Compare this to the single GraphQL query  
 ```shell
