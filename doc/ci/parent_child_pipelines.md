@@ -43,6 +43,9 @@ Child pipelines work well with other GitLab CI/CD features:
 All of this will work with the [`include:`](yaml/README.md#include) feature so you can compose
 the child pipeline configuration.
 
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For an overview, see [Parent-Child Pipelines feature demo](https://youtu.be/n8KpBSqZNbk).
+
 ## Examples
 
 The simplest case is [triggering a child pipeline](yaml/README.md#trigger) using a
