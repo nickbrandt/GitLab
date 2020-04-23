@@ -314,6 +314,16 @@ To change your WAF's mode:
 1. Under **Global default**, select your desired mode.
 1. Click **Save changes**.
 
+##### WAF version updates
+
+Enabling, disabling, or changing the logging mode for **ModSecurity** is only allowed within same version of [Ingress](#ingress) due to limitations in [Helm](https://helm.sh/) which might be overcome in future releases.
+
+**ModSecurity** UI controls are disabled if the version deployed differs from the one available in GitLab, while actions at the [Ingress](#ingress) level, such as uninstalling, can still be performed:
+
+![WAF settings disabled](../../topics/web_application_firewall/img/guide_waf_ingress_disabled_settings_v12_10.png)
+
+Updating [Ingress](#ingress) to the most recent version enables you to take advantage of bug fixes, security fixes, and performance improvements. To update [Ingress application](#ingress), you must first uninstall it, and then re-install it as described in [Install ModSecurity](../../topics/web_application_firewall/quick_start_guide.md).
+
 ##### Viewing Web Application Firewall traffic
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/14707) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
