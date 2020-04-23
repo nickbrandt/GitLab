@@ -162,6 +162,16 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
       it { expect(report).to be_empty }
     end
 
+    context 'when the report is structured as an array' do
+      let(:invalid_json) { JSON.pretty_generate([]) }
+
+      before do
+        subject.parse!(invalid_json, report)
+      end
+
+      it { expect(report).to be_empty }
+    end
+
     context 'when the report is not a valid JSON document' do
       it do
         expect do
