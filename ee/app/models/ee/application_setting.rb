@@ -135,7 +135,15 @@ module EE
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      elasticsearch_limited_projects.exists?(project.id)
+      return elasticsearch_limited_projects.exists?(project.id) unless ::Feature.enabled?(:elasticsearch_indexes_project_cache, default_enabled: true)
+
+      ::Gitlab::Elastic::ElasticsearchEnabledCache.fetch(:project, project.id) do
+        elasticsearch_limited_projects.exists?(project.id)
+      end
+    end
+
+    def invalidate_elasticsearch_indexes_project_cache!
+      ::Gitlab::Elastic::ElasticsearchEnabledCache.delete(:project)
     end
 
     def elasticsearch_indexes_namespace?(namespace)
