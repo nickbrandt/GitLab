@@ -4,8 +4,4 @@ export default () => ({
   errorCode: null,
   mergeRequests: [],
   pageInfo: {},
-  filters: {
-    labelName: [],
-    milestoneTitle: null,
-  },
 });

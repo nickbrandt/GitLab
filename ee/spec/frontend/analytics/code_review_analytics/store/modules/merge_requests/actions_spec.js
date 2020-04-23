@@ -9,7 +9,7 @@ import mockMergeRequests from '../../../mock_data';
 
 jest.mock('~/flash', () => jest.fn());
 
-describe('Code review analytics actions', () => {
+describe('Code review analytics mergeRequests actions', () => {
   let state;
   let mock;
 
@@ -32,7 +32,13 @@ describe('Code review analytics actions', () => {
   };
 
   beforeEach(() => {
-    state = getInitialState();
+    state = {
+      filters: {
+        milestoneTitle: null,
+        labelName: [],
+      },
+      ...getInitialState(),
+    };
     mock = new MockAdapter(axios);
   });
 
@@ -140,26 +146,6 @@ describe('Code review analytics actions', () => {
       ).then(() => {
         expect(createFlash).toHaveBeenCalled();
       }));
-  });
-
-  describe('setFilters', () => {
-    const milestoneTitle = 'my milestone';
-    const labelName = ['first label', 'second label'];
-
-    it('commits the SET_FILTERS mutation', () => {
-      testAction(
-        actions.setFilters,
-        { milestone_title: milestoneTitle, label_name: labelName },
-        state,
-        [
-          {
-            type: types.SET_FILTERS,
-            payload: { milestoneTitle, labelName },
-          },
-        ],
-        [{ type: 'fetchMergeRequests' }],
-      );
-    });
   });
 
   describe('setPage', () => {

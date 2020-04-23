@@ -3,11 +3,8 @@ import mutations from 'ee/analytics/code_review_analytics/store/modules/merge_re
 import getInitialState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
 import mockMergeRequests from '../../../mock_data';
 
-describe('Code review analytics mutations', () => {
+describe('Code review analytics mergeRequests mutations', () => {
   let state;
-
-  const milestoneTitle = 'my milestone';
-  const labelName = ['first label', 'second label'];
 
   const pageInfo = {
     page: 1,
@@ -27,16 +24,6 @@ describe('Code review analytics mutations', () => {
       mutations[types.SET_PROJECT_ID](state, 1);
 
       expect(state.projectId).toBe(1);
-    });
-  });
-
-  describe(types.SET_FILTERS, () => {
-    it('updates milestoneTitle and labelName', () => {
-      mutations[types.SET_FILTERS](state, { milestoneTitle, labelName });
-
-      expect(state.filters.milestoneTitle).toBe(milestoneTitle);
-      expect(state.filters.labelName).toBe(labelName);
-      expect(state.pageInfo.page).toBe(1);
     });
   });
 
