@@ -8,8 +8,7 @@ module Types
     graphql_name 'JiraImport'
 
     field :scheduled_at, Types::TimeType, null: true,
-          method: :created_at,
-          description: 'Timestamp of when the Jira import was created'
+          description: 'Timestamp of when the Jira import was scheduled'
     field :scheduled_by, Types::UserType, null: true,
           description: 'User that started the Jira import'
     field :jira_project_key, GraphQL::STRING_TYPE, null: false,
