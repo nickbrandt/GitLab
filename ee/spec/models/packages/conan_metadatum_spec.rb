@@ -8,12 +8,22 @@ RSpec.describe Packages::ConanMetadatum, type: :model do
   end
 
   describe 'validations' do
+    let(:fifty_one_characters) { 'f_a' * 17}
+
     it { is_expected.to validate_presence_of(:package) }
     it { is_expected.to validate_presence_of(:package_username) }
     it { is_expected.to validate_presence_of(:package_channel) }
 
     describe '#package_username' do
       it { is_expected.to allow_value("my-package+username").for(:package_username) }
+      it { is_expected.to allow_value("my_package.username").for(:package_username) }
+      it { is_expected.to allow_value("_my-package.username123").for(:package_username) }
+      it { is_expected.to allow_value("my").for(:package_username) }
+      it { is_expected.not_to allow_value('+my_package').for(:package_username) }
+      it { is_expected.not_to allow_value('.my_package').for(:package_username) }
+      it { is_expected.not_to allow_value('-my_package').for(:package_username) }
+      it { is_expected.not_to allow_value('m').for(:package_username) }
+      it { is_expected.not_to allow_value(fifty_one_characters).for(:package_username) }
       it { is_expected.not_to allow_value("my/package").for(:package_username) }
       it { is_expected.not_to allow_value("my(package)").for(:package_username) }
       it { is_expected.not_to allow_value("my@package").for(:package_username) }
@@ -22,6 +32,14 @@ RSpec.describe Packages::ConanMetadatum, type: :model do
     describe '#package_channel' do
       it { is_expected.to allow_value("beta").for(:package_channel) }
       it { is_expected.to allow_value("stable+1.0").for(:package_channel) }
+      it { is_expected.to allow_value("my").for(:package_channel) }
+      it { is_expected.to allow_value("my_channel.beta").for(:package_channel) }
+      it { is_expected.to allow_value("_my-channel.beta123").for(:package_channel) }
+      it { is_expected.not_to allow_value('+my_channel').for(:package_channel) }
+      it { is_expected.not_to allow_value('.my_channel').for(:package_channel) }
+      it { is_expected.not_to allow_value('-my_channel').for(:package_channel) }
+      it { is_expected.not_to allow_value('m').for(:package_channel) }
+      it { is_expected.not_to allow_value(fifty_one_characters).for(:package_channel) }
       it { is_expected.not_to allow_value("my/channel").for(:package_channel) }
       it { is_expected.not_to allow_value("my(channel)").for(:package_channel) }
       it { is_expected.not_to allow_value("my@channel").for(:package_channel) }

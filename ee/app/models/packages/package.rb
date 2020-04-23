@@ -20,10 +20,9 @@ class Packages::Package < ApplicationRecord
   delegate :recipe, :recipe_path, to: :conan_metadatum, prefix: :conan
 
   validates :project, presence: true
+  validates :name, presence: true
 
-  validates :name,
-    presence: true,
-    format: { with: Gitlab::Regex.package_name_regex }
+  validates :name, format: { with: Gitlab::Regex.package_name_regex }, unless: :conan?
 
   validates :name,
     uniqueness: { scope: %i[project_id version package_type] }, unless: :conan?
@@ -32,6 +31,8 @@ class Packages::Package < ApplicationRecord
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
   validates :version, format: { with: Gitlab::Regex.semver_regex }, if: :npm?
+  validates :name, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
+  validates :version, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
 
   enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4, pypi: 5, composer: 6 }
 

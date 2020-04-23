@@ -31,7 +31,7 @@ describe Packages::Npm::CreateTagService do
       end
 
       context 'on different package type' do
-        let!(:package2) { create(:conan_package, project: package.project, name: package.name, version: package.version) }
+        let!(:package2) { create(:conan_package, project: package.project, name: 'conan_package_name', version: package.version) }
 
         it_behaves_like 'it creates the tag'
       end

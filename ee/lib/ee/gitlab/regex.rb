@@ -20,7 +20,7 @@ module EE
         end
 
         def conan_recipe_component_regex
-          @conan_recipe_component_regex ||= %r{\A(\w[.+-]?)+\z}.freeze
+          @conan_recipe_component_regex ||= %r{\A[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]{1,49}\z}.freeze
         end
 
         def package_name_regex
