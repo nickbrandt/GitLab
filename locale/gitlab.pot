@@ -13266,6 +13266,9 @@ msgstr ""
 msgid "Metrics|Link contains an invalid time window, please verify the link to see the requested time range."
 msgstr ""
 
+msgid "Metrics|Link contains invalid chart information, please verify the link to see the expanded panel."
+msgstr ""
+
 msgid "Metrics|Max"
 msgstr ""
 
