@@ -49,8 +49,7 @@ module Gitlab
 
         # @return [String] URL to download the resource from
         def resource_url
-          # TODO change to Generalized API endpoint after that is implemented
-          Gitlab::Geo.primary_node.geo_transfers_url(replicable_name, model_record.id.to_s)
+          Gitlab::Geo.primary_node.geo_retrieve_url(replicable_name, model_record.id.to_s)
         end
 
         private
@@ -65,7 +64,7 @@ module Gitlab
         def request_headers
           request_data = {
             replicable_name: replicable_name,
-            model_record_id: model_record.id
+            id: model_record.id
           }
 
           TransferRequest.new(request_data).headers

@@ -30,7 +30,7 @@ describe Gitlab::Geo::Replicator do
 
         protected
 
-        def publish_test(other:)
+        def consume_event_test(user:, other:)
           true
         end
       end
@@ -116,6 +116,20 @@ describe Gitlab::Geo::Replicator do
         it 'raises an argument error' do
           expect { subject.publish(:unsupported) }.to raise_error(ArgumentError)
         end
+      end
+    end
+
+    describe '#consume' do
+      subject { DummyReplicator.new }
+
+      it 'accepts valid attributes' do
+        expect { subject.consume(:test, user: 'something', other: 'something else') }.not_to raise_error
+      end
+
+      it 'calls corresponding method with specified named attributes' do
+        expect(subject).to receive(:consume_event_test).with(user: 'something', other: 'something else')
+
+        subject.consume(:test, user: 'something', other: 'something else')
       end
     end
   end
