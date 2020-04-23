@@ -56,10 +56,10 @@ export default {
     },
     dismissSelectedVulnerabilities() {
       // TODO: Batch vulnerability dismissal with https://gitlab.com/gitlab-org/gitlab/-/issues/214376
-      const promises = this.selectedVulnerabilities.map(vulnerability =>
+      const promises = this.selectedVulnerabilities.map((vulnerability, i) =>
         this.$apollo.mutate({
           mutation: dismissVulnerability,
-          variables: { id: vulnerability.id, comment: this.dismissalReason },
+          variables: { id: (i % 2 ? vulnerability.id : 10000), comment: this.dismissalReason },
         }),
       );
 
