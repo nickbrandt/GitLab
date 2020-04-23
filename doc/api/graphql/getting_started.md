@@ -74,7 +74,8 @@ Attempting this through REST requires multiple calls:
    curl --location --header 'PRIVATE-TOKEN: $PERSONAL_TOKEN' --request GET 'https://gitlab.example.com/api/v4/groups/:id/epics/:epic_iid/issues'
    ```
 
-Compare this to the single GraphQL query  
+Alternatively, you can accomplish all this with a single GraphQL query:
+
 ```shell
 curl --location --request POST 'https://gitlab.example.com/api/graphql' \
 --header 'Authorization: Bearer $PERSONAL_TOKEN' \
