@@ -129,7 +129,7 @@ describe 'Groups > Usage Quotas' do
     it 'has correct tracking setup and shows correct group quota and projects info' do
       visit_pipeline_quota_page
 
-      expect(page).to have_content('Buy additional minutes')
+      expect(page).to have_link('Buy additional minutes', href: EE::SUBSCRIPTIONS_MORE_MINUTES_URL)
 
       page.within('.pipeline-quota') do
         expect(page).to have_content("1000 / 500 minutes")
