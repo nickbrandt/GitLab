@@ -8,6 +8,10 @@ module StatusPage
     MAX_RECENT_INCIDENTS = 20
     # Limit the amount of comments per incident
     MAX_COMMENTS = 100
+    # Limit on paginated responses
+    MAX_KEYS_PER_PAGE = 1_000
+    MAX_PAGES = 5
+    MAX_IMAGE_UPLOADS = MAX_KEYS_PER_PAGE * MAX_PAGES
 
     def self.details_path(id)
       "data/incident/#{id}.json"
