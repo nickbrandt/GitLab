@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import EmptyRule from 'ee/approvals/components/mr_edit/empty_rule.vue';
+import EmptyRule from 'ee/approvals/components/empty_rule.vue';
 import { GlDeprecatedButton } from '@gitlab/ui';
 
 describe('Empty Rule', () => {

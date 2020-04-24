@@ -2,9 +2,9 @@
 import { mapActions } from 'vuex';
 import { GlDeprecatedButton } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import RuleInput from './rule_input.vue';
-import EmptyRuleName from '../empty_rule_name.vue';
-import RuleBranches from '../rule_branches.vue';
+import RuleInput from './mr_edit/rule_input.vue';
+import EmptyRuleName from './empty_rule_name.vue';
+import RuleBranches from './rule_branches.vue';
 
 export default {
   components: {

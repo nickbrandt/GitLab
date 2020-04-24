@@ -5,7 +5,7 @@ import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
-import EmptyRule from '../mr_edit/empty_rule.vue';
+import EmptyRule from '../empty_rule.vue';
 import RuleInput from '../mr_edit/rule_input.vue';
 import RuleBranches from '../rule_branches.vue';
 
