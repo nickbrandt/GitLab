@@ -4460,6 +4460,11 @@ scalar JSON
 
 type JiraImport {
   """
+  Timestamp of when the Jira import was created
+  """
+  createdAt: Time
+
+  """
   Project key for the imported Jira project
   """
   jiraProjectKey: String!

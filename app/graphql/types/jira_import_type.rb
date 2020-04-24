@@ -7,6 +7,8 @@ module Types
   class JiraImportType < BaseObject
     graphql_name 'JiraImport'
 
+    field :created_at, Types::TimeType, null: true,
+          description: 'Timestamp of when the Jira import was created'
     field :scheduled_at, Types::TimeType, null: true,
           description: 'Timestamp of when the Jira import was scheduled'
     field :scheduled_by, Types::UserType, null: true,
