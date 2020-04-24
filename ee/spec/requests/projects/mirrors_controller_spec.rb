@@ -23,7 +23,6 @@ describe Projects::MirrorsController do
                 project: {
           mirror: '1',
           import_url: '',
-          mirror_user_id: user.id,
           mirror_trigger_builds: '0'
         }
       }
