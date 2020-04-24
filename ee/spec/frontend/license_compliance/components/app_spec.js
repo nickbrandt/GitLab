@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 
 import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert, GlBadge } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
+import setWindowLocation from 'helpers/set_window_location_helper';
 
 import { REPORT_STATUS } from 'ee/license_compliance/store/modules/list/constants';
 
@@ -80,6 +81,10 @@ const createComponent = ({ state, props, options }) => {
     },
     ...options,
     store: fakeStore,
+    stubs: {
+      GlTabs,
+      GlTab,
+    },
   });
 };
 
@@ -182,6 +187,56 @@ describe('Project Licenses', () => {
       expect(wrapper.find(GlTab).exists()).toBe(true);
       expect(wrapper.findAll(GlTab)).toHaveLength(2);
     });
+
+    describe.each`
+      givenUrlHash   | tabName       | expectedActiveAttributeValue
+      ${'#policies'} | ${'policies'} | ${'true'}
+      ${'#policies'} | ${'licenses'} | ${undefined}
+      ${'#licenses'} | ${'licenses'} | ${'true'}
+      ${'#licenses'} | ${'policies'} | ${undefined}
+      ${'#foo'}      | ${'policies'} | ${undefined}
+      ${'#foo'}      | ${'licenses'} | ${undefined}
+    `(
+      'when the url contains $givenUrlHash hash',
+      ({ givenUrlHash, tabName, expectedActiveAttributeValue }) => {
+        beforeEach(() => {
+          setWindowLocation({
+            href: `${TEST_HOST}${givenUrlHash}`,
+          });
+
+          createComponent({
+            state: {
+              initialized: true,
+            },
+            options: {
+              provide: {
+                glFeatures: { licensePolicyList: true },
+              },
+            },
+          });
+        });
+
+        it(`${tabName} tab has "active" attribute set to be ${expectedActiveAttributeValue}`, () => {
+          expect(wrapper.find(`[data-testid=${tabName}]`).attributes('active')).toBe(
+            expectedActiveAttributeValue,
+          );
+        });
+      },
+    );
+
+    it.each(['policies', 'licenses'])(
+      'sets the location hash to "%s" when the corresponding tab is activated',
+      tabName => {
+        const originalHash = window.location.hash;
+        expect(originalHash).toBeFalsy();
+
+        wrapper.find(`[data-testid="${tabName}"]`).vm.$emit('click');
+
+        expect(window.location.hash).toContain(tabName);
+
+        window.location.hash = originalHash;
+      },
+    );
 
     it('it renders the "Detected in project" table', () => {
       expect(wrapper.find(DetectedLicensesTable).exists()).toBe(true);

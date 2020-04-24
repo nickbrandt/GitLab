@@ -35,7 +35,7 @@ module EE
     end
 
     def license_management_settings_path(project)
-      project_settings_ci_cd_path(project, anchor: 'js-license-management')
+      project_licenses_path(project, anchor: 'policies')
     end
 
     def vulnerability_path(entity, *args)
