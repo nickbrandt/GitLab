@@ -64,6 +64,83 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
     end
   end
 
+  describe '#recursive_delete' do
+    let(:key_prefix) { 'key_prefix/' }
+    let(:aws_client) { client.send('client') }
+
+    subject(:result) { client.recursive_delete(key_prefix) }
+
+    context 'when successful' do
+      include_context 'list_objects_v2 result'
+
+      it 'sends keys for batch delete' do
+        expect(aws_client).to receive(:delete_objects).with(delete_objects_data(key_list_1))
+        expect(aws_client).to receive(:delete_objects).with(delete_objects_data(key_list_2))
+
+        result
+      end
+
+      it 'returns true' do
+        expect(result).to eq(true)
+      end
+    end
+
+    context 'list_object exeeds upload limit' do
+      include_context 'oversized list_objects_v2 result'
+
+      it 'respects upload limit' do
+        expect(aws_client).to receive(:delete_objects).with(delete_objects_data(keys_page_1))
+        expect(aws_client).not_to receive(:delete_objects).with(delete_objects_data(keys_page_2))
+
+        result
+      end
+    end
+
+    context 'when failed' do
+      let(:aws_error) { 'SomeError' }
+
+      it 'raises an error' do
+        stub_responses(:list_objects_v2, aws_error)
+
+        msg = error_message(aws_error, prefix: key_prefix)
+        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+      end
+    end
+  end
+
+  describe '#list_object_keys' do
+    let(:key_prefix) { 'key_prefix/' }
+
+    subject(:result) { client.list_object_keys(key_prefix) }
+
+    context 'when successful' do
+      include_context 'list_objects_v2 result'
+
+      it 'returns keys from bucket' do
+        expect(result).to eq(Set.new(key_list_1 + key_list_2))
+      end
+    end
+
+    context 'when exceeds upload limits' do
+      include_context 'oversized list_objects_v2 result'
+
+      it 'returns result at max size' do
+        expect(result.count).to eq(StatusPage::Storage::MAX_IMAGE_UPLOADS)
+      end
+    end
+
+    context 'when failed' do
+      let(:aws_error) { 'SomeError' }
+
+      it 'raises an error' do
+        stub_responses(:list_objects_v2, aws_error)
+
+        msg = error_message(aws_error, prefix: key_prefix)
+        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+      end
+    end
+  end
+
   private
 
   def stub_responses(*args)
@@ -74,5 +151,24 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
   def error_message(error_class, **args)
     %{Error occured "Aws::S3::Errors::#{error_class}" } \
       "for bucket #{bucket_name.inspect}. Arguments: #{args.inspect}"
+  end
+
+  def delete_objects_data(keys)
+    objects = keys.map { |key| { key: key } }
+    {
+      bucket: bucket_name,
+      delete: {
+        objects: objects
+      }
+    }
+  end
+
+  def list_objects_data(key_list:, next_continuation_token:, is_truncated: )
+    contents = key_list.map { |key| Aws::S3::Types::Object.new(key: key) }
+    Aws::S3::Types::ListObjectsV2Output.new(
+      contents: contents,
+      next_continuation_token: next_continuation_token,
+      is_truncated: is_truncated
+    )
   end
 end
