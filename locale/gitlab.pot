@@ -7835,6 +7835,9 @@ msgstr ""
 msgid "Encountered an error while rendering: %{err}"
 msgstr ""
 
+msgid "End Time"
+msgstr ""
+
 msgid "End date"
 msgstr ""
 
@@ -13661,6 +13664,12 @@ msgstr ""
 msgid "No activities found"
 msgstr ""
 
+msgid "No alerts available to display. If you think you're seeing this message in error, refresh the page."
+msgstr ""
+
+msgid "No alerts to display."
+msgstr ""
+
 msgid "No application_settings found"
 msgstr ""
 
@@ -18768,6 +18777,9 @@ msgstr ""
 msgid "Settings to prevent self-approval across all projects in the instance. Only an administrator can modify these settings."
 msgstr ""
 
+msgid "Severity"
+msgstr ""
+
 msgid "Severity: %{severity}"
 msgstr ""
 
@@ -19548,6 +19560,9 @@ msgid "Stars"
 msgstr ""
 
 msgid "Start GitLab Ultimate trial"
+msgstr ""
+
+msgid "Start Time"
 msgstr ""
 
 msgid "Start Web Terminal"
