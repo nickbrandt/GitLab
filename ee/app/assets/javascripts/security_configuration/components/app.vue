@@ -1,13 +1,18 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { GlLink, GlCard, GlFormCheckbox, GlSprintf } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
     GlLink,
+    GlCard,
+    GlFormCheckbox,
+    GlSprintf,
     Icon,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     autoDevopsEnabled: {
       type: Boolean,
@@ -17,6 +22,17 @@ export default {
     helpPagePath: {
       type: String,
       required: true,
+    },
+    // TODO: make this required when the feature flag is removed
+    suggestedSolutionsHelpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    suggestedSolutionsEnabledInitial: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     autoDevopsHelpPagePath: {
       type: String,
@@ -31,6 +47,12 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  data() {
+    return {
+      suggestedSolutionsEnabled: this.suggestedSolutionsEnabledInitial,
+      suggestedSolutionsLoading: false,
+    };
   },
   computed: {
     headerContent() {
@@ -64,6 +86,14 @@ export default {
       return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
         featureName,
       });
+    },
+    toggleSuggestedSolutions(enabled) {
+      this.suggestedSolutionsLoading = true;
+      // Simulate API call for now
+      setTimeout(() => {
+        this.suggestedSolutionsEnabled = enabled;
+        this.suggestedSolutionsLoading = false;
+      }, 1000);
     },
   },
 };
@@ -140,6 +170,82 @@ export default {
           </div>
         </div>
       </div>
+    </section>
+    <section v-if="glFeatures.suggestedSolution">
+      <h2 class="h4 my-3">
+        {{ __('Suggested Solutions') }}
+        <gl-link
+          target="_blank"
+          :href="suggestedSolutionsHelpPagePath"
+          :aria-label="__('Suggested solutions help link')"
+        >
+          <icon name="question" />
+        </gl-link>
+      </h2>
+      <gl-card>
+        <gl-form-checkbox
+          :checked="suggestedSolutionsEnabled"
+          :disabled="suggestedSolutionsLoading"
+          @input="toggleSuggestedSolutions"
+        >
+          {{
+            __('Automatically create merge requests for vulnerabilities that have fixes available.')
+          }}
+          <template #help>
+            {{ __('Available for dependency and container scanning') }}
+          </template>
+        </gl-form-checkbox>
+        <div class="gl-bg-blue-100 gl-p-3">
+          <gl-sprintf
+            v-if="suggestedSolutionsEnabled"
+            :message="
+              __(
+                '%{securityBotLinkStart}GitLab Security Bot%{securityBotLinkEnd} is the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}.',
+              )
+            "
+          >
+            <template #securityBotLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+            <template #moreInfoLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+          </gl-sprintf>
+          <gl-sprintf
+            v-else
+            :message="
+              __(
+                'Once %{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} are configured, settings will default to opt-in. %{securityBotLinkStart}GitLab Security Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}.',
+              )
+            "
+          >
+            <template #containerScanningLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+            <template #dependencyScanningLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+            <template #securityBotLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+            <template #moreInfoLink="{ content }">
+              <gl-link href="#">
+                {{ content }}
+              </gl-link>
+            </template>
+          </gl-sprintf>
+        </div>
+      </gl-card>
     </section>
   </article>
 </template>

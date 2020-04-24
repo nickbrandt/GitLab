@@ -83,6 +83,7 @@
 // can be removed once the mixins are added.
 // See https://gitlab.com/gitlab-org/gitlab/issues/36857 for more details.
 .gl-bg-blue-50 { @include gl-bg-blue-50; }
+.gl-bg-blue-100 { @include gl-bg-blue-100; }
 .gl-bg-red-100 { @include gl-bg-red-100; }
 .gl-bg-orange-100 { @include gl-bg-orange-100; }
 .gl-bg-gray-50 { @include gl-bg-gray-50; }

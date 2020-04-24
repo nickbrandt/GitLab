@@ -7,6 +7,10 @@ module Projects
 
       alias_method :vulnerable, :project
 
+      before_action only: [:show] do
+        push_frontend_feature_flag(:suggested_solution)
+      end
+
       def show
         @configuration = ConfigurationPresenter.new(project)
       end
