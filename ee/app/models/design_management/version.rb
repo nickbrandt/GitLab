@@ -66,6 +66,10 @@ module DesignManagement
     # designs, and not being able to add designs without a saved version. Also this
     # method inserts designs in bulk, rather than one by one.
     #
+    # Before calling this method, callers must guard against concurrent
+    # modification by obtaining the lock on the design repository. See:
+    # `DesignManagement::Version.with_lock`.
+    #
     # Parameters:
     # - design_actions [DesignManagement::DesignAction]:
     #     the actions that have been performed in the repository.
@@ -98,8 +102,8 @@ module DesignManagement
     CREATION_TTL = 5.seconds
     RETRY_DELAY = ->(num) { 0.2.seconds * num**2 }
 
-    def self.lock_for_creation(project_id, repository, &block)
-      key = "lock_for_creation:#{name}:{#{project_id}}"
+    def self.with_lock(project_id, repository, &block)
+      key = "with_lock:#{name}:{#{project_id}}"
 
       in_lock(key, ttl: CREATION_TTL, retries: 5, sleep_sec: RETRY_DELAY) do |_retried|
         repository.create_if_not_exists
