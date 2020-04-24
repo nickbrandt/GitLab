@@ -43,8 +43,8 @@ describe EpicsFinder do
       end
 
       context 'when user can not read epics of a group' do
-        it 'raises an error when group_id param is missing' do
-          expect { epics }.to raise_error { ArgumentError }
+        it 'returns empty collection' do
+          expect(epics).to be_empty
         end
       end
 

@@ -44,18 +44,30 @@ describe API::Issues, :mailer do
         subject
 
         expect(response).to have_gitlab_http_status(:success)
-        expect(epic_issue_response_for(epic_issue)['epic_iid']).to eq(epic.iid)
+        expect(epic_issue_response_for(issue_with_epic)['epic_iid']).to eq(epic.iid)
       end
 
       it 'contains epic in response' do
         subject
 
         expect(response).to have_gitlab_http_status(:success)
-        expect(epic_issue_response_for(epic_issue)['epic']).to eq({ "id" => epic.id,
+        expect(epic_issue_response_for(issue_with_epic)['epic']).to eq({ "id" => epic.id,
                                                                     "iid" => epic.iid,
                                                                     "group_id" => epic.group_id,
                                                                     "title" => epic.title,
                                                                     "url" => group_epic_path(epic.group, epic) })
+      end
+
+      context 'and epic issue is not present' do
+        it 'exposes epic as nil' do
+          issue_with_epic.epic_issue.destroy
+
+          subject
+
+          response = epic_issue_response_for(issue_with_epic)
+          expect(response['epic']).to eq(nil)
+          expect(response['epic_id']).to eq(nil)
+        end
       end
     end
 
@@ -68,14 +80,14 @@ describe API::Issues, :mailer do
         subject
 
         expect(response).to have_gitlab_http_status(:success)
-        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+        expect(epic_issue_response_for(issue_with_epic)).not_to have_key('epic_iid')
       end
 
       it 'does not contain epic_iid in response' do
         subject
 
         expect(response).to have_gitlab_http_status(:success)
-        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic')
+        expect(epic_issue_response_for(issue_with_epic)).not_to have_key('epic')
       end
     end
   end
@@ -150,7 +162,7 @@ describe API::Issues, :mailer do
     end
 
     include_examples 'exposes epic' do
-      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+      let!(:issue_with_epic) { create(:issue, project: group_project, epic: epic) }
     end
   end
 
@@ -176,7 +188,7 @@ describe API::Issues, :mailer do
     end
 
     context 'on personal project' do
-      let!(:epic_issue) { create(:issue, project: project, epic: epic) }
+      let!(:issue_with_epic) { create(:issue, project: project, epic: epic) }
 
       before do
         stub_licensed_features(epics: true)
@@ -186,12 +198,12 @@ describe API::Issues, :mailer do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+        expect(epic_issue_response_for(issue_with_epic)).not_to have_key('epic_iid')
       end
     end
 
     context 'on group project' do
-      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+      let!(:issue_with_epic) { create(:issue, project: group_project, epic: epic) }
 
       subject { get api("/projects/#{group_project.id}/issues", user) }
 
@@ -201,9 +213,9 @@ describe API::Issues, :mailer do
 
   describe 'GET /project/:id/issues/:issue_id' do
     context 'on personal project' do
-      let!(:epic_issue) { create(:issue, project: project, epic: epic) }
+      let!(:issue_with_epic) { create(:issue, project: project, epic: epic) }
 
-      subject { get api("/projects/#{project.id}/issues/#{epic_issue.iid}", user) }
+      subject { get api("/projects/#{project.id}/issues/#{issue_with_epic.iid}", user) }
 
       before do
         stub_licensed_features(epics: true)
@@ -213,14 +225,14 @@ describe API::Issues, :mailer do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+        expect(epic_issue_response_for(issue_with_epic)).not_to have_key('epic_iid')
       end
     end
 
     context 'on group project' do
-      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+      let!(:issue_with_epic) { create(:issue, project: group_project, epic: epic) }
 
-      subject { get api("/projects/#{group_project.id}/issues/#{epic_issue.iid}", user) }
+      subject { get api("/projects/#{group_project.id}/issues/#{issue_with_epic.iid}", user) }
 
       include_examples 'exposes epic'
     end
@@ -399,8 +411,8 @@ describe API::Issues, :mailer do
 
   describe 'PUT /projects/:id/issues/:issue_id to update epic' do
     it_behaves_like 'with epic parameter' do
-      let(:epic_issue) { create(:issue, project: target_project) }
-      let(:request) { put api("/projects/#{target_project.id}/issues/#{epic_issue.iid}", user), params: params }
+      let(:issue_with_epic) { create(:issue, project: target_project) }
+      let(:request) { put api("/projects/#{target_project.id}/issues/#{issue_with_epic.iid}", user), params: params }
     end
   end
 
