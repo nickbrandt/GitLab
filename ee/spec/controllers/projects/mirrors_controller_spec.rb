@@ -122,9 +122,11 @@ describe Projects::MirrorsController do
       project = create(:project, :mirror)
       sign_in(project.owner)
 
-      expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
-
-      put :update_now, params: { namespace_id: project.namespace.to_param, project_id: project.to_param }
+      Sidekiq::Testing.fake! do
+        expect { put :update_now, params: { namespace_id: project.namespace.to_param, project_id: project.to_param } }
+          .to change { UpdateAllMirrorsWorker.jobs.size }
+          .by(1)
+      end
     end
   end
 

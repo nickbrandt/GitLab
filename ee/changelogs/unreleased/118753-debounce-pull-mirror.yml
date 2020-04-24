@@ -1,0 +1,5 @@
+---
+title: Debounce pull mirror invocation
+merge_request: 30157
+author:
+type: performance

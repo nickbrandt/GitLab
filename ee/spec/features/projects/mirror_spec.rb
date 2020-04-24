@@ -19,18 +19,20 @@ describe 'Project mirror', :js do
       let(:timestamp) { Time.now }
 
       before do
-        import_state.update(next_execution_timestamp: timestamp + 10.minutes)
+        import_state.update(last_update_at: 6.minutes.ago, next_execution_timestamp: timestamp + 10.minutes)
       end
 
       context 'when able to force update' do
         it 'forces import' do
-          expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
-
           Timecop.freeze(timestamp) do
             visit project_mirror_path(project)
           end
 
-          Sidekiq::Testing.fake! { find('.js-force-update-mirror').click }
+          Sidekiq::Testing.fake! do
+            expect { find('.js-force-update-mirror').click }
+              .to change { UpdateAllMirrorsWorker.jobs.size }
+              .by(1)
+          end
         end
       end
 
