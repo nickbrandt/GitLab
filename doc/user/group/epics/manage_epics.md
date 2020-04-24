@@ -17,7 +17,11 @@ selected group. From your group page:
 
 1. Go to **Epics**.
 1. Click **New epic**.
-1. Enter a descriptive title and click **Create epic**.
+1. Enter a descriptive title.
+1. To make the new epic confidential, select the **Make this epic confidential** checkbox
+   ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/213068) in
+   [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.0). **(ULTIMATE)**
+1. Click **Create epic** button.
 
 You will be taken to the new epic where can edit the following details:
 
@@ -29,9 +33,8 @@ You will be taken to the new epic where can edit the following details:
 
 An epic's page contains the following tabs:
 
-- **Epics and Issues**: epics and issues added to this epic. Child epics and their issues appear in
-  a tree view.
-  - Click the <kbd>></kbd> beside a parent epic to reveal the child epics and issues.
+- **Epics and Issues**: epics and issues added to this epic. Child epics, and their issues, are shown in a tree view.
+  - Click on the <kbd>></kbd> beside a parent epic to reveal the child epics and issues.
   - Hover over the total counts to see a breakdown of open and closed items.
 - **Roadmap**: a roadmap view of child epics which have start and due dates.
 

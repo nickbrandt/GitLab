@@ -18,6 +18,7 @@ class Groups::EpicsController < Groups::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_epic_sidebar, @group)
+    push_frontend_feature_flag(:confidential_epics, @group)
   end
 
   def index

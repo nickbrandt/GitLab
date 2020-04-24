@@ -320,6 +320,20 @@ describe('Epic Store Mutations', () => {
     });
   });
 
+  describe('SET_EPIC_CREATE_CONFIDENTIAL', () => {
+    it('Should set `newEpicConfidential` prop on state as with the value of provided `newEpicConfidential` param', () => {
+      const state = {
+        newEpicConfidential: true,
+      };
+
+      mutations[types.SET_EPIC_CREATE_CONFIDENTIAL](state, {
+        newEpicConfidential: true,
+      });
+
+      expect(state.newEpicConfidential).toBe(true);
+    });
+  });
+
   describe('REQUEST_EPIC_CREATE', () => {
     it('Should set `epicCreateInProgress` flag on state as `true`', () => {
       const state = {

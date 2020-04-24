@@ -1122,6 +1122,23 @@ describe('Epic Store Actions', () => {
     });
   });
 
+  describe('setEpicCreateConfidential', () => {
+    it('should set `state.newEpicConfidential` value to the value of `newEpicConfidential` param', done => {
+      const data = {
+        newEpicConfidential: true,
+      };
+
+      testAction(
+        actions.setEpicCreateConfidential,
+        data,
+        { newEpicConfidential: true },
+        [{ type: 'SET_EPIC_CREATE_CONFIDENTIAL', payload: { ...data } }],
+        [],
+        done,
+      );
+    });
+  });
+
   describe('requestEpicCreate', () => {
     it('should set `state.epicCreateInProgress` flag to `true`', done => {
       testAction(
@@ -1166,6 +1183,7 @@ describe('Epic Store Actions', () => {
     let mock;
     const stateCreateEpic = {
       newEpicTitle: 'foobar',
+      newEpicConfidential: true,
     };
 
     beforeEach(() => {
