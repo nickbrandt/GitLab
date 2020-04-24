@@ -420,7 +420,7 @@ export default {
     </div>
     <mr-widget-pipeline-container
       v-if="shouldRenderMergedPipeline"
-      class="js-post-merge-pipeline mr-widget-workflow test-class"
+      class="js-post-merge-pipeline mr-widget-workflow"
       :mr="mr"
       :is-post-merge="true"
     />
