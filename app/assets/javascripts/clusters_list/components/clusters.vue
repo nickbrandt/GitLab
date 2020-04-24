@@ -23,23 +23,23 @@ export default {
       key: 'environmentScope',
       label: __('Environment scope'),
     },
-    {
-      key: 'size',
-      label: __('Size'),
-    },
-    {
-      key: 'cpu',
-      label: __('Total cores (vCPUs)'),
-    },
-    {
-      key: 'memory',
-      label: __('Total memory (GB)'),
-    },
-    {
-      key: 'clusterType',
-      label: __('Cluster level'),
-      formatter: value => CLUSTER_TYPES[value],
-    },
+    //{
+    //  key: 'size',
+    //  label: __('Size'),
+    //},
+    //{
+    //  key: 'cpu',
+    //  label: __('Total cores (vCPUs)'),
+    //},
+    //{
+    //  key: 'memory',
+    //  label: __('Total memory (GB)'),
+    //},
+    //{
+    //  key: 'clusterType',
+    //  label: __('Cluster level'),
+    //  formatter: value => CLUSTER_TYPES[value],
+    //},
   ],
   computed: {
     ...mapState(['clusters', 'loading']),
