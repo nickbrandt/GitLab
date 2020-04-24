@@ -3,8 +3,8 @@
 require "spec_helper"
 
 describe License do
-  let(:gl_license)  { build(:gitlab_license) }
-  let(:license)     { build(:license, data: gl_license.export) }
+  let(:gl_license) { build(:gitlab_license) }
+  let(:license)    { build(:license, data: gl_license.export) }
 
   describe "Validation" do
     describe "Valid license" do
@@ -116,7 +116,7 @@ describe License do
         end
 
         context "after the license started" do
-          let(:date) { Date.today }
+          let(:date) { Date.current }
 
           it "is valid" do
             expect(license).to be_valid
@@ -249,7 +249,7 @@ describe License do
     describe 'downgrade' do
       context 'when more users were added in previous period' do
         before do
-          HistoricalData.create!(date: 6.months.ago, active_user_count: 15)
+          HistoricalData.create!(date: described_class.current.starts_at - 6.months, active_user_count: 15)
 
           set_restrictions(restricted_user_count: 5, previous_user_count: 10)
         end
@@ -778,12 +778,14 @@ describe License do
   end
 
   def set_restrictions(opts)
+    date = described_class.current.starts_at
+
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],
       previous_user_count: opts[:previous_user_count],
       trueup_quantity: opts[:trueup_quantity],
-      trueup_from: (Date.today - 1.year).to_s,
-      trueup_to: Date.today.to_s
+      trueup_from: (date - 1.year).to_s,
+      trueup_to: date.to_s
     }
   end
 
