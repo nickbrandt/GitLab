@@ -33,6 +33,10 @@ export default {
       type: String,
       required: true,
     },
+    hasData: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     subjectFilterOptions() {
@@ -87,14 +91,13 @@ export default {
   TASKS_BY_TYPE_FILTERS,
 };
 </script>
-
 <template>
   <div
     class="js-tasks-by-type-chart-filters d-flex flex-row justify-content-between align-items-center"
   >
     <div class="flex-column">
       <h4>{{ s__('CycleAnalytics|Tasks by type') }}</h4>
-      <p>{{ selectedFiltersText }}</p>
+      <p v-if="hasData">{{ selectedFiltersText }}</p>
     </div>
     <div class="flex-column">
       <labels-selector
