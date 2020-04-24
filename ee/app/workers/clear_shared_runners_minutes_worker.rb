@@ -24,7 +24,7 @@ class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWo
     else
       return unless try_obtain_lease
 
-      Namespace.reset_ci_minutes_in_batches!
+      Ci::Minutes::BatchResetService.new.execute!
     end
   end
 
