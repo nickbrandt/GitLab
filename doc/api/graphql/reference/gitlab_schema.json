@@ -16917,7 +16917,7 @@
           "fields": [
             {
               "name": "annotations",
-              "description": "Annotations added to the dashboard. Will always return `null` if `metrics_dashboard_annotations` feature flag is disabled",
+              "description": "Annotations added to the dashboard",
               "args": [
                 {
                   "name": "from",
