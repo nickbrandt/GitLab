@@ -4,7 +4,13 @@ import CodeAnalyticsApp from './components/app.vue';
 
 export default () => {
   const container = document.getElementById('js-code-review-analytics');
-  const { projectId, newMergeRequestUrl, emptyStateSvgPath } = container.dataset;
+  const {
+    projectId,
+    newMergeRequestUrl,
+    emptyStateSvgPath,
+    milestonePath,
+    labelsPath,
+  } = container.dataset;
 
   if (!container) return;
 
@@ -18,6 +24,8 @@ export default () => {
           projectId: Number(projectId),
           newMergeRequestUrl,
           emptyStateSvgPath,
+          milestonePath,
+          labelsPath,
         },
       });
     },

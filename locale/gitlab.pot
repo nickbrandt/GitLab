@@ -9227,6 +9227,9 @@ msgstr ""
 msgid "Filter projects"
 msgstr ""
 
+msgid "Filter results"
+msgstr ""
+
 msgid "Filter results by group"
 msgstr ""
 
