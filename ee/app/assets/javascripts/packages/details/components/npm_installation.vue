@@ -2,9 +2,7 @@
 import { GlLink, GlSprintf } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
-import Tracking from '~/tracking';
 import { NpmManager, TrackingActions, TrackingLabels } from '../constants';
-import { trackInstallationTabChange } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import InstallationTabs from './installation_tabs.vue';
 
@@ -16,7 +14,6 @@ export default {
     GlSprintf,
     InstallationTabs,
   },
-  mixins: [Tracking.mixin(), trackInstallationTabChange],
   computed: {
     ...mapState(['npmHelpPath']),
     ...mapGetters(['npmInstallationCommand', 'npmSetupCommand']),
