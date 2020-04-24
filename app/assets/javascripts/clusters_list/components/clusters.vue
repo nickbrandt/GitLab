@@ -35,11 +35,11 @@ export default {
     //  key: 'memory',
     //  label: __('Total memory (GB)'),
     //},
-    //{
-    //  key: 'clusterType',
-    //  label: __('Cluster level'),
-    //  formatter: value => CLUSTER_TYPES[value],
-    //},
+    {
+      key: 'clusterType',
+      label: __('Cluster level'),
+      formatter: value => CLUSTER_TYPES[value],
+    },
   ],
   computed: {
     ...mapState(['clusters', 'loading']),
@@ -70,5 +70,10 @@ export default {
     variant="light"
     class="qa-clusters-table"
   >
+    <template #cell(clusterType)="{value}">
+      <gl-badge variant="light">
+        {{ value }}
+      </gl-badge>
+    </template>
   </gl-table>
 </template>

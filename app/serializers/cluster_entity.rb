@@ -3,6 +3,7 @@
 class ClusterEntity < Grape::Entity
   include RequestAwareEntity
 
+  expose :cluster_type
   expose :environment_scope
   expose :name
   expose :status_name, as: :status
