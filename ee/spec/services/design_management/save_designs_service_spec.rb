@@ -272,7 +272,7 @@ describe DesignManagement::SaveDesignsService do
           expect { run_service }.to change { commit_count.call }.by(1)
         end
 
-        it 'only does 5 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
+        it 'only does 4 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
           service = described_class.new(project, user, issue: issue, files: files)
           # Some unrelated calls that are usually cached or happen only once
           service.__send__(:repository).create_if_not_exists
@@ -281,8 +281,8 @@ describe DesignManagement::SaveDesignsService do
           request_count = -> { Gitlab::GitalyClient.get_request_count }
 
           # An exists?, a check for existing blobs, default branch, an after_commit
-          # callback on LfsObjectsProject, and the creation of commits
-          expect { service.execute }.to change(&request_count).by(5)
+          # callback on LfsObjectsProject
+          expect { service.execute }.to change(&request_count).by(4)
         end
 
         context 'when uploading too many files' do
