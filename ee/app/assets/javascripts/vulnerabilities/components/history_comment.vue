@@ -27,6 +27,10 @@ export default {
       required: false,
       default: undefined,
     },
+    notesUrl: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
@@ -39,6 +43,9 @@ export default {
   },
 
   computed: {
+    noteIdUrl() {
+      return joinPaths(this.notesUrl, this.comment.id);
+    },
     commentNote() {
       return this.comment?.note;
     },
@@ -65,13 +72,13 @@ export default {
     getSaveConfig(note) {
       const isUpdatingComment = Boolean(this.comment);
       const method = isUpdatingComment ? 'put' : 'post';
-      let url = joinPaths(window.location.pathname, 'notes');
+      let url = this.notesUrl;
       const data = { note: { note } };
       const emitName = isUpdatingComment ? 'onCommentUpdated' : 'onCommentAdded';
 
       // If we're updating the comment, use the comment ID in the URL. Otherwise, use the discussion ID in the request data.
       if (isUpdatingComment) {
-        url = joinPaths(url, this.comment.id);
+        url = this.noteIdUrl;
       } else {
         data.in_reply_to_discussion_id = this.discussionId;
       }
@@ -100,7 +107,7 @@ export default {
     },
     deleteComment() {
       this.isDeletingComment = true;
-      const deleteUrl = joinPaths(window.location.pathname, 'notes', this.comment.id);
+      const deleteUrl = this.noteIdUrl;
 
       axios
         .delete(deleteUrl)

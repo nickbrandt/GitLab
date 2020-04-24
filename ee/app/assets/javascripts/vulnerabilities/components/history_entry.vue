@@ -9,6 +9,10 @@ export default {
       type: Object,
       required: true,
     },
+    notesUrl: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -66,6 +70,7 @@ export default {
         ref="existingComment"
         :comment="comment"
         :discussion-id="discussion.reply_id"
+        :notes-url="notesUrl"
         @onCommentUpdated="updateComment"
         @onCommentDeleted="removeComment"
       />
@@ -75,6 +80,7 @@ export default {
       v-else
       ref="newComment"
       :discussion-id="discussion.reply_id"
+      :notes-url="notesUrl"
       @onCommentAdded="addComment"
     />
   </li>
