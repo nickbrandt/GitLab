@@ -25,6 +25,8 @@ module EE
           params.delete(:shared_runners_minutes_limit)
           params.delete(:extra_shared_runners_minutes_limit)
         end
+
+        super
       end
 
       def log_audit_event
