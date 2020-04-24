@@ -28,12 +28,13 @@ describe('Status Page actions', () => {
   };
 
   it.each`
-    mutation                         | action                            | value          | key
-    ${types.SET_STATUS_PAGE_ENABLED} | ${'setStatusPageEnabled'}         | ${true}        | ${'enabled'}
-    ${types.SET_BUCKET_NAME}         | ${'setStatusPageBucketName'}      | ${'my-bucket'} | ${'bucketName'}
-    ${types.SET_REGION}              | ${'setStatusPageRegion'}          | ${'us-west'}   | ${'region'}
-    ${types.SET_ACCESS_KEY_ID}       | ${'setStatusPageAccessKey'}       | ${'key-id'}    | ${'awsAccessKey'}
-    ${types.SET_SECRET_ACCESS_KEY}   | ${'setStatusPageSecretAccessKey'} | ${'secret'}    | ${'awsSecretKey'}
+    mutation                         | action                            | value                 | key
+    ${types.SET_STATUS_PAGE_ENABLED} | ${'setStatusPageEnabled'}         | ${true}               | ${'enabled'}
+    ${types.SET_STATUS_PAGE_URL}     | ${'setStatusPageUrl'}             | ${'http://status.io'} | ${'url'}
+    ${types.SET_BUCKET_NAME}         | ${'setStatusPageBucketName'}      | ${'my-bucket'}        | ${'bucketName'}
+    ${types.SET_REGION}              | ${'setStatusPageRegion'}          | ${'us-west'}          | ${'region'}
+    ${types.SET_ACCESS_KEY_ID}       | ${'setStatusPageAccessKey'}       | ${'key-id'}           | ${'awsAccessKey'}
+    ${types.SET_SECRET_ACCESS_KEY}   | ${'setStatusPageSecretAccessKey'} | ${'secret'}           | ${'awsSecretKey'}
   `('$action will commit $mutation with $value', ({ mutation, action, value, key }) => {
     testAction(
       actions[action],

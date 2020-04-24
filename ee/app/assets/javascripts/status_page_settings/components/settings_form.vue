@@ -34,6 +34,10 @@ export default {
     ),
     introLinkText: s__('StatusPage|your status page frontend.'),
     activeLabel: s__('StatusPage|Active'),
+    url: {
+      label: s__('StatusPage|Status page URL'),
+      linkText: s__('StatusPage|Status page frontend documentation'),
+    },
     bucket: {
       label: s__('StatusPage|S3 Bucket name'),
       helpText: s__('StatusPage|Bucket %{docsLink}'),
@@ -55,6 +59,7 @@ export default {
     ...mapState(['loading']),
     ...mapComputed([
       { key: 'enabled', updateFn: 'setStatusPageEnabled' },
+      { key: 'url', updateFn: 'setStatusPageUrl' },
       { key: 'bucketName', updateFn: 'setStatusPageBucketName' },
       { key: 'region', updateFn: 'setStatusPageRegion' },
       { key: 'awsAccessKey', updateFn: 'setStatusPageAccessKey' },
@@ -97,6 +102,20 @@ export default {
           <gl-form-checkbox v-model="enabled">
             <span class="bold">{{ $options.i18n.activeLabel }}</span></gl-form-checkbox
           >
+        </gl-form-group>
+
+        <gl-form-group
+          :label="$options.i18n.url.label"
+          label-size="sm"
+          label-for="status-page-url"
+          class="col-8 col-md-9 gl-pl-0 mb-3"
+        >
+          <gl-form-input id="status-page-url" v-model="url" />
+          <p class="form-text text-muted">
+            <gl-link href="/help/user/project/status_page/index.html">
+              {{ $options.i18n.url.linkText }}
+            </gl-link>
+          </p>
         </gl-form-group>
 
         <gl-form-group
@@ -147,7 +166,7 @@ export default {
         <gl-form-group
           :label="$options.i18n.accessKey.label"
           label-size="sm"
-          label-for="status-page-aws-access-key-id"
+          label-for="status-page-aws-access-key"
           class="col-8 col-md-9 gl-pl-0 mb-3"
         >
           <gl-form-input id="status-page-aws-access-key " v-model="awsAccessKey" />

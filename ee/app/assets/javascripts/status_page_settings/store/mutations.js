@@ -4,6 +4,9 @@ export default {
   [types.SET_STATUS_PAGE_ENABLED](state, enabled) {
     state.enabled = enabled;
   },
+  [types.SET_STATUS_PAGE_URL](state, url) {
+    state.url = url;
+  },
   [types.SET_BUCKET_NAME](state, bucketName) {
     state.bucketName = bucketName;
   },
