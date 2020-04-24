@@ -89,6 +89,6 @@ jsdoc/
 .overcommit.yml.backup
 .projections.json
 /qa/.rakeTasks
-/webpack-dev-server.json
+webpack-dev-server.json
 /.nvimrc
 .solargraph.yml

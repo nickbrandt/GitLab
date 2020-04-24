@@ -1,9 +1,0 @@
-{
-  "ignoreRoot": [
-    ".git",
-    "node_modules/*/"
-  ],
-  "noUpdateNotifier": true,
-  "signal": "SIGTERM",
-  "delay": 1000
-}
