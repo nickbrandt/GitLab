@@ -271,7 +271,6 @@ describe ProjectsController do
         {
           mirror: true,
           mirror_trigger_builds: true,
-          mirror_user_id: user.id,
           import_url: 'https://example.com'
         }
       end
@@ -296,6 +295,20 @@ describe ProjectsController do
           expect(project.mirror_trigger_builds).to eq(true)
           expect(project.mirror_user).to eq(user)
           expect(project.import_url).to eq('https://example.com')
+        end
+
+        it 'ignores mirror_user_id' do
+          other_user = create(:user)
+
+          put :update,
+            params: {
+              namespace_id: project.namespace,
+              id: project,
+              project: params.merge(mirror_user_id: other_user.id)
+            }
+          project.reload
+
+          expect(project.mirror_user).to eq(user)
         end
       end
 
