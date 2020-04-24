@@ -418,8 +418,15 @@ describe GroupPolicy do
       context 'admin' do
         let(:current_user) { admin }
 
-        it { is_expected.to be_allowed(:override_group_member) }
-        it { is_expected.to be_allowed(:update_group_member) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(:override_group_member) }
+          it { is_expected.to be_allowed(:update_group_member) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(:override_group_member) }
+          it { is_expected.to be_disallowed(:update_group_member) }
+        end
       end
 
       context 'owner' do
@@ -801,7 +808,13 @@ describe GroupPolicy do
             stub_ee_application_setting(group_owners_can_manage_default_branch_protection: false)
           end
 
-          it { is_expected.to be_allowed(:update_default_branch_protection) }
+          context 'when admin mode is enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:update_default_branch_protection) }
+          end
+
+          context 'when admin mode is disabled' do
+            it { is_expected.to be_disallowed(:update_default_branch_protection) }
+          end
         end
       end
 
