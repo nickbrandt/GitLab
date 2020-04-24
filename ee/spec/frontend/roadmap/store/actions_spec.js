@@ -1,21 +1,15 @@
 import MockAdapter from 'axios-mock-adapter';
-
 import * as actions from 'ee/roadmap/store/actions';
 import * as types from 'ee/roadmap/store/mutation_types';
-
 import defaultState from 'ee/roadmap/store/state';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import * as epicUtils from 'ee/roadmap/utils/epic_utils';
 import * as roadmapItemUtils from 'ee/roadmap/utils/roadmap_item_utils';
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
-import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
 import groupMilestones from 'ee/roadmap/queries/groupMilestones.query.graphql';
-import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
-
 import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
-
 import {
   mockGroupId,
   basePath,
@@ -29,7 +23,6 @@ import {
   mockSortedBy,
   mockGroupEpicsQueryResponse,
   mockGroupEpicsQueryResponseFormatted,
-  mockEpicChildEpicsQueryResponse,
   mockGroupMilestonesQueryResponse,
   rawMilestones,
   mockMilestone,
@@ -85,65 +78,6 @@ describe('Roadmap Vuex Actions', () => {
         [{ type: types.SET_WINDOW_RESIZE_IN_PROGRESS, payload: true }],
         [],
       );
-    });
-  });
-
-  describe('fetchGroupEpics', () => {
-    let mockState;
-    let expectedVariables;
-
-    beforeEach(() => {
-      mockState = {
-        fullPath: 'gitlab-org',
-        epicsState: 'all',
-        sortedBy: 'start_date_asc',
-        presetType: PRESET_TYPES.MONTHS,
-        filterParams: {},
-        timeframe: mockTimeframeMonths,
-      };
-
-      expectedVariables = {
-        fullPath: 'gitlab-org',
-        state: mockState.epicsState,
-        sort: mockState.sortedBy,
-        startDate: '2017-11-1',
-        dueDate: '2018-6-30',
-      };
-    });
-
-    it('should fetch Group Epics using GraphQL client when epicIid is not present in state', () => {
-      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
-        Promise.resolve({
-          data: mockGroupEpicsQueryResponse.data,
-        }),
-      );
-
-      return actions.fetchGroupEpics(mockState).then(() => {
-        expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
-          query: groupEpics,
-          variables: expectedVariables,
-        });
-      });
-    });
-
-    it('should fetch child Epics of an Epic using GraphQL client when epicIid is present in state', () => {
-      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
-        Promise.resolve({
-          data: mockEpicChildEpicsQueryResponse.data,
-        }),
-      );
-
-      mockState.epicIid = '1';
-
-      return actions.fetchGroupEpics(mockState).then(() => {
-        expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
-          query: epicChildEpics,
-          variables: {
-            iid: '1',
-            ...expectedVariables,
-          },
-        });
-      });
     });
   });
 

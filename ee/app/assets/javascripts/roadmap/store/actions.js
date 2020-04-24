@@ -22,7 +22,7 @@ export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DAT
 export const setWindowResizeInProgress = ({ commit }, inProgress) =>
   commit(types.SET_WINDOW_RESIZE_IN_PROGRESS, inProgress);
 
-export const fetchGroupEpics = (
+const fetchGroupEpics = (
   { epicIid, fullPath, epicsState, sortedBy, presetType, filterParams, timeframe },
   defaultTimeframe,
 ) => {
