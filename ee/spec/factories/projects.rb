@@ -86,6 +86,12 @@ FactoryBot.modify do
       import_type { 'github' }
     end
 
+    trait :with_vulnerability do
+      after(:create) do |project|
+        create(:vulnerability, :detected, project: project)
+      end
+    end
+
     trait :with_vulnerabilities do
       after(:create) do |project|
         create_list(:vulnerability, 2, :detected, project: project)
