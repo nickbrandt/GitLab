@@ -1,4 +1,16 @@
 export default () => ({
-  labelName: [],
-  milestoneTitle: null,
+  milestonePath: '',
+  labelsPath: '',
+  milestones: {
+    isLoading: false,
+    data: [],
+    errorCode: null,
+    selected: null,
+  },
+  labels: {
+    isLoading: false,
+    data: [],
+    errorCode: null,
+    selected: [],
+  },
 });

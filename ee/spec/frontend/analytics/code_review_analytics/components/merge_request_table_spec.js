@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { GlTable } from '@gitlab/ui';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
 import createState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
-import mergeRequests from '../mock_data';
+import { mockMergeRequests } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -51,7 +51,7 @@ describe('MergeRequestTable component', () => {
       .at(1);
 
   const updateMergeRequests = (index, attrs) =>
-    mergeRequests.map((item, idx) => {
+    mockMergeRequests.map((item, idx) => {
       if (idx !== index) {
         return item;
       }
@@ -66,7 +66,7 @@ describe('MergeRequestTable component', () => {
     beforeEach(() => {
       jest.spyOn(global, 'Date').mockImplementationOnce(() => new Date('2020-03-09T11:01:58.135Z'));
 
-      bootstrap({ mergeRequests });
+      bootstrap({ mergeRequests: mockMergeRequests });
     });
 
     it('renders the GlTable component', () => {
