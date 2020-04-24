@@ -31,9 +31,9 @@ module Dashboard
       end
 
       def find_invalid_ids(projects_to_add, project_ids)
-        found_ids = projects_to_add.map(&:id).map(&:to_s)
+        found_ids = projects_to_add.map(&:id)
 
-        project_ids.map(&:to_s) - found_ids
+        project_ids.map(&:to_i) - found_ids
       end
 
       def add_projects(projects)

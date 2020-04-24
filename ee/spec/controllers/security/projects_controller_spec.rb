@@ -107,7 +107,7 @@ describe Security::ProjectsController do
             expect(json_response).to eq({
               'added' => [],
               'duplicate' => [],
-              'invalid' => ['-1']
+              'invalid' => [-1]
             })
           end
         end
