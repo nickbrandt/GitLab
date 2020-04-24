@@ -1,5 +1,7 @@
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
+import tasksByTypeStore from 'ee/analytics/cycle_analytics/store/modules/type_of_work';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
@@ -9,18 +11,39 @@ import {
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
 
-describe('TypeOfWorkCharts', () => {
-  function createComponent({ props = {}, stubs = {} } = {}) {
-    return shallowMount(TypeOfWorkCharts, {
-      propsData: {
-        isLoading: false,
-        tasksByTypeChartData: tasksByTypeData,
-        selectedTasksByTypeFilters: taskByTypeFilters,
-        ...props,
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+const actionSpies = {
+  setTasksByTypeFilters: jest.fn(),
+};
+
+const fakeStore = ({ initialGetters, initialState }) =>
+  new Vuex.Store({
+    modules: {
+      typeOfWork: {
+        ...tasksByTypeStore,
+        getters: {
+          tasksByTypeChartData: () => tasksByTypeData,
+          selectedTasksByTypeFilters: () => taskByTypeFilters,
+          ...initialGetters,
+        },
+        state: {
+          ...initialState,
+        },
       },
+    },
+  });
+
+describe('TypeOfWorkCharts', () => {
+  function createComponent({ stubs = {}, initialGetters, initialState } = {}) {
+    return shallowMount(TypeOfWorkCharts, {
+      localVue,
+      store: fakeStore({ initialGetters, initialState }),
+      methods: actionSpies,
       stubs: {
-        TasksByTypeChart: false,
-        TasksByTypeFilters: false,
+        TasksByTypeChart: true,
+        TasksByTypeFilters: true,
         ...stubs,
       },
     });
@@ -31,6 +54,8 @@ describe('TypeOfWorkCharts', () => {
   const findSubjectFilters = _wrapper => _wrapper.find(TasksByTypeFilters);
   const findTasksByTypeChart = _wrapper => _wrapper.find(TasksByTypeChart);
   const findLoader = _wrapper => _wrapper.find(GlLoadingIcon);
+  const selectedFilterText =
+    "Type of work Showing data for group 'Gitlab Org' from Dec 11, 2019 to Jan 10, 2020";
 
   afterEach(() => {
     wrapper.destroy();
@@ -45,8 +70,30 @@ describe('TypeOfWorkCharts', () => {
       expect(findTasksByTypeChart(wrapper).exists()).toBe(true);
     });
 
+    it('renders a description of the current filters', () => {
+      expect(wrapper.text()).toContain(selectedFilterText);
+    });
+
     it('does not render the loading icon', () => {
       expect(findLoader(wrapper).exists()).toBe(false);
+    });
+  });
+
+  describe('with no data', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        initialGetters: {
+          tasksByTypeChartData: () => ({ groupBy: [], data: [], seriesNames: [] }),
+        },
+      });
+    });
+
+    it('does not renders the task by type chart', () => {
+      expect(findTasksByTypeChart(wrapper).exists()).toBe(false);
+    });
+
+    it('renders the no data available message', () => {
+      expect(wrapper.text()).toContain('There is no data available. Please change your selection.');
     });
   });
 
@@ -62,15 +109,18 @@ describe('TypeOfWorkCharts', () => {
       return wrapper.vm.$nextTick();
     });
 
-    it('emits the `updateFilter` event', () => {
-      expect(wrapper.emitted('updateFilter')).toBeDefined();
-      expect(wrapper.emitted('updateFilter')[0]).toEqual([payload]);
+    it('calls the setTasksByTypeFilters method', () => {
+      expect(actionSpies.setTasksByTypeFilters).toHaveBeenCalledWith(payload);
     });
   });
 
-  describe('while loading', () => {
+  describe.each`
+    stateKey                                | value
+    ${'isLoadingTasksByTypeChart'}          | ${true}
+    ${'isLoadingTasksByTypeChartTopLabels'} | ${true}
+  `('when $stateKey=$value', ({ stateKey, value }) => {
     beforeEach(() => {
-      wrapper = createComponent({ props: { isLoading: true } });
+      wrapper = createComponent({ initialState: { [stateKey]: value } });
     });
 
     it('renders loading icon', () => {

@@ -20,16 +20,10 @@ export default {
       required: true,
     },
   },
-  computed: {
-    hasData() {
-      return Boolean(this.data.length);
-    },
-  },
 };
 </script>
 <template>
   <gl-stacked-column-chart
-    v-if="hasData"
     :data="data"
     :group-by="groupBy"
     x-axis-type="category"
@@ -38,7 +32,4 @@ export default {
     :y-axis-title="s__('CycleAnalytics|Number of tasks')"
     :series-names="seriesNames"
   />
-  <div v-else class="bs-callout bs-callout-info">
-    <p>{{ __('There is no data available. Please change your selection.') }}</p>
-  </div>
 </template>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { GlDropdownItem, GlSegmentedControl } from '@gitlab/ui';
+import createFlash from '~/flash';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
 import LabelsSelector from 'ee/analytics/cycle_analytics/components/labels_selector.vue';
 import {
@@ -11,7 +12,6 @@ import {
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
 import waitForPromises from 'helpers/wait_for_promises';
-import { shouldFlashAMessage } from '../../helpers';
 import { groupLabels } from '../../mock_data';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
@@ -36,7 +36,9 @@ let store = null;
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-function createComponent({ props = {}, mountFn = shallowMount }) {
+jest.mock('~/flash');
+
+function createComponent({ props = {}, mountFn = shallowMount } = {}) {
   store = createStore();
   return mountFn(TasksByTypeFilters, {
     localVue,
@@ -51,6 +53,7 @@ function createComponent({ props = {}, mountFn = shallowMount }) {
       selectedLabelIds,
       labels: groupLabels,
       subjectFilter: TASKS_BY_TYPE_SUBJECT_ISSUE,
+      hasData: true,
       ...props,
     },
     stubs: {
@@ -62,6 +65,7 @@ function createComponent({ props = {}, mountFn = shallowMount }) {
 describe('TasksByTypeFilters', () => {
   let wrapper = null;
   let mock = null;
+  const selectedFilterText = (count = 1) => `Showing Issues and ${count} labels`;
 
   beforeEach(() => {
     mock = mockGroupLabelsRequest();
@@ -75,10 +79,35 @@ describe('TasksByTypeFilters', () => {
     wrapper.destroy();
   });
 
-  describe('labels', () => {
+  describe('with data', () => {
     beforeEach(() => {
       mock = mockGroupLabelsRequest();
       wrapper = createComponent({});
+
+      return waitForPromises();
+    });
+
+    it('renders the selectedFiltersText', () => {
+      expect(wrapper.text()).toContain(selectedFilterText());
+    });
+  });
+
+  describe('with no data', () => {
+    beforeEach(() => {
+      mock = mockGroupLabelsRequest();
+      wrapper = createComponent({ props: { hasData: false } });
+
+      return waitForPromises();
+    });
+    it('renders the selectedFiltersText', () => {
+      expect(wrapper.text()).not.toContain(selectedFilterText());
+    });
+  });
+
+  describe('labels', () => {
+    beforeEach(() => {
+      mock = mockGroupLabelsRequest();
+      wrapper = createComponent();
 
       return waitForPromises();
     });
@@ -96,7 +125,6 @@ describe('TasksByTypeFilters', () => {
 
     describe('with the warningMessageThreshold label threshold reached', () => {
       beforeEach(() => {
-        setFixtures('<div class="flash-container"></div>');
         mock = mockGroupLabelsRequest();
         wrapper = createComponent({
           props: {
@@ -112,11 +140,14 @@ describe('TasksByTypeFilters', () => {
       it('should indicate how many labels are selected', () => {
         expect(wrapper.text()).toContain('2 selected (5 max)');
       });
+
+      it('renders the selectedFiltersText', () => {
+        expect(wrapper.text()).toContain(selectedFilterText(2));
+      });
     });
 
     describe('with maximum labels selected', () => {
       beforeEach(() => {
-        setFixtures('<div class="flash-container"></div>');
         mock = mockGroupLabelsRequest();
 
         wrapper = createComponent({
@@ -141,7 +172,10 @@ describe('TasksByTypeFilters', () => {
       });
 
       it('should display a message', () => {
-        shouldFlashAMessage('Only 2 labels can be selected at this time');
+        expect(createFlash).toHaveBeenCalledWith(
+          'Only 2 labels can be selected at this time',
+          'notice',
+        );
       });
     });
   });

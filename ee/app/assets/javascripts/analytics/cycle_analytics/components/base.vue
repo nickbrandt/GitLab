@@ -69,13 +69,6 @@ export default {
       'medians',
       'customStageFormErrors',
     ]),
-    ...mapState('typeOfWork', [
-      'isLoadingTasksByTypeChart',
-      'isLoadingTasksByTypeChartTopLabels',
-      'topRankedLabels',
-      'subject',
-      'selectedLabelIds',
-    ]),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',
@@ -84,7 +77,6 @@ export default {
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
     ]),
-    ...mapGetters('typeOfWork', ['tasksByTypeChartData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -105,24 +97,6 @@ export default {
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
-    },
-    selectedTasksByTypeFilters() {
-      const {
-        selectedGroup,
-        startDate,
-        endDate,
-        selectedProjectIds,
-        subject,
-        selectedLabelIds,
-      } = this;
-      return {
-        selectedGroup,
-        selectedProjectIds,
-        startDate,
-        endDate,
-        subject,
-        selectedLabelIds,
-      };
     },
     query() {
       return {
@@ -162,7 +136,6 @@ export default {
       'updateStage',
       'reorderStage',
     ]),
-    ...mapActions('typeOfWork', ['setTasksByTypeFilters']),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
@@ -315,13 +288,7 @@ export default {
         </div>
       </div>
       <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
-      <type-of-work-charts
-        v-if="shouldDisplayTypeOfWorkCharts"
-        :is-loading="isLoadingTypeOfWork"
-        :tasks-by-type-chart-data="tasksByTypeChartData"
-        :selected-tasks-by-type-filters="selectedTasksByTypeFilters"
-        @updateFilter="setTasksByTypeFilters"
-      />
+      <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" :is-loading="isLoadingTypeOfWork" />
     </div>
   </div>
 </template>
