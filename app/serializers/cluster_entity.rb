@@ -8,5 +8,10 @@ class ClusterEntity < Grape::Entity
   expose :name
   expose :status_name, as: :status
   expose :status_reason
+
+  expose :path do |cluster|
+    Clusters::ClusterPresenter.new(cluster).show_path
+  end
+
   expose :applications, using: ClusterApplicationEntity
 end

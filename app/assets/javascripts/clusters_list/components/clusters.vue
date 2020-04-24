@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTable, GlLoadingIcon, GlBadge } from '@gitlab/ui';
+import { GlTable, GlLink, GlLoadingIcon, GlBadge } from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
@@ -8,6 +8,7 @@ import { __, sprintf } from '~/locale';
 export default {
   components: {
     GlTable,
+    GlLink,
     GlLoadingIcon,
     GlBadge,
   },
@@ -70,6 +71,12 @@ export default {
     variant="light"
     class="qa-clusters-table"
   >
+    <template #cell(name)="{item}">
+      <gl-link :href="item.path">
+        {{ item.name }}
+      </gl-link>
+    </template>
+
     <template #cell(clusterType)="{value}">
       <gl-badge variant="light">
         {{ value }}
