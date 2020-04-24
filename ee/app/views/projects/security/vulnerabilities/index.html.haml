@@ -7,7 +7,7 @@
 
   #app{ data: { empty_state_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
     vulnerabilities_endpoint: expose_path(api_v4_projects_vulnerabilities_path(id: @project.id)),
-    vulnerability_exports_endpoint: expose_path(api_v4_projects_vulnerability_exports_path(id: @project.id)),
+    vulnerability_exports_endpoint: expose_path(api_v4_security_projects_vulnerability_exports_path(id: @project.id)),
     project_full_path: @project.full_path,
     dashboard_documentation: help_page_path('user/application_security/security_dashboard/index') } }
     -# Display table loading animation while Vue app loads
