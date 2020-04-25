@@ -18,16 +18,6 @@ RSpec.shared_examples 'rejects nuget packages access' do |user_type, status, add
   end
 end
 
-RSpec.shared_examples 'rejects nuget packages access with packages features disabled' do
-  context 'with packages features disabled' do
-    before do
-      stub_licensed_features(packages: false)
-    end
-
-    it_behaves_like 'rejects nuget packages access', :anonymous, :forbidden
-  end
-end
-
 RSpec.shared_examples 'process nuget service index request' do |user_type, status, add_member = true|
   context "for user type #{user_type}" do
     before do

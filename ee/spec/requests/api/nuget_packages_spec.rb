@@ -16,11 +16,7 @@ RSpec.describe API::NugetPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -65,8 +61,6 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/nuget/authorize' do
@@ -77,11 +71,7 @@ RSpec.describe API::NugetPackages do
 
     subject { put api(url), headers: headers }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -125,8 +115,6 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/nuget' do
@@ -150,11 +138,7 @@ RSpec.describe API::NugetPackages do
       )
     end
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -198,8 +182,6 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/index' do
@@ -216,11 +198,7 @@ RSpec.describe API::NugetPackages do
       packages.each { |pkg| create_dependencies_for(pkg) }
     end
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -265,8 +243,6 @@ RSpec.describe API::NugetPackages do
         it_behaves_like 'rejects nuget access with invalid project id'
       end
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/*package_version' do
@@ -283,11 +259,7 @@ RSpec.describe API::NugetPackages do
       create_dependencies_for(package)
     end
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -334,8 +306,6 @@ RSpec.describe API::NugetPackages do
         it_behaves_like 'rejects nuget packages access', :developer, :not_found
       end
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/download/*package_name/index' do
@@ -345,11 +315,7 @@ RSpec.describe API::NugetPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -394,8 +360,6 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/download/*package_name/*package_version/*package_filename' do
@@ -406,11 +370,7 @@ RSpec.describe API::NugetPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -455,8 +415,6 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/query' do
@@ -475,11 +433,7 @@ RSpec.describe API::NugetPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -524,7 +478,5 @@ RSpec.describe API::NugetPackages do
 
       it_behaves_like 'rejects nuget access with invalid project id'
     end
-
-    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 end

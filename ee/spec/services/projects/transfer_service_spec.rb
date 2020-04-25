@@ -56,10 +56,6 @@ RSpec.describe Projects::TransferService do
   context 'with npm packages' do
     let!(:package) { create(:npm_package, project: project) }
 
-    before do
-      stub_licensed_features(packages: true)
-    end
-
     context 'with a root namespace change' do
       it 'does not allow the transfer' do
         expect(subject.execute(group)).to be false

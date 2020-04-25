@@ -2532,22 +2532,7 @@ RSpec.describe Project do
       it { is_expected.to be false }
     end
 
-    context 'with packages disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'returning false examples' do
-        let!(:package) { create(:maven_package, project: project) }
-        let(:package_type) { :maven }
-      end
-    end
-
-    context 'with packages enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with maven packages' do
         it_behaves_like 'returning true examples' do
           let(:package_type) { :maven }

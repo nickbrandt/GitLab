@@ -10,22 +10,9 @@ RSpec.describe 'Group Packages' do
   before do
     sign_in(user)
     group.add_maintainer(user)
-    stub_licensed_features(packages: true)
   end
 
   context 'when feature is not available' do
-    context 'packages feature is not available because of license' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it 'gives 404' do
-        visit_group_packages
-
-        expect(page).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'packages feature is disabled by config' do
       before do
         allow(Gitlab.config.packages).to receive(:enabled).and_return(false)

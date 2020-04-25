@@ -137,7 +137,6 @@ RSpec.describe Groups::UpdateService, '#execute' do
 
     shared_examples 'with packages' do
       before do
-        stub_licensed_features(packages: true)
         group.add_owner(user)
       end
 

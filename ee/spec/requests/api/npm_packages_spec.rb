@@ -17,7 +17,6 @@ RSpec.describe API::NpmPackages do
 
   before do
     project.add_developer(user)
-    stub_licensed_features(packages: true)
   end
 
   shared_examples 'a package that requires auth' do
@@ -134,14 +133,6 @@ RSpec.describe API::NpmPackages do
       end
     end
 
-    it 'rejects request if feature is not in the license' do
-      stub_licensed_features(packages: false)
-
-      get_package(package)
-
-      expect(response).to have_gitlab_http_status(:forbidden)
-    end
-
     def get_package(package, params = {}, headers = {})
       get api("/packages/npm/#{package.name}"), params: params, headers: headers
     end
@@ -219,14 +210,6 @@ RSpec.describe API::NpmPackages do
       end
 
       it_behaves_like 'a package file that requires auth'
-    end
-
-    it 'rejects request if feature is not in the license' do
-      stub_licensed_features(packages: false)
-
-      get_file(package_file)
-
-      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     def get_file(package_file, params = {})
@@ -424,11 +407,7 @@ RSpec.describe API::NpmPackages do
 
     subject { get api(url) }
 
-    context 'with packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with public project' do
         context 'with authenticated user' do
           subject { get api(url, personal_access_token: personal_access_token) }
@@ -463,14 +442,6 @@ RSpec.describe API::NpmPackages do
         end
       end
     end
-
-    context 'with packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects package tags access', :no_type, :forbidden
-    end
   end
 
   describe 'PUT /api/v4/packages/npm/-/package/*package_name/dist-tags/:tag' do
@@ -482,11 +453,7 @@ RSpec.describe API::NpmPackages do
 
     subject { put api(url), env: { 'api.request.body': version } }
 
-    context 'with packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with public project' do
         context 'with authenticated user' do
           subject { put api(url, personal_access_token: personal_access_token), env: { 'api.request.body': version } }
@@ -520,14 +487,6 @@ RSpec.describe API::NpmPackages do
           it_behaves_like 'rejects package tags access', :no_type, :unauthorized
         end
       end
-    end
-
-    context 'with packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects package tags access', :no_type, :unauthorized
     end
   end
 
@@ -540,11 +499,7 @@ RSpec.describe API::NpmPackages do
 
     subject { delete api(url) }
 
-    context 'with packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with public project' do
         context 'with authenticated user' do
           subject { delete api(url, personal_access_token: personal_access_token) }
@@ -578,14 +533,6 @@ RSpec.describe API::NpmPackages do
           it_behaves_like 'rejects package tags access', :no_type, :unauthorized
         end
       end
-    end
-
-    context 'with packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects package tags access', :no_type, :unauthorized
     end
   end
 
