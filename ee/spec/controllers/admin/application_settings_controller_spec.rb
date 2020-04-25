@@ -120,7 +120,7 @@ RSpec.describe Admin::ApplicationSettingsController do
 
     context 'updating npm packages request forwarding setting' do
       let(:settings) { { npm_package_requests_forwarding: true } }
-      let(:feature) { :packages }
+      let(:feature) { :package_forwarding }
 
       it_behaves_like 'settings for licensed features'
     end

@@ -10,7 +10,6 @@ RSpec.describe 'PackageFiles' do
 
   before do
     sign_in(user)
-    stub_licensed_features(packages: true)
   end
 
   context 'user with master role' do
@@ -37,14 +36,6 @@ RSpec.describe 'PackageFiles' do
       another_file = another_package.package_files.first
 
       visit download_project_package_file_path(project, another_file)
-
-      expect(status_code).to eq(404)
-    end
-
-    it 'gives 404 when packages feature is not available' do
-      stub_licensed_features(packages: false)
-
-      visit download_project_package_file_path(project, package_file)
 
       expect(status_code).to eq(404)
     end

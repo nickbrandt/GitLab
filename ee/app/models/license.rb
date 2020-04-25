@@ -94,7 +94,7 @@ class License < ApplicationRecord
     object_storage
     operations_dashboard
     opsgenie_integration
-    packages
+    package_forwarding
     pages_size_limit
     productivity_analytics
     project_aliases

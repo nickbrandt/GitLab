@@ -11,6 +11,14 @@ RSpec.describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
+    insert_after_sub_nav_item(
+      _('Labels'),
+      within: _('Issues'),
+      new_sub_nav_item_name: _('Service Desk')
+    )
+
+    insert_package_nav(_('Operations'))
+
     project.add_maintainer(user)
     sign_in(user)
   end
@@ -56,20 +64,9 @@ RSpec.describe 'Project navbar' do
   context 'when packages are available' do
     before do
       stub_config(packages: { enabled: true }, registry: { enabled: false })
-      stub_licensed_features(packages: true)
-
-      insert_after_nav_item(
-        _('Operations'),
-        new_nav_item: {
-          nav_item: _('Packages & Registries'),
-          nav_sub_items: [_('Package Registry')]
-        }
-      )
 
       visit project_path(project)
     end
-
-    it_behaves_like 'verified navigation bar'
 
     context 'when container registry is available' do
       before do

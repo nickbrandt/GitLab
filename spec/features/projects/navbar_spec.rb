@@ -12,6 +12,19 @@ RSpec.describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
+    # TODO - This can be moved into 'project navbar structure' shared
+    # context when service desk feature gets moved to core.
+    # More information in: https://gitlab.com/gitlab-org/gitlab/-/issues/215364
+    if Gitlab.ee?
+      insert_after_sub_nav_item(
+        _('Labels'),
+        within: _('Issues'),
+        new_sub_nav_item_name: _('Service Desk')
+      )
+    end
+
+    insert_package_nav(_('Operations'))
+
     project.add_maintainer(user)
     sign_in(user)
   end
@@ -58,13 +71,8 @@ RSpec.describe 'Project navbar' do
     before do
       stub_config(registry: { enabled: true })
 
-      insert_after_nav_item(
-        _('Operations'),
-        new_nav_item: {
-          nav_item: _('Packages & Registries'),
-          nav_sub_items: [_('Container Registry')]
-        }
-      )
+      insert_container_nav(_('Operations'))
+
       visit project_path(project)
     end
 
