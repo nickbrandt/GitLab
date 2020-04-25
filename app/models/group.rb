@@ -172,6 +172,13 @@ class Group < Namespace
     notification_settings(hierarchy_order: hierarchy_order).where(user: user)
   end
 
+  def packages_feature_available?
+    # TODO: the ee? condition can be removed once
+    # the package feature is moved to core
+    # See https://gitlab.com/gitlab-org/gitlab/-/issues/221259
+    ::Gitlab.config.packages.enabled && ::Gitlab.ee?
+  end
+
   def notification_email_for(user)
     # Finds the closest notification_setting with a `notification_email`
     notification_settings = notification_settings_for(user, hierarchy_order: :asc)

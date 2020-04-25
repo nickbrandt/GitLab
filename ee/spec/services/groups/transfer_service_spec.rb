@@ -10,7 +10,6 @@ RSpec.describe Groups::TransferService, '#execute' do
   let(:transfer_service) { described_class.new(group, user) }
 
   before do
-    stub_licensed_features(packages: true)
     group.add_owner(user)
     new_group&.add_owner(user)
   end

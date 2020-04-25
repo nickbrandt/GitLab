@@ -70,7 +70,7 @@ module EE
           attrs << { compliance_frameworks: [] }
         end
 
-        if License.feature_available?(:packages)
+        if License.feature_available?(:package_forwarding)
           attrs << :npm_package_requests_forwarding
         end
 

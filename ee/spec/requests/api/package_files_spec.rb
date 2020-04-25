@@ -14,11 +14,7 @@ RSpec.describe API::PackageFiles do
   describe 'GET /projects/:id/packages/:package_id/package_files' do
     let(:url) { "/projects/#{project.id}/packages/#{package.id}/package_files" }
 
-    context 'packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'project is public' do
         it 'returns 200' do
           get api(url)
@@ -64,10 +60,6 @@ RSpec.describe API::PackageFiles do
         let!(:package_file_2) { package.package_files[1] }
         let!(:package_file_3) { package.package_files[2] }
 
-        before do
-          stub_licensed_features(packages: true)
-        end
-
         context 'when viewing the first page' do
           it 'returns first 2 packages' do
             get api(url, user), params: { page: 1, per_page: per_page }
@@ -83,18 +75,6 @@ RSpec.describe API::PackageFiles do
             expect_paginated_array_response([package_file_3.id])
           end
         end
-      end
-    end
-
-    context 'packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it 'returns 403' do
-        get api(url, user)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

@@ -22,7 +22,7 @@ module EE
 
       override :transfer
       def transfer(project)
-        if project.feature_available?(:packages) && project.has_packages?(:npm) && !new_namespace_has_same_root?(project)
+        if project.has_packages?(:npm) && !new_namespace_has_same_root?(project)
           raise ::Projects::TransferService::TransferError.new(s_("TransferProject|Root namespace can't be updated if project has NPM packages"))
         end
 

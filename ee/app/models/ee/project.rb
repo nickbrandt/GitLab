@@ -628,8 +628,6 @@ module EE
     end
 
     def has_packages?(package_type)
-      return false unless feature_available?(:packages)
-
       packages.where(package_type: package_type).exists?
     end
 

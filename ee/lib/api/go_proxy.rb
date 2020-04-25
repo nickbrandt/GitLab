@@ -74,7 +74,6 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_read_package!
-        authorize_packages_feature!
       end
 
       namespace ':id/packages/go/*module_name/@v' do

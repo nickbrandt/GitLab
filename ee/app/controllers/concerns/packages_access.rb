@@ -11,8 +11,7 @@ module PackagesAccess
   private
 
   def verify_packages_enabled!
-    render_404 unless Gitlab.config.packages.enabled &&
-      project.feature_available?(:packages)
+    render_404 unless Gitlab.config.packages.enabled
   end
 
   def verify_read_package!
