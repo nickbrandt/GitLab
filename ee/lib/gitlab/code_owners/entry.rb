@@ -5,6 +5,8 @@ module Gitlab
     class Entry
       include ::Gitlab::Utils::StrongMemoize
 
+      DEFAULT_SECTION = "codeowners"
+
       Data = Struct.new(:pattern, :owner_line, :section)
 
       attr_reader :data
@@ -12,8 +14,8 @@ module Gitlab
 
       delegate :pattern, :hash, :owner_line, :section, to: :data
 
-      def initialize(pattern, owner_line, section = "CODEOWNERS")
-        @data = Data.new(pattern, owner_line, section)
+      def initialize(pattern, owner_line, section = DEFAULT_SECTION)
+        @data = Data.new(pattern, owner_line, section.downcase)
       end
 
       def all_users

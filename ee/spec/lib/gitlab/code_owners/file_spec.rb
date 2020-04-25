@@ -43,9 +43,44 @@ describe Gitlab::CodeOwners::File do
       end
 
       it "passes the call to #get_parsed_sectional_data" do
-        expect(file).to receive(:get_parsed_sectional_data).and_return({})
+        expect(file).to receive(:get_parsed_sectional_data)
 
-        expect(file.parsed_data).to be_empty
+        file.parsed_data
+      end
+
+      it "populates a hash with a single default section" do
+        data = file.parsed_data
+
+        expect(data.keys.length).to eq(1)
+        expect(data.keys).to contain_exactly(::Gitlab::CodeOwners::Entry::DEFAULT_SECTION.downcase)
+      end
+
+      context "when CODEOWNERS file contains multiple sections" do
+        using RSpec::Parameterized::TableSyntax
+
+        let(:file_content) do
+          File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
+        end
+
+        it "is a hash sorted by sections without duplicates" do
+          data = file.parsed_data
+
+          expect(data.keys.length).to eq(3)
+          expect(data.keys).to contain_exactly("codeowners", "documentation", "database")
+        end
+
+        where(:section, :patterns) do
+          "codeowners"    | ["/**/ee/**/*"]
+          "documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"]
+          "database"      | ["/**/README.md", "/**/model/db"]
+        end
+
+        with_them do
+          it "assigns the correct paths to each section" do
+            expect(file.parsed_data[section].keys).to contain_exactly(*patterns)
+            expect(file.parsed_data[section].values.detect { |entry| entry.section != section }).to be_nil
+          end
+        end
       end
     end
   end

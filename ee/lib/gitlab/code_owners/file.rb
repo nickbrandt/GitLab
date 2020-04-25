@@ -63,7 +63,34 @@ module Gitlab
       end
 
       def get_parsed_sectional_data
-        {}
+        parsed = {}
+        section = ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION.downcase
+
+        parsed[section] = {}
+
+        data.lines.each do |line|
+          line = line.strip
+          next unless line.present?
+          next if line.starts_with?('#')
+
+          if line.starts_with?('[') && line.end_with?(']')
+            section = line[1...-1].downcase
+            parsed[section] ||= {}
+
+            next
+          end
+
+          pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
+
+          normalized_pattern = normalize_pattern(pattern)
+
+          # We still suffer from last-in overwrites, as we don't yet (%13.0)
+          #   allow for multiple matches, even within the section.
+          #
+          parsed[section][normalized_pattern] = Entry.new(pattern, owners, section)
+        end
+
+        parsed
       end
 
       def normalize_pattern(pattern)
