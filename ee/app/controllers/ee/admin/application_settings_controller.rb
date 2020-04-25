@@ -60,6 +60,10 @@ module EE
           attrs << :maintenance_mode_message
         end
 
+        if License.feature_available?(:package_forwarding)
+          attrs << :npm_package_requests_forwarding
+        end
+
         attrs
       end
 

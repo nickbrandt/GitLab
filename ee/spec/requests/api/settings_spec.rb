@@ -186,7 +186,7 @@ RSpec.describe API::Settings, 'EE Settings' do
 
   context 'updating npm packages request forwarding' do
     let(:settings) { { npm_package_requests_forwarding: true } }
-    let(:feature) { :packages }
+    let(:feature) { :package_forwarding }
 
     it_behaves_like 'settings for licensed features'
   end
