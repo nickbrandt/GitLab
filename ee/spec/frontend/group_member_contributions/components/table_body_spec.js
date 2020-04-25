@@ -33,7 +33,7 @@ describe('TableBodyComponent', () => {
       const rowEl = vm.$el.querySelector('tr');
 
       expect(rowEl).not.toBeNull();
-      expect(rowEl.querySelectorAll('td').length).toBe(7);
+      expect(rowEl.querySelectorAll('td')).toHaveLength(7);
     });
 
     it('renders username row cell element', () => {

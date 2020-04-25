@@ -68,7 +68,7 @@ describe('RelatedItemsTreeApp', () => {
         const value = '&1 &2 &3';
         const references = wrapper.vm.getRawRefs(value);
 
-        expect(references.length).toBe(3);
+        expect(references).toHaveLength(3);
         expect(references.join(' ')).toBe(value);
       });
     });

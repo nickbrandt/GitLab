@@ -55,7 +55,7 @@ describe('Unscanned projects getters', () => {
 
       const result = getters.outdatedProjects({ projects });
 
-      expect(result.length).toBe(3);
+      expect(result).toHaveLength(3);
       expect(result).toEqual(
         groupByDateRanges({
           ranges: UNSCANNED_PROJECTS_DATE_RANGES,

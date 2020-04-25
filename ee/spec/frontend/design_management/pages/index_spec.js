@@ -379,7 +379,7 @@ describe('Design management index page', () => {
     });
 
     it('renders design checkboxes', () => {
-      expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
+      expect(findDesignCheckboxes()).toHaveLength(mockDesigns.length);
     });
 
     it('renders toolbar buttons', () => {
@@ -460,7 +460,7 @@ describe('Design management index page', () => {
     });
 
     it('does not render design checkboxes', () => {
-      expect(findDesignCheckboxes().length).toBe(0);
+      expect(findDesignCheckboxes()).toHaveLength(0);
     });
 
     it('does not render Delete selected button', () => {

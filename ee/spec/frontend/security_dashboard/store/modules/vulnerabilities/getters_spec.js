@@ -84,7 +84,7 @@ describe('vulnerabilities module getters', () => {
         'critical',
       );
 
-      expect(filteredResults.length).toEqual(28);
+      expect(filteredResults).toHaveLength(28);
     });
 
     it('should filter the data to the last 60 days and days we have data for', () => {
@@ -93,7 +93,7 @@ describe('vulnerabilities module getters', () => {
         'critical',
       );
 
-      expect(filteredResults.length).toEqual(58);
+      expect(filteredResults).toHaveLength(58);
     });
 
     it('should filter the data to the last 90 days and days we have data for', () => {
@@ -102,7 +102,7 @@ describe('vulnerabilities module getters', () => {
         'critical',
       );
 
-      expect(filteredResults.length).toEqual(88);
+      expect(filteredResults).toHaveLength(88);
     });
   });
 

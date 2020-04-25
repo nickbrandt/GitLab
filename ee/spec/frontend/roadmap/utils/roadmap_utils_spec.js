@@ -37,7 +37,7 @@ describe('getTimeframeForQuartersView', () => {
   });
 
   it('returns timeframe with total of 7 quarters', () => {
-    expect(timeframe.length).toBe(7);
+    expect(timeframe).toHaveLength(7);
   });
 
   it('each timeframe item has `quarterSequence`, `year` and `range` present', () => {
@@ -89,7 +89,7 @@ describe('extendTimeframeForQuartersView', () => {
 
     const extendedTimeframe = extendTimeframeForQuartersView(initialDate, -9);
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeQuartersPrepend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeQuartersPrepend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.year).toBe(mockTimeframeQuartersPrepend[index].year);
       expect(timeframeItem.quarterSequence).toBe(
@@ -107,7 +107,7 @@ describe('extendTimeframeForQuartersView', () => {
 
     const extendedTimeframe = extendTimeframeForQuartersView(initialDate, 9);
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeQuartersAppend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeQuartersAppend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.year).toBe(mockTimeframeQuartersAppend[index].year);
       expect(timeframeItem.quarterSequence).toBe(
@@ -129,7 +129,7 @@ describe('getTimeframeForMonthsView', () => {
   });
 
   it('returns timeframe with total of 8 months', () => {
-    expect(timeframe.length).toBe(8);
+    expect(timeframe).toHaveLength(8);
   });
 
   it('first timeframe item refers to 2 months prior to current month', () => {
@@ -164,7 +164,7 @@ describe('extendTimeframeForMonthsView', () => {
     const initialDate = mockTimeframeMonths[0];
     const extendedTimeframe = extendTimeframeForMonthsView(initialDate, -8);
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeMonthsPrepend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeMonthsPrepend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.getTime()).toBe(mockTimeframeMonthsPrepend[index].getTime());
     });
@@ -174,7 +174,7 @@ describe('extendTimeframeForMonthsView', () => {
     const initialDate = mockTimeframeMonths[mockTimeframeMonths.length - 1];
     const extendedTimeframe = extendTimeframeForMonthsView(initialDate, 8);
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeMonthsAppend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeMonthsAppend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.getTime()).toBe(mockTimeframeMonthsAppend[index].getTime());
     });
@@ -189,7 +189,7 @@ describe('getTimeframeForWeeksView', () => {
   });
 
   it('returns timeframe with total of 7 weeks', () => {
-    expect(timeframe.length).toBe(7);
+    expect(timeframe).toHaveLength(7);
   });
 
   it('first timeframe item refers to 2 weeks prior to current week', () => {
@@ -230,7 +230,7 @@ describe('getTimeframeForWeeksView', () => {
       new Date(2018, 1, 4),
     ];
 
-    expect(timeframe.length).toBe(5);
+    expect(timeframe).toHaveLength(5);
     expectedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.getTime()).toBe(expectedTimeframe[index].getTime());
     });
@@ -241,7 +241,7 @@ describe('extendTimeframeForWeeksView', () => {
   it('returns extended timeframe into the past from current timeframe startDate', () => {
     const extendedTimeframe = extendTimeframeForWeeksView(mockTimeframeWeeks[0], -6); // initialDate: 17 Dec 2017
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeWeeksPrepend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeWeeksPrepend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.getTime()).toBe(mockTimeframeWeeksPrepend[index].getTime());
     });
@@ -253,7 +253,7 @@ describe('extendTimeframeForWeeksView', () => {
       6,
     );
 
-    expect(extendedTimeframe.length).toBe(mockTimeframeWeeksAppend.length);
+    expect(extendedTimeframe).toHaveLength(mockTimeframeWeeksAppend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
       expect(timeframeItem.getTime()).toBe(mockTimeframeWeeksAppend[index].getTime());
     });
@@ -280,7 +280,7 @@ describe('extendTimeframeForAvailableWidth', () => {
       timeframeEnd,
     });
 
-    expect(timeframe.length).toBe(mockTimeframeMonths.length);
+    expect(timeframe).toHaveLength(mockTimeframeMonths.length);
   });
 
   it('should extend `timeframe` when availableTimeframeWidth is large enough that it can fit more timeframe items to show up horizontal scrollbar', () => {
@@ -292,7 +292,7 @@ describe('extendTimeframeForAvailableWidth', () => {
       timeframeEnd,
     });
 
-    expect(timeframe.length).toBe(12);
+    expect(timeframe).toHaveLength(12);
     expect(timeframe[0].getTime()).toBe(1504224000000); // 1 Sep 2017
     expect(timeframe[timeframe.length - 1].getTime()).toBe(1535673600000); // 31 Aug 2018
   });
@@ -422,7 +422,7 @@ describe('sortEpics', () => {
 
     sortEpics(epics, 'start_date_asc');
 
-    expect(epics.length).toBe(mockUnsortedEpics.length);
+    expect(epics).toHaveLength(mockUnsortedEpics.length);
 
     epics.forEach((epic, index) => {
       expect(epic.startDate.getTime()).toBe(sortedOrder[index].getTime());
@@ -440,7 +440,7 @@ describe('sortEpics', () => {
 
     sortEpics(epics, 'start_date_desc');
 
-    expect(epics.length).toBe(mockUnsortedEpics.length);
+    expect(epics).toHaveLength(mockUnsortedEpics.length);
 
     epics.forEach((epic, index) => {
       expect(epic.startDate.getTime()).toBe(sortedOrder[index].getTime());
@@ -458,7 +458,7 @@ describe('sortEpics', () => {
 
     sortEpics(epics, 'end_date_asc');
 
-    expect(epics.length).toBe(mockUnsortedEpics.length);
+    expect(epics).toHaveLength(mockUnsortedEpics.length);
 
     epics.forEach((epic, index) => {
       expect(epic.endDate.getTime()).toBe(sortedOrder[index].getTime());
@@ -476,7 +476,7 @@ describe('sortEpics', () => {
 
     sortEpics(epics, 'end_date_desc');
 
-    expect(epics.length).toBe(mockUnsortedEpics.length);
+    expect(epics).toHaveLength(mockUnsortedEpics.length);
 
     epics.forEach((epic, index) => {
       expect(epic.endDate.getTime()).toBe(sortedOrder[index].getTime());

@@ -107,7 +107,7 @@ describe('Design management design version dropdown component', () => {
       createComponent();
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.findAll(GlDropdownItem).length).toEqual(wrapper.vm.allVersions.length);
+        expect(wrapper.findAll(GlDropdownItem)).toHaveLength(wrapper.vm.allVersions.length);
       });
     });
   });

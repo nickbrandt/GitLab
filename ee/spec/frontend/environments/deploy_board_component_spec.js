@@ -40,7 +40,7 @@ describe('Deploy Board', () => {
     it('should render all instances', () => {
       const instances = wrapper.findAll('.deploy-board-instances-container a');
 
-      expect(instances.length).toEqual(deployBoardMockData.instances.length);
+      expect(instances).toHaveLength(deployBoardMockData.instances.length);
       expect(
         instances.at(1).classes(`deployment-instance-${deployBoardMockData.instances[2].status}`),
       ).toBe(true);
@@ -129,7 +129,7 @@ describe('Deploy Board', () => {
       const deployBoardLegend = wrapper.find('.deploy-board-legend');
 
       expect(deployBoardLegend).toBeDefined();
-      expect(deployBoardLegend.findAll('a').length).toBe(Object.keys(statuses).length);
+      expect(deployBoardLegend.findAll('a')).toHaveLength(Object.keys(statuses).length);
     });
 
     Object.keys(statuses).forEach(item => {

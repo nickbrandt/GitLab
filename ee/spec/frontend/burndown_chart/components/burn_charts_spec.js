@@ -42,7 +42,7 @@ describe('burndown_chart', () => {
   it('defaults to total issues', () => {
     createComponent();
 
-    expect(findActiveButtons().length).toBe(1);
+    expect(findActiveButtons()).toHaveLength(1);
     expect(
       findActiveButtons()
         .at(0)
@@ -57,7 +57,7 @@ describe('burndown_chart', () => {
     findWeightButton().vm.$emit('click');
 
     return wrapper.vm.$nextTick().then(() => {
-      expect(findActiveButtons().length).toBe(1);
+      expect(findActiveButtons()).toHaveLength(1);
       expect(
         findActiveButtons()
           .at(0)

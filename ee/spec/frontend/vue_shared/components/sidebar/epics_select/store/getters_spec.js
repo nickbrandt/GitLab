@@ -26,7 +26,7 @@ describe('EpicsSelect', () => {
 
           const epics = getters.groupEpics(state);
 
-          expect(epics.length).toBe(normalizedEpics.length);
+          expect(epics).toHaveLength(normalizedEpics.length);
           epics.forEach((epic, index) => {
             expect.objectContaining({
               ...normalizedEpics[index],
@@ -39,7 +39,7 @@ describe('EpicsSelect', () => {
 
           const epics = getters.groupEpics(state);
 
-          expect(epics.length).toBe(1);
+          expect(epics).toHaveLength(1);
           expect(epics[0]).toEqual(
             expect.objectContaining({
               ...normalizedEpics[0],
@@ -52,7 +52,7 @@ describe('EpicsSelect', () => {
 
           const epics = getters.groupEpics(state);
 
-          expect(epics.length).toBe(1);
+          expect(epics).toHaveLength(1);
           expect(epics[0]).toEqual(
             expect.objectContaining({
               ...normalizedEpics[0],
@@ -65,7 +65,7 @@ describe('EpicsSelect', () => {
 
           const epics = getters.groupEpics(state);
 
-          expect(epics.length).toBe(1);
+          expect(epics).toHaveLength(1);
           expect(epics[0]).toEqual(
             expect.objectContaining({
               ...normalizedEpics[1],
@@ -78,7 +78,7 @@ describe('EpicsSelect', () => {
 
           const epics = getters.groupEpics(state);
 
-          expect(epics.length).toBe(1);
+          expect(epics).toHaveLength(1);
           expect(epics[0]).toEqual(
             expect.objectContaining({
               ...normalizedEpics[1],

@@ -116,15 +116,15 @@ describe('sast module mutations', () => {
     });
 
     it('should have the relevant `new` issues', () => {
-      expect(state.newIssues.length).toBe(3);
+      expect(state.newIssues).toHaveLength(3);
     });
 
     it('should have the relevant `resolved` issues', () => {
-      expect(state.resolvedIssues.length).toBe(2);
+      expect(state.resolvedIssues).toHaveLength(2);
     });
 
     it('should have the relevant `all` issues', () => {
-      expect(state.allIssues.length).toBe(1);
+      expect(state.allIssues).toHaveLength(1);
     });
   });
 

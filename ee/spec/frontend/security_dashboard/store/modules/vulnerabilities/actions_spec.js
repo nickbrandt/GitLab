@@ -809,7 +809,7 @@ describe('vulnerability dismissal', () => {
 
           expect(toast).toHaveBeenCalledTimes(1);
           expect(message).toContain('Turn off the hide dismissed toggle to view');
-          expect(Object.keys(options.action).length).toBe(2);
+          expect(Object.keys(options.action)).toHaveLength(2);
           done();
         };
 

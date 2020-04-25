@@ -85,7 +85,7 @@ describe('Event Item', () => {
     });
 
     it('renders the action buttons', () => {
-      expect(wrapper.findAll(GlDeprecatedButton).length).toBe(2);
+      expect(wrapper.findAll(GlDeprecatedButton)).toHaveLength(2);
       expect(wrapper).toMatchSnapshot();
     });
 

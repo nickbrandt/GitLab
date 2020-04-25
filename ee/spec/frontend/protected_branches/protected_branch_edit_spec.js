@@ -68,7 +68,7 @@ describe('EE ProtectedBranchEdit', () => {
       it('sends update to BE', () =>
         axios.waitForAll().then(() => {
           // Args are asserted in the `.onPatch` call
-          expect(mock.history.patch.length).toEqual(1);
+          expect(mock.history.patch).toHaveLength(1);
 
           expect(toggle).not.toBeDisabled();
           expect(flash).not.toHaveBeenCalled();

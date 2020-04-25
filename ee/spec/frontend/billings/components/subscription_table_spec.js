@@ -79,7 +79,7 @@ describe('SubscriptionTable component', () => {
     });
 
     it('should render a "Usage" and a "Billing" row', () => {
-      expect(wrapper.findAll(SubscriptionTableRow).length).toBe(2);
+      expect(wrapper.findAll(SubscriptionTableRow)).toHaveLength(2);
     });
   });
 

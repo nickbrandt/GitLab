@@ -55,7 +55,7 @@ describe('Environments', () => {
       const tableHeaders = ['Project', 'Environment', 'Job', `Pods in use 2`, 'Last updated'];
       const headers = table.findAll('th');
 
-      expect(headers.length).toBe(tableHeaders.length);
+      expect(headers).toHaveLength(tableHeaders.length);
 
       tableHeaders.forEach((headerText, i) => expect(headers.at(i).text()).toEqual(headerText));
     });
@@ -87,7 +87,7 @@ describe('Environments', () => {
         environments.forEach((environment, i) => {
           const { instances } = environment.rolloutStatus;
 
-          expect(tableRows.at(i).findAll('.js-deployment-instance').length).toBe(instances.length);
+          expect(tableRows.at(i).findAll('.js-deployment-instance')).toHaveLength(instances.length);
         });
       });
 

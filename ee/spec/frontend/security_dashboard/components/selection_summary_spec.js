@@ -73,7 +73,7 @@ describe('Selection Summary component', () => {
       it('should have the button enabled if a vulnerability is selected and an option is selected', () => {
         createComponent({ props: { selectedVulnerabilities: [{ id: 'id_0' }] } });
         expect(wrapper.vm.dismissalReason).toBe(null);
-        expect(wrapper.findAll('option').length).toBe(4);
+        expect(wrapper.findAll('option')).toHaveLength(4);
         formSelect()
           .findAll('option')
           .at(1)

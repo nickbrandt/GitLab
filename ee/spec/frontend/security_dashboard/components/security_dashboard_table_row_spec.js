@@ -54,7 +54,7 @@ describe('Security Dashboard Table Row', () => {
     });
 
     it('should not render action buttons', () => {
-      expect(wrapper.findAll('.action-buttons button').length).toBe(0);
+      expect(wrapper.findAll('.action-buttons button')).toHaveLength(0);
     });
   });
 

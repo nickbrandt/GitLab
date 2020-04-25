@@ -279,7 +279,7 @@ describe('EpicsListSectionComponent', () => {
   it('expands to show child epics when epic is toggled', done => {
     const epic = mockEpics[0];
 
-    expect(wrapper.findAll(EpicItem).length).toBe(mockEpics.length);
+    expect(wrapper.findAll(EpicItem)).toHaveLength(mockEpics.length);
 
     wrapper.vm.toggleIsEpicExpanded(epic.id);
 
@@ -288,7 +288,7 @@ describe('EpicsListSectionComponent', () => {
       .then(() => {
         const expected = mockEpics.length + epic.children.edges.length;
 
-        expect(wrapper.findAll(EpicItem).length).toBe(expected);
+        expect(wrapper.findAll(EpicItem)).toHaveLength(expected);
       })
       .then(done)
       .catch(done.fail);

@@ -52,7 +52,7 @@ describe('Project List component', () => {
     projectsCount => {
       factory({ projects: generateMockProjects(projectsCount) });
 
-      expect(getAllProjectItems().length).toBe(projectsCount);
+      expect(getAllProjectItems()).toHaveLength(projectsCount);
       expect(wrapper.find(GlBadge).text()).toBe(`${projectsCount}`);
     },
   );

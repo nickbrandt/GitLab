@@ -128,7 +128,7 @@ describe('Vulnerability Footer', () => {
 
       return axios.waitForAll().then(() => {
         expect(historyList().exists()).toBe(true);
-        expect(historyEntries().length).toBe(2);
+        expect(historyEntries()).toHaveLength(2);
         const entry1 = historyEntries().at(0);
         const entry2 = historyEntries().at(1);
         expect(entry1.props('discussion')).toEqual(historyItems[0]);

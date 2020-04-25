@@ -178,7 +178,7 @@ describe('CreateIssueForm', () => {
 
         expect(projectsDropdownButton.find(GlSearchBoxByType).exists()).toBe(true);
         expect(projectsDropdownButton.find(GlLoadingIcon).exists()).toBe(true);
-        expect(dropdownItems.length).toBe(mockProjects.length);
+        expect(dropdownItems).toHaveLength(mockProjects.length);
         expect(dropdownItems.at(0).text()).toContain(mockProjects[0].name);
         expect(dropdownItems.at(0).text()).toContain(mockProjects[0].namespace.name);
         expect(
@@ -207,7 +207,7 @@ describe('CreateIssueForm', () => {
           wrapper.vm.$store.dispatch('receiveProjectsSuccess', filteredMockProjects);
         })
         .then(() => {
-          expect(wrapper.findAll(GlDropdownItem).length).toBe(1);
+          expect(wrapper.findAll(GlDropdownItem)).toHaveLength(1);
         });
     });
 

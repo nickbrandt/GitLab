@@ -199,7 +199,7 @@ describe('RelatedItemsTree', () => {
           const countBadgesEl = wrapper.findAll('.issue-count-badge > span');
           const badgeIcon = countBadgesEl.at(0).find(GlIcon);
 
-          expect(countBadgesEl.length).toBe(1);
+          expect(countBadgesEl).toHaveLength(1);
           expect(badgeIcon.props('name')).toBe('issues');
         });
 

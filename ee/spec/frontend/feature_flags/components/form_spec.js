@@ -78,7 +78,7 @@ describe('feature flag form', () => {
           it('should add a new scope with the text value empty and the status', () => {
             wrapper.find(ToggleButton).vm.$emit('change', true);
 
-            expect(wrapper.vm.formScopes.length).toEqual(1);
+            expect(wrapper.vm.formScopes).toHaveLength(1);
             expect(wrapper.vm.formScopes[0].active).toEqual(true);
             expect(wrapper.vm.formScopes[0].environmentScope).toEqual('');
 

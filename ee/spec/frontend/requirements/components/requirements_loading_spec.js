@@ -81,7 +81,7 @@ describe('RequirementsLoading', () => {
     it('renders gl-skeleton-loading component project has some requirements and current tab has requirements to show', () => {
       const loaders = wrapper.find('.requirements-list-loading').findAll(GlSkeletonLoading);
 
-      expect(loaders.length).toBe(2);
+      expect(loaders).toHaveLength(2);
       expect(loaders.at(0).props('lines')).toBe(2);
     });
 

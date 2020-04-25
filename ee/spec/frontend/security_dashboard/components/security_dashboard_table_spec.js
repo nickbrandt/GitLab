@@ -44,7 +44,7 @@ describe('Security Dashboard Table', () => {
     });
 
     it('should render 10 skeleton rows in the table', () => {
-      expect(wrapper.findAll(SecurityDashboardTableRow).length).toEqual(10);
+      expect(wrapper.findAll(SecurityDashboardTableRow)).toHaveLength(10);
     });
   });
 
@@ -57,7 +57,7 @@ describe('Security Dashboard Table', () => {
     });
 
     it('should render a row for each vulnerability', () => {
-      expect(wrapper.findAll(SecurityDashboardTableRow).length).toEqual(
+      expect(wrapper.findAll(SecurityDashboardTableRow)).toHaveLength(
         mockDataVulnerabilities.length,
       );
     });

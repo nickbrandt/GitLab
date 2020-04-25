@@ -66,7 +66,7 @@ describe('PackageInformation', () => {
   it('renders the supplied information', () => {
     createComponent();
 
-    expect(informationSelector().length).toBe(3);
+    expect(informationSelector()).toHaveLength(3);
     expect(informationRowText(0)).toContain('one');
     expect(informationRowText(1)).toContain('two');
     expect(informationRowText(2)).toContain('three');
@@ -82,7 +82,7 @@ describe('PackageInformation', () => {
     it('does render when the prop is set and has correct text set', () => {
       createComponent({ showCopy: true });
 
-      expect(copyButton().length).toBe(3);
+      expect(copyButton()).toHaveLength(3);
       expect(copyButton().at(0).vm.text).toBe(defaultProps.information[0].value);
       expect(copyButton().at(1).vm.text).toBe(defaultProps.information[1].value);
       expect(copyButton().at(2).vm.text).toBe(defaultProps.information[2].value);

@@ -90,7 +90,7 @@ describe('EpicsSelect', () => {
       it('should render epics list for all provided epics', () => {
         const epicsEl = wrapper.findAll('ul > li');
 
-        expect(epicsEl.length).toBe(epics.length + 2); // includes divider & No Epic` <li>.
+        expect(epicsEl).toHaveLength(epics.length + 2); // includes divider & No Epic` <li>.
         expect(epicsEl.at(1).classes()).toContain('divider');
         expect(
           epicsEl

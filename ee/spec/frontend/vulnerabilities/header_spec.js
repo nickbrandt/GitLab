@@ -280,7 +280,7 @@ describe('Vulnerability Header', () => {
         createWrapper({ state, [`${state}_by_id`]: user.id });
 
         return waitForPromises().then(() => {
-          expect(mockAxios.history.get.length).toBe(1);
+          expect(mockAxios.history.get).toHaveLength(1);
           expect(findStatusDescription().props('user')).toEqual(user);
         });
       },
@@ -290,7 +290,7 @@ describe('Vulnerability Header', () => {
       createWrapper({ state: 'detected' });
 
       return waitForPromises().then(() => {
-        expect(mockAxios.history.get.length).toBe(0);
+        expect(mockAxios.history.get).toHaveLength(0);
         expect(findStatusDescription().props('user')).toBeUndefined();
       });
     });
@@ -302,7 +302,7 @@ describe('Vulnerability Header', () => {
 
       return waitForPromises().then(() => {
         expect(createFlash).toHaveBeenCalledTimes(1);
-        expect(mockAxios.history.get.length).toBe(1);
+        expect(mockAxios.history.get).toHaveLength(1);
       });
     });
 
@@ -313,7 +313,7 @@ describe('Vulnerability Header', () => {
       expect(findStatusDescription().props('isLoadingUser')).toBe(true);
 
       return waitForPromises().then(() => {
-        expect(mockAxios.history.get.length).toBe(1);
+        expect(mockAxios.history.get).toHaveLength(1);
         expect(findStatusDescription().props('isLoadingUser')).toBe(false);
       });
     });

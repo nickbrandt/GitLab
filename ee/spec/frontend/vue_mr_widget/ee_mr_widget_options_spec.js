@@ -988,7 +988,7 @@ describe('ee merge request widget options', () => {
     });
 
     it('renders multiple deployments', () => {
-      expect(vm.$el.querySelectorAll('.deploy-heading').length).toBe(2);
+      expect(vm.$el.querySelectorAll('.deploy-heading')).toHaveLength(2);
     });
   });
 

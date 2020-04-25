@@ -47,7 +47,7 @@ describe('AddLicenseFormDropdown', () => {
     element.on('select2-open', () => {
       const options = $('.select2-drop .select2-result');
 
-      expect(KNOWN_LICENSES.length).toEqual(options.length);
+      expect(KNOWN_LICENSES).toHaveLength(options.length);
       options.each((index, optionEl) => {
         expect(KNOWN_LICENSES).toContain($(optionEl).text());
       });

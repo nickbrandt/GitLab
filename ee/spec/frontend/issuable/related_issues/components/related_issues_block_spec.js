@@ -105,7 +105,7 @@ describe('RelatedIssuesBlock', () => {
     });
 
     it('should render issue tokens items', () => {
-      expect(wrapper.findAll('.js-related-issues-token-list-item').length).toEqual(3);
+      expect(wrapper.findAll('.js-related-issues-token-list-item')).toHaveLength(3);
     });
 
     it('shows "Blocks" heading', () => {

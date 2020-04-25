@@ -69,7 +69,7 @@ describe('Codequality report app', () => {
 
       expect(findWarningIcon().exists()).toBe(true);
       expect(findStatus().text()).toBe(`Found ${expectedIssueTotal} code quality issues`);
-      expect(wrapper.findAll('.report-block-list-issue').length).toBe(expectedIssueTotal);
+      expect(wrapper.findAll('.report-block-list-issue')).toHaveLength(expectedIssueTotal);
     });
 
     it('renders a link to the line where the issue was found', () => {
@@ -90,7 +90,7 @@ describe('Codequality report app', () => {
     it('shows a message that no codequality issues were found', () => {
       expect(findSuccessIcon().exists()).toBe(true);
       expect(findStatus().text()).toBe('No code quality issues found');
-      expect(wrapper.findAll('.report-block-list-issue').length).toBe(0);
+      expect(wrapper.findAll('.report-block-list-issue')).toHaveLength(0);
     });
   });
 });
