@@ -1085,6 +1085,9 @@ msgstr ""
 msgid "Account: %{account}"
 msgstr ""
 
+msgid "Acknowledged"
+msgstr ""
+
 msgid "Action to take when receiving an alert."
 msgstr ""
 
@@ -22141,6 +22144,9 @@ msgid "Trigger was created successfully."
 msgstr ""
 
 msgid "Trigger was successfully updated."
+msgstr ""
+
+msgid "Triggered"
 msgstr ""
 
 msgid "Triggerer"
