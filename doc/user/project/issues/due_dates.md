@@ -31,7 +31,6 @@ The last way to set a due date is by using _quick actions_, directly in an issue
 
 See [quick actions in documentation](../quick_actions.md) for more details.
 
-
 ## Making use of due dates
 
 Issues that have a due date can be easily seen in the issue tracker,
