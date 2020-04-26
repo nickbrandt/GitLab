@@ -1,11 +1,8 @@
-import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
 import component from 'ee/vue_merge_request_widget/components/performance_issue_body.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('performance issue body', () => {
-  let vm;
-
-  const Component = Vue.extend(component);
+  let wrapper;
 
   const performanceIssue = {
     delta: 0.1999999999998181,
@@ -14,25 +11,28 @@ describe('performance issue body', () => {
     score: 4974.8,
   };
 
-  afterEach(() => {
-    vm.$destroy();
-  });
-
   beforeEach(() => {
-    vm = mountComponent(Component, {
-      issue: performanceIssue,
+    wrapper = shallowMount(component, {
+      propsData: {
+        issue: performanceIssue,
+      },
     });
   });
 
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+
   it('renders issue name', () => {
-    expect(vm.$el.textContent.trim()).toContain(performanceIssue.name);
+    expect(wrapper.text()).toContain(performanceIssue.name);
   });
 
   it('renders issue score formatted', () => {
-    expect(vm.$el.textContent.trim()).toContain('4974.80');
+    expect(wrapper.text()).toContain('4974.80');
   });
 
   it('renders issue delta formatted', () => {
-    expect(vm.$el.textContent.trim()).toContain('(+0.20)');
+    expect(wrapper.text()).toContain('(+0.20)');
   });
 });
