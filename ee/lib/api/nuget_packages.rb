@@ -6,7 +6,7 @@
 # called by the NuGet package manager client when users run commands
 # like `nuget install` or `nuget push`.
 module API
-  class NugetPackages < Grape::API
+  class NugetPackages < Grape::API::Instance
     helpers ::API::Helpers::PackagesManagerClientsHelpers
     helpers ::API::Helpers::Packages::BasicAuthHelpers
 
