@@ -411,7 +411,7 @@ After configuring your worker to respond to health checks, run a Sidekiq
 worker for your Rails application. You can enable workers by setting the
 following in the [`.gitlab/auto-deploy-values.yaml` file](customize.md#customize-values-for-helm-chart):
 
-```yml
+```yaml
 workers:
   sidekiq:
     replicaCount: 1
@@ -435,7 +435,7 @@ workers:
 
 By default, all Kubernetes pods are
 [non-isolated](https://kubernetes.io/docs/concepts/services-networking/network-policies/#isolated-and-non-isolated-pods),
-meaning that they will accept traffic to and from any source. You can use
+and accept traffic to and from any source. You can use
 [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 to restrict connections to and from selected pods, namespaces, and the Internet.
 
@@ -455,13 +455,13 @@ networkPolicy:
   enabled: true
 ```
 
-The default policy deployed by the auto deploy pipeline will allow
-traffic within a local namespace and from the `gitlab-managed-apps`
-namespace. All other inbound connection will be blocked. Outbound
+The default policy deployed by the Auto Deploy pipeline allows
+traffic within a local namespace, and from the `gitlab-managed-apps`
+namespace. All other inbound connections are blocked. Outbound
 traffic (for example, to the Internet) is not affected by the default policy.
 
 You can also provide a custom [policy specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#networkpolicyspec-v1-networking-k8s-io)
-via the `.gitlab/auto-deploy-values.yaml` file, for example:
+in the `.gitlab/auto-deploy-values.yaml` file, for example:
 
 ```yaml
 networkPolicy:
@@ -479,16 +479,19 @@ networkPolicy:
             app.gitlab.com/managed_by: gitlab
 ```
 
-For more information on how to install Network Policies, see
+For more information on installing Network Policies, see
 [Install Cilium using GitLab CI/CD](../../user/clusters/applications.md#install-cilium-using-gitlab-cicd).
 
 ### Web Application Firewall (ModSecurity) customization
 
 > [Introduced](https://gitlab.com/gitlab-org/charts/auto-deploy-app/-/merge_requests/44) in GitLab 12.8.
 
-Customization on an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) or on a deployment base is available for clusters with [ModSecurity installed](../../user/clusters/applications.md#web-application-firewall-modsecurity).
+Customization on an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+or on a deployment base is available for clusters with
+[ModSecurity installed](../../user/clusters/applications.md#web-application-firewall-modsecurity).
 
-To enable ModSecurity with Auto Deploy, you need to create a `.gitlab/auto-deploy-values.yaml` file in your project with the following attributes.
+To enable ModSecurity with Auto Deploy, you must create a `.gitlab/auto-deploy-values.yaml`
+file in your project with the following attributes.
 
 |Attribute | Description | Default |
 -----------|-------------|---------|
@@ -499,7 +502,7 @@ To enable ModSecurity with Auto Deploy, you need to create a `.gitlab/auto-deplo
 In the following `auto-deploy-values.yaml` example, some custom settings
 are enabled for ModSecurity. Those include setting its engine to
 process rules instead of only logging them, while adding two specific
-rules which are header-based:
+header-based rules:
 
 ```yaml
 ingress:
@@ -525,7 +528,7 @@ may require commands to be wrapped as follows:
 /bin/herokuish procfile exec $COMMAND
 ```
 
-This might be necessary, for example, when:
+Some of the reasons you may need to wrap commands:
 
 - Attaching using `kubectl exec`.
 - Using GitLab's [Web Terminal](../../ci/environments.md#web-terminals).
@@ -538,12 +541,12 @@ For example, to start a Rails console from the application root directory, run:
 
 ## Auto Monitoring
 
-Once your application is deployed, Auto Monitoring makes it possible to monitor
+After your application deploys, Auto Monitoring helps you monitor
 your application's server and response metrics right out of the box. Auto
 Monitoring uses [Prometheus](../../user/project/integrations/prometheus.md) to
-get system metrics such as CPU and memory usage directly from
+retrieve system metrics, such as CPU and memory usage, directly from
 [Kubernetes](../../user/project/integrations/prometheus_library/kubernetes.md),
-and response metrics such as HTTP error rates, latency, and throughput from the
+and response metrics, such as HTTP error rates, latency, and throughput, from the
 [NGINX server](../../user/project/integrations/prometheus_library/nginx_ingress.md).
 
 The metrics include:
@@ -556,14 +559,14 @@ GitLab provides some initial alerts for you after you install Prometheus:
 - Ingress status code `500` > 0.1%
 - NGINX status code `500` > 0.1%
 
-To make use of Auto Monitoring:
+To use Auto Monitoring:
 
 1. [Install and configure the requirements](index.md#requirements).
-1. [Enable Auto DevOps](index.md#enablingdisabling-auto-devops) if you haven't done already.
-1. Finally, go to your project's **CI/CD > Pipelines** and run a pipeline.
-1. Once the pipeline finishes successfully, open the
+1. [Enable Auto DevOps](index.md#enablingdisabling-auto-devops), if you haven't done already.
+1. Navigate to your project's **{rocket}** **CI/CD > Pipelines** and click **Run pipeline**.
+1. After the pipeline finishes successfully, open the
    [monitoring dashboard for a deployed environment](../../ci/environments.md#monitoring-environments)
    to view the metrics of your deployed application. To view the metrics of the
-   whole Kubernetes cluster, navigate to **Operations > Metrics**.
+   whole Kubernetes cluster, navigate to **{cloud-gear}** **Operations > Metrics**.
 
 ![Auto Metrics](img/auto_monitoring.png)
