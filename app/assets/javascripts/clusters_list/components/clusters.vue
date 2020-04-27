@@ -1,7 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTable, GlLink, GlLoadingIcon, GlBadge } from '@gitlab/ui';
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlBadge, GlLink, GlLoadingIcon, GlTable, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
 import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
 
@@ -13,7 +12,7 @@ export default {
     GlBadge,
   },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   fields: [
     {
@@ -50,13 +49,6 @@ export default {
   },
   methods: {
     ...mapActions(['fetchClusters']),
-    statusClass(status) {
-      return STATUSES[status].className;
-    },
-    statusTitle(status) {
-      const { title } = STATUSES[status];
-      return sprintf(__('Status: %{title}'), { title }, false);
-    },
   },
 };
 </script>
@@ -72,9 +64,23 @@ export default {
     class="qa-clusters-table"
   >
     <template #cell(name)="{item}">
-      <gl-link :href="item.path">
-        {{ item.name }}
-      </gl-link>
+      <div>
+        <gl-link
+          data-qa-selector="cluster"
+          :data-qa-cluster-name="item.name"
+          :href="item.path"
+        >
+          {{ item.name }}
+        </gl-link>
+
+        <gl-loading-icon
+          :id="`cluster-loading-${item.name}`"
+          size="sm"
+          v-gl-tooltip.hover="{ container: `cluster-loading-${item.name}` }"
+          v-if="item.status == 'creating'"
+          :title="__('Cluster is being created')"
+        />
+      </div>
     </template>
 
     <template #cell(clusterType)="{value}">

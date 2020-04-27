@@ -5,7 +5,12 @@ class ClusterSerializer < BaseSerializer
   entity ClusterEntity
 
   def represent_group(resource)
-    represent(resource, { only: [:cluster_type, :environment_scope, :name, :path] })
+    represent(resource, { only: [
+      :cluster_type,
+      :environment_scope,
+      :name,
+      :path,
+      :status] })
   end
 
   def represent_status(resource)
