@@ -1,11 +1,10 @@
 <script>
-import { GlLink, GlSprintf, GlTab, GlTabs } from '@gitlab/ui';
+import { GlLink, GlSprintf } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
-import Tracking from '~/tracking';
 import { TrackingActions, TrackingLabels } from '../constants';
-import { trackInstallationTabChange } from '../utils';
 import { mapGetters, mapState } from 'vuex';
+import InstallationTabs from './installation_tabs.vue';
 
 export default {
   name: 'ConanInstallation',
@@ -13,15 +12,8 @@ export default {
     CodeInstruction,
     GlLink,
     GlSprintf,
-    GlTab,
-    GlTabs,
+    InstallationTabs,
   },
-  mixins: [
-    Tracking.mixin({
-      label: TrackingLabels.CONAN_INSTALLATION,
-    }),
-    trackInstallationTabChange,
-  ],
   computed: {
     ...mapState(['conanHelpPath']),
     ...mapGetters(['conanInstallationCommand', 'conanSetupCommand']),
@@ -32,41 +24,37 @@ export default {
     ),
   },
   trackingActions: { ...TrackingActions },
+  trackingLabel: TrackingLabels.CONAN_INSTALLATION,
 };
 </script>
 
 <template>
-  <div class="append-bottom-default">
-    <gl-tabs @input="trackInstallationTabChange">
-      <gl-tab :title="s__('PackageRegistry|Installation')" title-item-class="js-installation-tab">
-        <div class="prepend-left-default append-right-default">
-          <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
-          <code-instruction
-            :instruction="conanInstallationCommand"
-            :copy-text="s__('PackageRegistry|Copy Conan Command')"
-            class="js-conan-command"
-            :tracking-action="$options.trackingActions.COPY_CONAN_COMMAND"
-          />
-        </div>
-      </gl-tab>
-      <gl-tab :title="s__('PackageRegistry|Registry Setup')" title-item-class="js-setup-tab">
-        <div class="prepend-left-default append-right-default">
-          <p class="prepend-top-8 font-weight-bold">
-            {{ s__('PackageRegistry|Add Conan Remote') }}
-          </p>
-          <code-instruction
-            :instruction="conanSetupCommand"
-            :copy-text="s__('PackageRegistry|Copy Conan Setup Command')"
-            class="js-conan-setup"
-            :tracking-action="$options.trackingActions.COPY_CONAN_SETUP_COMMAND"
-          />
-          <gl-sprintf :message="$options.i18n.helpText">
-            <template #link="{ content }">
-              <gl-link :href="conanHelpPath" target="_blank">{{ content }}</gl-link>
-            </template>
-          </gl-sprintf>
-        </div>
-      </gl-tab>
-    </gl-tabs>
-  </div>
+  <installation-tabs :tracking-label="$options.trackingLabel">
+    <template #installation>
+      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
+      <code-instruction
+        :instruction="conanInstallationCommand"
+        :copy-text="s__('PackageRegistry|Copy Conan Command')"
+        class="js-conan-command"
+        :tracking-action="$options.trackingActions.COPY_CONAN_COMMAND"
+      />
+    </template>
+
+    <template #setup>
+      <p class="prepend-top-8 font-weight-bold">
+        {{ s__('PackageRegistry|Add Conan Remote') }}
+      </p>
+      <code-instruction
+        :instruction="conanSetupCommand"
+        :copy-text="s__('PackageRegistry|Copy Conan Setup Command')"
+        class="js-conan-setup"
+        :tracking-action="$options.trackingActions.COPY_CONAN_SETUP_COMMAND"
+      />
+      <gl-sprintf :message="$options.i18n.helpText">
+        <template #link="{ content }">
+          <gl-link :href="conanHelpPath" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
+    </template>
+  </installation-tabs>
 </template>
