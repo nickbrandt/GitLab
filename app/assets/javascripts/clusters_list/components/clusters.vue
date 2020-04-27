@@ -80,6 +80,13 @@ export default {
           v-if="item.status == 'creating'"
           :title="__('Cluster is being created')"
         />
+
+        <gl-badge
+          v-if="!item.enabled"
+          variant="danger"
+        >
+          {{ __('Connection disabled') }}
+        </gl-badge>
       </div>
     </template>
 

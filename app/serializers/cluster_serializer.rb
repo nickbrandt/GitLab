@@ -7,6 +7,7 @@ class ClusterSerializer < BaseSerializer
   def represent_group(resource)
     represent(resource, { only: [
       :cluster_type,
+      :enabled,
       :environment_scope,
       :name,
       :path,
