@@ -89,7 +89,6 @@ RSpec.shared_examples 'logs the release audit event' do
     expect(logger).to receive(:info).with(author_id: user.id,
                                           entity_id: entity.id,
                                           entity_type: entity_type,
-                                          action: :custom,
                                           ip_address: ip_address,
                                           custom_message: custom_message,
                                           target_details: target_details,
@@ -102,7 +101,6 @@ RSpec.shared_examples 'logs the release audit event' do
 
     expect(security_event.details).to eq(custom_message: custom_message,
                                          ip_address: ip_address,
-                                         action: :custom,
                                          target_details: target_details,
                                          target_id: target_id,
                                          target_type: target_type)
