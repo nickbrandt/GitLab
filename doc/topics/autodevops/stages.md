@@ -152,10 +152,9 @@ documentation.
 
 > Introduced in GitLab 10.4.
 
-Vulnerability Static Analysis for containers runs static analysis on a Docker
-images with [Clair](https://github.com/quay/clair) to check for potential security
-issues. The Auto Container Scanning stage is skipped on licenses other than
-[Ultimate](https://about.gitlab.com/pricing/).
+Vulnerability Static Analysis for containers uses [Clair](https://github.com/quay/clair)
+to check for potential security issues on Docker images. The Auto Container Scanning
+stage is skipped on licenses other than [Ultimate](https://about.gitlab.com/pricing/).
 
 After creating the report, it's uploaded as an artifact which you can later download and
 check out. The merge request displays any detected security issues.
@@ -175,7 +174,7 @@ branch's code so developers, designers, QA, product managers, and other
 reviewers can actually see and interact with code changes as part of the review
 process. Auto Review Apps create a Review App for each branch.
 
-Auto Review Apps deploy your app to your Kubernetes cluster only. If no cluster
+Auto Review Apps deploy your application to your Kubernetes cluster only. If no cluster
 is available, no deployment occurs.
 
 The Review App has a unique URL based on a combination of the project ID, the branch
@@ -186,7 +185,7 @@ such as after merging a merge request, the Review App is also deleted.
 
 Review apps are deployed using the
 [auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
-Helm, which you can [customize](customize.md#custom-helm-chart). The app deploys
+Helm, which you can [customize](customize.md#custom-helm-chart). The application deploys
 into the [Kubernetes namespace](../../user/project/clusters/index.md#deployment-variables)
 for the environment.
 
@@ -210,7 +209,7 @@ Dynamic Application Security Testing (DAST) uses the popular open source tool
 and check for potential security issues. The Auto DAST stage is skipped on
 licenses other than [Ultimate](https://about.gitlab.com/pricing/).
 
-- On your default branch, DAST scans an app deployed specifically for that purpose
+- On your default branch, DAST scans an application deployed specifically for that purpose
   unless you [override the target branch](#overriding-the-dast-target).
   The app is deleted after DAST has run.
 - On feature branches, DAST scans the [review app](#auto-review-apps).
@@ -252,7 +251,7 @@ Auto Browser Performance Testing measures the performance of a web page with the
 creates a JSON report including the overall performance score for each page, and
 uploads the report as an artifact. By default, it tests the root page of your Review and
 Production environments. If you want to test additional URLs, add the paths to a
-file named `.gitlab-urls.txt` in the root directory, one file per line:
+file named `.gitlab-urls.txt` in the root directory, one file per line. For example:
 
 ```plaintext
 /
@@ -283,8 +282,8 @@ scale your pod replicas, and to apply custom arguments to the Auto DevOps `helm 
 commands. This is an easy way to
 [customize the Auto Deploy Helm chart](customize.md#custom-helm-chart).
 
-The [auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
-Helm deploys the application into the
+Helm uses the [auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app)
+chart to deploy the application into the
 [Kubernetes namespace](../../user/project/clusters/index.md#deployment-variables)
 for the environment.
 
