@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_07_120740) do
+ActiveRecord::Schema.define(version: 2020_04_27_204005) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(version: 2020_04_07_120740) do
     t.boolean "missing_on_primary", default: false, null: false
     t.boolean "success", default: false, null: false
     t.binary "sha256"
+    t.boolean "pending_delete", default: false, null: false
     t.index ["lfs_object_id"], name: "index_lfs_object_registry_on_lfs_object_id", unique: true
     t.index ["retry_at"], name: "index_lfs_object_registry_on_retry_at"
     t.index ["success"], name: "index_lfs_object_registry_on_success"
