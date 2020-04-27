@@ -151,7 +151,7 @@ class GeoNodeStatus < ApplicationRecord
     package_files_checksum_failed_count: 'Number of package files failed to checksum on primary'
   }.freeze
 
-  EXPIRATION_IN_MINUTES = 5
+  EXPIRATION_IN_MINUTES = 10
   HEALTHY_STATUS = 'Healthy'.freeze
   UNHEALTHY_STATUS = 'Unhealthy'.freeze
 
@@ -278,10 +278,6 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def health
-    if outdated?
-      return "Status has not been updated in the past #{EXPIRATION_IN_MINUTES} minutes"
-    end
-
     status_message
   end
 

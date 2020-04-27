@@ -33,80 +33,81 @@ describe('GeoNodeDetailsComponent', () => {
     wrapper.destroy();
   });
 
-  describe('data', () => {
-    it('returns default data props', () => {
-      expect(wrapper.vm.showAdvanceItems).toBeFalsy();
-      expect(wrapper.vm.errorMessage).toBe('');
-    });
-  });
-
-  describe('computed', () => {
-    describe('hasError', () => {
-      beforeEach(() => {
-        const nodeDetails = Object.assign({}, mockNodeDetails, {
-          health: 'Something went wrong.',
-          healthy: false,
-        });
-
-        createComponent({ nodeDetails });
-      });
-
-      it('returns boolean value representing if node has any errors', () => {
-        // With altered mock data for Unhealthy status
-        expect(wrapper.vm.errorMessage).toBe('Something went wrong.');
-        expect(wrapper.vm.hasError).toBeTruthy();
-
-        // With default mock data
-        expect(defaultProps.hasError).toBeFalsy();
-      });
-    });
-
-    describe('hasVersionMismatch', () => {
-      beforeEach(() => {
-        const nodeDetails = Object.assign({}, mockNodeDetails, {
-          primaryVersion: '10.3.0-pre',
-          primaryRevision: 'b93c51850b',
-        });
-
-        createComponent({ nodeDetails });
-      });
-
-      it('returns boolean value representing if node has version mismatch', () => {
-        // With altered mock data for version mismatch
-        expect(wrapper.vm.errorMessage).toBe(
-          'GitLab version does not match the primary node version',
-        );
-        expect(wrapper.vm.hasVersionMismatch).toBeTruthy();
-
-        // With default mock data
-        expect(defaultProps.hasVersionMismatch).toBeFalsy();
-      });
-    });
-  });
+  const findErrorSection = () => wrapper.find('.bg-danger-100');
+  const findTroubleshootingLink = () => findErrorSection().find(GlLink);
 
   describe('template', () => {
     it('renders container elements correctly', () => {
-      expect(wrapper.vm.$el.classList.contains('card-body')).toBe(true);
+      expect(wrapper.classes('card-body')).toBe(true);
     });
 
-    describe('with error', () => {
+    describe('when unhealthy', () => {
+      describe('with errorMessage', () => {
+        beforeEach(() => {
+          createComponent({
+            nodeDetails: {
+              ...defaultProps.nodeDetails,
+              healthy: false,
+              health: 'This is an error',
+            },
+          });
+        });
+
+        it('renders error message section', () => {
+          expect(findErrorSection().text()).toContain('This is an error');
+        });
+
+        it('renders troubleshooting URL within error message section', () => {
+          expect(findTroubleshootingLink().attributes('href')).toBe('/foo/bar');
+        });
+      });
+
+      describe('without error message', () => {
+        beforeEach(() => {
+          createComponent({
+            nodeDetails: {
+              ...defaultProps.nodeDetails,
+              healthy: false,
+              health: '',
+            },
+          });
+        });
+
+        it('does not render error message section', () => {
+          expect(findErrorSection().exists()).toBeFalsy();
+        });
+      });
+    });
+
+    describe('when healthy', () => {
+      beforeEach(() => {
+        createComponent();
+      });
+
+      it('does not render error message section', () => {
+        expect(findErrorSection().exists()).toBeFalsy();
+      });
+    });
+
+    describe('when version mismatched', () => {
       beforeEach(() => {
         createComponent({
-          errorMessage: 'Foobar',
           nodeDetails: {
             ...defaultProps.nodeDetails,
-            healthy: false,
+            primaryVersion: '10.3.0-pre',
+            primaryRevision: 'b93c51850b',
           },
         });
       });
 
+      it('renders error message section', () => {
+        expect(findErrorSection().text()).toContain(
+          'GitLab version does not match the primary node version',
+        );
+      });
+
       it('renders troubleshooting URL within error message section', () => {
-        expect(
-          wrapper
-            .find('.bg-danger-100')
-            .find(GlLink)
-            .attributes('href'),
-        ).toBe('/foo/bar');
+        expect(findTroubleshootingLink().attributes('href')).toBe('/foo/bar');
       });
     });
   });

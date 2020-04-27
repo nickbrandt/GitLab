@@ -39,16 +39,6 @@ export default {
       type: [Object, String, Number],
       required: true,
     },
-    itemValueStale: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    itemValueStaleTooltip: {
-      type: String,
-      required: false,
-      default: '',
-    },
     itemValueType: {
       type: String,
       required: true,
@@ -104,10 +94,7 @@ export default {
         :item-enabled="itemEnabled"
         :item-title="itemTitle"
         :item-value="itemValue"
-        :item-value-stale="itemValueStale"
-        :item-value-stale-tooltip="itemValueStaleTooltip"
         :details-path="detailsPath"
-        :class="{ 'd-flex': itemValueStale }"
         class="mt-1"
       />
       <template v-if="isValueTypeCustom">
