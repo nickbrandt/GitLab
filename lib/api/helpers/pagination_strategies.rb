@@ -11,7 +11,7 @@ module API
         end
       end
 
-      def paginator(relation, request_scope)
+      def paginator(relation, request_scope = nil)
         return keyset_paginator(relation) if keyset_pagination_enabled?
 
         offset_paginator(relation, request_scope)
@@ -31,8 +31,9 @@ module API
       def offset_paginator(relation, request_scope)
         offset_limit = limit_for_scope(request_scope)
         if Gitlab::Pagination::Keyset.available_for_type?(relation) && offset_limit_exceeded?(offset_limit)
-          return error!("Offset pagination has a maximum allowed offset of #{offset_limit}, " \
-            "remaining records can be retrieved using keyset pagination.", 405)
+          return error!("Offset pagination has a maximum allowed offset of #{offset_limit} " \
+            "for requests that return objects of type #{relation.klass}. " \
+            "Remaining records can be retrieved using keyset pagination.", 405)
         end
 
         Gitlab::Pagination::OffsetPagination.new(self)

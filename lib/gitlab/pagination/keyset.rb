@@ -3,8 +3,12 @@
 module Gitlab
   module Pagination
     module Keyset
+      SUPPORTED_TYPES = [
+        Project
+      ].freeze
+
       def self.available_for_type?(relation)
-        relation.klass == Project
+        SUPPORTED_TYPES.include?(relation.klass)
       end
 
       def self.available?(request_context, relation)

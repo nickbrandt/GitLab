@@ -6,7 +6,7 @@ describe API::Helpers::PaginationStrategies do
   subject { Class.new.include(described_class).new }
 
   let(:expected_result) { double("result") }
-  let(:relation) { double("relation") }
+  let(:relation) { double("relation", klass: "SomeClass") }
   let(:params) { {} }
 
   before do
@@ -90,7 +90,7 @@ describe API::Helpers::PaginationStrategies do
             it 'renders a 405 error' do
               expect(subject).to receive(:error!).with(/maximum allowed offset/, 405)
 
-              subject.paginator(relation, nil)
+              subject.paginator(relation)
             end
           end
 
@@ -100,7 +100,7 @@ describe API::Helpers::PaginationStrategies do
             it 'delegates to OffsetPagination' do
               expect(Gitlab::Pagination::OffsetPagination).to receive(:new).with(subject).and_return(paginator)
 
-              expect(subject.paginator(relation, nil)).to eq(paginator)
+              expect(subject.paginator(relation)).to eq(paginator)
             end
           end
         end
@@ -116,7 +116,7 @@ describe API::Helpers::PaginationStrategies do
         it 'delegates to OffsetPagination' do
           expect(Gitlab::Pagination::OffsetPagination).to receive(:new).with(subject).and_return(paginator)
 
-          expect(subject.paginator(relation, nil)).to eq(paginator)
+          expect(subject.paginator(relation)).to eq(paginator)
         end
       end
     end
@@ -138,7 +138,7 @@ describe API::Helpers::PaginationStrategies do
         end
 
         it 'delegates to Pager' do
-          expect(subject.paginator(relation, nil)).to eq(pager)
+          expect(subject.paginator(relation)).to eq(pager)
         end
       end
 
@@ -150,7 +150,7 @@ describe API::Helpers::PaginationStrategies do
         it 'renders a 501 error' do
           expect(subject).to receive(:error!).with(/not yet available/, 405)
 
-          subject.paginator(relation, nil)
+          subject.paginator(relation)
         end
       end
     end
