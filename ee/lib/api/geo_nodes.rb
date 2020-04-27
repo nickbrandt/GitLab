@@ -6,7 +6,24 @@ module API
     include APIGuard
     include ::Gitlab::Utils::StrongMemoize
 
-    before { authenticated_as_admin! }
+    before { authenticate_admin_or_geo_node! }
+
+    helpers do
+      def authenticate_admin_or_geo_node!
+        if gitlab_geo_node_token?
+          bad_request! unless update_geo_nodes_endpoint?
+          check_gitlab_geo_request_ip!
+          allow_paused_nodes!
+          authenticate_by_gitlab_geo_node_token!
+        else
+          authenticated_as_admin!
+        end
+      end
+
+      def update_geo_nodes_endpoint?
+        request.put? && request.path.match?(/\/geo_nodes\/\d+/)
+      end
+    end
 
     resource :geo_nodes do
       # Add a new Geo node

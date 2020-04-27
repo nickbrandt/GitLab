@@ -20,6 +20,19 @@ module EE
         render_api_error!(e.to_s, 401)
       end
 
+      def geo_jwt_decoder
+        return unless gitlab_geo_node_token?
+
+        strong_memoize(:geo_jwt_decoder) do
+          ::Gitlab::Geo::JwtRequestDecoder.new(headers['Authorization'])
+        end
+      end
+
+      # Update the jwt_decoder to allow authorization of disabled (paused) nodes
+      def allow_paused_nodes!
+        geo_jwt_decoder.include_disabled!
+      end
+
       def check_gitlab_geo_request_ip!
         unauthorized! unless ::Gitlab::Geo.allowed_ip?(request.ip)
       end
@@ -39,10 +52,9 @@ module EE
       end
 
       def authorization_header_valid?
-        auth_header = headers['Authorization']
-        return unless auth_header
+        return unless gitlab_geo_node_token?
 
-        scope = ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode.try { |x| x[:scope] }
+        scope = geo_jwt_decoder.decode.try { |x| x[:scope] }
         scope == ::Gitlab::Geo::API_SCOPE
       end
 

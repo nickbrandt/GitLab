@@ -552,6 +552,12 @@ describe GeoNode, :request_store, :geo, type: :model do
     end
   end
 
+  describe '#node_api_url' do
+    it 'returns an api url based on the node uri and provided node id' do
+      expect(new_primary_node.node_api_url(new_node)).to eq("https://localhost:3000/gitlab/api/#{api_version}/geo_nodes/#{new_node.id}")
+    end
+  end
+
   describe '#snapshot_url' do
     let(:project) { create(:project) }
     let(:snapshot_url) { "https://localhost:3000/gitlab/api/#{api_version}/projects/#{project.id}/snapshot" }
