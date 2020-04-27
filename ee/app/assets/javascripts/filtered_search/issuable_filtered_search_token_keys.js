@@ -6,7 +6,7 @@ import {
 } from '~/filtered_search/issuable_filtered_search_token_keys';
 import { __ } from '~/locale';
 
-const weightTokenKey = {
+export const weightTokenKey = {
   formattedKey: __('Weight'),
   key: 'weight',
   type: 'string',
@@ -16,7 +16,7 @@ const weightTokenKey = {
   tag: 'number',
 };
 
-const epicTokenKey = {
+export const epicTokenKey = {
   formattedKey: __('Epic'),
   key: 'epic',
   type: 'string',
@@ -25,7 +25,7 @@ const epicTokenKey = {
   icon: 'epic',
 };
 
-const weightConditions = [
+export const weightConditions = [
   {
     url: 'weight=None',
     operator: '=',
@@ -52,7 +52,7 @@ const weightConditions = [
   },
 ];
 
-const epicConditions = [
+export const epicConditions = [
   {
     url: 'epic_id=None',
     operator: '=',

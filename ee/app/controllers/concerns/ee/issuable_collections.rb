@@ -10,9 +10,19 @@ module EE
       @preload_for_collection ||= case collection_type
                                   when 'MergeRequest'
                                     super.push(:approvals, :approval_rules)
+                                  when 'Issue'
+                                    super.push(*issue_preloads)
                                   else
                                     super
                                   end
+    end
+
+    private
+
+    def issue_preloads
+      [].tap do |issue_params|
+        issue_params << :epic_issue if params[:include_subepics].present?
+      end
     end
   end
 end

@@ -1,5 +1,5 @@
 import CodeReviewAnalyticsFilteredSearchTokenKeys from './code_review_analytics_filtered_search_token_keys';
-import FilteredSearchManager from '~/filtered_search/filtered_search_manager';
+import FilteredSearchManager from 'ee_else_ce/filtered_search/filtered_search_manager';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import store from './store';
 
