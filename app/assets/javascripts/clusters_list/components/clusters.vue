@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlBadge, GlLink, GlLoadingIcon, GlTable, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
+import { GlBadge, GlLink, GlLoadingIcon, GlPagination, GlTable, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
 import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
 
@@ -9,6 +9,7 @@ export default {
     GlTable,
     GlLink,
     GlLoadingIcon,
+    GlPagination,
     GlBadge,
   },
   directives: {
@@ -42,13 +43,17 @@ export default {
     },
   ],
   computed: {
-    ...mapState(['clusters', 'loading']),
+    ...mapState(['clusters', 'clustersPerPage', 'currentPage', 'loading', 'totalPages']),
   },
   mounted() {
     this.fetchClusters();
   },
   methods: {
-    ...mapActions(['fetchClusters']),
+    ...mapActions(['fetchClusters', 'updateCurrentPage']),
+    queryClusterGroup(page) {
+      this.updateCurrentPage(page)
+      // this.fetchClusters(page);
+    }
   },
 };
 </script>
@@ -96,5 +101,15 @@ export default {
         </gl-badge>
       </template>
     </gl-table>
+
+    <gl-pagination
+      v-model="currentPage"
+      :per-page="clustersPerPage"
+      :total-items="totalPages"
+      :prev-text="__('Prev')"
+      :next-text="__('Next')"
+      @input="queryClusterGroup"
+      class="justify-content-center"
+    />
   </section>
 </template>

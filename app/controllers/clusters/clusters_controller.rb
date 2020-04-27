@@ -54,7 +54,13 @@ class Clusters::ClustersController < Clusters::BaseController
       format.json do
         serializer = ClusterSerializer.new(current_user: @current_user)
 
-        render json: serializer.with_pagination(request, response).represent_group(@clusters)
+        render json: {
+          clusters: serializer.with_pagination(request, response).represent_group(@clusters),
+          current_page: @clusters.current_page,
+          per_page: @clusters.limit_value,
+          total_count: @clusters.total_count,
+          total_pages: @clusters.total_pages,
+        }
       end
     end
   end
