@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_27_211126) do
+ActiveRecord::Schema.define(version: 2020_04_27_211436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2020_04_27_211126) do
     t.integer "retry_count"
     t.datetime "retry_at"
     t.boolean "missing_on_primary", default: false, null: false
+    t.boolean "pending_delete", default: false, null: false
     t.index ["file_type", "file_id"], name: "index_file_registry_on_file_type_and_file_id", unique: true
     t.index ["file_type"], name: "index_file_registry_on_file_type"
     t.index ["retry_at"], name: "index_file_registry_on_retry_at"
