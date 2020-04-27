@@ -16,9 +16,7 @@
         .card-header.alert.alert-danger
           Last repository check
           = "(#{time_ago_with_tooltip(@project.last_repository_check_at)})"
-          failed. See
-          = link_to 'repocheck.log', admin_logs_path
-          for error messages.
+          failed. See the 'repocheck.log' file for error messages.
 .row
   .col-md-6
     .card
@@ -148,9 +146,7 @@
               - if @project.last_repository_check_failed?
                 = succeed '.' do
                   %strong.cred failed
-                See
-                = link_to 'repocheck.log', admin_logs_path
-                for error messages.
+                See the 'repocheck.log' file for error messages.
               - else
                 passed.
 
