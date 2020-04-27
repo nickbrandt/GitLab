@@ -38,7 +38,7 @@ describe API::Search do
     context 'for wiki_blobs scope', :sidekiq_might_not_need_inline do
       before do
         wiki = create(:project_wiki, project: project)
-        create(:wiki_page, wiki: wiki, attrs: { title: 'home', content: "Awesome page" })
+        create(:wiki_page, wiki: wiki, title: 'home', content: "Awesome page")
 
         project.wiki.index_wiki_blobs
         ensure_elasticsearch_index!
@@ -183,7 +183,7 @@ describe API::Search do
       context 'for wiki_blobs scope' do
         before do
           wiki = create(:project_wiki, project: project)
-          create(:wiki_page, wiki: wiki, attrs: { title: 'home', content: "Awesome page" })
+          create(:wiki_page, wiki: wiki, title: 'home', content: "Awesome page")
 
           get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }
         end
