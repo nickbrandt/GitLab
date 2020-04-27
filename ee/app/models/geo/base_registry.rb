@@ -8,7 +8,7 @@ class Geo::BaseRegistry < Geo::TrackingBase
   include GlobalID::Identification
 
   def self.pluck_model_ids_in_range(range)
-    where(self::MODEL_FOREIGN_KEY => range).pluck(self::MODEL_FOREIGN_KEY)
+    where(self::MODEL_FOREIGN_KEY => range, pending_delete: false).pluck(self::MODEL_FOREIGN_KEY)
   end
 
   def self.model_id_in(ids)
@@ -25,9 +25,17 @@ class Geo::BaseRegistry < Geo::TrackingBase
 
   def self.insert_for_model_ids(ids)
     records = ids.map do |id|
-      new(self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now)
+      new(self::MODEL_FOREIGN_KEY => id, pending_delete: false, created_at: Time.zone.now)
     end
 
-    bulk_insert!(records, returns: :ids)
+    bulk_upsert!(records, unique_by: self::MODEL_FOREIGN_KEY, returns: :ids)
+  end
+
+  def self.delete_for_model_ids(ids)
+    records = ids.map do |id|
+      new(self::MODEL_FOREIGN_KEY => id, pending_delete: true)
+    end
+
+    bulk_upsert!(records, unique_by: self::MODEL_FOREIGN_KEY, returns: :ids)
   end
 end

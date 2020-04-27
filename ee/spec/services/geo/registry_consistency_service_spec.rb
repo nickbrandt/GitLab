@@ -2,12 +2,10 @@
 
 require 'spec_helper'
 
-describe Geo::RegistryConsistencyService, :geo_fdw, :use_clean_rails_memory_store_caching do
+describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_store_caching do
   include EE::GeoHelpers
 
   let(:secondary) { create(:geo_node) }
-
-  subject { described_class.new(registry_class, batch_size: batch_size) }
 
   before do
     stub_current_geo_node(secondary)
@@ -15,8 +13,13 @@ describe Geo::RegistryConsistencyService, :geo_fdw, :use_clean_rails_memory_stor
 
   ::Geo::Secondary::RegistryConsistencyWorker::REGISTRY_CLASSES.each do |klass|
     let(:registry_class) { klass }
+    let(:registry_class_factory) { registry_class.underscore.tr('/', '_').to_sym }
     let(:model_class) { registry_class::MODEL_CLASS }
+    let(:model_class_factory) { model_class.underscore.tr('/', '_').to_sym }
+    let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }
     let(:batch_size) { 2 }
+
+    subject { described_class.new(registry_class, batch_size: batch_size) }
 
     describe 'registry_class interface' do
       it 'defines a MODEL_CLASS constant' do
@@ -29,6 +32,10 @@ describe Geo::RegistryConsistencyService, :geo_fdw, :use_clean_rails_memory_stor
 
       it 'responds to .insert_for_model_ids' do
         expect(registry_class).to respond_to(:insert_for_model_ids)
+      end
+
+      it 'responds to .delete_for_model_ids' do
+        expect(registry_class).to respond_to(:delete_for_model_ids)
       end
 
       it 'responds to .finder_class' do
@@ -138,6 +145,33 @@ describe Geo::RegistryConsistencyService, :geo_fdw, :use_clean_rails_memory_stor
 
             subject.execute
           end
+        end
+      end
+
+      context 'when there are unused registries' do
+        let(:records) { create_list(model_class_factory, batch_size) }
+        let(:unused_registry_ids) { [records.first].map(&:id) }
+
+        let!(:registries) do
+          records.map do |record|
+            create(registry_class_factory, model_foreign_key => record.id)
+          end
+        end
+
+        before do
+          model_class.where(id: unused_registry_ids).delete_all
+        end
+
+        it 'marks unused registries as pending delete' do
+          subject.execute
+
+          registry_class.where(model_foreign_key => unused_registry_ids).each do |registry|
+            expect(registry).to be_pending_delete
+          end
+        end
+
+        it 'returns truthy' do
+          expect(subject.execute).to be_truthy
         end
       end
 

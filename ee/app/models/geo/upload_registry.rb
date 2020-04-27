@@ -12,7 +12,6 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   scope :failed, -> { where(success: false).where.not(retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
-  scope :never, -> { where(success: false, retry_count: nil) }
 
   def self.registry_consistency_worker_enabled?
     Feature.enabled?(:geo_file_registry_ssot_sync, default_enabled: true)
@@ -30,10 +29,18 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   def self.insert_for_model_ids(attrs)
     records = attrs.map do |file_id, file_type|
-      new(file_id: file_id, file_type: file_type, created_at: Time.zone.now)
+      new(file_id: file_id, file_type: file_type, pending_delete: false, created_at: Time.zone.now)
     end
 
-    bulk_insert!(records, returns: :ids)
+    bulk_upsert!(records, unique_by: [:file_type, :file_id], returns: :ids)
+  end
+
+  def self.delete_for_model_ids(ids)
+    records = attrs.map do |file_id, file_type|
+      new(file_id: file_id, file_type: file_type, pending_delete: true)
+    end
+
+    bulk_upsert!(records, unique_by: [:file_type, :file_id], returns: :ids)
   end
 
   def self.with_search(query)

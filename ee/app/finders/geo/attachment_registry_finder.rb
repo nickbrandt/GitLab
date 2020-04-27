@@ -65,6 +65,7 @@ module Geo
       tracked =
         Geo::UploadRegistry
             .model_id_in(range)
+            .where(pending_delete: false)
             .pluck(:file_id, :file_type)
       # rubocop:enable CodeReuse/ActiveRecord
 

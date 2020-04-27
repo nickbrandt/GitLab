@@ -6,14 +6,12 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
   MODEL_CLASS = ::Ci::JobArtifact
   MODEL_FOREIGN_KEY = :artifact_id
 
-  scope :never, -> { where(success: false, retry_count: nil) }
-
   def self.failed
     if registry_consistency_worker_enabled?
-      where(success: false).where.not(retry_count: nil)
+      where(success: false).where.not(retry_count: nil).without_deleted
     else
       # Would do `super` except it doesn't work with an included scope
-      where(success: false)
+      where(success: false).without_deleted
     end
   end
 
@@ -35,10 +33,10 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
   # https://gitlab.com/gitlab-org/gitlab/-/issues/214407
   def self.insert_for_model_ids(ids)
     records = ids.map do |id|
-      new(artifact_id: id, success: false, created_at: Time.zone.now)
+      new(artifact_id: id, success: false, pending_delete: false, created_at: Time.zone.now)
     end
 
-    bulk_insert!(records, returns: :ids)
+    bulk_upsert!(records, unique_by: :artifact_id, returns: :ids)
   end
 
   def self.replication_enabled?

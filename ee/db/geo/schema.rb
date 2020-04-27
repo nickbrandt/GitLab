@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 2020_04_28_220225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "postgres_fdw"
 
   create_table "container_repository_registry", id: :serial, force: :cascade do |t|
     t.integer "container_repository_id", null: false
