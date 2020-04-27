@@ -19,6 +19,7 @@ module EE
         mount_mutation ::Mutations::Vulnerabilities::Dismiss
         mount_mutation ::Mutations::Boards::Lists::UpdateLimitMetrics
         mount_mutation ::Mutations::SecurityDashboard::AddProjects
+        mount_mutation ::Mutations::Vulnerabilities::MultiDismiss
       end
     end
   end
