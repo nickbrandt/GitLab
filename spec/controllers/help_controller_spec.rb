@@ -99,6 +99,7 @@ describe HelpController do
     context 'for Markdown formats' do
       context 'when requested file exists' do
         before do
+          expect(File).to receive(:read).and_return(fixture_file('blockquote_fence_after.md'))
           get :show, params: { path: 'ssh/README' }, format: :md
         end
 
@@ -168,6 +169,6 @@ describe HelpController do
   end
 
   def stub_readme(content)
-    allow(File).to receive(:read).and_return(content)
+    expect(File).to receive(:read).and_return(content)
   end
 end
