@@ -77,10 +77,11 @@ authentication is not provided. For
 those cases where it is not required, this will be mentioned in the documentation
 for each individual endpoint. For example, the [`/projects/:id` endpoint](projects.md).
 
-There are four ways to authenticate with the GitLab API:
+There are five ways to authenticate with the GitLab API:
 
 1. [OAuth2 tokens](#oauth2-tokens)
 1. [Personal access tokens](#personal-access-tokens)
+1. [Project access tokens](#project-access-tokens-core-only) **(CORE ONLY)**
 1. [Session cookie](#session-cookie)
 1. [GitLab CI/CD job token](#gitlab-ci-job-token) **(Specific endpoints only)**
 
@@ -117,30 +118,38 @@ curl --header "Authorization: Bearer OAUTH-TOKEN" https://gitlab.example.com/api
 
 Read more about [GitLab as an OAuth2 provider](oauth2.md).
 
-### Personal access tokens
+### Access tokens
 
-You can use a [personal access token](../user/profile/personal_access_tokens.md) to authenticate with the API by passing it in either the
-`private_token` parameter or the `Private-Token` header.
+#### Personal access tokens
 
-Example of using the personal access token in a parameter:
+Read more about [personal access tokens](../user/profile/personal_access_tokens.md).
+
+#### Project access tokens **(CORE ONLY)**
+
+Read more about [project access tokens](../user/project/settings/index.md#project-access-tokens-core-only).
+
+#### Usage
+
+Access tokens can be used to authenticate with the API by passing it in either the `private_token` parameter
+or the `Private-Token` header.
+
+Example of using the personal/project access token in a parameter:
 
 ```shell
 curl https://gitlab.example.com/api/v4/projects?private_token=<your_access_token>
 ```
 
-Example of using the personal access token in a header:
+Example of using the personal/project access token in a header:
 
 ```shell
 curl --header "Private-Token: <your_access_token>" https://gitlab.example.com/api/v4/projects
 ```
 
-You can also use personal access tokens with OAuth-compliant headers:
+You can also use personal/project access tokens with OAuth-compliant headers:
 
 ```shell
 curl --header "Authorization: Bearer <your_access_token>" https://gitlab.example.com/api/v4/projects
 ```
-
-Read more about [personal access tokens](../user/profile/personal_access_tokens.md).
 
 ### Session cookie
 
