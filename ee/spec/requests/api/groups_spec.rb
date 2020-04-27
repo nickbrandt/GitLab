@@ -106,6 +106,41 @@ describe API::Groups do
         end
       end
     end
+
+    context 'file_template_project_id is a private project' do
+      let_it_be(:private_project) { create(:project, :private, group: group) }
+
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: true)
+        group.update_attribute(:file_template_project_id, private_project.id)
+      end
+
+      context 'user has permission to private project' do
+        it 'returns file_template_project_id' do
+          private_project.add_maintainer(user)
+
+          get api("/groups/#{group.id}", user)
+
+          expect(json_response).to have_key 'file_template_project_id'
+        end
+      end
+
+      context 'user does not have permission to private project' do
+        it 'does not return file_template_project_id' do
+          get api("/groups/#{group.id}", another_user)
+
+          expect(json_response).not_to have_key 'file_template_project_id'
+        end
+      end
+
+      context 'user is not logged in' do
+        it 'does not return file_template_project_id' do
+          get api("/groups/#{group.id}")
+
+          expect(json_response).not_to have_key 'file_template_project_id'
+        end
+      end
+    end
   end
 
   describe 'PUT /groups/:id' do
