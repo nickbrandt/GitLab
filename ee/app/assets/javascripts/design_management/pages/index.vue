@@ -230,7 +230,10 @@ export default {
           return;
         }
         event.preventDefault();
-        const filename = getFilename(event) || 'image.png';
+        let filename = getFilename(event);
+        if (!filename || filename === 'image.png') {
+          filename = `design_${Date.now()}.png`;
+        }
         const newFile = new File([files[0]], filename);
         this.onUploadDesign([newFile]);
       }
