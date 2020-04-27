@@ -603,6 +603,14 @@ m = project.merge_requests.find_by(iid: )
 m.project.try(:ci_service)
 ```
 
+### Validate the `.gitlab-ci.yml`
+
+```ruby
+project = Project.find_by_full_path 'group/project'
+content = project.repository.gitlab_ci_yml_for(project.repository.root_ref_sha)
+Gitlab::Ci::YamlProcessor.validation_message(content,  user: User.first)
+```
+
 ### Disable AutoDevOps on Existing Projects
 
 ```ruby
@@ -886,14 +894,4 @@ Geo::ProjectRegistry.update_all(resync_repository: true, resync_wiki: true)
 project = Project.find_by_full_path('<group/project>')
 
 Geo::RepositorySyncService.new(project).execute
-```
-
-## Advanced Troubleshooting
-
-### Validate the `.gitlab-ci.yml`
-
-```ruby
-project = Project.find_by_full_path 'group/project'
-content = project.repository.gitlab_ci_yml_for(project.repository.root_ref_sha)
-Gitlab::Ci::YamlProcessor.validation_message(content,  user: User.first)
 ```
