@@ -80,8 +80,13 @@ describe Vulnerabilities::Export do
     context 'when the export does not have project assigned' do
       let(:author) { build(:user) }
       let(:vulnerability_export) { build(:vulnerability_export, :user, author: author) }
+      let(:mock_security_dashboard) { instance_double(InstanceSecurityDashboard) }
 
-      it { is_expected.to eql(author) }
+      before do
+        allow(author).to receive(:security_dashboard).and_return(mock_security_dashboard)
+      end
+
+      it { is_expected.to eql(mock_security_dashboard) }
     end
   end
 
@@ -98,10 +103,14 @@ describe Vulnerabilities::Export do
       end
     end
 
-    context 'when the exportable is a User' do
-      let(:exportable) { build(:user) }
+    context 'when the exportable is an InstanceSecurityDashboard' do
+      let(:exportable) { InstanceSecurityDashboard.new(vulnerability_export.author) }
 
-      it 'changes the exportable of the export to given user' do
+      before do
+        allow(vulnerability_export.author).to receive(:security_dashboard).and_return(exportable)
+      end
+
+      it 'changes the exportable of the export to security dashboard of the author' do
         expect { set_exportable }.to change { vulnerability_export.exportable }.to(exportable)
       end
     end

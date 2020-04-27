@@ -349,8 +349,8 @@ module EE
       gitlab_employee? ? 'GitLab' : super
     end
 
-    def vulnerabilities
-      InstanceSecurityDashboard.new(self).vulnerabilities
+    def security_dashboard
+      InstanceSecurityDashboard.new(self)
     end
 
     protected

@@ -16,9 +16,6 @@ module EE
         updating_name_disabled_for_users &
         ~admin
       end.prevent :update_name
-
-      # TODO: Check this before removing WIP from MR
-      rule { user_is_self }.enable :create_vulnerability_export
     end
   end
 end

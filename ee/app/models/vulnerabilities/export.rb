@@ -48,16 +48,15 @@ module Vulnerabilities
     end
 
     def exportable
-      project || author
+      project || author.security_dashboard
     end
 
     def exportable=(value)
       case value
       when Project
         self.project = value
-      when User
+      when InstanceSecurityDashboard
         self.project = nil
-        self.author = value
       else
         raise "Can not assign #{value.class} as exportable"
       end
