@@ -95,17 +95,19 @@ RSpec.describe Packages::Package, type: :model do
     end
 
     describe '#version' do
-      context 'npm package' do
-        subject { create(:npm_package) }
+      RSpec.shared_examples 'validating version to be SemVer compliant for' do |factory_name|
+        context "for #{factory_name}" do
+          subject { create(factory_name) }
 
-        it { is_expected.to allow_value('1.2.3').for(:version) }
-        it { is_expected.to allow_value('1.2.3-beta').for(:version) }
-        it { is_expected.to allow_value('1.2.3-alpha.3').for(:version) }
-        it { is_expected.not_to allow_value('1').for(:version) }
-        it { is_expected.not_to allow_value('1.2').for(:version) }
-        it { is_expected.not_to allow_value('1./2.3').for(:version) }
-        it { is_expected.not_to allow_value('../../../../../1.2.3').for(:version) }
-        it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
+          it { is_expected.to allow_value('1.2.3').for(:version) }
+          it { is_expected.to allow_value('1.2.3-beta').for(:version) }
+          it { is_expected.to allow_value('1.2.3-alpha.3').for(:version) }
+          it { is_expected.not_to allow_value('1').for(:version) }
+          it { is_expected.not_to allow_value('1.2').for(:version) }
+          it { is_expected.not_to allow_value('1./2.3').for(:version) }
+          it { is_expected.not_to allow_value('../../../../../1.2.3').for(:version) }
+          it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
+        end
       end
 
       context 'conan package' do
@@ -123,6 +125,9 @@ RSpec.describe Packages::Package, type: :model do
         it { is_expected.not_to allow_value('+1.2.3').for(:version) }
         it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
       end
+
+      it_behaves_like 'validating version to be SemVer compliant for', :npm_package
+      it_behaves_like 'validating version to be SemVer compliant for', :nuget_package
     end
 
     describe '#package_already_taken' do
@@ -218,9 +223,11 @@ RSpec.describe Packages::Package, type: :model do
     end
 
     describe '.has_version' do
-      let!(:package4) { create(:nuget_package, version: nil) }
-
       subject { described_class.has_version }
+
+      before do
+        create(:maven_metadatum).package.update!(version: nil)
+      end
 
       it 'includes only packages with version attribute' do
         is_expected.to match_array([package1, package2, package3])
