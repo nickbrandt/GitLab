@@ -9211,6 +9211,8 @@ CREATE INDEX index_clusters_kubernetes_namespaces_on_project_id ON public.cluste
 
 CREATE INDEX index_clusters_on_enabled_and_provider_type_and_id ON public.clusters USING btree (enabled, provider_type, id);
 
+CREATE INDEX index_clusters_on_enabled_cluster_type_id_and_created_at ON public.clusters USING btree (enabled, cluster_type, id, created_at);
+
 CREATE INDEX index_clusters_on_management_project_id ON public.clusters USING btree (management_project_id) WHERE (management_project_id IS NOT NULL);
 
 CREATE INDEX index_clusters_on_user_id ON public.clusters USING btree (user_id);
@@ -13411,6 +13413,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200401091051
 20200401095430
 20200401211005
+20200402001106
 20200402123926
 20200402124802
 20200402135250
