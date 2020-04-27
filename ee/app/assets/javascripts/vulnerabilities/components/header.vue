@@ -146,7 +146,7 @@ export default {
   <div>
     <resolution-alert
       v-if="showResolutionAlert"
-      :default-branch-name="vulnerability.default_branch_name"
+      :default-branch-name="vulnerability.project_default_branch"
     />
     <div class="detail-page-header">
       <div class="detail-page-header-body align-items-center">
