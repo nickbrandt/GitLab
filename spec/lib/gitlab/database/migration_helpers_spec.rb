@@ -790,6 +790,25 @@ describe Gitlab::Database::MigrationHelpers do
           model.rename_column_concurrently(:users, :old, :new)
         end
 
+        it 'passes the batch_column_name' do
+          expect(model).to receive(:column_exists?).with(:users, :other_batch_column).and_return(true)
+          expect(model).to receive(:check_trigger_permissions!).and_return(true)
+
+          expect(model).to receive(:create_column_from).with(
+            :users, :old, :new, type: nil, batch_column_name: :other_batch_column
+          ).and_return(true)
+
+          expect(model).to receive(:install_rename_triggers).and_return(true)
+
+          model.rename_column_concurrently(:users, :old, :new, batch_column_name: :other_batch_column)
+        end
+
+        it 'raises an error with invalid batch_column_name' do
+          expect do
+            model.rename_column_concurrently(:users, :old, :new, batch_column_name: :invalid)
+          end.to raise_error(RuntimeError, /Column invalid does not exist on users/)
+        end
+
         context 'when default is false' do
           let(:old_column) do
             double(:column,
@@ -902,6 +921,25 @@ describe Gitlab::Database::MigrationHelpers do
         expect(model).to receive(:copy_foreign_keys).with(:users, :new, :old)
 
         model.undo_cleanup_concurrent_column_rename(:users, :old, :new)
+      end
+
+      it 'passes the batch_column_name' do
+        expect(model).to receive(:column_exists?).with(:users, :other_batch_column).and_return(true)
+        expect(model).to receive(:check_trigger_permissions!).and_return(true)
+
+        expect(model).to receive(:create_column_from).with(
+          :users, :new, :old, type: nil, batch_column_name: :other_batch_column
+        ).and_return(true)
+
+        expect(model).to receive(:install_rename_triggers).and_return(true)
+
+        model.undo_cleanup_concurrent_column_rename(:users, :old, :new, batch_column_name: :other_batch_column)
+      end
+
+      it 'raises an error with invalid batch_column_name' do
+        expect do
+          model.undo_cleanup_concurrent_column_rename(:users, :old, :new, batch_column_name: :invalid)
+        end.to raise_error(RuntimeError, /Column invalid does not exist on users/)
       end
 
       context 'when default is false' do
