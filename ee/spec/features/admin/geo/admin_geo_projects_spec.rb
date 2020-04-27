@@ -9,6 +9,10 @@ describe 'admin Geo Projects', :js, :geo do
   let!(:sync_failed_registry) { create(:geo_project_registry, :existing_repository_sync_failed) }
   let!(:never_synced_registry) { create(:geo_project_registry) }
 
+  def find_toast
+    page.find('.gl-toast')
+  end
+
   before do
     allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
     sign_in(create(:admin))
@@ -167,9 +171,35 @@ describe 'admin Geo Projects', :js, :geo do
         page.click_button('Remove entry')
       end
       # Wait for remove confirmation
-      expect(page.find('.gl-toast')).to have_text('removed')
+      expect(find_toast).to have_text('removed')
 
       expect(page.all(:css, '.project-card').length).to be(card_count - 1)
+    end
+  end
+
+  describe 'Resync all' do
+    before do
+      visit(admin_geo_projects_path)
+      wait_for_requests
+    end
+
+    it 'fires job to resync all projects' do
+      page.click_button('Resync all')
+
+      expect(find_toast).to have_text('All projects are being scheduled for resync')
+    end
+  end
+
+  describe 'Reverify all' do
+    before do
+      visit(admin_geo_projects_path)
+      wait_for_requests
+    end
+
+    it 'fires job to reverify all projects' do
+      page.click_button('Reverify all')
+
+      expect(find_toast).to have_text('All projects are being scheduled for reverify')
     end
   end
 end

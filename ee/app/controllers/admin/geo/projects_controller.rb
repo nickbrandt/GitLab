@@ -20,6 +20,8 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
     if params[:name]
       @registries = @registries.with_search(params[:name])
     end
+
+    @action_buttons = [helpers.resync_all_button, helpers.reverify_all_button]
   end
 
   def destroy
@@ -58,14 +60,14 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
   def reverify_all
     Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:reverify_repositories) # rubocop:disable CodeReuse/Worker
 
-    flash[:toast] = s_('Geo|All projects are being scheduled for re-verify')
+    flash[:toast] = s_('Geo|All projects are being scheduled for reverify')
     redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def resync_all
     Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories) # rubocop:disable CodeReuse/Worker
 
-    flash[:toast] = s_('Geo|All projects are being scheduled for re-sync')
+    flash[:toast] = s_('Geo|All projects are being scheduled for resync')
     redirect_back_or_default(default: admin_geo_projects_path)
   end
 
