@@ -1,10 +1,15 @@
-import { pickBy } from 'lodash';
+import { omit, pickBy } from 'lodash';
 import { queryToObject, mergeUrlParams, removeParams } from '~/lib/utils/url_utility';
 import {
   timeRangeParamNames,
   timeRangeFromParams,
   timeRangeToParams,
 } from '~/lib/utils/datetime_range';
+
+/**
+ * List of non time range url parameters
+ */
+export const dashboardParams = ['dashboard', 'group', 'title', 'y_label'];
 
 /**
  * This method is used to validate if the graph data format for a chart component
@@ -112,6 +117,20 @@ export const graphDataValidatorForAnomalyValues = graphData => {
 export const timeRangeFromUrl = (search = window.location.search) => {
   const params = queryToObject(search);
   return timeRangeFromParams(params);
+};
+
+/**
+ * Returns an array with user defined variables from the URL
+ *
+ * @returns {Array} The custom variables defined by the
+ * user in the URL
+ */
+
+export const customVariablesFromUrl = (search = window.location.search) => {
+  const params = queryToObject(search);
+  const paramsToRemove = timeRangeParamNames.concat(dashboardParams);
+
+  return omit(params, paramsToRemove);
 };
 
 /**

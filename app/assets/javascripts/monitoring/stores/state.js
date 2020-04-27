@@ -33,6 +33,7 @@ export default () => ({
     panel: null,
   },
   allDashboards: [],
+  variables: [],
 
   // Other project data
   annotations: [],

@@ -1,0 +1,5 @@
+---
+title: Filter out custom variables from URL and interpolate them in queries
+merge_request: 30560
+author:
+type: added

@@ -169,6 +169,29 @@ describe('monitoring/utils', () => {
     });
   });
 
+  describe('customVariablesFromUrl', () => {
+    const { customVariablesFromUrl } = monitoringUtils;
+
+    it('returns an object with only the custom variables', () => {
+      queryToObject.mockReturnValueOnce({
+        dashboard: '.gitlab/dashboards/custom_dashboard.yml',
+        pod: 'POD',
+      });
+
+      expect(customVariablesFromUrl()).toEqual(expect.objectContaining({ pod: 'POD' }));
+    });
+
+    it('returns an empty object when no custom variables are present', () => {
+      const params = {
+        dashboard: '.gitlab/dashboards/custom_dashboard.yml',
+        param1: 'value1',
+        param2: 'value2',
+      };
+
+      expect(customVariablesFromUrl(params, mockPath)).toStrictEqual({});
+    });
+  });
+
   describe('removeTimeRangeParams', () => {
     const { removeTimeRangeParams } = monitoringUtils;
 

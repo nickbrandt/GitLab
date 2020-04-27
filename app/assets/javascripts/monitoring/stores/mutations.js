@@ -169,4 +169,19 @@ export default {
     state.expandedPanel.group = group;
     state.expandedPanel.panel = panel;
   },
+  [types.SET_QUERY_VARIABLES](state, variables) {
+    let variablesArr = [];
+    const variablesKeys = Object.keys(variables);
+
+    if (variablesKeys.length > 0) {
+      variablesArr = variablesKeys.reduce((acc, key) => {
+        acc.push(key);
+        acc.push(`${key}_${variables[key]}`);
+
+        return acc;
+      }, []);
+    }
+
+    state.variables = variablesArr;
+  },
 };

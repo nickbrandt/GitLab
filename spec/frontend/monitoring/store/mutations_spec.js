@@ -364,4 +364,18 @@ describe('Monitoring mutations', () => {
       expect(stateCopy.expandedPanel.panel).toEqual(null);
     });
   });
+
+  describe('SET_QUERY_VARIABLES', () => {
+    it('stores an empty variables array when no custom variables are given', () => {
+      mutations[types.SET_QUERY_VARIABLES](stateCopy, {});
+
+      expect(stateCopy.variables).toEqual([]);
+    });
+
+    it('stores variables in the key key_value format in the array', () => {
+      mutations[types.SET_QUERY_VARIABLES](stateCopy, { pod: 'POD' });
+
+      expect(stateCopy.variables).toEqual(['pod', 'pod_POD']);
+    });
+  });
 });
