@@ -1,0 +1,5 @@
+---
+title: Add mutation to dismiss vulnerabilities in batches using GraphQL API
+merge_request: 30511
+author:
+type: added
