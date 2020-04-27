@@ -32,6 +32,8 @@ describe 'Projects > Merge Requests > User edits a merge request' do
     let(:ruby_owner) { create(:user, username: 'ruby-owner') }
 
     before do
+      stub_feature_flags(sectional_codeowners: false)
+
       project.add_developer(ruby_owner)
       project.repository.create_file(user, 'ruby.rb', '# a ruby file',
                                      message: 'Add a ruby file',

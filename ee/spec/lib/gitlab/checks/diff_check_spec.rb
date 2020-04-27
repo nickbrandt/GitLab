@@ -56,6 +56,10 @@ describe Gitlab::Checks::DiffCheck do
         end
 
         context 'and the user is not listed as a codeowner' do
+          before do
+            stub_feature_flags(sectional_codeowners: false)
+          end
+
           it "returns an error message" do
             expect { diff_check.validate! }.to raise_error do |error|
               expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
@@ -81,6 +85,10 @@ describe Gitlab::Checks::DiffCheck do
         end
 
         context "and the user is not listed as a code owner" do
+          before do
+            stub_feature_flags(sectional_codeowners: false)
+          end
+
           it "returns an error message" do
             expect(validation_result).to include("Pushes to protected branches")
           end
