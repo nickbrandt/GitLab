@@ -9,7 +9,7 @@
 #
 # Technical debt: https://gitlab.com/gitlab-org/gitlab/issues/35798
 module API
-  class ConanPackages < Grape::API::Instance
+  class ConanPackages < Grape::API
     helpers ::API::Helpers::PackagesManagerClientsHelpers
 
     PACKAGE_REQUIREMENTS = {

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module API
-  class NpmPackages < Grape::API::Instance
+  class NpmPackages < Grape::API
     helpers ::API::Helpers::PackagesHelpers
     helpers ::API::Helpers::Packages::DependencyProxyHelpers
 

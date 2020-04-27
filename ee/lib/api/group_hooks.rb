@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class GroupHooks < Grape::API::Instance
+  class GroupHooks < Grape::API
     include ::API::PaginationParams
 
     before { authenticate! }
