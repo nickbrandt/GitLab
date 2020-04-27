@@ -56,6 +56,7 @@ export default class GeoNodesStore {
       editPath: rawNode.web_edit_url,
       geoProjectsUrl: rawNode.web_geo_projects_url,
       statusPath: rawNode._links.status,
+      selectiveSyncShards: rawNode.selective_sync_shards,
     };
   }
 
@@ -151,6 +152,7 @@ export default class GeoNodesStore {
         timeStamp: rawNodeDetails.cursor_last_event_timestamp,
       },
       selectiveSyncType: rawNodeDetails.selective_sync_type,
+      namespaces: rawNodeDetails.namespaces,
       dbReplicationLag: rawNodeDetails.db_replication_lag_seconds,
     };
   }

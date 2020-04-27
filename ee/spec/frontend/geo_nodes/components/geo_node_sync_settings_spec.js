@@ -23,11 +23,37 @@ const createComponent = (
 describe('GeoNodeSyncSettingsComponent', () => {
   describe('computed', () => {
     describe('syncType', () => {
-      it('returns string representing sync type', () => {
-        const vm = createComponent();
+      let vm;
+      describe('when syncType is namespaces', () => {
+        beforeEach(() => {
+          vm = createComponent(false, 'namespaces');
+        });
 
-        expect(vm.syncType).toBe('Selective (namespaces)');
-        vm.$destroy();
+        afterEach(() => {
+          vm.$destroy();
+        });
+
+        it('renders the correct sync title', () => {
+          expect(vm.$el.querySelector('[data-testid="syncType"]').innerText.trim()).toBe(
+            'Selective (groups)',
+          );
+        });
+      });
+
+      describe('when syncType is shards', () => {
+        beforeEach(() => {
+          vm = createComponent(false, 'shards');
+        });
+
+        afterEach(() => {
+          vm.$destroy();
+        });
+
+        it('renders the correct sync title', () => {
+          expect(vm.$el.querySelector('[data-testid="syncType"]').innerText.trim()).toBe(
+            'Selective (shards)',
+          );
+        });
       });
     });
 
@@ -35,7 +61,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
       it('returns `true` if one of the event timestamp is empty', () => {
         const vmEmptyTimestamp = createComponent(
           false,
-          mockNodeDetails.namespaces,
+          mockNodeDetails.selectiveSyncType,
           {
             id: 0,
             timeStamp: 0,

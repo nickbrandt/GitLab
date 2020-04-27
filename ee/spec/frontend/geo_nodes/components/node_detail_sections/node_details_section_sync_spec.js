@@ -46,7 +46,6 @@ describe('NodeDetailsSectionSync', () => {
         return wrapper.vm.$nextTick(() => {
           const syncSettings = wrapper.vm.syncSettings();
           expect(syncSettings.syncStatusUnavailable).toBe(true);
-          expect(syncSettings.namespaces).toBe(mockNodeDetails.namespaces);
           expect(syncSettings.lastEvent).toBe(mockNodeDetails.lastEvent);
           expect(syncSettings.cursorLastEvent).toBe(mockNodeDetails.cursorLastEvent);
         });

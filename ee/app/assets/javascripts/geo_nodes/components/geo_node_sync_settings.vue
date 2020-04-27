@@ -1,5 +1,5 @@
 <script>
-import { sprintf, s__ } from '~/locale';
+import { sprintf, s__, __ } from '~/locale';
 import { timeIntervalInWords } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
@@ -40,7 +40,11 @@ export default {
         return s__('GeoNodes|Full');
       }
 
-      return `${s__('GeoNodes|Selective')} (${this.selectiveSyncType})`;
+      // Renaming namespaces to groups in the UI for Geo Selective Sync
+      const syncLabel =
+        this.selectiveSyncType === 'namespaces' ? __('groups') : this.selectiveSyncType;
+
+      return sprintf(s__('GeoNodes|Selective (%{syncLabel})'), { syncLabel });
     },
     eventTimestampEmpty() {
       return this.lastEvent.timeStamp === 0 || this.cursorLastEvent.timeStamp === 0;
@@ -117,7 +121,7 @@ export default {
       class="d-flex align-items-center"
       data-placement="bottom"
     >
-      <strong>{{ syncType }}</strong>
+      <strong data-testid="syncType">{{ syncType }}</strong>
       <icon name="retry" class="ml-2" />
       <span v-if="!eventTimestampEmpty" class="ml-2">
         {{ syncStatusEventInfo }}
