@@ -44,7 +44,7 @@ module API
       end
 
       def limit_for_scope(scope)
-        (scope&.actual_limits || Plan.default.actual_limits).offset_pagination_limit
+        (scope || Plan.default).actual_limits.offset_pagination_limit
       end
 
       def offset_limit_exceeded?(offset_limit)
