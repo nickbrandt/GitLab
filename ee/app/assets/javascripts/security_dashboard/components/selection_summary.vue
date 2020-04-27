@@ -67,13 +67,15 @@ export default {
         .then(() => {
           toast(this.dismissalSuccessMessage());
           this.$emit('deselect-all-vulnerabilities');
-          this.$emit('refetch-vulnerabilities');
         })
         .catch(() => {
           createFlash(
             s__('SecurityReports|There was an error dismissing the vulnerabilities.'),
             'alert',
           );
+        })
+        .finally(() => {
+          this.$emit('refetch-vulnerabilities');
         });
     },
   },
