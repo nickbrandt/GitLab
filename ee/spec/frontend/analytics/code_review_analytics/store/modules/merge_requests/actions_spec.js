@@ -5,7 +5,7 @@ import * as actions from 'ee/analytics/code_review_analytics/store/modules/merge
 import * as types from 'ee/analytics/code_review_analytics/store/modules/merge_requests/mutation_types';
 import getInitialState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
 import createFlash from '~/flash';
-import mockMergeRequests from '../../../mock_data';
+import { mockMergeRequests } from '../../../mock_data';
 
 jest.mock('~/flash', () => jest.fn());
 
@@ -34,8 +34,8 @@ describe('Code review analytics mergeRequests actions', () => {
   beforeEach(() => {
     state = {
       filters: {
-        milestoneTitle: null,
-        labelName: [],
+        milestones: { selected: null },
+        labels: { selected: [] },
       },
       ...getInitialState(),
     };

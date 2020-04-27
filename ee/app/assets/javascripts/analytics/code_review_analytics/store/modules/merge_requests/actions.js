@@ -11,7 +11,8 @@ export const fetchMergeRequests = ({ dispatch, state, rootState }) => {
 
   const { projectId, pageInfo } = state;
 
-  const { milestoneTitle, labelName } = rootState.filters;
+  const { selected: milestoneTitle } = rootState.filters.milestones;
+  const { selected: labelName } = rootState.filters.labels;
 
   const params = {
     project_id: projectId,
