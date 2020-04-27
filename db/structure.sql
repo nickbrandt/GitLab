@@ -3357,7 +3357,8 @@ CREATE TABLE public.issues (
     duplicated_to_id integer,
     promoted_to_epic_id integer,
     health_status smallint,
-    external_key character varying(255)
+    external_key character varying(255),
+    sprint_id bigint
 );
 
 CREATE SEQUENCE public.issues_id_seq
@@ -3932,7 +3933,8 @@ CREATE TABLE public.merge_requests (
     allow_maintainer_to_push boolean,
     state_id smallint DEFAULT 1 NOT NULL,
     rebase_jid character varying,
-    squash_commit_sha bytea
+    squash_commit_sha bytea,
+    sprint_id bigint
 );
 
 CREATE TABLE public.merge_requests_closing_issues (
@@ -6106,6 +6108,7 @@ CREATE TABLE public.sprints (
     title_html text,
     description text,
     description_html text,
+    CONSTRAINT sprints_must_belong_to_project_or_group CHECK ((((project_id <> NULL::bigint) AND (group_id IS NULL)) OR ((group_id <> NULL::bigint) AND (project_id IS NULL)))),
     CONSTRAINT sprints_title CHECK ((char_length(title) <= 255))
 );
 
@@ -9598,6 +9601,8 @@ CREATE INDEX index_issues_on_promoted_to_epic_id ON public.issues USING btree (p
 
 CREATE INDEX index_issues_on_relative_position ON public.issues USING btree (relative_position);
 
+CREATE INDEX index_issues_on_sprint_id ON public.issues USING btree (sprint_id);
+
 CREATE INDEX index_issues_on_title_trigram ON public.issues USING gin (title public.gin_trgm_ops);
 
 CREATE INDEX index_issues_on_updated_at ON public.issues USING btree (updated_at);
@@ -9759,6 +9764,8 @@ CREATE INDEX index_merge_requests_on_milestone_id ON public.merge_requests USING
 CREATE INDEX index_merge_requests_on_source_branch ON public.merge_requests USING btree (source_branch);
 
 CREATE INDEX index_merge_requests_on_source_project_id_and_source_branch ON public.merge_requests USING btree (source_project_id, source_branch);
+
+CREATE INDEX index_merge_requests_on_sprint_id ON public.merge_requests USING btree (sprint_id);
 
 CREATE INDEX index_merge_requests_on_target_branch ON public.merge_requests USING btree (target_branch);
 
@@ -10849,6 +10856,9 @@ ALTER TABLE ONLY public.push_event_payloads
 ALTER TABLE ONLY public.ci_builds
     ADD CONSTRAINT fk_3a9eaa254d FOREIGN KEY (stage_id) REFERENCES public.ci_stages(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.issues
+    ADD CONSTRAINT fk_3b8c72ea56 FOREIGN KEY (sprint_id) REFERENCES public.sprints(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_3c1fd1cccc FOREIGN KEY (due_date_sourcing_milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
 
@@ -10965,6 +10975,9 @@ ALTER TABLE ONLY public.vulnerabilities
 
 ALTER TABLE ONLY public.labels
     ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.merge_requests
+    ADD CONSTRAINT fk_7e85395a64 FOREIGN KEY (sprint_id) REFERENCES public.sprints(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.merge_request_metrics
     ADD CONSTRAINT fk_7f28d925f3 FOREIGN KEY (merged_by_id) REFERENCES public.users(id) ON DELETE SET NULL;
@@ -13285,6 +13298,10 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200303055348
 20200303074328
 20200303181648
+20200304023245
+20200304023851
+20200304024025
+20200304024042
 20200304085423
 20200304090155
 20200304121828
@@ -13457,6 +13474,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200420172113
 20200420172752
 20200420172927
+20200420201933
 20200421233150
 20200423075720
 20200423080334
