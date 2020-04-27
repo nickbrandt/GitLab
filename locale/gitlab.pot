@@ -1716,9 +1716,6 @@ msgstr ""
 msgid "AlertManagement|Status"
 msgstr ""
 
-msgid "AlertManagement|Surface alerts in GitLab"
-msgstr ""
-
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
 msgstr ""
 
@@ -20121,6 +20118,9 @@ msgid "Support for custom certificates is disabled. Ask your system's administra
 msgstr ""
 
 msgid "Support page URL"
+msgstr ""
+
+msgid "Surface alerts in GitLab"
 msgstr ""
 
 msgid "Switch branch/tag"
