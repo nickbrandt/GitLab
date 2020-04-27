@@ -5,6 +5,8 @@ module QA
     module Page
       module MergeRequest
         module New
+          include QA::Page::Component::Select2
+
           def self.prepended(page)
             page.module_eval do
               view 'ee/app/assets/javascripts/approvals/components/app.vue' do
@@ -60,7 +62,7 @@ module QA
 
               def enter_member(name)
                 within_element(:member_select_field) do
-                  find(".select2-input").set(name)
+                  search_item(name)
                 end
               end
             end
