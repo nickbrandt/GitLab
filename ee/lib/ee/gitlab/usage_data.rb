@@ -82,6 +82,14 @@ module EE
           usage_data
         end
 
+        def requirements_counts
+          return {} unless ::License.feature_available?(:requirements)
+
+          {
+            requirements_created: count(RequirementsManagement::Requirement)
+          }
+        end
+
         # rubocop: disable CodeReuse/ActiveRecord
         def service_desk_counts
           return {} unless ::License.feature_available?(:service_desk)
@@ -160,6 +168,7 @@ module EE
                 status_page_issues: count(::Issue.on_status_page),
                 template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
               },
+              requirements_counts,
               service_desk_counts,
               security_products_usage,
               epics_deepest_relationship_level,

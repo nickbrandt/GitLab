@@ -7,7 +7,7 @@ describe Gitlab::UsageData do
     allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
   end
 
-  describe '#data' do
+  describe '.data' do
     # using Array.new to create a different creator User for each of the projects
     let_it_be(:projects) { Array.new(3) { create(:project, :repository, creator: create(:user, group_view: :security_dashboard)) } }
     let(:count_data) { subject[:counts] }
@@ -152,7 +152,7 @@ describe Gitlab::UsageData do
     end
   end
 
-  describe '#features_usage_data_ee' do
+  describe '.features_usage_data_ee' do
     subject { described_class.features_usage_data_ee }
 
     it 'gathers feature usage data of EE' do
@@ -162,7 +162,7 @@ describe Gitlab::UsageData do
     end
   end
 
-  describe '#license_usage_data' do
+  describe '.license_usage_data' do
     subject { described_class.license_usage_data }
 
     it 'gathers license data' do
@@ -177,6 +177,28 @@ describe Gitlab::UsageData do
       expect(subject[:license_expires_at]).to eq(license.expires_at)
       expect(subject[:license_add_ons]).to eq(license.add_ons)
       expect(subject[:license_trial]).to eq(license.trial?)
+    end
+  end
+
+  describe '.requirements_counts' do
+    subject { described_class.requirements_counts }
+
+    context 'when requirements are disabled' do
+      it 'returns empty hash' do
+        stub_licensed_features(requirements: false)
+
+        expect(subject).to eq({})
+      end
+    end
+
+    context 'when requirements are enabled' do
+      it 'returns created requirements count' do
+        stub_licensed_features(requirements: true)
+
+        create_list(:requirement, 2)
+
+        expect(subject).to eq({ requirements_created: 2 })
+      end
     end
   end
 
