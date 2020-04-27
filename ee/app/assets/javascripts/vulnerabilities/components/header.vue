@@ -10,6 +10,7 @@ import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS } from '../constants';
+import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
   name: 'VulnerabilityHeader',
@@ -110,6 +111,7 @@ export default {
         })
         .finally(() => {
           this.isLoadingVulnerability = false;
+          VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGE');
         });
     },
     createIssue() {
