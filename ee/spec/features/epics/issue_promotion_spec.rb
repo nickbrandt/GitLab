@@ -71,6 +71,25 @@ describe 'Issue promotion', :js do
         expect(epic.description).to eq(issue.description)
         expect(epic.author).to eq(user)
       end
+
+      # Spec for https://gitlab.com/gitlab-org/gitlab/-/issues/215549
+      context 'if there is a remove resource milestone event' do
+        let!(:resource_milestone_event) { create(:resource_milestone_event, issue: issue, action: 'remove', milestone_id: nil) }
+
+        it 'promotes the issue' do
+          add_note('/promote')
+
+          wait_for_requests
+
+          epic = Epic.last
+
+          expect(page).to have_content 'Promoted issue to an epic.'
+          expect(issue.reload).to be_closed
+          expect(epic.title).to eq(issue.title)
+          expect(epic.description).to eq(issue.description)
+          expect(epic.author).to eq(user)
+        end
+      end
     end
 
     context 'when issue is confidential' do
