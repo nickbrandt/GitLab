@@ -505,6 +505,20 @@ describe('Design management index page', () => {
       ]);
     });
 
+    it('renames a design if it has an image.png filename', () => {
+      event.clipboardData = {
+        files: [{ name: 'image.png', type: 'image/png' }],
+        getData: () => 'image.png',
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith([
+        new File([{ name: 'image.png' }], `design_${Date.now()}.png`),
+      ]);
+    });
+
     it('does not call onUploadDesign with invalid paste', () => {
       event.clipboardData = {
         items: [{ type: 'text/plain' }, { type: 'text' }],
