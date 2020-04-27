@@ -1,13 +1,23 @@
 <script>
-import { GlTabs, GlTab } from '@gitlab/ui';
+import { GlNewDropdown, GlNewDropdownItem, GlTabs, GlTab } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
+/* eslint-disable import/no-commonjs */
+const mock = require('./alerts.json');
+
 export default {
+  statuses: {
+    triggered: s__('AlertManagement|Triggered'),
+    acknowledged: s__('AlertManagement|Acknowledged'),
+    ignored: s__('AlertManagement|Ignored'),
+  },
   i18n: {
     fullAlertDetailsTitle: s__('AlertManagement|Full Alert Details'),
     overviewTitle: s__('AlertManagement|Overview'),
   },
   components: {
+    GlNewDropdown,
+    GlNewDropdownItem,
     GlTab,
     GlTabs,
   },
@@ -32,6 +42,16 @@ export default {
         </gl-tab>
         <gl-tab data-testid="fullDetailsTab" :title="$options.i18n.fullAlertDetailsTitle" />
       </gl-tabs>
+    </div>
+    <div class="d-flex justify-content-between">
+      <gl-new-dropdown :text="alertDetails[0].status">
+        <gl-new-dropdown-item
+          v-for="(label, field) in $options.statuses"
+          :key="field"
+          class="align-middle"
+          >{{ label }}
+        </gl-new-dropdown-item>
+      </gl-new-dropdown>
     </div>
   </div>
 </template>
