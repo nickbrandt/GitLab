@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import DesignNotePin from 'ee/design_management/components/design_note_pin.vue';
+import DesignNotePin from '~/design_management/components/design_note_pin.vue';
 
 describe('Design discussions component', () => {
   let wrapper;

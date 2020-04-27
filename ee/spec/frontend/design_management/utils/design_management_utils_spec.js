@@ -6,7 +6,7 @@ import {
   updateImageDiffNoteOptimisticResponse,
   isValidDesignFile,
   extractDesign,
-} from 'ee/design_management/utils/design_management_utils';
+} from '~/design_management/utils/design_management_utils';
 import mockResponseNoDesigns from '../mock_data/no_designs';
 import mockResponseWithDesigns from '../mock_data/designs';
 import mockDesign from '../mock_data/design';

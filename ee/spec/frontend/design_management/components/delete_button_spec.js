@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlDeprecatedButton, GlModal, GlModalDirective } from '@gitlab/ui';
-import BatchDeleteButton from 'ee/design_management/components/delete_button.vue';
+import BatchDeleteButton from '~/design_management/components/delete_button.vue';
 
 describe('Batch delete button component', () => {
   let wrapper;

@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import UploadButton from 'ee/design_management/components/upload/button.vue';
+import UploadButton from '~/design_management/components/upload/button.vue';
 
 describe('Design management upload button component', () => {
   let wrapper;

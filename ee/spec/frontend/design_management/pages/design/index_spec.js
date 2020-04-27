@@ -2,11 +2,11 @@ import { shallowMount } from '@vue/test-utils';
 import { GlAlert } from '@gitlab/ui';
 import { ApolloMutation } from 'vue-apollo';
 import createFlash from '~/flash';
-import DesignIndex from 'ee/design_management/pages/design/index.vue';
-import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
-import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
+import DesignIndex from '~/design_management/pages/design/index.vue';
+import DesignDiscussion from '~/design_management/components/design_notes/design_discussion.vue';
+import DesignReplyForm from '~/design_management/components/design_notes/design_reply_form.vue';
 import Participants from '~/sidebar/components/participants/participants.vue';
-import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
+import createImageDiffNoteMutation from '~/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
 import design from '../../mock_data/design';
 import mockResponseWithDesigns from '../../mock_data/designs';
 import mockResponseNoDesigns from '../../mock_data/no_designs';
@@ -14,8 +14,8 @@ import mockAllVersions from '../../mock_data/all_versions';
 import {
   DESIGN_NOT_FOUND_ERROR,
   DESIGN_VERSION_NOT_EXIST_ERROR,
-} from 'ee/design_management/utils/error_messages';
-import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
+} from '~/design_management/utils/error_messages';
+import { DESIGNS_ROUTE_NAME } from '~/design_management/router/constants';
 
 jest.mock('~/flash');
 jest.mock('mousetrap', () => ({

@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlIcon } from '@gitlab/ui';
-import DesignImage from 'ee/design_management/components/image.vue';
+import DesignImage from '~/design_management/components/image.vue';
 
 describe('Design management large image component', () => {
   let wrapper;

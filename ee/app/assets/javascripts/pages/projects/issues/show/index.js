@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRelatedIssues();
 
   if (document.getElementById('js-design-management')) {
-    import(/* webpackChunkName: 'design_management' */ 'ee/design_management')
+    import(/* webpackChunkName: 'design_management' */ '~/design_management')
       .then(module => module.default())
       .catch(() => {});
   }
