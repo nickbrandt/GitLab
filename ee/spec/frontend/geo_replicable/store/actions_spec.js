@@ -118,7 +118,7 @@ describe('GeoReplicable Store Actions', () => {
               expect(Api.getGeoReplicableItems).toHaveBeenCalledWith(MOCK_REPLICABLE_TYPE, {
                 page: 3,
                 search: 'test search',
-                sync_status: state.filterOptions[2],
+                sync_status: state.filterOptions[2].value,
               });
             },
           );

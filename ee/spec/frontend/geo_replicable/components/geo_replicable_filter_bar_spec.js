@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlTabs, GlTab, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlButton } from '@gitlab/ui';
 import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
 import store from 'ee/geo_replicable/store';
 import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/store/constants';
@@ -32,48 +32,53 @@ describe('GeoReplicableFilterBar', () => {
     wrapper.destroy();
   });
 
-  const findGlTabsContainer = () => wrapper.find(GlTabs);
-  const findGlTab = () => findGlTabsContainer().findAll(GlTab);
-  const findGlFormInput = () => findGlTabsContainer().find(GlFormInput);
-  const findGlDropdown = () => findGlTabsContainer().find(GlDropdown);
-  const findGlDropdownItem = () => findGlTabsContainer().find(GlDropdownItem);
+  const findNavContainer = () => wrapper.find('nav');
+  const findGlDropdown = () => findNavContainer().find(GlDropdown);
+  const findGlDropdownItems = () => findNavContainer().findAll(GlDropdownItem);
+  const findDropdownItemsText = () => findGlDropdownItems().wrappers.map(w => w.text());
+  const findGlSearchBox = () => findNavContainer().find(GlSearchBoxByType);
+  const findGlButton = () => findNavContainer().find(GlButton);
 
   describe('template', () => {
     beforeEach(() => {
       createComponent();
     });
 
-    describe('GlTab', () => {
-      it('renders', () => {
-        expect(findGlTabsContainer().exists()).toBe(true);
+    it('renders nav container always', () => {
+      expect(findNavContainer().exists()).toBeTruthy();
+    });
+
+    it('renders dropdown always', () => {
+      expect(findGlDropdown().exists()).toBeTruthy();
+    });
+
+    describe('Filter options', () => {
+      it('renders a dropdown item for each filterOption', () => {
+        expect(findDropdownItemsText()).toStrictEqual(wrapper.vm.filterOptions.map(n => n.label));
       });
 
-      it('calls setFilter when input event is fired', () => {
-        findGlTabsContainer().vm.$emit('input');
-        expect(actionSpies.setFilter).toHaveBeenCalled();
+      it('clicking a dropdown item calls setFilter with its index', () => {
+        const index = 1;
+        findGlDropdownItems()
+          .at(index)
+          .find('button')
+          .trigger('click');
+
+        expect(actionSpies.setFilter).toHaveBeenCalledWith(index);
       });
     });
 
-    it('renders an instance of GlTab for each FilterOption', () => {
-      expect(findGlTab().length).toBe(wrapper.vm.$store.state.filterOptions.length);
+    it('renders a search box always', () => {
+      expect(findGlSearchBox().exists()).toBeTruthy();
     });
 
-    it('renders GlFormInput', () => {
-      expect(findGlFormInput().exists()).toBe(true);
-    });
-
-    it('renders GlDropdown', () => {
-      expect(findGlDropdown().exists()).toBe(true);
-    });
-
-    describe('GlDropDownItem', () => {
-      it('renders', () => {
-        expect(findGlDropdownItem().exists()).toBe(true);
+    describe('Re-sync all button', () => {
+      it('renders always', () => {
+        expect(findGlButton().exists()).toBeTruthy();
       });
 
       it('calls initiateAllReplicableSyncs when clicked', () => {
-        const innerButton = findGlDropdownItem().find('button');
-        innerButton.trigger('click');
+        findGlButton().trigger('click');
         expect(actionSpies.initiateAllReplicableSyncs).toHaveBeenCalled();
       });
     });
