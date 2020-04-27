@@ -55,45 +55,46 @@ export default {
 
 <template>
   <gl-loading-icon v-if="loading" size="md" class="mt-3" />
-  <gl-table
-    v-else
-    :items="clusters"
-    :fields="$options.fields"
-    stacked="md"
-    variant="light"
-    class="qa-clusters-table"
-  >
-    <template #cell(name)="{item}">
-      <div>
-        <gl-link
-          data-qa-selector="cluster"
-          :data-qa-cluster-name="item.name"
-          :href="item.path"
-        >
-          {{ item.name }}
-        </gl-link>
+  <section v-else>
+    <gl-table
+      :items="clusters"
+      :fields="$options.fields"
+      stacked="md"
+      variant="light"
+      class="qa-clusters-table"
+    >
+      <template #cell(name)="{item}">
+        <div>
+          <gl-link
+            data-qa-selector="cluster"
+            :data-qa-cluster-name="item.name"
+            :href="item.path"
+          >
+            {{ item.name }}
+          </gl-link>
 
-        <gl-loading-icon
-          :id="`cluster-loading-${item.name}`"
-          size="sm"
-          v-gl-tooltip.hover="{ container: `cluster-loading-${item.name}` }"
-          v-if="item.status == 'creating'"
-          :title="__('Cluster is being created')"
-        />
+          <gl-loading-icon
+            :id="`cluster-loading-${item.name}`"
+            size="sm"
+            v-gl-tooltip.hover="{ container: `cluster-loading-${item.name}` }"
+            v-if="item.status == 'creating'"
+            :title="__('Cluster is being created')"
+          />
 
-        <gl-badge
-          v-if="!item.enabled"
-          variant="danger"
-        >
-          {{ __('Connection disabled') }}
+          <gl-badge
+            v-if="!item.enabled"
+            variant="danger"
+          >
+            {{ __('Connection disabled') }}
+          </gl-badge>
+        </div>
+      </template>
+
+      <template #cell(clusterType)="{value}">
+        <gl-badge variant="light">
+          {{ value }}
         </gl-badge>
-      </div>
-    </template>
-
-    <template #cell(clusterType)="{value}">
-      <gl-badge variant="light">
-        {{ value }}
-      </gl-badge>
-    </template>
-  </gl-table>
+      </template>
+    </gl-table>
+  </section>
 </template>
