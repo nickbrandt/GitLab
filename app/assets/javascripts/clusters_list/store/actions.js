@@ -6,14 +6,16 @@ import flash from '~/flash';
 import { __ } from '~/locale';
 import * as types from './mutation_types';
 
-export const fetchClusters = ({ state, commit }) => {
+export const fetchClusters = ({ state, commit }, page) => {
   commit(types.SET_LOADING_STATE, true);
+
+  const newPage = Number(page) || 1
 
   const poll = new Poll({
     resource: {
       fetchClusters: endpoint => axios.get(endpoint),
     },
-    data: state.endpoint,
+    data: `${state.endpoint}?page=${newPage}`,
     method: 'fetchClusters',
     successCallback: ({ data }) => {
       commit(types.SET_CLUSTERS_DATA, convertObjectPropsToCamelCase(data, { deep: true }));
@@ -37,10 +39,6 @@ export const fetchClusters = ({ state, commit }) => {
     }
   });
 };
-
-export const updateCurrentPage = () => {
-  // TODO
-}
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

@@ -43,16 +43,20 @@ export default {
     },
   ],
   computed: {
-    ...mapState(['clusters', 'clustersPerPage', 'currentPage', 'loading', 'totalPages']),
+    ...mapState(['clusters', 'clustersPerPage', 'loading', 'totalPages']),
+  },
+  data() {
+    return {
+      currentPage: 1,
+    }
   },
   mounted() {
-    this.fetchClusters();
+    this.queryClusterGroup();
   },
   methods: {
-    ...mapActions(['fetchClusters', 'updateCurrentPage']),
-    queryClusterGroup(page) {
-      this.updateCurrentPage(page)
-      // this.fetchClusters(page);
+    ...mapActions(['fetchClusters']),
+    queryClusterGroup() {
+      this.fetchClusters(this.currentPage)
     }
   },
 };

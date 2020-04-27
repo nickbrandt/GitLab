@@ -19,9 +19,4 @@ export default {
       totalPages
     });
   },
-  [types.SET_CURRENT_PAGE](state, newPage) {
-    const currentPage = Number(data.currentPage) || 1
-
-    state.currentPage = currentPage
-  }
 };
