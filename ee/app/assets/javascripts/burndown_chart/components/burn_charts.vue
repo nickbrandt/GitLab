@@ -56,7 +56,7 @@ export default {
 </script>
 
 <template>
-  <div data-qa-selector="burndown_chart">
+  <div>
     <div class="burndown-header d-flex align-items-center">
       <h3 ref="chartsTitle">{{ title }}</h3>
       <gl-button-group class="ml-3 js-burndown-data-selector">
