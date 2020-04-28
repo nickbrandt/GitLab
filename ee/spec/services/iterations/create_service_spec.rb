@@ -19,7 +19,9 @@ describe Iterations::CreateService do
         let(:params) do
           {
               title: 'v2.1.9',
-              description: 'Patch release to fix security issue'
+              description: 'Patch release to fix security issue',
+              start_date: Time.now.to_s,
+              due_date: 1.day.from_now.to_s
           }
         end
 
@@ -44,7 +46,7 @@ describe Iterations::CreateService do
 
           it 'does not create an iteration but returns errors' do
             expect(response.error?).to be_truthy
-            expect(errors.messages).to match({ title: ["can't be blank"] })
+            expect(errors.messages).to match({ title: ["can't be blank"], due_date: ["can't be blank"], start_date: ["can't be blank"] })
           end
         end
 
