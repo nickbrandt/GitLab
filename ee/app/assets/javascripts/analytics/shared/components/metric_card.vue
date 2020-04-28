@@ -45,7 +45,7 @@ export default {
             >
             <template v-else>{{ metric.value }}</template>
           </h3>
-          <p class="text-secondary gl-font-size-small mb-2">{{ metric.label }}</p>
+          <p class="text-secondary gl-font-sm mb-2">{{ metric.label }}</p>
         </div>
       </div>
     </template>

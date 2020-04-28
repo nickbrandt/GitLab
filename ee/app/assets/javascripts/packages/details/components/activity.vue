@@ -48,7 +48,7 @@ export default {
 
 <template>
   <div class="mb-3">
-    <h3 class="gl-font-size-16">{{ __('Activity') }}</h3>
+    <h3 class="gl-font-lg">{{ __('Activity') }}</h3>
 
     <div ref="commit-info" class="info-well">
       <div v-if="packagePipeline" class="well-segment">

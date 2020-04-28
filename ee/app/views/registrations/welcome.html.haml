@@ -1,7 +1,7 @@
 - page_title _('Your profile')
 
 .row.flex-grow-1.bg-gray-light
-  .d-flex.flex-column.align-items-center.w-100.gl-p-3
+  .d-flex.flex-column.align-items-center.w-100.gl-p-3-deprecated-no-really-do-not-use-me
     .edit-profile.login-page.d-flex.flex-column.align-items-center.pt-lg-3
       - if in_subscription_flow?
         #progress-bar
@@ -9,7 +9,7 @@
       %p
         .center= _('In order to personalize your experience with GitLab<br>we would like to know a bit more about you.').html_safe
 
-      = form_for(current_user, url: users_sign_up_update_registration_path, html: { class: 'card w-100 gl-p-3', 'aria-live' => 'assertive' }) do |f|
+      = form_for(current_user, url: users_sign_up_update_registration_path, html: { class: 'card w-100 gl-p-3-deprecated-no-really-do-not-use-me', 'aria-live' => 'assertive' }) do |f|
         .devise-errors
           = render 'devise/shared/error_messages', resource: current_user
         .row
