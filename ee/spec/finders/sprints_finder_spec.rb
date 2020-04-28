@@ -7,10 +7,10 @@ describe SprintsFinder do
   let_it_be(:group) { create(:group) }
   let_it_be(:project_1) { create(:project, namespace: group) }
   let_it_be(:project_2) { create(:project, namespace: group) }
-  let!(:started_group_sprint) { create(:sprint, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
+  let!(:started_group_sprint) { create(:sprint, :skip_future_date_validation, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
   let!(:upcoming_group_sprint) { create(:sprint, group: group, start_date: now + 1.day, due_date: now + 2.days) }
-  let!(:sprint_from_project_1) { create(:sprint, project: project_1, state: ::Sprint::STATE_ID_MAP[:active], start_date: now + 2.days, due_date: now + 3.days) }
-  let!(:sprint_from_project_2) { create(:sprint, project: project_2, state: ::Sprint::STATE_ID_MAP[:active], start_date: now + 4.days, due_date: now + 5.days) }
+  let!(:sprint_from_project_1) { create(:sprint, project: project_1, state_enum: ::Sprint::STATE_ENUM_MAP[:upcoming], start_date: now + 2.days, due_date: now + 3.days) }
+  let!(:sprint_from_project_2) { create(:sprint, project: project_2, state_enum: ::Sprint::STATE_ENUM_MAP[:upcoming], start_date: now + 4.days, due_date: now + 5.days) }
   let(:project_ids) { [project_1.id, project_2.id] }
 
   subject { described_class.new(params).execute }
@@ -39,7 +39,7 @@ describe SprintsFinder do
     end
 
     it 'orders sprints by due date' do
-      sprint = create(:sprint, group: group, due_date: now - 2.days)
+      sprint = create(:sprint, :skip_future_date_validation, group: group, start_date: now - 3.days, due_date: now - 2.days)
 
       expect(subject.first).to eq(sprint)
       expect(subject.second).to eq(started_group_sprint)
@@ -61,8 +61,8 @@ describe SprintsFinder do
       sprint_from_project_1.close
     end
 
-    it 'filters by active state' do
-      params[:state] = 'active'
+    it 'filters by upcoming state' do
+      params[:state] = 'upcoming'
 
       expect(subject).to contain_exactly(upcoming_group_sprint, sprint_from_project_2)
     end
@@ -93,15 +93,15 @@ describe SprintsFinder do
       end
 
       it 'returns sprints which start before the timeframe' do
-        sprint = create(:sprint, project: project_2, start_date: now - 5.days)
+        sprint = create(:sprint, :skip_future_date_validation, project: project_2, start_date: now - 5.days)
         params.merge!(start_date: now - 3.days, end_date: now - 2.days)
 
         expect(subject).to match_array([sprint])
       end
 
       it 'returns sprints which end after the timeframe' do
-        sprint = create(:sprint, project: project_2, due_date: now + 6.days)
-        params.merge!(start_date: now + 6.days, end_date: now + 7.days)
+        sprint = create(:sprint, project: project_2, start_date: now + 6.days, due_date: now + 7.days)
+        params.merge!(start_date: now + 7.days, end_date: now + 8.days)
 
         expect(subject).to match_array([sprint])
       end

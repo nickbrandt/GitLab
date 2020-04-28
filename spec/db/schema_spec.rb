@@ -70,6 +70,7 @@ describe 'Database schema' do
     sent_notifications: %w[project_id noteable_id recipient_id commit_id in_reply_to_discussion_id],
     snippets: %w[author_id],
     spam_logs: %w[user_id],
+    sprints: %w[state_id],
     subscriptions: %w[user_id subscribable_id],
     slack_integrations: %w[team_id user_id],
     taggings: %w[tag_id taggable_id tagger_id],
