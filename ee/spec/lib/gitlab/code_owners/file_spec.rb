@@ -52,7 +52,7 @@ describe Gitlab::CodeOwners::File do
         data = file.parsed_data
 
         expect(data.keys.length).to eq(1)
-        expect(data.keys).to contain_exactly(::Gitlab::CodeOwners::Entry::DEFAULT_SECTION.downcase)
+        expect(data.keys).to contain_exactly(::Gitlab::CodeOwners::Entry::DEFAULT_SECTION)
       end
 
       context "when CODEOWNERS file contains multiple sections" do
@@ -66,13 +66,13 @@ describe Gitlab::CodeOwners::File do
           data = file.parsed_data
 
           expect(data.keys.length).to eq(3)
-          expect(data.keys).to contain_exactly("codeowners", "documentation", "database")
+          expect(data.keys).to contain_exactly("codeowners", "Documentation", "Database")
         end
 
         where(:section, :patterns) do
           "codeowners"    | ["/**/ee/**/*"]
-          "documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"]
-          "database"      | ["/**/README.md", "/**/model/db"]
+          "Documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"]
+          "Database"      | ["/**/README.md", "/**/model/db"]
         end
 
         with_them do

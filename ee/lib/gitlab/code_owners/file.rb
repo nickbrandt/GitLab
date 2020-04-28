@@ -60,7 +60,7 @@ module Gitlab
 
       def get_parsed_sectional_data
         parsed = {}
-        section = ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION.downcase
+        section = ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION
 
         parsed[section] = {}
 
@@ -70,13 +70,13 @@ module Gitlab
           next if skip?(line)
 
           if line.starts_with?('[') && line.end_with?(']')
-            section = line[1...-1].downcase
+            section = line[1...-1].strip
             parsed[section] ||= {}
 
             next
           end
 
-          extract_entry_and_populate_parsed(line, parsed, section.downcase)
+          extract_entry_and_populate_parsed(line, parsed, section)
         end
 
         parsed
