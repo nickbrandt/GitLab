@@ -1070,6 +1070,9 @@ msgstr ""
 msgid "AccessibilityReport|New"
 msgstr ""
 
+msgid "AccessibilityReport|The accessibility scanning found an error of the following type: %{code}"
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -17301,6 +17304,20 @@ msgid "Reporting"
 msgstr ""
 
 msgid "Reports|%{combinedString} and %{resolvedString}"
+msgstr ""
+
+msgid "Reports|Accessibility scanning detected %d issue for the source branch only"
+msgid_plural "Reports|Accessibility scanning detected %d issues for the source branch only"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Reports|Accessibility scanning detected no issues for the source branch only"
+msgstr ""
+
+msgid "Reports|Accessibility scanning failed loading results"
+msgstr ""
+
+msgid "Reports|Accessibility scanning results are being parsed"
 msgstr ""
 
 msgid "Reports|Actions"
