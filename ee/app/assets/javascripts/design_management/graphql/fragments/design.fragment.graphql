@@ -9,16 +9,12 @@ fragment DesignItem on Design {
     ...DesignDiffRefs
   }
   discussions {
-    edges {
-      node {
-        id
-        replyId
-        notes {
-          edges {
-            node {
-              ...DesignNote
-            }
-          }
+    nodes {
+      id
+      replyId
+      notes {
+        nodes {
+          ...DesignNote
         }
       }
     }

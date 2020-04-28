@@ -78,12 +78,18 @@ export default {
     },
     design: {
       query: getDesignQuery,
-      fetchPolicy: fetchPolicies.NETWORK_ONLY,
+      // We want to see cached design version if we have one, and fetch newer version on the background to update discussions
+      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
       variables() {
         return this.designVariables;
       },
       update: data => extractDesign(data),
-      result({ data }) {
+      result({ data, loading }) {
+        // On the initial load with cache-and-network policy data is undefined while loading is true
+        // To prevent throwing an error, we don't perform any logic until loading is false
+        if (loading) {
+          return;
+        }
         if (!data) {
           this.onQueryError(DESIGN_NOT_FOUND_ERROR);
         }
@@ -97,8 +103,10 @@ export default {
     },
   },
   computed: {
-    isLoading() {
-      return this.$apollo.queries.design.loading;
+    isFirstLoading() {
+      // We only want to show spinner on initial design load (when opened from a deep link to design)
+      // If we already have cached a design, loading shouldn't be indicated to user
+      return this.$apollo.queries.design.loading && !this.design.filename;
     },
     discussions() {
       return extractDiscussions(this.design.discussions);
@@ -256,7 +264,7 @@ export default {
   <div
     class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
   >
-    <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
+    <gl-loading-icon v-if="isFirstLoading" size="xl" class="align-self-center" />
     <template v-else>
       <div class="d-flex overflow-hidden flex-grow-1 flex-column position-relative">
         <design-destroyer

@@ -1,7 +1,7 @@
 import { propertyOf } from 'lodash';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import projectQuery from '../graphql/queries/project.query.graphql';
+import getDesignListQuery from '../graphql/queries/get_design_list.query.graphql';
 import { extractNodes } from '../utils/design_management_utils';
 import allVersionsMixin from './all_versions';
 import { DESIGNS_ROUTE_NAME } from '../router/constants';
@@ -10,7 +10,7 @@ export default {
   mixins: [allVersionsMixin],
   apollo: {
     designs: {
-      query: projectQuery,
+      query: getDesignListQuery,
       variables() {
         return {
           fullPath: this.projectPath,
