@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class Dependencies < Grape::API::Instance
+  class Dependencies < Grape::API
     helpers do
       def dependencies_by(params)
         pipeline = ::Security::ReportFetchService.new(user_project, ::Ci::JobArtifact.dependency_list_reports).pipeline
@@ -28,7 +28,6 @@ module API
       params do
         optional :package_manager,
                  type: Array[String],
-                 coerce_with: Validations::Types::CommaSeparatedToArray.coerce,
                  desc: "Returns dependencies belonging to specified package managers: #{::Security::DependencyListService::FILTER_PACKAGE_MANAGERS_VALUES.join(', ')}.",
                  values: ::Security::DependencyListService::FILTER_PACKAGE_MANAGERS_VALUES
       end

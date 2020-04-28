@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class DependencyProxy < Grape::API::Instance
+  class DependencyProxy < Grape::API
     helpers ::API::Helpers::PackagesHelpers
 
     helpers do

@@ -79,7 +79,6 @@ RSpec.shared_examples 'an API endpoint for updating project approval rule' do
   shared_examples 'a user with access' do
     before do
       project.add_developer(approver)
-      project.add_developer(other_approver)
     end
 
     context 'when protected_branch_ids param is present' do
@@ -118,10 +117,10 @@ RSpec.shared_examples 'an API endpoint for updating project approval rule' do
 
     it 'sets approvers' do
       expect do
-        put api(url, current_user), params: { users: "#{approver.id},#{other_approver.id}" }
-      end.to change { approval_rule.users.count }.from(0).to(2)
+        put api(url, current_user), params: { users: [approver.id] }
+      end.to change { approval_rule.users.count }.from(0).to(1)
 
-      expect(approval_rule.users).to contain_exactly(approver, other_approver)
+      expect(approval_rule.users).to contain_exactly(approver)
       expect(approval_rule.groups).to be_empty
 
       expect(response).to have_gitlab_http_status(:ok)

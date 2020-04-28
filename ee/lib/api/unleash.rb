@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class Unleash < Grape::API::Instance
+  class Unleash < Grape::API
     include PaginationParams
 
     namespace :feature_flags do

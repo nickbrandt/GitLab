@@ -2,7 +2,7 @@
 
 module EE
   module API
-    class GroupBoards < ::Grape::API::Instance
+    class GroupBoards < ::Grape::API
       include ::API::PaginationParams
       include ::API::BoardsResponses
 
