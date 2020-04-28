@@ -11,7 +11,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
-        resources :requirements, only: [:index]
+        namespace :requirements_management do
+          resources :requirements, only: [:index]
+        end
+
         resources :packages, only: [:index, :show, :destroy], module: :packages
         resources :package_files, only: [], module: :packages do
           member do
