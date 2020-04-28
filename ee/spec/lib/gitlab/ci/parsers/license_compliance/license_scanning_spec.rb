@@ -130,14 +130,14 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
     context 'when the report version is not recognized' do
       it do
         expect do
-          subject.parse!(JSON.pretty_generate({ version: 'x' }), report)
+          subject.parse!(Gitlab::Json.pretty_generate({ version: 'x' }), report)
         end.to raise_error(KeyError)
       end
     end
 
     context 'when the report version is missing' do
       before do
-        subject.parse!(JSON.pretty_generate({}), report)
+        subject.parse!(Gitlab::Json.pretty_generate({}), report)
       end
 
       it { expect(report.version).to eq('1.0') }
@@ -146,7 +146,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
 
     context 'when the report version is nil' do
       before do
-        subject.parse!(JSON.pretty_generate({ version: nil }), report)
+        subject.parse!(Gitlab::Json.pretty_generate({ version: nil }), report)
       end
 
       it { expect(report.version).to eq('1.0') }
@@ -155,7 +155,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
 
     context 'when the report version is blank' do
       before do
-        subject.parse!(JSON.pretty_generate({ version: '' }), report)
+        subject.parse!(Gitlab::Json.pretty_generate({ version: '' }), report)
       end
 
       it { expect(report.version).to eq('1.0') }
@@ -163,7 +163,7 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
     end
 
     context 'when the report is structured as an array' do
-      let(:invalid_json) { JSON.pretty_generate([]) }
+      let(:invalid_json) { Gitlab::Json.pretty_generate([]) }
 
       before do
         subject.parse!(invalid_json, report)

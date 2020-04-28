@@ -10,7 +10,7 @@ module Gitlab
           PARSERS = { '1' => V1, '2' => V2 }.freeze
 
           def parse!(json_data, report)
-            json = JSON.parse(json_data, symbolize_names: true, object_class: Hash)
+            json = Gitlab::Json.parse(json_data, symbolize_names: true, object_class: Hash)
             return unless json.is_a?(Hash)
 
             report.version = json[:version].presence || DEFAULT_VERSION

@@ -9,7 +9,7 @@ describe 'Show trial banner', :js do
   let!(:group) { create(:group) }
   let!(:gold_plan) { create(:gold_plan) }
   let(:plans_data) do
-    JSON.parse(File.read(Rails.root.join('ee/spec/fixtures/gitlab_com_plans.json'))).map do |data|
+    Gitlab::Json.parse(File.read(Rails.root.join('ee/spec/fixtures/gitlab_com_plans.json'))).map do |data|
       data.deep_symbolize_keys
     end
   end

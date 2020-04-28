@@ -8,11 +8,9 @@ describe Packages::Npm::CreatePackageService do
   let(:version) { '1.0.1' }
 
   let(:params) do
-    JSON.parse(
-      fixture_file('npm/payload.json', dir: 'ee')
+    Gitlab::Json.parse(fixture_file('npm/payload.json', dir: 'ee')
         .gsub('@root/npm-test', package_name)
-        .gsub('1.0.1', version)
-    ).with_indifferent_access
+        .gsub('1.0.1', version)).with_indifferent_access
       .merge!(override)
   end
   let(:override) { {} }

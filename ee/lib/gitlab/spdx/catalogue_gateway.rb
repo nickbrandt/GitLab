@@ -22,7 +22,7 @@ module Gitlab
       private
 
       def parse(json)
-        build_catalogue(JSON.parse(json, symbolize_names: true))
+        build_catalogue(Gitlab::Json.parse(json, symbolize_names: true))
       end
 
       def record_failure(tags = {})

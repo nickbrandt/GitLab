@@ -47,7 +47,7 @@ describe StatusPage::IncidentCommentsFinder do
 
   describe 'award emoji' do
     let(:digest_path) { Rails.root.join(*%w[fixtures emojis digests.json]) }
-    let(:digest_json) { JSON.parse(File.read(digest_path)) }
+    let(:digest_json) { Gitlab::Json.parse(File.read(digest_path)) }
 
     it 'ensures that emoji exists' do
       expect(digest_json).to include(visible_emoji)

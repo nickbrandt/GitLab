@@ -105,7 +105,7 @@ RSpec.shared_examples 'cluster metrics' do
         let(:prometheus_body) { '{"status":"success"}' }
 
         it 'returns prometheus response' do
-          prometheus_json_body = JSON.parse(prometheus_body)
+          prometheus_json_body = Gitlab::Json.parse(prometheus_body)
 
           get :prometheus_proxy, params: prometheus_proxy_params
 
