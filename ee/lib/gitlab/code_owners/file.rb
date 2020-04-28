@@ -87,12 +87,10 @@ module Gitlab
 
         normalized_pattern = normalize_pattern(pattern)
 
-        entry = Entry.new(pattern, owners, section)
-
         if section
-          parsed[section][normalized_pattern] = entry
+          parsed[section][normalized_pattern] = Entry.new(pattern, owners, section)
         else
-          parsed[normalized_pattern] = entry
+          parsed[normalized_pattern] = Entry.new(pattern, owners)
         end
       end
 
