@@ -1,7 +1,8 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlFilteredSearch, GlFilteredSearchToken } from '@gitlab/ui';
+import { GlFilteredSearch } from '@gitlab/ui';
 import { __ } from '~/locale';
+import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 
 export default {
   components: {
@@ -17,6 +18,7 @@ export default {
       milestonePath: 'milestonePath',
       labelsPath: 'labelsPath',
       milestones: state => state.milestones.data,
+      milestonesLoading: state => state.milestones.isLoading,
     }),
     tokens() {
       return [
@@ -24,9 +26,11 @@ export default {
           icon: 'clock',
           title: __('Milestone'),
           type: 'milestone',
-          token: GlFilteredSearchToken,
-          options: this.milestones,
+          token: MilestoneToken,
+          milestones: this.milestones,
           unique: true,
+          symbol: '%',
+          isLoading: this.milestonesLoading,
         },
       ];
     },
@@ -36,22 +40,30 @@ export default {
   },
   methods: {
     ...mapActions('filters', ['fetchMilestones', 'setFilters']),
-    filteredSearchSubmit(filters) {
-      const result = filters.reduce((acc, item) => {
-        const {
-          type,
-          value: { data },
-        } = item;
+    processFilters(filters) {
+      return filters.reduce((acc, token) => {
+        const { type, value } = token;
+        let tokenValue = value.data;
+
+        // remove wrapping double quotes which were added for token values that include spaces
+        if (
+          (tokenValue[0] === "'" && tokenValue[tokenValue.length - 1] === "'") ||
+          (tokenValue[0] === '"' && tokenValue[tokenValue.length - 1] === '"')
+        ) {
+          tokenValue = tokenValue.slice(1, -1);
+        }
 
         if (!acc[type]) {
           acc[type] = [];
         }
 
-        acc[type].push(data);
+        acc[type].push(tokenValue);
         return acc;
       }, {});
-
-      this.setFilters({ label_name: result.label, milestone_title: result.milestone });
+    },
+    filteredSearchSubmit(filters) {
+      const { label, milestone } = this.processFilters(filters);
+      this.setFilters({ label_name: label, milestone_title: milestone });
     },
   },
 };

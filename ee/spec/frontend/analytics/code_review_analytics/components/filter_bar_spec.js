@@ -73,9 +73,9 @@ describe('FilteredSearchBar', () => {
     });
 
     it('displays options in the milestone token', () => {
-      const { options } = getSearchToken(milestoneTokenType);
+      const { milestones: milestoneToken } = getSearchToken(milestoneTokenType);
 
-      expect(options).toHaveLength(mockMilestones.length);
+      expect(milestoneToken).toHaveLength(mockMilestones.length);
     });
   });
 
@@ -95,6 +95,51 @@ describe('FilteredSearchBar', () => {
         {
           label_name: undefined,
           milestone_title: ['my-milestone'],
+        },
+        undefined,
+      );
+    });
+
+    it('removes wrapping double quotes from the data and dispatches setFilters', () => {
+      findFilteredSearch().vm.$emit('submit', [
+        { type: 'milestone', value: { data: '"milestone with spaces"', operator: '=' } },
+      ]);
+
+      expect(setFiltersMock).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          label_name: undefined,
+          milestone_title: ['milestone with spaces'],
+        },
+        undefined,
+      );
+    });
+
+    it('removes wrapping single quotes from the data and dispatches setFilters', () => {
+      findFilteredSearch().vm.$emit('submit', [
+        { type: 'milestone', value: { data: "'milestone with spaces'", operator: '=' } },
+      ]);
+
+      expect(setFiltersMock).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          label_name: undefined,
+          milestone_title: ['milestone with spaces'],
+        },
+        undefined,
+      );
+    });
+
+    it('does not remove inner double quotes from the data and dispatches setFilters ', () => {
+      findFilteredSearch().vm.$emit('submit', [
+        { type: 'milestone', value: { data: 'milestone "with" spaces', operator: '=' } },
+      ]);
+
+      expect(setFiltersMock).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          label_name: undefined,
+          milestone_title: ['milestone "with" spaces'],
         },
         undefined,
       );
