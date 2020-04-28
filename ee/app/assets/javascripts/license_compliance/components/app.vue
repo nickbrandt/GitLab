@@ -49,7 +49,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(LICENSE_LIST, ['initialized', 'licenses', 'reportInfo', 'listTypes']),
+    ...mapState(LICENSE_LIST, ['initialized', 'licenses', 'reportInfo', 'listTypes', 'pageInfo']),
     ...mapState(LICENSE_MANAGEMENT, ['managedLicenses']),
     ...mapGetters(LICENSE_LIST, ['isJobSetUp', 'isJobFailed', 'hasPolicyViolations']),
     hasEmptyState() {
@@ -59,7 +59,7 @@ export default {
       return Boolean(this.glFeatures.licensePolicyList);
     },
     licenseCount() {
-      return this.licenses.length;
+      return this.pageInfo.total;
     },
     policyCount() {
       return this.managedLicenses.length;

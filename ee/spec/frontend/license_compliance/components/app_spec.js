@@ -153,6 +153,9 @@ describe('Project Licenses', () => {
             generatedAt: '',
             status: REPORT_STATUS.ok,
           },
+          pageInfo: {
+            total: 24,
+          },
         },
         options: {
           provide: {
@@ -174,6 +177,14 @@ describe('Project Licenses', () => {
 
     it('it renders the "Detected in project" table', () => {
       expect(wrapper.find(DetectedLicensesTable).exists()).toBe(true);
+    });
+
+    it('it renders the correct count in "Detected in project" tab', () => {
+      expect(wrapper.vm.licenseCount).toBe(24);
+    });
+
+    it('it renders the correct count in "Policies" tab', () => {
+      expect(wrapper.vm.policyCount).toBe(2);
     });
 
     it('it renders the "Policies" table', () => {
