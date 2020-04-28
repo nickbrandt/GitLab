@@ -1809,6 +1809,9 @@ msgstr ""
 msgid "Allow only the selected protocols to be used for Git access."
 msgstr ""
 
+msgid "Allow owners to manage default branch protection per group"
+msgstr ""
+
 msgid "Allow owners to manually add users outside of LDAP"
 msgstr ""
 

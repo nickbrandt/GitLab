@@ -158,6 +158,60 @@ describe API::Groups do
         end
       end
     end
+
+    context 'default_branch_protection' do
+      using RSpec::Parameterized::TableSyntax
+
+      let(:params) { { default_branch_protection: Gitlab::Access::PROTECTION_NONE } }
+
+      context 'authenticated as an admin' do
+        let(:user) { admin }
+
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_NONE
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it 'updates the attribute as expected' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response['default_branch_protection']).to eq(default_branch_protection)
+          end
+        end
+      end
+
+      context 'authenticated a normal user' do
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_FULL
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it 'updates the attribute as expected' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response['default_branch_protection']).to eq(default_branch_protection)
+          end
+        end
+      end
+    end
   end
 
   describe "POST /groups" do
@@ -193,6 +247,64 @@ describe API::Groups do
             expect(created_group.shared_runners_minutes_limit).to eq(133)
             expect(response).to have_gitlab_http_status(:created)
             expect(json_response['shared_runners_minutes_limit']).to eq(133)
+          end
+        end
+      end
+    end
+
+    context 'when creating a group with `default_branch_protection` attribute' do
+      using RSpec::Parameterized::TableSyntax
+
+      let(:params) { attributes_for_group_api(default_branch_protection: Gitlab::Access::PROTECTION_NONE) }
+
+      subject do
+        post api("/groups", user), params: params
+      end
+
+      context 'authenticated as an admin' do
+        let(:user) { admin }
+
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_NONE
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it 'creates the group with the expected `default_branch_protection` value' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:created)
+            expect(json_response['default_branch_protection']).to eq(default_branch_protection)
+          end
+        end
+      end
+
+      context 'authenticated a normal user' do
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_FULL
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it 'creates the group with the expected `default_branch_protection` value' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:created)
+            expect(json_response['default_branch_protection']).to eq(default_branch_protection)
           end
         end
       end

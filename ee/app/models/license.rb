@@ -59,6 +59,7 @@ class License < ApplicationRecord
     custom_project_templates
     cycle_analytics_for_groups
     db_load_balancing
+    default_branch_protection_restriction_in_groups
     default_project_deletion_protection
     dependency_proxy
     deploy_board
@@ -201,6 +202,7 @@ class License < ApplicationRecord
     custom_file_templates
     custom_project_templates
     db_load_balancing
+    default_branch_protection_restriction_in_groups
     elastic_search
     enterprise_templates
     extended_audit_events

@@ -247,6 +247,67 @@ describe GroupsController do
         expect(response).to have_gitlab_http_status(:found)
       end
     end
+
+    context 'when creating a group with `default_branch_protection` attribute' do
+      using RSpec::Parameterized::TableSyntax
+
+      let(:params) do
+        { group: { name: 'new_group', path: 'new_group', default_branch_protection: Gitlab::Access::PROTECTION_NONE } }
+      end
+
+      subject { post :create, params: params }
+
+      shared_examples_for 'creates the group with the expected `default_branch_protection` value' do
+        it 'creates the group with the expected `default_branch_protection` value' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:found)
+          expect(Group.last.default_branch_protection).to eq(default_branch_protection)
+        end
+      end
+
+      context 'authenticated as an admin', :enable_admin_mode do
+        let_it_be(:user) { create(:admin) }
+
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_NONE
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            sign_in(user)
+
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it_behaves_like 'creates the group with the expected `default_branch_protection` value'
+        end
+      end
+
+      context 'authenticated a normal user' do
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_FULL
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            sign_in(user)
+
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it_behaves_like 'creates the group with the expected `default_branch_protection` value'
+        end
+      end
+    end
   end
 
   describe 'PUT #update' do
@@ -366,6 +427,68 @@ describe GroupsController do
 
             subject
           end
+        end
+      end
+    end
+
+    context 'when `default_branch_protection` is specified' do
+      using RSpec::Parameterized::TableSyntax
+
+      let(:params) do
+        { id: group.to_param, group: { default_branch_protection: Gitlab::Access::PROTECTION_NONE } }
+      end
+
+      subject { put :update, params: params }
+
+      shared_examples_for 'updates the attribute' do
+        it 'updates the attribute' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:found)
+          expect(group.reload.default_branch_protection).to eq(default_branch_protection)
+        end
+      end
+
+      context 'authenticated as admin', :enable_admin_mode do
+        let_it_be(:user) { create(:admin) }
+
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_NONE
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            sign_in(user)
+
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it_behaves_like 'updates the attribute'
+        end
+      end
+
+      context 'authenticated as group owner' do
+        where(:feature_enabled, :setting_enabled, :default_branch_protection) do
+          false | false | Gitlab::Access::PROTECTION_NONE
+          false | true  | Gitlab::Access::PROTECTION_NONE
+          true  | false | Gitlab::Access::PROTECTION_FULL
+          false | false | Gitlab::Access::PROTECTION_NONE
+        end
+
+        with_them do
+          before do
+            group.add_owner(user)
+            sign_in(user)
+
+            stub_licensed_features(default_branch_protection_restriction_in_groups: feature_enabled)
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: setting_enabled)
+          end
+
+          it_behaves_like 'updates the attribute'
         end
       end
     end
