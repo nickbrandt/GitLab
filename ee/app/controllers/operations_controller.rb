@@ -2,7 +2,6 @@
 
 class OperationsController < ApplicationController
   before_action :authorize_read_operations_dashboard!
-  before_action :environments_dashboard_feature_flag, only: %i[environments environments_list]
 
   respond_to :json, only: [:list]
 
@@ -54,10 +53,6 @@ class OperationsController < ApplicationController
 
   def authorize_read_operations_dashboard!
     render_404 unless can?(current_user, :read_operations_dashboard)
-  end
-
-  def environments_dashboard_feature_flag
-    render_404 unless Feature.enabled?(:environments_dashboard, current_user, default_enabled: true)
   end
 
   def load_projects

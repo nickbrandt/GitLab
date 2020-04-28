@@ -67,34 +67,18 @@ describe DashboardHelper, type: :helper do
     end
 
     describe 'environments dashboard link' do
-      context 'when the feature is enabled' do
-        before do
-          stub_feature_flags(environments_dashboard: true)
-        end
-
-        context 'and the feature is available on the license' do
-          context 'and the user is authenticated' do
-            before do
-              stub_user_permissions_for(:operations, true)
-            end
-
-            it 'is included in the nav' do
-              expect(helper.dashboard_nav_links).to include(:environments)
-            end
+      context 'and the feature is available on the license' do
+        context 'and the user is authenticated' do
+          before do
+            stub_user_permissions_for(:operations, true)
           end
 
-          context 'and the user is not authenticated' do
-            before do
-              stub_user_permissions_for(:operations, false)
-            end
-
-            it 'is not included in the nav' do
-              expect(helper.dashboard_nav_links).not_to include(:environments)
-            end
+          it 'is included in the nav' do
+            expect(helper.dashboard_nav_links).to include(:environments)
           end
         end
 
-        context 'and the feature is not available on the license' do
+        context 'and the user is not authenticated' do
           before do
             stub_user_permissions_for(:operations, false)
           end
@@ -105,9 +89,8 @@ describe DashboardHelper, type: :helper do
         end
       end
 
-      context 'when the feature is not enabled' do
+      context 'and the feature is not available on the license' do
         before do
-          stub_feature_flags(environments_dashboard: false)
           stub_user_permissions_for(:operations, false)
         end
 

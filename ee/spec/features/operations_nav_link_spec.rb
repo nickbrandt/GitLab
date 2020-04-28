@@ -11,7 +11,6 @@ describe 'Operations dropdown navbar EE' do
     sign_in(user)
 
     stub_licensed_features(operations_dashboard: true)
-    stub_feature_flags(environments_dashboard: true)
 
     visit project_issues_path(project)
   end
