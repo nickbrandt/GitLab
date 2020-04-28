@@ -12,7 +12,7 @@ module Mutations
             description: 'Vulnerabilities after dismissal'
 
       argument :vulnerability_ids,
-               GraphQL::ID_TYPE,
+               [GraphQL::ID_TYPE],
                required: true,
                description: 'IDs of the vulnerabilities to be dismissed'
 
