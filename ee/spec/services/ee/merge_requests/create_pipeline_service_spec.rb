@@ -76,14 +76,6 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
       it_behaves_like 'detached merge request pipeline'
     end
 
-    context 'when ci_use_merge_request_ref feature flag is disabled' do
-      before do
-        stub_feature_flags(ci_use_merge_request_ref: false)
-      end
-
-      it_behaves_like 'detached merge request pipeline'
-    end
-
     context 'when merge request is submitted from fork' do
       let(:source_project) { fork_project(project, nil, repository: true) }
 
