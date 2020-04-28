@@ -129,29 +129,14 @@ describe API::GroupPackages do
         it_behaves_like 'returns paginated packages'
       end
 
-      context 'filtering on package_type' do
-        let_it_be(:package1) { create(:conan_package, project: project) }
-        let_it_be(:package2) { create(:maven_package, project: project) }
-        let_it_be(:package3) { create(:npm_package, project: project) }
-        let_it_be(:package4) { create(:nuget_package, project: project) }
+      it_behaves_like 'filters on each package_type', is_project: false
 
-        context 'for each type' do
-          %w[conan maven npm nuget].each do |package_type|
-            it "returns #{package_type} packages" do
-              url = "/groups/#{group.id}/packages?package_type=#{package_type}"
+      context 'does not accept non supported package_type value' do
+        include_context 'package filter context'
 
-              get api(url)
+        let(:url) { group_filter_url(:type, 'foo') }
 
-              expect(json_response.map { |package| package['package_type'] }).to eq([package_type])
-            end
-          end
-        end
-
-        context 'does not accept non supported package_type value' do
-          let(:url) { "/groups/#{group.id}/packages?package_type=foo" }
-
-          it_behaves_like 'returning response status', :bad_request
-        end
+        it_behaves_like 'returning response status', :bad_request
       end
     end
 

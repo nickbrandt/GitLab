@@ -142,6 +142,42 @@ RSpec.shared_examples 'background upload schedules a file migration' do
   end
 end
 
+RSpec.shared_context 'package filter context' do
+  def package_filter_url(filter, param)
+    "/projects/#{project.id}/packages?package_#{filter}=#{param}"
+  end
+
+  def group_filter_url(filter, param)
+    "/groups/#{group.id}/packages?package_#{filter}=#{param}"
+  end
+end
+
+RSpec.shared_examples 'filters on each package_type' do |is_project: false|
+  include_context 'package filter context'
+
+  let_it_be(:package1) { create(:conan_package, project: project) }
+  let_it_be(:package2) { create(:maven_package, project: project) }
+  let_it_be(:package3) { create(:npm_package, project: project) }
+  let_it_be(:package4) { create(:nuget_package, project: project) }
+  let_it_be(:package5) { create(:pypi_package, project: project) }
+  let_it_be(:package6) { create(:composer_package, project: project) }
+
+  Packages::Package.package_types.keys.each do |package_type|
+    context "for package type #{package_type}" do
+      let(:url) { is_project ? package_filter_url(:type, package_type) : group_filter_url(:type, package_type) }
+
+      subject { get api(url, user) }
+
+      it "returns #{package_type} packages" do
+        subject
+
+        expect(json_response.length).to eq(1)
+        expect(json_response.map { |package| package['package_type'] }).to contain_exactly(package_type)
+      end
+    end
+  end
+end
+
 shared_examples 'package workhorse uploads' do
   context 'without a workhorse header' do
     let(:workhorse_token) { JWT.encode({ 'iss' => 'invalid header' }, Gitlab::Workhorse.secret, 'HS256') }
