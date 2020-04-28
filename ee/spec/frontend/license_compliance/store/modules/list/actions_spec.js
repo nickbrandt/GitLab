@@ -141,6 +141,8 @@ describe('Licenses actions', () => {
           const paramsDefault = {
             page: state.pageInfo.page,
             per_page: 10,
+            sort_by: 'classifcation',
+            sort_direction: 'desc',
           };
 
           mock
@@ -174,6 +176,8 @@ describe('Licenses actions', () => {
         const paramsSent = {
           ...paramsGiven,
           per_page: 10,
+          sort_by: 'classifcation',
+          sort_direction: 'desc',
         };
 
         beforeEach(() => {

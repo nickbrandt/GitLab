@@ -21,6 +21,8 @@ export const fetchLicenses = ({ state, dispatch }, params = {}) => {
       params: {
         per_page: 10,
         page: state.pageInfo.page || 1,
+        sort_by: 'classifcation',
+        sort_direction: 'desc',
         ...params,
       },
     })
