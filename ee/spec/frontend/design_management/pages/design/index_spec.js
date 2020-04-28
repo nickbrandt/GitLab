@@ -8,8 +8,13 @@ import DesignReplyForm from 'ee/design_management/components/design_notes/design
 import Participants from '~/sidebar/components/participants/participants.vue';
 import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
 import design from '../../mock_data/design';
+import mockResponseWithDesigns from '../../mock_data/designs';
 import mockResponseNoDesigns from '../../mock_data/no_designs';
-import { DESIGN_NOT_FOUND_ERROR } from 'ee/design_management/utils/error_messages';
+import mockAllVersions from '../../mock_data/all_versions';
+import {
+  DESIGN_NOT_FOUND_ERROR,
+  DESIGN_VERSION_NOT_EXIST_ERROR,
+} from 'ee/design_management/utils/error_messages';
 import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
 
 jest.mock('~/flash');
@@ -53,7 +58,7 @@ describe('Design management design index page', () => {
   const findDiscussionForm = () => wrapper.find(DesignReplyForm);
   const findParticipants = () => wrapper.find(Participants);
 
-  function createComponent(loading = false) {
+  function createComponent(loading = false, { routeQuery = {} } = {}) {
     const $apollo = {
       queries: {
         design: {
@@ -65,12 +70,15 @@ describe('Design management design index page', () => {
 
     const $router = {
       push: routerPush,
-      query: {},
+    };
+
+    const $route = {
+      query: routeQuery,
     };
 
     wrapper = shallowMount(DesignIndex, {
       propsData: { id: '1' },
-      mocks: { $apollo, $router },
+      mocks: { $apollo, $router, $route },
       stubs: {
         ApolloMutation,
       },
@@ -84,6 +92,12 @@ describe('Design management design index page', () => {
   function setDesign() {
     createComponent(true);
     wrapper.vm.$apollo.queries.design.loading = false;
+  }
+
+  function setDesignData() {
+    wrapper.setData({
+      design,
+    });
   }
 
   afterEach(() => {
@@ -100,10 +114,7 @@ describe('Design management design index page', () => {
 
   it('renders design index', () => {
     setDesign();
-
-    wrapper.setData({
-      design,
-    });
+    setDesignData();
 
     return wrapper.vm.$nextTick().then(() => {
       expect(wrapper.element).toMatchSnapshot();
@@ -113,10 +124,7 @@ describe('Design management design index page', () => {
 
   it('renders participants', () => {
     setDesign();
-
-    wrapper.setData({
-      design,
-    });
+    setDesignData();
 
     return wrapper.vm.$nextTick().then(() => {
       expect(findParticipants().exists()).toBe(true);
@@ -153,10 +161,7 @@ describe('Design management design index page', () => {
   describe('when has discussions', () => {
     beforeEach(() => {
       setDesign();
-
-      wrapper.setData({
-        design,
-      });
+      setDesignData();
     });
 
     it('renders correct amount of discussions', () => {
@@ -258,16 +263,35 @@ describe('Design management design index page', () => {
   });
 
   describe('onDesignQueryResult', () => {
+    const mockOnQueryError = () => {
+      wrapper.setMethods({
+        onQueryError: jest.fn(),
+      });
+    };
+
     describe('with no designs', () => {
       it('redirects to /designs', () => {
         createComponent(true);
-        wrapper.setMethods({
-          onQueryError: jest.fn(),
-        });
+        mockOnQueryError();
 
-        wrapper.vm.onDesignQueryResult(mockResponseNoDesigns);
+        wrapper.vm.onDesignQueryResult({ data: mockResponseNoDesigns, loading: false });
         expect(wrapper.vm.onQueryError).toHaveBeenCalledTimes(1);
         expect(wrapper.vm.onQueryError).toHaveBeenCalledWith(DESIGN_NOT_FOUND_ERROR);
+      });
+    });
+
+    describe('when no design exists for given version', () => {
+      it('redirects to /designs', () => {
+        // attempt to query for a version of the design that doesn't exist
+        createComponent(true, { routeQuery: { version: '999' } });
+        mockOnQueryError();
+        wrapper.setData({
+          allVersions: mockAllVersions,
+        });
+
+        wrapper.vm.onDesignQueryResult({ data: mockResponseWithDesigns, loading: false });
+        expect(wrapper.vm.onQueryError).toHaveBeenCalledTimes(1);
+        expect(wrapper.vm.onQueryError).toHaveBeenCalledWith(DESIGN_VERSION_NOT_EXIST_ERROR);
       });
     });
   });
