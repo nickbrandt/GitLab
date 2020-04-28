@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Mutations::Requirements::Update do
+describe Mutations::RequirementsManagement::UpdateRequirement do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:requirement) { create(:requirement, project: project) }

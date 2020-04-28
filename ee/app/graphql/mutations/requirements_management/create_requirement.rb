@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Mutations
-  module Requirements
-    class Create < BaseMutation
+  module RequirementsManagement
+    class CreateRequirement < BaseMutation
       include Mutations::ResolvesProject
 
       graphql_name 'CreateRequirement'
 
       authorize :create_requirement
 
-      field :requirement, Types::RequirementType,
+      field :requirement, Types::RequirementsManagement::RequirementType,
             null: true,
             description: 'The requirement after mutation'
 

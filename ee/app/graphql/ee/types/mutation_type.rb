@@ -14,8 +14,8 @@ module EE
         mount_mutation ::Mutations::Epics::Create
         mount_mutation ::Mutations::Epics::SetSubscription
         mount_mutation ::Mutations::Epics::AddIssue
-        mount_mutation ::Mutations::Requirements::Create
-        mount_mutation ::Mutations::Requirements::Update
+        mount_mutation ::Mutations::RequirementsManagement::CreateRequirement
+        mount_mutation ::Mutations::RequirementsManagement::UpdateRequirement
         mount_mutation ::Mutations::Vulnerabilities::Dismiss
         mount_mutation ::Mutations::Boards::Lists::UpdateLimitMetrics
         mount_mutation ::Mutations::SecurityDashboard::AddProject

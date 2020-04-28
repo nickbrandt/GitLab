@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Mutations
-  module Requirements
-    class Update < BaseMutation
+  module RequirementsManagement
+    class UpdateRequirement < BaseMutation
       include Mutations::ResolvesProject
 
       graphql_name 'UpdateRequirement'
 
       authorize :update_requirement
 
-      field :requirement, Types::RequirementType,
+      field :requirement, Types::RequirementsManagement::RequirementType,
             null: true,
             description: 'The requirement after mutation'
 
@@ -17,7 +17,7 @@ module Mutations
                required: false,
                description: 'Title of the requirement'
 
-      argument :state, Types::RequirementStateEnum,
+      argument :state, Types::RequirementsManagement::RequirementStateEnum,
                required: false,
                description: 'State of the requirement'
 
@@ -60,7 +60,7 @@ module Mutations
       def find_object(project_path:, iid:)
         project = resolve_project(full_path: project_path)
 
-        resolver = Resolvers::RequirementsResolver
+        resolver = Resolvers::RequirementsManagement::RequirementsResolver
           .single.new(object: project, context: context, field: nil)
 
         resolver.resolve(iid: iid)
