@@ -1,0 +1,5 @@
+---
+title: Replace 'marked_for_deletion_at' attribute for Projects in favor of 'marked_for_deletion_on'
+merge_request: 30580
+author:
+type: removed

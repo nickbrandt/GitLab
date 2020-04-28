@@ -23,6 +23,8 @@ module EE
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
 
+      alias_attribute :marked_for_deletion_on, :marked_for_deletion_at
+
       ignore_columns :mirror_last_update_at, :mirror_last_successful_update_at, remove_after: '2019-12-15', remove_with: '12.6'
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
@@ -680,7 +682,7 @@ module EE
     end
 
     def marked_for_deletion?
-      marked_for_deletion_at.present? &&
+      marked_for_deletion_on.present? &&
         feature_available?(:adjourned_deletion_for_projects_and_groups)
     end
 

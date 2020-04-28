@@ -4,12 +4,12 @@ require 'spec_helper'
 
 describe Projects::MarkForDeletionService do
   let(:user) { create(:user) }
-  let(:marked_for_deletion_at) { nil }
+  let(:marked_for_deletion_on) { nil }
   let(:project) do
     create(:project,
       :repository,
       namespace: user.namespace,
-      marked_for_deletion_at: marked_for_deletion_at)
+      marked_for_deletion_on: marked_for_deletion_on)
   end
 
   context 'with soft-delete feature turned on' do
@@ -24,19 +24,19 @@ describe Projects::MarkForDeletionService do
         expect(result[:status]).to eq(:success)
         expect(Project.unscoped.all).to include(project)
         expect(project.archived).to eq(true)
-        expect(project.marked_for_deletion_at).not_to be_nil
+        expect(project.marked_for_deletion_on).not_to be_nil
         expect(project.deleting_user).to eq(user)
       end
     end
 
     context 'marking project for deletion once again' do
-      let(:marked_for_deletion_at) { 2.days.ago }
+      let(:marked_for_deletion_on) { 2.days.ago }
 
       it 'does not change original date' do
         result = described_class.new(project, user).execute
 
         expect(result[:status]).to eq(:success)
-        expect(project.marked_for_deletion_at).to eq(marked_for_deletion_at.to_date)
+        expect(project.marked_for_deletion_on).to eq(marked_for_deletion_on.to_date)
       end
     end
 
@@ -61,7 +61,7 @@ describe Projects::MarkForDeletionService do
         expect(Project.all).to include(project)
 
         expect(project.archived).to eq(false)
-        expect(project.marked_for_deletion_at).to be_nil
+        expect(project.marked_for_deletion_on).to be_nil
         expect(project.deleting_user).to be_nil
       end
     end

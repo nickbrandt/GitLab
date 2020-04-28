@@ -18,9 +18,12 @@ module EE
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
           expose :service_desk_enabled, if: ->(project, _) { project.feature_available?(:service_desk) }
           expose :service_desk_address, if: ->(project, _) { project.feature_available?(:service_desk) }
-          expose :marked_for_deletion_at, if: ->(project, _) { project.feature_available?(:adjourned_deletion_for_projects_and_groups) }
-          expose :marked_for_deletion_on, if: ->(project, _) { project.feature_available?(:adjourned_deletion_for_projects_and_groups) } do |project, _|
-            project.marked_for_deletion_at
+          expose :marked_for_deletion_on, if: ->(project, _) { project.feature_available?(:adjourned_deletion_for_projects_and_groups) }
+
+          # TODO: Remove in 13.1: https://gitlab.com/gitlab-org/gitlab/-/issues/216096
+          expose :marked_for_deletion_at, if: ->(project, _) do
+            ::Feature.disabled?(:hide_marked_for_deletion_at_in_projects_api, default_enabled: true) &&
+            project.feature_available?(:adjourned_deletion_for_projects_and_groups)
           end
         end
       end

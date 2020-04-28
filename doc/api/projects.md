@@ -162,7 +162,6 @@ When the user is authenticated and `simple` is not set this returns something li
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
     "suggestion_commit_message": null,
-    "marked_for_deletion_at": "2020-04-03", // to be deprecated in GitLab 13.0 in favor of marked_for_deletion_on
     "marked_for_deletion_on": "2020-04-03",
     "statistics": {
       "commit_count": 37,
@@ -288,7 +287,7 @@ When the user is authenticated and `simple` is not set this returns something li
 ```
 
 NOTE: **Note:**
-For users on GitLab [Silver, Premium, or higher](https://about.gitlab.com/pricing/) the `marked_for_deletion_at` attribute will be deprecated in GitLab 13.0 in favor of the `marked_for_deletion_on` attribute.
+For users on GitLab [Silver, Premium, or higher](https://about.gitlab.com/pricing/) the `marked_for_deletion_at` attribute was removed in GitLab 13.0 in favor of the `marked_for_deletion_on` attribute.
 
 Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) will also see
 the `approvals_before_merge` parameter:
@@ -411,7 +410,6 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
     "suggestion_commit_message": null,
-    "marked_for_deletion_at": "2020-04-03", // to be deprecated in GitLab 13.0 in favor of marked_for_deletion_on
     "marked_for_deletion_on": "2020-04-03",
     "statistics": {
       "commit_count": 37,
@@ -877,7 +875,6 @@ GET /projects/:id
   "service_desk_address": null,
   "autoclose_referenced_issues": true,
   "suggestion_commit_message": null,
-  "marked_for_deletion_at": "2020-04-03", // to be deprecated in GitLab 13.0 in favor of marked_for_deletion_on
   "marked_for_deletion_on": "2020-04-03",
   "statistics": {
     "commit_count": 37,

@@ -1,6 +1,6 @@
 - return unless project.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
-- date = permanent_deletion_date(project.marked_for_deletion_at)
+- date = permanent_deletion_date(project.marked_for_deletion_on)
 .sub-section
   %h4.danger-title= _('Restore project')
   %p

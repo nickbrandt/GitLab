@@ -3,14 +3,14 @@
 module Projects
   class MarkForDeletionService < BaseService
     def execute
-      return success if project.marked_for_deletion_at?
+      return success if project.marked_for_deletion_on?
       return error('Cannot mark project for deletion: feature not supported') unless project.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
       result = ::Projects::UpdateService.new(
         project,
         current_user,
         { archived: true,
-          marked_for_deletion_at: Time.now.utc,
+          marked_for_deletion_on: Time.now.utc,
           deleting_user: current_user }
       ).execute
       log_event if result[:status] == :success

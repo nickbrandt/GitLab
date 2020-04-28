@@ -9,7 +9,7 @@ module Projects
         project,
         current_user,
         { archived: false,
-          marked_for_deletion_at: nil,
+          marked_for_deletion_on: nil,
           deleting_user: nil }
       ).execute
       log_event if result[:status] == :success

@@ -569,7 +569,7 @@ describe ProjectsController do
     it 'restores project deletion' do
       post :restore, params: { namespace_id: project.namespace, project_id: project }
 
-      expect(project.reload.marked_for_deletion_at).to be_nil
+      expect(project.reload.marked_for_deletion_on).to be_nil
       expect(project.reload.archived).to be_falsey
       expect(response).to have_gitlab_http_status(:found)
       expect(response).to redirect_to(edit_project_path(project))

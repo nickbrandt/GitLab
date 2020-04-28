@@ -9,7 +9,7 @@ describe Projects::RestoreService do
     create(:project,
       :repository,
       namespace: user.namespace,
-      marked_for_deletion_at: 1.day.ago,
+      marked_for_deletion_on: 1.day.ago,
       deleting_user: user,
       archived: true,
       pending_delete: pending_delete)
@@ -24,7 +24,7 @@ describe Projects::RestoreService do
       expect(Project.unscoped.all).to include(project)
 
       expect(project.archived).to eq(false)
-      expect(project.marked_for_deletion_at).to be_nil
+      expect(project.marked_for_deletion_on).to be_nil
       expect(project.deleting_user).to eq(nil)
     end
   end

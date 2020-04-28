@@ -38,7 +38,7 @@ module EE
 
       result = ::Projects::MarkForDeletionService.new(project, current_user, {}).execute
       if result[:status] == :success
-        date = permanent_deletion_date(project.marked_for_deletion_at)
+        date = permanent_deletion_date(project.marked_for_deletion_on)
         flash[:notice] = _("Project '%{project_name}' will be deleted on %{date}") % { date: date, project_name: project.full_name }
 
         redirect_to(project_path(project), status: :found)
