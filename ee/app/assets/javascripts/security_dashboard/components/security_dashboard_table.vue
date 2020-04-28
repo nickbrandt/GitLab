@@ -64,14 +64,16 @@ export default {
   <div class="ci-table js-security-dashboard-table" data-qa-selector="security_report_content">
     <selection-summary v-if="isSelectingVulnerabilities" />
     <div class="gl-responsive-table-row table-row-header gl-bg-gray-50 text-2 px-2" role="row">
-      <div class="table-section">
+      <div class="table-section section-5">
         <gl-form-checkbox
           :checked="hasSelectedAllVulnerabilities"
           class="my-0 ml-1 mr-3"
           @change="handleSelectAll"
         />
       </div>
-      <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
+      <div class="table-section section-15" role="rowheader">
+        {{ s__('Reports|Severity') }}
+      </div>
       <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>
