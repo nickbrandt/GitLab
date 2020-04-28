@@ -55,10 +55,11 @@ describe Geo::UploadRegistry, :geo, :geo_fdw do
       described_class.with_status('synced')
     end
 
-    it 'finds the registries with status "never"' do
+    # Explained via: https://gitlab.com/gitlab-org/gitlab/-/issues/216049
+    it 'finds the registries with status "never" when filter is set to "pending"' do
       expect(described_class).to receive(:never)
 
-      described_class.with_status('never')
+      described_class.with_status('pending')
     end
     it 'finds the registries with status "failed"' do
       expect(described_class).to receive(:failed)

@@ -8,7 +8,7 @@
     %ul.dropdown-menu
       = nav_link(html_options: { class: ('bg-secondary-100' if !params[:sync_status].present?) }) do
         = link_to controller: replicable_controller do
-          = sprintf(s_('Geo|All %{replicable_type}'), { replicable_type: replicable_type })
+          = sprintf(s_('Geo|All %{replicable_name}'), { replicable_name: replicable_name })
       = nav_link(html_options: { class: ('bg-secondary-100' if params[:sync_status] == 'pending') }) do
         = link_to controller: replicable_controller, sync_status: 'pending' do
           = s_('Geo|In progress')
