@@ -14530,6 +14530,9 @@ msgstr ""
 msgid "PackageRegistry|Published to the repository at %{timestamp}"
 msgstr ""
 
+msgid "PackageRegistry|PyPi"
+msgstr ""
+
 msgid "PackageRegistry|Registry Setup"
 msgstr ""
 

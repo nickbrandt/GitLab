@@ -3,6 +3,7 @@ export const PackageType = {
   MAVEN: 'maven',
   NPM: 'npm',
   NUGET: 'nuget',
+  PYPI: 'pypi',
 };
 
 export const TrackingActions = {
