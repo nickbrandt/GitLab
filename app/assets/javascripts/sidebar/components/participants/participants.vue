@@ -96,7 +96,7 @@ export default {
     >
       <i class="fa fa-users" aria-hidden="true"> </i>
       <gl-loading-icon v-if="loading" />
-      <span v-else class="js-participants-collapsed-count"> {{ participantCount }} </span>
+      <span v-else data-testid="collapsed-count"> {{ participantCount }} </span>
     </div>
     <div v-if="showParticipantLabel" class="title hide-collapsed">
       <gl-loading-icon v-if="loading" :inline="true" />

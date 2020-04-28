@@ -19,6 +19,8 @@ describe('Participants', () => {
 
   const getMoreParticipantsButton = () => wrapper.find('button');
 
+  const getCollapsedParticipantsCount = () => wrapper.find('[data-testid="collapsed-count"]');
+
   const mountComponent = propsData =>
     shallowMount(Participants, {
       propsData,
@@ -35,7 +37,15 @@ describe('Participants', () => {
         loading: true,
       });
 
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+      expect(wrapper.contains(GlLoadingIcon)).toBe(true);
+    });
+
+    it('does not show loading spinner not loading', () => {
+      wrapper = mountComponent({
+        loading: false,
+      });
+
+      expect(wrapper.contains(GlLoadingIcon)).toBe(false);
     });
 
     it('shows participant count when given', () => {
@@ -44,9 +54,7 @@ describe('Participants', () => {
         participants: PARTICIPANT_LIST,
       });
 
-      expect(wrapper.find('.js-participants-collapsed-count').text()).toBe(
-        `${PARTICIPANT_LIST.length}`,
-      );
+      expect(getCollapsedParticipantsCount().text()).toBe(`${PARTICIPANT_LIST.length}`);
     });
 
     it('shows full participant count when there are hidden participants', () => {
@@ -56,9 +64,7 @@ describe('Participants', () => {
         numberOfLessParticipants: 1,
       });
 
-      expect(wrapper.find('.js-participants-collapsed-count').text()).toBe(
-        `${PARTICIPANT_LIST.length}`,
-      );
+      expect(getCollapsedParticipantsCount().text()).toBe(`${PARTICIPANT_LIST.length}`);
     });
   });
 
@@ -68,7 +74,7 @@ describe('Participants', () => {
         loading: true,
       });
 
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+      expect(wrapper.contains(GlLoadingIcon)).toBe(true);
     });
 
     it('when only showing visible participants, shows an avatar only for each participant under the limit', () => {
@@ -84,7 +90,7 @@ describe('Participants', () => {
       });
 
       return Vue.nextTick().then(() => {
-        expect(wrapper.findAll('.participants-author').length).toBe(numberOfLessParticipants);
+        expect(wrapper.findAll('.participants-author')).toHaveLength(numberOfLessParticipants);
       });
     });
 
@@ -100,7 +106,7 @@ describe('Participants', () => {
       });
 
       return Vue.nextTick().then(() => {
-        expect(wrapper.findAll('.participants-author').length).toBe(PARTICIPANT_LIST.length);
+        expect(wrapper.findAll('.participants-author')).toHaveLength(PARTICIPANT_LIST.length);
       });
     });
 
@@ -190,11 +196,11 @@ describe('Participants', () => {
     });
 
     it('does not show sidebar collapsed icon', () => {
-      expect(wrapper.find('.sidebar-collapsed-icon').exists()).toBe(false);
+      expect(wrapper.contains('.sidebar-collapsed-icon')).toBe(false);
     });
 
     it('does not show participants label title', () => {
-      expect(wrapper.find('.title').exists()).toBe(false);
+      expect(wrapper.contains('.title')).toBe(false);
     });
   });
 });

@@ -60,7 +60,6 @@ describe('Subscriptions', () => {
   it('tracks the event when toggled', () => {
     wrapper = mountComponent({ subscribed: true });
 
-    // const spy = mockTracking('_category_', wrapper.element, jest.spyOn);
     const wrapperTrackSpy = jest.spyOn(wrapper.vm, 'track');
 
     wrapper.vm.toggleSubscription();
@@ -101,7 +100,7 @@ describe('Subscriptions', () => {
     });
 
     it('does not render the toggle button', () => {
-      expect(wrapper.find('.js-issuable-subscribe-button').exists()).toBe(false);
+      expect(wrapper.contains('.js-issuable-subscribe-button')).toBe(false);
     });
   });
 });
