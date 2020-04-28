@@ -64,21 +64,24 @@ module Epics
     end
 
     def validate_objects
-      if adjacent_reference
-        return 'Relative position is not valid.' unless valid_relative_position?
-
-        unless supported_type?(moving_object) && supported_type?(adjacent_reference)
-          return 'Only epics and epic_issues are supported.'
-        end
-      end
-
+      return 'Only epics and epic_issues are supported.' unless supported_types?
       return 'You don\'t have permissions to move the objects.' unless authorized?
 
-      if adjacent_reference
-        if different_epic_parent?
-          return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
-        end
+      validate_adjacent_reference if adjacent_reference
+    end
+
+    def validate_adjacent_reference
+      return 'Relative position is not valid.' unless valid_relative_position?
+
+      if different_epic_parent?
+        return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
       end
+    end
+
+    def supported_types?
+      return false if adjacent_reference && !supported_type?(adjacent_reference)
+
+      supported_type?(moving_object)
     end
 
     def valid_relative_position?

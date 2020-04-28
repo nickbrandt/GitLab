@@ -197,7 +197,7 @@ export const fetchNextPageItems = ({ dispatch, state }, { parentItem, isSubItem 
     });
 };
 
-export const toggleItem = ({ state, dispatch }, { parentItem }) => {
+export const toggleItem = ({ state, dispatch }, { parentItem, isDragging = false }) => {
   if (!state.childrenFlags[parentItem.reference].itemExpanded) {
     if (!state.children[parentItem.reference]) {
       dispatch('fetchItems', {
@@ -209,7 +209,7 @@ export const toggleItem = ({ state, dispatch }, { parentItem }) => {
         parentItem,
       });
     }
-  } else {
+  } else if (!isDragging) {
     dispatch('collapseItem', {
       parentItem,
     });
@@ -470,7 +470,7 @@ export const moveItem = (
   let isFirstChild = false;
   const newParentChildren = state.children[newParentItem.parentReference];
 
-  if (newParentChildren !== undefined) {
+  if (newParentChildren !== undefined && newParentChildren.length > 0) {
     adjacentItem = newParentChildren[newIndex];
     if (adjacentItem === undefined) {
       adjacentItem = newParentChildren[newParentChildren.length - 1];

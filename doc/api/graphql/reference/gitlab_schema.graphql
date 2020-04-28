@@ -3376,7 +3376,7 @@ input EpicTreeNodeFieldsInputType {
   """
   The type of the switch, after or before allowed
   """
-  relativePosition: MoveType!
+  relativePosition: MoveType
 }
 
 """

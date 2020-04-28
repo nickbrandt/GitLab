@@ -99,10 +99,6 @@ describe Epics::TreeReorderService do
               tree_object_2.update(epic: epic1)
             end
 
-            # it 'raises an error' do
-            #   expect { subject }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
-            # end
-
             it 'updates the parent' do
               expect { subject }.to change { tree_object_2.reload.epic }.from(epic1).to(epic)
             end

@@ -19,7 +19,7 @@ module Types
 
       argument :relative_position,
                MoveTypeEnum,
-               required: true,
+               required: false,
                description: 'The type of the switch, after or before allowed'
 
       argument :new_parent_id,

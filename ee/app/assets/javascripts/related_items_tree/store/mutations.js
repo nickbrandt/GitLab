@@ -220,10 +220,17 @@ export default {
   ) {
     // Remove from old position in previous parent
     state.children[oldParentItem.reference].splice(oldIndex, 1);
+    if (state.children[oldParentItem.reference].length === 0) {
+      state.childrenFlags[oldParentItem.reference].itemHasChildren = false;
+    }
 
     // Insert at new position in new parent
     if (isFirstChild) {
       Vue.set(state.children, newParentItem.parentReference, [targetItem]);
+      Vue.set(state.childrenFlags, newParentItem.parentReference, {
+        itemExpanded: true,
+        itemHasChildren: true,
+      });
     } else {
       state.children[newParentItem.parentReference].splice(newIndex, 0, targetItem);
     }

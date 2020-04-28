@@ -9678,13 +9678,9 @@
               "name": "relativePosition",
               "description": "The type of the switch, after or before allowed",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "ENUM",
-                  "name": "MoveType",
-                  "ofType": null
-                }
+                "kind": "ENUM",
+                "name": "MoveType",
+                "ofType": null
               },
               "defaultValue": null
             },

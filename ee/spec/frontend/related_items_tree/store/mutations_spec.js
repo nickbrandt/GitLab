@@ -617,6 +617,33 @@ describe('RelatedItemsTree', () => {
             expect.arrayContaining(['bar']),
           );
         });
+
+        it('should update itemHasChildren flags', () => {
+          const newParentItem = {
+            parentReference: '&2',
+          };
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['bar'];
+          state.childrenFlags[state.parentItem.reference] = { itemHasChildren: true };
+
+          mutations[types.MOVE_ITEM](state, {
+            oldParentItem: {
+              reference: '&1',
+            },
+            newParentItem,
+            targetItem: 'bar',
+            oldIndex: 0,
+            newIndex: 0,
+            isFirstChild: true,
+          });
+
+          expect(state.children[state.parentItem.reference].length).toEqual(0);
+          expect(state.childrenFlags[state.parentItem.reference].itemHasChildren).toEqual(false);
+          expect(state.children[newParentItem.parentReference]).toEqual(
+            expect.arrayContaining(['bar']),
+          );
+          expect(state.childrenFlags[newParentItem.parentReference].itemHasChildren).toEqual(true);
+        });
       });
 
       describe(types.MOVE_ITEM_FAILURE, () => {

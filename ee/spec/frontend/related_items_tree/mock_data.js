@@ -16,6 +16,7 @@ export const mockParentItem = {
   fullPath: 'gitlab-org',
   title: 'Some sample epic',
   reference: 'gitlab-org&1',
+  type: 'Epic',
   userPermissions: {
     adminEpic: true,
     createEpic: true,

@@ -1267,7 +1267,7 @@ describe('RelatedItemTree', () => {
       });
 
       describe('receiveMoveItemFailure', () => {
-        it('should revert moved item back to its original position ion its original parent via MOVE_ITEM_FAILURE mutation', () => {
+        it('should revert moved item back to its original position on its original parent via MOVE_ITEM_FAILURE mutation', () => {
           testAction(
             actions.receiveMoveItemFailure,
             {},

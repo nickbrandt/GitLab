@@ -376,6 +376,32 @@ describe('RelatedItemsTree', () => {
           );
         });
       });
+
+      describe('onMove', () => {
+        it('calls toggleItem action if move event finds epic element', () => {
+          jest.spyOn(wrapper.vm, 'toggleItem').mockImplementation(() => {});
+          const evt = {
+            relatedContext: {
+              element: mockParentItem,
+            },
+          };
+          wrapper.vm.onMove(evt);
+
+          expect(wrapper.vm.toggleItem).toHaveBeenCalled();
+        });
+
+        it(' does not call toggleItem action if move event does not find epic element', () => {
+          jest.spyOn(wrapper.vm, 'toggleItem').mockImplementation(() => {});
+          const evt = {
+            relatedContext: {
+              element: mockIssue2,
+            },
+          };
+          wrapper.vm.onMove(evt);
+
+          expect(wrapper.vm.toggleItem).not.toHaveBeenCalled();
+        });
+      });
     });
 
     describe('template', () => {
