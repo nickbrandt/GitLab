@@ -6204,11 +6204,11 @@ CREATE TABLE public.sprints (
     group_id bigint,
     iid integer NOT NULL,
     cached_markdown_version integer,
-    state smallint,
     title text NOT NULL,
     title_html text,
     description text,
     description_html text,
+    state_enum smallint,
     CONSTRAINT sprints_must_belong_to_project_or_group CHECK ((((project_id <> NULL::bigint) AND (group_id IS NULL)) OR ((group_id <> NULL::bigint) AND (project_id IS NULL)))),
     CONSTRAINT sprints_title CHECK ((char_length(title) <= 255))
 );
@@ -13705,6 +13705,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200424050250
 20200424101920
 20200427064130
+20200429001827
+20200429002150
 20200429015603
 20200429181335
 20200429181955
