@@ -87,8 +87,8 @@ Some features depend on others:
   - **Git Large File Storage**
   - **Packages**
 
-- Metrics dashboard access is dependent on reading both project environments and deployments.
-  This means anyone with access to metrics dashboard will also have access to environments and deployments.
+- Metrics dashboard access requires reading both project environments and deployments.
+  Users with access to the metrics dashboard can also access environments and deployments.
 
 #### Disabling email notifications
 
