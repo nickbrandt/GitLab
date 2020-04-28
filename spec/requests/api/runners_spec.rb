@@ -419,6 +419,42 @@ describe API::Runners do
             .not_to eq(runner_queue_value)
           expect(shared_runner.maximum_timeout).to eq(1234)
         end
+
+        context 'when it is not gitlab.com' do
+          it 'does not update cost factors' do
+            update_runner(shared_runner.id,admin,
+                          public_projects_minutes_cost_factor: 1.1,
+                          private_projects_minutes_cost_factor: 2.2)
+
+            shared_runner.reload
+
+            expect(shared_runner.public_projects_minutes_cost_factor).to eq(0.0)
+            expect(shared_runner.private_projects_minutes_cost_factor).to eq(1.0)
+          end
+        end
+
+        context 'when on gitlab.com' do
+          before do
+            allow(Gitlab).to receive(:com?) { true }
+            Rails.application.reload_routes!
+          end
+
+          after do
+            allow(Gitlab).to receive(:com?) { false }
+            Rails.application.reload_routes!
+          end
+
+          it 'updates cost factors' do
+            update_runner(shared_runner.id,admin,
+                          public_projects_minutes_cost_factor: 1.1,
+                          private_projects_minutes_cost_factor: 2.2)
+
+            shared_runner.reload
+
+            expect(shared_runner.public_projects_minutes_cost_factor).to eq(1.1)
+            expect(shared_runner.private_projects_minutes_cost_factor).to eq(2.2)
+          end
+        end
       end
 
       context 'when runner is not shared' do
