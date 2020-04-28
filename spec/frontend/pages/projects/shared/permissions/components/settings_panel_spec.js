@@ -489,7 +489,7 @@ describe('Settings Panel', () => {
         .find('[name="project[project_feature_attributes][metrics_dashboard_access_level]"]')
         .setValue(visibilityOptions.PUBLIC);
 
-      expect(wrapper.vm.metricsAccessLevel).toBe(visibilityOptions.PUBLIC);
+      expect(wrapper.vm.metricsDashboardAccessLevel).toBe(visibilityOptions.PUBLIC);
     });
 
     it('should contain help text', () => {

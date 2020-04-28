@@ -2398,15 +2398,6 @@ class Project < ApplicationRecord
   def after_wiki_activity
     touch(:last_activity_at, :last_repository_updated_at)
   end
-  
-  def metrics_dashboard_allowed?(user)
-    project_feature.metrics_dashboard_access_level = 10 if private? # private projects should never have an access level above private
-
-    return true if public? && metrics_dashboard_access_level >= 20
-    return false unless user
-
-    feature_available?(:metrics_dashboard, user) ? true : false
-  end
 
   private
 

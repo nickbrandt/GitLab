@@ -4,7 +4,14 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   include MetricsDashboard
 
   layout 'project'
-  before_action :authorize_read_environment!, except: [:metrics, :additional_metrics, :metrics_dashboard]
+
+  before_action only: [:metrics, :additional_metrics, :metrics_dashboard] do
+    authorize_metrics_dashboard!
+
+    push_frontend_feature_flag(:prometheus_computed_alerts)
+    push_frontend_feature_flag(:metrics_dashboard_annotations, project)
+  end
+  before_action :authorize_read_environment!
   before_action :authorize_create_environment!, only: [:new, :create]
   before_action :authorize_stop_environment!, only: [:stop]
   before_action :authorize_update_environment!, only: [:edit, :update, :cancel_auto_stop]
@@ -12,12 +19,6 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics, :cancel_auto_stop]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
   before_action :expire_etag_cache, only: [:index], unless: -> { request.format.json? }
-  before_action only: [:metrics, :additional_metrics, :metrics_dashboard] do
-    authorize_metrics_dashboard!
-
-    push_frontend_feature_flag(:prometheus_computed_alerts)
-    push_frontend_feature_flag(:metrics_dashboard_annotations, project)
-  end
   after_action :expire_etag_cache, only: [:cancel_auto_stop]
 
   def index

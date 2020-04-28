@@ -90,7 +90,7 @@ class ProjectPolicy < BasePolicy
 
   with_scope :subject
   condition(:metrics_dashboard_allowed) do
-    @subject.metrics_dashboard_allowed?(@user)
+    feature_available?(:metrics_dashboard)
   end
 
   with_scope :global
@@ -233,6 +233,7 @@ class ProjectPolicy < BasePolicy
     enable :read_prometheus
     enable :read_metrics_dashboard_annotation
     enable :read_alert_management_alerts
+    enable :metrics_dashboard
   end
 
   # We define `:public_user_access` separately because there are cases in gitlab-ee
@@ -255,8 +256,11 @@ class ProjectPolicy < BasePolicy
     enable :fork_project
   end
 
-  rule { metrics_dashboard_allowed }.enable do
-    enable :metrics_dashboard
+  rule { metrics_dashboard_disabled }.policy do
+    prevent(:metrics_dashboard)
+  end
+
+  rule { can?(:metrics_dashboard) }.policy do
     enable :read_prometheus
     enable :read_environment
     enable :read_deployment
@@ -338,6 +342,14 @@ class ProjectPolicy < BasePolicy
     enable :destroy_deploy_token
     enable :read_prometheus_alerts
     enable :admin_terraform_state
+  end
+
+  rule { public_project & metrics_dashboard_allowed }.policy do
+    enable :metrics_dashboard
+  end
+
+  rule { internal_access & metrics_dashboard_allowed }.policy do
+    enable :metrics_dashboard
   end
 
   rule { (mirror_available & can?(:admin_project)) | admin }.enable :admin_remote_mirror
