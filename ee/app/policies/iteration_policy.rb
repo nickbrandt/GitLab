@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class SprintPolicy < BasePolicy
+class IterationPolicy < BasePolicy
   delegate { @subject.resource_parent }
 end
