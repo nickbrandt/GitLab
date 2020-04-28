@@ -18,6 +18,7 @@ class Milestone < ApplicationRecord
 
   has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
+  scope :active, -> { with_state(:active) }
   scope :started, -> { active.where('milestones.start_date <= CURRENT_DATE') }
 
   scope :order_by_name_asc, -> { order(Arel::Nodes::Ascending.new(arel_table[:title].lower)) }

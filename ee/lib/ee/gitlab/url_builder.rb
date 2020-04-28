@@ -15,6 +15,8 @@ module EE
             design_url(object, **options)
           when Epic
             instance.group_epic_url(object.group, object, **options)
+          when Sprint
+            instance.group_iteration_url(object.group, object, **options)
           when Vulnerability
             instance.project_security_vulnerability_url(object.project, object, **options)
           else
