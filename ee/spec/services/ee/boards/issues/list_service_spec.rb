@@ -153,43 +153,18 @@ describe Boards::Issues::ListService, services: true do
     end
 
     context 'when search param is present' do
-      shared_examples 'returns correct result using 3 characters' do
-        it 'returns correct issues' do
-          params = { board_id: board.id, search: 'Iss' }
+      it 'returns correct issues' do
+        params = { board_id: board.id, search: 'Iss' }
 
-          issues = described_class.new(parent, user, params).execute
-          expect(issues).to contain_exactly(opened_issue1, opened_issue2, reopened_issue1)
-        end
+        issues = described_class.new(parent, user, params).execute
+        expect(issues).to contain_exactly(opened_issue1, opened_issue2, reopened_issue1)
       end
 
-      context 'when board_search_optimization feature is enabled' do
-        before do
-          stub_feature_flags(board_search_optimization: true)
-        end
+      it 'returns correct issues using 2 characters' do
+        params = { board_id: board.id, search: 'Is' }
 
-        it_behaves_like 'returns correct result using 3 characters'
-
-        it 'returns correct issues using 2 characters' do
-          params = { board_id: board.id, search: 'Is' }
-
-          issues = described_class.new(parent, user, params).execute
-          expect(issues).to contain_exactly(opened_issue1, opened_issue2, reopened_issue1)
-        end
-      end
-
-      context 'when board_search_optimization feature is disabled' do
-        before do
-          stub_feature_flags(board_search_optimization: false)
-        end
-
-        it_behaves_like 'returns correct result using 3 characters'
-
-        it 'returns empty result using 2 characters' do
-          params = { board_id: board.id, search: 'Is' }
-
-          issues = described_class.new(parent, user, params).execute
-          expect(issues).to be_empty
-        end
+        issues = described_class.new(parent, user, params).execute
+        expect(issues).to contain_exactly(opened_issue1, opened_issue2, reopened_issue1)
       end
     end
   end
