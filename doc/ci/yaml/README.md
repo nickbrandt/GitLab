@@ -2941,191 +2941,27 @@ job:
 
 #### `artifacts:reports`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20390) in GitLab 11.2. Requires GitLab Runner 11.2 and above.
-
-The `reports` keyword is used for collecting test reports, code quality reports, and security reports from jobs.
+The [`artifacts:reports` keyword](../pipelines/job_artifacts.md#artifactsreports)
+is used for collecting test reports, code quality reports, and security reports from jobs.
 It also exposes these reports in GitLab's UI (merge requests, pipeline views, and security dashboards).
 
-NOTE: **Note:**
-The test reports are collected regardless of the job results (success or failure).
-You can use [`artifacts:expire_in`](#artifactsexpire_in) to set up an expiration
-date for their artifacts.
+These are the available report types:
 
-NOTE: **Note:**
-If you also want the ability to browse the report output files, include the
-[`artifacts:paths`](#artifactspaths) keyword.
-
-##### `artifacts:reports:junit`
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20390) in GitLab 11.2. Requires GitLab Runner 11.2 and above.
-
-The `junit` report collects [JUnit XML files](https://www.ibm.com/support/knowledgecenter/en/SSQ2R2_14.1.0/com.ibm.rsar.analysis.codereview.cobol.doc/topics/cac_useresults_junit.html)
-as artifacts. Although JUnit was originally developed in Java, there are many
-[third party ports](https://en.wikipedia.org/wiki/JUnit#Ports) for other
-languages like JavaScript, Python, Ruby, etc.
-
-See [JUnit test reports](../junit_test_reports.md) for more details and examples.
-Below is an example of collecting a JUnit XML file from Ruby's RSpec test tool:
-
-```yaml
-rspec:
-  stage: test
-  script:
-  - bundle install
-  - rspec --format RspecJunitFormatter --out rspec.xml
-  artifacts:
-    reports:
-      junit: rspec.xml
-```
-
-The collected JUnit reports will be uploaded to GitLab as an artifact and will
-be automatically shown in merge requests.
-
-NOTE: **Note:**
-In case the JUnit tool you use exports to multiple XML files, you can specify
-multiple test report paths within a single job and they will be automatically
-concatenated into a single file. Use a filename pattern (`junit: rspec-*.xml`),
-an array of filenames (`junit: [rspec-1.xml, rspec-2.xml, rspec-3.xml]`), or a
-combination thereof (`junit: [rspec.xml, test-results/TEST-*.xml]`).
-
-##### `artifacts:reports:dotenv`
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/17066) in GitLab 12.9. Requires GitLab Runner 11.5 and later.
-
-The `dotenv` report collects a set of environment variables as artifacts.
-
-The collected variables are registered as runtime-created variables of the job,
-which is useful to [set dynamic environment URLs after a job finishes](../environments.md#set-dynamic-environment-urls-after-a-job-finishes).
-It is not available for download through the web interface.
-
-There are a couple of limitations on top of the [original dotenv rules](https://github.com/motdotla/dotenv#rules).
-
-- The variable key can contain only letters, digits and underscore ('_').
-- The size of dotenv file must be smaller than 5 kilobytes.
-- The number of variables must be less than 10.
-- It doesn't support variable substitution in the dotenv file itself.
-- It doesn't support empty lines and comments (`#`) in dotenv file.
-- It doesn't support quote escape, spaces in a quote, a new line expansion in a quote, in dotenv file.
-
-##### `artifacts:reports:cobertura`
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3708) in GitLab 12.9. Requires [GitLab Runner](https://docs.gitlab.com/runner/) 11.5 and above.
-
-The `cobertura` report collects [Cobertura coverage XML files](../../user/project/merge_requests/test_coverage_visualization.md).
-The collected Cobertura coverage reports will be uploaded to GitLab as an artifact
-and will be automatically shown in merge requests.
-
-Cobertura was originally developed for Java, but there are many
-third party ports for other languages like JavaScript, Python, Ruby, etc.
-
-##### `artifacts:reports:terraform`
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/207527) in GitLab 12.10. Requires [GitLab Runner](https://docs.gitlab.com/runner/) 11.5 and above.
-
-The `terraform` report collects Terraform `tfplan.json` files. The
-collected Terraform plan reports will be uploaded to GitLab as
-artifacts and will be automatically shown in merge requests.
-
-##### `artifacts:reports:codequality` **(STARTER)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `codequality` report collects [CodeQuality issues](../../user/project/merge_requests/code_quality.md)
-as artifacts.
-
-The collected Code Quality report will be uploaded to GitLab as an artifact and will
-be summarized in merge requests. It is not available for download through the web interface.
-
-##### `artifacts:reports:sast` **(ULTIMATE)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `sast` report collects [SAST vulnerabilities](../../user/application_security/sast/index.md)
-as artifacts.
-
-The collected SAST report will be uploaded to GitLab as an artifact and will
-be summarized in the merge requests and pipeline view. It is also used to provide data for security
-dashboards. It is not available for download through the web interface.
-
-##### `artifacts:reports:dependency_scanning` **(ULTIMATE)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `dependency_scanning` report collects [Dependency Scanning vulnerabilities](../../user/application_security/dependency_scanning/index.md)
-as artifacts.
-
-The collected Dependency Scanning report will be uploaded to GitLab as an artifact and will
-be summarized in the merge requests and pipeline view. It is also used to provide data for security
-dashboards. It is not available for download through the web interface.
-
-##### `artifacts:reports:container_scanning` **(ULTIMATE)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `container_scanning` report collects [Container Scanning vulnerabilities](../../user/application_security/container_scanning/index.md)
-as artifacts.
-
-The collected Container Scanning report will be uploaded to GitLab as an artifact and will
-be summarized in the merge requests and pipeline view. It is also used to provide data for security
-dashboards. It is not available for download through the web interface.
-
-##### `artifacts:reports:dast` **(ULTIMATE)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `dast` report collects [DAST vulnerabilities](../../user/application_security/dast/index.md)
-as artifacts.
-
-The collected DAST report will be uploaded to GitLab as an artifact and will
-be summarized in the merge requests and pipeline view. It is also used to provide data for security
-dashboards. It is not available for download through the web interface.
-
-##### `artifacts:reports:license_management` **(ULTIMATE)**
-
-CAUTION: **Warning:**
-This artifact is still valid but was **deprecated** in favor of the
-[artifacts:reports:license_scanning](#artifactsreportslicense_scanning-ultimate)
-introduced in GitLab 12.8.
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `license_management` report collects [Licenses](../../user/compliance/license_compliance/index.md)
-as artifacts.
-
-The collected License Compliance report will be uploaded to GitLab as an artifact and will
-be summarized in the merge requests and pipeline view. It is also used to provide data for security
-dashboards. It is not available for download through the web interface.
-
-##### `artifacts:reports:license_scanning` **(ULTIMATE)**
-
-> Introduced in GitLab 12.8. Requires GitLab Runner 11.5 and above.
-
-The `license_scanning` report collects [Licenses](../../user/compliance/license_compliance/index.md)
-as artifacts.
-
-The License Compliance report will be uploaded to GitLab as an artifact and will
-be automatically shown in merge requests, pipeline view and provide data for security
-dashboards.
-
-##### `artifacts:reports:performance` **(PREMIUM)**
-
-> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
-
-The `performance` report collects [Performance metrics](../../user/project/merge_requests/browser_performance_testing.md)
-as artifacts.
-
-The collected Performance report will be uploaded to GitLab as an artifact and will
-be automatically shown in merge requests. It is not available for download through the web interface.
-
-##### `artifacts:reports:metrics` **(PREMIUM)**
-
-> Introduced in GitLab 11.10.
-
-The `metrics` report collects [Metrics](../../ci/metrics_reports.md)
-as artifacts.
-
-The collected Metrics report will be uploaded to GitLab as an artifact and will
-be automatically shown in merge requests. It is not available for download through the web interface.
+| Parameter                                                                                                                            | Description |
+|--------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| [`artifacts:reports:junit`](../pipelines/job_artifacts.md#artifactsreportsjunit)                                                     | The `junit` report collects JUnit XML files.                                     |
+| [`artifacts:reports:dotenv`](../pipelines/job_artifacts.md#artifactsreportsdotenv)                                                   | The `dotenv` report collects a set of environment variables.                     |
+| [`artifacts:reports:cobertura`](../pipelines/job_artifacts.md#artifactsreportscobertura)                                             | The `cobertura` report collects Cobertura coverage XML files.                    |
+| [`artifacts:reports:terraform`](../pipelines/job_artifacts.md#artifactsreportsterraform)                                             | The `terraform` report collects Terraform `tfplan.json` files.                   |
+| [`artifacts:reports:codequality`](../pipelines/job_artifacts.md#artifactsreportscodequality-starter) **(STARTER)**                   | The `codequality` report collects CodeQuality issues.                            |
+| [`artifacts:reports:sast`](../pipelines/job_artifacts.md#artifactsreportssast-ultimate) **(ULTIMATE)**                               | The `sast` report collects Static Application Security Testing vulnerabilities.  |
+| [`artifacts:reports:dependency_scanning`](../pipelines/job_artifacts.md#artifactsreportsdependency_scanning-ultimate) **(ULTIMATE)** | The `dependency_scanning` report collects Dependency Scanning vulnerabilities.   |
+| [`artifacts:reports:container_scanning`](../pipelines/job_artifacts.md#artifactsreportscontainer_scanning-ultimate) **(ULTIMATE)**   | The `container_scanning` report collects Container Scanning vulnerabilities.     |
+| [`artifacts:reports:dast`](../pipelines/job_artifacts.md#artifactsreportsdast-ultimate) **(ULTIMATE)**                               | The `dast` report collects Dynamic Application Security Testing vulnerabilities. |
+| [`artifacts:reports:license_management`](../pipelines/job_artifacts.md#artifactsreportslicense_management-ultimate) **(ULTIMATE)**   | The `license_management` report collects Licenses (*deprecated*).                |
+| [`artifacts:reports:license_scanning`](../pipelines/job_artifacts.md#artifactsreportslicense_scanning-ultimate) **(ULTIMATE)**       | The `license_scanning` report collects Licenses.                                 |
+| [`artifacts:reports:performance`](../pipelines/job_artifacts.md#artifactsreportsperformance-premium) **(PREMIUM)**                   | The `performance` report collects Performance metrics.                           |
+| [`artifacts:reports:metrics`](../pipelines/job_artifacts.md#artifactsreportsmetrics-premium) **(PREMIUM)**                           | The `metrics` report collects Metrics.                                           |
 
 #### `dependencies`
 
