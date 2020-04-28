@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_27_211436) do
+ActiveRecord::Schema.define(version: 2020_04_28_220225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(version: 2020_04_27_211436) do
     t.string "sha256"
     t.boolean "missing_on_primary", default: false, null: false
     t.boolean "pending_delete", default: false, null: false
-    t.index ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id"
+    t.index ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id", unique: true
     t.index ["retry_at"], name: "index_job_artifact_registry_on_retry_at"
     t.index ["success"], name: "index_job_artifact_registry_on_success"
   end
