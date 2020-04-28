@@ -94,11 +94,11 @@ export default {
   ),
   wafChartEmptyStateDescription: s__(
     `ThreatMonitoring|The firewall is not installed or has been disabled. To view
-     this data, ensure you firewall is installed and enabled for your cluster.`,
+     this data, ensure the web application firewall is installed and enabled for your cluster.`,
   ),
   networkPolicyChartEmptyStateDescription: s__(
-    `ThreatMonitoring|Container NetworkPolicies are not installed or has been disabled. To view
-     this data, ensure you NetworkPolicies are installed and enabled for your cluster.`,
+    `ThreatMonitoring|Container Network Policies are not installed or have been disabled. To view
+     this data, ensure your Network Policies are installed and enabled for your cluster.`,
   ),
   emptyStateDescription: s__(
     `ThreatMonitoring|To view this data, ensure you have configured an environment
