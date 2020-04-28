@@ -11942,6 +11942,15 @@ msgstr ""
 msgid "It's you"
 msgstr ""
 
+msgid "Iterations"
+msgstr ""
+
+msgid "Iteration|Dates cannot overlap with other existing Iterations"
+msgstr ""
+
+msgid "Iteration|cannot be in the past"
+msgstr ""
+
 msgid "Jaeger URL"
 msgstr ""
 
@@ -13891,6 +13900,9 @@ msgid "New Issue"
 msgid_plural "New Issues"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "New Iteration"
+msgstr ""
 
 msgid "New Jira import"
 msgstr ""

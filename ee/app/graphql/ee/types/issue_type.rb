@@ -9,6 +9,10 @@ module EE
         field :epic, ::Types::EpicType, null: true,
               description: 'Epic to which this issue belongs'
 
+        field :iteration, ::Types::IterationType, null: true,
+              description: 'Iteration of the issue',
+              resolve: -> (obj, _args, _ctx) { ::Gitlab::Graphql::Loaders::BatchModelLoader.new(::Iteration, obj.sprint_id).find }
+
         field :weight, GraphQL::INT_TYPE, null: true,
               description: 'Weight of the issue',
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }

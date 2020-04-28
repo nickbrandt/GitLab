@@ -21,6 +21,10 @@ module EE
               max_page_size: 2000,
               resolver: ::Resolvers::EpicsResolver
 
+        field :iterations, ::Types::IterationType.connection_type, null: true,
+              description: 'Find iterations',
+              resolver: ::Resolvers::IterationsResolver
+
         field :timelogs, ::Types::TimelogType.connection_type, null: false,
               description: 'Time logged in issues by group members',
               complexity: 5,
