@@ -212,7 +212,7 @@ Gitlab/HTTParty:
     - 'ee/spec/**/*'
 
 Gitlab/Json:
-  Enabled: false
+  Enabled: true
   Exclude:
     - 'db/**/*'
     - 'qa/**/*'
