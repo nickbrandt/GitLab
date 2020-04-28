@@ -2,6 +2,7 @@
 require 'securerandom'
 
 module QA
+  # TODO: Remove the :orchestrated meta after https://gitlab.com/gitlab-org/quality/team-tasks/-/issues/493 is complete
   context 'Create', :docker, :orchestrated, :requires_admin do
     describe 'Jenkins integration' do
       let(:project_name) { "project_with_jenkins_#{SecureRandom.hex(4)}" }
