@@ -1,6 +1,6 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
-import projectQuery from '../graphql/queries/project.query.graphql';
+import getDesignListQuery from '../graphql/queries/get_design_list.query.graphql';
 import destroyDesignMutation from '../graphql/mutations/destroyDesign.mutation.graphql';
 import { updateStoreAfterDesignsDelete } from '../utils/cache_update';
 
@@ -25,7 +25,7 @@ export default {
   computed: {
     projectQueryBody() {
       return {
-        query: projectQuery,
+        query: getDesignListQuery,
         variables: { fullPath: this.projectPath, iid: this.iid, atVersion: null },
       };
     },

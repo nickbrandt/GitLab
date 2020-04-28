@@ -10,7 +10,7 @@ import DesignVersionDropdown from '../components/upload/design_version_dropdown.
 import DesignDropzone from '../components/upload/design_dropzone.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
-import projectQuery from '../graphql/queries/project.query.graphql';
+import getDesignListQuery from '../graphql/queries/get_design_list.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
 import {
   UPLOAD_DESIGN_ERROR,
@@ -87,7 +87,7 @@ export default {
     },
     projectQueryBody() {
       return {
-        query: projectQuery,
+        query: getDesignListQuery,
         variables: { fullPath: this.projectPath, iid: this.issueIid, atVersion: null },
       };
     },

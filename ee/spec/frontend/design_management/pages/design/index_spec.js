@@ -124,7 +124,7 @@ describe('Design management design index page', () => {
         design: {
           ...design,
           discussions: {
-            edges: [],
+            nodes: [],
           },
         },
       });
@@ -160,7 +160,7 @@ describe('Design management design index page', () => {
       design: {
         ...design,
         discussions: {
-          edges: [],
+          nodes: [],
         },
       },
     });
@@ -179,7 +179,7 @@ describe('Design management design index page', () => {
       design: {
         ...design,
         discussions: {
-          edges: [],
+          nodes: [],
         },
       },
       annotationCoordinates,
@@ -206,7 +206,7 @@ describe('Design management design index page', () => {
       design: {
         ...design,
         discussions: {
-          edges: [],
+          nodes: [],
         },
       },
       annotationCoordinates,
@@ -234,7 +234,7 @@ describe('Design management design index page', () => {
         design: {
           ...design,
           discussions: {
-            edges: [],
+            nodes: [],
           },
         },
         errorMessage: 'woops',

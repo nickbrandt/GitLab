@@ -210,7 +210,7 @@ describe('Design management index page', () => {
                 },
                 discussions: {
                   __typename: 'DesignDiscussion',
-                  edges: [],
+                  nodes: [],
                 },
                 versions: {
                   __typename: 'DesignVersionConnection',
