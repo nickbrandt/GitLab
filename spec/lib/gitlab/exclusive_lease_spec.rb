@@ -76,6 +76,31 @@ describe Gitlab::ExclusiveLease, :clean_gitlab_redis_shared_state do
     end
   end
 
+  describe '#cancel' do
+    it 'can cancel a lease' do
+      lease = new_lease(unique_key)
+      uuid = lease.try_obtain
+      expect(uuid).to be_present
+      expect(new_lease(unique_key).try_obtain).to eq(false)
+
+      lease.cancel
+
+      expect(new_lease(unique_key).try_obtain).to be_present
+    end
+
+    it 'is safe to call even if the lease was never obtained' do
+      lease = new_lease(unique_key)
+
+      lease.cancel
+
+      expect(new_lease(unique_key).try_obtain).to be_present
+    end
+
+    def new_lease(key)
+      described_class.new(key, timeout: 3600)
+    end
+  end
+
   describe '#ttl' do
     it 'returns the TTL of the Redis key' do
       lease = described_class.new('kittens', timeout: 100)

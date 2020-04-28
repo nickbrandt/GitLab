@@ -94,6 +94,13 @@ module Gitlab
         ttl if ttl.positive?
       end
     end
+
+    # Gives up this lease, allowing it to be obtained by others.
+    def cancel
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.eval(LUA_CANCEL_SCRIPT, keys: [@redis_shared_state_key], argv: [@uuid])
+      end
+    end
   end
 end
 
