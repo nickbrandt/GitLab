@@ -23,12 +23,12 @@ export default {
   <div class="append-bottom-default">
     <gl-tabs @input="trackInstallationTabChange">
       <gl-tab :title="s__('PackageRegistry|Installation')" title-item-class="js-installation-tab">
-        <div class="prepend-left-default append-right-default">
+        <div class="prepend-append-default">
           <slot name="installation"></slot>
         </div>
       </gl-tab>
       <gl-tab :title="s__('PackageRegistry|Registry Setup')" title-item-class="js-setup-tab">
-        <div class="prepend-left-default append-right-default">
+        <div class="prepend-append-default">
           <slot name="setup"></slot>
         </div>
       </gl-tab>
