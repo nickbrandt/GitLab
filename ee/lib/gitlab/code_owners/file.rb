@@ -52,11 +52,7 @@ module Gitlab
 
           next if skip?(line)
 
-          pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
-
-          normalized_pattern = normalize_pattern(pattern)
-
-          parsed[normalized_pattern] = Entry.new(pattern, owners)
+          extract_entry_and_populate_parsed(line, parsed)
         end
 
         parsed
@@ -80,17 +76,24 @@ module Gitlab
             next
           end
 
-          pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
-
-          normalized_pattern = normalize_pattern(pattern)
-
-          # We still suffer from last-in overwrites, as we don't yet (%13.0)
-          #   allow for multiple matches, even within the section.
-          #
-          parsed[section][normalized_pattern] = Entry.new(pattern, owners, section)
+          extract_entry_and_populate_parsed(line, parsed, section.downcase)
         end
 
         parsed
+      end
+
+      def extract_entry_and_populate_parsed(line, parsed, section = nil)
+        pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
+
+        normalized_pattern = normalize_pattern(pattern)
+
+        entry = Entry.new(pattern, owners, section)
+
+        if section
+          parsed[section][normalized_pattern] = entry
+        else
+          parsed[normalized_pattern] = entry
+        end
       end
 
       def skip?(line)

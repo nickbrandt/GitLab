@@ -15,7 +15,7 @@ module Gitlab
       delegate :pattern, :hash, :owner_line, :section, to: :data
 
       def initialize(pattern, owner_line, section = DEFAULT_SECTION)
-        @data = Data.new(pattern, owner_line, section.downcase)
+        @data = Data.new(pattern, owner_line, section)
       end
 
       def all_users
