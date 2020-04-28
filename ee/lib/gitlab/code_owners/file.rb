@@ -49,8 +49,8 @@ module Gitlab
 
         data.lines.each do |line|
           line = line.strip
-          next unless line.present?
-          next if line.starts_with?('#')
+
+          next if skip?(line)
 
           pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
 
@@ -70,8 +70,8 @@ module Gitlab
 
         data.lines.each do |line|
           line = line.strip
-          next unless line.present?
-          next if line.starts_with?('#')
+
+          next if skip?(line)
 
           if line.starts_with?('[') && line.end_with?(']')
             section = line[1...-1].downcase
@@ -91,6 +91,13 @@ module Gitlab
         end
 
         parsed
+      end
+
+      def skip?(line)
+        return true unless line.present?
+        return true if line.starts_with?('#')
+
+        false
       end
 
       def normalize_pattern(pattern)
