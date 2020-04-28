@@ -3,5 +3,5 @@
 class Vulnerabilities::OccurrenceDiffSerializer < BaseSerializer
   include WithPagination
 
-  entity Vulnerabilities::OccurrenceReportsComparerEntity
+  entity Vulnerabilities::FindingReportsComparerEntity
 end
