@@ -3,8 +3,9 @@
 module Gitlab
   module CodeOwners
     class File
-      def initialize(blob)
+      def initialize(blob, project = nil)
         @blob = blob
+        @project = project
       end
 
       def parsed_data
