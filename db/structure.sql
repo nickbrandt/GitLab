@@ -171,7 +171,10 @@ CREATE TABLE public.appearances (
     message_background_color text,
     message_font_color text,
     favicon character varying,
-    email_header_and_footer_enabled boolean DEFAULT false NOT NULL
+    email_header_and_footer_enabled boolean DEFAULT false NOT NULL,
+    profile_image_guidelines text,
+    profile_image_guidelines_html text,
+    CONSTRAINT appearances_profile_image_guidelines CHECK ((char_length(profile_image_guidelines) <= 4096))
 );
 
 CREATE SEQUENCE public.appearances_id_seq
@@ -13540,6 +13543,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200416120354
 20200417044453
 20200417145946
+20200420092011
 20200420104303
 20200420104323
 20200420162730
