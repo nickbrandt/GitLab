@@ -69,16 +69,21 @@ describe Gitlab::CodeOwners::File do
           expect(data.keys).to contain_exactly("codeowners", "Documentation", "Database")
         end
 
-        where(:section, :patterns) do
-          "codeowners"    | ["/**/ee/**/*"]
-          "Documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"]
-          "Database"      | ["/**/README.md", "/**/model/db"]
+        where(:section, :patterns, :owners) do
+          "codeowners"    | ["/**/ee/**/*"] | ["@gl-admin"]
+          "Documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"] | ["@gl-docs"]
+          "Database"      | ["/**/README.md", "/**/model/db"] | ["@gl-database"]
         end
 
         with_them do
           it "assigns the correct paths to each section" do
             expect(file.parsed_data[section].keys).to contain_exactly(*patterns)
             expect(file.parsed_data[section].values.detect { |entry| entry.section != section }).to be_nil
+          end
+
+          it "assigns the correct owners for each entry" do
+            extracted_owners = file.parsed_data[section].values.collect(&:owner_line).uniq
+            expect(extracted_owners).to contain_exactly(*owners)
           end
         end
       end
