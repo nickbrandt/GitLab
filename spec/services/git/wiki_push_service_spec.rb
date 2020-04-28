@@ -49,8 +49,8 @@ describe Git::WikiPushService, services: true do
     end
 
     context 'one creation, one update, one deletion' do
-      let(:wiki_page_a) { create(:wiki_page, :with_real_page, project: project) }
-      let(:wiki_page_b) { create(:wiki_page, :with_real_page, project: project) }
+      let(:wiki_page_a) { create(:wiki_page, project: project) }
+      let(:wiki_page_b) { create(:wiki_page, project: project) }
       let(:count) { Event::WIKI_ACTIONS.count }
       let(:setup) { wiki_page_a && wiki_page_b }
 
@@ -188,7 +188,7 @@ describe Git::WikiPushService, services: true do
     end
 
     context 'when a page we already know about has been updated' do
-      let(:wiki_page) { create(:wiki_page, :with_real_page, project: project) }
+      let(:wiki_page) { create(:wiki_page, project: project) }
       let(:setup) { create(:wiki_page_meta, :for_wiki_page, wiki_page: wiki_page) }
 
       before do
@@ -228,7 +228,7 @@ describe Git::WikiPushService, services: true do
     end
 
     context 'when a page we do not know about has been updated' do
-      let(:wiki_page) { create(:wiki_page, :with_real_page, project: project) }
+      let(:wiki_page) { create(:wiki_page, project: project) }
       let(:setup) { wiki_page }
 
       before do
@@ -254,7 +254,7 @@ describe Git::WikiPushService, services: true do
     end
 
     context 'when a page we do not know about has been deleted' do
-      let(:wiki_page) { create(:wiki_page, :with_real_page, project: project) }
+      let(:wiki_page) { create(:wiki_page, project: project) }
       let(:setup) { wiki_page }
 
       before do
