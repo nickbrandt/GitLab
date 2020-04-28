@@ -2209,7 +2209,7 @@ input DismissVulnerabilitiesInput {
   """
   IDs of the vulnerabilities to be dismissed
   """
-  vulnerabilityIds: ID!
+  vulnerabilityIds: [ID!]!
 }
 
 """
