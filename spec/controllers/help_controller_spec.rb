@@ -109,7 +109,7 @@ describe HelpController do
 
         it 'renders HTML' do
           expect(response).to render_template('show.html.haml')
-          expect(response.content_type).to eq 'text/html'
+          expect(response.media_type).to eq 'text/html'
         end
       end
 
@@ -130,7 +130,7 @@ describe HelpController do
               },
               format: :png
           expect(response).to be_successful
-          expect(response.content_type).to eq 'image/png'
+          expect(response.media_type).to eq 'image/png'
           expect(response.headers['Content-Disposition']).to match(/^inline;/)
         end
       end
