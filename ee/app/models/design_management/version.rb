@@ -4,7 +4,9 @@ module DesignManagement
   class Version < ApplicationRecord
     include Importable
     include ShaAttribute
+    include AfterCommitQueue
     include Gitlab::Utils::StrongMemoize
+    extend Gitlab::ExclusiveLeaseHelpers
 
     NotSameIssue = Class.new(StandardError)
 
@@ -64,6 +66,10 @@ module DesignManagement
     # designs, and not being able to add designs without a saved version. Also this
     # method inserts designs in bulk, rather than one by one.
     #
+    # Before calling this method, callers must guard against concurrent
+    # modification by obtaining the lock on the design repository. See:
+    # `DesignManagement::Version.with_lock`.
+    #
     # Parameters:
     # - design_actions [DesignManagement::DesignAction]:
     #     the actions that have been performed in the repository.
@@ -91,6 +97,18 @@ module DesignManagement
       end
     rescue
       raise CouldNotCreateVersion.new(sha, issue_id, design_actions)
+    end
+
+    CREATION_TTL = 5.seconds
+    RETRY_DELAY = ->(num) { 0.2.seconds * num**2 }
+
+    def self.with_lock(project_id, repository, &block)
+      key = "with_lock:#{name}:{#{project_id}}"
+
+      in_lock(key, ttl: CREATION_TTL, retries: 5, sleep_sec: RETRY_DELAY) do |_retried|
+        repository.create_if_not_exists
+        yield
+      end
     end
 
     def designs_by_event

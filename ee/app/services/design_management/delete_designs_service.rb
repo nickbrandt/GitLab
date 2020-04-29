@@ -14,8 +14,7 @@ module DesignManagement
     def execute
       return error('Forbidden!') unless can_delete_designs?
 
-      actions = build_actions
-      version = run_actions(actions)
+      version = delete_designs!
 
       # Create a Geo event so changes will be replicated to secondary node(s)
       repository.log_geo_updated_event
@@ -36,6 +35,12 @@ module DesignManagement
     private
 
     attr_reader :designs
+
+    def delete_designs!
+      DesignManagement::Version.with_lock(project.id, repository) do
+        run_actions(build_actions)
+      end
+    end
 
     def can_delete_designs?
       Ability.allowed?(current_user, :destroy_design, issue)

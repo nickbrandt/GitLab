@@ -17,15 +17,13 @@ module DesignManagement
       return error("Not allowed!") unless can_create_designs?
       return error("Only #{MAX_FILES} files are allowed simultaneously") if files.size > MAX_FILES
 
-      repository.create_if_not_exists
-
-      uploaded_designs = upload_designs!
+      uploaded_designs, version = upload_designs!
       skipped_designs = designs - uploaded_designs
 
       # Create a Geo event so changes will be replicated to secondary node(s)
       repository.log_geo_updated_event
 
-      success({ designs: uploaded_designs, skipped_designs: skipped_designs })
+      success({ designs: uploaded_designs, version: version, skipped_designs: skipped_designs })
     rescue ::ActiveRecord::RecordInvalid => e
       error(e.message)
     end
@@ -35,13 +33,11 @@ module DesignManagement
     attr_reader :files
 
     def upload_designs!
-      actions = build_actions
-      return [] if actions.empty?
+      ::DesignManagement::Version.with_lock(project.id, repository) do
+        actions = build_actions
 
-      version = run_actions(actions)
-      ::DesignManagement::NewVersionWorker.perform_async(version.id)
-
-      actions.map(&:design)
+        [actions.map(&:design), actions.presence && run_actions(actions)]
+      end
     end
 
     # Returns `Design` instances that correspond with `files`.
