@@ -5,6 +5,8 @@ class Geo::BaseRegistry < Geo::TrackingBase
 
   self.abstract_class = true
 
+  include GlobalID::Identification
+
   def self.pluck_model_ids_in_range(range)
     where(self::MODEL_FOREIGN_KEY => range).pluck(self::MODEL_FOREIGN_KEY)
   end

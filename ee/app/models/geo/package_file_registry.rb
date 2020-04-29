@@ -3,6 +3,10 @@
 class Geo::PackageFileRegistry < Geo::BaseRegistry
   include ::Delay
 
+  def self.declarative_policy_class
+    'Geo::RegistryPolicy'
+  end
+
   STATE_VALUES = {
     pending: 0,
     started: 1,
