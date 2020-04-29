@@ -156,7 +156,7 @@ export default {
           <div class="gl-max-w-full text-truncate">{{ item.title }}</div>
         </template>
         <template #cell(status)>
-          <gl-new-dropdown class="w-100">
+          <gl-new-dropdown class="w-100" :text="alert.status">
             <gl-new-dropdown-item v-for="(label, field) in $options.statuses" :key="field"
               >{{ label }}
             </gl-new-dropdown-item>

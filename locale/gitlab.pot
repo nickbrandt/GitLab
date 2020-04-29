@@ -1085,9 +1085,6 @@ msgstr ""
 msgid "Account: %{account}"
 msgstr ""
 
-msgid "Acknowledged"
-msgstr ""
-
 msgid "Action to take when receiving an alert."
 msgstr ""
 
@@ -1695,6 +1692,9 @@ msgstr[1] ""
 msgid "Alert Details"
 msgstr ""
 
+msgid "AlertManagement|Acknowledged"
+msgstr ""
+
 msgid "AlertManagement|Alert"
 msgstr ""
 
@@ -1747,6 +1747,9 @@ msgid "AlertManagement|Surface alerts in GitLab"
 msgstr ""
 
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
+msgstr ""
+
+msgid "AlertManagement|Triggered"
 msgstr ""
 
 msgid "AlertService|%{linkStart}Learn more%{linkEnd} about configuring this endpoint to receive alerts."
@@ -22144,9 +22147,6 @@ msgid "Trigger was created successfully."
 msgstr ""
 
 msgid "Trigger was successfully updated."
-msgstr ""
-
-msgid "Triggered"
 msgstr ""
 
 msgid "Triggerer"
