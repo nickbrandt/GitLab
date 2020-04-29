@@ -51,9 +51,6 @@ describe('~/static_site_editor/components/saved_changes_message.vue', () => {
 
     expect(el.exists()).toBe(true);
     expect(el.text()).toBe(prop.label);
-
-    if (desc !== 'branch') {
-      expect(el.attributes('href')).toBe(prop.url);
-    }
+    expect(el.attributes('href')).toBe(prop.url);
   });
 });
