@@ -15,16 +15,18 @@ module Packages
         raise InvalidMetadataError.new('package name and/or package version not found in metadata') unless valid_metadata?
 
         @package_file.transaction do
-          @package_file.update!(
-            file_name: package_filename,
-            file: @package_file.file
-          )
-
           if existing_package_id
             link_to_existing_package
           else
             update_linked_package
           end
+
+          # Updating file_name updates the path where the file is stored.
+          # We must pass the file again so that CarrierWave can handle the update
+          @package_file.update!(
+            file_name: package_filename,
+            file: @package_file.file
+          )
         end
       end
 
@@ -36,7 +38,12 @@ module Packages
 
       def link_to_existing_package
         package_to_destroy = @package_file.package
-        @package_file.update!(package_id: existing_package_id)
+        # Updating package_id updates the path where the file is stored.
+        # We must pass the file again so that CarrierWave can handle the update
+        @package_file.update!(
+          package_id: existing_package_id,
+          file: @package_file.file
+        )
         package_to_destroy.destroy!
       end
 
