@@ -1,6 +1,4 @@
-- page_title 'Geo Uploads'
-- params[:sync_status] ||= []
-
+= render 'admin/geo/shared/replication_nav'
 = render 'admin/geo/shared/filter_nav', replicable_name: _('uploads'), replicable_controller: 'admin/geo/uploads'
 - if @registries.any?
   - @registries.each do |upload_registry|

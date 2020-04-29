@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlLink, GlDeprecatedButton } from '@gitlab/ui';
+import { GlLink, GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { ACTION_TYPES } from '../store/constants';
 import GeoReplicableStatus from './geo_replicable_status.vue';
@@ -10,7 +10,7 @@ export default {
   name: 'GeoReplicableItem',
   components: {
     GlLink,
-    GlDeprecatedButton,
+    GlButton,
     GeoReplicableTimeAgo,
     GeoReplicableStatus,
   },
@@ -77,9 +77,10 @@ export default {
     <div class="card-header d-flex align-center">
       <gl-link class="font-weight-bold" :href="`/${name}`" target="_blank">{{ name }}</gl-link>
       <div class="ml-auto">
-        <gl-deprecated-button
+        <gl-button
+          size="small"
           @click="initiateReplicableSync({ projectId, name, action: $options.actionTypes.RESYNC })"
-          >{{ __('Resync') }}</gl-deprecated-button
+          >{{ __('Resync') }}</gl-button
         >
       </div>
     </div>
