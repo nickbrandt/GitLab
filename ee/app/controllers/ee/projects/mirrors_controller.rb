@@ -41,7 +41,7 @@ module EE
           project.update_remote_mirrors
           flash[:notice] = _('The remote repository is being updated...')
         else
-          project.import_state.force_import_job!
+          StartPullMirroringService.new(project, current_user, pause_on_hard_failure: false).execute
           flash[:notice] = _('The repository is being updated...')
         end
 

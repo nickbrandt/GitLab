@@ -59,7 +59,7 @@ module API
       end
 
       def start_pull_mirroring
-        result = StartPullMirroringService.new(project, mirror_user).execute
+        result = StartPullMirroringService.new(project, mirror_user, pause_on_hard_failure: true).execute
 
         render_api_error!(result[:message], result[:http_status]) if result[:status] == :error
       end
