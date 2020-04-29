@@ -16,6 +16,10 @@ module API
         project.deploy_keys_projects.find_by!(deploy_key: key_id)
       end
       # rubocop: enable CodeReuse/ActiveRecord
+
+      def project_deploy_key_type
+        { deploy_key_type: DeployKey.deploy_key_types[:project_type] }
+      end
     end
 
     desc 'Return all deploy keys'
@@ -93,6 +97,7 @@ module API
 
         # Create a new deploy key
         deploy_key_attributes = declared_params.except(:can_push).merge(user: current_user)
+        deploy_key_attributes.merge!(project_deploy_key_type)
         deploy_key_project = add_deploy_keys_project(user_project, deploy_key_attributes: deploy_key_attributes, can_push: !!params[:can_push])
 
         if deploy_key_project.valid?
@@ -127,6 +132,8 @@ module API
         if can?(current_user, :update_deploy_key, deploy_keys_project.deploy_key)
           update_params[:deploy_key_attributes][:title] = params[:title] if params.key?(:title)
         end
+
+        update_params[:deploy_key_attributes].merge!(project_deploy_key_type)
 
         result = deploy_keys_project.update(update_params)
 

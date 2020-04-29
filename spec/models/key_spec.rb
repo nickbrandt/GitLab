@@ -21,6 +21,36 @@ describe Key, :mailer do
     it { is_expected.to allow_value(attributes_for(:ecdsa_key_256)[:key]).for(:key) }
     it { is_expected.to allow_value(attributes_for(:ed25519_key_256)[:key]).for(:key) }
     it { is_expected.not_to allow_value('foo-bar').for(:key) }
+
+    context 'when type is DeployKey' do
+      let(:key) { build(:key, type: 'DeployKey') }
+
+      context 'and deploy_type_key is nil' do
+        context 'and the deploy key is private' do
+          it 'is not valid' do
+            key.public = false
+
+            expect(key).not_to be_valid
+          end
+        end
+
+        context 'and the deploy key is public' do
+          it 'is valid' do
+            key.public = true
+
+            expect(key).to be_valid
+          end
+        end
+      end
+
+      context 'and deploy_type_key is not nil' do
+        it 'is valid' do
+          key = build(:key, :with_deploy_key_type, type: 'DeployKey')
+
+          expect(key).to be_valid
+        end
+      end
+    end
   end
 
   describe "Methods" do

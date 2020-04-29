@@ -81,6 +81,7 @@ class Projects::DeployKeysController < Projects::ApplicationController
     create_params = params.require(:deploy_key)
                           .permit(:key, :title, deploy_keys_projects_attributes: [:can_push])
     create_params.dig(:deploy_keys_projects_attributes, '0')&.merge!(project_id: @project.id)
+    create_params.merge(project_deploy_key_type)
     create_params
   end
 
@@ -88,7 +89,9 @@ class Projects::DeployKeysController < Projects::ApplicationController
     permitted_params = [deploy_keys_projects_attributes: [:id, :can_push]]
     permitted_params << :title if can?(current_user, :update_deploy_key, deploy_key)
 
-    params.require(:deploy_key).permit(*permitted_params)
+    update_params = params.require(:deploy_key).permit(*permitted_params)
+    update_params.merge(project_deploy_key_type)
+    update_params
   end
 
   def authorize_update_deploy_key!
@@ -102,5 +105,9 @@ class Projects::DeployKeysController < Projects::ApplicationController
 
   def redirect_to_repository
     redirect_to_repository_settings(@project, anchor: 'js-deploy-keys-settings')
+  end
+
+  def project_deploy_key_type
+    { deploy_key_type: DeployKey.deploy_key_types[:project_type] }
   end
 end

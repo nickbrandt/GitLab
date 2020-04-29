@@ -1,0 +1,5 @@
+---
+title: Add deploy_key_type to keys table
+merge_request: 30240
+author:
+type: added

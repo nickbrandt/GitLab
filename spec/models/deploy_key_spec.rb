@@ -8,6 +8,8 @@ describe DeployKey, :mailer do
     it { is_expected.to have_many(:projects) }
   end
 
+  it_behaves_like 'having unique enum values'
+
   describe 'notification' do
     let(:user) { create(:user) }
 

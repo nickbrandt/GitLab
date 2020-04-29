@@ -27,6 +27,10 @@ class Key < ApplicationRecord
     uniqueness: true,
     presence: { message: 'cannot be generated' }
 
+  validates :deploy_key_type,
+    presence: true,
+    if: :private_deploy_key?
+
   validate :key_meets_restrictions
 
   delegate :name, :email, to: :user, prefix: true
@@ -142,6 +146,10 @@ class Key < ApplicationRecord
     allowed_types = Gitlab::CurrentSettings.allowed_key_types.map(&:upcase)
 
     "type is forbidden. Must be #{Gitlab::Utils.to_exclusive_sentence(allowed_types)}"
+  end
+
+  def private_deploy_key?
+    type == 'DeployKey' && !public?
   end
 end
 

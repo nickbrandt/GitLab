@@ -89,7 +89,7 @@ describe API::DeployKeys do
     end
 
     it 'creates new ssh key' do
-      key_attrs = attributes_for :another_key
+      key_attrs = attributes_for :another_deploy_key
 
       expect do
         post api("/projects/#{project.id}/deploy_keys", admin), params: key_attrs
@@ -117,7 +117,7 @@ describe API::DeployKeys do
     end
 
     it 'accepts can_push parameter' do
-      key_attrs = attributes_for(:another_key).merge(can_push: true)
+      key_attrs = attributes_for(:another_deploy_key).merge(can_push: true)
 
       post api("/projects/#{project.id}/deploy_keys", admin), params: key_attrs
 

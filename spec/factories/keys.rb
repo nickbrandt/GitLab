@@ -11,14 +11,16 @@ FactoryBot.define do
       key { Spec::Support::Helpers::KeyGeneratorHelper.new(1024).generate }
     end
 
-    factory :deploy_key, class: 'DeployKey'
+    factory :deploy_key, class: 'DeployKey' do
+      with_deploy_key_type
+
+      factory :another_deploy_key
+    end
+
+    factory :another_key
 
     factory :personal_key do
       user
-    end
-
-    factory :another_key do
-      factory :another_deploy_key, class: 'DeployKey'
     end
 
     factory :rsa_key_2048 do
@@ -33,7 +35,9 @@ FactoryBot.define do
         KEY
       end
 
-      factory :rsa_deploy_key_2048, class: 'DeployKey'
+      factory :rsa_deploy_key_2048, class: 'DeployKey' do
+        with_deploy_key_type
+      end
     end
 
     factory :rsa_key_4096 do
@@ -143,6 +147,10 @@ FactoryBot.define do
           OhDRvf59ohL6 dummy@gitlab.com
         KEY
       end
+    end
+
+    trait :with_deploy_key_type do
+      deploy_key_type { DeployKey.deploy_key_types[:project_type] }
     end
   end
 end
