@@ -28,7 +28,8 @@ export default {
     },
     returnUrl: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
 };
@@ -46,7 +47,7 @@ export default {
         }}
       </p>
       <div class="d-flex justify-content-end">
-        <gl-button ref="returnToSiteButton" :href="returnUrl">{{
+        <gl-button v-if="returnUrl" ref="returnToSiteButton" :href="returnUrl">{{
           s__('StaticSiteEditor|Return to site')
         }}</gl-button>
         <gl-button ref="mergeRequestButton" class="ml-2" :href="mergeRequest.url" variant="success">
