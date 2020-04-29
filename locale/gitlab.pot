@@ -15371,6 +15371,9 @@ msgstr ""
 msgid "Performance optimization"
 msgstr ""
 
+msgid "PerformanceBar|Bullet notifications"
+msgstr ""
+
 msgid "PerformanceBar|Download"
 msgstr ""
 
