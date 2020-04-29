@@ -7,8 +7,6 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
 
   def index
     @registries = case params[:sync_status]
-                  when 'never'
-                    finder.never_synced_projects.page(params[:page])
                   when 'failed'
                     finder.failed_projects.page(params[:page])
                   when 'pending'

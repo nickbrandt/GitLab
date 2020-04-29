@@ -65,16 +65,6 @@ describe Admin::Geo::ProjectsController, :geo do
         end
       end
 
-      context 'with sync_status=never' do
-        subject { get :index, params: { sync_status: 'never' } }
-
-        it 'renders failed template' do
-          expect(subject).to have_gitlab_http_status(:ok)
-          expect(subject).to render_template(:index)
-          expect(subject).to render_template(partial: 'admin/geo/projects/_never')
-        end
-      end
-
       context 'with sync_status=synced' do
         subject { get :index, params: { sync_status: 'synced' } }
 

@@ -27,3 +27,11 @@
     }
   }
 }
+
+// Overrides for the generalized `shared/projects/search_form` used in Geo
+.project-search {
+  #project-filter-form-field {
+    width: 100%;
+    padding-left: 1.75rem;
+  }
+}
