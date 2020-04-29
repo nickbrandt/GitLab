@@ -34,8 +34,26 @@ module Elastic
         filter = {
           bool: {
             should: [
-              { bool: { must_not: [{ exists: { field: :issue } }] } },
-              { term: { "issue.confidential" => false } }
+              bool: {
+                must: [
+                  {
+                    bool: {
+                    should: [
+                      { bool: { must_not: [{ exists: { field: :issue } }] } },
+                      { term: { "issue.confidential" => false } }
+                    ]
+                    }
+                  },
+                  {
+                    bool: {
+                    should: [
+                      { bool: { must_not: [{ exists: { field: :confidential } }] } },
+                      { term: { "confidential" => false } }
+                    ]
+                    }
+                  }
+                ]
+              }
             ]
           }
         }
@@ -44,7 +62,14 @@ module Elastic
           filter[:bool][:should] << {
             bool: {
               must: [
-                { term: { "issue.confidential" => true } },
+                {
+                  bool: {
+                    should: [
+                      { term: { "issue.confidential" => true } },
+                      { term: { "confidential" => true } }
+                    ]
+                  }
+                },
                 {
                   bool: {
                     should: [

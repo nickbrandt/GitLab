@@ -187,4 +187,26 @@ describe Search::GlobalService do
       end
     end
   end
+
+  context 'confidential notes' do
+    let(:project) { create(:project, :public) }
+
+    context 'with notes on issues' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create :issue, project: project }
+      end
+    end
+
+    context 'with notes on merge requests' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create :merge_request, target_project: project, source_project: project }
+      end
+    end
+
+    context 'with notes on commits' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create(:commit, project: project) }
+      end
+    end
+  end
 end
