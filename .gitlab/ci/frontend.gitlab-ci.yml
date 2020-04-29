@@ -66,6 +66,8 @@ build-assets-image:
     - .frontend:rules:gitlab-assets-compile-pull-cache
   stage: build-images
   needs: ["gitlab:assets:compile pull-cache"]
+  variables:
+    GIT_DEPTH: "1"
   script:
     # TODO: Change the image tag to be the MD5 of assets files and skip image building if the image exists
     # We'll also need to pass GITLAB_ASSETS_TAG to the trigerred omnibus-gitlab pipeline similarly to how we do it for trigerred CNG pipelines
