@@ -34,8 +34,9 @@ module Gitlab
     end
 
     def self.cancel(key, uuid)
+      key = key&.start_with?('gitlab:exclusive_lease:') ? key : redis_shared_state_key(key)
       Gitlab::Redis::SharedState.with do |redis|
-        redis.eval(LUA_CANCEL_SCRIPT, keys: [redis_shared_state_key(key)], argv: [uuid])
+        redis.eval(LUA_CANCEL_SCRIPT, keys: [key], argv: [uuid])
       end
     end
 
@@ -97,9 +98,7 @@ module Gitlab
 
     # Gives up this lease, allowing it to be obtained by others.
     def cancel
-      Gitlab::Redis::SharedState.with do |redis|
-        redis.eval(LUA_CANCEL_SCRIPT, keys: [@redis_shared_state_key], argv: [@uuid])
-      end
+      self.class.cancel(@redis_shared_state_key, @uuid)
     end
   end
 end
