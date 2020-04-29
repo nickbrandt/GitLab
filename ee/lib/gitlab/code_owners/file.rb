@@ -3,8 +3,9 @@
 module Gitlab
   module CodeOwners
     class File
-      def initialize(blob)
+      def initialize(blob, project = nil)
         @blob = blob
+        @project = project
       end
 
       def parsed_data
@@ -40,7 +41,7 @@ module Gitlab
       end
 
       def get_parsed_data
-        if Feature.enabled?(:sectional_codeowners, default_enabled: false)
+        if Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
           return get_parsed_sectional_data
         end
 
