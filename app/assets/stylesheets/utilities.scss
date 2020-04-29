@@ -124,5 +124,5 @@
 
 .gl-white-space-normal { @include gl-white-space-normal; }
 .gl-word-break-all { @include gl-word-break-all; }
-.gl-line-height-inherit { line-height: inherit; }
-.gl-text-align-inherit { text-align: inherit; }
+.gl-reset-line-height { @include gl-reset-line-height; }
+.gl-reset-text-align { @include gl-reset-text-align; }
