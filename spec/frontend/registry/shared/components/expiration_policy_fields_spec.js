@@ -40,12 +40,12 @@ describe('Expiration Policy Form', () => {
   });
 
   describe.each`
-    elementName        | modelName              | value    | disabledByToggle
-    ${'toggle'}        | ${'enabled'}           | ${true}  | ${'not disabled'}
-    ${'interval'}      | ${'older_than'}        | ${'foo'} | ${'disabled'}
-    ${'schedule'}      | ${'cadence'}           | ${'foo'} | ${'disabled'}
-    ${'latest'}        | ${'keep_n'}            | ${'foo'} | ${'disabled'}
-    ${'name-matching'} | ${'name_regex_delete'} | ${'foo'} | ${'disabled'}
+    elementName        | modelName       | value    | disabledByToggle
+    ${'toggle'}        | ${'enabled'}    | ${true}  | ${'not disabled'}
+    ${'interval'}      | ${'older_than'} | ${'foo'} | ${'disabled'}
+    ${'schedule'}      | ${'cadence'}    | ${'foo'} | ${'disabled'}
+    ${'latest'}        | ${'keep_n'}     | ${'foo'} | ${'disabled'}
+    ${'name-matching'} | ${'name_regex'} | ${'foo'} | ${'disabled'}
   `(
     `${FORM_ELEMENTS_ID_PREFIX}-$elementName form element`,
     ({ elementName, modelName, value, disabledByToggle }) => {
@@ -128,7 +128,7 @@ describe('Expiration Policy Form', () => {
       const invalidString = new Array(NAME_REGEX_LENGTH + 2).join(',');
 
       beforeEach(() => {
-        mountComponent({ value: { name_regex_delete: invalidString } });
+        mountComponent({ value: { name_regex: invalidString } });
       });
 
       it('nameRegexState is false', () => {
@@ -141,7 +141,7 @@ describe('Expiration Policy Form', () => {
     });
 
     it('if the user did not type validation is null', () => {
-      mountComponent({ value: { name_regex_delete: '' } });
+      mountComponent({ value: { name_regex: '' } });
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.nameRegexState).toBe(null);
         expect(wrapper.emitted('validated')).toBeTruthy();
@@ -149,7 +149,7 @@ describe('Expiration Policy Form', () => {
     });
 
     it(`if the user typed and is less than ${NAME_REGEX_LENGTH} state is true`, () => {
-      mountComponent({ value: { name_regex_delete: 'foo' } });
+      mountComponent({ value: { name_regex: 'foo' } });
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.nameRegexState).toBe(true);
       });

@@ -500,7 +500,7 @@ then goes through a process of excluding tags from it until only the ones to be 
 
 1. Collect all the tags for a given repository in a list.
 1. Excludes the tag named `latest` from the list.
-1. Evaluates the `name_regex_delete`, excluding non-matching names from the list.
+1. Evaluates the `name_regex`, excluding non-matching names from the list.
 1. Excludes any tags that do not have a manifest (not part of the options).
 1. Orders the remaining tags by `created_date`.
 1. Excludes from the list the N tags based on the `keep_n` value (Expiration latest).

@@ -38,7 +38,7 @@ module Projects
       end
 
       def filter_by_name(tags)
-        regex_delete = Gitlab::UntrustedRegexp.new("\\A#{params['name_regex_delete']}\\z")
+        regex_delete = Gitlab::UntrustedRegexp.new("\\A#{params['name_regex_delete'] || params['name_regex']}\\z")
         regex_retain = Gitlab::UntrustedRegexp.new("\\A#{params['name_regex_keep']}\\z")
 
         tags.select do |tag|

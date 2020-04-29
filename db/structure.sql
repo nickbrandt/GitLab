@@ -1901,12 +1901,12 @@ CREATE TABLE public.container_expiration_policies (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     next_run_at timestamp with time zone,
+    name_regex character varying(255),
     cadence character varying(12) DEFAULT '7d'::character varying NOT NULL,
     older_than character varying(12),
     keep_n integer,
     enabled boolean DEFAULT true NOT NULL,
     name_regex_keep text,
-    name_regex_delete character varying(255),
     CONSTRAINT container_expiration_policies_name_regex_keep CHECK ((char_length(name_regex_keep) <= 255))
 );
 
@@ -13530,7 +13530,5 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200423101529
 20200424050250
 20200427064130
-20200428044349
-20200428044451
 \.
 

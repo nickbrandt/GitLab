@@ -1,5 +1,0 @@
----
-title: Rename container_expiration_policies name_regex to name_regex_delete
-merge_request: 30108
-author:
-type: changed
