@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe EE::Audit::Changes do
-  subject(:foo_instance) { Class.new { include EE::Audit::Changes }.new }
+describe Audit::Changes do
+  subject(:foo_instance) { Class.new { include Audit::Changes }.new }
 
   describe '.audit_changes' do
     let(:current_user) { create(:user, name: 'Mickey Mouse') }
