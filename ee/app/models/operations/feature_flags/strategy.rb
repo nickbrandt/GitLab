@@ -51,7 +51,7 @@ module Operations
         when STRATEGY_GRADUALROLLOUTUSERID
           gradual_rollout_user_id_parameters_validation
         when STRATEGY_USERWITHID
-          user_with_id_parameters_validation
+          FeatureFlagUserXidsValidator.validate_user_xids(self, :parameters, parameters['userIds'], 'userIds')
         end
       end
 
@@ -66,24 +66,6 @@ module Operations
         unless group_id.is_a?(String) && group_id.match(/\A[a-z]{1,32}\z/)
           parameters_error('groupId parameter is invalid')
         end
-      end
-
-      def user_with_id_parameters_validation
-        user_ids = parameters['userIds']
-        unless user_ids.is_a?(String) && !user_ids.match(/[\n\r\t]|,,/) && valid_ids?(user_ids.split(","))
-          parameters_error("userIds must be a string of unique comma separated values each #{USERID_MAX_LENGTH} characters or less")
-        end
-      end
-
-      def valid_ids?(user_ids)
-        user_ids.uniq.length == user_ids.length &&
-          user_ids.all? { |id| valid_id?(id) }
-      end
-
-      def valid_id?(user_id)
-        user_id.present? &&
-          user_id.strip == user_id &&
-          user_id.length <= USERID_MAX_LENGTH
       end
 
       def parameters_error(message)
