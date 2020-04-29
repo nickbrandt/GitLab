@@ -7,7 +7,9 @@ exports[`PackageTitle renders with tags 1`] = `
   <h1
     class="gl-font-size-20-deprecated-no-really-do-not-use-me prepend-top-8 append-bottom-4"
   >
+    
     Test package
+  
   </h1>
    
   <div
@@ -80,7 +82,9 @@ exports[`PackageTitle renders without tags 1`] = `
   <h1
     class="gl-font-size-20-deprecated-no-really-do-not-use-me prepend-top-8 append-bottom-4"
   >
+    
     Test package
+  
   </h1>
    
   <div
