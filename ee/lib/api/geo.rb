@@ -36,7 +36,14 @@ module API
         service = ::Geo::BlobUploadService.new(replicable_name: params[:replicable_name],
                                                blob_id: params[:id],
                                                decoded_params: decoded_params)
-        service.execute
+        response = service.execute
+
+        if response[:code] == :ok
+          file = response[:file]
+          present_carrierwave_file!(file)
+        else
+          error! response, response.delete(:code)
+        end
       end
 
       # Verify the GitLab Geo transfer request is valid
