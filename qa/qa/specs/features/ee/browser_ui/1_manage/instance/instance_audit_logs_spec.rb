@@ -60,9 +60,12 @@ module QA
           new_email_address = 'new_email@example.com'
           Page::Main::Menu.perform(&:click_settings_link)
           Page::Profile::Menu.perform(&:click_emails)
-          Page::Profile::Emails.perform do |emails|
-            emails.add_email_address(new_email_address)
-            emails.delete_email_address(new_email_address)
+          Support::Retrier.retry_until(sleep_interval: 3) do
+            Page::Profile::Emails.perform do |emails|
+              emails.add_email_address(new_email_address)
+              expect(emails).to have_text(new_email_address)
+              emails.delete_email_address(new_email_address)
+            end
           end
         end
 
