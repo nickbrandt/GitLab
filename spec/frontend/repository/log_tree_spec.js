@@ -53,7 +53,7 @@ describe('fetchLogsTree', () => {
     client = {
       readQuery: () => ({
         projectPath: 'gitlab-org/gitlab-foss',
-        ref: 'master',
+        escapedRef: 'master',
         commits: [],
       }),
       writeQuery: jest.fn(),
