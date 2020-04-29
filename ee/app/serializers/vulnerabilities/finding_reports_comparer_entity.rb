@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Vulnerabilities::OccurrenceReportsComparerEntity < Grape::Entity
+class Vulnerabilities::FindingReportsComparerEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :base_report_created_at
