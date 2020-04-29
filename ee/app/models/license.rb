@@ -419,10 +419,6 @@ class License < ApplicationRecord
     restricted_attr(:trial)
   end
 
-  def active?
-    !expired?
-  end
-
   def exclude_guests_from_active_count?
     plan == License::ULTIMATE_PLAN
   end
