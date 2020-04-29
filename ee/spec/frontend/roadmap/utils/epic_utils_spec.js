@@ -7,7 +7,7 @@ describe('extractGroupEpics', () => {
     const { edges } = mockGroupEpicsQueryResponse.data.group.epics;
     const extractedEpics = epicUtils.extractGroupEpics(edges);
 
-    expect(extractedEpics.length).toBe(edges.length);
+    expect(extractedEpics).toHaveLength(edges.length);
     expect(extractedEpics[0]).toEqual(
       expect.objectContaining({
         ...edges[0].node,

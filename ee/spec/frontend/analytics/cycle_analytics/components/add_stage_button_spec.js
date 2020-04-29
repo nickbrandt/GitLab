@@ -28,7 +28,7 @@ describe('AddStageButton', () => {
       expect(wrapper.emitted().showform).toBeUndefined();
       wrapper.trigger('click');
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted().showform.length).toBe(1);
+        expect(wrapper.emitted().showform).toHaveLength(1);
       });
     });
 

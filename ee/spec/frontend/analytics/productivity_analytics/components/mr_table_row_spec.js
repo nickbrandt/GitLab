@@ -78,7 +78,7 @@ describe('MergeRequestTableRow component', () => {
 
     describe('metric columns', () => {
       it('renders two metric columns', () => {
-        expect(findMetricColumns().length).toBe(2);
+        expect(findMetricColumns()).toHaveLength(2);
       });
 
       it('renders the "Time to merge" metric column with the "days_to_merge" metric', () => {

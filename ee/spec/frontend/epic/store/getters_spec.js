@@ -266,14 +266,14 @@ describe('Epic Store Getters', () => {
         ancestors: [{ id: 1, title: 'Parent' }],
       });
 
-      expect(ancestors.length).toBe(1);
+      expect(ancestors).toHaveLength(1);
     });
 
     it('returns empty array when `ancestors` within state is null', () => {
       const ancestors = getters.ancestors({});
 
       expect(ancestors).not.toBeNull();
-      expect(ancestors.length).toBe(0);
+      expect(ancestors).toHaveLength(0);
     });
   });
 });

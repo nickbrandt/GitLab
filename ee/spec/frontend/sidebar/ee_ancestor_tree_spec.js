@@ -20,7 +20,7 @@ describe('AncestorsTreeContainer', () => {
   });
 
   it('renders all ancestors rows', () => {
-    expect(vm.$el.querySelectorAll('.vertical-timeline-row').length).toBe(ancestors.length);
+    expect(vm.$el.querySelectorAll('.vertical-timeline-row')).toHaveLength(ancestors.length);
   });
 
   it('renders tooltip with the immediate parent', () => {

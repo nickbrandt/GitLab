@@ -104,7 +104,7 @@ describe('PackagesApp', () => {
     createComponent(npmPackage, npmFiles);
 
     expect(packageInformation(0)).toExist();
-    expect(allPackageInformation().length).toBe(1);
+    expect(allPackageInformation()).toHaveLength(1);
   });
 
   it('renders package installation instructions for npm packages', () => {
@@ -123,14 +123,14 @@ describe('PackagesApp', () => {
     createComponent(npmPackage, npmFiles);
 
     expect(allFileRows()).toExist();
-    expect(allFileRows().length).toBe(1);
+    expect(allFileRows()).toHaveLength(1);
   });
 
   it('renders multiple files for a package that contains more than one file', () => {
     createComponent();
 
     expect(allFileRows()).toExist();
-    expect(allFileRows().length).toBe(2);
+    expect(allFileRows()).toHaveLength(2);
   });
 
   it('allows the user to download a package file by rendering a download link', () => {

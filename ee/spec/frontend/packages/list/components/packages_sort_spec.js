@@ -60,7 +60,7 @@ describe('packages_sort', () => {
     });
 
     it('has all the sortable items', () => {
-      expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
+      expect(sortingItems).toHaveLength(wrapper.vm.sortableFields.length);
     });
 
     it('on sort change set sorting in vuex and emit event', () => {
@@ -86,7 +86,7 @@ describe('packages_sort', () => {
     });
 
     it('has all the sortable items', () => {
-      expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
+      expect(sortingItems).toHaveLength(wrapper.vm.sortableFields.length);
     });
   });
 });

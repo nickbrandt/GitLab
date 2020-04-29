@@ -40,7 +40,7 @@ describe('History Comment Editor', () => {
     textarea().vm.$emit('input', comment);
     saveButton().vm.$emit('click');
 
-    expect(wrapper.emitted().onSave.length).toBe(1);
+    expect(wrapper.emitted().onSave).toHaveLength(1);
     expect(wrapper.emitted().onSave[0][0]).toBe(comment);
   });
 
@@ -48,7 +48,7 @@ describe('History Comment Editor', () => {
     createWrapper();
     cancelButton().vm.$emit('click');
 
-    expect(wrapper.emitted().onCancel.length).toBe(1);
+    expect(wrapper.emitted().onCancel).toHaveLength(1);
   });
 
   it('disables the save button when there is no text or only whitespace in the textarea', () => {

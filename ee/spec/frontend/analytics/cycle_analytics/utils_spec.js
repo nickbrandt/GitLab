@@ -292,12 +292,12 @@ describe('Cycle analytics utils', () => {
         });
 
         it('contains an array of data for each label', () => {
-          expect(transformed.data.length).toEqual(labels.length);
+          expect(transformed.data).toHaveLength(labels.length);
         });
 
         it('contains a value for each day in the groupBy', () => {
           transformed.data.forEach(d => {
-            expect(d.length).toEqual(transformed.groupBy.length);
+            expect(d).toHaveLength(transformed.groupBy.length);
           });
         });
       });

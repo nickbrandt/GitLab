@@ -36,12 +36,12 @@ describe('EpicHealthStatus', () => {
     const longLabels = wrapper.findAll('.health-label-long');
     const shortLabels = wrapper.findAll('.health-label-short');
 
-    expect(longLabels.length).toBe(3);
-    expect(shortLabels.length).toBe(3);
+    expect(longLabels).toHaveLength(3);
+    expect(shortLabels).toHaveLength(3);
 
     const expectedLongLabels = ['issues on track', 'issues need attention', 'issues at risk'];
 
-    expect(longLabels.length).toBe(expectedLongLabels.length);
+    expect(longLabels).toHaveLength(expectedLongLabels.length);
 
     longLabels.wrappers.forEach((longLabelWrapper, index) => {
       expect(longLabelWrapper.text()).toEqual(expectedLongLabels[index]);
@@ -49,7 +49,7 @@ describe('EpicHealthStatus', () => {
 
     const expectedShortLabels = ['on track', 'need attention', 'at risk'];
 
-    expect(shortLabels.length).toBe(expectedShortLabels.length);
+    expect(shortLabels).toHaveLength(expectedShortLabels.length);
 
     shortLabels.wrappers.forEach((shortLabelWrapper, index) => {
       expect(shortLabelWrapper.text()).toEqual(expectedShortLabels[index]);

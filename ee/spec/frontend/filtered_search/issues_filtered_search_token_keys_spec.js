@@ -42,7 +42,7 @@ describe('Issues Filtered Search Token Keys (EE)', () => {
     it('should return weightConditions as part of conditions', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
 
-      expect(weightConditions.length).toBe(4);
+      expect(weightConditions).toHaveLength(4);
     });
   });
 

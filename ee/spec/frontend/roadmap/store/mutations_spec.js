@@ -62,7 +62,7 @@ describe('Roadmap Store Mutations', () => {
     it('Should insert provided epicId to epicIds array in state', () => {
       mutations[types.UPDATE_EPIC_IDS](state, 22);
 
-      expect(state.epicIds.length).toBe(1);
+      expect(state.epicIds).toHaveLength(1);
       expect(state.epicIds[0]).toBe(22);
     });
   });
@@ -154,7 +154,7 @@ describe('Roadmap Store Mutations', () => {
     it('Should update milestoneIds array', () => {
       mutations[types.UPDATE_MILESTONE_IDS](state, [22]);
 
-      expect(state.milestoneIds.length).toBe(1);
+      expect(state.milestoneIds).toHaveLength(1);
       expect(state.milestoneIds[0]).toBe(22);
     });
   });

@@ -57,7 +57,7 @@ describe('User onboarding tour parts list', () => {
 
   describe('template', () => {
     it('renders a list item for each tour title', () => {
-      expect(wrapper.findAll('.tour-item').length).toEqual(tourTitles.length);
+      expect(wrapper.findAll('.tour-item')).toHaveLength(tourTitles.length);
     });
 
     it('adds the "active" class to the first tour item', () => {

@@ -122,7 +122,7 @@ describe('MetricChart component', () => {
           });
 
           it('renders a dropdown item for each item in metricTypes', () => {
-            expect(findMetricDropdownItems().length).toBe(2);
+            expect(findMetricDropdownItems()).toHaveLength(2);
           });
 
           it('should emit `metricTypeChange` event when dropdown item gets clicked', () => {

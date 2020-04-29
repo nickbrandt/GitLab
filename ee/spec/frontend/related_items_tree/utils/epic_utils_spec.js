@@ -109,7 +109,7 @@ describe('RelatedItemsTree', () => {
           mockQueryResponse2.data.group.epic.children,
         );
 
-        expect(formattedChildren.length).toBe(
+        expect(formattedChildren).toHaveLength(
           mockQueryResponse2.data.group.epic.children.edges.length,
         );
         expect(formattedChildren[0]).toHaveProperty('type', ChildType.Epic);
@@ -122,7 +122,7 @@ describe('RelatedItemsTree', () => {
       it('returns updated assignees array with `edges->node` nesting removed', () => {
         const formattedChildren = epicUtils.extractIssueAssignees(mockIssue1.assignees);
 
-        expect(formattedChildren.length).toBe(mockIssue1.assignees.edges.length);
+        expect(formattedChildren).toHaveLength(mockIssue1.assignees.edges.length);
         expect(formattedChildren[0]).toHaveProperty(
           'username',
           mockIssue1.assignees.edges[0].node.username,
@@ -136,7 +136,7 @@ describe('RelatedItemsTree', () => {
           mockQueryResponse2.data.group.epic.issues,
         );
 
-        expect(formattedChildren.length).toBe(
+        expect(formattedChildren).toHaveLength(
           mockQueryResponse2.data.group.epic.issues.edges.length,
         );
         expect(formattedChildren[0]).toHaveProperty('type', ChildType.Issue);
@@ -148,7 +148,7 @@ describe('RelatedItemsTree', () => {
       it('returns array of issues and epics from query response with open epics and issues being on top of the list', () => {
         const formattedChildren = epicUtils.processQueryResponse(mockQueryResponse2.data.group);
 
-        expect(formattedChildren.length).toBe(5); // 2 Epics and 3 Issues
+        expect(formattedChildren).toHaveLength(5); // 2 Epics and 3 Issues
         expect(formattedChildren[0]).toHaveProperty('type', ChildType.Epic);
         expect(formattedChildren[0]).toHaveProperty('state', 'opened');
         expect(formattedChildren[1]).toHaveProperty('type', ChildType.Issue);

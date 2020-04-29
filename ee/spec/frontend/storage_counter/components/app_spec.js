@@ -37,7 +37,7 @@ describe('Storage counter app', () => {
     wrapper.vm
       .$nextTick()
       .then(() => {
-        expect(wrapper.findAll(Project).length).toEqual(2);
+        expect(wrapper.findAll(Project)).toHaveLength(2);
       })
       .then(done)
       .catch(done.fail);

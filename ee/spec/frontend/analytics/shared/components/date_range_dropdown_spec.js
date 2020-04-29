@@ -31,7 +31,7 @@ describe('DateRangeDropdown component', () => {
   });
 
   it('renders 3 dropdown items', () => {
-    expect(findDropdownElements().length).toBe(3);
+    expect(findDropdownElements()).toHaveLength(3);
   });
 
   it('displays the correct label for the first dropdown item', () => {

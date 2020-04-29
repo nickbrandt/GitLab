@@ -152,7 +152,7 @@ describe('EE Approvals MRRules', () => {
       store.modules.approvals.state.rules = [createMRRule()];
       factory();
 
-      expect(store.modules.approvals.state.rules.length).toBe(2);
+      expect(store.modules.approvals.state.rules).toHaveLength(2);
     });
 
     it('should always display any_approver first', () => {
@@ -170,7 +170,7 @@ describe('EE Approvals MRRules', () => {
         rule => rule.ruleType === 'any_approver',
       );
 
-      expect(anyApproverCount.length).toBe(1);
+      expect(anyApproverCount).toHaveLength(1);
     });
 
     it('renders headers when there are multiple rules', () => {
@@ -254,7 +254,7 @@ describe('EE Approvals MRRules', () => {
       factory();
 
       expect(store.modules.approvals.state.rules[0].ruleType).toBe('regular');
-      expect(store.modules.approvals.state.rules.length).toBe(1);
+      expect(store.modules.approvals.state.rules).toHaveLength(1);
     });
 
     it('should only show single any_approver rule', () => {
@@ -262,7 +262,7 @@ describe('EE Approvals MRRules', () => {
       factory();
 
       expect(store.modules.approvals.state.rules[0].ruleType).toBe('any_approver');
-      expect(store.modules.approvals.state.rules.length).toBe(1);
+      expect(store.modules.approvals.state.rules).toHaveLength(1);
     });
 
     it('does not show name header for any rule', () => {

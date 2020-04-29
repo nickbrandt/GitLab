@@ -113,7 +113,7 @@ describe('dashboard', () => {
     describe('project header', () => {
       it('should have one project header per project', () => {
         const headers = wrapper.findAll(ProjectHeader);
-        expect(headers.length).toBe(2);
+        expect(headers).toHaveLength(2);
       });
 
       it('should remove a project if it emits `remove`', () => {
@@ -126,7 +126,7 @@ describe('dashboard', () => {
     describe('environment component', () => {
       it('should have one environment component per environment', () => {
         const environments = wrapper.findAll(Environment);
-        expect(environments.length).toBe(3);
+        expect(environments).toHaveLength(3);
       });
     });
 

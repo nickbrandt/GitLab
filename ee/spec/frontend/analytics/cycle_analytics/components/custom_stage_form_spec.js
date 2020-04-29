@@ -288,7 +288,7 @@ describe('CustomStageForm', () => {
     it('will update the list of stop events when a start event is changed', () => {
       let stopOptions = wrapper.find(sel.endEvent).findAll('option');
       const selectedStartEvent = startEvents[startEventDropdownIndex];
-      expect(stopOptions.length).toEqual(1);
+      expect(stopOptions).toHaveLength(1);
 
       selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
 
@@ -488,7 +488,7 @@ describe('CustomStageForm', () => {
         return Vue.nextTick().then(() => {
           event = findEvent(STAGE_ACTIONS.CREATE);
           expect(event).toBeTruthy();
-          expect(event.length).toEqual(1);
+          expect(event).toHaveLength(1);
         });
       });
 
@@ -583,7 +583,7 @@ describe('CustomStageForm', () => {
         .then(() => {
           ev = findEvent('cancel');
           expect(ev).toBeTruthy();
-          expect(ev.length).toEqual(1);
+          expect(ev).toHaveLength(1);
         });
     });
   });
@@ -697,7 +697,7 @@ describe('CustomStageForm', () => {
           .then(() => {
             ev = findEvent(STAGE_ACTIONS.UPDATE);
             expect(ev).toBeTruthy();
-            expect(ev.length).toEqual(1);
+            expect(ev).toHaveLength(1);
           });
       });
 

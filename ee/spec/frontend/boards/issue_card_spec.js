@@ -87,7 +87,7 @@ describe('Issue card component', () => {
 
       createComponent({ groupId: 1 });
 
-      expect(wrapper.findAll(GlLabel).length).toBe(3);
+      expect(wrapper.findAll(GlLabel)).toHaveLength(3);
       expect(wrapper.find(GlLabel).props('title')).toContain(title);
     });
 
@@ -101,7 +101,7 @@ describe('Issue card component', () => {
       };
       createComponent({}, store);
 
-      expect(wrapper.findAll('.board-card-labels').length).toBe(0);
+      expect(wrapper.findAll('.board-card-labels')).toHaveLength(0);
     });
   });
 

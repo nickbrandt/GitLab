@@ -132,7 +132,7 @@ describe('ProjectsDropdownFilter component', () => {
       });
 
       it('contains 3 items', () => {
-        expect(findDropdownItems().length).toEqual(3);
+        expect(findDropdownItems()).toHaveLength(3);
       });
 
       it('renders an avatar when the project has an avatar_url', () => {
@@ -257,7 +257,7 @@ describe('ProjectsDropdownFilter component', () => {
       });
 
       it('contains 3 items', () => {
-        expect(findDropdownItems().length).toEqual(3);
+        expect(findDropdownItems()).toHaveLength(3);
       });
 
       it('renders an avatar when the project has an avatar_url', () => {

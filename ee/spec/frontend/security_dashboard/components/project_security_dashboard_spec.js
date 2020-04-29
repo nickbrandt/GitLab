@@ -102,7 +102,7 @@ describe('Project Security Dashboard component', () => {
     it('renders one filter less because projects filter is locked', () => {
       const dashboard = findDashboard();
       const filters = dashboard.findAll('.dashboard-filter');
-      expect(filters.length).toBe(wrapper.vm.$store.state.filters.filters.length - 1);
+      expect(filters).toHaveLength(wrapper.vm.$store.state.filters.filters.length - 1);
     });
   });
 
