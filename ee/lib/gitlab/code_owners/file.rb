@@ -95,10 +95,7 @@ module Gitlab
       end
 
       def skip?(line)
-        return true unless line.present?
-        return true if line.starts_with?('#')
-
-        false
+        line.blank? || line.starts_with?('#')
       end
 
       def normalize_pattern(pattern)
