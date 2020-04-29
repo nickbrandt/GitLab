@@ -63,55 +63,14 @@ export default {
   [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
     state.medians = {};
   },
-  [types.SHOW_CUSTOM_STAGE_FORM](state) {
-    state.isCreatingCustomStage = true;
-    state.isEditingCustomStage = false;
-    state.customStageFormInitialData = null;
-    state.customStageFormErrors = null;
-  },
-  [types.SHOW_EDIT_CUSTOM_STAGE_FORM](state, initialData) {
-    state.isEditingCustomStage = true;
-    state.isCreatingCustomStage = false;
-    state.customStageFormInitialData = initialData;
-    state.customStageFormErrors = null;
-  },
-  [types.HIDE_CUSTOM_STAGE_FORM](state) {
-    state.isEditingCustomStage = false;
-    state.isCreatingCustomStage = false;
-    state.customStageFormInitialData = null;
-    state.customStageFormErrors = null;
-  },
-  [types.CLEAR_CUSTOM_STAGE_FORM_ERRORS](state) {
-    state.customStageFormErrors = null;
-  },
-  [types.REQUEST_GROUP_STAGES_AND_EVENTS](state) {
+  [types.REQUEST_GROUP_STAGES](state) {
     state.stages = [];
-    state.customStageFormEvents = [];
   },
-  [types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR](state) {
+  [types.RECEIVE_GROUP_STAGES_ERROR](state) {
     state.stages = [];
-    state.customStageFormEvents = [];
   },
-  [types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, data) {
-    const { events = [], stages = [] } = data;
+  [types.RECEIVE_GROUP_STAGES_SUCCESS](state, stages) {
     state.stages = transformRawStages(stages);
-
-    state.customStageFormEvents = events.map(ev =>
-      convertObjectPropsToCamelCase(ev, { deep: true }),
-    );
-  },
-  [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
-    state.isSavingCustomStage = true;
-    state.customStageFormErrors = {};
-  },
-  [types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR](state, { errors = null } = {}) {
-    state.isSavingCustomStage = false;
-    state.customStageFormErrors = convertObjectPropsToCamelCase(errors, { deep: true });
-  },
-  [types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS](state) {
-    state.isSavingCustomStage = false;
-    state.customStageFormErrors = null;
-    state.customStageFormInitialData = null;
   },
   [types.REQUEST_UPDATE_STAGE](state) {
     state.isLoading = true;

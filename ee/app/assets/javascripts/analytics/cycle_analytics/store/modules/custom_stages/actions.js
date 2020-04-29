@@ -15,17 +15,17 @@ const isStageNameExistsError = ({ status, errors }) => {
 
 export const setStageEvents = ({ commit }, data) => commit(types.SET_STAGE_EVENTS, data);
 
-export const hideCustomStageForm = ({ commit }) => {
-  commit(types.HIDE_CUSTOM_STAGE_FORM);
+export const hideForm = ({ commit }) => {
+  commit(types.HIDE_FORM);
   removeFlash();
 };
 
-export const showCustomStageForm = ({ commit }) => {
-  commit(types.SHOW_CUSTOM_STAGE_FORM);
+export const showCreateForm = ({ commit }) => {
+  commit(types.SHOW_CREATE_FORM);
   removeFlash();
 };
 
-export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}) => {
+export const showEditForm = ({ commit, dispatch }, selectedStage = {}) => {
   const {
     id = null,
     name = null,
@@ -35,7 +35,7 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
     endEventLabel: { id: endEventLabelId = null } = {},
   } = selectedStage;
 
-  commit(types.SHOW_EDIT_CUSTOM_STAGE_FORM, {
+  commit(types.SHOW_EDIT_FORM, {
     id,
     name,
     startEventIdentifier,
@@ -47,14 +47,14 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
   removeFlash();
 };
 
-export const clearCustomStageFormErrors = ({ commit }) => {
-  commit(types.CLEAR_CUSTOM_STAGE_FORM_ERRORS);
+export const clearFormErrors = ({ commit }) => {
+  commit(types.CLEAR_FORM_ERRORS);
   removeFlash();
 };
 
-export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
-export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS);
+export const requestCreateStage = ({ commit }) => commit(types.REQUEST_CREATE_STAGE);
+export const receiveCreateStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
+  commit(types.RECEIVE_CREATE_STAGE_SUCCESS);
   createFlash(sprintf(__(`Your custom stage '%{title}' was created`), { title }), 'notice');
 
   return Promise.resolve()
@@ -64,11 +64,11 @@ export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { 
     });
 };
 
-export const receiveCreateCustomStageError = (
+export const receiveCreateStageError = (
   { commit },
   { status = 400, errors = {}, data = {} } = {},
 ) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, { errors });
+  commit(types.RECEIVE_CREATE_STAGE_ERROR, { errors });
   const { name = null } = data;
   const flashMessage =
     name && isStageNameExistsError({ status, errors })
@@ -78,20 +78,20 @@ export const receiveCreateCustomStageError = (
   createFlash(flashMessage);
 };
 
-export const createCustomStage = ({ dispatch, state }, data) => {
+export const createStage = ({ dispatch, state }, data) => {
   const {
     selectedGroup: { fullPath },
   } = state;
-  dispatch('requestCreateCustomStage');
+  dispatch('requestCreateStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
     .then(response => {
       const { status, data: responseData } = response;
-      return dispatch('receiveCreateCustomStageSuccess', { status, data: responseData });
+      return dispatch('receiveCreateStageSuccess', { status, data: responseData });
     })
     .catch(({ response } = {}) => {
       const { data: { message, errors } = null, status = 400 } = response;
 
-      dispatch('receiveCreateCustomStageError', { data, message, errors, status });
+      dispatch('receiveCreateStageError', { data, message, errors, status });
     });
 };

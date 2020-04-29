@@ -1,7 +1,7 @@
 export default () => ({
-  isSaving: false,
-  isCreating: false,
-  isEditing: false,
+  isSavingCustomStage: false,
+  isCreatingCustomStage: false,
+  isEditingCustomStage: false,
 
   formEvents: [],
   formErrors: null,
