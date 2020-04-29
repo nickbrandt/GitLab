@@ -119,7 +119,21 @@ describe 'getting an issue list for a project' do
 
   describe 'sorting and pagination' do
     let(:start_cursor) { graphql_data['project']['issues']['pageInfo']['startCursor'] }
-    let(:end_cursor) { graphql_data['project']['issues']['pageInfo']['endCursor'] }
+    let(:end_cursor)   { graphql_data['project']['issues']['pageInfo']['endCursor'] }
+    let(:data_path)    { [:project, :issues] }
+
+    def pagination_query(params, page_info)
+      graphql_query_for(
+        'project',
+        { 'fullPath' => sort_project.full_path },
+        "issues(#{params}) { #{page_info} edges { node { iid dueDate } } }"
+      )
+    end
+
+    def pagination_results_data(data)
+      data.map { |issue| issue.dig('node', 'iid').to_i }
+    end
+
 
     context 'when sorting by due date' do
       let_it_be(:sort_project) { create(:project, :public) }
@@ -384,6 +398,31 @@ describe 'getting an issue list for a project' do
 
             expect(grab_iids(response_data)).to eq [label_issue1.iid, label_issue4.iid]
           end
+        end
+      end
+    end
+
+    context 'when sorting by milestone due date' do
+      let_it_be(:sort_project) { create(:project, :public) }
+      let_it_be(:early_milestone) { create(:milestone, project: sort_project, due_date: 10.days.from_now) }
+      let_it_be(:late_milestone) { create(:milestone, project: sort_project, due_date: 30.days.from_now) }
+      let_it_be(:milestone_issue1) { create(:issue, project: sort_project) }
+      let_it_be(:milestone_issue2) { create(:issue, project: sort_project, milestone: early_milestone) }
+      let_it_be(:milestone_issue3) { create(:issue, project: sort_project, milestone: late_milestone) }
+
+      context 'when ascending' do
+        it_behaves_like 'sorted paginated query' do
+          let(:sort_param)       { 'MILESTONE_DUE_ASC' }
+          let(:first_param)      { 2 }
+          let(:expected_results) { [milestone_issue2.iid, milestone_issue3.iid, milestone_issue1.iid] }
+        end
+      end
+
+      context 'when descending' do
+        it_behaves_like 'sorted paginated query' do
+          let(:sort_param)       { 'MILESTONE_DUE_DESC' }
+          let(:first_param)      { 2 }
+          let(:expected_results) { [milestone_issue3.iid, milestone_issue2.iid, milestone_issue1.iid] }
         end
       end
     end
