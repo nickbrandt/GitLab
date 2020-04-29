@@ -45,7 +45,7 @@ module Audit
 
         "Updated ref #{target_ref} from #{from_sha} to #{to_sha}"
       when :custom_message
-        detail_value
+        @details.dig(:custom_message)
       else
         text_for_change(target_name)
       end

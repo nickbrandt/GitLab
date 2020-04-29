@@ -273,5 +273,26 @@ describe Audit::Details do
         expect(string).to eq("Removed user access via system job. Reason: access expired on #{member.expires_at}")
       end
     end
+
+    context 'creates release event' do
+      let(:user_member) { create(:user) }
+      let(:member) { create(:project_member, :developer, user: user_member, project: project, expires_at: 1.day.from_now) }
+      let(:release_creation_action) do
+        {
+          action: :custom,
+          custom_message: 'Created Release 1.0',
+          target_id: user_member.id,
+          target_type: 'Release',
+          target_details: '1.0',
+          entity_path: 'root/test-project'
+        }
+      end
+
+      it 'returns correct action name' do
+        string = described_class.humanize(release_creation_action)
+
+        expect(string).to eq('Created Release 1.0')
+      end
+    end
   end
 end

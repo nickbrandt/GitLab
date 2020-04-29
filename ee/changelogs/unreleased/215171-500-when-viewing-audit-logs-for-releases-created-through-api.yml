@@ -1,0 +1,5 @@
+---
+title: Fix showing admin audit log when release created via API
+merge_request: 30714
+author:
+type: fixed
