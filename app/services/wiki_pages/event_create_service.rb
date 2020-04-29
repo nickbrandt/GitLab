@@ -12,10 +12,11 @@ module WikiPages
 
       event = Event.transaction do
         wiki_page_meta = WikiPage::Meta.find_or_create(slug, page)
+
         ::EventCreateService.new.wiki_event(wiki_page_meta, author, action)
       end
 
-      ServiceResponse.success(message: 'Event created', payload: { event: event })
+      ServiceResponse.success(payload: { event: event })
     rescue ::EventCreateService::IllegalActionError, ::ActiveRecord::ActiveRecordError => e
       ServiceResponse.error(message: e.message, payload: { error: e })
     end

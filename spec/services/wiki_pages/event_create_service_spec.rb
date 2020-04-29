@@ -41,6 +41,18 @@ describe WikiPages::EventCreateService do
       expect(response).to be_success
     end
 
+    context 'the action is a deletion' do
+      let(:action) { Event::DESTROYED }
+
+      it 'does not synchronize the wiki metadata timestamps with the git commit' do
+        expect_next_instance_of(WikiPage::Meta) do |instance|
+          expect(instance).not_to receive(:synch_times_with_page)
+        end
+
+        response
+      end
+    end
+
     it 'creates a wiki page event' do
       expect { response }.to change(Event, :count).by(1)
     end
