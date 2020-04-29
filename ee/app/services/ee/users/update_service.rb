@@ -5,7 +5,7 @@ module EE
     module UpdateService
       extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
-      include Audit::Changes
+      include ::Audit::Changes
 
       attr_reader :group_id_for_saml
 
