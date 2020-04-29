@@ -48,7 +48,7 @@ module Ci
 
       if Feature.enabled?(:keep_latest_artifact_for_ref, job.project)
         artifact.locked = true
-        artifact_metadata.locked = true
+        artifact_metadata&.locked = true
       end
 
       [artifact, artifact_metadata]
