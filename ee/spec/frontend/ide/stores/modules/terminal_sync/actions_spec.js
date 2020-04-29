@@ -73,7 +73,7 @@ describe('ee/ide/stores/modules/terminal_sync/actions', () => {
 
       const result = actions.start({ rootState: { terminal: { session } } });
 
-      expect(result).rejects.toBe(undefined);
+      return expect(result).rejects.toBe(undefined);
     });
 
     describe('with terminal session in state', () => {
@@ -106,11 +106,12 @@ describe('ee/ide/stores/modules/terminal_sync/actions', () => {
 
         const result = actions.start({ rootState, commit });
 
-        expect(result).rejects.toEqual(err);
-
-        return result.catch(() => {
-          expect(commit).toHaveBeenCalledWith(types.SET_ERROR, err);
-        });
+        return Promise.all([
+          expect(result).rejects.toEqual(err),
+          result.catch(() => {
+            expect(commit).toHaveBeenCalledWith(types.SET_ERROR, err);
+          }),
+        ]);
       });
     });
   });

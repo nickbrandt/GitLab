@@ -67,8 +67,6 @@ describe('Design management list item component', () => {
       image = wrapper.find('img');
       glIntersectionObserver = wrapper.find(GlIntersectionObserver);
 
-      expect(image.attributes('src')).toBe('');
-
       glIntersectionObserver.vm.$emit('appear');
       return wrapper.vm.$nextTick();
     });
