@@ -95,14 +95,20 @@ describe MergeRequests::RefreshService do
         subject
       end
 
-      it 'creates an approval rule based on current diff' do
-        file = File.read(Rails.root.join('ee', 'spec', 'fixtures', 'codeowners_example'))
-        project.repository.create_file(owner, 'CODEOWNERS', file, { branch_name: 'test', message: 'codeowners' })
+      context 'when :sectional_codeowners is disabled' do
+        before do
+          stub_feature_flags(sectional_codeowners: false)
+        end
 
-        subject
+        it 'creates an approval rule based on current diff' do
+          file = File.read(Rails.root.join('ee', 'spec', 'fixtures', 'codeowners_example'))
+          project.repository.create_file(owner, 'CODEOWNERS', file, { branch_name: 'test', message: 'codeowners' })
 
-        expect(another_merge_request.approval_rules.size).to eq(3)
-        expect(another_merge_request.approval_rules.first.rule_type).to eq('code_owner')
+          subject
+
+          expect(another_merge_request.approval_rules.size).to eq(3)
+          expect(another_merge_request.approval_rules.first.rule_type).to eq('code_owner')
+        end
       end
 
       context 'when code owners disabled' do
