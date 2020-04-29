@@ -35,6 +35,7 @@ class License < ApplicationRecord
     repository_mirrors
     repository_size_limit
     seat_link
+    service_desk
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -96,7 +97,6 @@ class License < ApplicationRecord
     reject_unsigned_commits
     required_ci_templates
     scoped_labels
-    service_desk
     smartcard_auth
     group_timelogs
     type_of_work_analytics

@@ -11,6 +11,12 @@ describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
+    insert_after_sub_nav_item(
+      _('Labels'),
+      within: _('Issues'),
+      new_sub_nav_item_name: _('Service Desk')
+    )
+
     project.add_maintainer(user)
     sign_in(user)
   end
@@ -23,22 +29,6 @@ describe 'Project navbar' do
         _('Code Review'),
         within: _('Analytics'),
         new_sub_nav_item_name: _('Issues')
-      )
-
-      visit project_path(project)
-    end
-
-    it_behaves_like 'verified navigation bar'
-  end
-
-  context 'when service desk is available' do
-    before do
-      stub_licensed_features(service_desk: true)
-
-      insert_after_sub_nav_item(
-        _('Labels'),
-        within: _('Issues'),
-        new_sub_nav_item_name: _('Service Desk')
       )
 
       visit project_path(project)
