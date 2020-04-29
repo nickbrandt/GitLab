@@ -10,7 +10,7 @@ class Admin::LicensesController < Admin::ApplicationController
     if @license.blank?
       render :missing
     else
-      @previous_licenses = License.previous
+      @licenses = License.history
     end
   end
 

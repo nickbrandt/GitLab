@@ -737,6 +737,33 @@ describe License do
     end
   end
 
+  describe '.history' do
+    before(:all) do
+      described_class.delete_all
+    end
+
+    it 'returns the licenses sorted by created_at, starts_at and expires_at descending' do
+      today = Date.current
+      now = Time.current
+
+      past_license = create(:license, created_at: now - 1.month, data: build(:gitlab_license, starts_at: today - 1.month, expires_at: today + 11.months).export)
+      expired_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 1.year, expires_at: today - 1.month).export)
+      future_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today + 1.month, expires_at: today + 13.months).export)
+      another_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 1.month, expires_at: today + 1.year).export)
+      current_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 15.days, expires_at: today + 11.months).export)
+
+      expect(described_class.history.map(&:id)).to eq(
+        [
+          future_license.id,
+          current_license.id,
+          another_license.id,
+          past_license.id,
+          expired_license.id
+        ]
+      )
+    end
+  end
+
   describe '#edition' do
     let(:ultimate) { build(:license, plan: 'ultimate') }
     let(:premium) { build(:license, plan: 'premium') }
