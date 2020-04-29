@@ -228,8 +228,8 @@ export const fetchPrometheusMetric = ({ commit, state }, { metric, defaultQueryP
     queryParams.step = metric.step;
   }
 
-  if (state.variables.length > 0) {
-    queryParams.variables = state.variables;
+  if (state.promVariables.length > 0) {
+    queryParams.variables = state.promVariables;
   }
 
   commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metricId });

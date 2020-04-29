@@ -124,6 +124,7 @@ export const timeRangeFromUrl = (search = window.location.search) => {
  *
  * @returns {Array} The custom variables defined by the
  * user in the URL
+ * @param {String} New URL
  */
 
 export const customVariablesFromUrl = (search = window.location.search) => {

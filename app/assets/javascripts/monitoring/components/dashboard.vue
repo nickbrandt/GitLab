@@ -212,7 +212,6 @@ export default {
       hasValidDates: true,
       timeRanges,
       isRearrangingPanels: false,
-      customVariables: customVariablesFromUrl(),
     };
   },
   computed: {
@@ -284,7 +283,7 @@ export default {
       this.setGettingStartedEmptyState();
     } else {
       this.setTimeRange(this.selectedTimeRange);
-      this.setVariables(this.customVariables);
+      this.setVariables(customVariablesFromUrl());
       this.fetchData();
     }
   },
