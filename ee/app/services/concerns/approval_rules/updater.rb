@@ -2,7 +2,7 @@
 
 module ApprovalRules
   module Updater
-    include Audit::Changes
+    include ::Audit::Changes
 
     def action
       filter_eligible_users!
