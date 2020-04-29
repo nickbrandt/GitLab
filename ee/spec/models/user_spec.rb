@@ -1143,4 +1143,14 @@ describe User do
       it { is_expected.to eql(expected_result) }
     end
   end
+
+  describe '#security_dashboard' do
+    let(:user) { create(:user) }
+
+    subject(:security_dashboard) { user.security_dashboard }
+
+    it 'returns an instance of InstanceSecurityDashboard for the user' do
+      expect(security_dashboard).to be_a(InstanceSecurityDashboard)
+    end
+  end
 end

@@ -349,6 +349,10 @@ module EE
       gitlab_employee? ? 'GitLab' : super
     end
 
+    def security_dashboard
+      InstanceSecurityDashboard.new(self)
+    end
+
     protected
 
     override :password_required?
