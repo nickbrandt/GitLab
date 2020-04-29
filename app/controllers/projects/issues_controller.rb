@@ -154,13 +154,10 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def related_branches
-    @related_branches = Issues::RelatedBranchesService.new(project, current_user).execute(issue)
-    @branch_info = @related_branches.map do |branch_name|
-      branch = @project.repository.find_branch(branch_name)
-      target = branch&.dereferenced_target
-      pipeline = @project.pipeline_for(branch_name, target.sha) if target
-      { name: branch_name, pipeline: pipeline }
-    end
+    @related_branches = Issues::RelatedBranchesService
+      .new(project, current_user)
+      .execute(issue)
+      .map { |name| { name: name, link: branch_link(name), pipeline_status: pipeline_status(name) } }
 
     respond_to do |format|
       format.json do
@@ -311,6 +308,18 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   private
+
+  def branch_link(branch_name)
+    project_compare_path(project, from: project.default_branch, to: branch_name)
+  end
+
+  def pipeline_status(branch_name)
+    branch = @project.repository.find_branch(branch_name)
+    target = branch&.dereferenced_target
+    pipeline = @project.pipeline_for(branch_name, target.sha) if target
+
+    pipeline.detailed_status(current_user) if can?(current_user, :read_pipeline, pipeline)
+  end
 
   def create_rate_limit
     key = :issues_create

@@ -243,7 +243,7 @@ describe Projects::IssuesController do
     end
   end
 
-  describe '#related_branches', :aggregate_failures do
+  describe '#related_branches' do
     subject { get :related_branches, params: params, format: :json }
 
     before do
@@ -272,12 +272,11 @@ describe Projects::IssuesController do
     end
 
     context 'there are no related branches' do
-      it 'assigns empty arrays' do
+      it 'assigns empty arrays', :aggregate_failures do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(assigns(:related_branches)).to be_empty
-        expect(assigns(:branch_info)).to be_empty
         expect(response).to render_template('projects/issues/_related_branches')
         expect(json_response).to eq('html' => '')
       end
@@ -285,12 +284,33 @@ describe Projects::IssuesController do
 
     context 'there are related branches' do
       let(:missing_branch) { "#{issue.to_branch_name}-missing" }
-      let(:repo) { double('Repo', branch_names: branch_names) }
+      let(:unreadable_branch_name) { "#{issue.to_branch_name}-unreadable" }
+      let(:repo) { double('Repo', root_ref: 'refs/heads/master', branch_names: branch_names) }
       let(:sha) { 'abcdef' }
-      let(:pipeline) { build(:ci_pipeline, :success) }
-      let(:branch) { double('Branch', dereferenced_target: double('Target', sha: sha)) }
+      let(:pipeline) { build(:ci_pipeline, :success, project: project) }
+      let(:unreadable_pipeline) { build(:ci_pipeline, :running) }
+      let(:branch) { make_branch }
+      let(:unreadable_branch) { make_branch }
       let(:branch_names) do
-        [ generate(:branch), "#{issue.iid}doesnt-match", issue.to_branch_name, missing_branch ]
+        [
+          generate(:branch),
+          "#{issue.iid}doesnt-match",
+          issue.to_branch_name,
+          missing_branch,
+          unreadable_branch_name
+        ]
+      end
+
+      def make_branch
+        double('Branch', dereferenced_target: double('Target', sha: sha))
+      end
+
+      def branch_info(name, status)
+        {
+          name: name,
+          link: controller.project_compare_path(project, from: project.default_branch, to: name),
+          pipeline_status: status
+        }
       end
 
       before do
@@ -302,20 +322,25 @@ describe Projects::IssuesController do
           .with(issue.to_branch_name).and_return(branch)
         allow(repo).to receive(:find_branch)
           .with(missing_branch).and_return(nil)
+        allow(repo).to receive(:find_branch)
+          .with(unreadable_branch_name).and_return(unreadable_branch)
 
-        allow(project).to receive(:pipeline_for)
+        expect(project).to receive(:pipeline_for)
           .with(issue.to_branch_name, sha)
           .and_return(pipeline)
+        expect(project).to receive(:pipeline_for)
+          .with(unreadable_branch_name, sha)
+          .and_return(unreadable_pipeline)
       end
 
-      it 'finds and assigns the appropriate branch information' do
+      it 'finds and assigns the appropriate branch information', :aggregate_failures do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(assigns(:related_branches)).to contain_exactly(issue.to_branch_name, missing_branch)
-        expect(assigns(:branch_info)).to contain_exactly(
-          a_hash_including(name: issue.to_branch_name, pipeline: pipeline),
-          a_hash_including(name: missing_branch, pipeline: nil)
+        expect(assigns(:related_branches)).to contain_exactly(
+          branch_info(issue.to_branch_name, an_instance_of(Gitlab::Ci::Status::Success)),
+          branch_info(missing_branch, be_nil),
+          branch_info(unreadable_branch_name, be_nil)
         )
         expect(response).to render_template('projects/issues/_related_branches')
         expect(json_response).to match('html' => String)
