@@ -41,7 +41,7 @@ export default {
       target="_blank"
       class="d-flex-center pl-1"
     >
-      <icon name="question-o" />
+      <icon name="question" />
     </gl-link>
   </div>
 </template>

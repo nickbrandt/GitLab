@@ -25,7 +25,7 @@ export default {
       <icon
         id="pop-approver"
         tabindex="0"
-        name="question-o"
+        name="question"
         :aria-label="__('help')"
         :size="14"
         class="author-link suggestion-help-hover"
