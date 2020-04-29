@@ -66,7 +66,7 @@ export default {
         <gl-link
           ref="pipeline-project"
           :href="packagePipeline.project.web_url"
-          class="text-primary font-weight-bold text-truncate"
+          class="font-weight-bold text-truncate"
         >
           {{ packagePipeline.project.name }}
         </gl-link>
