@@ -30,8 +30,7 @@ module EE
               ::Types::VulnerabilityType.connection_type,
               null: true,
               description: 'Vulnerabilities reported on the projects in the group and its subgroups',
-              resolver: Resolvers::VulnerabilitiesResolver,
-              feature_flag: :first_class_vulnerabilities
+              resolver: Resolvers::VulnerabilitiesResolver
       end
     end
   end

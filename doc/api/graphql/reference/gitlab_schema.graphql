@@ -4001,8 +4001,7 @@ type Group {
   visibility: String
 
   """
-  Vulnerabilities reported on the projects in the group and its subgroups.
-  Available only when feature flag `first_class_vulnerabilities` is enabled
+  Vulnerabilities reported on the projects in the group and its subgroups
   """
   vulnerabilities(
     """
@@ -7237,7 +7236,7 @@ type Project {
   visibility: String
 
   """
-  Vulnerabilities reported on the project. Available only when feature flag `first_class_vulnerabilities` is enabled
+  Vulnerabilities reported on the project
   """
   vulnerabilities(
     """
@@ -7282,8 +7281,7 @@ type Project {
   ): VulnerabilityConnection
 
   """
-  Counts for each severity of vulnerability of the project. Available only when
-  feature flag `first_class_vulnerabilities` is enabled
+  Counts for each severity of vulnerability of the project
   """
   vulnerabilitySeveritiesCount: VulnerabilitySeveritiesCount
 
