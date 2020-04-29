@@ -6,15 +6,12 @@ RSpec.shared_context 'rake task object storage shared context' do
   end
 
   around do |example|
-    old_direct_upload_setting     = Settings.uploads.object_store['direct_upload']
-    old_background_upload_setting = Settings.uploads.object_store['background_upload']
+    old_object_store_setting = Settings.uploads.object_store['enabled']
 
-    Settings.uploads.object_store['direct_upload']     = true
-    Settings.uploads.object_store['background_upload'] = true
+    Settings.uploads.object_store['enabled'] = true
 
     example.run
 
-    Settings.uploads.object_store['direct_upload']     = old_direct_upload_setting
-    Settings.uploads.object_store['background_upload'] = old_background_upload_setting
+    Settings.uploads.object_store['enabled'] = old_object_store_setting
   end
 end

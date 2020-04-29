@@ -27,10 +27,8 @@ module Gitlab
         end
 
         def disable_upload_object_storage
-          overwrite_uploads_setting('background_upload', false) do
-            overwrite_uploads_setting('direct_upload', false) do
-              yield
-            end
+          overwrite_uploads_setting('enabled', false) do
+            yield
           end
         end
 

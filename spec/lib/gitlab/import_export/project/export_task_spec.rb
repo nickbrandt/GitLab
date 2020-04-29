@@ -30,7 +30,7 @@ describe Gitlab::ImportExport::Project::ExportTask do
     around do |example|
       example.run
     ensure
-      File.delete(file_path) if File.exists?(file_path)
+      File.delete(file_path) if File.exist?(file_path)
     end
 
     include_context 'rake task object storage shared context'
