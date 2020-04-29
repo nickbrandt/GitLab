@@ -23,6 +23,7 @@ module Mutations
 
       def resolve(vulnerability_ids:, comment: nil)
         vulnerability_ids
+          .uniq
           .map(&method(:authorized_find!))
           .map { |vulnerability| dismiss_vulnerability(vulnerability, comment) }
           .then do |vulnerabilities|

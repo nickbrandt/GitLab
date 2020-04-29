@@ -7,8 +7,8 @@ describe Mutations::Vulnerabilities::MultiDismiss do
   describe '#resolve' do
     let_it_be(:vulnerabilities) { create_list(:vulnerability, 5, :with_findings) }
     let_it_be(:user) { create(:user) }
+    let_it_be(:comment) { 'Dismissal Feedback' }
 
-    let(:comment) { 'Dismissal Feedback' }
     let(:mutated_vulnerabilities) { subject[:vulnerabilities] }
 
     subject { mutation.resolve(vulnerability_ids: vulnerabilities.map(&GitlabSchema.method(:id_from_object)), comment: comment) }
