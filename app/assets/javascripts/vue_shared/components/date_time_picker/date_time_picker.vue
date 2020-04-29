@@ -198,7 +198,10 @@ export default {
             </gl-deprecated-button>
           </gl-form-group>
         </gl-form-group>
-        <gl-form-group label-for="group-id-dropdown" class="col-md-5 gl-pl-1-deprecated-no-really-do-not-use-me gl-pr-1-deprecated-no-really-do-not-use-me m-0">
+        <gl-form-group
+          label-for="group-id-dropdown"
+          class="col-md-5 gl-pl-1-deprecated-no-really-do-not-use-me gl-pr-1-deprecated-no-really-do-not-use-me m-0"
+        >
           <template #label>
             <span class="gl-pl-5-deprecated-no-really-do-not-use-me">{{ __('Quick range') }}</span>
           </template>

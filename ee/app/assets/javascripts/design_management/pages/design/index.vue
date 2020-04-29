@@ -308,7 +308,9 @@ export default {
         </div>
       </div>
       <div class="image-notes">
-        <h2 class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0">{{ issue.title }}</h2>
+        <h2 class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0">
+          {{ issue.title }}
+        </h2>
         <a class="text-tertiary text-decoration-none mb-3 d-block" :href="issue.webUrl">{{
           issue.webPath
         }}</a>

@@ -58,10 +58,7 @@ export default {
           />
         </span>
         <span class="inline">
-          <span
-            v-if="node.current"
-            class="rounded-pill gl-font-sm p-1 text-white bg-success-400"
-          >
+          <span v-if="node.current" class="rounded-pill gl-font-sm p-1 text-white bg-success-400">
             {{ s__('Current node') }}
           </span>
           <span
