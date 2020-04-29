@@ -26,7 +26,7 @@ class RequirementsFinder
   attr_reader :current_user, :params
 
   def init_collection
-    return Requirement.none unless Ability.allowed?(current_user, :read_requirement, project)
+    return RequirementsManagement::Requirement.none unless Ability.allowed?(current_user, :read_requirement, project)
 
     project.requirements
   end
@@ -50,7 +50,7 @@ class RequirementsFinder
   end
 
   def sort(items)
-    sorts = Requirement.simple_sorts.keys
+    sorts = RequirementsManagement::Requirement.simple_sorts.keys
     sort = sorts.include?(params[:sort]) ? params[:sort] : 'id_desc'
 
     items.order_by(sort)

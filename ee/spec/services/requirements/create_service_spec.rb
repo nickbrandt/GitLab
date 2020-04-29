@@ -21,7 +21,7 @@ describe Requirements::CreateService do
       end
 
       it 'creates new requirement' do
-        expect { subject }.to change { Requirement.count }.by(1)
+        expect { subject }.to change { RequirementsManagement::Requirement.count }.by(1)
       end
 
       it 'uses only permitted params' do
