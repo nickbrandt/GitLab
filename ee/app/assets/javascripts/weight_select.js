@@ -1,4 +1,4 @@
-/* eslint-disable no-shadow, no-else-return */
+/* eslint-disable no-shadow */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -33,9 +33,8 @@ function WeightSelect(els, options = {}) {
       id(obj, el) {
         if ($(el).data('none') == null) {
           return $(el).data('id');
-        } else {
-          return '';
         }
+        return '';
       },
       clicked(glDropdownEvt) {
         const { e } = glDropdownEvt;
