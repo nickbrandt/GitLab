@@ -22,6 +22,8 @@ module Gitlab
           return error(project.import_export_shared.errors.join(', ')) if project.import_export_shared.errors.any?
 
           success('Done!')
+        rescue Gitlab::ImportExport::Error => e
+          error(e.message)
         end
 
         private
