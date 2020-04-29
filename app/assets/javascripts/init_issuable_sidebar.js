@@ -25,7 +25,8 @@ export default () => {
     cable.subscriptions.create(
       {
         channel: 'IssuesChannel',
-        id: sidebarOptions.id,
+        project_path: sidebarOptions.fullPath,
+        iid: sidebarOptions.iid,
       },
       {
         received(data) {

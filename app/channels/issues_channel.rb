@@ -2,9 +2,11 @@
 
 class IssuesChannel < ApplicationCable::Channel
   def subscribed
-    issue = Issue.find(params[:id])
+    project = Project.find_by_full_path(params[:project_path])
+    return unless project
 
-    return unless Ability.allowed?(current_user, :read_issue, issue)
+    issue = project.issues.find_by_iid(params[:iid])
+    return unless issue && Ability.allowed?(current_user, :read_issue, issue)
 
     stream_for issue
   end
