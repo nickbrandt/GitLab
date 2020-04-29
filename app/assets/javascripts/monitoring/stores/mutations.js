@@ -51,18 +51,6 @@ const emptyStateFromError = error => {
   return metricStates.UNKNOWN_ERROR;
 };
 
-/**
- * Maps an variables object to an array
- * @returns {Array} The custom variables array to be send to the API
- * in the format of [variable1, variable1_value]
- * @param {Object} variables - Custom variables provided by the user
- */
-
-const transformVariablesObjectArray = variables =>
-  Object.entries(variables)
-    .flat()
-    .map(encodeURIComponent);
-
 export default {
   /**
    * Dashboard panels structure and global state
@@ -182,6 +170,6 @@ export default {
     state.expandedPanel.panel = panel;
   },
   [types.SET_PROM_QUERY_VARIABLES](state, variables) {
-    state.promVariables = transformVariablesObjectArray(variables);
+    state.promVariables = variables;
   },
 };
