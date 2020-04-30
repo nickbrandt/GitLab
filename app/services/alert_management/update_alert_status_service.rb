@@ -13,7 +13,7 @@ module AlertManagement
       alert.status = status
       return ServiceResponse.success(payload: { alert: alert }) if alert.save
 
-      error_response
+      error_response(alert.errors.full_messages.to_sentence)
     end
 
     private

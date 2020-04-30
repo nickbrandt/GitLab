@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Mutations::AlertManagement::UpdateAlertStatus do
   let_it_be(:current_user) { create(:user) }
   let_it_be(:alert) { create(:alert_management_alert, status: 'triggered') }
-  let(:project) { alert.project }
+  let_it_be(:project) { alert.project }
   let(:new_status) { 'acknowledged' }
   let(:args) { { status: new_status, project_path: project.full_path, iid: alert.iid } }
 
@@ -19,6 +19,36 @@ describe Mutations::AlertManagement::UpdateAlertStatus do
 
       it 'changes the status' do
         expect { resolve }.to change { alert.reload.status }.from(alert.status).to(new_status)
+      end
+
+      it 'returns the alert with no errors' do
+        expect(resolve).to eq(
+          alert: alert,
+          errors: []
+        )
+      end
+
+      context 'error occurs when updating' do
+        before do
+          # Stubbing and error on alert
+          allow_next_instance_of(Resolvers::AlertManagementAlertResolver) do |resolver|
+            allow(resolver).to receive(:resolve).and_return(alert)
+          end
+
+          expect(alert).to receive(:save).and_return(false)
+
+          errors = ActiveModel::Errors.new(alert)
+          errors.add(:status, :invalid)
+
+          expect(alert).to receive(:errors).and_return(errors)
+        end
+
+        it 'returns the alert with no errors' do
+          expect(resolve).to eq(
+            alert: alert,
+            errors: ['Status is invalid']
+          )
+        end
       end
     end
 

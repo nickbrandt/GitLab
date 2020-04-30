@@ -14,15 +14,8 @@ module Mutations
       def resolve(args)
         alert = authorized_find!(project_path: args[:project_path], iid: args[:iid])
 
-        if alert
-          result = update_status(alert, args[:status])
-          prepare_response(result)
-        else
-          {
-            alert: alert,
-            errors: ['Alert could not be found']
-          }
-        end
+        result = update_status(alert, args[:status])
+        prepare_response(result)
       end
 
       private
@@ -35,7 +28,7 @@ module Mutations
       def prepare_response(result)
         {
           alert: result.payload[:alert],
-          errors: result.message.present? ? [result.message] : []
+          errors: result.error? ? [result.message].compact : []
         }
       end
     end
