@@ -46,7 +46,7 @@ describe('~/static_site_editor/components/saved_changes_message.vue', () => {
     ${'branch'}        | ${findBranchLink}       | ${props.branch}
     ${'commit'}        | ${findCommitLink}       | ${props.commit}
     ${'merge request'} | ${findMergeRequestLink} | ${props.mergeRequest}
-  `('renders $desc link', ({ desc, findEl, prop }) => {
+  `('renders $desc link', ({ findEl, prop }) => {
     const el = findEl();
 
     expect(el.exists()).toBe(true);
