@@ -35,6 +35,17 @@ module EE
           end
         end
 
+        override :wiki_url
+        def wiki_url(object, **options)
+          if object.container.is_a?(Group)
+            # TODO: Use the new route for group wikis once we add it.
+            # https://gitlab.com/gitlab-org/gitlab/-/issues/211360
+            instance.group_canonical_url(object.container, **options) + "/-/wikis/#{::Wiki::HOMEPAGE}"
+          else
+            super
+          end
+        end
+
         def design_url(design, **options)
           size, ref = options.values_at(:size, :ref)
           options.except!(:size, :ref)

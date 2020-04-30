@@ -15,6 +15,8 @@ describe Gitlab::UrlBuilder do
 
       :note_on_epic          | ->(note)          { "/groups/#{note.noteable.group.full_path}/-/epics/#{note.noteable.iid}#note_#{note.id}" }
       :note_on_vulnerability | ->(note)          { "/#{note.project.full_path}/-/security/vulnerabilities/#{note.noteable.id}#note_#{note.id}" }
+
+      :group_wiki            | ->(wiki)          { "/groups/#{wiki.container.full_path}/-/wikis/home" }
     end
 
     with_them do
