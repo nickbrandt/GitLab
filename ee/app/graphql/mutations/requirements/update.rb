@@ -43,7 +43,7 @@ module Mutations
         requirement_iid = args.delete(:iid)
         requirement = authorized_find!(project_path: project_path, iid: requirement_iid)
 
-        requirement = ::Requirements::UpdateService.new(
+        requirement = ::RequirementsManagement::UpdateRequirementService.new(
           requirement.project,
           context[:current_user],
           args

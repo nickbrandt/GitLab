@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Requirements::CreateService do
+describe RequirementsManagement::CreateRequirementService do
   let_it_be(:project) { create(:project)}
   let_it_be(:user) { create(:user) }
   let_it_be(:other_user) { create(:user) }

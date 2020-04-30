@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Requirements
-  class UpdateService < BaseService
+module RequirementsManagement
+  class UpdateRequirementService < BaseService
     def execute(requirement)
       raise Gitlab::Access::AccessDeniedError unless can?(current_user, :update_requirement, project)
 
