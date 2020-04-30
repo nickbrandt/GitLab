@@ -469,6 +469,10 @@ class License < ApplicationRecord
     [License::STARTER_PLAN, License::PREMIUM_PLAN, License::ULTIMATE_PLAN].include?(plan)
   end
 
+  def started?
+    starts_at <= Date.current
+  end
+
   private
 
   def restricted_attr(name, default = nil)
