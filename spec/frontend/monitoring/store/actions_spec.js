@@ -399,14 +399,14 @@ describe('Monitoring store actions', () => {
     beforeEach(() => {
       mockedState = storeState();
     });
-    it('should commit SET_QUERY_VARIABLES mutation', done => {
+    it('should commit SET_PROM_QUERY_VARIABLES mutation', done => {
       testAction(
         setVariables,
         { pod: 'POD' },
         mockedState,
         [
           {
-            type: types.SET_QUERY_VARIABLES,
+            type: types.SET_PROM_QUERY_VARIABLES,
             payload: { pod: 'POD' },
           },
         ],

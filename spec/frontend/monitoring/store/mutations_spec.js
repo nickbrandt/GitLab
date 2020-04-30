@@ -365,17 +365,17 @@ describe('Monitoring mutations', () => {
     });
   });
 
-  describe('SET_QUERY_VARIABLES', () => {
+  describe('SET_PROM_QUERY_VARIABLES', () => {
     it('stores an empty variables array when no custom variables are given', () => {
-      mutations[types.SET_QUERY_VARIABLES](stateCopy, {});
+      mutations[types.SET_PROM_QUERY_VARIABLES](stateCopy, {});
 
       expect(stateCopy.promVariables).toEqual([]);
     });
 
     it('stores variables in the key key_value format in the array', () => {
-      mutations[types.SET_QUERY_VARIABLES](stateCopy, { pod: 'POD' });
+      mutations[types.SET_PROM_QUERY_VARIABLES](stateCopy, { pod: 'POD' });
 
-      expect(stateCopy.promVariables).toEqual(['pod', 'pod_POD']);
+      expect(stateCopy.promVariables).toEqual(['pod', 'POD']);
     });
   });
 });

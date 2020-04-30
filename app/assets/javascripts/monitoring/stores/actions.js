@@ -81,7 +81,7 @@ export const setTimeRange = ({ commit }, timeRange) => {
 };
 
 export const setVariables = ({ commit }, variables) => {
-  commit(types.SET_QUERY_VARIABLES, variables);
+  commit(types.SET_PROM_QUERY_VARIABLES, variables);
 };
 
 export const filterEnvironments = ({ commit, dispatch }, searchTerm) => {

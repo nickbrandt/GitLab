@@ -38,7 +38,7 @@ import {
   timeRangeFromUrl,
   panelToUrl,
   expandedPanelPayloadFromUrl,
-  customVariablesFromUrl,
+  promCustomVariablesFromUrl,
 } from '../utils';
 import { metricStates } from '../constants';
 import { defaultTimeRange, timeRanges } from '~/vue_shared/constants';
@@ -283,7 +283,7 @@ export default {
       this.setGettingStartedEmptyState();
     } else {
       this.setTimeRange(this.selectedTimeRange);
-      this.setVariables(customVariablesFromUrl());
+      this.setVariables(promCustomVariablesFromUrl());
       this.fetchData();
     }
   },

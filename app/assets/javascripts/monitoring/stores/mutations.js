@@ -58,19 +58,10 @@ const emptyStateFromError = error => {
  * @param {Object} variables - Custom variables provided by the user
  */
 
-const transformVariablesObjectArray = variables => {
-  let variablesArr = [];
-  const variablesKeys = Object.keys(variables);
-
-  variablesArr = variablesKeys.reduce((acc, key) => {
-    acc.push(key);
-    acc.push(`${key}_${variables[key]}`);
-
-    return acc;
-  }, []);
-
-  return variablesArr;
-};
+const transformVariablesObjectArray = variables =>
+  Object.entries(variables)
+    .flat()
+    .map(encodeURIComponent);
 
 export default {
   /**
@@ -190,7 +181,7 @@ export default {
     state.expandedPanel.group = group;
     state.expandedPanel.panel = panel;
   },
-  [types.SET_QUERY_VARIABLES](state, variables) {
+  [types.SET_PROM_QUERY_VARIABLES](state, variables) {
     state.promVariables = transformVariablesObjectArray(variables);
   },
 };

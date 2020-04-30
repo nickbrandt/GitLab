@@ -169,8 +169,8 @@ describe('monitoring/utils', () => {
     });
   });
 
-  describe('customVariablesFromUrl', () => {
-    const { customVariablesFromUrl } = monitoringUtils;
+  describe('promCustomVariablesFromUrl', () => {
+    const { promCustomVariablesFromUrl } = monitoringUtils;
 
     it('returns an object with only the custom variables', () => {
       queryToObject.mockReturnValueOnce({
@@ -178,7 +178,7 @@ describe('monitoring/utils', () => {
         pod: 'POD',
       });
 
-      expect(customVariablesFromUrl()).toEqual(expect.objectContaining({ pod: 'POD' }));
+      expect(promCustomVariablesFromUrl()).toEqual(expect.objectContaining({ pod: 'POD' }));
     });
 
     it('returns an empty object when no custom variables are present', () => {
@@ -188,7 +188,7 @@ describe('monitoring/utils', () => {
         param2: 'value2',
       };
 
-      expect(customVariablesFromUrl(params, mockPath)).toStrictEqual({});
+      expect(promCustomVariablesFromUrl(params, mockPath)).toStrictEqual({});
     });
   });
 

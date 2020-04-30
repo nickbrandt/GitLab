@@ -127,7 +127,7 @@ export const timeRangeFromUrl = (search = window.location.search) => {
  * @param {String} New URL
  */
 
-export const customVariablesFromUrl = (search = window.location.search) => {
+export const promCustomVariablesFromUrl = (search = window.location.search) => {
   const params = queryToObject(search);
   const paramsToRemove = timeRangeParamNames.concat(dashboardParams);
 
