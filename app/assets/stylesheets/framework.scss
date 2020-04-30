@@ -3,7 +3,6 @@
 @import 'framework/mixins';
 
 @import '@gitlab/ui/src/scss/gitlab_ui';
-@import '@gitlab/ui/src/scss/utilities';
 
 @import 'bootstrap_migration';
 @import 'framework/layout';
@@ -72,3 +71,5 @@
 @import "framework/spinner";
 @import 'framework/card';
 @import 'framework/editor-lite';
+
+@import '@gitlab/ui/src/scss/utilities';
