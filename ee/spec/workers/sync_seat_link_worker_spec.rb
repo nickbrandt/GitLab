@@ -104,6 +104,14 @@ describe SyncSeatLinkWorker, type: :worker do
       include_examples 'no seat link sync'
     end
 
+    context 'when the license has no expiration date' do
+      before do
+        create_current_license(expires_at: nil, block_changes_at: nil)
+      end
+
+      include_examples 'no seat link sync'
+    end
+
     context 'when using an expired license' do
       before do
         create_current_license(expires_at: expiration_date)

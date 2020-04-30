@@ -35,6 +35,7 @@ class SyncSeatLinkWorker # rubocop:disable Scalability/IdempotentWorker
     Gitlab::CurrentSettings.seat_link_enabled? &&
       License.current &&
       !License.current.trial? &&
+      License.current.expires_at && # Skip sync if license has no expiration
       seat_link_data.date.between?(License.current.starts_at, License.current.expires_at + 14.days)
   end
 end
