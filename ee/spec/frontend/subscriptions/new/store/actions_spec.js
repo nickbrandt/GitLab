@@ -1,4 +1,3 @@
-import { mockTracking } from 'helpers/tracking_helper';
 import testAction from 'helpers/vuex_action_helper';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
@@ -588,7 +587,7 @@ describe('Subscriptions Actions', () => {
 
   describe('confirmOrder', () => {
     it('calls confirmOrderSuccess with a redirect location on success', done => {
-      const response = { location: 'x', plan_id: 'id', quantity: 1 };
+      const response = { location: 'x' };
       mock.onPost(confirmOrderPath).replyOnce(200, response);
 
       testAction(
@@ -636,20 +635,6 @@ describe('Subscriptions Actions', () => {
 
       testAction(actions.confirmOrderSuccess, params, {}, [], [], () => {
         expect(spy).toHaveBeenCalledWith('http://example.com');
-        done();
-      });
-    });
-
-    it('sends tracking event', done => {
-      const spy = mockTracking('Growth::Acquisition::Experiment::PaidSignUpFlow', null, jest.spyOn);
-      jest.spyOn(window.location, 'assign').mockImplementation();
-
-      testAction(actions.confirmOrderSuccess, params, {}, [], [], () => {
-        expect(spy).toHaveBeenCalledWith('Growth::Acquisition::Experiment::PaidSignUpFlow', 'end', {
-          label: 'x',
-          property: null,
-          value: 10,
-        });
         done();
       });
     });
