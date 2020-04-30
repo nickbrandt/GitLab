@@ -66,5 +66,25 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
         expect { subject }.to raise_error(::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError)
       end
     end
+
+    context 'with an invalid package version' do
+      invalid_versions = [
+        '555',
+        '1.2',
+        '1./2.3',
+        '../../../../../1.2.3',
+        '%2e%2e%2f1.2.3'
+      ]
+
+      invalid_versions.each do |invalid_version|
+        it "raises an error for version #{invalid_version}" do
+          allow(service).to receive(:package_version).and_return(invalid_version)
+
+          expect { subject }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Version is invalid')
+          expect(package_file.file_name).not_to include(invalid_version)
+          expect(package_file.file.file.path).not_to include(invalid_version)
+        end
+      end
+    end
   end
 end

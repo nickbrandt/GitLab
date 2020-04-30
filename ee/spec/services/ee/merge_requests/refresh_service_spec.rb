@@ -61,7 +61,7 @@ describe MergeRequests::RefreshService do
     end
 
     describe '#update_approvers' do
-      let(:owner) { create(:user) }
+      let(:owner) { create(:user, username: 'default-codeowner') }
       let(:current_user) { merge_request.author }
       let(:service) { described_class.new(project, current_user) }
       let(:enable_code_owner) { true }
@@ -84,6 +84,31 @@ describe MergeRequests::RefreshService do
         merge_request
         another_merge_request
         forked_merge_request
+      end
+
+      it 'gets called in a specific order' do
+        allow_any_instance_of(MergeRequests::BaseService).to receive(:inspect).and_return(true)
+        expect(service).to receive(:reload_merge_requests).ordered
+        expect(service).to receive(:update_approvers).ordered
+        expect(service).to receive(:reset_approvals_for_merge_requests).ordered
+
+        subject
+      end
+
+      context 'when :sectional_codeowners is disabled' do
+        before do
+          stub_feature_flags(sectional_codeowners: false)
+        end
+
+        it 'creates an approval rule based on current diff' do
+          file = File.read(Rails.root.join('ee', 'spec', 'fixtures', 'codeowners_example'))
+          project.repository.create_file(owner, 'CODEOWNERS', file, { branch_name: 'test', message: 'codeowners' })
+
+          subject
+
+          expect(another_merge_request.approval_rules.size).to eq(3)
+          expect(another_merge_request.approval_rules.first.rule_type).to eq('code_owner')
+        end
       end
 
       context 'when code owners disabled' do

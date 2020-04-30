@@ -9,11 +9,12 @@ module EE
 
       override :refresh_merge_requests!
       def refresh_merge_requests!
-        update_approvers
-        reset_approvals_for_merge_requests(push.ref, push.newrev)
         check_merge_train_status
 
         super
+
+        update_approvers
+        reset_approvals_for_merge_requests(push.ref, push.newrev)
       end
 
       # Note: Closed merge requests also need approvals reset.

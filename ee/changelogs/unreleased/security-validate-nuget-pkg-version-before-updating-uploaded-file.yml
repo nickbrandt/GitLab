@@ -1,0 +1,6 @@
+---
+title: Ensure that NuGet package versions are validated before updating the stored
+  file path
+merge_request:
+author:
+type: security
