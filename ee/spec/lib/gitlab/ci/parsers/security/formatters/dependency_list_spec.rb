@@ -8,9 +8,11 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
   let(:sha) { '4242424242424242' }
 
   let(:parsed_report) do
-    Gitlab::Json.parse!(File.read(
+    Gitlab::Json.parse!(
+      File.read(
         Rails.root.join('ee/spec/fixtures/security_reports/dependency_list/gl-dependency-scanning-report.json')
-      ))
+      )
+    )
   end
 
   describe '#format' do
