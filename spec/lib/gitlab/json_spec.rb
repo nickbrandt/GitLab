@@ -4,24 +4,52 @@ require "spec_helper"
 
 RSpec.describe Gitlab::Json do
   describe ".parse" do
-    it "parses an object" do
-      expect(subject.parse('{ "foo": "bar" }')).to eq({ "foo" => "bar" })
+    context "legacy_mode is on by default" do
+      it "parses an object" do
+        expect(subject.parse('{ "foo": "bar" }')).to eq({ "foo" => "bar" })
+      end
+
+      it "parses an array" do
+        expect(subject.parse('[{ "foo": "bar" }]')).to eq([{ "foo" => "bar" }])
+      end
+
+      it "raises an error on a string" do
+        expect { subject.parse('"foo"') }.to raise_error(JSON::ParserError)
+      end
+
+      it "raises an error on a true bool" do
+        expect { subject.parse("true") }.to raise_error(JSON::ParserError)
+      end
+
+      it "raises an error on a false bool" do
+        expect { subject.parse("false") }.to raise_error(JSON::ParserError)
+      end
     end
 
-    it "parses an array" do
-      expect(subject.parse('[{ "foo": "bar" }]')).to eq([{ "foo" => "bar" }])
-    end
+    context "legacy_mode is disabled" do
+      it "parses an object" do
+        expect(subject.parse('{ "foo": "bar" }', legacy_mode: false)).to eq({ "foo" => "bar" })
+      end
 
-    it "raises an error on a string" do
-      expect { subject.parse('"foo"') }.to raise_error(JSON::ParserError)
-    end
+      it "parses an array" do
+        expect(subject.parse('[{ "foo": "bar" }]', legacy_mode: false)).to eq([{ "foo" => "bar" }])
+      end
 
-    it "raises an error on a true bool" do
-      expect { subject.parse("true") }.to raise_error(JSON::ParserError)
-    end
+      # These are expected errors now until we upgrade the `json` gem,
+      # and then it will be expected to not raise errors and these tests
+      # will be updated accordingly.
 
-    it "raises an error on a false bool" do
-      expect { subject.parse("false") }.to raise_error(JSON::ParserError)
+      it "raises an error on a string" do
+        expect { subject.parse('"foo"') }.to raise_error(JSON::ParserError)
+      end
+
+      it "raises an error on a true bool" do
+        expect { subject.parse("true") }.to raise_error(JSON::ParserError)
+      end
+
+      it "raises an error on a false bool" do
+        expect { subject.parse("false") }.to raise_error(JSON::ParserError)
+      end
     end
   end
 

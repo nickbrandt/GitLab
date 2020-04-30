@@ -3,8 +3,13 @@
 module Gitlab
   module Json
     class << self
-      def parse(*args)
-        adapter.parse(*args)
+      def parse(string, *args, **named_args)
+        legacy_mode = legacy_mode_enabled?(named_args.delete(:legacy_mode))
+        data = adapter.parse(string, *args, **named_args)
+
+        raise parser_error if legacy_mode && [String, TrueClass, FalseClass].any? { |type| data.is_a?(type) }
+
+        data
       end
 
       def parse!(*args)
@@ -27,6 +32,17 @@ module Gitlab
 
       def adapter
         ::JSON
+      end
+
+      def parser_error
+        ::JSON::ParserError
+      end
+
+      def legacy_mode_enabled?(arg_value)
+        # This will change to the following once the `json` gem is upgraded:
+        # arg_value.nil? ? true : arg_value
+
+        true
       end
     end
   end
