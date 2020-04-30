@@ -11,7 +11,6 @@ module AlertManagement
       return error_response('Invalid status') unless AlertManagement::Alert.statuses.key?(status.to_s)
 
       alert.status = status
-
       return ServiceResponse.success(payload: { alert: alert }) if alert.save
 
       error_response
