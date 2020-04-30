@@ -26,7 +26,7 @@ module EnvironmentsHelper
     metrics_data.merge!(project_metrics_data(project)) if project
     metrics_data.merge!(environment_metrics_data(environment)) if environment
     metrics_data.merge!(project_and_environment_metrics_data(project, environment)) if project && environment
-    metrics_data.merge!(static_data)
+    metrics_data.merge!(static_metrics_data)
 
     metrics_data
   end
@@ -50,7 +50,7 @@ module EnvironmentsHelper
     return {} unless project
 
     {
-      'settings-path'               => edit_project_service_path(project),
+      'settings-path'               => edit_project_service_path(project, 'prometheus'),
       'clusters-path'               => project_clusters_path(project),
       'dashboards-endpoint'         => project_performance_monitoring_dashboards_path(project, format: :json),
       'default-branch'              => project.default_branch,
