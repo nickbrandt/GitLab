@@ -284,53 +284,33 @@ describe Projects::IssuesController do
 
     context 'there are related branches' do
       let(:missing_branch) { "#{issue.to_branch_name}-missing" }
-      let(:unreadable_branch_name) { "#{issue.to_branch_name}-unreadable" }
-      let(:repo) { double('Repo', root_ref: 'refs/heads/master', branch_names: branch_names) }
-      let(:sha) { 'abcdef' }
+      let(:unreadable_branch) { "#{issue.to_branch_name}-unreadable" }
       let(:pipeline) { build(:ci_pipeline, :success, project: project) }
-      let(:unreadable_pipeline) { build(:ci_pipeline, :running) }
-      let(:branch) { make_branch }
-      let(:unreadable_branch) { make_branch }
-      let(:branch_names) do
-        [
-          generate(:branch),
-          "#{issue.iid}doesnt-match",
-          issue.to_branch_name,
-          missing_branch,
-          unreadable_branch_name
-        ]
-      end
+      let(:master_branch) { 'master' }
 
-      def make_branch
-        double('Branch', dereferenced_target: double('Target', sha: sha))
+      let(:related_branches) do
+        [
+          branch_info(issue.to_branch_name, pipeline.detailed_status(user)),
+          branch_info(missing_branch, nil),
+          branch_info(unreadable_branch, nil)
+        ]
       end
 
       def branch_info(name, status)
         {
           name: name,
-          link: controller.project_compare_path(project, from: project.default_branch, to: name),
+          link: controller.project_compare_path(project, from: master_branch, to: name),
           pipeline_status: status
         }
       end
 
       before do
-        allow(project).to receive(:repository).and_return(repo)
         allow(controller).to receive(:find_routable!)
           .with(Project, project.full_path, any_args).and_return(project)
-
-        allow(repo).to receive(:find_branch)
-          .with(issue.to_branch_name).and_return(branch)
-        allow(repo).to receive(:find_branch)
-          .with(missing_branch).and_return(nil)
-        allow(repo).to receive(:find_branch)
-          .with(unreadable_branch_name).and_return(unreadable_branch)
-
-        expect(project).to receive(:pipeline_for)
-          .with(issue.to_branch_name, sha)
-          .and_return(pipeline)
-        expect(project).to receive(:pipeline_for)
-          .with(unreadable_branch_name, sha)
-          .and_return(unreadable_pipeline)
+        allow(project).to receive(:default_branch).and_return(master_branch)
+        allow_next_instance_of(Issues::RelatedBranchesService) do |service|
+          allow(service).to receive(:execute).and_return(related_branches)
+        end
       end
 
       it 'finds and assigns the appropriate branch information', :aggregate_failures do
@@ -340,7 +320,7 @@ describe Projects::IssuesController do
         expect(assigns(:related_branches)).to contain_exactly(
           branch_info(issue.to_branch_name, an_instance_of(Gitlab::Ci::Status::Success)),
           branch_info(missing_branch, be_nil),
-          branch_info(unreadable_branch_name, be_nil)
+          branch_info(unreadable_branch, be_nil)
         )
         expect(response).to render_template('projects/issues/_related_branches')
         expect(json_response).to match('html' => String)
