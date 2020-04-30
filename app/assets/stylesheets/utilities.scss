@@ -1,3 +1,10 @@
+/**
+  Please note: These are deprecated in favor of the Gitlab UI utility classes.
+  Check https://unpkg.com/browse/@gitlab/ui/src/scss/utilities.scss
+  to see the available utility classes. If you cannot find the class you need,
+  consider adding it to Gitlab UI before adding it here.
+**/
+
 @each $variant, $range in $color-ranges {
   @each $suffix, $color in $range {
     #{'.bg-#{$variant}-#{$suffix}'} {
