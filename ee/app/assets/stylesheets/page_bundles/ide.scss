@@ -2,7 +2,7 @@
 
 .ide-right-sidebar {
   .multi-file-commit-panel-inner.ide-right-sidebar-terminal {
-    padding-top: 0;
+    padding: 0;
   }
 }
 
@@ -10,7 +10,6 @@
   @include ide-trace-view();
 
   .terminal-wrapper {
-    margin-left: -$gl-padding;
     background: $black;
     color: $gray-darkest;
     overflow: hidden;
