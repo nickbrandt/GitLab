@@ -263,20 +263,17 @@ describe('Design management design index page', () => {
   });
 
   describe('onDesignQueryResult', () => {
-    const mockOnQueryError = () => {
-      wrapper.setMethods({
-        onQueryError: jest.fn(),
-      });
-    };
-
     describe('with no designs', () => {
       it('redirects to /designs', () => {
         createComponent(true);
-        mockOnQueryError();
 
         wrapper.vm.onDesignQueryResult({ data: mockResponseNoDesigns, loading: false });
-        expect(wrapper.vm.onQueryError).toHaveBeenCalledTimes(1);
-        expect(wrapper.vm.onQueryError).toHaveBeenCalledWith(DESIGN_NOT_FOUND_ERROR);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(createFlash).toHaveBeenCalledTimes(1);
+          expect(createFlash).toHaveBeenCalledWith(DESIGN_NOT_FOUND_ERROR);
+          expect(routerPush).toHaveBeenCalledTimes(1);
+          expect(routerPush).toHaveBeenCalledWith({ name: DESIGNS_ROUTE_NAME });
+        });
       });
     });
 
@@ -284,28 +281,18 @@ describe('Design management design index page', () => {
       it('redirects to /designs', () => {
         // attempt to query for a version of the design that doesn't exist
         createComponent(true, { routeQuery: { version: '999' } });
-        mockOnQueryError();
         wrapper.setData({
           allVersions: mockAllVersions,
         });
 
         wrapper.vm.onDesignQueryResult({ data: mockResponseWithDesigns, loading: false });
-        expect(wrapper.vm.onQueryError).toHaveBeenCalledTimes(1);
-        expect(wrapper.vm.onQueryError).toHaveBeenCalledWith(DESIGN_VERSION_NOT_EXIST_ERROR);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(createFlash).toHaveBeenCalledTimes(1);
+          expect(createFlash).toHaveBeenCalledWith(DESIGN_VERSION_NOT_EXIST_ERROR);
+          expect(routerPush).toHaveBeenCalledTimes(1);
+          expect(routerPush).toHaveBeenCalledWith({ name: DESIGNS_ROUTE_NAME });
+        });
       });
-    });
-  });
-
-  describe('onQueryError', () => {
-    it('redirects to /designs and displays flash', () => {
-      createComponent(true);
-
-      wrapper.vm.onQueryError(DESIGN_NOT_FOUND_ERROR);
-
-      expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(createFlash).toHaveBeenCalledWith(DESIGN_NOT_FOUND_ERROR);
-      expect(routerPush).toHaveBeenCalledTimes(1);
-      expect(routerPush).toHaveBeenCalledWith({ name: DESIGNS_ROUTE_NAME });
     });
   });
 });
