@@ -6,7 +6,7 @@ export default {
   statuses: {
     triggered: s__('AlertManagement|Triggered'),
     acknowledged: s__('AlertManagement|Acknowledged'),
-    ignored: s__('AlertManagement|Ignored'),
+    resolved: s__('AlertManagement|Resolved'),
   },
   i18n: {
     fullAlertDetailsTitle: s__('AlertManagement|Full Alert Details'),
@@ -27,6 +27,7 @@ export default {
         <gl-new-dropdown-item
           v-for="(label, field) in $options.statuses"
           :key="field"
+          data-testid="statusDropdownItem"
           class="align-middle"
           >{{ label }}
         </gl-new-dropdown-item>
