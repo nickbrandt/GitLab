@@ -38,6 +38,10 @@ export default {
       type: Number,
       required: true,
     },
+    hasFiltersApplied: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -112,6 +116,7 @@ export default {
       :epics="epics"
       :timeframe="timeframe"
       :current-group-id="currentGroupId"
+      :has-filters-applied="hasFiltersApplied"
     />
   </div>
 </template>

@@ -136,6 +136,7 @@ export default {
       :milestones="milestones"
       :timeframe="timeframe"
       :current-group-id="currentGroupId"
+      :has-filters-applied="hasFiltersApplied"
       @onScrollToStart="handleScrollToExtend"
       @onScrollToEnd="handleScrollToExtend"
     />

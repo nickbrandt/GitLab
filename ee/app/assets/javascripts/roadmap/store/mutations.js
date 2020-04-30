@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import * as types from './mutation_types';
 
 export default {
@@ -40,6 +42,35 @@ export default {
     state.epicsFetchInProgress = false;
     state.epicsFetchForTimeframeInProgress = false;
     state.epicsFetchFailure = true;
+    Object.keys(state.childrenEpics).forEach(id => {
+      Vue.set(state.childrenFlags, id, {
+        itemChildrenFetchInProgress: false,
+      });
+    });
+  },
+
+  [types.REQUEST_CHILDREN_EPICS](state, { parentItemId }) {
+    state.childrenFlags[parentItemId].itemChildrenFetchInProgress = true;
+  },
+  [types.RECEIVE_CHILDREN_SUCCESS](state, { parentItemId, children }) {
+    Vue.set(state.childrenEpics, parentItemId, children);
+    state.childrenFlags[parentItemId].itemChildrenFetchInProgress = false;
+  },
+
+  [types.INIT_EPIC_CHILDREN_FLAGS](state, { epics }) {
+    epics.forEach(item => {
+      Vue.set(state.childrenFlags, item.id, {
+        itemExpanded: false,
+        itemChildrenFetchInProgress: false,
+      });
+    });
+  },
+
+  [types.EXPAND_EPIC](state, { parentItemId }) {
+    state.childrenFlags[parentItemId].itemExpanded = true;
+  },
+  [types.COLLAPSE_EPIC](state, { parentItemId }) {
+    state.childrenFlags[parentItemId].itemExpanded = false;
   },
 
   [types.PREPEND_TIMEFRAME](state, extendedTimeframe) {
@@ -75,10 +106,5 @@ export default {
 
   [types.SET_BUFFER_SIZE](state, bufferSize) {
     state.bufferSize = bufferSize;
-  },
-
-  [types.TOGGLE_EXPANDED_EPIC](state, epicId) {
-    const epic = state.epics.find(e => e.id === epicId);
-    epic.isChildEpicShowing = !epic.isChildEpicShowing;
   },
 };

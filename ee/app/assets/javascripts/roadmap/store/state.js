@@ -9,6 +9,8 @@ export default () => ({
   // Data
   epicIid: '',
   epics: [],
+  childrenEpics: {},
+  childrenFlags: {},
   visibleEpics: [],
   epicIds: [],
   currentGroupId: -1,

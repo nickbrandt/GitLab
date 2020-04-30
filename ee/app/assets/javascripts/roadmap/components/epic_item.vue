@@ -1,8 +1,8 @@
 <script>
 import { delay } from 'lodash';
 
-import epicItemDetails from './epic_item_details.vue';
-import epicItemTimeline from './epic_item_timeline.vue';
+import EpicItemDetails from './epic_item_details.vue';
+import EpicItemTimeline from './epic_item_timeline.vue';
 
 import CommonMixin from '../mixins/common_mixin';
 
@@ -10,8 +10,8 @@ import { EPIC_HIGHLIGHT_REMOVE_AFTER } from '../constants';
 
 export default {
   components: {
-    epicItemDetails,
-    epicItemTimeline,
+    EpicItemDetails,
+    EpicItemTimeline,
   },
   mixins: [CommonMixin],
   props: {
@@ -36,6 +36,22 @@ export default {
       required: false,
       default: 0,
     },
+    childLevel: {
+      type: Number,
+      required: true,
+    },
+    childrenEpics: {
+      type: Object,
+      required: true,
+    },
+    childrenFlags: {
+      type: Object,
+      required: true,
+    },
+    hasFiltersApplied: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     /**
@@ -58,6 +74,12 @@ export default {
         return this.epic.originalEndDate;
       }
       return this.epic.endDate;
+    },
+    isChildrenEmpty() {
+      return this.childrenEpics[this.epic.id] && this.childrenEpics[this.epic.id].length === 0;
+    },
+    hasChildrenToShow() {
+      return this.childrenFlags[this.epic.id].itemExpanded && this.childrenEpics[this.epic.id];
     },
   },
   updated() {
@@ -89,20 +111,38 @@ export default {
 </script>
 
 <template>
-  <div :class="{ 'newly-added-epic': epic.newEpic }" class="epics-list-item clearfix">
-    <epic-item-details
-      :epic="epic"
-      :current-group-id="currentGroupId"
-      :timeframe-string="timeframeString(epic)"
-    />
-    <epic-item-timeline
-      v-for="(timeframeItem, index) in timeframe"
-      :key="index"
+  <div class="epic-item-container">
+    <div :class="{ 'newly-added-epic': epic.newEpic }" class="epics-list-item clearfix">
+      <epic-item-details
+        :epic="epic"
+        :current-group-id="currentGroupId"
+        :timeframe-string="timeframeString(epic)"
+        :child-level="childLevel"
+        :children-flags="childrenFlags"
+        :has-filters-applied="hasFiltersApplied"
+        :is-children-empty="isChildrenEmpty"
+      />
+      <epic-item-timeline
+        v-for="(timeframeItem, index) in timeframe"
+        :key="index"
+        :preset-type="presetType"
+        :timeframe="timeframe"
+        :timeframe-item="timeframeItem"
+        :epic="epic"
+        :client-width="clientWidth"
+      />
+    </div>
+    <epic-item-container
+      v-if="hasChildrenToShow"
       :preset-type="presetType"
       :timeframe="timeframe"
-      :timeframe-item="timeframeItem"
-      :epic="epic"
+      :current-group-id="currentGroupId"
       :client-width="clientWidth"
+      :children="childrenEpics[epic.id] || []"
+      :child-level="childLevel + 1"
+      :children-epics="childrenEpics"
+      :children-flags="childrenFlags"
+      :has-filters-applied="hasFiltersApplied"
     />
   </div>
 </template>

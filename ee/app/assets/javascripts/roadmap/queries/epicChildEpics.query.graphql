@@ -7,6 +7,9 @@ query epicChildEpics(
   $sort: EpicSort
   $startDate: Time
   $dueDate: Time
+  $labelName: [String!] = []
+  $authorUsername: String = ""
+  $search: String = ""
 ) {
   group(fullPath: $fullPath) {
     id
@@ -15,32 +18,18 @@ query epicChildEpics(
       id
       title
       hasChildren
-      children(state: $state, sort: $sort, startDate: $startDate, endDate: $dueDate) {
+      children(
+        state: $state
+        sort: $sort
+        startDate: $startDate
+        endDate: $dueDate
+        labelName: $labelName
+        authorUsername: $authorUsername
+        search: $search
+      ) {
         edges {
           node {
-            id
-            title
-            description
-            state
-            webUrl
-            startDate
-            dueDate
-            hasChildren
-            descendantWeightSum {
-              closedIssues
-              openedIssues
-            }
-            group {
-              name
-              fullName
-            }
-            children {
-              edges {
-                node {
-                  ...EpicNode
-                }
-              }
-            }
+            ...BaseEpic
           }
         }
       }
