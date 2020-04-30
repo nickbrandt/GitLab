@@ -5992,7 +5992,7 @@ msgstr ""
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
-msgid "Could not find design"
+msgid "Could not find design."
 msgstr ""
 
 msgid "Could not remove the trigger."
@@ -17458,7 +17458,7 @@ msgstr ""
 msgid "Requested %{time_ago}"
 msgstr ""
 
-msgid "Requested design version does not exist"
+msgid "Requested design version does not exist."
 msgstr ""
 
 msgid "Requested states are invalid"
