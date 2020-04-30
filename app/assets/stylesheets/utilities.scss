@@ -82,6 +82,14 @@
   width: px-to-rem(16px);
 }
 
+.gl-shim-pb-3 {
+  padding-bottom: 8px;
+}
+
+.gl-shim-pt-5 {
+  padding-top: 16px;
+}
+
 .gl-text-purple { color: $purple; }
 .gl-text-gray-800 { color: $gray-800; }
 .gl-bg-purple-light { background-color: $purple-light; }
