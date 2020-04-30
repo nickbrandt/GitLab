@@ -53,7 +53,7 @@ export default {
   statuses: {
     triggered: s__('AlertManagement|Triggered'),
     acknowledged: s__('AlertManagement|Acknowledged'),
-    ignored: s__('AlertManagement|Ignored'),
+    resolved: s__('AlertManagement|Resolved'),
   },
   components: {
     GlEmptyState,
@@ -155,10 +155,10 @@ export default {
         <template #cell(title)="{ item }">
           <div class="gl-max-w-full text-truncate">{{ item.title }}</div>
         </template>
-        <template #cell(status)>
-          <gl-new-dropdown class="w-100" :text="alert.status">
-            <gl-new-dropdown-item v-for="(label, field) in $options.statuses" :key="field"
-              >{{ label }}
+        <template #cell(status)="{ item }">
+          <gl-new-dropdown class="w-100" :text="item.status">
+            <gl-new-dropdown-item v-for="(label, field) in $options.statuses" :key="field">
+              {{ label }}
             </gl-new-dropdown-item>
           </gl-new-dropdown>
         </template>

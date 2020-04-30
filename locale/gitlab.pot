@@ -1731,6 +1731,9 @@ msgstr ""
 msgid "AlertManagement|Overview"
 msgstr ""
 
+msgid "AlertManagement|Resolved"
+msgstr ""
+
 msgid "AlertManagement|Severity"
 msgstr ""
 
