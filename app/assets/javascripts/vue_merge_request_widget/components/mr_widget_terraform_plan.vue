@@ -68,7 +68,7 @@ export default {
         successCallback: ({ data }) => {
           this.plans = data;
 
-          if (Object.keys(this.plan).length > 0) {
+          if (Object.keys(this.plan).length) {
             this.loading = false;
             poll.stop();
           }
@@ -80,9 +80,7 @@ export default {
         },
       });
 
-      if (this.loading) {
-        poll.makeRequest();
-      }
+      poll.makeRequest();
     },
   },
 };
