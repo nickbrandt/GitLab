@@ -4,7 +4,7 @@ module Elastic
   class ProcessBookkeepingService
     REDIS_SET_KEY = 'elastic:incremental:updates:0:zset'
     REDIS_SCORE_KEY = 'elastic:incremental:updates:0:score'
-    LIMIT = 1000
+    LIMIT = 10_000
 
     class << self
       # Add some records to the processing queue. Items must be serializable to
