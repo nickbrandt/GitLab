@@ -8,12 +8,6 @@ module Gitlab
 
         def structure_load(*args)
           super(*args)
-          load_version_files
-        end
-
-        private
-
-        def load_version_files
           Gitlab::Database::SchemaVersionFiles.load_all
         end
       end

@@ -3,8 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Database::PostgresqlAdapter::DumpSchemaVersionsMixin do
-  let(:schema_migration) { double('schem_migration', table_name: table_name, all_versions: versions) }
-  let(:table_name) { "schema_migrations" }
+  let(:schema_migration) { double('schema_migration', all_versions: versions) }
 
   let(:instance) do
     Object.new.extend(described_class)

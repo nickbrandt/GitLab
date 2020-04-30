@@ -4,14 +4,14 @@ require 'spec_helper'
 
 describe Gitlab::Database::SchemaVersionFiles do
   describe '.touch_all' do
-    let(:versions) { %w[123 456 890] }
+    let(:versions) { %w[2020123 2020456 2020890] }
 
     it 'touches a file for each version given' do
       Dir.mktmpdir do |tmpdir|
         schema_dirpath = Pathname.new(tmpdir).join("test")
         FileUtils.mkdir_p(schema_dirpath)
 
-        old_version_filepath = schema_dirpath.join("001")
+        old_version_filepath = schema_dirpath.join("2020001")
         FileUtils.touch(old_version_filepath)
 
         expect(File.exist?(old_version_filepath)).to be(true)

@@ -6,8 +6,8 @@ module Gitlab
       SCHEMA_DIRECTORY = "db/schema_migrations"
 
       def self.touch_all(versions)
-        FileUtils.rm_rf(schema_dirpath)
-        FileUtils.mkdir_p(schema_dirpath)
+        filenames_with_path = find_version_filenames.map { |f| schema_dirpath.join(f) }
+        FileUtils.rm(filenames_with_path)
 
         versions.each do |version|
           FileUtils.touch(schema_dirpath.join(version))
