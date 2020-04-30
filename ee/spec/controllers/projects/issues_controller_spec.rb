@@ -238,23 +238,21 @@ describe Projects::IssuesController do
       before do
         sign_in(user)
         allow(Gitlab).to receive(:com?).and_return(true)
-        note_user = discussion.author
-        note_user.update(email: email)
-        note_user.confirm
+        discussion.update(author: user)
       end
 
-      shared_examples 'non inclusion of gitlab employee badge' do
+      shared_context 'non inclusion of gitlab team member badge' do |result|
         it 'does not render the is_gitlab_employee attribute' do
           subject
 
           note_json = json_response.first['notes'].first
 
-          expect(note_json['author'].has_key?('is_gitlab_employee')).to be false
+          expect(note_json['author']['is_gitlab_employee']).to be result
         end
       end
 
-      context 'when user is a gitlab employee' do
-        let(:email) { 'test@gitlab.com' }
+      context 'when user is a gitlab team member' do
+        include_context 'gitlab team member'
 
         it 'renders the is_gitlab_employee attribute' do
           subject
@@ -269,27 +267,19 @@ describe Projects::IssuesController do
             stub_feature_flags(gitlab_employee_badge: false)
           end
 
-          it_behaves_like 'non inclusion of gitlab employee badge'
+          it_behaves_like 'non inclusion of gitlab team member badge', nil
         end
       end
 
-      context 'when user is not a gitlab employee' do
-        let(:email) { 'test@example.com' }
-
-        it 'shows is_gitlab_employee attribute as false' do
-          subject
-
-          note_json = json_response.first['notes'].first
-
-          expect(note_json['author']['is_gitlab_employee']).to be false
-        end
+      context 'when user is not a gitlab team member' do
+        it_behaves_like 'non inclusion of gitlab team member badge', false
 
         context 'when feature flag is disabled' do
           before do
             stub_feature_flags(gitlab_employee_badge: false)
           end
 
-          it_behaves_like 'non inclusion of gitlab employee badge'
+          it_behaves_like 'non inclusion of gitlab team member badge', nil
         end
       end
     end

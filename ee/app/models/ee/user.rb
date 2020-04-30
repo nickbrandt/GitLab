@@ -348,7 +348,7 @@ module EE
     def gitlab_employee?
       strong_memoize(:gitlab_employee) do
         if ::Gitlab.com? && ::Feature.enabled?(:gitlab_employee_badge)
-          confirmed? && human? && Mail::Address.new(email).domain == "gitlab.com"
+          human? && ::Gitlab::Com.gitlab_com_group_member_id?(id)
         else
           false
         end
