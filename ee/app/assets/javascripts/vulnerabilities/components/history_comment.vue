@@ -72,14 +72,12 @@ export default {
     getSaveConfig(note) {
       const isUpdatingComment = Boolean(this.comment);
       const method = isUpdatingComment ? 'put' : 'post';
-      let url = this.notesUrl;
+      const url = isUpdatingComment ? this.noteIdUrl : this.notesUrl;
       const data = { note: { note } };
       const emitName = isUpdatingComment ? 'onCommentUpdated' : 'onCommentAdded';
 
-      // If we're updating the comment, use the comment ID in the URL. Otherwise, use the discussion ID in the request data.
-      if (isUpdatingComment) {
-        url = this.noteIdUrl;
-      } else {
+      // If we're saving a new comment, use the discussion ID in the request data.
+      if (!isUpdatingComment) {
         data.in_reply_to_discussion_id = this.discussionId;
       }
 

@@ -3,7 +3,7 @@ import Visibility from 'visibilityjs';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import createFlash from '~/flash';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import HistoryEntry from './history_entry.vue';
@@ -34,22 +34,28 @@ export default {
       type: Object,
       required: true,
     },
-    timestamp: {
-      type: String,
-      required: true,
-    },
   },
 
-  data() {
-    return {
-      discussions: {},
-      poll: null,
-    };
-  },
+  data: () => ({
+    discussions: [],
+    poll: null,
+    lastFetchedAt: null,
+  }),
 
   computed: {
-    discussionsValues() {
-      return Object.values(this.discussions);
+    discussionLookup() {
+      return this.discussions.reduce((acc, discussion) => {
+        acc[discussion.id] = discussion;
+        return acc;
+      }, {});
+    },
+    noteLookup() {
+      return this.discussions
+        .flatMap(x => x.notes)
+        .reduce((acc, note) => {
+          acc[note.id] = note;
+          return acc;
+        }, {});
     },
     hasIssue() {
       return Boolean(this.feedback?.issue_iid);
@@ -60,25 +66,39 @@ export default {
   },
 
   created() {
-    this.createNotesPoll();
     this.fetchDiscussions();
 
     VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGE', this.fetchDiscussions);
   },
 
   beforeDestroy() {
-    this.poll.stop();
+    if (this.poll) this.poll.stop();
   },
 
   methods: {
+    dateToSeconds(date) {
+      return Date.parse(date) / 1000;
+    },
     fetchDiscussions() {
       axios
         .get(this.discussionsUrl)
-        .then(({ data }) => {
-          this.discussions = data.reduce((acc, curr) => {
-            acc[curr.id] = curr;
-            return acc;
-          }, {});
+        .then(({ data, headers: { date } }) => {
+          this.discussions = data;
+          this.lastFetchedAt = this.dateToSeconds(date);
+
+          if (!this.poll) this.createNotesPoll();
+
+          if (!Visibility.hidden()) {
+            this.poll.makeRequest();
+          }
+
+          Visibility.change(() => {
+            if (Visibility.hidden()) {
+              this.poll.stop();
+            } else {
+              this.poll.restart();
+            }
+          });
         })
         .catch(() => {
           createFlash(
@@ -86,89 +106,42 @@ export default {
               'VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later.',
             ),
           );
-        })
-        .finally(() => {
-          if (!Visibility.hidden()) {
-            this.poll.enable();
-            this.poll.makeRequest();
-          }
-
-          Visibility.change(() => {
-            if (!Visibility.hidden()) {
-              this.poll.restart();
-            } else {
-              this.poll.stop();
-            }
-          });
         });
     },
     createNotesPoll() {
-      // Create headers object to update the X-Last-Fetched-At property on each update
-      const headers = {
-        'X-Last-Fetched-At': parseInt(this.timestamp, 10),
-      };
       this.poll = new Poll({
         resource: {
-          fetchNotes: data => axios(data),
+          fetchNotes: () =>
+            axios.get(this.notesUrl, { headers: { 'X-Last-Fetched-At': this.lastFetchedAt } }),
         },
         method: 'fetchNotes',
-        data: {
-          method: 'get',
-          url: this.notesUrl,
-          headers,
-        },
-        successCallback: ({ data }) => {
-          const { notes } = data;
-          if (!notes.length) return;
-
-          const updatedDiscussions = this.getUpdatedDiscussions(this.discussions, notes);
-
-          this.discussions = { ...this.discussions, ...updatedDiscussions };
-          headers['X-Last-Fetched-At'] = data.last_fetched_at;
+        successCallback: ({ data: { notes, last_fetched_at: lastFetchedAt } }) => {
+          this.updateNotes(notes);
+          this.lastFetchedAt = lastFetchedAt;
         },
         errorCallback: () =>
-          createFlash(
-            s__(
-              'VulnerabilityManagement|Something went wrong while fetching latest comments. Please try again later.',
-            ),
-          ),
+          createFlash(__('Something went wrong while fetching latest comments.')),
       });
     },
-    getUpdatedDiscussions(discussions, notes) {
-      return notes.reduce((acc, note) => {
-        const discussion = discussions[note.discussion_id];
-        if (!discussion) {
-          this.poll.stop();
-          this.fetchDiscussions();
-        } else {
-          const newDiscussion = this.updateDiscussion(discussion, note);
-          acc[newDiscussion.id] = newDiscussion;
+    updateNotes(notes) {
+      notes.forEach(note => {
+        // If the note exists, update it.
+        if (this.noteLookup[note.id]) {
+          Object.assign(this.noteLookup[note.id], note);
         }
-        return acc;
-      }, {});
-    },
-    updateDiscussion(discussion, note) {
-      const newDiscussion = { ...discussion };
-      const { existingNote, index } = this.getExistingNote(discussion, note);
-
-      if (existingNote) {
-        newDiscussion.notes.splice(index, 1, note);
-      } else {
-        newDiscussion.notes.push(note);
-      }
-
-      return newDiscussion;
-    },
-    getExistingNote(discussion, note) {
-      let index = -1;
-      const existingNote = discussion.notes.find((dnote, i) => {
-        if (dnote.id === note.id) {
-          index = i;
-          return true;
+        // If the note doesn't exist, but the discussion does, add the note to the discussion.
+        else if (this.discussionLookup[note.discussion_id]) {
+          this.discussionLookup[note.discussion_id].notes.push(note);
         }
-        return false;
+        // If the discussion doesn't exist, create it.
+        else {
+          this.discussions.push({
+            id: note.discussion_id,
+            reply_id: note.discussion_id,
+            notes: [note],
+          });
+        }
       });
-      return { index, existingNote };
     },
   },
 };
@@ -181,9 +154,9 @@ export default {
     </div>
     <hr />
 
-    <ul v-if="discussionsValues.length" ref="historyList" class="notes discussion-body">
+    <ul v-if="discussions.length" ref="historyList" class="notes discussion-body">
       <history-entry
-        v-for="discussion in discussionsValues"
+        v-for="discussion in discussions"
         :key="discussion.id"
         :discussion="discussion"
         :notes-url="notesUrl"
