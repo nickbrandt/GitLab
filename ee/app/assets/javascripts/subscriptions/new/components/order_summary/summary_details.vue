@@ -66,7 +66,7 @@ export default {
       </div>
     </div>
     <div class="border-bottom prepend-top-default append-bottom-default"></div>
-    <div class="d-flex justify-content-between bold gl-font-size-large">
+    <div class="d-flex justify-content-between bold gl-font-lg">
       <div>{{ $options.i18n.total }}</div>
       <div class="js-total-amount">{{ formatAmount(totalAmount, usersPresent) }}</div>
     </div>

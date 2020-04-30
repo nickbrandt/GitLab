@@ -85,7 +85,7 @@ export default {
           <span class="font-weight-bold">{{ itemValue.failureCount.toLocaleString() }}</span>
         </div>
         <div v-if="detailsPath" class="mt-3">
-          <gl-link class="gl-font-size-small" :href="detailsPath" target="_blank">{{
+          <gl-link class="gl-font-sm" :href="detailsPath" target="_blank">{{
             __('More information')
           }}</gl-link>
         </div>

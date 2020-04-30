@@ -33,9 +33,11 @@ exports[`Design management design index page renders design index 1`] = `
     class="image-notes"
   >
     <h2
-      class="gl-font-size-20 font-weight-bold mt-0"
+      class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0"
     >
-      My precious issue
+      
+        My precious issue
+      
     </h2>
      
     <a
@@ -127,9 +129,11 @@ exports[`Design management design index page with error GlAlert is rendered in c
     class="image-notes"
   >
     <h2
-      class="gl-font-size-20 font-weight-bold mt-0"
+      class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0"
     >
-      My precious issue
+      
+        My precious issue
+      
     </h2>
      
     <a
@@ -146,7 +150,7 @@ exports[`Design management design index page with error GlAlert is rendered in c
     />
      
     <h2
-      class="new-discussion-disclaimer gl-font-size-14 m-0"
+      class="new-discussion-disclaimer gl-font-base m-0"
     >
       
         Click the image where you'd like to start a new discussion

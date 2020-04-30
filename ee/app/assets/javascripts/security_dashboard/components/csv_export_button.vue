@@ -85,7 +85,7 @@ export default {
       placement="left"
       triggers="manual"
     >
-      <p class="gl-font-size-14">
+      <p class="gl-font-base">
         {{ __('You can now export your security dashboard to a CSV report.') }}
       </p>
       <gl-link

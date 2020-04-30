@@ -308,7 +308,9 @@ export default {
         </div>
       </div>
       <div class="image-notes">
-        <h2 class="gl-font-size-20 font-weight-bold mt-0">{{ issue.title }}</h2>
+        <h2 class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0">
+          {{ issue.title }}
+        </h2>
         <a class="text-tertiary text-decoration-none mb-3 d-block" :href="issue.webUrl">{{
           issue.webPath
         }}</a>
@@ -348,7 +350,7 @@ export default {
             />
           </apollo-mutation>
         </template>
-        <h2 v-else class="new-discussion-disclaimer gl-font-size-14 m-0">
+        <h2 v-else class="new-discussion-disclaimer gl-font-base m-0">
           {{ __("Click the image where you'd like to start a new discussion") }}
         </h2>
       </div>

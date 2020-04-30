@@ -5,7 +5,7 @@ exports[`PackageActivity render to match the default snapshot when no pipeline 1
   class="mb-3"
 >
   <h3
-    class="gl-font-size-16"
+    class="gl-font-lg"
   >
     Activity
   </h3>
@@ -39,7 +39,7 @@ exports[`PackageActivity render to match the default snapshot when there is a pi
   class="mb-3"
 >
   <h3
-    class="gl-font-size-16"
+    class="gl-font-lg"
   >
     Activity
   </h3>

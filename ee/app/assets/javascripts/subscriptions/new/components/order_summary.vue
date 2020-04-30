@@ -37,7 +37,7 @@ export default {
     <div class="d-lg-none">
       <div @click="toggleCollapse">
         <h4
-          class="d-flex justify-content-between gl-font-size-16"
+          class="d-flex justify-content-between gl-font-lg"
           :class="{ 'prepend-bottom-32': !collapsed }"
         >
           <div class="d-flex">
@@ -52,7 +52,7 @@ export default {
     </div>
     <div class="d-none d-lg-block">
       <div class="append-bottom-20">
-        <h4 class="gl-font-size-20">
+        <h4 class="gl-font-size-20-deprecated-no-really-do-not-use-me">
           {{ titleWithName }}
         </h4>
       </div>

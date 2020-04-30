@@ -67,7 +67,7 @@ export default {
     />
     <gl-popover :target="() => $refs.lastUpdated.$el" placement="top" triggers="hover focus">
       <p>{{ syncTimeAgo.popoverText }}</p>
-      <gl-link class="mt-3 gl-font-size-small" :href="syncHelp.link" target="_blank">{{
+      <gl-link class="mt-3 gl-font-sm" :href="syncHelp.link" target="_blank">{{
         syncHelp.text
       }}</gl-link>
     </gl-popover>
