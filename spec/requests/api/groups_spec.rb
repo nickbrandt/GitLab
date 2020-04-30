@@ -379,24 +379,54 @@ describe API::Groups do
         expect(json_response).to include('created_at')
       end
 
-      it 'returns only public projects in the group' do
-        public_group = create(:group, :public)
-        projects = add_projects_to_group(public_group)
+      context 'details of projects in the group' do
+        let_it_be(:public_group) { create(:group, :public) }
 
-        get api("/groups/#{public_group.id}")
+        context 'when the feature flag to hide the project attributes is enabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: true)
+          end
 
-        expect(response_project_ids(json_response, 'projects'))
-          .to contain_exactly(projects[:public].id)
-      end
+          it 'does not return the details of pojects in the group' do
+            add_projects_to_group(public_group)
 
-      it 'returns only public projects shared with the group' do
-        public_group = create(:group, :public)
-        projects = add_projects_to_group(public_group, share_with: group1)
+            get api("/groups/#{public_group.id}")
 
-        get api("/groups/#{group1.id}")
+            expect(json_response).not_to have_key 'projects'
+          end
 
-        expect(response_project_ids(json_response, 'shared_projects'))
-          .to contain_exactly(projects[:public].id)
+          it 'does not return the details of projects shared with the group' do
+            add_projects_to_group(public_group, share_with: group1)
+
+            get api("/groups/#{group1.id}")
+
+            expect(json_response).not_to have_key 'shared_projects'
+          end
+        end
+
+        context 'when the feature flag to hide the project attributes is disabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: false)
+          end
+
+          it 'returns only public projects in the group' do
+            projects = add_projects_to_group(public_group)
+
+            get api("/groups/#{public_group.id}")
+
+            expect(response_project_ids(json_response, 'projects'))
+              .to contain_exactly(projects[:public].id)
+          end
+
+          it 'returns only public projects shared with the group' do
+            projects = add_projects_to_group(public_group, share_with: group1)
+
+            get api("/groups/#{group1.id}")
+
+            expect(response_project_ids(json_response, 'shared_projects'))
+              .to contain_exactly(projects[:public].id)
+          end
+        end
       end
     end
 
@@ -428,11 +458,50 @@ describe API::Groups do
         expect(json_response['full_path']).to eq(group1.full_path)
         expect(json_response['parent_id']).to eq(group1.parent_id)
         expect(json_response['created_at']).to be_present
-        expect(json_response['projects']).to be_an Array
-        expect(json_response['projects'].length).to eq(2)
-        expect(json_response['shared_projects']).to be_an Array
-        expect(json_response['shared_projects'].length).to eq(1)
-        expect(json_response['shared_projects'][0]['id']).to eq(project.id)
+      end
+
+      context 'details of projects in the group' do
+        let!(:project) { create(:project, namespace: group2, path: 'Foo') }
+        let!(:project_group_link) { create(:project_group_link, project: project, group: group1) }
+
+        context 'when the feature flag to hide the project attributes is enabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: true)
+          end
+
+          it 'does not return the details of projects in the group' do
+            get api("/groups/#{group1.id}", user1)
+
+            expect(json_response).not_to have_key 'projects'
+          end
+
+          it 'does not return the details of projects shared with the group' do
+            get api("/groups/#{group1.id}", user1)
+
+            expect(json_response).not_to have_key 'shared_projects'
+          end
+        end
+
+        context 'when the feature flag to hide the project attributes is disabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: false)
+          end
+
+          it 'returns the details of projects in the group' do
+            get api("/groups/#{group1.id}", user1)
+
+            expect(json_response['projects']).to be_an Array
+            expect(json_response['projects'].length).to eq(2)
+          end
+
+          it 'returns the details of shared projects in the group' do
+            get api("/groups/#{group1.id}", user1)
+
+            expect(json_response['shared_projects']).to be_an Array
+            expect(json_response['shared_projects'].length).to eq(1)
+            expect(json_response['shared_projects'].first['id']).to eq(project.id)
+          end
+        end
       end
 
       it "returns one of user1's groups without projects when with_projects option is set to false" do
@@ -474,24 +543,56 @@ describe API::Groups do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      it 'returns only public and internal projects in the group' do
-        public_group = create(:group, :public)
-        projects = add_projects_to_group(public_group)
+      context 'details of projects in a public group' do
+        let_it_be(:public_group) { create(:group, :public) }
 
-        get api("/groups/#{public_group.id}", user2)
+        context 'the user is not a member of the public group' do
+          context 'when the feature flag to hide the project attributes is enabled' do
+            before do
+              stub_feature_flags(hide_projects_in_groups_api: true)
+            end
 
-        expect(response_project_ids(json_response, 'projects'))
-          .to contain_exactly(projects[:public].id, projects[:internal].id)
-      end
+            it 'does not return the details of projects in the group' do
+              add_projects_to_group(public_group)
 
-      it 'returns only public and internal projects shared with the group' do
-        public_group = create(:group, :public)
-        projects = add_projects_to_group(public_group, share_with: group1)
+              get api("/groups/#{public_group.id}", user2)
 
-        get api("/groups/#{group1.id}", user2)
+              expect(json_response).not_to have_key 'projects'
+            end
 
-        expect(response_project_ids(json_response, 'shared_projects'))
-          .to contain_exactly(projects[:public].id, projects[:internal].id)
+            it 'does not return the details of projects shared with the group' do
+              add_projects_to_group(public_group, share_with: group1)
+
+              get api("/groups/#{group1.id}", user2)
+
+              expect(json_response).not_to have_key 'shared_projects'
+            end
+          end
+
+          context 'when the feature flag to hide the project attributes is disabled' do
+            before do
+              stub_feature_flags(hide_projects_in_groups_api: false)
+            end
+
+            it 'returns only public and internal projects in the group' do
+              projects = add_projects_to_group(public_group)
+
+              get api("/groups/#{public_group.id}", user2)
+
+              expect(response_project_ids(json_response, 'projects'))
+                .to contain_exactly(projects[:public].id, projects[:internal].id)
+            end
+
+            it 'returns only public and internal projects shared with the group' do
+              projects = add_projects_to_group(public_group, share_with: group1)
+
+              get api("/groups/#{group1.id}", user2)
+
+              expect(response_project_ids(json_response, 'shared_projects'))
+                .to contain_exactly(projects[:public].id, projects[:internal].id)
+            end
+          end
+        end
       end
 
       it 'avoids N+1 queries' do
@@ -570,29 +671,67 @@ describe API::Groups do
         end
       end
 
-      context 'when limiting feature is enabled' do
+      context 'when the feature flag to hide the project attributes is disabled' do
         before do
-          stub_feature_flags(limit_projects_in_groups_api: true)
+          stub_feature_flags(hide_projects_in_groups_api: false)
         end
 
-        it 'limits projects and shared_projects' do
-          get api("/groups/#{group1.id}")
+        context 'when limiting feature is enabled' do
+          before do
+            stub_feature_flags(limit_projects_in_groups_api: true)
+          end
 
-          expect(json_response['projects'].count).to eq(limit)
-          expect(json_response['shared_projects'].count).to eq(limit)
+          it 'limits projects and shared_projects' do
+            get api("/groups/#{group1.id}")
+
+            expect(json_response['projects'].count).to eq(limit)
+            expect(json_response['shared_projects'].count).to eq(limit)
+          end
+        end
+
+        context 'when limiting feature is not enabled' do
+          before do
+            stub_feature_flags(limit_projects_in_groups_api: false)
+          end
+
+          it 'does not limit projects and shared_projects' do
+            get api("/groups/#{group1.id}")
+
+            expect(json_response['projects'].count).to eq(3)
+            expect(json_response['shared_projects'].count).to eq(3)
+          end
         end
       end
 
-      context 'when limiting feature is not enabled' do
+      context 'when the feature flag to hide the project attributes is enabled' do
         before do
-          stub_feature_flags(limit_projects_in_groups_api: false)
+          stub_feature_flags(hide_projects_in_groups_api: true)
         end
 
-        it 'does not limit projects and shared_projects' do
-          get api("/groups/#{group1.id}")
+        context 'when limiting feature is enabled' do
+          before do
+            stub_feature_flags(limit_projects_in_groups_api: true)
+          end
 
-          expect(json_response['projects'].count).to eq(3)
-          expect(json_response['shared_projects'].count).to eq(3)
+          it 'does not expose projects or shared projects' do
+            get api("/groups/#{group1.id}")
+
+            expect(json_response).not_to have_key 'projects'
+            expect(json_response).not_to have_key 'shared_projects'
+          end
+        end
+
+        context 'when limiting feature is not enabled' do
+          before do
+            stub_feature_flags(limit_projects_in_groups_api: false)
+          end
+
+          it 'does not expose projects or shared projects' do
+            get api("/groups/#{group1.id}")
+
+            expect(json_response).not_to have_key 'projects'
+            expect(json_response).not_to have_key 'shared_projects'
+          end
         end
       end
     end
@@ -635,11 +774,51 @@ describe API::Groups do
         expect(json_response['request_access_enabled']).to eq(true)
         expect(json_response['parent_id']).to eq(nil)
         expect(json_response['created_at']).to be_present
-        expect(json_response['projects']).to be_an Array
-        expect(json_response['projects'].length).to eq(2)
-        expect(json_response['shared_projects']).to be_an Array
-        expect(json_response['shared_projects'].length).to eq(0)
         expect(json_response['default_branch_protection']).to eq(::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
+      end
+
+      context 'details of projects in the group' do
+        subject do
+          put api("/groups/#{group1.id}", user1), params: { name: new_group_name }
+        end
+
+        context 'when the feature flag to hide the project attributes is enabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: true)
+          end
+
+          it 'does not return the details of projects in the group' do
+            subject
+
+            expect(json_response).not_to have_key 'projects'
+          end
+
+          it 'does not return the details of projects shared with the group' do
+            subject
+
+            expect(json_response).not_to have_key 'shared_projects'
+          end
+        end
+
+        context 'when the feature flag to hide the project attributes is disabled' do
+          before do
+            stub_feature_flags(hide_projects_in_groups_api: false)
+          end
+
+          it 'returns the details of projects in the group' do
+            subject
+
+            expect(json_response['projects']).to be_an Array
+            expect(json_response['projects'].length).to eq(2)
+          end
+
+          it 'returns the details of shared projects in the group' do
+            subject
+
+            expect(json_response['shared_projects']).to be_an Array
+            expect(json_response['shared_projects'].length).to eq(0)
+          end
+        end
       end
 
       context 'updating the `default_branch_protection` attribute' do

@@ -392,18 +392,10 @@ Parameters:
 | ------------------------ | -------------- | -------- | ----------- |
 | `id`                     | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `with_custom_attributes` | boolean        | no       | Include [custom attributes](custom_attributes.md) in response (admins only). |
-| `with_projects`          | boolean        | no       | Include details from projects that belong to the specified group (defaults to `true`). (Deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects).)  |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4
 ```
-
-This endpoint returns:
-
-- All projects and shared projects in GitLab 12.5 and earlier.
-- A maximum of 100 projects and shared projects [in GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/31031)
-  and later. To get the details of all projects within a group, use the
-  [list a group's projects endpoint](#list-a-groups-projects) instead.
 
 Example response:
 
@@ -422,139 +414,7 @@ Example response:
   "runners_token": "ba324ca7b1c77fc20bb9",
   "file_template_project_id": 1,
   "parent_id": null,
-  "created_at": "2020-01-15T12:36:29.590Z",
-  "projects": [
-    {
-      "id": 7,
-      "description": "Voluptas veniam qui et beatae voluptas doloremque explicabo facilis.",
-      "default_branch": "master",
-      "tag_list": [],
-      "archived": false,
-      "visibility": "public",
-      "ssh_url_to_repo": "git@gitlab.example.com:twitter/typeahead-js.git",
-      "http_url_to_repo": "https://gitlab.example.com/twitter/typeahead-js.git",
-      "web_url": "https://gitlab.example.com/twitter/typeahead-js",
-      "name": "Typeahead.Js",
-      "name_with_namespace": "Twitter / Typeahead.Js",
-      "path": "typeahead-js",
-      "path_with_namespace": "twitter/typeahead-js",
-      "issues_enabled": true,
-      "merge_requests_enabled": true,
-      "wiki_enabled": true,
-      "jobs_enabled": true,
-      "snippets_enabled": false,
-      "container_registry_enabled": true,
-      "created_at": "2016-06-17T07:47:25.578Z",
-      "last_activity_at": "2016-06-17T07:47:25.881Z",
-      "shared_runners_enabled": true,
-      "creator_id": 1,
-      "namespace": {
-        "id": 4,
-        "name": "Twitter",
-        "path": "twitter",
-        "kind": "group"
-      },
-      "avatar_url": null,
-      "star_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 3,
-      "public_jobs": true,
-      "shared_with_groups": [],
-      "request_access_enabled": false
-    },
-    {
-      "id": 6,
-      "description": "Aspernatur omnis repudiandae qui voluptatibus eaque.",
-      "default_branch": "master",
-      "tag_list": [],
-      "archived": false,
-      "visibility": "internal",
-      "ssh_url_to_repo": "git@gitlab.example.com:twitter/flight.git",
-      "http_url_to_repo": "https://gitlab.example.com/twitter/flight.git",
-      "web_url": "https://gitlab.example.com/twitter/flight",
-      "name": "Flight",
-      "name_with_namespace": "Twitter / Flight",
-      "path": "flight",
-      "path_with_namespace": "twitter/flight",
-      "issues_enabled": true,
-      "merge_requests_enabled": true,
-      "wiki_enabled": true,
-      "jobs_enabled": true,
-      "snippets_enabled": false,
-      "container_registry_enabled": true,
-      "created_at": "2016-06-17T07:47:24.661Z",
-      "last_activity_at": "2016-06-17T07:47:24.838Z",
-      "shared_runners_enabled": true,
-      "creator_id": 1,
-      "namespace": {
-        "id": 4,
-        "name": "Twitter",
-        "path": "twitter",
-        "kind": "group"
-      },
-      "avatar_url": null,
-      "star_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 8,
-      "public_jobs": true,
-      "shared_with_groups": [],
-      "request_access_enabled": false
-    }
-  ],
-  "shared_projects": [
-    {
-      "id": 8,
-      "description": "Velit eveniet provident fugiat saepe eligendi autem.",
-      "default_branch": "master",
-      "tag_list": [],
-      "archived": false,
-      "visibility": "private",
-      "ssh_url_to_repo": "git@gitlab.example.com:h5bp/html5-boilerplate.git",
-      "http_url_to_repo": "https://gitlab.example.com/h5bp/html5-boilerplate.git",
-      "web_url": "https://gitlab.example.com/h5bp/html5-boilerplate",
-      "name": "Html5 Boilerplate",
-      "name_with_namespace": "H5bp / Html5 Boilerplate",
-      "path": "html5-boilerplate",
-      "path_with_namespace": "h5bp/html5-boilerplate",
-      "issues_enabled": true,
-      "merge_requests_enabled": true,
-      "wiki_enabled": true,
-      "jobs_enabled": true,
-      "snippets_enabled": false,
-      "container_registry_enabled": true,
-      "created_at": "2016-06-17T07:47:27.089Z",
-      "last_activity_at": "2016-06-17T07:47:27.310Z",
-      "shared_runners_enabled": true,
-      "creator_id": 1,
-      "namespace": {
-        "id": 5,
-        "name": "H5bp",
-        "path": "h5bp",
-        "kind": "group"
-      },
-      "avatar_url": null,
-      "star_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 4,
-      "public_jobs": true,
-      "shared_with_groups": [
-        {
-          "group_id": 4,
-          "group_name": "Twitter",
-          "group_full_path": "twitter",
-          "group_access_level": 30,
-          "expires_at": null
-        },
-        {
-          "group_id": 3,
-          "group_name": "Gitlab Org",
-          "group_full_path": "gitlab-org",
-          "group_access_level": 10,
-          "expires_at": "2018-08-14"
-        }
-      ]
-    }
-  ]
+  "created_at": "2020-01-15T12:36:29.590Z"
 }
 ```
 
@@ -573,42 +433,8 @@ Additional response parameters:
 }
 ```
 
-When adding the parameter `with_projects=false`, projects will not be returned.
-
-```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4?with_projects=false
-```
-
-Example response:
-
-```json
-{
-  "id": 4,
-  "name": "Twitter",
-  "path": "twitter",
-  "description": "Aliquid qui quis dignissimos distinctio ut commodi voluptas est.",
-  "visibility": "public",
-  "avatar_url": null,
-  "web_url": "https://gitlab.example.com/groups/twitter",
-  "request_access_enabled": false,
-  "full_name": "Twitter",
-  "full_path": "twitter",
-  "file_template_project_id": 1,
-  "parent_id": null
-}
-```
-
-### Disabling the results limit
-
-The 100 results limit can be disabled if it breaks integrations developed using GitLab
-12.4 and earlier.
-
-To disable the limit while migrating to using the [list a group's projects](#list-a-groups-projects) endpoint, ask a GitLab administrator
-with Rails console access to run the following command:
-
-```ruby
-Feature.disable(:limit_projects_in_groups_api)
-```
+NOTE: **Note:**
+The `projects` and `shared_projects` attributes [have been deprecated from GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects) or [list a group's shared projects endpoint](#list-a-groups-shared-projects) instead.
 
 ## New group
 
@@ -708,16 +534,6 @@ PUT /groups/:id
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"
 ```
 
-This endpoint returns:
-
-- All projects and shared projects in GitLab 12.5 and earlier.
-- A maximum of 100 projects and shared projects [in GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/31031)
-  and later. To get the details of all projects within a group, use the
-  [list a group's projects endpoint](#list-a-groups-projects) instead.
-
-NOTE: **Note:**
-The `projects` and `shared_projects` attributes [will be deprecated in GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects) instead.
-
 Example response:
 
 ```json
@@ -734,62 +550,12 @@ Example response:
   "full_path": "foo-bar",
   "file_template_project_id": 1,
   "parent_id": null,
-  "created_at": "2020-01-15T12:36:29.590Z",
-  "projects": [
-    {
-      "id": 9,
-      "description": "foo",
-      "default_branch": "master",
-      "tag_list": [],
-      "public": false,
-      "archived": false,
-      "visibility": "internal",
-      "ssh_url_to_repo": "git@gitlab.example.com/html5-boilerplate.git",
-      "http_url_to_repo": "http://gitlab.example.com/h5bp/html5-boilerplate.git",
-      "web_url": "http://gitlab.example.com/h5bp/html5-boilerplate",
-      "name": "Html5 Boilerplate",
-      "name_with_namespace": "Experimental / Html5 Boilerplate",
-      "path": "html5-boilerplate",
-      "path_with_namespace": "h5bp/html5-boilerplate",
-      "issues_enabled": true,
-      "merge_requests_enabled": true,
-      "wiki_enabled": true,
-      "jobs_enabled": true,
-      "snippets_enabled": true,
-      "created_at": "2016-04-05T21:40:50.169Z",
-      "last_activity_at": "2016-04-06T16:52:08.432Z",
-      "shared_runners_enabled": true,
-      "creator_id": 1,
-      "namespace": {
-        "id": 5,
-        "name": "Experimental",
-        "path": "h5bp",
-        "kind": "group"
-      },
-      "avatar_url": null,
-      "star_count": 1,
-      "forks_count": 0,
-      "open_issues_count": 3,
-      "public_jobs": true,
-      "shared_with_groups": [],
-      "request_access_enabled": false
-    }
-  ]
+  "created_at": "2020-01-15T12:36:29.590Z"
 }
 ```
 
-### Disabling the results limit
-
-The 100 results limit can be disabled if it breaks integrations developed using GitLab
-12.4 and earlier.
-
-To disable the limit while migrating to using the
-[list a group's projects](#list-a-groups-projects) endpoint, ask a GitLab administrator
-with Rails console access to run the following command:
-
-```ruby
-Feature.disable(:limit_projects_in_groups_api)
-```
+NOTE: **Note:**
+The `projects` and `shared_projects` attributes [have been deprecated from GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213797). To get the details of all projects within a group, use the [list a group's projects endpoint](#list-a-groups-projects) or [list a group's shared projects endpoint](#list-a-groups-shared-projects) instead.
 
 ## Remove group
 

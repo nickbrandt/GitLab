@@ -1,0 +1,5 @@
+---
+title: Remove 'projects' and 'shared_projects' attributes from Groups API
+merge_request: 30815
+author:
+type: removed

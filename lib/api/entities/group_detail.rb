@@ -4,7 +4,9 @@ module API
   module Entities
     class GroupDetail < Group
       expose :runners_token, if: lambda { |group, options| options[:user_can_admin_group] }
-      expose :projects, using: Entities::Project do |group, options|
+
+      expose :projects, unless: lambda { |_, _| hide_projects_in_groups_api? },
+        using: Entities::Project do |group, options|
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
@@ -14,7 +16,8 @@ module API
         Entities::Project.prepare_relation(projects)
       end
 
-      expose :shared_projects, using: Entities::Project do |group, options|
+      expose :shared_projects, unless: lambda { |_, _| hide_projects_in_groups_api? },
+        using: Entities::Project do |group, options|
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
@@ -30,6 +33,11 @@ module API
         else
           nil
         end
+      end
+
+      # TODO: Remove in 13.1: https://gitlab.com/gitlab-org/gitlab/-/issues/216440
+      def hide_projects_in_groups_api?
+        ::Feature.enabled?(:hide_projects_in_groups_api, default_enabled: true)
       end
     end
   end
