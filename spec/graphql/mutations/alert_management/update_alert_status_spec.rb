@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe Mutations::AlertManagement::ChangeAlertStatus do
+describe Mutations::AlertManagement::UpdateAlertStatus do
   let_it_be(:current_user) { create(:user) }
-  let_it_be(:alert) { create(:alert_management_alert) }
+  let_it_be(:alert) { create(:alert_management_alert, status: 'triggered') }
   let(:project) { alert.project }
   let(:new_status) { 'acknowledged' }
   let(:args) { { status: new_status, project_path: project.full_path, iid: alert.iid } }
@@ -17,19 +17,13 @@ describe Mutations::AlertManagement::ChangeAlertStatus do
         project.add_developer(current_user)
       end
 
-      it 'does not change the status' do
+      it 'changes the status' do
         expect { resolve }.to change { alert.reload.status }.from(alert.status).to(new_status)
       end
     end
 
-    context 'user has no access' do
-      it 'does not change the status' do
-        expect { resolve }.not_to change { alert.reload.status }
-      end
-
-      it 'sets the error' do
-        expect(resolve.dig(:errors)).not_to be_empty
-      end
+    it 'raises an error if the resource is not accessible to the user' do
+      expect { subject }.to raise_error(Gitlab::Graphql::Errors::ResourceNotAvailable)
     end
   end
 

@@ -20,7 +20,7 @@ module Mutations
 
       private
 
-      def find_alert(project_path:, iid:)
+      def find_object(project_path:, iid:)
         project = resolve_project(full_path: project_path)
 
         return unless project
