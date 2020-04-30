@@ -18,7 +18,7 @@ describe Mutations::Vulnerabilities::MultiDismiss do
         stub_licensed_features(security_dashboard: true)
       end
 
-      context 'when user doe not have access to the project of at least one vulnerability' do
+      context 'when user does not have access to the project of at least one vulnerability' do
         before do
           vulnerabilities.first.project.add_developer(user)
         end
