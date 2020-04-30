@@ -82,12 +82,15 @@ export default {
 </script>
 <template>
   <div class="insights-container prepend-top-default">
+    <div class="mb-3">
+      <h3>{{ __('Insights') }}</h3>
+    </div>
     <div v-if="configLoading" class="insights-config-loading text-center">
       <gl-loading-icon :inline="true" size="lg" />
     </div>
     <div v-else-if="configPresent" class="insights-wrapper">
       <gl-dropdown
-        class="js-insights-dropdown col-8 col-md-9 gl-pr-0"
+        class="js-insights-dropdown w-100"
         data-qa-selector="insights_dashboard_dropdown"
         menu-class="w-100 mw-100"
         toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
