@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RequirementsFinder do
+describe RequirementsManagement::RequirementsFinder do
   let_it_be(:project) { create(:project) }
   let_it_be(:project_user) { create(:user).tap { |u| project.add_developer(u) } }
   let_it_be(:requirement1) { create(:requirement, project: project, state: 'opened', updated_at: 3.days.ago) }

@@ -26,7 +26,7 @@ module Mutations
         project = authorized_find!(full_path: project_path)
         validate_flag!(project)
 
-        requirement = ::Requirements::CreateService.new(
+        requirement = ::RequirementsManagement::CreateRequirementService.new(
           project,
           context[:current_user],
           args

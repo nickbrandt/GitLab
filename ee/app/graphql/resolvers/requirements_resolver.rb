@@ -31,7 +31,7 @@ module Resolvers
       args[:project_id] = project.id
       args[:iids] ||= [args[:iid]].compact
 
-      RequirementsFinder.new(context[:current_user], args).execute
+      RequirementsManagement::RequirementsFinder.new(context[:current_user], args).execute
     end
   end
 end
