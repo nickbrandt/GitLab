@@ -142,6 +142,7 @@ export default {
         <gl-dropdown
           ref="dropdown"
           class="w-100"
+          variant="outline-secondary"
           :text="dropdownText"
           @keydown.esc.native="hideDropdown"
           @hide="hideDropdown"
