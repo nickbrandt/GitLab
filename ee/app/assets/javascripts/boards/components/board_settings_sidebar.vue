@@ -168,9 +168,6 @@ export default {
     showScopedLabels(label) {
       return boardsStoreEE.store.scopedLabels.enabled && isScopedLabel(label);
     },
-    helpLink() {
-      return boardsStoreEE.store.scopedLabels.helpLink;
-    },
   },
 };
 </script>

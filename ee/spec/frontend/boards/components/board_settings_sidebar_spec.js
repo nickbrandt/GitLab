@@ -67,7 +67,6 @@ describe('BoardSettingsSideBar', () => {
       removeList: bs.removeList,
       scopedLabels: {
         enabled: false,
-        scopedLabelsDocumentationLink: '',
       },
     };
 

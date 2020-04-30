@@ -13,14 +13,6 @@ describe LabelsHelper do
         stub_licensed_features(scoped_labels: true)
       end
 
-      it 'includes link to scoped labels documentation' do
-        expect(render_label(scoped_label)).to match(%r(<span.+>#{scoped_label.scoped_label_key}</span><span.+>#{scoped_label.scoped_label_value}</span><a.+>.*question-circle.*</a>)m)
-      end
-
-      it 'does not include link to scoped label documentation for common labels' do
-        expect(render_label(label)).to match(%r(<span.+><span.+>#{label.name}</span></span>$)m)
-      end
-
       it 'right text span does not have .gl-label-text-dark class if label color is dark' do
         scoped_label.color = '#D10069'
 
@@ -56,8 +48,7 @@ describe LabelsHelper do
         show_no: "true",
         show_any: "true",
         default_label: "Labels",
-        scoped_labels: "false",
-        scoped_labels_documentation_link: "/help/user/project/labels.md#scoped-labels-premium"
+        scoped_labels: "false"
       }
     end
 

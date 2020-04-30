@@ -35,7 +35,6 @@ export default {
       'labelsWebUrl',
       'epicsWebUrl',
       'scopedLabels',
-      'scopedLabelsDocumentationLink',
       'epicLabelsSelectInProgress',
     ]),
     epicContext() {
@@ -118,7 +117,6 @@ export default {
     :labels-fetch-path="labelsPath"
     :labels-manage-path="labelsWebUrl"
     :labels-filter-base-path="epicsWebUrl"
-    :scoped-labels-documentation-path="scopedLabelsDocumentationLink"
     class="block labels js-labels-block"
     @updateSelectedLabels="handleUpdateSelectedLabels"
     @onDropdownClose="handleDropdownClose"
