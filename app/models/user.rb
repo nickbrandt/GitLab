@@ -736,7 +736,7 @@ class User < ApplicationRecord
   end
 
   def unique_email
-    if !emails.exists?(email: email) && Email.exists?(email: email)
+    if !emails.exists?(email: email) && Email.confirmed.exists?(email: email)
       errors.add(:email, _('has already been taken'))
     end
   end

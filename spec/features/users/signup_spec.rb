@@ -217,6 +217,35 @@ shared_examples 'Signup' do
       end
     end
 
+    context "when sigining up with duplicate unconfirmed emails" do
+      it "creates the user successfully" do
+        existing_email = create(:email, :unconfirmed)
+
+        visit new_user_registration_path
+
+        fill_in 'new_user_username', with: new_user.username
+        fill_in 'new_user_email', with: existing_email.email
+
+        if Gitlab::Experimentation.enabled?(:signup_flow)
+          fill_in 'new_user_first_name', with: new_user.first_name
+          fill_in 'new_user_last_name', with: new_user.last_name
+        else
+          fill_in 'new_user_name', with: new_user.name
+          fill_in 'new_user_email_confirmation', with: existing_email.email
+        end
+
+        fill_in 'new_user_password', with: new_user.password
+        click_button "Register"
+
+        if Gitlab::Experimentation.enabled?(:signup_flow)
+          expect(current_path).to eq users_sign_up_welcome_path
+        else
+          expect(current_path).to eq dashboard_projects_path
+          expect(page).to have_content("Welcome! You have signed up successfully.")
+        end
+      end
+    end
+
     context "when not sending confirmation email" do
       before do
         stub_application_setting(send_user_confirmation_email: false)

@@ -356,6 +356,21 @@ describe User, :do_not_mock_admin_mode do
     end
 
     describe 'email' do
+      it 'invalid when duplicate confirmed email exists' do
+        email = create(:email, :confirmed)
+        user = build(:user, email: email.email)
+
+        expect(user).to be_invalid
+        expect(user.errors[:email]).to include a_string_matching('has already been taken')
+      end
+
+      it 'valid when duplicate unconfirmed email exists' do
+        email = create(:email, :unconfirmed)
+        user = build(:user, email: email.email)
+
+        expect(user).to be_valid
+      end
+
       context 'when no signup domains whitelisted' do
         before do
           allow_any_instance_of(ApplicationSetting).to receive(:domain_whitelist).and_return([])
