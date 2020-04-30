@@ -139,15 +139,15 @@ describe 'epics list', :js do
 
       page.within('.content-wrapper .content') do
         page.within('.epics-list-section') do
-          page.within('div.epics-list-item:nth-child(1)') do
+          page.within('div.epic-item-container:nth-child(1) div.epics-list-item') do
             expect(page).to have_content(epic1.title)
           end
 
-          page.within('div.epics-list-item:nth-child(2)') do
+          page.within('div.epic-item-container:nth-child(2) div.epics-list-item') do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within('div.epics-list-item:nth-child(3)') do
+          page.within('div.epic-item-container:nth-child(3) div.epics-list-item') do
             expect(page).to have_content(epic2.title)
           end
         end

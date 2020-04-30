@@ -24,6 +24,7 @@ const createComponent = (
     timeframe = mockTimeframeMonths,
     currentGroupId = mockGroupId,
     defaultInnerHeight = 0,
+    hasFiltersApplied = false,
   },
   el,
 ) => {
@@ -32,6 +33,7 @@ const createComponent = (
   const store = createStore();
   store.dispatch('setInitialData', {
     defaultInnerHeight,
+    childrenFlags: { '1': { itemExpanded: false } },
   });
 
   return mountComponentWithStore(Component, {
@@ -43,6 +45,7 @@ const createComponent = (
       milestones,
       timeframe,
       currentGroupId,
+      hasFiltersApplied,
     },
   });
 };

@@ -37,6 +37,10 @@ export default {
       type: Number,
       required: true,
     },
+    hasFiltersApplied: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -48,7 +52,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['bufferSize']),
+    ...mapState(['bufferSize', 'epicIid', 'childrenEpics', 'childrenFlags', 'epicIds']),
     emptyRowContainerVisible() {
       return this.epics.length < this.bufferSize;
     },
@@ -62,14 +66,30 @@ export default {
         left: `${this.offsetLeft}px`,
       };
     },
-    displayedEpics() {
+    findEpicsMatchingFilter() {
       return this.epics.reduce((acc, epic) => {
-        acc.push(epic);
-        if (epic.isChildEpicShowing) {
-          acc.push(...epic.children.edges);
+        if (!epic.hasParent || (epic.hasParent && this.epicIds.indexOf(epic.parent.id) < 0)) {
+          acc.push(epic);
         }
         return acc;
       }, []);
+    },
+    findParentEpics() {
+      return this.epics.reduce((acc, epic) => {
+        if (!epic.hasParent) {
+          acc.push(epic);
+        }
+        return acc;
+      }, []);
+    },
+    displayedEpics() {
+      // If roadmap is accessed from epic, return all epics
+      if (this.epicIid) {
+        return this.epics;
+      }
+
+      // If a search is being performed, add child as parent if parent doesn't match the search
+      return this.hasFiltersApplied ? this.findEpicsMatchingFilter : this.findParentEpics;
     },
   },
   mounted() {
@@ -84,7 +104,7 @@ export default {
     window.removeEventListener('resize', this.syncClientWidth);
   },
   methods: {
-    ...mapActions(['setBufferSize', 'toggleExpandedEpic']),
+    ...mapActions(['setBufferSize', 'toggleEpic']),
     initMounted() {
       this.roadmapShellEl = this.$root.$el && this.$root.$el.firstChild;
       this.setBufferSize(Math.ceil((window.innerHeight - this.$el.offsetTop) / EPIC_ITEM_HEIGHT));
@@ -141,8 +161,8 @@ export default {
         },
       };
     },
-    toggleIsEpicExpanded(epicId) {
-      this.toggleExpandedEpic(epicId);
+    toggleIsEpicExpanded(epic) {
+      this.toggleEpic({ parentItem: epic });
     },
     generateKey,
   },
@@ -174,6 +194,10 @@ export default {
         :timeframe="timeframe"
         :current-group-id="currentGroupId"
         :client-width="clientWidth"
+        :child-level="0"
+        :children-epics="childrenEpics"
+        :children-flags="childrenFlags"
+        :has-filters-applied="hasFiltersApplied"
       />
     </template>
     <div

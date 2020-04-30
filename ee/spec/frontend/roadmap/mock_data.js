@@ -18,6 +18,11 @@ export const mockSvgPath = '/foo/bar.svg';
 
 export const mockTimeframeInitialDate = new Date(2018, 0, 1);
 
+const defaultDescendantCounts = {
+  openedEpics: 0,
+  closedEpics: 0,
+};
+
 export const mockTimeframeQuartersPrepend = [
   {
     year: 2016,
@@ -103,6 +108,10 @@ export const mockEpic = {
   originalStartDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
   webUrl: '/groups/gitlab-org/-/epics/1',
+  descendantCounts: {
+    openedEpics: 3,
+    closedEpics: 2,
+  },
 };
 
 export const mockRawEpic = {
@@ -116,6 +125,10 @@ export const mockRawEpic = {
   start_date: '2017-6-26',
   end_date: '2018-03-10',
   web_url: '/groups/gitlab-org/marketing/-/epics/2',
+  descendantCounts: {
+    openedEpics: 3,
+    closedEpics: 2,
+  },
 };
 
 export const mockFormattedChildEpic1 = {
@@ -138,6 +151,7 @@ export const mockFormattedChildEpic1 = {
     closedIssues: 3,
     openedIssues: 2,
   },
+  descendantCounts: defaultDescendantCounts,
   isChildEpic: true,
 };
 
@@ -184,8 +198,11 @@ export const mockFormattedEpic = {
     closedIssues: 3,
     openedIssues: 2,
   },
+  descendantCounts: {
+    openedEpics: 3,
+    closedEpics: 2,
+  },
   isChildEpic: false,
-  isChildEpicShowing: false,
 };
 
 export const rawEpics = [
@@ -200,6 +217,11 @@ export const rawEpics = [
     start_date: '2017-12-26',
     end_date: '2018-03-10',
     web_url: '/groups/gitlab-org/marketing/-/epics/2',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: true,
+    parent: {
+      id: '40',
+    },
   },
   {
     id: 40,
@@ -212,6 +234,8 @@ export const rawEpics = [
     start_date: '2017-12-25',
     end_date: '2018-03-09',
     web_url: '/groups/gitlab-org/marketing/-/epics/1',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 39,
@@ -224,6 +248,8 @@ export const rawEpics = [
     start_date: '2017-04-02',
     end_date: '2017-11-30',
     web_url: '/groups/gitlab-org/-/epics/12',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 38,
@@ -236,6 +262,8 @@ export const rawEpics = [
     start_date: '2018-01-15',
     end_date: '2020-01-03',
     web_url: '/groups/gitlab-org/-/epics/11',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 37,
@@ -248,6 +276,8 @@ export const rawEpics = [
     start_date: '2018-01-01',
     end_date: '2018-01-31',
     web_url: '/groups/gitlab-org/-/epics/10',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 35,
@@ -260,6 +290,8 @@ export const rawEpics = [
     start_date: '2017-09-04',
     end_date: null,
     web_url: '/groups/gitlab-org/-/epics/8',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 33,
@@ -272,6 +304,8 @@ export const rawEpics = [
     start_date: '2017-11-27',
     end_date: null,
     web_url: '/groups/gitlab-org/-/epics/6',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 4,
@@ -285,6 +319,8 @@ export const rawEpics = [
     start_date: '2018-01-01',
     end_date: '2018-02-02',
     web_url: '/groups/gitlab-org/-/epics/4',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 3,
@@ -298,6 +334,11 @@ export const rawEpics = [
     start_date: '2017-12-01',
     end_date: '2018-03-26',
     web_url: '/groups/gitlab-org/-/epics/3',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: true,
+    parent: {
+      id: '40',
+    },
   },
   {
     id: 2,
@@ -311,6 +352,8 @@ export const rawEpics = [
     start_date: '2017-11-26',
     end_date: '2018-03-22',
     web_url: '/groups/gitlab-org/-/epics/2',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 1,
@@ -325,6 +368,8 @@ export const rawEpics = [
     start_date: '2017-07-10',
     end_date: '2018-06-02',
     web_url: '/groups/gitlab-org/-/epics/1',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
   {
     id: 22,
@@ -337,6 +382,8 @@ export const rawEpics = [
     start_date: '2018-12-26',
     end_date: '2018-03-10',
     web_url: '/groups/gitlab-org/marketing/-/epics/22',
+    descendantCounts: defaultDescendantCounts,
+    hasParent: false,
   },
 ];
 
@@ -438,6 +485,20 @@ export const mockEpicChildEpicsQueryResponse = {
         children: {
           edges: mockGroupEpicsQueryResponse.data.group.epics.edges,
         },
+      },
+    },
+  },
+};
+
+export const mockEpicChildEpicsQueryResponseFormatted = {
+  data: {
+    group: {
+      id: 'gid://gitlab/Group/2',
+      name: 'Gitlab Org',
+      epic: {
+        id: 'gid://gitlab/Epic/1',
+        title: 'Error omnis quos consequatur',
+        children: [mockFormattedChildEpic1, mockFormattedChildEpic2],
       },
     },
   },

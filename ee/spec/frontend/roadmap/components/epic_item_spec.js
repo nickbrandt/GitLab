@@ -1,15 +1,20 @@
-import Vue from 'vue';
+import { mount } from '@vue/test-utils';
 
-import _ from 'lodash';
+import { delay } from 'lodash';
 
-import epicItemComponent from 'ee/roadmap/components/epic_item.vue';
+import EpicItemComponent from 'ee/roadmap/components/epic_item.vue';
+import EpicItemContainer from 'ee/roadmap/components/epic_item_container.vue';
 
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic, mockGroupId } from 'ee_jest/roadmap/mock_data';
+import {
+  mockTimeframeInitialDate,
+  mockEpic,
+  mockGroupId,
+  mockFormattedChildEpic1,
+} from 'ee_jest/roadmap/mock_data';
 
 jest.mock('lodash/delay', () =>
   jest.fn(func => {
@@ -26,31 +31,43 @@ const createComponent = ({
   epic = mockEpic,
   timeframe = mockTimeframeMonths,
   currentGroupId = mockGroupId,
+  childLevel = 0,
+  childrenEpics = {},
+  childrenFlags = { '1': { itemExpanded: false } },
+  hasFiltersApplied = false,
 }) => {
-  const Component = Vue.extend(epicItemComponent);
-
-  return mountComponent(Component, {
-    presetType,
-    epic,
-    timeframe,
-    currentGroupId,
+  return mount(EpicItemComponent, {
+    stubs: {
+      'epic-item-container': EpicItemContainer,
+      'epic-item': EpicItemComponent,
+    },
+    propsData: {
+      presetType,
+      epic,
+      timeframe,
+      currentGroupId,
+      childLevel,
+      childrenEpics,
+      childrenFlags,
+      hasFiltersApplied,
+    },
   });
 };
 
 describe('EpicItemComponent', () => {
-  let vm;
+  let wrapper;
 
   beforeEach(() => {
-    vm = createComponent({});
+    wrapper = createComponent({});
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('startDate', () => {
     it('returns Epic.startDate when start date is within range', () => {
-      expect(vm.startDate).toBe(mockEpic.startDate);
+      expect(wrapper.vm.startDate).toBe(mockEpic.startDate);
     });
 
     it('returns Epic.originalStartDate when start date is out of range', () => {
@@ -59,15 +76,15 @@ describe('EpicItemComponent', () => {
         startDateOutOfRange: true,
         originalStartDate: mockStartDate,
       });
-      vm = createComponent({ epic });
+      wrapper = createComponent({ epic });
 
-      expect(vm.startDate).toBe(mockStartDate);
+      expect(wrapper.vm.startDate).toBe(mockStartDate);
     });
   });
 
   describe('endDate', () => {
     it('returns Epic.endDate when end date is within range', () => {
-      expect(vm.endDate).toBe(mockEpic.endDate);
+      expect(wrapper.vm.endDate).toBe(mockEpic.endDate);
     });
 
     it('returns Epic.originalEndDate when end date is out of range', () => {
@@ -76,33 +93,33 @@ describe('EpicItemComponent', () => {
         endDateOutOfRange: true,
         originalEndDate: mockEndDate,
       });
-      vm = createComponent({ epic });
+      wrapper = createComponent({ epic });
 
-      expect(vm.endDate).toBe(mockEndDate);
+      expect(wrapper.vm.endDate).toBe(mockEndDate);
     });
   });
 
   describe('timeframeString', () => {
     it('returns timeframe string correctly when both start and end dates are defined', () => {
-      expect(vm.timeframeString(mockEpic)).toBe('Jul 10, 2017 – Jun 2, 2018');
+      expect(wrapper.vm.timeframeString(mockEpic)).toBe('Jul 10, 2017 – Jun 2, 2018');
     });
 
     it('returns timeframe string correctly when only start date is defined', () => {
       const epic = Object.assign({}, mockEpic, {
         endDateUndefined: true,
       });
-      vm = createComponent({ epic });
+      wrapper = createComponent({ epic });
 
-      expect(vm.timeframeString(epic)).toBe('Jul 10, 2017 – No end date');
+      expect(wrapper.vm.timeframeString(epic)).toBe('Jul 10, 2017 – No end date');
     });
 
     it('returns timeframe string correctly when only end date is defined', () => {
       const epic = Object.assign({}, mockEpic, {
         startDateUndefined: true,
       });
-      vm = createComponent({ epic });
+      wrapper = createComponent({ epic });
 
-      expect(vm.timeframeString(epic)).toBe('No start date – Jun 2, 2018');
+      expect(wrapper.vm.timeframeString(epic)).toBe('No start date – Jun 2, 2018');
     });
 
     it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
@@ -110,40 +127,59 @@ describe('EpicItemComponent', () => {
         startDate: new Date(2018, 0, 1),
         endDate: new Date(2018, 3, 1),
       });
-      vm = createComponent({ epic });
+      wrapper = createComponent({ epic });
 
-      expect(vm.timeframeString(epic)).toBe('Jan 1 – Apr 1, 2018');
+      expect(wrapper.vm.timeframeString(epic)).toBe('Jan 1 – Apr 1, 2018');
     });
   });
 
   describe('methods', () => {
     describe('removeHighlight', () => {
-      it('should call _.delay after 3 seconds with a callback function which would set `epic.newEpic` to false when it is true already', done => {
-        vm.epic.newEpic = true;
+      it('should wait 3 seconds before toggling `epic.newEpic` from true to false', () => {
+        wrapper.setProps({
+          epic: {
+            ...wrapper.vm.epic,
+            newEpic: true,
+          },
+        });
 
-        vm.removeHighlight();
+        wrapper.vm.removeHighlight();
 
-        vm.$nextTick()
-          .then(() => {
-            expect(_.delay).toHaveBeenCalledWith(expect.any(Function), 3000);
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(delay).toHaveBeenCalledWith(expect.any(Function), 3000);
+        });
       });
     });
   });
 
   describe('template', () => {
-    it('renders component container element class `epics-list-item`', () => {
-      expect(vm.$el.classList.contains('epics-list-item')).toBeTruthy();
+    it('renders Epic item container', () => {
+      expect(wrapper.find('.epics-list-item').exists()).toBe(true);
     });
 
     it('renders Epic item details element with class `epic-details-cell`', () => {
-      expect(vm.$el.querySelector('.epic-details-cell')).not.toBeNull();
+      expect(wrapper.find('.epic-details-cell').exists()).toBe(true);
     });
 
     it('renders Epic timeline element with class `epic-timeline-cell`', () => {
-      expect(vm.$el.querySelector('.epic-timeline-cell')).not.toBeNull();
+      expect(wrapper.find('.epic-timeline-cell').exists()).toBe(true);
+    });
+
+    it('does not render Epic item container element with class `epic-list-item-container` if epic is not expanded', () => {
+      expect(wrapper.find('.epic-list-item-container').exists()).toBe(false);
+    });
+
+    it('renders Epic item container element with class `epic-list-item-container` if epic has children and is expanded', () => {
+      wrapper = createComponent({
+        childrenEpics: {
+          '1': [mockFormattedChildEpic1],
+        },
+        childrenFlags: {
+          '1': { itemExpanded: true },
+          '50': { itemExpanded: false },
+        },
+      });
+      expect(wrapper.find('.epic-list-item-container').exists()).toBe(true);
     });
   });
 });

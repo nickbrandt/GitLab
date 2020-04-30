@@ -65,10 +65,25 @@ const fetchGroupEpics = (
     });
 };
 
+export const fetchChildrenEpics = (state, { parentItem }) => {
+  const { iid } = parentItem;
+  const { fullPath, filterParams } = state;
+
+  return epicUtils.gqClient
+    .query({
+      query: epicChildEpics,
+      variables: { iid, fullPath, ...filterParams },
+    })
+    .then(({ data }) => {
+      const edges = data?.group?.epic?.children?.edges || [];
+      return epicUtils.extractGroupEpics(edges);
+    });
+};
+
 export const requestEpics = ({ commit }) => commit(types.REQUEST_EPICS);
 export const requestEpicsForTimeframe = ({ commit }) => commit(types.REQUEST_EPICS_FOR_TIMEFRAME);
 export const receiveEpicsSuccess = (
-  { commit, state, getters },
+  { commit, dispatch, state, getters },
   { rawEpics, newEpic, timeframeExtended },
 ) => {
   const epics = rawEpics.reduce((filteredEpics, epic) => {
@@ -79,21 +94,6 @@ export const receiveEpicsSuccess = (
     );
 
     formattedEpic.isChildEpic = false;
-    formattedEpic.isChildEpicShowing = false;
-
-    // Format child epics
-    if (formattedEpic.children?.edges?.length > 0) {
-      formattedEpic.children.edges = formattedEpic.children.edges
-        .map(epicUtils.flattenGroupProperty)
-        .map(epicUtils.addIsChildEpicTrueProperty)
-        .map(childEpic =>
-          roadmapItemUtils.formatRoadmapItemDetails(
-            childEpic,
-            getters.timeframeStartDate,
-            getters.timeframeEndDate,
-          ),
-        );
-    }
 
     // Exclude any Epic that has invalid dates
     // or is already present in Roadmap timeline
@@ -115,12 +115,42 @@ export const receiveEpicsSuccess = (
     sortEpics(updatedEpics, state.sortedBy);
     commit(types.RECEIVE_EPICS_FOR_TIMEFRAME_SUCCESS, updatedEpics);
   } else {
+    dispatch('initItemChildrenFlags', { epics });
     commit(types.RECEIVE_EPICS_SUCCESS, epics);
   }
 };
 export const receiveEpicsFailure = ({ commit }) => {
   commit(types.RECEIVE_EPICS_FAILURE);
   flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
+};
+
+export const requestChildrenEpics = ({ commit }, { parentItemId }) => {
+  commit(types.REQUEST_CHILDREN_EPICS, { parentItemId });
+};
+export const receiveChildrenSuccess = (
+  { commit, dispatch, getters },
+  { parentItemId, rawChildren },
+) => {
+  const children = rawChildren.reduce((filteredChildren, epic) => {
+    const formattedChild = roadmapItemUtils.formatRoadmapItemDetails(
+      epic,
+      getters.timeframeStartDate,
+      getters.timeframeEndDate,
+    );
+
+    formattedChild.isChildEpic = true;
+
+    // Exclude any Epic that has invalid dates
+    if (formattedChild.startDate.getTime() <= formattedChild.endDate.getTime()) {
+      filteredChildren.push(formattedChild);
+    }
+    return filteredChildren;
+  }, []);
+  dispatch('expandEpic', {
+    parentItemId,
+  });
+  dispatch('initItemChildrenFlags', { epics: children });
+  commit(types.RECEIVE_CHILDREN_SUCCESS, { parentItemId, children });
 };
 
 export const fetchEpics = ({ state, dispatch }) => {
@@ -165,6 +195,39 @@ export const extendTimeframe = ({ commit, state, getters }, { extendAs }) => {
     commit(types.PREPEND_TIMEFRAME, timeframeToExtend);
   } else {
     commit(types.APPEND_TIMEFRAME, timeframeToExtend);
+  }
+};
+
+export const initItemChildrenFlags = ({ commit }, data) =>
+  commit(types.INIT_EPIC_CHILDREN_FLAGS, data);
+
+export const expandEpic = ({ commit }, { parentItemId }) =>
+  commit(types.EXPAND_EPIC, { parentItemId });
+export const collapseEpic = ({ commit }, { parentItemId }) =>
+  commit(types.COLLAPSE_EPIC, { parentItemId });
+
+export const toggleEpic = ({ state, dispatch }, { parentItem }) => {
+  const parentItemId = parentItem.id;
+  if (!state.childrenFlags[parentItemId].itemExpanded) {
+    if (!state.childrenEpics[parentItemId]) {
+      dispatch('requestChildrenEpics', { parentItemId });
+      fetchChildrenEpics(state, { parentItem })
+        .then(rawChildren => {
+          dispatch('receiveChildrenSuccess', {
+            parentItemId,
+            rawChildren,
+          });
+        })
+        .catch(() => dispatch('receiveEpicsFailure'));
+    } else {
+      dispatch('expandEpic', {
+        parentItemId,
+      });
+    }
+  } else {
+    dispatch('collapseEpic', {
+      parentItemId,
+    });
   }
 };
 
@@ -283,9 +346,6 @@ export const refreshMilestoneDates = ({ commit, state, getters }) => {
 };
 
 export const setBufferSize = ({ commit }, bufferSize) => commit(types.SET_BUFFER_SIZE, bufferSize);
-
-export const toggleExpandedEpic = ({ commit }, epicId) =>
-  commit(types.TOGGLE_EXPANDED_EPIC, epicId);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
