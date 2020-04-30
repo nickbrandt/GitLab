@@ -30,12 +30,12 @@ module EE
       super.merge(ee_environments_folder_list_view_data)
     end
 
-    override :project_data
-    def project_data(project)
-      ee_project_data = {}
-      ee_project_data['logs_path'] = project_logs_path(project) if can?(current_user, :read_pod_logs, project)
+    override :project_metrics_data
+    def project_metrics_data(project)
+      ee_project_metrics_data = {}
+      ee_project_metrics_data['logs_path'] = project_logs_path(project) if can?(current_user, :read_pod_logs, project)
 
-      super.merge(ee_project_data)
+      super.merge(ee_project_metrics_data)
     end
   end
 end

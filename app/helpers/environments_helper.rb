@@ -23,9 +23,9 @@ module EnvironmentsHelper
 
   def metrics_data(project, environment)
     metrics_data = {}
-    metrics_data.merge!(project_data(project)) if project
-    metrics_data.merge!(environment_data(environment)) if environment
-    metrics_data.merge!(project_and_environment_data(project, environment)) if project && environment
+    metrics_data.merge!(project_metrics_data(project)) if project
+    metrics_data.merge!(environment_metrics_data(environment)) if environment
+    metrics_data.merge!(project_and_environment_metrics_data(project, environment)) if project && environment
     metrics_data.merge!(static_data)
 
     metrics_data
@@ -46,7 +46,7 @@ module EnvironmentsHelper
 
   private
 
-  def project_data(project)
+  def project_metrics_data(project)
     return {} unless project
 
     {
@@ -64,7 +64,7 @@ module EnvironmentsHelper
     }
   end
 
-  def environment_data(environment)
+  def environment_metrics_data(environment)
     return {} unless environment
 
     {
@@ -75,7 +75,7 @@ module EnvironmentsHelper
     }
   end
 
-  def project_and_environment_data(project, environment)
+  def project_and_environment_metrics_data(project, environment)
     return {} unless project && environment
 
     {
@@ -87,7 +87,7 @@ module EnvironmentsHelper
     }
   end
 
-  def static_data
+  def static_metrics_data
     {
       'documentation-path'               => help_page_path('administration/monitoring/prometheus/index.md'),
       'empty-getting-started-svg-path'   => image_path('illustrations/monitoring/getting_started.svg'),
