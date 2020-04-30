@@ -25,7 +25,8 @@ module EE
       'designs_discussion_added' => 'doc-image',
       'vulnerability_confirmed' => 'shield',
       'vulnerability_dismissed' => 'cancel',
-      'vulnerability_resolved' => 'status_closed'
+      'vulnerability_resolved' => 'status_closed',
+      'published' => 'bullhorn'
     }.freeze
 
     override :system_note_icon_name

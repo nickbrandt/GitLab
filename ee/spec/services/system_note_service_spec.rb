@@ -240,4 +240,14 @@ describe SystemNoteService do
       described_class.change_vulnerability_state(noteable, author)
     end
   end
+
+  describe '.publish_issue_to_status_page' do
+    it 'calls IssuablesService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:publish_issue_to_status_page)
+      end
+
+      described_class.publish_issue_to_status_page(noteable, project, author)
+    end
+  end
 end

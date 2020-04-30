@@ -104,4 +104,18 @@ describe ::SystemNotes::IssuablesService do
       end
     end
   end
+
+  describe '#publish_issue_to_status_page' do
+    let_it_be(:noteable) { create(:issue, project: project) }
+
+    subject { service.publish_issue_to_status_page }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'published' }
+    end
+
+    it 'sets the note text' do
+      expect(subject.note).to eq 'published this issue to the status page'
+    end
+  end
 end

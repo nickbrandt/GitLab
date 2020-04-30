@@ -180,5 +180,9 @@ module EE
     def change_vulnerability_state(noteable, author)
       EE::SystemNotes::VulnerabilitiesService.new(noteable: noteable, project: noteable.project, author: author).change_vulnerability_state
     end
+
+    def publish_issue_to_status_page(noteable, project, author)
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).publish_issue_to_status_page
+    end
   end
 end
