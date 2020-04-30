@@ -49,37 +49,20 @@ describe GitlabSchema.types['Group'] do
     end
 
     before do
+      stub_licensed_features(security_dashboard: true)
+
       group.add_developer(user)
     end
 
     subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
 
-    context 'when first_class_vulnerabilities is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
+    it "returns the vulnerabilities for all projects in the group and its subgroups" do
+      vulnerabilities = subject.dig('data', 'group', 'vulnerabilities', 'nodes')
 
-      it 'is null' do
-        vulnerabilities = subject.dig('data', 'group', 'vulnerabilities')
-
-        expect(vulnerabilities).to be_nil
-      end
-    end
-
-    context 'when first_class_vulnerabilities is enabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: true)
-        stub_licensed_features(security_dashboard: true)
-      end
-
-      it "returns the vulnerabilities for all projects in the group and its subgroups" do
-        vulnerabilities = subject.dig('data', 'group', 'vulnerabilities', 'nodes')
-
-        expect(vulnerabilities.count).to be(1)
-        expect(vulnerabilities.first['title']).to eq('A terrible one!')
-        expect(vulnerabilities.first['state']).to eq('DETECTED')
-        expect(vulnerabilities.first['severity']).to eq('CRITICAL')
-      end
+      expect(vulnerabilities.count).to be(1)
+      expect(vulnerabilities.first['title']).to eq('A terrible one!')
+      expect(vulnerabilities.first['state']).to eq('DETECTED')
+      expect(vulnerabilities.first['severity']).to eq('CRITICAL')
     end
   end
 end

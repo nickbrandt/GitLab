@@ -167,6 +167,8 @@ class User < ApplicationRecord
   has_many :term_agreements
   belongs_to :accepted_term, class_name: 'ApplicationSetting::Term'
 
+  has_many :metrics_users_starred_dashboards, class_name: 'Metrics::UsersStarredDashboard', inverse_of: :user
+
   has_one :status, class_name: 'UserStatus'
   has_one :user_preference
   has_one :user_detail
@@ -1786,7 +1788,6 @@ class User < ApplicationRecord
   end
 
   def check_email_restrictions
-    return unless Feature.enabled?(:email_restrictions)
     return unless Gitlab::CurrentSettings.email_restrictions_enabled?
 
     restrictions = Gitlab::CurrentSettings.email_restrictions

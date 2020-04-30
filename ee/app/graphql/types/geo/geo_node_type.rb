@@ -22,6 +22,11 @@ module Types
       field :selective_sync_shards, type: [GraphQL::STRING_TYPE], null: true, description: 'The repository storages whose projects should be synced, if `selective_sync_type` == `shards`'
       field :selective_sync_namespaces, ::Types::NamespaceType.connection_type, null: true, method: :namespaces, description: 'The namespaces that should be synced, if `selective_sync_type` == `namespaces`'
       field :minimum_reverification_interval, GraphQL::INT_TYPE, null: true, description: 'The interval (in days) in which the repository verification is valid. Once expired, it will be reverified'
+      field :package_file_registries, ::Types::Geo::PackageFileRegistryType.connection_type,
+            null: true,
+            resolver: ::Resolvers::Geo::PackageFileRegistriesResolver,
+            description: 'Package file registries of the GeoNode',
+            feature_flag: :geo_self_service_framework
     end
   end
 end

@@ -8,27 +8,18 @@ fragment BaseEpic on Epic {
   startDate
   dueDate
   hasChildren
+  hasParent
   descendantWeightSum {
     closedIssues
     openedIssues
   }
+  descendantCounts {
+    openedEpics
+    closedEpics
+  }
   group {
     name
     fullName
-  }
-}
-
-fragment EpicNode on Epic {
-  ...BaseEpic
-  state
-  reference(full: true)
-  createdAt
-  closedAt
-  relationPath
-  createdAt
-  hasChildren
-  hasIssues
-  group {
     fullPath
   }
 }

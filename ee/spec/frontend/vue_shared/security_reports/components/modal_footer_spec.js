@@ -104,7 +104,7 @@ describe('Security Reports modal footer', () => {
 
     it('renders create merge request and issue button as a split button', () => {
       expect(wrapper.contains('.js-split-button')).toBe(true);
-      expect(wrapper.vm.actionButtons.length).toBe(2);
+      expect(wrapper.vm.actionButtons).toHaveLength(2);
       expect(wrapper.find(SplitButton).exists()).toBe(true);
       expect(wrapper.find('.js-split-button').text()).toContain('Resolve with merge request');
       expect(wrapper.find('.js-split-button').text()).toContain('Create issue');
@@ -123,7 +123,7 @@ describe('Security Reports modal footer', () => {
     });
 
     it('renders the split button', () => {
-      expect(wrapper.vm.actionButtons.length).toBe(3);
+      expect(wrapper.vm.actionButtons).toHaveLength(3);
       expect(wrapper.find(SplitButton).exists()).toBe(true);
       expect(wrapper.find('.js-split-button').text()).toContain('Resolve with merge request');
       expect(wrapper.find('.js-split-button').text()).toContain('Create issue');

@@ -64,7 +64,7 @@ describe('Design discussions component', () => {
   });
 
   it('renders correct amount of discussion notes', () => {
-    expect(wrapper.findAll(DesignNote).length).toBe(2);
+    expect(wrapper.findAll(DesignNote)).toHaveLength(2);
   });
 
   it('renders reply placeholder by default', () => {

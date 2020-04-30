@@ -73,36 +73,14 @@ describe Boards::IssuesController do
         end
 
         context 'with search param' do
-          context 'when board_search_optimization is enabled' do
-            before do
-              stub_feature_flags(board_search_optimization: true)
-            end
+          it 'returns matching issues using optimized search' do
+            create(:labeled_issue, project: project_1, labels: [planning], title: 'Test Issue')
+            create(:labeled_issue, project: project_1, labels: [planning], title: 'Sample Issue')
 
-            it 'returns matching issues using optimized search' do
-              create(:labeled_issue, project: project_1, labels: [planning], title: 'Test Issue')
-              create(:labeled_issue, project: project_1, labels: [planning], title: 'Sample Issue')
+            list_issues user: user, board: board, list: list1, search: 'Te'
 
-              list_issues user: user, board: board, list: list1, search: 'Te'
-
-              expect(response).to match_response_schema('issues')
-              expect(json_response['issues'].length).to eq 1
-            end
-          end
-
-          context 'when board_search_optimization is disabled' do
-            before do
-              stub_feature_flags(board_search_optimization: false)
-            end
-
-            it 'returns empty result' do
-              create(:labeled_issue, project: project_1, labels: [planning], title: 'Test Issue')
-              create(:labeled_issue, project: project_1, labels: [planning], title: 'Sample Issue')
-
-              list_issues user: user, board: board, list: list1, search: 'Te'
-
-              expect(response).to match_response_schema('issues')
-              expect(json_response['issues'].length).to eq 0
-            end
+            expect(response).to match_response_schema('issues')
+            expect(json_response['issues'].length).to eq 1
           end
         end
       end
@@ -131,36 +109,14 @@ describe Boards::IssuesController do
       end
 
       context 'with search param' do
-        context 'when board_search_optimization is enabled' do
-          before do
-            stub_feature_flags(board_search_optimization: true)
-          end
+        it 'returns matching issues using optimized search' do
+          create(:issue, project: project_1, title: 'Issue XI')
+          create(:issue, project: project_1, title: 'Issue XX')
 
-          it 'returns matching issues using optimized search' do
-            create(:issue, project: project_1, title: 'Issue XI')
-            create(:issue, project: project_1, title: 'Issue XX')
+          list_issues user: user, board: board, search: 'XI'
 
-            list_issues user: user, board: board, search: 'XI'
-
-            expect(response).to match_response_schema('issues')
-            expect(json_response['issues'].length).to eq 1
-          end
-        end
-
-        context 'when board_search_optimization is disabled' do
-          before do
-            stub_feature_flags(board_search_optimization: false)
-          end
-
-          it 'returns empty result' do
-            create(:issue, project: project_1, title: 'Issue XI')
-            create(:issue, project: project_1, title: 'Issue XX')
-
-            list_issues user: user, board: board, search: 'XI'
-
-            expect(response).to match_response_schema('issues')
-            expect(json_response['issues'].length).to eq 0
-          end
+          expect(response).to match_response_schema('issues')
+          expect(json_response['issues'].length).to eq 1
         end
       end
     end

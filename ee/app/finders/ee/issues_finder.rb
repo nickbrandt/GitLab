@@ -11,7 +11,7 @@ module EE
 
       override :scalar_params
       def scalar_params
-        @scalar_params ||= super + [:weight, :epic_id]
+        @scalar_params ||= super + [:weight, :epic_id, :include_subepics]
       end
     end
 

@@ -3,11 +3,15 @@ import Vuex from 'vuex';
 import { GlLoadingIcon, GlEmptyState, GlBadge, GlPagination } from '@gitlab/ui';
 import CodeReviewAnalyticsApp from 'ee/analytics/code_review_analytics/components/app.vue';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
-import createState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
+import FilterBar from 'ee/analytics/code_review_analytics/components/filter_bar.vue';
+import createMergeRequestsState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
+import createFiltersState from 'ee/analytics/code_review_analytics/store/modules/filters/state';
+import { TEST_HOST } from 'helpers/test_constants';
 
+const mockFilterManagerSetup = jest.fn();
 jest.mock('ee/analytics/code_review_analytics/filtered_search_code_review_analytics', () =>
   jest.fn().mockImplementation(() => ({
-    setup: jest.fn(),
+    setup: mockFilterManagerSetup,
   })),
 );
 
@@ -20,6 +24,8 @@ describe('CodeReviewAnalyticsApp component', () => {
 
   let setPage;
   let fetchMergeRequests;
+  let setMilestonesEndpoint;
+  let setLabelsEndpoint;
 
   const pageInfo = {
     page: 1,
@@ -33,8 +39,8 @@ describe('CodeReviewAnalyticsApp component', () => {
         mergeRequests: {
           namespaced: true,
           state: {
-            ...createState(),
-            ...initialState,
+            ...createMergeRequestsState(),
+            ...initialState.mergeRequests,
           },
           actions: {
             setProjectId: jest.fn(),
@@ -46,10 +52,21 @@ describe('CodeReviewAnalyticsApp component', () => {
             ...getters,
           },
         },
+        filters: {
+          namespaced: true,
+          state: {
+            ...createFiltersState(),
+            ...initialState.filters,
+          },
+          actions: {
+            setMilestonesEndpoint,
+            setLabelsEndpoint,
+          },
+        },
       },
     });
 
-  const createComponent = store =>
+  const createComponent = (store, codeReviewAnalyticsHasNewSearch = false) =>
     shallowMount(CodeReviewAnalyticsApp, {
       localVue,
       store,
@@ -57,10 +74,12 @@ describe('CodeReviewAnalyticsApp component', () => {
         projectId: 1,
         newMergeRequestUrl: 'new_merge_request',
         emptyStateSvgPath: 'svg',
+        milestonePath: `${TEST_HOST}/milestones`,
+        labelsPath: `${TEST_HOST}/labels`,
       },
       provide: {
         glFeatures: {
-          codeReviewAnalyticsHasNewSearch: false,
+          codeReviewAnalyticsHasNewSearch,
         },
       },
     });
@@ -68,12 +87,15 @@ describe('CodeReviewAnalyticsApp component', () => {
   beforeEach(() => {
     setPage = jest.fn();
     fetchMergeRequests = jest.fn();
+    setMilestonesEndpoint = jest.fn();
+    setLabelsEndpoint = jest.fn();
   });
 
   afterEach(() => {
     wrapper.destroy();
   });
 
+  const findFilterBar = () => wrapper.find(FilterBar);
   const findEmptyState = () => wrapper.find(GlEmptyState);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findBadge = () => wrapper.find(GlBadge);
@@ -81,9 +103,57 @@ describe('CodeReviewAnalyticsApp component', () => {
   const findPagination = () => wrapper.find(GlPagination);
 
   describe('template', () => {
+    describe('when "codeReviewAnalyticsHasNewSearch" is disabled', () => {
+      beforeEach(() => {
+        vuexStore = createStore();
+        wrapper = createComponent(vuexStore);
+      });
+
+      it('does not render the filter bar component', () => {
+        expect(findFilterBar().exists()).toBe(false);
+      });
+
+      it("calls the filterManager's setup method", () => {
+        expect(mockFilterManagerSetup).toHaveBeenCalled();
+      });
+
+      it('does not call setMilestonesEndpoint action', () => {
+        expect(setMilestonesEndpoint).not.toHaveBeenCalled();
+      });
+
+      it('does not call setLabelsEndpoint action', () => {
+        expect(setLabelsEndpoint).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when "codeReviewAnalyticsHasNewSearch" is enabled', () => {
+      describe('when the feature is enabled', () => {
+        beforeEach(() => {
+          vuexStore = createStore();
+          wrapper = createComponent(vuexStore, true);
+        });
+
+        it('renders the filter bar component', () => {
+          expect(findFilterBar().exists()).toBe(true);
+        });
+
+        it("does not call the filterManager's setup method", () => {
+          expect(mockFilterManagerSetup).not.toHaveBeenCalled();
+        });
+
+        it('calls setMilestonesEndpoint action', () => {
+          expect(setMilestonesEndpoint).toHaveBeenCalled();
+        });
+
+        it('calls setLabelsEndpoint action', () => {
+          expect(setLabelsEndpoint).toHaveBeenCalled();
+        });
+      });
+    });
+
     describe('while loading', () => {
       beforeEach(() => {
-        vuexStore = createStore({ isLoading: true });
+        vuexStore = createStore({ mergeRequests: { isLoading: true } });
         wrapper = createComponent(vuexStore);
       });
 
@@ -108,7 +178,7 @@ describe('CodeReviewAnalyticsApp component', () => {
       describe('and there are no merge requests', () => {
         beforeEach(() => {
           vuexStore = createStore(
-            { isLoading: false, pageInfo: { page: 0, perPage: 0, total: 0 } },
+            { mergeRequests: { isLoading: false, pageInfo: { page: 0, perPage: 0, total: 0 } } },
             { showMrCount: () => true },
           );
           wrapper = createComponent(vuexStore);
@@ -137,7 +207,10 @@ describe('CodeReviewAnalyticsApp component', () => {
 
       describe('and there are merge requests', () => {
         beforeEach(() => {
-          vuexStore = createStore({ isLoading: false, pageInfo }, { showMrCount: () => true });
+          vuexStore = createStore(
+            { mergeRequests: { isLoading: false, pageInfo } },
+            { showMrCount: () => true },
+          );
           wrapper = createComponent(vuexStore);
         });
 
@@ -167,7 +240,10 @@ describe('CodeReviewAnalyticsApp component', () => {
 
   describe('changing the page', () => {
     beforeEach(() => {
-      vuexStore = createStore({ isLoading: false, pageInfo }, { showMrCount: () => true });
+      vuexStore = createStore(
+        { mergeRequests: { isLoading: false, pageInfo } },
+        { showMrCount: () => true },
+      );
       wrapper = createComponent(vuexStore);
       wrapper.vm.currentPage = 2;
     });

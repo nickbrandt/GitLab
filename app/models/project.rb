@@ -257,6 +257,7 @@ class Project < ApplicationRecord
   has_many :prometheus_alerts, inverse_of: :project
   has_many :prometheus_alert_events, inverse_of: :project
   has_many :self_managed_prometheus_alert_events, inverse_of: :project
+  has_many :metrics_users_starred_dashboards, class_name: 'Metrics::UsersStarredDashboard', inverse_of: :project
 
   has_many :alert_management_alerts, class_name: 'AlertManagement::Alert', inverse_of: :project
 
@@ -870,10 +871,12 @@ class Project < ApplicationRecord
     raise Projects::ImportService::Error, _('Jira import feature is disabled.') unless jira_issues_import_feature_flag_enabled?
     raise Projects::ImportService::Error, _('Jira integration not configured.') unless jira_service&.active?
 
-    return unless user
+    if user
+      raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
+      raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
+    end
 
-    raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
-    raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
+    raise Projects::ImportService::Error, _('Unable to connect to the Jira instance. Please check your Jira integration configuration.') unless jira_service.test(nil)[:success]
   end
 
   def human_import_status_name

@@ -71,7 +71,7 @@ describe('Project scanning store utils', () => {
         projects,
       });
 
-      expect(groups.length).toBe(1);
+      expect(groups).toHaveLength(1);
       expect(groups[0].projects).toEqual([projectWithMatchingGroup]);
     });
 
@@ -96,7 +96,7 @@ describe('Project scanning store utils', () => {
         projects: projectsWithoutTimeStamp,
       });
 
-      expect(groups.length).toBe(0);
+      expect(groups).toHaveLength(0);
     });
   });
 });

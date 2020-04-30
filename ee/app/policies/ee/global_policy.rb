@@ -26,6 +26,10 @@ module EE
       rule { ~anonymous }.policy do
         enable :view_productivity_analytics
       end
+
+      rule { ~(admin | allow_to_manage_default_branch_protection) }.policy do
+        prevent :create_group_with_default_branch_protection
+      end
     end
   end
 end

@@ -1,9 +1,8 @@
 <script>
-import { GlEmptyState, GlButton, GlLoadingIcon, GlTable, GlAlert } from '@gitlab/ui';
+import { GlEmptyState, GlDeprecatedButton, GlLoadingIcon, GlTable, GlAlert } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import getAlerts from '../graphql/queries/getAlerts.query.graphql';
-
-const tdClass = 'table-col d-flex';
 
 export default {
   i18n: {
@@ -18,55 +17,54 @@ export default {
     {
       key: 'severity',
       label: s__('AlertManagement|Severity'),
-      tdClass,
     },
     {
-      key: 'start_time',
-      label: s__('AlertManagement|Start Time'),
-      tdClass,
+      key: 'startedAt',
+      label: s__('AlertManagement|Start time'),
     },
     {
-      key: 'end_time',
-      label: s__('AlertManagement|End Time'),
-      tdClass,
+      key: 'endedAt',
+      label: s__('AlertManagement|End time'),
     },
     {
-      key: 'alert',
+      key: 'title',
       label: s__('AlertManagement|Alert'),
       thClass: 'w-30p',
-      tdClass,
     },
     {
-      key: 'events',
+      key: 'eventCount',
       label: s__('AlertManagement|Events'),
-      tdClass,
+      thClass: 'text-right event-count',
+      tdClass: 'text-right event-count',
     },
     {
       key: 'status',
       label: s__('AlertManagement|Status'),
-      tdClass,
     },
   ],
   components: {
     GlEmptyState,
-    GlButton,
     GlLoadingIcon,
     GlTable,
     GlAlert,
+    GlDeprecatedButton,
+    TimeAgo,
   },
   props: {
-    indexPath: {
+    projectPath: {
       type: String,
       required: true,
     },
-    // TODO: Handle alertManagementEnabled depending on resolution - https://gitlab.com/gitlab-org/gitlab/-/merge_requests/30024.
     alertManagementEnabled: {
       type: Boolean,
-      required: false,
-      default: true,
+      required: true,
     },
     enableAlertManagementPath: {
       type: String,
+      required: true,
+    },
+    userCanEnableAlertManagement: {
+      type: Boolean,
       required: true,
     },
     emptyAlertSvgPath: {
@@ -79,8 +77,11 @@ export default {
       query: getAlerts,
       variables() {
         return {
-          projectPath: this.indexPath,
+          projectPath: this.projectPath,
         };
+      },
+      update(data) {
+        return data.project.alertManagementAlerts.nodes;
       },
       error() {
         this.errored = true;
@@ -126,40 +127,55 @@ export default {
         :show-empty="true"
         :busy="loading"
         fixed
-        stacked="sm"
-        tbody-tr-class="table-row mb-4"
+        stacked="md"
       >
+        <template #cell(startedAt)="{ item }">
+          <time-ago :time="item.startedAt" />
+        </template>
+
+        <template #cell(endedAt)="{ item }">
+          <time-ago :time="item.endedAt" />
+        </template>
+
+        <template #cell(title)="{ item }">
+          <div class="gl-max-w-full text-truncate">{{ item.title }}</div>
+        </template>
+
         <template #empty>
           {{ s__('AlertManagement|No alerts to display.') }}
         </template>
+
         <template #table-busy>
           <gl-loading-icon size="lg" color="dark" class="mt-3" />
         </template>
       </gl-table>
     </div>
-    <template v-else>
-      <gl-empty-state
-        :title="s__('AlertManagement|Surface alerts in GitLab')"
-        :svg-path="emptyAlertSvgPath"
-      >
-        <template #description>
-          <div class="d-block">
-            <span>{{
-              s__(
-                'AlertManagement|Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
-              )
-            }}</span>
-            <a href="/help/user/project/operations/alert_management.html">
-              {{ s__('AlertManagement|More information') }}
-            </a>
-          </div>
-          <div class="d-block center pt-4">
-            <gl-button category="primary" variant="success" :href="enableAlertManagementPath">
-              {{ s__('AlertManagement|Authorize external service') }}
-            </gl-button>
-          </div>
-        </template>
-      </gl-empty-state>
-    </template>
+    <gl-empty-state
+      v-else
+      :title="__('AlertManagement|Surface alerts in GitLab')"
+      :svg-path="emptyAlertSvgPath"
+    >
+      <template #description>
+        <div class="d-block">
+          <span>{{
+            s__(
+              'AlertManagement|Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents.',
+            )
+          }}</span>
+          <a href="/help/user/project/operations/alert_management.html" target="_blank">
+            {{ s__('AlertManagement|More information') }}
+          </a>
+        </div>
+        <div v-if="userCanEnableAlertManagement" class="d-block center pt-4">
+          <gl-deprecated-button
+            category="primary"
+            variant="success"
+            :href="enableAlertManagementPath"
+          >
+            {{ s__('AlertManagement|Authorize external service') }}
+          </gl-deprecated-button>
+        </div>
+      </template>
+    </gl-empty-state>
   </div>
 </template>

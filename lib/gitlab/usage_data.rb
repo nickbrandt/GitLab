@@ -24,6 +24,7 @@ module Gitlab
           .merge(features_usage_data)
           .merge(components_usage_data)
           .merge(cycle_analytics_usage_data)
+          .merge(object_store_usage_data)
       end
 
       def to_json(force_refresh: false)
@@ -237,6 +238,40 @@ module Gitlab
         'unknown_app_server_type'
       end
 
+      def object_store_config(component)
+        config = alt_usage_data(fallback: nil) do
+          Settings[component]['object_store']
+        end
+
+        if config
+          {
+            enabled: alt_usage_data { Settings[component]['enabled'] },
+            object_store: {
+              enabled: alt_usage_data { config['enabled'] },
+              direct_upload: alt_usage_data { config['direct_upload'] },
+              background_upload: alt_usage_data { config['background_upload'] },
+              provider: alt_usage_data { config['connection']['provider'] }
+            }
+          }
+        else
+          {
+            enabled: alt_usage_data { Settings[component]['enabled'] }
+          }
+        end
+      end
+
+      def object_store_usage_data
+        {
+          object_store: {
+            artifacts: object_store_config('artifacts'),
+            external_diffs: object_store_config('external_diffs'),
+            lfs: object_store_config('lfs'),
+            uploads: object_store_config('uploads'),
+            packages: object_store_config('packages')
+          }
+        }
+      end
+
       def ingress_modsecurity_usage
         ::Clusters::Applications::IngressModsecurityUsageService.new.execute
       end
@@ -251,7 +286,7 @@ module Gitlab
         results[:projects_slack_notifications_active] = results[:projects_slack_active]
         results[:projects_slack_slash_active] = results[:projects_slack_slash_commands_active]
 
-        results.merge(jira_usage)
+        results.merge(jira_usage).merge(jira_import_usage)
       end
 
       def jira_usage
@@ -284,6 +319,16 @@ module Gitlab
         { projects_jira_server_active: -1, projects_jira_cloud_active: -1, projects_jira_active: -1 }
       end
       # rubocop: enable CodeReuse/ActiveRecord
+
+      def jira_import_usage
+        finished_jira_imports = JiraImportState.finished
+
+        {
+          jira_imports_total_imported_count: count(finished_jira_imports),
+          jira_imports_projects_count: distinct_count(finished_jira_imports, :project_id),
+          jira_imports_total_imported_issues_count: alt_usage_data { JiraImportState.finished_imports_count }
+        }
+      end
 
       def user_preferences_usage
         {} # augmented in EE

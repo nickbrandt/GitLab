@@ -42,7 +42,6 @@ describe('Branches Select', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
     jest
       .spyOn(Api, 'projectProtectedBranches')
       .mockReturnValue(Promise.resolve(TEST_PROTECTED_BRANCHES));

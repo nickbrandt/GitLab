@@ -65,7 +65,7 @@ describe('StageTable', () => {
     });
     it('will render the headers', () => {
       const renderedHeaders = wrapper.findAll($sel.headers);
-      expect(renderedHeaders.length).toEqual(headers.length);
+      expect(renderedHeaders).toHaveLength(headers.length);
 
       const headerText = wrapper.find($sel.headersList).text();
       headers.forEach(title => {
@@ -89,7 +89,7 @@ describe('StageTable', () => {
 
     it('will render the correct stages', () => {
       const evs = wrapper.findAll({ name: 'StageNavItem' });
-      expect(evs.length).toEqual(allowedStages.length);
+      expect(evs).toHaveLength(allowedStages.length);
 
       const nav = wrapper.find($sel.nav).html();
       allowedStages.forEach(stage => {
@@ -109,7 +109,7 @@ describe('StageTable', () => {
 
     it('will render the correct events', () => {
       const evs = wrapper.findAll($sel.events);
-      expect(evs.length).toEqual(issueEvents.length);
+      expect(evs).toHaveLength(issueEvents.length);
 
       const evshtml = wrapper.find($sel.eventList).html();
       issueEvents.forEach(ev => {
@@ -131,7 +131,7 @@ describe('StageTable', () => {
         selectStage(1);
 
         Vue.nextTick(() => {
-          expect(wrapper.emitted().selectStage.length).toEqual(1);
+          expect(wrapper.emitted().selectStage).toHaveLength(1);
           done();
         });
       });

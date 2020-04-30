@@ -21,11 +21,10 @@ export const extractNodes = elements => elements.edges.map(({ node }) => node);
  */
 
 export const extractDiscussions = discussions =>
-  discussions.edges.map(discussion => {
-    const discussionNode = { ...discussion.node };
-    discussionNode.notes = extractNodes(discussionNode.notes);
-    return discussionNode;
-  });
+  discussions.nodes.map(discussion => ({
+    ...discussion,
+    notes: discussion.notes.nodes,
+  }));
 
 /**
  * Returns a discussion with the given id from discussions array
@@ -34,13 +33,15 @@ export const extractDiscussions = discussions =>
  */
 
 export const extractCurrentDiscussion = (discussions, id) =>
-  discussions.edges.find(({ node }) => node.id === id);
+  discussions.nodes.find(discussion => discussion.id === id);
 
 export const findVersionId = id => (id.match('::Version/(.+$)') || [])[1];
 
 export const findNoteId = id => (id.match('DiffNote/(.+$)') || [])[1];
 
-export const extractDesign = data => data.project.issue.designCollection.designs.edges[0].node;
+export const extractDesigns = data => data.project.issue.designCollection.designs.edges;
+
+export const extractDesign = data => (extractDesigns(data) || [])[0]?.node;
 
 /**
  * Generates optimistic response for a design upload mutation
@@ -66,7 +67,7 @@ export const designUploadOptimisticResponse = files => {
     },
     discussions: {
       __typename: 'DesignDiscussion',
-      edges: [],
+      nodes: [],
     },
     versions: {
       __typename: 'DesignVersionConnection',

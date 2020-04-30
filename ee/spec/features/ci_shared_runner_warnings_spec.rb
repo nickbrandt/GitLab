@@ -11,6 +11,24 @@ describe 'CI shared runner limits' do
     sign_in(user)
   end
 
+  shared_examples 'threshold breached' do
+    before do
+      group.update(shared_runners_minutes_limit: 20)
+    end
+
+    it 'displays a warning message on pipelines page' do
+      visit project_pipelines_path(project)
+
+      expect_quota_exceeded_alert(message)
+    end
+
+    it 'displays a warning message on project homepage' do
+      visit project_path(project)
+
+      expect_quota_exceeded_alert(message)
+    end
+  end
+
   context 'when project member' do
     before do
       group.add_developer(user)
@@ -18,49 +36,62 @@ describe 'CI shared runner limits' do
 
     context 'without limit' do
       it 'does not display a warning message on project homepage' do
-        visit_project_home
+        visit project_path(project)
+
         expect_no_quota_exceeded_alert
       end
 
       it 'does not display a warning message on pipelines page' do
-        visit_project_pipelines
+        visit project_pipelines_path(project)
+
         expect_no_quota_exceeded_alert
       end
     end
 
     context 'when limit is defined' do
-      before do
-        stub_const("EE::Namespace::CI_USAGE_ALERT_LEVELS", [30, 5])
-      end
+      context 'when usage has reached a warning level', :js do
+        it_behaves_like 'threshold breached' do
+          let(:message) do
+            "Group #{group.name} has 30% or less Shared Runner Pipeline minutes remaining. " \
+            "Once it runs out, no new jobs or pipelines in its projects will run."
+          end
 
-      context 'when usage has reached a notification level' do
-        before do
-          group.update(last_ci_minutes_usage_notification_level: 30, shared_runners_minutes_limit: 10)
-          allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(2)
-        end
-
-        it 'displays a warning message on pipelines page' do
-          visit_project_pipelines
-          expect_quota_exceeded_alert("#{group.name} has less than 30% of CI minutes available.")
-        end
-
-        it 'displays a warning message on project homepage' do
-          visit_project_home
-          expect_quota_exceeded_alert("#{group.name} has less than 30% of CI minutes available.")
+          before do
+            allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(4)
+          end
         end
       end
 
-      context 'when limit is exceeded' do
+      context 'when usage has reached a danger level', :js do
+        it_behaves_like 'threshold breached' do
+          let(:message) do
+            "Group #{group.name} has 5% or less Shared Runner Pipeline minutes remaining. " \
+            "Once it runs out, no new jobs or pipelines in its projects will run."
+          end
+
+          before do
+            allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(1)
+          end
+        end
+      end
+
+      context 'when limit is exceeded', :js do
         let(:group) { create(:group, :with_used_build_minutes_limit) }
+        let(:message) do
+          "Group #{group.name} has exceeded its pipeline minutes quota. " \
+          "Unless you buy additional pipeline minutes, no new jobs or pipelines in its projects will run."
+        end
 
         it 'displays a warning message on project homepage' do
-          visit_project_home
-          expect_quota_exceeded_alert("#{group.name} has exceeded its pipeline minutes quota.")
+          visit project_path(project)
+
+          expect_quota_exceeded_alert(message)
         end
 
         it 'displays a warning message on pipelines page' do
-          visit_project_pipelines
-          expect_quota_exceeded_alert("#{group.name} has exceeded its pipeline minutes quota.")
+          visit project_pipelines_path(project)
+
+          expect_quota_exceeded_alert(message)
         end
       end
 
@@ -68,12 +99,14 @@ describe 'CI shared runner limits' do
         let(:group) { create(:group, :with_not_used_build_minutes_limit) }
 
         it 'does not display a warning message on project homepage' do
-          visit_project_home
+          visit project_path(project)
+
           expect_no_quota_exceeded_alert
         end
 
         it 'does not display a warning message on pipelines page' do
-          visit_project_pipelines
+          visit project_pipelines_path(project)
+
           expect_no_quota_exceeded_alert
         end
       end
@@ -82,12 +115,14 @@ describe 'CI shared runner limits' do
         let(:group) { create(:group, :with_build_minutes_limit) }
 
         it 'does not display a warning message on project homepage' do
-          visit_project_home
+          visit project_path(project)
+
           expect_no_quota_exceeded_alert
         end
 
         it 'does not display a warning message on pipelines page' do
-          visit_project_pipelines
+          visit project_pipelines_path(project)
+
           expect_no_quota_exceeded_alert
         end
       end
@@ -99,31 +134,27 @@ describe 'CI shared runner limits' do
 
     context 'when limit is defined and limit is exceeded' do
       it 'does not display a warning message on project homepage' do
-        visit_project_home
+        visit project_path(project)
+
         expect_no_quota_exceeded_alert
       end
 
       it 'does not display a warning message on pipelines page' do
-        visit_project_pipelines
+        visit project_pipelines_path(project)
+
         expect_no_quota_exceeded_alert
       end
     end
-  end
-
-  def visit_project_home
-    visit project_path(project)
-  end
-
-  def visit_project_pipelines
-    visit project_pipelines_path(project)
   end
 
   def expect_quota_exceeded_alert(message = nil)
     expect(page).to have_selector('.shared-runner-quota-message', count: 1)
 
     if message
-      element = page.find('.shared-runner-quota-message')
-      expect(element).to have_content(message)
+      page.within('.shared-runner-quota-message') do
+        expect(page).to have_content(message)
+        expect(page).to have_link 'Buy more Pipeline minutes'
+      end
     end
   end
 

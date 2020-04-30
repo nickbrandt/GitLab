@@ -95,26 +95,11 @@ describe API::ProjectPackages do
         end
       end
 
-      context 'filtering on package_type' do
-        let_it_be(:package1) { create(:conan_package, project: project) }
-        let_it_be(:package2) { create(:maven_package, project: project) }
-        let_it_be(:package3) { create(:npm_package, project: project) }
-        let_it_be(:package4) { create(:nuget_package, project: project) }
-
-        context 'for each type' do
-          %w[conan maven npm nuget].each do |package_type|
-            it "returns #{package_type} packages" do
-              url = package_filter_url(:type, package_type)
-              get api(url, user)
-
-              expect(json_response.length).to eq(1)
-              expect(json_response.map { |package| package['package_type'] }).to contain_exactly(package_type)
-            end
-          end
-        end
-      end
+      it_behaves_like 'filters on each package_type', is_project: true
 
       context 'filtering on package_name' do
+        include_context 'package filter context'
+
         it 'returns the named package' do
           url = package_filter_url(:name, 'nuget')
           get api(url, user)
@@ -122,10 +107,6 @@ describe API::ProjectPackages do
           expect(json_response.length).to eq(1)
           expect(json_response.first['name']).to include(package2.name)
         end
-      end
-
-      def package_filter_url(filter, param)
-        "/projects/#{project.id}/packages?package_#{filter}=#{param}"
       end
     end
 

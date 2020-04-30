@@ -31,7 +31,7 @@ module QA
       end
 
       def create_kubernetes_cluster
-        Resource::KubernetesCluster.fabricate_via_browser_ui! do |c|
+        Resource::KubernetesCluster::ProjectCluster.fabricate_via_browser_ui! do |c|
           c.project = @project
           c.cluster = @cluster
           c.install_helm_tiller = true

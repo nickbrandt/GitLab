@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlPopover } from '@gitlab/ui';
 import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 
 import GeoNodeSyncProgress from 'ee/geo_nodes/components/geo_node_sync_progress.vue';
 
@@ -34,7 +33,6 @@ describe('GeoNodeSyncProgress', () => {
   const findStackedProgressBar = () => wrapper.find(StackedProgressBar);
   const findGlPopover = () => wrapper.find(GlPopover);
   const findCounts = () => findGlPopover().findAll('div');
-  const findStaleIcon = () => wrapper.find(Icon);
 
   describe('template', () => {
     beforeEach(() => {
@@ -54,25 +52,6 @@ describe('GeoNodeSyncProgress', () => {
         findCounts().wrappers.forEach(row => {
           expect(row.element).toMatchSnapshot();
         });
-      });
-    });
-
-    describe('when itemValueStale is false', () => {
-      it('does not render StaleIcon always', () => {
-        expect(findStaleIcon().exists()).toBeFalsy();
-      });
-    });
-
-    describe('when itemValueStale is true', () => {
-      beforeEach(() => {
-        createComponent({
-          itemValueStale: true,
-          itemValueStaleTooltip: 'Stale',
-        });
-      });
-
-      it('does render StaleIcon always', () => {
-        expect(findStaleIcon().exists()).toBeTruthy();
       });
     });
   });

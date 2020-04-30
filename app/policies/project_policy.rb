@@ -88,6 +88,11 @@ class ProjectPolicy < BasePolicy
     @subject.feature_available?(:forking, @user)
   end
 
+  with_scope :subject
+  condition(:metrics_dashboard_allowed) do
+    feature_available?(:metrics_dashboard)
+  end
+
   with_scope :global
   condition(:mirror_available, score: 0) do
     ::Gitlab::CurrentSettings.current_application_settings.mirror_available
@@ -134,6 +139,7 @@ class ProjectPolicy < BasePolicy
     wiki
     builds
     pages
+    metrics_dashboard
   ]
 
   features.each do |f|
@@ -218,6 +224,7 @@ class ProjectPolicy < BasePolicy
     enable :read_build
     enable :read_container_image
     enable :read_pipeline
+    enable :read_pipeline_schedule
     enable :read_environment
     enable :read_deployment
     enable :read_merge_request
@@ -226,6 +233,8 @@ class ProjectPolicy < BasePolicy
     enable :read_alert_management
     enable :read_prometheus
     enable :read_metrics_dashboard_annotation
+    enable :read_alert_management_alerts
+    enable :metrics_dashboard
   end
 
   # We define `:public_user_access` separately because there are cases in gitlab-ee
@@ -248,6 +257,16 @@ class ProjectPolicy < BasePolicy
     enable :fork_project
   end
 
+  rule { metrics_dashboard_disabled }.policy do
+    prevent(:metrics_dashboard)
+  end
+
+  rule { can?(:metrics_dashboard) }.policy do
+    enable :read_prometheus
+    enable :read_environment
+    enable :read_deployment
+  end
+
   rule { owner | admin | guest | group_member }.prevent :request_access
   rule { ~request_access_enabled }.prevent :request_access
 
@@ -263,7 +282,6 @@ class ProjectPolicy < BasePolicy
     enable :update_commit_status
     enable :create_build
     enable :update_build
-    enable :read_pipeline_schedule
     enable :create_merge_request_from
     enable :create_wiki
     enable :push_code
@@ -324,6 +342,14 @@ class ProjectPolicy < BasePolicy
     enable :destroy_deploy_token
     enable :read_prometheus_alerts
     enable :admin_terraform_state
+  end
+
+  rule { public_project & metrics_dashboard_allowed }.policy do
+    enable :metrics_dashboard
+  end
+
+  rule { internal_access & metrics_dashboard_allowed }.policy do
+    enable :metrics_dashboard
   end
 
   rule { (mirror_available & can?(:admin_project)) | admin }.enable :admin_remote_mirror
@@ -396,6 +422,7 @@ class ProjectPolicy < BasePolicy
     prevent :fork_project
     prevent :read_commit_status
     prevent :read_pipeline
+    prevent :read_pipeline_schedule
     prevent(*create_read_update_admin_destroy(:release))
   end
 
@@ -422,6 +449,7 @@ class ProjectPolicy < BasePolicy
     enable :read_merge_request
     enable :read_note
     enable :read_pipeline
+    enable :read_pipeline_schedule
     enable :read_commit_status
     enable :read_container_image
     enable :download_code
@@ -440,6 +468,7 @@ class ProjectPolicy < BasePolicy
 
   rule { public_builds & can?(:guest_access) }.policy do
     enable :read_pipeline
+    enable :read_pipeline_schedule
   end
 
   # These rules are included to allow maintainers of projects to push to certain

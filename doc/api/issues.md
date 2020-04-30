@@ -67,6 +67,7 @@ GET /issues?confidential=true
 | `updated_before`    | datetime         | no         | Return issues updated on or before the given time                                                                                                   |
 | `confidential`      | boolean          | no         | Filter confidential or public issues.                                                                                                               |
 | `not`               | Hash             | no         | Return issues that do not match the parameters supplied. Accepts: `labels`, `milestone`, `author_id`, `author_username`, `assignee_id`, `assignee_username`, `my_reaction_emoji`, `search`, `in` |
+| `non_archived`      | boolean          | no         | Return issues only from non-archived projects. If `false`, response will return issues from both archived and non-archived projects. Default is `true`. _(Introduced in [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/197170))_ |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/issues
@@ -630,7 +631,7 @@ the `epic` property:
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17042). This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
 
-**Note**: The `epic_iid` attribute is deprecated and [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157).
+**Note**: The `epic_iid` attribute is deprecated and [will be removed in version 5](https://gitlab.com/gitlab-org/gitlab/issues/35157).
 Please use `iid` of the `epic` attribute instead.
 
 ## New issue
@@ -657,7 +658,7 @@ POST /projects/:id/issues
 | `discussion_to_resolve`                   | string         | no       | The ID of a discussion to resolve. This will fill in the issue with a default description and mark the discussion as resolved. Use in combination with `merge_request_to_resolve_discussions_of`. |
 | `weight` **(STARTER)**                    | integer        | no       | The weight of the issue. Valid values are greater than or equal to 0. |
 | `epic_id` **(ULTIMATE)** | integer | no | ID of the epic to add the issue to. Valid values are greater than or equal to 0. |
-| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
+| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in version 5](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/issues?title=Issues%20with%20auth&labels=bug
@@ -773,7 +774,7 @@ PUT /projects/:id/issues/:issue_iid
 | `weight` **(STARTER)** | integer | no | The weight of the issue. Valid values are greater than or equal to 0. 0                                                                    |
 | `discussion_locked` | boolean | no  | Flag indicating if the issue's discussion is locked. If the discussion is locked only project members can add or edit comments. |
 | `epic_id` **(ULTIMATE)** | integer | no | ID of the epic to add the issue to. Valid values are greater than or equal to 0. |
-| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
+| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in version 5](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
 
 ```shell
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/issues/85?state_event=close

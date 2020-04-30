@@ -1,12 +1,14 @@
 <script>
-import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlButton, GlIcon, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
 import eventHub from '../event_hub';
+import { EPIC_LEVEL_MARGIN } from '../constants';
 
 export default {
   components: {
     GlButton,
     GlIcon,
+    GlLoadingIcon,
     GlTooltip,
   },
   props: {
@@ -22,69 +24,144 @@ export default {
       type: String,
       required: true,
     },
+    childLevel: {
+      type: Number,
+      required: true,
+    },
+    childrenFlags: {
+      type: Object,
+      required: true,
+    },
+    hasFiltersApplied: {
+      type: Boolean,
+      required: true,
+    },
+    isChildrenEmpty: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
+    itemId() {
+      return this.epic.id;
+    },
     isEpicGroupDifferent() {
       return this.currentGroupId !== this.epic.groupId;
     },
     isExpandIconHidden() {
-      return this.epic.isChildEpic || !this.epic.children?.edges?.length;
+      return !this.epic.hasChildren;
+    },
+    isEmptyChildrenWithFilter() {
+      return (
+        this.childrenFlags[this.itemId].itemExpanded &&
+        this.hasFiltersApplied &&
+        this.isChildrenEmpty
+      );
     },
     expandIconName() {
-      return this.epic.isChildEpicShowing ? 'chevron-down' : 'chevron-right';
+      if (this.isEmptyChildrenWithFilter) {
+        return 'information-o';
+      }
+      return this.childrenFlags[this.itemId].itemExpanded ? 'chevron-down' : 'chevron-right';
+    },
+    infoSearchLabel() {
+      return __('No child epics match applied filters');
     },
     expandIconLabel() {
-      return this.epic.isChildEpicShowing ? __('Collapse child epics') : __('Expand child epics');
+      if (this.isEmptyChildrenWithFilter) {
+        return this.infoSearchLabel;
+      }
+      return this.childrenFlags[this.itemId].itemExpanded
+        ? __('Collapse child epics')
+        : __('Expand child epics');
+    },
+    childrenFetchInProgress() {
+      return this.epic.hasChildren && this.childrenFlags[this.itemId].itemChildrenFetchInProgress;
     },
     childEpicsCount() {
-      return this.epic.isChildEpic ? '-' : this.epic.children?.edges?.length || 0;
+      const { openedEpics = 0, closedEpics = 0 } = this.epic.descendantCounts;
+      return openedEpics + closedEpics;
     },
     childEpicsCountText() {
       return Number.isInteger(this.childEpicsCount)
         ? n__(`%d child epic`, `%d child epics`, this.childEpicsCount)
         : '';
     },
+    childEpicsSearchText() {
+      return __('Some child epics may be hidden due to applied filters');
+    },
+    childMarginClassname() {
+      return EPIC_LEVEL_MARGIN[this.childLevel];
+    },
   },
   methods: {
     toggleIsEpicExpanded() {
-      eventHub.$emit('toggleIsEpicExpanded', this.epic.id);
+      if (!this.isEmptyChildrenWithFilter) {
+        eventHub.$emit('toggleIsEpicExpanded', this.epic);
+      }
     },
   },
 };
 </script>
 
 <template>
-  <div class="epic-details-cell d-flex align-items-start p-2" data-qa-selector="epic_details_cell">
-    <gl-button
-      :class="{ invisible: isExpandIconHidden }"
-      variant="link"
-      :aria-label="expandIconLabel"
-      @click="toggleIsEpicExpanded"
-    >
-      <gl-icon :name="expandIconName" class="text-secondary" aria-hidden="true" />
-    </gl-button>
-    <div class="overflow-hidden flex-grow-1" :class="[epic.isChildEpic ? 'ml-4 mr-2' : 'mx-2']">
-      <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
-        {{ epic.title }}
-      </a>
-      <div class="epic-group-timeframe d-flex text-secondary">
-        <p v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group">
-          {{ epic.groupName }}
-        </p>
-        <span class="mx-1" aria-hidden="true">&middot;</span>
-        <p class="epic-timeframe" :title="timeframeString">{{ timeframeString }}</p>
-      </div>
-    </div>
+  <div class="epic-details-cell" data-qa-selector="epic_details_cell">
     <div
-      ref="childEpicsCount"
-      :class="{ invisible: epic.isChildEpic }"
-      class="d-flex text-secondary text-nowrap"
+      class="d-flex align-items-start p-2"
+      :class="[epic.isChildEpic ? childMarginClassname : '']"
     >
-      <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
-      <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
+      <span ref="expandCollapseInfo">
+        <gl-button
+          :class="{ invisible: isExpandIconHidden }"
+          variant="link"
+          :aria-label="expandIconLabel"
+          @click="toggleIsEpicExpanded"
+        >
+          <gl-icon
+            v-if="!childrenFetchInProgress"
+            :name="expandIconName"
+            class="text-secondary"
+            aria-hidden="true"
+          />
+          <gl-loading-icon v-if="childrenFetchInProgress" size="sm" />
+        </gl-button>
+      </span>
+      <gl-tooltip
+        v-if="isEmptyChildrenWithFilter"
+        :target="() => $refs.expandCollapseInfo"
+        boundary="viewport"
+        offset="80"
+        placement="topright"
+      >
+        {{ infoSearchLabel }}
+      </gl-tooltip>
+      <div class="overflow-hidden flex-grow-1 mx-2">
+        <a :href="epic.webUrl" :title="epic.title" class="epic-title d-block text-body bold">
+          {{ epic.title }}
+        </a>
+        <div class="epic-group-timeframe d-flex text-secondary">
+          <p
+            v-if="isEpicGroupDifferent && !epic.hasParent"
+            :title="epic.groupFullName"
+            class="epic-group"
+          >
+            {{ epic.groupName }}
+          </p>
+          <span v-if="isEpicGroupDifferent && !epic.hasParent" class="mx-1" aria-hidden="true"
+            >&middot;</span
+          >
+          <p class="epic-timeframe" :title="timeframeString">{{ timeframeString }}</p>
+        </div>
+      </div>
+      <div ref="childEpicsCount" class="d-flex text-secondary text-nowrap">
+        <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
+        <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
+      </div>
+      <gl-tooltip :target="() => $refs.childEpicsCount">
+        <span :class="{ bold: hasFiltersApplied }">{{ childEpicsCountText }}</span>
+        <span v-if="hasFiltersApplied" class="d-block">{{ childEpicsSearchText }}</span>
+      </gl-tooltip>
     </div>
-    <gl-tooltip v-if="!epic.isChildEpic" :target="() => $refs.childEpicsCount">
-      {{ childEpicsCountText }}
-    </gl-tooltip>
   </div>
 </template>

@@ -150,6 +150,7 @@ describe VulnerabilitiesHelper do
         vulnerability.finding.save
 
         expect(subject).not_to include('#L')
+        expect(subject).not_to match(/#{vulnerability.finding.location['file']}:\d*/)
       end
     end
   end

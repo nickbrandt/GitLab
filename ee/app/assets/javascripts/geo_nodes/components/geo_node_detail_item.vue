@@ -39,16 +39,6 @@ export default {
       type: [Object, String, Number],
       required: true,
     },
-    itemValueStale: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    itemValueStaleTooltip: {
-      type: String,
-      required: false,
-      default: '',
-    },
     itemValueType: {
       type: String,
       required: true,
@@ -104,10 +94,7 @@ export default {
         :item-enabled="itemEnabled"
         :item-title="itemTitle"
         :item-value="itemValue"
-        :item-value-stale="itemValueStale"
-        :item-value-stale-tooltip="itemValueStaleTooltip"
         :details-path="detailsPath"
-        :class="{ 'd-flex': itemValueStale }"
         class="mt-1"
       />
       <template v-if="isValueTypeCustom">
@@ -126,7 +113,7 @@ export default {
         class="d-inline-flex align-items-center cursor-pointer"
       >
         <gl-icon name="canceled-circle" :size="14" class="mr-1 text-secondary-300" />
-        <span ref="disabledText" class="text-secondary-600 gl-font-size-small">{{
+        <span ref="disabledText" class="text-secondary-600 gl-font-sm">{{
           __('Synchronization disabled')
         }}</span>
       </div>
@@ -139,12 +126,9 @@ export default {
         <section>
           <p>{{ __('Synchronization of container repositories is disabled.') }}</p>
           <div class="mt-3">
-            <gl-link
-              class="gl-font-size-small"
-              :href="$options.replicationHelpUrl"
-              target="_blank"
-              >{{ __('Learn how to enable synchronization') }}</gl-link
-            >
+            <gl-link class="gl-font-sm" :href="$options.replicationHelpUrl" target="_blank">{{
+              __('Learn how to enable synchronization')
+            }}</gl-link>
           </div>
         </section>
       </gl-popover>

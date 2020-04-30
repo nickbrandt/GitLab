@@ -39,7 +39,6 @@ class BoardsStoreEE {
             boardWeight,
             weightFeatureAvailable,
             scopedLabels,
-            scopedLabelsDocumentationLink,
           },
         } = this.$boardApp;
         this.store.boardConfig = {
@@ -53,7 +52,6 @@ class BoardsStoreEE {
         this.store.weightFeatureAvailable = parseBoolean(weightFeatureAvailable);
         this.store.scopedLabels = {
           enabled: parseBoolean(scopedLabels),
-          helpLink: scopedLabelsDocumentationLink,
         };
         this.initBoardFilters();
       }

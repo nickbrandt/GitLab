@@ -56,7 +56,7 @@ describe('BoardsStoreEE', () => {
       state[listType] = ['something'];
 
       return BoardsStoreEE.loadList(listPath, listType).then(() => {
-        expect(axiosMock.history.get.length).toBe(0);
+        expect(axiosMock.history.get).toHaveLength(0);
       });
     });
   });

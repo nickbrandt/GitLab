@@ -42,7 +42,7 @@
                 Expired:
               - else
                 Expires:
-            - if @license.will_expire? && @license.active?
+            - if @license.will_expire? && !@license.expired?
               - if @license.trial?
                 %strong.has-tooltip{ title: @license.expires_at.to_formatted_s(:long), data: { placement: 'top' } }
                   Free trial will expire in #{pluralize(@license.remaining_days, 'day')}
@@ -77,7 +77,7 @@
 
   = render "breakdown", license: @license
 
-  - if @previous_licenses.any?
+  - if @licenses.any?
     %h4 License History
 
     .card#license_history
@@ -92,8 +92,8 @@
             %th Expires on
             %th Active users
         %tbody
-          - @previous_licenses.each do |license|
-            %tr
+          - @licenses.each do |license|
+            %tr{ class: ('gl-bg-blue-50 font-weight-bold gl-text-blue-500' if license == @license), data: { testid: ('license-current' if license == @license) } }
               - @license.licensee.keys.each do |label|
                 %td= license.licensee[label]
               %td

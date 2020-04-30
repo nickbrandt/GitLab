@@ -4,8 +4,8 @@ module EE
   module Users
     module UpdateService
       extend ::Gitlab::Utils::Override
-      include EE::Audit::Changes # rubocop: disable Cop/InjectEnterpriseEditionModule
       include ::Gitlab::Utils::StrongMemoize
+      include ::Audit::Changes
 
       attr_reader :group_id_for_saml
 

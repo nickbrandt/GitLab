@@ -35,6 +35,7 @@ class License < ApplicationRecord
     repository_mirrors
     repository_size_limit
     seat_link
+    service_desk
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -59,6 +60,7 @@ class License < ApplicationRecord
     custom_project_templates
     cycle_analytics_for_groups
     db_load_balancing
+    default_branch_protection_restriction_in_groups
     default_project_deletion_protection
     dependency_proxy
     deploy_board
@@ -95,7 +97,6 @@ class License < ApplicationRecord
     reject_unsigned_commits
     required_ci_templates
     scoped_labels
-    service_desk
     smartcard_auth
     group_timelogs
     type_of_work_analytics
@@ -201,6 +202,7 @@ class License < ApplicationRecord
     custom_file_templates
     custom_project_templates
     db_load_balancing
+    default_branch_protection_restriction_in_groups
     elastic_search
     enterprise_templates
     extended_audit_events
@@ -228,7 +230,6 @@ class License < ApplicationRecord
   after_create :reset_current
   after_destroy :reset_current
 
-  scope :previous, -> { order(created_at: :desc).offset(1) }
   scope :recent, -> { reorder(id: :desc) }
 
   class << self
@@ -288,6 +289,10 @@ class License < ApplicationRecord
       return false unless ::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
 
       ANY_PLAN_FEATURES.include?(feature)
+    end
+
+    def history
+      all.sort_by { |license| [license.starts_at, license.created_at, license.expires_at] }.reverse
     end
   end
 
@@ -414,10 +419,6 @@ class License < ApplicationRecord
     restricted_attr(:trial)
   end
 
-  def active?
-    !expired?
-  end
-
   def exclude_guests_from_active_count?
     plan == License::ULTIMATE_PLAN
   end
@@ -466,6 +467,10 @@ class License < ApplicationRecord
 
   def paid?
     [License::STARTER_PLAN, License::PREMIUM_PLAN, License::ULTIMATE_PLAN].include?(plan)
+  end
+
+  def started?
+    starts_at <= Date.current
   end
 
   private

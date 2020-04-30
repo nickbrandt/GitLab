@@ -1,7 +1,6 @@
 <script>
 import { GlPopover, GlSprintf, GlLink } from '@gitlab/ui';
 import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 
 export default {
@@ -14,7 +13,6 @@ export default {
     GlSprintf,
     GlLink,
     StackedProgressBar,
-    Icon,
   },
   props: {
     itemTitle: {
@@ -26,16 +24,6 @@ export default {
       required: true,
       validator: value =>
         ['totalCount', 'successCount', 'failureCount'].every(key => typeof value[key] === 'number'),
-    },
-    itemValueStale: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    itemValueStaleTooltip: {
-      type: String,
-      required: false,
-      default: '',
     },
     detailsPath: {
       type: String,
@@ -56,7 +44,6 @@ export default {
     <stacked-progress-bar
       :id="`syncProgress-${itemTitle}`"
       tabindex="0"
-      :css-class="itemValueStale ? 'flex-fill' : ''"
       :hide-tooltips="true"
       :unavailable-label="__('Nothing to synchronize')"
       :success-count="itemValue.successCount"
@@ -98,20 +85,11 @@ export default {
           <span class="font-weight-bold">{{ itemValue.failureCount.toLocaleString() }}</span>
         </div>
         <div v-if="detailsPath" class="mt-3">
-          <gl-link class="gl-font-size-small" :href="detailsPath" target="_blank">{{
+          <gl-link class="gl-font-sm" :href="detailsPath" target="_blank">{{
             __('More information')
           }}</gl-link>
         </div>
       </section>
     </gl-popover>
-    <icon
-      v-if="itemValueStale"
-      v-tooltip
-      :title="itemValueStaleTooltip"
-      :aria-label="itemValueStaleTooltip"
-      name="time-out"
-      class="ml-2 text-warning-500"
-      data-container="body"
-    />
   </div>
 </template>

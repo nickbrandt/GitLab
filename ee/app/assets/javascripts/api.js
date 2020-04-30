@@ -35,6 +35,8 @@ export default {
   paymentMethodPath: '/-/subscriptions/payment_method',
   confirmOrderPath: '/-/subscriptions',
   vulnerabilitiesActionPath: '/api/:version/vulnerabilities/:id/:action',
+  featureFlagUserLists: '/api/:version/projects/:id/feature_flags_user_lists',
+  featureFlagUserList: '/api/:version/projects/:id/feature_flags_user_lists/:list_iid',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -297,5 +299,48 @@ export default {
   updateGeoNode(node) {
     const url = Api.buildUrl(this.geoNodesPath);
     return axios.put(`${url}/${node.id}`, node);
+  },
+
+  fetchFeatureFlagUserLists(version, id) {
+    const url = Api.buildUrl(this.featureFlagUserLists)
+      .replace(':version', version)
+      .replace(':id', id);
+
+    return axios.get(url);
+  },
+
+  createFeatureFlagUserList(version, id, list) {
+    const url = Api.buildUrl(this.featureFlagUserLists)
+      .replace(':version', version)
+      .replace(':id', id);
+
+    return axios.post(url, list);
+  },
+
+  fetchFeatureFlagUserList(version, id, listIid) {
+    const url = Api.buildUrl(this.featureFlagUserList)
+      .replace(':version', version)
+      .replace(':id', id)
+      .replace(':list_iid', listIid);
+
+    return axios.get(url);
+  },
+
+  updateFeatureFlagUserList(version, id, list) {
+    const url = Api.buildUrl(this.featureFlagUserList)
+      .replace(':version', version)
+      .replace(':id', id)
+      .replace(':list_iid', list.iid);
+
+    return axios.put(url, list);
+  },
+
+  deleteFeatureFlagUserList(version, id, listIid) {
+    const url = Api.buildUrl(this.featureFlagUserList)
+      .replace(':version', version)
+      .replace(':id', id)
+      .replace(':list_iid', listIid);
+
+    return axios.delete(url);
   },
 };

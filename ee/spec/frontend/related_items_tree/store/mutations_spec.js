@@ -94,7 +94,7 @@ describe('RelatedItemsTree', () => {
           data.append = true;
           mutations[types.SET_ITEM_CHILDREN](state, data);
 
-          expect(state.children[data.parentItem.reference].length).toEqual(4);
+          expect(state.children[data.parentItem.reference]).toHaveLength(4);
         });
       });
 
@@ -457,7 +457,7 @@ describe('RelatedItemsTree', () => {
 
           mutations[types.REMOVE_PENDING_REFERENCE](state, 0);
 
-          expect(state.pendingReferences.length).toEqual(0);
+          expect(state.pendingReferences).toHaveLength(0);
           expect(state.itemAddFailure).toBe(false);
         });
       });

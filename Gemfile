@@ -152,7 +152,7 @@ gem 'asciidoctor-plantuml', '0.0.10'
 gem 'rouge', '~> 3.18.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
-gem 'nokogiri', '~> 1.10.5'
+gem 'nokogiri', '~> 1.10.9'
 gem 'escape_utils', '~> 1.1'
 
 # Calendar rendering
@@ -166,7 +166,7 @@ gem 'diff_match_patch', '~> 0.1.0'
 gem 'rack', '~> 2.0.9'
 
 group :unicorn do
-  gem 'unicorn', '~> 5.4.1'
+  gem 'unicorn', '~> 5.5'
   gem 'unicorn-worker-killer', '~> 0.4.4'
 end
 
@@ -355,7 +355,7 @@ group :development, :test do
 
   gem 'database_cleaner', '~> 1.7.0'
   gem 'factory_bot_rails', '~> 5.1.0'
-  gem 'rspec-rails', '~> 4.0.0.beta4'
+  gem 'rspec-rails', '~> 4.0.0'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest', '~> 5.11.0'
@@ -455,7 +455,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 12.9.0.pre.rc4'
+gem 'gitaly', '~> 13.0.0.pre.rc1'
 
 gem 'grpc', '~> 1.24.0'
 

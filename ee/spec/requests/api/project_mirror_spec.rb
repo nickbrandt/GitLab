@@ -5,7 +5,7 @@ require 'spec_helper'
 describe API::ProjectMirror do
   describe 'POST /projects/:id/mirror/pull' do
     let(:visibility) { Gitlab::VisibilityLevel::PUBLIC }
-    let(:project_mirrored) { create(:project, :repository, :mirror, :import_finished, visibility: visibility) }
+    let(:project_mirrored) { create(:project, :repository, :mirror, visibility: visibility) }
 
     def do_post(user: nil, params: {}, headers: { 'X-Hub-Signature' => 'signature' })
       api_path = api("/projects/#{project_mirrored.id}/mirror/pull", user)
@@ -267,27 +267,25 @@ describe API::ProjectMirror do
               it 'triggers the pull mirroring operation' do
                 project_member(:maintainer, user)
 
-                expect(StartPullMirroringService)
-                  .to receive(:new)
-                  .with(project_mirrored, user)
-                  .and_call_original
+                Sidekiq::Testing.fake! do
+                  expect { do_post(user: user, headers: {}) }
+                    .to change { UpdateAllMirrorsWorker.jobs.size }
+                    .by(1)
 
-                do_post(user: user, headers: {})
-
-                expect(response).to have_gitlab_http_status(:ok)
+                  expect(response).to have_gitlab_http_status(:ok)
+                end
               end
             end
 
             context 'is authenticated as owner' do
               it 'triggers the pull mirroring operation' do
-                expect(StartPullMirroringService)
-                  .to receive(:new)
-                  .with(project_mirrored, project_mirrored.creator)
-                  .and_call_original
+                Sidekiq::Testing.fake! do
+                  expect { do_post(user: project_mirrored.creator, headers: {}) }
+                    .to change { UpdateAllMirrorsWorker.jobs.size }
+                    .by(1)
 
-                do_post(user: project_mirrored.creator, headers: {})
-
-                expect(response).to have_gitlab_http_status(:ok)
+                  expect(response).to have_gitlab_http_status(:ok)
+                end
               end
             end
           end

@@ -80,7 +80,7 @@ export default {
     class="gl-responsive-table-row vulnerabilities-row p-2"
     :class="{ dismissed: isDismissed, 'gl-bg-blue-50': isSelected }"
   >
-    <div class="table-section">
+    <div class="table-section section-5">
       <gl-form-checkbox
         :checked="isSelected"
         :inline="true"
@@ -89,10 +89,10 @@ export default {
       />
     </div>
 
-    <div class="table-section section-10">
+    <div class="table-section section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-mobile-content">
-        <severity-badge :severity="severity" />
+        <severity-badge :severity="severity" class="text-right text-md-left" />
       </div>
     </div>
 
@@ -106,7 +106,7 @@ export default {
         <template v-else>
           <gl-deprecated-button
             ref="vulnerability-title"
-            class="d-inline gl-line-height-inherit gl-text-align-inherit gl-white-space-normal"
+            class="d-inline gl-reset-line-height gl-reset-text-align gl-white-space-normal"
             variant="blank"
             @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-deprecated-button

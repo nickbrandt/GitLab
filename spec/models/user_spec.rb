@@ -54,6 +54,7 @@ describe User, :do_not_mock_admin_mode do
     it { is_expected.to have_many(:reported_abuse_reports).dependent(:destroy).class_name('AbuseReport') }
     it { is_expected.to have_many(:custom_attributes).class_name('UserCustomAttribute') }
     it { is_expected.to have_many(:releases).dependent(:nullify) }
+    it { is_expected.to have_many(:metrics_users_starred_dashboards).inverse_of(:user) }
 
     describe "#bio" do
       it 'syncs bio with `user_details.bio` on create' do
@@ -536,18 +537,6 @@ describe User, :do_not_mock_admin_mode do
             user = build(:user, email: 'info@test.com')
 
             expect(user).to be_valid
-          end
-
-          context 'when feature flag is turned off' do
-            before do
-              stub_feature_flags(email_restrictions: false)
-            end
-
-            it 'does accept the email address' do
-              user = build(:user, email: 'info+1@test.com')
-
-              expect(user).to be_valid
-            end
           end
 
           context 'when created_by_id is set' do

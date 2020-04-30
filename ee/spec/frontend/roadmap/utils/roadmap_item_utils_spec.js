@@ -119,7 +119,7 @@ describe('extractGroupMilestones', () => {
     const { edges } = mockGroupMilestonesQueryResponse.data.group.milestones;
     const extractedMilestones = roadmapItemUtils.extractGroupMilestones(edges);
 
-    expect(extractedMilestones.length).toBe(edges.length);
+    expect(extractedMilestones).toHaveLength(edges.length);
     expect(extractedMilestones[0]).toEqual(
       expect.objectContaining({
         ...edges[0].node,

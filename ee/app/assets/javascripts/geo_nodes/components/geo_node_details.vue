@@ -1,5 +1,4 @@
 <script>
-/* eslint-disable vue/no-side-effects-in-computed-properties */
 import { GlLink } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
@@ -42,28 +41,21 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      showAdvanceItems: false,
-      errorMessage: '',
-    };
-  },
   computed: {
-    hasError() {
-      if (!this.nodeDetails.healthy) {
-        this.errorMessage = this.nodeDetails.health;
-      }
-      return !this.nodeDetails.healthy;
-    },
     hasVersionMismatch() {
-      if (
+      return (
         this.nodeDetails.version !== this.nodeDetails.primaryVersion ||
         this.nodeDetails.revision !== this.nodeDetails.primaryRevision
-      ) {
-        this.errorMessage = s__('GeoNodes|GitLab version does not match the primary node version');
-        return true;
+      );
+    },
+    errorMessage() {
+      if (!this.nodeDetails.healthy) {
+        return this.nodeDetails.health;
+      } else if (this.hasVersionMismatch) {
+        return s__('GeoNodes|GitLab version does not match the primary node version');
       }
-      return false;
+
+      return '';
     },
   },
 };
@@ -90,7 +82,7 @@ export default {
       :node-details="nodeDetails"
       :node-type-primary="node.primary"
     />
-    <div v-if="hasError || hasVersionMismatch">
+    <div v-if="errorMessage">
       <p class="p-3 mb-0 bg-danger-100 text-danger-500">
         {{ errorMessage }}
         <gl-link :href="geoTroubleshootingHelpPath">{{

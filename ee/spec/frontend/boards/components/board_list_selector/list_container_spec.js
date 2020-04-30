@@ -27,7 +27,7 @@ describe('ListContainer', () => {
       it('returns assignees list as it is when `query` is empty', () => {
         wrapper.setData({ query: '' });
 
-        expect(wrapper.vm.filteredItems.length).toBe(mockAssigneesList.length);
+        expect(wrapper.vm.filteredItems).toHaveLength(mockAssigneesList.length);
       });
 
       it('returns filtered assignees list as it is when `query` has name', () => {
@@ -35,7 +35,7 @@ describe('ListContainer', () => {
 
         wrapper.setData({ query: assignee.name });
 
-        expect(wrapper.vm.filteredItems.length).toBe(1);
+        expect(wrapper.vm.filteredItems).toHaveLength(1);
         expect(wrapper.vm.filteredItems[0].name).toBe(assignee.name);
       });
 
@@ -44,7 +44,7 @@ describe('ListContainer', () => {
 
         wrapper.setData({ query: assignee.username });
 
-        expect(wrapper.vm.filteredItems.length).toBe(1);
+        expect(wrapper.vm.filteredItems).toHaveLength(1);
         expect(wrapper.vm.filteredItems[0].username).toBe(assignee.username);
       });
     });

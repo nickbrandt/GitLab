@@ -34,7 +34,7 @@ module EE
 
       has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
       has_many :epics,                    foreign_key: :author_id
-      has_many :requirements,             foreign_key: :author_id
+      has_many :requirements,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::Requirement'
       has_many :assigned_epics,           foreign_key: :assignee_id, class_name: "Epic"
       has_many :path_locks,               dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :vulnerability_feedback, foreign_key: :author_id, class_name: 'Vulnerabilities::Feedback'
@@ -132,16 +132,6 @@ module EE
         end
 
         ''
-      end
-
-      # Limits the users to those who have an identity that belongs to
-      # the given SAML Provider
-      def limit_to_saml_provider(saml_provider_id)
-        if saml_provider_id
-          joins(:identities).where(identities: { saml_provider_id: saml_provider_id }).distinct
-        else
-          all
-        end
       end
     end
 
@@ -357,6 +347,10 @@ module EE
 
     def organization
       gitlab_employee? ? 'GitLab' : super
+    end
+
+    def security_dashboard
+      InstanceSecurityDashboard.new(self)
     end
 
     protected

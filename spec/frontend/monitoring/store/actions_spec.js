@@ -20,6 +20,8 @@ import {
   fetchPrometheusMetric,
   setInitialState,
   filterEnvironments,
+  setExpandedPanel,
+  clearExpandedPanel,
   setGettingStartedEmptyState,
   duplicateSystemDashboard,
 } from '~/monitoring/stores/actions';
@@ -61,9 +63,6 @@ describe('Monitoring store actions', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-
-    // Mock `backOff` function to remove exponential algorithm delay.
-    jest.useFakeTimers();
 
     jest.spyOn(commonUtils, 'backOff').mockImplementation(callback => {
       const q = new Promise((resolve, reject) => {
@@ -871,6 +870,45 @@ describe('Monitoring store actions', () => {
 
         done();
       });
+    });
+  });
+
+  describe('setExpandedPanel', () => {
+    let state;
+
+    beforeEach(() => {
+      state = storeState();
+    });
+
+    it('Sets a panel as expanded', () => {
+      const group = 'group_1';
+      const panel = { title: 'A Panel' };
+
+      return testAction(
+        setExpandedPanel,
+        { group, panel },
+        state,
+        [{ type: types.SET_EXPANDED_PANEL, payload: { group, panel } }],
+        [],
+      );
+    });
+  });
+
+  describe('clearExpandedPanel', () => {
+    let state;
+
+    beforeEach(() => {
+      state = storeState();
+    });
+
+    it('Clears a panel as expanded', () => {
+      return testAction(
+        clearExpandedPanel,
+        undefined,
+        state,
+        [{ type: types.SET_EXPANDED_PANEL, payload: { group: null, panel: null } }],
+        [],
+      );
     });
   });
 });

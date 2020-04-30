@@ -3,28 +3,18 @@
 module EE
   module NamespacesHelper
     def namespace_extra_shared_runner_limits_quota(namespace)
-      limit = namespace.extra_shared_runners_minutes_limit.to_i
-      used = namespace.extra_shared_runners_minutes.to_i
-      status = namespace.extra_shared_runners_minutes_used? ? 'over_quota' : 'under_quota'
+      report = ::Ci::Minutes::Quota.new(namespace).purchased_minutes_report
 
-      content_tag(:span, class: "shared_runners_limit_#{status}") do
-        "#{used} / #{limit}"
+      content_tag(:span, class: "shared_runners_limit_#{report.status}") do
+        "#{report.used} / #{report.limit}"
       end
     end
 
     def namespace_shared_runner_limits_quota(namespace)
-      used = namespace.shared_runners_minutes(include_extra: false).to_i
+      report = ::Ci::Minutes::Quota.new(namespace).monthly_minutes_report
 
-      if namespace.shared_runners_minutes_limit_enabled?
-        limit = namespace.actual_shared_runners_minutes_limit(include_extra: false)
-        status = namespace.shared_runners_minutes_used? ? 'over_quota' : 'under_quota'
-      else
-        limit = 'Unlimited'
-        status = 'disabled'
-      end
-
-      content_tag(:span, class: "shared_runners_limit_#{status}") do
-        "#{used} / #{limit}"
+      content_tag(:span, class: "shared_runners_limit_#{report.status}") do
+        "#{report.used} / #{report.limit}"
       end
     end
 

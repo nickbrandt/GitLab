@@ -33,7 +33,7 @@ describe EE::NamespacesHelper do
       end
 
       it 'returns the proper value for the used section' do
-        allow(user_group).to receive(:shared_runners_minutes).and_return(100)
+        allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
 
         expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{100 / Unlimited})
       end
@@ -42,7 +42,7 @@ describe EE::NamespacesHelper do
     context "when it's limited" do
       before do
         allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
-        allow(user_group).to receive(:shared_runners_minutes).and_return(100)
+        allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
 
         user_group.update!(shared_runners_minutes_limit: 500)
       end
@@ -56,7 +56,7 @@ describe EE::NamespacesHelper do
   describe '#namespace_extra_shared_runner_limits_quota' do
     context 'when extra minutes are assigned' do
       it 'returns the proper values for used and limit sections' do
-        allow(user_group).to receive(:extra_shared_runners_minutes).and_return(50)
+        allow(user_group).to receive(:shared_runners_seconds).and_return(50 * 60)
         user_group.update!(extra_shared_runners_minutes_limit: 100)
 
         expect(helper.namespace_extra_shared_runner_limits_quota(user_group)).to match(%r{50 / 100})

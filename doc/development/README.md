@@ -9,7 +9,7 @@ description: 'Learn how to contribute to GitLab.'
 
 - Set up GitLab's development environment with [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/README.md)
 - [GitLab contributing guide](contributing/index.md)
-  - [Issues workflow](contributing/issue_workflow.md). For information on:
+  - [Issues workflow](contributing/issue_workflow.md) for more information on:
     - Issue tracker guidelines.
     - Triaging.
     - Labels.
@@ -17,7 +17,7 @@ description: 'Learn how to contribute to GitLab.'
     - Issue weight.
     - Regression issues.
     - Technical or UX debt.
-  - [Merge requests workflow](contributing/merge_request_workflow.md). For
+  - [Merge requests workflow](contributing/merge_request_workflow.md) for more
     information on:
     - Merge request guidelines.
     - Contribution acceptance criteria.
@@ -57,10 +57,8 @@ Complementary reads:
 - [GitLab utilities](utilities.md)
 - [Issuable-like Rails models](issuable-like-models.md)
 - [Logging](logging.md)
-- [API styleguide](api_styleguide.md) Use this styleguide if you are
-  contributing to the API
-- [GraphQL API styleguide](api_graphql_styleguide.md) Use this
-  styleguide if you are contributing to the [GraphQL API](../api/graphql/index.md)
+- [API styleguide](api_styleguide.md) for contributing to the API
+- [GraphQL API styleguide](api_graphql_styleguide.md) for contributing to the [GraphQL API](../api/graphql/index.md)
 - [Sidekiq guidelines](sidekiq_style_guide.md) for working with Sidekiq workers
 - [Working with Gitaly](gitaly.md)
 - [Manage feature flags](feature_flags/index.md)
@@ -117,7 +115,7 @@ Complementary reads:
 ### Tooling
 
 - [Understanding EXPLAIN plans](understanding_explain_plans.md)
-- [explain.depesz.com](https://explain.depesz.com/) for visualising the output
+- [explain.depesz.com](https://explain.depesz.com/) for visualizing the output
   of `EXPLAIN`
 - [pgFormatter](http://sqlformat.darold.net/) a PostgreSQL SQL syntax beautifier
 
@@ -224,5 +222,5 @@ Complementary reads:
 ## Other GitLab Development Kit (GDK) guides
 
 - [Run full Auto DevOps cycle in a GDK instance](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/auto_devops.md)
-- [Using GitLab Runner with GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/runner.md)
-- [Using the Web IDE terminal with GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/master/doc/howto/web_ide_terminal_gdk_setup.md)
+- [Using GitLab Runner with the GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/runner.md)
+- [Using the Web IDE terminal with the GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/master/doc/howto/web_ide_terminal_gdk_setup.md)

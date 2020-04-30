@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-properties, babel/camelcase,
 no-unused-expressions, default-case,
-consistent-return, no-alert, no-param-reassign, no-else-return,
+consistent-return, no-alert, no-param-reassign,
 no-shadow, no-useless-escape,
 class-methods-use-this */
 
@@ -964,11 +964,11 @@ export default class Notes {
 
     form
       .prepend(
-        `<div class="avatar-note-form-holder"><div class="content"><a href="${escape(
+        `<a href="${escape(
           gon.current_username,
         )}" class="user-avatar-link d-none d-sm-block"><img class="avatar s40" src="${encodeURI(
-          gon.current_user_avatar_url,
-        )}" alt="${escape(gon.current_user_fullname)}" /></a></div></div>`,
+          gon.current_user_avatar_url || gon.default_avatar_url,
+        )}" alt="${escape(gon.current_user_fullname)}" /></a>`,
       )
       .append('</div>')
       .find('.js-close-discussion-note-form')
@@ -1123,10 +1123,9 @@ export default class Notes {
     if (row.is('.js-temp-notes-holder')) {
       // remove temporary row for diff lines
       return row.remove();
-    } else {
-      // only remove the form
-      return form.remove();
     }
+    // only remove the form
+    return form.remove();
   }
 
   cancelDiscussionForm(e) {

@@ -1,0 +1,37 @@
+@media (max-width: map-get($grid-breakpoints, sm)) {
+  .geo-node-actions {
+    flex-direction: column;
+    margin: 0 1rem;
+
+    .sm-column-spacing {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  }
+
+  .geo-node-actions-container {
+    flex-direction: column;
+  }
+}
+
+.project-card-errors {
+  .btn-card-header {
+    &.collapsed {
+      .card-collapse-icon {
+        display: none;
+      }
+
+      .card-expand-icon {
+        display: block;
+      }
+    }
+  }
+}
+
+// Overrides for the generalized `shared/projects/search_form` used in Geo
+.project-search {
+  #project-filter-form-field {
+    width: 100%;
+    padding-left: 1.75rem;
+  }
+}

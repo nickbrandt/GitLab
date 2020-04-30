@@ -42,35 +42,6 @@ describe RegistrationsController do
     end
   end
 
-  describe '#new' do
-    before do
-      stub_experiment(signup_flow: true, paid_signup_flow: true)
-      stub_experiment_for_user(signup_flow: true, paid_signup_flow: true)
-    end
-
-    context 'when not redirected from checkout page' do
-      it 'does not push tracking data to gon' do
-        get :new
-
-        expect(Gon.tracking_data).to eq(nil)
-      end
-    end
-
-    context 'when redirect from checkout page' do
-      it 'pushes tracking data to gon' do
-        get :new, params: { redirect_from: 'checkout' }
-
-        expect(Gon.tracking_data).to include(
-          {
-            category: 'Growth::Acquisition::Experiment::PaidSignUpFlow',
-            action: 'sign_up_page_view',
-            property: 'experimental_group'
-          }
-        )
-      end
-    end
-  end
-
   describe '#welcome' do
     subject { get :welcome }
 

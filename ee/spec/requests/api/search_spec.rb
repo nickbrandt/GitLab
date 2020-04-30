@@ -100,6 +100,24 @@ describe API::Search do
         end
       end
     end
+
+    context 'for issues scope', :sidekiq_inline do
+      before do
+        create_list(:issue, 4, project: project)
+        ensure_elasticsearch_index!
+      end
+
+      it 'avoids N+1 queries' do
+        control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'issues', search: '*' } }
+
+        new_issues = create_list(:issue, 4, project: project)
+
+        ensure_elasticsearch_index!
+
+        # Some N+1 queries still exist
+        expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control.count + new_issues.count * 4)
+      end
+    end
   end
 
   describe 'GET /search' do

@@ -84,7 +84,7 @@ describe('EE IDE TerminalEmptyState', () => {
 
       button.trigger('click');
 
-      expect(wrapper.emitted().start.length).toBe(1);
+      expect(wrapper.emitted().start).toHaveLength(1);
     });
 
     it('shows help path link', () => {

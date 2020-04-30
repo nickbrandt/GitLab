@@ -17,7 +17,7 @@ that apply to all GitLab content, not just documentation.
 
 ### Why a single source of truth
 
-The documentation of GitLab products and features is the SSOT for all information related to implementation, usage, and troubleshooting. It evolves continually, in keeping with new products and features, and with improvements for clarity, accuracy, and completeness.
+The documentation of GitLab products and features is the SSOT for all information related to implementation, usage, and troubleshooting. It evolves continuously, in keeping with new products and features, and with improvements for clarity, accuracy, and completeness.
 
 This policy prevents information silos, making it easier to find information about GitLab products.
 
@@ -46,12 +46,12 @@ In the software industry, it is a best practice to organize documentation in dif
 1. Explanation
 1. Reference (for example, a glossary)
 
-At GitLab, we have so many product changes in our monthly releases that we can't afford to continually update multiple types of information.
+At GitLab, we have so many product changes in our monthly releases that we can't afford to continuously update multiple types of information.
 If we have multiple types, the information will become outdated. Therefore, we have a [single template](structure.md) for documentation.
 
 We currently do not distinguish specific document types, although we are open to reconsidering this policy
 once the documentation has reached a future stage of maturity and quality. If you are reading this, then despite our
-continual improvement efforts, that point hasn't been reached.
+continuous improvement efforts, that point hasn't been reached.
 
 ### Link instead of summarize
 
@@ -1221,7 +1221,7 @@ a helpful link back to how the feature was developed.
   to the following should be added immediately below the heading as a blockquote:
   - `> Introduced in GitLab 11.3.`.
 
-- Whenever possible, version text should have a link to the issue, merge request, or epic that introduced the feature.
+- Whenever possible, version text should have a link to the _completed_ issue, merge request, or epic that introduced the feature.
   An issue is preferred over a merge request, and a merge request is preferred over an epic. For example:
   - `> [Introduced](<link-to-issue>) in GitLab 11.3.`.
 

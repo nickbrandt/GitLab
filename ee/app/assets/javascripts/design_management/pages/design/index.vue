@@ -31,7 +31,7 @@ import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
   UPDATE_IMAGE_DIFF_NOTE_ERROR,
   DESIGN_NOT_FOUND_ERROR,
-  DESIGN_NOT_EXIST_ERROR,
+  DESIGN_VERSION_NOT_EXIST_ERROR,
   designDeletionError,
 } from '../../utils/error_messages';
 import { DESIGNS_ROUTE_NAME } from '../../router/constants';
@@ -78,18 +78,14 @@ export default {
     },
     design: {
       query: getDesignQuery,
-      fetchPolicy: fetchPolicies.NETWORK_ONLY,
+      // We want to see cached design version if we have one, and fetch newer version on the background to update discussions
+      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
       variables() {
         return this.designVariables;
       },
       update: data => extractDesign(data),
-      result({ data }) {
-        if (!data) {
-          this.onQueryError(DESIGN_NOT_FOUND_ERROR);
-        }
-        if (this.$route.query.version && !this.hasValidVersion) {
-          this.onQueryError(DESIGN_NOT_EXIST_ERROR);
-        }
+      result(res) {
+        this.onDesignQueryResult(res);
       },
       error() {
         this.onQueryError(DESIGN_NOT_FOUND_ERROR);
@@ -97,8 +93,10 @@ export default {
     },
   },
   computed: {
-    isLoading() {
-      return this.$apollo.queries.design.loading;
+    isFirstLoading() {
+      // We only want to show spinner on initial design load (when opened from a deep link to design)
+      // If we already have cached a design, loading shouldn't be indicated to user
+      return this.$apollo.queries.design.loading && !this.design.filename;
     },
     discussions() {
       return extractDiscussions(this.design.discussions);
@@ -207,6 +205,19 @@ export default {
 
       return this.$apollo.mutate(mutationPayload).catch(e => this.onUpdateImageDiffNoteError(e));
     },
+    onDesignQueryResult({ data, loading }) {
+      // On the initial load with cache-and-network policy data is undefined while loading is true
+      // To prevent throwing an error, we don't perform any logic until loading is false
+      if (loading) {
+        return;
+      }
+
+      if (!data || !extractDesign(data)) {
+        this.onQueryError(DESIGN_NOT_FOUND_ERROR);
+      } else if (this.$route.query.version && !this.hasValidVersion) {
+        this.onQueryError(DESIGN_VERSION_NOT_EXIST_ERROR);
+      }
+    },
     onQueryError(message) {
       // because we redirect user to /designs (the issue page),
       // we want to create these flashes on the issue page
@@ -256,7 +267,7 @@ export default {
   <div
     class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
   >
-    <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
+    <gl-loading-icon v-if="isFirstLoading" size="xl" class="align-self-center" />
     <template v-else>
       <div class="d-flex overflow-hidden flex-grow-1 flex-column position-relative">
         <design-destroyer
@@ -297,7 +308,9 @@ export default {
         </div>
       </div>
       <div class="image-notes">
-        <h2 class="gl-font-size-20 font-weight-bold mt-0">{{ issue.title }}</h2>
+        <h2 class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0">
+          {{ issue.title }}
+        </h2>
         <a class="text-tertiary text-decoration-none mb-3 d-block" :href="issue.webUrl">{{
           issue.webPath
         }}</a>
@@ -337,7 +350,7 @@ export default {
             />
           </apollo-mutation>
         </template>
-        <h2 v-else class="new-discussion-disclaimer gl-font-size-14 m-0">
+        <h2 v-else class="new-discussion-disclaimer gl-font-base m-0">
           {{ __("Click the image where you'd like to start a new discussion") }}
         </h2>
       </div>

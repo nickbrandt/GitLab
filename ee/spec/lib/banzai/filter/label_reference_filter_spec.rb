@@ -18,14 +18,12 @@ describe Banzai::Filter::LabelReferenceFilter do
       doc = reference_filter("See #{scoped_label.to_reference}")
 
       expect(doc.css('.gl-label-scoped .gl-label-text').map(&:text)).to eq([scoped_label.scoped_label_key, scoped_label.scoped_label_value])
-      expect(doc.at_css('a.gl-label-icon')['href']).to eq('http://localhost/help/user/project/labels.md#scoped-labels-premium')
     end
 
     it 'renders common label' do
       doc = reference_filter("See #{label.to_reference}")
 
       expect(doc.css('.gl-label .gl-label-text').map(&:text)).to eq([label.name])
-      expect(doc.at_css('a.gl-label-icon')).to be_nil
     end
   end
 
@@ -38,7 +36,6 @@ describe Banzai::Filter::LabelReferenceFilter do
       doc = reference_filter("See #{scoped_label.to_reference}")
 
       expect(doc.css('.gl-label .gl-label-text').map(&:text)).to eq([scoped_label.name])
-      expect(doc.at_css('a.gl-label-icon')).to be_nil
     end
   end
 end

@@ -70,7 +70,8 @@ Example response:
    "asset_proxy_url": "https://assets.example.com",
    "asset_proxy_whitelist": ["example.com", "*.example.com", "your-instance.com"],
    "npm_package_requests_forwarding": true,
-   "issues_create_limit": 300
+   "issues_create_limit": 300,
+   "raw_blob_request_limit": 300
 }
 ```
 
@@ -158,7 +159,8 @@ Example response:
   "allow_local_requests_from_web_hooks_and_services": true,
   "allow_local_requests_from_system_hooks": false,
   "npm_package_requests_forwarding": true,
-  "issues_create_limit": 300
+  "issues_create_limit": 300,
+  "raw_blob_request_limit": 300
 }
 ```
 
@@ -238,7 +240,7 @@ are listed in the descriptions of the relevant settings.
 | `elasticsearch_namespace_ids`            | array of integers | no                                  | **(PREMIUM)** The namespaces to index via Elasticsearch if `elasticsearch_limit_indexing` is enabled. |
 | `elasticsearch_project_ids`              | array of integers | no                                  | **(PREMIUM)** The projects to index via Elasticsearch if `elasticsearch_limit_indexing` is enabled. |
 | `elasticsearch_search`                   | boolean          | no                                   | **(PREMIUM)** Enable Elasticsearch search |
-| `elasticsearch_url`                      | string           | no                                   | **(PREMIUM)** The url to use for connecting to Elasticsearch. Use a comma-separated list to support cluster (for example, `http://localhost:9200, http://localhost:9201"`). If your Elasticsearch instance is password protected, pass the `username:password` in the URL (for example, `http://<username>:<password>@<elastic_host>:9200/`). |
+| `elasticsearch_url`                      | string           | no                                   | **(PREMIUM)** The URL to use for connecting to Elasticsearch. Use a comma-separated list to support cluster (for example, `http://localhost:9200, http://localhost:9201"`). If your Elasticsearch instance is password protected, pass the `username:password` in the URL (for example, `http://<username>:<password>@<elastic_host>:9200/`). |
 | `email_additional_text`                  | string           | no                                   | **(PREMIUM)** Additional text added to the bottom of every email for legal/auditing/compliance reasons |
 | `email_author_in_body`                   | boolean          | no                                   | Some email servers do not support overriding the email sender name. Enable this option to include the name of the author of the issue, merge request or comment in the email body instead. |
 | `enabled_git_access_protocol`            | string           | no                                   | Enabled protocols for Git access. Allowed values are: `ssh`, `http`, and `nil` to allow both protocols. |
@@ -364,4 +366,5 @@ are listed in the descriptions of the relevant settings.
 | `version_check_enabled`                  | boolean          | no                                   | Let GitLab inform you when an update is available. |
 | `web_ide_clientside_preview_enabled`     | boolean          | no                                   | Client side evaluation (allow live previews of JavaScript projects in the Web IDE using CodeSandbox client side evaluation). |
 | `snippet_size_limit`                     | integer          | no                                   | Max snippet content size in **bytes**. Default: 52428800 Bytes (50MB).|
-| `issues_create_limit`                    | integer          | no                                   | Max number of issue creation requests allowed per minute per user.|
+| `issues_create_limit`                    | integer          | no                                   | Max number of issue creation requests per minute per user. Default: 300. To disable throttling set to 0.|
+| `raw_blob_request_limit`                 | integer          | no                                   | Max number of requests per minute for each raw path. Default: 300. To disable throttling set to 0.|

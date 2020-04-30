@@ -220,7 +220,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       end
 
       stub_licensed_features(type_of_work_analytics: true)
-      stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
 
       group.add_maintainer(user)
 

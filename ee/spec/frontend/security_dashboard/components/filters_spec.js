@@ -18,11 +18,11 @@ describe('Filter component', () => {
     });
 
     it('should display all filters', () => {
-      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(3);
+      expect(vm.$el.querySelectorAll('.js-filter')).toHaveLength(3);
     });
 
     it('should display "Hide dismissed vulnerabilities" toggle', () => {
-      expect(vm.$el.querySelectorAll('.js-toggle').length).toEqual(1);
+      expect(vm.$el.querySelectorAll('.js-toggle')).toHaveLength(1);
     });
   });
 });

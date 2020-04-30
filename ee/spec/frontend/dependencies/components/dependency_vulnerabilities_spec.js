@@ -53,7 +53,7 @@ describe('DependencVulnerabilities component', () => {
     });
 
     it('does not render all of them', () => {
-      expect(findVulnerabilities().length).toBe(MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY);
+      expect(findVulnerabilities()).toHaveLength(MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY);
     });
 
     it('renders the excess message', () => {

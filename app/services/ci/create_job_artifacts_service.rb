@@ -46,6 +46,11 @@ module Ci
                               expire_in: expire_in)
                           end
 
+      if Feature.enabled?(:keep_latest_artifact_for_ref, job.project)
+        artifact.locked = true
+        artifact_metadata&.locked = true
+      end
+
       [artifact, artifact_metadata]
     end
 
@@ -64,6 +69,7 @@ module Ci
       Ci::JobArtifact.transaction do
         artifact.save!
         artifact_metadata&.save!
+        unlock_previous_artifacts!(artifact)
 
         # NOTE: The `artifacts_expire_at` column is already deprecated and to be removed in the near future.
         job.update_column(:artifacts_expire_at, artifact.expire_at)
@@ -79,6 +85,12 @@ module Ci
     rescue => error
       track_exception(error, job, params)
       error(error.message, :bad_request)
+    end
+
+    def unlock_previous_artifacts!(artifact)
+      return unless Feature.enabled?(:keep_latest_artifact_for_ref, artifact.job.project)
+
+      Ci::JobArtifact.for_ref(artifact.job.ref, artifact.project_id).locked.update_all(locked: false)
     end
 
     def sha256_matches_existing_artifact?(job, artifact_type, artifacts_file)

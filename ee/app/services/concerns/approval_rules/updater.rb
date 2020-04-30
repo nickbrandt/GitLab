@@ -2,7 +2,7 @@
 
 module ApprovalRules
   module Updater
-    include EE::Audit::Changes # rubocop: disable Cop/InjectEnterpriseEditionModule
+    include ::Audit::Changes
 
     def action
       filter_eligible_users!

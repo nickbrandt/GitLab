@@ -30,7 +30,7 @@ module EE
 
       <<~HTML.chomp.html_safe
         <span class="d-inline-block position-relative scoped-label-wrapper">
-          <span class="#{wrapper_classes.join(' ')}" style="color: #{label.color}">#{label_html + scoped_labels_doc_link}</span>
+          <span class="#{wrapper_classes.join(' ')}" style="color: #{label.color}">#{label_html}</span>
         </span>
       HTML
     end
@@ -44,8 +44,7 @@ module EE
 
     def label_dropdown_data(edit_context, opts = {})
       scoped_labels_fields = {
-        scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s,
-        scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
+        scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s
       }
 
       return super.merge(scoped_labels_fields) unless edit_context.is_a?(Group)
@@ -69,14 +68,6 @@ module EE
       return super unless @group&.feature_available?(:epics)
 
       super + ['epics']
-    end
-
-    private
-
-    def scoped_labels_doc_link
-      help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels-premium')
-
-      %(<a href="#{help_url}" class="gl-link gl-label-icon" target="_blank" rel="noopener"><i class="fa fa-question-circle"></i></a>).html_safe
     end
   end
 end

@@ -36,9 +36,8 @@ store.dispatch('receiveEpicsSuccess', { rawEpics });
 
 const mockEpics = store.state.epics;
 
-store.state.epics[0].children = {
-  edges: [mockFormattedChildEpic1, mockFormattedChildEpic2],
-};
+store.state.childrenEpics[mockEpics[0].id] = [mockFormattedChildEpic1, mockFormattedChildEpic2];
+
 const localVue = createLocalVue();
 
 const createComponent = ({
@@ -47,6 +46,7 @@ const createComponent = ({
   currentGroupId = mockGroupId,
   presetType = PRESET_TYPES.MONTHS,
   roadmapBufferedRendering = true,
+  hasFiltersApplied = false,
 } = {}) => {
   return shallowMount(EpicsListSection, {
     localVue,
@@ -60,6 +60,7 @@ const createComponent = ({
       epics,
       timeframe,
       currentGroupId,
+      hasFiltersApplied,
     },
     provide: {
       glFeatures: { roadmapBufferedRendering },
@@ -115,6 +116,28 @@ describe('EpicsListSectionComponent', () => {
     describe('shadowCellStyles', () => {
       it('returns computed style object based on `offsetLeft` prop value', () => {
         expect(wrapper.vm.shadowCellStyles.left).toBe('0px');
+      });
+    });
+
+    describe('displayedEpics', () => {
+      beforeAll(() => {
+        store.state.epicIds = ['1', '2', '3'];
+      });
+
+      it('returns findParentEpics method by default', () => {
+        expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.findParentEpics);
+      });
+
+      it('returns findEpicsMatchingFilter method if filtered is applied', () => {
+        wrapper.setProps({
+          hasFiltersApplied: true,
+        });
+        expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.findEpicsMatchingFilter);
+      });
+
+      it('returns all epics if epicIid is specified', () => {
+        store.state.epicIid = '23';
+        expect(wrapper.vm.displayedEpics).toEqual(mockEpics);
       });
     });
   });
@@ -276,21 +299,15 @@ describe('EpicsListSectionComponent', () => {
     });
   });
 
-  it('expands to show child epics when epic is toggled', done => {
+  it('expands to show child epics when epic is toggled', () => {
     const epic = mockEpics[0];
 
-    expect(wrapper.findAll(EpicItem).length).toBe(mockEpics.length);
+    expect(store.state.childrenFlags[epic.id].itemExpanded).toBe(false);
 
-    wrapper.vm.toggleIsEpicExpanded(epic.id);
+    wrapper.vm.toggleIsEpicExpanded(epic);
 
-    wrapper.vm
-      .$nextTick()
-      .then(() => {
-        const expected = mockEpics.length + epic.children.edges.length;
-
-        expect(wrapper.findAll(EpicItem).length).toBe(expected);
-      })
-      .then(done)
-      .catch(done.fail);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(store.state.childrenFlags[epic.id].itemExpanded).toBe(true);
+    });
   });
 });

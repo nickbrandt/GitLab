@@ -160,7 +160,9 @@ export default {
       </div>
       <div
         class="linked-issues-card-body bg-gray-light"
-        :class="{ 'gl-p-3': isFormVisible || shouldShowTokenBody }"
+        :class="{
+          'gl-p-3-deprecated-no-really-do-not-use-me': isFormVisible || shouldShowTokenBody,
+        }"
       >
         <div
           v-if="isFormVisible"

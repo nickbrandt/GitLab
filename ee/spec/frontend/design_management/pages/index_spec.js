@@ -210,7 +210,7 @@ describe('Design management index page', () => {
                 },
                 discussions: {
                   __typename: 'DesignDiscussion',
-                  edges: [],
+                  nodes: [],
                 },
                 versions: {
                   __typename: 'DesignVersionConnection',
@@ -379,7 +379,7 @@ describe('Design management index page', () => {
     });
 
     it('renders design checkboxes', () => {
-      expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
+      expect(findDesignCheckboxes()).toHaveLength(mockDesigns.length);
     });
 
     it('renders toolbar buttons', () => {
@@ -460,7 +460,7 @@ describe('Design management index page', () => {
     });
 
     it('does not render design checkboxes', () => {
-      expect(findDesignCheckboxes().length).toBe(0);
+      expect(findDesignCheckboxes()).toHaveLength(0);
     });
 
     it('does not render Delete selected button', () => {
@@ -502,6 +502,20 @@ describe('Design management index page', () => {
       expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
       expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith([
         new File([{ name: 'image.png' }], 'test.png'),
+      ]);
+    });
+
+    it('renames a design if it has an image.png filename', () => {
+      event.clipboardData = {
+        files: [{ name: 'image.png', type: 'image/png' }],
+        getData: () => 'image.png',
+      };
+
+      document.dispatchEvent(event);
+
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledTimes(1);
+      expect(wrapper.vm.onUploadDesign).toHaveBeenCalledWith([
+        new File([{ name: 'image.png' }], `design_${Date.now()}.png`),
       ]);
     });
 

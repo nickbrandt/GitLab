@@ -180,22 +180,6 @@ describe Snippet do
     end
   end
 
-  describe '.search_code' do
-    let(:snippet) { create(:snippet, content: 'class Foo; end') }
-
-    it 'returns snippets with matching content' do
-      expect(described_class.search_code(snippet.content)).to eq([snippet])
-    end
-
-    it 'returns snippets with partially matching content' do
-      expect(described_class.search_code('class')).to eq([snippet])
-    end
-
-    it 'returns snippets with matching content regardless of the casing' do
-      expect(described_class.search_code('FOO')).to eq([snippet])
-    end
-  end
-
   describe 'when default snippet visibility set to internal' do
     using RSpec::Parameterized::TableSyntax
 
@@ -545,11 +529,11 @@ describe Snippet do
     let(:snippet) { build(:snippet) }
 
     it 'excludes secret_token from generated json' do
-      expect(JSON.parse(to_json).keys).not_to include("secret_token")
+      expect(Gitlab::Json.parse(to_json).keys).not_to include("secret_token")
     end
 
     it 'does not override existing exclude option value' do
-      expect(JSON.parse(to_json(except: [:id])).keys).not_to include("secret_token", "id")
+      expect(Gitlab::Json.parse(to_json(except: [:id])).keys).not_to include("secret_token", "id")
     end
 
     def to_json(params = {})

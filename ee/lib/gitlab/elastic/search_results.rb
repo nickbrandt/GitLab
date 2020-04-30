@@ -29,7 +29,7 @@ module Gitlab
         when 'projects'
           eager_load(projects, page, eager: [:route, :namespace, :compliance_framework_setting])
         when 'issues'
-          eager_load(issues, page, eager: { project: [:route, :namespace] })
+          eager_load(issues, page, eager: { project: [:route, :namespace], labels: [], timelogs: [], assignees: [] })
         when 'merge_requests'
           eager_load(merge_requests, page, eager: { target_project: [:route, :namespace] })
         when 'milestones'

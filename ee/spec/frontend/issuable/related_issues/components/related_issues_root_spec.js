@@ -68,7 +68,7 @@ describe('RelatedIssuesRoot', () => {
         wrapper.vm.onRelatedIssueRemoveRequest(issuable1.id);
 
         return axios.waitForAll().then(() => {
-          expect(wrapper.vm.state.relatedIssues.length).toEqual(1);
+          expect(wrapper.vm.state.relatedIssues).toHaveLength(1);
           expect(wrapper.vm.state.relatedIssues[0].id).toEqual(issuable1.id);
         });
       });
@@ -100,11 +100,11 @@ describe('RelatedIssuesRoot', () => {
       );
 
       it('remove pending related issue', () => {
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(1);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(1);
 
         wrapper.vm.onPendingIssueRemoveRequest(0);
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(0);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(0);
       });
     });
 
@@ -140,8 +140,8 @@ describe('RelatedIssuesRoot', () => {
         wrapper.vm.onPendingFormSubmit({});
 
         return waitForPromises().then(() => {
-          expect(wrapper.vm.state.pendingReferences.length).toEqual(0);
-          expect(wrapper.vm.state.relatedIssues.length).toEqual(0);
+          expect(wrapper.vm.state.pendingReferences).toHaveLength(0);
+          expect(wrapper.vm.state.relatedIssues).toHaveLength(0);
         });
       });
 
@@ -158,8 +158,8 @@ describe('RelatedIssuesRoot', () => {
         wrapper.vm.onPendingFormSubmit({});
 
         return waitForPromises().then(() => {
-          expect(wrapper.vm.state.pendingReferences.length).toEqual(0);
-          expect(wrapper.vm.state.relatedIssues.length).toEqual(1);
+          expect(wrapper.vm.state.pendingReferences).toHaveLength(0);
+          expect(wrapper.vm.state.relatedIssues).toHaveLength(1);
           expect(wrapper.vm.state.relatedIssues[0].id).toEqual(issuable1.id);
         });
       });
@@ -177,8 +177,8 @@ describe('RelatedIssuesRoot', () => {
         wrapper.vm.onPendingFormSubmit({});
 
         return waitForPromises().then(() => {
-          expect(wrapper.vm.state.pendingReferences.length).toEqual(0);
-          expect(wrapper.vm.state.relatedIssues.length).toEqual(2);
+          expect(wrapper.vm.state.pendingReferences).toHaveLength(0);
+          expect(wrapper.vm.state.relatedIssues).toHaveLength(2);
           expect(wrapper.vm.state.relatedIssues[0].id).toEqual(issuable1.id);
           expect(wrapper.vm.state.relatedIssues[1].id).toEqual(issuable2.id);
         });
@@ -214,7 +214,7 @@ describe('RelatedIssuesRoot', () => {
         return wrapper.vm.$nextTick().then(() => {
           expect(wrapper.vm.isFormVisible).toEqual(false);
           expect(wrapper.vm.inputValue).toEqual('');
-          expect(wrapper.vm.state.pendingReferences.length).toEqual(0);
+          expect(wrapper.vm.state.pendingReferences).toHaveLength(0);
         });
       });
     });
@@ -238,7 +238,7 @@ describe('RelatedIssuesRoot', () => {
         wrapper.vm.fetchRelatedIssues();
 
         return waitForPromises().then(() => {
-          expect(wrapper.vm.state.relatedIssues.length).toEqual(2);
+          expect(wrapper.vm.state.relatedIssues).toHaveLength(2);
           expect(wrapper.vm.state.relatedIssues[0].id).toEqual(issuable1.id);
           expect(wrapper.vm.state.relatedIssues[1].id).toEqual(issuable2.id);
         });
@@ -255,7 +255,7 @@ describe('RelatedIssuesRoot', () => {
           touchedReference: input,
         });
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(1);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(1);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('#123');
       });
 
@@ -263,7 +263,7 @@ describe('RelatedIssuesRoot', () => {
         const input = 'asdf/qwer#444 ';
         wrapper.vm.onInput({ untouchedRawReferences: [input.trim()], touchedReference: input });
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(1);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(1);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('asdf/qwer#444');
       });
 
@@ -272,7 +272,7 @@ describe('RelatedIssuesRoot', () => {
         const input = `${link} `;
         wrapper.vm.onInput({ untouchedRawReferences: [input.trim()], touchedReference: input });
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(1);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(1);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual(link);
       });
 
@@ -283,7 +283,7 @@ describe('RelatedIssuesRoot', () => {
           touchedReference: 2,
         });
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(2);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(2);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('asdf/qwer#444');
         expect(wrapper.vm.state.pendingReferences[1]).toEqual('#12');
       });
@@ -295,7 +295,7 @@ describe('RelatedIssuesRoot', () => {
           touchedReference: 2,
         });
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(2);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(2);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('something');
         expect(wrapper.vm.state.pendingReferences[1]).toEqual('random');
       });
@@ -324,7 +324,7 @@ describe('RelatedIssuesRoot', () => {
         const input = '#123';
         wrapper.vm.processAllReferences(input);
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(1);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(1);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('#123');
       });
 
@@ -332,7 +332,7 @@ describe('RelatedIssuesRoot', () => {
         const input = 'asdf #123';
         wrapper.vm.processAllReferences(input);
 
-        expect(wrapper.vm.state.pendingReferences.length).toEqual(2);
+        expect(wrapper.vm.state.pendingReferences).toHaveLength(2);
         expect(wrapper.vm.state.pendingReferences[0]).toEqual('asdf');
         expect(wrapper.vm.state.pendingReferences[1]).toEqual('#123');
       });

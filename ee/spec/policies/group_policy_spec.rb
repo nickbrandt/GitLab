@@ -739,4 +739,102 @@ describe GroupPolicy do
       end
     end
   end
+
+  describe 'update_default_branch_protection' do
+    context 'for an admin' do
+      let(:current_user) { admin }
+
+      context 'when the `default_branch_protection_restriction_in_groups` feature is available' do
+        before do
+          stub_licensed_features(default_branch_protection_restriction_in_groups: true)
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is enabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: true)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is disabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: false)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+      end
+
+      context 'when the `default_branch_protection_restriction_in_groups` feature is not available' do
+        before do
+          stub_licensed_features(default_branch_protection_restriction_in_groups: false)
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is enabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: true)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is disabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: false)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+      end
+    end
+
+    context 'for an owner' do
+      let(:current_user) { owner }
+
+      context 'when the `default_branch_protection_restriction_in_groups` feature is available' do
+        before do
+          stub_licensed_features(default_branch_protection_restriction_in_groups: true)
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is enabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: true)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is disabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: false)
+          end
+
+          it { is_expected.to be_disallowed(:update_default_branch_protection) }
+        end
+      end
+
+      context 'when the `default_branch_protection_restriction_in_groups` feature is not available' do
+        before do
+          stub_licensed_features(default_branch_protection_restriction_in_groups: false)
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is enabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: true)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+
+        context 'when the setting `group_owners_can_manage_default_branch_protection` is disabled' do
+          before do
+            stub_ee_application_setting(group_owners_can_manage_default_branch_protection: false)
+          end
+
+          it { is_expected.to be_allowed(:update_default_branch_protection) }
+        end
+      end
+    end
+  end
 end

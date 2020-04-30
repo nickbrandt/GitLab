@@ -25,27 +25,25 @@ export default {
     },
   },
   discussions: {
-    edges: [
+    nodes: [
       {
-        node: {
-          id: 'discussion-id',
-          replyId: 'discussion-reply-id',
-          notes: {
-            edges: [
-              {
-                node: {
-                  id: 'note-id',
-                  body: '123',
-                  author: {
-                    name: 'Administrator',
-                    username: 'root',
-                    webUrl: 'link-to-author',
-                    avatarUrl: 'link-to-avatar',
-                  },
+        id: 'discussion-id',
+        replyId: 'discussion-reply-id',
+        notes: {
+          edges: [
+            {
+              node: {
+                id: 'note-id',
+                body: '123',
+                author: {
+                  name: 'Administrator',
+                  username: 'root',
+                  webUrl: 'link-to-author',
+                  avatarUrl: 'link-to-avatar',
                 },
               },
-            ],
-          },
+            },
+          ],
         },
       },
     ],

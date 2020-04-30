@@ -111,6 +111,13 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating `group_owners_can_manage_default_branch_protection` setting' do
+      let(:settings) { { group_owners_can_manage_default_branch_protection: false } }
+      let(:feature) { :default_branch_protection_restriction_in_groups }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'updating npm packages request forwarding setting' do
       let(:settings) { { npm_package_requests_forwarding: true } }
       let(:feature) { :packages }

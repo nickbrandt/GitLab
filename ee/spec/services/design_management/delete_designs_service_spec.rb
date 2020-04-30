@@ -91,6 +91,12 @@ describe DesignManagement::DeleteDesignsService do
           expect { run_service }.to change { counter.read(:delete) }.by(1)
         end
 
+        it 'informs the new-version-worker' do
+          expect(::DesignManagement::NewVersionWorker).to receive(:perform_async).with(Integer)
+
+          run_service
+        end
+
         it 'creates a new verison' do
           expect { run_service }.to change { DesignManagement::Version.where(issue: issue).count }.by(1)
         end

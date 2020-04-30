@@ -27,7 +27,7 @@ describe('burndown_chart', () => {
       });
 
       const data = wrapper.vm.dataSeries;
-      expect(data.length).toBe(1);
+      expect(data).toHaveLength(1);
       expect(data[0].name).not.toBe('Guideline');
     });
   });
@@ -43,7 +43,7 @@ describe('burndown_chart', () => {
       });
 
       const data = wrapper.vm.dataSeries;
-      expect(data.length).toBe(2);
+      expect(data).toHaveLength(2);
       expect(data[1].name).toBe('Guideline');
     });
   });

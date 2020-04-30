@@ -570,9 +570,10 @@ To enable Fluentd:
 1. Provide the host domain name or URL in **SIEM Hostname**.
 1. Provide the host port number in **SIEM Port**.
 1. Select a **SIEM Protocol**.
+1. Select at least one of the available logs (such as WAF or Cilium).
 1. Click **Save changes**.
 
-![Fluentd input fields](img/fluentd_v12_10.png)
+![Fluentd input fields](img/fluentd_v13_0.png)
 
 ### Future apps
 
@@ -1023,11 +1024,11 @@ In addition, the following variables must be specified using [CI variables](../.
 
 | CI Variable                            | Description                                                                                                                                                         |
 |:---------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `JUPYTERHUB_PROXY_SECRET_TOKEN`        | Sets [`proxy.secretToken`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference.html#proxy-secrettoken). Generate using `openssl rand -hex 32`.             |
-| `JUPYTERHUB_COOKIE_SECRET`             | Sets [`hub.cookieSecret`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference.html#hub-cookiesecret). Generate using `openssl rand -hex 32`.               |
+| `JUPYTERHUB_PROXY_SECRET_TOKEN`        | Secure string used for signing communications from the hub. See[`proxy.secretToken`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference/reference.html#proxy-secrettoken).             |
+| `JUPYTERHUB_COOKIE_SECRET`             | Secure string used for signing secure cookies. See [`hub.cookieSecret`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference/reference.html#hub-cookiesecret).               |
 | `JUPYTERHUB_HOST`                      | Hostname used for the installation. For example, `jupyter.gitlab.example.com`.                                                                                      |
 | `JUPYTERHUB_GITLAB_HOST`               | Hostname of the GitLab instance used for authentication. For example, `gitlab.example.com`.                                                                         |
-| `JUPYTERHUB_AUTH_CRYPTO_KEY`           | Sets [`auth.state.cryptoKey`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference.html#auth-state-cryptokey). Generate using `openssl rand -hex 32`. |
+| `JUPYTERHUB_AUTH_CRYPTO_KEY`           | A 32-byte encryption key used to set [`auth.state.cryptoKey`](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference/reference.html#auth-state-cryptokey). |
 | `JUPYTERHUB_AUTH_GITLAB_CLIENT_ID`     | "Application ID" for the OAuth Application.                                                                                                                         |
 | `JUPYTERHUB_AUTH_GITLAB_CLIENT_SECRET` | "Secret" for the OAuth Application.                                                                                                                                 |
 

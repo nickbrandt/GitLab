@@ -58,15 +58,12 @@ export default {
           />
         </span>
         <span class="inline">
-          <span
-            v-if="node.current"
-            class="rounded-pill gl-font-size-12 p-1 text-white bg-success-400"
-          >
+          <span v-if="node.current" class="rounded-pill gl-font-sm p-1 text-white bg-success-400">
             {{ s__('Current node') }}
           </span>
           <span
             v-if="node.primary"
-            class="ml-1 rounded-pill gl-font-size-12 p-1 text-white bg-primary-600"
+            class="ml-1 rounded-pill gl-font-sm p-1 text-white bg-primary-600"
           >
             {{ s__('Primary') }}
           </span>

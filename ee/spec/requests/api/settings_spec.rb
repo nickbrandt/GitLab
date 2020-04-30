@@ -143,6 +143,13 @@ describe API::Settings, 'EE Settings' do
     it_behaves_like 'settings for licensed features'
   end
 
+  context 'group_owners_can_manage_default_branch_protection setting' do
+    let(:settings) { { group_owners_can_manage_default_branch_protection: false } }
+    let(:feature) { :default_branch_protection_restriction_in_groups }
+
+    it_behaves_like 'settings for licensed features'
+  end
+
   context 'deletion adjourned period' do
     let(:settings) { { deletion_adjourned_period: 5 } }
     let(:feature) { :adjourned_deletion_for_projects_and_groups }

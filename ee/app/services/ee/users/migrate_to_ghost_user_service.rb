@@ -7,7 +7,7 @@ module EE
 
       def migrate_records
         migrate_epics
-        migrate_requirements
+        migrate_requirements_management_requirements
         migrate_vulnerabilities_feedback
         migrate_reviews
         super
@@ -20,7 +20,7 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def migrate_requirements
+      def migrate_requirements_management_requirements
         user.requirements.update_all(author_id: ghost_user.id)
       end
 

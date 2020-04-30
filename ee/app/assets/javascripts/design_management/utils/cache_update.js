@@ -1,3 +1,5 @@
+/* eslint-disable @gitlab/require-i18n-strings */
+
 import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
 import {
@@ -53,13 +55,7 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
 
   const design = extractDesign(data);
   const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
-  currentDiscussion.node.notes.edges = [
-    ...currentDiscussion.node.notes.edges,
-    {
-      __typename: 'NoteEdge',
-      node: createNote.note,
-    },
-  ];
+  currentDiscussion.notes.nodes = [...currentDiscussion.notes.nodes, createNote.note];
 
   design.notesCount += 1;
   if (
@@ -72,7 +68,6 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
       {
         __typename: 'UserEdge',
         node: {
-          // eslint-disable-next-line @gitlab/require-i18n-strings
           __typename: 'User',
           ...createNote.note.author,
         },
@@ -97,27 +92,17 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
     variables,
   });
   const newDiscussion = {
-    __typename: 'DiscussionEdge',
-    node: {
-      // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-      // eslint-disable-next-line @gitlab/require-i18n-strings
-      __typename: 'Discussion',
-      id: createImageDiffNote.note.discussion.id,
-      replyId: createImageDiffNote.note.discussion.replyId,
-      notes: {
-        __typename: 'NoteConnection',
-        edges: [
-          {
-            __typename: 'NoteEdge',
-            node: createImageDiffNote.note,
-          },
-        ],
-      },
+    __typename: 'Discussion',
+    id: createImageDiffNote.note.discussion.id,
+    replyId: createImageDiffNote.note.discussion.replyId,
+    notes: {
+      __typename: 'NoteConnection',
+      nodes: [createImageDiffNote.note],
     },
   };
   const design = extractDesign(data);
   const notesCount = design.notesCount + 1;
-  design.discussions.edges = [...design.discussions.edges, newDiscussion];
+  design.discussions.nodes = [...design.discussions.nodes, newDiscussion];
   if (
     !design.issue.participants.edges.some(
       participant => participant.node.username === createImageDiffNote.note.author.username,
@@ -128,7 +113,6 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
       {
         __typename: 'UserEdge',
         node: {
-          // eslint-disable-next-line @gitlab/require-i18n-strings
           __typename: 'User',
           ...createImageDiffNote.note.author,
         },
@@ -160,19 +144,9 @@ const updateImageDiffNoteInStore = (store, updateImageDiffNote, query, variables
     updateImageDiffNote.note.discussion.id,
   );
 
-  discussion.node = {
-    ...discussion.node,
-    notes: {
-      ...discussion.node.notes,
-      edges: [
-        // the first note is original discussion, and includes the pin `position`
-        {
-          __typename: 'NoteEdge',
-          node: updateImageDiffNote.note,
-        },
-        ...discussion.node.notes.edges.slice(1),
-      ],
-    },
+  discussion.notes = {
+    ...discussion.notes,
+    nodes: [updateImageDiffNote.note, ...discussion.notes.nodes.slice(1)],
   };
 
   store.writeQuery({

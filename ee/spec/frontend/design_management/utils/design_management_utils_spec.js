@@ -5,7 +5,11 @@ import {
   designUploadOptimisticResponse,
   updateImageDiffNoteOptimisticResponse,
   isValidDesignFile,
+  extractDesign,
 } from 'ee/design_management/utils/design_management_utils';
+import mockResponseNoDesigns from '../mock_data/no_designs';
+import mockResponseWithDesigns from '../mock_data/designs';
+import mockDesign from '../mock_data/design';
 
 jest.mock('lodash/uniqueId', () => () => 1);
 
@@ -14,20 +18,18 @@ describe('extractCurrentDiscussion', () => {
 
   beforeEach(() => {
     discussions = {
-      edges: [
-        { node: { id: 101, payload: 'w' } },
-        { node: { id: 102, payload: 'x' } },
-        { node: { id: 103, payload: 'y' } },
-        { node: { id: 104, payload: 'z' } },
+      nodes: [
+        { id: 101, payload: 'w' },
+        { id: 102, payload: 'x' },
+        { id: 103, payload: 'y' },
+        { id: 104, payload: 'z' },
       ],
     };
   });
 
   it('finds the relevant discussion if it exists', () => {
     const id = 103;
-    expect(extractCurrentDiscussion(discussions, id)).toEqual({
-      node: { id, payload: 'y' },
-    });
+    expect(extractCurrentDiscussion(discussions, id)).toEqual({ id, payload: 'y' });
   });
 
   it('returns null if the relevant discussion does not exist', () => {
@@ -40,11 +42,11 @@ describe('extractDiscussions', () => {
 
   beforeEach(() => {
     discussions = {
-      edges: [
-        { node: { id: 1, notes: { edges: [{ node: 'a' }] } } },
-        { node: { id: 2, notes: { edges: [{ node: 'b' }] } } },
-        { node: { id: 3, notes: { edges: [{ node: 'c' }] } } },
-        { node: { id: 4, notes: { edges: [{ node: 'd' }] } } },
+      nodes: [
+        { id: 1, notes: { nodes: ['a'] } },
+        { id: 2, notes: { nodes: ['b'] } },
+        { id: 3, notes: { nodes: ['c'] } },
+        { id: 4, notes: { nodes: ['d'] } },
       ],
     };
   });
@@ -91,7 +93,7 @@ describe('optimistic responses', () => {
             notesCount: 0,
             event: 'NONE',
             diffRefs: { __typename: 'DiffRefs', baseSha: '', startSha: '', headSha: '' },
-            discussions: { __typename: 'DesignDiscussion', edges: [] },
+            discussions: { __typename: 'DesignDiscussion', nodes: [] },
             versions: {
               __typename: 'DesignVersionConnection',
               edges: {
@@ -154,7 +156,21 @@ describe('isValidDesignFile', () => {
     ${'video/mpeg'}               | ${false}
     ${'audio/midi'}               | ${false}
     ${'application/octet-stream'} | ${false}
-  `('returns $valid for file type $mimetype', ({ mimetype, isValid }) => {
+  `('returns $isValid for file type $mimetype', ({ mimetype, isValid }) => {
     expect(isValidDesignFile({ type: mimetype })).toBe(isValid);
+  });
+});
+
+describe('extractDesign', () => {
+  describe('with no designs', () => {
+    it('returns undefined', () => {
+      expect(extractDesign(mockResponseNoDesigns)).toBeUndefined();
+    });
+  });
+
+  describe('with designs', () => {
+    it('returns the first design available', () => {
+      expect(extractDesign(mockResponseWithDesigns)).toEqual(mockDesign);
+    });
   });
 });

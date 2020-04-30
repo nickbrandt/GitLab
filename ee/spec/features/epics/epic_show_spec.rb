@@ -72,8 +72,8 @@ describe 'Epic show', :js do
 
           page.within('.roadmap-shell .epics-list-section') do
             expect(page).not_to have_content(not_child.title)
-            expect(find('.epics-list-item:nth-child(1) .epic-title')).to have_content('Child epic B')
-            expect(find('.epics-list-item:nth-child(2) .epic-title')).to have_content('Child epic A')
+            expect(find('.epic-item-container:nth-child(1) .epics-list-item .epic-title')).to have_content('Child epic B')
+            expect(find('.epic-item-container:nth-child(2) .epics-list-item .epic-title')).to have_content('Child epic A')
           end
         end
       end

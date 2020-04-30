@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlIcon } from '@gitlab/ui';
 import geoNodeHealthStatusComponent from 'ee/geo_nodes/components/geo_node_health_status.vue';
 import { HEALTH_STATUS_ICON, HEALTH_STATUS_CLASS } from 'ee/geo_nodes/constants';
 import { mockNodeDetails } from '../mock_data';
@@ -9,6 +9,7 @@ describe('GeoNodeHealthStatusComponent', () => {
 
   const defaultProps = {
     status: mockNodeDetails.health,
+    statusCheckTimestamp: mockNodeDetails.statusCheckTimestamp,
   };
 
   const createComponent = (props = {}) => {
@@ -26,7 +27,7 @@ describe('GeoNodeHealthStatusComponent', () => {
   });
 
   const findStatusPill = () => wrapper.find('.rounded-pill');
-  const findStatusIcon = () => findStatusPill().find(Icon);
+  const findStatusIcon = () => findStatusPill().find(GlIcon);
 
   describe.each`
     status         | healthCssClass                   | statusIconName

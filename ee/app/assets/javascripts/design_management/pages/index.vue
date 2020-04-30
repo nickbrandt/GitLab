@@ -10,7 +10,7 @@ import DesignVersionDropdown from '../components/upload/design_version_dropdown.
 import DesignDropzone from '../components/upload/design_dropzone.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
-import projectQuery from '../graphql/queries/project.query.graphql';
+import getDesignListQuery from '../graphql/queries/get_design_list.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
 import {
   UPLOAD_DESIGN_ERROR,
@@ -87,7 +87,7 @@ export default {
     },
     projectQueryBody() {
       return {
-        query: projectQuery,
+        query: getDesignListQuery,
         variables: { fullPath: this.projectPath, iid: this.issueIid, atVersion: null },
       };
     },
@@ -230,7 +230,10 @@ export default {
           return;
         }
         event.preventDefault();
-        const filename = getFilename(event) || 'image.png';
+        let filename = getFilename(event);
+        if (!filename || filename === 'image.png') {
+          filename = `design_${Date.now()}.png`;
+        }
         const newFile = new File([files[0]], filename);
         this.onUploadDesign([newFile]);
       }

@@ -3,6 +3,8 @@
 class InstanceSecurityDashboard
   extend ActiveModel::Naming
 
+  delegate :full_path, to: :user
+
   def initialize(user, project_ids: [])
     @project_ids = project_ids
     @user = user

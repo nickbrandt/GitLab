@@ -183,12 +183,6 @@ module Elastic
         indexes :last_activity_at, type: :date
         indexes :last_pushed_at, type: :date
 
-        ### SNIPPETS
-        indexes :file_name, type: :text,
-          index_options: 'positions'
-        indexes :content, type: :text,
-          index_options: 'positions'
-
         ### REPOSITORIES
         indexes :blob do
           indexes :type, type: :keyword

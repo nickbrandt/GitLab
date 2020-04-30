@@ -43,15 +43,29 @@ describe "Admin views license" do
       end
     end
 
-    context "when viewing license history" do
+    context "when viewing license history", :aggregate_failures do
       let_it_be(:license) { create(:license) }
 
       it "shows licensee" do
         license_history = page.find("#license_history")
 
-        License.previous.each do |license|
+        License.all.each do |license|
           expect(license_history).to have_content(license.licensee.each_value.first)
         end
+      end
+
+      it "highlights the current license with a css class", :aggregate_failures do
+        license_history = page.find("#license_history")
+        highlighted_license_row = license_history.find("[data-testid='license-current']")
+
+        expect(highlighted_license_row).to have_content(license.licensee[:name])
+        expect(highlighted_license_row).to have_content(license.licensee[:email])
+        expect(highlighted_license_row).to have_content(license.licensee[:company])
+        expect(highlighted_license_row).to have_content(license.plan.capitalize)
+        expect(highlighted_license_row).to have_content(license.created_at)
+        expect(highlighted_license_row).to have_content(license.starts_at)
+        expect(highlighted_license_row).to have_content(license.expires_at)
+        expect(highlighted_license_row).to have_content(license.restrictions[:active_user_count])
       end
     end
   end

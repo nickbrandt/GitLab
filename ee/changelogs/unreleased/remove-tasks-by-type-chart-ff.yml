@@ -1,0 +1,5 @@
+---
+title: Remove tasks_by_type_chart feature flag
+merge_request: 30034
+author:
+type: changed

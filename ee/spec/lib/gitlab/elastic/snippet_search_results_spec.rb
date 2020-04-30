@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_need_inline do
-  let(:snippet) { create(:personal_snippet, content: 'foo', file_name: 'foo') }
+  let(:snippet) { create(:personal_snippet, title: 'foo', description: 'foo') }
   let(:results) { described_class.new(snippet.author, 'foo', []) }
 
   before do
@@ -19,18 +19,11 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     end
   end
 
-  describe '#snippet_blobs_count' do
-    it 'returns the amount of matched snippet blobs' do
-      expect(results.snippet_blobs_count).to eq(1)
-    end
-  end
-
   context 'when user is not author' do
     let(:results) { described_class.new(create(:user), 'foo', []) }
 
     it 'returns nothing' do
       expect(results.snippet_titles_count).to eq(0)
-      expect(results.snippet_blobs_count).to eq(0)
     end
   end
 
@@ -39,15 +32,13 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
 
     it 'returns nothing' do
       expect(results.snippet_titles_count).to eq(0)
-      expect(results.snippet_blobs_count).to eq(0)
     end
 
     context 'when snippet is public' do
-      let(:snippet) { create(:personal_snippet, :public, content: 'foo', file_name: 'foo') }
+      let(:snippet) { create(:personal_snippet, :public, title: 'foo', description: 'foo') }
 
       it 'returns public snippet' do
         expect(results.snippet_titles_count).to eq(1)
-        expect(results.snippet_blobs_count).to eq(1)
       end
     end
   end
@@ -61,7 +52,6 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     context 'admin mode disabled' do
       it 'returns nothing' do
         expect(results.snippet_titles_count).to eq(0)
-        expect(results.snippet_blobs_count).to eq(0)
       end
     end
 
@@ -73,18 +63,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
 
       it 'returns matched snippets' do
         expect(results.snippet_titles_count).to eq(1)
-        expect(results.snippet_blobs_count).to eq(1)
       end
-    end
-  end
-
-  context 'when content is too long' do
-    let(:content) { "abc" + (" " * Elastic::Latest::SnippetInstanceProxy::MAX_INDEX_SIZE) + "xyz" }
-    let(:snippet) { create(:personal_snippet, :public, content: content) }
-
-    it 'indexes up to a limit' do
-      expect(described_class.new(nil, 'abc', []).snippet_blobs_count).to eq(1)
-      expect(described_class.new(nil, 'xyz', []).snippet_blobs_count).to eq(0)
     end
   end
 end

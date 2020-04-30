@@ -5,12 +5,10 @@ module Gitlab
     # Normally each analytics feature should be guarded with a feature flag.
     CYCLE_ANALYTICS_FEATURE_FLAG = :cycle_analytics
     PRODUCTIVITY_ANALYTICS_FEATURE_FLAG = :productivity_analytics
-    TASKS_BY_TYPE_CHART_FEATURE_FLAG = :tasks_by_type_chart
 
     FEATURE_FLAGS = [
       CYCLE_ANALYTICS_FEATURE_FLAG,
-      PRODUCTIVITY_ANALYTICS_FEATURE_FLAG,
-      TASKS_BY_TYPE_CHART_FEATURE_FLAG
+      PRODUCTIVITY_ANALYTICS_FEATURE_FLAG
     ].freeze
 
     FEATURE_FLAG_DEFAULTS = {

@@ -1,4 +1,4 @@
-import projectQuery from '../graphql/queries/project.query.graphql';
+import getDesignListQuery from '../graphql/queries/get_design_list.query.graphql';
 import appDataQuery from '../graphql/queries/appData.query.graphql';
 import { findVersionId } from '../utils/design_management_utils';
 
@@ -13,7 +13,7 @@ export default {
       },
     },
     allVersions: {
-      query: projectQuery,
+      query: getDesignListQuery,
       variables() {
         return {
           fullPath: this.projectPath,

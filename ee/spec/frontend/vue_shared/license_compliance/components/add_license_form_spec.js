@@ -99,7 +99,7 @@ describe('AddLicenseForm', () => {
     it('renders the license approval radio buttons dropdown', () => {
       const radioButtonParents = vm.$el.querySelectorAll('.form-check');
 
-      expect(radioButtonParents.length).toBe(2);
+      expect(radioButtonParents).toHaveLength(2);
       expect(radioButtonParents[0].innerText.trim()).toBe('Allow');
       expect(radioButtonParents[0].querySelector('.form-check-input')).not.toBeNull();
       expect(radioButtonParents[1].innerText.trim()).toBe('Deny');

@@ -12,6 +12,8 @@ module Gitlab
     class Replicator
       include ::Gitlab::Geo::LogHelpers
 
+      CLASS_SUFFIXES = %w(RegistryFinder RegistriesResolver).freeze
+
       attr_reader :model_record_id
       delegate :model, to: :class
 
@@ -63,6 +65,14 @@ module Gitlab
         const_get("::Geo::#{replicable_name.camelize}Registry", false)
       end
 
+      def self.registry_finder_class
+        const_get("::Geo::#{replicable_name.camelize}RegistryFinder", false)
+      end
+
+      def self.graphql_registry_type
+        const_get("::Types::Geo::#{replicable_name.camelize}RegistryType", false)
+      end
+
       # Given a `replicable_name`, return the corresponding replicator
       #
       # @param [String] replicable_name the replicable slug
@@ -87,6 +97,21 @@ module Gitlab
 
       def self.primary_total_count
         model.count
+      end
+
+      # @example Given `Geo::PackageFileRegistryFinder`, this returns
+      #   `::Geo::PackageFileReplicator`
+      # @example Given `Resolver::Geo::PackageFileRegistriesResolver`, this
+      #   returns `::Geo::PackageFileReplicator`
+      #
+      # @return [Class] a Replicator subclass
+      def self.for_class_name(class_name)
+        name = class_name.demodulize
+
+        # Strip suffixes is dumb but will probably work for a while
+        CLASS_SUFFIXES.each { |suffix| name.delete_suffix!(suffix) }
+
+        const_get("::Geo::#{name}Replicator", false)
       end
 
       # @param [ActiveRecord::Base] model_record

@@ -74,7 +74,7 @@ describe('GeoNodeEventStatus', () => {
       });
 
       expect(vmWithoutTimestamp.$el.querySelectorAll('strong').length).not.toBe(0);
-      expect(vmWithoutTimestamp.$el.querySelectorAll('.event-status-timestamp').length).toBe(0);
+      expect(vmWithoutTimestamp.$el.querySelectorAll('.event-status-timestamp')).toHaveLength(0);
       expect(vmWithoutTimestamp.$el.querySelector('strong').innerText.trim()).toBe('Not available');
       vmWithoutTimestamp.$destroy();
     });

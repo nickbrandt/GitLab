@@ -234,7 +234,7 @@ describe('EpicSidebarComponent', () => {
 
             expect(ancestorsEl).not.toBeNull();
 
-            expect(getEls('li.vertical-timeline-row').length).toBe(reverseAncestors.length);
+            expect(getEls('li.vertical-timeline-row')).toHaveLength(reverseAncestors.length);
 
             expect(getEls('a').map(el => el.innerText.trim())).toEqual(
               reverseAncestors.map(a => a.title),

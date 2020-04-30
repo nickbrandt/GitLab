@@ -4,7 +4,6 @@ import createFlash from '~/flash';
 import Api from 'ee/api';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { STEPS, PAYMENT_FORM_ID } from '../constants';
-import Tracking from '~/tracking';
 
 export const activateStep = ({ commit }, currentStep) => {
   if (STEPS.includes(currentStep)) {
@@ -188,8 +187,6 @@ export const confirmOrder = ({ getters, dispatch, commit }) => {
       if (data.location) {
         dispatch('confirmOrderSuccess', {
           location: data.location,
-          plan_id: data.plan_id,
-          quantity: data.quantity,
         });
       } else {
         dispatch('confirmOrderError', JSON.stringify(data.errors));
@@ -198,13 +195,7 @@ export const confirmOrder = ({ getters, dispatch, commit }) => {
     .catch(() => dispatch('confirmOrderError'));
 };
 
-export const confirmOrderSuccess = (_, { location, plan_id, quantity }) => {
-  Tracking.event('Growth::Acquisition::Experiment::PaidSignUpFlow', 'end', {
-    label: plan_id,
-    property: null,
-    value: quantity,
-  });
-
+export const confirmOrderSuccess = (_, { location }) => {
   redirectTo(location);
 };
 

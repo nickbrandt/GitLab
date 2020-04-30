@@ -14,7 +14,7 @@ module Analytics
 
       def summary
         @summary ||=
-          Gitlab::Analytics::CycleAnalytics::GroupStageSummary
+          Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary
             .new(group, options: options)
             .data
       end

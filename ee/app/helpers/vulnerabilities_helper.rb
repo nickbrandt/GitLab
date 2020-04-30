@@ -49,9 +49,13 @@ module VulnerabilitiesHelper
     finding = vulnerability.finding
     location = finding.location
     branch = finding.pipelines&.last&.sha || vulnerability.project.default_branch
-    link_text = "#{location['file']}:#{location['start_line']}"
-    offset = location['start_line'] ? "#L#{location['start_line']}" : ''
-    link_path = project_blob_path(vulnerability.project, tree_join(branch, location['file'])) + offset
+    link_text = location['file']
+    link_path = project_blob_path(vulnerability.project, tree_join(branch, location['file']))
+
+    if location['start_line']
+      link_text += ":#{location['start_line']}"
+      link_path += "#L#{location['start_line']}"
+    end
 
     link_to link_text, link_path, target: '_blank', rel: 'noopener noreferrer'
   end

@@ -55,6 +55,7 @@ CentOS
 Chatops
 Citrix
 Cloudwatch
+Cobertura
 Cognito
 colocated
 colocating
@@ -85,6 +86,7 @@ discoverability
 Disqus
 Dockerfile
 Dockerfiles
+dotenv
 downvoted
 downvotes
 Dpl
@@ -136,6 +138,7 @@ initializer
 initializers
 interdependencies
 interdependency
+interruptible
 Irker
 Istio
 jasmine-jquery
@@ -234,6 +237,7 @@ Qualys
 Rackspace
 Raketask
 Raketasks
+reachability
 rebase
 rebased
 rebases
@@ -292,6 +296,7 @@ Splunk
 SSH
 storable
 strace
+subpath
 subfolder
 subfolders
 sublicense
@@ -307,6 +312,8 @@ subqueried
 subqueries
 subquery
 subquerying
+substring
+substrings
 syslog
 Tiller
 todos
@@ -361,10 +368,12 @@ unreferenced
 unresolve
 unresolved
 unresolving
+unschedule
 unstage
 unstaged
 unstages
 unstaging
+untarred
 untracked
 untrusted
 unverified
