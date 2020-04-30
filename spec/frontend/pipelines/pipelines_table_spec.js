@@ -35,7 +35,7 @@ describe('Pipelines Table', () => {
 
   describe('table', () => {
     it('should render a table', () => {
-      expect(wrapper.attributes('class')).toContain('ci-table');
+      expect(wrapper.classes()).toContain('ci-table');
     });
 
     it('should render table head with correct columns', () => {
