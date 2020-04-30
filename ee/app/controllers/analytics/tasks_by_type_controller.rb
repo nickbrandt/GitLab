@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Analytics::TasksByTypeController < Analytics::ApplicationController
-  check_feature_flag Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG
-
   before_action :load_group
   before_action -> { check_feature_availability!(:type_of_work_analytics) }
   before_action -> { authorize_view_by_action!(:view_type_of_work_charts) }
