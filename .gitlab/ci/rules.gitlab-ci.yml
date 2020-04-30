@@ -58,6 +58,9 @@
 ####################
 # Changes patterns #
 ####################
+.ci-patterns: &ci-patterns
+  - ".gitlab/ci/**/*"
+
 .yaml-patterns: &yaml-patterns
   - "**/*.yml"
 
@@ -179,7 +182,7 @@
 .cache-repo:rules:
   rules:
     - <<: *if-cache-credentials-schedule
-      when: on_success
+      allow_failure: true
 
 #############
 # CNG rules #
@@ -188,6 +191,7 @@
   rules:
     - <<: *if-dot-com-gitlab-org-and-security-tag
       when: manual
+      allow_failure: true
 
 ######################
 # Dev fixtures rules #
@@ -214,6 +218,7 @@
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *docs-patterns
       when: manual
+      allow_failure: true
 
 .docs:rules:docs-lint:
   rules:
@@ -308,6 +313,15 @@
       changes: *frontend-dependency-patterns
       when: on_success
 
+.frontend:rules:qa-frontend-node-latest:
+  rules:
+    - <<: *if-master-refs
+      changes: *frontend-dependency-patterns
+      allow_failure: true
+    - <<: *if-merge-request
+      changes: *frontend-dependency-patterns
+      allow_failure: true
+
 ################
 # Memory rules #
 ################
@@ -348,13 +362,17 @@
 .qa:rules:package-and-qa:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *ci-patterns
+      allow_failure: true
+    - <<: *if-dot-com-gitlab-org-merge-request
       changes: *qa-patterns
-      when: on_success
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-patterns
       when: manual
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-schedule
-      when: on_success
+      allow_failure: true
 
 ###############
 # Rails rules #
@@ -433,6 +451,7 @@
     # - <<: *if-master-refs  # To be done in a later iteration: https://gitlab.com/gitlab-org/gitlab/issues/31160#note_278188255
     - <<: *if-default-refs
       changes: *code-backstage-patterns
+      allow_failure: true
 
 .reports:rules:sast:
   rules:
@@ -441,6 +460,7 @@
     # - <<: *if-master-refs  # To be done in a later iteration: https://gitlab.com/gitlab-org/gitlab/issues/31160#note_278188255
     - <<: *if-default-refs
       changes: *code-backstage-qa-patterns
+      allow_failure: true
 
 .reports:rules:dependency_scanning:
   rules:
@@ -449,6 +469,7 @@
     # - <<: *if-master-refs  # To be done in a later iteration: https://gitlab.com/gitlab-org/gitlab/issues/31160#note_278188255
     - <<: *if-default-refs
       changes: *code-backstage-qa-patterns
+      allow_failure: true
 
 .reports:rules:dast:
   rules:
@@ -456,10 +477,11 @@
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
-      when: on_success
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
+      allow_failure: true
 
 .reports:schedule-dast:
   rules:
@@ -470,59 +492,74 @@
 ################
 # Review rules #
 ################
-.review:rules:mr-and-schedule-auto:
+.review:rules:build-qa-image:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
-      when: on_success
     - <<: *if-dot-com-gitlab-org-schedule
-      when: on_success
 
-.review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
+.review:rules:review-build-cng:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *ci-patterns
+    - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
-      when: on_success
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
       allow_failure: true
     - <<: *if-dot-com-gitlab-org-schedule
-      when: on_success
 
-.review:rules:mr-only-auto:
+.review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
-      changes: *code-qa-patterns
-      when: on_success
-
-.review:rules:mr-only-auto-if-frontend-manual-otherwise:
-  rules:
+      changes: *ci-patterns
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
-      when: on_success
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
+      allow_failure: true
+    - <<: *if-dot-com-gitlab-org-schedule
+      allow_failure: true
+
+.review:rules:review-stop-failed-deployment:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+
+.review:rules:review-qa-smoke:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *ci-patterns
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *frontend-patterns
+      allow_failure: true
+    - <<: *if-dot-com-gitlab-org-merge-request
+      changes: *code-qa-patterns
+      when: manual
+      allow_failure: true
 
 .review:rules:mr-only-manual:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
+      allow_failure: true
 
 .review:rules:review-cleanup:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-schedule
-      when: on_success
+      allow_failure: true
 
 .review:rules:danger:
   rules:
     - if: '$DANGER_GITLAB_API_TOKEN && $CI_MERGE_REQUEST_IID'
-      when: on_success
 
 ###############
 # Setup rules #
@@ -538,10 +575,11 @@
 .setup:rules:dont-interrupt-me:
   rules:
     - <<: *if-master-or-tag
-      when: on_success
+      allow_failure: true
     - <<: *if-auto-deploy-branches
-      when: on_success
+      allow_failure: true
     - when: manual
+      allow_failure: true
 
 .setup:rules:gitlab_git_test:
   rules:
