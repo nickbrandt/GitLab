@@ -4,7 +4,12 @@ module StatusPage
   module Pipeline
     class PostProcessPipeline < ::Banzai::Pipeline::PostProcessPipeline
       def self.filters
-        super + [StatusPage::Filter::ImageFilter]
+        @filters ||= super
+          .dup
+          .insert_before(::Banzai::Filter::ReferenceRedactorFilter,
+                         StatusPage::Filter::MentionAnonymizationFilter)
+          .concat(::Banzai::FilterArray[StatusPage::Filter::ImageFilter])
+          .freeze
       end
     end
   end
