@@ -8,6 +8,12 @@
     "issue_id"
   ],
   "properties": {
+    "event_type": {
+      "type": { "enum": [ "milestone", "weight" ] }
+    },
+    "weight": {
+      "type": ["integer", "null"]
+    },
     "milestone_id": {
       "type": ["integer", "null"]
     },
@@ -15,7 +21,7 @@
       "type": "integer"
     },
     "action": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "created_at": {
       "type": "date"
