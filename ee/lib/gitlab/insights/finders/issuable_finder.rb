@@ -77,12 +77,17 @@ module Gitlab
           }.merge(entity_args)
         end
 
+        # rubocop: disable CodeReuse/ActiveRecord
         def entity_args
           strong_memoize(:entity_args) do
             case entity
             when ::Project
               if finder_projects
-                { project_id: entity.id } if finder_projects.exists?(entity.id) # rubocop: disable CodeReuse/ActiveRecord
+                if finder_projects.exists?(entity.id)
+                  { project_id: entity.id }
+                else
+                  { projects: ::Project.none }
+                end
               else
                 { project_id: entity.id }
               end
@@ -93,6 +98,7 @@ module Gitlab
             end
           end
         end
+        # rubocop: enable CodeReuse/ActiveRecord
 
         def created_after_argument
           return unless query.key?(:group_by)

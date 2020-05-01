@@ -110,7 +110,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after 30 days ago' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -120,7 +120,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after one day ago' do
-            expect(subject.to_a).to eq([issuable4])
+            expect(subject).to eq([issuable4])
           end
         end
 
@@ -130,7 +130,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after 12 weeks ago' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -140,7 +140,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after one week ago' do
-            expect(subject.to_a).to eq([issuable4])
+            expect(subject).to eq([issuable4])
           end
         end
 
@@ -150,7 +150,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after 12 months ago' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -160,7 +160,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           end
 
           it 'returns issuable created after one month ago' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
       end
@@ -188,7 +188,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [project.id] } }
 
           it 'returns issuables for that project' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -202,7 +202,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
               expected.shift(2) # Those are from other_project
             end
 
-            expect(subject.to_a).to eq(expected)
+            expect(subject).to eq(expected)
           end
         end
 
@@ -210,7 +210,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [0] } }
 
           it 'returns nothing' do
-            expect(subject.to_a).to be_empty
+            expect(subject).to be_empty
           end
         end
 
@@ -218,7 +218,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [0, project.id] } }
 
           it 'returns issuables for good project' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -226,7 +226,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [project.full_path] } }
 
           it 'returns issuables for that project' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -240,7 +240,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
               expected.shift(2) # Those are from other_project
             end
 
-            expect(subject.to_a).to eq(expected)
+            expect(subject).to eq(expected)
           end
         end
 
@@ -248,7 +248,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [project.id, project.full_path] } }
 
           it 'returns issuables for that project without duplicated issuables' do
-            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
+            expect(subject).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -256,7 +256,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [project.full_path.reverse] } }
 
           it 'returns nothing' do
-            expect(subject.to_a).to be_empty
+            expect(subject).to be_empty
           end
         end
 
@@ -264,7 +264,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           let(:projects) { { only: [create(:project, :public).id] } }
 
           it 'returns nothing' do
-            expect(subject.to_a).to be_empty
+            expect(subject).to be_empty
           end
         end
       end

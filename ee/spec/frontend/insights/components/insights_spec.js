@@ -107,6 +107,21 @@ describe('Insights component', () => {
     });
   });
 
+  describe('filtered out items', () => {
+    beforeEach(() => {
+      vm.$store.state.insights.configLoading = false;
+      vm.$store.state.insights.configData = {};
+    });
+
+    it('it displays a warning', () => {
+      return vm.$nextTick(() => {
+        expect(vm.$el.querySelector('.gl-alert-body').innerText.trim()).toContain(
+          'This project is filtered out in the insights.yml file',
+        );
+      });
+    });
+  });
+
   describe('hash fragment present', () => {
     const defaultKey = 'issues';
     const selectedKey = 'mrs';
