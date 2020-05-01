@@ -37,7 +37,7 @@ module Gitlab
 
       yield(lease.attempts > 1)
     ensure
-      lease&.release
+      lease&.cancel
     end
   end
 end

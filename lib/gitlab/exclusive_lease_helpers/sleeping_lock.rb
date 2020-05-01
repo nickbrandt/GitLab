@@ -6,6 +6,8 @@ module Gitlab
     class SleepingLock
       attr_reader :attempts
 
+      delegate :cancel, to: :@lease
+
       def initialize(key, timeout:, delay:)
         @lease = ::Gitlab::ExclusiveLease.new(key, timeout: timeout)
         @delay = delay
@@ -19,10 +21,6 @@ module Gitlab
           sleep(sleep_sec) unless first_attempt?
           try_obtain
         end
-      end
-
-      def release
-        @lease.cancel
       end
 
       private

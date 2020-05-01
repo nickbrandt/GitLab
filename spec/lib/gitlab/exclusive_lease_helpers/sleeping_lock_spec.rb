@@ -63,13 +63,13 @@ describe Gitlab::ExclusiveLeaseHelpers::SleepingLock, :clean_gitlab_redis_shared
       end
     end
 
-    describe 'release' do
+    describe 'cancel' do
       let!(:lease) { stub_exclusive_lease(key, 'uuid') }
 
       it 'cancels the lease' do
         expect(lease).to receive(:cancel)
 
-        subject.release
+        subject.cancel
       end
     end
   end
