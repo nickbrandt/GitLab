@@ -1,0 +1,5 @@
+---
+title: Remove deprecated route for serving full-size Design Management design files
+merge_request: 30917
+author:
+type: removed
