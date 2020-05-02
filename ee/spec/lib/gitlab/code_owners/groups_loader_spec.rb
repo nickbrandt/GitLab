@@ -51,7 +51,18 @@ describe Gitlab::CodeOwners::GroupsLoader do
         group = create(:group, path: "GROUP-1")
         create(:group, path: "GROUP-2")
         project.invited_groups << group
+        load_groups
 
+        expect(entry).to have_received(:add_matching_groups_from).with([group])
+      end
+    end
+
+    context "input matches project.group" do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, :repository, namespace: group) }
+      let(:text) { "@#{project.group.name}" }
+
+      it "returns the project's group" do
         load_groups
 
         expect(entry).to have_received(:add_matching_groups_from).with([group])
