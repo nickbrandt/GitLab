@@ -89,22 +89,8 @@ describe Gitlab::Checks::DiffCheck do
             stub_feature_flags(sectional_codeowners: false)
           end
 
-          context "for a non-web-based request" do
-            it "returns an error message" do
-              expect(validation_result).to include("Pushes to protected branches")
-              expect(validation_result).to include("\n")
-            end
-          end
-
-          context "for a web-based request" do
-            before do
-              expect(subject).to receive(:updated_from_web?).and_return(true)
-            end
-
-            it "returns an error message with newline chars removed" do
-              expect(validation_result).to include("Pushes to protected branches")
-              expect(validation_result).not_to include("\n")
-            end
+          it "returns an error message" do
+            expect(validation_result).to include("Pushes to protected branches")
           end
         end
 
@@ -142,16 +128,30 @@ describe Gitlab::Checks::DiffCheck do
       end
 
       context "when the feature is enabled on the project" do
-        before do
-          expect(project).to receive(:branch_requires_code_owner_approval?)
-            .once.and_return(true)
+        context "updated_from_web? == false" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(false)
+            expect(project).to receive(:branch_requires_code_owner_approval?)
+              .once.and_return(true)
+          end
+
+          it "returns an array of Proc(s)" do
+            validations = subject.send(:path_validations)
+
+            expect(validations.any?).to be_truthy
+            expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          end
         end
 
-        it "returns an array of Proc(s)" do
-          validations = subject.send(:path_validations)
+        context "updated_from_web? == true" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(true)
+            expect(project).not_to receive(:branch_requires_code_owner_approval?)
+          end
 
-          expect(validations.any?).to be_truthy
-          expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          it "returns an empty array" do
+            expect(subject.send(:path_validations)).to eq([])
+          end
         end
       end
     end
