@@ -142,6 +142,23 @@ describe AuditEventService do
           expect(event[:details][:ip_address]).to eq(user.current_sign_in_ip)
         end
       end
+
+      context 'for an impersonated user' do
+        let(:impersonator) { build(:user, name: 'Donald Duck', current_sign_in_ip: '192.168.88.88') }
+        let(:user) { build(:user, impersonator: impersonator) }
+
+        it 'has the impersonator IP address' do
+          event = service.security_event
+
+          expect(event[:details][:ip_address]).to eq('192.168.88.88')
+        end
+
+        it 'has the impersonator name' do
+          event = service.security_event
+
+          expect(event[:details][:impersonated_by]).to eq('Donald Duck')
+        end
+      end
     end
   end
 

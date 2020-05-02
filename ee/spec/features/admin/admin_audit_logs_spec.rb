@@ -6,9 +6,10 @@ describe 'Admin::AuditLogs', :js do
   include Select2Helper
 
   let(:user) { create(:user) }
+  let(:admin) { create(:admin, name: 'Bruce Wayne') }
 
   before do
-    sign_in(create(:admin))
+    sign_in(admin)
   end
 
   context 'unlicensed' do
@@ -130,6 +131,32 @@ describe 'Admin::AuditLogs', :js do
         visit admin_audit_logs_path(created_after: '12-345-6789')
 
         expect(page).to have_content('Invalid date format. Please use UTC format as YYYY-MM-DD')
+      end
+    end
+
+    describe 'impersonated events' do
+      it 'show impersonation details' do
+        visit admin_user_path(user)
+
+        click_link 'Impersonate'
+
+        visit(new_project_path)
+
+        fill_in(:project_name, with: 'Gotham City')
+
+        page.within('#content-body') do
+          click_button('Create project')
+        end
+
+        wait_for('Creation to complete') do
+          page.has_content?('was successfully created', wait: 0)
+        end
+
+        click_link 'Stop impersonation'
+
+        visit admin_audit_logs_path
+
+        expect(page).to have_content('by Bruce Wayne')
       end
     end
   end
