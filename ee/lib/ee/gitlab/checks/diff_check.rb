@@ -12,7 +12,7 @@ module EE
         def path_validations
           validations = [super].flatten
 
-          if project.branch_requires_code_owner_approval?(branch_name)
+          if !updated_from_web? && project.branch_requires_code_owner_approval?(branch_name)
             validations << validate_code_owners
           end
 
@@ -34,13 +34,11 @@ module EE
           matched_rules = loader.entries.collect { |e| "- #{e.pattern}" }
           code_owner_path = project.repository.code_owners_blob(ref: branch_name).path || "CODEOWNERS"
 
-          msg = "Pushes to protected branches that contain changes to files that\n" \
+          "Pushes to protected branches that contain changes to files that\n" \
             "match patterns defined in `#{code_owner_path}` are disabled for\n" \
             "this project. Please submit these changes via a merge request.\n\n" \
             "The following pattern(s) from `#{code_owner_path}` were matched:\n" \
             "#{matched_rules.join('\n')}\n"
-
-          updated_from_web? ? msg.tr("\n", " ") : msg
         end
 
         def validate_path_locks?
