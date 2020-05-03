@@ -60,7 +60,7 @@ export default {
   >
     <p v-html="bodyText"></p>
     <p>{{ __('Are you sure you want to merge immediately?') }}</p>
-    <template v-slot:modal-footer>
+    <template #modal-footer>
       <gl-deprecated-button ref="cancelButton" @click="cancel">{{
         __('Cancel')
       }}</gl-deprecated-button>

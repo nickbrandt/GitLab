@@ -272,7 +272,7 @@ export default {
             >{{ selectAllButtonText }}</gl-deprecated-button
           >
           <design-destroyer
-            v-slot="{ mutate, loading }"
+            #default="{ mutate, loading }"
             :filenames="selectedDesigns"
             :project-path="projectPath"
             :iid="issueIid"

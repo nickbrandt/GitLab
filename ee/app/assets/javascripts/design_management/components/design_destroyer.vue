@@ -51,7 +51,7 @@ export default {
 
 <template>
   <apollo-mutation
-    v-slot="{ mutate, loading, error }"
+    #default="{ mutate, loading, error }"
     :mutation="$options.destroyDesignMutation"
     :variables="{
       filenames,
