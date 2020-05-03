@@ -5,8 +5,8 @@ require 'spec_helper'
 describe AlertManagement::UpdateAlertStatusService do
   let_it_be(:alert) { create(:alert_management_alert, status: 'triggered') }
 
-  describe '#execute!' do
-    subject(:execute) { described_class.new(alert, new_status).execute! }
+  describe '#execute' do
+    subject(:execute) { described_class.new(alert, new_status).execute }
 
     let(:new_status) { 'acknowledged' }
 

@@ -7,7 +7,7 @@ module AlertManagement
       @status = status
     end
 
-    def execute!
+    def execute
       return error_response('Invalid status') unless AlertManagement::Alert.statuses.key?(status.to_s)
 
       alert.status = status

@@ -18,6 +18,8 @@ module Mutations
             null: true,
             description: "The alert after mutation"
 
+      authorize :update_alert_management_alerts
+
       private
 
       def find_object(project_path:, iid:)

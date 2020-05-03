@@ -29,25 +29,31 @@ describe Mutations::AlertManagement::UpdateAlertStatus do
       end
 
       context 'error occurs when updating' do
-        before do
-          # Stubbing and error on alert
+        it 'returns the alert with errors' do
+          # Stub an error on the alert
           allow_next_instance_of(Resolvers::AlertManagementAlertResolver) do |resolver|
             allow(resolver).to receive(:resolve).and_return(alert)
           end
 
           expect(alert).to receive(:save).and_return(false)
-
-          errors = ActiveModel::Errors.new(alert)
-          errors.add(:status, :invalid)
-
-          expect(alert).to receive(:errors).and_return(errors)
-        end
-
-        it 'returns the alert with no errors' do
+          expect(alert).to receive(:errors).and_return(
+            double(full_messages: %w(foo bar))
+          )
           expect(resolve).to eq(
             alert: alert,
-            errors: ['Status is invalid']
+            errors: ['foo and bar']
           )
+        end
+
+        context 'invalid status given' do
+          let(:new_status) { 'invalid_status' }
+
+          it 'returns the alert with errors' do
+            expect(resolve).to eq(
+              alert: alert,
+              errors: ['Invalid status']
+            )
+          end
         end
       end
     end

@@ -9,8 +9,6 @@ module Mutations
                required: true,
                description: 'The status to set the alert'
 
-      authorize :read_alert_management_alerts
-
       def resolve(args)
         alert = authorized_find!(project_path: args[:project_path], iid: args[:iid])
 
@@ -22,7 +20,7 @@ module Mutations
 
       def update_status(alert, status)
         service = ::AlertManagement::UpdateAlertStatusService.new(alert, status)
-        service.execute!
+        service.execute
       end
 
       def prepare_response(result)
