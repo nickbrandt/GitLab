@@ -245,7 +245,8 @@ rspec:coverage:
 
 .rspec-base-pg9-as-if-foss:
   extends:
-    - .rspec-base-ee
+    - .rspec-base
+    - .rails:rules:ee-only-as-if-foss
     - .as-if-foss
     - .use-pg9
   needs: ["setup-test-env pg9", "retrieve-tests-metadata", "compile-assets pull-cache as-if-foss"]
