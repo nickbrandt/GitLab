@@ -7,7 +7,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DeprecatedContainerScanning 
 
   describe '#format' do
     let(:raw_report) do
-      JSON.parse!(
+      Gitlab::Json.parse!(
         File.read(
           Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-container-scanning-report.json')
         )

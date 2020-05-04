@@ -31,7 +31,7 @@ describe Geo::ContainerRepositorySync, :geo do
           })
       .to_return(
         status: 200,
-        body: JSON.dump(tags: %w(obsolete)),
+        body: Gitlab::Json.dump(tags: %w(obsolete)),
         headers: { 'Content-Type' => 'application/json' })
 
     stub_request(:get, "http://primary.registry.gitlab/v2/group/test/my_image/tags/list")
@@ -39,7 +39,7 @@ describe Geo::ContainerRepositorySync, :geo do
         headers: { 'Authorization' => 'bearer pull-token' })
       .to_return(
         status: 200,
-        body: JSON.dump(tags: %w(tag-to-sync)),
+        body: Gitlab::Json.dump(tags: %w(tag-to-sync)),
         headers: { 'Content-Type' => 'application/json' })
 
     stub_request(:head, "http://primary.registry.gitlab/v2/group/test/my_image/manifests/tag-to-sync")

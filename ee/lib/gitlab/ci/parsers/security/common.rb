@@ -24,7 +24,7 @@ module Gitlab
           protected
 
           def parse_report(json_data)
-            JSON.parse!(json_data)
+            Gitlab::Json.parse!(json_data)
           end
 
           # map remediations to relevant vulnerabilities

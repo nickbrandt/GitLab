@@ -41,7 +41,7 @@ describe EE::API::Helpers do
 
       get 'user'
 
-      expect(JSON.parse(last_response.body)).to eq({ 'id' => user.id })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'id' => user.id })
     end
 
     it 'does not handle sticking if no user could be found' do
@@ -52,7 +52,7 @@ describe EE::API::Helpers do
 
       get 'user'
 
-      expect(JSON.parse(last_response.body)).to eq({ 'found' => false })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'found' => false })
     end
 
     it 'returns the user if one could be found' do
@@ -60,7 +60,7 @@ describe EE::API::Helpers do
 
       get 'user'
 
-      expect(JSON.parse(last_response.body)).to eq({ 'id' => user.id })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'id' => user.id })
     end
   end
 
@@ -71,7 +71,7 @@ describe EE::API::Helpers do
       header 'Authorization', 'test'
       get 'protected', params: { current_user: 'test' }
 
-      expect(JSON.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidDecryptionKeyError' })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidDecryptionKeyError' })
     end
 
     it 'rescues from ::Gitlab::Geo::InvalidSignatureTimeError' do
@@ -80,7 +80,7 @@ describe EE::API::Helpers do
       header 'Authorization', 'test'
       get 'protected', params: { current_user: 'test' }
 
-      expect(JSON.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidSignatureTimeError' })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidSignatureTimeError' })
     end
 
     it 'returns unauthorized response when scope is not valid' do
@@ -89,7 +89,7 @@ describe EE::API::Helpers do
       header 'Authorization', 'test'
       get 'protected', params: { current_user: 'test' }
 
-      expect(JSON.parse(last_response.body)).to eq({ 'message' => '401 Unauthorized' })
+      expect(Gitlab::Json.parse(last_response.body)).to eq({ 'message' => '401 Unauthorized' })
     end
   end
 

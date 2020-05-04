@@ -74,7 +74,7 @@ describe Projects::PipelinesController do
     let!(:mit_license) { create(:software_license, :mit) }
     let!(:software_license_policy) { create(:software_license_policy, software_license: mit_license, project: project) }
 
-    let(:payload) { JSON.parse(licenses_with_json.body) }
+    let(:payload) { Gitlab::Json.parse(licenses_with_json.body) }
 
     context 'with a license scanning artifact' do
       before do

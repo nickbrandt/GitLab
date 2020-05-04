@@ -34,7 +34,7 @@ describe Gitlab::Geo::Oauth::Session, :geo do
       end
 
       it 'returns hashed user data' do
-        parsed_json = JSON.parse(user_json)
+        parsed_json = Gitlab::Json.parse(user_json)
 
         expect(subject.authenticate(access_token.token)).to eq(parsed_json)
       end

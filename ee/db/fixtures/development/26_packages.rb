@@ -16,8 +16,7 @@ class Gitlab::Seeder::Packages
       name = "@#{@project.root_namespace.path}/npm_package_#{SecureRandom.hex}"
       version = "1.12.#{i}"
 
-      params = JSON.parse(
-        read_fixture_file('npm', 'payload.json')
+      params = Gitlab::Json.parse(read_fixture_file('npm', 'payload.json')
           .gsub('@root/npm-test', name)
           .gsub('1.0.1', version))
         .with_indifferent_access

@@ -158,7 +158,7 @@ describe API::FeatureFlagScopes do
         expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
         expect(json_response['environment_scope']).to eq(params[:environment_scope])
         expect(json_response['active']).to eq(params[:active])
-        expect(json_response['strategies']).to eq(JSON.parse(params[:strategies]))
+        expect(json_response['strategies']).to eq(Gitlab::Json.parse(params[:strategies]))
       end
 
       context 'when the scope already exists' do
@@ -258,7 +258,7 @@ describe API::FeatureFlagScopes do
         expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
         expect(json_response['id']).to eq(scope.id)
         expect(json_response['active']).to eq(params[:active])
-        expect(json_response['strategies']).to eq(JSON.parse(params[:strategies]))
+        expect(json_response['strategies']).to eq(Gitlab::Json.parse(params[:strategies]))
       end
 
       context 'when there are no corresponding feature flag scopes' do

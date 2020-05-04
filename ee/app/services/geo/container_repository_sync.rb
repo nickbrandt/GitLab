@@ -30,7 +30,7 @@ module Geo
     def sync_tag(tag)
       file = nil
       manifest = client.repository_raw_manifest(name, tag)
-      manifest_parsed = JSON.parse(manifest)
+      manifest_parsed = Gitlab::Json.parse(manifest)
 
       list_blobs(manifest_parsed).each do |digest|
         next if container_repository.blob_exists?(digest)

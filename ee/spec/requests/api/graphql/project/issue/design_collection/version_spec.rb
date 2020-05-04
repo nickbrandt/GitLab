@@ -188,7 +188,7 @@ describe 'Query.project(fullPath).issue(iid).designCollection.version(sha)' do
 
         post_graphql(cursored_query, current_user: current_user)
 
-        new_data = JSON.parse(response.body).fetch('data')
+        new_data = Gitlab::Json.parse(response.body).fetch('data')
 
         expect(response_values(new_data)).to match_array(ids.drop(2))
       end

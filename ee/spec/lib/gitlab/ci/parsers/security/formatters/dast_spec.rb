@@ -6,7 +6,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
   let(:formatter) { described_class.new(parsed_report) }
 
   let(:parsed_report) do
-    JSON.parse!(
+    Gitlab::Json.parse!(
       File.read(
         Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-dast-report-no-common-fields.json')
       )

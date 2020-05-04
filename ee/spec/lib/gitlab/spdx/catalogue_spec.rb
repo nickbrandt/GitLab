@@ -6,7 +6,7 @@ RSpec.describe Gitlab::SPDX::Catalogue do
   subject { described_class.new(catalogue_hash) }
 
   let(:spdx_json) { IO.read(Rails.root.join("spec", "fixtures", "spdx.json")) }
-  let(:catalogue_hash) { JSON.parse(spdx_json, symbolize_names: true) }
+  let(:catalogue_hash) { Gitlab::Json.parse(spdx_json, symbolize_names: true) }
 
   describe "#version" do
     let(:version) { SecureRandom.uuid }

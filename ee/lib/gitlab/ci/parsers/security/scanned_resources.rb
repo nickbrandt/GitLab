@@ -16,7 +16,7 @@ module Gitlab
           private
 
           def parse_report_json(blob)
-            JSON.parse!(blob)
+            Gitlab::Json.parse!(blob)
           rescue JSON::ParserError
             {}
           end

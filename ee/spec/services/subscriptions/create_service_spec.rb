@@ -29,7 +29,7 @@ describe Subscriptions::CreateService do
   end
 
   let_it_be(:client) { Gitlab::SubscriptionPortal::Client }
-  let_it_be(:create_service_params) { JSON.parse(fixture_file('create_service_params.json', dir: 'ee')).deep_symbolize_keys }
+  let_it_be(:create_service_params) { Gitlab::Json.parse(fixture_file('create_service_params.json', dir: 'ee')).deep_symbolize_keys }
 
   describe '#execute' do
     context 'when failing to create a customer' do

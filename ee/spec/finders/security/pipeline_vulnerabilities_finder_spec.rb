@@ -299,7 +299,7 @@ describe Security::PipelineVulnerabilitiesFinder do
       end
 
       def read_fixture(fixture)
-        JSON.parse(File.read(fixture.file.path))
+        Gitlab::Json.parse(File.read(fixture.file.path))
       end
     end
   end

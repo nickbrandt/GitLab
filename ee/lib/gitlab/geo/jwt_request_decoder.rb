@@ -70,7 +70,7 @@ module Gitlab
           )
 
           message = decoded.first
-          data = JSON.parse(message['data']) if message
+          data = Gitlab::Json.parse(message['data']) if message
           data&.deep_symbolize_keys!
           data
         rescue JWT::ImmatureSignature, JWT::ExpiredSignature

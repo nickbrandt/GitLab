@@ -50,7 +50,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
     end
 
     context "when parsing a vulnerability with a missing location" do
-      let(:report_hash) { JSON.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
+      let(:report_hash) { Gitlab::Json.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
 
       before do
         report_hash[:vulnerabilities][0][:location] = nil
@@ -60,7 +60,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
     end
 
     context "when parsing a vulnerability with a missing cve" do
-      let(:report_hash) { JSON.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
+      let(:report_hash) { Gitlab::Json.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
 
       before do
         report_hash[:vulnerabilities][0][:cve] = nil
@@ -80,7 +80,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
 
       it "generates occurrence with expected remediation" do
         occurrence = report.occurrences.last
-        raw_metadata = JSON.parse!(occurrence.raw_metadata)
+        raw_metadata = Gitlab::Json.parse!(occurrence.raw_metadata)
 
         expect(occurrence.name).to eq("Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js")
         expect(raw_metadata["remediations"].first["summary"]).to eq("Upgrade saml2-js")
