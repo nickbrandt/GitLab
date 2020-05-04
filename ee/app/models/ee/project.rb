@@ -57,7 +57,6 @@ module EE
       has_many :approval_rules, class_name: 'ApprovalProjectRule'
       has_many :approval_merge_request_rules, through: :merge_requests, source: :approval_rules
       has_many :audit_events, as: :entity
-      has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
       has_many :path_locks
       has_many :requirements, inverse_of: :project, class_name: 'RequirementsManagement::Requirement'
 
@@ -656,22 +655,11 @@ module EE
       super.presence || build_feature_usage
     end
 
-    # LFS and hashed repository storage are required for using Design Management.
-    def design_management_enabled?
-      lfs_enabled? && hashed_storage?(:repository)
-    end
-
-    def design_repository
-      strong_memoize(:design_repository) do
-        DesignManagement::Repository.new(self)
-      end
-    end
-
     override(:expire_caches_before_rename)
     def expire_caches_before_rename(old_path)
       super
 
-      design = ::Repository.new("#{old_path}#{::EE::Gitlab::GlRepository::DESIGN.path_suffix}", self, shard: repository_storage, repo_type: ::EE::Gitlab::GlRepository::DESIGN)
+      design = ::Repository.new("#{old_path}#{::Gitlab::GlRepository::DESIGN.path_suffix}", self, shard: repository_storage, repo_type: ::Gitlab::GlRepository::DESIGN)
 
       if design.exists?
         design.before_delete

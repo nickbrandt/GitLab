@@ -2,11 +2,9 @@
 
 module Gitlab
   class GitAccessDesign < GitAccess
-    def check(cmd, _changes)
-      unless geo?
-        check_protocol!
-        check_can_create_design!
-      end
+    def check(_cmd, _changes)
+      check_protocol!
+      check_can_create_design!
 
       success_result
     end
@@ -26,3 +24,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::GitAccessDesign.prepend_if_ee('EE::Gitlab::GitAccessDesign')

@@ -169,8 +169,6 @@ describe Issue do
   end
 
   describe 'relations' do
-    it { is_expected.to have_many(:designs) }
-    it { is_expected.to have_many(:design_versions) }
     it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
     it { is_expected.to have_and_belong_to_many(:self_managed_prometheus_alert_events) }
     it { is_expected.to have_many(:prometheus_alerts) }
@@ -590,50 +588,6 @@ describe Issue do
 
         issue.visible_to_user?(user)
       end
-    end
-  end
-
-  describe "#design_collection" do
-    it "returns a design collection" do
-      issue = build(:issue)
-      collection = issue.design_collection
-
-      expect(collection).to be_a(DesignManagement::DesignCollection)
-      expect(collection.issue).to eq(issue)
-    end
-  end
-
-  describe 'current designs' do
-    let(:issue) { create(:issue) }
-
-    subject { issue.designs.current }
-
-    context 'an issue has no designs' do
-      it { is_expected.to be_empty }
-    end
-
-    context 'an issue only has current designs' do
-      let!(:design_a) { create(:design, :with_file, issue: issue) }
-      let!(:design_b) { create(:design, :with_file, issue: issue) }
-      let!(:design_c) { create(:design, :with_file, issue: issue) }
-
-      it { is_expected.to include(design_a, design_b, design_c) }
-    end
-
-    context 'an issue only has deleted designs' do
-      let!(:design_a) { create(:design, :with_file, issue: issue, deleted: true) }
-      let!(:design_b) { create(:design, :with_file, issue: issue, deleted: true) }
-      let!(:design_c) { create(:design, :with_file, issue: issue, deleted: true) }
-
-      it { is_expected.to be_empty }
-    end
-
-    context 'an issue has a mixture of current and deleted designs' do
-      let!(:design_a) { create(:design, :with_file, issue: issue) }
-      let!(:design_b) { create(:design, :with_file, issue: issue, deleted: true) }
-      let!(:design_c) { create(:design, :with_file, issue: issue) }
-
-      it { is_expected.to contain_exactly(design_a, design_c) }
     end
   end
 

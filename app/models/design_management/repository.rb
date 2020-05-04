@@ -13,10 +13,10 @@ module DesignManagement
     GA
 
     def initialize(project)
-      full_path = project.full_path + EE::Gitlab::GlRepository::DESIGN.path_suffix
-      disk_path = project.disk_path + EE::Gitlab::GlRepository::DESIGN.path_suffix
+      full_path = project.full_path + Gitlab::GlRepository::DESIGN.path_suffix
+      disk_path = project.disk_path + Gitlab::GlRepository::DESIGN.path_suffix
 
-      super(full_path, project, shard: project.repository_storage, disk_path: disk_path, repo_type: EE::Gitlab::GlRepository::DESIGN)
+      super(full_path, project, shard: project.repository_storage, disk_path: disk_path, repo_type: Gitlab::GlRepository::DESIGN)
     end
 
     # Override of a method called on Repository instances but sent via
