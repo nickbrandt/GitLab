@@ -565,6 +565,41 @@ to mix types, that is also possible, as long as you don't mix items at the same 
 - Unordered list item three.
 ```
 
+## Tables
+
+Tables should be used to describe complex information in a straightforward
+manner. Note that in many cases, an unordered list is sufficient to describe a
+list of items with a single, simple description per item. But, if you have data
+that is best described by a matrix, tables are the best choice for use.
+
+### Creation guidelines
+
+Due to accessibility and scanability requirements, tables should not have any
+blank cells or areas. If a cell does not have a useable value, consider using
+*none* as a value.
+
+To help tables be easier to maintain, consider adding additional spaces to the
+column widths to make them consistent. For example, 
+
+```markdown
+| Header 1  | Header 2             |
+| Item 1    | Description          |
+| Item 2    | Expanded description |
+```
+If you're using Visual Studio Code, consider installing and using the
+[Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
+extension.
+
+
+### Feature tables
+
+When creating tables of lists of features (such as whether or not features are
+available to certain roles on the [Permissions](../../user/permissions.md#project-members-permissions)
+page), use the following phrases (based on the SVG icons):
+
+* No: **{dotted-circle}** No
+* Yes: **{checked-circle}** Yes
+
 ## Quotes
 
 Valid for Markdown content only, not for frontmatter entries:
