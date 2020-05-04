@@ -1,5 +1,6 @@
 = form_errors(@service)
 - trigger_events = Feature.enabled?(:integration_form_refactor) ? ServiceEventSerializer.new(service: @service).represent(@service.configurable_events).to_json : []
+- fields = @service.global_fields_json
 
 - if lookup_context.template_exists?('help', "projects/services/#{@service.to_param}", true)
   = render "projects/services/#{@service.to_param}/help", subject: @service
@@ -10,7 +11,7 @@
 
 .service-settings
   .js-vue-integration-settings{ data: { show_active: @service.show_active_box?.to_s, activated: (@service.active || @service.new_record?).to_s, type: @service.to_param, merge_request_events: @service.merge_requests_events.to_s,
-commit_events: @service.commit_events.to_s, enable_comments: @service.comment_on_event_enabled.to_s, comment_detail: @service.comment_detail, trigger_events: trigger_events } }
+commit_events: @service.commit_events.to_s, enable_comments: @service.comment_on_event_enabled.to_s, comment_detail: @service.comment_detail, trigger_events: trigger_events, fields: fields } }
 
   - if @service.configurable_events.present? && !@service.is_a?(JiraService) && Feature.disabled?(:integration_form_refactor)
     .form-group.row
