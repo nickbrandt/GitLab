@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::SystemNotes::DesignManagementService do
+describe SystemNotes::DesignManagementService do
   let(:project) { create(:project) }
   let(:issue) { create(:issue, project: project) }
 
