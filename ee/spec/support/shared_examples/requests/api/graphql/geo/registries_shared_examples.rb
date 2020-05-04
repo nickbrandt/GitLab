@@ -97,7 +97,7 @@ RSpec.shared_examples 'gets registries for' do |args|
       # Get second page
       post_graphql(query("first: 2, after: \"#{end_cursor}\""), current_user: current_user)
 
-      response_data = JSON.parse(response.body).dig('data', 'geoNode', GraphqlHelpers.fieldnamerize(field_name), 'edges')
+      response_data = Gitlab::Json.parse(response.body).dig('data', 'geoNode', GraphqlHelpers.fieldnamerize(field_name), 'edges')
       first_result = response_data.first['node']
       second_result = response_data.second['node']
 
