@@ -47,6 +47,7 @@ const createComponent = ({
   showCreateRequirement = false,
   emptyStatePath = '/assets/illustrations/empty-state/requirements.svg',
   loading = false,
+  canCreateRequirement = true,
   requirementsWebUrl = '/gitlab-org/gitlab-shell/-/requirements',
 } = {}) =>
   shallowMount(RequirementsRoot, {
@@ -56,6 +57,7 @@ const createComponent = ({
       requirementsCount,
       showCreateRequirement,
       emptyStatePath,
+      canCreateRequirement,
       requirementsWebUrl,
     },
     mocks: {

@@ -60,6 +60,10 @@ export default {
       type: String,
       required: true,
     },
+    canCreateRequirement: {
+      type: Boolean,
+      required: true,
+    },
     requirementsWebUrl: {
       type: String,
       required: true,
@@ -429,6 +433,7 @@ export default {
       :filter-by="filterBy"
       :empty-state-path="emptyStatePath"
       :requirements-count="requirementsCount"
+      :can-create-requirement="canCreateRequirement"
       @clickNewRequirement="handleNewRequirementClick"
     />
     <requirements-loading

@@ -48,6 +48,7 @@ export default () => {
         opened,
         archived,
         all,
+        canCreateRequirement,
         requirementsWebUrl,
       } = el.dataset;
       const stateFilterBy = filterBy ? FilterState[filterBy] : FilterState.opened;
@@ -68,6 +69,7 @@ export default () => {
         next,
         emptyStatePath,
         projectPath,
+        canCreateRequirement,
         requirementsWebUrl,
       };
     },
@@ -81,6 +83,7 @@ export default () => {
           prev: this.prev,
           next: this.next,
           emptyStatePath: this.emptyStatePath,
+          canCreateRequirement: this.canCreateRequirement,
           requirementsWebUrl: this.requirementsWebUrl,
         },
       });
