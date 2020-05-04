@@ -2,11 +2,18 @@
 
 require 'spec_helper'
 
-describe EE::SystemNotes::DesignManagementService do
+describe SystemNotes::DesignManagementService do
   let(:project) { create(:project) }
   let(:issue) { create(:issue, project: project) }
 
   let(:instance) { described_class.new(noteable: instance_noteable, project: instance_project, author: instance_author) }
+
+  # TODO This MR needs the routes + controllers MR to be merged first.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283.
+  before do
+    skip 'https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283' unless Gitlab.ee?
+  end
 
   describe '#design_version_added' do
     let(:instance_noteable) { version.issue }

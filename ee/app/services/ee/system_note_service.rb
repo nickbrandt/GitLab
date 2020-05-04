@@ -24,37 +24,6 @@ module EE
       ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).unrelate_issue(noteable_ref)
     end
 
-    # Parameters:
-    #   - version [DesignManagement::Version]
-    #
-    # Example Note text:
-    #
-    #   "added [1 designs](link-to-version)"
-    #   "changed [2 designs](link-to-version)"
-    #
-    # Returns [Array<Note>]: the created Note objects
-    def design_version_added(version)
-      EE::SystemNotes::DesignManagementService.new(noteable: version.issue,
-                                                   project: version.issue.project,
-                                                   author: version.author).design_version_added(version)
-    end
-
-    # Called when a new discussion is created on a design
-    #
-    # discussion_note - DiscussionNote
-    #
-    # Example Note text:
-    #
-    #   "started a discussion on screen.png"
-    #
-    # Returns the created Note object
-    def design_discussion_added(discussion_note)
-      design = discussion_note.noteable
-      EE::SystemNotes::DesignManagementService.new(noteable: design.issue,
-                                                   project: design.project,
-                                                   author: discussion_note.author).design_discussion_added(discussion_note)
-    end
-
     def epic_issue(epic, issue, user, type)
       EE::SystemNotes::EpicsService.new(noteable: epic, author: user).epic_issue(issue, type)
     end

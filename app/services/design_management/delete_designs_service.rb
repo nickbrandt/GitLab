@@ -16,9 +16,6 @@ module DesignManagement
 
       version = delete_designs!
 
-      # Create a Geo event so changes will be replicated to secondary node(s)
-      repository.log_geo_updated_event
-
       success(version: version)
     end
 
@@ -65,3 +62,5 @@ module DesignManagement
     end
   end
 end
+
+DesignManagement::DeleteDesignsService.prepend_if_ee('EE::DesignManagement::DeleteDesignsService')

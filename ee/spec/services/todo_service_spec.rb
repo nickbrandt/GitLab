@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe TodoService do
-  include DesignManagementTestHelpers
-
   let(:author) { create(:user, username: 'author') }
   let(:non_member) { create(:user, username: 'non_member') }
   let(:member) { create(:user, username: 'member') }
@@ -324,35 +322,6 @@ describe TodoService do
           should_not_create_todo(user: non_member, target: merge_request, action: Todo::APPROVAL_REQUIRED)
         end
       end
-    end
-  end
-
-  describe 'Designs' do
-    let(:project) { create(:project) }
-    let(:issue) { create(:issue, project: project) }
-    let(:design) { create(:design, issue: issue) }
-
-    before do
-      enable_design_management
-
-      project.add_guest(author)
-      project.add_developer(john_doe)
-    end
-
-    let(:note) do
-      build(:diff_note_on_design,
-             noteable: design,
-             author: author,
-             note: "Hey #{john_doe.to_reference}")
-    end
-
-    it 'creates a todo for mentioned user on new diff note' do
-      service.new_note(note, author)
-
-      should_create_todo(user: john_doe,
-                         target: design,
-                         action: Todo::MENTIONED,
-                         note: note)
     end
   end
 

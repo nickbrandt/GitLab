@@ -19,6 +19,13 @@ describe DesignManagement::SaveDesignsService do
     fixture_file_upload("spec/fixtures/#{filename}")
   end
 
+  # TODO This MR needs lib to be migrated `Gitlab::UsageCounters::DesignsCounter`
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283.
+  before do
+    skip 'https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283' unless Gitlab.ee?
+  end
+
   before do
     project.add_developer(developer)
   end
@@ -181,16 +188,6 @@ describe DesignManagement::SaveDesignsService do
             expect(updated_designs.size).to eq(1)
             expect(updated_designs.first.versions.size).to eq(1)
           end
-        end
-
-        it 'calls repository#log_geo_updated_event' do
-          expect(design_repository).to receive(:log_geo_updated_event)
-
-          allow_next_instance_of(described_class) do |instance|
-            allow(instance).to receive(:repository).and_return(design_repository)
-          end
-
-          run_service
         end
       end
 
