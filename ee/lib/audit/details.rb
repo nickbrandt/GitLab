@@ -29,7 +29,7 @@ module Audit
     end
 
     def action_text
-      action = @details.slice(*ACTIONS)
+      action_name = @details.slice(*ACTIONS).first
 
       case action.each_key.first
       when :add
@@ -45,7 +45,7 @@ module Audit
 
         "Updated ref #{target_ref} from #{from_sha} to #{to_sha}"
       when :custom_message
-        @details.dig(:custom_message)
+        @details[:custom_message]
       else
         text_for_change(target_name)
       end
