@@ -53,7 +53,7 @@ export default {
           anchor.click();
         })
         .catch(() => {
-          createFlash(s__('SecurityDashboard|There was an error while generating the report.'));
+          createFlash(s__('SecurityReports|There was an error while generating the report.'));
         })
         .finally(() => {
           this.isPreparingCsvExport = false;

@@ -53,7 +53,7 @@ export default {
     <div class="row justify-content-center mt-md-4">
       <div class="col col-lg-7">
         <h3 class="text-3 font-weight-bold border-bottom mb-4 pb-3">
-          {{ s__('SecurityDashboard|Add or remove projects from your dashboard') }}
+          {{ s__('SecurityReports|Add or remove projects from your dashboard') }}
         </h3>
         <div class="d-flex flex-column flex-md-row">
           <project-selector
@@ -75,7 +75,7 @@ export default {
               variant="success"
               @click="addProjects"
             >
-              {{ s__('SecurityDashboard|Add projects') }}
+              {{ s__('SecurityReports|Add projects') }}
             </gl-deprecated-button>
           </div>
         </div>

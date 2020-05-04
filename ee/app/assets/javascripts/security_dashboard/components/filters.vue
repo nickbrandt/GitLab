@@ -28,7 +28,7 @@ export default {
         @setFilter="setFilter"
       />
       <div class="ml-lg-auto p-2">
-        <strong>{{ s__('SecurityDashboard|Hide dismissed') }}</strong>
+        <strong>{{ s__('SecurityReports|Hide dismissed') }}</strong>
         <gl-toggle-vuex
           class="d-block mt-1 js-toggle"
           store-module="filters"

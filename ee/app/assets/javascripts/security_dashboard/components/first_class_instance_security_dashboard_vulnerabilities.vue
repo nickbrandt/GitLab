@@ -80,7 +80,7 @@ export default {
     },
   },
   emptyStateDescription: s__(
-    `While it's rare to have no vulnerabilities, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly.`,
+    `SecurityReports|While it's rare to have no vulnerabilities, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly.`,
   ),
 };
 </script>
@@ -95,7 +95,7 @@ export default {
     >
       {{
         s__(
-          'Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.',
+          'SecurityReports|Error fetching the vulnerability list. Please check your network connection and try again.',
         )
       }}
     </gl-alert>
@@ -109,11 +109,11 @@ export default {
     >
       <template #emptyState>
         <gl-empty-state
-          :title="s__(`SecurityDashboard|No vulnerabilities found for dashboard`)"
+          :title="s__(`SecurityReports|No vulnerabilities found for dashboard`)"
           :svg-path="emptyStateSvgPath"
           :description="$options.emptyStateDescription"
           :primary-button-link="dashboardDocumentation"
-          :primary-button-text="s__('Security Reports|Learn more about setting up your dashboard')"
+          :primary-button-text="s__('SecurityReports|Learn more about setting up your dashboard')"
         />
       </template>
     </vulnerability-list>
@@ -124,7 +124,7 @@ export default {
     >
       <gl-button :disabled="isFirstResultLoading" @click="fetchNextPage">
         <gl-loading-icon v-if="isQueryLoading" size="md" />
-        <template v-else>{{ __('Load more vulnerabilities') }}</template>
+        <template v-else>{{ s__('SecurityReports|Load more vulnerabilities') }}</template>
       </gl-button>
     </gl-intersection-observer>
   </div>
