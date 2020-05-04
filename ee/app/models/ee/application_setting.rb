@@ -135,10 +135,10 @@ module EE
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      return elasticsearch_limited_projects.exists?(project.id) unless ::Feature.enabled?(:elasticsearch_indexes_project_cache, default_enabled: true)
+      return optimized_elasticsearch_indexes_project?(project) unless ::Feature.enabled?(:elasticsearch_indexes_project_cache, default_enabled: true)
 
       ::Gitlab::Elastic::ElasticsearchEnabledCache.fetch(:project, project.id) do
-        elasticsearch_limited_projects.exists?(project.id)
+        optimized_elasticsearch_indexes_project?(project)
       end
     end
 
@@ -289,6 +289,26 @@ module EE
     end
 
     private
+
+    def optimized_elasticsearch_indexes_project?(project)
+      if ::Feature.enabled?(:optimized_elasticsearch_indexes_project, default_enabled: true)
+        indexed_namespaces = ::Gitlab::ObjectHierarchy
+          .new(::Namespace.where(id: project.namespace_id))
+          .base_and_ancestors
+          .joins(:elasticsearch_indexed_namespace)
+
+        indexed_namespaces = ::Project.where('EXISTS (?)', indexed_namespaces)
+        indexed_projects = ::Project.where('EXISTS (?)', ElasticsearchIndexedProject.where(project_id: project.id))
+
+        ::Project
+          .from("(SELECT) as projects") # SELECT from "nothing" since the EXISTS queries have all the conditions.
+          .merge(indexed_namespaces.or(indexed_projects))
+          .exists?
+      else
+        # old behavior
+        elasticsearch_limited_projects.exists?(project.id)
+      end
+    end
 
     def update_personal_access_tokens_lifetime
       return unless max_personal_access_token_lifetime.present? && License.feature_available?(:personal_access_token_expiration_policy)

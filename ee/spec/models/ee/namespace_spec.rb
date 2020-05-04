@@ -14,6 +14,7 @@ describe Namespace do
 
   it { is_expected.to have_one(:namespace_statistics) }
   it { is_expected.to have_one(:gitlab_subscription).dependent(:destroy) }
+  it { is_expected.to have_one(:elasticsearch_indexed_namespace) }
 
   it { is_expected.to delegate_method(:extra_shared_runners_minutes).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }
