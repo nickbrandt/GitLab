@@ -1,8 +1,8 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert, GlBadge } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import { REPORT_STATUS } from 'ee/license_compliance/store/modules/list/constants';
@@ -41,6 +41,15 @@ const createComponent = ({ state, props, options }) => {
         state: {
           managedLicenses,
         },
+        getters: {
+          isAddingNewLicense: () => false,
+          hasPendingLicenses: () => false,
+          isLicenseBeingUpdated: () => () => false,
+        },
+        actions: {
+          fetchManagedLicenses: noop,
+          setLicenseApproval: noop,
+        },
       },
       licenseList: {
         namespaced: true,
@@ -60,7 +69,9 @@ const createComponent = ({ state, props, options }) => {
     },
   });
 
-  wrapper = shallowMount(LicenseComplianceApp, {
+  const mountFunc = options && options.mount ? mount : shallowMount;
+
+  wrapper = mountFunc(LicenseComplianceApp, {
     propsData: {
       emptyStateSvgPath,
       documentationPath,
@@ -153,9 +164,6 @@ describe('Project Licenses', () => {
             generatedAt: '',
             status: REPORT_STATUS.ok,
           },
-          pageInfo: {
-            total: 24,
-          },
         },
         options: {
           provide: {
@@ -179,20 +187,62 @@ describe('Project Licenses', () => {
       expect(wrapper.find(DetectedLicensesTable).exists()).toBe(true);
     });
 
-    it('it renders the correct count in "Detected in project" tab', () => {
-      expect(wrapper.vm.licenseCount).toBe(24);
-    });
-
-    it('it renders the correct count in "Policies" tab', () => {
-      expect(wrapper.vm.policyCount).toBe(2);
-    });
-
     it('it renders the "Policies" table', () => {
       expect(wrapper.find(LicenseManagement).exists()).toBe(true);
     });
 
     it('renders the pipeline info', () => {
       expect(wrapper.find(PipelineInfo).exists()).toBe(true);
+    });
+
+    describe('when the tabs are rendered', () => {
+      beforeEach(() => {
+        createComponent({
+          state: {
+            initialized: true,
+            isLoading: false,
+            licenses: [
+              {
+                name: 'MIT',
+                classification: LICENSE_APPROVAL_CLASSIFICATION.DENIED,
+                components: [],
+              },
+            ],
+            reportInfo: {
+              jobPath: '/',
+              generatedAt: '',
+              status: REPORT_STATUS.ok,
+            },
+            pageInfo: {
+              total: 1,
+            },
+          },
+          options: {
+            provide: {
+              glFeatures: { licensePolicyList: true },
+            },
+            mount: true,
+          },
+        });
+      });
+
+      it('it renders the correct count in "Detected in project" tab', () => {
+        expect(
+          wrapper
+            .findAll(GlBadge)
+            .at(0)
+            .text(),
+        ).toBe('1');
+      });
+
+      it('it renders the correct count in "Policies" tab', () => {
+        expect(
+          wrapper
+            .findAll(GlBadge)
+            .at(1)
+            .text(),
+        ).toBe('2');
+      });
     });
 
     describe('when there are policy violations', () => {
