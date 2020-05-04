@@ -38,6 +38,17 @@ describe API::Dependencies do
         expect(vulnerability['severity']).to eq('unknown')
       end
 
+      context 'with nil package_manager' do
+        let(:params) { { package_manager: nil } }
+
+        it 'returns no dependencies' do
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('public_api/v4/dependencies', dir: 'ee')
+
+          expect(json_response).to eq([])
+        end
+      end
+
       context 'with filter options' do
         let(:params) { { package_manager: 'yarn' } }
 
