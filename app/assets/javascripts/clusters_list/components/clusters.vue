@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTable, GlLoadingIcon, GlBadge } from '@gitlab/ui';
+import { GlTable, GlLink, GlLoadingIcon, GlBadge } from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
@@ -8,6 +8,7 @@ import { __, sprintf } from '~/locale';
 export default {
   components: {
     GlTable,
+    GlLink,
     GlLoadingIcon,
     GlBadge,
   },
@@ -23,18 +24,19 @@ export default {
       key: 'environmentScope',
       label: __('Environment scope'),
     },
-    {
-      key: 'size',
-      label: __('Size'),
-    },
-    {
-      key: 'cpu',
-      label: __('Total cores (vCPUs)'),
-    },
-    {
-      key: 'memory',
-      label: __('Total memory (GB)'),
-    },
+    // Wait for backend to send these fields
+    // {
+    //  key: 'size',
+    //  label: __('Size'),
+    // },
+    // {
+    //  key: 'cpu',
+    //  label: __('Total cores (vCPUs)'),
+    // },
+    // {
+    //  key: 'memory',
+    //  label: __('Total memory (GB)'),
+    // },
     {
       key: 'clusterType',
       label: __('Cluster level'),
@@ -45,13 +47,13 @@ export default {
     ...mapState(['clusters', 'loading']),
   },
   mounted() {
-    // TODO - uncomment this once integrated with BE
-    // this.fetchClusters();
+    this.fetchClusters();
   },
   methods: {
     ...mapActions(['fetchClusters']),
     statusClass(status) {
-      return STATUSES[status].className;
+      const { className } = STATUSES[status];
+      return className || 'disabled';
     },
     statusTitle(status) {
       const { title } = STATUSES[status];
@@ -73,7 +75,10 @@ export default {
   >
     <template #cell(name)="{ item }">
       <div class="d-flex flex-row-reverse flex-md-row js-status">
-        {{ item.name }}
+        <gl-link data-qa-selector="cluster" :data-qa-cluster-name="item.name" :href="item.path">
+          {{ item.name }}
+        </gl-link>
+
         <gl-loading-icon
           v-if="item.status === 'deleting'"
           v-tooltip
@@ -84,7 +89,7 @@ export default {
         <div
           v-else
           v-tooltip
-          class="cluster-status-indicator rounded-circle align-self-center gl-w-8 gl-h-8 mr-2 ml-md-2"
+          class="cluster-status-indicator rounded-circle align-self-center gl-w-4 gl-h-4 mr-2 ml-md-2"
           :class="statusClass(item.status)"
           :title="statusTitle(item.status)"
         ></div>

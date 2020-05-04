@@ -8,7 +8,7 @@ export const CLUSTER_TYPES = {
 
 export const STATUSES = {
   disabled: { className: 'disabled', title: __('Disabled') },
-  connected: { className: 'bg-success', title: __('Connected') },
+  created: { className: 'bg-success', title: __('Connected') },
   unreachable: { className: 'bg-danger', title: __('Unreachable') },
   authentication_failure: { className: 'bg-warning', title: __('Authentication Failure') },
   deleting: { title: __('Deleting') },
