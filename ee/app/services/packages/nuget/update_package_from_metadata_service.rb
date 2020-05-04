@@ -37,8 +37,14 @@ module Packages
       private
 
       def update_package(package)
-        ::Packages::UpdateTagsService.new(package, package_tags)
-                                     .execute
+        ::Packages::Nuget::SyncMetadatumService
+          .new(package, metadata.slice(:project_url, :license_url, :icon_url))
+          .execute
+        ::Packages::UpdateTagsService
+          .new(package, package_tags)
+          .execute
+      rescue => e
+        raise InvalidMetadataError, e.message
       end
 
       def valid_metadata?

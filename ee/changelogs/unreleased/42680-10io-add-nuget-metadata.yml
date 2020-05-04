@@ -1,0 +1,5 @@
+---
+title: Add Nuget metadatum support in GitLab Packages
+merge_request: 30994
+author:
+type: added

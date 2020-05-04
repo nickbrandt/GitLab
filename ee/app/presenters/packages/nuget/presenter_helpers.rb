@@ -47,8 +47,17 @@ module Packages
           package_version: package.version,
           archive_url: archive_url_for(package),
           summary: BLANK_STRING,
-          tags: tags_for(package)
+          tags: tags_for(package),
+          metadatum: metadatum_for(package)
         }
+      end
+
+      def metadatum_for(package)
+        metadatum = package.nuget_metadatum
+        return {} unless metadatum
+
+        metadatum.slice(:project_url, :license_url, :icon_url)
+                  .compact
       end
 
       def base_path_for(package)

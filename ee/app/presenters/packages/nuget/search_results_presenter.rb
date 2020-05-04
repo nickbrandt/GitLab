@@ -28,7 +28,8 @@ module Packages
               summary: '',
               total_downloads: 0,
               verified: true,
-              tags: tags_for(latest_package)
+              tags: tags_for(latest_package),
+              metadatum: metadatum_for(latest_package)
             }
           end
         end

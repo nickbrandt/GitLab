@@ -15,6 +15,7 @@ module EE
           expose :version
           expose :versions, using: EE::API::Entities::Nuget::SearchResultVersion
           expose :tags
+          expose :metadatum, using: EE::API::Entities::Nuget::Metadatum, merge: true
         end
       end
     end

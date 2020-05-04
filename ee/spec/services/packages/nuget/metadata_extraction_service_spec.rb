@@ -53,6 +53,18 @@ describe Packages::Nuget::MetadataExtractionService do
       end
     end
 
+    context 'with a nuspec file with metadata' do
+      let_it_be(:nuspec_filepath) { 'nuget/with_metadata.nuspec' }
+
+      before do
+        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+      end
+
+      it { expect(subject[:license_url]).to eq('https://opensource.org/licenses/MIT') }
+      it { expect(subject[:project_url]).to eq('https://gitlab.com/gitlab-org/gitlab') }
+      it { expect(subject[:icon_url]).to eq('https://opensource.org/files/osi_keyhole_300X300_90ppi_0.png') }
+    end
+
     context 'with invalid package file id' do
       let(:package_file) { OpenStruct.new(id: 555) }
 

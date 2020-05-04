@@ -15,6 +15,9 @@
         "packageContent": { "type": "string" },
         "summary": { "const": "" },
         "tags": { "type": "string" },
+        "projectUrl": { "type": "string" },
+        "licenseUrl": { "type": "string" },
+        "iconUrl": { "type": "string" },
         "version": { "type": "string" }
       }
     }

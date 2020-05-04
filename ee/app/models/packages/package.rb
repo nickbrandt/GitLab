@@ -12,6 +12,7 @@ class Packages::Package < ApplicationRecord
   has_one :conan_metadatum, inverse_of: :package, class_name: 'Packages::Conan::Metadatum'
   has_one :pypi_metadatum, inverse_of: :package, class_name: 'Packages::Pypi::Metadatum'
   has_one :maven_metadatum, inverse_of: :package, class_name: 'Packages::Maven::Metadatum'
+  has_one :nuget_metadatum, inverse_of: :package, class_name: 'Packages::Nuget::Metadatum'
   has_one :build_info, inverse_of: :package
 
   accepts_nested_attributes_for :conan_metadatum

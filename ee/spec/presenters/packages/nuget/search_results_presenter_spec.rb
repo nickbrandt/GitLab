@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Packages::Nuget::SearchResultsPresenter do
   let_it_be(:project) { create(:project) }
-  let_it_be(:package_a) { create(:nuget_package, project: project, name: 'DummyPackageA') }
+  let_it_be(:package_a) { create(:nuget_package, :with_metadatum, project: project, name: 'DummyPackageA') }
   let_it_be(:tag1) { create(:packages_tag, package: package_a, name: 'tag1') }
   let_it_be(:tag2) { create(:packages_tag, package: package_a, name: 'tag2') }
   let_it_be(:packages_b) { create_list(:nuget_package, 5, project: project, name: 'DummyPackageB') }
@@ -24,13 +24,13 @@ describe Packages::Nuget::SearchResultsPresenter do
     it 'returns the proper data structure' do
       expect(data.size).to eq 3
       pkg_a, pkg_b, pkg_c = data
-      expect_package_result(pkg_a, package_a.name, [package_a.version], %w(tag1 tag2))
+      expect_package_result(pkg_a, package_a.name, [package_a.version], %w(tag1 tag2), with_metadatum: true)
       expect_package_result(pkg_b, packages_b.first.name, packages_b.map(&:version))
       expect_package_result(pkg_c, packages_c.first.name, packages_c.map(&:version))
     end
 
     # rubocop:disable Metrics/AbcSize
-    def expect_package_result(package_json, name, versions, tags = [])
+    def expect_package_result(package_json, name, versions, tags = [], with_metadatum: false)
       expect(package_json[:type]).to eq 'Package'
       expect(package_json[:authors]).to be_blank
       expect(package_json[:name]).to eq(name)
@@ -48,6 +48,10 @@ describe Packages::Nuget::SearchResultsPresenter do
         expect(package_json[:tags].split(::Packages::Tag::NUGET_TAGS_SEPARATOR)).to contain_exactly(*tags)
       else
         expect(package_json[:tags]).to be_blank
+      end
+
+      %i[project_url license_url icon_url].each do |field|
+        expect(package_json.dig(:metadatum, field)).to with_metadatum ? be_present : be_blank
       end
     end
     # rubocop:enable Metrics/AbcSize

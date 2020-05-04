@@ -13,6 +13,7 @@ module EE
           expose :tags
           expose :archive_url, as: :packageContent
           expose :summary
+          expose :metadatum, using: EE::API::Entities::Nuget::Metadatum, merge: true
         end
       end
     end

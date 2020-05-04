@@ -17,6 +17,9 @@
           "totalDownloads": { "const": 0 },
           "verified": { "const": true },
           "tags": { "type": "string" },
+          "projectUrl": { "type": "string" },
+          "licenseUrl": { "type": "string" },
+          "iconUrl": { "type": "string" },
           "versions": {
             "type": "array",
             "items": {
