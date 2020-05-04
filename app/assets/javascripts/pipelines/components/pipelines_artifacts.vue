@@ -33,7 +33,7 @@ export default {
       <i class="fa fa-caret-down" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-      <li v-for="(artifact, i) in artifacts" :key="i">
+      <li v-for="(artifact, i) in artifacts" :key="i" data-testid="artifact">
         <gl-link :href="artifact.path" rel="nofollow" download
           >Download {{ artifact.name }} artifacts</gl-link
         >
