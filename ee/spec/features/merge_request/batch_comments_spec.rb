@@ -154,7 +154,7 @@ describe 'Merge request > Batch comments', :js do
         write_reply_to_discussion(button_text: 'Add comment now', resolve: true)
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('1/1 thread resolved')
+          expect(page).to have_content('All threads resolved')
           expect(page).to have_selector('.line-resolve-btn.is-active')
         end
       end
@@ -172,7 +172,7 @@ describe 'Merge request > Batch comments', :js do
         wait_for_requests
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('1/1 thread resolved')
+          expect(page).to have_content('All threads resolved')
           expect(page).to have_selector('.line-resolve-btn.is-active')
         end
       end
@@ -195,8 +195,8 @@ describe 'Merge request > Batch comments', :js do
         write_reply_to_discussion(button_text: 'Add comment now', unresolve: true)
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('0/1 thread resolved')
-          expect(page).to have_selector('.line-resolve-btn.is-disabled')
+          expect(page).to have_content('1 unresolved thread')
+          expect(page).not_to have_selector('.line-resolve-btn.is-active')
         end
       end
 
@@ -215,8 +215,8 @@ describe 'Merge request > Batch comments', :js do
         wait_for_requests
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('0/1 thread resolved')
-          expect(page).to have_selector('.line-resolve-btn.is-disabled')
+          expect(page).to have_content('1 unresolved thread')
+          expect(page).not_to have_selector('.line-resolve-btn.is-active')
         end
       end
     end

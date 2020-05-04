@@ -33,7 +33,7 @@ module QA
 
           expect(show).to have_content("I'm starting a new discussion")
           expect(show).to have_content("Could you please check this?")
-          expect(show).to have_content("0/1 thread resolved")
+          expect(show).to have_content("1 unresolved thread")
         end
       end
 
@@ -72,7 +72,7 @@ module QA
           show.resolve_discussion_at_index(0)
 
           expect(show).to have_content("Can you check this line of code?")
-          expect(show).to have_content("1/1 thread resolved")
+          expect(show).to have_content("All threads resolved")
         end
       end
     end
