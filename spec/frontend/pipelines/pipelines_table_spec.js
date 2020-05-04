@@ -18,6 +18,7 @@ describe('Pipelines Table', () => {
       propsData: props,
     });
   };
+  const findRows = () => wrapper.findAll('.commit.gl-responsive-table-row');
 
   preloadFixtures(jsonFixtureName);
 
@@ -51,7 +52,7 @@ describe('Pipelines Table', () => {
 
   describe('without data', () => {
     it('should render an empty table', () => {
-      expect(wrapper.find('.commit.gl-responsive-table-row').exists()).toBe(false);
+      expect(findRows()).toHaveLength(0);
     });
   });
 
@@ -59,7 +60,7 @@ describe('Pipelines Table', () => {
     it('should render rows', () => {
       createComponent({ pipelines: [pipeline], autoDevopsHelpPath: 'foo', viewType: 'root' });
 
-      expect(wrapper.findAll('.commit.gl-responsive-table-row')).toHaveLength(1);
+      expect(findRows()).toHaveLength(1);
     });
   });
 });
