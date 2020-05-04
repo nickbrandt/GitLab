@@ -775,6 +775,31 @@ $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$
 
 For Omnibus installations, Pages logs reside in `/var/log/gitlab/gitlab-pages/current`.
 
+For example:
+
+```json
+{
+  "level": "info",
+  "msg": "GitLab Pages Daemon",
+  "revision": "52b2899",
+  "time": "2020-04-22T17:53:12Z",
+  "version": "1.17.0"
+}
+{
+  "level": "info",
+  "msg": "URL: https://gitlab.com/gitlab-org/gitlab-pages",
+  "time": "2020-04-22T17:53:12Z"
+}
+{
+  "gid": 998,
+  "in-place": false,
+  "level": "info",
+  "msg": "running the daemon as unprivileged user",
+  "time": "2020-04-22T17:53:12Z",
+  "uid": 998
+}
+```
+
 ## Workhorse Logs
 
 For Omnibus installations, Workhorse logs reside in `/var/log/gitlab/gitlab-workhorse/current`.
