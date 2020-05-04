@@ -8,6 +8,8 @@ describe API::PypiPackages do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, reload: true) { create(:project, :public) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
+  let_it_be(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
+  let_it_be(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
 
   describe 'GET /api/v4/projects/:id/packages/pypi/simple/:package_name' do
     let_it_be(:package) { create(:pypi_package, project: project) }
@@ -57,6 +59,8 @@ describe API::PypiPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package GET requests'
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
@@ -113,6 +117,8 @@ describe API::PypiPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package uploads'
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
@@ -196,6 +202,8 @@ describe API::PypiPackages do
         it_behaves_like 'returning response status', :bad_request
       end
 
+      it_behaves_like 'deploy token for package uploads'
+
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
 
@@ -250,6 +258,20 @@ describe API::PypiPackages do
           end
 
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+        end
+      end
+
+      context 'with deploy token headers' do
+        let(:headers) { build_basic_auth_header(deploy_token.username, deploy_token.token) }
+
+        context 'valid token' do
+          it_behaves_like 'returning response status', :success
+        end
+
+        context 'invalid token' do
+          let(:headers) { build_basic_auth_header('foo', 'bar') }
+
+          it_behaves_like 'returning response status', :success
         end
       end
 
