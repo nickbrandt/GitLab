@@ -586,6 +586,7 @@ column widths to make them consistent. For example,
 | Item 1    | Description          |
 | Item 2    | Expanded description |
 ```
+
 If you're using Visual Studio Code, consider installing and using the
 [Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
 extension.
