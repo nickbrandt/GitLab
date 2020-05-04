@@ -141,7 +141,7 @@ describe('Licenses actions', () => {
           const paramsDefault = {
             page: state.pageInfo.page,
             per_page: 10,
-            sort_by: 'classifcation',
+            sort_by: 'classification',
             sort_direction: 'desc',
           };
 
@@ -176,7 +176,7 @@ describe('Licenses actions', () => {
         const paramsSent = {
           ...paramsGiven,
           per_page: 10,
-          sort_by: 'classifcation',
+          sort_by: 'classification',
           sort_direction: 'desc',
         };
 
