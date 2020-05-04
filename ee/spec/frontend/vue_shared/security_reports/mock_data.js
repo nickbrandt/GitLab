@@ -308,7 +308,12 @@ export const mockFindings = [
     report_type: 'dependency_scanning',
     name: 'Cross-site Scripting in serialize-javascript',
     severity: 'unknown',
-    scanner: { external_id: 'gemnasium', name: 'Gemnasium' },
+    scanner: {
+      external_id: 'gemnasium',
+      name: 'Gemnasium',
+      version: '1.1.1',
+      url: 'https://gitlab.com/gitlab-org/security-products/gemnasium',
+    },
     identifiers: [
       {
         external_type: 'gemnasium',

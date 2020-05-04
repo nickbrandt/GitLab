@@ -23434,6 +23434,9 @@ msgstr ""
 msgid "VulnerabilityStatusTypes|Resolved"
 msgstr ""
 
+msgid "Vulnerability|%{scannerName} (version %{scannerVersion})"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -23467,7 +23470,10 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
-msgid "Vulnerability|Report Type"
+msgid "Vulnerability|Scanner Provider"
+msgstr ""
+
+msgid "Vulnerability|Scanner Type"
 msgstr ""
 
 msgid "Vulnerability|Severity"
