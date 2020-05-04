@@ -6,26 +6,47 @@
 With the Go proxy for GitLab, every project in GitLab can be fetched with the
 [Go proxy protocol](https://proxy.golang.org/).
 
-## Enable the Go proxy
+## Prerequisites
 
-NOTE: **Note:**
-This option is available only if your GitLab administrator has
-[enabled support for the Package Registry](../../../administration/packages/index.md). **(PREMIUM ONLY)**
+### Enable the Package Registry
 
-After the Package Registry is enabled, it will be available for all new projects
-by default. To enable it for existing projects, or if you want to disable it:
+The Package Registry is enabled for new projects by default. If you cannot find
+the **{package}** **Packages > List** entry under your project's sidebar, verify
+the following:
 
-1. Navigate to your project's **Settings > General > Permissions**.
-1. Find the Packages feature and enable or disable it.
-1. Click on **Save changes** for the changes to take effect.
-
-You should then be able to see the **Packages** section on the left sidebar.
-Next, you must configure your development environment to use the Go proxy.
+1. Your GitLab administrator has [enabled support for the Package
+   Registry](../../../administration/packages/index.md). **(PREMIUM ONLY)**
+1. The Package Registry is [enabled for your project](../index.md).
 
 NOTE: **Note:**
 GitLab does not display Go modules in the **Packages** section of a project.
 Only the Go proxy protocol is supported at this time, and only for modules on
 GitLab.
+
+### Fetch modules from private projects
+
+NOTE: **Note:**
+`go` does not support transmitting credentials over insecure connections. The
+steps below will only work if GitLab is configured for HTTPS.
+
+GitLab's Go proxy implementation supports HTTP Basic authentication for personal
+access tokens, in addition to the usual authentication mechanisms. To configure
+Go to use HTTP Basic authentication, you must create a [personal access
+token](../../profile/personal_access_tokens.md) with the `api` or `read_api`
+scope and add it to [`~/.netrc`](https://ec.haxx.se/usingcurl/usingcurl-netrc):
+
+```netrc
+machine my-server
+login my-user
+password my-token
+```
+
+Replace `my-user` with your username and `my-token` with your personal access
+token. The value of `my-server` should be `gitlab.com` or the URL of your GitLab
+instance. You can optionally append a path to `my-server`, which will restrict
+the scope that the credentials will be used for. For example, `machine
+gitlab.com/my-group` will restrict the credentials to URLs starting with
+`gitlab.com/my-group`.
 
 ## Add GitLab as a Go proxy
 
@@ -62,31 +83,6 @@ source is hosted).
 ```shell
 go env -w GOPROXY=https://gitlab.com/api/v4/projects/1234/packages/go,https://proxy.golang.org,direct
 ```
-
-## Fetch modules from private projects
-
-NOTE: **Note:**
-`go` does not support transmitting credentials over insecure connections. The
-steps below will only work if GitLab is configured for HTTPS.
-
-GitLab's Go proxy implementation supports HTTP Basic authentication for personal
-access tokens, in addition to the usual authentication mechanisms. To configure
-Go to use HTTP Basic authentication, you must create a [personal access
-token](../../profile/personal_access_tokens.md) with the `api` or `read_api`
-scope and add it to [`~/.netrc`](https://ec.haxx.se/usingcurl/usingcurl-netrc):
-
-```netrc
-machine my-server
-login my-user
-password my-token
-```
-
-Replace `my-user` with your username and `my-token` with your personal access
-token. The value of `my-server` should be `gitlab.com` or the URL of your GitLab
-instance. You can optionally append a path to `my-server`, which will restrict
-the scope that the credentials will be used for. For example, `machine
-gitlab.com/my-group` will restrict the credentials to URLs starting with
-`gitlab.com/my-group`.
 
 ## Release a module
 
