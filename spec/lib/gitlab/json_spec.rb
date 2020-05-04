@@ -40,15 +40,15 @@ RSpec.describe Gitlab::Json do
       # will be updated accordingly.
 
       it "raises an error on a string" do
-        expect { subject.parse('"foo"') }.to raise_error(JSON::ParserError)
+        expect { subject.parse('"foo"', legacy_mode: false) }.to raise_error(JSON::ParserError)
       end
 
       it "raises an error on a true bool" do
-        expect { subject.parse("true") }.to raise_error(JSON::ParserError)
+        expect { subject.parse("true", legacy_mode: false) }.to raise_error(JSON::ParserError)
       end
 
       it "raises an error on a false bool" do
-        expect { subject.parse("false") }.to raise_error(JSON::ParserError)
+        expect { subject.parse("false", legacy_mode: false) }.to raise_error(JSON::ParserError)
       end
     end
   end
