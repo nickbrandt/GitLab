@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-return, func-names, no-underscore-dangle, no-new, consistent-return, no-shadow, no-param-reassign, no-lonely-if, no-else-return, dot-notation, no-empty */
+/* eslint-disable no-useless-return, func-names, no-underscore-dangle, no-new, consistent-return, no-shadow, no-param-reassign, no-lonely-if, dot-notation, no-empty */
 /* global Issuable */
 /* global ListLabel */
 
@@ -55,7 +55,6 @@ export default class LabelsSelect {
         })
         .get();
       const scopedLabels = $dropdown.data('scopedLabels');
-      const scopedLabelsDocumentationLink = $dropdown.data('scopedLabelsDocumentationLink');
       const { handleClick } = options;
       $sidebarLabelTooltip.tooltip();
 
@@ -104,7 +103,6 @@ export default class LabelsSelect {
                 labels: sortBy(data.labels, 'title'),
                 issueUpdateURL,
                 enableScopedLabels: scopedLabels,
-                scopedLabelsDocumentationLink,
               });
               labelCount = data.labels.length;
 
@@ -311,9 +309,8 @@ export default class LabelsSelect {
               firstLabel: selectedLabels[0],
               labelCount: selectedLabels.length - 1,
             });
-          } else {
-            return defaultLabel;
           }
+          return defaultLabel;
         },
         fieldName: $dropdown.data('fieldName'),
         id(label) {
@@ -325,9 +322,8 @@ export default class LabelsSelect {
 
           if ($dropdown.hasClass('js-filter-submit') && label.isAny == null) {
             return label.title;
-          } else {
-            return label.id;
           }
+          return label.id;
         },
         hidden() {
           const page = $('body').attr('data-page');
@@ -499,14 +495,6 @@ export default class LabelsSelect {
       return escapeStr(label.text_color === '#FFFFFF' ? label.color : label.text_color);
     };
 
-    const infoIconTemplate = template(
-      [
-        '<a href="<%= scopedLabelsDocumentationLink %>" class="gl-link gl-label-icon" target="_blank" rel="noopener">',
-        '<i class="fa fa-question-circle"></i>',
-        '</a>',
-      ].join(''),
-    );
-
     const scopedLabelTemplate = template(
       [
         '<span class="gl-label gl-label-scoped" style="color: <%= escapeStr(label.color) %>;">',
@@ -518,7 +506,6 @@ export default class LabelsSelect {
         '<%- label.title.slice(label.title.lastIndexOf("::") + 2) %>',
         '</span>',
         '</a>',
-        '<%= infoIconTemplate({ label, scopedLabelsDocumentationLink, escapeStr }) %>',
         '</span>',
       ].join(''),
     );
@@ -540,7 +527,7 @@ export default class LabelsSelect {
         '<% labels.forEach(function(label){ %>',
         '<% if (isScopedLabel(label) && enableScopedLabels) { %>',
         '<span class="d-inline-block position-relative scoped-label-wrapper">',
-        '<%= scopedLabelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, rightLabelTextColor, infoIconTemplate, scopedLabelsDocumentationLink, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
+        '<%= scopedLabelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, rightLabelTextColor, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
         '</span>',
         '<% } else { %>',
         '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: "" }) %>',
@@ -553,7 +540,6 @@ export default class LabelsSelect {
       ...tplData,
       labelTemplate,
       rightLabelTextColor,
-      infoIconTemplate,
       scopedLabelTemplate,
       tooltipTitleTemplate,
       isScopedLabel,

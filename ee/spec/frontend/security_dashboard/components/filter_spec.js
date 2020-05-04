@@ -60,7 +60,7 @@ describe('Filter component', () => {
     });
 
     it('should display a check next to only the selected items', () => {
-      expect(wrapper.findAll('.dropdown-item .js-check').length).toEqual(3);
+      expect(wrapper.findAll('.dropdown-item .js-check')).toHaveLength(3);
     });
 
     it('should correctly display the selected text', () => {

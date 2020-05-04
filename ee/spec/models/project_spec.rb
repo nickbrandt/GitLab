@@ -1433,7 +1433,7 @@ describe Project do
         let(:plan_license) { :bronze }
 
         it 'filters for bronze features' do
-          is_expected.to contain_exactly(:audit_events, :geo)
+          is_expected.to contain_exactly(:audit_events, :geo, :service_desk)
         end
       end
 
@@ -2076,28 +2076,6 @@ describe Project do
     end
   end
 
-  describe '#design_management_enabled?' do
-    let(:project) { build(:project) }
-
-    where(:lfs_enabled, :hashed_storage_enabled, :expectation) do
-      false | false | false
-      true  | false | false
-      false | true  | false
-      true  | true  | true
-    end
-
-    with_them do
-      before do
-        expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
-        allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
-      end
-
-      it do
-        expect(project.design_management_enabled?).to be(expectation)
-      end
-    end
-  end
-
   describe "#kerberos_url_to_repo" do
     let(:project) { create(:project, path: "somewhere") }
 
@@ -2562,7 +2540,7 @@ describe Project do
         .and_return(wiki)
 
       allow(Repository).to receive(:new)
-        .with('foo.design', project, shard: project.repository_storage, repo_type: ::EE::Gitlab::GlRepository::DESIGN)
+        .with('foo.design', project, shard: project.repository_storage, repo_type: ::Gitlab::GlRepository::DESIGN)
         .and_return(design)
 
       expect(design).to receive(:before_delete)

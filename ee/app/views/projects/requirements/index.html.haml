@@ -50,6 +50,7 @@
   archived: requirements_count['archived'],
   all: total_requirements,
   requirements_web_url: project_requirements_path(@project),
+  can_create_requirement: can?(current_user, :create_requirement, @project),
   empty_state_path: image_path('illustrations/empty-state/empty-requirements-lg.svg') } }
   - if current_tab_count == 0
     -# Show regular spinner only when there will be no

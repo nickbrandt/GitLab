@@ -7,7 +7,7 @@ module Ci
     end
 
     def serializer_class
-      Vulnerabilities::OccurrenceDiffSerializer
+      Vulnerabilities::FindingDiffSerializer
     end
 
     def get_report(pipeline)

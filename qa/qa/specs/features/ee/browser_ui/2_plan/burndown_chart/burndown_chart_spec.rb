@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/merge_requests/29719', type: :waiting_on } do
+  context 'Plan', :reliable do
     describe 'Burndown chart' do
       include ::QA::Support::Dates
 

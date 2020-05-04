@@ -34,7 +34,7 @@ is recommended over [NFS](nfs.md) wherever possible for improved performance.
    mkdir -p /var/opt/gitlab/.ssh /var/opt/gitlab/gitlab-rails/uploads /var/opt/gitlab/gitlab-rails/shared /var/opt/gitlab/gitlab-ci/builds /var/opt/gitlab/git-data
    ```
 
-1. Download/install GitLab Omnibus using **steps 1 and 2** from
+1. Download/install Omnibus GitLab using **steps 1 and 2** from
    [GitLab downloads](https://about.gitlab.com/install/). Do not complete other
    steps on the download page.
 1. Create/edit `/etc/gitlab/gitlab.rb` and use the following configuration.
@@ -79,8 +79,8 @@ is recommended over [NFS](nfs.md) wherever possible for improved performance.
 
    NOTE: **Note:** To maintain uniformity of links across HA clusters, the `external_url`
    on the first application server as well as the additional application
-   servers should point to the external url that users will use to access GitLab.
-   In a typical HA setup, this will be the url of the load balancer which will
+   servers should point to the external URL that users will use to access GitLab.
+   In a typical HA setup, this will be the URL of the load balancer which will
    route traffic to all GitLab application servers in the HA cluster.
 
    NOTE: **Note:** When you specify `https` in the `external_url`, as in the example

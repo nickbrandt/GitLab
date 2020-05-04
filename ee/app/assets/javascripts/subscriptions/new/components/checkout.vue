@@ -7,7 +7,6 @@ import SubscriptionDetails from './checkout/subscription_details.vue';
 import BillingAddress from './checkout/billing_address.vue';
 import PaymentMethod from './checkout/payment_method.vue';
 import ConfirmOrder from './checkout/confirm_order.vue';
-import Tracking from '~/tracking';
 
 export default {
   components: { ProgressBar, SubscriptionDetails, BillingAddress, PaymentMethod, ConfirmOrder },
@@ -18,15 +17,6 @@ export default {
   },
   computed: {
     ...mapState(['isNewUser']),
-  },
-  created() {
-    document.addEventListener('SnowplowInitialized', () => {
-      Tracking.event('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start', {
-        label: null,
-        property: null,
-        value: null,
-      });
-    });
   },
   i18n: {
     checkout: s__('Checkout|Checkout'),

@@ -50,6 +50,10 @@ class Projects::IssuesController < Projects::ApplicationController
     push_frontend_feature_flag(:save_issuable_health_status, project.group, default_enabled: true)
   end
 
+  before_action only: :show do
+    push_frontend_feature_flag(:real_time_issue_sidebar, @project)
+  end
+
   around_action :allow_gitaly_ref_name_caching, only: [:discussions]
 
   respond_to :html
@@ -154,7 +158,10 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def related_branches
-    @related_branches = Issues::RelatedBranchesService.new(project, current_user).execute(issue)
+    @related_branches = Issues::RelatedBranchesService
+      .new(project, current_user)
+      .execute(issue)
+      .map { |branch| branch.merge(link: branch_link(branch)) }
 
     respond_to do |format|
       format.json do
@@ -305,6 +312,10 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   private
+
+  def branch_link(branch)
+    project_compare_path(project, from: project.default_branch, to: branch[:name])
+  end
 
   def create_rate_limit
     key = :issues_create

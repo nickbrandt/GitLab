@@ -55,7 +55,7 @@ static-analysis:
   script:
     - scripts/static-analysis
   cache:
-    key: "ruby-2.6.5-pg9-rubocop"
+    key: "ruby-2.6.6-pg9-rubocop"
     paths:
       - vendor/ruby
       - tmp/rubocop_cache
@@ -143,6 +143,7 @@ db:migrate:reset:
 db:check-schema:
   extends: .db-job-base
   script:
+    - scripts/regenerate-schema
     - source scripts/schema_changed.sh
 
 db:migrate-from-v11.11.0:

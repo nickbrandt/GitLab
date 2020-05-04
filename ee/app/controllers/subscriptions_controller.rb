@@ -6,7 +6,6 @@ class SubscriptionsController < ApplicationController
 
   content_security_policy do |p|
     next if p.directives.blank?
-    next unless Feature.enabled?(:paid_signup_flow)
 
     default_script_src = p.directives['script-src'] || p.directives['default-src']
     script_src_values = Array.wrap(default_script_src) | ["'self'", "'unsafe-eval'", 'https://*.zuora.com']
@@ -23,18 +22,10 @@ class SubscriptionsController < ApplicationController
   end
 
   def new
-    if experiment_enabled?(:paid_signup_flow)
-      track_paid_signup_flow_event('start_experiment') unless experiment_already_started?
+    return if current_user
 
-      if current_user
-        track_paid_signup_flow_event('start')
-      else
-        store_location_for_user
-        redirect_to new_user_registration_path(redirect_from: 'checkout')
-      end
-    else
-      redirect_to customer_portal_new_subscription_url
-    end
+    store_location_for_user
+    redirect_to new_user_registration_path(redirect_from: 'checkout')
   end
 
   def payment_form
@@ -67,31 +58,20 @@ class SubscriptionsController < ApplicationController
     ).execute
 
     if response[:success]
-      plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
       redirect_location = if params[:selected_group]
                             group_path(group)
                           else
+                            plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
                             edit_subscriptions_group_path(group.path, plan_id: plan_id, quantity: quantity, new_user: params[:new_user])
                           end
 
-      response[:data] = { location: redirect_location, plan_id: plan_id, quantity: quantity }
-
-      track_paid_signup_flow_event('end', label: plan_id, value: quantity)
+      response[:data] = { location: redirect_location }
     end
 
     render json: response[:data]
   end
 
   private
-
-  def track_paid_signup_flow_event(action, label: nil, value: nil)
-    ::Gitlab::Tracking.event(
-      'Growth::Acquisition::Experiment::PaidSignUpFlow',
-      action,
-      label: label,
-      value: value
-    )
-  end
 
   def customer_params
     params.require(:customer).permit(:country, :address_1, :address_2, :city, :state, :zip_code, :company)

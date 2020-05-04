@@ -31,7 +31,7 @@ module Audit
     def action_text
       action_name = @details.slice(*ACTIONS).first
 
-      case action.each_key.first
+      case action_name
       when :add
         "Added #{target_name}#{@details[:as] ? " as #{@details[:as]}" : ''}"
       when :remove

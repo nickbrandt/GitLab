@@ -122,7 +122,7 @@ export default {
         <div class="deploy-board-information">
           <section class="deploy-board-status">
             <span v-gl-tooltip :title="instanceIsCompletedText">
-              <span ref="percentage" class="text-center text-plain gl-font-size-large"
+              <span ref="percentage" class="text-center text-plain gl-font-lg"
                 >{{ deployBoardData.completion }}%</span
               >
               <span class="text text-center text-secondary">{{ __('Complete') }}</span>
@@ -130,7 +130,7 @@ export default {
           </section>
 
           <section class="deploy-board-instances">
-            <span class="deploy-board-instances-text gl-font-size-14 text-secondary">
+            <span class="deploy-board-instances-text gl-font-base text-secondary">
               {{ instanceTitle }} ({{ instanceCount }})
             </span>
 

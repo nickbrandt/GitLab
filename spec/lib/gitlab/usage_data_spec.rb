@@ -7,6 +7,8 @@ describe Gitlab::UsageData, :aggregate_failures do
 
   before do
     allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+
+    stub_object_store_settings
   end
 
   shared_examples "usage data execution" do
@@ -42,6 +44,9 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:projects_jira_active]).to eq(4)
         expect(count_data[:projects_jira_server_active]).to eq(2)
         expect(count_data[:projects_jira_cloud_active]).to eq(2)
+        expect(count_data[:jira_imports_projects_count]).to eq(2)
+        expect(count_data[:jira_imports_total_imported_count]).to eq(3)
+        expect(count_data[:jira_imports_total_imported_issues_count]).to eq(13)
         expect(count_data[:projects_slack_notifications_active]).to eq(2)
         expect(count_data[:projects_slack_slash_active]).to eq(1)
         expect(count_data[:projects_slack_active]).to eq(2)
@@ -80,6 +85,16 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:grafana_integrated_projects]).to eq(2)
         expect(count_data[:clusters_applications_jupyter]).to eq(1)
         expect(count_data[:clusters_management_project]).to eq(1)
+      end
+
+      it 'gathers object store usage correctly' do
+        expect(subject[:object_store]).to eq(
+          { artifacts: { enabled: true, object_store: { enabled: true, direct_upload: true, background_upload: false, provider: "AWS" } },
+           external_diffs: { enabled: false },
+           lfs: { enabled: true, object_store: { enabled: false, direct_upload: true, background_upload: false, provider: "AWS" } },
+           uploads: { enabled: nil, object_store: { enabled: false, direct_upload: true, background_upload: false, provider: "AWS" } },
+           packages: { enabled: true, object_store: { enabled: false, direct_upload: false, background_upload: true, provider: "AWS" } } }
+        )
       end
 
       it 'works when queries time out' do
@@ -223,6 +238,66 @@ describe Gitlab::UsageData, :aggregate_failures do
         end
       end
 
+      describe '#object_store_config' do
+        let(:component) { 'lfs' }
+
+        subject { described_class.object_store_config(component) }
+
+        context 'when object_store is not configured' do
+          it 'returns component enable status only' do
+            allow(Settings).to receive(:[]).with(component).and_return({ 'enabled' => false })
+
+            expect(subject).to eq({ enabled: false })
+          end
+        end
+
+        context 'when object_store is configured' do
+          it 'returns filtered object store config' do
+            allow(Settings).to receive(:[]).with(component)
+              .and_return(
+                { 'enabled' => true,
+                  'object_store' =>
+                  { 'enabled' => true,
+                    'remote_directory' => component,
+                    'direct_upload' => true,
+                    'connection' =>
+                  { 'provider' => 'AWS', 'aws_access_key_id' => 'minio', 'aws_secret_access_key' => 'gdk-minio', 'region' => 'gdk', 'endpoint' => 'http://127.0.0.1:9000', 'path_style' => true },
+                    'background_upload' => false,
+                    'proxy_download' => false } })
+
+            expect(subject).to eq(
+              { enabled: true, object_store: { enabled: true, direct_upload: true, background_upload: false, provider: "AWS" } })
+          end
+        end
+
+        context 'when retrieve component setting meets exception' do
+          it 'returns -1 for component enable status' do
+            allow(Settings).to receive(:[]).with(component).and_raise(StandardError)
+
+            expect(subject).to eq({ enabled: -1 })
+          end
+        end
+      end
+
+      describe '#object_store_usage_data' do
+        subject { described_class.object_store_usage_data }
+
+        it 'fetches object store config of five components' do
+          %w(artifacts external_diffs lfs uploads packages).each do |component|
+            expect(described_class).to receive(:object_store_config).with(component).and_return("#{component}_object_store_config")
+          end
+
+          expect(subject).to eq(
+            object_store: {
+              artifacts: 'artifacts_object_store_config',
+              external_diffs: 'external_diffs_object_store_config',
+              lfs: 'lfs_object_store_config',
+              uploads: 'uploads_object_store_config',
+              packages: 'packages_object_store_config'
+            })
+        end
+      end
+
       describe '#cycle_analytics_usage_data' do
         subject { described_class.cycle_analytics_usage_data }
 
@@ -244,18 +319,132 @@ describe Gitlab::UsageData, :aggregate_failures do
       describe '#ingress_modsecurity_usage' do
         subject { described_class.ingress_modsecurity_usage }
 
-        it 'gathers variable data' do
-          allow_any_instance_of(
-            ::Clusters::Applications::IngressModsecurityUsageService
-          ).to receive(:execute).and_return(
-            {
-              ingress_modsecurity_blocking: 1,
-              ingress_modsecurity_disabled: 2
-            }
-          )
+        let(:environment) { create(:environment) }
+        let(:project) { environment.project }
+        let(:environment_scope) { '*' }
+        let(:deployment) { create(:deployment, :success, environment: environment, project: project, cluster: cluster) }
+        let(:cluster) { create(:cluster, environment_scope: environment_scope, projects: [project]) }
+        let(:ingress_mode) { :modsecurity_blocking }
+        let!(:ingress) { create(:clusters_applications_ingress, ingress_mode, cluster: cluster) }
 
-          expect(subject[:ingress_modsecurity_blocking]).to eq(1)
-          expect(subject[:ingress_modsecurity_disabled]).to eq(2)
+        context 'when cluster is disabled' do
+          let(:cluster) { create(:cluster, :disabled, projects: [project]) }
+
+          it 'gathers ingress data' do
+            expect(subject[:ingress_modsecurity_logging]).to eq(0)
+            expect(subject[:ingress_modsecurity_blocking]).to eq(0)
+            expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+            expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+          end
+        end
+
+        context 'when deployment is unsuccessful' do
+          let!(:deployment) { create(:deployment, :failed, environment: environment, project: project, cluster: cluster) }
+
+          it 'gathers ingress data' do
+            expect(subject[:ingress_modsecurity_logging]).to eq(0)
+            expect(subject[:ingress_modsecurity_blocking]).to eq(0)
+            expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+            expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+          end
+        end
+
+        context 'when deployment is successful' do
+          let!(:deployment) { create(:deployment, :success, environment: environment, project: project, cluster: cluster) }
+
+          context 'when modsecurity is in blocking mode' do
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(1)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'when modsecurity is in logging mode' do
+            let(:ingress_mode) { :modsecurity_logging }
+
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(1)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(0)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'when modsecurity is disabled' do
+            let(:ingress_mode) { :modsecurity_disabled }
+
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(0)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(1)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'when modsecurity is not installed' do
+            let(:ingress_mode) { :modsecurity_not_installed }
+
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(0)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(1)
+            end
+          end
+
+          context 'with multiple projects' do
+            let(:environment_2) { create(:environment) }
+            let(:project_2) { environment_2.project }
+            let(:cluster_2) { create(:cluster, environment_scope: environment_scope, projects: [project_2]) }
+            let!(:ingress_2) { create(:clusters_applications_ingress, :modsecurity_logging, cluster: cluster_2) }
+            let!(:deployment_2) { create(:deployment, :success, environment: environment_2, project: project_2, cluster: cluster_2) }
+
+            it 'gathers non-duplicated ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(1)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(1)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'with multiple deployments' do
+            let!(:deployment_2) { create(:deployment, :success, environment: environment, project: project, cluster: cluster) }
+
+            it 'gathers non-duplicated ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(1)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'with multiple projects' do
+            let(:environment_2) { create(:environment) }
+            let(:project_2) { environment_2.project }
+            let!(:deployment_2) { create(:deployment, :success, environment: environment_2, project: project_2, cluster: cluster) }
+            let(:cluster) { create(:cluster, environment_scope: environment_scope, projects: [project, project_2]) }
+
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(2)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
+
+          context 'with multiple environments' do
+            let!(:environment_2) { create(:environment, project: project) }
+            let!(:deployment_2) { create(:deployment, :success, environment: environment_2, project: project, cluster: cluster) }
+
+            it 'gathers ingress data' do
+              expect(subject[:ingress_modsecurity_logging]).to eq(0)
+              expect(subject[:ingress_modsecurity_blocking]).to eq(2)
+              expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+              expect(subject[:ingress_modsecurity_not_installed]).to eq(0)
+            end
+          end
         end
       end
 

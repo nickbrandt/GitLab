@@ -48,7 +48,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
       end
 
       it "adds report image's name to raw_metadata" do
-        expect(JSON.parse(report.occurrences.first.raw_metadata).dig('location', 'image')).to eq(image)
+        expect(Gitlab::Json.parse(report.occurrences.first.raw_metadata).dig('location', 'image')).to eq(image)
       end
     end
   end

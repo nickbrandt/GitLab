@@ -39,7 +39,9 @@ export const findVersionId = id => (id.match('::Version/(.+$)') || [])[1];
 
 export const findNoteId = id => (id.match('DiffNote/(.+$)') || [])[1];
 
-export const extractDesign = data => data.project.issue.designCollection.designs.edges[0].node;
+export const extractDesigns = data => data.project.issue.designCollection.designs.edges;
+
+export const extractDesign = data => (extractDesigns(data) || [])[0]?.node;
 
 /**
  * Generates optimistic response for a design upload mutation

@@ -14,7 +14,11 @@ module EE
 
           expose :checked_file_template_project_id,
                  as: :file_template_project_id,
-                 if: ->(group, options) { group.feature_available?(:custom_file_templates_for_namespace) }
+                 if: ->(group, options) {
+                       group.feature_available?(:custom_file_templates_for_namespace) &&
+                       Ability.allowed?(options[:current_user], :read_project, group.checked_file_template_project)
+                     }
+
           expose :marked_for_deletion_on, if: ->(group, _) { group.feature_available?(:adjourned_deletion_for_projects_and_groups) }
         end
       end

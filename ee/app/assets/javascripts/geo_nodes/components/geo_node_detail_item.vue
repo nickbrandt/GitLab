@@ -113,7 +113,7 @@ export default {
         class="d-inline-flex align-items-center cursor-pointer"
       >
         <gl-icon name="canceled-circle" :size="14" class="mr-1 text-secondary-300" />
-        <span ref="disabledText" class="text-secondary-600 gl-font-size-small">{{
+        <span ref="disabledText" class="text-secondary-600 gl-font-sm">{{
           __('Synchronization disabled')
         }}</span>
       </div>
@@ -126,12 +126,9 @@ export default {
         <section>
           <p>{{ __('Synchronization of container repositories is disabled.') }}</p>
           <div class="mt-3">
-            <gl-link
-              class="gl-font-size-small"
-              :href="$options.replicationHelpUrl"
-              target="_blank"
-              >{{ __('Learn how to enable synchronization') }}</gl-link
-            >
+            <gl-link class="gl-font-sm" :href="$options.replicationHelpUrl" target="_blank">{{
+              __('Learn how to enable synchronization')
+            }}</gl-link>
           </div>
         </section>
       </gl-popover>

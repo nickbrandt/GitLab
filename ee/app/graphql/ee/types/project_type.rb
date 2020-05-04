@@ -16,12 +16,10 @@ module EE
               ::Types::VulnerabilityType.connection_type,
               null: true,
               description: 'Vulnerabilities reported on the project',
-              resolver: Resolvers::VulnerabilitiesResolver,
-              feature_flag: :first_class_vulnerabilities
+              resolver: Resolvers::VulnerabilitiesResolver
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each severity of vulnerability of the project',
-               feature_flag: :first_class_vulnerabilities,
                resolve: -> (obj, _args, ctx) do
                  Hash.new(0).merge(
                    obj.vulnerabilities.with_states([:detected, :confirmed]).counts_by_severity

@@ -55,11 +55,11 @@ describe('MergeRequestTable component', () => {
     });
 
     it('renders a dropdown item for each item in columnOptions', () => {
-      expect(findDropdownItems().length).toBe(Object.keys(defaultProps.columnOptions).length);
+      expect(findDropdownItems()).toHaveLength(Object.keys(defaultProps.columnOptions).length);
     });
 
     it('renders a row for every MR', () => {
-      expect(findMergeRequestTableRows().length).toBe(2);
+      expect(findMergeRequestTableRows()).toHaveLength(2);
     });
   });
 

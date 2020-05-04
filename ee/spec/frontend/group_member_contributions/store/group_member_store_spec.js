@@ -39,7 +39,7 @@ describe('GroupMemberStore', () => {
     it('sets members to store state', () => {
       store.setMembers(rawMembers);
 
-      expect(store.state.members.length).toBe(rawMembers.length);
+      expect(store.state.members).toHaveLength(rawMembers.length);
     });
   });
 

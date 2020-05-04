@@ -516,6 +516,9 @@ msgstr[1] ""
 msgid "%{text} is available"
 msgstr ""
 
+msgid "%{timebox_name} should belong either to a project or a group."
+msgstr ""
+
 msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
@@ -1692,6 +1695,9 @@ msgstr[1] ""
 msgid "Alert Details"
 msgstr ""
 
+msgid "AlertManagement|Acknowledged"
+msgstr ""
+
 msgid "AlertManagement|Alert"
 msgstr ""
 
@@ -1701,10 +1707,19 @@ msgstr ""
 msgid "AlertManagement|Display alerts from all your monitoring tools directly within GitLab. Streamline the investigation of your alerts and the escalation of alerts to incidents."
 msgstr ""
 
-msgid "AlertManagement|End Time"
+msgid "AlertManagement|End time"
+msgstr ""
+
+msgid "AlertManagement|End time:"
 msgstr ""
 
 msgid "AlertManagement|Events"
+msgstr ""
+
+msgid "AlertManagement|Events:"
+msgstr ""
+
+msgid "AlertManagement|Full Alert Details"
 msgstr ""
 
 msgid "AlertManagement|More information"
@@ -1716,16 +1731,31 @@ msgstr ""
 msgid "AlertManagement|No alerts to display."
 msgstr ""
 
+msgid "AlertManagement|Overview"
+msgstr ""
+
+msgid "AlertManagement|Resolved"
+msgstr ""
+
 msgid "AlertManagement|Severity"
 msgstr ""
 
-msgid "AlertManagement|Start Time"
+msgid "AlertManagement|Start time"
+msgstr ""
+
+msgid "AlertManagement|Start time:"
 msgstr ""
 
 msgid "AlertManagement|Status"
 msgstr ""
 
+msgid "AlertManagement|Surface alerts in GitLab"
+msgstr ""
+
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
+msgstr ""
+
+msgid "AlertManagement|Triggered"
 msgstr ""
 
 msgid "AlertService|%{linkStart}Learn more%{linkEnd} about configuring this endpoint to receive alerts."
@@ -3354,6 +3384,9 @@ msgstr ""
 msgid "Buy GitLab Enterprise Edition"
 msgstr ""
 
+msgid "Buy more Pipeline minutes"
+msgstr ""
+
 msgid "By %{user_name}"
 msgstr ""
 
@@ -4149,9 +4182,6 @@ msgstr ""
 msgid "Click any <strong>project name</strong> in the project list below to navigate to the project milestone."
 msgstr ""
 
-msgid "Click here"
-msgstr ""
-
 msgid "Click the <strong>Download</strong> button and wait for downloading to complete."
 msgstr ""
 
@@ -4542,7 +4572,7 @@ msgstr ""
 msgid "ClusterIntegration|Fluentd"
 msgstr ""
 
-msgid "ClusterIntegration|Fluentd is an open source data collector, which lets you unify the data collection and consumption for a better use and understanding of data. Export Web Application Firewall logs to your favorite SIEM."
+msgid "ClusterIntegration|Fluentd is an open source data collector, which lets you unify the data collection and consumption for a better use and understanding of data. It requires at least one of the following logs to be successfully installed."
 msgstr ""
 
 msgid "ClusterIntegration|GitLab Integration"
@@ -4954,6 +4984,12 @@ msgid "ClusterIntegration|Select zone"
 msgstr ""
 
 msgid "ClusterIntegration|Select zone to choose machine type"
+msgstr ""
+
+msgid "ClusterIntegration|Send Cilium Logs"
+msgstr ""
+
+msgid "ClusterIntegration|Send ModSecurity Logs"
 msgstr ""
 
 msgid "ClusterIntegration|Service Token"
@@ -5597,9 +5633,6 @@ msgstr ""
 msgid "ContainerRegistry|Docker tag expiration policy is %{toggleStatus}"
 msgstr ""
 
-msgid "ContainerRegistry|Docker tags with names matching this regex pattern will expire:"
-msgstr ""
-
 msgid "ContainerRegistry|Edit Settings"
 msgstr ""
 
@@ -5645,7 +5678,10 @@ msgstr ""
 msgid "ContainerRegistry|Quick Start"
 msgstr ""
 
-msgid "ContainerRegistry|Regular expressions such as %{codeStart}.*-test%{codeEnd} or %{codeStart}dev-.*%{codeEnd} are supported.  To select all tags, use %{codeStart}.*%{codeEnd}"
+msgid "ContainerRegistry|Regular expressions such as %{codeStart}.*-test%{codeEnd} or %{codeStart}dev-.*%{codeEnd} are supported"
+msgstr ""
+
+msgid "ContainerRegistry|Regular expressions such as %{codeStart}.*-test%{codeEnd} or %{codeStart}dev-.*%{codeEnd} are supported. To select all tags, use %{codeStart}.*%{codeEnd}"
 msgstr ""
 
 msgid "ContainerRegistry|Remove repository"
@@ -5696,6 +5732,12 @@ msgid "ContainerRegistry|Tag expiration policy is designed to:"
 msgstr ""
 
 msgid "ContainerRegistry|Tags deleted successfully"
+msgstr ""
+
+msgid "ContainerRegistry|Tags with names matching this regex pattern will %{italicStart}be preserved:%{italicEnd}"
+msgstr ""
+
+msgid "ContainerRegistry|Tags with names matching this regex pattern will %{italicStart}expire:%{italicEnd}"
 msgstr ""
 
 msgid "ContainerRegistry|The Container Registry tag expiration and retention policies for this project have not been enabled."
@@ -5986,7 +6028,7 @@ msgstr ""
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
-msgid "Could not find design"
+msgid "Could not find design."
 msgstr ""
 
 msgid "Could not remove the trigger."
@@ -12058,6 +12100,9 @@ msgstr ""
 msgid "Lead"
 msgstr ""
 
+msgid "Lead Time"
+msgstr ""
+
 msgid "Learn GitLab"
 msgstr ""
 
@@ -13129,6 +13174,9 @@ msgstr ""
 msgid "Metrics|For grouping similar metrics"
 msgstr ""
 
+msgid "Metrics|Go back (Esc)"
+msgstr ""
+
 msgid "Metrics|Invalid time range, please verify."
 msgstr ""
 
@@ -13746,6 +13794,9 @@ msgid "No changes"
 msgstr ""
 
 msgid "No changes between %{ref_start}%{source_branch}%{ref_end} and %{ref_start}%{target_branch}%{ref_end}"
+msgstr ""
+
+msgid "No child epics match applied filters"
 msgstr ""
 
 msgid "No connection could be made to a Gitaly Server, please check your logs!"
@@ -14905,15 +14956,6 @@ msgstr ""
 msgid "Pipelines settings for '%{project_name}' were successfully updated."
 msgstr ""
 
-msgid "Pipelines| to purchase more minutes."
-msgstr ""
-
-msgid "Pipelines|%{namespace_name} has exceeded its pipeline minutes quota."
-msgstr ""
-
-msgid "Pipelines|%{namespace_name} has less than %{notification_level}%% of CI minutes available."
-msgstr ""
-
 msgid "Pipelines|API"
 msgstr ""
 
@@ -14935,10 +14977,13 @@ msgstr ""
 msgid "Pipelines|Get started with Pipelines"
 msgstr ""
 
-msgid "Pipelines|Loading Pipelines"
+msgid "Pipelines|Group %{namespace_name} has %{percentage}%% or less Shared Runner Pipeline minutes remaining.  Once it runs out, no new jobs or pipelines in its projects will run."
 msgstr ""
 
-msgid "Pipelines|Pipelines will not run anymore on shared Runners."
+msgid "Pipelines|Group %{namespace_name} has exceeded its pipeline minutes quota. Unless you buy additional pipeline minutes, no new jobs or pipelines in its projects will run."
+msgstr ""
+
+msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
 msgid "Pipelines|Project cache successfully reset."
@@ -17443,7 +17488,7 @@ msgstr ""
 msgid "Requested %{time_ago}"
 msgstr ""
 
-msgid "Requested design version does not exist"
+msgid "Requested design version does not exist."
 msgstr ""
 
 msgid "Requested states are invalid"
@@ -19169,6 +19214,9 @@ msgstr ""
 msgid "Snowplow"
 msgstr ""
 
+msgid "Some child epics may be hidden due to applied filters"
+msgstr ""
+
 msgid "Some email servers do not support overriding the email sender name. Enable this option to include the name of the author of the issue, merge request or comment in the email body instead."
 msgstr ""
 
@@ -20156,9 +20204,6 @@ msgstr ""
 msgid "Support page URL"
 msgstr ""
 
-msgid "Surface alerts in GitLab"
-msgstr ""
-
 msgid "Switch branch/tag"
 msgstr ""
 
@@ -20640,6 +20685,9 @@ msgid "The license was removed. GitLab now no longer has a valid license."
 msgstr ""
 
 msgid "The license was successfully uploaded and is now active. You can see the details below."
+msgstr ""
+
+msgid "The license was successfully uploaded and will be active from %{starts_at}. You can see the details below."
 msgstr ""
 
 msgid "The maximum file size allowed is %{size}."
@@ -22221,6 +22269,9 @@ msgstr ""
 msgid "Unable to connect to server: %{error}"
 msgstr ""
 
+msgid "Unable to connect to the Jira instance. Please check your Jira integration configuration."
+msgstr ""
+
 msgid "Unable to convert Kubernetes logs encoding to UTF-8"
 msgstr ""
 
@@ -23383,6 +23434,9 @@ msgstr ""
 msgid "VulnerabilityStatusTypes|Resolved"
 msgstr ""
 
+msgid "Vulnerability|%{scannerName} (version %{scannerVersion})"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -23416,7 +23470,10 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
-msgid "Vulnerability|Report Type"
+msgid "Vulnerability|Scanner Provider"
+msgstr ""
+
+msgid "Vulnerability|Scanner Type"
 msgstr ""
 
 msgid "Vulnerability|Severity"
@@ -24072,6 +24129,9 @@ msgstr ""
 msgid "You have declined the invitation to join %{label}."
 msgstr ""
 
+msgid "You have imported from this project %{numberOfPreviousImportsForProject} times before. Each new import will create duplicate issues."
+msgstr ""
+
 msgid "You have no permissions"
 msgstr ""
 
@@ -24461,7 +24521,7 @@ msgstr ""
 msgid "allowed to fail"
 msgstr ""
 
-msgid "already being used for another group or project milestone."
+msgid "already being used for another group or project %{timebox_name}."
 msgstr ""
 
 msgid "already has a \"created\" issue link"
@@ -25072,9 +25132,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "merged %{time_ago}"
-msgstr ""
-
-msgid "milestone should belong either to a project or a group."
 msgstr ""
 
 msgid "missing"

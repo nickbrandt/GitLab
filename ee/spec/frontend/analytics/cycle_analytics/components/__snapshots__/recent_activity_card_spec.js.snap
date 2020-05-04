@@ -31,7 +31,7 @@ exports[`RecentActivityCard matches the snapshot 1`] = `
         </h3>
          
         <p
-          class="text-secondary gl-font-size-small mb-2"
+          class="text-secondary gl-font-sm mb-2"
         >
           New Issues
         </p>
@@ -46,7 +46,7 @@ exports[`RecentActivityCard matches the snapshot 1`] = `
         </h3>
          
         <p
-          class="text-secondary gl-font-size-small mb-2"
+          class="text-secondary gl-font-sm mb-2"
         >
           Deploys
         </p>
@@ -61,7 +61,7 @@ exports[`RecentActivityCard matches the snapshot 1`] = `
         </h3>
          
         <p
-          class="text-secondary gl-font-size-small mb-2"
+          class="text-secondary gl-font-sm mb-2"
         >
           Deployment Frequency
         </p>

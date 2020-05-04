@@ -42,7 +42,7 @@ module EE
         end
 
         def design_path_suffix
-          @design_path_suffix ||= EE::Gitlab::GlRepository::DESIGN.path_suffix
+          @design_path_suffix ||= ::Gitlab::GlRepository::DESIGN.path_suffix
         end
 
         def old_design_disk_path

@@ -19,7 +19,7 @@ class FetchSubscriptionPlansService
                                 query: { plan: @plan },
                                 headers: { 'Accept' => 'application/json' })
 
-    JSON.parse(response.body).map { |plan| Hashie::Mash.new(plan) }
+    Gitlab::Json.parse(response.body).map { |plan| Hashie::Mash.new(plan) }
   rescue => e
     Rails.logger.info "Unable to connect to GitLab Customers App #{e}" # rubocop:disable Gitlab/RailsLogger
 

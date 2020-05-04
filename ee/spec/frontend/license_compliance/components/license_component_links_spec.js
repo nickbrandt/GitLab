@@ -50,7 +50,7 @@ describe('LicenseComponentLinks component', () => {
   it.each([3, 5, 8, 13])('limits the number of visible licenses to 2', numComponents => {
     factory({ numComponents });
 
-    expect(findComponentListItems().length).toBe(VISIBLE_COMPONENT_COUNT);
+    expect(findComponentListItems()).toHaveLength(VISIBLE_COMPONENT_COUNT);
   });
 
   it.each`
@@ -66,11 +66,11 @@ describe('LicenseComponentLinks component', () => {
     ({ numComponents, numComponentsWithUrl, expectedNumVisibleLinks, expectedNumModalLinks }) => {
       factory({ numComponents, numComponentsWithUrl });
 
-      expect(findComponentsList().findAll(GlLink).length).toBe(expectedNumVisibleLinks);
+      expect(findComponentsList().findAll(GlLink)).toHaveLength(expectedNumVisibleLinks);
 
       // findModal() is an empty wrapper if we have less than VISIBLE_COMPONENT_COUNT
       if (numComponents > VISIBLE_COMPONENT_COUNT) {
-        expect(findModal().findAll(GlLink).length).toBe(expectedNumModalLinks);
+        expect(findModal().findAll(GlLink)).toHaveLength(expectedNumModalLinks);
       } else {
         expect(findModal().exists()).toBe(false);
       }
@@ -114,7 +114,7 @@ describe('LicenseComponentLinks component', () => {
     ({ numComponents, expectedNumModals }) => {
       factory({ numComponents, expectedNumModals });
 
-      expect(wrapper.findAll(GlModal).length).toBe(expectedNumModals);
+      expect(wrapper.findAll(GlModal)).toHaveLength(expectedNumModals);
     },
   );
 

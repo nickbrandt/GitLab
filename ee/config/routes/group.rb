@@ -23,7 +23,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     namespace :analytics do
       resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
 
-      constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG, default_enabled: Gitlab::Analytics.feature_enabled_by_default?(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG))) do
+      feature_default_enabled = Gitlab::Analytics.feature_enabled_by_default?(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)
+      constrainer = ::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG, default_enabled: feature_default_enabled)
+      constraints(constrainer) do
         resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
         scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
           resources :stages, only: [:index, :create, :update, :destroy] do
@@ -38,11 +40,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         get '/cycle_analytics', to: redirect('-/analytics/value_stream_analytics')
       end
 
-      constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG)) do
-        scope :type_of_work do
-          resource :tasks_by_type, controller: :tasks_by_type, only: :show do
-            get :top_labels
-          end
+      scope :type_of_work do
+        resource :tasks_by_type, controller: :tasks_by_type, only: :show do
+          get :top_labels
         end
       end
     end

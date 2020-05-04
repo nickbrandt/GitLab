@@ -43,7 +43,7 @@ describe('StageBuildItem', () => {
   it('will render the events list', () => {
     const items = wrapper.findAll($sel.item);
     expect(items.length > 0).toBe(true);
-    expect(items.length).toEqual(events.length);
+    expect(items).toHaveLength(events.length);
   });
   it('will render the build pipeline id', () => {
     events.forEach((item, index) => {

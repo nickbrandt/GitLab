@@ -25,13 +25,13 @@ module Resolvers
       # At this point we need the `id` of the project to query for issues, so
       # make sure it's loaded and not `nil` before continuing.
       project = object.respond_to?(:sync) ? object.sync : object
-      return Requirement.none if project.nil?
-      return Requirement.none unless Feature.enabled?(:requirements_management, project, default_enabled: true)
+      return RequirementsManagement::Requirement.none if project.nil?
+      return RequirementsManagement::Requirement.none unless Feature.enabled?(:requirements_management, project, default_enabled: true)
 
       args[:project_id] = project.id
       args[:iids] ||= [args[:iid]].compact
 
-      RequirementsFinder.new(context[:current_user], args).execute
+      RequirementsManagement::RequirementsFinder.new(context[:current_user], args).execute
     end
   end
 end

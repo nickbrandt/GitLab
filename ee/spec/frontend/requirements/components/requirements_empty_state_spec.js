@@ -4,19 +4,18 @@ import { GlEmptyState, GlDeprecatedButton } from '@gitlab/ui';
 import RequirementsEmptyState from 'ee/requirements/components/requirements_empty_state.vue';
 import { FilterState } from 'ee/requirements/constants';
 
-const createComponent = (
-  filterBy = FilterState.opened,
-  emptyStatePath = '/assets/illustrations/empty-state/requirements.svg',
-) =>
+const createComponent = (props = {}) =>
   shallowMount(RequirementsEmptyState, {
     propsData: {
-      filterBy,
-      emptyStatePath,
+      filterBy: FilterState.opened,
+      emptyStatePath: '/assets/illustrations/empty-state/requirements.svg',
       requirementsCount: {
         OPENED: 0,
         ARCHIVED: 0,
         ALL: 0,
       },
+      canCreateRequirement: true,
+      ...props,
     },
     stubs: { GlEmptyState },
   });
@@ -120,6 +119,18 @@ describe('RequirementsEmptyState', () => {
           ARCHIVED: 0,
           ALL: 2,
         },
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        const newReqButton = wrapper.find(GlDeprecatedButton);
+
+        expect(newReqButton.exists()).toBe(false);
+      });
+    });
+
+    it('does not render new requirement button when user is not authenticated', () => {
+      wrapper = createComponent({
+        canCreateRequirement: false,
       });
 
       return wrapper.vm.$nextTick(() => {

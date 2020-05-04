@@ -104,6 +104,8 @@ describe 'Issue Boards', :js do
     it 'assignees to current user' do
       click_card(card2)
 
+      wait_for_requests
+
       page.within(find('.assignee')) do
         expect(find('.qa-assign-yourself')).to have_content('None')
 

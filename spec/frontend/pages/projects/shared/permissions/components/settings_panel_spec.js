@@ -57,9 +57,6 @@ describe('Settings Panel', () => {
 
     return mountFn(settingsPanel, {
       propsData,
-      provide: {
-        glFeatures: { metricsDashboardVisibilitySwitchingAvailable: true },
-      },
     });
   };
 
@@ -489,15 +486,22 @@ describe('Settings Panel', () => {
         .find('[name="project[project_feature_attributes][metrics_dashboard_access_level]"]')
         .setValue(visibilityOptions.PUBLIC);
 
-      expect(wrapper.vm.metricsAccessLevel).toBe(visibilityOptions.PUBLIC);
+      expect(wrapper.vm.metricsDashboardAccessLevel).toBe(visibilityOptions.PUBLIC);
     });
 
     it('should contain help text', () => {
-      wrapper = overrideCurrentSettings({ visibilityLevel: visibilityOptions.PRIVATE });
-
       expect(wrapper.find({ ref: 'metrics-visibility-settings' }).props().helpText).toEqual(
         'With Metrics Dashboard you can visualize this project performance metrics',
       );
+    });
+
+    it('should disable the metrics visibility dropdown when the project visibility level changes to private', () => {
+      wrapper = overrideCurrentSettings({ visibilityLevel: visibilityOptions.PRIVATE });
+
+      const metricsSettingsRow = wrapper.find({ ref: 'metrics-visibility-settings' });
+
+      expect(wrapper.vm.metricsOptionsDropdownEnabled).toBe(true);
+      expect(metricsSettingsRow.find('select').attributes('disabled')).toEqual('disabled');
     });
   });
 });

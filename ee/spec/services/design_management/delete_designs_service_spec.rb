@@ -91,12 +91,18 @@ describe DesignManagement::DeleteDesignsService do
           expect { run_service }.to change { counter.read(:delete) }.by(1)
         end
 
+        it 'informs the new-version-worker' do
+          expect(::DesignManagement::NewVersionWorker).to receive(:perform_async).with(Integer)
+
+          run_service
+        end
+
         it 'creates a new verison' do
           expect { run_service }.to change { DesignManagement::Version.where(issue: issue).count }.by(1)
         end
 
         it 'calls repository#log_geo_updated_event' do
-          design_repository = EE::Gitlab::GlRepository::DESIGN.repository_resolver.call(project)
+          design_repository = ::Gitlab::GlRepository::DESIGN.repository_resolver.call(project)
           allow_next_instance_of(described_class) do |instance|
             allow(instance).to receive(:repository).and_return(design_repository)
           end

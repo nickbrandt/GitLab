@@ -59,10 +59,6 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        unless ::Feature.enabled?(:pypi_packages, unauthorized_user_project, default_enabled: true)
-          not_found!
-        end
-
         authorize_packages_feature!(unauthorized_user_project)
       end
 

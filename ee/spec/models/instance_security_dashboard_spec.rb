@@ -115,4 +115,12 @@ describe InstanceSecurityDashboard do
       end
     end
   end
+
+  describe '#full_path' do
+    let(:user) { create(:user) }
+
+    it 'returns the full_path of the user' do
+      expect(subject.full_path).to eql(user.full_path)
+    end
+  end
 end

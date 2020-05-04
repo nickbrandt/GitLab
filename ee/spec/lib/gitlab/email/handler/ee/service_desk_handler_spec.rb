@@ -290,7 +290,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
   end
 
   context 'service desk is disabled for the project' do
-    let(:project) { create(:project, :public, namespace: namespace, path: 'test') }
+    let(:project) { create(:project, :public, namespace: namespace, path: 'test', service_desk_enabled: false) }
 
     it 'bounces the email' do
       expect { receiver.execute }.to raise_error(Gitlab::Email::ProcessingError)

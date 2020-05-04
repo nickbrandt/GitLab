@@ -3,6 +3,9 @@ import { mapActions } from 'vuex';
 
 import Translate from '~/vue_shared/translate';
 
+import EpicItem from './components/epic_item.vue';
+import EpicItemContainer from './components/epic_item_container.vue';
+
 import {
   parseBoolean,
   urlParamsToObject,
@@ -37,6 +40,9 @@ export default () => {
       visitUrl(mergeUrlParams({ layout: presetType }, window.location.href));
     });
   }
+
+  Vue.component('epic-item', EpicItem);
+  Vue.component('epic-item-container', EpicItemContainer);
 
   return new Vue({
     el,

@@ -57,10 +57,6 @@ module EE
       for_epic? || super
     end
 
-    def for_design?
-      noteable_type == DesignManagement::Design.name
-    end
-
     override :resource_parent
     def resource_parent
       for_epic? ? noteable.group : super

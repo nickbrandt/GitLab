@@ -74,7 +74,7 @@ describe VulnerabilitiesHelper do
 
     describe 'when pipeline exists' do
       let(:pipeline) { create(:ci_pipeline) }
-      let(:pipelineData) { JSON.parse(subject[:pipeline_json]) }
+      let(:pipelineData) { Gitlab::Json.parse(subject[:pipeline_json]) }
 
       include_examples 'vulnerability properties'
 

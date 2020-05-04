@@ -29,7 +29,7 @@ describe 'Creating a Requirement' do
                'or you don\'t have permission to perform this action']
 
     it 'does not create requirement' do
-      expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Requirement, :count)
+      expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(RequirementsManagement::Requirement, :count)
     end
   end
 
@@ -69,7 +69,7 @@ describe 'Creating a Requirement' do
           errors: ["Title can't be blank"]
 
         it 'does not create the requirement' do
-          expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Requirement, :count)
+          expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(RequirementsManagement::Requirement, :count)
         end
       end
 

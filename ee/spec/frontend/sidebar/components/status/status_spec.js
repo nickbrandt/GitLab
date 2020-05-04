@@ -241,7 +241,7 @@ describe('Status', () => {
       });
 
       it('shows 4 dropdown items', () => {
-        expect(wrapper.findAll(GlDropdownItem).length).toBe(4);
+        expect(wrapper.findAll(GlDropdownItem)).toHaveLength(4);
       });
 
       // Test that "On track", "Needs attention", and "At risk" are displayed

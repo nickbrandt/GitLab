@@ -9,7 +9,6 @@ module EE
         @release = release
 
         super(author, entity, {
-          action: :custom,
           custom_message: message,
           ip_address: ip_address,
           target_id: release.id,

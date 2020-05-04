@@ -39,6 +39,10 @@ describe 'User activates GitHub Service' do
       expect(page).to have_content('GitHub activated.')
     end
 
+    it 'renders a token field of type `password` for masking input' do
+      expect(find('#service_token')['type']).to eq('password')
+    end
+
     context 'with pipelines', :js do
       let(:pipeline) { create(:ci_pipeline) }
       let(:project) { create(:project, ci_pipelines: [pipeline])}

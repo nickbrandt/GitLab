@@ -31,7 +31,9 @@ export default {
 
 <template>
   <div class="flex-column">
-    <h1 class="gl-font-size-20 prepend-top-8 append-bottom-4">{{ packageEntity.name }}</h1>
+    <h1 class="gl-font-size-20-deprecated-no-really-do-not-use-me prepend-top-8 append-bottom-4">
+      {{ packageEntity.name }}
+    </h1>
 
     <div class="d-flex align-items-center text-secondary">
       <gl-icon name="eye" class="append-right-8" />

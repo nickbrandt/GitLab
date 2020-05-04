@@ -215,6 +215,7 @@ class Project < ApplicationRecord
   has_many :protected_branches
   has_many :protected_tags
   has_many :repository_languages, -> { order "share DESC" }
+  has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
 
   has_many :project_authorizations
   has_many :authorized_users, through: :project_authorizations, source: :user, class_name: 'User'
@@ -257,6 +258,7 @@ class Project < ApplicationRecord
   has_many :prometheus_alerts, inverse_of: :project
   has_many :prometheus_alert_events, inverse_of: :project
   has_many :self_managed_prometheus_alert_events, inverse_of: :project
+  has_many :metrics_users_starred_dashboards, class_name: 'Metrics::UsersStarredDashboard', inverse_of: :project
 
   has_many :alert_management_alerts, class_name: 'AlertManagement::Alert', inverse_of: :project
 
@@ -790,12 +792,23 @@ class Project < ApplicationRecord
     Feature.enabled?(:jira_issue_import, self, default_enabled: true)
   end
 
+  # LFS and hashed repository storage are required for using Design Management.
+  def design_management_enabled?
+    lfs_enabled? && hashed_storage?(:repository)
+  end
+
   def team
     @team ||= ProjectTeam.new(self)
   end
 
   def repository
     @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path)
+  end
+
+  def design_repository
+    strong_memoize(:design_repository) do
+      DesignManagement::Repository.new(self)
+    end
   end
 
   def cleanup
@@ -870,10 +883,12 @@ class Project < ApplicationRecord
     raise Projects::ImportService::Error, _('Jira import feature is disabled.') unless jira_issues_import_feature_flag_enabled?
     raise Projects::ImportService::Error, _('Jira integration not configured.') unless jira_service&.active?
 
-    return unless user
+    if user
+      raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
+      raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
+    end
 
-    raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
-    raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
+    raise Projects::ImportService::Error, _('Unable to connect to the Jira instance. Please check your Jira integration configuration.') unless jira_service.test(nil)[:success]
   end
 
   def human_import_status_name

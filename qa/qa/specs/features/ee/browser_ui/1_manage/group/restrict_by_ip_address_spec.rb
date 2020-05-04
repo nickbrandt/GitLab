@@ -3,8 +3,7 @@ require 'securerandom'
 
 module QA
   context 'Manage' do
-    # TODO: Remove the :orchestrated meta after https://gitlab.com/gitlab-org/quality/team-tasks/-/issues/493 is complete
-    describe 'Group access', :requires_admin, :orchestrated do
+    describe 'Group access', :requires_admin, :skip_live_env do
       include Runtime::IPAddress
 
       before(:all) do

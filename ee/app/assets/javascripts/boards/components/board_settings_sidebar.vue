@@ -168,9 +168,6 @@ export default {
     showScopedLabels(label) {
       return boardsStoreEE.store.scopedLabels.enabled && isScopedLabel(label);
     },
-    helpLink() {
-      return boardsStoreEE.store.scopedLabels.helpLink;
-    },
   },
 };
 </script>
@@ -213,7 +210,7 @@ export default {
         <div class="d-flex justify-content-between align-items-center mb-2">
           <label class="m-0">{{ $options.wipLimitText }}</label>
           <gl-deprecated-button
-            class="js-edit-button h-100 border-0 gl-line-height-14 text-dark"
+            class="js-edit-button h-100 border-0 gl-line-height-14-deprecated-no-really-do-not-use-me text-dark"
             variant="link"
             @click="showInput"
             >{{ $options.editLinkText }}</gl-deprecated-button
@@ -238,7 +235,7 @@ export default {
           <template v-if="wipLimitIsSet">
             <span class="m-1">-</span>
             <gl-deprecated-button
-              class="js-remove-limit h-100 border-0 gl-line-height-14 text-secondary"
+              class="js-remove-limit h-100 border-0 gl-line-height-14-deprecated-no-really-do-not-use-me text-secondary"
               variant="link"
               @click="clearWipLimit"
               >{{ $options.removeLimitText }}</gl-deprecated-button

@@ -106,7 +106,7 @@ export default {
         <template v-else>
           <gl-deprecated-button
             ref="vulnerability-title"
-            class="d-inline gl-line-height-inherit gl-text-align-inherit gl-white-space-normal"
+            class="d-inline gl-reset-line-height gl-reset-text-align gl-white-space-normal"
             variant="blank"
             @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-deprecated-button

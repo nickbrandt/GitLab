@@ -169,7 +169,7 @@ describe('Project Licenses', () => {
     it('renders a "Detected in project" tab and a "Policies" tab', () => {
       expect(wrapper.find(GlTabs).exists()).toBe(true);
       expect(wrapper.find(GlTab).exists()).toBe(true);
-      expect(wrapper.findAll(GlTab).length).toBe(2);
+      expect(wrapper.findAll(GlTab)).toHaveLength(2);
     });
 
     it('it renders the "Detected in project" table', () => {

@@ -5,7 +5,11 @@ import {
   designUploadOptimisticResponse,
   updateImageDiffNoteOptimisticResponse,
   isValidDesignFile,
+  extractDesign,
 } from 'ee/design_management/utils/design_management_utils';
+import mockResponseNoDesigns from '../mock_data/no_designs';
+import mockResponseWithDesigns from '../mock_data/designs';
+import mockDesign from '../mock_data/design';
 
 jest.mock('lodash/uniqueId', () => () => 1);
 
@@ -152,7 +156,21 @@ describe('isValidDesignFile', () => {
     ${'video/mpeg'}               | ${false}
     ${'audio/midi'}               | ${false}
     ${'application/octet-stream'} | ${false}
-  `('returns $valid for file type $mimetype', ({ mimetype, isValid }) => {
+  `('returns $isValid for file type $mimetype', ({ mimetype, isValid }) => {
     expect(isValidDesignFile({ type: mimetype })).toBe(isValid);
+  });
+});
+
+describe('extractDesign', () => {
+  describe('with no designs', () => {
+    it('returns undefined', () => {
+      expect(extractDesign(mockResponseNoDesigns)).toBeUndefined();
+    });
+  });
+
+  describe('with designs', () => {
+    it('returns the first design available', () => {
+      expect(extractDesign(mockResponseWithDesigns)).toEqual(mockDesign);
+    });
   });
 });

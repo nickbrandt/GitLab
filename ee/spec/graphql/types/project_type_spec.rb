@@ -8,6 +8,8 @@ describe GitlabSchema.types['Project'] do
   let_it_be(:vulnerability) { create(:vulnerability, project: project, severity: :high) }
 
   before do
+    stub_licensed_features(security_dashboard: true)
+
     project.add_developer(user)
   end
 
@@ -45,32 +47,13 @@ describe GitlabSchema.types['Project'] do
 
     subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
 
-    context 'when first_class_vulnerabilities is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
+    it "returns the project's vulnerabilities" do
+      vulnerabilities = subject.dig('data', 'project', 'vulnerabilities', 'nodes')
 
-      it 'is null' do
-        vulnerabilities = subject.dig('data', 'project', 'vulnerabilities')
-
-        expect(vulnerabilities).to be_nil
-      end
-    end
-
-    context 'when first_class_vulnerabilities is enabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: true)
-        stub_licensed_features(security_dashboard: true)
-      end
-
-      it "returns the project's vulnerabilities" do
-        vulnerabilities = subject.dig('data', 'project', 'vulnerabilities', 'nodes')
-
-        expect(vulnerabilities.count).to be(1)
-        expect(vulnerabilities.first['title']).to eq('A terrible one!')
-        expect(vulnerabilities.first['state']).to eq('DETECTED')
-        expect(vulnerabilities.first['severity']).to eq('CRITICAL')
-      end
+      expect(vulnerabilities.count).to be(1)
+      expect(vulnerabilities.first['title']).to eq('A terrible one!')
+      expect(vulnerabilities.first['state']).to eq('DETECTED')
+      expect(vulnerabilities.first['severity']).to eq('CRITICAL')
     end
   end
 end

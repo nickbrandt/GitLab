@@ -184,7 +184,7 @@ export default {
               :value="epicWeightPercentage"
               aria-hidden="true"
             />
-            <div class="gl-font-size-small d-flex align-items-center text-nowrap">
+            <div class="gl-font-sm d-flex align-items-center text-nowrap">
               <icon class="append-right-2" :size="12" name="weight" />
               <p class="m-0" :aria-label="epicWeightPercentageText">{{ epicWeightPercentage }}%</p>
             </div>

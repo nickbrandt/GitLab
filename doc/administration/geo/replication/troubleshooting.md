@@ -497,6 +497,12 @@ to start again from scratch, there are a few steps that can help you:
    gitlab-ctl start
    ```
 
+1. Refresh Foreign Data Wrapper tables
+
+   ```sh
+   gitlab-rake geo:db:refresh_foreign_tables
+   ```
+
 ## Fixing errors during a failover or when promoting a secondary to a primary node
 
 The following are possible errors that might be encountered during failover or
@@ -854,7 +860,7 @@ Make sure you follow the [Geo database replication](database.md) instructions fo
 
 ### Geo database version (...) does not match latest migration (...)
 
-If you are using GitLab Omnibus installation, something might have failed during upgrade. You can:
+If you are using Omnibus GitLab installation, something might have failed during upgrade. You can:
 
 - Run `sudo gitlab-ctl reconfigure`.
 - Manually trigger the database migration by running: `sudo gitlab-rake geo:db:migrate` as root on the **secondary** node.

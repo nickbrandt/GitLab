@@ -10,7 +10,7 @@ class Admin::LicensesController < Admin::ApplicationController
     if @license.blank?
       render :missing
     else
-      @previous_licenses = License.previous
+      @licenses = License.history
     end
   end
 
@@ -36,7 +36,14 @@ class Admin::LicensesController < Admin::ApplicationController
     respond_with(@license, location: admin_license_path) do
       if @license.save
         @license.update_trial_setting
-        flash[:notice] = _('The license was successfully uploaded and is now active. You can see the details below.')
+
+        notice = if @license.started?
+                   _('The license was successfully uploaded and is now active. You can see the details below.')
+                 else
+                   _('The license was successfully uploaded and will be active from %{starts_at}. You can see the details below.' % { starts_at: @license.starts_at })
+                 end
+
+        flash[:notice] = notice
       end
     end
   end

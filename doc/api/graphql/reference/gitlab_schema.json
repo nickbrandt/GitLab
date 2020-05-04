@@ -10207,7 +10207,7 @@
             },
             {
               "name": "grafanaUrl",
-              "description": "Url for the Grafana host for the Grafana integration",
+              "description": "URL for the Grafana host for the Grafana integration",
               "args": [
 
               ],
@@ -11490,7 +11490,7 @@
             },
             {
               "name": "vulnerabilities",
-              "description": "Vulnerabilities reported on the projects in the group and its subgroups. Available only when feature flag `first_class_vulnerabilities` is enabled",
+              "description": "Vulnerabilities reported on the projects in the group and its subgroups",
               "args": [
                 {
                   "name": "projectId",
@@ -21926,7 +21926,7 @@
             },
             {
               "name": "vulnerabilities",
-              "description": "Vulnerabilities reported on the project. Available only when feature flag `first_class_vulnerabilities` is enabled",
+              "description": "Vulnerabilities reported on the project",
               "args": [
                 {
                   "name": "projectId",
@@ -22051,7 +22051,7 @@
             },
             {
               "name": "vulnerabilitySeveritiesCount",
-              "description": "Counts for each severity of vulnerability of the project. Available only when feature flag `first_class_vulnerabilities` is enabled",
+              "description": "Counts for each severity of vulnerability of the project",
               "args": [
 
               ],
@@ -30217,6 +30217,24 @@
                 "kind": "OBJECT",
                 "name": "SnippetConnection",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "state",
+              "description": "State of the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

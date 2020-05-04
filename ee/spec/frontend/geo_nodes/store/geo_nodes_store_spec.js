@@ -23,7 +23,7 @@ describe('GeoNodesStore', () => {
     it('sets nodes list to state', () => {
       store.setNodes(mockNodes);
 
-      expect(store.getNodes().length).toBe(mockNodes.length);
+      expect(store.getNodes()).toHaveLength(mockNodes.length);
     });
   });
 

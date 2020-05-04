@@ -102,7 +102,7 @@ export default {
 
 <template>
   <div>
-    <h4 v-if="heading" class="gl-font-size-14 mt-0">{{ heading }}</h4>
+    <h4 v-if="heading" class="gl-font-base mt-0">{{ heading }}</h4>
     <div
       class="related-issues-token-body bordered-box bg-white"
       :class="{ 'sortable-container': canReorder }"

@@ -35,6 +35,69 @@ describe API::Geo do
     end
   end
 
+  describe 'GET /geo/retrieve/:replicable/:id' do
+    before do
+      stub_current_geo_node(secondary_node)
+    end
+
+    let_it_be(:resource) { create(:package_file, :npm) }
+    let(:replicator) { Geo::PackageFileReplicator.new(model_record_id: resource.id) }
+
+    context 'valid requests' do
+      let(:req_header) { Gitlab::Geo::Replication::BlobDownloader.new(replicator: replicator).send(:request_headers) }
+
+      it 'returns the file' do
+        get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: req_header
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response.headers['Content-Type']).to eq('application/octet-stream')
+        expect(response.headers['X-Sendfile']).to eq(resource.file.path)
+      end
+
+      context 'allowed IPs' do
+        it 'responds with 401 when IP is not allowed' do
+          stub_application_setting(geo_node_allowed_ips: '192.34.34.34')
+
+          get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: req_header
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
+        end
+
+        it 'responds with 200 when IP is allowed' do
+          stub_application_setting(geo_node_allowed_ips: '127.0.0.1')
+
+          get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: req_header
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+    end
+
+    context 'invalid requests' do
+      it 'responds with 401 with invalid auth header' do
+        get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: { Authorization: 'Test' }
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+
+      it 'responds with 401 with mismatched params in auth headers' do
+        wrong_headers = Gitlab::Geo::TransferRequest.new({ replicable_name: 'wrong', id: 1234 }).headers
+
+        get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: wrong_headers
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+
+      it 'responds with 404 when resource is not found' do
+        model_not_found_header = Gitlab::Geo::TransferRequest.new({ replicable_name: replicator.replicable_name, id: 1234 }).headers
+
+        get api("/geo/retrieve/#{replicator.replicable_name}/1234"), headers: model_not_found_header
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
   describe 'GET /geo/transfers' do
     before do
       stub_current_geo_node(secondary_node)
@@ -70,7 +133,7 @@ describe API::Geo do
         end
       end
 
-      it 'responds with 401 with invalid auth header' do
+      it 'responds with 401 when an invalid auth header is provided' do
         path = File.join(api_path, resource.id.to_s)
         get api(path), headers: { Authorization: 'Test' }
 
@@ -82,7 +145,7 @@ describe API::Geo do
 
         it 'responds with 401' do
           path = File.join(api_path, resource.id.to_s)
-          get api(path), headers: { Authorization: 'Test' }
+          get api(path), headers: req_header
 
           expect(response).to have_gitlab_http_status(:unauthorized)
         end
@@ -213,7 +276,25 @@ describe API::Geo do
       let(:transfer) { Gitlab::Geo::Replication::LfsTransfer.new(resource) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
-      it_behaves_like 'validate geo transfer requests', '/geo/transfers/lfs/'
+      context 'invalid requests' do
+        before do
+          allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+            allow(instance).to receive(:requesting_node).and_return(secondary_node)
+          end
+        end
+
+        it 'responds with 401 when an invalid auth header is provided' do
+          get api("/geo/transfers/lfs/#{resource.id}"), headers: { Authorization: 'Test' }
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
+        end
+
+        it 'responds with 404 when resource does not exist' do
+          get api("/geo/transfers/lfs/100000"), headers: not_found_req_header
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
 
       context 'LFS object exists' do
         context 'file exists' do

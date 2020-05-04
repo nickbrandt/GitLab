@@ -107,7 +107,7 @@ describe 'getting a requirement list for a project' do
           cursored_query = query("sort: #{sort_by}, after: \"#{end_cursor}\"")
           post_graphql(cursored_query, current_user: current_user)
 
-          JSON.parse(response.body)['data']['project']['requirements']['edges']
+          Gitlab::Json.parse(response.body)['data']['project']['requirements']['edges']
         end
 
         before do

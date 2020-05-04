@@ -618,6 +618,17 @@ describe API::Epics do
         expect(json_response['labels']).to include '&'
         expect(json_response['labels']).to include '?'
       end
+
+      it 'creates a new epic with no labels' do
+        params[:labels] = nil
+
+        post api(url, user), params: params
+
+        expect(response).to have_gitlab_http_status(:created)
+        expect(json_response['title']).to include 'new epic'
+        expect(json_response['description']).to include 'epic description'
+        expect(json_response['labels']).to be_empty
+      end
     end
   end
 
@@ -703,6 +714,25 @@ describe API::Epics do
           it 'does not include confidential attribute' do
             expect(epic.reload.confidential).to be_falsey
           end
+        end
+
+        it 'clears labels when labels param is nil' do
+          params[:labels] = 'label1'
+          put api(url, user), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['title']).to include 'new title'
+          expect(json_response['description']).to include 'new description'
+          expect(json_response['labels']).to contain_exactly('label1')
+
+          params[:labels] = nil
+          put api(url, user), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
+          json_response = Gitlab::Json.parse(response.body)
+          expect(json_response['title']).to include 'new title'
+          expect(json_response['description']).to include 'new description'
+          expect(json_response['labels']).to be_empty
         end
 
         it 'updates the epic with labels param as array' do

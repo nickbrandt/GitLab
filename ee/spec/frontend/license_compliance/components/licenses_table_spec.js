@@ -32,7 +32,7 @@ describe('LicensesTable component', () => {
     });
 
     it('renders the empty license table', () => {
-      expect(findRows().length).toEqual(0);
+      expect(findRows()).toHaveLength(0);
     });
   });
 
@@ -53,7 +53,7 @@ describe('LicensesTable component', () => {
       });
 
       it('passes the correct props to the table rows', () => {
-        expect(findRows().length).toEqual(licenses.length);
+        expect(findRows()).toHaveLength(licenses.length);
         expect(findRows().wrappers.map(x => x.props())).toEqual(
           licenses.map(license => ({
             license,

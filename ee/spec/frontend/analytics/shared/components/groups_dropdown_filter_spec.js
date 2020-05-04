@@ -88,7 +88,7 @@ describe('GroupsDropdownFilter component', () => {
     });
 
     it('should contain 2 items', () => {
-      expect(findDropdownItems().length).toEqual(2);
+      expect(findDropdownItems()).toHaveLength(2);
     });
 
     it('renders an avatar when the group has an avatar_url', () => {

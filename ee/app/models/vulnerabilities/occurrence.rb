@@ -228,7 +228,7 @@ module Vulnerabilities
 
     def metadata
       strong_memoize(:metadata) do
-        JSON.parse(raw_metadata)
+        Gitlab::Json.parse(raw_metadata)
       rescue JSON::ParserError
         {}
       end

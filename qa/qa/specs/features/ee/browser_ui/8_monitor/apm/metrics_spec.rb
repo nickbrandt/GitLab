@@ -40,7 +40,7 @@ module QA
           p.description = 'Cluster with Prometheus'
         end
 
-        @cluster_props = Resource::KubernetesCluster.fabricate_via_browser_ui! do |c|
+        @cluster_props = Resource::KubernetesCluster::ProjectCluster.fabricate_via_browser_ui! do |c|
           c.project = @project
           c.cluster = @cluster
           c.install_helm_tiller = true

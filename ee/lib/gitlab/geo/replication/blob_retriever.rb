@@ -22,7 +22,7 @@ module Gitlab
           return file_not_found(recorded_file) unless recorded_file.file_exist?
           return error('Checksum mismatch') unless matches_checksum?
 
-          success(replicator.carrierwave_uploader.file)
+          success(replicator.carrierwave_uploader)
         end
 
         private

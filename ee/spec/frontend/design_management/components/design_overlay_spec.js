@@ -77,7 +77,7 @@ describe('Design overlay component', () => {
     });
 
     it('should render a correct amount of notes', () => {
-      expect(findAllNotes().length).toBe(notes.length);
+      expect(findAllNotes()).toHaveLength(notes.length);
     });
 
     it('should have a correct style for each note badge', () => {

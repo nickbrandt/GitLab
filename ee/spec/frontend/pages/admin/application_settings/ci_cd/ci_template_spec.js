@@ -25,9 +25,9 @@ describe('CI Template Dropdown (ee/pages/admin/application_settings/ci_cd/ci_tem
 
   describe('Init Dropdown', () => {
     it('Instantiates dropdown objects', () => {
-      expect(CiTemplateInstance.$input.length).toBe(1);
-      expect(CiTemplateInstance.$dropdown.length).toBe(1);
-      expect(CiTemplateInstance.$dropdownToggle.length).toBe(1);
+      expect(CiTemplateInstance.$input).toHaveLength(1);
+      expect(CiTemplateInstance.$dropdown).toHaveLength(1);
+      expect(CiTemplateInstance.$dropdownToggle).toHaveLength(1);
     });
 
     it('Sets the dropdown text value', () => {

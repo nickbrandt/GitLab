@@ -89,7 +89,7 @@ describe('MergeRequestTable component', () => {
       ];
       const headers = findTable().findAll('th');
 
-      expect(headers.length).toBe(tableHeaders.length);
+      expect(headers).toHaveLength(tableHeaders.length);
 
       tableHeaders.forEach((headerText, i) => expect(headers.at(i).text()).toEqual(headerText));
     });

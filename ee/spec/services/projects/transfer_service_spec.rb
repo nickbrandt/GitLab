@@ -98,7 +98,7 @@ describe Projects::TransferService do
     end
 
     describe 'when the project has a design repository' do
-      let(:project_repo_path) { "#{project.path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}" }
+      let(:project_repo_path) { "#{project.path}#{::Gitlab::GlRepository::DESIGN.path_suffix}" }
       let(:old_full_path) { "#{user.namespace.full_path}/#{project_repo_path}" }
       let(:new_full_path) { "#{group.full_path}/#{project_repo_path}" }
 

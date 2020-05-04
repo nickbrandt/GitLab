@@ -3,13 +3,14 @@ require 'spec_helper'
 
 describe DesignManagement::SaveDesignsService do
   include DesignManagementTestHelpers
+  include ConcurrentHelpers
 
   let_it_be(:developer) { create(:user) }
   let(:project) { issue.project }
   let(:issue) { create(:issue) }
   let(:user) { developer }
   let(:files) { [rails_sample] }
-  let(:design_repository) { EE::Gitlab::GlRepository::DESIGN.repository_resolver.call(project) }
+  let(:design_repository) { ::Gitlab::GlRepository::DESIGN.repository_resolver.call(project) }
   let(:rails_sample_name) { 'rails_sample.jpg' }
   let(:rails_sample) { sample_image(rails_sample_name) }
   let(:dk_png) { sample_image('dk.png') }
@@ -20,18 +21,6 @@ describe DesignManagement::SaveDesignsService do
 
   before do
     project.add_developer(developer)
-
-    allow(::DesignManagement::NewVersionWorker).to receive(:perform_async)
-  end
-
-  RSpec::Matchers.define :enqueue_worker do
-    match do |action|
-      expect(::DesignManagement::NewVersionWorker)
-        .to receive(:perform_async).once.with(Integer)
-      action.call
-    end
-
-    supports_block_expectations
   end
 
   def run_service(files_to_upload = nil)
@@ -107,6 +96,17 @@ describe DesignManagement::SaveDesignsService do
           author: user,
           message: include(rails_sample_name)
         )
+      end
+
+      it 'can run the same command in parallel' do
+        blocks = Array.new(10).map do
+          unique_files = %w(rails_sample.jpg dk.png)
+                          .map { |name| RenameableUpload.unique_file(name) }
+
+          -> { run_service(unique_files) }
+        end
+
+        expect { run_parallel(blocks) }.to change(DesignManagement::Version, :count).by(10)
       end
 
       it 'causes diff_refs not to be nil' do
@@ -237,7 +237,10 @@ describe DesignManagement::SaveDesignsService do
         end
 
         it 'enqueues just one new version worker' do
-          expect { run_service }.to enqueue_worker
+          expect(::DesignManagement::NewVersionWorker)
+            .to receive(:perform_async).once.with(Integer)
+
+          run_service
         end
       end
 
@@ -260,7 +263,10 @@ describe DesignManagement::SaveDesignsService do
         end
 
         it 'enqueues a new version worker' do
-          expect { run_service }.to enqueue_worker
+          expect(::DesignManagement::NewVersionWorker)
+            .to receive(:perform_async).once.with(Integer)
+
+          run_service
         end
 
         it 'creates a single commit' do
@@ -272,7 +278,8 @@ describe DesignManagement::SaveDesignsService do
           expect { run_service }.to change { commit_count.call }.by(1)
         end
 
-        it 'only does 4 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
+        it 'only does 5 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
+          allow(::DesignManagement::NewVersionWorker).to receive(:perform_async).with(Integer)
           service = described_class.new(project, user, issue: issue, files: files)
           # Some unrelated calls that are usually cached or happen only once
           service.__send__(:repository).create_if_not_exists

@@ -97,14 +97,14 @@ describe('SidebarLabelsComponent', () => {
         wrapper.vm.handleLabelClick(labelIsAny);
 
         expect(Array.isArray(wrapper.vm.epicContext.labels)).toBe(true);
-        expect(wrapper.vm.epicContext.labels.length).toBe(0);
+        expect(wrapper.vm.epicContext.labels).toHaveLength(0);
       });
 
       it('adds provided `label` to epicContext.labels', () => {
         wrapper.vm.handleLabelClick(label);
         // epicContext.labels gets initialized with initialLabels, hence
         // newly insert label will be at second position (index `1`)
-        expect(wrapper.vm.epicContext.labels.length).toBe(2);
+        expect(wrapper.vm.epicContext.labels).toHaveLength(2);
         expect(wrapper.vm.epicContext.labels[1].id).toBe(label.id);
         wrapper.vm.handleLabelClick(label);
       });
@@ -113,7 +113,7 @@ describe('SidebarLabelsComponent', () => {
         wrapper.vm.handleLabelClick(label); // Select
         wrapper.vm.handleLabelClick(label); // Un-select
 
-        expect(wrapper.vm.epicContext.labels.length).toBe(1);
+        expect(wrapper.vm.epicContext.labels).toHaveLength(1);
         expect(wrapper.vm.epicContext.labels[0].id).toBe(mockLabels[0].id);
       });
     });

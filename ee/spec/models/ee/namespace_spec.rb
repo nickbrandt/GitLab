@@ -244,7 +244,7 @@ describe Namespace do
   describe '#feature_available?' do
     let(:hosted_plan) { create(:bronze_plan) }
     let(:group) { create(:group) }
-    let(:licensed_feature) { :service_desk }
+    let(:licensed_feature) { :epics }
     let(:feature) { licensed_feature }
 
     subject { group.feature_available?(feature) }

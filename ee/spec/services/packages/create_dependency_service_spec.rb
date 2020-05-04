@@ -10,7 +10,7 @@ describe Packages::CreateDependencyService do
     context 'when packages are published' do
       let(:json_file) { 'npm/payload.json' }
       let(:params) do
-        JSON.parse(fixture_file(json_file, dir: 'ee')
+        Gitlab::Json.parse(fixture_file(json_file, dir: 'ee')
                 .gsub('@root/npm-test', package_name)
                 .gsub('1.0.1', version))
                 .with_indifferent_access

@@ -235,7 +235,7 @@ describe('License Report MR Widget', () => {
             stubs: { ReportSection },
           });
 
-          expect(wrapper.findAll({ ref: 'reportHeading' }).length).toBe(
+          expect(wrapper.findAll({ ref: 'reportHeading' })).toHaveLength(
             expectedNumberOfReportHeadings,
           );
         },
@@ -260,7 +260,7 @@ describe('License Report MR Widget', () => {
             stubs: { ReportSection },
           });
 
-          expect(findAllReportItems().length).toBe(numberOfLicenses);
+          expect(findAllReportItems()).toHaveLength(numberOfLicenses);
         },
       );
 

@@ -2,7 +2,7 @@
 
 module QA
   context 'Create' do
-    describe 'Pull mirror a repository over SSH with a private key' do
+    describe 'Pull mirror a repository over SSH with a private key', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/216297', type: :investigating } do
       let(:source) do
         Resource::Repository::ProjectPush.fabricate! do |project_push|
           project_push.project_name = 'pull-mirror-source-project'

@@ -65,7 +65,7 @@ describe('project header component', () => {
   describe('wrapped components', () => {
     describe('project avatar', () => {
       it('renders', () => {
-        expect(wrapper.findAll(ProjectAvatar).length).toBe(1);
+        expect(wrapper.findAll(ProjectAvatar)).toHaveLength(1);
       });
 
       it('binds project', () => {

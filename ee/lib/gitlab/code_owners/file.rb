@@ -3,8 +3,9 @@
 module Gitlab
   module CodeOwners
     class File
-      def initialize(blob)
+      def initialize(blob, project = nil)
         @blob = blob
+        @project = project
       end
 
       def parsed_data
@@ -40,7 +41,7 @@ module Gitlab
       end
 
       def get_parsed_data
-        if Feature.enabled?(:sectional_codeowners, default_enabled: false)
+        if Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
           return get_parsed_sectional_data
         end
 
@@ -48,21 +49,53 @@ module Gitlab
 
         data.lines.each do |line|
           line = line.strip
-          next unless line.present?
-          next if line.starts_with?('#')
 
-          pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
+          next if skip?(line)
 
-          normalized_pattern = normalize_pattern(pattern)
-
-          parsed[normalized_pattern] = Entry.new(pattern, owners)
+          extract_entry_and_populate_parsed(line, parsed)
         end
 
         parsed
       end
 
       def get_parsed_sectional_data
-        {}
+        parsed = {}
+        section = ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION
+
+        parsed[section] = {}
+
+        data.lines.each do |line|
+          line = line.strip
+
+          next if skip?(line)
+
+          if line.starts_with?('[') && line.end_with?(']')
+            section = line[1...-1].strip
+            parsed[section] ||= {}
+
+            next
+          end
+
+          extract_entry_and_populate_parsed(line, parsed, section)
+        end
+
+        parsed
+      end
+
+      def extract_entry_and_populate_parsed(line, parsed, section = nil)
+        pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
+
+        normalized_pattern = normalize_pattern(pattern)
+
+        if section
+          parsed[section][normalized_pattern] = Entry.new(pattern, owners, section)
+        else
+          parsed[normalized_pattern] = Entry.new(pattern, owners)
+        end
+      end
+
+      def skip?(line)
+        line.blank? || line.starts_with?('#')
       end
 
       def normalize_pattern(pattern)

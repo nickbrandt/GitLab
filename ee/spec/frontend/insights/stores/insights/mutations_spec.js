@@ -163,7 +163,7 @@ describe('Insights mutations', () => {
 
       const { chartData } = state;
 
-      expect(Object.keys(chartData[chart.title].data).length).toBe(0);
+      expect(Object.keys(chartData[chart.title].data)).toHaveLength(0);
     });
 
     it('sets charts type to incoming type on error', () => {

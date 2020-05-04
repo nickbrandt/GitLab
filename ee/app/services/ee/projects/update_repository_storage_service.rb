@@ -10,7 +10,7 @@ module EE
         super
 
         if project.design_repository.exists?
-          mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
+          mirror_repository(new_repository_storage_key, type: ::Gitlab::GlRepository::DESIGN)
         end
       end
 

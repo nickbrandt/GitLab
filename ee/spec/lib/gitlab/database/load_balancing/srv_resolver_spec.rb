@@ -53,7 +53,7 @@ describe Gitlab::Database::LoadBalancing::SrvResolver do
 
   def dns_response_packet_from_fixture(fixture_name)
     fixture         = File.read(Rails.root + "ee/spec/fixtures/dns/#{fixture_name}.json")
-    encoded_payload = JSON.parse(fixture)['payload']
+    encoded_payload = Gitlab::Json.parse(fixture)['payload']
     payload         = Base64.decode64(encoded_payload)
 
     Net::DNS::Packet.parse(payload)
