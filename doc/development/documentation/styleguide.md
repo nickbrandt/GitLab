@@ -583,6 +583,7 @@ column widths to make them consistent. For example:
 
 ```markdown
 | Header 1  | Header 2             |
+|:----------|:---------------------|
 | Item 1    | Description          |
 | Item 2    | Expanded description |
 ```
