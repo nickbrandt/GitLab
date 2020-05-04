@@ -133,6 +133,16 @@ module EE
 
         ''
       end
+
+      # Limits the users to those who have an identity that belongs to
+      # the given SAML Provider
+      def limit_to_saml_provider(saml_provider_id)
+        if saml_provider_id
+          joins(:identities).where(identities: { saml_provider_id: saml_provider_id })
+        else
+          all
+        end
+      end
     end
 
     def cannot_be_admin_and_auditor
