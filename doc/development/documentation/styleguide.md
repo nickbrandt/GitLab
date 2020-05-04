@@ -579,7 +579,7 @@ blank cells or areas. If a cell does not have a useable value, consider using
 *none* as a value.
 
 To help tables be easier to maintain, consider adding additional spaces to the
-column widths to make them consistent. For example, 
+column widths to make them consistent. For example:
 
 ```markdown
 | Header 1  | Header 2             |
@@ -591,15 +591,14 @@ If you're using Visual Studio Code, consider installing and using the
 [Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
 extension.
 
-
 ### Feature tables
 
 When creating tables of lists of features (such as whether or not features are
 available to certain roles on the [Permissions](../../user/permissions.md#project-members-permissions)
 page), use the following phrases (based on the SVG icons):
 
-* No: **{dotted-circle}** No
-* Yes: **{checked-circle}** Yes
+- No: **{dotted-circle}** No
+- Yes: **{checked-circle}** Yes
 
 ## Quotes
 
