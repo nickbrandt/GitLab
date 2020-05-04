@@ -217,6 +217,7 @@ Gitlab/Json:
     - 'db/**/*'
     - 'qa/**/*'
     - 'scripts/**/*'
+    - 'lib/rspec_flaky/**/*'
 
 GitlabSecurity/PublicSend:
   Enabled: true
