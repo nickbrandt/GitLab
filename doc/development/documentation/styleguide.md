@@ -598,7 +598,7 @@ available to certain roles on the [Permissions](../../user/permissions.md#projec
 page), use the following phrases (based on the SVG icons):
 
 - No: **{dotted-circle}** No
-- Yes: **{checked-circle}** Yes
+- Yes: **{check-circle}** Yes
 
 ## Quotes
 
