@@ -3,6 +3,8 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project deletion replication' do
+      include Support::Api
+
       deleted_project_name = nil
       deleted_project_id = nil
 

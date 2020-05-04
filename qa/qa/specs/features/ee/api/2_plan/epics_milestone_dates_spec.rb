@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'airborne'
+
 module QA
   context 'Plan', :reliable do
     describe 'Epics milestone dates API' do
