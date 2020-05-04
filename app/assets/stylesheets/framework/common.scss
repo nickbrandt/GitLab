@@ -424,7 +424,6 @@ img.emoji {
 .append-right-32 { margin-right: 32px; }
 .append-right-48 { margin-right: 48px; }
 .prepend-right-32 { margin-right: 32px; }
-.prepend-append-default { margin-left: $gl-padding; margin-right: $gl-padding; }
 .append-bottom-0 { margin-bottom: 0; }
 .append-bottom-2 { margin-bottom: 2px; }
 .append-bottom-4 { margin-bottom: $gl-padding-4; }
@@ -435,6 +434,12 @@ img.emoji {
 .append-bottom-20 { margin-bottom: 20px; }
 .append-bottom-default { margin-bottom: $gl-padding; }
 .prepend-bottom-32 { margin-bottom: 32px; }
+
+.prepend-append-default {
+  margin-left: $gl-padding;
+  margin-right: $gl-padding;
+}
+
 .ml-10 { margin-left: 4.5rem; }
 .inline { display: inline-block; }
 .center { text-align: center; }
