@@ -214,6 +214,11 @@ msgid_plural "%d tags"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d unresolved thread"
+msgid_plural "%d unresolved threads"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d vulnerability dismissed"
 msgid_plural "%d vulnerabilities dismissed"
 msgstr[0] ""
@@ -1798,6 +1803,9 @@ msgid "All projects"
 msgstr ""
 
 msgid "All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project"
+msgstr ""
+
+msgid "All threads resolved"
 msgstr ""
 
 msgid "All users"
@@ -25674,11 +25682,6 @@ msgstr ""
 
 msgid "this document"
 msgstr ""
-
-msgid "thread resolved"
-msgid_plural "threads resolved"
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "to help your contributors communicate effectively!"
 msgstr ""
