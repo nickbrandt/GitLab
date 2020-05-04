@@ -218,6 +218,7 @@ Gitlab/Json:
     - 'qa/**/*'
     - 'scripts/**/*'
     - 'lib/rspec_flaky/**/*'
+    - 'lib/quality/**/*'
 
 GitlabSecurity/PublicSend:
   Enabled: true
