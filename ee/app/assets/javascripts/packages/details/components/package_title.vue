@@ -36,8 +36,8 @@ export default {
       {{ packageEntity.name }}
     </h1>
 
-    <div class="d-flex align-items-center text-secondary">
-      <gl-icon name="eye" class="append-right-8" />
+    <div class="gl-display-flex gl-align-items-center text-secondary">
+      <gl-icon name="eye" class="gl-mr-3" />
       <gl-sprintf message="v%{version} published %{timeAgo}">
         <template #version>
           {{ packageEntity.version }}
@@ -51,18 +51,18 @@ export default {
       </gl-sprintf>
     </div>
 
-    <div class="d-flex flex-wrap align-items-center append-bottom-8">
-      <div v-if="packageTypeDisplay" class="d-flex align-items-center append-right-default">
-        <gl-icon name="package" class="text-secondary append-right-8" />
+    <div class="gl-display-flex flex-wrap gl-align-items-center append-bottom-8">
+      <div v-if="packageTypeDisplay" class="gl-display-flex align-items-center gl-mr-5">
+        <gl-icon name="package" class="text-secondary gl-mr-3" />
         <span ref="package-type" class="font-weight-bold">{{ packageTypeDisplay }}</span>
       </div>
 
-      <div v-if="hasTagsToDisplay" class="d-flex align-items-center append-right-default">
+      <div v-if="hasTagsToDisplay" class="gl-display-flex gl-align-items-center gl-mr-5">
         <package-tags :tag-display-limit="1" :tags="packageEntity.tags" />
       </div>
 
-      <div v-if="packagePipeline" class="d-flex align-items-center append-right-default">
-        <gl-icon name="review-list" class="text-secondary append-right-8" />
+      <div v-if="packagePipeline" class="gl-display-flex gl-align-items-center gl-mr-5">
+        <gl-icon name="review-list" class="text-secondary gl-mr-3" />
         <gl-link
           ref="pipeline-project"
           :href="packagePipeline.project.web_url"
@@ -75,9 +75,9 @@ export default {
       <div
         v-if="packagePipeline"
         ref="package-ref"
-        class="d-flex align-items-center append-right-default"
+        class="gl-display-flex gl-align-items-center gl-mr-5"
       >
-        <gl-icon name="branch" class="text-secondary append-right-8" />
+        <gl-icon name="branch" class="text-secondary gl-mr-3" />
         <span
           v-gl-tooltip
           class="font-weight-bold text-truncate mw-xs"
@@ -86,8 +86,8 @@ export default {
         >
       </div>
 
-      <div class="d-flex align-items-center append-right-default">
-        <gl-icon name="disk" class="text-secondary append-right-8" />
+      <div class="gl-display-flex gl-align-items-center gl-mr-5">
+        <gl-icon name="disk" class="text-secondary gl-mr-3" />
         <span ref="package-size" class="font-weight-bold">{{ totalSize }}</span>
       </div>
     </div>
