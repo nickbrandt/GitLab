@@ -10,10 +10,6 @@ export default () => {
 
   const store = createStore();
 
-  if (!gon.features?.dependencyListUi) {
-    addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
-  }
-
   return new Vue({
     el,
     store,

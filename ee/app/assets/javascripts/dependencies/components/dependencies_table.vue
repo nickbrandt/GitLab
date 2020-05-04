@@ -2,8 +2,6 @@
 import { cloneDeep } from 'lodash';
 import { GlBadge, GlIcon, GlLink, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import DependenciesTableRow from './dependencies_table_row.vue';
 import DependencyLicenseLinks from './dependency_license_links.vue';
 import DependencyVulnerabilities from './dependency_vulnerabilities.vue';
 
@@ -36,7 +34,6 @@ export default {
     GlSkeletonLoading,
     GlTable,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     dependencies: {
       type: Array,
@@ -96,7 +93,6 @@ export default {
   <!-- tbody- and thead-class props can be removed when
     https://gitlab.com/gitlab-org/gitlab/-/issues/213324 is fixed -->
   <gl-table
-    v-if="glFeatures.dependencyListUi"
     :fields="$options.fields"
     :items="localDependencies"
     :busy="isLoading"
@@ -168,25 +164,4 @@ export default {
       </div>
     </template>
   </gl-table>
-
-  <div v-else>
-    <div class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2" role="row">
-      <div
-        v-for="(section, index) in tableSections"
-        :key="index"
-        class="table-section"
-        :class="section.className"
-        role="rowheader"
-      >
-        {{ section.label }}
-      </div>
-    </div>
-
-    <dependencies-table-row
-      v-for="(dependency, index) in dependencies"
-      :key="index"
-      :dependency="dependency"
-      :is-loading="isLoading"
-    />
-  </div>
 </template>

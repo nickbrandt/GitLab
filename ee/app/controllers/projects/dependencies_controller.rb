@@ -4,10 +4,6 @@ module Projects
   class DependenciesController < Projects::ApplicationController
     before_action :authorize_read_dependency_list!
 
-    before_action only: [:index] do
-      push_frontend_feature_flag(:dependency_list_ui, project, default_enabled: true)
-    end
-
     def index
       respond_to do |format|
         format.html do

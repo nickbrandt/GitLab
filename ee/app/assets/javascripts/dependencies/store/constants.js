@@ -10,11 +10,4 @@ export const DEPENDENCY_LIST_TYPES = {
       filter: FILTER.all,
     },
   },
-  vulnerable: {
-    namespace: 'vulnerableDependencies',
-    label: s__('Dependencies|Vulnerable components'),
-    initialState: {
-      filter: FILTER.vulnerable,
-    },
-  },
 };
