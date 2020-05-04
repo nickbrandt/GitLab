@@ -6,7 +6,7 @@ module EE
     SWITCH_TO_BASIC_SEARCHABLE_TABS = %w[projects issues merge_requests milestones users].freeze
 
     override :search_filter_input_options
-    def search_filter_input_options(type)
+    def search_filter_input_options(type, placeholder = _('Search or filter results...'))
       options = super
       options[:data][:'multiple-assignees'] = 'true' if search_multiple_assignees?(type)
 

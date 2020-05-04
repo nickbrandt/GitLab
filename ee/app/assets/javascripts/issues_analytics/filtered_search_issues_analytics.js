@@ -2,6 +2,7 @@ import IssuableFilteredSearchTokenKeys from 'ee_else_ce/filtered_search/issuable
 import FilteredSearchTokenKeys from '~/filtered_search/filtered_search_token_keys';
 import FilteredSearchManager from 'ee_else_ce/filtered_search/filtered_search_manager';
 import { historyPushState } from '~/lib/utils/common_utils';
+import { __ } from '~/locale';
 import issueAnalyticsStore from './stores';
 
 const EXCLUDED_TOKENS = ['release'];
@@ -20,6 +21,7 @@ export default class FilteredSearchIssueAnalytics extends FilteredSearchManager 
       stateFiltersSelector: '.issues-state-filters',
       isGroup: true,
       filteredSearchTokenKeys: issuesAnalyticsTokenKeys,
+      placeholder: __('Filter results...'),
     });
 
     this.isHandledAsync = true;
