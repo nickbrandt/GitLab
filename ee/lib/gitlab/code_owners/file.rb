@@ -19,13 +19,30 @@ module Gitlab
       end
 
       def entry_for_path(path)
+        return sectional_entry_for_path(path) if sectional_codeowners?
+
         path = "/#{path}" unless path.start_with?('/')
 
         matching_pattern = parsed_data.keys.reverse.detect do |pattern|
           path_matches?(pattern, path)
         end
 
-        parsed_data[matching_pattern].dup if matching_pattern
+        matching_pattern ? [parsed_data[matching_pattern].dup] : []
+      end
+
+      def sectional_entry_for_path(path)
+        path = "/#{path}" unless path.start_with?('/')
+        matches = []
+
+        parsed_data.each do |_, section_entries|
+          matching_pattern = section_entries.keys.reverse.detect do |pattern|
+            path_matches?(pattern, path)
+          end
+
+          matches << section_entries[matching_pattern].dup if matching_pattern
+        end
+
+        matches
       end
 
       def path
