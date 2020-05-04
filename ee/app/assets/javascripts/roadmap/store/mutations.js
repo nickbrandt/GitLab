@@ -11,10 +11,6 @@ export default {
     state.epics = epics;
   },
 
-  [types.SET_WINDOW_RESIZE_IN_PROGRESS](state, inProgress) {
-    state.windowResizeInProgress = inProgress;
-  },
-
   [types.UPDATE_EPIC_IDS](state, epicId) {
     state.epicIds.push(epicId);
   },

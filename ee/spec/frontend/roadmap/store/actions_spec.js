@@ -70,36 +70,6 @@ describe('Roadmap Vuex Actions', () => {
     });
   });
 
-  describe('setWindowResizeInProgress', () => {
-    it('should set value of `state.windowResizeInProgress` based on provided value', () => {
-      return testAction(
-        actions.setWindowResizeInProgress,
-        true,
-        state,
-        [{ type: types.SET_WINDOW_RESIZE_IN_PROGRESS, payload: true }],
-        [],
-      );
-    });
-  });
-
-  describe('requestEpics', () => {
-    it('should set `epicsFetchInProgress` to true', () => {
-      return testAction(actions.requestEpics, {}, state, [{ type: 'REQUEST_EPICS' }], []);
-    });
-  });
-
-  describe('requestEpicsForTimeframe', () => {
-    it('should set `epicsFetchForTimeframeInProgress` to true', () => {
-      return testAction(
-        actions.requestEpicsForTimeframe,
-        {},
-        state,
-        [{ type: types.REQUEST_EPICS_FOR_TIMEFRAME }],
-        [],
-      );
-    });
-  });
-
   describe('receiveEpicsSuccess', () => {
     it('should set formatted epics array and epicId to IDs array in state based on provided epics list', () => {
       return testAction(
@@ -216,7 +186,7 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('success', () => {
-      it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', () => {
+      it('should perform REQUEST_EPICS mutation dispatch receiveEpicsSuccess action when request is successful', () => {
         jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
           Promise.resolve({
             data: mockGroupEpicsQueryResponse.data,
@@ -227,11 +197,12 @@ describe('Roadmap Vuex Actions', () => {
           actions.fetchEpics,
           null,
           state,
-          [],
           [
             {
-              type: 'requestEpics',
+              type: types.REQUEST_EPICS,
             },
+          ],
+          [
             {
               type: 'receiveEpicsSuccess',
               payload: { rawEpics: mockGroupEpicsQueryResponseFormatted },
@@ -242,18 +213,19 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('failure', () => {
-      it('should dispatch requestEpics and receiveEpicsFailure when request fails', () => {
+      it('should perform REQUEST_EPICS mutation and dispatch receiveEpicsFailure action when request fails', () => {
         jest.spyOn(epicUtils.gqClient, 'query').mockRejectedValue(new Error('error message'));
 
         return testAction(
           actions.fetchEpics,
           null,
           state,
-          [],
           [
             {
-              type: 'requestEpics',
+              type: types.REQUEST_EPICS,
             },
+          ],
+          [
             {
               type: 'receiveEpicsFailure',
             },
@@ -265,7 +237,7 @@ describe('Roadmap Vuex Actions', () => {
 
   describe('fetchEpicsForTimeframe', () => {
     describe('success', () => {
-      it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', () => {
+      it('should perform REQUEST_EPICS_FOR_TIMEFRAME mutation and dispatch receiveEpicsSuccess action when request is successful', () => {
         jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
           Promise.resolve({
             data: mockGroupEpicsQueryResponse.data,
@@ -276,11 +248,12 @@ describe('Roadmap Vuex Actions', () => {
           actions.fetchEpicsForTimeframe,
           { timeframe: mockTimeframeMonths },
           state,
-          [],
           [
             {
-              type: 'requestEpicsForTimeframe',
+              type: types.REQUEST_EPICS_FOR_TIMEFRAME,
             },
+          ],
+          [
             {
               type: 'receiveEpicsSuccess',
               payload: {
@@ -295,18 +268,19 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('failure', () => {
-      it('should dispatch requestEpicsForTimeframe and requestEpicsFailure when request fails', () => {
+      it('should perform REQUEST_EPICS_FOR_TIMEFRAME mutation and dispatch requestEpicsFailure action when request fails', () => {
         jest.spyOn(epicUtils.gqClient, 'query').mockRejectedValue();
 
         return testAction(
           actions.fetchEpicsForTimeframe,
           { timeframe: mockTimeframeMonths },
           state,
-          [],
           [
             {
-              type: 'requestEpicsForTimeframe',
+              type: types.REQUEST_EPICS_FOR_TIMEFRAME,
             },
+          ],
+          [
             {
               type: 'receiveEpicsFailure',
             },

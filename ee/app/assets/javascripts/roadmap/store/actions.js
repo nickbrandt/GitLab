@@ -19,9 +19,6 @@ import * as types from './mutation_types';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 
-export const setWindowResizeInProgress = ({ commit }, inProgress) =>
-  commit(types.SET_WINDOW_RESIZE_IN_PROGRESS, inProgress);
-
 const fetchGroupEpics = (
   { epicIid, fullPath, epicsState, sortedBy, presetType, filterParams, timeframe },
   defaultTimeframe,
@@ -80,8 +77,6 @@ export const fetchChildrenEpics = (state, { parentItem }) => {
     });
 };
 
-export const requestEpics = ({ commit }) => commit(types.REQUEST_EPICS);
-export const requestEpicsForTimeframe = ({ commit }) => commit(types.REQUEST_EPICS_FOR_TIMEFRAME);
 export const receiveEpicsSuccess = (
   { commit, dispatch, state, getters },
   { rawEpics, newEpic, timeframeExtended },
@@ -153,8 +148,8 @@ export const receiveChildrenSuccess = (
   commit(types.RECEIVE_CHILDREN_SUCCESS, { parentItemId, children });
 };
 
-export const fetchEpics = ({ state, dispatch }) => {
-  dispatch('requestEpics');
+export const fetchEpics = ({ state, commit, dispatch }) => {
+  commit(types.REQUEST_EPICS);
 
   fetchGroupEpics(state)
     .then(rawEpics => {
@@ -163,8 +158,8 @@ export const fetchEpics = ({ state, dispatch }) => {
     .catch(() => dispatch('receiveEpicsFailure'));
 };
 
-export const fetchEpicsForTimeframe = ({ state, dispatch }, { timeframe }) => {
-  dispatch('requestEpicsForTimeframe');
+export const fetchEpicsForTimeframe = ({ state, commit, dispatch }, { timeframe }) => {
+  commit(types.REQUEST_EPICS_FOR_TIMEFRAME);
 
   return fetchGroupEpics(state, timeframe)
     .then(rawEpics => {

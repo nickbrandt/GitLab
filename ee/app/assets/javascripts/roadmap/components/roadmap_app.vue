@@ -37,7 +37,6 @@ export default {
       'milestones',
       'timeframe',
       'extendedTimeframe',
-      'windowResizeInProgress',
       'epicsFetchInProgress',
       'epicsFetchForTimeframeInProgress',
       'epicsFetchResultEmpty',
@@ -53,12 +52,7 @@ export default {
       return this.timeframe[last];
     },
     showRoadmap() {
-      return (
-        !this.windowResizeInProgress &&
-        !this.epicsFetchFailure &&
-        !this.epicsFetchInProgress &&
-        !this.epicsFetchResultEmpty
-      );
+      return !this.epicsFetchFailure && !this.epicsFetchInProgress && !this.epicsFetchResultEmpty;
     },
   },
   mounted() {
@@ -67,7 +61,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setWindowResizeInProgress',
       'fetchEpics',
       'fetchEpicsForTimeframe',
       'extendTimeframe',
