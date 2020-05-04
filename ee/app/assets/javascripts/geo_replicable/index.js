@@ -17,22 +17,20 @@ export default () => {
     },
     data() {
       const {
-        dataset: { geoSvgPath, issuesSvgPath, geoTroubleshootingLink },
+        dataset: { geoTroubleshootingLink, geoReplicableEmptySvgPath },
       } = this.$options.el;
 
       return {
-        geoSvgPath,
-        issuesSvgPath,
         geoTroubleshootingLink,
+        geoReplicableEmptySvgPath,
       };
     },
 
     render(createElement) {
       return createElement('geo-replicable-app', {
         props: {
-          geoSvgPath: this.geoSvgPath,
-          issuesSvgPath: this.issuesSvgPath,
           geoTroubleshootingLink: this.geoTroubleshootingLink,
+          geoReplicableEmptySvgPath: this.geoReplicableEmptySvgPath,
         },
       });
     },

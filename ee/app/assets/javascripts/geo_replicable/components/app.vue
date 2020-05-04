@@ -14,11 +14,7 @@ export default {
     GeoReplicableEmptyState,
   },
   props: {
-    geoSvgPath: {
-      type: String,
-      required: true,
-    },
-    issuesSvgPath: {
+    geoReplicableEmptySvgPath: {
       type: String,
       required: true,
     },
@@ -50,7 +46,7 @@ export default {
       <geo-replicable v-if="hasReplicableItems" />
       <geo-replicable-empty-state
         v-else
-        :issues-svg-path="issuesSvgPath"
+        :geo-replicable-empty-svg-path="geoReplicableEmptySvgPath"
         :geo-troubleshooting-link="geoTroubleshootingLink"
       />
     </template>

@@ -19,7 +19,10 @@
   .nav-controls
     = render(partial: 'shared/projects/search_form', autofocus: true)
 
-- @registries.each do |upload_registry|
-  = render partial: 'registry', locals: { upload_registry: upload_registry }
+- if @registries.any?
+  - @registries.each do |upload_registry|
+    = render partial: 'registry', locals: { upload_registry: upload_registry }
 
-= paginate @registries, theme: 'gitlab'
+  = paginate @registries, theme: 'gitlab'
+- else
+  = render 'shared/empty_states/geo_replication', replicable_type: _('uploads')
