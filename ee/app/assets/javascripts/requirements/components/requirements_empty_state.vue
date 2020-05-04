@@ -22,6 +22,10 @@ export default {
       type: Object,
       required: true,
     },
+    canCreateRequirement: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     emptyStateTitle() {
@@ -48,7 +52,7 @@ export default {
       :title="emptyStateTitle"
       :description="emptyStateDescription"
     >
-      <template v-if="emptyStateDescription" #actions>
+      <template v-if="emptyStateDescription && canCreateRequirement" #actions>
         <gl-deprecated-button
           category="primary"
           variant="success"
