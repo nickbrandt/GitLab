@@ -527,6 +527,30 @@ describe User do
     end
   end
 
+  describe '.limit_to_saml_provider' do
+    let_it_be(:user1) { create(:user) }
+    let_it_be(:user2) { create(:user) }
+
+    it 'returns all users when SAML provider is nil' do
+      rel = described_class.limit_to_saml_provider(nil)
+
+      expect(rel).to include(user1, user2)
+    end
+
+    it 'returns only the users who have an identity that belongs to the given SAML provider' do
+      create(:user)
+      group = create(:group)
+      saml_provider = create(:saml_provider, group: group)
+      create(:identity, saml_provider: saml_provider, user: user1)
+      create(:identity, saml_provider: saml_provider, user: user2)
+      create(:identity, user: create(:user))
+
+      rel = described_class.limit_to_saml_provider(saml_provider.id)
+
+      expect(rel).to contain_exactly(user1, user2)
+    end
+  end
+
   describe '#group_managed_account?' do
     subject { user.group_managed_account? }
 
