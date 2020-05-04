@@ -29,7 +29,7 @@ module Audit
     end
 
     def action_text
-      action = @details.slice(*ACTIONS).first
+      action_name = @details.slice(*ACTIONS).first
 
       case action_name
       when :add
