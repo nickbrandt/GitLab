@@ -650,7 +650,7 @@ notifications:
 
 NOTE: **Note:**
 The garbage collection tools are only available when you've installed GitLab
-via an Omnibus package or the cloud native chart.
+via an Omnibus package or the [cloud native chart](https://docs.gitlab.com/charts/charts/registry/#garbage-collection).
 
 DANGER: **Danger:**
 By running the built-in garbage collection command, it will cause downtime to
