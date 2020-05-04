@@ -7,6 +7,18 @@ describe Issue do
 
   using RSpec::Parameterized::TableSyntax
 
+  describe 'associations' do
+    subject { build(:issue) }
+
+    it { is_expected.to have_many(:resource_weight_events) }
+  end
+
+  describe 'modules' do
+    subject { build(:issue) }
+
+    it { is_expected.to include_module(EE::WeightEventable) }
+  end
+
   context 'callbacks' do
     describe '.after_create' do
       let_it_be(:project) { create(:project) }
