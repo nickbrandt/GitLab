@@ -5,6 +5,7 @@ class WikiPage
     include Gitlab::Utils::StrongMemoize
 
     CanonicalSlugConflictError = Class.new(ActiveRecord::RecordInvalid)
+    WikiPageInvalid = Class.new(ArgumentError)
 
     self.table_name = 'wiki_page_meta'
 
@@ -32,12 +33,13 @@ class WikiPage
       # @param [String] last_known_slug
       # @param [WikiPage] wiki_page
       #
-      # As with all `find_or_create` methods, this one raises errors on
-      # validation issues.
+      # This method raises errors on validation issues.
       def find_or_create(last_known_slug, wiki_page)
+        raise WikiPageInvalid unless wiki_page.valid?
+
         project = wiki_page.wiki.project
         known_slugs = [last_known_slug, wiki_page.slug].compact.uniq
-        raise 'no slugs!' if known_slugs.empty?
+        raise 'No slugs found! This should not be possible.' if known_slugs.empty?
 
         transaction do
           updates = wiki_page_updates(wiki_page)
@@ -70,7 +72,8 @@ class WikiPage
       private
 
       def wiki_page_updates(wiki_page)
-        last_commit_date = wiki_page.version.commit.committed_date
+        last_commit_date = wiki_page.version_commit_timestamp || Time.now.utc
+
         {
           title: wiki_page.title,
           created_at: last_commit_date,

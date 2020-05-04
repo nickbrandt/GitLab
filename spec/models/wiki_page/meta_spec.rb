@@ -233,6 +233,14 @@ describe WikiPage::Meta do
           expect { find_record }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
+
+      context 'the wiki page is not valid' do
+        let(:wiki_page) { build(:wiki_page, project: project, title: nil) }
+
+        it 'raises an error' do
+          expect { find_record }.to raise_error(described_class::WikiPageInvalid)
+        end
+      end
     end
 
     context 'no existing record exists' do
