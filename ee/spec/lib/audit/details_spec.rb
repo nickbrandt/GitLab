@@ -275,22 +275,12 @@ describe Audit::Details do
     end
 
     context 'creates release event' do
-      let(:user_member) { create(:user) }
-      let(:release_creation_action) do
-        {
-          action: :custom,
-          custom_message: 'Created Release 1.0',
-          target_id: user_member.id,
-          target_type: 'Release',
-          target_details: '1.0',
-          entity_path: 'root/test-project'
-        }
-      end
+      let(:user) { create(:user) }
 
-      it 'returns correct action name' do
-        string = described_class.humanize(release_creation_action)
+      it 'returns the correct action name' do
+        action = attributes_for(:audit_event, user: user, custom_message: 'Created Release 1.0')
 
-        expect(string).to eq('Created Release 1.0')
+        expect(described_class.humanize(action)).to eq('Created Release 1.0')
       end
     end
   end
