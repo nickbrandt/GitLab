@@ -141,8 +141,3 @@
 .gl-word-break-all { @include gl-word-break-all; }
 .gl-reset-line-height { @include gl-reset-line-height; }
 .gl-reset-text-align { @include gl-reset-text-align; }
-
-.prepend-append-default {
-  margin-left: $gl-padding;
-  margin-right: $gl-padding;
-}
