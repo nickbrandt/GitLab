@@ -23910,9 +23910,6 @@ msgstr ""
 msgid "WikiClone|Install Gollum"
 msgstr ""
 
-msgid "WikiClone|It is recommended to install %{markdown} so that GFM features render locally:"
-msgstr ""
-
 msgid "WikiClone|Start Gollum and edit locally"
 msgstr ""
 
