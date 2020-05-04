@@ -2,9 +2,11 @@
 
 RSpec::Matchers.define :require_graphql_authorizations do |*expected|
   match do |klass|
-    permissions = klass.respond_to?(:required_permissions) ?
-                    klass.required_permissions :
+    permissions = if klass.respond_to?(:required_permissions)
+                    klass.required_permissions
+                  else
                     [klass.to_graphql.metadata[:authorize]]
+                  end
 
     expect(permissions).to eq(expected)
   end
