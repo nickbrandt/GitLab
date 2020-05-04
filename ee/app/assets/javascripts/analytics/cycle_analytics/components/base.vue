@@ -184,8 +184,8 @@ export default {
 </script>
 <template>
   <div class="js-cycle-analytics">
-    <div class="page-title-holder d-flex align-items-center">
-      <h3 class="page-title">{{ __('Value Stream Analytics') }}</h3>
+    <div class="mb-3">
+      <h3>{{ __('Value Stream Analytics') }}</h3>
     </div>
     <div class="mw-100">
       <div
