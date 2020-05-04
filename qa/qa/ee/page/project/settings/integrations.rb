@@ -6,8 +6,8 @@ module QA
       module Project
         module Settings
           class Integrations < QA::Page::Base
-            view 'app/views/projects/services/_index.html.haml' do
-              element :jenkins_ci_link, '{ data: { qa_selector: "#{service.title.downcase.gsub' # rubocop:disable QA/ElementWithPattern
+            view 'app/views/shared/integrations/_integrations.html.haml' do
+              element :jenkins_ci_link, '{ data: { qa_selector: "#{integration.title.downcase.gsub' # rubocop:disable QA/ElementWithPattern
             end
 
             def click_jenkins_ci_link
