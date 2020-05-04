@@ -30,4 +30,23 @@ describe('normalizeData', () => {
       },
     ]);
   });
+
+  it('normalizes data into LogTreeCommit object with no lockLabel', () => {
+    const mock = [...mockData];
+    delete mock[0].lock_label;
+
+    expect(normalizeData(mock, '')).toEqual([
+      {
+        sha: '123',
+        message: 'testing message',
+        committedDate: '2019-01-01',
+        commitPath: 'https://test.com',
+        fileName: 'index.js',
+        filePath: '/index.js',
+        type: 'blob',
+        lockLabel: false,
+        __typename: 'LogTreeCommit',
+      },
+    ]);
+  });
 });
