@@ -37,8 +37,6 @@ module EE
 
         override :uncached_data
         def uncached_data
-          return super if ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
-
           time_period = { created_at: 28.days.ago..Time.current }
           usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
           super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)

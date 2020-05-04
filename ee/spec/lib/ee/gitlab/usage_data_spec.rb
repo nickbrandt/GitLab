@@ -265,18 +265,7 @@ describe Gitlab::UsageData do
       end
 
       describe '.uncached_data' do
-        context 'when the :usage_activity_by_stage feature is not enabled' do
-          before do
-            stub_feature_flags(usage_activity_by_stage: false)
-          end
-
-          it "does not include usage_activity_by_stage data" do
-            expect(described_class.uncached_data).not_to include(:usage_activity_by_stage)
-            expect(described_class.uncached_data).not_to include(:usage_activity_by_stage_monthly)
-          end
-        end
-
-        context 'when the :usage_activity_by_stage feature is enabled' do
+        describe '.usage_activity_by_stage' do
           it 'includes usage_activity_by_stage data' do
             expect(described_class.uncached_data).to include(:usage_activity_by_stage)
             expect(described_class.uncached_data).to include(:usage_activity_by_stage_monthly)
