@@ -53,7 +53,7 @@ module QA
             Page::Main::Menu.act { click_settings_link }
             Page::Profile::Menu.act { click_ssh_keys }
 
-            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.title)
             expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
@@ -126,7 +126,7 @@ module QA
             Page::Main::Menu.act { click_settings_link }
             Page::Profile::Menu.act { click_ssh_keys }
 
-            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.title)
             expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated

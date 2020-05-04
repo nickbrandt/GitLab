@@ -53,7 +53,7 @@ module QA
               menu.wait_for_key_to_replicate(key_title)
             end
 
-            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.title)
             expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
@@ -143,7 +143,7 @@ module QA
               menu.wait_for_key_to_replicate(key_title)
             end
 
-            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.title)
             expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
