@@ -1,4 +1,3 @@
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import Poll from '~/lib/utils/poll';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
@@ -14,7 +13,7 @@ export const fetchClusters = ({ state, commit }) => {
     method: 'fetchClusters',
     successCallback: ({ data }) => {
       if (data.clusters) {
-        commit(types.SET_CLUSTERS_DATA, convertObjectPropsToCamelCase(data, { deep: true }));
+        commit(types.SET_CLUSTERS_DATA, data);
         commit(types.SET_LOADING_STATE, false);
         poll.stop();
       }

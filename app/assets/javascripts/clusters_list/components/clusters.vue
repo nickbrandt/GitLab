@@ -15,36 +15,38 @@ export default {
   directives: {
     tooltip,
   },
-  fields: [
-    {
-      key: 'name',
-      label: __('Kubernetes cluster'),
-    },
-    {
-      key: 'environmentScope',
-      label: __('Environment scope'),
-    },
-    // Wait for backend to send these fields
-    // {
-    //  key: 'size',
-    //  label: __('Size'),
-    // },
-    // {
-    //  key: 'cpu',
-    //  label: __('Total cores (vCPUs)'),
-    // },
-    // {
-    //  key: 'memory',
-    //  label: __('Total memory (GB)'),
-    // },
-    {
-      key: 'clusterType',
-      label: __('Cluster level'),
-      formatter: value => CLUSTER_TYPES[value],
-    },
-  ],
   computed: {
     ...mapState(['clusters', 'loading']),
+    fields() {
+      return [
+        {
+          key: 'name',
+          label: __('Kubernetes cluster'),
+        },
+        {
+          key: 'environment_scope',
+          label: __('Environment scope'),
+        },
+        // Wait for backend to send these fields
+        // {
+        //  key: 'size',
+        //  label: __('Size'),
+        // },
+        // {
+        //  key: 'cpu',
+        //  label: __('Total cores (vCPUs)'),
+        // },
+        // {
+        //  key: 'memory',
+        //  label: __('Total memory (GB)'),
+        // },
+        {
+          key: 'cluster_type',
+          label: __('Cluster level'),
+          formatter: value => CLUSTER_TYPES[value],
+        },
+      ];
+    },
   },
   mounted() {
     this.fetchClusters();
@@ -65,14 +67,7 @@ export default {
 
 <template>
   <gl-loading-icon v-if="loading" size="md" class="mt-3" />
-  <gl-table
-    v-else
-    :items="clusters"
-    :fields="$options.fields"
-    stacked="md"
-    variant="light"
-    class="qa-clusters-table"
-  >
+  <gl-table v-else :items="clusters" :fields="fields" stacked="md" class="qa-clusters-table">
     <template #cell(name)="{ item }">
       <div class="d-flex flex-row-reverse flex-md-row js-status">
         <gl-link data-qa-selector="cluster" :data-qa-cluster-name="item.name" :href="item.path">
@@ -95,7 +90,7 @@ export default {
         ></div>
       </div>
     </template>
-    <template #cell(clusterType)="{value}">
+    <template #cell(cluster_type)="{value}">
       <gl-badge variant="light">
         {{ value }}
       </gl-badge>

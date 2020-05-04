@@ -7,7 +7,7 @@ export default {
   [types.SET_CLUSTERS_DATA](state, data) {
     Object.assign(state, {
       clusters: data.clusters,
-      hasAncestorClusters: data.hasAncestorClusters,
+      hasAncestorClusters: data.has_ancestor_clusters,
     });
   },
 };
