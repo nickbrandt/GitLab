@@ -276,7 +276,6 @@ describe Audit::Details do
 
     context 'creates release event' do
       let(:user_member) { create(:user) }
-      let(:member) { create(:project_member, :developer, user: user_member, project: project, expires_at: 1.day.from_now) }
       let(:release_creation_action) do
         {
           action: :custom,
