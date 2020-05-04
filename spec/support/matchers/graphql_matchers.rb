@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 RSpec::Matchers.define :require_graphql_authorizations do |*expected|
-  match do |field|
-    expect(field.to_graphql.metadata[:authorize]).to eq(*expected)
+  match do |klass|
+    permissions = klass.respond_to?(:required_permissions) ?
+                    klass.required_permissions :
+                    [klass.to_graphql.metadata[:authorize]]
+
+    expect(permissions).to eq(expected)
   end
 end
 
