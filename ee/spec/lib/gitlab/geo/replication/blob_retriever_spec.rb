@@ -53,6 +53,7 @@ describe Gitlab::Geo::Replication::BlobRetriever, :aggregate_failures do
       expect(response).to include(code: :ok)
       expect(response).to include(message: 'Success')
       expect(response[:file].path).to eq(package_file.file.path)
+      expect(response[:file]).to be_a(GitlabUploader)
     end
   end
 end
