@@ -189,52 +189,47 @@ describe('Project Licenses', () => {
     });
 
     describe.each`
-      givenUrlHash   | tabName       | expectedActiveAttributeValue
-      ${'#policies'} | ${'policies'} | ${'true'}
-      ${'#policies'} | ${'licenses'} | ${undefined}
-      ${'#licenses'} | ${'licenses'} | ${'true'}
-      ${'#licenses'} | ${'policies'} | ${undefined}
-      ${'#foo'}      | ${'policies'} | ${undefined}
-      ${'#foo'}      | ${'licenses'} | ${undefined}
+      givenLocationHash | expectedTabIndex
+      ${'licenses'}     | ${0}
+      ${'policies'}     | ${1}
+      ${'foo'}          | ${0}
+      ${'bar'}          | ${0}
+    `('when the url contains $givenUrlHash hash', ({ givenLocationHash, expectedTabIndex }) => {
+      beforeEach(() => {
+        setWindowLocation({
+          href: `${TEST_HOST}#${givenLocationHash}`,
+        });
+
+        createComponent({
+          state: {
+            initialized: true,
+          },
+          options: {
+            provide: {
+              glFeatures: { licensePolicyList: true },
+            },
+          },
+        });
+      });
+
+      it(`sets the tabIndex to be "${expectedTabIndex}`, () => {
+        expect(wrapper.find(GlTabs).attributes('value')).toBe(`${expectedTabIndex}`);
+      });
+    });
+
+    it.each`
+      givenTabIndex | expectedLocationHash
+      ${0}          | ${'licenses'}
+      ${1}          | ${'policies'}
     `(
-      'when the url contains $givenUrlHash hash',
-      ({ givenUrlHash, tabName, expectedActiveAttributeValue }) => {
-        beforeEach(() => {
-          setWindowLocation({
-            href: `${TEST_HOST}${givenUrlHash}`,
-          });
+      'sets the location hash to "tabName" when the corresponding tab is activated',
+      ({ givenTabIndex, expectedLocationHash }) => {
+        wrapper.setData({ tabIndex: givenTabIndex });
+        wrapper.vm.$forceUpdate();
 
-          createComponent({
-            state: {
-              initialized: true,
-            },
-            options: {
-              provide: {
-                glFeatures: { licensePolicyList: true },
-              },
-            },
-          });
+        return wrapper.vm.$nextTick().then(() => {
+          expect(window.location.hash).toBe(expectedLocationHash);
         });
-
-        it(`${tabName} tab has "active" attribute set to be ${expectedActiveAttributeValue}`, () => {
-          expect(wrapper.find(`[data-testid=${tabName}]`).attributes('active')).toBe(
-            expectedActiveAttributeValue,
-          );
-        });
-      },
-    );
-
-    it.each(['policies', 'licenses'])(
-      'sets the location hash to "%s" when the corresponding tab is activated',
-      tabName => {
-        const originalHash = window.location.hash;
-        expect(originalHash).toBeFalsy();
-
-        wrapper.find(`[data-testid="${tabName}"]`).vm.$emit('click');
-
-        expect(window.location.hash).toContain(tabName);
-
-        window.location.hash = originalHash;
       },
     );
 
