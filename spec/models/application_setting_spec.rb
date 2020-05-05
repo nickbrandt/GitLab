@@ -103,6 +103,11 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(10.5).for(:raw_blob_request_limit) }
     it { is_expected.not_to allow_value(-1).for(:raw_blob_request_limit) }
 
+    it { is_expected.to allow_value(['user1'] * 100).for(:issues_create_limit_users_allowlist) }
+    it { is_expected.not_to allow_value(['user1'] * 101).for(:issues_create_limit_users_allowlist) }
+    it { is_expected.not_to allow_value(nil).for(:issues_create_limit_users_allowlist) }
+    it { is_expected.to allow_value([]).for(:issues_create_limit_users_allowlist) }
+
     context 'grafana_url validations' do
       before do
         subject.instance_variable_set(:@parsed_grafana_url, nil)

@@ -80,6 +80,7 @@ module ApplicationSettingImplementation
         housekeeping_incremental_repack_period: 10,
         import_sources: Settings.gitlab['import_sources'],
         issues_create_limit: 300,
+        issues_create_limit_users_allowlist: [],
         local_markdown_version: 0,
         max_artifacts_size: Settings.artifacts['max_size'],
         max_attachment_size: Settings.gitlab['max_attachment_size'],
@@ -358,6 +359,16 @@ module ApplicationSettingImplementation
   # https://gitlab.com/gitlab-org/gitlab/issues/208161
   def web_ide_clientside_preview_bundler_url
     'https://sandbox-prod.gitlab-static.net'
+  end
+
+  def issues_create_limit_users_allowlist_raw
+    array_to_string(self.issues_create_limit_users_allowlist)
+  end
+
+  def issues_create_limit_users_allowlist_raw=(values)
+    clear_memoization(:issues_create_limit_users_allowlist)
+
+    self.issues_create_limit_users_allowlist = strings_to_array(values)
   end
 
   private

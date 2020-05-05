@@ -6,4 +6,11 @@
       = f.label :issues_create_limit, 'Max requests per second per user', class: 'label-bold'
       = f.number_field :issues_create_limit, class: 'form-control'
 
+    .form-group
+      = f.label :issues_create_limit_users_allowlist_raw, class: 'label-bold' do
+        = _('Allow-list for users that should not be subjected to the rate limit')
+      = f.text_area :issues_create_limit_users_allowlist_raw, placeholder: "user1, user2, user3", class: 'form-control', rows: 6
+      %span.form-text.text-muted
+        = _("When the current user's username is included in this list, the rate limit will be disabled for the user.")
+
   = f.submit 'Save changes', class: "btn btn-success", data: { qa_selector: 'save_changes_button' }

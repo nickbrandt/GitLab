@@ -318,6 +318,8 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def create_rate_limit
+    return if rate_limit_users_allowlist.include?(@current_user.username)
+
     key = :issues_create
 
     if rate_limiter.throttled?(key, scope: [@project, @current_user])
@@ -329,6 +331,12 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def rate_limiter
     ::Gitlab::ApplicationRateLimiter
+  end
+
+  def rate_limit_users_allowlist
+    Gitlab::CurrentSettings
+      .current_application_settings
+      .issues_create_limit_users_allowlist
   end
 end
 

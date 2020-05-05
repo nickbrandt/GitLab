@@ -388,11 +388,13 @@ describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_moc
 
         page.within('.as-issue-limits') do
           fill_in 'Max requests per second per user', with: 0
+          fill_in 'Allow-list for users that should not be subjected to the rate limit', with: 'user1, user2'
           click_button 'Save changes'
         end
 
         expect(page).to have_content "Application settings saved successfully"
         expect(current_settings.issues_create_limit).to eq(0)
+        expect(current_settings.issues_create_limit_users_allowlist).to eq(%w(user1 user2))
       end
     end
 

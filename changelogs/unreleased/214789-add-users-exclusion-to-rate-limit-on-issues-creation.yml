@@ -1,0 +1,5 @@
+---
+title: Add users exclusion to rate limit on issues creation
+merge_request: 31071
+author:
+type: added

@@ -90,6 +90,7 @@ describe API::Settings, 'Settings' do
             push_event_activities_limit: 2,
             snippet_size_limit: 5,
             issues_create_limit: 300,
+            issues_create_limit_users_allowlist: ['user1'],
             raw_blob_request_limit: 300
           }
 
@@ -128,6 +129,7 @@ describe API::Settings, 'Settings' do
         expect(json_response['push_event_activities_limit']).to eq(2)
         expect(json_response['snippet_size_limit']).to eq(5)
         expect(json_response['issues_create_limit']).to eq(300)
+        expect(json_response['issues_create_limit_users_allowlist']).to eq(['user1'])
         expect(json_response['raw_blob_request_limit']).to eq(300)
       end
     end

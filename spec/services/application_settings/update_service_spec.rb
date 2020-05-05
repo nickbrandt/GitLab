@@ -335,19 +335,23 @@ describe ApplicationSettings::UpdateService do
     end
   end
 
-  context 'when issues_create_limit is passsed' do
+  context 'when issues rate limit settings are passsed' do
     let(:params) do
       {
-        issues_create_limit: 600
+        issues_create_limit: 600,
+        issues_create_limit_users_allowlist_raw: "user1, user2"
       }
     end
 
-    it 'updates issues_create_limit value' do
+    it 'updates issues create limit settings' do
       subject.execute
 
       application_settings.reload
 
       expect(application_settings.issues_create_limit).to eq(600)
+      expect(application_settings.issues_create_limit_users_allowlist).to contain_exactly(
+        'user1', 'user2'
+      )
     end
   end
 end

@@ -1898,6 +1898,9 @@ msgstr ""
 msgid "Allow users to request access (if visibility is public or internal)"
 msgstr ""
 
+msgid "Allow-list for users that should not be subjected to the rate limit"
+msgstr ""
+
 msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
@@ -23719,6 +23722,9 @@ msgid "When enabled, users cannot use GitLab until the terms have been accepted.
 msgstr ""
 
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
+msgstr ""
+
+msgid "When the current user's username is included in this list, the rate limit will be disabled for the user."
 msgstr ""
 
 msgid "When this merge request is accepted"

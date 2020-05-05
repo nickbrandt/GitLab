@@ -71,6 +71,7 @@ Example response:
    "asset_proxy_whitelist": ["example.com", "*.example.com", "your-instance.com"],
    "npm_package_requests_forwarding": true,
    "issues_create_limit": 300,
+   "issues_create_limit_users_allowlist": ["user1", "user2", "user3"],
    "raw_blob_request_limit": 300
 }
 ```
@@ -160,6 +161,7 @@ Example response:
   "allow_local_requests_from_system_hooks": false,
   "npm_package_requests_forwarding": true,
   "issues_create_limit": 300,
+  "issues_create_limit_users_allowlist": ["user1", "user2", "user3"],
   "raw_blob_request_limit": 300
 }
 ```
@@ -367,4 +369,5 @@ are listed in the descriptions of the relevant settings.
 | `web_ide_clientside_preview_enabled`     | boolean          | no                                   | Live Preview (allow live previews of JavaScript projects in the Web IDE using CodeSandbox Live Preview). |
 | `snippet_size_limit`                     | integer          | no                                   | Max snippet content size in **bytes**. Default: 52428800 Bytes (50MB).|
 | `issues_create_limit`                    | integer          | no                                   | Max number of issue creation requests per minute per user. Default: 300. To disable throttling set to 0.|
+| `issues_create_limit_users_allowlist`    | array of strings | no                                   | Users in this list will not be subject to the rate limit set for issues creation.|
 | `raw_blob_request_limit`                 | integer          | no                                   | Max number of requests per minute for each raw path. Default: 300. To disable throttling set to 0.|
