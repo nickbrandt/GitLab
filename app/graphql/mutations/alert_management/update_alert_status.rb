@@ -13,20 +13,20 @@ module Mutations
         alert = authorized_find!(project_path: args[:project_path], iid: args[:iid])
 
         result = update_status(alert, args[:status])
+
         prepare_response(result)
       end
 
       private
 
       def update_status(alert, status)
-        service = ::AlertManagement::UpdateAlertStatusService.new(alert, status)
-        service.execute
+        ::AlertManagement::UpdateAlertStatusService.new(alert, status).execute
       end
 
       def prepare_response(result)
         {
           alert: result.payload[:alert],
-          errors: result.error? ? [result.message].compact : []
+          errors: result.error? ? [result.message] : []
         }
       end
     end

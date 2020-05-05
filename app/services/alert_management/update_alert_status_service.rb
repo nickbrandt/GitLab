@@ -8,20 +8,27 @@ module AlertManagement
     end
 
     def execute
-      return error_response('Invalid status') unless AlertManagement::Alert.statuses.key?(status.to_s)
+      return error('Invalid status') unless AlertManagement::Alert.statuses.key?(status.to_s)
 
       alert.status = status
-      return ServiceResponse.success(payload: { alert: alert }) if alert.save
 
-      error_response(alert.errors.full_messages.to_sentence)
+      if alert.save
+        success
+      else
+        error(alert.errors.full_messages.to_sentence)
+      end
     end
 
     private
 
-    def error_response(message)
-      ServiceResponse.error(payload: { alert: alert }, message: message)
+    attr_reader :alert, :status
+
+    def success
+      ServiceResponse.success(payload: { alert: alert })
     end
 
-    attr_reader :alert, :status
+    def error(message)
+      ServiceResponse.error(payload: { alert: alert }, message: message)
+    end
   end
 end
