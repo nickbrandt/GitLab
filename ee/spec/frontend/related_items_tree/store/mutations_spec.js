@@ -565,6 +565,16 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.MOVE_ITEM, () => {
+        const defaultPayload = {
+          oldParentItem: {
+            reference: '&1',
+          },
+          targetItem: 'bar',
+          oldIndex: 1,
+          newIndex: 0,
+          isFirstChild: false,
+        };
+
         it('should move an item from one parent to another with children based on provided indexes', () => {
           const newParentItem = {
             parentReference: '&2',
@@ -574,14 +584,8 @@ describe('RelatedItemsTree', () => {
           state.children[newParentItem.parentReference] = ['baz'];
 
           mutations[types.MOVE_ITEM](state, {
-            oldParentItem: {
-              reference: '&1',
-            },
+            ...defaultPayload,
             newParentItem,
-            targetItem: 'bar',
-            oldIndex: 1,
-            newIndex: 0,
-            isFirstChild: false,
           });
 
           expect(state.children[state.parentItem.reference]).toEqual(
@@ -600,13 +604,8 @@ describe('RelatedItemsTree', () => {
           state.children[state.parentItem.reference] = ['foo', 'bar'];
 
           mutations[types.MOVE_ITEM](state, {
-            oldParentItem: {
-              reference: '&1',
-            },
+            ...defaultPayload,
             newParentItem,
-            targetItem: 'bar',
-            oldIndex: 1,
-            newIndex: 0,
             isFirstChild: true,
           });
 
@@ -627,13 +626,9 @@ describe('RelatedItemsTree', () => {
           state.childrenFlags[state.parentItem.reference] = { itemHasChildren: true };
 
           mutations[types.MOVE_ITEM](state, {
-            oldParentItem: {
-              reference: '&1',
-            },
+            ...defaultPayload,
             newParentItem,
-            targetItem: 'bar',
             oldIndex: 0,
-            newIndex: 0,
             isFirstChild: true,
           });
 

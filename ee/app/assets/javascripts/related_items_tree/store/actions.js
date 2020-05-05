@@ -470,9 +470,9 @@ export const moveItem = (
   let isFirstChild = false;
   const newParentChildren = state.children[newParentItem.parentReference];
 
-  if (newParentChildren !== undefined && newParentChildren.length > 0) {
+  if (newParentChildren?.length > 0) {
     adjacentItem = newParentChildren[newIndex];
-    if (adjacentItem === undefined) {
+    if (!adjacentItem) {
       adjacentItem = newParentChildren[newParentChildren.length - 1];
       relativePosition = relativePositions.Before;
     }

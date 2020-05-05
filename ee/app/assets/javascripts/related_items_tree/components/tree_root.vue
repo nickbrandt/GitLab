@@ -51,7 +51,7 @@ export default {
     },
     onMove(e) {
       const item = e.relatedContext.element;
-      if (item && item.type && item.type === ChildType.Epic)
+      if (item?.type === ChildType.Epic)
         this.toggleItem({
           parentItem: item,
           isDragging: true,

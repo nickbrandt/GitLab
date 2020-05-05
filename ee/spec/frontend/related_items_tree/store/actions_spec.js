@@ -1379,15 +1379,17 @@ describe('RelatedItemTree', () => {
             }),
           );
 
+          const payload = {
+            oldParentItem: mockParentItem,
+            newParentItem: mockParentItem2,
+            targetItem: mockItems[1],
+            newIndex: 1,
+            oldIndex: 0,
+          };
+
           testAction(
             actions.moveItem,
-            {
-              oldParentItem: mockParentItem,
-              newParentItem: mockParentItem2,
-              targetItem: mockItems[1],
-              newIndex: 1,
-              oldIndex: 0,
-            },
+            payload,
             state,
             [
               {
@@ -1405,13 +1407,7 @@ describe('RelatedItemTree', () => {
             [
               {
                 type: 'receiveMoveItemFailure',
-                payload: {
-                  oldParentItem: mockParentItem,
-                  newParentItem: mockParentItem2,
-                  targetItem: mockItems[1],
-                  newIndex: 1,
-                  oldIndex: 0,
-                },
+                payload,
               },
             ],
           );
@@ -1420,15 +1416,17 @@ describe('RelatedItemTree', () => {
         it('should perform MOVE_ITEM mutation before request and dispatch `receiveReorderItemFailure` on request failure', () => {
           jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(Promise.reject());
 
+          const payload = {
+            oldParentItem: mockParentItem,
+            newParentItem: mockParentItem2,
+            targetItem: mockItems[1],
+            newIndex: 1,
+            oldIndex: 0,
+          };
+
           testAction(
             actions.moveItem,
-            {
-              oldParentItem: mockParentItem,
-              newParentItem: mockParentItem2,
-              targetItem: mockItems[1],
-              newIndex: 1,
-              oldIndex: 0,
-            },
+            payload,
             state,
             [
               {
@@ -1446,13 +1444,7 @@ describe('RelatedItemTree', () => {
             [
               {
                 type: 'receiveMoveItemFailure',
-                payload: {
-                  oldParentItem: mockParentItem,
-                  newParentItem: mockParentItem2,
-                  targetItem: mockItems[1],
-                  newIndex: 1,
-                  oldIndex: 0,
-                },
+                payload,
               },
             ],
           );
