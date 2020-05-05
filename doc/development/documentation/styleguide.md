@@ -582,10 +582,10 @@ To help tables be easier to maintain, consider adding additional spaces to the
 column widths to make them consistent. For example:
 
 ```markdown
-| Header 1  | Header 2             |
-|:----------|:---------------------|
-| Item 1    | Description          |
-| Item 2    | Expanded description |
+| App name | Description          | Requirements   |
+|:---------|:---------------------|:---------------|
+| App 1    | Description text 1.  | Requirements 1 |
+| App 2    | Description text 2.  | None           |
 ```
 
 If you're using Visual Studio Code, consider installing and using the
