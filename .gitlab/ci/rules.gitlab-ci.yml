@@ -465,7 +465,7 @@
   rules:
     - if: '$DAST_DISABLED || $GITLAB_FEATURES !~ /\bdast\b/'
       when: never
-    - <<: *if-nightly-master-schedule
+#    - <<: *if-nightly-master-schedule
 
 ################
 # Review rules #
