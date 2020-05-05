@@ -117,8 +117,8 @@ export default {
         @ok="deleteItemConfirmation"
         @cancel="deleteItemCanceled"
       >
-        <template v-slot:modal-title>{{ modalAction }}</template>
-        <template v-slot:modal-ok>{{ modalAction }}</template>
+        <template #modal-title>{{ modalAction }}</template>
+        <template #modal-ok>{{ modalAction }}</template>
         <p v-html="deletePackageDescription"></p>
       </gl-modal>
     </template>

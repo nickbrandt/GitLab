@@ -277,7 +277,7 @@ export default {
           @done="$router.push({ name: $options.DESIGNS_ROUTE_NAME })"
           @error="onDesignDeleteError"
         >
-          <template v-slot="{ mutate, loading }">
+          <template #default="{ mutate, loading }">
             <toolbar
               :id="id"
               :is-deleting="loading"
@@ -332,7 +332,7 @@ export default {
           />
           <apollo-mutation
             v-if="annotationCoordinates"
-            v-slot="{ mutate, loading }"
+            #default="{ mutate, loading }"
             :mutation="$options.createImageDiffNoteMutation"
             :variables="{
               input: mutationPayload,

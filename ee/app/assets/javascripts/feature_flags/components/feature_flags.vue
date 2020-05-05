@@ -271,7 +271,7 @@ export default {
       :title="emptyStateTitle"
       :svg-path="errorStateSvgPath"
     >
-      <template v-slot:description>
+      <template #description>
         {{
           s__(
             'FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.',

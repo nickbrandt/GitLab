@@ -103,7 +103,7 @@ export default {
     issues-list-container-class="p-0"
     issue-item-class="p-0"
   >
-    <template v-slot:success>
+    <template #success>
       {{ __('All merge request dependencies have been merged') }}
       <span class="text-secondary">
         {{
@@ -113,7 +113,7 @@ export default {
         }}
       </span>
     </template>
-    <template v-slot:error>
+    <template #error>
       <span v-html="blockedByText"></span>
     </template>
   </report-section>
