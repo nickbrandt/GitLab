@@ -62,15 +62,15 @@ export default {
   >
     <template #emptyState>
       <gl-empty-state
-        :title="s__('No vulnerabilities found for this pipeline')"
+        :title="s__('SecurityReports|No vulnerabilities found for this pipeline')"
         :svg-path="emptyStateSvgPath"
         :description="
           s__(
-            `While it's rare to have no vulnerabilities for your pipeline, it can happen. In any event, we ask that you double check your settings to make sure all security scanning jobs have passed successfully.`,
+            `SecurityReports|While it's rare to have no vulnerabilities for your pipeline, it can happen. In any event, we ask that you double check your settings to make sure all security scanning jobs have passed successfully.`,
           )
         "
         :primary-button-link="dashboardDocumentation"
-        :primary-button-text="s__('Security Reports|Learn more about setting up your dashboard')"
+        :primary-button-text="s__('SecurityReports|Learn more about setting up your dashboard')"
       />
     </template>
   </security-dashboard>

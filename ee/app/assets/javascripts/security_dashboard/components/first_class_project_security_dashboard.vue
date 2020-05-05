@@ -77,15 +77,15 @@ export default {
             v-if="isBannerVisible"
             class="mt-4"
             variant="introduction"
-            :title="s__('SecurityDashboard|Introducing standalone vulnerabilities')"
-            :button-text="s__('SecurityDashboard|Learn More')"
+            :title="s__('SecurityReports|Introducing standalone vulnerabilities')"
+            :button-text="s__('SecurityReports|Learn More')"
             :button-link="dashboardDocumentation"
             @close="handleBannerClose"
           >
             <div class="mb-2">
               {{
                 s__(
-                  'SecurityDashboard|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans.',
+                  'SecurityReports|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans.',
                 )
               }}
             </div>

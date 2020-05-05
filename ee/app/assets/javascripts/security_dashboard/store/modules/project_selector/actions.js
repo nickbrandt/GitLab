@@ -65,19 +65,19 @@ export const receiveAddProjectsSuccess = ({ commit, dispatch, state }, data) => 
     let invalidProjects;
     if (rest.length > 0) {
       invalidProjects = sprintf(
-        s__('SecurityDashboard|%{firstProject}, %{secondProject}, and %{rest}'),
+        s__('SecurityReports|%{firstProject}, %{secondProject}, and %{rest}'),
         translationValues,
       );
     } else if (secondProject) {
       invalidProjects = sprintf(
-        s__('SecurityDashboard|%{firstProject} and %{secondProject}'),
+        s__('SecurityReports|%{firstProject} and %{secondProject}'),
         translationValues,
       );
     } else {
       invalidProjects = firstProject;
     }
     createFlash(
-      sprintf(s__('SecurityDashboard|Unable to add %{invalidProjects}'), {
+      sprintf(s__('SecurityReports|Unable to add %{invalidProjects}'), {
         invalidProjects,
       }),
     );

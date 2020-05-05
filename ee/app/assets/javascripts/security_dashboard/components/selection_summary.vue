@@ -5,9 +5,9 @@ import toast from '~/vue_shared/plugins/global_toast';
 import createFlash from '~/flash';
 import dismissVulnerability from '../graphql/dismissVulnerability.graphql';
 
-const REASON_NONE = s__('Security Reports|[No reason]');
-const REASON_WONT_FIX = s__("Security Reports|Won't fix / Accept risk");
-const REASON_FALSE_POSITIVE = s__('Security Reports|False positive');
+const REASON_NONE = s__('SecurityReports|[No reason]');
+const REASON_WONT_FIX = s__("SecurityReports|Won't fix / Accept risk");
+const REASON_FALSE_POSITIVE = s__('SecurityReports|False positive');
 
 export default {
   name: 'SelectionSummary',
@@ -71,14 +71,14 @@ export default {
         })
         .catch(() => {
           createFlash(
-            s__('Security Reports|There was an error dismissing the vulnerabilities.'),
+            s__('SecurityReports|There was an error dismissing the vulnerabilities.'),
             'alert',
           );
         });
     },
   },
   dismissalReasons: [
-    { value: null, text: s__('Security Reports|Select a reason') },
+    { value: null, text: s__('SecurityReports|Select a reason') },
     REASON_FALSE_POSITIVE,
     REASON_WONT_FIX,
     REASON_NONE,
@@ -102,7 +102,7 @@ export default {
         variant="warning"
         :disabled="!canDismissVulnerability"
       >
-        {{ s__('Security Reports|Dismiss Selected') }}
+        {{ s__('SecurityReports|Dismiss Selected') }}
       </gl-button>
     </form>
   </div>

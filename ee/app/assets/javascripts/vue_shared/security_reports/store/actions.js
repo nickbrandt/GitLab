@@ -216,7 +216,7 @@ export const receiveDismissVulnerabilityError = ({ commit }, error) =>
 export const dismissVulnerability = ({ state, dispatch }, comment) => {
   dispatch('requestDismissVulnerability');
 
-  const toastMsg = sprintf(s__("Security Reports|Dismissed '%{vulnerabilityName}'"), {
+  const toastMsg = sprintf(s__("SecurityReports|Dismissed '%{vulnerabilityName}'"), {
     vulnerabilityName: state.modal.vulnerability.name,
   });
 
@@ -262,10 +262,10 @@ export const addDismissalComment = ({ state, dispatch }, { comment }) => {
     dismissalFeedback.comment_details && dismissalFeedback.comment_details.comment;
 
   const toastMsg = editingDismissalContent
-    ? sprintf(s__("Security Reports|Comment edited on '%{vulnerabilityName}'"), {
+    ? sprintf(s__("SecurityReports|Comment edited on '%{vulnerabilityName}'"), {
         vulnerabilityName: vulnerability.name,
       })
-    : sprintf(s__("Security Reports|Comment added to '%{vulnerabilityName}'"), {
+    : sprintf(s__("SecurityReports|Comment added to '%{vulnerabilityName}'"), {
         vulnerabilityName: vulnerability.name,
       });
 
@@ -283,7 +283,7 @@ export const addDismissalComment = ({ state, dispatch }, { comment }) => {
     .catch(() => {
       dispatch(
         'receiveAddDismissalCommentError',
-        s__('Security Reports|There was an error adding the comment.'),
+        s__('SecurityReports|There was an error adding the comment.'),
       );
     });
 };
@@ -294,7 +294,7 @@ export const deleteDismissalComment = ({ state, dispatch }) => {
   const { vulnerability } = state.modal;
   const { dismissalFeedback } = vulnerability;
   const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
-  const toastMsg = sprintf(s__("Security Reports|Comment deleted on '%{vulnerabilityName}'"), {
+  const toastMsg = sprintf(s__("SecurityReports|Comment deleted on '%{vulnerabilityName}'"), {
     vulnerabilityName: vulnerability.name,
   });
 
@@ -311,7 +311,7 @@ export const deleteDismissalComment = ({ state, dispatch }) => {
     .catch(() => {
       dispatch(
         'receiveDeleteDismissalCommentError',
-        s__('Security Reports|There was an error deleting the comment.'),
+        s__('SecurityReports|There was an error deleting the comment.'),
       );
     });
 };

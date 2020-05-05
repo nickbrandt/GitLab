@@ -17,14 +17,14 @@ export default {
     },
   },
   DESCRIPTION: s__(
-    `SecurityDashboard|The security dashboard displays the latest security report. Use it to find and fix vulnerabilities.`,
+    `SecurityReports|The security dashboard displays the latest security report. Use it to find and fix vulnerabilities.`,
   ),
 };
 </script>
 
 <template>
   <gl-empty-state
-    :title="s__('SecurityDashboard|Monitor vulnerabilities in your code')"
+    :title="s__('SecurityReports|Monitor vulnerabilities in your code')"
     :svg-path="svgPath"
     :description="$options.DESCRIPTION"
     :primary-button-link="helpPath"

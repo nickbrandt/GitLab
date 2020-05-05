@@ -85,7 +85,7 @@ export default {
         <div class="flash-text container-fluid container-limited limit-container-width">
           {{
             s__(
-              'Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.',
+              'SecurityReports|Error fetching the vulnerability list. Please check your network connection and try again.',
             )
           }}
         </div>

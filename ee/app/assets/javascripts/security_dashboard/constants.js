@@ -8,7 +8,7 @@ const parseOptions = obj =>
 
 export const initFirstClassVulnerabilityFilters = () => [
   {
-    name: s__('SecurityDashboard|Status'),
+    name: s__('SecurityReports|Status'),
     id: 'state',
     options: [
       { id: ALL, name: s__('VulnerabilityStatusTypes|All') },
@@ -17,13 +17,13 @@ export const initFirstClassVulnerabilityFilters = () => [
     selection: new Set([ALL]),
   },
   {
-    name: s__('SecurityDashboard|Severity'),
+    name: s__('SecurityReports|Severity'),
     id: 'severity',
     options: [BASE_FILTERS.severity, ...parseOptions(SEVERITY_LEVELS)],
     selection: new Set([ALL]),
   },
   {
-    name: s__('SecurityDashboard|Report type'),
+    name: s__('SecurityReports|Report type'),
     id: 'reportType',
     options: [BASE_FILTERS.report_type, ...parseOptions(REPORT_TYPES)],
     selection: new Set([ALL]),
