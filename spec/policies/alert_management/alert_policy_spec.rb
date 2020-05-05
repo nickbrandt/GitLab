@@ -9,14 +9,15 @@ describe AlertManagement::AlertPolicy, :models do
   let(:policy) { described_class.new(user, alert) }
 
   describe 'rules' do
-    it { expect(policy).to be_disallowed :read_alert_management_alerts }
+    specify { expect(policy).to be_disallowed :read_alert_management_alerts }
 
     context 'when developer' do
       before do
         project.add_developer(user)
       end
 
-      it { expect(policy).to be_allowed :read_alert_management_alerts }
+      specify { expect(policy).to be_allowed :read_alert_management_alerts }
+      specify { expect(policy).to be_allowed :update_alert_management_alerts }
     end
   end
 end

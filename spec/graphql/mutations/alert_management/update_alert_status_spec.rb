@@ -35,8 +35,8 @@ describe Mutations::AlertManagement::UpdateAlertStatus do
             allow(resolver).to receive(:resolve).and_return(alert)
           end
 
-          expect(alert).to receive(:save).and_return(false)
-          expect(alert).to receive(:errors).and_return(
+          allow(alert).to receive(:save).and_return(false)
+          allow(alert).to receive(:errors).and_return(
             double(full_messages: %w(foo bar))
           )
           expect(resolve).to eq(
