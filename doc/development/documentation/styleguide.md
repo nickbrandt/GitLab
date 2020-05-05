@@ -588,9 +588,10 @@ column widths to make them consistent. For example:
 | App 2    | Description text 2.  | None           |
 ```
 
-If you're using Visual Studio Code, consider installing and using the
-[Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
-extension.
+Consider installing a plugin or extension in your editor for formatting tables:
+* [Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify) for Visual Studio Code
+* [Markdown Table Formatter](https://packagecontrol.io/packages/Markdown%20Table%20Formatter) for Sublime Text
+* [Markdown Table Formatter](https://atom.io/packages/markdown-table-formatter) for Atom
 
 ### Feature tables
 
