@@ -8,7 +8,8 @@ describe 'SAST.gitlab-ci.yml' do
   describe 'the created pipeline' do
     let(:user) { create(:admin) }
     let(:default_branch) { 'master' }
-    let(:project) { create(:project, :custom_repo, files: { 'README.txt' => '' }) }
+    let(:files) { { 'README.txt' => '' } }
+    let(:project) { create(:project, :custom_repo, files: files) }
     let(:service) { Ci::CreatePipelineService.new(project, user, ref: 'master' ) }
     let(:pipeline) { service.execute!(:push) }
     let(:build_names) { pipeline.builds.pluck(:name) }
@@ -48,33 +49,34 @@ describe 'SAST.gitlab-ci.yml' do
         end
       end
 
-      context 'when SAST_DISABLE_DIND=1' do
+      context 'when SAST_DISABLE_DIND=true' do
         before do
-          create(:ci_variable, project: project, key: 'SAST_DISABLE_DIND', value: '1')
+          create(:ci_variable, project: project, key: 'SAST_DISABLE_DIND', value: 'true')
         end
 
         describe 'language detection' do
           using RSpec::Parameterized::TableSyntax
 
-          where(:case_name, :variables, :include_build_names) do
-            'No match'             | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "" }                | %w(secrets-sast)
-            'Apex'                 | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "apex" }            | %w(pmd-apex-sast secrets-sast)
-            'C'                    | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "c" }               | %w(flawfinder-sast secrets-sast)
-            'C++'                  | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "c++" }             | %w(flawfinder-sast secrets-sast)
-            'C#'                   | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "c#" }              | %w(security-code-scan-sast secrets-sast)
-            'Elixir'               | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "elixir" }          | %w(sobelow-sast secrets-sast)
-            'Golang'               | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "go" }              | %w(gosec-sast secrets-sast)
-            'Groovy'               | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "groovy" }          | %w(spotbugs-sast secrets-sast)
-            'Java'                 | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "java" }            | %w(spotbugs-sast secrets-sast)
-            'Javascript'           | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "javascript" }      | %w(eslint-sast nodejs-scan-sast secrets-sast)
-            'Kubernetes Manifests' | { "SCAN_KUBERNETES_MANIFESTS" => "true" }                  | %w(kubesec-sast secrets-sast)
-            'Multiple languages'   | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "java,javascript" } | %w(eslint-sast nodejs-scan-sast spotbugs-sast secrets-sast)
-            'PHP'                  | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "php" }             | %w(phpcs-security-audit-sast secrets-sast)
-            'Python'               | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "python" }          | %w(bandit-sast secrets-sast)
-            'Ruby'                 | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "ruby" }            | %w(brakeman-sast secrets-sast)
-            'Scala'                | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "scala" }           | %w(spotbugs-sast secrets-sast)
-            'Typescript'           | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "typescript" }      | %w(tslint-sast secrets-sast)
-            'Visual Basic'         | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "visual basic" }    | %w(security-code-scan-sast secrets-sast)
+          where(:case_name, :files, :variables, :include_build_names) do
+            'No match'             | { 'README.md' => '' }                | {}                                        | %w(secrets-sast)
+            'Apex'                 | { 'app.cls' => '' }                  | {}                                        | %w(pmd-apex-sast secrets-sast)
+            'C'                    | { 'app.c' => '' }                    | {}                                        | %w(flawfinder-sast secrets-sast)
+            'C++'                  | { 'app.cpp' => '' }                  | {}                                        | %w(flawfinder-sast secrets-sast)
+            'C#'                   | { 'app.csproj' => '' }               | {}                                        | %w(security-code-scan-sast secrets-sast)
+            'Elixir'               | { 'mix.ex' => '' }                   | {}                                        | %w(sobelow-sast secrets-sast)
+            'Golang'               | { 'main.go' => '' }                  | {}                                        | %w(gosec-sast secrets-sast)
+            'Groovy'               | { 'app.groovy' => '' }               | {}                                        | %w(spotbugs-sast secrets-sast)
+            'Java'                 | { 'app.java' => '' }                 | {}                                        | %w(spotbugs-sast secrets-sast)
+            'Javascript'           | { 'app.js' => '' }                   | {}                                        | %w(eslint-sast nodejs-scan-sast secrets-sast)
+            'HTML'                 | { 'index.html' => '' }               | {}                                        | %w(eslint-sast secrets-sast)
+            'Kubernetes Manifests' | { 'Chart.yaml' => '' }               | { 'SCAN_KUBERNETES_MANIFESTS' => 'true' } | %w(kubesec-sast secrets-sast)
+            'Multiple languages'   | { 'app.java' => '', 'app.js' => '' } | {}                                        | %w(eslint-sast nodejs-scan-sast spotbugs-sast secrets-sast)
+            'PHP'                  | { 'app.php' => '' }                  | {}                                        | %w(phpcs-security-audit-sast secrets-sast)
+            'Python'               | { 'app.py' => '' }                   | {}                                        | %w(bandit-sast secrets-sast)
+            'Ruby'                 | { 'application.rb' => '' }           | {}                                        | %w(brakeman-sast secrets-sast)
+            'Scala'                | { 'app.scala' => '' }                | {}                                        | %w(spotbugs-sast secrets-sast)
+            'Typescript'           | { 'app.ts' => '' }                   | {}                                        | %w(tslint-sast secrets-sast)
+            'Visual Basic'         | { 'app.vbproj' => '' }               | {}                                        | %w(security-code-scan-sast secrets-sast)
           end
 
           with_them do
