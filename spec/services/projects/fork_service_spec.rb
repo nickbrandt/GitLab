@@ -320,8 +320,10 @@ describe Projects::ForkService do
       allow_any_instance_of(Gitlab::Git::Repository).to receive(:checksum)
         .and_return(::Gitlab::Git::BLANK_SHA)
 
-      storage_move = project.repository_storage_moves.create!(
-        source_storage_name: project.repository_storage,
+      storage_move = create(
+        :project_repository_storage_move,
+        :scheduled,
+        project: project,
         destination_storage_name: 'test_second_storage'
       )
       Projects::UpdateRepositoryStorageService.new(storage_move).execute

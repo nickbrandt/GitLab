@@ -31,4 +31,33 @@ RSpec.describe ProjectRepositoryStorageMove, type: :model do
       end
     end
   end
+
+  describe 'state transitions' do
+    using RSpec::Parameterized::TableSyntax
+
+    context 'when in the default state' do
+      subject(:storage_move) { create(:project_repository_storage_move, project: project, destination_storage_name: 'test_second_storage') }
+
+      let(:project) { create(:project) }
+
+      before do
+        stub_storage_settings('test_second_storage' => { 'path' => 'tmp/tests/extra_storage' })
+      end
+
+      context 'and transits to scheduled' do
+        it 'triggers ProjectUpdateRepositoryStorageWorker' do
+          expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'test_second_storage', repository_storage_move_id: storage_move.id)
+
+          storage_move.schedule!
+        end
+      end
+
+      context 'and transits to started' do
+        it 'does not allow the transition' do
+          expect { storage_move.start! }
+            .to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+    end
+  end
 end

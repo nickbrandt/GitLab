@@ -14,7 +14,7 @@ module Projects
     end
 
     def execute
-      repository_storage_move.update!(state: :started)
+      repository_storage_move.start!
 
       raise SameFilesystemError if same_filesystem?(repository.storage, destination_storage_name)
 
@@ -23,7 +23,7 @@ module Projects
       project.transaction do
         mark_old_paths_for_archive
 
-        repository_storage_move.update!(state: :finished)
+        repository_storage_move.finish!
         project.update!(repository_storage: destination_storage_name, repository_read_only: false)
         project.leave_pool_repository
         project.track_project_repository
@@ -35,7 +35,7 @@ module Projects
 
     rescue StandardError => e
       project.transaction do
-        repository_storage_move.update!(state: :failed)
+        repository_storage_move.do_fail!
         project.update!(repository_read_only: false)
       end
 

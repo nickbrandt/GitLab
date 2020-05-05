@@ -2079,13 +2079,7 @@ class Project < ApplicationRecord
       source_storage_name: repository_storage,
       destination_storage_name: new_repository_storage_key
     )
-
-    run_after_commit do
-      ProjectUpdateRepositoryStorageWorker.perform_async(
-        id, new_repository_storage_key,
-        repository_storage_move_id: storage_move.id
-      )
-    end
+    storage_move.schedule!
 
     self.repository_read_only = true
   end
