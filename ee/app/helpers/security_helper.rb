@@ -11,7 +11,8 @@ module SecurityHelper
       vulnerable_projects_endpoint: security_vulnerable_projects_path,
       vulnerabilities_endpoint: security_vulnerability_findings_path,
       vulnerabilities_history_endpoint: history_security_vulnerability_findings_path,
-      vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities')
+      vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities'),
+      vulnerabilities_export_endpoint: expose_path(api_v4_security_vulnerability_exports_path)
     }
   end
 end
