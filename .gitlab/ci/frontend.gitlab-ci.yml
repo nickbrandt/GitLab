@@ -1,14 +1,5 @@
-.assets-compile-cache:
-  cache:
-    paths:
-      - vendor/ruby/
-      - public/assets/webpack/
-      - assets-hash.txt
-      - .yarn-cache/
-      - tmp/cache/assets/sprockets
-      - tmp/cache/babel-loader
-      - tmp/cache/vue-loader
-      - tmp/cache/webpack-dlls
+include:
+  - local: .gitlab/ci/shared/frontend.yml
 
 .gitlab:assets:compile-metadata:
   extends:
@@ -74,48 +65,12 @@ build-assets-image:
     # https://gitlab.com/gitlab-org/gitlab/issues/208389
     - scripts/build_assets_image
 
-.compile-assets-metadata:
-  extends:
-    - .default-retry
-    - .default-before_script
-    - .assets-compile-cache
-  stage: prepare
-  script:
-    - node --version
-    - retry yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
-    - free -m
-    - time bin/rake gitlab:assets:compile > assets-compile.log 2>&1
-    - scripts/clean-old-cached-assets
-  variables:
-    SETUP_DB: "false"
-    # we override the max_old_space_size to prevent OOM errors
-    NODE_OPTIONS: --max_old_space_size=3584
-    WEBPACK_VENDOR_DLL: "true"
-  cache:
-    key: "assets-compile:test:v1"
-  artifacts:
-    expire_in: 7d
-    paths:
-      - node_modules
-      - public/assets
-      - assets-compile.log
-    when: always
-
 compile-assets pull-push-cache:
   extends:
     - .compile-assets-metadata
     - .frontend:rules:compile-assets-pull-push-cache
   cache:
     policy: pull-push
-
-compile-assets pull-push-cache as-if-foss:
-  extends:
-    - .compile-assets-metadata
-    - .frontend:rules:compile-assets-pull-push-cache-as-if-foss
-    - .as-if-foss
-  cache:
-    policy: pull-push
-    key: "assets-compile:test:as-if-foss:v1"
 
 compile-assets pull-cache:
   extends:
@@ -124,67 +79,10 @@ compile-assets pull-cache:
   cache:
     policy: pull
 
-compile-assets pull-cache as-if-foss:
-  extends:
-    - .compile-assets-metadata
-    - .frontend:rules:compile-assets-pull-cache-as-if-foss
-    - .as-if-foss
-  cache:
-    policy: pull
-    key: "assets-compile:test:as-if-foss:v1"
-
-.frontend-fixtures-base:
-  extends:
-    - .default-retry
-    - .default-cache
-    - .default-before_script
-    - .use-pg9
-  stage: fixtures
-  needs: ["setup-test-env pg9", "compile-assets pull-cache"]
-  script:
-    - date
-    - scripts/gitaly-test-spawn
-    - date
-    - bundle exec rake frontend:fixtures
-  artifacts:
-    name: frontend-fixtures
-    expire_in: 31d
-    when: always
-    paths:
-      - node_modules
-      - public/assets
-      - tmp/tests/frontend/
-
 frontend-fixtures:
   extends:
     - .frontend-fixtures-base
     - .frontend:rules:default-frontend-jobs
-
-frontend-fixtures-as-if-foss:
-  extends:
-    - .frontend-fixtures-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
-    - .as-if-foss
-
-.frontend-job-base:
-  extends:
-    - .default-retry
-    - .default-cache
-    - .default-before_script
-  variables:
-    USE_BUNDLE_INSTALL: "false"
-    SETUP_DB: "false"
-  stage: test
-
-.karma-base:
-  extends: .frontend-job-base
-  variables:
-    # we override the max_old_space_size to prevent OOM errors
-    NODE_OPTIONS: --max_old_space_size=3584
-  script:
-    - export BABEL_ENV=coverage CHROME_LOG_FILE=chrome_debug.log
-    - date
-    - yarn karma
 
 karma:
   extends:
@@ -203,24 +101,6 @@ karma:
     reports:
       junit: junit_karma.xml
 
-karma-as-if-foss:
-  extends:
-    - .karma-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
-    - .as-if-foss
-  needs: ["frontend-fixtures-as-if-foss"]
-
-.jest-base:
-  extends: .frontend-job-base
-  script:
-    - date
-    - yarn jest --ci --coverage --testSequencer ./scripts/frontend/parallel_ci_sequencer.js
-  cache:
-    key: jest
-    paths:
-      - tmp/cache/jest/
-    policy: pull-push
-
 jest:
   extends:
     - .jest-base
@@ -237,15 +117,6 @@ jest:
     reports:
       junit: junit_jest.xml
   parallel: 2
-
-jest-as-if-foss:
-  extends:
-    - .jest-base
-    - .frontend:rules:default-frontend-jobs-as-if-foss
-    - .as-if-foss
-  needs: ["frontend-fixtures-as-if-foss"]
-  cache:
-    policy: pull
 
 coverage-frontend:
   extends:

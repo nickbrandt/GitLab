@@ -1,11 +1,8 @@
+include:
+  - local: .gitlab/ci/shared/rails.yml
+
 .rails:needs:setup-and-assets:
   needs: ["setup-test-env pg9", "compile-assets pull-cache"]
-
-.rails-job-base:
-  extends:
-    - .default-retry
-    - .default-cache
-    - .default-before_script
 
 #######################################################
 # EE/FOSS: default refs (MRs, master, schedules) jobs #
@@ -71,38 +68,6 @@ downtime_check:
     SETUP_DB: "false"
   script:
     - bundle exec rake downtime_check
-
-.rspec-base:
-  extends: .rails-job-base
-  stage: test
-  needs: ["setup-test-env pg9", "retrieve-tests-metadata", "compile-assets pull-cache"]
-  script:
-    - source scripts/rspec_helpers.sh
-    - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
-  artifacts:
-    expire_in: 31d
-    when: always
-    paths:
-      - coverage/
-      - knapsack/
-      - rspec_flaky/
-      - rspec_profiling/
-      - tmp/capybara/
-      - tmp/memory_test/
-      - log/*.log
-    reports:
-      junit: junit_rspec.xml
-
-.rspec-base-pg9:
-  extends:
-    - .rspec-base
-    - .rails:rules:ee-and-foss
-    - .use-pg9
-
-.rspec-base-migration:
-  script:
-    - source scripts/rspec_helpers.sh
-    - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag level:migration"
 
 rspec migration pg9:
   extends:
@@ -243,36 +208,10 @@ rspec:coverage:
     - .rspec-base
     - .rails:rules:ee-only
 
-.rspec-base-pg9-as-if-foss:
-  extends:
-    - .rspec-base
-    - .rails:rules:ee-only-as-if-foss
-    - .as-if-foss
-    - .use-pg9
-  needs: ["setup-test-env pg9", "retrieve-tests-metadata", "compile-assets pull-cache as-if-foss"]
-
 .rspec-ee-base-pg9:
   extends:
     - .rspec-base-ee
     - .use-pg9-ee
-
-rspec migration pg9-as-if-foss:
-  extends:
-    - .rspec-base-pg9-as-if-foss
-    - .rspec-base-migration
-  parallel: 5
-
-rspec unit pg9-as-if-foss:
-  extends: .rspec-base-pg9-as-if-foss
-  parallel: 20
-
-rspec integration pg9-as-if-foss:
-  extends: .rspec-base-pg9-as-if-foss
-  parallel: 8
-
-rspec system pg9-as-if-foss:
-  extends: .rspec-base-pg9-as-if-foss
-  parallel: 24
 
 rspec-ee migration pg9:
   extends:

@@ -1,0 +1,8 @@
+start as-if-foss pipeline:
+  needs: []
+  # It seems `rules` aren't supported for `trigger` jobs, despite what's documented at
+  # https://docs.gitlab.com/ee/ci/parent_child_pipelines.html#merge-request-child-pipelines.
+  # extends: .as-if-foss:rules:as-if-foss-child-pipeline
+  trigger:
+    include: .gitlab/ci/child-pipelines/as-if-foss.yml
+    strategy: depend

@@ -1,0 +1,37 @@
+.rails-job-base:
+  extends:
+    - .default-retry
+    - .default-cache
+    - .default-before_script
+
+.rspec-base:
+  extends: .rails-job-base
+  stage: test
+  needs: ["setup-test-env pg9", "retrieve-tests-metadata", "compile-assets pull-cache"]
+  script:
+    - source scripts/rspec_helpers.sh
+    - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
+  artifacts:
+    expire_in: 31d
+    when: always
+    paths:
+      - coverage/
+      - knapsack/
+      - rspec_flaky/
+      - rspec_profiling/
+      - tmp/capybara/
+      - tmp/memory_test/
+      - log/*.log
+    reports:
+      junit: junit_rspec.xml
+
+.rspec-base-pg9:
+  extends:
+    - .rspec-base
+    - .rails:rules:ee-and-foss
+    - .use-pg9
+
+.rspec-base-migration:
+  script:
+    - source scripts/rspec_helpers.sh
+    - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag level:migration"

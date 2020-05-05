@@ -1,30 +1,10 @@
-.qa-job-base:
-  extends:
-    - .default-retry
-  stage: test
-  needs: []
-  cache:
-    key: "qa-framework-jobs:v1"
-    paths:
-      - vendor/ruby
-  before_script:
-    - '[ "$FOSS_ONLY" = "1" ] && rm -rf ee/ qa/spec/ee/ qa/qa/specs/features/ee/ qa/qa/ee/ qa/qa/ee.rb'
-    - cd qa/
-    - bundle install --clean --jobs=$(nproc) --path=vendor --retry=3 --quiet
-    - bundle check
+include:
+  - local: .gitlab/ci/shared/qa.yml
 
 qa:internal:
   extends:
     - .qa-job-base
     - .qa:rules:ee-and-foss
-  script:
-    - bundle exec rspec
-
-qa:internal-as-if-foss:
-  extends:
-    - .qa-job-base
-    - .qa:rules:ee-only
-    - .as-if-foss
   script:
     - bundle exec rspec
 
@@ -34,12 +14,6 @@ qa:selectors:
     - .qa:rules:ee-and-foss
   script:
     - bundle exec bin/qa Test::Sanity::Selectors
-
-qa:selectors-as-if-foss:
-  extends:
-    - qa:selectors
-    - .qa:rules:ee-only
-    - .as-if-foss
 
 .package-and-qa-base:
   image: ruby:2.6-alpine
