@@ -1,5 +1,5 @@
 <script>
-import { GlPopover, GlIcon, GlLink, GlButton, GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
+import { GlPopover, GlIcon, GlLink, GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
@@ -14,7 +14,6 @@ export default {
     GlButton,
     GlPopover,
     GlLink,
-    GlLoadingIcon,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -77,7 +76,6 @@ export default {
       name="export"
       class="mr-0 position-top-0"
     />
-    <gl-loading-icon v-else />
     <gl-popover
       ref="popover"
       :target="() => $refs.csvExportButton.$el"
