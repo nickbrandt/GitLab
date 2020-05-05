@@ -84,18 +84,6 @@ describe API::MergeTrains do
           expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
-
-      context 'when feature flag is disabled' do
-        before do
-          stub_feature_flags(merge_trains_api: false)
-        end
-
-        it 'forbids the request' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:service_unavailable)
-        end
-      end
     end
   end
 end
