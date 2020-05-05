@@ -18,6 +18,7 @@ import ConanInstallation from './conan_installation.vue';
 import MavenInstallation from './maven_installation.vue';
 import NpmInstallation from './npm_installation.vue';
 import NugetInstallation from './nuget_installation.vue';
+import PypiInstallation from './pypi_installation.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
@@ -42,6 +43,7 @@ export default {
     MavenInstallation,
     NpmInstallation,
     NugetInstallation,
+    PypiInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -59,17 +61,21 @@ export default {
       'npmPath',
       'npmHelpPath',
     ]),
-    isNpmPackage() {
-      return this.packageEntity.package_type === PackageType.NPM;
-    },
-    isMavenPackage() {
-      return this.packageEntity.package_type === PackageType.MAVEN;
-    },
-    isConanPackage() {
-      return this.packageEntity.package_type === PackageType.CONAN;
-    },
-    isNugetPackage() {
-      return this.packageEntity.package_type === PackageType.NUGET;
+    installationComponent() {
+      switch (this.packageEntity.package_type) {
+        case PackageType.CONAN:
+          return ConanInstallation;
+        case PackageType.MAVEN:
+          return MavenInstallation;
+        case PackageType.NPM:
+          return NpmInstallation;
+        case PackageType.NUGET:
+          return NugetInstallation;
+        case PackageType.PYPI:
+          return PypiInstallation;
+        default:
+          return null;
+      }
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
@@ -203,16 +209,13 @@ export default {
       </div>
 
       <div class="col-sm-6">
-        <npm-installation
-          v-if="isNpmPackage"
+        <component
+          :is="installationComponent"
+          v-if="installationComponent"
           :name="packageEntity.name"
           :registry-url="npmPath"
           :help-url="npmHelpPath"
         />
-
-        <maven-installation v-else-if="isMavenPackage" />
-        <conan-installation v-else-if="isConanPackage" />
-        <nuget-installation v-else-if="isNugetPackage" />
       </div>
     </div>
 

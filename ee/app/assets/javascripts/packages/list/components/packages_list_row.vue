@@ -2,7 +2,7 @@
 import PackageTags from '../../shared/components/package_tags.vue';
 import PublishMethod from './publish_method.vue';
 import { GlButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
-import { getPackageType } from '../../shared/utils';
+import { getPackageTypeLabel } from '../../shared/utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { mapState } from 'vuex';
 
@@ -31,7 +31,7 @@ export default {
       isGroupPage: state => state.config.isGroupPage,
     }),
     packageType() {
-      return getPackageType(this.packageEntity.package_type);
+      return getPackageTypeLabel(this.packageEntity.package_type);
     },
     hasPipeline() {
       return Boolean(this.packageEntity.pipeline);

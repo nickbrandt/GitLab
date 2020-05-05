@@ -73,3 +73,8 @@ export const generateConanInformation = conanPackage => [
   },
   ...generateCommonPackageInformation(conanPackage),
 ];
+
+export const pypiSetupCommandStr = `[gitlab]
+repository = foo
+username = __token__
+password = <your personal access token>`;
