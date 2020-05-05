@@ -14,6 +14,8 @@ const isStageNameExistsError = ({ status, errors }) => {
 };
 
 export const setStageEvents = ({ commit }, data) => commit(types.SET_STAGE_EVENTS, data);
+export const setStageFormErrors = ({ commit }, errors) =>
+  commit(types.SET_STAGE_FORM_ERRORS, errors);
 
 export const hideForm = ({ commit }) => {
   commit(types.HIDE_FORM);
@@ -59,22 +61,24 @@ export const receiveCreateStageSuccess = ({ commit, dispatch }, { data: { title 
 
   return Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .catch(() => {
+    .catch(err => {
+      console.log('err', err);
       createFlash(__('There was a problem refreshing the data, please try again'));
     });
 };
 
 export const receiveCreateStageError = (
-  { commit },
+  { commit, dispatch },
   { status = 400, errors = {}, data = {} } = {},
 ) => {
-  commit(types.RECEIVE_CREATE_STAGE_ERROR, { errors });
+  commit(types.RECEIVE_CREATE_STAGE_ERROR);
   const { name = null } = data;
   const flashMessage =
     name && isStageNameExistsError({ status, errors })
       ? sprintf(__(`'%{name}' stage already exists`), { name })
       : __('There was a problem saving your custom stage, please try again');
 
+  dispatch('setStageFormErrors', errors);
   createFlash(flashMessage);
 };
 

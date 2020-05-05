@@ -1,4 +1,5 @@
 export const SET_STAGE_EVENTS = 'SET_STAGE_EVENTS';
+export const SET_STAGE_FORM_ERRORS = 'SET_STAGE_FORM_ERRORS';
 
 export const HIDE_FORM = 'SHOW_FORM';
 export const SHOW_CREATE_FORM = 'SHOW_CREATE_FORM';

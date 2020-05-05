@@ -85,8 +85,8 @@ function createComponent({
       ...selectedGroup,
     });
 
-    comp.vm.$store.dispatch('receiveGroupStagesAndEventsSuccess', {
-      ...mockData.customizableStagesAndEvents,
+    comp.vm.$store.dispatch('receiveGroupStagesSuccess', {
+      ...mockData.customizableStagesAndEvents.stages,
     });
 
     comp.vm.$store.dispatch('receiveStageDataSuccess', mockData.issueEvents);

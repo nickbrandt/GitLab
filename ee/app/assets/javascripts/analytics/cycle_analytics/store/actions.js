@@ -42,13 +42,19 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ state, dispatch, getters }, slug) => {
+export const fetchStageData = ({ state, dispatch, getters }) => {
   const { cycleAnalyticsRequestParams = {} } = getters;
   const {
     selectedGroup: { fullPath },
+    stages,
   } = state;
 
   dispatch('requestStageData');
+
+  const [firstStage] = stages;
+  const { slug } = firstStage;
+
+  dispatch('setSelectedStage', firstStage);
 
   return Api.cycleAnalyticsStageEvents(fullPath, slug, cycleAnalyticsRequestParams)
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
@@ -103,9 +109,8 @@ export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
   dispatch('typeOfWork/fetchTopRankedGroupLabels');
 };
 
-export const receiveCycleAnalyticsDataError = ({ commit }, error) => {
-  console.log('error', error);
-  const { status = null } = error; // non api errors thrown wont have a status field
+export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
+  const { status = null } = response; // non api errors thrown wont have a status field
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
 
   if (!status || status !== httpStatus.FORBIDDEN)
@@ -133,9 +138,10 @@ export const receiveGroupStagesError = ({ commit }, error) => {
 export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   commit(types.RECEIVE_GROUP_STAGES_SUCCESS, stages);
   if (stages.length) {
-    const [firstStage] = stages;
-    dispatch('setSelectedStage', firstStage);
-    dispatch('fetchStageData', firstStage.slug);
+    // console.log('receiveGroupStagesSuccess::stages', stages);
+    // const [firstStage] = stages;
+    // dispatch('setSelectedStage', firstStage);
+    dispatch('fetchStageData');
   } else {
     createFlash(__('There was an error while fetching value stream analytics data.'));
   }
@@ -182,7 +188,7 @@ export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => 
 };
 
 export const receiveUpdateStageError = (
-  { commit },
+  { commit, dispatch },
   { status, responseData: { errors = null } = {}, data = {} },
 ) => {
   commit(types.RECEIVE_UPDATE_STAGE_ERROR, { errors, data });
@@ -193,6 +199,7 @@ export const receiveUpdateStageError = (
       ? sprintf(__(`'%{name}' stage already exists`), { name })
       : __('There was a problem saving your custom stage, please try again');
 
+  dispatch('customStages/setStageFormErrors', errors);
   createFlash(__(message));
 };
 

@@ -4,6 +4,8 @@ import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import * as customStageActions from 'ee/analytics/cycle_analytics/store/modules/custom_stages/actions';
+import * as customStageTypes from 'ee/analytics/cycle_analytics/store/modules/custom_stages/mutation_types';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import {
@@ -250,7 +252,7 @@ describe('Cycle analytics actions', () => {
           dispatch: jest
             .fn()
             .mockResolvedValueOnce()
-            .mockImplementation(actions.receiveGroupStagesAndEventsError({ commit: () => {} })),
+            .mockImplementation(actions.receiveGroupStagesError({ commit: () => {} })),
           commit: () => {},
           state: { ...state },
           getters,
@@ -299,10 +301,10 @@ describe('Cycle analytics actions', () => {
 
     it('will flash an error when there are no stages', () => {
       [[], null].forEach(emptyStages => {
-        actions.receiveGroupStagesAndEventsSuccess(
+        actions.receiveGroupStagesSuccess(
           {
             commit: () => {},
-            state: { stages: emptyStages },
+            state: emptyStages,
             getters,
           },
           {},
@@ -365,20 +367,20 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('receiveGroupStagesAndEventsSuccess', () => {
+  describe('receiveGroupStagesSuccess', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
     });
 
-    it(`commits the ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS} mutation`, done => {
+    it(`commits the ${types.RECEIVE_GROUP_STAGES_SUCCESS} mutation`, done => {
       testAction(
-        actions.receiveGroupStagesAndEventsSuccess,
-        { ...customizableStagesAndEvents },
+        actions.receiveGroupStagesSuccess,
+        { ...customizableStagesAndEvents.stages },
         state,
         [
           {
-            type: types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS,
-            payload: { ...customizableStagesAndEvents },
+            type: types.RECEIVE_GROUP_STAGES_SUCCESS,
+            payload: { ...customizableStagesAndEvents.stages },
           },
         ],
         [],
@@ -387,19 +389,14 @@ describe('Cycle analytics actions', () => {
     });
 
     it("dispatches the 'fetchStageData' action", done => {
-      const stateWithStages = {
-        ...state,
-        stages,
-      };
-
       testAction(
-        actions.receiveGroupStagesAndEventsSuccess,
-        { ...customizableStagesAndEvents },
-        stateWithStages,
+        actions.receiveGroupStagesSuccess,
+        stages,
+        {},
         [
           {
-            type: types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS,
-            payload: { ...customizableStagesAndEvents },
+            type: types.RECEIVE_GROUP_STAGES_SUCCESS,
+            payload: stages,
           },
         ],
         [
@@ -412,10 +409,10 @@ describe('Cycle analytics actions', () => {
 
     it('will flash an error when there are no stages', () => {
       [[], null].forEach(emptyStages => {
-        actions.receiveGroupStagesAndEventsSuccess(
+        actions.receiveGroupStagesSuccess(
           {
             commit: () => {},
-            state: { stages: emptyStages },
+            state: emptyStages,
           },
           {},
         );
@@ -759,7 +756,7 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('createCustomStage', () => {
+  describe('createStage', () => {
     describe('with valid data', () => {
       const customStageData = {
         startEventIdentifier: 'start_event',
@@ -772,16 +769,16 @@ describe('Cycle analytics actions', () => {
         mock.onPost(endpoints.baseStagesEndpointstageData).reply(201, customStageData);
       });
 
-      it(`dispatches the 'receiveCreateCustomStageSuccess' action`, () =>
+      it(`dispatches the 'receiveCreateStageSuccess' action`, () =>
         testAction(
-          actions.createCustomStage,
+          customStageActions.createStage,
           customStageData,
           state,
           [],
           [
-            { type: 'requestCreateCustomStage' },
+            { type: 'requestCreateStage' },
             {
-              type: 'receiveCreateCustomStageSuccess',
+              type: 'receiveCreateStageSuccess',
               payload: { data: customStageData, status: 201 },
             },
           ],
@@ -809,16 +806,16 @@ describe('Cycle analytics actions', () => {
           });
       });
 
-      it(`dispatches the 'receiveCreateCustomStageError' action`, () =>
+      it(`dispatches the 'receiveCreateStageError' action`, () =>
         testAction(
-          actions.createCustomStage,
+          customStageActions.createStage,
           customStageData,
           state,
           [],
           [
-            { type: 'requestCreateCustomStage' },
+            { type: 'requestCreateStage' },
             {
-              type: 'receiveCreateCustomStageError',
+              type: 'receiveCreateStageError',
               payload: {
                 data: customStageData,
                 errors,
@@ -831,7 +828,7 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('receiveCreateCustomStageError', () => {
+  describe('receiveCreateStageError', () => {
     const response = {
       data: { name: 'uh oh' },
     };
@@ -840,13 +837,13 @@ describe('Cycle analytics actions', () => {
       setFixtures('<div class="flash-container"></div>');
     });
 
-    it('will commit the RECEIVE_CREATE_CUSTOM_STAGE_ERROR mutation', () =>
-      testAction(actions.receiveCreateCustomStageError, response, state, [
-        { type: types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, payload: { errors: {} } },
+    it('will commit the RECEIVE_CREATE_STAGE_ERROR mutation', () =>
+      testAction(customStageActions.receiveCreateStageError, response, state, [
+        { type: customStageTypes.RECEIVE_CREATE_STAGE_ERROR, payload: { errors: {} } },
       ]));
 
     it('will flash an error message', done => {
-      actions.receiveCreateCustomStageError(
+      customStageActions.receiveCreateStageError(
         {
           commit: () => {},
         },
@@ -859,7 +856,7 @@ describe('Cycle analytics actions', () => {
 
     describe('with a stage name error', () => {
       it('will flash an error message', done => {
-        actions.receiveCreateCustomStageError(
+        customStageActions.receiveCreateStageError(
           {
             commit: () => {},
           },
@@ -935,7 +932,7 @@ describe('Cycle analytics actions', () => {
       ));
   });
 
-  describe('receiveCreateCustomStageSuccess', () => {
+  describe('receiveCreateStageSuccess', () => {
     const response = {
       data: {
         title: 'COOL',
@@ -944,10 +941,10 @@ describe('Cycle analytics actions', () => {
 
     it('will dispatch fetchGroupStagesAndEvents', () =>
       testAction(
-        actions.receiveCreateCustomStageSuccess,
+        customStageActions.receiveCreateStageSuccess,
         response,
         state,
-        [{ type: types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS }],
+        [{ type: customStageTypes.RECEIVE_CREATE_STAGE_SUCCESS }],
         [{ type: 'fetchGroupStagesAndEvents' }],
       ));
 
@@ -957,8 +954,8 @@ describe('Cycle analytics actions', () => {
       });
 
       it('will flash an error message', () =>
-        actions
-          .receiveCreateCustomStageSuccess(
+        customStageActions
+          .receiveCreateStageSuccess(
             {
               dispatch: () => Promise.reject(),
               commit: () => {},

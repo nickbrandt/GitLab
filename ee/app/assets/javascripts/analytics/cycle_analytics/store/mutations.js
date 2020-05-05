@@ -22,8 +22,6 @@ export default {
   },
   [types.REQUEST_CYCLE_ANALYTICS_DATA](state) {
     state.isLoading = true;
-    state.isCreatingCustomStage = false;
-    state.isEditingCustomStage = false;
   },
   [types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS](state) {
     state.errorCode = null;
@@ -74,21 +72,12 @@ export default {
   },
   [types.REQUEST_UPDATE_STAGE](state) {
     state.isLoading = true;
-    state.isSavingCustomStage = true;
-    state.customStageFormErrors = null;
   },
   [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {
     state.isLoading = false;
-    state.isSavingCustomStage = false;
-    state.isEditingCustomStage = false;
-    state.customStageFormErrors = null;
-    state.customStageFormInitialData = null;
   },
-  [types.RECEIVE_UPDATE_STAGE_ERROR](state, { errors = null, data } = {}) {
+  [types.RECEIVE_UPDATE_STAGE_ERROR](state) {
     state.isLoading = false;
-    state.isSavingCustomStage = false;
-    state.customStageFormErrors = convertObjectPropsToCamelCase(errors, { deep: true });
-    state.customStageFormInitialData = convertObjectPropsToCamelCase(data, { deep: true });
   },
   [types.REQUEST_REMOVE_STAGE](state) {
     state.isLoading = true;
