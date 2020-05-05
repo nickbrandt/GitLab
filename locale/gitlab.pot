@@ -14065,6 +14065,9 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
+msgid "NetworkPolicies|Enabled"
+msgstr ""
+
 msgid "NetworkPolicies|Environment does not have deployment platform"
 msgstr ""
 
@@ -14074,6 +14077,18 @@ msgstr ""
 msgid "NetworkPolicies|Kubernetes error: %{error}"
 msgstr ""
 
+msgid "NetworkPolicies|Last modified"
+msgstr ""
+
+msgid "NetworkPolicies|Name"
+msgstr ""
+
+msgid "NetworkPolicies|No policies detected"
+msgstr ""
+
+msgid "NetworkPolicies|Policies are a specification of how groups of pods are allowed to communicate with each other network endpoints."
+msgstr ""
+
 msgid "NetworkPolicies|Policy %{policyName} was successfully changed"
 msgstr ""
 
@@ -14081,6 +14096,9 @@ msgid "NetworkPolicies|Something went wrong, failed to update policy"
 msgstr ""
 
 msgid "NetworkPolicies|Something went wrong, unable to fetch policies"
+msgstr ""
+
+msgid "NetworkPolicies|Status"
 msgstr ""
 
 msgid "Never"
@@ -22329,7 +22347,13 @@ msgstr ""
 msgid "ThreatMonitoring|Operations Per Second"
 msgstr ""
 
+msgid "ThreatMonitoring|Overview"
+msgstr ""
+
 msgid "ThreatMonitoring|Packet Activity"
+msgstr ""
+
+msgid "ThreatMonitoring|Policies"
 msgstr ""
 
 msgid "ThreatMonitoring|Requests"

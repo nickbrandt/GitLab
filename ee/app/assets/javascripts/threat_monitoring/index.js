@@ -9,6 +9,7 @@ export default () => {
     wafStatisticsEndpoint,
     networkPolicyStatisticsEndpoint,
     environmentsEndpoint,
+    networkPoliciesEndpoint,
     chartEmptyStateSvgPath,
     emptyStateSvgPath,
     wafNoDataSvgPath,
@@ -25,6 +26,9 @@ export default () => {
     wafStatisticsEndpoint,
     networkPolicyStatisticsEndpoint,
     environmentsEndpoint,
+  });
+  store.dispatch('networkPolicies/setEndpoints', {
+    networkPoliciesEndpoint,
   });
 
   return new Vue({
