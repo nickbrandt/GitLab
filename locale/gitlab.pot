@@ -6886,11 +6886,6 @@ msgid_plural "Dependencies|%d additional vulnerabilities not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Dependencies|%d vulnerability"
-msgid_plural "Dependencies|%d vulnerabilities"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "Dependencies|%d vulnerability detected"
 msgid_plural "Dependencies|%d vulnerabilities detected"
 msgstr[0] ""
@@ -6926,12 +6921,6 @@ msgstr ""
 msgid "Dependencies|Packager"
 msgstr ""
 
-msgid "Dependencies|Safe"
-msgstr ""
-
-msgid "Dependencies|Status"
-msgstr ""
-
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
 msgstr ""
 
@@ -6939,9 +6928,6 @@ msgid "Dependencies|Toggle vulnerability list"
 msgstr ""
 
 msgid "Dependencies|Unsupported file(s) detected"
-msgstr ""
-
-msgid "Dependencies|Version"
 msgstr ""
 
 msgid "Dependencies|Vulnerable components"
