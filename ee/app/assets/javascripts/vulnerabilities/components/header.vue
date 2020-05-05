@@ -12,6 +12,7 @@ import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS } from '../constants';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
+import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
 
 export default {
   name: 'VulnerabilityHeader',
@@ -79,6 +80,11 @@ export default {
         isLoading: this.isCreationLoading,
         action: 'createMergeRequest',
       };
+      const DownloadButton = {
+        name: s__('ciReport|Download patch to resolve'),
+        tagline: s__('ciReport|Download the patch to apply it manually'),
+        action: 'downloadPatch',
+      };
 
       if (this.canCreateMergeRequest) {
         buttons.push(MergeRequestButton);
@@ -88,7 +94,19 @@ export default {
         buttons.push(issueButton);
       }
 
+      if (this.canDownloadPatch) {
+        buttons.push(DownloadButton);
+      }
+
       return buttons;
+    },
+    canDownloadPatch() {
+      const { remediations } = this.finding;
+      return Boolean(
+        this.vulnerability.state !== 'resolved' &&
+          (remediations && remediations[0].diff?.length > 0) &&
+          (!this.vulnerability.hasMergeRequest && remediations),
+      );
     },
     hasIssue() {
       return Boolean(this.finding.issue_feedback?.issue_iid);
@@ -206,6 +224,9 @@ export default {
           );
         });
     },
+    downloadPatch() {
+      downloadPatchHelper(this.finding.remediations[0].diff);
+    },
   },
 };
 </script>
@@ -251,12 +272,13 @@ export default {
         </template>
         <template>
           <split-button
-            v-if="actionButtons.length > 0 && hasIssue"
+            v-if="actionButtons.length > 1"
             :buttons="actionButtons"
             class="js-split-button"
             data-qa-selector="resolve_split_button"
             @createMergeRequest="createMergeRequest"
             @createIssue="createIssue"
+            @downloadPatch="downloadPatch"
           />
           <gl-deprecated-button
             v-else-if="actionButtons.length > 0 && !hasIssue"
