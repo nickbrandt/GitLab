@@ -39,8 +39,6 @@ describe Gitlab::Checks::DiffCheck do
         allow(project.repository).to receive(:code_owners_blob)
           .with(ref: codeowner_lookup_ref)
           .and_return(codeowner_blob)
-
-        stub_feature_flags(sectional_codeowners: false)
       end
 
       context 'the MR contains a renamed file matching a file path' do
@@ -58,6 +56,10 @@ describe Gitlab::Checks::DiffCheck do
         end
 
         context 'and the user is not listed as a codeowner' do
+          before do
+            stub_feature_flags(sectional_codeowners: false)
+          end
+
           it "returns an error message" do
             expect { diff_check.validate! }.to raise_error do |error|
               expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
@@ -82,40 +84,14 @@ describe Gitlab::Checks::DiffCheck do
           subject.send(:validate_code_owners).call(["docs/CODEOWNERS", "README"])
         end
 
-        shared_examples_for "returns an error message" do
-          it "returns the expected error message" do
-            expect(validation_result).to include("Pushes to protected branches")
-          end
-        end
-
         context "and the user is not listed as a code owner" do
           before do
             stub_feature_flags(sectional_codeowners: false)
           end
 
-          context "for a non-web-based request" do
-            it_behaves_like "returns an error message"
-
-            it "returns an error message with newline chars" do
-              expect(validation_result).to include("\n")
-            end
+          it "returns an error message" do
+            expect(validation_result).to include("Pushes to protected branches")
           end
-
-          context "for a web-based request" do
-            before do
-              expect(subject).to receive(:updated_from_web?).and_return(true)
-            end
-
-            it_behaves_like "returns an error message"
-
-            it "returns an error message with newline chars removed" do
-              expect(validation_result).not_to include("\n")
-            end
-          end
-        end
-
-        context "and the user is not listed as a code owner" do
-          it_behaves_like "returns an error message"
         end
 
         context "and the user is listed as a code owner" do
@@ -125,32 +101,6 @@ describe Gitlab::Checks::DiffCheck do
 
           it "returns nil" do
             expect(validation_result).to be_nil
-          end
-        end
-
-        context "when the codeowner entity is a group" do
-          let(:group_a) { create(:group) }
-          let(:project) { create(:project, :repository, namespace: group_a) }
-          let(:codeowner_content) do
-            <<~CODEOWNERS
-            *.rb @#{code_owner.username}
-            docs/CODEOWNERS @#{group_a.name}
-            *.js.coffee @#{group_a.name}
-            CODEOWNERS
-          end
-
-          context "and the user is part of the codeowning-group" do
-            before do
-              group_a.add_developer(user)
-            end
-
-            it "returns nil" do
-              expect(validation_result).to be_nil
-            end
-          end
-
-          context "and the user is not part of the codeowning-group" do
-            it_behaves_like "returns an error message"
           end
         end
       end
@@ -178,16 +128,30 @@ describe Gitlab::Checks::DiffCheck do
       end
 
       context "when the feature is enabled on the project" do
-        before do
-          expect(project).to receive(:branch_requires_code_owner_approval?)
-            .once.and_return(true)
+        context "updated_from_web? == false" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(false)
+            expect(project).to receive(:branch_requires_code_owner_approval?)
+              .once.and_return(true)
+          end
+
+          it "returns an array of Proc(s)" do
+            validations = subject.send(:path_validations)
+
+            expect(validations.any?).to be_truthy
+            expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          end
         end
 
-        it "returns an array of Proc(s)" do
-          validations = subject.send(:path_validations)
+        context "updated_from_web? == true" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(true)
+            expect(project).not_to receive(:branch_requires_code_owner_approval?)
+          end
 
-          expect(validations.any?).to be_truthy
-          expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          it "returns an empty array" do
+            expect(subject.send(:path_validations)).to eq([])
+          end
         end
       end
     end
