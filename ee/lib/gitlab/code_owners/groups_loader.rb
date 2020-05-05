@@ -23,7 +23,15 @@ module Gitlab
         return Group.none if extractor.names.empty?
 
         groups = project.invited_groups.where_full_path_in(extractor.names)
-        groups.with_route.with_users
+        group_list = groups.with_route.with_users.to_a
+
+        if extractor.names.include?(project.group&.full_path)
+          project.group.users.load
+
+          group_list << project.group
+        end
+
+        group_list
       end
     end
   end
