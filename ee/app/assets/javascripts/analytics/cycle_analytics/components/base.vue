@@ -3,7 +3,7 @@ import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { PROJECTS_PER_PAGE } from '../constants';
+import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import { LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
@@ -14,6 +14,8 @@ import TypeOfWorkCharts from './type_of_work_charts.vue';
 import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
 import { toYmd } from '../../shared/utils';
 import RecentActivityCard from './recent_activity_card.vue';
+import StageTableNav from './stage_table_nav.vue';
+import CustomStageForm from './custom_stage_form.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -27,6 +29,8 @@ export default {
     StageTable,
     TypeOfWorkCharts,
     RecentActivityCard,
+    CustomStageForm,
+    StageTableNav,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -68,6 +72,7 @@ export default {
       'endDate',
       'medians',
       'customStageFormErrors',
+      'customStageFormInitialData',
     ]),
     ...mapGetters([
       'hasNoAccessError',
@@ -76,6 +81,7 @@ export default {
       'selectedProjectIds',
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
+      'customStageFormActive',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -180,10 +186,11 @@ export default {
     include_subgroups: true,
   },
   maxDateRange: DATE_RANGE_LIMIT,
+  STAGE_ACTIONS,
 };
 </script>
 <template>
-  <div class="js-cycle-analytics">
+  <div>
     <div class="mb-3">
       <h3>{{ __('Value Stream Analytics') }}</h3>
     </div>
@@ -261,30 +268,42 @@ export default {
             :key="stageCount"
             class="js-stage-table"
             :current-stage="selectedStage"
-            :stages="activeStages"
-            :medians="medians"
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"
-            :is-saving-custom-stage="isSavingCustomStage"
-            :is-creating-custom-stage="isCreatingCustomStage"
-            :is-editing-custom-stage="isEditingCustomStage"
+            :custom-stage-form-active="customStageFormActive"
             :current-stage-events="currentStageEvents"
-            :custom-stage-form-events="customStageFormEvents"
-            :custom-stage-form-errors="customStageFormErrors"
             :no-data-svg-path="noDataSvgPath"
-            :no-access-svg-path="noAccessSvgPath"
-            :can-edit-stages="hasCustomizableCycleAnalytics"
-            :custom-ordering="enableCustomOrdering"
-            @clearCustomStageFormErrors="clearCustomStageFormErrors"
-            @selectStage="onStageSelect"
-            @editStage="onShowEditStageForm"
-            @showAddStageForm="onShowAddStageForm"
-            @hideStage="onUpdateCustomStage"
-            @removeStage="onRemoveStage"
-            @createStage="onCreateCustomStage"
-            @updateStage="onUpdateCustomStage"
-            @reorderStage="onStageReorder"
-          />
+          >
+            <template #nav>
+              <stage-table-nav
+                :current-stage="selectedStage"
+                :stages="activeStages"
+                :medians="medians"
+                :is-creating-custom-stage="isCreatingCustomStage"
+                :custom-stage-form-active="customStageFormActive"
+                :can-edit-stages="hasCustomizableCycleAnalytics"
+                :custom-ordering="enableCustomOrdering"
+                @reorderStage="onStageReorder"
+                @selectStage="onStageSelect"
+                @editStage="onShowEditStageForm"
+                @showAddStageForm="onShowAddStageForm"
+                @hideStage="onUpdateCustomStage"
+                @removeStage="onRemoveStage"
+              />
+            </template>
+            <template v-if="customStageFormActive" #content>
+              <custom-stage-form
+                :events="customStageFormEvents"
+                :is-saving-custom-stage="isSavingCustomStage"
+                :initial-fields="customStageFormInitialData"
+                :is-editing-custom-stage="isEditingCustomStage"
+                :errors="customStageFormErrors"
+                @createStage="onCreateCustomStage"
+                @updateStage="onUpdateCustomStage"
+                @clearErrors="$emit('clearCustomStageFormErrors')"
+              />
+            </template>
+          </stage-table>
         </div>
       </div>
       <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />

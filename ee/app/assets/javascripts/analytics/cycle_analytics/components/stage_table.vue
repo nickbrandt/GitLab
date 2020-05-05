@@ -1,16 +1,9 @@
 <script>
 import { mapState } from 'vuex';
-import Sortable from 'sortablejs';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
-import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
-import AddStageButton from './add_stage_button.vue';
-import CustomStageForm from './custom_stage_form.vue';
-import { STAGE_ACTIONS } from '../constants';
-import { NO_DRAG_CLASS } from '../../shared/constants';
-import sortableDefaultOptions from '../../shared/mixins/sortable_default_options';
 
 export default {
   name: 'StageTable',
@@ -18,23 +11,12 @@ export default {
     GlLoadingIcon,
     GlEmptyState,
     StageEventList,
-    StageNavItem,
     StageTableHeader,
-    AddStageButton,
-    CustomStageForm,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
   props: {
-    stages: {
-      type: Array,
-      required: true,
-    },
-    medians: {
-      type: Object,
-      required: true,
-    },
     currentStage: {
       type: Object,
       required: true,
@@ -47,15 +29,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    isCreatingCustomStage: {
-      type: Boolean,
-      required: true,
-    },
-    isEditingCustomStage: {
-      type: Boolean,
-      required: true,
-    },
-    isSavingCustomStage: {
+    customStageFormActive: {
       type: Boolean,
       required: true,
     },
@@ -63,36 +37,9 @@ export default {
       type: Array,
       required: true,
     },
-    customStageFormEvents: {
-      type: Array,
-      required: true,
-    },
-    customStageFormErrors: {
-      type: Object,
-      required: false,
-      default: () => {},
-    },
     noDataSvgPath: {
       type: String,
       required: true,
-    },
-    noAccessSvgPath: {
-      type: String,
-      required: true,
-    },
-    canEditStages: {
-      type: Boolean,
-      required: true,
-    },
-    customOrdering: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    errorSavingStageOrder: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
   },
   data() {
@@ -111,15 +58,6 @@ export default {
     shouldDisplayStage() {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
       return currentStageEvents.length && !isLoading && !isEmptyStage;
-    },
-    customStageFormActive() {
-      return this.isCreatingCustomStage;
-    },
-    allowCustomOrdering() {
-      return this.customOrdering && !this.errorSavingStageOrder;
-    },
-    manualOrderingClass() {
-      return this.allowCustomOrdering ? 'js-manual-ordering' : '';
     },
     stageHeaders() {
       return [
@@ -152,31 +90,7 @@ export default {
   },
   mounted() {
     this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
-
-    if (this.allowCustomOrdering) {
-      const options = Object.assign({}, sortableDefaultOptions(), {
-        onUpdate: event => {
-          const el = event.item;
-
-          const { previousElementSibling, nextElementSibling } = el;
-
-          const { id } = el.dataset;
-          const moveAfterId = previousElementSibling?.dataset?.id || null;
-          const moveBeforeId = nextElementSibling?.dataset?.id || null;
-
-          this.$emit('reorderStage', { id, moveAfterId, moveBeforeId });
-        },
-      });
-      this.sortable = Sortable.create(this.$refs.list, options);
-    }
   },
-  methods: {
-    medianValue(id) {
-      return this.medians[id] ? this.medians[id] : null;
-    },
-  },
-  STAGE_ACTIONS,
-  noDragClass: NO_DRAG_CLASS,
 };
 </script>
 <template>
@@ -198,56 +112,25 @@ export default {
       </div>
       <div class="stage-panel-body">
         <nav ref="stageNav" class="stage-nav pl-2">
-          <ul ref="list" :class="manualOrderingClass">
-            <stage-nav-item
-              v-for="stage in stages"
-              :id="stage.id"
-              :key="`ca-stage-title-${stage.title}`"
-              :title="stage.title"
-              :value="medianValue(stage.id)"
-              :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
-              :can-edit="canEditStages"
-              :is-default-stage="!stage.custom"
-              @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
-              @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
-              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
-              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
-            />
-            <add-stage-button
-              v-if="canEditStages"
-              :class="$options.noDragClass"
-              :active="customStageFormActive"
-              @showform="$emit('showAddStageForm')"
-            />
-          </ul>
+          <slot name="nav"></slot>
         </nav>
-        <div class="section stage-events" :style="{ height: stageEventsHeight }">
-          <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
-          <custom-stage-form
-            v-else-if="isCreatingCustomStage || isEditingCustomStage"
-            :events="customStageFormEvents"
-            :is-saving-custom-stage="isSavingCustomStage"
-            :initial-fields="customStageFormInitialData"
-            :is-editing-custom-stage="isEditingCustomStage"
-            :errors="customStageFormErrors"
-            @submit="$emit('submit', $event)"
-            @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
-            @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
-            @clearErrors="$emit('clearCustomStageFormErrors')"
-          />
-          <template v-else>
-            <stage-event-list
-              v-if="shouldDisplayStage"
-              :stage="currentStage"
-              :events="currentStageEvents"
-            />
-            <gl-empty-state
-              v-if="isEmptyStage"
-              :title="__('We don\'t have enough data to show this stage.')"
-              :description="currentStage.emptyStageText"
-              :svg-path="noDataSvgPath"
-            />
-          </template>
+        <div class="section stage-events overflow-auto" :style="{ height: stageEventsHeight }">
+          <slot name="content">
+            <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
+            <template v-else>
+              <stage-event-list
+                v-if="shouldDisplayStage"
+                :stage="currentStage"
+                :events="currentStageEvents"
+              />
+              <gl-empty-state
+                v-if="isEmptyStage"
+                :title="__('We don\'t have enough data to show this stage.')"
+                :description="currentStage.emptyStageText"
+                :svg-path="noDataSvgPath"
+              />
+            </template>
+          </slot>
         </div>
       </div>
     </div>

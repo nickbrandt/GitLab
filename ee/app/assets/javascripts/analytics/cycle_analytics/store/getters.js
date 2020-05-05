@@ -25,3 +25,6 @@ export const activeStages = ({ stages }) => filterStagesByHiddenStatus(stages, f
 
 export const enableCustomOrdering = ({ stages, errorSavingStageOrder }) =>
   stages.some(stage => isNumber(stage.id)) && !errorSavingStageOrder;
+
+export const customStageFormActive = ({ isCreatingCustomStage, isEditingCustomStage }) =>
+  Boolean(isCreatingCustomStage || isEditingCustomStage);

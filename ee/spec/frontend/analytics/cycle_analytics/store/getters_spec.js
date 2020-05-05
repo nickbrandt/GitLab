@@ -142,4 +142,20 @@ describe('Cycle analytics getters', () => {
       });
     });
   });
+
+  describe.each`
+    isEditingCustomStage | isCreatingCustomStage | result
+    ${true}              | ${true}               | ${true}
+    ${true}              | ${false}              | ${true}
+    ${false}             | ${true}               | ${true}
+    ${null}              | ${true}               | ${true}
+    ${true}              | ${null}               | ${true}
+    ${null}              | ${null}               | ${false}
+    ${false}             | ${false}              | ${false}
+  `('customStageFormActive', ({ isEditingCustomStage, isCreatingCustomStage, result }) => {
+    it(`returns ${result} when isEditingCustomStage=${isEditingCustomStage} and isCreatingCustomStage=${isCreatingCustomStage}`, () => {
+      const resp = getters.customStageFormActive({ isCreatingCustomStage, isEditingCustomStage });
+      expect(resp).toEqual(result);
+    });
+  });
 });
