@@ -74,11 +74,14 @@ describe('Code review analytics mergeRequests actions', () => {
           actions.fetchMergeRequests,
           null,
           state,
-          [],
           [
-            { type: 'requestMergeRequests' },
-            { type: 'receiveMergeRequestsSuccess', payload: { headers, data: mockMergeRequests } },
+            { type: types.REQUEST_MERGE_REQUESTS },
+            {
+              type: types.RECEIVE_MERGE_REQUESTS_SUCCESS,
+              payload: { pageInfo, mergeRequests: mockMergeRequests },
+            },
           ],
+          [],
         );
       });
     });
@@ -88,64 +91,26 @@ describe('Code review analytics mergeRequests actions', () => {
         mock.onGet(/api\/(.*)\/analytics\/code_review/).replyOnce(500);
       });
 
-      it('dispatches error', () => {
+      it('dispatches error', done => {
         testAction(
           actions.fetchMergeRequests,
           null,
           state,
-          [],
           [
-            { type: 'requestMergeRequests' },
+            { type: types.REQUEST_MERGE_REQUESTS },
             {
-              type: 'receiveMergeRequestsError',
-              payload: new Error('Request failed with status code 500'),
+              type: types.RECEIVE_MERGE_REQUESTS_ERROR,
+              payload: 500,
             },
           ],
+          [],
+          () => {
+            expect(createFlash).toHaveBeenCalled();
+            done();
+          },
         );
       });
     });
-  });
-
-  describe('requestMergeRequests', () => {
-    it('commits REQUEST_MERGE_REQUESTS mutation', () => {
-      testAction(
-        actions.requestMergeRequests,
-        null,
-        state,
-        [{ type: types.REQUEST_MERGE_REQUESTS }],
-        [],
-      );
-    });
-  });
-
-  describe('receiveMergeRequestsSuccess', () => {
-    it('commits RECEIVE_MERGE_REQUESTS_SUCCESS mutation', () => {
-      testAction(
-        actions.receiveMergeRequestsSuccess,
-        { headers, data: mockMergeRequests },
-        state,
-        [
-          {
-            type: types.RECEIVE_MERGE_REQUESTS_SUCCESS,
-            payload: { pageInfo, mergeRequests: mockMergeRequests },
-          },
-        ],
-        [],
-      );
-    });
-  });
-
-  describe('receiveMergeRequestsError', () => {
-    it('commits SET_MERGE_REQUEST_ERROR mutation', () =>
-      testAction(
-        actions.receiveMergeRequestsError,
-        { response: { status: 500 } },
-        state,
-        [{ type: types.RECEIVE_MERGE_REQUESTS_ERROR, payload: 500 }],
-        [],
-      ).then(() => {
-        expect(createFlash).toHaveBeenCalled();
-      }));
   });
 
   describe('setPage', () => {
