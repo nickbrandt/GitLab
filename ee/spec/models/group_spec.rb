@@ -19,6 +19,11 @@ describe Group do
     it { is_expected.to have_one(:dependency_proxy_setting) }
     it { is_expected.to have_one(:deletion_schedule) }
     it { is_expected.to belong_to(:push_rule) }
+
+    it_behaves_like 'model with wiki' do
+      let(:container) { create(:group, :nested, :wiki_repo) }
+      let(:container_without_wiki) { create(:group, :nested) }
+    end
   end
 
   describe 'scopes' do
