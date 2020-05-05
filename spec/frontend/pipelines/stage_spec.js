@@ -81,10 +81,15 @@ describe('Pipelines stage component', () => {
     });
 
     it('should close the dropdown', () => {
-      wrapper.trigger('click');
+      wrapper.setMethods({
+        closeDropdown: jest.fn(),
+        isDropdownOpen: jest.fn().mockReturnValue(false),
+      });
+
+      wrapper.find('button').trigger('click');
 
       return waitForPromises().then(() => {
-        expect(wrapper.classes('open')).toBe(false);
+        expect(wrapper.vm.closeDropdown).toHaveBeenCalled();
       });
     });
   });
