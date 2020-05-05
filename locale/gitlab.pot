@@ -3760,6 +3760,9 @@ msgstr ""
 msgid "Changing group path can have unintended side effects."
 msgstr ""
 
+msgid "Channel handle (e.g. town-square)"
+msgstr ""
+
 msgid "Charts"
 msgstr ""
 
