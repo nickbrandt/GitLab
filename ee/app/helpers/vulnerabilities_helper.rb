@@ -3,10 +3,11 @@
 module VulnerabilitiesHelper
   def vulnerability_data(vulnerability, pipeline)
     return unless vulnerability
-
     {
+      source_branch: pipeline.source_ref,
       vulnerability_json: VulnerabilitySerializer.new.represent(vulnerability).to_json,
       project_fingerprint: vulnerability.finding.project_fingerprint,
+      create_mr_url: create_vulnerability_feedback_merge_request_path(vulnerability.finding.project),
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       notes_url: project_security_vulnerability_notes_path(vulnerability.project, vulnerability),
       discussions_url: discussions_project_security_vulnerability_path(vulnerability.project, vulnerability),
@@ -39,7 +40,8 @@ module VulnerabilitiesHelper
       :location,
       :name,
       :issue_feedback,
-      :project
+      :project,
+      :remediations
     ).merge(
       solution: remediation ? remediation['summary'] : occurrence[:solution]
     )

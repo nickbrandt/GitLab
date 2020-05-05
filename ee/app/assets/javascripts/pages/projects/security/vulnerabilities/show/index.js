@@ -8,7 +8,12 @@ function createHeaderApp() {
   const pipeline = JSON.parse(el.dataset.pipelineJson);
   const finding = JSON.parse(el.dataset.findingJson);
 
-  const { projectFingerprint, createIssueUrl } = el.dataset;
+  const {
+    projectFingerprint,
+    createIssueUrl,
+    sourceBranch: targetBranch,
+    createMrUrl,
+  } = el.dataset;
 
   return new Vue({
     el,
@@ -16,11 +21,13 @@ function createHeaderApp() {
     render: h =>
       h(HeaderApp, {
         props: {
+          createMrUrl,
           initialVulnerability,
           finding,
           pipeline,
           projectFingerprint,
           createIssueUrl,
+          targetBranch,
         },
       }),
   });
