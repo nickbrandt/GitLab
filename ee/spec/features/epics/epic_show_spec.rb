@@ -175,7 +175,7 @@ describe 'Epic show', :js do
 
         it 'shows label create view when `Create group label` is clicked' do
           page.within('.js-labels-block') do
-            find('button', text: 'Create group label').click
+            find('a', text: 'Create group label').click
 
             expect(page).to have_selector('.js-labels-create')
           end
@@ -183,7 +183,7 @@ describe 'Epic show', :js do
 
         it 'creates new label using create view' do
           page.within('.js-labels-block') do
-            find('button', text: 'Create group label').click
+            find('a', text: 'Create group label').click
 
             find('.dropdown-input .gl-form-input').set('Test label')
             find('.suggest-colors-dropdown a', match: :first).click
@@ -200,7 +200,7 @@ describe 'Epic show', :js do
 
         it 'shows labels list view when `Cancel` button is clicked from create view' do
           page.within('.js-labels-block') do
-            find('button', text: 'Create group label').click
+            find('a', text: 'Create group label').click
 
             find('.js-btn-cancel-create').click
             wait_for_requests
@@ -211,7 +211,7 @@ describe 'Epic show', :js do
 
         it 'shows labels list view when back button is clicked from create view' do
           page.within('.js-labels-block') do
-            find('button', text: 'Create group label').click
+            find('a', text: 'Create group label').click
 
             find('.js-btn-back').click
             wait_for_requests
