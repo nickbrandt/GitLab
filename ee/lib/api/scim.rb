@@ -43,6 +43,11 @@ module API
           unauthorized! unless token && ScimOauthAccessToken.token_matches_for_group?(token, group)
         end
 
+        def sanitize_request_parameters(parameters)
+          filter = ActiveSupport::ParameterFilter.new(::Rails.application.config.filter_parameters)
+          filter.filter(parameters)
+        end
+
         # Instance variable `@group` is necessary for the
         # Gitlab::ApplicationContext in API::API
         def find_and_authenticate_group!(group_path)
@@ -178,9 +183,9 @@ module API
 
             present result.identity, with: ::EE::API::Entities::Scim::User
           when :conflict
-            scim_conflict!(message: "Error saving user with #{params.inspect}: #{result.message}")
+            scim_conflict!(message: "Error saving user with #{sanitize_request_parameters(params).inspect}: #{result.message}")
           when :error
-            scim_error!(message: ["Error saving user with #{params.inspect}", result.message].compact.join(": "))
+            scim_error!(message: ["Error saving user with #{sanitize_request_parameters(params).inspect}", result.message].compact.join(": "))
           end
         end
 
@@ -200,7 +205,7 @@ module API
           if updated
             no_content!
           else
-            scim_error!(message: "Error updating #{identity.user.name} with #{params.inspect}")
+            scim_error!(message: "Error updating #{identity.user.name} with #{sanitize_request_parameters(params).inspect}")
           end
         end
 
