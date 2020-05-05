@@ -13,12 +13,17 @@ describe('Pipelines Artifacts dropdown', () => {
             name: 'artifact',
             path: '/download/path',
           },
+          {
+            name: 'artifact two',
+            path: '/download/path-two',
+          },
         ],
       },
     });
   };
 
   const findGlLink = () => wrapper.find(GlLink);
+  const findAllGlLinks = () => wrapper.find('.dropdown-menu').findAll(GlLink);
 
   beforeEach(() => {
     createComponent();
@@ -29,8 +34,8 @@ describe('Pipelines Artifacts dropdown', () => {
     wrapper = null;
   });
 
-  it('should render a dropdown with the provided artifacts', () => {
-    expect(wrapper.findAll('[data-testid="artifact"]')).toHaveLength(1);
+  it('should render a dropdown with all the provided artifacts', () => {
+    expect(findAllGlLinks()).toHaveLength(2);
   });
 
   it('should render a link with the provided path', () => {
