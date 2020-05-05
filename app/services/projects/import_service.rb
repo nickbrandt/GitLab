@@ -21,6 +21,8 @@ module Projects
 
       import_data
 
+      after_execute_hook
+
       success
     rescue Gitlab::UrlBlocker::BlockedUrlError => e
       Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path, importer: project.import_type)
@@ -35,6 +37,10 @@ module Projects
     end
 
     private
+
+    def after_execute_hook
+      # Defined in EE::Projects::ImportService
+    end
 
     def add_repository_to_project
       if project.external_import? && !unknown_url?
@@ -130,3 +136,5 @@ module Projects
     end
   end
 end
+
+Projects::ImportService.prepend_if_ee('EE::Projects::ImportService')
