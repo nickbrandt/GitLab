@@ -23,9 +23,13 @@ describe AuditEventPresenter do
   end
 
   context 'exposes the author' do
+    it 'gets the event author name' do
+      expect(presenter.author_name).to eq(audit_event.user.name)
+    end
+
     context 'event authored by a user that exists' do
-      it 'shows a link' do
-        expect(presenter.author_name).to eq("<a href=\"#{user_path(audit_event.user)}\">#{audit_event.user.name}</a>")
+      it 'returns a url' do
+        expect(presenter.author_url).to eq(url_for(user_path(audit_event.user)))
       end
     end
 
@@ -50,8 +54,8 @@ describe AuditEventPresenter do
           }
         end
 
-        it 'shows a blank author name' do
-          expect(presenter.author_name).to be_blank
+        it 'does not return a url' do
+          expect(presenter.author_url).to be_blank
         end
       end
 
@@ -101,14 +105,24 @@ describe AuditEventPresenter do
   end
 
   context 'exposes the object' do
-    it 'link if it exists' do
-      expect(presenter.object).to eq("<a href=\"#{url_for(audit_event.entity)}\">#{details[:entity_path]}</a>")
+    it 'returns the object path if it exists' do
+      expect(presenter.object).to eq(details[:entity_path])
     end
 
-    it 'stored name if it has been deleted' do
+    it 'returns the stored name if it has been deleted' do
       audit_event.entity_id = nil
 
       expect(presenter.object).to be_blank
+    end
+
+    it 'returns the object url if it exists' do
+      expect(presenter.object_url).to eq(url_for(audit_event.entity))
+    end
+
+    it 'returns no object url if it has been deleted' do
+      audit_event.entity_id = nil
+
+      expect(presenter.object_url).to be_blank
     end
   end
 

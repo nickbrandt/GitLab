@@ -11,7 +11,7 @@ module QA
         QA::Page::Admin::Menu.perform(&:go_to_monitoring_audit_logs)
         EE::Page::Admin::Monitoring::AuditLog.perform do |audit_log_page|
           expected_events.each do |expected_event|
-            expect(audit_log_page).to have_audit_log_row(expected_event)
+            expect(audit_log_page).to have_audit_log_table_with_text(expected_event)
           end
         end
       end

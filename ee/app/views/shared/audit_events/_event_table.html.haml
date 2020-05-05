@@ -16,7 +16,7 @@
             = _('Author')
           .table-mobile-content
             - if event.author_name
-              = event.author_name
+              %a{ href: event.author_url }= event.author_name
             - else
               = s_('AuditEvents|(removed)')
         .table-section.section-50.section-wrap.audit-action.js-audit-action
