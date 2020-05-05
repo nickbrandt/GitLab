@@ -173,6 +173,7 @@ dast:
     DAST_PASSWORD_FIELD: "user[password]"
     # FIXME: Remove the following line once ready
     DAST_FULL_SCAN_ENABLED: "true"
+    DAST_EXCLUDE_RULES: 10047
   allow_failure: true
   script:
     - 'export DAST_WEBSITE="${DAST_WEBSITE:-$(cat environment_url.txt)}"'
