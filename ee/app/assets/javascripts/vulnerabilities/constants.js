@@ -41,6 +41,11 @@ export const HEADER_ACTION_BUTTONS = {
     tagline: s__('ciReport|Automatically apply the patch in a new branch'),
     action: 'createMergeRequest',
   },
+  patchDownload: {
+    name: s__('ciReport|Download patch to resolve'),
+    tagline: s__('ciReport|Download the patch to apply it manually'),
+    action: 'downloadPatch',
+  },
 };
 
 export const FEEDBACK_TYPES = {

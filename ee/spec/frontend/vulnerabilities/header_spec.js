@@ -5,6 +5,7 @@ import waitForPromises from 'helpers/wait_for_promises';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
 import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
+import download from '~/lib/utils/downloader';
 import * as urlUtility from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import Header from 'ee/vulnerabilities/components/header.vue';
@@ -18,6 +19,7 @@ import { FEEDBACK_TYPES, VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/
 const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
+jest.mock('~/lib/utils/downloader');
 
 describe('Vulnerability Header', () => {
   let wrapper;
@@ -75,10 +77,11 @@ describe('Vulnerability Header', () => {
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
-  const createWrapper = ({ vulnerability = {}, finding = getFinding({}) }) => {
+  const createWrapper = ({ vulnerability = {}, finding = getFinding({}), props = {} }) => {
     wrapper = shallowMount(Header, {
       propsData: {
         ...dataset,
+        ...props,
         initialVulnerability: { ...defaultVulnerability, ...vulnerability },
         finding,
       },
@@ -163,9 +166,10 @@ describe('Vulnerability Header', () => {
       });
       expect(findSplitButton().exists()).toBe(true);
       const buttons = findSplitButton().props('buttons');
-      expect(buttons).toHaveLength(2);
+      expect(buttons).toHaveLength(3);
       expect(buttons[0].name).toBe('Resolve with merge request');
-      expect(buttons[1].name).toBe('Create issue');
+      expect(buttons[1].name).toBe('Download patch to resolve');
+      expect(buttons[2].name).toBe('Create issue');
     });
 
     it('does not render the split button if there is only one action', () => {
@@ -279,6 +283,29 @@ describe('Vulnerability Header', () => {
           expect(createFlash).toHaveBeenCalledWith(
             'There was an error creating the merge request. Please try again.',
           );
+        });
+      });
+    });
+
+    describe('can download download patch', () => {
+      beforeEach(() => {
+        createWrapper({
+          finding: getFinding({ shouldShowMergeRequestButton: true }),
+          props: { createMrUrl: '' },
+        });
+      });
+
+      it('only renders the download patch button', () => {
+        expect(findGlDeprecatedButton().exists()).toBe(true);
+        expect(findGlDeprecatedButton().text()).toBe('Download patch to resolve');
+      });
+
+      it('emits downloadPatch when download patch button is clicked', () => {
+        const glDeprecatedButton = findGlDeprecatedButton();
+        expect(glDeprecatedButton.exists()).toBe(true);
+        glDeprecatedButton.vm.$emit('click');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(download).toHaveBeenCalledWith({ fileData: diff, fileName: `remediation.patch` });
         });
       });
     });

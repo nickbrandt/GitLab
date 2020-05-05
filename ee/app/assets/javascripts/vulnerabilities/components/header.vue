@@ -2,6 +2,7 @@
 import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
+import download from '~/lib/utils/downloader';
 import { redirectTo } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
@@ -69,11 +70,20 @@ export default {
         buttons.push(HEADER_ACTION_BUTTONS.mergeRequestCreation);
       }
 
+      if (this.canDownloadPatch) {
+        buttons.push(HEADER_ACTION_BUTTONS.patchDownload);
+      }
+
       if (!this.hasIssue) {
         buttons.push(HEADER_ACTION_BUTTONS.issueCreation);
       }
 
       return buttons;
+    },
+    canDownloadPatch() {
+      return (
+        this.vulnerability.state !== 'resolved' && !this.vulnerability.hasMr && this.hasRemediation
+      );
     },
     hasIssue() {
       return Boolean(this.finding.issue_feedback?.issue_iid);
@@ -200,6 +210,9 @@ export default {
           );
         });
     },
+    downloadPatch() {
+      download({ fileData: this.finding.remediations[0].diff, fileName: `remediation.patch` });
+    },
   },
 };
 </script>
@@ -248,6 +261,7 @@ export default {
           class="js-split-button"
           @createMergeRequest="createMergeRequest"
           @createIssue="createIssue"
+          @downloadPatch="downloadPatch"
         />
         <gl-deprecated-button
           v-else-if="actionButtons.length > 0"
