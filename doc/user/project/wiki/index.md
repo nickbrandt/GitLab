@@ -189,7 +189,24 @@ instructions.
 
 On the project's Wiki page, there is a right side navigation that renders the full Wiki pages list by default, with hierarchy.
 
-If the Wiki repository contains a `_sidebar` page, the file of this page replaces the default side navigation.
-This custom file serves to render it's custom content, fully replacing the standard sidebar.
+To customize the sidebar, you can create a file named `_sidebar` to fully replace the default navigation.
+
+CAUTION: **Warning:**
+Unless you link the `_sidebar` file from your custom nav, to edit it you'll have to access it directly
+from the browser's address bar by typing: `https://gitlab.com/<namespace>/<project_name>/-/wikis/_sidebar` (for self-managed GitLab instances, replace `gitlab.com` with your instance's URL).
+
+Example for `_sidebar` (using Markdown format):
+
+```markdown
+### [Home](home)
+
+- [Hello World](hello)
+- [Foo](foo)
+- [Bar](bar)
+
+---
+
+- [Sidebar](_sidebar)
+```
 
 Support for displaying a generated TOC with a custom side navigation is planned.
