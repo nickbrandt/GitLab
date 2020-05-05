@@ -49,31 +49,5 @@
             #js-audit-logs-date-range-app
             = render 'shared/audit_events/event_sort'
 
-- if @events.present?
-  %table#events-table.table
-    %thead
-      %tr
-        %th Author
-        %th Object
-        %th Action
-        %th Target
-        %th IP Address
-        %th Date
-    %tbody
-      - @events.map(&:present).each do |event|
-        %tr{ data: { qa_selector: 'admin_audit_log_row_content' } }
-          %td
-            - if (author_link = event.author_name)
-              = author_link
-            - else
-              #{event.details[:author_name]} <small>(removed)</small>
-          %td
-            - if (object_link = event.object)
-              = object_link
-            - else
-              #{event.details[:entity_path]} <small>(removed)</small>
-          %td= sanitize(event.action, tags: %w(strong))
-          %td= event.target
-          %td= event.ip_address
-          %td= event.date
-  = paginate_without_count @events
+- if @table_events.present?
+  #js-audit-logs-table-app{ data: { events: @table_events.to_json, is_last_page: @events.last_page?.to_json, qa_selector: 'admin_audit_log_table' } }

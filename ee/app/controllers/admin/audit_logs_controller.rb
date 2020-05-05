@@ -11,6 +11,7 @@ class Admin::AuditLogsController < Admin::ApplicationController
 
   def index
     @events = audit_log_events
+    @table_events = AuditEventSerializer.new.represent(@events)
 
     @entity = case audit_logs_params[:entity_type]
               when 'User'
