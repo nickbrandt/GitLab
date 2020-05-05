@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -16,7 +16,6 @@ import SplitButton from 'ee/vue_shared/security_reports/components/split_button.
 export default {
   name: 'VulnerabilityHeader',
   components: {
-    GlDeprecatedButton,
     GlLoadingIcon,
     ResolutionAlert,
     VulnerabilityStateDropdown,
