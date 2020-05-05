@@ -474,6 +474,8 @@
 ################
 .review:rules:mr-and-schedule-auto:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: on_success
@@ -482,6 +484,8 @@
 
 .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       when: on_success
@@ -494,12 +498,16 @@
 
 .review:rules:mr-only-auto:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: on_success
 
 .review:rules:mr-only-auto-if-frontend-manual-otherwise:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       when: on_success
@@ -509,12 +517,16 @@
 
 .review:rules:mr-only-manual:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
 
 .review:rules:review-cleanup:
   rules:
+    - <<: *if-not-ee
+      when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
