@@ -576,7 +576,7 @@ that is best described by a matrix, tables are the best choice for use.
 
 Due to accessibility and scanability requirements, tables should not have any
 blank cells or areas. If a cell does not have a useable value, consider using
-*none* as a value.
+*N/A* (for 'not applicable') or *none*.
 
 To help tables be easier to maintain, consider adding additional spaces to the
 column widths to make them consistent. For example:
