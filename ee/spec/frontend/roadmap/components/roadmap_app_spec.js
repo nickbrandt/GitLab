@@ -36,8 +36,7 @@ describe('RoadmapApp', () => {
   const presetType = PRESET_TYPES.MONTHS;
   const timeframe = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
-  const createComponent = mountType => {
-    const mountFunction = mountType === 'mount' ? mount : shallowMount;
+  const createComponent = (mountFunction = shallowMount) => {
     return mountFunction(RoadmapApp, {
       localVue,
       propsData: {
@@ -172,13 +171,13 @@ describe('RoadmapApp', () => {
     let roadmapTimelineEl;
 
     beforeEach(() => {
-      wrapper = createComponent('mount');
+      wrapper = createComponent(mount);
       store.dispatch('receiveEpicsSuccess', { rawEpics });
       roadmapTimelineEl = wrapper.find('.roadmap-timeline-section').element;
     });
 
     it('updates timeline by extending timeframe from the start when called with extendType as `prepend`', () => {
-      jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+      jest.spyOn(eventHub, '$emit').mockImplementation();
 
       wrapper.vm.processExtendedTimeline({
         extendType: EXTEND_AS.PREPEND,
@@ -191,7 +190,7 @@ describe('RoadmapApp', () => {
     });
 
     it('updates timeline by extending timeframe from the end when called with extendType as `append`', () => {
-      jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+      jest.spyOn(eventHub, '$emit').mockImplementation();
 
       wrapper.vm.processExtendedTimeline({
         extendType: EXTEND_AS.APPEND,
@@ -203,9 +202,9 @@ describe('RoadmapApp', () => {
     });
 
     it('updates the store and refreshes roadmap with extended timeline based on provided extendType', () => {
-      jest.spyOn(wrapper.vm, 'extendTimeframe').mockImplementation(() => {});
-      jest.spyOn(wrapper.vm, 'refreshEpicDates').mockImplementation(() => {});
-      jest.spyOn(wrapper.vm, 'refreshMilestoneDates').mockImplementation(() => {});
+      jest.spyOn(wrapper.vm, 'extendTimeframe').mockImplementation();
+      jest.spyOn(wrapper.vm, 'refreshEpicDates').mockImplementation();
+      jest.spyOn(wrapper.vm, 'refreshMilestoneDates').mockImplementation();
       jest.spyOn(wrapper.vm, 'fetchEpicsForTimeframe').mockResolvedValue();
 
       const extendType = EXTEND_AS.PREPEND;
