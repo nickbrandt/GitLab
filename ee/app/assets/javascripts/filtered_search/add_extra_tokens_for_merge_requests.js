@@ -32,8 +32,8 @@ export default IssuableTokenKeys => {
   ];
 
   const approversToken = {
-    formattedKey: __('Approver'),
-    key: 'approver',
+    formattedKey: __('Eligible-Approver'),
+    key: 'eligible-approver',
     type: 'array',
     param: 'usernames[]',
     symbol: '@',
