@@ -277,7 +277,7 @@ describe('Cycle analytics actions', () => {
         setFixtures('<div class="flash-container"></div>');
       });
 
-      it('removes an existing flash error if present', done => {
+      it('removes an existing flash error if present', () => {
         const { mockDispatchContext } = mockFetchCycleAnalyticsAction();
         createFlash(flashErrorMessage);
 
@@ -285,7 +285,7 @@ describe('Cycle analytics actions', () => {
 
         expect(flashAlert).toBeVisible();
 
-        actions
+        return actions
           .fetchCycleAnalyticsData({
             dispatch: mockDispatchContext,
             state: {},
@@ -293,26 +293,25 @@ describe('Cycle analytics actions', () => {
           })
           .then(() => {
             expect(flashAlert.style.opacity).toBe('0');
-            done();
-          })
-          .catch(done.fail);
+          });
       });
     });
 
-    it('will flash an error when there are no stages', () => {
-      [[], null].forEach(emptyStages => {
-        actions.receiveGroupStagesSuccess(
-          {
-            commit: () => {},
-            state: emptyStages,
-            getters,
-          },
-          {},
-        );
+    // it('will flash an error when there are no stages', () => {
+    //   [[], null].forEach(emptyStages => {
+    //     actions.receiveGroupStagesSuccess(
+    //       {
+    //         dispatch: () => {},
+    //         commit: () => {},
+    //         state: { stages: emptyStages },
+    //         getters,
+    //       },
+    //       {},
+    //     );
 
-        shouldFlashAMessage(flashErrorMessage);
-      });
-    });
+    //     shouldFlashAMessage(flashErrorMessage);
+    //   });
+    // });
   });
 
   describe('receiveCycleAnalyticsDataError', () => {
@@ -372,8 +371,8 @@ describe('Cycle analytics actions', () => {
       setFixtures('<div class="flash-container"></div>');
     });
 
-    it(`commits the ${types.RECEIVE_GROUP_STAGES_SUCCESS} mutation`, done => {
-      testAction(
+    it(`commits the ${types.RECEIVE_GROUP_STAGES_SUCCESS} mutation and dispatches 'setDefaultSelectedStage'`, () => {
+      return testAction(
         actions.receiveGroupStagesSuccess,
         { ...customizableStagesAndEvents.stages },
         state,
@@ -383,36 +382,33 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents.stages },
           },
         ],
-        [],
-        done,
+        [{ type: 'setDefaultSelectedStage' }],
       );
     });
+  });
 
-    it("dispatches the 'fetchStageData' action", done => {
-      testAction(
-        actions.receiveGroupStagesSuccess,
-        stages,
-        {},
-        [
-          {
-            type: types.RECEIVE_GROUP_STAGES_SUCCESS,
-            payload: stages,
-          },
-        ],
+  describe.only('setDefaultSelectedStage', () => {
+    it("dispatches the 'fetchStageData' action", () => {
+      return testAction(
+        actions.setDefaultSelectedStage,
+        null,
+        {
+          activeStages: stages,
+        },
+        [],
         [
           { type: 'setSelectedStage', payload: selectedStage },
           { type: 'fetchStageData', payload: selectedStageSlug },
         ],
-        done,
       );
     });
 
     it('will flash an error when there are no stages', () => {
       [[], null].forEach(emptyStages => {
-        actions.receiveGroupStagesSuccess(
+        actions.setDefaultSelectedStage(
           {
-            commit: () => {},
-            state: emptyStages,
+            getters: { activeStages: emptyStages },
+            dispatch: () => {},
           },
           {},
         );
@@ -1018,6 +1014,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
     });
+
     it(`commits the ${types.RECEIVE_REORDER_STAGE_ERROR} mutation and flashes an error`, () => {
       testAction(
         actions.receiveReorderStageError,
