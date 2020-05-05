@@ -599,8 +599,8 @@ When creating tables of lists of features (such as whether or not features are
 available to certain roles on the [Permissions](../../user/permissions.md#project-members-permissions)
 page), use the following phrases (based on the SVG icons):
 
-- No: **{dotted-circle}** No
-- Yes: **{check-circle}** Yes
+- *No*: **{dotted-circle}** No
+- *Yes*: **{check-circle}** Yes
 
 ## Quotes
 
