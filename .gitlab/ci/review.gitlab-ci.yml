@@ -203,6 +203,7 @@ review-performance:
       - sitespeed-results/
     reports:
       performance: performance.json
+    expire_in: 31d
 
 parallel-spec-reports:
   extends:
@@ -229,6 +230,7 @@ parallel-spec-reports:
       - qa/gitlab-qa-run-*
     reports:
       junit: qa/gitlab-qa-run-*/**/rspec-*.xml
+    expire_in: 31d
 
 danger-review:
   extends:
