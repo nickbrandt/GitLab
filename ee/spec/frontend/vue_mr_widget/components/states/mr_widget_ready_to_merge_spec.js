@@ -7,7 +7,10 @@ import {
   MT_MERGE_STRATEGY,
   MTWPS_MERGE_STRATEGY,
 } from '~/vue_merge_request_widget/constants';
-import { MERGE_DISABLED_TEXT } from '~/vue_merge_request_widget/mixins/ready_to_merge';
+import {
+  MERGE_DISABLED_TEXT,
+  PIPELINE_MUST_SUCCEED_CONFLICT_TEXT,
+} from '~/vue_merge_request_widget/mixins/ready_to_merge';
 
 describe('ReadyToMerge', () => {
   let wrapper;
@@ -247,7 +250,10 @@ describe('ReadyToMerge', () => {
     });
 
     it('should not ask for confirmation in non-merge train scenarios', () => {
-      factory({ isPipelineActive: true, onlyAllowMergeIfPipelineSucceeds: false });
+      factory({
+        isPipelineActive: true,
+        onlyAllowMergeIfPipelineSucceeds: false,
+      });
       return clickMergeImmediately().then(() => {
         expect(dialog.vm.show).not.toHaveBeenCalled();
         expect(vm.handleMergeButtonClick).toHaveBeenCalled();
@@ -258,11 +264,14 @@ describe('ReadyToMerge', () => {
   describe('cannot merge', () => {
     describe('when isMergeAllowed=false', () => {
       beforeEach(() => {
-        factory({ isMergeAllowed: false, availableAutoMergeStrategies: [] });
+        factory({
+          isMergeAllowed: false,
+          availableAutoMergeStrategies: [],
+        });
       });
 
       it('should show cannot merge text', () => {
-        expect(findResolveItemsMessage().text()).toEqual(MERGE_DISABLED_TEXT);
+        expect(findResolveItemsMessage().html()).toContain(MERGE_DISABLED_TEXT);
       });
 
       it('should show disabled merge button', () => {
@@ -285,7 +294,22 @@ describe('ReadyToMerge', () => {
     });
 
     it('should show approvals needed text', () => {
-      expect(findResolveItemsMessage().text()).toEqual(MERGE_DISABLED_TEXT_UNAPPROVED);
+      expect(findResolveItemsMessage().html()).toContain(MERGE_DISABLED_TEXT_UNAPPROVED);
+    });
+  });
+
+  describe('when no CI service are found and enforce `Pipeline must succeed`', () => {
+    beforeEach(() => {
+      factory({
+        isMergeAllowed: false,
+        availableAutoMergeStrategies: [],
+        hasCI: false,
+        onlyAllowMergeIfPipelineSucceeds: true,
+      });
+    });
+
+    it('should show a custom message that explains the conflict', () => {
+      expect(findResolveItemsMessage().html()).toContain(PIPELINE_MUST_SUCCEED_CONFLICT_TEXT);
     });
   });
 });
