@@ -1,43 +1,43 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlNewDropdownItem, GlModal, GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
+import * as types from '~/monitoring/stores/mutation_types';
 
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
 import DuplicateDashboardForm from '~/monitoring/components/duplicate_dashboard_form.vue';
+import { createStore } from '~/monitoring/stores';
 
 import { dashboardGitResponse } from '../mock_data';
 
 const defaultBranch = 'master';
 
-function createComponent(props, opts = {}) {
-  const storeOpts = {
-    methods: {
-      duplicateSystemDashboard: jest.fn(),
-    },
-    computed: {
-      allDashboards: () => dashboardGitResponse,
-    },
-  };
-
-  return shallowMount(DashboardsDropdown, {
-    propsData: {
-      ...props,
-      defaultBranch,
-    },
-    sync: false,
-    ...storeOpts,
-    ...opts,
-  });
-}
-
 describe('DashboardsDropdown', () => {
   let wrapper;
+  let store;
+
+  function createComponent(props, opts = {}) {
+    return shallowMount(DashboardsDropdown, {
+      propsData: {
+        ...props,
+        defaultBranch,
+      },
+      store,
+      ...opts,
+    });
+  }
 
   const findItems = () => wrapper.findAll(GlNewDropdownItem);
   const findItemAt = i => wrapper.findAll(GlNewDropdownItem).at(i);
   const findSearchInput = () => wrapper.find({ ref: 'monitorDashboardsDropdownSearch' });
   const findNoItemsMsg = () => wrapper.find({ ref: 'monitorDashboardsDropdownMsg' });
   const setSearchTerm = searchTerm => wrapper.setData({ searchTerm });
+
+  beforeEach(() => {
+    store = createStore();
+    store.commit(`monitoringDashboard/${types.SET_ALL_DASHBOARDS}`, dashboardGitResponse);
+
+    jest.spyOn(store, 'dispatch');
+  });
 
   describe('when it receives dashboards data', () => {
     beforeEach(() => {
@@ -52,6 +52,11 @@ describe('DashboardsDropdown', () => {
       expect(findItemAt(0).text()).toBe(dashboardGitResponse[0].display_name);
       expect(findItemAt(1).text()).toBe(dashboardGitResponse[1].display_name);
       expect(findItemAt(2).text()).toBe(dashboardGitResponse[2].display_name);
+    });
+
+    it('displays items with a star for starred dashboards', () => {
+      expect(findItemAt(0).props('iconRightName')).toBe(null);
+      expect(findItemAt(1).props('iconRightName')).toBe('star');
     });
 
     it('displays a search input', () => {
@@ -82,12 +87,10 @@ describe('DashboardsDropdown', () => {
   });
 
   describe('when a system dashboard is selected', () => {
-    let duplicateDashboardAction;
     let modalDirective;
 
     beforeEach(() => {
       modalDirective = jest.fn();
-      duplicateDashboardAction = jest.fn().mockResolvedValue();
 
       wrapper = createComponent(
         {
@@ -96,10 +99,6 @@ describe('DashboardsDropdown', () => {
         {
           directives: {
             GlModal: modalDirective,
-          },
-          methods: {
-            // Mock vuex actions
-            duplicateSystemDashboard: duplicateDashboardAction,
           },
         },
       );
@@ -119,8 +118,21 @@ describe('DashboardsDropdown', () => {
 
       const findModal = () => wrapper.find(GlModal);
       const findAlert = () => wrapper.find(GlAlert);
+      const newDashboard = {
+        can_edit: true,
+        default: false,
+        display_name: 'A new dashboard',
+        system_dashboard: false,
+      };
 
       beforeEach(() => {
+        store.dispatch.mockImplementation(action => {
+          if (action === 'monitoringDashboard/duplicateSystemDashboard') {
+            return Promise.resolve(newDashboard);
+          }
+          throw new Error('Not implemented');
+        });
+
         okEvent = {
           preventDefault: jest.fn(),
         };
@@ -145,15 +157,7 @@ describe('DashboardsDropdown', () => {
       });
 
       describe('when a new dashboard is saved succesfully', () => {
-        const newDashboard = {
-          can_edit: true,
-          default: false,
-          display_name: 'A new dashboard',
-          system_dashboard: false,
-        };
-
         const submitForm = formVals => {
-          duplicateDashboardAction.mockResolvedValueOnce(newDashboard);
           findModal()
             .find(DuplicateDashboardForm)
             .vm.$emit('change', {
@@ -188,7 +192,13 @@ describe('DashboardsDropdown', () => {
       it('handles error when a new dashboard is not saved', () => {
         const errMsg = 'An error occurred';
 
-        duplicateDashboardAction.mockRejectedValueOnce(errMsg);
+        store.dispatch.mockImplementationOnce(action => {
+          if (action === 'monitoringDashboard/duplicateSystemDashboard') {
+            return Promise.reject(errMsg);
+          }
+          throw new Error('Not implemented');
+        });
+
         findModal().vm.$emit('ok', okEvent);
 
         return waitForPromises().then(() => {

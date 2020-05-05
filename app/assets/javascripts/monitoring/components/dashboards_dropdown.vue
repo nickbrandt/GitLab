@@ -127,6 +127,7 @@ export default {
           :key="dashboard.path"
           is-check-item
           :is-checked="dashboard.path === selectedDashboard.path"
+          :icon-right-name="dashboard.starred ? 'star' : null"
           @click="selectDashboard(dashboard)"
         >
           {{ dashboard.display_name || dashboard.path }}
