@@ -126,7 +126,7 @@ found. The list is ordered alphabetically.
 ![Wiki sidebar](img/wiki_sidebar.png)
 
 If you have many pages, not all will be listed in the sidebar. Click on
-**More pages** to see all of them.
+**View All Pages** to see all of them.
 
 ## Viewing the history of a wiki page
 
