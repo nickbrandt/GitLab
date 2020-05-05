@@ -137,6 +137,12 @@
   }
 }
 
+.d-sm-table-cell {
+  @include media-breakpoint-up(sm) {
+    display: table-cell !important;
+  }
+}
+
 .gl-white-space-normal { @include gl-white-space-normal; }
 .gl-word-break-all { @include gl-word-break-all; }
 .gl-reset-line-height { @include gl-reset-line-height; }
