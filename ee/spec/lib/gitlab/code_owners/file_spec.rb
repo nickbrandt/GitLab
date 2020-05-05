@@ -38,30 +38,13 @@ describe Gitlab::CodeOwners::File do
     end
 
     context "when feature flag `:sectional_codeowners` is enabled" do
+      using RSpec::Parameterized::TableSyntax
+
       before do
         stub_feature_flags(sectional_codeowners: true)
       end
 
-      it "passes the call to #get_parsed_sectional_data" do
-        expect(file).to receive(:get_parsed_sectional_data)
-
-        file.parsed_data
-      end
-
-      it "populates a hash with a single default section" do
-        data = file.parsed_data
-
-        expect(data.keys.length).to eq(1)
-        expect(data.keys).to contain_exactly(::Gitlab::CodeOwners::Entry::DEFAULT_SECTION)
-      end
-
-      context "when CODEOWNERS file contains multiple sections" do
-        using RSpec::Parameterized::TableSyntax
-
-        let(:file_content) do
-          File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
-        end
-
+      shared_examples_for "creates expected parsed results" do
         it "is a hash sorted by sections without duplicates" do
           data = file.parsed_data
 
@@ -86,6 +69,35 @@ describe Gitlab::CodeOwners::File do
             expect(extracted_owners).to contain_exactly(*owners)
           end
         end
+      end
+
+      it "passes the call to #get_parsed_sectional_data" do
+        expect(file).to receive(:get_parsed_sectional_data)
+
+        file.parsed_data
+      end
+
+      it "populates a hash with a single default section" do
+        data = file.parsed_data
+
+        expect(data.keys.length).to eq(1)
+        expect(data.keys).to contain_exactly(::Gitlab::CodeOwners::Entry::DEFAULT_SECTION)
+      end
+
+      context "when CODEOWNERS file contains multiple sections" do
+        let(:file_content) do
+          File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
+        end
+
+        it_behaves_like "creates expected parsed results"
+      end
+
+      context "when CODEOWNERS file contains multiple sections with mixed-case names" do
+        let(:file_content) do
+          File.read(Rails.root.join("ee", "spec", "fixtures", "mixed_case_sectional_codeowners_example"))
+        end
+
+        it_behaves_like "creates expected parsed results"
       end
     end
   end
