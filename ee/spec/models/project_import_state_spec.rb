@@ -52,7 +52,7 @@ describe ProjectImportState, type: :model do
 
         context 'no index status' do
           it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, nil)
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id)
 
             import_state.finish
           end
@@ -61,8 +61,8 @@ describe ProjectImportState, type: :model do
         context 'with index status' do
           let(:index_status) { IndexStatus.create!(project: project, indexed_at: Time.now, last_commit: 'foo') }
 
-          it 'schedules a progressive index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, index_status.last_commit)
+          it 'schedules a full index of the repository' do
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id)
 
             import_state.finish
           end
