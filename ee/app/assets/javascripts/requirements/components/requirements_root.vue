@@ -136,8 +136,6 @@ export default {
         opened: tabsContainerEl.querySelector('.js-opened-count'),
         archived: tabsContainerEl.querySelector('.js-archived-count'),
         all: tabsContainerEl.querySelector('.js-all-count'),
-        nav: document.querySelector('.js-nav-requirements-count'),
-        navFlyOut: document.querySelector('.js-nav-requirements-count-fly-out'),
       },
     };
   },
@@ -200,8 +198,6 @@ export default {
       const totalCount = this.requirements.count.ALL;
 
       this.countEls.all.innerText = totalCount;
-      this.countEls.nav.innerText = totalCount;
-      this.countEls.navFlyOut.innerText = totalCount;
     },
     openedCount(value) {
       this.countEls.opened.innerText = value;
