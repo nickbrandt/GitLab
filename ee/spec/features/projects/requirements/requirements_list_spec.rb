@@ -42,7 +42,6 @@ describe 'Requirements list', :js do
 
     it 'shows the requirements in the navigation sidebar' do
       expect(first('.nav-sidebar  .active a .nav-item-name')).to have_content('Requirements')
-      expect(first('.nav-sidebar .active a .count')).to have_content('4')
     end
 
     it 'shows requirements tabs for each status type' do
@@ -93,7 +92,6 @@ describe 'Requirements list', :js do
       end
 
       it 'updates requirements count in nav sidebar and opened and all tab badges' do
-        expect(page.find('.js-nav-requirements-count')).to have_content('4')
         page.within('.requirements-state-filters') do
           expect(find('li > a#state-opened .badge')).to have_content('3')
           expect(find('li > a#state-all .badge')).to have_content('4')
@@ -101,7 +99,6 @@ describe 'Requirements list', :js do
 
         create_requirement('Foobar')
 
-        expect(page.find('.js-nav-requirements-count')).to have_content('5')
         page.within('.requirements-state-filters') do
           expect(find('li > a#state-opened .badge')).to have_content('4')
           expect(find('li > a#state-all .badge')).to have_content('5')
