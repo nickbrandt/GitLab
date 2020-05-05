@@ -140,7 +140,7 @@ describe('ee/ide/lib/mirror', () => {
         beforeEach(connectFail);
 
         it('rejects with error', () => {
-          expect(connection).rejects.toEqual(new Error(MSG_CONNECTION_ERROR));
+          return expect(connection).rejects.toEqual(new Error(MSG_CONNECTION_ERROR));
         });
       });
     });
