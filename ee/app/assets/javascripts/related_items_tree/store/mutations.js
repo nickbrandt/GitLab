@@ -214,6 +214,38 @@ export default {
     state.children[parentItem.reference].splice(newIndex, 0, targetItem);
   },
 
+  [types.MOVE_ITEM](
+    state,
+    { oldParentItem, newParentItem, targetItem, oldIndex, newIndex, isFirstChild },
+  ) {
+    // Remove from old position in previous parent
+    state.children[oldParentItem.reference].splice(oldIndex, 1);
+    if (state.children[oldParentItem.reference].length === 0) {
+      state.childrenFlags[oldParentItem.reference].itemHasChildren = false;
+    }
+
+    // Insert at new position in new parent
+    if (isFirstChild) {
+      Vue.set(state.children, newParentItem.parentReference, [targetItem]);
+      Vue.set(state.childrenFlags, newParentItem.parentReference, {
+        itemExpanded: true,
+        itemHasChildren: true,
+      });
+    } else {
+      state.children[newParentItem.parentReference].splice(newIndex, 0, targetItem);
+    }
+  },
+  [types.MOVE_ITEM_FAILURE](
+    state,
+    { oldParentItem, newParentItem, targetItem, oldIndex, newIndex },
+  ) {
+    // Remove from new position in new parent
+    state.children[newParentItem.parentReference].splice(newIndex, 1);
+
+    // Insert at old position in old parent
+    state.children[oldParentItem.reference].splice(oldIndex, 0, targetItem);
+  },
+
   [types.REQUEST_PROJECTS](state) {
     state.projectsFetchInProgress = true;
   },

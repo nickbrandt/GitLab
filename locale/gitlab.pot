@@ -8341,6 +8341,9 @@ msgstr ""
 msgid "Epics|Something went wrong while fetching group epics."
 msgstr ""
 
+msgid "Epics|Something went wrong while moving item."
+msgstr ""
+
 msgid "Epics|Something went wrong while ordering item."
 msgstr ""
 

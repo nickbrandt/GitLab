@@ -545,7 +545,7 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.REORDER_ITEM, () => {
-        it('should reorder an item within children of provided parent based on provided indices', () => {
+        it('should reorder an item within children of provided parent based on provided indexes', () => {
           state.parentItem = { reference: '&1' };
           state.children[state.parentItem.reference] = ['foo', 'bar'];
 
@@ -560,6 +560,112 @@ describe('RelatedItemsTree', () => {
 
           expect(state.children[state.parentItem.reference]).toEqual(
             expect.arrayContaining(['bar', 'foo']),
+          );
+        });
+      });
+
+      describe(types.MOVE_ITEM, () => {
+        const defaultPayload = {
+          oldParentItem: {
+            reference: '&1',
+          },
+          targetItem: 'bar',
+          oldIndex: 1,
+          newIndex: 0,
+          isFirstChild: false,
+        };
+
+        it('should move an item from one parent to another with children based on provided indexes', () => {
+          const newParentItem = {
+            parentReference: '&2',
+          };
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['foo', 'bar'];
+          state.children[newParentItem.parentReference] = ['baz'];
+
+          mutations[types.MOVE_ITEM](state, {
+            ...defaultPayload,
+            newParentItem,
+          });
+
+          expect(state.children[state.parentItem.reference]).toEqual(
+            expect.arrayContaining(['foo']),
+          );
+          expect(state.children[newParentItem.parentReference]).toEqual(
+            expect.arrayContaining(['bar', 'baz']),
+          );
+        });
+
+        it('should move an item from one parent to another without children based on provided indexes', () => {
+          const newParentItem = {
+            parentReference: '&2',
+          };
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['foo', 'bar'];
+
+          mutations[types.MOVE_ITEM](state, {
+            ...defaultPayload,
+            newParentItem,
+            isFirstChild: true,
+          });
+
+          expect(state.children[state.parentItem.reference]).toEqual(
+            expect.arrayContaining(['foo']),
+          );
+          expect(state.children[newParentItem.parentReference]).toEqual(
+            expect.arrayContaining(['bar']),
+          );
+        });
+
+        it('should update itemHasChildren flags', () => {
+          const newParentItem = {
+            parentReference: '&2',
+          };
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['bar'];
+          state.childrenFlags[state.parentItem.reference] = { itemHasChildren: true };
+
+          mutations[types.MOVE_ITEM](state, {
+            ...defaultPayload,
+            newParentItem,
+            oldIndex: 0,
+            isFirstChild: true,
+          });
+
+          expect(state.children[state.parentItem.reference].length).toEqual(0);
+          expect(state.childrenFlags[state.parentItem.reference].itemHasChildren).toEqual(false);
+          expect(state.children[newParentItem.parentReference]).toEqual(
+            expect.arrayContaining(['bar']),
+          );
+          expect(state.childrenFlags[newParentItem.parentReference].itemHasChildren).toEqual(true);
+        });
+      });
+
+      describe(types.MOVE_ITEM_FAILURE, () => {
+        it('should move an item from one parent to another with children based on provided indexes', () => {
+          const newParentItem = {
+            parentReference: '&2',
+          };
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['foo'];
+          state.children[newParentItem.parentReference] = ['bar', 'baz'];
+
+          mutations[types.MOVE_ITEM_FAILURE](state, {
+            oldParentItem: {
+              reference: '&1',
+            },
+            newParentItem,
+            targetItem: 'bar',
+            oldIndex: 1,
+            newIndex: 0,
+            isFirstChild: false,
+          });
+
+          expect(state.children[state.parentItem.reference]).toEqual(
+            expect.arrayContaining(['foo', 'bar']),
+          );
+          expect(state.children[newParentItem.parentReference]).toEqual(
+            expect.arrayContaining(['baz']),
           );
         });
       });

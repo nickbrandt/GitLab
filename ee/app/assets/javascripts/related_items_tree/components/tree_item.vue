@@ -48,9 +48,7 @@ export default {
       return this.childrenFlags[this.itemReference].itemExpanded ? __('Collapse') : __('Expand');
     },
     childrenFetchInProgress() {
-      return (
-        this.hasChildren && !this.childrenFlags[this.itemReference].itemChildrenFetchInProgress
-      );
+      return this.hasChildren && this.childrenFlags[this.itemReference].itemChildrenFetchInProgress;
     },
     itemExpanded() {
       return this.hasChildren && this.childrenFlags[this.itemReference].itemExpanded;
@@ -61,6 +59,9 @@ export default {
         !this.hasChildren &&
         !this.childrenFlags[this.itemReference].itemChildrenFetchInProgress
       );
+    },
+    showEpicDropzone() {
+      return !this.hasChildren && this.item.type === ChildType.Epic;
     },
   },
   methods: {
@@ -87,7 +88,7 @@ export default {
   >
     <div class="list-item-body d-flex align-items-center">
       <gl-deprecated-button
-        v-if="childrenFetchInProgress"
+        v-if="!childrenFetchInProgress && hasChildren"
         v-gl-tooltip.hover
         :title="chevronTooltip"
         :class="chevronType"
@@ -97,11 +98,7 @@ export default {
       >
         <icon :name="chevronType" />
       </gl-deprecated-button>
-      <gl-loading-icon
-        v-if="childrenFlags[itemReference].itemChildrenFetchInProgress"
-        class="loading-icon"
-        size="sm"
-      />
+      <gl-loading-icon v-if="childrenFetchInProgress" class="loading-icon" size="sm" />
       <tree-item-body
         class="tree-item-row"
         :parent-item="parentItem"
@@ -112,9 +109,9 @@ export default {
       />
     </div>
     <tree-root
-      v-if="itemExpanded"
+      v-if="itemExpanded || showEpicDropzone"
       :parent-item="item"
-      :children="children[itemReference]"
+      :children="children[itemReference] || []"
       class="sub-tree-root"
     />
   </li>

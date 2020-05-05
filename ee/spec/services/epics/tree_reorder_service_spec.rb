@@ -93,9 +93,14 @@ describe Epics::TreeReorderService do
 
           context 'when no object to switch is provided' do
             let(:adjacent_reference_id) { nil }
+            let(:new_parent_id) { GitlabSchema.id_from_object(epic) }
 
-            it 'raises an error' do
-              expect { subject }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
+            before do
+              tree_object_2.update(epic: epic1)
+            end
+
+            it 'updates the parent' do
+              expect { subject }.to change { tree_object_2.reload.epic }.from(epic1).to(epic)
             end
           end
 

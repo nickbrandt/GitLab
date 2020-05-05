@@ -16,6 +16,31 @@ export const mockParentItem = {
   fullPath: 'gitlab-org',
   title: 'Some sample epic',
   reference: 'gitlab-org&1',
+  type: 'Epic',
+  userPermissions: {
+    adminEpic: true,
+    createEpic: true,
+  },
+  descendantCounts: {
+    openedEpics: 1,
+    closedEpics: 1,
+    openedIssues: 1,
+    closedIssues: 1,
+  },
+  healthStatus: {
+    issuesOnTrack: 1,
+    issuesAtRisk: 0,
+    issuesNeedingAttention: 1,
+  },
+};
+
+export const mockParentItem2 = {
+  id: 'gid://gitlab/Epic/43',
+  iid: 2,
+  fullPath: 'gitlab-org',
+  title: 'Some sample epic 2',
+  reference: 'gitlab-org&2',
+  parentReference: 'gitlab-org&2',
   userPermissions: {
     adminEpic: true,
     createEpic: true,
