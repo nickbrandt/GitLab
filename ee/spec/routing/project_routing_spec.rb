@@ -57,15 +57,6 @@ describe 'EE-specific project routing' do
     end
   end
 
-  describe 'Deprecated Design management legacy paths' do
-    include RSpec::Rails::RequestExampleGroup
-
-    it 'redirects to canonical path' do
-      expect(get('/gitlab/gitlabhq/-/designs/1/c6f00aa50b80887ada30a6fe517670be9f8f9ece')).to redirect_to('/gitlab/gitlabhq/-/design_management/designs/1/c6f00aa50b80887ada30a6fe517670be9f8f9ece/raw_image')
-      expect(get('/gitlab/gitlabhq/-/designs/1')).to redirect_to('/gitlab/gitlabhq/-/design_management/designs/1/raw_image')
-    end
-  end
-
   describe Projects::AutocompleteSourcesController, 'routing' do
     it "to #epics" do
       expect(get("/gitlab/gitlabhq/-/autocomplete_sources/epics")).to route_to("projects/autocomplete_sources#epics", namespace_id: 'gitlab', project_id: 'gitlabhq')
