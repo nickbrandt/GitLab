@@ -438,7 +438,12 @@ CREATE TABLE public.application_settings (
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
     issues_create_limit integer DEFAULT 300 NOT NULL,
     push_rule_id bigint,
-    group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL
+    group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL,
+    container_registry_vendor text DEFAULT ''::text NOT NULL,
+    container_registry_version text DEFAULT ''::text NOT NULL,
+    container_registry_features text[] DEFAULT '{}'::text[] NOT NULL,
+    CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
+    CONSTRAINT check_e5aba18f02 CHECK ((char_length(container_registry_version) <= 255))
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
@@ -13707,6 +13712,10 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200429181335
 20200429181955
 20200429182245
+20200505164958
+20200505171834
+20200505172405
 20200506125731
+20200507221434
 \.
 
