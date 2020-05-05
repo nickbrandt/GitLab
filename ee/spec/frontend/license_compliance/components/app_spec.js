@@ -196,6 +196,10 @@ describe('Project Licenses', () => {
     });
 
     describe('when the tabs are rendered', () => {
+      const pageInfo = {
+        total: 1,
+      };
+
       beforeEach(() => {
         createComponent({
           state: {
@@ -213,9 +217,7 @@ describe('Project Licenses', () => {
               generatedAt: '',
               status: REPORT_STATUS.ok,
             },
-            pageInfo: {
-              total: 1,
-            },
+            pageInfo,
           },
           options: {
             provide: {
@@ -232,7 +234,7 @@ describe('Project Licenses', () => {
             .findAll(GlBadge)
             .at(0)
             .text(),
-        ).toBe('1');
+        ).toBe(pageInfo.total.toString());
       });
 
       it('it renders the correct count in "Policies" tab', () => {
@@ -241,7 +243,7 @@ describe('Project Licenses', () => {
             .findAll(GlBadge)
             .at(1)
             .text(),
-        ).toBe('2');
+        ).toBe(managedLicenses.length.toString());
       });
     });
 
