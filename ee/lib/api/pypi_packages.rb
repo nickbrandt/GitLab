@@ -43,10 +43,6 @@ module API
 
         packages
       end
-
-      def unauthorized_user_project
-        @unauthorized_user_project ||= find_project(params[:id]) || not_found!
-      end
     end
 
     before do
@@ -59,7 +55,7 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!(unauthorized_user_project)
+        authorize_packages_feature!(unauthorized_user_project!)
       end
 
       namespace ':id/packages/pypi' do
@@ -73,7 +69,7 @@ module API
         end
 
         get 'files/:sha256/*file_identifier' do
-          project = unauthorized_user_project
+          project = unauthorized_user_project!
 
           filename = "#{params[:file_identifier]}.#{params[:format]}"
           package = packages_finder(project).by_file_name_and_sha256(filename, params[:sha256])

@@ -15,12 +15,20 @@ module API
           find_personal_access_token_from_http_basic_auth
         end
 
-        def authorized_user_project
-          @authorized_user_project ||= authorized_project_find!(params[:id])
+        def unauthorized_user_project
+          @unauthorized_user_project ||= find_project(params[:id])
         end
 
-        def authorized_project_find!(id)
-          project = find_project(id)
+        def unauthorized_user_project!
+          unauthorized_user_project || not_found!
+        end
+
+        def authorized_user_project
+          @authorized_user_project ||= authorized_project_find!
+        end
+
+        def authorized_project_find!
+          project = unauthorized_user_project
 
           unless project && can?(current_user, :read_project, project)
             return unauthorized_or! { not_found! }
