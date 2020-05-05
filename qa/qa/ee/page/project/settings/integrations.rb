@@ -6,7 +6,7 @@ module QA
       module Project
         module Settings
           class Integrations < QA::Page::Base
-            view 'app/views/shared/integrations/_integrations.html.haml' do
+            view 'app/views/shared/integrations/_index.html.haml' do
               element :jenkins_link, '{ data: { qa_selector: "#{integration.to_param' # rubocop:disable QA/ElementWithPattern
             end
 
