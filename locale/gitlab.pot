@@ -13655,6 +13655,9 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
+msgid "NetworkPolicies|Something went wrong, unable to fetch policies"
+msgstr ""
+
 msgid "Never"
 msgstr ""
 
