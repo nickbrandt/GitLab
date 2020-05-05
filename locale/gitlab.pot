@@ -13028,6 +13028,9 @@ msgstr ""
 msgid "Merge Request Approvals"
 msgstr ""
 
+msgid "Merge Request Commits"
+msgstr ""
+
 msgid "Merge Requests"
 msgstr ""
 
@@ -13884,6 +13887,9 @@ msgid "Newly registered users will by default be external"
 msgstr ""
 
 msgid "Next"
+msgstr ""
+
+msgid "Next commit"
 msgstr ""
 
 msgid "Next file in diff"
@@ -15590,6 +15596,9 @@ msgid "Preview payload"
 msgstr ""
 
 msgid "Previous Artifacts"
+msgstr ""
+
+msgid "Previous commit"
 msgstr ""
 
 msgid "Previous file in diff"
