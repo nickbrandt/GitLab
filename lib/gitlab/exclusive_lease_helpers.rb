@@ -35,7 +35,7 @@ module Gitlab
 
       lease.obtain(1 + retries)
 
-      yield(lease.attempts > 1)
+      yield(lease.retried?)
     ensure
       lease&.cancel
     end

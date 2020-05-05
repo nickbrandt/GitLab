@@ -11,6 +11,32 @@ describe Gitlab::ExclusiveLeaseHelpers::SleepingLock, :clean_gitlab_redis_shared
 
   subject { described_class.new(key, timeout: timeout, delay: delay) }
 
+  describe '#retried?' do
+    before do
+      stub_exclusive_lease(key, 'uuid')
+    end
+
+    context 'we have not made any attempts' do
+      it { is_expected.not_to be_retried }
+    end
+
+    context 'we just made a single (initial) attempt' do
+      it 'is not considered a retry' do
+        subject.send(:try_obtain)
+
+        is_expected.not_to be_retried
+      end
+    end
+
+    context 'made multiple attempts' do
+      it 'is considered a retry' do
+        2.times { subject.send(:try_obtain) }
+
+        is_expected.to be_retried
+      end
+    end
+  end
+
   describe '#obtain' do
     context 'when the lease is not held' do
       before do
@@ -22,7 +48,7 @@ describe Gitlab::ExclusiveLeaseHelpers::SleepingLock, :clean_gitlab_redis_shared
 
         subject.obtain(10)
 
-        expect(subject.attempts).to eq(1)
+        expect(subject).not_to be_retried
       end
     end
 
@@ -51,14 +77,14 @@ describe Gitlab::ExclusiveLeaseHelpers::SleepingLock, :clean_gitlab_redis_shared
       end
 
       context 'when lease is granted after retry' do
-        it 'records the successful attempt number' do
+        it 'knows that it retried' do
           expect(subject).to receive(:sleep).with(delay).exactly(3).times
           expect(lease).to receive(:try_obtain).exactly(3).times { nil }
           expect(lease).to receive(:try_obtain).once { 'obtained' }
 
           subject.obtain(max_attempts)
 
-          expect(subject.attempts).to eq(4)
+          expect(subject).to be_retried
         end
       end
     end

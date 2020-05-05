@@ -4,8 +4,6 @@ module Gitlab
   module ExclusiveLeaseHelpers
     # Wrapper around ExclusiveLease that adds retry logic
     class SleepingLock
-      attr_reader :attempts
-
       delegate :cancel, to: :@lease
 
       def initialize(key, timeout:, delay:)
@@ -23,9 +21,13 @@ module Gitlab
         end
       end
 
+      def retried?
+        attempts > 1
+      end
+
       private
 
-      attr_reader :delay
+      attr_reader :delay, :attempts
 
       def held?
         @uuid.present?
