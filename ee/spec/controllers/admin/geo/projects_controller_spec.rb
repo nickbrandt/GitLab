@@ -163,7 +163,7 @@ describe Admin::Geo::ProjectsController, :geo do
       it 'redirects back and display confirmation' do
         Sidekiq::Testing.inline! do
           expect(subject).to redirect_to(admin_geo_projects_path)
-          expect(flash[:toast]).to include('All projects are being scheduled for re-verify')
+          expect(flash[:toast]).to include('All projects are being scheduled for reverify')
         end
       end
     end
@@ -188,7 +188,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       it 'redirects back and display confirmation' do
         expect(subject).to redirect_to(admin_geo_projects_path)
-        expect(flash[:toast]).to include('All projects are being scheduled for re-sync')
+        expect(flash[:toast]).to include('All projects are being scheduled for resync')
       end
     end
   end
