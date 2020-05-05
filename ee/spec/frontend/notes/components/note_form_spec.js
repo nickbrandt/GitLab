@@ -67,6 +67,17 @@ describe('issue_note_form component', () => {
       return store.dispatch('batchComments/enableBatchComments').then(vm.$nextTick);
     });
 
+    it('should be possible to cancel', () => {
+      jest.spyOn(vm, 'cancelHandler');
+
+      return vm.$nextTick().then(() => {
+        const cancelButton = vm.$el.querySelector('[data-testid="cancelBatchCommentsEnabled"]');
+        cancelButton.click();
+
+        expect(vm.cancelHandler).toHaveBeenCalledWith(true);
+      });
+    });
+
     it('shows resolve checkbox', () => {
       expect(
         vm.$el.querySelector('[data-qa-selector="resolve_review_discussion_checkbox"]'),
