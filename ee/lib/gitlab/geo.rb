@@ -87,7 +87,7 @@ module Gitlab
 
     def self.l1_cache
       SafeRequestStore[:geo_l1_cache] ||=
-        Gitlab::JsonCache.new(namespace: :geo, backend: ::Gitlab::ThreadMemoryCache.cache_backend)
+        Gitlab::JsonCache.new(namespace: :geo, backend: ::Gitlab::ProcessMemoryCache.cache_backend)
     end
 
     def self.l2_cache

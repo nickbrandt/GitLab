@@ -21,6 +21,8 @@ describe 'view audit events' do
     end
 
     it 'avoids N+1 DB queries', :request_store do
+      send_request
+
       control = ActiveRecord::QueryRecorder.new(skip_cached: false) { send_request }
 
       create_list(:project_audit_event, 2, entity_id: project.id)
