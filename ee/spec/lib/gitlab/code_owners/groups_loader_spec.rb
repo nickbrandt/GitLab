@@ -58,6 +58,18 @@ describe Gitlab::CodeOwners::GroupsLoader do
       end
     end
 
+    context "input matches project.group" do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, :repository, namespace: group) }
+      let(:text) { "@#{project.group.full_path}" }
+
+      it "returns the project's group" do
+        load_groups
+
+        expect(entry).to have_received(:add_matching_groups_from).with([group])
+      end
+    end
+
     context 'input as array of strings' do
       let(:text) { super().lines }
 
