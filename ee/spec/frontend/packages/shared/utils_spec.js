@@ -1,4 +1,8 @@
-import { packageTypeToTrackCategory, beautifyPath, getPackageType } from 'ee/packages/shared/utils';
+import {
+  packageTypeToTrackCategory,
+  beautifyPath,
+  getPackageTypeLabel,
+} from 'ee/packages/shared/utils';
 import { PackageType, TrackingCategories } from 'ee/packages/shared/constants';
 
 describe('Packages shared utils', () => {
@@ -24,17 +28,18 @@ describe('Packages shared utils', () => {
     });
   });
 
-  describe('getPackageType', () => {
+  describe('getPackageTypeLabel', () => {
     describe.each`
       packageType | expectedResult
       ${'conan'}  | ${'Conan'}
       ${'maven'}  | ${'Maven'}
       ${'npm'}    | ${'NPM'}
       ${'nuget'}  | ${'NuGet'}
+      ${'pypi'}   | ${'PyPi'}
       ${'foo'}    | ${null}
     `(`package type`, ({ packageType, expectedResult }) => {
       it(`${packageType} should show as ${expectedResult}`, () => {
-        expect(getPackageType(packageType)).toBe(expectedResult);
+        expect(getPackageTypeLabel(packageType)).toBe(expectedResult);
       });
     });
   });

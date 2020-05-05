@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe EE::PackagesHelper do
-  let(:base_url) { "#{Gitlab.config.gitlab.url}/api/v4/" }
+  let_it_be(:base_url) { "#{Gitlab.config.gitlab.url}/api/v4/" }
 
   describe 'package_registry_instance_url' do
     it 'returns conant instance url when registry_type is conant' do
@@ -30,6 +30,16 @@ describe EE::PackagesHelper do
       url = helper.package_registry_project_url(1, :npm)
 
       expect(url).to eq("#{base_url}projects/1/packages/npm")
+    end
+  end
+
+  describe 'pypi_registry_url' do
+    let_it_be(:base_url_with_token) { base_url.sub('://', '://__token__:<your_personal_token>@') }
+
+    it 'returns the pypi registry url' do
+      url = helper.pypi_registry_url(1)
+
+      expect(url).to eq("#{base_url_with_token}projects/1/packages/pypi/simple")
     end
   end
 end

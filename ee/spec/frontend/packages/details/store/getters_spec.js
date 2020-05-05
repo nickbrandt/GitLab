@@ -10,6 +10,8 @@ import {
   npmSetupCommand,
   nugetInstallationCommand,
   nugetSetupCommand,
+  pypiPipCommand,
+  pypiSetupCommand,
 } from 'ee/packages/details/store/getters';
 import {
   conanPackage,
@@ -17,12 +19,14 @@ import {
   nugetPackage,
   mockPipelineInfo,
   mavenPackage as packageWithoutBuildInfo,
+  pypiPackage,
 } from '../../mock_data';
 import {
   generateMavenCommand,
   generateXmlCodeBlock,
   generateMavenSetupXml,
   registryUrl,
+  pypiSetupCommandStr,
 } from '../mock_data';
 import { generateConanRecipe } from 'ee/packages/details/utils';
 import { NpmManager } from 'ee/packages/details/constants';
@@ -36,6 +40,7 @@ describe('Getters PackageDetails Store', () => {
     mavenPath: registryUrl,
     npmPath: registryUrl,
     nugetPath: registryUrl,
+    pypiPath: registryUrl,
   };
 
   const setupState = (testState = {}) => {
@@ -60,6 +65,8 @@ describe('Getters PackageDetails Store', () => {
 
   const nugetInstallationCommandStr = `nuget install ${nugetPackage.name} -Source "GitLab"`;
   const nugetSetupCommandStr = `nuget source Add -Name "GitLab" -Source "${registryUrl}" -UserName <your_username> -Password <your_token>`;
+
+  const pypiPipCommandStr = `pip install ${pypiPackage.name} --index-url ${registryUrl}`;
 
   describe('packagePipeline', () => {
     it('should return the pipeline info when pipeline exists', () => {
@@ -87,6 +94,7 @@ describe('Getters PackageDetails Store', () => {
       ${packageWithoutBuildInfo} | ${'Maven'}
       ${npmPackage}              | ${'NPM'}
       ${nugetPackage}            | ${'NuGet'}
+      ${pypiPackage}             | ${'PyPi'}
     `(`package type`, ({ packageEntity, expectedResult }) => {
       beforeEach(() => setupState({ packageEntity }));
 
@@ -100,13 +108,13 @@ describe('Getters PackageDetails Store', () => {
     it('gets the correct conanInstallationCommand', () => {
       setupState({ packageEntity: conanPackage });
 
-      expect(conanInstallationCommand(state)).toEqual(conanInstallationCommandStr);
+      expect(conanInstallationCommand(state)).toBe(conanInstallationCommandStr);
     });
 
     it('gets the correct conanSetupCommand', () => {
       setupState({ packageEntity: conanPackage });
 
-      expect(conanSetupCommand(state)).toEqual(conanSetupCommandStr);
+      expect(conanSetupCommand(state)).toBe(conanSetupCommandStr);
     });
   });
 
@@ -114,19 +122,19 @@ describe('Getters PackageDetails Store', () => {
     it('gets the correct mavenInstallationXml', () => {
       setupState();
 
-      expect(mavenInstallationXml(state)).toEqual(mavenInstallationXmlBlock);
+      expect(mavenInstallationXml(state)).toBe(mavenInstallationXmlBlock);
     });
 
     it('gets the correct mavenInstallationCommand', () => {
       setupState();
 
-      expect(mavenInstallationCommand(state)).toEqual(mavenCommandStr);
+      expect(mavenInstallationCommand(state)).toBe(mavenCommandStr);
     });
 
     it('gets the correct mavenSetupXml', () => {
       setupState();
 
-      expect(mavenSetupXml(state)).toEqual(mavenSetupXmlBlock);
+      expect(mavenSetupXml(state)).toBe(mavenSetupXmlBlock);
     });
   });
 
@@ -134,25 +142,25 @@ describe('Getters PackageDetails Store', () => {
     it('gets the correct npmInstallationCommand for NPM', () => {
       setupState({ packageEntity: npmPackage });
 
-      expect(npmInstallationCommand(state)(NpmManager.NPM)).toEqual(npmInstallStr);
+      expect(npmInstallationCommand(state)(NpmManager.NPM)).toBe(npmInstallStr);
     });
 
     it('gets the correct npmSetupCommand for NPM', () => {
       setupState({ packageEntity: npmPackage });
 
-      expect(npmSetupCommand(state)(NpmManager.NPM)).toEqual(npmSetupStr);
+      expect(npmSetupCommand(state)(NpmManager.NPM)).toBe(npmSetupStr);
     });
 
     it('gets the correct npmInstallationCommand for Yarn', () => {
       setupState({ packageEntity: npmPackage });
 
-      expect(npmInstallationCommand(state)(NpmManager.YARN)).toEqual(yarnInstallStr);
+      expect(npmInstallationCommand(state)(NpmManager.YARN)).toBe(yarnInstallStr);
     });
 
     it('gets the correct npmSetupCommand for Yarn', () => {
       setupState({ packageEntity: npmPackage });
 
-      expect(npmSetupCommand(state)(NpmManager.YARN)).toEqual(yarnSetupStr);
+      expect(npmSetupCommand(state)(NpmManager.YARN)).toBe(yarnSetupStr);
     });
   });
 
@@ -160,13 +168,27 @@ describe('Getters PackageDetails Store', () => {
     it('gets the correct nugetInstallationCommand', () => {
       setupState({ packageEntity: nugetPackage });
 
-      expect(nugetInstallationCommand(state)).toEqual(nugetInstallationCommandStr);
+      expect(nugetInstallationCommand(state)).toBe(nugetInstallationCommandStr);
     });
 
     it('gets the correct nugetSetupCommand', () => {
       setupState({ packageEntity: nugetPackage });
 
-      expect(nugetSetupCommand(state)).toEqual(nugetSetupCommandStr);
+      expect(nugetSetupCommand(state)).toBe(nugetSetupCommandStr);
+    });
+  });
+
+  describe('pypi string getters', () => {
+    it('gets the correct pypiPipCommand', () => {
+      setupState({ packageEntity: pypiPackage });
+
+      expect(pypiPipCommand(state)).toBe(pypiPipCommandStr);
+    });
+
+    it('gets the correct pypiSetupCommand', () => {
+      setupState({ pypiSetupPath: 'foo' });
+
+      expect(pypiSetupCommand(state)).toBe(pypiSetupCommandStr);
     });
   });
 });

@@ -2,6 +2,7 @@ import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
+import * as getters from 'ee/packages/details/store/getters';
 import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageTitle from 'ee/packages/details/components/package_title.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
@@ -11,6 +12,7 @@ import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
 import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
+import PypiInstallation from 'ee/packages/details/components/pypi_installation.vue';
 import {
   conanPackage,
   mavenPackage,
@@ -18,6 +20,7 @@ import {
   npmPackage,
   npmFiles,
   nugetPackage,
+  pypiPackage,
 } from '../../mock_data';
 import stubChildren from 'helpers/stub_children';
 
@@ -40,6 +43,7 @@ describe('PackagesApp', () => {
         npmPath: 'foo',
         npmHelpPath: 'foo',
       },
+      getters,
     });
 
     wrapper = mount(PackagesApp, {
@@ -63,6 +67,7 @@ describe('PackagesApp', () => {
   const mavenInstallation = () => wrapper.find(MavenInstallation);
   const conanInstallation = () => wrapper.find(ConanInstallation);
   const nugetInstallation = () => wrapper.find(NugetInstallation);
+  const pypiInstallation = () => wrapper.find(PypiInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -94,12 +99,6 @@ describe('PackagesApp', () => {
     expect(packageInformation(1)).toExist();
   });
 
-  it('renders package installation instructions for maven packages', () => {
-    createComponent();
-
-    expect(mavenInstallation()).toExist();
-  });
-
   it('does not render package metadata for npm as npm packages do not contain metadata', () => {
     createComponent(npmPackage, npmFiles);
 
@@ -107,16 +106,21 @@ describe('PackagesApp', () => {
     expect(allPackageInformation()).toHaveLength(1);
   });
 
-  it('renders package installation instructions for npm packages', () => {
-    createComponent(npmPackage, npmFiles);
+  describe('installation instructions', () => {
+    describe.each`
+      packageEntity   | selector
+      ${conanPackage} | ${conanInstallation}
+      ${mavenPackage} | ${mavenInstallation}
+      ${npmPackage}   | ${npmInstallation}
+      ${nugetPackage} | ${nugetInstallation}
+      ${pypiPackage}  | ${pypiInstallation}
+    `('renders', ({ packageEntity, selector }) => {
+      it(`${packageEntity.package_type} instructions`, () => {
+        createComponent({ packageEntity });
 
-    expect(npmInstallation()).toExist();
-  });
-
-  it('does not render package installation instructions for non npm packages', () => {
-    createComponent();
-
-    expect(npmInstallation().exists()).toBe(false);
+        expect(selector()).toExist();
+      });
+    });
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {
@@ -189,21 +193,5 @@ describe('PackagesApp', () => {
         expect.any(Object),
       );
     });
-  });
-
-  it('renders package installation instructions for conan packages', () => {
-    createComponent({
-      packageEntity: conanPackage,
-    });
-
-    expect(conanInstallation()).toExist();
-  });
-
-  it('renders package installation instructions for nuget packages', () => {
-    createComponent({
-      packageEntity: nugetPackage,
-    });
-
-    expect(nugetInstallation()).toExist();
   });
 });
