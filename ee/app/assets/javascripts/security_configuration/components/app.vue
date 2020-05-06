@@ -2,12 +2,16 @@
 import { GlLink } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import AutoFixSettings from './auto_fix_settings.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
     GlLink,
     Icon,
+    AutoFixSettings,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     autoDevopsEnabled: {
       type: Boolean,
@@ -29,6 +33,10 @@ export default {
     },
     features: {
       type: Array,
+      required: true,
+    },
+    autoFixSettingsProps: {
+      type: Object,
       required: true,
     },
   },
@@ -141,5 +149,6 @@ export default {
         </div>
       </div>
     </section>
+    <auto-fix-settings v-if="glFeatures.securityAutoFix" v-bind="autoFixSettingsProps" />
   </article>
 </template>

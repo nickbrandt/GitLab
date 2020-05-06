@@ -13,6 +13,7 @@ describe('Security Configuration App', () => {
         latestPipelinePath: 'http://latestPipelinePath',
         autoDevopsHelpPagePath: 'http://autoDevopsHelpPagePath',
         helpPagePath: 'http://helpPagePath',
+        autoFixSettingsProps: {},
         ...props,
       },
     });
