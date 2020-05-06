@@ -16,6 +16,7 @@ describe 'getting group information' do
       let(:group) { create(:group, :private) }
 
       before do
+        stub_licensed_features(group_saml: true)
         stub_feature_flags(enforced_sso_requires_session: true)
         saml_provider = create(:saml_provider, enforced_sso: true, group: group)
         create(:group_saml_identity, saml_provider: saml_provider, user: user)
