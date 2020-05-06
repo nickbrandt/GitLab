@@ -19264,6 +19264,9 @@ msgstr ""
 msgid "Snippets"
 msgstr ""
 
+msgid "Snippets with non-text files can only be edited via Git."
+msgstr ""
+
 msgid "SnippetsEmptyState|Code snippets"
 msgstr ""
 
