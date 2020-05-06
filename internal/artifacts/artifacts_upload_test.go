@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -32,11 +31,12 @@ const (
 	MetadataHeaderKey     = "Metadata-Status"
 	MetadataHeaderPresent = "present"
 	MetadataHeaderMissing = "missing"
+	Path                  = "/url/path"
 )
 
 func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProcessor func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/url/path/authorize", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(Path+"/authorize", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
 		}
@@ -49,7 +49,7 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 		}
 		w.Write(data)
 	})
-	mux.HandleFunc("/url/path", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(Path, func(w http.ResponseWriter, r *http.Request) {
 		opts := filestore.GetOpts(&authResponse)
 
 		if r.Method != "POST" {
@@ -110,14 +110,42 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 	return testhelper.TestServerWithHandler(nil, mux.ServeHTTP)
 }
 
-func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *httptest.Server) *httptest.ResponseRecorder {
-	httpRequest, err := http.NewRequest("POST", ts.URL+"/url/path", body)
-	if err != nil {
-		t.Fatal(err)
+type testServer struct {
+	url        string
+	writer     *multipart.Writer
+	buffer     *bytes.Buffer
+	fileWriter io.Writer
+	cleanup    func()
+}
+
+func setupWithTmpPath(t *testing.T, filename string, bodyProcessor func(w http.ResponseWriter, r *http.Request)) *testServer {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+
+	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, bodyProcessor)
+
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+	fileWriter, err := writer.CreateFormFile(filename, "my.file")
+	require.NotNil(t, fileWriter)
+	require.NoError(t, err)
+
+	cleanup := func() {
+		ts.Close()
+		require.NoError(t, os.RemoveAll(tempPath))
+		require.NoError(t, writer.Close())
 	}
+
+	return &testServer{url: ts.URL + Path, writer: writer, buffer: &buffer, fileWriter: fileWriter, cleanup: cleanup}
+}
+
+func testUploadArtifacts(t *testing.T, contentType, url string, body io.Reader) *httptest.ResponseRecorder {
+	httpRequest, err := http.NewRequest("POST", url, body)
+	require.NoError(t, err)
+
 	httpRequest.Header.Set("Content-Type", contentType)
 	response := httptest.NewRecorder()
-	parsedURL := helper.URLMustParse(ts.URL)
+	parsedURL := helper.URLMustParse(url)
 	roundTripper := roundtripper.NewTestBackendRoundTripper(parsedURL)
 	testhelper.ConfigureSecret()
 	apiClient := api.NewAPI(parsedURL, "123", roundTripper)
@@ -127,13 +155,7 @@ func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *h
 }
 
 func TestUploadHandlerAddingMetadata(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
-
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath},
+	s := setupWithTmpPath(t, "file",
 		func(w http.ResponseWriter, r *http.Request) {
 			jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), testhelper.ParseJWT)
 			require.NoError(t, err)
@@ -145,102 +167,49 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 			require.Contains(t, rewrittenFields, "metadata")
 		},
 	)
-	defer ts.Close()
+	defer s.cleanup()
 
-	var buffer bytes.Buffer
-	writer := multipart.NewWriter(&buffer)
-	file, err := writer.CreateFormFile("file", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	archive := zip.NewWriter(file)
-	defer archive.Close()
+	archive := zip.NewWriter(s.fileWriter)
+	file, err := archive.Create("test.file")
+	require.NotNil(t, file)
+	require.NoError(t, err)
 
-	fileInArchive, err := archive.Create("test.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(fileInArchive, "test")
-	archive.Close()
-	writer.Close()
+	require.NoError(t, archive.Close())
+	require.NoError(t, s.writer.Close())
 
-	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
 	testhelper.AssertResponseCode(t, response, http.StatusOK)
 	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
 func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
+	s := setupWithTmpPath(t, "file", nil)
+	defer s.cleanup()
+	require.NoError(t, s.writer.Close())
 
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, nil)
-	defer ts.Close()
-
-	var buffer bytes.Buffer
-	writer := multipart.NewWriter(&buffer)
-	file, err := writer.CreateFormFile("file", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "test")
-	writer.Close()
-
-	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
 	testhelper.AssertResponseCode(t, response, http.StatusOK)
 	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderMissing)
 }
 
 func TestUploadHandlerForMultipleFiles(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
+	s := setupWithTmpPath(t, "file", nil)
+	defer s.cleanup()
 
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, nil)
-	defer ts.Close()
+	file, err := s.writer.CreateFormFile("file", "my.file")
+	require.NotNil(t, file)
+	require.NoError(t, err)
+	require.NoError(t, s.writer.Close())
 
-	var buffer bytes.Buffer
-	writer := multipart.NewWriter(&buffer)
-	file, err := writer.CreateFormFile("file", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "test")
-
-	file, err = writer.CreateFormFile("file", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "test")
-	writer.Close()
-
-	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
 	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestUploadFormProcessing(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
+	s := setupWithTmpPath(t, "metadata", nil)
+	defer s.cleanup()
+	require.NoError(t, s.writer.Close())
 
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, nil)
-	defer ts.Close()
-
-	var buffer bytes.Buffer
-	writer := multipart.NewWriter(&buffer)
-	file, err := writer.CreateFormFile("metadata", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "test")
-	writer.Close()
-
-	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
 	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
