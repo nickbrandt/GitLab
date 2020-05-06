@@ -245,6 +245,18 @@ describe('EpicsListSectionComponent', () => {
               presetType: wrapper.vm.presetType,
               timeframe: wrapper.vm.timeframe,
               currentGroupId: wrapper.vm.currentGroupId,
+              clientWidth: wrapper.vm.clientWidth,
+              childLevel: 0,
+              childrenEpics: expect.objectContaining({
+                41: expect.arrayContaining([mockFormattedChildEpic1]),
+              }),
+              childrenFlags: expect.objectContaining({
+                1: {
+                  itemChildrenFetchInProgress: false,
+                  itemExpanded: false,
+                },
+              }),
+              hasFiltersApplied: false,
             },
           }),
         );

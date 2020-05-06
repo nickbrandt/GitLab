@@ -135,7 +135,7 @@ export default {
       if (this.$refs.epicItems && this.$refs.epicItems.length) {
         return {
           height: `${this.$el.clientHeight -
-            this.epics.length * this.$refs.epicItems[0].$el.clientHeight}px`,
+            this.displayedEpics.length * this.$refs.epicItems[0].$el.clientHeight}px`,
         };
       }
       return {};
@@ -154,10 +154,15 @@ export default {
       return {
         key: index,
         props: {
-          epic: this.epics[index],
+          epic: this.displayedEpics[index],
           presetType: this.presetType,
           timeframe: this.timeframe,
           currentGroupId: this.currentGroupId,
+          clientWidth: this.clientWidth,
+          childLevel: 0,
+          childrenEpics: this.childrenEpics,
+          childrenFlags: this.childrenFlags,
+          hasFiltersApplied: this.hasFiltersApplied,
         },
       };
     },
@@ -173,22 +178,21 @@ export default {
   <div :style="sectionContainerStyles" class="epics-list-section">
     <template v-if="glFeatures.roadmapBufferedRendering && !emptyRowContainerVisible">
       <virtual-list
-        v-if="epics.length"
+        v-if="displayedEpics.length"
         :size="$options.epicItemHeight"
         :remain="bufferSize"
         :bench="bufferSize"
         :scrollelement="roadmapShellEl"
         :item="$options.EpicItem"
-        :itemcount="epics.length"
+        :itemcount="displayedEpics.length"
         :itemprops="getEpicItemProps"
       />
     </template>
     <template v-else>
       <epic-item
-        v-for="(epic, index) in displayedEpics"
+        v-for="epic in displayedEpics"
         ref="epicItems"
         :key="generateKey(epic)"
-        :first-epic="index === 0"
         :preset-type="presetType"
         :epic="epic"
         :timeframe="timeframe"
