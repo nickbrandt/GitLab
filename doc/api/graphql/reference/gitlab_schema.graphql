@@ -143,6 +143,21 @@ Describes an alert from the project's Alert Management
 """
 type AlertManagementAlert {
   """
+  Timestamp the alert was created
+  """
+  createdAt: Time
+
+  """
+  Description of the alert
+  """
+  description: String
+
+  """
+  Alert details
+  """
+  details: JSON
+
+  """
   Timestamp the alert ended
   """
   endedAt: Time
@@ -151,6 +166,11 @@ type AlertManagementAlert {
   Number of events of this alert
   """
   eventCount: Int
+
+  """
+  List of hosts the alert came from
+  """
+  hosts: [String!]
 
   """
   Internal ID of the alert
@@ -186,6 +206,11 @@ type AlertManagementAlert {
   Title of the alert
   """
   title: String
+
+  """
+  Timestamp the alert was last updated
+  """
+  updatedAt: Time
 }
 
 """
