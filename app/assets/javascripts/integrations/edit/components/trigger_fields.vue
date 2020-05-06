@@ -35,12 +35,10 @@ export default {
     checkboxName(name) {
       return `service[${name}]`;
     },
-    checkboxTitle(title) {
-      return startCase(title);
-    },
     fieldName(name) {
       return `service[${name}]`;
     },
+    startCase,
   },
 };
 </script>
@@ -51,10 +49,10 @@ export default {
       <gl-form-group v-for="event in events" :key="event.title" :description="event.description">
         <input :name="checkboxName(event.name)" type="hidden" value="false" />
         <gl-form-checkbox v-model="event.value" :name="checkboxName(event.name)">
-          {{ checkboxTitle(event.title) }}
+          {{ startCase(event.title) }}
         </gl-form-checkbox>
         <gl-form-input
-          v-if="event.field.name"
+          v-if="event.field"
           v-model="event.field.value"
           :name="fieldName(event.field.name)"
           :placeholder="placeholder"
