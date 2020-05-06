@@ -44,7 +44,7 @@ class WikiPage
         transaction do
           updates = wiki_page_updates(wiki_page)
           found = find_by_canonical_slug(known_slugs, project)
-          meta = found || create(updates.merge(project_id: project.id))
+          meta = found || create!(updates.merge(project_id: project.id))
 
           meta.update_state(found.nil?, known_slugs, wiki_page, updates)
 
