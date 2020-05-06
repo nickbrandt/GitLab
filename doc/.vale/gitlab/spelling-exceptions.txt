@@ -301,6 +301,7 @@ Slack
 Slony
 SMTP
 Sourcegraph
+spidering
 Splunk
 SSH
 storable
