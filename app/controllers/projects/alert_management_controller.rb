@@ -7,6 +7,7 @@ class Projects::AlertManagementController < Projects::ApplicationController
   end
 
   def details
+    @alert_id = params[:id]
   end
 
   private
