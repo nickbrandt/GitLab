@@ -19,7 +19,7 @@ describe Members::UpdateService do
   end
 
   shared_examples_for 'logs an audit event' do
-    it do
+    specify do
       expect do
         described_class.new(current_user, params).execute(member, permission: permission)
       end.to change { SecurityEvent.count }.by(1)

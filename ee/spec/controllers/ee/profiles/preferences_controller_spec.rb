@@ -37,7 +37,7 @@ describe Profiles::PreferencesController do
 
     context 'when security dashboard feature is disabled' do
       context 'when security dashboard feature enabled' do
-        it do
+        specify do
           expect { subject }.not_to change { user.reload.group_view_security_dashboard? }
         end
       end

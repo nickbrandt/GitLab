@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Types::PermissionTypes::Epic do
-  it do
+  specify do
     expected_permissions = [:read_epic, :read_epic_iid, :update_epic, :destroy_epic,
                             :admin_epic, :create_epic, :create_note, :award_emoji]
 

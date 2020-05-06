@@ -28,7 +28,7 @@ describe MergeTrains::CreatePipelineService do
     shared_examples_for 'returns an error' do
       let(:expected_reason) { 'unknown' }
 
-      it do
+      specify do
         expect(subject[:status]).to eq(:error)
         expect(subject[:message]).to eq(expected_reason)
       end

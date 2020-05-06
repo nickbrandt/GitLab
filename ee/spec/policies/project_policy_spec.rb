@@ -117,25 +117,19 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it do
-          is_expected.to be_allowed(:admin_mirror)
-        end
+        it { is_expected.to be_allowed(:admin_mirror) }
       end
 
       context 'with owner' do
         let(:current_user) { owner }
 
-        it do
-          is_expected.to be_allowed(:admin_mirror)
-        end
+        it { is_expected.to be_allowed(:admin_mirror) }
       end
 
       context 'with developer' do
         let(:current_user) { developer }
 
-        it do
-          is_expected.to be_disallowed(:admin_mirror)
-        end
+        it { is_expected.to be_disallowed(:admin_mirror) }
       end
     end
 
@@ -147,17 +141,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it do
-          is_expected.to be_allowed(:admin_mirror)
-        end
+        it { is_expected.to be_allowed(:admin_mirror) }
       end
 
       context 'with owner' do
         let(:current_user) { owner }
 
-        it do
-          is_expected.to be_disallowed(:admin_mirror)
-        end
+        it { is_expected.to be_disallowed(:admin_mirror) }
       end
     end
 
@@ -169,17 +159,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it do
-          is_expected.to be_disallowed(:admin_mirror)
-        end
+        it { is_expected.to be_disallowed(:admin_mirror) }
       end
 
       context 'with owner' do
         let(:current_user) { owner }
 
-        it do
-          is_expected.to be_disallowed(:admin_mirror)
-        end
+        it { is_expected.to be_disallowed(:admin_mirror) }
       end
     end
 
@@ -191,17 +177,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it do
-          is_expected.to be_allowed(:admin_mirror)
-        end
+        it { is_expected.to be_allowed(:admin_mirror) }
       end
 
       context 'with owner' do
         let(:current_user) { owner }
 
-        it do
-          is_expected.to be_allowed(:admin_mirror)
-        end
+        it { is_expected.to be_allowed(:admin_mirror) }
       end
     end
   end
@@ -879,9 +861,7 @@ describe ProjectPolicy do
           stub_licensed_features(feature => true)
         end
 
-        it do
-          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
 
         context 'when feature is not available' do
           before do
@@ -1079,9 +1059,7 @@ describe ProjectPolicy do
         stub_licensed_features(code_review_analytics: true)
       end
 
-      it do
-        is_expected.to(allowed ? be_allowed(:read_code_review_analytics) : be_disallowed(:read_code_review_analytics))
-      end
+      it { is_expected.to(allowed ? be_allowed(:read_code_review_analytics) : be_disallowed(:read_code_review_analytics)) }
     end
 
     context 'with code review analytics is not available in license' do
@@ -1162,9 +1140,7 @@ describe ProjectPolicy do
           stub_application_setting(setting_name => setting)
         end
 
-        it do
-          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
 
@@ -1189,9 +1165,7 @@ describe ProjectPolicy do
           stub_application_setting(setting_name => setting)
         end
 
-        it do
-          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
   end
@@ -1244,9 +1218,7 @@ describe ProjectPolicy do
           stub_application_setting(setting_name => setting)
         end
 
-        it do
-          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
 
@@ -1271,9 +1243,7 @@ describe ProjectPolicy do
           stub_application_setting(setting_name => setting)
         end
 
-        it do
-          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
   end
@@ -1309,9 +1279,7 @@ describe ProjectPolicy do
         stub_licensed_features(compliance_framework: feature_enabled)
       end
 
-      it do
-        is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
-      end
+      it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
     end
   end
 end

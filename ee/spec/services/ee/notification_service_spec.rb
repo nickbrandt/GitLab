@@ -415,7 +415,7 @@ describe EE::NotificationService, :mailer do
       end
 
       describe '#new_note' do
-        it do
+        specify do
           reset_delivered_emails!
 
           expect(SentNotification).to receive(:record).with(epic, any_args).exactly(9).times

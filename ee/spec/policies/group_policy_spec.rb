@@ -59,9 +59,7 @@ describe GroupPolicy do
       subject { described_class.new(non_group_member, private_group) }
 
       context 'when user is not invited to any of the group projects' do
-        it do
-          is_expected.not_to be_allowed(:read_group_contribution_analytics)
-        end
+        it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
       end
 
       context 'when user is invited to a group project, but not to the group' do
@@ -71,9 +69,7 @@ describe GroupPolicy do
           private_project.add_guest(non_group_member)
         end
 
-        it do
-          is_expected.not_to be_allowed(:read_group_contribution_analytics)
-        end
+        it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
       end
     end
   end
@@ -628,7 +624,7 @@ describe GroupPolicy do
         stub_licensed_features(security_dashboard: true)
       end
 
-      it do
+      specify do
         expect_allowed(:read_group)
         expect_allowed(:read_group_security_dashboard)
         expect_disallowed(:upload_file)

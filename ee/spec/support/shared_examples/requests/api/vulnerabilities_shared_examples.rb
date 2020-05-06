@@ -29,7 +29,7 @@ end
 RSpec.shared_examples 'responds with "not found" for an unknown vulnerability ID' do
   let(:vulnerability_id) { 0 }
 
-  it do
+  specify do
     subject
 
     expect(response).to have_gitlab_http_status(:not_found)

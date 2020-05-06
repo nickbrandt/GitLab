@@ -27,7 +27,7 @@ describe MergeTrains::RefreshMergeRequestService do
     shared_examples_for 'drops the merge request from the merge train' do
       let(:expected_reason) { 'unknown' }
 
-      it do
+      specify do
         expect_next_instance_of(AutoMerge::MergeTrainService) do |service|
           expect(service).to receive(:abort).with(merge_request, expected_reason, hash_including(process_next: false))
         end
@@ -39,7 +39,7 @@ describe MergeTrains::RefreshMergeRequestService do
     shared_examples_for 'creates a pipeline for merge train' do
       let(:previous_ref) { 'refs/heads/master' }
 
-      it do
+      specify do
         expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
           allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: pipeline } }
           expect(pipeline_service).to receive(:execute).with(merge_request, previous_ref)
@@ -73,7 +73,7 @@ describe MergeTrains::RefreshMergeRequestService do
     end
 
     shared_examples_for 'does not create a pipeline' do
-      it do
+      specify do
         expect(service).not_to receive(:create_pipeline!)
 
         result = subject

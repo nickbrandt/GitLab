@@ -157,7 +157,7 @@ describe Git::BranchPushService do
     let(:commits_to_sync) { [] }
 
     shared_examples 'enqueues Jira sync worker' do
-      it do
+      specify do
         Sidekiq::Testing.fake! do
           expect(JiraConnect::SyncBranchWorker).to receive(:perform_async)
             .with(project.id, branch_to_sync, commits_to_sync)
@@ -169,7 +169,7 @@ describe Git::BranchPushService do
     end
 
     shared_examples 'does not enqueue Jira sync worker' do
-      it do
+      specify do
         Sidekiq::Testing.fake! do
           expect { subject.execute }.not_to change(JiraConnect::SyncBranchWorker.jobs, :size)
         end

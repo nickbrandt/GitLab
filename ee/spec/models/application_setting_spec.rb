@@ -95,7 +95,7 @@ describe ApplicationSetting do
       end
 
       with_them do
-        it do
+        specify do
           setting.update_column(:geo_node_allowed_ips, allowed_ips)
 
           expect(setting.reload.valid?).to eq(is_valid)
@@ -122,7 +122,7 @@ describe ApplicationSetting do
       end
 
       with_them do
-        it do
+        specify do
           setting.elasticsearch_url = elasticsearch_url
 
           expect(setting.valid?).to eq(is_valid)
