@@ -67,7 +67,7 @@ export default {
       return (this.hasCi && !this.ciStatus) || this.hasPipelineMustSucceedConflict;
     },
     hasPipelineMustSucceedConflict() {
-      return !this.hasCi && Boolean(this.pipelineMustSucceed);
+      return !this.hasCi && this.pipelineMustSucceed;
     },
     status() {
       return this.pipeline.details && this.pipeline.details.status

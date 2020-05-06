@@ -326,10 +326,7 @@ export default {
               </li>
             </ul>
           </span>
-          <div
-            class="media-body-wrap"
-            :class="{ 'space-children': !hasPipelineMustSucceedConflict }"
-          >
+          <div class="media-body-wrap space-children">
             <template v-if="shouldShowMergeControls">
               <label v-if="mr.canRemoveSourceBranch">
                 <input
