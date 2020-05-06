@@ -118,11 +118,15 @@ type testServer struct {
 	cleanup    func()
 }
 
-func setupWithTmpPath(t *testing.T, filename string, bodyProcessor func(w http.ResponseWriter, r *http.Request)) *testServer {
+func setupWithTmpPath(t *testing.T, filename string, authResponse *api.Response, bodyProcessor func(w http.ResponseWriter, r *http.Request)) *testServer {
 	tempPath, err := ioutil.TempDir("", "uploads")
 	require.NoError(t, err)
 
-	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, bodyProcessor)
+	if authResponse == nil {
+		authResponse = &api.Response{TempPath: tempPath}
+	}
+
+	ts := testArtifactsUploadServer(t, *authResponse, bodyProcessor)
 
 	var buffer bytes.Buffer
 	writer := multipart.NewWriter(&buffer)
@@ -155,7 +159,7 @@ func testUploadArtifacts(t *testing.T, contentType, url string, body io.Reader) 
 }
 
 func TestUploadHandlerAddingMetadata(t *testing.T) {
-	s := setupWithTmpPath(t, "file",
+	s := setupWithTmpPath(t, "file", nil,
 		func(w http.ResponseWriter, r *http.Request) {
 			jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), testhelper.ParseJWT)
 			require.NoError(t, err)
@@ -183,7 +187,7 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 }
 
 func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
-	s := setupWithTmpPath(t, "file", nil)
+	s := setupWithTmpPath(t, "file", nil, nil)
 	defer s.cleanup()
 	require.NoError(t, s.writer.Close())
 
@@ -193,7 +197,7 @@ func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
 }
 
 func TestUploadHandlerForMultipleFiles(t *testing.T) {
-	s := setupWithTmpPath(t, "file", nil)
+	s := setupWithTmpPath(t, "file", nil, nil)
 	defer s.cleanup()
 
 	file, err := s.writer.CreateFormFile("file", "my.file")
@@ -206,8 +210,47 @@ func TestUploadHandlerForMultipleFiles(t *testing.T) {
 }
 
 func TestUploadFormProcessing(t *testing.T) {
-	s := setupWithTmpPath(t, "metadata", nil)
+	s := setupWithTmpPath(t, "metadata", nil, nil)
 	defer s.cleanup()
+	require.NoError(t, s.writer.Close())
+
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
+}
+
+func TestLsifFileProcessing(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+
+	s := setupWithTmpPath(t, "file", &api.Response{TempPath: tempPath, ProcessLsif: true}, nil)
+	defer s.cleanup()
+
+	file, err := os.Open("../../testdata/lsif/valid.lsif.zip")
+	require.NoError(t, err)
+
+	_, err = io.Copy(s.fileWriter, file)
+	require.NoError(t, err)
+	require.NoError(t, file.Close())
+	require.NoError(t, s.writer.Close())
+
+	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
+	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
+}
+
+func TestInvalidLsifFileProcessing(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+
+	s := setupWithTmpPath(t, "file", &api.Response{TempPath: tempPath, ProcessLsif: true}, nil)
+	defer s.cleanup()
+
+	file, err := os.Open("../../testdata/lsif/invalid.lsif.zip")
+	require.NoError(t, err)
+
+	_, err = io.Copy(s.fileWriter, file)
+	require.NoError(t, err)
+	require.NoError(t, file.Close())
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)

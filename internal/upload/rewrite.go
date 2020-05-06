@@ -14,6 +14,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lsif_transformer/parser"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload/exif"
 )
 
@@ -140,6 +141,11 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		inputReader = p
 	}
 
+	inputReader, err := rew.handleLsifUpload(inputReader, opts.LocalTempPath)
+	if err != nil {
+		return err
+	}
+
 	fh, err := filestore.SaveFileFromReader(ctx, inputReader, -1, opts)
 	if err != nil {
 		switch err {
@@ -158,6 +164,28 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	multipartFileUploadBytes.WithLabelValues(rew.filter.Name()).Add(float64(fh.Size))
 
 	return rew.filter.ProcessFile(ctx, name, fh, rew.writer)
+}
+
+func (rew *rewriter) handleLsifUpload(reader io.Reader, tempPath string) (io.Reader, error) {
+	if rew.preauth.ProcessLsif {
+		p, err := parser.NewParser(reader, tempPath)
+		if err != nil {
+			return nil, err
+		}
+
+		z, err := p.ZipReader()
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.Close(); err != nil {
+			return nil, err
+		}
+
+		return z, nil
+	}
+
+	return reader, nil
 }
 
 func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {
