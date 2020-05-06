@@ -1,0 +1,5 @@
+---
+title: Change default concurrency of merge trains to twenty
+merge_request: 30599
+author:
+type: changed
