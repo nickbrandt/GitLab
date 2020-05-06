@@ -33,7 +33,7 @@ describe('IDE merge request item', () => {
       `/project/${vm.item.projectPathWithNamespace}/merge_requests/${vm.item.iid}`,
     ).href;
 
-    expect(vm.$el).toMatch('a');
+    expect(vm.$el.tagName.toLowerCase()).toBe('a');
     expect(vm.$el).toHaveAttr('href', expectedHref);
   });
 

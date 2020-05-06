@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { resetStore } from 'spec/ide/helpers';
+import { createComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { resetStore } from 'jest/ide/helpers';
 import store from '~/ide/stores';
 import radioGroup from '~/ide/components/commit_sidebar/radio_group.vue';
 
@@ -41,13 +41,8 @@ describe('IDE commit sidebar radio group', () => {
         radioGroup,
       },
       store,
-      template: `
-        <radio-group
-          value="1"
-        >
-          Testing slot
-        </radio-group>
-      `,
+      render: createElement =>
+        createElement('radio-group', { props: { value: '1' } }, 'Testing slot'),
     });
 
     vm.$mount();

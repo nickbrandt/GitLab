@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import _ from 'lodash';
-import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { TEST_HOST } from 'spec/test_constants';
+import { createComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { TEST_HOST } from '../../helpers/test_constants';
 import { createStore } from '~/ide/stores';
 import IdeStatusBar from '~/ide/components/ide_status_bar.vue';
 import { rightSidebarViews } from '~/ide/constants';
@@ -45,26 +45,24 @@ describe('ideStatusBar', () => {
     });
 
     describe('commitAgeUpdate', () => {
-      beforeEach(function() {
-        jasmine.clock().install();
-        spyOn(vm, 'commitAgeUpdate').and.callFake(() => {});
-        vm.startTimer();
+      beforeEach(() => {
+        jest.spyOn(vm, 'commitAgeUpdate').mockImplementation(() => {});
       });
 
-      afterEach(function() {
-        jasmine.clock().uninstall();
+      afterEach(() => {
+        jest.clearAllTimers();
       });
 
       it('gets called every second', () => {
         expect(vm.commitAgeUpdate).not.toHaveBeenCalled();
 
-        jasmine.clock().tick(1100);
+        jest.advanceTimersByTime(1000);
 
-        expect(vm.commitAgeUpdate.calls.count()).toEqual(1);
+        expect(vm.commitAgeUpdate.mock.calls.length).toEqual(1);
 
-        jasmine.clock().tick(1000);
+        jest.advanceTimersByTime(1000);
 
-        expect(vm.commitAgeUpdate.calls.count()).toEqual(2);
+        expect(vm.commitAgeUpdate.mock.calls.length).toEqual(2);
       });
     });
 
@@ -76,7 +74,7 @@ describe('ideStatusBar', () => {
 
     describe('pipeline status', () => {
       it('opens right sidebar on clicking icon', done => {
-        spyOn(vm, 'openRightPane');
+        jest.spyOn(vm, 'openRightPane').mockImplementation(() => {});
         Vue.set(vm.$store.state.pipelines, 'latestPipeline', {
           details: {
             status: {
