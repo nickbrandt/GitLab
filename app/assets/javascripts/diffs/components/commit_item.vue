@@ -2,6 +2,8 @@
 import { mapActions } from 'vuex';
 import { GlButtonGroup, GlButton, GlIcon, GlTooltipDirective } from '@gitlab/ui';
 
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
@@ -48,6 +50,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     commit: {
       type: Object,
@@ -160,7 +163,10 @@ export default {
             class="btn btn-default"
           />
         </div>
-        <div v-if="hasNeighborCommits" class="commit-nav-buttons ml-3">
+        <div
+          v-if="hasNeighborCommits && glFeatures.mrCommitNeighborNav"
+          class="commit-nav-buttons ml-3"
+        >
           <gl-button-group>
             <gl-button
               :href="previousCommitUrl"
