@@ -43,7 +43,7 @@ To start multiple processes:
 
    ```ruby
    sidekiq['queue_groups'] = [
-     "elastic_indexer, elastic_commit_indexer",
+     "cronjob:elastic_index_bulk_cron, elastic_indexer, elastic_commit_indexer",
      "mailers",
      "*"
    ]
@@ -243,8 +243,8 @@ like regular Sidekiq logs.
 ## Ignore all GitHub import queues
 
 When [importing from GitHub](../../user/project/import/github.md), Sidekiq might
-use all of its resources to perform those operations. To set up a separate
-`sidekiq-cluster` process to ignore all GitHub import-related queues:
+use all of its resources to perform those operations. To prevent this, set up a 
+separate `sidekiq-cluster` process to ignore all GitHub import-related queues:
 
 1. Edit `/etc/gitlab/gitlab.rb` and add:
 
