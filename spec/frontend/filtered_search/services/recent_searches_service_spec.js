@@ -1,18 +1,21 @@
 import RecentSearchesService from '~/filtered_search/services/recent_searches_service';
 import RecentSearchesServiceError from '~/filtered_search/services/recent_searches_service_error';
 import AccessorUtilities from '~/lib/utils/accessor';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
+
+useLocalStorageSpy();
 
 describe('RecentSearchesService', () => {
   let service;
 
   beforeEach(() => {
     service = new RecentSearchesService();
-    window.localStorage.removeItem(service.localStorageKey);
+    localStorage.removeItem(service.localStorageKey);
   });
 
   describe('fetch', () => {
     beforeEach(() => {
-      spyOn(RecentSearchesService, 'isAvailable').and.returnValue(true);
+      jest.spyOn(RecentSearchesService, 'isAvailable').mockReturnValue(true);
     });
 
     it('should default to empty array', done => {
@@ -27,33 +30,33 @@ describe('RecentSearchesService', () => {
     });
 
     it('should reject when unable to parse', done => {
-      window.localStorage.setItem(service.localStorageKey, 'fail');
+      jest.spyOn(localStorage, 'getItem').mockReturnValue('fail');
       const fetchItemsPromise = service.fetch();
 
       fetchItemsPromise
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(SyntaxError));
+          expect(error).toEqual(expect.any(SyntaxError));
         })
         .then(done)
         .catch(done.fail);
     });
 
     it('should reject when service is unavailable', done => {
-      RecentSearchesService.isAvailable.and.returnValue(false);
+      RecentSearchesService.isAvailable.mockReturnValue(false);
 
       service
         .fetch()
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(Error));
+          expect(error).toEqual(expect.any(Error));
         })
         .then(done)
         .catch(done.fail);
     });
 
     it('should return items from localStorage', done => {
-      window.localStorage.setItem(service.localStorageKey, '["foo", "bar"]');
+      jest.spyOn(localStorage, 'getItem').mockReturnValue('["foo", "bar"]');
       const fetchItemsPromise = service.fetch();
 
       fetchItemsPromise
@@ -66,9 +69,9 @@ describe('RecentSearchesService', () => {
 
     describe('if .isAvailable returns `false`', () => {
       beforeEach(() => {
-        RecentSearchesService.isAvailable.and.returnValue(false);
+        RecentSearchesService.isAvailable.mockReturnValue(false);
 
-        spyOn(window.localStorage, 'getItem');
+        jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {});
       });
 
       it('should not call .getItem', done => {
@@ -77,7 +80,7 @@ describe('RecentSearchesService', () => {
           .then(done.fail)
           .catch(err => {
             expect(err).toEqual(new RecentSearchesServiceError());
-            expect(window.localStorage.getItem).not.toHaveBeenCalled();
+            expect(localStorage.getItem).not.toHaveBeenCalled();
           })
           .then(done)
           .catch(done.fail);
@@ -87,22 +90,22 @@ describe('RecentSearchesService', () => {
 
   describe('setRecentSearches', () => {
     beforeEach(() => {
-      spyOn(RecentSearchesService, 'isAvailable').and.returnValue(true);
+      jest.spyOn(RecentSearchesService, 'isAvailable').mockReturnValue(true);
     });
 
     it('should save things in localStorage', () => {
+      jest.spyOn(localStorage, 'setItem');
       const items = ['foo', 'bar'];
       service.save(items);
-      const newLocalStorageValue = window.localStorage.getItem(service.localStorageKey);
 
-      expect(JSON.parse(newLocalStorageValue)).toEqual(items);
+      expect(localStorage.setItem).toHaveBeenCalledWith(expect.any(String), JSON.stringify(items));
     });
   });
 
   describe('save', () => {
     beforeEach(() => {
-      spyOn(window.localStorage, 'setItem');
-      spyOn(RecentSearchesService, 'isAvailable');
+      jest.spyOn(localStorage, 'setItem');
+      jest.spyOn(RecentSearchesService, 'isAvailable').mockImplementation(() => {});
     });
 
     describe('if .isAvailable returns `true`', () => {
@@ -113,27 +116,27 @@ describe('RecentSearchesService', () => {
       };
 
       beforeEach(() => {
-        RecentSearchesService.isAvailable.and.returnValue(true);
+        RecentSearchesService.isAvailable.mockReturnValue(true);
 
-        spyOn(JSON, 'stringify').and.returnValue(searchesString);
+        jest.spyOn(JSON, 'stringify').mockReturnValue(searchesString);
       });
 
       it('should call .setItem', () => {
         RecentSearchesService.prototype.save.call(recentSearchesService);
 
-        expect(window.localStorage.setItem).toHaveBeenCalledWith(localStorageKey, searchesString);
+        expect(localStorage.setItem).toHaveBeenCalledWith(localStorageKey, searchesString);
       });
     });
 
     describe('if .isAvailable returns `false`', () => {
       beforeEach(() => {
-        RecentSearchesService.isAvailable.and.returnValue(false);
+        RecentSearchesService.isAvailable.mockReturnValue(false);
       });
 
       it('should not call .setItem', () => {
         RecentSearchesService.prototype.save();
 
-        expect(window.localStorage.setItem).not.toHaveBeenCalled();
+        expect(localStorage.setItem).not.toHaveBeenCalled();
       });
     });
   });
@@ -142,7 +145,7 @@ describe('RecentSearchesService', () => {
     let isAvailable;
 
     beforeEach(() => {
-      spyOn(AccessorUtilities, 'isLocalStorageAccessSafe').and.callThrough();
+      jest.spyOn(AccessorUtilities, 'isLocalStorageAccessSafe');
 
       isAvailable = RecentSearchesService.isAvailable();
     });
