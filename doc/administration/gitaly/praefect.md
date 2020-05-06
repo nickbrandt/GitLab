@@ -214,16 +214,12 @@ application server, or a Gitaly node.
 1. Configure **Praefect** to listen on network interfaces by editing
    `/etc/gitlab/gitlab.rb`:
 
-   You will need to replace:
-
-   - `PRAEFECT_HOST` with the IP address or hostname of the Praefect node
-
    ```ruby
-   praefect['listen_addr'] = 'PRAEFECT_HOST:2305'
+   praefect['listen_addr'] = '0.0.0.0:2305'
 
    # Enable Prometheus metrics access to Praefect. You must use firewalls
    # to restrict access to this address/port.
-   praefect['prometheus_listen_addr'] = 'PRAEFECT_HOST:9652'
+   praefect['prometheus_listen_addr'] = '0.0.0.0:9652'
    ```
 
 1. Configure a strong `auth_token` for **Praefect** by editing
@@ -340,10 +336,19 @@ application server, or a Gitaly node.
    will be an option to favor consistency by marking [out-of-date repositories
    read-only](https://gitlab.com/gitlab-org/gitaly/-/issues/2630).
 
-1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
+1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
+   Praefect](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell
    gitlab-ctl reconfigure
+   ```
+
+1. To ensure that Praefect [has updated its Prometheus listen
+   address](https://gitlab.com/gitlab-org/gitaly/-/issues/2734), [restart
+   Gitaly](../restart_gitlab.md#omnibus-gitlab-restart):
+
+   ```shell
+   gitlab-ctl restart praefect
    ```
 
 1. Verify that Praefect can reach PostgreSQL:
@@ -355,6 +360,8 @@ application server, or a Gitaly node.
    If the check fails, make sure you have followed the steps correctly. If you
    edit `/etc/gitlab/gitlab.rb`, remember to run `sudo gitlab-ctl reconfigure`
    again before trying the `sql-ping` command.
+
+**The steps above must be completed for each Praefect node!**
 
 ### Gitaly
 
@@ -421,18 +428,14 @@ documentation](index.md#3-gitaly-server-configuration).
 1. Configure **Gitaly** to listen on network interfaces by editing
    `/etc/gitlab/gitlab.rb`:
 
-   You will need to replace:
-
-   - `GITALY_HOST` with the IP address or hostname of the Gitaly node
-
    ```ruby
    # Make Gitaly accept connections on all network interfaces.
    # Use firewalls to restrict access to this address/port.
-   gitaly['listen_addr'] = 'GITALY_HOST:8075'
+   gitaly['listen_addr'] = '0.0.0.0:8075'
 
    # Enable Prometheus metrics access to Gitaly. You must use firewalls
    # to restrict access to this address/port.
-   gitaly['prometheus_listen_addr'] = 'GITALY_HOST:9236'
+   gitaly['prometheus_listen_addr'] = '0.0.0.0:9236'
    ```
 
 1. Configure a strong `auth_token` for **Gitaly** by editing
@@ -486,13 +489,16 @@ documentation](index.md#3-gitaly-server-configuration).
    })
    ```
 
-1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure Gitaly](../restart_gitlab.md#omnibus-gitlab-reconfigure):
+1. Save the changes to `/etc/gitlab/gitlab.rb` and [reconfigure
+   Gitaly](../restart_gitlab.md#omnibus-gitlab-reconfigure):
 
    ```shell
    gitlab-ctl reconfigure
    ```
 
-1. To ensure that Gitaly [has updated its Prometheus listen address](https://gitlab.com/gitlab-org/gitaly/-/issues/2521), [restart Gitaly](../restart_gitlab.md#omnibus-gitlab-restart):
+1. To ensure that Gitaly [has updated its Prometheus listen
+   address](https://gitlab.com/gitlab-org/gitaly/-/issues/2734), [restart
+   Gitaly](../restart_gitlab.md#omnibus-gitlab-restart):
 
    ```shell
    gitlab-ctl restart gitaly
@@ -577,7 +583,7 @@ Particular attention should be shown to:
    `/etc/gitlab/gitlab.rb`
 
    ```ruby
-   gitaly['listen_addr'] = 'GITLAB_HOST:8075'
+   gitaly['listen_addr'] = '0.0.0.0:8075'
    ```
 
 1. Configure the `gitlab_shell['secret_token']` so that callbacks from Gitaly
@@ -636,6 +642,14 @@ Particular attention should be shown to:
 
    ```shell
    gitlab-ctl reconfigure
+   ```
+
+1. To ensure that Gitaly [has updated its Prometheus listen
+   address](https://gitlab.com/gitlab-org/gitaly/-/issues/2734), [restart
+   Gitaly](../restart_gitlab.md#omnibus-gitlab-restart):
+
+   ```shell
+   gitlab-ctl restart gitaly
    ```
 
 1. Verify each `gitlab-shell` on each Gitaly instance can reach GitLab. On each Gitaly instance run:
