@@ -86,9 +86,6 @@ export default {
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
-    hasCustomizableCycleAnalytics() {
-      return Boolean(this.glFeatures.customizableCycleAnalytics);
-    },
     shouldDisplayFilters() {
       return this.selectedGroup && !this.errorCode;
     },
@@ -96,7 +93,7 @@ export default {
       return this.featureFlags.hasDurationChart && !this.hasNoAccessError && !this.isLoading;
     },
     shouldDisplayTypeOfWorkCharts() {
-      return this.featureFlags.hasTasksByTypeChart && !this.hasNoAccessError && !this.isLoading;
+      return !this.hasNoAccessError && !this.isLoading;
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
@@ -120,7 +117,6 @@ export default {
     this.setFeatureFlags({
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
       hasDurationChartMedian: this.glFeatures.cycleAnalyticsScatterplotMedianEnabled,
-      hasTasksByTypeChart: this.glFeatures.tasksByTypeChart,
     });
   },
   methods: {
@@ -281,7 +277,7 @@ export default {
                 :medians="medians"
                 :is-creating-custom-stage="isCreatingCustomStage"
                 :custom-stage-form-active="customStageFormActive"
-                :can-edit-stages="hasCustomizableCycleAnalytics"
+                :can-edit-stages="true"
                 :custom-ordering="enableCustomOrdering"
                 @reorderStage="onStageReorder"
                 @selectStage="onStageSelect"

@@ -935,21 +935,5 @@ describe 'Group Value Stream Analytics', :js do
         end
       end
     end
-
-    context 'not enabled' do
-      before do
-        stub_feature_flags(customizable_cycle_analytics: false)
-
-        select_group
-      end
-
-      context 'Add a stage button' do
-        it 'is not visible' do
-          expect(page).to have_selector('.js-add-stage-button', visible: false)
-        end
-      end
-
-      it_behaves_like 'manual ordering disabled'
-    end
   end
 end
