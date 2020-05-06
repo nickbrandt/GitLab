@@ -551,6 +551,16 @@ Particular attention should be shown to:
    sudo -i
    ```
 
+1. Configure the `external_url` so that files could be served by GitLab
+   by proper endpoint access by editing `/etc/gitlab/gitlab.rb`:
+
+   You will need to replace `GITLAB_SERVER_URL` with the real external facing
+   URL on which current GitLab instance is serving:
+
+   ```ruby
+   external_url 'GITLAB_SERVER_URL'
+   ```
+
 1. Add the Praefect cluster as a storage location by editing
    `/etc/gitlab/gitlab.rb`.
 
@@ -588,16 +598,6 @@ Particular attention should be shown to:
 
    ```ruby
    gitlab_shell['secret_token'] = 'GITLAB_SHELL_SECRET_TOKEN'
-   ```
-
-1. Configure the `external_url` so that files could be served by GitLab
-   by proper endpoint access by editing `/etc/gitlab/gitlab.rb`:
-
-   You will need to replace `GITLAB_SERVER_URL` with the real external facing URL on which
-   current GitLab instance is serving:
-
-   ```ruby
-   external_url 'GITLAB_SERVER_URL'
    ```
 
 1. Add Prometheus monitoring settings by editing `/etc/gitlab/gitlab.rb`.
