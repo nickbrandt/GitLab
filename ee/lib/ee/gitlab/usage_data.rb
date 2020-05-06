@@ -148,7 +148,7 @@ module EE
           super.tap do |usage_data|
             usage_data[:counts].merge!(
               {
-                dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
+                dependency_list_usages_total: redis_usage_data { ::Gitlab::UsageCounters::DependencyList.usage_totals[:total] },
                 epics: count(::Epic),
                 feature_flags: count(Operations::FeatureFlag),
                 geo_nodes: count(::GeoNode),
@@ -156,7 +156,7 @@ module EE
                 issues_with_health_status: count(::Issue.with_health_status),
                 ldap_keys: count(::LDAPKey),
                 ldap_users: count(::User.ldap, 'users.id'),
-                pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
+                pod_logs_usages_total: redis_usage_data { ::Gitlab::UsageCounters::PodLogs.usage_totals[:total] },
                 projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
                 merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                 merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
