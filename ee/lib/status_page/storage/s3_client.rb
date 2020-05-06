@@ -45,7 +45,7 @@ module StatusPage
 
             objects = response.contents.map { |obj| { key: obj.key } }
             # Batch delete in sets determined by default max_key argument that can be passed to list_objects_v2
-            client.delete_objects({ bucket: bucket_name, delete: { objects: objects } })
+            client.delete_objects({ bucket: bucket_name, delete: { objects: objects } }) unless objects.empty?
           end
         end
 

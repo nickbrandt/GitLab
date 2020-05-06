@@ -45,20 +45,20 @@ describe StatusPage::PublishService do
     describe 'unpublish details' do
       let_it_be(:issue) { create(:issue, :confidential, project: project) }
 
-      context 'when deletion succeeds' do
-        it 'deletes incident details and upload list' do
-          expect_to_delete_details(issue)
+      context 'when unpublish succeeds' do
+        it 'unpublishes incident details and uploads incident list' do
+          expect_to_unpublish(error?: false)
           expect_to_upload_list
 
           expect(result).to be_success
         end
       end
 
-      context 'when deletion fails' do
-        it 'propagates the exception' do
-          expect_to_delete_details(issue, status: 403)
+      context 'when unpublish service responses with error' do
+        it 'returns the response' do
+          response = expect_to_unpublish(error?: true)
 
-          expect { result }.to raise_error(StatusPage::Storage::Error)
+          expect(result).to be(response)
         end
       end
     end
@@ -94,6 +94,15 @@ describe StatusPage::PublishService do
   end
 
   private
+
+  def expect_to_unpublish(**response_kwargs)
+    service_response = double(**response_kwargs)
+    expect_next_instance_of(StatusPage::UnpublishDetailsService) do |service|
+      expect(service).to receive(:execute).and_return(service_response)
+    end
+
+    service_response
+  end
 
   def expect_to_upload_details(issue, **kwargs)
     stub_aws_request(:put, StatusPage::Storage.details_path(issue.iid), **kwargs)
