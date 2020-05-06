@@ -59,9 +59,9 @@ module EE
 
         def identity_provider
           strong_memoize(:identity_provider) do
-            next 'group_scim' if scim_identities_enabled?
+            next ::Users::BuildService::GROUP_SCIM_PROVIDER if scim_identities_enabled?
 
-            'group_saml'
+            ::Users::BuildService::GROUP_SAML_PROVIDER
           end
         end
 
