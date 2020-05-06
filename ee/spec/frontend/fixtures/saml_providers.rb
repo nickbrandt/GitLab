@@ -4,20 +4,22 @@ require 'spec_helper'
 describe Groups::SamlProvidersController, '(JavaScript fixtures)', type: :controller do
   include JavaScriptFixturesHelpers
 
-  let(:group) { create(:group, :private) }
-  let(:user) { create(:user) }
+  let_it_be(:group) { create(:group, :private) }
+  let_it_be(:user) { create(:user) }
 
   render_views
 
-  before(:all) do
+  before_all do
     clean_frontend_fixtures('groups/saml_providers/')
+
+    group.add_owner(user)
   end
 
   before do
-    sign_in(user)
-    group.add_owner(user)
     allow(Devise).to receive(:omniauth_providers).and_return(%i(group_saml))
     stub_licensed_features(group_saml: true)
+
+    sign_in(user)
   end
 
   it 'groups/saml_providers/show.html' do

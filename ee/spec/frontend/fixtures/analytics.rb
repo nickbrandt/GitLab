@@ -4,34 +4,34 @@ require 'spec_helper'
 describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   include JavaScriptFixturesHelpers
 
-  let(:group) { create(:group)}
-  let(:project) { create(:project, :repository, namespace: group) }
-  let(:user) { create(:user, :admin) }
-  # let(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
-  let(:milestone) { create(:milestone, project: project) }
-  # let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
+  let_it_be(:group) { create(:group)}
+  let_it_be(:project) { create(:project, :repository, namespace: group) }
+  let_it_be(:user) { create(:user, :admin) }
+  # let_it_be(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
+  let_it_be(:milestone) { create(:milestone, project: project) }
+  # let_it_be(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
 
-  let(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
-  let(:issue_1) { create(:issue, project: project, created_at: 5.days.ago) }
-  let(:issue_2) { create(:issue, project: project, created_at: 4.days.ago) }
-  let(:issue_3) { create(:issue, project: project, created_at: 3.days.ago) }
+  let_it_be(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
+  let_it_be(:issue_1) { create(:issue, project: project, created_at: 5.days.ago) }
+  let_it_be(:issue_2) { create(:issue, project: project, created_at: 4.days.ago) }
+  let_it_be(:issue_3) { create(:issue, project: project, created_at: 3.days.ago) }
 
-  let(:label) { create(:group_label, name: 'in-code-review', group: group) }
+  let_it_be(:label) { create(:group_label, name: 'in-code-review', group: group) }
 
-  let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
-  let(:mr_1) { create(:merge_request, source_project: project, allow_broken: true, created_at: 20.days.ago) }
-  let(:mr_2) { create(:merge_request, source_project: project, allow_broken: true, created_at: 19.days.ago) }
-  let(:mr_3) { create(:merge_request, source_project: project, allow_broken: true, created_at: 18.days.ago) }
+  let_it_be(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
+  let_it_be(:mr_1) { create(:merge_request, source_project: project, allow_broken: true, created_at: 20.days.ago) }
+  let_it_be(:mr_2) { create(:merge_request, source_project: project, allow_broken: true, created_at: 19.days.ago) }
+  let_it_be(:mr_3) { create(:merge_request, source_project: project, allow_broken: true, created_at: 18.days.ago) }
 
-  let(:pipeline_1) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_1.source_branch, sha: mr_1.source_branch_sha, head_pipeline_of: mr_1) }
-  let(:pipeline_2) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_2.source_branch, sha: mr_2.source_branch_sha, head_pipeline_of: mr_2) }
-  let(:pipeline_3) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_3.source_branch, sha: mr_3.source_branch_sha, head_pipeline_of: mr_3) }
+  let_it_be(:pipeline_1) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_1.source_branch, sha: mr_1.source_branch_sha, head_pipeline_of: mr_1) }
+  let_it_be(:pipeline_2) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_2.source_branch, sha: mr_2.source_branch_sha, head_pipeline_of: mr_2) }
+  let_it_be(:pipeline_3) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_3.source_branch, sha: mr_3.source_branch_sha, head_pipeline_of: mr_3) }
 
-  let(:build_1) { create(:ci_build, :success, pipeline: pipeline_1, author: user) }
-  let(:build_2) { create(:ci_build, :success, pipeline: pipeline_2, author: user) }
-  let(:build_3) { create(:ci_build, :success, pipeline: pipeline_3, author: user) }
+  let_it_be(:build_1) { create(:ci_build, :success, pipeline: pipeline_1, author: user) }
+  let_it_be(:build_2) { create(:ci_build, :success, pipeline: pipeline_2, author: user) }
+  let_it_be(:build_3) { create(:ci_build, :success, pipeline: pipeline_3, author: user) }
 
-  let(:label_based_stage) do
+  let_it_be(:label_based_stage) do
     create(:cycle_analytics_group_stage, {
       name: 'label-based-stage',
       parent: group,
@@ -100,19 +100,23 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     issue = create(:issue, project: project, created_at: 20.days.ago, author: user)
 
     Timecop.travel(5.days.ago) do
-      Issues::UpdateService.new(
-        project,
-        user,
-        label_ids: [label.id]
-      ).execute(issue)
+      Sidekiq::Worker.skipping_transaction_check do
+        Issues::UpdateService.new(
+          project,
+          user,
+          label_ids: [label.id]
+        ).execute(issue)
+      end
     end
 
     Timecop.travel(2.days.ago) do
-      Issues::UpdateService.new(
-        project,
-        user,
-        label_ids: []
-      ).execute(issue)
+      Sidekiq::Worker.skipping_transaction_check do
+        Issues::UpdateService.new(
+          project,
+          user,
+          label_ids: []
+        ).execute(issue)
+      end
     end
   end
 
@@ -120,7 +124,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     Timecop.freeze { example.run }
   end
 
-  before(:all) do
+  before_all do
     clean_frontend_fixtures('analytics/')
     clean_frontend_fixtures('cycle_analytics/')
   end
@@ -130,10 +134,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
     let(:params) { { created_after: 3.months.ago, created_before: Time.now, group_id: group.full_path } }
 
-    before do
-      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
+    before_all do
       # Persist the default stages
       Gitlab::Analytics::CycleAnalytics::DefaultStages.all.map do |params|
         group.cycle_analytics_stages.build(params).save!
@@ -145,6 +146,10 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       create_deployment
 
       additional_cycle_analytics_metrics
+    end
+
+    before do
+      stub_licensed_features(cycle_analytics_for_groups: true)
 
       sign_in(user)
     end
@@ -189,11 +194,12 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
     let(:params) { { created_after: 3.months.ago, created_before: Time.now, group_id: group.full_path } }
 
-    before do
-      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
+    before_all do
       prepare_cycle_analytics_data
+    end
+
+    before do
+      stub_licensed_features(cycle_analytics_for_groups: true)
 
       sign_in(user)
     end
@@ -208,20 +214,22 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   describe Analytics::TasksByTypeController, type: :controller do
     render_views
 
-    let(:label) { create(:group_label, group: group) }
-    let(:label2) { create(:group_label, group: group) }
-    let(:label3) { create(:group_label, group: group) }
+    let_it_be(:label) { create(:group_label, group: group) }
+    let_it_be(:label2) { create(:group_label, group: group) }
+    let_it_be(:label3) { create(:group_label, group: group) }
 
-    before do
+    before_all do
       5.times do |i|
         create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label])
         create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label2])
         create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label3])
       end
 
-      stub_licensed_features(type_of_work_analytics: true)
-
       group.add_maintainer(user)
+    end
+
+    before do
+      stub_licensed_features(type_of_work_analytics: true)
 
       sign_in(user)
     end

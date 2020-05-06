@@ -5,7 +5,7 @@ module CycleAnalyticsHelpers
 
   def create_commit_referencing_issue(issue, branch_name: generate(:branch))
     project.repository.add_branch(user, branch_name, 'master')
-    create_commit("Commit for ##{issue.iid}", issue.project, user, branch_name)
+    Sidekiq::Worker.skipping_transaction_check { create_commit("Commit for ##{issue.iid}", issue.project, user, branch_name) }
   end
 
   def create_commit(message, project, user, branch_name, count: 1, commit_time: nil, skip_push_handler: false)
@@ -67,9 +67,11 @@ module CycleAnalyticsHelpers
       target_branch: 'master'
     }
 
-    mr = MergeRequests::CreateService.new(project, user, opts).execute
-    NewMergeRequestWorker.new.perform(mr, user)
-    mr
+    Sidekiq::Worker.skipping_transaction_check do
+      MergeRequests::CreateService.new(project, user, opts).execute.tap do |mr|
+        NewMergeRequestWorker.new.perform(mr, user)
+      end
+    end
   end
 
   def merge_merge_requests_closing_issue(user, project, issue)
@@ -77,7 +79,11 @@ module CycleAnalyticsHelpers
                        .new(project, user)
                        .closed_by_merge_requests(issue)
 
-    merge_requests.each { |merge_request| MergeRequests::MergeService.new(project, user, sha: merge_request.diff_head_sha).execute(merge_request) }
+    merge_requests.each do |merge_request|
+      Sidekiq::Worker.skipping_transaction_check do
+        MergeRequests::MergeService.new(project, user, sha: merge_request.diff_head_sha).execute(merge_request)
+      end
+    end
   end
 
   def deploy_master(user, project, environment: 'production')

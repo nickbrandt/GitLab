@@ -6,16 +6,16 @@ describe 'Epics (JavaScript fixtures)' do
   include ApplicationHelper
   include JavaScriptFixturesHelpers
 
-  let(:user) { create(:user) }
-  let(:group) { create(:group, name: 'frontend-fixtures-group' )}
-  let(:label) { create(:group_label, group: group, title: 'bug') }
-  let(:public_project) { create(:project, :public, group: group) }
-  let(:milestone1) { create(:milestone, group: group, title: 'Decade A', start_date: '2010-01-01', due_date: '2019-12-31')}
-  let(:milestone2) { create(:milestone, group: group, title: 'Decade B', start_date: '2020-01-01', due_date: '2029-12-31')}
-  let(:issue1) { create(:issue, project: public_project, milestone: milestone1)}
-  let(:issue2) { create(:issue, project: public_project, milestone: milestone2)}
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group, name: 'frontend-fixtures-group' )}
+  let_it_be(:label) { create(:group_label, group: group, title: 'bug') }
+  let_it_be(:public_project) { create(:project, :public, group: group) }
+  let_it_be(:milestone1) { create(:milestone, group: group, title: 'Decade A', start_date: '2010-01-01', due_date: '2019-12-31')}
+  let_it_be(:milestone2) { create(:milestone, group: group, title: 'Decade B', start_date: '2020-01-01', due_date: '2029-12-31')}
+  let_it_be(:issue1) { create(:issue, project: public_project, milestone: milestone1)}
+  let_it_be(:issue2) { create(:issue, project: public_project, milestone: milestone2)}
 
-  let(:markdown) do
+  let_it_be(:markdown) do
     <<-MARKDOWN.strip_heredoc
     This is an Epic description.
 
@@ -25,16 +25,16 @@ describe 'Epics (JavaScript fixtures)' do
     MARKDOWN
   end
 
-  let(:epic) { create(:epic, group: group, title: 'This is a sample epic', description: markdown, start_date_fixed: '2018-06-01', due_date_fixed: '2018-08-01') }
+  let_it_be(:epic) { create(:epic, group: group, title: 'This is a sample epic', description: markdown, start_date_fixed: '2018-06-01', due_date_fixed: '2018-08-01') }
 
-  let!(:epic_issues) do
+  let_it_be(:epic_issues) do
     [
       create(:epic_issue, epic: epic, issue: issue1, relative_position: 1),
       create(:epic_issue, epic: epic, issue: issue2, relative_position: 2)
     ]
   end
 
-  before(:all) do
+  before_all do
     clean_frontend_fixtures('epic/')
   end
 

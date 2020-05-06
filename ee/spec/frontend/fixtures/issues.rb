@@ -5,19 +5,19 @@ require 'spec_helper'
 describe Projects::IssuesController, '(JavaScript fixtures)', type: :controller do
   include JavaScriptFixturesHelpers
 
-  let(:user) { create(:user, feed_token: 'feedtoken:coldfeed') }
-  let(:group) { create(:group) }
-  let(:project) { create(:project_empty_repo, namespace: group, path: 'issues-project') }
+  let_it_be(:user) { create(:user, feed_token: 'feedtoken:coldfeed') }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project_empty_repo, namespace: group, path: 'issues-project') }
 
   render_views
 
-  before(:all) do
+  before_all do
     clean_frontend_fixtures('ee/issues/')
+
+    project.add_developer(user)
   end
 
   before do
-    project.add_developer(user)
-
     sign_in(user)
   end
 
