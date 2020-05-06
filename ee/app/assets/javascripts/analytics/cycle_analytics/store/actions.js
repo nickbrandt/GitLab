@@ -133,16 +133,19 @@ export const setDefaultSelectedStage = ({ dispatch, getters }) => {
   const { activeStages = [] } = getters;
   if (activeStages && activeStages.length) {
     const [firstActiveStage] = activeStages;
-    dispatch('setSelectedStage', firstActiveStage);
-    dispatch('fetchStageData', firstActiveStage.slug);
-  } else {
-    createFlash(__('There was an error while fetching value stream analytics data.'));
+    return Promise.all([
+      dispatch('setSelectedStage', firstActiveStage),
+      dispatch('fetchStageData', firstActiveStage.slug),
+    ]);
   }
+
+  createFlash(__('There was an error while fetching value stream analytics data.'));
+  return Promise.resolve();
 };
 
 export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   commit(types.RECEIVE_GROUP_STAGES_SUCCESS, stages);
-  dispatch('setDefaultSelectedStage');
+  return dispatch('setDefaultSelectedStage');
 };
 
 export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
@@ -197,8 +200,8 @@ export const receiveUpdateStageError = (
       ? sprintf(__(`'%{name}' stage already exists`), { name })
       : __('There was a problem saving your custom stage, please try again');
 
-  dispatch('customStages/setStageFormErrors', errors);
   createFlash(__(message));
+  return dispatch('customStages/setStageFormErrors', errors);
 };
 
 export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
@@ -219,7 +222,7 @@ export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_ST
 export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
   createFlash(__('Stage removed'), 'notice');
-  dispatch('fetchCycleAnalyticsData');
+  return dispatch('fetchCycleAnalyticsData');
 };
 
 export const receiveRemoveStageError = ({ commit }) => {

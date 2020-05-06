@@ -5,8 +5,6 @@ import * as customStageTypes from 'ee/analytics/cycle_analytics/store/modules/cu
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
-  rawIssueEvents,
-  issueEvents as transformedEvents,
   issueStage,
   planStage,
   codeStage,

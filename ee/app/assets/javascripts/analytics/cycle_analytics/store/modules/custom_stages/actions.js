@@ -60,9 +60,8 @@ export const receiveCreateStageSuccess = ({ commit, dispatch }, { data: { title 
   createFlash(sprintf(__(`Your custom stage '%{title}' was created`), { title }), 'notice');
 
   return Promise.resolve()
-    .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .catch(err => {
-      console.log('err', err);
+    .then(() => dispatch('fetchGroupStagesAndEvents', null, { root: true }))
+    .catch(() => {
       createFlash(__('There was a problem refreshing the data, please try again'));
     });
 };
@@ -78,14 +77,15 @@ export const receiveCreateStageError = (
       ? sprintf(__(`'%{name}' stage already exists`), { name })
       : __('There was a problem saving your custom stage, please try again');
 
-  dispatch('setStageFormErrors', errors);
   createFlash(flashMessage);
+  return dispatch('setStageFormErrors', errors);
 };
 
-export const createStage = ({ dispatch, state }, data) => {
+export const createStage = ({ dispatch, rootState }, data) => {
   const {
     selectedGroup: { fullPath },
-  } = state;
+  } = rootState;
+
   dispatch('requestCreateStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
