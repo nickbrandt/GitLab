@@ -11,6 +11,48 @@ describe 'admin Geo Uploads', :js, :geo do
     sign_in(create(:admin))
   end
 
+  describe 'visiting geo uploads initial page' do
+    before do
+      visit(admin_geo_uploads_path)
+      wait_for_requests
+    end
+
+    it 'shows all uploads in the registry' do
+      page.within(find('#content-body', match: :first)) do
+        expect(page).to have_content(synced_registry.file)
+        expect(page).not_to have_content('There are no uploads to show')
+      end
+    end
+
+    describe 'searching for a geo upload', :geo_fdw do
+      it 'filters out uploads with the search term' do
+        fill_in :name, with: synced_registry.file
+        find('#project-filter-form-field').native.send_keys(:enter)
+
+        wait_for_requests
+
+        page.within(find('#content-body', match: :first)) do
+          expect(page).to have_content(synced_registry.file)
+          expect(page).not_to have_content('There are no uploads to show')
+        end
+      end
+    end
+
+    describe 'with no registries', :geo_fdw do
+      it 'shows empty state' do
+        fill_in :name, with: 'asdfasdf'
+        find('#project-filter-form-field').native.send_keys(:enter)
+
+        wait_for_requests
+
+        page.within(find('#content-body', match: :first)) do
+          expect(page).not_to have_content(synced_registry.file)
+          expect(page).to have_content('There are no uploads to show')
+        end
+      end
+    end
+  end
+
   describe 'remove an orphaned Tracking Entry' do
     before do
       synced_registry.upload.destroy!

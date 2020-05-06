@@ -1,8 +1,6 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
-export const MOCK_GEO_SVG_PATH = 'illustrations/empty-state/geo-empty.svg';
-
-export const MOCK_ISSUES_SVG_PATH = 'illustrations/issues.svg';
+export const MOCK_GEO_REPLICATION_SVG_PATH = 'illustrations/empty-state/geo-replication-empty.svg';
 
 export const MOCK_GEO_TROUBLESHOOTING_LINK =
   'https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html';

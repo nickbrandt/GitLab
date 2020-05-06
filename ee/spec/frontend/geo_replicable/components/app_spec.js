@@ -7,8 +7,7 @@ import GeoReplicable from 'ee/geo_replicable/components/geo_replicable.vue';
 import GeoReplicableEmptyState from 'ee/geo_replicable/components/geo_replicable_empty_state.vue';
 import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
 import {
-  MOCK_GEO_SVG_PATH,
-  MOCK_ISSUES_SVG_PATH,
+  MOCK_GEO_REPLICATION_SVG_PATH,
   MOCK_GEO_TROUBLESHOOTING_LINK,
   MOCK_BASIC_FETCH_DATA_MAP,
 } from '../mock_data';
@@ -20,9 +19,8 @@ describe('GeoReplicableApp', () => {
   let wrapper;
 
   const propsData = {
-    geoSvgPath: MOCK_GEO_SVG_PATH,
-    issuesSvgPath: MOCK_ISSUES_SVG_PATH,
     geoTroubleshootingLink: MOCK_GEO_TROUBLESHOOTING_LINK,
+    geoReplicableEmptySvgPath: MOCK_GEO_REPLICATION_SVG_PATH,
   };
 
   const actionSpies = {

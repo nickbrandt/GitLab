@@ -30,6 +30,7 @@ describe 'admin Geo Projects', :js, :geo do
         expect(page).to have_content(sync_pending_registry.project.full_name)
         expect(page).to have_content(sync_failed_registry.project.full_name)
         expect(page).to have_content(never_synced_registry.project.full_name)
+        expect(page).not_to have_content('There are no projects to show')
       end
     end
 
@@ -45,6 +46,24 @@ describe 'admin Geo Projects', :js, :geo do
           expect(page).not_to have_content(sync_pending_registry.project.full_name)
           expect(page).not_to have_content(sync_failed_registry.project.full_name)
           expect(page).not_to have_content(never_synced_registry.project.full_name)
+          expect(page).not_to have_content('There are no projects to show')
+        end
+      end
+    end
+
+    describe 'with no registries', :geo_fdw do
+      it 'shows empty state' do
+        fill_in :name, with: 'asdfasdf'
+        find('#project-filter-form-field').native.send_keys(:enter)
+
+        wait_for_requests
+
+        page.within(find('#content-body', match: :first)) do
+          expect(page).not_to have_content(synced_registry.project.full_name)
+          expect(page).not_to have_content(sync_pending_registry.project.full_name)
+          expect(page).not_to have_content(sync_failed_registry.project.full_name)
+          expect(page).not_to have_content(never_synced_registry.project.full_name)
+          expect(page).to have_content('There are no projects to show')
         end
       end
     end

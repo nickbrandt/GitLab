@@ -9,7 +9,7 @@ export default {
     GlEmptyState,
   },
   props: {
-    issuesSvgPath: {
+    geoReplicableEmptySvgPath: {
       type: String,
       required: true,
     },
@@ -23,7 +23,7 @@ export default {
     linkText() {
       return sprintf(
         s__(
-          'If you believe this may be an error, please refer to the %{linkStart}Geo Troubleshooting%{linkEnd} documentation for more information.',
+          'Geo|Adjust your filters/search criteria above. If you believe this may be an error, please refer to the %{linkStart}Geo Troubleshooting%{linkEnd} documentation for more information.',
         ),
         {
           linkStart: `<a href="${this.geoTroubleshootingLink}" target="_blank">`,
@@ -38,12 +38,11 @@ export default {
 
 <template>
   <gl-empty-state
-    :title="sprintf(__('No %{replicableType} match this filter'), { replicableType })"
-    :svg-path="issuesSvgPath"
+    :title="sprintf(__('There are no %{replicableType} to show'), { replicableType })"
+    :svg-path="geoReplicableEmptySvgPath"
   >
     <template #description>
-      <div class="text-center">
-        <p>{{ __('Adjust your filters/search criteria above.') }}</p>
+      <div>
         <p v-html="linkText"></p>
       </div>
     </template>
