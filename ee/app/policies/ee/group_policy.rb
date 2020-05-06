@@ -11,6 +11,7 @@ module EE
       with_scope :subject
       condition(:ldap_synced) { @subject.ldap_synced? }
       condition(:epics_available) { @subject.feature_available?(:epics) }
+      condition(:iterations_available) { @subject.feature_available?(:iterations) }
       condition(:subepics_available) { @subject.feature_available?(:subepics) }
       condition(:contribution_analytics_available) do
         @subject.feature_available?(:contribution_analytics)
@@ -116,6 +117,13 @@ module EE
         .enable :admin_dependency_proxy
 
       rule { can?(:read_group) & epics_available }.enable :read_epic
+
+      rule { can?(:read_group) & iterations_available }.enable :read_iteration
+
+      rule { developer & iterations_available }.policy do
+        enable :create_iteration
+        enable :admin_iteration
+      end
 
       rule { reporter & epics_available }.policy do
         enable :create_epic

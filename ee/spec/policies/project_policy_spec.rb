@@ -45,7 +45,7 @@ describe ProjectPolicy do
       %i[
         download_code download_wiki_code read_project read_board read_list
         read_project_for_iids read_issue_iid read_merge_request_iid read_wiki
-        read_issue read_label read_issue_link read_milestone
+        read_issue read_label read_issue_link read_milestone read_iteration
         read_snippet read_project_member read_note read_cycle_analytics
         read_pipeline read_build read_commit_status read_container_image
         read_environment read_deployment read_merge_request read_pages
@@ -92,6 +92,100 @@ describe ProjectPolicy do
           is_expected.to be_disallowed(*owner_permissions)
           is_expected.to be_allowed(*(guest_permissions - auditor_permissions))
           is_expected.to be_allowed(*auditor_permissions)
+        end
+      end
+    end
+  end
+
+  context 'iterations' do
+    let(:current_user) { owner }
+
+    context 'when feature is disabled' do
+      before do
+        stub_licensed_features(iterations: false)
+      end
+
+      it { is_expected.to be_disallowed(:read_iteration, :create_iteration, :admin_iteration) }
+    end
+
+    context 'when feature is enabled' do
+      before do
+        stub_licensed_features(iterations: true)
+      end
+
+      it { is_expected.to be_allowed(:read_iteration, :create_iteration, :admin_iteration) }
+
+      context 'when issues are disabled but merge requests are enabled' do
+        before do
+          project.update!(issues_enabled: false)
+        end
+
+        it { is_expected.to be_allowed(:read_iteration, :create_iteration, :admin_iteration) }
+      end
+
+      context 'when issues are enabled but merge requests are enabled' do
+        before do
+          project.update!(merge_requests_enabled: false)
+        end
+
+        it { is_expected.to be_allowed(:read_iteration, :create_iteration, :admin_iteration) }
+      end
+
+      context 'when both issues and merge requests are disabled' do
+        before do
+          project.update!(issues_enabled: false, merge_requests_enabled: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_iteration, :create_iteration, :admin_iteration) }
+      end
+
+      context 'when user is a developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.to be_allowed(:read_iteration, :create_iteration, :admin_iteration) }
+      end
+
+      context 'when user is a guest' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_allowed(:read_iteration) }
+        it { is_expected.to be_disallowed(:create_iteration, :admin_iteration) }
+      end
+
+      context 'when user is not a member' do
+        let(:current_user) { build(:user) }
+
+        it { is_expected.to be_allowed(:read_iteration) }
+        it { is_expected.to be_disallowed(:create_iteration, :admin_iteration) }
+      end
+
+      context 'when user is logged out' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_allowed(:read_iteration) }
+        it { is_expected.to be_disallowed(:create_iteration, :admin_iteration) }
+      end
+
+      context 'when the project is private' do
+        let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+        before do
+          project.add_maintainer(maintainer)
+          project.add_developer(developer)
+          project.add_reporter(reporter)
+          project.add_guest(guest)
+        end
+
+        context 'when user is not a member' do
+          let(:current_user) { build(:user) }
+
+          it { is_expected.to be_disallowed(:read_iteration, :create_iteration, :admin_iteration) }
+        end
+
+        context 'when user is logged out' do
+          let(:current_user) { nil }
+
+          it { is_expected.to be_disallowed(:read_iteration, :create_iteration, :admin_iteration) }
         end
       end
     end

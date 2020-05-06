@@ -14,6 +14,7 @@ module EE
       license_management
       feature_flag
       feature_flags_client
+      iteration
     ].freeze
 
     prepended do
@@ -31,6 +32,9 @@ module EE
 
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
+
+      with_scope :subject
+      condition(:iterations_available) { @subject.feature_available?(:iterations) }
 
       with_scope :subject
       condition(:requirements_available) { @subject.feature_available?(:requirements) }
@@ -153,6 +157,8 @@ module EE
         enable :read_issue_link
       end
 
+      rule { can?(:guest_access) & iterations_available }.enable :read_iteration
+
       rule { can?(:reporter_access) }.policy do
         enable :admin_board
         enable :read_deploy_board
@@ -177,7 +183,14 @@ module EE
         enable :admin_feature_flags_user_lists
       end
 
+      rule { can?(:developer_access) & iterations_available }.policy do
+        enable :create_iteration
+        enable :admin_iteration
+      end
+
       rule { can?(:public_access) }.enable :read_package
+
+      rule { can?(:read_project) & iterations_available }.enable :read_iteration
 
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
@@ -189,6 +202,10 @@ module EE
         enable :create_vulnerability_export
         enable :admin_vulnerability
         enable :admin_vulnerability_issue_link
+      end
+
+      rule { issues_disabled & merge_requests_disabled }.policy do
+        prevent(*create_read_update_admin_destroy(:iteration))
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
