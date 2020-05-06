@@ -67,6 +67,17 @@ describe Clusters::Platforms::Kubernetes do
         end
       end
 
+      context 'deployment with no pods' do
+        let(:deployment) { kube_deployment(name: 'some-deployment', environment_slug: environment.slug, project_slug: project.full_path_slug) }
+        let(:deployments) { [deployment] }
+        let(:pods) { [] }
+
+        it 'returns a valid status with matching deployments' do
+          expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+          expect(rollout_status.deployments.map(&:name)).to contain_exactly('some-deployment')
+        end
+      end
+
       context 'new deployment based on annotations' do
         let(:matched_deployment) { kube_deployment(name: 'matched-deployment', environment_slug: environment.slug, project_slug: project.full_path_slug) }
         let(:matched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug) }
