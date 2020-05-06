@@ -588,4 +588,22 @@ describe Vulnerabilities::Occurrence do
       expect(occurrence.evidence).to be_nil
     end
   end
+
+  describe '#message' do
+    let(:occurrence) { build(:vulnerabilities_occurrence) }
+    let(:expected_message) { occurrence.metadata['message'] }
+
+    subject { occurrence.message }
+
+    it { is_expected.to eql(expected_message) }
+  end
+
+  describe '#cve' do
+    let(:occurrence) { build(:vulnerabilities_occurrence) }
+    let(:expected_cve) { occurrence.metadata['cve'] }
+
+    subject { occurrence.cve }
+
+    it { is_expected.to eql(expected_cve) }
+  end
 end
