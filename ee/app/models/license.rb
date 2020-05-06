@@ -22,6 +22,7 @@ class License < ApplicationRecord
     group_webhooks
     issuable_default_templates
     issue_weights
+    iterations
     jenkins_integration
     ldap_group_sync
     member_lock

@@ -8380,6 +8380,9 @@ msgstr ""
 msgid "Error creating label."
 msgstr ""
 
+msgid "Error creating new iteration"
+msgstr ""
+
 msgid "Error deleting %{issuableType}"
 msgstr ""
 
@@ -13738,6 +13741,9 @@ msgstr ""
 msgid "New issue title"
 msgstr ""
 
+msgid "New iteration created"
+msgstr ""
+
 msgid "New label"
 msgstr ""
 
@@ -14419,6 +14425,9 @@ msgid "Opens in a new window"
 msgstr ""
 
 msgid "Operation failed. Check pod logs for %{pod_name} for more details."
+msgstr ""
+
+msgid "Operation not allowed"
 msgstr ""
 
 msgid "Operation timed out. Check pod logs for %{pod_name} for more details."
