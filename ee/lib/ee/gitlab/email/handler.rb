@@ -12,8 +12,8 @@ module EE
           override :load_handlers
           def load_handlers
             [
-              ::Gitlab::Email::Handler::EE::ServiceDeskHandler,
-              *super
+              *super,
+              ::Gitlab::Email::Handler::EE::ServiceDeskHandler
             ]
           end
         end
