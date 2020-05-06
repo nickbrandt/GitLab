@@ -2,6 +2,7 @@
 
 class Geo::PackageFileRegistry < Geo::BaseRegistry
   include ::Delay
+  include ShaAttribute
 
   def self.declarative_policy_class
     'Geo::RegistryPolicy'
@@ -64,6 +65,9 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
       transition [:synced, :failed] => :pending
     end
   end
+
+  sha_attribute :verification_checksum
+  sha_attribute :verification_checksum_mismatched
 
   # @return [Geo::PackageFileRegistry] an instance of this class
   def self.for_model_record_id(id)

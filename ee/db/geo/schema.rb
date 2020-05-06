@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_21_194300) do
+ActiveRecord::Schema.define(version: 2020_04_07_120740) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -99,6 +99,13 @@ ActiveRecord::Schema.define(version: 2020_01_21_194300) do
     t.datetime_with_timezone "retry_at"
     t.datetime_with_timezone "last_synced_at"
     t.datetime_with_timezone "created_at", null: false
+    t.string "verification_failure", limit: 255
+    t.binary "verification_checksum"
+    t.boolean "checksum_mismatch"
+    t.binary "verification_checksum_mismatched"
+    t.integer "verification_retry_count"
+    t.datetime_with_timezone "verified_at"
+    t.datetime_with_timezone "verification_retry_at"
     t.index ["package_file_id"], name: "index_package_file_registry_on_repository_id"
     t.index ["retry_at"], name: "index_package_file_registry_on_retry_at"
     t.index ["state"], name: "index_package_file_registry_on_state"
