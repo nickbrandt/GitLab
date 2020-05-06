@@ -7,10 +7,6 @@ query projectRequirements(
   $nextPageCursor: String = ""
 ) {
   project(fullPath: $projectPath) {
-    requirementStatesCount {
-      opened
-      archived
-    }
     requirements(
       first: $firstPageSize
       last: $lastPageSize
