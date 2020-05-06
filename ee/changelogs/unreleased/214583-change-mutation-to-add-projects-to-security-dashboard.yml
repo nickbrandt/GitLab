@@ -1,0 +1,6 @@
+---
+title: Modify GraphQL mutation for adding projects to Instance Security Dashboard
+  to support only single project id
+merge_request: 30865
+author:
+type: changed
