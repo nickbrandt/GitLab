@@ -142,17 +142,20 @@ export default {
 
     state.showAddItemForm = toggleState;
     state.showCreateEpicForm = false;
+    state.showCreateIssueForm = false;
   },
 
   [types.TOGGLE_CREATE_EPIC_FORM](state, { toggleState }) {
     state.showCreateEpicForm = toggleState;
     state.showAddItemForm = false;
+    state.showCreateIssueForm = false;
     state.issuableType = issuableTypesMap.EPIC;
   },
 
   [types.TOGGLE_CREATE_ISSUE_FORM](state, { toggleState }) {
     state.showCreateIssueForm = toggleState;
     state.showAddItemForm = false;
+    state.showCreateEpicForm = false;
   },
 
   [types.SET_PENDING_REFERENCES](state, references) {

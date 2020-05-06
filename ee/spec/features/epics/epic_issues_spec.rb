@@ -71,7 +71,7 @@ describe 'Epic Issues', :js do
 
     def add_issues(references)
       find(".related-items-tree-container .js-add-epics-issues-button").click
-      find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an issue').click
+      find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an existing issue').click
       find('.related-items-tree-container .js-add-issuable-form-input').set(references)
       # When adding long references, for some reason the input gets stuck
       # waiting for more text. Send a keystroke before clicking the button to
@@ -84,7 +84,7 @@ describe 'Epic Issues', :js do
 
     def add_epics(references)
       find('.related-items-tree-container .js-add-epics-issues-button').click
-      find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an epic').click
+      find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an existing epic').click
       find('.related-items-tree-container .js-add-issuable-form-input').set(references)
 
       find('.related-items-tree-container .js-add-issuable-form-input').send_keys(:tab)
@@ -103,7 +103,7 @@ describe 'Epic Issues', :js do
         expect(page).not_to have_selector('input[placeholder="New epic title"]')
 
         find('.related-items-tree-container .js-add-epics-issues-button .dropdown-toggle').click
-        find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Create new epic').click
+        find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add a new epic').click
 
         expect(page).to have_selector('input[placeholder="New epic title"]')
       end
@@ -226,8 +226,8 @@ describe 'Epic Issues', :js do
           visit_epic
           find('.related-items-tree-container .js-add-epics-issues-button').click
 
-          expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an epic')
-          expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Create new epic')
+          expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an existing epic')
+          expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add a new epic')
         end
       end
     end

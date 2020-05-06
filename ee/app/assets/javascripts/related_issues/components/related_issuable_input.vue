@@ -72,7 +72,11 @@ export default {
   mounted() {
     this.setupAutoComplete();
     if (this.focusOnMount) {
-      this.$refs.input.focus();
+      this.$nextTick()
+        .then(() => {
+          this.$refs.input.focus();
+        })
+        .catch(() => {});
     }
   },
   beforeUpdate() {

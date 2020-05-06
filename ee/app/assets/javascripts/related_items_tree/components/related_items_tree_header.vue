@@ -95,17 +95,18 @@ export default {
       </div>
       <epic-health-status v-if="healthStatus" :health-status="healthStatus" />
     </div>
-    <div class="d-inline-flex flex-column flex-sm-row js-button-container">
-      <template v-if="parentItem.userPermissions.adminEpic">
-        <epic-actions-split-button
-          :allow-sub-epics="allowSubEpics"
-          class="js-add-epics-issues-button qa-add-epics-button mb-2 mb-sm-0"
-          @showAddIssueForm="showAddIssueForm"
-          @showCreateIssueForm="showCreateIssueForm"
-          @showAddEpicForm="showAddEpicForm"
-          @showCreateEpicForm="showCreateEpicForm"
-        />
-      </template>
+    <div
+      v-if="parentItem.userPermissions.adminEpic"
+      class="d-inline-flex flex-column flex-sm-row js-button-container"
+    >
+      <epic-actions-split-button
+        :allow-sub-epics="allowSubEpics"
+        class="js-add-epics-issues-button qa-add-epics-button mb-2 mb-sm-0"
+        @showAddIssueForm="showAddIssueForm"
+        @showCreateIssueForm="showCreateIssueForm"
+        @showAddEpicForm="showAddEpicForm"
+        @showCreateEpicForm="showCreateEpicForm"
+      />
     </div>
   </div>
 </template>

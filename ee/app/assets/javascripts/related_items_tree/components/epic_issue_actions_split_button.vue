@@ -1,31 +1,27 @@
 <script>
 import { GlDropdown, GlDropdownDivider, GlDropdownHeader, GlDropdownItem } from '@gitlab/ui';
 
-import { s__ } from '~/locale';
-
-const epicActionItems = [
-  {
-    title: s__('Epics|Add an epic'),
-    description: s__('Epics|Add an existing epic as a child epic.'),
-    eventName: 'showAddEpicForm',
-  },
-  {
-    title: s__('Epics|Create new epic'),
-    description: s__('Epics|Create an epic within this group and add it as a child epic.'),
-    eventName: 'showCreateEpicForm',
-  },
-];
+import { s__, __ } from '~/locale';
 
 const issueActionItems = [
   {
-    title: s__('Add an issue'),
-    description: s__('Add an existing issue to the epic.'),
-    eventName: 'showAddIssueForm',
+    title: __('Add a new issue'),
+    eventName: 'showCreateIssueForm',
   },
   {
-    title: s__('Create an issue'),
-    description: s__('Create a new issue and add it to the epic.'),
-    eventName: 'showCreateIssueForm',
+    title: __('Add an existing issue'),
+    eventName: 'showAddIssueForm',
+  },
+];
+
+const epicActionItems = [
+  {
+    title: s__('Epics|Add a new epic'),
+    eventName: 'showCreateEpicForm',
+  },
+  {
+    title: s__('Epics|Add an existing epic'),
+    eventName: 'showAddEpicForm',
   },
 ];
 
@@ -45,14 +41,9 @@ export default {
       default: false,
     },
   },
-  computed: {
-    actionItems() {
-      return this.allowSubEpics ? [...epicActionItems, ...issueActionItems] : issueActionItems;
-    },
-  },
   methods: {
-    change(item) {
-      this.$emit(item.eventName);
+    change({ eventName }) {
+      this.$emit(eventName);
     },
   },
 };
@@ -60,26 +51,31 @@ export default {
 
 <template>
   <gl-dropdown
-    :menu-class="`dropdown-menu-selectable`"
-    :text="s__('Add')"
+    :text="__('Add')"
     variant="secondary"
     data-qa-selector="epic_issue_actions_split_button"
-    v-on="$listeners"
+    right
   >
-    <gl-dropdown-header>{{ s__('Issue') }}</gl-dropdown-header>
-    <template v-for="item in $options.issueActionItems">
-      <gl-dropdown-item :key="item.eventName" active-class="is-active" @click="change(item)">
-        {{ item.title }}
-      </gl-dropdown-item>
-    </template>
+    <gl-dropdown-header>{{ __('Issue') }}</gl-dropdown-header>
+    <gl-dropdown-item
+      v-for="item in $options.issueActionItems"
+      :key="item.eventName"
+      active-class="is-active"
+      @click="change(item)"
+    >
+      {{ item.title }}
+    </gl-dropdown-item>
     <template v-if="allowSubEpics">
       <gl-dropdown-divider />
-      <gl-dropdown-header>{{ s__('Epic') }}</gl-dropdown-header>
-      <template v-for="item in $options.epicActionItems">
-        <gl-dropdown-item :key="item.eventName" active-class="is-active" @click="change(item)">
-          {{ item.title }}
-        </gl-dropdown-item>
-      </template>
+      <gl-dropdown-header>{{ __('Epic') }}</gl-dropdown-header>
+      <gl-dropdown-item
+        v-for="item in $options.epicActionItems"
+        :key="item.eventName"
+        active-class="is-active"
+        @click="change(item)"
+      >
+        {{ item.title }}
+      </gl-dropdown-item>
     </template>
   </gl-dropdown>
 </template>
