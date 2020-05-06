@@ -4,10 +4,12 @@ module Operations
   module FeatureFlags
     class Strategy < ApplicationRecord
       STRATEGY_DEFAULT = 'default'
+      STRATEGY_GITLABUSERLIST = 'gitlabUserList'
       STRATEGY_GRADUALROLLOUTUSERID = 'gradualRolloutUserId'
       STRATEGY_USERWITHID = 'userWithId'
       STRATEGIES = {
         STRATEGY_DEFAULT => [].freeze,
+        STRATEGY_GITLABUSERLIST => [].freeze,
         STRATEGY_GRADUALROLLOUTUSERID => %w[groupId percentage].freeze,
         STRATEGY_USERWITHID => ['userIds'].freeze
       }.freeze
@@ -17,6 +19,8 @@ module Operations
 
       belongs_to :feature_flag
       has_many :scopes, class_name: 'Operations::FeatureFlags::Scope'
+      has_one :strategy_user_list
+      has_one :user_list, through: :strategy_user_list
 
       validates :name,
         inclusion: {
@@ -25,10 +29,19 @@ module Operations
       }
 
       validate :parameters_validations, if: -> { errors[:name].blank? }
+      validates :user_list, presence: true, if: -> { name == STRATEGY_GITLABUSERLIST }
+      validates :user_list, absence: true, if: -> { name != STRATEGY_GITLABUSERLIST }
+      validate :same_project_validation, if: -> { user_list.present? }
 
       accepts_nested_attributes_for :scopes, allow_destroy: true
 
       private
+
+      def same_project_validation
+        unless user_list.project_id == feature_flag.project_id
+          errors.add(:user_list, 'must belong to the same project')
+        end
+      end
 
       def parameters_validations
         validate_parameters_type &&

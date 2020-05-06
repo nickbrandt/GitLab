@@ -494,6 +494,28 @@ describe API::Unleash do
             }]
           }])
         end
+
+        it 'returns a userWithId strategy for a gitlabUserList strategy' do
+          feature_flag = create(:operations_feature_flag, :new_version_flag, project: project,
+                                name: 'myfeature', active: true)
+          user_list = create(:operations_feature_flag_user_list, project: project,
+                             name: 'My List', user_xids: 'user1,user2')
+          strategy = create(:operations_strategy, feature_flag: feature_flag,
+                            name: 'gitlabUserList', parameters: {}, user_list: user_list)
+          create(:operations_scope, strategy: strategy, environment_scope: 'production')
+
+          get api(features_url), headers: { 'UNLEASH-INSTANCEID' => client.token, 'UNLEASH-APPNAME' => 'production' }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['features']).to eq([{
+            'name' => 'myfeature',
+            'enabled' => true,
+            'strategies' => [{
+              'name' => 'userWithId',
+              'parameters' => { 'userIds' => 'user1,user2' }
+            }]
+          }])
+        end
       end
 
       context 'when mixing version 1 and version 2 feature flags' do

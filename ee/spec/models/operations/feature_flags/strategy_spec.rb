@@ -3,10 +3,12 @@
 require 'spec_helper'
 
 describe Operations::FeatureFlags::Strategy do
+  let_it_be(:project) { create(:project) }
+
   describe 'validations' do
     it do
       is_expected.to validate_inclusion_of(:name)
-        .in_array(%w[default gradualRolloutUserId userWithId])
+        .in_array(%w[default gradualRolloutUserId userWithId gitlabUserList])
         .with_message('strategy name is invalid')
     end
 
@@ -17,7 +19,7 @@ describe Operations::FeatureFlags::Strategy do
         end
         with_them do
           it 'skips parameters validation' do
-            feature_flag = create(:operations_feature_flag)
+            feature_flag = create(:operations_feature_flag, project: project)
             strategy = described_class.create(feature_flag: feature_flag,
                                               name: invalid_name, parameters: { bad: 'params' })
 
@@ -34,7 +36,7 @@ describe Operations::FeatureFlags::Strategy do
         end
         with_them do
           it 'must have valid parameters for the strategy' do
-            feature_flag = create(:operations_feature_flag)
+            feature_flag = create(:operations_feature_flag, project: project)
             strategy = described_class.create(feature_flag: feature_flag,
                                               name: 'gradualRolloutUserId', parameters: invalid_parameters)
 
@@ -43,7 +45,7 @@ describe Operations::FeatureFlags::Strategy do
         end
 
         it 'allows the parameters in any order' do
-          feature_flag = create(:operations_feature_flag)
+          feature_flag = create(:operations_feature_flag, project: project)
           strategy = described_class.create(feature_flag: feature_flag,
                                             name: 'gradualRolloutUserId',
                                             parameters: { percentage: '10', groupId: 'mygroup' })
@@ -59,7 +61,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: 'mygroup', percentage: invalid_value })
@@ -73,7 +75,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: 'mygroup', percentage: valid_value })
@@ -90,7 +92,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'must be a string value of up to 32 lowercase characters' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: invalid_value, percentage: '40' })
@@ -104,7 +106,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'must be a string value of up to 32 lowercase characters' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: valid_value, percentage: '40' })
@@ -121,7 +123,7 @@ describe Operations::FeatureFlags::Strategy do
         end
         with_them do
           it 'must have valid parameters for the strategy' do
-            feature_flag = create(:operations_feature_flag)
+            feature_flag = create(:operations_feature_flag, project: project)
             strategy = described_class.create(feature_flag: feature_flag,
                                               name: 'userWithId', parameters: invalid_parameters)
 
@@ -138,7 +140,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'is valid with a string of comma separated values' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'userWithId', parameters: { userIds: valid_value })
 
@@ -153,7 +155,7 @@ describe Operations::FeatureFlags::Strategy do
           end
           with_them do
             it 'is invalid' do
-              feature_flag = create(:operations_feature_flag)
+              feature_flag = create(:operations_feature_flag, project: project)
               strategy = described_class.create(feature_flag: feature_flag,
                                                 name: 'userWithId', parameters: { userIds: invalid_value })
 
@@ -171,7 +173,7 @@ describe Operations::FeatureFlags::Strategy do
         end
         with_them do
           it 'must be empty' do
-            feature_flag = create(:operations_feature_flag)
+            feature_flag = create(:operations_feature_flag, project: project)
             strategy = described_class.create(feature_flag: feature_flag,
                                               name: 'default',
                                               parameters: invalid_value)
@@ -181,12 +183,139 @@ describe Operations::FeatureFlags::Strategy do
         end
 
         it 'must be empty' do
-          feature_flag = create(:operations_feature_flag)
+          feature_flag = create(:operations_feature_flag, project: project)
           strategy = described_class.create(feature_flag: feature_flag,
                                             name: 'default',
                                             parameters: {})
 
           expect(strategy.errors[:parameters]).to be_empty
+        end
+      end
+
+      context 'when the strategy name is gitlabUserList' do
+        where(:invalid_value) do
+          [{ groupId: "default", percentage: "7" }, "", "nothing", 7, nil, [], 2.5, { userIds: 'user1' }]
+        end
+        with_them do
+          it 'must be empty' do
+            feature_flag = create(:operations_feature_flag, project: project)
+            strategy = described_class.create(feature_flag: feature_flag,
+                                              name: 'gitlabUserList',
+                                              parameters: invalid_value)
+
+            expect(strategy.errors[:parameters]).to eq(['parameters are invalid'])
+          end
+        end
+
+        it 'must be empty' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gitlabUserList',
+                                            parameters: {})
+
+          expect(strategy.errors[:parameters]).to be_empty
+        end
+      end
+    end
+
+    describe 'associations' do
+      context 'when name is gitlabUserList' do
+        it 'is valid when associated with a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          user_list = create(:operations_feature_flag_user_list, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gitlabUserList',
+                                            user_list: user_list,
+                                            parameters: {})
+
+          expect(strategy.errors[:user_list]).to be_empty
+        end
+
+        it 'is invalid without a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gitlabUserList',
+                                            parameters: {})
+
+          expect(strategy.errors[:user_list]).to eq(["can't be blank"])
+        end
+
+        it 'is invalid when associated with a user list from another project' do
+          other_project = create(:project)
+          feature_flag = create(:operations_feature_flag, project: project)
+          user_list = create(:operations_feature_flag_user_list, project: other_project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gitlabUserList',
+                                            user_list: user_list,
+                                            parameters: {})
+
+          expect(strategy.errors[:user_list]).to eq(['must belong to the same project'])
+        end
+      end
+
+      context 'when name is default' do
+        it 'is invalid when associated with a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          user_list = create(:operations_feature_flag_user_list, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'default',
+                                            user_list: user_list,
+                                            parameters: {})
+
+          expect(strategy.errors[:user_list]).to eq(['must be blank'])
+        end
+
+        it 'is valid without a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'default',
+                                            parameters: {})
+
+          expect(strategy.errors[:user_list]).to be_empty
+        end
+      end
+
+      context 'when name is userWithId' do
+        it 'is invalid when associated with a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          user_list = create(:operations_feature_flag_user_list, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'userWithId',
+                                            user_list: user_list,
+                                            parameters: { userIds: 'user1' })
+
+          expect(strategy.errors[:user_list]).to eq(['must be blank'])
+        end
+
+        it 'is valid without a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'userWithId',
+                                            parameters: { userIds: 'user1' })
+
+          expect(strategy.errors[:user_list]).to be_empty
+        end
+      end
+
+      context 'when name is gradualRolloutUserId' do
+        it 'is invalid when associated with a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          user_list = create(:operations_feature_flag_user_list, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gradualRolloutUserId',
+                                            user_list: user_list,
+                                            parameters: { groupId: 'default', percentage: '10' })
+
+          expect(strategy.errors[:user_list]).to eq(['must be blank'])
+        end
+
+        it 'is valid without a user list' do
+          feature_flag = create(:operations_feature_flag, project: project)
+          strategy = described_class.create(feature_flag: feature_flag,
+                                            name: 'gradualRolloutUserId',
+                                            parameters: { groupId: 'default', percentage: '10' })
+
+          expect(strategy.errors[:user_list]).to be_empty
         end
       end
     end
