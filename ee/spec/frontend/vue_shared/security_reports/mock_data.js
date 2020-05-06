@@ -138,6 +138,29 @@ export const parsedDast = [
     cweid: '3',
     desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
     pluginid: '123',
+    request: {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'python-requests/2.20.1',
+        Accept: '*/*',
+        Connection: 'keep-alive',
+        Host: 'nginx',
+      },
+    },
+    response: {
+      status_code: '200',
+      reason_phrase: 'string',
+      headers: {
+        Server: 'nginx/1.17.6',
+        Date: 'Wed, 11 Mar 2020 22:39:38 GMT',
+        'Content-Type': 'text/html',
+        'Content-Length': '277',
+        'Last-Modified': 'Fri, 15 Nov 2019 03:54:29 GMT',
+        Connection: 'keep-alive',
+        ETag: '5dce2175-115',
+        'Accept-Ranges': 'bytes',
+      },
+    },
     identifiers: [
       {
         type: 'CWE',
@@ -180,6 +203,29 @@ export const parsedDast = [
     cweid: '4',
     desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
     pluginid: '3456',
+    request: {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'python-requests/2.20.1',
+        Accept: '*/*',
+        Connection: 'keep-alive',
+        Host: 'nginx',
+      },
+    },
+    response: {
+      status_code: '200',
+      reason_phrase: 'string',
+      headers: {
+        Server: 'nginx/1.17.6',
+        Date: 'Wed, 11 Mar 2020 22:39:38 GMT',
+        'Content-Type': 'text/html',
+        'Content-Length': '277',
+        'Last-Modified': 'Fri, 15 Nov 2019 03:54:29 GMT',
+        Connection: 'keep-alive',
+        ETag: '5dce2175-115',
+        'Accept-Ranges': 'bytes',
+      },
+    },
     instances: [
       {
         uri: 'http://192.168.32.236:3001/assets/webpack/main.bundle.js',
