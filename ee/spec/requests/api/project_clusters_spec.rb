@@ -25,7 +25,6 @@ describe API::ProjectClusters do
       )
 
       stub_kubeclient_put_secret(api_url, "#{namespace}-token", namespace: namespace)
-      stub_kubeclient_get_role_binding(api_url, "gitlab-#{namespace}", namespace: namespace)
       stub_kubeclient_put_role_binding(api_url, "gitlab-#{namespace}", namespace: namespace)
     end
   end
