@@ -49,7 +49,7 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       result = subject.execute
 
-      expect(result[:status]).to eq(:success)
+      expect(result).to be_success
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('test_second_storage')
       expect(gitlab_shell.repository_exists?('default', old_project_repository_path)).to be(false)
@@ -92,8 +92,8 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
     it 'bails out and does nothing' do
       result = subject.execute
 
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to match(/SameFilesystemError/)
+      expect(result).to be_error
+      expect(result.message).to match(/SameFilesystemError/)
     end
   end
 
@@ -118,7 +118,7 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       result = subject.execute
 
-      expect(result[:status]).to eq(:error)
+      expect(result).to be_error
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('default')
     end
@@ -146,7 +146,7 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       result = subject.execute
 
-      expect(result[:status]).to eq(:error)
+      expect(result).to be_error
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('default')
     end

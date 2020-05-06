@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Projects
-  class UpdateRepositoryStorageService < BaseService
+  class UpdateRepositoryStorageService
     Error = Class.new(StandardError)
     SameFilesystemError = Class.new(Error)
 
     attr_reader :repository_storage_move
-    delegate :destination_storage_name, to: :repository_storage_move
+    delegate :project, :destination_storage_name, to: :repository_storage_move
+    delegate :repository, to: :project
 
     def initialize(repository_storage_move)
-      super(repository_storage_move.project)
       @repository_storage_move = repository_storage_move
     end
 
@@ -31,7 +31,7 @@ module Projects
 
       enqueue_housekeeping
 
-      success
+      ServiceResponse.success
 
     rescue StandardError => e
       project.transaction do
@@ -41,7 +41,9 @@ module Projects
 
       Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path)
 
-      error(s_("UpdateRepositoryStorage|Error moving repository storage for %{project_full_path} - %{message}") % { project_full_path: project.full_path, message: e.message })
+      ServiceResponse.error(
+        message: s_("UpdateRepositoryStorage|Error moving repository storage for %{project_full_path} - %{message}") % { project_full_path: project.full_path, message: e.message }
+      )
     end
 
     private
