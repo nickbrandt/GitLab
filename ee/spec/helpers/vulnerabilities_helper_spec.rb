@@ -30,6 +30,7 @@ describe VulnerabilitiesHelper do
       :name,
       :issue_feedback,
       :project,
+      :remediations,
       :solution
     )
   end
@@ -64,6 +65,8 @@ describe VulnerabilitiesHelper do
         has_mr: anything,
         vulnerability_feedback_help_path: kind_of(String),
         finding_json: kind_of(String),
+        source_branch: kind_of(String),
+        create_mr_url: "/#{project.full_path}/-/vulnerability_feedback",
         timestamp: Time.now.to_i
       )
     end
@@ -113,6 +116,7 @@ describe VulnerabilitiesHelper do
         location: finding.location,
         name: finding.name,
         project: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        remediations: finding.remediations,
         solution: kind_of(String)
       )
     end
