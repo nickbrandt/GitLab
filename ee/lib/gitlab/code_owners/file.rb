@@ -3,6 +3,8 @@
 module Gitlab
   module CodeOwners
     class File
+      include ::Gitlab::Utils::StrongMemoize
+
       SECTION_HEADER_REGEX = /\[(.*?)\]/.freeze
 
       def initialize(blob, project = nil)
@@ -155,7 +157,9 @@ module Gitlab
       end
 
       def sectional_codeowners?
-        Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
+        strong_memoize(:sectional_codeowners_check) do
+          Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
+        end
       end
     end
   end
