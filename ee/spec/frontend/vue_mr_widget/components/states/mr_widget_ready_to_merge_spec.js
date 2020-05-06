@@ -11,6 +11,7 @@ import {
   MERGE_DISABLED_TEXT,
   PIPELINE_MUST_SUCCEED_CONFLICT_TEXT,
 } from '~/vue_merge_request_widget/mixins/ready_to_merge';
+import { GlSprintf } from '@gitlab/ui';
 
 describe('ReadyToMerge', () => {
   let wrapper;
@@ -58,7 +59,7 @@ describe('ReadyToMerge', () => {
     ({ vm } = wrapper);
   };
 
-  const findResolveItemsMessage = () => wrapper.find('.js-resolve-mr-widget-items-message');
+  const findResolveItemsMessage = () => wrapper.find(GlSprintf);
   const findMergeButton = () => wrapper.find('.qa-merge-button');
   const findMergeButtonDropdown = () => wrapper.find('.js-merge-moment');
   const findMergeImmediatelyButton = () => wrapper.find('.js-merge-immediately-button');
@@ -271,7 +272,7 @@ describe('ReadyToMerge', () => {
       });
 
       it('should show cannot merge text', () => {
-        expect(findResolveItemsMessage().html()).toContain(MERGE_DISABLED_TEXT);
+        expect(findResolveItemsMessage().attributes('message')).toBe(MERGE_DISABLED_TEXT);
       });
 
       it('should show disabled merge button', () => {
@@ -294,7 +295,7 @@ describe('ReadyToMerge', () => {
     });
 
     it('should show approvals needed text', () => {
-      expect(findResolveItemsMessage().html()).toContain(MERGE_DISABLED_TEXT_UNAPPROVED);
+      expect(findResolveItemsMessage().attributes('message')).toBe(MERGE_DISABLED_TEXT_UNAPPROVED);
     });
   });
 
@@ -309,7 +310,9 @@ describe('ReadyToMerge', () => {
     });
 
     it('should show a custom message that explains the conflict', () => {
-      expect(findResolveItemsMessage().html()).toContain(PIPELINE_MUST_SUCCEED_CONFLICT_TEXT);
+      expect(findResolveItemsMessage().attributes('message')).toBe(
+        PIPELINE_MUST_SUCCEED_CONFLICT_TEXT,
+      );
     });
   });
 });
