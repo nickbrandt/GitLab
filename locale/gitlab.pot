@@ -9319,6 +9319,9 @@ msgstr ""
 msgid "Filter by user"
 msgstr ""
 
+msgid "Filter pipelines"
+msgstr ""
+
 msgid "Filter projects"
 msgstr ""
 
@@ -15130,6 +15133,9 @@ msgid "Pipeline|Stop pipeline"
 msgstr ""
 
 msgid "Pipeline|Stop pipeline #%{pipelineId}?"
+msgstr ""
+
+msgid "Pipeline|Trigger author"
 msgstr ""
 
 msgid "Pipeline|Triggerer"
@@ -21029,6 +21035,9 @@ msgid "There is no data available. Please change your selection."
 msgstr ""
 
 msgid "There was a problem communicating with your device."
+msgstr ""
+
+msgid "There was a problem fetching project users."
 msgstr ""
 
 msgid "There was a problem refreshing the data, please try again"
