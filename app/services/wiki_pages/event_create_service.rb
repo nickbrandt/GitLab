@@ -4,6 +4,8 @@ module WikiPages
   class EventCreateService
     # @param [User] author The event author
     def initialize(author)
+      raise ArgumentError, 'author must not be nil' unless author
+
       @author = author
     end
 

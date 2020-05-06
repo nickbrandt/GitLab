@@ -29,11 +29,27 @@ describe WikiPages::EventCreateService do
       end
     end
 
+    context 'the user is nil' do
+      subject { described_class.new(nil) }
+
+      it 'raises an error on construction' do
+        expect { subject }.to raise_error ArgumentError
+      end
+    end
+
     context 'the action is illegal' do
       let(:action) { Event::WIKI_ACTIONS.max + 1 }
 
       it 'returns an error' do
         expect(response).to be_error
+      end
+
+      it 'does not create an event' do
+        expect { response }.not_to change(Event, :count)
+      end
+
+      it 'does not create a metadata record' do
+        expect { response }.not_to change(WikiPage::Meta, :count)
       end
     end
 
