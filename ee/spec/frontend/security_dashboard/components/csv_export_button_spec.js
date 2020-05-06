@@ -25,7 +25,6 @@ describe('Csv Button Export', () => {
   const findPopoverButton = () => wrapper.find({ ref: 'popoverButton' });
   const findPopover = () => wrapper.find({ ref: 'popover' });
   const findCsvExportButton = () => wrapper.find({ ref: 'csvExportButton' });
-  const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findExportIcon = () => wrapper.find({ ref: 'exportIcon' });
 
   const createComponent = () => {
@@ -103,7 +102,7 @@ describe('Csv Button Export', () => {
 
     it('displays the export icon when not loading and the loading icon when loading', () => {
       expect(findExportIcon().props('name')).toBe('export');
-      expect(findLoadingIcon().exists()).toBe(false);
+      expect(findCsvExportButton().props('loading')).toBe(false);
 
       wrapper.setData({
         isPreparingCsvExport: true,
@@ -111,7 +110,7 @@ describe('Csv Button Export', () => {
 
       return wrapper.vm.$nextTick(() => {
         expect(findExportIcon().exists()).toBe(false);
-        expect(findLoadingIcon().exists()).toBe(true);
+        expect(findCsvExportButton().props('loading')).toBe(true);
       });
     });
 
