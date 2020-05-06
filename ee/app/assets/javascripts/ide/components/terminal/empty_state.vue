@@ -40,7 +40,7 @@ export default {
 };
 </script>
 <template>
-  <div class="text-center">
+  <div class="text-center p-3">
     <div v-if="illustrationPath" class="svg-content svg-130"><img :src="illustrationPath" /></div>
     <h4>{{ __('Web Terminal') }}</h4>
     <gl-loading-icon v-if="isLoading" size="lg" class="prepend-top-default" />
