@@ -373,9 +373,9 @@ describe('Monitoring mutations', () => {
     });
 
     it('stores variables in the key key_value format in the array', () => {
-      mutations[types.SET_PROM_QUERY_VARIABLES](stateCopy, { pod: 'POD' });
+      mutations[types.SET_PROM_QUERY_VARIABLES](stateCopy, { pod: 'POD', stage: 'main ops' });
 
-      expect(stateCopy.promVariables).toEqual(['pod', 'POD']);
+      expect(stateCopy.promVariables).toEqual(['pod', 'POD', 'stage', 'main%20ops']);
     });
   });
 });

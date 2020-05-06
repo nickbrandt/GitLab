@@ -102,17 +102,12 @@ describe('Dashboard', () => {
   });
 
   describe('request information to the server', () => {
-    it('calls to set time range, variables and fetch data', () => {
+    it('calls to set time range and fetch data', () => {
       createShallowWrapper({ hasMetrics: true });
 
       return wrapper.vm.$nextTick().then(() => {
         expect(store.dispatch).toHaveBeenCalledWith(
           'monitoringDashboard/setTimeRange',
-          expect.any(Object),
-        );
-
-        expect(store.dispatch).toHaveBeenCalledWith(
-          'monitoringDashboard/setVariables',
           expect.any(Object),
         );
 

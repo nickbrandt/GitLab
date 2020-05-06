@@ -52,7 +52,7 @@ const emptyStateFromError = error => {
 };
 
 /**
- * Maps a backened error state to a `metricStates` constant
+ * Maps an variables object to an array
  * @returns {Array} The custom variables array to be send to the API
  * in the format of [variable1, variable1_value]
  * @param {Object} variables - Custom variables provided by the user

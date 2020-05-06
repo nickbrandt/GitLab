@@ -8,6 +8,8 @@ import {
 
 /**
  * List of non time range url parameters
+ * This will be removed once we add support for free text variables
+ * via the dashboard yaml files in https://gitlab.com/gitlab-org/gitlab/-/issues/215689
  */
 export const dashboardParams = ['dashboard', 'group', 'title', 'y_label'];
 
