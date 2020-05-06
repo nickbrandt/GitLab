@@ -52,8 +52,12 @@ Describes an alert from the project's Alert Management
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `createdAt` | Time | Timestamp the alert was created |
+| `description` | String | Description of the alert |
+| `details` | JSON | Alert details |
 | `endedAt` | Time | Timestamp the alert ended |
 | `eventCount` | Int | Number of events of this alert |
+| `hosts` | String! => Array | List of hosts the alert came from |
 | `iid` | ID! | Internal ID of the alert |
 | `monitoringTool` | String | Monitoring tool the alert came from |
 | `service` | String | Service the alert came from |
@@ -61,6 +65,7 @@ Describes an alert from the project's Alert Management
 | `startedAt` | Time | Timestamp the alert was raised |
 | `status` | AlertManagementStatus | Status of the alert |
 | `title` | String | Title of the alert |
+| `updatedAt` | Time | Timestamp the alert was last updated |
 
 ## AwardEmoji
 
