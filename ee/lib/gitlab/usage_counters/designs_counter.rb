@@ -25,7 +25,17 @@ module Gitlab::UsageCounters
       end
 
       def totals
-        KNOWN_EVENTS.map { |e| ["design_management_designs_#{e}".to_sym, read(e)] }.to_h
+        KNOWN_EVENTS.map { |event| [counter_key(event), read(event)] }.to_h
+      end
+
+      def fallback_totals
+        KNOWN_EVENTS.map { |event| [counter_key(event), -1] }.to_h
+      end
+
+      private
+
+      def counter_key(event)
+        "design_management_designs_#{event}".to_sym
       end
     end
   end
