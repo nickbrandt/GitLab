@@ -241,6 +241,9 @@ msgstr ""
 msgid "%{completedWeight} of %{totalWeight} weight completed"
 msgstr ""
 
+msgid "%{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} must be enabled. %{securityBotLinkStart}GitLab-Security-Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}."
+msgstr ""
+
 msgid "%{cores} cores"
 msgstr ""
 
@@ -2912,6 +2915,9 @@ msgstr ""
 msgid "Automatic certificate management using Let's Encrypt"
 msgstr ""
 
+msgid "Automatically create merge requests for vulnerabilities that have fixes available."
+msgstr ""
+
 msgid "Automatically marked as default internal user"
 msgstr ""
 
@@ -2925,6 +2931,9 @@ msgid "Autosave|Note"
 msgstr ""
 
 msgid "Available"
+msgstr ""
+
+msgid "Available for dependency and container scanning"
 msgstr ""
 
 msgid "Available group Runners: %{runners}"
@@ -19492,6 +19501,9 @@ msgstr ""
 msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 
+msgid "Something went wrong while toggling auto-fix settings, please try again later."
+msgstr ""
+
 msgid "Something went wrong while updating a requirement."
 msgstr ""
 
@@ -20254,7 +20266,13 @@ msgstr ""
 msgid "Suggest code changes which can be immediately applied in one click. Try it out!"
 msgstr ""
 
+msgid "Suggested Solutions"
+msgstr ""
+
 msgid "Suggested change"
+msgstr ""
+
+msgid "Suggested solutions help link"
 msgstr ""
 
 msgid "SuggestedColors|Bright green"

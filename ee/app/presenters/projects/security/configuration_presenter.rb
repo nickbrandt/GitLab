@@ -44,7 +44,12 @@ module Projects
           auto_devops_help_page_path: help_page_path('topics/autodevops/index'),
           features: features.to_json,
           help_page_path: help_page_path('user/application_security/index'),
-          latest_pipeline_path: latest_pipeline_path
+          latest_pipeline_path: latest_pipeline_path,
+          auto_fix_enabled: {
+            dependency_scanning: true,
+            container_scanning: true
+          }.to_json,
+          auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end
 
