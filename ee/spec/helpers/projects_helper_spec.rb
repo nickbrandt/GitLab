@@ -134,7 +134,7 @@ describe ProjectsHelper do
         it 'checks if first vulnerability class is enabled' do
           expect(subject[:vulnerabilities_export_endpoint]).to(
             eq(
-              api_v4_projects_vulnerability_exports_path(id: project.id)
+              api_v4_security_projects_vulnerability_exports_path(id: project.id)
             ))
         end
       end

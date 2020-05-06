@@ -248,7 +248,7 @@ module EE
     def project_vulnerabilities_config(project)
       return {} unless first_class_vulnerabilities_available?(project)
 
-      { vulnerabilities_export_endpoint: api_v4_projects_vulnerability_exports_path(id: project.id) }
+      { vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id) }
     end
 
     def can_create_feedback?(project, feedback_type)
