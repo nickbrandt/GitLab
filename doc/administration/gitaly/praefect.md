@@ -46,7 +46,7 @@ A minimum highly available configuration requires:
 
 - 1 highly available load balancer
 - 1 highly available PostgreSQL server (PostgreSQL 9.6 or newer)
-- 2 Praefect nodes
+- 3 Praefect nodes
 - 3 Gitaly nodes (1 primary, 2 secondary)
 
 ![Architecture diagram](img/praefect_architecture_v12_10.png)
@@ -613,7 +613,9 @@ Particular attention should be shown to:
        'job_name' => 'praefect',
        'static_configs' => [
          'targets' => [
-           'PRAEFECT_HOST:9652' # praefect
+           'PRAEFECT_HOST:9652', # praefect-1
+           'PRAEFECT_HOST:9652', # praefect-2
+           'PRAEFECT_HOST:9652', # praefect-3
          ]
        ]
      },
