@@ -36,3 +36,14 @@ RSpec.shared_context 'oversized list_objects_v2 result' do
     (0...desired_size).to_a.map { |_| SecureRandom.hex }
   end
 end
+
+RSpec.shared_context 'no objects list_objects_v2 result' do
+  let(:key_list_no_objects) { [] }
+
+  before do
+    stub_responses(
+      :list_objects_v2,
+      list_objects_data(key_list: key_list_no_objects, next_continuation_token: nil, is_truncated: false)
+    )
+  end
+end

@@ -96,6 +96,16 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
       end
     end
 
+    context 'when list_object returns no objects' do
+      include_context 'no objects list_objects_v2 result'
+
+      it 'does not attempt to delete' do
+        expect(aws_client).not_to receive(:delete_objects).with(delete_objects_data(key_list_no_objects))
+
+        result
+      end
+    end
+
     context 'when failed' do
       let(:aws_error) { 'SomeError' }
 
@@ -126,6 +136,15 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
 
       it 'returns result at max size' do
         expect(result.count).to eq(StatusPage::Storage::MAX_IMAGE_UPLOADS)
+      end
+    end
+
+    context 'when list_object returns no objects' do
+      include_context 'no objects list_objects_v2 result'
+
+      it 'returns an empty set' do
+        expect(result).to be_an_instance_of(Set)
+        expect(result.empty?).to be(true)
       end
     end
 
