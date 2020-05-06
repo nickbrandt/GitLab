@@ -10,7 +10,5 @@ export default {
 };
 </script>
 <template>
-  <pre class="code-block rounded">
-    <code class="d-block">{{ code }}</code>
-  </pre>
+  <pre class="code-block rounded"><code class="d-block">{{ code }}</code></pre>
 </template>
