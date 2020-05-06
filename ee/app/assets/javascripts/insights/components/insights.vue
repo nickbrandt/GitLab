@@ -1,11 +1,12 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert, GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import InsightsPage from './insights_page.vue';
 import InsightsConfigWarning from './insights_config_warning.vue';
 
 export default {
   components: {
+    GlAlert,
     GlLoadingIcon,
     InsightsPage,
     InsightsConfigWarning,
@@ -20,6 +21,11 @@ export default {
     queryEndpoint: {
       type: String,
       required: true,
+    },
+    notice: {
+      type: String,
+      default: '',
+      required: false,
     },
   },
   computed: {
@@ -53,6 +59,9 @@ export default {
         scope: key,
         isActive: this.activeTab === key,
       }));
+    },
+    allItemsAreFilteredOut() {
+      return this.configPresent && Object.keys(this.configData).length === 0;
     },
     configPresent() {
       return !this.configLoading && this.configData != null;
@@ -88,6 +97,15 @@ export default {
     <div v-if="configLoading" class="insights-config-loading text-center">
       <gl-loading-icon :inline="true" size="lg" />
     </div>
+    <div v-else-if="allItemsAreFilteredOut" class="insights-wrapper">
+      <gl-alert>
+        {{
+          s__(
+            'Insights|This project is filtered out in the insights.yml file (see the projects.only config for more information).',
+          )
+        }}
+      </gl-alert>
+    </div>
     <div v-else-if="configPresent" class="insights-wrapper">
       <gl-dropdown
         class="js-insights-dropdown w-100"
@@ -105,6 +123,9 @@ export default {
           >{{ page.name }}</gl-dropdown-item
         >
       </gl-dropdown>
+      <gl-alert v-if="notice != ''">
+        {{ notice }}
+      </gl-alert>
       <insights-page :query-endpoint="queryEndpoint" :page-config="activePage" />
     </div>
     <insights-config-warning

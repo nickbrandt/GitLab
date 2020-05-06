@@ -11387,6 +11387,12 @@ msgstr ""
 msgid "Insights"
 msgstr ""
 
+msgid "Insights|Some items are not visible beacuse the project was filtered out in the insights.yml file (see the projects.only config for more information)."
+msgstr ""
+
+msgid "Insights|This project is filtered out in the insights.yml file (see the projects.only config for more information)."
+msgstr ""
+
 msgid "Install"
 msgstr ""
 
