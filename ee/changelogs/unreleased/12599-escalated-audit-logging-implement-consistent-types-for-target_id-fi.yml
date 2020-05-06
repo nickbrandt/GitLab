@@ -1,0 +1,5 @@
+---
+title: Fix audit log recording full_path instead of ID
+merge_request: 31194
+author:
+type: fixed

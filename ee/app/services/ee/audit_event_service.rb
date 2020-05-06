@@ -158,7 +158,7 @@ module EE
     #
     # @return [AuditEventService]
     def for_user(full_path = @entity.full_path)
-      for_custom_model('user', full_path)
+      for_custom_model('user', @entity)
     end
 
     # Builds the @details attribute for project
@@ -167,7 +167,7 @@ module EE
     #
     # @return [AuditEventService]
     def for_project
-      for_custom_model('project', @entity.full_path)
+      for_custom_model('project', @entity)
     end
 
     # Builds the @details attribute for group
@@ -176,7 +176,7 @@ module EE
     #
     # @return [AuditEventService]
     def for_group
-      for_custom_model('group', @entity.full_path)
+      for_custom_model('group', @entity)
     end
 
     def enabled?
@@ -222,7 +222,7 @@ module EE
       }
     end
 
-    def for_custom_model(model, key_title)
+    def for_custom_model(model, data, opts = { is_object: true })
       action = @details[:action]
       model_class = model.camelize
       custom_message = @details[:custom_message]
@@ -232,30 +232,31 @@ module EE
         when :destroy
           {
             remove: model,
-            author_name: @author.name,
-            target_id: key_title,
+            author_name: @author&.name,
+            target_id: data,
             target_type: model_class,
-            target_details: key_title
+            target_details: data
           }
         when :create
           {
             add: model,
-            author_name: @author.name,
-            target_id: key_title,
+            author_name: @author&.name,
+            target_id: data,
             target_type: model_class,
-            target_details: key_title
+            target_details: data
           }
         when :custom
           {
             custom_message: custom_message,
             author_name: @author&.name,
-            target_id: key_title,
+            target_id: data,
             target_type: model_class,
-            target_details: key_title,
+            target_details: data,
             ip_address: @details[:ip_address]
           }
         end
 
+      @details.merge!(target_id: data.id, target_details: data.full_path) if data.is_a?(ApplicationRecord)
       self
     end
 

@@ -48,7 +48,7 @@ describe Users::DestroyService do
             details: {
               remove: 'user',
               author_name: current_user.name,
-              target_id: @resource.full_path,
+              target_id: @resource.id,
               target_type: 'User',
               target_details: @resource.full_path
             }

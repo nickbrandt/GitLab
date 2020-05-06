@@ -295,7 +295,7 @@ describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           remove: 'user',
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.id,
           target_type: 'User',
           target_details: target_user_full_path
         )
@@ -309,7 +309,7 @@ describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           add: 'user',
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.id,
           target_type: 'User',
           target_details: target_user_full_path
         )
@@ -323,7 +323,7 @@ describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           custom_message: custom_message,
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.id,
           target_type: 'User',
           target_details: target_user_full_path,
           ip_address: ip_address
