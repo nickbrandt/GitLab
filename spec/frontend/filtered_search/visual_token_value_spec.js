@@ -38,11 +38,11 @@ describe('Filtered Search Visual Tokens', () => {
     let usersCacheSpy;
 
     beforeEach(() => {
-      spyOn(UsersCache, 'retrieve').and.callFake(username => usersCacheSpy(username));
+      jest.spyOn(UsersCache, 'retrieve').mockImplementation(username => usersCacheSpy(username));
     });
 
     it('ignores error if UsersCache throws', done => {
-      spyOn(window, 'Flash');
+      jest.spyOn(window, 'Flash').mockImplementation(() => {});
       const dummyError = new Error('Earth rotated backwards');
       const { subject, tokenValueContainer, tokenValueElement } = findElements(authorToken);
       const tokenValue = tokenValueElement.innerText;
@@ -54,7 +54,7 @@ describe('Filtered Search Visual Tokens', () => {
       subject
         .updateUserTokenAppearance(tokenValueContainer, tokenValueElement, tokenValue)
         .then(() => {
-          expect(window.Flash.calls.count()).toBe(0);
+          expect(window.Flash.mock.calls.length).toBe(0);
         })
         .then(done)
         .catch(done.fail);
@@ -96,8 +96,8 @@ describe('Filtered Search Visual Tokens', () => {
           expect(tokenValueElement.innerText.trim()).toBe(dummyUser.name);
           const avatar = tokenValueElement.querySelector('img.avatar');
 
-          expect(avatar.src).toBe(dummyUser.avatar_url);
-          expect(avatar.alt).toBe('');
+          expect(avatar.getAttribute('src')).toBe(dummyUser.avatar_url);
+          expect(avatar.getAttribute('alt')).toBe('');
         })
         .then(done)
         .catch(done.fail);
@@ -260,10 +260,10 @@ describe('Filtered Search Visual Tokens', () => {
 
   describe('render', () => {
     const setupSpies = subject => {
-      spyOn(subject, 'updateLabelTokenColor'); // eslint-disable-line jasmine/no-unsafe-spy
+      jest.spyOn(subject, 'updateLabelTokenColor').mockImplementation(() => {});
       const updateLabelTokenColorSpy = subject.updateLabelTokenColor;
 
-      spyOn(subject, 'updateUserTokenAppearance'); // eslint-disable-line jasmine/no-unsafe-spy
+      jest.spyOn(subject, 'updateUserTokenAppearance').mockImplementation(() => {});
       const updateUserTokenAppearanceSpy = subject.updateUserTokenAppearance;
 
       return { updateLabelTokenColorSpy, updateUserTokenAppearanceSpy };
@@ -290,11 +290,11 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy, updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(1);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(1);
       const expectedArgs = [tokenValueContainer, tokenValueElement];
 
-      expect(updateUserTokenAppearanceSpy.calls.argsFor(0)).toEqual(expectedArgs);
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(0);
+      expect(updateUserTokenAppearanceSpy.mock.calls[0]).toEqual(expectedArgs);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(0);
     });
 
     it('renders a label token value element', () => {
@@ -303,11 +303,11 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy, updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(1);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(1);
       const expectedArgs = [tokenValueContainer];
 
-      expect(updateLabelTokenColorSpy.calls.argsFor(0)).toEqual(expectedArgs);
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(0);
+      expect(updateLabelTokenColorSpy.mock.calls[0]).toEqual(expectedArgs);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(0);
     });
 
     it('renders a milestone token value element', () => {
@@ -316,8 +316,8 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy, updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(0);
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(0);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(0);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update user token appearance for `none` filter', () => {
@@ -328,7 +328,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(0);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update user token appearance for `None` filter', () => {
@@ -339,7 +339,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(0);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update user token appearance for `any` filter', () => {
@@ -350,7 +350,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateUserTokenAppearanceSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateUserTokenAppearanceSpy.calls.count()).toBe(0);
+      expect(updateUserTokenAppearanceSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update label token color for `None` filter', () => {
@@ -361,7 +361,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(0);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update label token color for `none` filter', () => {
@@ -372,7 +372,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(0);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(0);
     });
 
     it('does not update label token color for `any` filter', () => {
@@ -383,7 +383,7 @@ describe('Filtered Search Visual Tokens', () => {
       const { updateLabelTokenColorSpy } = setupSpies(subject);
       subject.render(tokenValueContainer, tokenValueElement);
 
-      expect(updateLabelTokenColorSpy.calls.count()).toBe(0);
+      expect(updateLabelTokenColorSpy.mock.calls.length).toBe(0);
     });
   });
 });

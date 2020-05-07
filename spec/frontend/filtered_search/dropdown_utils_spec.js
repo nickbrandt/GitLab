@@ -213,7 +213,7 @@ describe('Dropdown Utils', () => {
 
   describe('setDataValueIfSelected', () => {
     beforeEach(() => {
-      spyOn(FilteredSearchDropdownManager, 'addWordToInput').and.callFake(() => {});
+      jest.spyOn(FilteredSearchDropdownManager, 'addWordToInput').mockImplementation(() => {});
     });
 
     it('calls addWordToInput when dataValue exists', () => {
@@ -224,7 +224,7 @@ describe('Dropdown Utils', () => {
 
       DropdownUtils.setDataValueIfSelected(null, '=', selected);
 
-      expect(FilteredSearchDropdownManager.addWordToInput.calls.count()).toEqual(1);
+      expect(FilteredSearchDropdownManager.addWordToInput.mock.calls.length).toEqual(1);
     });
 
     it('returns true when dataValue exists', () => {
