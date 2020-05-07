@@ -673,6 +673,14 @@ describe Gitlab::UsageData do
     end
   end
 
+  describe '.recording_ee_finished_at' do
+    subject { described_class.recording_ee_finish_data }
+
+    it 'gathers time ee recording finishes at' do
+      expect(subject[:recording_ee_finished_at]).to be_a(Time)
+    end
+  end
+
   def for_defined_days_back(days: [29, 2])
     days.each do |n|
       Timecop.travel(n.days.ago) do

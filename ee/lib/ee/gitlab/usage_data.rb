@@ -38,7 +38,16 @@ module EE
         def uncached_data
           time_period = { created_at: 28.days.ago..Time.current }
           usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
-          super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)
+          super
+            .merge(usage_activity_by_stage)
+            .merge(usage_activity_by_stage_monthly)
+            .merge(recording_ee_finish_data)
+        end
+
+        def recording_ee_finish_data
+          {
+            recording_ee_finished_at: Time.now
+          }
         end
 
         override :features_usage_data
