@@ -29,6 +29,20 @@ describe API::ProjectRepositoryStorageMoves do
 
       expect { get_project_repository_storage_moves }.not_to exceed_query_limit(control)
     end
+
+    it 'returns the most recently created first' do
+      storage_move_oldest = create(:project_repository_storage_move, :scheduled, created_at: 2.days.ago)
+      storage_move_middle = create(:project_repository_storage_move, :scheduled, created_at: 1.day.ago)
+
+      get api('/project_repository_storage_moves', user)
+
+      json_ids = json_response.map {|storage_move| storage_move['id'] }
+      expect(json_ids).to eq([
+        storage_move.id,
+        storage_move_middle.id,
+        storage_move_oldest.id
+      ])
+    end
   end
 
   describe 'GET /project_repository_storage_moves/:id' do

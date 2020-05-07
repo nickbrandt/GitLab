@@ -15,7 +15,7 @@ module API
         use :pagination
       end
       get do
-        storage_moves = ProjectRepositoryStorageMove.all
+        storage_moves = ProjectRepositoryStorageMove.order_created_at_desc
 
         present paginate(storage_moves), with: Entities::ProjectRepositoryStorageMove, current_user: current_user
       end
