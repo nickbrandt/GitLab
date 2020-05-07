@@ -26,15 +26,15 @@ module EE
                  )
                end
 
-        field :requirement, ::Types::RequirementType, null: true,
+        field :requirement, ::Types::RequirementsManagement::RequirementType, null: true,
               description: 'Find a single requirement. Available only when feature flag `requirements_management` is enabled.',
-              resolver: ::Resolvers::RequirementsResolver.single
+              resolver: ::Resolvers::RequirementsManagement::RequirementsResolver.single
 
-        field :requirements, ::Types::RequirementType.connection_type, null: true,
+        field :requirements, ::Types::RequirementsManagement::RequirementType.connection_type, null: true,
               description: 'Find requirements. Available only when feature flag `requirements_management` is enabled.',
-              resolver: ::Resolvers::RequirementsResolver
+              resolver: ::Resolvers::RequirementsManagement::RequirementsResolver
 
-        field :requirement_states_count, ::Types::RequirementStatesCountType, null: true,
+        field :requirement_states_count, ::Types::RequirementsManagement::RequirementStatesCountType, null: true,
               description: 'Number of requirements for the project by their state',
               resolve: -> (project, args, ctx) do
                 return unless requirements_available?(project, ctx[:current_user])
