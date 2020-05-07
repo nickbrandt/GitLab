@@ -9,6 +9,7 @@ module SubscriptionsHelper
       full_name: current_user.name,
       plan_data: plan_data.to_json,
       plan_id: params[:plan_id],
+      namespace_id: params[:namespace_id],
       new_user: new_user?.to_s,
       group_data: group_data.to_json
     }
