@@ -19,8 +19,7 @@ module EE
           name: :license_management_jobs
         },
         license_scanning: {
-          name: :license_scanning_jobs,
-          fallback: 0
+          name: :license_scanning_jobs
         },
         sast: {
           name: :sast_jobs
@@ -111,12 +110,12 @@ module EE
 
         def security_products_usage
           results = SECURE_PRODUCT_TYPES.each_with_object({}) do |(secure_type, attribs), response|
-            response[attribs[:name]] = count(::Ci::Build.where(name: secure_type), fallback: attribs.fetch(:fallback, -1)) # rubocop:disable CodeReuse/ActiveRecord
+            response[attribs[:name]] = count(::Ci::Build.where(name: secure_type)) # rubocop:disable CodeReuse/ActiveRecord
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           license_scan_count = results.delete(:license_scanning_jobs)
-          results[:license_management_jobs] += license_scan_count
+          results[:license_management_jobs] += license_scan_count > 0 ? license_scan_count : 0
 
           results
         end
@@ -345,13 +344,13 @@ module EE
           }
 
           SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
-            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id, fallback: attribs.fetch(:fallback, -1))
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym
           license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
-          results[combined_license_key] += license_scan_count
+          results[combined_license_key] += license_scan_count > 0 ? license_scan_count : 0
 
           results
         end
