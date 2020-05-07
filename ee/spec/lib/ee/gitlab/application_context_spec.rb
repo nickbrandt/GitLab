@@ -49,7 +49,7 @@ describe Gitlab::ApplicationContext do
     end
 
     with_them do
-      it do
+      specify do
         # Build a hash that has all `provided_options` as keys, and `nil` as value
         provided_values = provided_options.map { |key| [key, nil] }.to_h
         context = described_class.new(provided_values)

@@ -31,7 +31,7 @@ describe Gitlab::CIDR do
     end
 
     with_them do
-      it do
+      specify do
         expect(described_class.new(values).match?(ip)).to eq(match)
       end
     end

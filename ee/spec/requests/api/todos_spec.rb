@@ -37,7 +37,7 @@ describe API::Todos do
     end
 
     shared_examples 'an endpoint that responds with success' do
-      it do
+      specify do
         expect(response).to have_gitlab_http_status(:ok)
       end
     end

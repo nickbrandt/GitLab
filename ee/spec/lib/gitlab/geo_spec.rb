@@ -300,7 +300,7 @@ describe Gitlab::Geo, :geo, :request_store do
     end
 
     with_them do
-      it do
+      specify do
         stub_application_setting(geo_node_allowed_ips: allowed_ips)
 
         expect(described_class.allowed_ip?(ip)).to eq(allowed)

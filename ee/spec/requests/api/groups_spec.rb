@@ -646,7 +646,7 @@ describe API::Groups do
     subject { delete api("/groups/#{group.id}", user) }
 
     shared_examples_for 'immediately enqueues the job to delete the group' do
-      it do
+      specify do
         Sidekiq::Testing.fake! do
           expect { subject }.to change(GroupDestroyWorker.jobs, :size).by(1)
         end

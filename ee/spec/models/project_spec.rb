@@ -862,7 +862,7 @@ describe Project do
     with_them do
       let(:project) { build(:project, :mirror, import_url: import_url, import_data_attributes: { auth_method: auth_method } ) }
 
-      it do
+      specify do
         expect(project.repository).to receive(:fetch_upstream).with(expected, forced: false)
 
         project.fetch_mirror
