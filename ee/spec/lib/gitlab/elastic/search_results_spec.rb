@@ -17,7 +17,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       expect(Repository).to receive(:find_commits_by_message_with_elastic).with('hello world', anything).once.and_call_original
 
       results = described_class.new(user, 'hello world', limit_project_ids)
-      expect(results.objects('commits', 2)).to be_empty
+      expect(results.objects('commits', page: 2)).to be_empty
       expect(results.commits_count).to eq 0
     end
   end
@@ -56,13 +56,18 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
 
     it 'does not explode when given a page as a string' do
-      expect { results.objects(object_type, "2") }.not_to raise_error
+      expect { results.objects(object_type, page: "2") }.not_to raise_error
     end
 
     it 'paginates' do
-      objects = results.objects(object_type, 2)
+      objects = results.objects(object_type, page: 2)
       expect(objects).to respond_to(:total_count, :limit, :offset)
       expect(objects.offset_value).to eq(20)
+    end
+
+    it 'uses the per_page value if passed' do
+      objects = results.objects(object_type, page: 5, per_page: 1)
+      expect(objects.offset_value).to eq(4)
     end
   end
 

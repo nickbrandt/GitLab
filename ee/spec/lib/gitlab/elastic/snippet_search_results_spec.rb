@@ -13,6 +13,24 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     ensure_elasticsearch_index!
   end
 
+  describe 'pagination' do
+    let(:snippet2) { create(:personal_snippet, title: 'foo 2', author: snippet.author) }
+
+    before do
+      perform_enqueued_jobs { snippet2 }
+      ensure_elasticsearch_index!
+    end
+
+    it 'returns the correct page of results' do
+      expect(results.objects('snippet_titles', page: 1, per_page: 1)).to eq([snippet2])
+      expect(results.objects('snippet_titles', page: 2, per_page: 1)).to eq([snippet])
+    end
+
+    it 'returns the correct number of results for one page' do
+      expect(results.objects('snippet_titles', page: 1, per_page: 2)).to eq([snippet, snippet2])
+    end
+  end
+
   describe '#snippet_titles_count' do
     it 'returns the amount of matched snippet titles' do
       expect(results.snippet_titles_count).to eq(1)
