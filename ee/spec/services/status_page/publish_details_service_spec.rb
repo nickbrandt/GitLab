@@ -4,9 +4,10 @@ require 'spec_helper'
 
 describe StatusPage::PublishDetailsService do
   let_it_be(:project, refind: true) { create(:project) }
-  let(:issue) { instance_double(Issue) }
-  let(:user_notes) { double(:user_notes) }
+  let(:markdown_field) { 'Hello World' }
+  let(:user_notes) { [] }
   let(:incident_id) { 1 }
+  let(:issue) { instance_double(Issue, notes: user_notes, description: markdown_field, iid: incident_id) }
   let(:key) { StatusPage::Storage.details_path(incident_id) }
   let(:content) { { id: incident_id } }
 

@@ -63,9 +63,71 @@ module StatusPage
         end
       end
 
+      # Stores +file+ as +key+ in storage using multipart upload
+      #
+      # key: s3 key at which file is stored
+      # file: An open file or file-like io object
+      def multipart_upload(key, file)
+        # AWS sdk v2 has upload_file which supports multipart
+        # However Gitlab::HttpIO used when objectStorage is enabled
+        # cannot be used with upload_file
+        wrap_errors(key: key) do
+          upload_id = client.create_multipart_upload({ bucket: bucket_name, key: key }).to_h[:upload_id]
+          parts = upload_in_parts(key, file, upload_id)
+          complete_multipart_upload(key, upload_id, parts)
+        end
+      # Rescue on Exception since even on keyboard inturrupt we want to abor the upload and re-raise
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        abort_multipart_upload(key, upload_id)
+        raise e
+      end
+
       private
 
       attr_reader :client, :bucket_name
+
+      def upload_in_parts(key, file, upload_id)
+        parts = []
+        part_number = 1
+        part_size = 5.megabytes
+
+        file.seek(0)
+        until file.eof?
+          part = client.upload_part({
+            body: file.read(part_size),
+            bucket: bucket_name,
+            key: key,
+            part_number: part_number, # required
+            upload_id: upload_id
+          })
+          parts << part.to_h.merge(part_number: part_number)
+          part_number += 1
+        end
+        file.seek(0)
+
+        parts
+      end
+
+      def complete_multipart_upload(key, upload_id, parts)
+        client.complete_multipart_upload({
+          bucket: bucket_name,
+          key: key,
+          multipart_upload: {
+            parts: parts
+          },
+          upload_id: upload_id
+        })
+      end
+
+      def abort_multipart_upload(key, upload_id)
+        if upload_id
+          client.abort_multipart_upload(
+            bucket: bucket_name,
+            key: key,
+            upload_id: upload_id
+          )
+        end
+      end
 
       def list_objects(prefix)
         client.list_objects_v2(bucket: bucket_name, prefix: prefix, max_keys: StatusPage::Storage::MAX_KEYS_PER_PAGE)

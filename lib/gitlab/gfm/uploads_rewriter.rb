@@ -22,9 +22,8 @@ module Gitlab
         return @text unless needs_rewrite?
 
         @text.gsub(@pattern) do |markdown|
-          Gitlab::Utils.check_path_traversal!($~[:file])
+          file = UploadFinder.new(@source_project, $~[:secret], $~[:file]).execute
 
-          file = find_file(@source_project, $~[:secret], $~[:file])
           break markdown unless file.try(:exists?)
 
           klass = target_parent.is_a?(Namespace) ? NamespaceFileUploader : FileUploader
@@ -55,14 +54,6 @@ module Gitlab
 
       def was_embedded?(markdown)
         markdown.starts_with?("!")
-      end
-
-      private
-
-      def find_file(project, secret, file)
-        uploader = FileUploader.new(project, secret: secret)
-        uploader.retrieve_from_store!(file)
-        uploader
       end
     end
   end

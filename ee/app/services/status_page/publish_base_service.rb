@@ -44,13 +44,17 @@ module StatusPage
       project.status_page_setting&.enabled?
     end
 
-    def upload(key, json)
+    def upload_json(key, json)
       return error_limit_exceeded(key) if limit_exceeded?(json)
 
       content = json.to_json
       storage_client.upload_object(key, content)
 
       success(object_key: key)
+    end
+
+    def multipart_upload(key, uploader)
+      storage_client.multipart_upload(key, uploader)
     end
 
     def delete_object(key)

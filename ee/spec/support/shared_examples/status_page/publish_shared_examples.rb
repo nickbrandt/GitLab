@@ -20,17 +20,15 @@ RSpec.shared_examples 'publish incidents' do
       .and_return(serializer)
   end
 
-  shared_examples 'feature is not available' do
-  end
-
-  context 'when upload succeeds' do
+  context 'when json upload succeeds' do
     before do
       allow(storage_client).to receive(:upload_object).with(key, content_json)
+      allow(storage_client).to receive(:list_object_keys).and_return(Set.new)
     end
 
     it 'publishes details as JSON' do
       expect(result).to be_success
-      expect(result.payload).to eq(object_key: key)
+      expect(result.payload[:json_object_key]).to eq(key)
     end
   end
 
@@ -77,6 +75,82 @@ RSpec.shared_examples 'publish incidents' do
     it 'returns feature not available error' do
       expect(result).to be_error
       expect(result.message).to eq('Feature not available')
+    end
+  end
+
+  context 'publishes image uploads' do
+    before do
+      allow(storage_client).to receive(:upload_object).with("data/incident/1.json", "{\"id\":1}")
+      allow(storage_client).to receive(:list_object_keys).and_return(Set.new)
+    end
+
+    context 'no upload in markdown' do
+      it 'publishes no images' do
+        expect(result).to be_success
+        expect(result.payload[:image_object_keys]).to eq([])
+      end
+    end
+
+    context 'upload in markdown' do
+      let(:upload_secret) { '734b8524a16d44eb0ff28a2c2e4ff3c0' }
+      let(:image_file_name) { 'tanuki.png'}
+      let(:upload_path) { "/uploads/#{upload_secret}/#{image_file_name}" }
+      let(:markdown_field) { "![tanuki](#{upload_path})" }
+      let(:status_page_upload_path) { StatusPage::Storage.upload_path(issue.iid, upload_secret, image_file_name) }
+
+      let(:open_file) { instance_double(File) }
+      let(:upload) { double(file: double(:file, file: upload_path)) }
+
+      before do
+        allow_next_instance_of(FileUploader) do |uploader|
+          allow(uploader).to receive(:retrieve_from_store!).and_return(upload)
+        end
+        allow(File).to receive(:open).and_return(open_file)
+        allow(storage_client).to receive(:upload_object).with(upload_path, open_file)
+      end
+
+      it 'publishes description images' do
+        expect(result).to be_success
+        expect(result.payload[:image_object_keys]).to eq([status_page_upload_path])
+      end
+
+      context 'user notes uploads' do
+        let(:user_note) { instance_double(Note, note: markdown_field) }
+        let(:user_notes) { [user_note] }
+
+        it 'publishes images' do
+          expect(result).to be_success
+          expect(result.payload[:image_object_keys]).to eq([status_page_upload_path])
+        end
+      end
+
+      context 'when all images are in s3' do
+        before do
+          allow(storage_client).to receive(:list_object_keys).and_return(Set[status_page_upload_path])
+        end
+
+        it 'publishes no images' do
+          expect(result).to be_success
+          expect(result.payload[:image_object_keys]).to eq([])
+        end
+      end
+
+      context 'when images are already in s3' do
+        let(:upload_secret_2) { '9cb61a79ce884d5b6c1dd42728d3c159' }
+        let(:image_file_name_2) { 'tanuki_2.png' }
+        let(:upload_path_2) { "/uploads/#{upload_secret_2}/#{image_file_name_2}" }
+        let(:markdown_field) { "![tanuki](#{upload_path}) and ![tanuki_2](#{upload_path_2})" }
+        let(:status_page_upload_path_2) { StatusPage::Storage.upload_path(issue.iid, upload_secret_2, image_file_name_2) }
+
+        before do
+          allow(storage_client).to receive(:list_object_keys).and_return(Set[status_page_upload_path])
+        end
+
+        it 'publishes new images' do
+          expect(result).to be_success
+          expect(result.payload[:image_object_keys]).to eq([status_page_upload_path_2, status_page_upload_path_2])
+        end
+      end
     end
   end
 end

@@ -71,7 +71,8 @@ The incident detail page shows detailed information about a particular incident.
 
 - Status on the incident, including when the incident was last updated.
 - The incident title, including any emojis.
-- The description of the incident, including emojis and static images.
+- The description of the incident, including emojis.
+- Including any file attachments that are image type.[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.0.
 - A chronological ordered list of updates to the incident.
 
 ![Status Page detail](../img/status_page_detail_v12_10.png)
@@ -108,3 +109,9 @@ Anyone with access to view the Issue can add an Emoji Award to a comment, so you
 ### Changing the Incident status
 
 To change the incident status from `open` to `closed`, close the incident issue within GitLab. This will then be updated shortly on the Status Page website.
+
+## Attachment storage
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.0.
+
+Starting with GitLab 13.0, any file that is uploaded to incident issue descriptions or comments will be published and unpublished to the status page s3 bucket, as part of the publication flow described in the [How it works](#how-it-works) section.
