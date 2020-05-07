@@ -6,7 +6,7 @@ module Banzai
       self.reference_type = :design
 
       def references_relation
-        DesignManagement::Design
+        ::DesignManagement::Design
       end
 
       def nodes_visible_to_user(user, nodes)

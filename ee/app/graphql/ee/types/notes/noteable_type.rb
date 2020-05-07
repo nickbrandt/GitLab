@@ -9,7 +9,7 @@ module EE
         override :resolve_type
         def resolve_type(object, context)
           case object
-          when DesignManagement::Design
+          when ::DesignManagement::Design
             ::Types::DesignManagement::DesignType
           else
             super

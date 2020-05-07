@@ -80,7 +80,7 @@ describe Projects::DesignManagement::Designs::RawImagesController do
 
         shared_examples 'a successful request for sha' do
           it do
-            expect_next_instance_of(DesignManagement::Repository) do |repository|
+            expect_next_instance_of(::DesignManagement::Repository) do |repository|
               expect(repository).to receive(:blob_at).with(expected_ref, design.full_path).and_call_original
             end
 

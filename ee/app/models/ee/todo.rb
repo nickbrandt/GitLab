@@ -15,7 +15,7 @@ module EE
     end
 
     def for_design?
-      target_type == DesignManagement::Design.name
+      target_type == ::DesignManagement::Design.name
     end
   end
 end

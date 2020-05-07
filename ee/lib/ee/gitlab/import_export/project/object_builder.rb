@@ -18,7 +18,7 @@ module EE
           end
 
           def design?
-            klass == DesignManagement::Design
+            klass == ::DesignManagement::Design
           end
         end
       end
