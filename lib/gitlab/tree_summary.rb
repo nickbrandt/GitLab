@@ -3,6 +3,7 @@
 module Gitlab
   class TreeSummary
     include ::Gitlab::Utils::StrongMemoize
+    include ::MarkupHelper
 
     CACHE_EXPIRE_IN = 1.hour
     MAX_OFFSET = 2**31
@@ -104,6 +105,7 @@ module Gitlab
         if commit
           entry[:commit] = commit
           entry[:commit_path] = commit_path(commit)
+          entry[:commit_title_html] = markdown_field(commit, :title)
         end
       end
     end

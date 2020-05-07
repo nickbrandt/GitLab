@@ -72,7 +72,8 @@ describe Gitlab::TreeSummary do
       expected_commit_path = Gitlab::Routing.url_helpers.project_commit_path(project, commit)
 
       expect(entry[:commit]).to be_a(::Commit)
-      expect(entry[:commit_path]).to eq expected_commit_path
+      expect(entry[:commit_path]).to eq(expected_commit_path)
+      expect(entry[:commit_title_html]).to eq(commit.message)
     end
 
     context 'in a good subdirectory' do
