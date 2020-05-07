@@ -194,28 +194,31 @@ describe('Project Licenses', () => {
       ${'policies'}     | ${1}
       ${'foo'}          | ${0}
       ${'bar'}          | ${0}
-    `('when the url contains $givenUrlHash hash', ({ givenLocationHash, expectedTabIndex }) => {
-      beforeEach(() => {
-        setWindowLocation({
-          href: `${TEST_HOST}#${givenLocationHash}`,
-        });
+    `(
+      'when the url contains $givenLocationHash hash',
+      ({ givenLocationHash, expectedTabIndex }) => {
+        beforeEach(() => {
+          setWindowLocation({
+            href: `${TEST_HOST}#${givenLocationHash}`,
+          });
 
-        createComponent({
-          state: {
-            initialized: true,
-          },
-          options: {
-            provide: {
-              glFeatures: { licensePolicyList: true },
+          createComponent({
+            state: {
+              initialized: true,
             },
-          },
+            options: {
+              provide: {
+                glFeatures: { licensePolicyList: true },
+              },
+            },
+          });
         });
-      });
 
-      it(`sets the tabIndex to be "${expectedTabIndex}`, () => {
-        expect(wrapper.find(GlTabs).attributes('value')).toBe(`${expectedTabIndex}`);
-      });
-    });
+        it(`sets the tabIndex to be "${expectedTabIndex}"`, () => {
+          expect(wrapper.find(GlTabs).attributes('value')).toBe(`${expectedTabIndex}`);
+        });
+      },
+    );
 
     it.each`
       givenTabIndex | expectedLocationHash

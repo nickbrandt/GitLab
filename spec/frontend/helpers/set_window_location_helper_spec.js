@@ -8,22 +8,22 @@ describe('setWindowLocationHelper', () => {
   });
 
   it.each`
-    locationProperty | value
-    ${'hash'}        | ${'foo'}
-    ${'host'}        | ${'gitlab.com'}
-    ${'hostname'}    | ${'gitlab.com'}
-    ${'href'}        | ${'https://gitlab.com/foo'}
-    ${'origin'}      | ${'https://gitlab.com'}
-    ${'origin'}      | ${'/foo'}
-    ${'port'}        | ${'80'}
-    ${'protocol'}    | ${'https:'}
-  `('sets "window.location.$locationProperty" to be $value', ({ locationProperty, value }) => {
-    expect(window.location[locationProperty]).not.toBe(value);
+    property      | value
+    ${'hash'}     | ${'foo'}
+    ${'host'}     | ${'gitlab.com'}
+    ${'hostname'} | ${'gitlab.com'}
+    ${'href'}     | ${'https://gitlab.com/foo'}
+    ${'origin'}   | ${'https://gitlab.com'}
+    ${'origin'}   | ${'/foo'}
+    ${'port'}     | ${'80'}
+    ${'protocol'} | ${'https:'}
+  `('sets "window.location.$property" to be $value', ({ property, value }) => {
+    expect(window.location).toBe(originalLocation);
 
     setWindowLocationHelper({
-      [locationProperty]: value,
+      [property]: value,
     });
 
-    expect(window.location[locationProperty]).toBe(value);
+    expect(window.location[property]).toBe(value);
   });
 });
