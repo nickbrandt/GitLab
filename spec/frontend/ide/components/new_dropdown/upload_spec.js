@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import createComponent from 'spec/helpers/vue_mount_component_helper';
+import createComponent from 'helpers/vue_mount_component_helper';
 import upload from '~/ide/components/new_dropdown/upload.vue';
 
 describe('new dropdown upload', () => {
@@ -14,7 +14,7 @@ describe('new dropdown upload', () => {
 
     vm.entryName = 'testing';
 
-    spyOn(vm, '$emit').and.callThrough();
+    jest.spyOn(vm, '$emit');
   });
 
   afterEach(() => {
@@ -25,22 +25,22 @@ describe('new dropdown upload', () => {
     it('calls for each file', () => {
       const files = ['test', 'test2', 'test3'];
 
-      spyOn(vm, 'readFile');
-      spyOnProperty(vm.$refs.fileUpload, 'files').and.returnValue(files);
+      jest.spyOn(vm, 'readFile').mockImplementation(() => {});
+      jest.spyOn(vm.$refs.fileUpload, 'files', 'get').mockReturnValue(files);
 
       vm.openFile();
 
-      expect(vm.readFile.calls.count()).toBe(3);
+      expect(vm.readFile.mock.calls.length).toBe(3);
 
       files.forEach((file, i) => {
-        expect(vm.readFile.calls.argsFor(i)).toEqual([file]);
+        expect(vm.readFile.mock.calls[i]).toEqual([file]);
       });
     });
   });
 
   describe('readFile', () => {
     beforeEach(() => {
-      spyOn(FileReader.prototype, 'readAsDataURL');
+      jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(() => {});
     });
 
     it('calls readAsDataURL for all files', () => {
@@ -69,7 +69,7 @@ describe('new dropdown upload', () => {
     };
 
     beforeEach(() => {
-      spyOn(FileReader.prototype, 'readAsText').and.callThrough();
+      jest.spyOn(FileReader.prototype, 'readAsText');
     });
 
     it('calls readAsText and creates file in plain text (without encoding) if the file content is plain text', done => {

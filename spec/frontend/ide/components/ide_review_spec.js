@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import IdeReview from '~/ide/components/ide_review.vue';
-import store from '~/ide/stores';
+import { createStore } from '~/ide/stores';
 import { createComponentWithStore } from '../../helpers/vue_mount_component_helper';
 import { trimText } from '../../helpers/text_helper';
 import { resetStore, file } from '../helpers';
@@ -9,8 +9,10 @@ import { projectData } from '../mock_data';
 describe('IDE review mode', () => {
   const Component = Vue.extend(IdeReview);
   let vm;
+  let store;
 
   beforeEach(() => {
+    store = createStore();
     store.state.currentProjectId = 'abcproject';
     store.state.currentBranchId = 'master';
     store.state.projects.abcproject = Object.assign({}, projectData);
@@ -33,14 +35,14 @@ describe('IDE review mode', () => {
   });
 
   describe('merge request', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       store.state.currentMergeRequestId = '1';
       store.state.projects.abcproject.mergeRequests['1'] = {
         iid: 123,
         web_url: 'testing123',
       };
 
-      vm.$nextTick(done);
+      return vm.$nextTick();
     });
 
     it('renders edit dropdown', () => {
@@ -48,21 +50,23 @@ describe('IDE review mode', () => {
     });
 
     it('renders merge request link & IID', () => {
-      const link = vm.$el.querySelector('.ide-review-sub-header');
+      store.state.viewer = 'mrdiff';
 
-      expect(link.querySelector('a').getAttribute('href')).toBe('testing123');
-      expect(trimText(link.textContent)).toBe('Merge request (!123)');
+      return vm.$nextTick(() => {
+        const link = vm.$el.querySelector('.ide-review-sub-header');
+
+        expect(link.querySelector('a').getAttribute('href')).toBe('testing123');
+        expect(trimText(link.textContent)).toBe('Merge request (!123)');
+      });
     });
 
-    it('changes text to latest changes when viewer is not mrdiff', done => {
+    it('changes text to latest changes when viewer is not mrdiff', () => {
       store.state.viewer = 'diff';
 
-      vm.$nextTick(() => {
+      return vm.$nextTick(() => {
         expect(trimText(vm.$el.querySelector('.ide-review-sub-header').textContent)).toBe(
           'Latest changes',
         );
-
-        done();
       });
     });
   });

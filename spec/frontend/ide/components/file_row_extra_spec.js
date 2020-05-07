@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { createComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { createStore } from '~/ide/stores';
 import FileRowExtra from '~/ide/components/file_row_extra.vue';
 import { file, resetStore } from '../helpers';
@@ -23,9 +23,9 @@ describe('IDE extra file row component', () => {
       dropdownOpen: false,
     });
 
-    spyOnProperty(vm, 'getUnstagedFilesCountForPath').and.returnValue(() => unstagedFilesCount);
-    spyOnProperty(vm, 'getStagedFilesCountForPath').and.returnValue(() => stagedFilesCount);
-    spyOnProperty(vm, 'getChangesInFolder').and.returnValue(() => changesCount);
+    jest.spyOn(vm, 'getUnstagedFilesCountForPath', 'get').mockReturnValue(() => unstagedFilesCount);
+    jest.spyOn(vm, 'getStagedFilesCountForPath', 'get').mockReturnValue(() => stagedFilesCount);
+    jest.spyOn(vm, 'getChangesInFolder', 'get').mockReturnValue(() => changesCount);
 
     vm.$mount();
   });
