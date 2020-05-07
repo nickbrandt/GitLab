@@ -2,10 +2,9 @@
 import { mapState, mapActions } from 'vuex';
 import {
   GlAlert,
-  GlDropdown,
-  GlDropdownItem,
-  GlDropdownHeader,
-  GlDropdownDivider,
+  GlNewDropdown,
+  GlNewDropdownItem,
+  GlNewDropdownDivider,
   GlSearchBoxByType,
   GlModal,
   GlLoadingIcon,
@@ -21,10 +20,9 @@ const events = {
 export default {
   components: {
     GlAlert,
-    GlDropdown,
-    GlDropdownItem,
-    GlDropdownHeader,
-    GlDropdownDivider,
+    GlNewDropdown,
+    GlNewDropdownItem,
+    GlNewDropdownDivider,
     GlSearchBoxByType,
     GlModal,
     GlLoadingIcon,
@@ -112,31 +110,27 @@ export default {
 };
 </script>
 <template>
-  <gl-dropdown
-    toggle-class="dropdown-menu-toggle"
+  <gl-new-dropdown
     menu-class="monitor-dashboard-dropdown-menu"
     :text="selectedDashboardText"
+    :header-text="__('Dashboard')"
   >
     <div class="d-flex flex-column overflow-hidden">
-      <gl-dropdown-header class="monitor-dashboard-dropdown-header text-center">{{
-        __('Dashboard')
-      }}</gl-dropdown-header>
-      <gl-dropdown-divider />
       <gl-search-box-by-type
         ref="monitorDashboardsDropdownSearch"
         v-model="searchTerm"
         class="m-2"
       />
       <div class="flex-fill overflow-auto">
-        <gl-dropdown-item
+        <gl-new-dropdown-item
           v-for="dashboard in filteredDashboards"
           :key="dashboard.path"
-          :active="dashboard.path === selectedDashboard.path"
-          active-class="is-active"
+          is-check-item
+          :is-checked="dashboard.path === selectedDashboard.path"
           @click="selectDashboard(dashboard)"
         >
           {{ dashboard.display_name || dashboard.path }}
-        </gl-dropdown-item>
+        </gl-new-dropdown-item>
       </div>
 
       <div
@@ -148,7 +142,7 @@ export default {
       </div>
 
       <template v-if="isSystemDashboard">
-        <gl-dropdown-divider />
+        <gl-new-dropdown-divider />
 
         <gl-modal
           ref="duplicateDashboardModal"
@@ -172,10 +166,14 @@ export default {
           </template>
         </gl-modal>
 
-        <gl-dropdown-item ref="duplicateDashboardItem" v-gl-modal="'duplicateDashboardModal'">
+        <gl-new-dropdown-item
+          ref="duplicateDashboardItem"
+          v-gl-modal="'duplicateDashboardModal'"
+          is-check-item
+        >
           {{ s__('Metrics|Duplicate dashboard') }}
-        </gl-dropdown-item>
+        </gl-new-dropdown-item>
       </template>
     </div>
-  </gl-dropdown>
+  </gl-new-dropdown>
 </template>

@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import { GlDropdown, GlDropdownItem, GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import {
   defaultTimeRanges,
@@ -16,8 +17,8 @@ describe('DateTimePicker', () => {
   const findQuickRangeItems = () => dateTimePicker.findAll('.dropdown-item');
   const cancelButtonElement = () => dateTimePicker.find('button.btn-secondary').element;
 
-  const createComponent = props => {
-    dateTimePicker = mount(DateTimePicker, {
+  const createComponent = (props, mountMethod = mount) => {
+    dateTimePicker = mountMethod(DateTimePicker, {
       propsData: {
         ...props,
       },
@@ -41,6 +42,24 @@ describe('DateTimePicker', () => {
     dateTimePicker.vm.$nextTick(() => {
       expect(dateTimePicker.findAll('input').length).toBe(2);
     });
+  });
+
+  it('renders dropdown toggle using the dropdown (deprecated) component', () => {
+    createComponent();
+    expect(dateTimePicker.find(GlDropdown).exists()).toBe(true);
+    expect(dateTimePicker.find(GlNewDropdown).exists()).toBe(false);
+
+    expect(dateTimePicker.findAll(GlDropdownItem).length).not.toBe(0);
+    expect(dateTimePicker.findAll(GlNewDropdownItem).length).toBe(0);
+  });
+
+  it('renders dropdown toggle using the new dropdown component', () => {
+    createComponent({ useNewDropdown: true });
+    expect(dateTimePicker.find(GlNewDropdown).exists()).toBe(true);
+    expect(dateTimePicker.find(GlDropdown).exists()).toBe(false);
+
+    expect(dateTimePicker.findAll(GlNewDropdownItem).length).not.toBe(0);
+    expect(dateTimePicker.findAll(GlDropdownItem).length).toBe(0);
   });
 
   it('renders inputs with h/m/s truncated if its all 0s', done => {

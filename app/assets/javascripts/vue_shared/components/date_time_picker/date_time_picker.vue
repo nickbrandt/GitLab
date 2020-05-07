@@ -1,5 +1,12 @@
 <script>
-import { GlDeprecatedButton, GlDropdown, GlDropdownItem, GlFormGroup } from '@gitlab/ui';
+import {
+  GlDeprecatedButton,
+  GlDropdown,
+  GlDropdownItem,
+  GlNewDropdown,
+  GlNewDropdownItem,
+  GlFormGroup,
+} from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 
 import { convertToFixedRange, isEqualTimeRanges, findTimeRange } from '~/lib/utils/datetime_range';
@@ -29,8 +36,6 @@ export default {
     DateTimePickerInput,
     GlFormGroup,
     GlDeprecatedButton,
-    GlDropdown,
-    GlDropdownItem,
   },
   props: {
     value: {
@@ -47,6 +52,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    useNewDropdown: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -107,6 +117,13 @@ export default {
       }
       return '';
     },
+
+    dropdownComponent() {
+      return this.useNewDropdown ? GlNewDropdown : GlDropdown;
+    },
+    dropdownItemComponent() {
+      return this.useNewDropdown ? GlNewDropdownItem : GlDropdownItem;
+    },
   },
   watch: {
     value(newValue) {
@@ -158,16 +175,19 @@ export default {
 <template>
   <tooltip-on-truncate
     :title="timeWindowText"
-    :truncate-target="elem => elem.querySelector('.gl-dropdown-toggle-text')"
+    :truncate-target="
+      elem => elem.querySelector('.gl-dropdown-toggle-text, .gl-new-dropdown-button-text')
+    "
     placement="top"
     class="d-inline-block"
   >
-    <gl-dropdown
+    <component
+      :is="dropdownComponent"
       :text="timeWindowText"
       v-bind="$attrs"
       class="date-time-picker w-100"
       menu-class="date-time-picker-menu"
-      toggle-class="date-time-picker-toggle text-truncate"
+      toggle-class="text-truncate"
     >
       <div class="d-flex justify-content-between gl-p-2-deprecated-no-really-do-not-use-me">
         <gl-form-group
@@ -206,7 +226,8 @@ export default {
             <span class="gl-pl-5-deprecated-no-really-do-not-use-me">{{ __('Quick range') }}</span>
           </template>
 
-          <gl-dropdown-item
+          <component
+            :is="dropdownItemComponent"
             v-for="(option, index) in options"
             :key="index"
             :active="isOptionActive(option)"
@@ -219,9 +240,9 @@ export default {
               :class="{ invisible: !isOptionActive(option) }"
             />
             {{ option.label }}
-          </gl-dropdown-item>
+          </component>
         </gl-form-group>
       </div>
-    </gl-dropdown>
+    </component>
   </tooltip-on-truncate>
 </template>

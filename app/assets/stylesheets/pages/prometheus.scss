@@ -47,11 +47,6 @@
 }
 
 .prometheus-graphs-header {
-  .monitor-environment-dropdown-header header,
-  .monitor-dashboard-dropdown-header header {
-    font-size: $gl-font-size;
-  }
-
   .monitor-environment-dropdown-menu,
   .monitor-dashboard-dropdown-menu {
     &.show {
@@ -65,7 +60,8 @@
     }
   }
 
-  .show-last-dropdown {
+  .show-last-dropdown,
+  .gl-new-dropdown {
     // same as in .dropdown-menu-toggle
     // see app/assets/stylesheets/framework/dropdowns.scss
     width: 160px;

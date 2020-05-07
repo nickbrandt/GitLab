@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDropdownItem, GlModal, GlLoadingIcon, GlAlert } from '@gitlab/ui';
+import { GlNewDropdownItem, GlModal, GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
 
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
@@ -33,8 +33,8 @@ function createComponent(props, opts = {}) {
 describe('DashboardsDropdown', () => {
   let wrapper;
 
-  const findItems = () => wrapper.findAll(GlDropdownItem);
-  const findItemAt = i => wrapper.findAll(GlDropdownItem).at(i);
+  const findItems = () => wrapper.findAll(GlNewDropdownItem);
+  const findItemAt = i => wrapper.findAll(GlNewDropdownItem).at(i);
   const findSearchInput = () => wrapper.find({ ref: 'monitorDashboardsDropdownSearch' });
   const findNoItemsMsg = () => wrapper.find({ ref: 'monitorDashboardsDropdownMsg' });
   const setSearchTerm = searchTerm => wrapper.setData({ searchTerm });

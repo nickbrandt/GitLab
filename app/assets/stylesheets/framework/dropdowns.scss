@@ -134,6 +134,26 @@
   }
 }
 
+// Fix styles for new dropdowns
+.gl-new-dropdown .dropdown-toggle {
+  // Force toggles to match new buttons using some of the new buttons styles.
+  // Fetched from @gitlab/ui/src/components/base/button/button.scss
+  @include gl-border-0;
+  @include gl-py-3;
+  @include gl-px-4;
+  @include gl-rounded-base;
+
+  &:hover {
+    @include gl-bg-gray-50;
+    @include gl-tmp-button-secondary-hover($gray-200);
+  }
+
+  &:focus {
+    @include gl-bg-gray-50;
+    @include gl-tmp-button-focus($gray-200);
+  }
+}
+
 .dropdown-menu-toggle {
   @extend .dropdown-toggle;
   padding-right: 25px;
