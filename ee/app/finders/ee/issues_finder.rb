@@ -39,7 +39,7 @@ module EE
 
     override :by_assignee
     def by_assignee(items)
-      if params.assignees.any? && !not_query?
+      if params.assignees.any?
         params.assignees.each do |assignee|
           items = items.assigned_to(assignee)
         end
