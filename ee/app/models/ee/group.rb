@@ -389,7 +389,7 @@ module EE
 
     # Members belonging directly to Projects within Group or Projects within subgroups
     def billed_project_members
-      ::ProjectMember.active_without_invites_and_requests.where(
+      ::ProjectMember.active_without_invites_and_requests.without_project_bots.where(
         source_id: ::Project.joins(:group).where(namespace: self_and_descendants)
       )
     end
