@@ -45,6 +45,6 @@ export default {
   <div>
     <active-toggle v-if="showActive" v-bind="activeToggleProps" />
     <jira-trigger-fields v-if="isJira" v-bind="triggerFieldsProps" />
-    <trigger-fields v-else :events="triggerEvents" :type="type" />
+    <trigger-fields v-else-if="triggerEvents.length" :events="triggerEvents" :type="type" />
   </div>
 </template>
