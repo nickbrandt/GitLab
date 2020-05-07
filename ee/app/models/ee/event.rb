@@ -23,16 +23,10 @@ module EE
       @capability ||= begin
                         if epic? || epic_note?
                           :read_epic
-                        elsif design_note?
-                          :read_design
                         else
                           super
                         end
                       end
-    end
-
-    def design_note?
-      note? && note.for_design?
     end
 
     def epic_note?

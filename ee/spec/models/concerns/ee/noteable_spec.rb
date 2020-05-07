@@ -14,10 +14,4 @@ describe EE::Noteable do
       expect(klazz.replyable_types).to include("Vulnerability")
     end
   end
-
-  describe '.resolvable_types' do
-    it 'includes design management' do
-      expect(klazz.resolvable_types).to include('DesignManagement::Design')
-    end
-  end
 end
