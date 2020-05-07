@@ -51,6 +51,7 @@ export default {
       },
       update: ({ group }) => group.vulnerabilities.nodes,
       result({ data }) {
+        this.$emit('projectFetch', data.group.projects.nodes);
         this.pageInfo = data.group.vulnerabilities.pageInfo;
       },
       error() {

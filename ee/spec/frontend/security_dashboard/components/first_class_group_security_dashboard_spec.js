@@ -52,7 +52,15 @@ describe('First Class Group Dashboard Component', () => {
     expect(findFilters().exists()).toBe(true);
   });
 
-  it('it responds to the filterChange event', () => {
+  it('responds to the projectFetch event', () => {
+    const projects = [{ id: 1, name: 'GitLab Org' }];
+    findGroupVulnerabilities().vm.$listeners.projectFetch(projects);
+    return wrapper.vm.$nextTick(() => {
+      expect(findFilters().props('projects')).toEqual(projects);
+    });
+  });
+
+  it('responds to the filterChange event', () => {
     const filters = { severity: 'critical' };
     findFilters().vm.$listeners.filterChange(filters);
     return wrapper.vm.$nextTick(() => {

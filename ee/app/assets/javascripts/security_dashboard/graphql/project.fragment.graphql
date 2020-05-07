@@ -1,0 +1,4 @@
+fragment Project on Project {
+  id
+  name
+}
