@@ -81,12 +81,10 @@ const createComponent = ({ state, props, options }) => {
     },
     ...options,
     store: fakeStore,
-    stubs: {
-      GlTabs,
-      GlTab,
-    },
   });
 };
+
+const findByTestId = testId => wrapper.find(`[data-testid="${testId}"]`);
 
 describe('Project Licenses', () => {
   afterEach(() => {
@@ -188,54 +186,6 @@ describe('Project Licenses', () => {
       expect(wrapper.findAll(GlTab)).toHaveLength(2);
     });
 
-    describe.each`
-      givenLocationHash | expectedTabIndex
-      ${'licenses'}     | ${0}
-      ${'policies'}     | ${1}
-      ${'foo'}          | ${0}
-      ${'bar'}          | ${0}
-    `(
-      'when the url contains $givenLocationHash hash',
-      ({ givenLocationHash, expectedTabIndex }) => {
-        beforeEach(() => {
-          setWindowLocation({
-            href: `${TEST_HOST}#${givenLocationHash}`,
-          });
-
-          createComponent({
-            state: {
-              initialized: true,
-            },
-            options: {
-              provide: {
-                glFeatures: { licensePolicyList: true },
-              },
-            },
-          });
-        });
-
-        it(`sets the tabIndex to be "${expectedTabIndex}"`, () => {
-          expect(wrapper.find(GlTabs).attributes('value')).toBe(`${expectedTabIndex}`);
-        });
-      },
-    );
-
-    it.each`
-      givenTabIndex | expectedLocationHash
-      ${0}          | ${'licenses'}
-      ${1}          | ${'policies'}
-    `(
-      'sets the location hash to "tabName" when the corresponding tab is activated',
-      ({ givenTabIndex, expectedLocationHash }) => {
-        wrapper.setData({ tabIndex: givenTabIndex });
-        wrapper.vm.$forceUpdate();
-
-        return wrapper.vm.$nextTick().then(() => {
-          expect(window.location.hash).toBe(expectedLocationHash);
-        });
-      },
-    );
-
     it('it renders the "Detected in project" table', () => {
       expect(wrapper.find(DetectedLicensesTable).exists()).toBe(true);
     });
@@ -247,6 +197,50 @@ describe('Project Licenses', () => {
     it('renders the pipeline info', () => {
       expect(wrapper.find(PipelineInfo).exists()).toBe(true);
     });
+
+    describe.each`
+      givenLocationHash | expectedActiveTab
+      ${'#licenses'}    | ${'licenses'}
+      ${'#policies'}    | ${'policies'}
+    `(
+      'when window.location contains the hash "$givenLocationHash"',
+      ({ givenLocationHash, expectedActiveTab }) => {
+        const originalLocation = window.location;
+
+        beforeEach(() => {
+          setWindowLocation(`http://foo.com/index${givenLocationHash}`);
+
+          createComponent({
+            state: {
+              initialized: true,
+              isLoading: false,
+              licenses: [
+                {
+                  name: 'MIT',
+                  classification: LICENSE_APPROVAL_CLASSIFICATION.DENIED,
+                  components: [],
+                },
+              ],
+              pageInfo: 1,
+            },
+            options: {
+              provide: {
+                glFeatures: { licensePolicyList: true },
+              },
+              mount: true,
+            },
+          });
+        });
+
+        afterEach(() => {
+          window.location = originalLocation;
+        });
+
+        it(`sets the active tab to be "${expectedActiveTab}"`, () => {
+          expect(findByTestId(`${expectedActiveTab}Tab`).classes()).toContain('active');
+        });
+      },
+    );
 
     describe('when the tabs are rendered', () => {
       const pageInfo = {
@@ -280,6 +274,21 @@ describe('Project Licenses', () => {
           },
         });
       });
+
+      it.each`
+        givenActiveTab | expectedLocationHash
+        ${'policies'}  | ${'#policies'}
+        ${'licenses'}  | ${'#licenses'}
+      `(
+        'sets the location hash to "$expectedLocationHash" when the "$givenTab" tab is activate',
+        ({ givenActiveTab, expectedLocationHash }) => {
+          findByTestId(`${givenActiveTab}TabTitle`).trigger('click');
+
+          return wrapper.vm.$nextTick().then(() => {
+            expect(window.location.hash).toBe(expectedLocationHash);
+          });
+        },
+      );
 
       it('it renders the correct count in "Detected in project" tab', () => {
         expect(

@@ -1,6 +1,6 @@
-import setWindowLocationHelper from './set_window_location_helper';
+import setWindowLocation from './set_window_location_helper';
 
-describe('setWindowLocationHelper', () => {
+describe('setWindowLocation', () => {
   const originalLocation = window.location;
 
   afterEach(() => {
@@ -8,22 +8,33 @@ describe('setWindowLocationHelper', () => {
   });
 
   it.each`
-    property      | value
-    ${'hash'}     | ${'foo'}
-    ${'host'}     | ${'gitlab.com'}
-    ${'hostname'} | ${'gitlab.com'}
-    ${'href'}     | ${'https://gitlab.com/foo'}
-    ${'origin'}   | ${'https://gitlab.com'}
-    ${'origin'}   | ${'/foo'}
-    ${'port'}     | ${'80'}
-    ${'protocol'} | ${'https:'}
-  `('sets "window.location.$property" to be $value', ({ property, value }) => {
-    expect(window.location).toBe(originalLocation);
+    url                                    | property      | value
+    ${'https://gitlab.com#foo'}            | ${'hash'}     | ${'#foo'}
+    ${'http://gitlab.com'}                 | ${'host'}     | ${'gitlab.com'}
+    ${'http://gitlab.org'}                 | ${'hostname'} | ${'gitlab.org'}
+    ${'http://gitlab.org/foo#bar'}         | ${'href'}     | ${'http://gitlab.org/foo#bar'}
+    ${'http://gitlab.com'}                 | ${'origin'}   | ${'http://gitlab.com'}
+    ${'http://gitlab.com/foo/bar/baz'}     | ${'pathname'} | ${'/foo/bar/baz'}
+    ${'https://gitlab.com'}                | ${'protocol'} | ${'https:'}
+    ${'http://gitlab.com#foo'}             | ${'protocol'} | ${'http:'}
+    ${'http://gitlab.com:8080'}            | ${'port'}     | ${'8080'}
+    ${'http://gitlab.com?foo=bar&bar=foo'} | ${'search'}   | ${'?foo=bar&bar=foo'}
+  `(
+    'sets "window.location.$property" to be "$value" when called with: "$url"',
+    ({ url, property, value }) => {
+      expect(window.location).toBe(originalLocation);
 
-    setWindowLocationHelper({
-      [property]: value,
-    });
+      setWindowLocation(url);
 
-    expect(window.location[property]).toBe(value);
-  });
+      expect(window.location[property]).toBe(value);
+    },
+  );
+
+  it.each([null, 1, undefined, false, '', 'gitlab.com'])(
+    'throws an error when called with an invalid url: "%s"',
+    invalidUrl => {
+      expect(() => setWindowLocation(invalidUrl)).toThrow(new TypeError('Invalid URL'));
+      expect(window.location).toBe(originalLocation);
+    },
+  );
 });

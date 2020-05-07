@@ -137,18 +137,18 @@ export default {
     <!-- TODO: Remove feature flag -->
     <template v-if="hasLicensePolicyList">
       <gl-tabs v-model="tabIndex" content-class="pt-0">
-        <gl-tab>
+        <gl-tab data-testid="licensesTab">
           <template #title>
-            {{ s__('Licenses|Detected in Project') }}
+            <span data-testid="licensesTabTitle">{{ s__('Licenses|Detected in Project') }}</span>
             <gl-badge pill>{{ licenseCount }}</gl-badge>
           </template>
 
           <detected-licenses-table />
         </gl-tab>
 
-        <gl-tab>
+        <gl-tab data-testid="policiesTab">
           <template #title>
-            {{ s__('Licenses|Policies') }}
+            <span data-testid="policiesTabTitle">{{ s__('Licenses|Policies') }}</span>
             <gl-badge pill>{{ policyCount }}</gl-badge>
           </template>
 
