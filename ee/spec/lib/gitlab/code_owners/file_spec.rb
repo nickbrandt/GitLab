@@ -52,8 +52,21 @@ describe Gitlab::CodeOwners::File do
           expect(data.keys).to contain_exactly("codeowners", "Documentation", "Database")
         end
 
+        codeowners_section_paths = [
+          "/**/#file_with_pound.rb", "/**/*", "/**/*.rb", "/**/CODEOWNERS",
+          "/**/LICENSE", "/**/lib/**/*", "/**/path with spaces/**/*",
+          "/config/**/*", "/docs/*", "/docs/**/*"
+        ]
+
+        codeowners_section_owners = [
+          "@all-docs", "@config-owner", "@default-codeowner",
+          "@legal this does not match janedoe@gitlab.com", "@lib-owner",
+          "@multiple @owners\t@tab-separated", "@owner-file-with-pound",
+          "@root-docs", "@ruby-owner", "@space-owner"
+        ]
+
         where(:section, :patterns, :owners) do
-          "codeowners"    | ["/**/ee/**/*"] | ["@gl-admin"]
+          "codeowners"    | codeowners_section_paths | codeowners_section_owners
           "Documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"] | ["@gl-docs"]
           "Database"      | ["/**/README.md", "/**/model/db"] | ["@gl-database"]
         end
@@ -226,7 +239,7 @@ describe Gitlab::CodeOwners::File do
       end
 
       it 'correctly matches paths with spaces' do
-        entry = file.entry_for_path('path with spaces/README.md').first
+        entry = file.entry_for_path('path with spaces/docs.md').first
 
         expect(entry.owner_line).to eq('@space-owner')
       end
@@ -285,7 +298,17 @@ describe Gitlab::CodeOwners::File do
         stub_feature_flags(sectional_codeowners: true)
       end
 
-      it_behaves_like "returns expected matches"
+      context "when CODEOWNERS file contains no sections" do
+        it_behaves_like "returns expected matches"
+      end
+
+      context "when CODEOWNERS file contains multiple sections" do
+        let(:file_content) do
+          File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
+        end
+
+        it_behaves_like "returns expected matches"
+      end
     end
 
     context "when feature flag `:sectional_codeowners` is disabled" do
@@ -293,7 +316,17 @@ describe Gitlab::CodeOwners::File do
         stub_feature_flags(sectional_codeowners: false)
       end
 
-      it_behaves_like "returns expected matches"
+      context "when CODEOWNERS file contains no sections" do
+        it_behaves_like "returns expected matches"
+      end
+
+      context "when CODEOWNERS file contains multiple sections" do
+        let(:file_content) do
+          File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
+        end
+
+        it_behaves_like "returns expected matches"
+      end
     end
   end
 end
