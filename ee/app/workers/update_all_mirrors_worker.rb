@@ -42,6 +42,17 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
     last = nil
     scheduled = 0
 
+    # On GitLab.com, we stopped processing free mirrors for private
+    # projects on 2020-03-27. Including mirrors with
+    # next_execution_timestamp of that date or earlier in the query will
+    # lead to higher query times:
+    # <https://gitlab.com/gitlab-org/gitlab/-/issues/216252>
+    #
+    # We should remove this workaround in favour of a simpler solution:
+    # <https://gitlab.com/gitlab-org/gitlab/-/issues/216783>
+    #
+    last = Time.utc(2020, 3, 28) if Gitlab.com?
+
     while capacity > 0
       batch_size = [capacity * 2, 500].min
       projects = pull_mirrors_batch(freeze_at: now, batch_size: batch_size, offset_at: last).to_a
