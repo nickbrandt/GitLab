@@ -119,7 +119,7 @@ Enter file in which to save the key (/home/user/.ssh/id_rsa):
 For guidance, proceed to the [common steps](#common-steps-for-generating-an-ssh-key-pair).
 
 NOTE: **Note:**
-If your have OpenSSH version 7.8 or below, consider the problems associated
+If you have OpenSSH version 7.8 or below, consider the problems associated
 with [encoding](#rsa-keys-and-openssh-from-versions-65-to-78).
 
 ### Common steps for generating an SSH key pair
@@ -371,37 +371,52 @@ git remote set-url origin git@<user_1.gitlab.com>:gitlab-org/gitlab.git
 ## Deploy keys
 
 Deploy keys allow read-only or read-write (if enabled) access to one or
-multiple repositories with a single SSH key pair.
+multiple repositories, by importing SSH public key to your GitLab instance.
 
 This is useful for cloning repositories to your Continuous
 Integration (CI) server. By using deploy keys, you don't have to set up a
 dummy user account.
 
-If you don't have a key pair, you might want to use a
+There are two types of deploy keys: [Project deploy keys](#project-deploy-keys) or [Instance-wide deploy keys](#instance-wide-deploy-keys).
+
+If you don't have a SSH key pair to use for this intent, you might want to use a
 [deploy token](../user/project/deploy_tokens/index.md#deploy-tokens) instead.
 
-### Per-repository deploy keys
+### Project deploy keys
 
-Project maintainers and owners can add a deploy key for a repository.
+[Project maintainers and owners](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions)
+can add or enable a deploy key for a project repository. To do so:
 
 1. Navigate to the project's **Settings > Repository** page.
 1. Expand the **Deploy Keys** section.
-1. Specify a title for the new deploy key and paste a public SSH key.
 
-After this, the machine that uses the corresponding private SSH key has read-only or
-read-write (if enabled) access to the project.
+There are three types of Deploy Keys, as shown in the screenshot underneath:
 
-You can't add the same deploy key twice using the form.
-If you want to add the same key to another project, please enable it in the
-list that says **Deploy keys from projects available to you**. All the deploy
-keys of all the projects you have access to are available. This project
-access can happen through being a direct member of the project, or through
-a group.
+![Deploy Keys section](img/deploy_keys_v13_0.png)
 
-Deploy keys can be shared between projects, you just need to add them to each
-project.
+* You can add your own SSH key.
+  * Specify a title for the new deploy key and paste your public SSH key.
+  * Check **Write access allowed** to allow read-write access. Leave it
+    unchecked for read-only.
 
-### Global shared deploy keys
+  Once you submit this form, your key will then be enabled for this project right away, as it'll appear in the **Enabled deploy keys** tab.
+* From the **Privately accessible deploy key**, you can enable a private key which has been already imported to another project.
+  You have access to these keys because you either have uploaded them yourselves
+  or you are a maintainer/owner of this other project.
+* From the **Instance-wide deploy key** tab, you can enable keys that were made
+  available to your entire GitLab instance. More about this type of keys
+  [here](#instance-wide-deploy-keys).
+
+Once a key is enabled, you can edit it to update its title or switch between
+read-only and read-write access.
+
+NOTE: **Note:**
+If you have enabled a privately accessible or instance-wide deploy key for your
+project, and then if you update the access level of this key from read-only to
+read-write, this change will be effective only for the current project you just
+enabled this key for.
+
+### Instance-wide deploy keys
 
 Global Shared Deploy keys allow read-only or read-write access to
 any repository in the entire GitLab installation.
