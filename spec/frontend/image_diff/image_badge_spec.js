@@ -79,7 +79,7 @@ describe('ImageBadge', () => {
 
   describe('imageEl property is provided and not browser property', () => {
     beforeEach(() => {
-      spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement').and.returnValue(true);
+      jest.spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement').mockReturnValue(true);
     });
 
     it('should generate browser property', () => {

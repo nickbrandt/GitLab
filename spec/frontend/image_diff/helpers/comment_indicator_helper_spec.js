@@ -128,8 +128,8 @@ describe('commentIndicatorHelper', () => {
         currentTarget: containerEl.querySelector('button'),
       };
 
-      spyOn(event, 'stopPropagation');
-      spyOn(textAreaEl, 'focus');
+      jest.spyOn(event, 'stopPropagation').mockImplementation(() => {});
+      jest.spyOn(textAreaEl, 'focus').mockImplementation(() => {});
       commentIndicatorHelper.commentIndicatorOnClick(event);
     });
 
