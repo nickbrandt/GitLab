@@ -210,7 +210,8 @@ export default {
           type="submit"
           :aria-label="__('Save changes')"
           :disabled="isSaveChangesDisabled"
-        >{{ __('Save changes') }}</gl-button>
+          >{{ __('Save changes') }}</gl-button
+        >
         <gl-button :href="cancelPath" class="js-cancel-button">{{ __('Cancel') }}</gl-button>
       </div>
     </form>

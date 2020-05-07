@@ -170,9 +170,9 @@ export default {
 <template>
   <gl-new-dropdown>
     <template slot="button-content">
-      <span ref="buttonText" class="flex-grow-1 ml-1 text-muted">
-        {{ selectedMilestonesLabel }}
-      </span>
+      <span ref="buttonText" class="flex-grow-1 ml-1 text-muted">{{
+        selectedMilestonesLabel
+      }}</span>
       <gl-icon name="chevron-down" />
     </template>
 
@@ -190,9 +190,9 @@ export default {
     />
 
     <gl-new-dropdown-item @click="onMilestoneClicked(null)">
-      <span :class="{ 'pl-4': true, 'selected-item': selectedMilestones.length === 0 }">{{
-        $options.translations.noMilestone
-      }}</span>
+      <span :class="{ 'pl-4': true, 'selected-item': selectedMilestones.length === 0 }">
+        {{ $options.translations.noMilestone }}
+      </span>
     </gl-new-dropdown-item>
 
     <gl-new-dropdown-divider />
@@ -214,9 +214,9 @@ export default {
         role="milestone option"
         @click="onMilestoneClicked(item)"
       >
-        <span :class="{ 'pl-4': true, 'selected-item': isSelectedMilestone(item) }">{{
-          item
-        }}</span>
+        <span :class="{ 'pl-4': true, 'selected-item': isSelectedMilestone(item) }">
+          {{ item }}
+        </span>
       </gl-new-dropdown-item>
       <gl-new-dropdown-divider />
     </template>
