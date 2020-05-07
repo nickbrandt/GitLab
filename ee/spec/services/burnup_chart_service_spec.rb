@@ -19,8 +19,14 @@ describe BurnupChartService do
   let_it_be(:issue3) { create(:issue, project: project, milestone: milestone1) }
   let_it_be(:other_issue) { create(:issue, project: project) }
 
+  let_it_be(:weight_event1) { create(:resource_weight_event, issue: issue1, weight: 9, created_at: start_date + 2.seconds) }
+  let_it_be(:weight_event2) { create(:resource_weight_event, issue: issue2, weight: 3, created_at: start_date + 3.seconds) }
+  let_it_be(:weight_event3) { create(:resource_weight_event, issue: issue3, weight: 1, created_at: start_date + 2.days) }
+  let_it_be(:weight_event4) { create(:resource_weight_event, issue: issue3, weight: 2, created_at: start_date + 2.days + 23.hours + 59.minutes + 59.seconds) }
+  let_it_be(:weight_event5) { create(:resource_weight_event, issue: issue3, weight: 7, created_at: start_date + 4.days + 1.second) }
+
   let_it_be(:event1) { create(:resource_milestone_event, issue: issue1, action: :add, milestone: milestone1, created_at: start_date + 1.second) }
-  let_it_be(:event2) { create(:resource_milestone_event, issue: issue2, action: :add, milestone: milestone1, created_at: start_date + 2.seconds) }
+  let_it_be(:event2) { create(:resource_milestone_event, issue: issue2, action: :add, milestone: milestone1, created_at: start_date + 4.seconds) }
   let_it_be(:event3) { create(:resource_milestone_event, issue: issue3, action: :add, milestone: milestone1, created_at: start_date + 1.day) }
   let_it_be(:event4) { create(:resource_milestone_event, issue: issue3, action: :remove, milestone: nil, created_at: start_date + 2.days + 1.second) }
   let_it_be(:event5) { create(:resource_milestone_event, issue: issue3, action: :add, milestone: milestone2, created_at: start_date + 3.days) }
@@ -43,17 +49,20 @@ describe BurnupChartService do
 
       data = described_class.new(milestone: milestone1, user: user).execute
 
-      expected_events = [
-        { action: 'add', issue_id: issue1.id, milestone_id: milestone2.id, created_at: start_date.beginning_of_day - 1.second },
-        { action: 'add', issue_id: issue1.id, milestone_id: milestone1.id, created_at: start_date + 1.second },
-        { action: 'add', issue_id: issue2.id, milestone_id: milestone1.id, created_at: start_date + 2.seconds },
-        { action: 'add', issue_id: issue3.id, milestone_id: milestone1.id, created_at: start_date + 1.day },
-        { action: 'remove', issue_id: issue3.id, milestone_id: milestone1.id, created_at: start_date + 2.days + 1.second },
-        { action: 'add', issue_id: issue3.id, milestone_id: milestone2.id, created_at: start_date + 3.days },
-        { action: 'remove', issue_id: issue3.id, milestone_id: milestone2.id, created_at: start_date + 4.days }
-      ]
+      expect(data.size).to eq(12)
 
-      expect(data).to eq(expected_events)
+      expect(data[0]).to include(event_type: 'milestone', action: 'add', issue_id: issue1.id, milestone_id: milestone2.id, created_at: start_date.beginning_of_day - 1.second)
+      expect(data[1]).to include(event_type: 'milestone', action: 'add', issue_id: issue1.id, milestone_id: milestone1.id, created_at: start_date + 1.second)
+      expect(data[2]).to include(event_type: 'weight', issue_id: issue1.id, weight: 9, created_at: start_date + 2.seconds)
+      expect(data[3]).to include(event_type: 'weight', issue_id: issue2.id, weight: 3, created_at: start_date + 3.seconds)
+      expect(data[4]).to include(event_type: 'milestone', action: 'add', issue_id: issue2.id, milestone_id: milestone1.id, created_at: start_date + 4.seconds)
+      expect(data[5]).to include(event_type: 'milestone', action: 'add', issue_id: issue3.id, milestone_id: milestone1.id, created_at: start_date + 1.day)
+      expect(data[6]).to include(event_type: 'weight', issue_id: issue3.id, weight: 1, created_at: start_date + 2.days)
+      expect(data[7]).to include(event_type: 'milestone', action: 'remove', issue_id: issue3.id, milestone_id: milestone1.id, created_at: start_date + 2.days + 1.second)
+      expect(data[8]).to include(event_type: 'weight', issue_id: issue3.id, weight: 2, created_at: start_date + 2.days + 23.hours + 59.minutes + 59.seconds)
+      expect(data[9]).to include(event_type: 'milestone', action: 'add', issue_id: issue3.id, milestone_id: milestone2.id, created_at: start_date + 3.days)
+      expect(data[10]).to include(event_type: 'milestone', action: 'remove', issue_id: issue3.id, milestone_id: milestone2.id, created_at: start_date + 4.days)
+      expect(data[11]).to include(event_type: 'weight', issue_id: issue3.id, weight: 7, created_at: start_date + 4.days + 1.second)
     end
 
     it 'excludes issues which should not be visible to the user ' do

@@ -17,13 +17,11 @@ RSpec.shared_examples 'group and project milestone burnups' do |route_definition
       expect(json_response).to be_an Array
       expect(json_response).to match_schema('burnup_events', dir: 'ee')
 
-      expected_events = [
-        { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event1.created_at.iso8601(3) },
-        { 'issue_id' => issue2.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event2.created_at.iso8601(3) },
-        { 'issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'remove', 'created_at' => event3.created_at.iso8601(3) }
-      ]
+      expect(json_response.size).to eq(3)
 
-      expect(json_response).to eq(expected_events)
+      expect(json_response.first).to include('issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event_time - 1.hour)
+      expect(json_response.second).to include('issue_id' => issue2.id, 'milestone_id' => milestone.id, 'action' => 'add', 'created_at' => event_time + 1.hour)
+      expect(json_response.third).to include('issue_id' => issue1.id, 'milestone_id' => milestone.id, 'action' => 'remove', 'created_at' => event_time + 2.hours)
     end
 
     it 'returns 404 when user is not authorized to read milestone' do

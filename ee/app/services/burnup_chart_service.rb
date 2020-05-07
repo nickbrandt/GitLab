@@ -3,7 +3,12 @@
 class BurnupChartService
   include Gitlab::Utils::StrongMemoize
 
-  attr_reader :milestone, :start_date, :due_date, :end_date, :user
+  EVENT_TYPE = 'event_type'.freeze
+  CREATED_AT = 'created_at'.freeze
+  MILESTONE_ID = 'value'.freeze
+  WEIGHT = 'value'.freeze
+  ACTION = 'action'.freeze
+  ISSUE_ID = 'issue_id'.freeze
 
   def initialize(milestone:, user:)
     @user = user
@@ -15,10 +20,12 @@ class BurnupChartService
   def execute
     return [] unless milestone.burnup_charts_available?
 
+    return [] unless can_read_milestone?
+
     events = []
     assigned_milestones = {}
 
-    resource_milestone_events.each do |event|
+    resource_events.each do |event|
       handle_added_milestone(event, assigned_milestones)
 
       events << create_burnup_graph_event_by(event, assigned_milestones)
@@ -31,25 +38,74 @@ class BurnupChartService
 
   private
 
+  attr_reader :milestone, :start_date, :due_date, :end_date, :user
+
+  def can_read_milestone?
+    Ability.allowed?(user, :read_milestone, milestone_parent)
+  end
+
+  def milestone_parent
+    if milestone.group_milestone?
+      milestone.group
+    else
+      milestone.project
+    end
+  end
+
   def handle_added_milestone(event, assigned_milestones)
-    if event.add?
-      assigned_milestones[event.issue_id] = event.milestone_id
+    if add_milestone?(event)
+      assigned_milestones[event[ISSUE_ID]] = event[MILESTONE_ID]
     end
   end
 
   def handle_removed_milestone(event, assigned_milestones)
-    if event.remove?
-      assigned_milestones[event.issue_id] = nil
+    if remove_milestone?(event)
+      assigned_milestones[event[ISSUE_ID]] = nil
     end
+  end
+
+  def resource_events
+    strong_memoize(:resource_events) do
+      union = Gitlab::SQL::Union.new(all_events).to_sql # rubocop: disable Gitlab/Union
+      ActiveRecord::Base.connection.execute("(#{union}) ORDER BY created_at")
+    end
+  end
+
+  def all_events
+    [milestone_events, weight_events]
+  end
+
+  def weight_events
+    ResourceWeightEvent.by_issue_ids_and_created_at_earlier_or_equal_to(relevant_issue_ids, end_time)
+      .select('\'weight\' as event_type, created_at, weight as value, null as action, issue_id')
+  end
+
+  def milestone_events
+    ResourceMilestoneEvent.by_issue_ids_and_created_at_earlier_or_equal_to(relevant_issue_ids, end_time)
+      .select('\'milestone\' as event_type, created_at, milestone_id as value, action, issue_id')
   end
 
   def create_burnup_graph_event_by(event, assigned_milestones)
     {
-      created_at: event.created_at,
-      action: event.action,
+      event_type: event[EVENT_TYPE],
+      created_at: event[CREATED_AT],
+      action: action_of(event),
       milestone_id: milestone_id_of(event, assigned_milestones),
-      issue_id: event.issue_id
+      issue_id: event[ISSUE_ID],
+      weight: weight_of(event)
     }
+  end
+
+  def action_of(event)
+    return unless milestone_event?(event)
+
+    ResourceMilestoneEvent.actions.key(event[ACTION])
+  end
+
+  def weight_of(event)
+    return unless event[EVENT_TYPE] == 'weight'
+
+    event[WEIGHT]
   end
 
   def assign_dates_by_milestone
@@ -63,45 +119,43 @@ class BurnupChartService
   end
 
   def milestone_id_of(event, assigned_milestones)
-    if event.remove? && event.milestone_id.nil?
-      return assigned_milestones[event.issue_id]
+    if remove_milestone?(event) && event[MILESTONE_ID].nil?
+      return assigned_milestones[event[ISSUE_ID]]
     end
 
-    event.milestone_id
+    event[MILESTONE_ID]
   end
 
-  # This is just temporarily disabled until https://gitlab.com/gitlab-org/gitlab/-/merge_requests/29578
-  # is merged.
+  def add_milestone?(event)
+    return unless milestone_event?(event)
+
+    event[ACTION] == ResourceMilestoneEvent.actions[:add]
+  end
+
+  def remove_milestone?(event)
+    return unless milestone_event?(event)
+
+    event[ACTION] == ResourceMilestoneEvent.actions[:remove]
+  end
+
+  def milestone_event?(event)
+    event[EVENT_TYPE] == 'milestone'
+  end
+
   # rubocop: disable CodeReuse/ActiveRecord
-  def resource_milestone_events
-    # Here we use the relevant issues to get *all* milestone events for
-    # them.
-    strong_memoize(:resource_milestone_events) do
-      ResourceMilestoneEvent
-        .where(issue_id: relevant_issue_ids)
-        .where('created_at <= ?', end_time)
-        .order(:created_at)
-    end
-  end
-
   def relevant_issue_ids
     # We are using all resource milestone events where the
     # milestone in question was added to identify the relevant
     # issues.
     strong_memoize(:relevant_issue_ids) do
-      ids = ResourceMilestoneEvent
-              .select(:issue_id)
-              .where(milestone_id: milestone.id)
-              .where(action: :add)
-              .distinct
-
-      # We need to perform an additional check whether all these
-      # issues are visible to the given user
-      IssuesFinder.new(user)
-        .execute.select(:id).where(id: ids)
+      ResourceMilestoneEvent
+            .select(:issue_id)
+            .where(milestone_id: milestone.id)
+            .where(action: :add)
+            .distinct
     end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def end_time
     @end_time ||= @end_date.end_of_day
