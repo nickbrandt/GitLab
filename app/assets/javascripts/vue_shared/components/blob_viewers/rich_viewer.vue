@@ -1,15 +1,18 @@
 <script>
-import MarkdownFieldMixin from '~/vue_shared/mixins/markdown_field_mixin';
+import MarkdownFieldView from '~/vue_shared/components/markdown/field_view.vue';
 import ViewerMixin from './mixins';
 import { handleBlobRichViewer } from '~/blob/viewer';
 
 export default {
-  mixins: [ViewerMixin, MarkdownFieldMixin],
+  components: {
+    MarkdownFieldView,
+  },
+  mixins: [ViewerMixin],
   mounted() {
     handleBlobRichViewer(this.$refs.content, this.type);
   },
 };
 </script>
 <template>
-  <div ref="content" v-html="content"></div>
+  <markdown-field-view ref="content" v-html="content" />
 </template>

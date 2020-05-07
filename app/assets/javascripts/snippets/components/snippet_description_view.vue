@@ -1,8 +1,10 @@
 <script>
-import MarkdownFieldMixin from '~/vue_shared/mixins/markdown_field_mixin';
+import MarkdownFieldView from '~/vue_shared/components/markdown/field_view.vue';
 
 export default {
-  mixins: [MarkdownFieldMixin],
+  components: {
+    MarkdownFieldView,
+  },
   props: {
     description: {
       type: String,
@@ -13,7 +15,7 @@ export default {
 };
 </script>
 <template>
-  <div class="snippet-description" data-qa-selector="snippet_description_field">
+  <markdown-field-view class="snippet-description" data-qa-selector="snippet_description_field">
     <div class="md js-snippet-description" v-html="description"></div>
-  </div>
+  </markdown-field-view>
 </template>

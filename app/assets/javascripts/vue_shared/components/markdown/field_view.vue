@@ -1,3 +1,4 @@
+<script>
 import $ from 'jquery';
 import '~/behaviors/markdown/render_gfm';
 
@@ -11,3 +12,8 @@ export default {
     },
   },
 };
+</script>
+
+<template>
+  <div><slot></slot></div>
+</template>

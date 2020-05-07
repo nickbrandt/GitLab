@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import RichViewer from '~/vue_shared/components/blob_viewers/rich_viewer.vue';
+import MarkdownFieldView from '~/vue_shared/components/markdown/field_view.vue';
 import { handleBlobRichViewer } from '~/blob/viewer';
-import $ from 'jquery';
 
 jest.mock('~/blob/viewer');
 
@@ -9,8 +9,6 @@ describe('Blob Rich Viewer component', () => {
   let wrapper;
   const content = '<h1 id="markdown">Foo Bar</h1>';
   const defaultType = 'markdown';
-
-  let renderGFMSpy;
 
   function createComponent(type = defaultType) {
     wrapper = shallowMount(RichViewer, {
@@ -22,7 +20,6 @@ describe('Blob Rich Viewer component', () => {
   }
 
   beforeEach(() => {
-    renderGFMSpy = jest.spyOn($.fn, 'renderGFM');
     createComponent();
   });
 
@@ -38,7 +35,7 @@ describe('Blob Rich Viewer component', () => {
     expect(handleBlobRichViewer).toHaveBeenCalledWith(expect.anything(), defaultType);
   });
 
-  it('processes rendering with GFM', () => {
-    expect(renderGFMSpy).toHaveBeenCalled();
+  it('is using Markdown View Field', () => {
+    expect(wrapper.contains(MarkdownFieldView)).toBe(true);
   });
 });
