@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Mutations::SecurityDashboard::AddProject do
+describe Mutations::InstanceSecurityDashboard::AddProject do
   let(:mutation) { described_class.new(object: nil, context: { current_user: current_user }, field: nil) }
 
   describe '#resolve' do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Mutations
-  module SecurityDashboard
+  module InstanceSecurityDashboard
     class AddProject < BaseMutation
       graphql_name 'AddProjectToSecurityDashboard'
 
