@@ -1,0 +1,5 @@
+---
+title: Allow multiple root certificates for smartcard auth
+merge_request: 26812
+author:
+type: added
