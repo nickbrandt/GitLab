@@ -271,7 +271,9 @@ export function queryToObject(query) {
   const removeQuestionMarkFromQuery = String(query).startsWith('?') ? query.slice(1) : query;
   return removeQuestionMarkFromQuery.split('&').reduce((accumulator, curr) => {
     const p = curr.split('=');
-    accumulator[decodeURIComponent(p[0])] = decodeURIComponent(p[1]);
+    if (p[1] !== undefined) {
+      accumulator[decodeURIComponent(p[0])] = decodeURIComponent(p[1]);
+    }
     return accumulator;
   }, {});
 }
