@@ -24,7 +24,7 @@ class SubscriptionsController < ApplicationController
   def new
     return if current_user
 
-    store_location_for_user
+    store_location_for :user, request.fullpath
     redirect_to new_user_registration_path(redirect_from: 'checkout')
   end
 
@@ -83,15 +83,6 @@ class SubscriptionsController < ApplicationController
 
   def client
     Gitlab::SubscriptionPortal::Client
-  end
-
-  def store_location_for_user
-    redirect_url = url_for(safe_params.merge(experiment_started: true))
-    store_location_for :user, redirect_url
-  end
-
-  def experiment_already_started?
-    params[:experiment_started].present?
   end
 
   def customer_portal_new_subscription_url

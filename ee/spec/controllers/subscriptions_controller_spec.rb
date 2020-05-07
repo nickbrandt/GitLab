@@ -15,7 +15,7 @@ describe SubscriptionsController do
       it 'stores subscription URL for later' do
         subject
 
-        expected_subscription_path = new_subscriptions_path(experiment_started: true, plan_id: 'bronze_id')
+        expected_subscription_path = new_subscriptions_path(plan_id: 'bronze_id')
 
         expect(controller.stored_location_for(:user)).to eq(expected_subscription_path)
       end
