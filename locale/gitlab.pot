@@ -1712,6 +1712,9 @@ msgstr ""
 msgid "AlertManagement|Alerts"
 msgstr ""
 
+msgid "AlertManagement|All alerts"
+msgstr ""
+
 msgid "AlertManagement|Authorize external service"
 msgstr ""
 
@@ -1740,6 +1743,9 @@ msgid "AlertManagement|No alerts available to display. If you think you're seein
 msgstr ""
 
 msgid "AlertManagement|No alerts to display."
+msgstr ""
+
+msgid "AlertManagement|Open"
 msgstr ""
 
 msgid "AlertManagement|Overview"
