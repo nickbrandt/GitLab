@@ -38,7 +38,7 @@ module Resolvers
 
       strong_memoize(:vulnerable) do
         if resolve_vulnerabilities_for_instance_security_dashboard?
-          InstanceSecurityDashboard.new(current_user)
+          ::InstanceSecurityDashboard.new(current_user)
         elsif object.respond_to?(:sync)
           object.sync
         else

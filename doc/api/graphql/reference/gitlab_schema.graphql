@@ -4319,6 +4319,33 @@ enum HealthStatus {
   onTrack
 }
 
+type InstanceSecurityDashboard {
+  """
+  Projects selected in Instance Security Dashboard
+  """
+  projects(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ProjectConnection!
+}
+
 """
 State of a GitLab issue or merge request
 """
@@ -8020,6 +8047,11 @@ type Query {
     """
     fullPath: ID!
   ): Group
+
+  """
+  Fields related to Instance Security Dashboard
+  """
+  instanceSecurityDashboard: InstanceSecurityDashboard
 
   """
   Metadata about GitLab
