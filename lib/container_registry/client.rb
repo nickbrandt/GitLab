@@ -24,6 +24,19 @@ module ContainerRegistry
       @options = options
     end
 
+    def registry_info
+      response = faraday.get("/v2/")
+
+      if response && response.success?
+        version = response.headers['gitlab-container-registry-version']
+        features = response.headers['gitlab-container-registry-features']
+        features = features.split(',').map(&:strip) if features
+        vendor = version ? 'gitlab' : 'other'
+      end
+
+      {vendor: vendor, version: version, features: features}
+    end
+
     def repository_tags(name)
       response_body faraday.get("/v2/#{name}/tags/list")
     end
