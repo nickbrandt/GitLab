@@ -16,7 +16,7 @@ describe API::ProjectRepositoryStorageMoves do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(response).to include_pagination_headers
-      expect(json_response).to be_an Array
+      expect(response).to match_response_schema('public_api/v4/project_repository_storage_moves')
       expect(json_response.size).to eq(1)
       expect(json_response.first['id']).to eq(storage_move.id)
       expect(json_response.first['state']).to eq(storage_move.human_state_name)
@@ -36,7 +36,7 @@ describe API::ProjectRepositoryStorageMoves do
       get api("/project_repository_storage_moves/#{storage_move.id}", user)
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(json_response).to be_a Hash
+      expect(response).to match_response_schema('public_api/v4/project_repository_storage_move')
       expect(json_response['id']).to eq(storage_move.id)
       expect(json_response['state']).to eq(storage_move.human_state_name)
     end
