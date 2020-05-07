@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 
 import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert, GlBadge } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
+import setWindowLocation from 'helpers/set_window_location_helper';
 
 import { REPORT_STATUS } from 'ee/license_compliance/store/modules/list/constants';
 
@@ -82,6 +83,8 @@ const createComponent = ({ state, props, options }) => {
     store: fakeStore,
   });
 };
+
+const findByTestId = testId => wrapper.find(`[data-testid="${testId}"]`);
 
 describe('Project Licenses', () => {
   afterEach(() => {
@@ -195,6 +198,50 @@ describe('Project Licenses', () => {
       expect(wrapper.find(PipelineInfo).exists()).toBe(true);
     });
 
+    describe.each`
+      givenLocationHash | expectedActiveTab
+      ${'#licenses'}    | ${'licenses'}
+      ${'#policies'}    | ${'policies'}
+    `(
+      'when window.location contains the hash "$givenLocationHash"',
+      ({ givenLocationHash, expectedActiveTab }) => {
+        const originalLocation = window.location;
+
+        beforeEach(() => {
+          setWindowLocation(`http://foo.com/index${givenLocationHash}`);
+
+          createComponent({
+            state: {
+              initialized: true,
+              isLoading: false,
+              licenses: [
+                {
+                  name: 'MIT',
+                  classification: LICENSE_APPROVAL_CLASSIFICATION.DENIED,
+                  components: [],
+                },
+              ],
+              pageInfo: 1,
+            },
+            options: {
+              provide: {
+                glFeatures: { licensePolicyList: true },
+              },
+              mount: true,
+            },
+          });
+        });
+
+        afterEach(() => {
+          window.location = originalLocation;
+        });
+
+        it(`sets the active tab to be "${expectedActiveTab}"`, () => {
+          expect(findByTestId(`${expectedActiveTab}Tab`).classes()).toContain('active');
+        });
+      },
+    );
+
     describe('when the tabs are rendered', () => {
       const pageInfo = {
         total: 1,
@@ -227,6 +274,21 @@ describe('Project Licenses', () => {
           },
         });
       });
+
+      it.each`
+        givenActiveTab | expectedLocationHash
+        ${'policies'}  | ${'#policies'}
+        ${'licenses'}  | ${'#licenses'}
+      `(
+        'sets the location hash to "$expectedLocationHash" when the "$givenTab" tab is activate',
+        ({ givenActiveTab, expectedLocationHash }) => {
+          findByTestId(`${givenActiveTab}TabTitle`).trigger('click');
+
+          return wrapper.vm.$nextTick().then(() => {
+            expect(window.location.hash).toBe(expectedLocationHash);
+          });
+        },
+      );
 
       it('it renders the correct count in "Detected in project" tab', () => {
         expect(
