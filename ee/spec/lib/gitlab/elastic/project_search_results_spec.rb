@@ -214,7 +214,9 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   end
 
   context 'user search' do
-    subject(:results) { described_class.new(user, project.owner.username, project) }
+    subject(:results) { described_class.new(user, query, project) }
+
+    let(:query) { project.owner.username }
 
     before do
       expect(Gitlab::ProjectSearchResults).to receive(:new).and_call_original
@@ -222,5 +224,20 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
     it { expect(results.objects('users')).to eq([project.owner]) }
     it { expect(results.limited_users_count).to eq(1) }
+
+    describe 'pagination' do
+      let(:query) {}
+
+      let!(:user2) { create(:user).tap { |u| project.add_user(u, Gitlab::Access::REPORTER) } }
+
+      it 'returns the correct page of results' do
+        expect(results.objects('users', page: 1, per_page: 1)).to eq([project.owner])
+        expect(results.objects('users', page: 2, per_page: 1)).to eq([user2])
+      end
+
+      it 'returns the correct number of results for one page' do
+        expect(results.objects('users', page: 1, per_page: 2).count).to eq(2)
+      end
+    end
   end
 end

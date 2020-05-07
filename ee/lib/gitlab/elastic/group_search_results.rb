@@ -11,7 +11,7 @@ module Gitlab
 
       attr_reader :group, :default_project_filter
 
-      def initialize(current_user, limit_project_ids, limit_projects, group, query, public_and_internal_projects, default_project_filter: false, per_page: 20)
+      def initialize(current_user, limit_project_ids, limit_projects, group, query, public_and_internal_projects, default_project_filter: false)
         super(current_user, query, limit_project_ids, limit_projects, public_and_internal_projects)
 
         @default_project_filter = default_project_filter

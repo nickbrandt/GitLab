@@ -3,10 +3,10 @@
 module Gitlab
   module Elastic
     class SnippetSearchResults < Gitlab::Elastic::SearchResults
-      def objects(scope, page = 1)
+      def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE)
         page = (page || 1).to_i
 
-        eager_load(snippet_titles, page, eager: { project: [:route, :namespace] })
+        eager_load(snippet_titles, page, per_page, eager: { project: [:route, :namespace] })
       end
 
       def formatted_count(scope)
