@@ -9,7 +9,6 @@ describe Resolvers::PackagesResolver do
   let_it_be(:project) { create(:project) }
   let_it_be(:package) { create(:package, project: project) }
 
- 
   describe '#resolve' do
     subject(:packages) { resolve(described_class, ctx: { current_user: user }, obj: project) }
 
@@ -30,7 +29,7 @@ describe Resolvers::PackagesResolver do
 
           it { is_expected.to contain_exactly(package) }
         end
-        
+
         context 'when the user is not authorized to read the package' do
           it { is_expected.to be_nil }
         end
@@ -46,8 +45,11 @@ describe Resolvers::PackagesResolver do
     end
 
     context 'when the package feature is not enabled' do
+      before do
+        stub_licensed_features(packages: false)
+      end
+
       it { is_expected.to be_nil }
     end
   end
-
 end

@@ -6,6 +6,7 @@ module Resolvers
 
     def resolve(**args)
       return unless packages_available?(object, current_user)
+
       ::Packages::PackagesFinder.new(object).execute
     end
 
@@ -16,4 +17,3 @@ module Resolvers
     end
   end
 end
-  
