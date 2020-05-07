@@ -103,6 +103,9 @@ export default {
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
     },
+    isUpdatingCustomStage() {
+      return this.isEditingCustomStage && this.isSavingCustomStage;
+    },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
     },
@@ -296,7 +299,7 @@ export default {
               />
             </template>
             <template v-if="customStageFormActive" #content>
-              <div v-if="isEditingCustomStage && isSavingCustomStage">
+              <div v-if="isUpdatingCustomStage">
                 <gl-loading-icon class="mt-4" size="md" />
               </div>
               <custom-stage-form

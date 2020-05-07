@@ -3,15 +3,7 @@ import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
-import { removeFlash, handleErrorOrRethrow } from '../utils';
-
-const isStageNameExistsError = ({ status, errors }) => {
-  const ERROR_NAME_RESERVED = 'is reserved';
-  if (status === httpStatus.UNPROCESSABLE_ENTITY) {
-    if (errors?.name?.includes(ERROR_NAME_RESERVED)) return true;
-  }
-  return false;
-};
+import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../utils';
 
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
@@ -104,7 +96,7 @@ export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
-  const { status = null } = response; // non api errors thrown wont have a status field
+  const { status = null } = response; // non api errors thrown won't have a status field
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
 
   if (!status || status !== httpStatus.FORBIDDEN)

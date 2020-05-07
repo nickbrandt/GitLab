@@ -28,7 +28,7 @@ const stageEndpoint = ({ stageId }) =>
 
 jest.mock('~/flash');
 
-describe.only('Cycle analytics actions', () => {
+describe('Cycle analytics actions', () => {
   let state;
   let mock;
 

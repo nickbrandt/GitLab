@@ -1,17 +1,8 @@
 import Api from 'ee/api';
 import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
-import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
-import { removeFlash } from '../../../utils';
-
-const isStageNameExistsError = ({ status, errors }) => {
-  const ERROR_NAME_RESERVED = 'is reserved';
-  if (status === httpStatus.UNPROCESSABLE_ENTITY) {
-    if (errors?.name?.includes(ERROR_NAME_RESERVED)) return true;
-  }
-  return false;
-};
+import { removeFlash, isStageNameExistsError } from '../../../utils';
 
 export const setStageEvents = ({ commit }, data) => commit(types.SET_STAGE_EVENTS, data);
 export const setStageFormErrors = ({ commit }, errors) =>
