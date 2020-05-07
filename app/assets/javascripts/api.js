@@ -23,6 +23,8 @@ const Api = {
   projectMergeRequestVersionsPath: '/api/:version/projects/:id/merge_requests/:mrid/versions',
   projectRunnersPath: '/api/:version/projects/:id/runners',
   projectProtectedBranchesPath: '/api/:version/projects/:id/protected_branches',
+  projectSearchPath: '/api/:version/projects/:id/search',
+  projectMilestonesPath: '/api/:version/projects/:id/milestones',
   mergeRequestsPath: '/api/:version/merge_requests',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
   issuableTemplatePath: '/:namespace_path/:project_path/templates/:type/:key',
@@ -244,6 +246,23 @@ const Api = {
         },
       })
       .then(({ data }) => data);
+  },
+
+  projectSearch(id, options = {}) {
+    const url = Api.buildUrl(Api.projectSearchPath).replace(':id', encodeURIComponent(id));
+
+    return axios.get(url, {
+      params: {
+        search: options.search,
+        scope: options.scope,
+      },
+    });
+  },
+
+  projectMilestones(id) {
+    const url = Api.buildUrl(Api.projectMilestonesPath).replace(':id', encodeURIComponent(id));
+
+    return axios.get(url);
   },
 
   mergeRequests(params = {}) {
