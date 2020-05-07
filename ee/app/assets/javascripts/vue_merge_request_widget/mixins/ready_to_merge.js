@@ -5,6 +5,9 @@ import base from '~/vue_merge_request_widget/mixins/ready_to_merge';
 export const MERGE_DISABLED_TEXT_UNAPPROVED = __(
   'You can only merge once this merge request is approved.',
 );
+export const PIPELINE_MUST_SUCCEED_CONFLICT_TEXT = __(
+  'Pipelines must succeed for merge requests to be eligible to merge. Please enable pipelines for this project to continue. For more information, see the %{linkStart}documentation.%{linkEnd}',
+);
 
 export default {
   computed: {
@@ -27,6 +30,9 @@ export default {
       }
 
       return base.computed.mergeDisabledText.call(this);
+    },
+    pipelineMustSucceedConflictText() {
+      return PIPELINE_MUST_SUCCEED_CONFLICT_TEXT;
     },
     autoMergeText() {
       if (this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY) {
