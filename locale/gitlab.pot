@@ -13081,6 +13081,9 @@ msgstr ""
 msgid "MergeRequests|Add a reply"
 msgstr ""
 
+msgid "MergeRequests|An error occurred while checking whether another squash is in progress."
+msgstr ""
+
 msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
