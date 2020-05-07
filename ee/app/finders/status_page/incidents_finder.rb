@@ -13,7 +13,7 @@
 #     # A single issue which includes confidential issues by default)
 #     issue = finder.find_by_id(issue_id)
 #     # Find a "public only" issue
-#     issue = finder.find_by_id(issue_id, include_confidential: false)
+#     issue = finder.find_by_id(issue_id, include_nonpublished: false)
 #
 #     # Most recent 20 non-confidential issues
 #     issues = finder.all
@@ -26,8 +26,8 @@ module StatusPage
       @project_id = project_id
     end
 
-    def find_by_id(issue_id, include_confidential: true)
-      execute(include_confidential: include_confidential)
+    def find_by_id(issue_id, include_nonpublished: true)
+      execute(include_nonpublished: include_nonpublished)
         .find_by_id(issue_id)
     end
 
@@ -40,9 +40,9 @@ module StatusPage
 
     attr_reader :project_id
 
-    def execute(sorted: false, include_confidential: false)
+    def execute(sorted: false, include_nonpublished: false)
       issues = init_collection
-      issues = public_only(issues) unless include_confidential
+      issues = published_only(issues) unless include_nonpublished
       issues = by_project(issues)
       issues = reverse_chronological(issues) if sorted
       issues
@@ -52,7 +52,7 @@ module StatusPage
       Issue
     end
 
-    def public_only(issues)
+    def published_only(issues)
       issues.public_only
     end
 
