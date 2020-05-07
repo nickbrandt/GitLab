@@ -1,8 +1,8 @@
 include:
   - local: .gitlab/ci/shared/frontend.yml
   - local: .gitlab/ci/shared/global.yml
-#   - local: .gitlab/ci/shared/qa.yml
-#   - local: .gitlab/ci/shared/rails.yml
+  - local: .gitlab/ci/shared/qa.yml
+  - local: .gitlab/ci/shared/rails.yml
   - local: .gitlab/ci/shared/rules.yml
   - local: .gitlab/ci/base.gitlab-ci.yml
 
@@ -40,38 +40,45 @@ compile-assets pull-push-cache as-if-foss:
   cache:
     policy: pull-push
     key: "assets-compile:test:as-if-foss:v1"
-#
-# compile-assets pull-cache as-if-foss:
-#   extends:
-#     - .compile-assets-metadata
-#     - .frontend:rules:default-frontend-jobs-as-if-foss
-#     - .as-if-foss
-#   cache:
-#     policy: pull
-#     key: "assets-compile:test:as-if-foss:v1"
-#
-# frontend-fixtures-as-if-foss:
-#   extends:
-#     - .frontend-fixtures-base
-#     - .frontend:rules:default-frontend-jobs-as-if-foss
-#     - .as-if-foss
-#
-# karma-as-if-foss:
-#   extends:
-#     - .karma-base
-#     - .frontend:rules:default-frontend-jobs-as-if-foss
-#     - .as-if-foss
-#   needs: ["frontend-fixtures-as-if-foss"]
-#
-# jest-as-if-foss:
-#   extends:
-#     - .jest-base
-#     - .frontend:rules:default-frontend-jobs-as-if-foss
-#     - .as-if-foss
-#   needs: ["frontend-fixtures-as-if-foss"]
-#   cache:
-#     policy: pull
-#
+
+compile-assets pull-cache as-if-foss:
+  extends:
+    - .compile-assets-metadata
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+  cache:
+    policy: pull
+    key: "assets-compile:test:as-if-foss:v1"
+
+frontend-fixtures-as-if-foss:
+  extends:
+    - .frontend-fixtures-base
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+  needs:
+    - project: $CI_PROJECT_PATH
+      job: setup-test-env pg9
+      ref: $CI_COMMIT_REF_NAME
+    - project: $CI_PROJECT_PATH
+      job: compile-assets pull-cache
+      ref: $CI_COMMIT_REF_NAME
+
+karma-as-if-foss:
+  extends:
+    - .karma-base
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+  needs: ["frontend-fixtures-as-if-foss"]
+
+jest-as-if-foss:
+  extends:
+    - .jest-base
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+  needs: ["frontend-fixtures-as-if-foss"]
+  cache:
+    policy: pull
+
 # ##############
 # # Rails jobs #
 # ##############
