@@ -1,0 +1,6 @@
+---
+title: Add standaloneVulnerabilitiesEnabled filter to group projects resolver for
+  GraphQL
+merge_request: 31081
+author:
+type: added

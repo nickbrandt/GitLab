@@ -151,6 +151,7 @@ module EE
       scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
       scope :with_deleting_user, -> { includes(:deleting_user) }
       scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
+      scope :has_vulnerabilities, -> { joins(:vulnerabilities).group(:id) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true

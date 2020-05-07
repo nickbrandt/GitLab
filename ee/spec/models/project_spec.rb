@@ -219,6 +219,19 @@ describe Project do
         end
       end
     end
+
+    describe '.has_vulnerabilities' do
+      let_it_be(:project_1) { create(:project) }
+      let_it_be(:project_2) { create(:project) }
+
+      before do
+        create(:vulnerability, project: project_1)
+      end
+
+      subject { described_class.has_vulnerabilities }
+
+      it { is_expected.to contain_exactly(project_1) }
+    end
   end
 
   describe 'validations' do

@@ -4157,6 +4157,11 @@ type Group {
     first: Int
 
     """
+    Returns only the projects which have vulnerabilities
+    """
+    hasVulnerabilities: Boolean = false
+
+    """
     Include also subgroup projects
     """
     includeSubgroups: Boolean = false
@@ -6320,6 +6325,11 @@ type Namespace {
     Returns the first _n_ elements from the list.
     """
     first: Int
+
+    """
+    Returns only the projects which have vulnerabilities
+    """
+    hasVulnerabilities: Boolean = false
 
     """
     Include also subgroup projects

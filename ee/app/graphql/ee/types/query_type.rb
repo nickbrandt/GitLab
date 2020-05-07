@@ -13,7 +13,7 @@ module EE
               ::Types::VulnerabilityType.connection_type,
               null: true,
               description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
-              resolver: Resolvers::VulnerabilitiesResolver
+              resolver: ::Resolvers::VulnerabilitiesResolver
 
         field :design_management, ::Types::DesignManagementType,
               null: false,
@@ -21,12 +21,12 @@ module EE
 
         field :geo_node, ::Types::Geo::GeoNodeType,
               null: true,
-              resolver: Resolvers::Geo::GeoNodeResolver,
+              resolver: ::Resolvers::Geo::GeoNodeResolver,
               description: 'Find a Geo node'
 
         field :instance_security_dashboard, ::Types::InstanceSecurityDashboardType,
               null: true,
-              resolver: Resolvers::InstanceSecurityDashboardResolver,
+              resolver: ::Resolvers::InstanceSecurityDashboardResolver,
               description: 'Fields related to Instance Security Dashboard'
 
         def design_management
