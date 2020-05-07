@@ -42,6 +42,27 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
 
       expect(subject).to be_active_session
     end
+
+    describe 'enforced sso expiry' do
+      before do
+        stub_feature_flags(enforced_sso_requires_session: { enabled: true, thing: saml_provider.group })
+      end
+
+      it 'returns true if a sign in is recently recorded' do
+        subject.update_session
+
+        expect(subject).to be_active_session
+      end
+
+      it 'returns false if the sign in predates the session timeout' do
+        subject.update_session
+
+        days_after_timeout = Gitlab::Auth::GroupSaml::SsoEnforcer::DEFAULT_SESSION_TIMEOUT + 2.days
+        Timecop.freeze(days_after_timeout) do
+          expect(subject).not_to be_active_session
+        end
+      end
+    end
   end
 
   describe '#allows_access?' do
