@@ -28,7 +28,7 @@ const stageEndpoint = ({ stageId }) =>
 
 jest.mock('~/flash');
 
-describe('Cycle analytics actions', () => {
+describe.only('Cycle analytics actions', () => {
   let state;
   let mock;
 
@@ -382,7 +382,7 @@ describe('Cycle analytics actions', () => {
       state = { selectedGroup };
     });
 
-    it('dispatches receiveUpdateStageSuccess with put request response data', () => {
+    it('dispatches receiveUpdateStageSuccess and customStages/setSavingCustomStage', () => {
       return testAction(
         actions.updateStage,
         {
@@ -393,6 +393,7 @@ describe('Cycle analytics actions', () => {
         [],
         [
           { type: 'requestUpdateStage' },
+          { type: 'customStages/setSavingCustomStage' },
           {
             type: 'receiveUpdateStageSuccess',
             payload,
@@ -420,6 +421,7 @@ describe('Cycle analytics actions', () => {
           [],
           [
             { type: 'requestUpdateStage' },
+            { type: 'customStages/setSavingCustomStage' },
             {
               type: 'receiveUpdateStageError',
               payload: {
@@ -703,7 +705,8 @@ describe('Cycle analytics actions', () => {
           state,
           [],
           [
-            { type: 'requestCreateStage' },
+            { type: 'clearFormErrors' },
+            { type: 'setSavingCustomStage' },
             {
               type: 'receiveCreateStageSuccess',
               payload: { data: customStageData, status: 201 },
@@ -740,7 +743,8 @@ describe('Cycle analytics actions', () => {
           state,
           [],
           [
-            { type: 'requestCreateStage' },
+            { type: 'clearFormErrors' },
+            { type: 'setSavingCustomStage' },
             {
               type: 'receiveCreateStageError',
               payload: {
@@ -768,7 +772,12 @@ describe('Cycle analytics actions', () => {
         response,
         state,
         [{ type: customStageTypes.RECEIVE_CREATE_STAGE_ERROR }],
-        [{ type: 'setStageFormErrors', payload: {} }],
+        [
+          {
+            type: 'setStageFormErrors',
+            payload: {},
+          },
+        ],
       ));
 
     it('will flash an error message', () => {
@@ -878,7 +887,7 @@ describe('Cycle analytics actions', () => {
         response,
         state,
         [{ type: customStageTypes.RECEIVE_CREATE_STAGE_SUCCESS }],
-        [{ type: 'fetchGroupStagesAndEvents', payload: null }],
+        [{ type: 'fetchGroupStagesAndEvents', payload: null }, { type: 'clearSavingCustomStage' }],
       ));
 
     describe('with an error', () => {

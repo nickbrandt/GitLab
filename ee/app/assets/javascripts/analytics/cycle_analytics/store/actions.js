@@ -179,12 +179,12 @@ export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_ST
 export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
   commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
-  return Promise.all([
-    dispatch('fetchGroupStagesAndEvents'),
-    dispatch('customStages/showEditForm', updatedData),
-  ]).catch(() => {
-    createFlash(__('There was a problem refreshing the data, please try again'));
-  });
+  return Promise.resolve()
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('customStages/showEditForm', updatedData))
+    .catch(() => {
+      createFlash(__('There was a problem refreshing the data, please try again'));
+    });
 };
 
 export const receiveUpdateStageError = (
@@ -209,6 +209,7 @@ export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
   } = state;
 
   dispatch('requestUpdateStage');
+  dispatch('customStages/setSavingCustomStage');
 
   return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))

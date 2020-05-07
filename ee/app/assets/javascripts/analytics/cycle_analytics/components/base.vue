@@ -296,7 +296,11 @@ export default {
               />
             </template>
             <template v-if="customStageFormActive" #content>
+              <div v-if="isEditingCustomStage && isSavingCustomStage">
+                <gl-loading-icon class="mt-4" size="md" />
+              </div>
               <custom-stage-form
+                v-else
                 :events="formEvents"
                 :is-saving-custom-stage="isSavingCustomStage"
                 :initial-fields="formInitialData"

@@ -80,21 +80,20 @@ describe('Cycle analytics mutations', () => {
     });
 
     it.each`
-      mutation                                         | stateKey                   | value
-      ${customStageTypes.HIDE_FORM}                    | ${'isCreatingCustomStage'} | ${false}
-      ${customStageTypes.HIDE_FORM}                    | ${'isEditingCustomStage'}  | ${false}
-      ${customStageTypes.HIDE_FORM}                    | ${'formErrors'}            | ${null}
-      ${customStageTypes.HIDE_FORM}                    | ${'formInitialData'}       | ${null}
-      ${customStageTypes.SHOW_CREATE_FORM}             | ${'isCreatingCustomStage'} | ${true}
-      ${customStageTypes.SHOW_CREATE_FORM}             | ${'isEditingCustomStage'}  | ${false}
-      ${customStageTypes.SHOW_CREATE_FORM}             | ${'formErrors'}            | ${null}
-      ${customStageTypes.SHOW_EDIT_FORM}               | ${'isEditingCustomStage'}  | ${true}
-      ${customStageTypes.SHOW_EDIT_FORM}               | ${'isCreatingCustomStage'} | ${false}
-      ${customStageTypes.SHOW_EDIT_FORM}               | ${'formErrors'}            | ${null}
-      ${customStageTypes.REQUEST_CREATE_STAGE}         | ${'isSavingCustomStage'}   | ${true}
-      ${customStageTypes.RECEIVE_CREATE_STAGE_SUCCESS} | ${'isSavingCustomStage'}   | ${false}
-      ${customStageTypes.RECEIVE_CREATE_STAGE_ERROR}   | ${'isSavingCustomStage'}   | ${false}
-      ${customStageTypes.SET_STAGE_FORM_ERRORS}        | ${'isSavingCustomStage'}   | ${false}
+      mutation                                       | stateKey                   | value
+      ${customStageTypes.HIDE_FORM}                  | ${'isCreatingCustomStage'} | ${false}
+      ${customStageTypes.HIDE_FORM}                  | ${'isEditingCustomStage'}  | ${false}
+      ${customStageTypes.HIDE_FORM}                  | ${'formErrors'}            | ${null}
+      ${customStageTypes.HIDE_FORM}                  | ${'formInitialData'}       | ${null}
+      ${customStageTypes.SHOW_CREATE_FORM}           | ${'isCreatingCustomStage'} | ${true}
+      ${customStageTypes.SHOW_CREATE_FORM}           | ${'isEditingCustomStage'}  | ${false}
+      ${customStageTypes.SHOW_CREATE_FORM}           | ${'formErrors'}            | ${null}
+      ${customStageTypes.SHOW_EDIT_FORM}             | ${'isEditingCustomStage'}  | ${true}
+      ${customStageTypes.SHOW_EDIT_FORM}             | ${'isCreatingCustomStage'} | ${false}
+      ${customStageTypes.SHOW_EDIT_FORM}             | ${'formErrors'}            | ${null}
+      ${customStageTypes.RECEIVE_CREATE_STAGE_ERROR} | ${'isSavingCustomStage'}   | ${false}
+      ${customStageTypes.SET_SAVING_CUSTOM_STAGE}    | ${'isSavingCustomStage'}   | ${true}
+      ${customStageTypes.CLEAR_SAVING_CUSTOM_STAGE}  | ${'isSavingCustomStage'}   | ${false}
     `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
       customStageMutations[mutation](state);
 

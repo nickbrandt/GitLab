@@ -28,11 +28,16 @@ export default {
     state.formEvents = data.map(ev => convertObjectPropsToCamelCase(ev, { deep: true }));
   },
   [types.SET_STAGE_FORM_ERRORS](state, errors) {
-    state.isSavingCustomStage = false;
     state.formErrors = convertObjectPropsToCamelCase(errors, { deep: true });
   },
   [types.SET_FORM_INITIAL_DATA](state, rawStageData = null) {
     state.formInitialData = extractFormFields(rawStageData);
+  },
+  [types.SET_SAVING_CUSTOM_STAGE](state) {
+    state.isSavingCustomStage = true;
+  },
+  [types.CLEAR_SAVING_CUSTOM_STAGE](state) {
+    state.isSavingCustomStage = false;
   },
   [types.SHOW_CREATE_FORM](state) {
     state.isEditingCustomStage = false;
@@ -46,7 +51,6 @@ export default {
     state.formErrors = null;
   },
   [types.HIDE_FORM](state) {
-    state.isSavingCustomStage = false;
     state.isEditingCustomStage = false;
     state.isCreatingCustomStage = false;
     state.formInitialData = null;
@@ -55,15 +59,10 @@ export default {
   [types.CLEAR_FORM_ERRORS](state) {
     state.formErrors = null;
   },
-  [types.REQUEST_CREATE_STAGE](state) {
-    state.isSavingCustomStage = true;
-    state.formErrors = {};
-  },
   [types.RECEIVE_CREATE_STAGE_ERROR](state) {
     state.isSavingCustomStage = false;
   },
   [types.RECEIVE_CREATE_STAGE_SUCCESS](state) {
-    state.isSavingCustomStage = false;
     state.formErrors = null;
     state.formInitialData = null;
   },

@@ -31,6 +31,7 @@ export const showEditForm = ({ commit, dispatch }, selectedStage = {}) => {
   commit(types.SET_FORM_INITIAL_DATA, selectedStage);
   commit(types.SHOW_EDIT_FORM);
   dispatch('setSelectedStage', selectedStage, { root: true });
+  dispatch('clearSavingCustomStage');
   removeFlash();
 };
 
@@ -39,13 +40,16 @@ export const clearFormErrors = ({ commit }) => {
   removeFlash();
 };
 
-export const requestCreateStage = ({ commit }) => commit(types.REQUEST_CREATE_STAGE);
+export const setSavingCustomStage = ({ commit }) => commit(types.SET_SAVING_CUSTOM_STAGE);
+export const clearSavingCustomStage = ({ commit }) => commit(types.CLEAR_SAVING_CUSTOM_STAGE);
+
 export const receiveCreateStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
   commit(types.RECEIVE_CREATE_STAGE_SUCCESS);
   createFlash(sprintf(__(`Your custom stage '%{title}' was created`), { title }), 'notice');
 
   return Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents', null, { root: true }))
+    .then(() => dispatch('clearSavingCustomStage'))
     .catch(() => {
       createFlash(__('There was a problem refreshing the data, please try again'));
     });
@@ -71,7 +75,8 @@ export const createStage = ({ dispatch, rootState }, data) => {
     selectedGroup: { fullPath },
   } = rootState;
 
-  dispatch('requestCreateStage');
+  dispatch('clearFormErrors');
+  dispatch('setSavingCustomStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
     .then(response => {
@@ -80,7 +85,6 @@ export const createStage = ({ dispatch, rootState }, data) => {
     })
     .catch(({ response } = {}) => {
       const { data: { message, errors } = null, status = 400 } = response;
-
       dispatch('receiveCreateStageError', { data, message, errors, status });
     });
 };
