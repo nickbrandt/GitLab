@@ -786,7 +786,7 @@
             },
             {
               "name": "CREATED_TIME_DESC",
-              "description": "Created time by ascending order",
+              "description": "Created time by descending order",
               "isDeprecated": false,
               "deprecationReason": null
             },
@@ -798,7 +798,7 @@
             },
             {
               "name": "UPDATED_TIME_DESC",
-              "description": "Created time by ascending order",
+              "description": "Created time by descending order",
               "isDeprecated": false,
               "deprecationReason": null
             },

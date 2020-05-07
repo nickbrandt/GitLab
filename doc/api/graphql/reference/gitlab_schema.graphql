@@ -258,7 +258,7 @@ enum AlertManagementAlertSort {
   CREATED_TIME_ASC
 
   """
-  Created time by ascending order
+  Created time by descending order
   """
   CREATED_TIME_DESC
 
@@ -318,7 +318,7 @@ enum AlertManagementAlertSort {
   UPDATED_TIME_ASC
 
   """
-  Created time by ascending order
+  Created time by descending order
   """
   UPDATED_TIME_DESC
 
