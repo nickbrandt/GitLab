@@ -14,7 +14,8 @@ class ElasticIndexBulkCronWorker
 
   def perform
     in_lock(self.class.name.underscore, ttl: 10.minutes, retries: 10, sleep_sec: 1) do
-      Elastic::ProcessBookkeepingService.new.execute
+      records_count = Elastic::ProcessBookkeepingService.new.execute
+      log_extra_metadata_on_done(:records_count, records_count)
     end
   rescue Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError
     # We're scheduled on a cronjob, so nothing to do here

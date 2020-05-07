@@ -93,6 +93,20 @@ describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_state do
       expect { described_class.new.execute }.to change(described_class, :queue_size).by(-limit)
     end
 
+    it 'returns the number of documents processed' do
+      described_class.track!(*fake_refs)
+
+      expect_processing(*fake_refs[0...limit])
+
+      expect(described_class.new.execute).to eq(limit)
+    end
+
+    it 'returns 0 without writing to the index when there are no documents' do
+      expect(::Gitlab::Elastic::BulkIndexer).not_to receive(:new)
+
+      expect(described_class.new.execute).to eq(0)
+    end
+
     it 'retries failed documents' do
       described_class.track!(*fake_refs)
       failed = fake_refs[0]
