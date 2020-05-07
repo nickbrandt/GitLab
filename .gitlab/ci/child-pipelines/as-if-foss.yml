@@ -24,9 +24,11 @@ workflow:
     FOSS_ONLY: '1'
 
 hello-world:
-  # extends: .as-if-foss:rules:ci-change
-  script: 'echo "hello world"'
-
+  script:
+    - echo $CI_SERVER_HOST
+    - echo $CI_PROJECT_PATH
+    - 'echo "hello world"'
+#
 # #################
 # # Frontend jobs #
 # #################
@@ -119,7 +121,7 @@ hello-world:
 # qa:internal-as-if-foss:
 #   extends:
 #     - .qa-job-base
-#     - .qa:rules:ee-only
+#     - .qa:rules:ee-only-as-if-foss
 #     - .as-if-foss
 #   script:
 #     - bundle exec rspec
@@ -127,5 +129,5 @@ hello-world:
 # qa:selectors-as-if-foss:
 #   extends:
 #     - qa:selectors
-#     - .qa:rules:ee-only
+#     - .qa:rules:ee-only-as-if-foss
 #     - .as-if-foss

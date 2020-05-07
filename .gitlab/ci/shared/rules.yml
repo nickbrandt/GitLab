@@ -180,17 +180,8 @@
   rules:
     - <<: *if-not-ee
       when: never
-    - <<: *if-security-merge-request
-      changes: *code-backstage-qa-patterns
-    - <<: *if-master-push
-      changes: *code-backstage-qa-patterns
     - <<: *if-master-schedule-2-hourly
-    - <<: *if-default-refs
-      changes: *code-backstage-qa-patterns
-
-.as-if-foss:rules:ci-change:
-  rules:
-    - changes: [".gitlab/ci/**/*.yml"]
+    - changes: *code-backstage-qa-patterns
 
 ####################
 # Cache repo rules #
@@ -356,7 +347,7 @@
       changes: *code-qa-patterns
       when: on_success
 
-.qa:rules:ee-only:
+.qa:rules:ee-only-as-if-foss:
   rules:
     - <<: *if-not-ee
       when: never
