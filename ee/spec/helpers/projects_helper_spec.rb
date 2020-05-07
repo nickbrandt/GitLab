@@ -121,14 +121,14 @@ describe ProjectsHelper do
       subject { helper.project_security_dashboard_config(project, pipeline) }
 
       it 'checks if first vulnerability class is enabled' do
-        expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project)
+        expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true)
 
         subject
       end
 
       context 'when first first class vulnerabilities is enabled for project' do
         before do
-          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(true)
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(true)
         end
 
         it 'checks if first vulnerability class is enabled' do
@@ -141,7 +141,7 @@ describe ProjectsHelper do
 
       context 'when first first class vulnerabilities is disabled for project' do
         before do
-          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project).and_return(false)
+          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(false)
         end
 
         it 'checks if first vulnerability class is enabled' do

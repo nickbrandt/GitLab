@@ -138,7 +138,7 @@ module Vulnerabilities
 
     def state
       return 'dismissed' if dismissal_feedback.present?
-      return 'detected' unless Feature.enabled?(:first_class_vulnerabilities, project)
+      return 'detected' unless Feature.enabled?(:first_class_vulnerabilities, project, default_enabled: true)
 
       if vulnerability.nil?
         'detected'

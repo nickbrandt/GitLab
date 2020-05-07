@@ -21,7 +21,7 @@
           = link_to project_security_dashboard_index_path(@project), title: _('Security Dashboard') do
             %span= _('Security Dashboard')
 
-      - if project_nav_tab?(:security) && Feature.enabled?(:first_class_vulnerabilities, @project)
+      - if project_nav_tab?(:security) && Feature.enabled?(:first_class_vulnerabilities, @project, default_enabled: true)
         = nav_link(path: 'projects/security/vulnerabilities#index') do
           = link_to project_security_vulnerabilities_path(@project), title: _('Vulnerability List') do
             %span= _('Vulnerability List')
