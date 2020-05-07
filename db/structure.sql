@@ -9258,6 +9258,8 @@ CREATE UNIQUE INDEX index_ci_instance_variables_on_key ON public.ci_instance_var
 
 CREATE INDEX index_ci_job_artifacts_file_store_is_null ON public.ci_job_artifacts USING btree (id) WHERE (file_store IS NULL);
 
+CREATE INDEX index_ci_job_artifacts_for_terraform_reports ON public.ci_job_artifacts USING btree (project_id, id) WHERE (file_type = 18);
+
 CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON public.ci_job_artifacts USING btree (expire_at, job_id);
 
 CREATE INDEX index_ci_job_artifacts_on_file_store ON public.ci_job_artifacts USING btree (file_store);
@@ -13856,6 +13858,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200511162115
 20200511220023
 20200512085150
+20200512160004
 20200512164334
 20200513160930
 20200513171959
