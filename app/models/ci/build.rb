@@ -33,7 +33,6 @@ module Ci
       scheduler_failure: 2
     }.freeze
 
-    CODE_NAVIGATION_JOB_NAME = 'code_navigation'
     DEGRADATION_THRESHOLD_VARIABLE_NAME = 'DEGRADATION_THRESHOLD'
 
     has_one :deployment, as: :deployable, class_name: 'Deployment'
