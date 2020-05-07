@@ -113,6 +113,22 @@ describe 'Issue Sidebar' do
     end
   end
 
+  context 'Iterations', :js do
+    before do
+      project.add_developer(user)
+    end
+
+    context 'when iterations feature is available' do
+      it 'shows Iterations' do
+        stub_licensed_features(iterations: true)
+
+        visit_issue(project, issue)
+
+        expect(page).to have_text('Iteration')
+      end
+    end
+  end
+
   def visit_issue(project, issue)
     visit project_issue_path(project, issue)
   end

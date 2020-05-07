@@ -254,6 +254,7 @@
     .confidential-edit,
     .lock-edit,
     .edit-link {
+      box-shadow: none;
       @extend .btn-link;
     }
   }

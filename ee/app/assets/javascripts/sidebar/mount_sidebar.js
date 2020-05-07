@@ -4,6 +4,7 @@ import * as CEMountSidebar from '~/sidebar/mount_sidebar';
 import SidebarItemEpicsSelect from './components/sidebar_item_epics_select.vue';
 import SidebarStatus from './components/status/sidebar_status.vue';
 import SidebarWeight from './components/weight/sidebar_weight.vue';
+import IterationSelect from './components/iteration_select.vue';
 import SidebarStore from './stores/sidebar_store';
 
 const mountWeightComponent = mediator => {
@@ -72,9 +73,30 @@ const mountEpicsSelect = () => {
   });
 };
 
+function mountIterationSelect() {
+  const el = document.querySelector('.js-iteration-select');
+
+  if (!el) {
+    return false;
+  }
+
+  return new Vue({
+    el,
+    components: {
+      IterationSelect,
+    },
+    render: createElement =>
+      createElement('iteration-select', {
+        props: {
+        },
+      }),
+  });
+}
+
 export default function mountSidebar(mediator) {
   CEMountSidebar.mountSidebar(mediator);
   mountWeightComponent(mediator);
   mountStatusComponent(mediator);
   mountEpicsSelect();
+  mountIterationSelect();
 }
