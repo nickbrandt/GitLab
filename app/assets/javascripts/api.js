@@ -75,13 +75,11 @@ const Api = {
     const url = Api.buildUrl(Api.groupsPath);
     return axios
       .get(url, {
-        params: Object.assign(
-          {
-            search: query,
-            per_page: DEFAULT_PER_PAGE,
-          },
-          options,
-        ),
+        params: {
+          search: query,
+          per_page: DEFAULT_PER_PAGE,
+          ...options,
+        },
       })
       .then(({ data }) => {
         callback(data);
@@ -282,7 +280,7 @@ const Api = {
     };
     return axios
       .get(url, {
-        params: Object.assign({}, defaults, options),
+        params: { ...defaults, ...options },
       })
       .then(({ data }) => callback(data))
       .catch(() => flash(__('Something went wrong while fetching projects')));
@@ -365,13 +363,11 @@ const Api = {
   users(query, options) {
     const url = Api.buildUrl(this.usersPath);
     return axios.get(url, {
-      params: Object.assign(
-        {
-          search: query,
-          per_page: DEFAULT_PER_PAGE,
-        },
-        options,
-      ),
+      params: {
+        search: query,
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
     });
   },
 
@@ -402,7 +398,7 @@ const Api = {
     };
     return axios
       .get(url, {
-        params: Object.assign({}, defaults, options),
+        params: { ...defaults, ...options },
       })
       .then(({ data }) => callback(data))
       .catch(() => flash(__('Something went wrong while fetching projects')));
