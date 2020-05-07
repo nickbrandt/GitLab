@@ -101,7 +101,22 @@ export default {
       }
     },
     handleUpdateSelectedLabels(labels) {
-      this.updateEpicLabels(labels);
+      // Iterate over selection and check if labels which were
+      // either selected or removed aren't leading to same selection
+      // as current one, as then we don't want to make network call
+      // since nothing has changed.
+      const anyLabelUpdated = labels.some(label => {
+        // Find this label in existing selection.
+        const existingLabel = this.epicContext.labels.find(l => l.id === label.id);
+
+        // Check either of the two following conditions;
+        // 1. A label that's not currently applied is being applied.
+        // 2. A label that's already applied is being removed.
+        return (!existingLabel && label.set) || (existingLabel && !label.set);
+      });
+
+      // Only proceed with action if there are any label updates to be done.
+      if (anyLabelUpdated) this.updateEpicLabels(labels);
     },
   },
 };
