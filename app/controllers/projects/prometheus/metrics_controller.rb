@@ -63,11 +63,23 @@ module Projects
           metrics_params.to_h.symbolize_keys
         )
 
-        if @metric.persisted?
-          redirect_to edit_project_service_path(project, ::PrometheusService),
-                      notice: _('Metric was successfully added.')
-        else
-          render 'new'
+        respond_to do |format|
+          format.html do
+            if @metric.persisted?
+              redirect_to edit_project_service_path(project, ::PrometheusService),
+                          notice: _('Metric was successfully added.')
+            else
+              render 'new'
+            end
+          end
+
+          format.json do
+            if @metric.persisted?
+              render json: { status: :success, notice: _('Metric was successfully added.') }
+            else
+              render json: { status: :error, message: _('Could not save metric.') }
+            end
+          end
         end
       end
 

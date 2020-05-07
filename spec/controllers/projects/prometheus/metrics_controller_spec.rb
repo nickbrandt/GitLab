@@ -143,6 +143,13 @@ describe Projects::Prometheus::MetricsController do
 
         expect(response).to redirect_to(edit_project_service_path(project, PrometheusService))
       end
+
+      it 'returns a success notice with json format', :aggregate_failures do
+        post :create, params: project_params(valid_metric.merge(format: :json))
+
+        expect(json_response['notice']).to eq('Metric was successfully added.')
+        expect(json_response['status']).to eq('success')
+      end
     end
 
     context 'metric is invalid' do
@@ -153,6 +160,13 @@ describe Projects::Prometheus::MetricsController do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template('new')
+      end
+
+      it 'returns an error message with json format', :aggregate_failures do
+        post :create, params: project_params(invalid_metric.merge(format: :json))
+
+        expect(json_response['message']).to eq('Could not save metric.')
+        expect(json_response['status']).to eq('error')
       end
     end
   end
