@@ -16,7 +16,7 @@ module EE
               ::Types::VulnerabilityType.connection_type,
               null: true,
               description: 'Vulnerabilities reported on the project',
-              resolver: Resolvers::VulnerabilitiesResolver
+              resolver: ::Resolvers::VulnerabilitiesResolver
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each severity of vulnerability of the project',
