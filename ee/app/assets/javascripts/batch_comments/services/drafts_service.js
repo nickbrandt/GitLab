@@ -2,7 +2,7 @@ import axios from '~/lib/utils/axios_utils';
 
 export default {
   createNewDraft(endpoint, data) {
-    const postData = Object.assign({}, data, { draft_note: data.note });
+    const postData = { ...data, draft_note: data.note };
     delete postData.note;
 
     return axios.post(endpoint, postData);

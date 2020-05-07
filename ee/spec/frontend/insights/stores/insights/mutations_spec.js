@@ -48,7 +48,7 @@ describe('Insights mutations', () => {
     it('sets configData state to incoming data on success', () => {
       mutations[types.RECEIVE_CONFIG_SUCCESS](state, configData);
 
-      const expected = Object.assign({}, configData);
+      const expected = { ...configData };
       delete expected.invalid;
 
       expect(state.configData).toEqual(expected);

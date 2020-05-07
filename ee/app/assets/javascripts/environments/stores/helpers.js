@@ -8,7 +8,8 @@
 export const setDeployBoard = (oldEnvironmentState, environment) => {
   let parsedEnvironment = environment;
   if (environment.size === 1 && environment.rollout_status) {
-    parsedEnvironment = Object.assign({}, environment, {
+    parsedEnvironment = {
+      ...environment,
       hasDeployBoard: true,
       isDeployBoardVisible:
         oldEnvironmentState.isDeployBoardVisible === false
@@ -19,7 +20,7 @@ export const setDeployBoard = (oldEnvironmentState, environment) => {
       isLoadingDeployBoard: environment.rollout_status.status === 'loading',
       isEmptyDeployBoard: environment.rollout_status.status === 'not_found',
       hasLegacyAppLabel: environment.rollout_status.has_legacy_app_label,
-    });
+    };
   }
   return parsedEnvironment;
 };

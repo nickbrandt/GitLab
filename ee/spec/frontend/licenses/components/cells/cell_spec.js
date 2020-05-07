@@ -9,7 +9,7 @@ describe('Cell', () => {
   };
 
   function createComponent(props, slots) {
-    const propsData = Object.assign({}, defaultProps, props);
+    const propsData = { ...defaultProps, ...props };
 
     wrapper = shallowMount(Cell, {
       propsData,

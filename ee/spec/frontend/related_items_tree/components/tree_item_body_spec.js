@@ -20,11 +20,12 @@ import { mockParentItem, mockInitialConfig, mockQueryResponse, mockIssue1 } from
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-const mockItem = Object.assign({}, mockIssue1, {
+const mockItem = {
+  ...mockIssue1,
   type: ChildType.Issue,
   pathIdSeparator: PathIdSeparator.Issue,
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
-});
+};
 
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
@@ -92,10 +93,7 @@ describe('RelatedItemsTree', () => {
 
         it('returns value of `item.path`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              path: mockPath,
-              webPath: undefined,
-            }),
+            item: { ...mockItem, path: mockPath, webPath: undefined },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -105,10 +103,7 @@ describe('RelatedItemsTree', () => {
 
         it('returns value of `item.webPath` when `item.path` is undefined', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              path: undefined,
-              webPath: mockPath,
-            }),
+            item: { ...mockItem, path: undefined, webPath: mockPath },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -120,9 +115,7 @@ describe('RelatedItemsTree', () => {
       describe('isOpen', () => {
         it('returns true when `item.state` value is `opened`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Open,
-            }),
+            item: { ...mockItem, state: ChildState.Open },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -134,9 +127,7 @@ describe('RelatedItemsTree', () => {
       describe('isClosed', () => {
         it('returns true when `item.state` value is `closed`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Closed,
-            }),
+            item: { ...mockItem, state: ChildState.Closed },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -160,9 +151,7 @@ describe('RelatedItemsTree', () => {
       describe('stateText', () => {
         it('returns string `Opened` when `item.state` value is `opened`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Open,
-            }),
+            item: { ...mockItem, state: ChildState.Open },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -172,9 +161,7 @@ describe('RelatedItemsTree', () => {
 
         it('returns string `Closed` when `item.state` value is `closed`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Closed,
-            }),
+            item: { ...mockItem, state: ChildState.Closed },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -186,9 +173,7 @@ describe('RelatedItemsTree', () => {
       describe('stateIconName', () => {
         it('returns string `issues` when `item.type` value is `issue`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              type: ChildType.Issue,
-            }),
+            item: { ...mockItem, type: ChildType.Issue },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -208,9 +193,7 @@ describe('RelatedItemsTree', () => {
       describe('stateIconClass', () => {
         it('returns string `issue-token-state-icon-open` when `item.state` value is `opened`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Open,
-            }),
+            item: { ...mockItem, state: ChildState.Open },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -220,9 +203,7 @@ describe('RelatedItemsTree', () => {
 
         it('returns string `issue-token-state-icon-closed` when `item.state` value is `closed`', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              state: ChildState.Closed,
-            }),
+            item: { ...mockItem, state: ChildState.Closed },
           });
 
           return wrapper.vm.$nextTick(() => {
@@ -250,9 +231,7 @@ describe('RelatedItemsTree', () => {
 
         it('returns `null` when `itemWebPath` is empty', () => {
           wrapper.setProps({
-            item: Object.assign({}, mockItem, {
-              webPath: '',
-            }),
+            item: { ...mockItem, webPath: '' },
           });
 
           return wrapper.vm.$nextTick(() => {

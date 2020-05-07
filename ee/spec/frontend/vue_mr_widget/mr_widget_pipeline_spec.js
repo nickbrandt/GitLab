@@ -28,9 +28,7 @@ describe('MRWidgetPipeline', () => {
   describe('computed', () => {
     describe('when upstream pipelines are passed', () => {
       beforeEach(() => {
-        const pipeline = Object.assign({}, mockData.pipeline, {
-          triggered_by: mockLinkedPipelines.triggered_by,
-        });
+        const pipeline = { ...mockData.pipeline, triggered_by: mockLinkedPipelines.triggered_by };
 
         createComponent(pipeline);
       });
@@ -46,9 +44,7 @@ describe('MRWidgetPipeline', () => {
 
     describe('when downstream pipelines are passed', () => {
       beforeEach(() => {
-        const pipeline = Object.assign({}, mockData.pipeline, {
-          triggered: mockLinkedPipelines.triggered,
-        });
+        const pipeline = { ...mockData.pipeline, triggered: mockLinkedPipelines.triggered };
 
         createComponent(pipeline);
       });

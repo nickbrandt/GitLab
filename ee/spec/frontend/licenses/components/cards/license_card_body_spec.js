@@ -24,8 +24,8 @@ describe('LicenseCardBody', () => {
 
   function createComponent(props = {}) {
     let propsData = props;
-    propsData.license = Object.assign({}, defaultProps.license, props.license || {});
-    propsData = Object.assign({}, defaultProps, props);
+    propsData.license = { ...defaultProps.license, ...(props.license || {}) };
+    propsData = { ...defaultProps, ...props };
 
     wrapper = shallowMount(LicenseCardBody, {
       propsData,
