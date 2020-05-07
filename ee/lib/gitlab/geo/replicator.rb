@@ -11,6 +11,7 @@ module Gitlab
     # Each replicator is tied to a specific replicable resource
     class Replicator
       include ::Gitlab::Geo::LogHelpers
+      extend ::Gitlab::Geo::LogHelpers
 
       CLASS_SUFFIXES = %w(RegistryFinder RegistriesResolver).freeze
 
@@ -73,7 +74,7 @@ module Gitlab
         const_get("::Types::Geo::#{replicable_name.camelize}RegistryType", false)
       end
 
-      # Given a `replicable_name`, return the corresponding replicator
+      # Given a `replicable_name`, return the corresponding replicator class
       #
       # @param [String] replicable_name the replicable slug
       # @return [Class<Geo::Replicator>] replicator implementation
@@ -81,6 +82,13 @@ module Gitlab
         replicator_class_name = "::Geo::#{replicable_name.camelize}Replicator"
 
         const_get(replicator_class_name, false)
+      rescue NameError
+        message = "Cannot find a Geo::Replicator for #{replicable_name}"
+        e = NotImplementedError.new(message)
+
+        log_error(message, e, { replicable_name: replicable_name })
+
+        raise e
       end
 
       def self.checksummed
