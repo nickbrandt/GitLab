@@ -42,6 +42,10 @@ module EE
                 Hash.new(0).merge(project.requirements.counts_by_state)
               end
 
+        field :packages, ::Types::PackageType.connection_type, null: true,
+              description: 'Packages of the project',
+              resolver: ::Resolvers::PackagesResolver
+
         def self.requirements_available?(project, user)
           ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)
         end
