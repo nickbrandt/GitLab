@@ -12,10 +12,7 @@ class SyncSeatLinkRequestWorker
 
   RequestError = Class.new(StandardError)
 
-  # active_users param is optional as it was added in a patch release for %12.9.
-  # The optional nil value can be removed in the next major release, %13.0, when
-  # it becomes mandatory.
-  def perform(date, license_key, max_historical_user_count, active_users = nil)
+  def perform(date, license_key, max_historical_user_count, active_users)
     response = Gitlab::HTTP.post(
       URI_PATH,
       base_uri: EE::SUBSCRIPTIONS_URL,
