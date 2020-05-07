@@ -147,11 +147,11 @@ the [permissions you have on the project](../../permissions.md#project-members-p
 
 ## Troubleshooting
 
-If an event is not being triggered, confirm that the channel you're using is a public one, as 
-Mattermost webhooks do not have access to private channels. 
+If an event is not being triggered, confirm that the channel you're using is a public one, as
+Mattermost webhooks do not have access to private channels.
 
-If a private channel is required, you can edit the webhook's channel in Mattermost and 
-select a private channel. It is not possible to use different channels for 
+If a private channel is required, you can edit the webhook's channel in Mattermost and
+select a private channel. It is not possible to use different channels for
 different types of notifications - all events will be sent to the specified channel.
 
 ## Further reading
