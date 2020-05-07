@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import DesignOverlay from 'ee/design_management/components/design_overlay.vue';
+import DesignOverlay from '~/design_management/components/design_overlay.vue';
 import notes from '../mock_data/notes';
 
 describe('Design overlay component', () => {

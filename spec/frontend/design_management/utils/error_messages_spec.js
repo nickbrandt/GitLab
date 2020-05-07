@@ -1,7 +1,7 @@
 import {
   designDeletionError,
   designUploadSkippedWarning,
-} from 'ee/design_management/utils/error_messages';
+} from '~/design_management/utils/error_messages';
 
 const mockFilenames = n =>
   Array(n)

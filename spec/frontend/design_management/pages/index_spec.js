@@ -3,16 +3,16 @@ import { ApolloMutation } from 'vue-apollo';
 import VueRouter from 'vue-router';
 import { GlEmptyState } from '@gitlab/ui';
 
-import Index from 'ee/design_management/pages/index.vue';
-import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
-import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
-import DesignDropzone from 'ee/design_management/components/upload/design_dropzone.vue';
-import DeleteButton from 'ee/design_management/components/delete_button.vue';
-import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
+import Index from '~/design_management/pages/index.vue';
+import uploadDesignQuery from '~/design_management/graphql/mutations/uploadDesign.mutation.graphql';
+import DesignDestroyer from '~/design_management/components/design_destroyer.vue';
+import DesignDropzone from '~/design_management/components/upload/design_dropzone.vue';
+import DeleteButton from '~/design_management/components/delete_button.vue';
+import { DESIGNS_ROUTE_NAME } from '~/design_management/router/constants';
 import {
   EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
   EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
-} from 'ee/design_management/utils/error_messages';
+} from '~/design_management/utils/error_messages';
 import createFlash from '~/flash';
 
 const localVue = createLocalVue();

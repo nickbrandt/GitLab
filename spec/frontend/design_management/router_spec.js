@@ -1,14 +1,14 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import VueRouter from 'vue-router';
-import App from 'ee/design_management/components/app.vue';
-import Designs from 'ee/design_management/pages/index.vue';
-import DesignDetail from 'ee/design_management/pages/design/index.vue';
-import createRouter from 'ee/design_management/router';
+import App from '~/design_management/components/app.vue';
+import Designs from '~/design_management/pages/index.vue';
+import DesignDetail from '~/design_management/pages/design/index.vue';
+import createRouter from '~/design_management/router';
 import {
   ROOT_ROUTE_NAME,
   DESIGNS_ROUTE_NAME,
   DESIGN_ROUTE_NAME,
-} from 'ee/design_management/router/constants';
+} from '~/design_management/router/constants';
 import '~/commons/bootstrap';
 
 jest.mock('mousetrap', () => ({

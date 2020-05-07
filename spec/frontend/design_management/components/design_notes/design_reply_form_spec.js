@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
+import DesignReplyForm from '~/design_management/components/design_notes/design_reply_form.vue';
 
 describe('Design reply form component', () => {
   let wrapper;

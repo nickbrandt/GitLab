@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import DesignDropzone from 'ee/design_management/components/upload/design_dropzone.vue';
+import DesignDropzone from '~/design_management/components/upload/design_dropzone.vue';
 import createFlash from '~/flash';
 
 jest.mock('~/flash');

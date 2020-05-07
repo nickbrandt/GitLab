@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
-import PaginationButton from 'ee/design_management/components/toolbar/pagination_button.vue';
-import { DESIGN_ROUTE_NAME } from 'ee/design_management/router/constants';
+import PaginationButton from '~/design_management/components/toolbar/pagination_button.vue';
+import { DESIGN_ROUTE_NAME } from '~/design_management/router/constants';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);

@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import DesignPresentation from 'ee/design_management/components/design_presentation.vue';
-import DesignOverlay from 'ee/design_management/components/design_overlay.vue';
+import DesignPresentation from '~/design_management/components/design_presentation.vue';
+import DesignOverlay from '~/design_management/components/design_overlay.vue';
 
 const mockOverlayData = {
   overlayDimensions: {

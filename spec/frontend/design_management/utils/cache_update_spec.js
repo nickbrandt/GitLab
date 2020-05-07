@@ -5,13 +5,13 @@ import {
   updateStoreAfterAddImageDiffNote,
   updateStoreAfterUploadDesign,
   updateStoreAfterUpdateImageDiffNote,
-} from 'ee/design_management/utils/cache_update';
+} from '~/design_management/utils/cache_update';
 import {
   designDeletionError,
   ADD_DISCUSSION_COMMENT_ERROR,
   ADD_IMAGE_DIFF_NOTE_ERROR,
   UPDATE_IMAGE_DIFF_NOTE_ERROR,
-} from 'ee/design_management/utils/error_messages';
+} from '~/design_management/utils/error_messages';
 import design from '../mock_data/design';
 import createFlash from '~/flash';
 

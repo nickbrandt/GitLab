@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import DesignScaler from 'ee/design_management/components/design_scaler.vue';
+import DesignScaler from '~/design_management/components/design_scaler.vue';
 
 describe('Design management design scaler component', () => {
   let wrapper;

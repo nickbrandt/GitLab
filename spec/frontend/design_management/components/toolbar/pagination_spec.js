@@ -1,8 +1,8 @@
 /* global Mousetrap */
 import 'mousetrap';
 import { shallowMount } from '@vue/test-utils';
-import Pagination from 'ee/design_management/components/toolbar/pagination.vue';
-import { DESIGN_ROUTE_NAME } from 'ee/design_management/router/constants';
+import Pagination from '~/design_management/components/toolbar/pagination.vue';
+import { DESIGN_ROUTE_NAME } from '~/design_management/router/constants';
 
 const push = jest.fn();
 const $router = {
