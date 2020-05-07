@@ -8099,6 +8099,9 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
+msgid "Enter the name of your application, and we'll return a unique %{type} token."
+msgstr ""
+
 msgid "Enter your password to approve"
 msgstr ""
 
@@ -15095,9 +15098,6 @@ msgid "Phabricator Tasks"
 msgstr ""
 
 msgid "Pick a name"
-msgstr ""
-
-msgid "Pick a name for the application, and we'll give you a unique %{type} token."
 msgstr ""
 
 msgid "Pin code"

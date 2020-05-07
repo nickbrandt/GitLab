@@ -4,7 +4,7 @@
 %h5.prepend-top-0
   = title
 %p.profile-settings-content
-  = _("Pick a name for the application, and we'll give you a unique %{type} token.") % { type: type }
+  = _("Enter the name of your application, and we'll return a unique %{type} token.") % { type: type }
 
 = form_for token, as: prefix, url: path, method: :post, html: { class: 'js-requires-input' } do |f|
 
