@@ -60,25 +60,38 @@ describe GroupMember do
     end
   end
 
-  describe '.with_saml_identity' do
-    let(:saml_provider) { create :saml_provider }
-    let(:group) { saml_provider.group }
-    let!(:member) do
-      create(:group_member, group: group).tap do |m|
-        create(:group_saml_identity, saml_provider: saml_provider, user: m.user)
-      end
-    end
-    let!(:member_without_identity) do
-      create(:group_member, group: group)
-    end
-    let!(:member_with_different_identity) do
-      create(:group_member, group: group).tap do |m|
-        create(:group_saml_identity, user: m.user)
+  describe 'scopes' do
+    describe '.by_group_ids' do
+      it 'returns only members from selected groups' do
+        group = create(:group)
+        member1 = create(:group_member, group: group)
+        member2 = create(:group_member, group: group)
+        create(:group_member)
+
+        expect(described_class.by_group_ids([group.id])).to match_array([member1, member2])
       end
     end
 
-    it 'returns members with identity linked to given saml provider' do
-      expect(described_class.with_saml_identity(saml_provider)).to eq([member])
+    describe '.with_saml_identity' do
+      let(:saml_provider) { create :saml_provider }
+      let(:group) { saml_provider.group }
+      let!(:member) do
+        create(:group_member, group: group).tap do |m|
+          create(:group_saml_identity, saml_provider: saml_provider, user: m.user)
+        end
+      end
+      let!(:member_without_identity) do
+        create(:group_member, group: group)
+      end
+      let!(:member_with_different_identity) do
+        create(:group_member, group: group).tap do |m|
+          create(:group_saml_identity, user: m.user)
+        end
+      end
+
+      it 'returns members with identity linked to given saml provider' do
+        expect(described_class.with_saml_identity(saml_provider)).to eq([member])
+      end
     end
   end
 

@@ -130,6 +130,7 @@ module EE
         enable :create_epic
         enable :admin_epic
         enable :update_epic
+        enable :read_confidential_epic
       end
 
       rule { reporter & subepics_available }.policy do
@@ -141,6 +142,7 @@ module EE
       rule { ~can?(:read_cross_project) }.policy do
         prevent :read_group_contribution_analytics
         prevent :read_epic
+        prevent :read_confidential_epic
         prevent :create_epic
         prevent :admin_epic
         prevent :update_epic

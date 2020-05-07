@@ -107,6 +107,10 @@ module EE
 
       scope :counts_by_state, -> { group(:state_id).count }
 
+      scope :not_confidential_or_in_groups, -> (groups) do
+        where.not(confidential: true).or(where(confidential: true, group_id: groups))
+      end
+
       MAX_HIERARCHY_DEPTH = 5
 
       def etag_caching_enabled?
