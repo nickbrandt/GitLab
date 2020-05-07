@@ -6,7 +6,9 @@ module Types
     description 'State of a GitLab iteration'
 
     value 'upcoming'
-    value 'in_progress'
+    value 'started'
+    value 'opened'
     value 'closed'
+    value 'all'
   end
 end

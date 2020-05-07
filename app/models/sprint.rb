@@ -55,6 +55,7 @@ class Sprint < ApplicationRecord
       case state
       when 'closed' then sprints.closed
       when 'started' then sprints.started
+      when 'opened' then sprints.started.or(sprints.upcoming)
       when 'all' then sprints
       else sprints.upcoming
       end
