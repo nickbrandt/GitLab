@@ -7,7 +7,7 @@ describe('EE Pipeline store', () => {
 
   beforeEach(() => {
     store = new PipelineStore();
-    data = Object.assign({}, LinkedPipelines);
+    data = { ...LinkedPipelines };
 
     store.storePipeline(data);
   });
