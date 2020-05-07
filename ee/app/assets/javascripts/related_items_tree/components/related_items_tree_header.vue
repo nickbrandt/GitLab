@@ -90,16 +90,14 @@ export default {
           </span>
         </p>
       </gl-tooltip>
-      <div ref="countBadge" class="issue-count-badge text-secondary p-0 pr-2">
+      <div ref="countBadge" class="issue-count-badge text-secondary p-0 pr-3">
         <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
           <gl-icon name="epic" class="mr-1" />
           {{ totalEpicsCount }}
-          <span class="ml-2 bullet-separator">&bull;</span>
         </span>
-        <span class="d-inline-flex align-items-center" :class="{ 'ml-2': allowSubEpics }">
+        <span class="d-inline-flex align-items-center" :class="{ 'ml-3': allowSubEpics }">
           <gl-icon name="issues" class="mr-1" />
           {{ totalIssuesCount }}
-          <span v-if="showHealthStatus" class="ml-2 bullet-separator">&bull;</span>
         </span>
       </div>
       <epic-health-status v-if="showHealthStatus" :health-status="healthStatus" />
