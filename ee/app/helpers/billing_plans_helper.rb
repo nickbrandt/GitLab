@@ -42,8 +42,18 @@ module BillingPlansHelper
     "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
   end
 
+  def use_new_purchase_flow?(namespace)
+    namespace.group? &&
+      namespace.actual_plan_name == Plan::FREE &&
+      Feature.enabled?(:free_group_new_purchase_flow, current_user)
+  end
+
   def plan_purchase_url(group, plan)
-    "#{plan.purchase_link.href}&gl_namespace_id=#{group.id}"
+    if use_new_purchase_flow?(group)
+      new_subscriptions_path(plan_id: plan.id, namespace_id: group.id)
+    else
+      "#{plan.purchase_link.href}&gl_namespace_id=#{group.id}"
+    end
   end
 
   def plan_feature_short_list(plan)

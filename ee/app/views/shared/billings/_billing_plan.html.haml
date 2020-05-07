@@ -35,4 +35,5 @@
       .card-footer.p-3
         .pull-right{ class: ("invisible" unless purchase_link.action == 'upgrade' || is_current_plan) }
           - upgrade_button_class = "disabled" if is_current_plan && !namespace.trial_active?
-          = link_to s_('BillingPlan|Upgrade'), plan_purchase_or_upgrade_url(namespace, plan, current_plan), class: "btn btn-success #{upgrade_button_class}"
+          - cta_class = '-new' if use_new_purchase_flow?(namespace)
+          = link_to s_('BillingPlan|Upgrade'), plan_purchase_or_upgrade_url(namespace, plan, current_plan), class: "btn btn-success #{upgrade_button_class} billing-cta-purchase#{cta_class}"
