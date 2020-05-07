@@ -44,7 +44,7 @@ export default {
 </script>
 
 <template>
-  <gl-form-group label="Trigger" label-for="trigger-fields">
+  <gl-form-group :label="__('Trigger')" label-for="trigger-fields">
     <div id="trigger-fields">
       <gl-form-group v-for="event in events" :key="event.title" :description="event.description">
         <input :name="checkboxName(event.name)" type="hidden" value="false" />

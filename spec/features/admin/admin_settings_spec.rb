@@ -198,7 +198,7 @@ describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_moc
 
     context 'Integrations page' do
       before do
-        stub_feature_flags(instance_level_integrations: false)
+        stub_feature_flags(instance_level_integrations: false, integration_form_refactor: false)
         visit integrations_admin_application_settings_path
       end
 
