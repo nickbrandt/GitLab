@@ -93,19 +93,12 @@ describe 'Project members list' do
       project.add_maintainer(project_bot)
     end
 
-    it 'does not show member form used to change roles or "Expiration date"' do
+    it 'does not show form used to change roles and "Expiration date" or the remove user button' do
       project_member = project.project_members.find_by(user_id: project_bot.id)
 
       visit_members_page
 
       expect(page).not_to have_selector("#edit_project_member_#{project_member.id}")
-    end
-
-    it 'does not show remove user button' do
-      project_member = project.project_members.find_by(user_id: project_bot.id)
-
-      visit_members_page
-
       expect(page).not_to have_selector("#project_member_#{project_member.id} .btn-remove")
     end
   end
