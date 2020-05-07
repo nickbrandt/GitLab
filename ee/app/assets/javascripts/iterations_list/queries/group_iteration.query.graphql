@@ -4,6 +4,10 @@ query GroupIterations($fullPath: ID!) {
       nodes {
         title
         state
+        id
+        webPath
+        startDate
+        dueDate
       }
     }
   }
