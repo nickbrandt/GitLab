@@ -67,14 +67,14 @@ describe('Milestone select component', () => {
   });
 
   describe('selected value', () => {
-    it('defaults to Any Milestone', () => {
-      expect(selectedText()).toContain('Any Milestone');
+    it('defaults to Any milestone', () => {
+      expect(selectedText()).toContain('Any milestone');
     });
 
-    it('shows No Milestone', done => {
+    it('shows No milestone', done => {
       vm.board.milestone_id = 0;
       Vue.nextTick(() => {
-        expect(selectedText()).toContain('No Milestone');
+        expect(selectedText()).toContain('No milestone');
         done();
       });
     });
@@ -103,7 +103,7 @@ describe('Milestone select component', () => {
         mock.restore();
       });
 
-      it('sets Any Milestone', done => {
+      it('sets Any milestone', done => {
         vm.board.milestone_id = 0;
         vm.$el.querySelector('.edit-link').click();
 
@@ -112,13 +112,13 @@ describe('Milestone select component', () => {
         });
 
         setTimeout(() => {
-          expect(activeDropdownItem(0)).toEqual('Any Milestone');
-          expect(selectedText()).toEqual('Any Milestone');
+          expect(activeDropdownItem(0)).toEqual('Any milestone');
+          expect(selectedText()).toEqual('Any milestone');
           done();
         });
       });
 
-      it('sets No Milestone', done => {
+      it('sets No milestone', done => {
         vm.$el.querySelector('.edit-link').click();
 
         setTimeout(() => {
@@ -126,8 +126,8 @@ describe('Milestone select component', () => {
         });
 
         setTimeout(() => {
-          expect(activeDropdownItem(0)).toEqual('No Milestone');
-          expect(selectedText()).toEqual('No Milestone');
+          expect(activeDropdownItem(0)).toEqual('No milestone');
+          expect(selectedText()).toEqual('No milestone');
           done();
         });
       });
