@@ -1,19 +1,19 @@
-# include:
-#   - local: .gitlab/ci/shared/frontend.yml
-#   - local: .gitlab/ci/shared/global.yml
+include:
+  - local: .gitlab/ci/shared/frontend.yml
+  - local: .gitlab/ci/shared/global.yml
 #   - local: .gitlab/ci/shared/qa.yml
 #   - local: .gitlab/ci/shared/rails.yml
-#   - local: .gitlab/ci/shared/rules.yml
-#   - local: .gitlab/ci/base.gitlab-ci.yml
+  - local: .gitlab/ci/shared/rules.yml
+  - local: .gitlab/ci/base.gitlab-ci.yml
 
 workflow:
   rules:
-    # # If not GitLab.com, don't create a pipeline.
-    # - if: '$CI_SERVER_HOST != "gitlab.com"'
-    #   when: never
-    # # If project isn't `gitlab-org/gitlab/gitlab` or `gitlab-org/security/gitlab`, don't create a pipeline.
-    # - if: '$CI_PROJECT_PATH != "gitlab-org/gitlab" || $CI_PROJECT_PATH != "gitlab-org/security/gitlab"'
-    #   when: never
+    # If not GitLab.com, don't create a pipeline.
+    - if: '$CI_SERVER_HOST != "gitlab.com"'
+      when: never
+    # If project isn't `gitlab-org/gitlab/gitlab` or `gitlab-org/security/gitlab`, don't create a pipeline.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitlab" && $CI_PROJECT_PATH != "gitlab-org/security/gitlab"'
+      when: never
     # For merge requests, create a pipeline.
     - if: '$CI_MERGE_REQUEST_IID'
     # For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
@@ -28,18 +28,18 @@ hello-world:
     - echo $CI_SERVER_HOST
     - echo $CI_PROJECT_PATH
     - 'echo "hello world"'
-#
-# #################
-# # Frontend jobs #
-# #################
-# compile-assets pull-push-cache as-if-foss:
-#   extends:
-#     - .compile-assets-metadata
-#     - .frontend:rules:default-frontend-jobs-as-if-foss
-#     - .as-if-foss
-#   cache:
-#     policy: pull-push
-#     key: "assets-compile:test:as-if-foss:v1"
+
+#################
+# Frontend jobs #
+#################
+compile-assets pull-push-cache as-if-foss:
+  extends:
+    - .compile-assets-metadata
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+  cache:
+    policy: pull-push
+    key: "assets-compile:test:as-if-foss:v1"
 #
 # compile-assets pull-cache as-if-foss:
 #   extends:
