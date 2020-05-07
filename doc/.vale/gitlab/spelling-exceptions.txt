@@ -302,6 +302,7 @@ sanitization
 serializer
 serializers
 serializing
+Sitespeed
 Slack
 Slony
 SMTP
