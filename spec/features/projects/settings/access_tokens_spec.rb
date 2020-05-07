@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'Project > Settings > Access Tokens', :js do
   let_it_be(:user) { create(:user) }
+  let_it_be(:bot_user) { create(:user, :project_bot) }
   let_it_be(:project) { create(:project) }
 
   before_all do
@@ -15,7 +16,6 @@ describe 'Project > Settings > Access Tokens', :js do
   end
 
   def create_project_access_token
-    bot_user = create(:user, :project_bot)
     project.add_maintainer(bot_user)
 
     create(:personal_access_token, user: bot_user)
