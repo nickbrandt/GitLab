@@ -179,10 +179,9 @@ export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_ST
 export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
   commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
-
   return Promise.all([
     dispatch('fetchGroupStagesAndEvents'),
-    dispatch('setSelectedStage', updatedData),
+    dispatch('customStages/showEditForm', updatedData),
   ]).catch(() => {
     createFlash(__('There was a problem refreshing the data, please try again'));
   });

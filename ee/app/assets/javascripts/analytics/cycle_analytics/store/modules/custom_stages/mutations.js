@@ -1,5 +1,27 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
+import { transformRawStages } from '../../../utils';
+
+const extractFormFields = (rawStage = {}) => {
+  const [
+    {
+      id = null,
+      name = null,
+      startEventIdentifier = null,
+      startEventLabel: { id: startEventLabelId = null } = {},
+      endEventIdentifier = null,
+      endEventLabel: { id: endEventLabelId = null } = {},
+    },
+  ] = transformRawStages([rawStage]);
+  return {
+    id,
+    name,
+    startEventIdentifier,
+    startEventLabelId,
+    endEventIdentifier,
+    endEventLabelId,
+  };
+};
 
 export default {
   [types.SET_STAGE_EVENTS](state, data = []) {
@@ -9,16 +31,18 @@ export default {
     state.isSavingCustomStage = false;
     state.formErrors = convertObjectPropsToCamelCase(errors, { deep: true });
   },
+  [types.SET_FORM_INITIAL_DATA](state, rawStageData = null) {
+    state.formInitialData = extractFormFields(rawStageData);
+  },
   [types.SHOW_CREATE_FORM](state) {
     state.isEditingCustomStage = false;
     state.isCreatingCustomStage = true;
     state.formInitialData = null;
     state.formErrors = null;
   },
-  [types.SHOW_EDIT_FORM](state, initialData) {
+  [types.SHOW_EDIT_FORM](state) {
     state.isCreatingCustomStage = false;
     state.isEditingCustomStage = true;
-    state.formInitialData = initialData;
     state.formErrors = null;
   },
   [types.HIDE_FORM](state) {

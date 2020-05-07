@@ -15,6 +15,7 @@ import {
   endDate,
   customizableStagesAndEvents,
   selectedProjects,
+  rawCustomStage,
 } from '../mock_data';
 
 let state = null;
@@ -107,6 +108,24 @@ describe('Cycle analytics mutations', () => {
         customStageMutations[customStageTypes.SET_STAGE_FORM_ERRORS](state, mockFormError);
 
         expect(state.formErrors).toEqual(convertObjectPropsToCamelCase(mockFormError));
+      });
+    });
+
+    describe(`${customStageTypes.SET_FORM_INITIAL_DATA}`, () => {
+      const mockStage = {
+        id: 18,
+        name: 'Coolest beans stage',
+        startEventIdentifier: 'issue_first_mentioned_in_commit',
+        startEventLabelId: null,
+        endEventIdentifier: 'issue_first_added_to_board',
+        endEventLabelId: null,
+      };
+
+      it('will set formInitialData', () => {
+        state = {};
+        customStageMutations[customStageTypes.SET_FORM_INITIAL_DATA](state, rawCustomStage);
+
+        expect(state.formInitialData).toEqual(mockStage);
       });
     });
   });

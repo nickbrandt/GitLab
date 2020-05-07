@@ -28,24 +28,9 @@ export const showCreateForm = ({ commit }) => {
 };
 
 export const showEditForm = ({ commit, dispatch }, selectedStage = {}) => {
-  const {
-    id = null,
-    name = null,
-    startEventIdentifier = null,
-    startEventLabel: { id: startEventLabelId = null } = {},
-    endEventIdentifier = null,
-    endEventLabel: { id: endEventLabelId = null } = {},
-  } = selectedStage;
-
-  commit(types.SHOW_EDIT_FORM, {
-    id,
-    name,
-    startEventIdentifier,
-    startEventLabelId,
-    endEventIdentifier,
-    endEventLabelId,
-  });
-  dispatch('setSelectedStage', selectedStage);
+  commit(types.SET_FORM_INITIAL_DATA, selectedStage);
+  commit(types.SHOW_EDIT_FORM);
+  dispatch('setSelectedStage', selectedStage, { root: true });
   removeFlash();
 };
 

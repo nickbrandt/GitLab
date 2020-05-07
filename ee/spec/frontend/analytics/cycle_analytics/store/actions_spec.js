@@ -481,7 +481,10 @@ describe('Cycle analytics actions', () => {
           response,
           state,
           [{ type: types.RECEIVE_UPDATE_STAGE_SUCCESS }],
-          [{ type: 'fetchGroupStagesAndEvents' }, { type: 'setSelectedStage', payload: response }],
+          [
+            { type: 'fetchGroupStagesAndEvents' },
+            { type: 'customStages/showEditForm', payload: response },
+          ],
         ));
 
       it('will flash a success message', () => {
