@@ -48,10 +48,7 @@ export const applySorts = array => array.sort(sortChildren).sort(sortByState);
  * flags and properties to use while rendering tree.
  * @param {Object} item
  */
-export const formatChildItem = item =>
-  Object.assign({}, item, {
-    pathIdSeparator: PathIdSeparator[item.type],
-  });
+export const formatChildItem = item => ({ ...item, pathIdSeparator: PathIdSeparator[item.type] });
 
 /**
  * Returns formatted array of Epics that doesn't contain

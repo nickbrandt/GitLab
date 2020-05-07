@@ -36,6 +36,4 @@ export const projects = {
   ],
 };
 
-export const withRootStorageStatistics = Object.assign({}, projects, {
-  totalUsage: 3261070,
-});
+export const withRootStorageStatistics = { ...projects, totalUsage: 3261070 };

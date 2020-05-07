@@ -31,7 +31,7 @@ export default {
       const index = this.notes.indexOf(comment);
 
       if (index > -1) {
-        this.notes.splice(index, 1, Object.assign({}, comment, data));
+        this.notes.splice(index, 1, { ...comment, ...data });
       }
     },
     removeComment(comment) {

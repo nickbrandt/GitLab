@@ -54,13 +54,13 @@ describe('GeoNodeActionsComponent', () => {
 
     describe('nodeToggleLabel', () => {
       it('returns label for toggle button for a node', () => {
-        let mockNode = Object.assign({}, mockNodes[1]);
+        let mockNode = { ...mockNodes[1] };
         let vmX = createComponent(mockNode);
 
         expect(vmX.nodeToggleLabel).toBe('Pause replication');
         vmX.$destroy();
 
-        mockNode = Object.assign({}, mockNodes[1], { enabled: false });
+        mockNode = { ...mockNodes[1], enabled: false };
         vmX = createComponent(mockNode);
 
         expect(vmX.nodeToggleLabel).toBe('Resume replication');

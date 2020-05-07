@@ -15,10 +15,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 
 import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
 
-const mockItem = Object.assign({}, mockEpic1, {
-  type: ChildType.Epic,
-  pathIdSeparator: PathIdSeparator.Epic,
-});
+const mockItem = { ...mockEpic1, type: ChildType.Epic, pathIdSeparator: PathIdSeparator.Epic };
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

@@ -14,7 +14,7 @@ describe('Epic Store Actions', () => {
   let state;
 
   beforeEach(() => {
-    state = Object.assign({}, defaultState());
+    state = { ...defaultState() };
   });
 
   describe('setEpicMeta', () => {

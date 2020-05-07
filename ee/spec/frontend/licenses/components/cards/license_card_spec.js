@@ -23,14 +23,14 @@ describe('LicenseCard', () => {
   localVue.use(Vuex);
 
   function createStore(newState) {
-    const state = Object.assign({}, defaultState, newState);
+    const state = { ...defaultState, ...newState };
     actions = { fetchDeleteLicense: jest.fn() };
 
     return new Vuex.Store({ state, actions });
   }
 
   function createComponent(state, props) {
-    const propsData = Object.assign({}, defaultProps, props);
+    const propsData = { ...defaultProps, ...props };
 
     wrapper = shallowMount(LicenseCard, {
       store: createStore(state),

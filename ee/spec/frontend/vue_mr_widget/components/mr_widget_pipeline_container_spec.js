@@ -19,7 +19,7 @@ describe('MrWidgetPipelineContainer', () => {
   const factory = (method = shallowMount, mrUpdates = {}, provide = {}) => {
     wrapper = method.call(this, MrWidgetPipelineContainer, {
       propsData: {
-        mr: Object.assign({}, mockStore, mrUpdates),
+        mr: { ...mockStore, ...mrUpdates },
       },
       provide: {
         ...provide,

@@ -72,10 +72,7 @@ describe('EpicItemComponent', () => {
 
     it('returns Epic.originalStartDate when start date is out of range', () => {
       const mockStartDate = new Date(2018, 0, 1);
-      const epic = Object.assign({}, mockEpic, {
-        startDateOutOfRange: true,
-        originalStartDate: mockStartDate,
-      });
+      const epic = { ...mockEpic, startDateOutOfRange: true, originalStartDate: mockStartDate };
       wrapper = createComponent({ epic });
 
       expect(wrapper.vm.startDate).toBe(mockStartDate);
@@ -89,10 +86,7 @@ describe('EpicItemComponent', () => {
 
     it('returns Epic.originalEndDate when end date is out of range', () => {
       const mockEndDate = new Date(2018, 0, 1);
-      const epic = Object.assign({}, mockEpic, {
-        endDateOutOfRange: true,
-        originalEndDate: mockEndDate,
-      });
+      const epic = { ...mockEpic, endDateOutOfRange: true, originalEndDate: mockEndDate };
       wrapper = createComponent({ epic });
 
       expect(wrapper.vm.endDate).toBe(mockEndDate);
@@ -105,28 +99,21 @@ describe('EpicItemComponent', () => {
     });
 
     it('returns timeframe string correctly when only start date is defined', () => {
-      const epic = Object.assign({}, mockEpic, {
-        endDateUndefined: true,
-      });
+      const epic = { ...mockEpic, endDateUndefined: true };
       wrapper = createComponent({ epic });
 
       expect(wrapper.vm.timeframeString(epic)).toBe('Jul 10, 2017 – No end date');
     });
 
     it('returns timeframe string correctly when only end date is defined', () => {
-      const epic = Object.assign({}, mockEpic, {
-        startDateUndefined: true,
-      });
+      const epic = { ...mockEpic, startDateUndefined: true };
       wrapper = createComponent({ epic });
 
       expect(wrapper.vm.timeframeString(epic)).toBe('No start date – Jun 2, 2018');
     });
 
     it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
-      const epic = Object.assign({}, mockEpic, {
-        startDate: new Date(2018, 0, 1),
-        endDate: new Date(2018, 3, 1),
-      });
+      const epic = { ...mockEpic, startDate: new Date(2018, 0, 1), endDate: new Date(2018, 3, 1) };
       wrapper = createComponent({ epic });
 
       expect(wrapper.vm.timeframeString(epic)).toBe('Jan 1 – Apr 1, 2018');
