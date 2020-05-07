@@ -1,11 +1,10 @@
 <script>
-import { GlButton, GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import GroupIterationQuery from '../queries/group_iteration.query.graphql';
 
 export default {
   components: {
     GlButton,
-    GlEmptyState,
     GlLoadingIcon,
     GlTab,
     GlTabs,
@@ -27,27 +26,71 @@ export default {
     },
   },
   apollo: {
-    iterations: {
+    upcomingIterations: {
       query: GroupIterationQuery,
       update: data => data.group.sprints.nodes,
       variables() {
         return {
           fullPath: this.groupPath,
+          state: 'upcoming',
+        };
+      },
+    },
+    inProgressIterations: {
+      query: GroupIterationQuery,
+      update: data => data.group.sprints.nodes,
+      variables() {
+        return {
+          fullPath: this.groupPath,
+          state: 'in_progress',
+        };
+      },
+    },
+    closedIterations: {
+      query: GroupIterationQuery,
+      update: data => data.group.sprints.nodes,
+      variables() {
+        return {
+          fullPath: this.groupPath,
+          state: 'closed',
         };
       },
     },
   },
   data() {
     return {
-      iterations: [],
+      upcomingIterations: [],
+      inProgressIterations: [],
+      closedIterations: [],
       loading: 0,
+      tabIndex: 0,
     };
+  },
+  computed: {
+    // TODO: these need to be combined in a single query
+    iterations() {
+      return [
+        ...this.inProgressIterations,
+        ...this.upcomingIterations,
+      ];
+    },
+    query() {
+      switch (this.tabIndex) {
+        default:
+        case 0:
+          return 'open';
+        case 1:
+          return 'closed';
+        case 2:
+          return 'all';
+      }
+    }
   },
 };
 </script>
 
 <template>
-  <gl-tabs>
+  <gl-tabs v-model="tabIndex">
     <gl-tab class="milestones">
       <template #title>
         {{ s__('Open') }}
@@ -64,6 +107,16 @@ export default {
       <div v-else class="nothing-here-block">
         {{ __('No iterations to show') }}
       </div>
+    </gl-tab>
+    <gl-tab>
+       <template #title>
+        {{ s__('Closed') }}
+      </template>
+    </gl-tab>
+    <gl-tab>
+       <template #title>
+        {{ s__('All') }}
+      </template>
     </gl-tab>
     <template #tabs-end>
       <li class="ml-auto d-flex align-items-center">
