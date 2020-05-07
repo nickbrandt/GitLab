@@ -24357,7 +24357,7 @@ msgstr ""
 msgid "You can filter by 'days to merge' by clicking on the columns in the chart."
 msgstr ""
 
-msgid "You can generate an access token scoped to this project for each application that needs access to the GitLab API."
+msgid "You can generate an access token scoped to this project for each application to use the GitLab API."
 msgstr ""
 
 msgid "You can get started by cloning the repository or start adding files to it with one of the following options."
