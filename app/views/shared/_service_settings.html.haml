@@ -1,6 +1,6 @@
 = form_errors(@service)
 - trigger_events = Feature.enabled?(:integration_form_refactor) ? ServiceEventSerializer.new(service: @service).represent(@service.configurable_events).to_json : []
-- fields = @service.global_fields_json
+- fields = Feature.enabled?(:integration_form_refactor) ? @service.global_fields_json : []
 
 - if lookup_context.template_exists?('help', "projects/services/#{@service.to_param}", true)
   = render "projects/services/#{@service.to_param}/help", subject: @service
