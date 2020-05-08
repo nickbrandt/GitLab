@@ -6,7 +6,9 @@ import Iterations from './components/iterations.vue';
 
 Vue.use(VueApollo);
 
-export default function initIterationsList(el) {
+export default function initIterationsList() {
+  const el = document.querySelector('.js-iterations-list');
+  
   if (!el) {
     return null;
   }
@@ -23,6 +25,7 @@ export default function initIterationsList(el) {
         props: {
           groupPath: el.dataset.groupFullPath,
           canAdmin: parseBoolean(el.dataset.canAdmin),
+          newIterationPath: el.dataset.newIterationPath,
         },
       });
     },

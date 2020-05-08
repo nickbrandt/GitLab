@@ -23,7 +23,7 @@ export default {
     newIterationPath: {
       type: String,
       required: false,
-      default: 'iterations/new', // TODO - get from BE
+      default: '',
     },
   },
   apollo: {
@@ -63,7 +63,7 @@ export default {
 
 <template>
   <gl-tabs v-model="tabIndex">
-    <gl-tab class="milestones">
+    <gl-tab>
       <template #title>
         {{ s__('Open') }}
       </template>
