@@ -18,14 +18,6 @@ module LicenseHelper
     License.current&.maximum_user_count || 0
   end
 
-  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?, license: License.current)
-    Gitlab::ExpiringSubscriptionMessage.new(
-      subscribable: license,
-      signed_in: signed_in,
-      is_admin: is_admin
-    ).message
-  end
-
   def seats_calculation_message(license)
     return unless license.present?
     return unless license.exclude_guests_from_active_count?

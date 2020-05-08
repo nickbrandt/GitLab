@@ -8,7 +8,7 @@ class SubscriptionPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def plan
-    namespace.try(:actual_plan_name)
+    hosted_plan.name
   end
 
   def notify_admins?
