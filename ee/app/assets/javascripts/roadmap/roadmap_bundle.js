@@ -78,6 +78,7 @@ export default () => {
       return {
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
         hasFiltersApplied: parseBoolean(dataset.hasFiltersApplied),
+        allowSubEpics: parseBoolean(dataset.allowSubEpics),
         defaultInnerHeight: Number(dataset.innerHeight),
         isChildEpics: parseBoolean(dataset.childEpics),
         currentGroupId: parseInt(dataset.groupId, 0),
@@ -109,6 +110,7 @@ export default () => {
         initialEpicsPath: this.initialEpicsPath,
         defaultInnerHeight: this.defaultInnerHeight,
         isChildEpics: this.isChildEpics,
+        allowSubEpics: this.allowSubEpics,
       });
     },
     methods: {
