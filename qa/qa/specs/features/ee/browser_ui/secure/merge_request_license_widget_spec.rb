@@ -3,7 +3,7 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker, :runner, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217093', type: :investigating } do
+  context 'Secure', :docker, :runner do
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
       let(:blacklisted_license_name) { "Zlib" }
@@ -44,7 +44,7 @@ module QA
           mr.source_branch = 'license-management-mr'
           mr.target_branch = 'master'
           mr.target = 'master'
-          mr.file_name = 'gl-license-management-report.json'
+          mr.file_name = 'gl-license-scanning-report.json'
           mr.file_content =
             <<~FILE_UPDATE
             {
