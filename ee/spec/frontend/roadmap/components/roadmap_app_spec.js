@@ -171,8 +171,8 @@ describe('RoadmapApp', () => {
     let roadmapTimelineEl;
 
     beforeEach(() => {
+      store.dispatch('receiveEpicsSuccess', { rawEpics: rawEpics.slice(0, 2) });
       wrapper = createComponent(mount);
-      store.dispatch('receiveEpicsSuccess', { rawEpics });
       roadmapTimelineEl = wrapper.find('.roadmap-timeline-section').element;
     });
 
