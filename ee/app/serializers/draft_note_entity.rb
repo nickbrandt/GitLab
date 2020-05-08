@@ -7,6 +7,7 @@ class DraftNoteEntity < Grape::Entity
   expose :merge_request_id
   expose :position, if: -> (note, _) { note.on_diff? }
   expose :line_code
+  expose :file_identifier_hash
   expose :file_hash
   expose :file_path
   expose :note
