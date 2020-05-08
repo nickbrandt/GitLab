@@ -32,7 +32,7 @@ describe API::License, api: true do
       get api('/license', admin)
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['user_limit']).to eq 0
-      expect(Date.parse(json_response['starts_at'])).to eq Date.today - 1.month
+      expect(Date.parse(json_response['starts_at'])).to eq Date.new(1970, 1, 1)
       expect(Date.parse(json_response['expires_at'])).to eq Date.today + 11.months
       expect(json_response['active_users']).to eq 1
       expect(json_response['licensee']).not_to be_empty
@@ -51,7 +51,7 @@ describe API::License, api: true do
 
       expect(response).to have_gitlab_http_status(:created)
       expect(json_response['user_limit']).to eq 0
-      expect(Date.parse(json_response['starts_at'])).to eq Date.today - 1.month
+      expect(Date.parse(json_response['starts_at'])).to eq Date.new(1970, 1, 1)
       expect(Date.parse(json_response['expires_at'])).to eq Date.today + 11.months
       expect(json_response['active_users']).to eq 1
       expect(json_response['licensee']).not_to be_empty
