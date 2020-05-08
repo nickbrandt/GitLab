@@ -2,7 +2,7 @@
 
 module QA
   context 'Monitor' do
-    describe 'Metrics with Prometheus', :orchestrated, :kubernetes, quarantine: { type: :new } do
+    describe 'Metrics with Prometheus', :orchestrated, :kubernetes, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28436', type: :waiting_on } do
       before do
         @cluster = Service::KubernetesCluster.new.create!
         Flow::Login.sign_in
