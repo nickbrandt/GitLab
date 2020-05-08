@@ -60,7 +60,7 @@ module DesignManagement
       return if design_unchanged?(design, content)
 
       action = new_file?(design) ? :create : :update
-      on_success { ::Gitlab::UsageCounters::DesignsCounter.count(action) }
+      on_success { ::Gitlab::UsageDataCounters::DesignsCounter.count(action) }
 
       DesignManagement::DesignAction.new(design, action, content)
     end
