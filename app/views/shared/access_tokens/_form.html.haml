@@ -24,7 +24,7 @@
 
         .js-access-tokens-expires-at
           %expires-at-field
-            = f.text_field :expires_at, class: 'datepicker form-control', placeholder: 'YYYY-MM-DD', autocomplete: 'off', data: { qa_selector: 'expiry_date_field' }
+            = f.text_field :expires_at, class: 'datepicker form-control gl-datepicker-input', placeholder: 'YYYY-MM-DD', autocomplete: 'off', data: { qa_selector: 'expiry_date_field' }
 
   .form-group
     = f.label :scopes, _('Scopes'), class: 'label-bold'
