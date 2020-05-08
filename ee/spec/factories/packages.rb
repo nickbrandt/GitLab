@@ -71,7 +71,7 @@ FactoryBot.define do
       conan_metadatum
 
       after :build do |package|
-        package.conan_metadatum.package_username = Packages::ConanMetadatum.package_username_from(
+        package.conan_metadatum.package_username = Packages::Conan::Metadatum.package_username_from(
           full_path: package.project.full_path
         )
       end
@@ -223,7 +223,7 @@ FactoryBot.define do
     end
   end
 
-  factory :maven_metadatum, class: 'Packages::MavenMetadatum' do
+  factory :maven_metadatum, class: 'Packages::Maven::Metadatum' do
     association :package, package_type: :maven
     path { 'my/company/app/my-app/1.0-SNAPSHOT' }
     app_group { 'my.company.app' }
@@ -231,18 +231,18 @@ FactoryBot.define do
     app_version { '1.0-SNAPSHOT' }
   end
 
-  factory :conan_metadatum, class: 'Packages::ConanMetadatum' do
+  factory :conan_metadatum, class: 'Packages::Conan::Metadatum' do
     association :package, factory: [:conan_package, :without_loaded_metadatum]
     package_username { 'username' }
     package_channel { 'stable' }
   end
 
-  factory :pypi_metadatum, class: 'Packages::PypiMetadatum' do
+  factory :pypi_metadatum, class: 'Packages::Pypi::Metadatum' do
     association :package, package_type: :pypi
     required_python { '>=2.7' }
   end
 
-  factory :conan_file_metadatum, class: 'Packages::ConanFileMetadatum' do
+  factory :conan_file_metadatum, class: 'Packages::Conan::FileMetadatum' do
     package_file
     recipe_revision { '0' }
 
@@ -274,7 +274,7 @@ FactoryBot.define do
     end
   end
 
-  factory :nuget_dependency_link_metadatum, class: 'Packages::NugetDependencyLinkMetadatum' do
+  factory :nuget_dependency_link_metadatum, class: 'Packages::Nuget::DependencyLinkMetadatum' do
     target_framework { '.NETStandard2.0' }
   end
 

@@ -8,7 +8,7 @@ module EE
       class_methods do
         def conan_file_name_regex
           @conan_file_name_regex ||=
-            %r{\A#{(::Packages::ConanFileMetadatum::RECIPE_FILES + ::Packages::ConanFileMetadatum::PACKAGE_FILES).join("|")}\z}.freeze
+            %r{\A#{(::Packages::Conan::FileMetadatum::RECIPE_FILES + ::Packages::Conan::FileMetadatum::PACKAGE_FILES).join("|")}\z}.freeze
         end
 
         def conan_package_reference_regex

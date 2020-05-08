@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Packages::ConanFileMetadatum < ApplicationRecord
+class Packages::Conan::FileMetadatum < ApplicationRecord
   belongs_to :package_file, inverse_of: :conan_file_metadatum
 
   validates :package_file, presence: true

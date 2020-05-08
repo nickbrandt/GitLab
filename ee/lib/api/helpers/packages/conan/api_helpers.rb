@@ -78,7 +78,7 @@ module API
 
           def project
             strong_memoize(:project) do
-              full_path = ::Packages::ConanMetadatum.full_path_from(package_username: params[:package_username])
+              full_path = ::Packages::Conan::Metadatum.full_path_from(package_username: params[:package_username])
               Project.find_by_full_path(full_path)
             end
           end
@@ -105,7 +105,7 @@ module API
                 conan_package_reference: params[:conan_package_reference]
               ).execute!
 
-            track_event('pull_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY
+            track_event('pull_package') if params[:file_name] == ::Packages::Conan::FileMetadatum::PACKAGE_BINARY
 
             present_carrierwave_file!(package_file.file)
           end
@@ -115,7 +115,7 @@ module API
           end
 
           def track_push_package_event
-            if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+            if params[:file_name] == ::Packages::Conan::FileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
               track_event('push_package')
             end
           end

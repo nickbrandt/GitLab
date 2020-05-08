@@ -2,7 +2,7 @@
 class Packages::DependencyLink < ApplicationRecord
   belongs_to :package, inverse_of: :dependency_links
   belongs_to :dependency, inverse_of: :dependency_links, class_name: 'Packages::Dependency'
-  has_one :nuget_metadatum, inverse_of: :dependency_link, class_name: 'Packages::NugetDependencyLinkMetadatum'
+  has_one :nuget_metadatum, inverse_of: :dependency_link, class_name: 'Packages::Nuget::DependencyLinkMetadatum'
 
   validates :package, :dependency, presence: true
 

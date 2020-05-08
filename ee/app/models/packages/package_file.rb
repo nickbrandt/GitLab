@@ -8,7 +8,7 @@ class Packages::PackageFile < ApplicationRecord
 
   belongs_to :package
 
-  has_one :conan_file_metadatum, inverse_of: :package_file
+  has_one :conan_file_metadatum, inverse_of: :package_file, class_name: 'Packages::Conan::FileMetadatum'
 
   accepts_nested_attributes_for :conan_file_metadatum
 
@@ -24,7 +24,7 @@ class Packages::PackageFile < ApplicationRecord
 
   scope :with_conan_file_type, ->(file_type) do
     joins(:conan_file_metadatum)
-      .where(packages_conan_file_metadata: { conan_file_type: ::Packages::ConanFileMetadatum.conan_file_types[file_type] })
+      .where(packages_conan_file_metadata: { conan_file_type: ::Packages::Conan::FileMetadatum.conan_file_types[file_type] })
   end
 
   scope :with_conan_package_reference, ->(conan_package_reference) do

@@ -267,7 +267,7 @@ RSpec.describe Packages::Package, type: :model do
     describe '.with_conan_username' do
       subject do
         described_class.with_conan_username(
-          Packages::ConanMetadatum.package_username_from(full_path: package.project.full_path)
+          Packages::Conan::Metadatum.package_username_from(full_path: package.project.full_path)
         )
       end
 

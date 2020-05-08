@@ -517,7 +517,7 @@ describe API::MavenPackages do
 
       it 'creates package and stores package file' do
         expect { upload_file_with_token(params) }.to change { project.packages.count }.by(1)
-          .and change { Packages::MavenMetadatum.count }.by(1)
+          .and change { Packages::Maven::Metadatum.count }.by(1)
           .and change { Packages::PackageFile.count }.by(1)
 
         expect(response).to have_gitlab_http_status(:ok)

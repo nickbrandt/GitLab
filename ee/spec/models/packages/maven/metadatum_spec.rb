@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Packages::MavenMetadatum, type: :model do
+RSpec.describe Packages::Maven::Metadatum, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:package) }
   end

@@ -37,7 +37,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
           .to change { ::Packages::Package.count }.by(-1)
           .and change { Packages::Dependency.count }.by(0)
           .and change { Packages::DependencyLink.count }.by(0)
-          .and change { Packages::NugetDependencyLinkMetadatum.count }.by(0)
+          .and change { Packages::Nuget::DependencyLinkMetadatum.count }.by(0)
         expect(package_file.reload.file_name).to eq(package_file_name)
         expect(package_file.package).to eq(existing_package)
       end
@@ -60,7 +60,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
           .to change { ::Packages::Package.count }.by(1)
           .and change { Packages::Dependency.count }.by(4)
           .and change { Packages::DependencyLink.count }.by(4)
-          .and change { Packages::NugetDependencyLinkMetadatum.count }.by(2)
+          .and change { Packages::Nuget::DependencyLinkMetadatum.count }.by(2)
 
         expect(package.reload.name).to eq(package_name)
         expect(package.version).to eq(package_version)

@@ -193,7 +193,7 @@ module API
           authorize!(:read_package, project)
 
           status 200
-          upload_urls = package_upload_urls(::Packages::ConanFileMetadatum::PACKAGE_FILES)
+          upload_urls = package_upload_urls(::Packages::Conan::FileMetadatum::PACKAGE_FILES)
 
           present upload_urls, with: EE::API::Entities::ConanPackage::ConanUploadUrls
         end
@@ -206,7 +206,7 @@ module API
           authorize!(:read_package, project)
 
           status 200
-          upload_urls = recipe_upload_urls(::Packages::ConanFileMetadatum::RECIPE_FILES)
+          upload_urls = recipe_upload_urls(::Packages::Conan::FileMetadatum::RECIPE_FILES)
 
           present upload_urls, with: EE::API::Entities::ConanPackage::ConanUploadUrls
         end
