@@ -26,12 +26,6 @@ describe API::Todos do
       create(:todo, project: nil, group: new_group, author: author_1, user: user, target: new_epic)
     end
 
-    shared_examples 'an endpoint that responds with success' do
-      specify do
-        expect(response).to have_gitlab_http_status(:ok)
-      end
-    end
-
     context 'when there is an Epic Todo' do
       let!(:epic_todo) { create_todo_for_new_epic }
 
@@ -39,7 +33,9 @@ describe API::Todos do
         get api('/todos', personal_access_token: pat)
       end
 
-      it_behaves_like 'an endpoint that responds with success'
+      specify do
+        expect(response).to have_gitlab_http_status(:ok)
+      end
 
       it 'avoids N+1 queries', :request_store do
         create_todo_for_new_epic

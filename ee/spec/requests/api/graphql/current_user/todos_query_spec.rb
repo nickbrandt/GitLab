@@ -6,7 +6,6 @@ describe 'getting project information' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
-  let_it_be(:design_todo) { create(:todo, user: current_user, target: create(:design)) }
   let_it_be(:epic_todo) { create(:todo, user: current_user, target: create(:epic)) }
   let(:fields) do
     <<~QUERY
@@ -29,7 +28,6 @@ describe 'getting project information' do
 
   it 'returns Todos for all target types' do
     is_expected.to include(
-      a_hash_including('targetType' => 'DESIGN'),
       a_hash_including('targetType' => 'EPIC')
     )
   end
