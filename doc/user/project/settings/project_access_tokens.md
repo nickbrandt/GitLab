@@ -2,13 +2,13 @@
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2587) in GitLab 13.0.
 
-Project access tokens are scoped to a project and can be used to authenticate with the [GitLab API](../../../api/README.md#project-access-tokens-core-only).
+Project access tokens are scoped to a project and can be used to authenticate with the [GitLab API](../../../api/README.md#personalproject-access-tokens).
 
 You can also use project access tokens with Git to authenticate over HTTP or SSH.
 
 Project access tokens expire on the date you define, at midnight UTC.
 
-For examples of how you can use a project access token to authenticate with the API, see the following section from our [API Docs](../../../api/README.md#project-access-tokens-core-only).
+For examples of how you can use a project access token to authenticate with the API, see the following section from our [API Docs](../../../api/README.md#personalproject-access-tokens).
 
 ## Creating a project access token
 

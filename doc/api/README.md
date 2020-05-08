@@ -80,8 +80,8 @@ for each individual endpoint. For example, the [`/projects/:id` endpoint](projec
 There are several ways to authenticate with the GitLab API:
 
 1. [OAuth2 tokens](#oauth2-tokens)
-1. [Personal access tokens](#personal-access-tokens)
-1. [Project access tokens](#project-access-tokens-core-only) **(CORE ONLY)**
+1. [Personal access tokens](../user/profile/personal_access_tokens.md)
+1. [Project access tokens](../user/project/settings/project_access_tokens.md) **(CORE ONLY)**
 1. [Session cookie](#session-cookie)
 1. [GitLab CI/CD job token](#gitlab-ci-job-token) **(Specific endpoints only)**
 
@@ -118,17 +118,7 @@ curl --header "Authorization: Bearer OAUTH-TOKEN" https://gitlab.example.com/api
 
 Read more about [GitLab as an OAuth2 provider](oauth2.md).
 
-### Access tokens
-
-#### Personal access tokens
-
-Read more about [personal access tokens](../user/profile/personal_access_tokens.md).
-
-#### Project access tokens **(CORE ONLY)**
-
-Read more about [project access tokens](../user/project/settings/project_access_tokens.md).
-
-#### Usage
+### Personal/project access tokens
 
 Access tokens can be used to authenticate with the API by passing it in either the `private_token` parameter
 or the `Private-Token` header.
