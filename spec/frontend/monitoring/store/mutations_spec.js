@@ -379,13 +379,13 @@ describe('Monitoring mutations', () => {
     });
   });
 
-  describe('SET_NEW_VARIABLE_DATA', () => {
+  describe('UPDATE_VARIABLE_DATA', () => {
     beforeEach(() => {
       mutations[types.SET_PROM_QUERY_VARIABLES](stateCopy, { pod: 'POD' });
     });
 
     it('sets a new value for an existing key', () => {
-      mutations[types.SET_NEW_VARIABLE_DATA](stateCopy, { pod: 'new pod' });
+      mutations[types.UPDATE_VARIABLE_DATA](stateCopy, { pod: 'new pod' });
 
       expect(stateCopy.promVariables).toEqual({ pod: 'new pod' });
     });

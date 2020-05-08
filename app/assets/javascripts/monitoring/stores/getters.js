@@ -98,9 +98,9 @@ export const filteredEnvironments = state =>
 
 /**
  * Maps an variables object to an array
+ * @param {Object} variables - Custom variables provided by the user
  * @returns {Array} The custom variables array to be send to the API
  * in the format of [variable1, variable1_value]
- * @param {Object} variables - Custom variables provided by the user
  */
 
 export const getCustomVariablesArray = state =>

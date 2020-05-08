@@ -105,7 +105,7 @@ describe('Metrics dashboard/variables section component', () => {
       expect(fetchDashboardData).toHaveBeenCalled();
     });
 
-    it('does not merge the url params and refreshes the dashboard if the value entered is not different that is what currently stored', () =>{
+    it('does not merge the url params and refreshes the dashboard if the value entered is not different that is what currently stored', () => {
       const firstInput = getInputAt(0);
 
       firstInput.vm.$emit('input');

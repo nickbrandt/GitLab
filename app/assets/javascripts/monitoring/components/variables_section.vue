@@ -38,7 +38,7 @@ export default {
     <div v-for="(val, key) in promVariables" :key="key" class="mb-1 pr-2 d-flex d-sm-block">
       <gl-form-group :label="key" class="mb-0 flex-grow-1">
         <gl-form-input
-          :value="promVariables[key]"
+          :value="val"
           :name="key"
           @keyup.native.enter="refreshDashboard"
           @blur.native="refreshDashboard"

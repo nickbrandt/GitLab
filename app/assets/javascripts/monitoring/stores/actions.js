@@ -395,8 +395,8 @@ export const duplicateSystemDashboard = ({ state }, payload) => {
 
 // Variables manipulation
 
-export const setVariableData = ({ commit }, changedVariable) => {
-  commit(types.SET_NEW_VARIABLE_DATA, changedVariable);
+export const setVariableData = ({ commit }, updatedVariable) => {
+  commit(types.UPDATE_VARIABLE_DATA, updatedVariable);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
