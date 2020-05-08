@@ -11792,6 +11792,9 @@ msgstr ""
 msgid "It's you"
 msgstr ""
 
+msgid "Iterations"
+msgstr ""
+
 msgid "Jaeger URL"
 msgstr ""
 
@@ -13732,6 +13735,9 @@ msgid "New Issue"
 msgid_plural "New Issues"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "New Iteration"
+msgstr ""
 
 msgid "New Jira import"
 msgstr ""
