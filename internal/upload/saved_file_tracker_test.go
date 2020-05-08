@@ -3,7 +3,7 @@ package upload
 import (
 	"context"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 
 	"net/http"
 	"testing"
@@ -29,10 +29,10 @@ func TestSavedFileTracking(t *testing.T) {
 	require.Equal(t, 1, tracker.Count())
 
 	tracker.Finalize(ctx)
-	jwtToken, err := jwt.Parse(r.Header.Get(RewrittenFieldsHeader), testhelper.ParseJWT)
+	token, err := jwt.ParseWithClaims(r.Header.Get(RewrittenFieldsHeader), &MultipartClaims{}, testhelper.ParseJWT)
 	require.NoError(t, err)
 
-	rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
+	rewrittenFields := token.Claims.(*MultipartClaims).RewrittenFields
 	require.Equal(t, 1, len(rewrittenFields))
 
 	require.Contains(t, rewrittenFields, "test")

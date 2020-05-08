@@ -159,8 +159,8 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			}
 		}
 
-		if valueCnt := len(r.MultipartForm.Value); valueCnt != 10 {
-			t.Fatal("Expected to receive exactly 10 values but got", valueCnt)
+		if valueCnt := len(r.MultipartForm.Value); valueCnt != 11 {
+			t.Fatal("Expected to receive exactly 11 values but got", valueCnt)
 		}
 
 		w.WriteHeader(202)

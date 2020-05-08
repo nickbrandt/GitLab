@@ -14,7 +14,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/builds"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/channel"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lfs"
@@ -207,10 +206,10 @@ func (u *upstream) configureRoutes() {
 		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
 
 		// Maven Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, filestore.BodyUploader(api, signingProxy, nil)),
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, upload.BodyUploader(api, signingProxy, nil)),
 
 		// Conan Artifact Repository
-		route("PUT", apiPattern+`v4/packages/conan/`, filestore.BodyUploader(api, signingProxy, nil)),
+		route("PUT", apiPattern+`v4/packages/conan/`, upload.BodyUploader(api, signingProxy, nil)),
 
 		// NuGet Artifact Repository
 		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, signingProxy)),

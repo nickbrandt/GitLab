@@ -11,11 +11,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func testDeadline() time.Time {
@@ -154,6 +156,8 @@ func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
+	testhelper.ConfigureSecret()
+
 	type remote int
 	const (
 		notRemote remote = iota
@@ -227,8 +231,8 @@ func TestSaveFile(t *testing.T) {
 			assert.NoError(err)
 			require.NotNil(t, fh)
 
-			assert.Equal(opts.RemoteID, fh.RemoteID)
-			assert.Equal(opts.RemoteURL, fh.RemoteURL)
+			require.Equal(t, opts.RemoteID, fh.RemoteID)
+			require.Equal(t, opts.RemoteURL, fh.RemoteURL)
 
 			if spec.local {
 				assert.NotEmpty(fh.LocalPath, "File not persisted on disk")
@@ -236,7 +240,7 @@ func TestSaveFile(t *testing.T) {
 				assert.NoError(err)
 
 				dir := path.Dir(fh.LocalPath)
-				assert.Equal(opts.LocalTempPath, dir)
+				require.Equal(t, opts.LocalTempPath, dir)
 				filename := path.Base(fh.LocalPath)
 				beginsWithPrefix := strings.HasPrefix(filename, opts.TempFilePrefix)
 				assert.True(beginsWithPrefix, fmt.Sprintf("LocalPath filename %q do not begin with TempFilePrefix %q", filename, opts.TempFilePrefix))
@@ -244,34 +248,29 @@ func TestSaveFile(t *testing.T) {
 				assert.Empty(fh.LocalPath, "LocalPath must be empty for non local uploads")
 			}
 
-			assert.Equal(test.ObjectSize, fh.Size)
-			assert.Equal(test.ObjectMD5, fh.MD5())
-			assert.Equal(test.ObjectSHA256, fh.SHA256())
+			require.Equal(t, test.ObjectSize, fh.Size)
+			require.Equal(t, test.ObjectMD5, fh.MD5())
+			require.Equal(t, test.ObjectSHA256, fh.SHA256())
 
-			assert.Equal(expectedPuts, osStub.PutsCnt(), "ObjectStore PutObject count mismatch")
-			assert.Equal(0, osStub.DeletesCnt(), "File deleted too early")
+			require.Equal(t, expectedPuts, osStub.PutsCnt(), "ObjectStore PutObject count mismatch")
+			require.Equal(t, 0, osStub.DeletesCnt(), "File deleted too early")
 
 			cancel() // this will trigger an async cleanup
 			assertObjectStoreDeletedAsync(t, expectedDeletes, osStub)
 			assertFileGetsRemovedAsync(t, fh.LocalPath)
 
 			// checking generated fields
-			fields := fh.GitLabFinalizeFields("file")
+			fields, err := fh.GitLabFinalizeFields("file")
+			require.NoError(t, err)
 
-			assert.Equal(fh.Name, fields["file.name"])
-			assert.Equal(fh.LocalPath, fields["file.path"])
-			assert.Equal(fh.RemoteURL, fields["file.remote_url"])
-			assert.Equal(fh.RemoteID, fields["file.remote_id"])
-			assert.Equal(strconv.FormatInt(test.ObjectSize, 10), fields["file.size"])
-			assert.Equal(test.ObjectMD5, fields["file.md5"])
-			assert.Equal(test.ObjectSHA1, fields["file.sha1"])
-			assert.Equal(test.ObjectSHA256, fields["file.sha256"])
-			assert.Equal(test.ObjectSHA512, fields["file.sha512"])
-			if spec.remote == notRemote {
-				assert.NotContains(fields, "file.etag")
-			} else {
-				assert.Contains(fields, "file.etag")
-			}
+			checkFileHandlerWithFields(t, fh, fields, "file", spec.remote == notRemote)
+
+			token, jwtErr := jwt.ParseWithClaims(fields["file.gitlab-workhorse-upload"], &testhelper.UploadClaims{}, testhelper.ParseJWT)
+			require.NoError(t, jwtErr)
+
+			uploadFields := token.Claims.(*testhelper.UploadClaims).Upload
+
+			checkFileHandlerWithFields(t, fh, uploadFields, "", spec.remote == notRemote)
 		})
 	}
 }
@@ -304,4 +303,29 @@ func TestSaveMultipartInBodyFailure(t *testing.T) {
 	assert.Nil(fh)
 	require.Error(t, err)
 	assert.EqualError(err, test.MultipartUploadInternalError().Error())
+}
+
+func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields map[string]string, prefix string, remote bool) {
+	key := func(field string) string {
+		if prefix == "" {
+			return field
+		}
+
+		return fmt.Sprintf("%s.%s", prefix, field)
+	}
+
+	require.Equal(t, fh.Name, fields[key("name")])
+	require.Equal(t, fh.LocalPath, fields[key("path")])
+	require.Equal(t, fh.RemoteURL, fields[key("remote_url")])
+	require.Equal(t, fh.RemoteID, fields[key("remote_id")])
+	require.Equal(t, strconv.FormatInt(test.ObjectSize, 10), fields[key("size")])
+	require.Equal(t, test.ObjectMD5, fields[key("md5")])
+	require.Equal(t, test.ObjectSHA1, fields[key("sha1")])
+	require.Equal(t, test.ObjectSHA256, fields[key("sha256")])
+	require.Equal(t, test.ObjectSHA512, fields[key("sha512")])
+	if remote {
+		require.NotContains(t, fields, key("etag"))
+	} else {
+		require.Contains(t, fields, key("etag"))
+	}
 }

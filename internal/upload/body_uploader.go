@@ -1,4 +1,4 @@
-package filestore
+package upload
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -15,29 +16,29 @@ type PreAuthorizer interface {
 	PreAuthorizeHandler(next api.HandleFunc, suffix string) http.Handler
 }
 
-// UploadVerifier allows to check an upload before sending it to rails
-type UploadVerifier interface {
+// Verifier allows to check an upload before sending it to rails
+type Verifier interface {
 	// Verify can abort the upload returning an error
-	Verify(handler *FileHandler) error
+	Verify(handler *filestore.FileHandler) error
 }
 
-// UploadPreparer allows to customize BodyUploader configuration
-type UploadPreparer interface {
-	// Prepare converts api.Response into a *SaveFileOpts, it can optionally return an UploadVerifier that will be
+// Preparer allows to customize BodyUploader configuration
+type Preparer interface {
+	// Prepare converts api.Response into a *SaveFileOpts, it can optionally return an Verifier that will be
 	// invoked after the real upload, before the finalization with rails
-	Prepare(a *api.Response) (*SaveFileOpts, UploadVerifier, error)
+	Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error)
 }
 
 type defaultPreparer struct{}
 
-func (s *defaultPreparer) Prepare(a *api.Response) (*SaveFileOpts, UploadVerifier, error) {
-	return GetOpts(a), nil, nil
+func (s *defaultPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
+	return filestore.GetOpts(a), nil, nil
 }
 
 // BodyUploader is an http.Handler that perform a pre authorization call to rails before hijacking the request body and
 // uploading it.
-// Providing an UploadPreparer allows to customize the upload process
-func BodyUploader(rails PreAuthorizer, h http.Handler, p UploadPreparer) http.Handler {
+// Providing an Preparer allows to customize the upload process
+func BodyUploader(rails PreAuthorizer, h http.Handler, p Preparer) http.Handler {
 	if p == nil {
 		p = &defaultPreparer{}
 	}
@@ -49,7 +50,7 @@ func BodyUploader(rails PreAuthorizer, h http.Handler, p UploadPreparer) http.Ha
 			return
 		}
 
-		fh, err := SaveFileFromReader(r.Context(), r.Body, r.ContentLength, opts)
+		fh, err := filestore.SaveFileFromReader(r.Context(), r.Body, r.ContentLength, opts)
 		if err != nil {
 			helper.Fail500(w, r, fmt.Errorf("BodyUploader: upload failed: %v", err))
 			return
@@ -63,7 +64,13 @@ func BodyUploader(rails PreAuthorizer, h http.Handler, p UploadPreparer) http.Ha
 		}
 
 		data := url.Values{}
-		for k, v := range fh.GitLabFinalizeFields("file") {
+		fields, err := fh.GitLabFinalizeFields("file")
+		if err != nil {
+			helper.Fail500(w, r, fmt.Errorf("BodyUploader: finalize fields failed: %v", err))
+			return
+		}
+
+		for k, v := range fields {
 			data.Set(k, v)
 		}
 
@@ -72,6 +79,13 @@ func BodyUploader(rails PreAuthorizer, h http.Handler, p UploadPreparer) http.Ha
 		r.Body = ioutil.NopCloser(strings.NewReader(body))
 		r.ContentLength = int64(len(body))
 		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		sft := SavedFileTracker{Request: r}
+		sft.Track("file", fh.LocalPath)
+		if err := sft.Finalize(r.Context()); err != nil {
+			helper.Fail500(w, r, fmt.Errorf("BodyUploader: finalize failed: %v", err))
+			return
+		}
 
 		// And proxy the request
 		h.ServeHTTP(w, r)

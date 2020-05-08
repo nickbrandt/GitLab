@@ -13,7 +13,7 @@ import (
 	"os"
 	"testing"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
@@ -157,14 +157,16 @@ func testUploadArtifacts(t *testing.T, contentType, url string, body io.Reader) 
 func TestUploadHandlerAddingMetadata(t *testing.T) {
 	s := setupWithTmpPath(t, "file",
 		func(w http.ResponseWriter, r *http.Request) {
-			jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), testhelper.ParseJWT)
+			token, err := jwt.ParseWithClaims(r.Header.Get(upload.RewrittenFieldsHeader), &upload.MultipartClaims{}, testhelper.ParseJWT)
 			require.NoError(t, err)
 
-			rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
+			rewrittenFields := token.Claims.(*upload.MultipartClaims).RewrittenFields
 			require.Equal(t, 2, len(rewrittenFields))
 
 			require.Contains(t, rewrittenFields, "file")
 			require.Contains(t, rewrittenFields, "metadata")
+			require.Contains(t, r.PostForm, "file.gitlab-workhorse-upload")
+			require.Contains(t, r.PostForm, "metadata.gitlab-workhorse-upload")
 		},
 	)
 	defer s.cleanup()
