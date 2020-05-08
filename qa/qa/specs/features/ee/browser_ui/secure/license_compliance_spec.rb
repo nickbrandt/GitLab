@@ -38,7 +38,7 @@ module QA
       end
     end
 
-    describe 'License Compliance pipeline reports' do
+    describe 'License Compliance pipeline reports', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217070', type: :investigating } do
       let(:number_of_licenses_in_fixture) { 2 }
 
       after do
