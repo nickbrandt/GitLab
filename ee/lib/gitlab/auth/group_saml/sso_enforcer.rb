@@ -4,6 +4,8 @@ module Gitlab
   module Auth
     module GroupSaml
       class SsoEnforcer
+        DEFAULT_SESSION_TIMEOUT = 7.days
+
         attr_reader :saml_provider
 
         def initialize(saml_provider)
@@ -15,7 +17,11 @@ module Gitlab
         end
 
         def active_session?
-          SsoState.new(saml_provider.id).active?
+          if ::Feature.enabled?(:enforced_sso_expiry, group)
+            SsoState.new(saml_provider.id).active_since?(DEFAULT_SESSION_TIMEOUT.ago)
+          else
+            SsoState.new(saml_provider.id).active?
+          end
         end
 
         def access_restricted?

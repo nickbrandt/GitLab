@@ -266,8 +266,17 @@ export default {
         );
       }
     },
+    expandedPanel: {
+      handler({ group, panel }) {
+        const dashboardPath = this.currentDashboard || this.firstDashboard.path;
+        updateHistory({
+          url: panelToUrl(dashboardPath, group, panel),
+          title: document.title,
+        });
+      },
+      deep: true,
+    },
   },
-
   created() {
     this.setInitialState({
       metricsEndpoint: this.metricsEndpoint,

@@ -7,8 +7,8 @@ import { mockNode, mockNodeDetails } from '../../mock_data';
 const MOCK_VERSION_TEXT = `${mockNodeDetails.version} (${mockNodeDetails.revision})`;
 
 const createComponent = ({
-  node = Object.assign({}, mockNode),
-  nodeDetails = Object.assign({}, mockNodeDetails),
+  node = { ...mockNode },
+  nodeDetails = { ...mockNodeDetails },
   nodeActionsAllowed = true,
   nodeEditAllowed = true,
   nodeRemovalAllowed = true,

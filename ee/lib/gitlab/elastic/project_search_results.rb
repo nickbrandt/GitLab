@@ -25,7 +25,7 @@ module Gitlab
 
       private
 
-      def blobs(page: 1, per_page: 20)
+      def blobs(page: 1, per_page: DEFAULT_PER_PAGE)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :download_code, project)
         return Kaminari.paginate_array([]) if project.empty_repo? || query.blank?
         return Kaminari.paginate_array([]) unless root_ref?
@@ -37,7 +37,7 @@ module Gitlab
         )
       end
 
-      def wiki_blobs(page: 1, per_page: 20)
+      def wiki_blobs(page: 1, per_page: DEFAULT_PER_PAGE)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :read_wiki, project)
 
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
@@ -61,7 +61,7 @@ module Gitlab
         Note.elastic_search(query, options: opt)
       end
 
-      def commits(page: 1, per_page: 20)
+      def commits(page: 1, per_page: DEFAULT_PER_PAGE)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :download_code, project)
 
         if project.empty_repo? || query.blank?

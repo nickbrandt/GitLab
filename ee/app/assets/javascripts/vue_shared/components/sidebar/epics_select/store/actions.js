@@ -19,9 +19,12 @@ export const setSelectedEpic = ({ commit }, selectedEpic) =>
 export const requestEpics = ({ commit }) => commit(types.REQUEST_EPICS);
 export const receiveEpicsSuccess = ({ commit }, data) => {
   const epics = data.map(rawEpic =>
-    convertObjectPropsToCamelCase(Object.assign({}, rawEpic, { url: rawEpic.web_edit_url }), {
-      dropKeys: ['web_edit_url'],
-    }),
+    convertObjectPropsToCamelCase(
+      { ...rawEpic, url: rawEpic.web_edit_url },
+      {
+        dropKeys: ['web_edit_url'],
+      },
+    ),
   );
 
   commit(types.RECEIVE_EPICS_SUCCESS, { epics });

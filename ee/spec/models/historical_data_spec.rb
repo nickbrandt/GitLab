@@ -102,7 +102,7 @@ describe HistoricalData do
     end
 
     context 'with data outside of the license period' do
-      let!(:license) { create(:license) }
+      let!(:license) { create(:license, starts_at: Date.current - 1.month) }
 
       context 'with stats before the license period' do
         before do

@@ -148,7 +148,7 @@ module EE
     end
 
     def first_class_vulnerabilities_available?(project)
-      ::Feature.enabled?(:first_class_vulnerabilities, project)
+      ::Feature.enabled?(:first_class_vulnerabilities, project, default_enabled: true)
     end
 
     def merge_pipelines_available?

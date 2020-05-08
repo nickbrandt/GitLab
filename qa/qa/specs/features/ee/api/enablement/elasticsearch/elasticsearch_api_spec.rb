@@ -5,8 +5,7 @@ require 'securerandom'
 
 module QA
   context 'Enablement:Search' do
-    include Support::Api
-    describe 'When using elasticsearch API to search for a known blob', :orchestrated, :elasticsearch, :requires_admin, quarantine: { type: :new } do
+    describe 'When using elasticsearch API to search for a known blob', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_file_content) { "elasticsearch: #{SecureRandom.hex(8)}" }
       let(:non_member_user) { Resource::User.fabricate_or_use('non_member_user', 'non_member_user_password') }
       let(:api_client) { Runtime::API::Client.new(:gitlab) }

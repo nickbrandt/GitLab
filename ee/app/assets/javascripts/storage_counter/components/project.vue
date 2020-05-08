@@ -45,7 +45,7 @@ export default {
       return this.isOpen ? 'angle-down' : 'angle-right';
     },
     statistics() {
-      const statisticsCopy = Object.assign({}, this.project.statistics);
+      const statisticsCopy = { ...this.project.statistics };
       delete statisticsCopy.storageSize;
       // eslint-disable-next-line no-underscore-dangle
       delete statisticsCopy.__typename;

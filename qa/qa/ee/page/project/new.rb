@@ -43,12 +43,6 @@ module QA
           def instance_template_tab_badge_text
             find_element(:instance_template_tab_badge).text
           end
-
-          def use_template_for_project(project_name)
-            within find_element(:template_option_row, text: project_name) do
-              click_element :use_template_button
-            end
-          end
         end
       end
     end

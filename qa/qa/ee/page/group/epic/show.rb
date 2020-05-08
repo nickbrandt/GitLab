@@ -20,8 +20,8 @@ module QA
               element :add_issue_input
             end
 
-            view 'ee/app/assets/javascripts/related_items_tree/components/issue_actions_split_button.vue' do
-              element :issue_actions_split_button
+            view 'ee/app/assets/javascripts/related_items_tree/components/epic_issue_actions_split_button.vue' do
+              element :epic_issue_actions_split_button
             end
 
             view 'ee/app/assets/javascripts/related_items_tree/components/tree_item.vue' do
@@ -33,7 +33,8 @@ module QA
             end
 
             def add_issue_to_epic(issue_url)
-              find_element(:issue_actions_split_button).find('button', text: 'Add an issue').click
+              click_element(:epic_issue_actions_split_button)
+              find('button', text: 'Add an existing issue').click
               fill_element :add_issue_input, issue_url
               # Clicking the title blurs the input
               click_element :title

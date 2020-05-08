@@ -1,15 +1,14 @@
 <script>
 import { escape } from 'lodash';
-import { GlDeprecatedButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltipDirective, GlModal, GlToggle, GlIcon } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
+import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT, NEW_VERSION_FLAG } from '../constants';
 
 export default {
   components: {
     GlDeprecatedButton,
-    Icon,
+    GlIcon,
     GlModal,
     GlToggle,
   },
@@ -33,9 +32,15 @@ export default {
       deleteFeatureFlagName: null,
     };
   },
+  translations: {
+    legacyFlagAlert: s__('FeatureFlags|Flag becomes read only soon'),
+  },
   computed: {
     permissions() {
       return this.glFeatures.featureFlagPermissions;
+    },
+    isNewVersionFlagsEnabled() {
+      return this.glFeatures.featureFlagsNewVersion;
     },
     modalTitle() {
       return sprintf(
@@ -60,6 +65,9 @@ export default {
     },
   },
   methods: {
+    isLegacyFlag(flag) {
+      return this.isNewVersionFlagsEnabled && flag.version !== NEW_VERSION_FLAG;
+    },
     scopeTooltipText(scope) {
       return !scope.active
         ? sprintf(s__('FeatureFlags|Inactive flag for %{scope}'), {
@@ -149,7 +157,17 @@ export default {
             {{ s__('FeatureFlags|Feature Flag') }}
           </div>
           <div class="table-mobile-content d-flex flex-column js-feature-flag-title">
-            <div class="feature-flag-name text-monospace text-truncate">{{ featureFlag.name }}</div>
+            <div class="gl-display-flex gl-align-items-center">
+              <div class="feature-flag-name text-monospace text-truncate">
+                {{ featureFlag.name }}
+              </div>
+              <gl-icon
+                v-if="isLegacyFlag(featureFlag)"
+                v-gl-tooltip.hover="$options.translations.legacyFlagAlert"
+                class="gl-ml-3"
+                name="information-o"
+              />
+            </div>
             <div class="feature-flag-description text-secondary text-truncate">
               {{ featureFlag.description }}
             </div>
@@ -186,7 +204,7 @@ export default {
                 variant="outline-primary"
                 :href="featureFlag.edit_path"
               >
-                <icon name="pencil" :size="16" />
+                <gl-icon name="pencil" :size="16" />
               </gl-deprecated-button>
             </template>
             <template v-if="featureFlag.destroy_path">
@@ -197,7 +215,7 @@ export default {
                 :disabled="!canDeleteFlag(featureFlag)"
                 @click="setDeleteModalData(featureFlag)"
               >
-                <icon name="remove" :size="16" />
+                <gl-icon name="remove" :size="16" />
               </gl-deprecated-button>
             </template>
           </div>

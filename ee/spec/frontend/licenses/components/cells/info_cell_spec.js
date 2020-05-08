@@ -10,7 +10,7 @@ describe('InfoCell', () => {
   };
 
   function createComponent(props, slots) {
-    const propsData = Object.assign({}, defaultProps, props);
+    const propsData = { ...defaultProps, ...props };
 
     wrapper = shallowMount(InfoCell, {
       propsData,

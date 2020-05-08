@@ -55,13 +55,11 @@ export default {
   },
   mounted() {
     if (this.canReorder) {
-      this.sortable = Sortable.create(
-        this.$refs.list,
-        Object.assign({}, sortableConfig, {
-          onStart: this.addDraggingCursor,
-          onEnd: this.reordered,
-        }),
-      );
+      this.sortable = Sortable.create(this.$refs.list, {
+        ...sortableConfig,
+        onStart: this.addDraggingCursor,
+        onEnd: this.reordered,
+      });
     }
   },
   methods: {

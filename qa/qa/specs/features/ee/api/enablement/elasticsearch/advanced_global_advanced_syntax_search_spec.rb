@@ -5,8 +5,7 @@ require 'securerandom'
 
 module QA
   context 'Enablement:Search' do
-    include Support::Api
-    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin, quarantine: { type: :new } do
+    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_name_suffix) { SecureRandom.hex(8) }
       let(:api_client) { Runtime::API::Client.new(:gitlab) }
 

@@ -1,0 +1,5 @@
+---
+title: Make active_users param mandatory for SyncSeatLinkRequestWorker#perform
+merge_request: 30810
+author:
+type: other

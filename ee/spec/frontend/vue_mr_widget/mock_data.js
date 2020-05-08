@@ -1,6 +1,7 @@
 import mockData, { mockStore } from 'jest/vue_mr_widget/mock_data';
 
-export default Object.assign({}, mockData, {
+export default {
+  ...mockData,
   codeclimate: {
     head_path: 'head.json',
     base_path: 'base.json',
@@ -18,7 +19,7 @@ export default Object.assign({}, mockData, {
     license_management: false,
     secret_scanning: false,
   },
-});
+};
 
 // Codeclimate
 export const headIssues = [

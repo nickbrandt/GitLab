@@ -96,7 +96,7 @@ export default class AccessDropdown {
     }
 
     const persistedItems = itemsToPreselect.map(item => {
-      const persistedItem = Object.assign({}, item);
+      const persistedItem = { ...item };
       persistedItem.persisted = true;
       return persistedItem;
     });
@@ -361,7 +361,7 @@ export default class AccessDropdown {
     usersResponse.forEach(response => {
       // Add is it has not been added
       if (map.indexOf(LEVEL_TYPES.USER + response.id) === -1) {
-        const user = Object.assign({}, response);
+        const user = { ...response };
         user.type = LEVEL_TYPES.USER;
         users.push(user);
       }

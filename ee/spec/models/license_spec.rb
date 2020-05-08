@@ -3,8 +3,8 @@
 require "spec_helper"
 
 describe License do
-  let(:gl_license)  { build(:gitlab_license) }
-  let(:license)     { build(:license, data: gl_license.export) }
+  let(:gl_license) { build(:gitlab_license) }
+  let(:license)    { build(:license, data: gl_license.export) }
 
   describe "Validation" do
     describe "Valid license" do
@@ -116,7 +116,7 @@ describe License do
         end
 
         context "after the license started" do
-          let(:date) { Date.today }
+          let(:date) { Date.current }
 
           it "is valid" do
             expect(license).to be_valid
@@ -249,7 +249,7 @@ describe License do
     describe 'downgrade' do
       context 'when more users were added in previous period' do
         before do
-          HistoricalData.create!(date: 6.months.ago, active_user_count: 15)
+          HistoricalData.create!(date: described_class.current.starts_at - 6.months, active_user_count: 15)
 
           set_restrictions(restricted_user_count: 5, previous_user_count: 10)
         end
@@ -274,11 +274,8 @@ describe License do
   end
 
   describe "Class methods" do
-    let!(:license) { described_class.last }
-
     before do
       described_class.reset_current
-      allow(described_class).to receive(:last).and_return(license)
     end
 
     describe '.features_for_plan' do
@@ -343,45 +340,47 @@ describe License do
 
     describe ".current" do
       context 'when licenses table does not exist' do
-        before do
-          allow(described_class).to receive(:table_exists?).and_return(false)
-        end
-
         it 'returns nil' do
+          allow(described_class).to receive(:table_exists?).and_return(false)
+
           expect(described_class.current).to be_nil
         end
       end
 
       context "when there is no license" do
-        let!(:license) { nil }
-
         it "returns nil" do
+          allow(described_class).to receive(:order).and_return(double(limit: []))
+
           expect(described_class.current).to be_nil
         end
       end
 
       context "when the license is invalid" do
-        before do
-          allow(license).to receive(:valid?).and_return(false)
-        end
-
         it "returns nil" do
+          allow(described_class).to receive(:order).and_return(double(limit: [license]))
+          allow(license).to receive(:valid?).and_return(false)
+
           expect(described_class.current).to be_nil
         end
       end
 
       context "when the license is valid" do
         it "returns the license" do
-          expect(described_class.current).to be_present
+          current_license = create_list(:license, 2).last
+          create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export)
+
+          expect(described_class.current).to eq(current_license)
         end
       end
     end
 
     describe ".block_changes?" do
+      before do
+        allow(License).to receive(:current).and_return(license)
+      end
+
       context "when there is no current license" do
-        before do
-          allow(described_class).to receive(:current).and_return(nil)
-        end
+        let(:license) { nil }
 
         it "returns false" do
           expect(described_class.block_changes?).to be_falsey
@@ -779,12 +778,14 @@ describe License do
   end
 
   def set_restrictions(opts)
+    date = described_class.current.starts_at
+
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],
       previous_user_count: opts[:previous_user_count],
       trueup_quantity: opts[:trueup_quantity],
-      trueup_from: (Date.today - 1.year).to_s,
-      trueup_to: Date.today.to_s
+      trueup_from: (date - 1.year).to_s,
+      trueup_to: date.to_s
     }
   end
 

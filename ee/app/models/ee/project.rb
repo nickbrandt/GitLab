@@ -313,7 +313,7 @@ module EE
     end
 
     def first_class_vulnerabilities_enabled?
-      ::Feature.enabled?(:first_class_vulnerabilities, self)
+      ::Feature.enabled?(:first_class_vulnerabilities, self, default_enabled: true)
     end
 
     def feature_available?(feature, user = nil)

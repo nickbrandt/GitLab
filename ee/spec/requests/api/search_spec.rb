@@ -14,6 +14,30 @@ describe API::Search do
     it { expect(json_response.size).to eq(size) }
   end
 
+  shared_examples 'pagination' do |scope:, search: '*'|
+    it 'returns a different result for each page' do
+      get api(endpoint, user), params: { scope: scope, search: search, page: 1, per_page: 1 }
+      first = json_response.first
+
+      get api(endpoint, user), params: { scope: scope, search: search, page: 2, per_page: 1 }
+      second = Gitlab::Json.parse(response.body).first
+
+      expect(first).not_to eq(second)
+    end
+
+    it 'returns 1 result when per_page is 1' do
+      get api(endpoint, user), params: { scope: scope, search: search, per_page: 1 }
+
+      expect(json_response.count).to eq(1)
+    end
+
+    it 'returns 2 results when per_page is 2' do
+      get api(endpoint, user), params: { scope: scope, search: search, per_page: 2 }
+
+      expect(Gitlab::Json.parse(response.body).count).to eq(2)
+    end
+  end
+
   shared_examples 'elasticsearch disabled' do
     it 'returns 400 error for wiki_blobs scope' do
       get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }
@@ -34,11 +58,12 @@ describe API::Search do
     end
   end
 
-  shared_examples 'elasticsearch enabled' do
+  shared_examples 'elasticsearch enabled' do |level:|
     context 'for wiki_blobs scope', :sidekiq_might_not_need_inline do
       before do
         wiki = create(:project_wiki, project: project)
         create(:wiki_page, wiki: wiki, title: 'home', content: "Awesome page")
+        create(:wiki_page, wiki: wiki, title: 'other', content: "Another page")
 
         project.wiki.index_wiki_blobs
         ensure_elasticsearch_index!
@@ -47,6 +72,8 @@ describe API::Search do
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
+
+      it_behaves_like 'pagination', scope: 'wiki_blobs'
     end
 
     context 'for commits scope', :sidekiq_might_not_need_inline do
@@ -58,6 +85,8 @@ describe API::Search do
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
+
+      it_behaves_like 'pagination', scope: 'commits'
     end
 
     context 'for blobs scope', :sidekiq_might_not_need_inline do
@@ -69,6 +98,8 @@ describe API::Search do
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
+
+      it_behaves_like 'pagination', scope: 'blobs'
 
       context 'filters' do
         it 'by filename' do
@@ -117,6 +148,79 @@ describe API::Search do
         # Some N+1 queries still exist
         expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control.count + new_issues.count * 4)
       end
+
+      it_behaves_like 'pagination', scope: 'issues'
+    end
+
+    context 'for merge_requests scope', :sidekiq_inline do
+      before do
+        create(:merge_request, target_branch: 'feature_2', source_project: project)
+        create(:merge_request, target_branch: 'feature_3', source_project: project)
+
+        ensure_elasticsearch_index!
+      end
+
+      it_behaves_like 'pagination', scope: 'merge_requests'
+    end
+
+    unless level == :project
+      context 'for projects scope', :sidekiq_inline do
+        before do
+          project
+          create(:project, :public, name: 'second project', group: group)
+
+          ensure_elasticsearch_index!
+        end
+
+        it_behaves_like 'pagination', scope: 'projects'
+      end
+    end
+
+    context 'for milestones scope', :sidekiq_inline do
+      before do
+        create_list(:milestone, 2, project: project)
+
+        ensure_elasticsearch_index!
+      end
+
+      it_behaves_like 'pagination', scope: 'milestones'
+    end
+
+    context 'for users scope', :sidekiq_inline do
+      before do
+        create_list(:user, 2).each do |user|
+          project.add_developer(user)
+          group.add_developer(user)
+        end
+      end
+
+      it_behaves_like 'pagination', scope: 'users', search: ''
+    end
+
+    if level == :global
+      context 'for snippet_titles scope', :sidekiq_inline do
+        before do
+          create_list(:snippet, 2, :public, title: 'Some code', content: 'Check it out')
+
+          ensure_elasticsearch_index!
+        end
+
+        it_behaves_like 'pagination', scope: 'snippet_titles'
+      end
+    end
+
+    if level == :project
+      context 'for notes scope', :sidekiq_inline do
+        before do
+          create(:note_on_merge_request, project: project, note: 'awesome note')
+          mr = create(:merge_request, source_project: project, target_branch: 'another_branch')
+          create(:note, project: project, noteable: mr, note: 'another note')
+
+          ensure_elasticsearch_index!
+        end
+
+        it_behaves_like 'pagination', scope: 'notes'
+      end
     end
   end
 
@@ -146,7 +250,7 @@ describe API::Search do
             stub_ee_application_setting(elasticsearch_limit_indexing: false)
           end
 
-          it_behaves_like 'elasticsearch enabled'
+          it_behaves_like 'elasticsearch enabled', level: :global
         end
       end
     end
@@ -175,7 +279,7 @@ describe API::Search do
               create :elasticsearch_indexed_namespace, namespace: group
             end
 
-            it_behaves_like 'elasticsearch enabled'
+            it_behaves_like 'elasticsearch enabled', level: :group
           end
 
           context 'when the namespace is not indexed' do
@@ -188,7 +292,7 @@ describe API::Search do
             stub_ee_application_setting(elasticsearch_limit_indexing: false)
           end
 
-          it_behaves_like 'elasticsearch enabled'
+          it_behaves_like 'elasticsearch enabled', level: :group
         end
       end
     end
@@ -278,7 +382,7 @@ describe API::Search do
               create :elasticsearch_indexed_project, project: project
             end
 
-            it_behaves_like 'elasticsearch enabled'
+            it_behaves_like 'elasticsearch enabled', level: :project
           end
 
           context 'when the project is not indexed' do
@@ -291,7 +395,7 @@ describe API::Search do
             stub_ee_application_setting(elasticsearch_limit_indexing: false)
           end
 
-          it_behaves_like 'elasticsearch enabled'
+          it_behaves_like 'elasticsearch enabled', level: :project
         end
       end
     end

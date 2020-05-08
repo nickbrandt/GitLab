@@ -3,13 +3,10 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 
 import { GlLoadingIcon } from '@gitlab/ui';
 
-import { issuableTypesMap } from 'ee/related_issues/constants';
-
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
 import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import CreateEpicForm from './create_epic_form.vue';
 import CreateIssueForm from './create_issue_form.vue';
-import IssueActionsSplitButton from './issue_actions_split_button.vue';
 import TreeItemRemoveModal from './tree_item_remove_modal.vue';
 
 import RelatedItemsTreeHeader from './related_items_tree_header.vue';
@@ -34,7 +31,6 @@ export default {
     CreateEpicForm,
     TreeItemRemoveModal,
     CreateIssueForm,
-    IssueActionsSplitButton,
     SlotSwitch,
   },
   computed: {
@@ -133,12 +129,6 @@ export default {
       this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
-    handleShowAddIssueForm() {
-      this.toggleAddItemForm({ toggleState: true, issuableType: issuableTypesMap.ISSUE });
-    },
-    handleShowCreateIssueForm() {
-      this.toggleCreateIssueForm({ toggleState: true });
-    },
   },
 };
 </script>
@@ -156,14 +146,7 @@ export default {
         'overflow-auto': directChildren.length > $options.OVERFLOW_AFTER,
       }"
     >
-      <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
-        <issue-actions-split-button
-          slot="issueActions"
-          class="ml-0 ml-sm-1"
-          @showAddIssueForm="handleShowAddIssueForm"
-          @showCreateIssueForm="handleShowCreateIssueForm"
-        />
-      </related-items-tree-header>
+      <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }" />
       <slot-switch
         v-if="visibleForm"
         :active-slot-names="[visibleForm]"

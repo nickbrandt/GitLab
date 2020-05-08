@@ -40,7 +40,8 @@ describe('Roadmap Vuex Actions', () => {
   let state;
 
   beforeEach(() => {
-    state = Object.assign({}, defaultState(), {
+    state = {
+      ...defaultState(),
       groupId: mockGroupId,
       timeframe: mockTimeframeMonths,
       presetType: PRESET_TYPES.MONTHS,
@@ -50,7 +51,7 @@ describe('Roadmap Vuex Actions', () => {
       basePath,
       timeframeStartDate,
       timeframeEndDate,
-    });
+    };
   });
 
   describe('setInitialData', () => {
@@ -76,7 +77,8 @@ describe('Roadmap Vuex Actions', () => {
         actions.receiveEpicsSuccess,
         {
           rawEpics: [
-            Object.assign({}, mockRawEpic, {
+            {
+              ...mockRawEpic,
               start_date: '2017-12-31',
               end_date: '2018-2-15',
               descendantWeightSum: {
@@ -87,7 +89,7 @@ describe('Roadmap Vuex Actions', () => {
                 openedEpics: 3,
                 closedEpics: 2,
               },
-            }),
+            },
           ],
         },
         state,
@@ -96,14 +98,15 @@ describe('Roadmap Vuex Actions', () => {
           {
             type: types.RECEIVE_EPICS_SUCCESS,
             payload: [
-              Object.assign({}, mockFormattedEpic, {
+              {
+                ...mockFormattedEpic,
                 startDateOutOfRange: false,
                 endDateOutOfRange: false,
                 startDate: new Date(2017, 11, 31),
                 originalStartDate: new Date(2017, 11, 31),
                 endDate: new Date(2018, 1, 15),
                 originalEndDate: new Date(2018, 1, 15),
-              }),
+              },
             ],
           },
         ],
@@ -112,14 +115,15 @@ describe('Roadmap Vuex Actions', () => {
             type: 'initItemChildrenFlags',
             payload: {
               epics: [
-                Object.assign({}, mockFormattedEpic, {
+                {
+                  ...mockFormattedEpic,
                   startDateOutOfRange: false,
                   endDateOutOfRange: false,
                   startDate: new Date(2017, 11, 31),
                   originalStartDate: new Date(2017, 11, 31),
                   endDate: new Date(2018, 1, 15),
                   originalEndDate: new Date(2018, 1, 15),
-                }),
+                },
               ],
             },
           },
@@ -148,7 +152,7 @@ describe('Roadmap Vuex Actions', () => {
           { type: types.UPDATE_EPIC_IDS, payload: mockRawEpic.id },
           {
             type: types.RECEIVE_EPICS_FOR_TIMEFRAME_SUCCESS,
-            payload: [Object.assign({}, mockFormattedEpic, { newEpic: true })],
+            payload: [{ ...mockFormattedEpic, newEpic: true }],
           },
         ],
         [],
@@ -352,7 +356,8 @@ describe('Roadmap Vuex Actions', () => {
         {
           parentItemId: '41',
           rawChildren: [
-            Object.assign({}, mockRawEpic, {
+            {
+              ...mockRawEpic,
               start_date: '2017-12-31',
               end_date: '2018-2-15',
               descendantWeightSum: {
@@ -363,7 +368,7 @@ describe('Roadmap Vuex Actions', () => {
                 openedEpics: 3,
                 closedEpics: 2,
               },
-            }),
+            },
           ],
         },
         state,
@@ -373,7 +378,8 @@ describe('Roadmap Vuex Actions', () => {
             payload: {
               parentItemId: '41',
               children: [
-                Object.assign({}, mockFormattedEpic, {
+                {
+                  ...mockFormattedEpic,
                   startDateOutOfRange: false,
                   endDateOutOfRange: false,
                   startDate: new Date(2017, 11, 31),
@@ -381,7 +387,7 @@ describe('Roadmap Vuex Actions', () => {
                   endDate: new Date(2018, 1, 15),
                   originalEndDate: new Date(2018, 1, 15),
                   isChildEpic: true,
-                }),
+                },
               ],
             },
           },
@@ -395,7 +401,8 @@ describe('Roadmap Vuex Actions', () => {
             type: 'initItemChildrenFlags',
             payload: {
               epics: [
-                Object.assign({}, mockFormattedEpic, {
+                {
+                  ...mockFormattedEpic,
                   startDateOutOfRange: false,
                   endDateOutOfRange: false,
                   startDate: new Date(2017, 11, 31),
@@ -403,7 +410,7 @@ describe('Roadmap Vuex Actions', () => {
                   endDate: new Date(2018, 1, 15),
                   originalEndDate: new Date(2018, 1, 15),
                   isChildEpic: true,
-                }),
+                },
               ],
             },
           },
@@ -680,12 +687,7 @@ describe('Roadmap Vuex Actions', () => {
       return testAction(
         actions.receiveMilestonesSuccess,
         {
-          rawMilestones: [
-            Object.assign({}, mockMilestone, {
-              start_date: '2017-12-31',
-              end_date: '2018-2-15',
-            }),
-          ],
+          rawMilestones: [{ ...mockMilestone, start_date: '2017-12-31', end_date: '2018-2-15' }],
         },
         state,
         [
@@ -693,14 +695,15 @@ describe('Roadmap Vuex Actions', () => {
           {
             type: types.RECEIVE_MILESTONES_SUCCESS,
             payload: [
-              Object.assign({}, mockFormattedMilestone, {
+              {
+                ...mockFormattedMilestone,
                 startDateOutOfRange: false,
                 endDateOutOfRange: false,
                 startDate: new Date(2017, 11, 31),
                 originalStartDate: new Date(2017, 11, 31),
                 endDate: new Date(2018, 1, 15),
                 originalEndDate: new Date(2018, 1, 15),
-              }),
+              },
             ],
           },
         ],

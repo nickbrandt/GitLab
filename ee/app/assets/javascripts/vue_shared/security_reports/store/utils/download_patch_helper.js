@@ -1,10 +1,8 @@
 const downloadPatchHelper = (patch, opts = {}) => {
-  const mergedOpts = Object.assign(
-    {
-      isEncoded: true,
-    },
-    opts,
-  );
+  const mergedOpts = {
+    isEncoded: true,
+    ...opts,
+  };
 
   const url = `data:text/plain;base64,${mergedOpts.isEncoded ? patch : btoa(patch)}`;
   const link = document.createElement('a');

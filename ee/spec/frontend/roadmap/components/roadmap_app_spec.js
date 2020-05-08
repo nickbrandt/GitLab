@@ -1,3 +1,4 @@
+import { GlLoadingIcon } from '@gitlab/ui';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -67,35 +68,34 @@ describe('RoadmapApp', () => {
     wrapper = null;
   });
 
-  describe('when the app contains epics', () => {
-    beforeEach(() => {
-      wrapper = createComponent();
-      store.commit(types.RECEIVE_EPICS_SUCCESS, epics);
-    });
+  describe.each`
+    testLabel         | epicList | showLoading | showRoadmapShell | showEpicsListEmpty
+    ${'is loading'}   | ${null}  | ${true}     | ${false}         | ${false}
+    ${'has epics'}    | ${epics} | ${false}    | ${true}          | ${false}
+    ${'has no epics'} | ${[]}    | ${false}    | ${false}         | ${true}
+  `(
+    `when epic list $testLabel`,
+    ({ epicList, showLoading, showRoadmapShell, showEpicsListEmpty }) => {
+      beforeEach(() => {
+        wrapper = createComponent();
+        if (epicList) {
+          store.commit(types.RECEIVE_EPICS_SUCCESS, epicList);
+        }
+      });
 
-    it('the roadmap is shown', () => {
-      expect(wrapper.contains(RoadmapShell)).toBe(true);
-    });
+      it(`loading icon is${showLoading ? '' : ' not'} shown`, () => {
+        expect(wrapper.contains(GlLoadingIcon)).toBe(showLoading);
+      });
 
-    it('the empty state view is not shown', () => {
-      expect(wrapper.contains(EpicsListEmpty)).toBe(false);
-    });
-  });
+      it(`roadmap is${showRoadmapShell ? '' : ' not'} shown`, () => {
+        expect(wrapper.contains(RoadmapShell)).toBe(showRoadmapShell);
+      });
 
-  describe('when the app does not contain any epics', () => {
-    beforeEach(() => {
-      wrapper = createComponent();
-      store.commit(types.RECEIVE_EPICS_SUCCESS, []);
-    });
-
-    it('the roadmap is not shown', () => {
-      expect(wrapper.contains(RoadmapShell)).toBe(false);
-    });
-
-    it('the empty state view is shown', () => {
-      expect(wrapper.contains(EpicsListEmpty)).toBe(true);
-    });
-  });
+      it(`empty state view is${showEpicsListEmpty ? '' : ' not'} shown`, () => {
+        expect(wrapper.contains(EpicsListEmpty)).toBe(showEpicsListEmpty);
+      });
+    },
+  );
 
   describe('empty state view', () => {
     beforeEach(() => {

@@ -1,16 +1,15 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { GlDeprecatedButton, GlTooltip, GlIcon } from '@gitlab/ui';
+import { GlTooltip, GlIcon } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
-import EpicActionsSplitButton from './epic_actions_split_button.vue';
+import EpicActionsSplitButton from './epic_issue_actions_split_button.vue';
 import EpicHealthStatus from './epic_health_status.vue';
 
 export default {
   components: {
-    GlDeprecatedButton,
     GlTooltip,
     GlIcon,
     EpicHealthStatus,
@@ -26,17 +25,25 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['toggleAddItemForm', 'toggleCreateEpicForm', 'setItemInputValue']),
-    showAddEpicForm() {
-      this.toggleAddItemForm({
-        issuableType: issuableTypesMap.EPIC,
-        toggleState: true,
-      });
-    },
+    ...mapActions([
+      'toggleCreateIssueForm',
+      'toggleAddItemForm',
+      'toggleCreateEpicForm',
+      'setItemInputValue',
+    ]),
     showAddIssueForm() {
       this.setItemInputValue('');
       this.toggleAddItemForm({
         issuableType: issuableTypesMap.ISSUE,
+        toggleState: true,
+      });
+    },
+    showCreateIssueForm() {
+      this.toggleCreateIssueForm({ toggleState: true });
+    },
+    showAddEpicForm() {
+      this.toggleAddItemForm({
+        issuableType: issuableTypesMap.EPIC,
         toggleState: true,
       });
     },
@@ -88,24 +95,18 @@ export default {
       </div>
       <epic-health-status v-if="healthStatus" :health-status="healthStatus" />
     </div>
-    <div class="d-inline-flex flex-column flex-sm-row js-button-container">
-      <template v-if="parentItem.userPermissions.adminEpic">
-        <epic-actions-split-button
-          v-if="allowSubEpics"
-          class="qa-add-epics-button mb-2 mb-sm-0"
-          @showAddEpicForm="showAddEpicForm"
-          @showCreateEpicForm="showCreateEpicForm"
-        />
-
-        <slot name="issueActions">
-          <gl-deprecated-button
-            class="ml-1 js-add-issues-button qa-add-issues-button"
-            size="sm"
-            @click="showAddIssueForm"
-            >{{ __('Add an issue') }}</gl-deprecated-button
-          >
-        </slot>
-      </template>
+    <div
+      v-if="parentItem.userPermissions.adminEpic"
+      class="d-inline-flex flex-column flex-sm-row js-button-container"
+    >
+      <epic-actions-split-button
+        :allow-sub-epics="allowSubEpics"
+        class="js-add-epics-issues-button qa-add-epics-button mb-2 mb-sm-0"
+        @showAddIssueForm="showAddIssueForm"
+        @showCreateIssueForm="showCreateIssueForm"
+        @showAddEpicForm="showAddEpicForm"
+        @showCreateEpicForm="showCreateEpicForm"
+      />
     </div>
   </div>
 </template>

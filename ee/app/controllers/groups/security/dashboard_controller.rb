@@ -3,7 +3,7 @@ class Groups::Security::DashboardController < Groups::ApplicationController
   layout 'group'
 
   before_action only: [:show] do
-    push_frontend_feature_flag(:first_class_vulnerabilities)
+    push_frontend_feature_flag(:first_class_vulnerabilities, group, default_enabled: true)
   end
 
   def show
