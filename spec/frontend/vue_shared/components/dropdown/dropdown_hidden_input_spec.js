@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import dropdownHiddenInputComponent from '~/vue_shared/components/dropdown/dropdown_hidden_input.vue';
 
 import { mockLabels } from './mock_data';

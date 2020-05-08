@@ -1,4 +1,4 @@
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import Vue from 'vue';
 import GlCountdown from '~/vue_shared/components/gl_countdown.vue';
 
@@ -8,13 +8,12 @@ describe('GlCountdown', () => {
   let now = '2000-01-01T00:00:00Z';
 
   beforeEach(() => {
-    spyOn(Date, 'now').and.callFake(() => new Date(now).getTime());
-    jasmine.clock().install();
+    jest.spyOn(Date, 'now').mockImplementation(() => new Date(now).getTime());
   });
 
   afterEach(() => {
     vm.$destroy();
-    jasmine.clock().uninstall();
+    jest.clearAllTimers();
   });
 
   describe('when there is time remaining', () => {
@@ -29,16 +28,16 @@ describe('GlCountdown', () => {
     });
 
     it('displays remaining time', () => {
-      expect(vm.$el).toContainText('01:02:03');
+      expect(vm.$el.textContent).toContain('01:02:03');
     });
 
     it('updates remaining time', done => {
       now = '2000-01-01T00:00:01Z';
-      jasmine.clock().tick(1000);
+      jest.advanceTimersByTime(1000);
 
       Vue.nextTick()
         .then(() => {
-          expect(vm.$el).toContainText('01:02:02');
+          expect(vm.$el.textContent).toContain('01:02:02');
           done();
         })
         .catch(done.fail);
@@ -57,19 +56,26 @@ describe('GlCountdown', () => {
     });
 
     it('displays 00:00:00', () => {
-      expect(vm.$el).toContainText('00:00:00');
+      expect(vm.$el.textContent).toContain('00:00:00');
     });
   });
 
   describe('when an invalid date is passed', () => {
+    beforeEach(() => {
+      Vue.config.warnHandler = jest.fn();
+    });
+
+    afterEach(() => {
+      Vue.config.warnHandler = null;
+    });
+
     it('throws a validation error', () => {
-      spyOn(Vue.config, 'warnHandler').and.stub();
       vm = mountComponent(Component, {
         endDateString: 'this is invalid',
       });
 
       expect(Vue.config.warnHandler).toHaveBeenCalledTimes(1);
-      const [errorMessage] = Vue.config.warnHandler.calls.argsFor(0);
+      const [errorMessage] = Vue.config.warnHandler.mock.calls[0];
 
       expect(errorMessage).toMatch(/^Invalid prop: .* "endDateString"/);
     });

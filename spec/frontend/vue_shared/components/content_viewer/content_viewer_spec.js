@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import waitForPromises from 'spec/helpers/wait_for_promises';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import waitForPromises from 'helpers/wait_for_promises';
 import { GREEN_BOX_IMAGE_URL } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
 import contentViewer from '~/vue_shared/components/content_viewer/content_viewer.vue';
@@ -96,7 +96,7 @@ describe('ContentViewer', () => {
 
   it('markdown preview receives the file path as a parameter', done => {
     mock = new MockAdapter(axios);
-    spyOn(axios, 'post').and.callThrough();
+    jest.spyOn(axios, 'post');
     mock.onPost(`${gon.relative_url_root}/testproject/preview_markdown`).reply(200, {
       body: '<b>testing</b>',
     });
@@ -114,7 +114,7 @@ describe('ContentViewer', () => {
         expect(axios.post).toHaveBeenCalledWith(
           `${gon.relative_url_root}/testproject/preview_markdown`,
           { path: 'foo/test.md', text: '*  Test' },
-          jasmine.any(Object),
+          expect.any(Object),
         );
       })
       .then(done)
