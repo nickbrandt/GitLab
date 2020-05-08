@@ -117,10 +117,9 @@ describe('Grouped accessibility reports app', () => {
       it('renders custom accessibility issue body', () => {
         const issueBody = wrapper.find(AccessibilityIssueBody);
 
-        expect(issueBody.props('issue').name).toEqual(mockReport.new_errors[0].name);
-        expect(issueBody.props('issue').code).toEqual(mockReport.new_errors[0].code);
-        expect(issueBody.props('issue').message).toEqual(mockReport.new_errors[0].message);
-        expect(issueBody.props('isNew')).toEqual(true);
+        expect(issueBody.props('issue').code).toBe(mockReport.new_errors[0].code);
+        expect(issueBody.props('issue').message).toBe(mockReport.new_errors[0].message);
+        expect(issueBody.props('isNew')).toBe(true);
       });
     });
   });

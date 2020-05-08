@@ -41,6 +41,8 @@ describe('Accessibility Reports actions', () => {
 
     afterEach(() => {
       mock.restore();
+      actions.stopPolling();
+      actions.clearEtagPoll();
     });
 
     describe('success', () => {
@@ -81,12 +83,23 @@ describe('Accessibility Reports actions', () => {
   });
 
   describe('receiveReportSuccess', () => {
-    it('should commit RECEIVE_REPORT_SUCCESS mutation', done => {
+    it('should commit RECEIVE_REPORT_SUCCESS mutation with 200', done => {
       testAction(
         actions.receiveReportSuccess,
         { status: 200, data: mockReport },
         localState,
         [{ type: types.RECEIVE_REPORT_SUCCESS, payload: mockReport }],
+        [],
+        done,
+      );
+    });
+
+    it('should not commit RECEIVE_REPORTS_SUCCESS mutation with 204', done => {
+      testAction(
+        actions.receiveReportSuccess,
+        { status: 204, data: mockReport },
+        localState,
+        [],
         [],
         done,
       );
@@ -99,7 +112,7 @@ describe('Accessibility Reports actions', () => {
         actions.receiveReportError,
         null,
         localState,
-        [{ type: types.RECEIVE_REPORT_ERROR, payload: 'Failed to retrieve accessibility report' }],
+        [{ type: types.RECEIVE_REPORT_ERROR }],
         [],
         done,
       );

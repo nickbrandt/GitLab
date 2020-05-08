@@ -12,10 +12,9 @@ export default {
     state.isLoading = false;
     state.report = report;
   },
-  [types.RECEIVE_REPORT_ERROR](state, message) {
+  [types.RECEIVE_REPORT_ERROR](state) {
     state.isLoading = false;
     state.hasError = true;
-    state.errorMessage = message;
     state.report = {};
   },
 };

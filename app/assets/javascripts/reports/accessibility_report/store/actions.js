@@ -3,7 +3,6 @@ import Poll from '~/lib/utils/poll';
 import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
-import { s__ } from '~/locale';
 
 let eTagPoll;
 
@@ -63,18 +62,14 @@ export const fetchReport = ({ state, dispatch, commit }) => {
   });
 };
 
-export const receiveReportSuccess = ({ commit }, response) => {
-  if (response.status === httpStatusCodes.OK) {
-    const report = response.data;
-    commit(types.RECEIVE_REPORT_SUCCESS, report);
+export const receiveReportSuccess = ({ commit }, { status, data }) => {
+  if (status === httpStatusCodes.OK) {
+    commit(types.RECEIVE_REPORT_SUCCESS, data);
   }
 };
 
 export const receiveReportError = ({ commit }) => {
-  commit(
-    types.RECEIVE_REPORT_ERROR,
-    s__('AccessibilityReport|Failed to retrieve accessibility report'),
-  );
+  commit(types.RECEIVE_REPORT_ERROR);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
