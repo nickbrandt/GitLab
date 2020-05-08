@@ -77,7 +77,7 @@ authentication is not provided. For
 those cases where it is not required, this will be mentioned in the documentation
 for each individual endpoint. For example, the [`/projects/:id` endpoint](projects.md).
 
-There are five ways to authenticate with the GitLab API:
+There are several ways to authenticate with the GitLab API:
 
 1. [OAuth2 tokens](#oauth2-tokens)
 1. [Personal access tokens](#personal-access-tokens)
@@ -126,7 +126,7 @@ Read more about [personal access tokens](../user/profile/personal_access_tokens.
 
 #### Project access tokens **(CORE ONLY)**
 
-Read more about [project access tokens](../user/project/settings/index.md#project-access-tokens-core-only).
+Read more about [project access tokens](../user/project/settings/project_access_tokens.md).
 
 #### Usage
 
