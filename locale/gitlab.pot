@@ -12718,6 +12718,9 @@ msgstr ""
 msgid "Mark comment as resolved"
 msgstr ""
 
+msgid "Mark this comment as private"
+msgstr ""
+
 msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
@@ -15487,6 +15490,9 @@ msgid "Private - Project access must be granted explicitly to each user. If this
 msgstr ""
 
 msgid "Private - The group and its projects can only be viewed by members."
+msgstr ""
+
+msgid "Private comments are accessible by internal staff only"
 msgstr ""
 
 msgid "Private group(s)"
