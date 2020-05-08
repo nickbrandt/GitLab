@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Packages::ConanMetadatum, type: :model do
+RSpec.describe Packages::Conan::Metadatum, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:package) }
   end

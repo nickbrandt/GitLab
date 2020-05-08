@@ -13,7 +13,7 @@ describe Packages::Conan::CreatePackageService do
         {
           package_name: 'my-pkg',
           package_version: '1.0.0',
-          package_username: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path),
+          package_username: ::Packages::Conan::Metadatum.package_username_from(full_path: project.full_path),
           package_channel: 'stable'
         }
       end

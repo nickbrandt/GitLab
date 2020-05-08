@@ -218,7 +218,7 @@ describe API::ConanPackages do
   shared_examples 'rejects recipe for not found package' do
     context 'with invalid recipe path' do
       let(:recipe_path) do
-        'aa/bb/%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) }
+        'aa/bb/%{project}/ccc' % { project: ::Packages::Conan::Metadatum.package_username_from(full_path: project.full_path) }
       end
 
       it 'returns not found' do
@@ -232,13 +232,13 @@ describe API::ConanPackages do
   shared_examples 'empty recipe for not found package' do
     context 'with invalid recipe url' do
       let(:recipe_path) do
-        'aa/bb/%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) }
+        'aa/bb/%{project}/ccc' % { project: ::Packages::Conan::Metadatum.package_username_from(full_path: project.full_path) }
       end
 
       it 'returns not found' do
         allow(::Packages::Conan::PackagePresenter).to receive(:new)
           .with(
-            'aa/bb@%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) },
+            'aa/bb@%{project}/ccc' % { project: ::Packages::Conan::Metadatum.package_username_from(full_path: project.full_path) },
             user,
             project,
             any_args
@@ -568,7 +568,7 @@ describe API::ConanPackages do
       it_behaves_like 'a project is not found'
 
       context 'tracking the conan_package.tgz download' do
-        let(:package_file) { package.package_files.find_by(file_name: ::Packages::ConanFileMetadatum::PACKAGE_BINARY) }
+        let(:package_file) { package.package_files.find_by(file_name: ::Packages::Conan::FileMetadatum::PACKAGE_BINARY) }
 
         it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
       end
@@ -802,7 +802,7 @@ describe API::ConanPackages do
       it_behaves_like 'rejects invalid recipe'
       it_behaves_like 'uploads a package file'
       context 'tracking the conan_package.tgz upload' do
-        let(:file_name) { ::Packages::ConanFileMetadatum::PACKAGE_BINARY }
+        let(:file_name) { ::Packages::Conan::FileMetadatum::PACKAGE_BINARY }
 
         it_behaves_like 'a gitlab tracking event', described_class.name, 'push_package'
       end

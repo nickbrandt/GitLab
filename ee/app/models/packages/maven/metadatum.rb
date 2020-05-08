@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class Packages::MavenMetadatum < ApplicationRecord
+class Packages::Maven::Metadatum < ApplicationRecord
   belongs_to :package, -> { where(package_type: :maven) }
 
   validates :package, presence: true

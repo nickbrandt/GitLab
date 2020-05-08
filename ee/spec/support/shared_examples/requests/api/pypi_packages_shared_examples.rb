@@ -6,7 +6,7 @@ RSpec.shared_examples 'PyPi package creation' do |user_type, status, add_member 
       expect { subject }
           .to change { project.packages.pypi.count }.by(1)
           .and change { Packages::PackageFile.count }.by(1)
-          .and change { Packages::PypiMetadatum.count }.by(1)
+          .and change { Packages::Pypi::Metadatum.count }.by(1)
       expect(response).to have_gitlab_http_status(status)
 
       package = project.reload.packages.pypi.last

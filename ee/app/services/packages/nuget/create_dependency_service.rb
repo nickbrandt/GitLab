@@ -41,7 +41,7 @@ module Packages
           }
         end
 
-        ::Gitlab::Database.bulk_insert(::Packages::NugetDependencyLinkMetadatum.table_name, rows.compact)
+        ::Gitlab::Database.bulk_insert(::Packages::Nuget::DependencyLinkMetadatum.table_name, rows.compact)
       end
 
       def raw_dependency_for(dependency)

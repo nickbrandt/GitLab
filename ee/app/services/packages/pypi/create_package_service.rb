@@ -7,7 +7,7 @@ module Packages
 
       def execute
         ::Packages::Package.transaction do
-          Packages::PypiMetadatum.upsert(
+          Packages::Pypi::Metadatum.upsert(
             package_id: created_package.id,
             required_python: params[:requires_python]
           )
